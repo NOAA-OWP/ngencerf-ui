@@ -1,0 +1,39 @@
+// Scss Document
+
+// Global Variables
+$ngwcp_primary1: #105d8e;
+$ngwcp_primary2: #5bb6c1;
+$ngwcp_primary3: #0c5274;
+
+$ngwcp_secondary1: #000000;
+$ngwcp_secondary2: #c5d4c8;
+$ngwcp_secondary3: #86afb5;
+
+$ngwcp_neutral1: #333333;
+$ngwcp_neutral2: #ffffff;
+
+$color-transparent: rgba(0, 0, 0, 0);
+
+// Global Variables
+$black: #000000;
+$gray-90: lighten($black, 10%);
+$gray-80: lighten($black, 20%);
+$gray-70: lighten($black, 30%);
+$gray-60: lighten($black, 40%);
+$gray-50: lighten($black, 50%);
+$gray-40: lighten($black, 60%);
+$gray-30: lighten($black, 70%);
+$gray-20: lighten($black, 80%);
+$gray-10: lighten($black, 90%);
+$white: #ffffff;
+
+$mainFontColor: #fff;
+$staticText: #fff9a7;
+$activeColor: #90caf9;
+$activeTextColor: #13212e;
+$inactiveColor: #54718e;
+
+$light: $ngwcp_secondary2;
+$dark: $ngwcp_secondary1;
+
+// Typography & Icons

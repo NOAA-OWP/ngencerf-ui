@@ -1,0 +1,113 @@
+// Scss Document
+
+@import "global.scss";
+@import "primeicons/primeicons.css";
+
+html {
+  background: hsla(210, 17%, 98%, 1);
+  background: linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);  
+  background: -moz-linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);  
+  background: -webkit-linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.4rem;
+  height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+input {
+  border: solid #aaaaaa;
+  border-width: 2px;
+  width: 100%;
+}
+
+h2 {
+  display: block;
+}
+
+h3 {
+  color: $staticText;
+  display: inline;
+  text-transform: capitalize;
+  font-weight: normal;
+}
+
+h4 {
+  color: $staticText;
+  display: inline;
+  text-transform: capitalize;
+  font-weight: normal;
+}
+
+h5 {
+  color: $staticText;
+  font-weight: normal;
+}
+
+fieldset {
+  border-color: $inactiveColor;
+  border-style: solid;
+  margin: 1em;
+  line-height: 1.5em;
+}
+
+label {
+  cursor: pointer;
+}
+
+.header {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 1.5rem;
+}
+
+/* End temporary styles */
+
+.default-style {
+  min-width: 100%;
+  min-height: 100vh;
+}
+
+.flex-display {
+  display: flex;
+}
+
+.flex-justify-end {
+  justify-content: flex-end;
+}
+
+.flex-justify-col-rev {
+  justify-content: flex-column-reverse;
+}
+
+.flex-justify-space-around {
+  justify-content: space-around;
+}
+
+.flex-grow {
+  flex: 1;
+}
+
+.flex-grow-shrink {
+  flex: 1 1 100%;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
