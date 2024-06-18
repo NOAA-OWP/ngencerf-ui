@@ -5,7 +5,7 @@
                 Version 0.01  06/17/2024
         </div>
         <div class="copyright">
-            Copyright &COPY;, Sombody
+            Copyright &COPY;, Somebody
         </div>
 
     </div>
