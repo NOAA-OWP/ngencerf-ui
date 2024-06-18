@@ -30,6 +30,5 @@
 }
 #LeafletMap {
     display: block;
-text-align: right;
 }
 </style>
