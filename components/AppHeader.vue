@@ -4,7 +4,7 @@
         &nbsp;
       </div>
         <div id="Logo">
-          <img src="@/assets/styles/img/Diviner.png">
+          <img src="@/assets/styles/img/NCWPC_wordmark_black-01.svg">
         </div>
         <div>
           <TopMenu />
@@ -32,9 +32,10 @@
     position: fixed;
     top: 6;
     left: 10px;
+    margin-top: 20px;
   
     img {
-      width: 100px;
+      width: 200px;
     }
   }
   #TopMenu {
