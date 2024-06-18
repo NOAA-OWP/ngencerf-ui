@@ -9,8 +9,8 @@
 
 html {
   background: hsla(210, 17%, 98%, 1);
-  background: linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);  
-  background: -moz-linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);  
+  background: linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);
+  background: -moz-linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);
   background: -webkit-linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);
   height: 100%;
 }
@@ -127,44 +127,81 @@ label {
     font-family: "ObjektivMk2_Bd";
     src: url("@/assets/fonts/ObjektivMk2_Bd.woff2") format("woff2");
   }
+
   @font-face {
     font-family: "ObjektivMk2_Lt";
     src: url("@/assets/fonts/ObjektivMk2_Lt.woff2") format("woff2");
   }
+
   @font-face {
     font-family: "ObjektivMk2_Rg";
     src: url("@/assets/fonts/ObjektivMk2_Rg.woff2") format("woff2");
   }
-  
+
   @font-face {
     font-family: "NeueFrutigerWorld-Bold";
     src: url("@/assets/fonts/NeueFrutigerWorld-Bold.woff2") format("woff2");
   }
+
   @font-face {
     font-family: "NeueFrutigerWorld-Book";
     src: url("@/assets/fonts/NeueFrutigerWorld-Book.woff2") format("woff2");
   }
+
   @font-face {
     font-family: "NeueFrutigerWorld-BookIt";
     src: url("@/assets/fonts/NeueFrutigerWorld-BookIt.woff2") format("woff2");
   }
+
   @font-face {
     font-family: "NeueFrutigerWorld-Medium";
     src: url("@/assets/fonts/NeueFrutigerWorld-Medium.woff2") format("woff2");
   }
+
   @font-face {
     font-family: "NeueFrutigerWorld-MediumIt";
     src: url(@/assets/fonts/NeueFrutigerWorld-MediumIt.woff2) format("woff2");
   }
-  
 
-  // @font-face {
-  //   font-family: "Inter";
-  //   src: url("@/assets/fonts/NeueFrutigerWorld-Bold.ttf") format("ttf"), url("@/assets/fonts/Inter-Regular.woff")
-  //       format("woff");
-  //   font-weight: 400;
-  //   font-style: normal;
-  // }
-  
-  // ... Include all the font weights and styles you need
+    // @font-face {
+    //   font-family: "Inter";
+    //   src: url("@/assets/fonts/NeueFrutigerWorld-Bold.ttf") format("ttf"), url("@/assets/fonts/Inter-Regular.woff")
+    //       format("woff");
+    //   font-weight: 400;
+    //   font-style: normal;
+    // }
+
+    // ... Include all the font weights and styles you need
+}
+
+.ObjektivMk2_Bd {
+  font-family: "ObjektivMk2_Bd"
+}
+
+.ObjektivMk2_Lt {
+  font-family: "ObjektivMk2_Lt"
+}
+
+.ObjektivMk2_Rg {
+  font-family: "ObjektivMk2_Rg"
+}
+
+.NeueFrutigerWorld-Bold {
+  font-family: "NeueFrutigerWorld-Bold"
+}
+
+.NeueFrutigerWorld-Book {
+  font-family: "NeueFrutigerWorld-Book"
+}
+
+.NeueFrutigerWorld-BookIt {
+  font-family: "NeueFrutigerWorld-BookIt"
+}
+
+.NeueFrutigerWorld-Medium {
+  font-family: "NeueFrutigerWorld-Medium"
+}
+
+.NeueFrutigerWorld-MediumIt {
+  font-family: "NeueFrutigerWorld-MediumIt";
 }

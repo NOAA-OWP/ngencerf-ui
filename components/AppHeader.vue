@@ -39,6 +39,7 @@
   }
   #TopMenu {
     position: fixed;
+    font: 20px "ObjektivMk2_Rg",sans-serif;
       right: 250px;
       top: 15px;
       ul {
@@ -51,13 +52,11 @@
 
   }
   #PgmName {
-    font: 38px "NeueFrutigerWorld-MediumIt-MediumIt", sans-serif;
+    font: 38px "NeueFrutigerWorld-Bold", sans-serif;
     font-weight: bold;
     position:fixed;
     right: 20px;
-    top: 0;
+    top: 5;
     margin-right: 20px;
-    margin-top: 20px;
-
   }
   </style>

@@ -1,6 +1,8 @@
 <template>
     <div id="LeftColumn" class="grid grid-cols-4 gap-4">
-        <div>&nbsp;</div>
+        <div>&nbsp;
+            <AllFonts />
+        </div>
 
     </div>
     <div id="RightColumn" class="grid grid-cols-4 gap-4">
