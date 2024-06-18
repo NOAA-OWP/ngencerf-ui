@@ -21,7 +21,7 @@ const info = json;
 @import "@/assets/styles/styles.scss";
 
 #Footer {
-    font: 24px Roboto, sans-serif;
+    font: 18px Roboto, sans-serif;
     position: absolute;
     bottom: 0;
     width: 100%;
