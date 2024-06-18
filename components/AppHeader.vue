@@ -48,12 +48,10 @@
       display: inline-block;
       margin-right: 20px;
       }
-      li a {
-  
-      }
+
   }
   #PgmName {
-    font: 38px Roboto, sans-serif;
+    font: 38px "NeueFrutigerWorld-MediumIt-MediumIt", sans-serif;
     font-weight: bold;
     position:fixed;
     right: 20px;

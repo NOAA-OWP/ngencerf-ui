@@ -120,3 +120,51 @@ label {
   pointer-events: none;
   color: #777777 !important;
 }
+
+
+@layer base {
+  @font-face {
+    font-family: "ObjektivMk2_Bd";
+    src: url("@/assets/fonts/ObjektivMk2_Bd.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "ObjektivMk2_Lt";
+    src: url("@/assets/fonts/ObjektivMk2_Lt.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "ObjektivMk2_Rg";
+    src: url("@/assets/fonts/ObjektivMk2_Rg.woff2") format("woff2");
+  }
+  
+  @font-face {
+    font-family: "NeueFrutigerWorld-Bold";
+    src: url("@/assets/fonts/NeueFrutigerWorld-Bold.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "NeueFrutigerWorld-Book";
+    src: url("@/assets/fonts/NeueFrutigerWorld-Book.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "NeueFrutigerWorld-BookIt";
+    src: url("@/assets/fonts/NeueFrutigerWorld-BookIt.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "NeueFrutigerWorld-Medium";
+    src: url("@/assets/fonts/NeueFrutigerWorld-Medium.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "NeueFrutigerWorld-MediumIt";
+    src: url(@/assets/fonts/NeueFrutigerWorld-MediumIt.woff2) format("woff2");
+  }
+  
+
+  // @font-face {
+  //   font-family: "Inter";
+  //   src: url("@/assets/fonts/NeueFrutigerWorld-Bold.ttf") format("ttf"), url("@/assets/fonts/Inter-Regular.woff")
+  //       format("woff");
+  //   font-weight: 400;
+  //   font-style: normal;
+  // }
+  
+  // ... Include all the font weights and styles you need
+}
