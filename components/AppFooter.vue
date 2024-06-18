@@ -2,7 +2,7 @@
     <div id="Footer">
         <div class="topBar">&nbsp</div>
         <div class="version">
-                Version 0.01  06/17/2024
+            Version {{ info.program_info.version }},&nbsp;&nbsp;{{ info.program_info.release_date }}
         </div>
         <div class="copyright">
             Copyright &COPY;, Somebody
@@ -10,8 +10,16 @@
 
     </div>
 </template>
+
+<script lang="ts" setup>
+import json from "@/assets/versionInfo.json";
+const info = json;
+
+</script>
+
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
 #Footer {
     font: 24px Roboto, sans-serif;
     position: absolute;
@@ -26,14 +34,17 @@
     height: 5px;
 }
 
-.version, .copyright {
+.version,
+.copyright {
     display: block;
     margin-top: 10px;
 }
+
 .version {
-    float:left;
+    float: left;
     margin-left: 20px;
 }
+
 .copyright {
     float: right;
     margin-right: 20px;
