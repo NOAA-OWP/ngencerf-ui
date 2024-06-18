@@ -1,5 +1,8 @@
 <template> 
     <div id="Header" class="header">
+      <div id="TopBar">
+        &nbsp;
+      </div>
         <div id="Logo">
           <img src="@/assets/styles/img/Diviner.png">
         </div>
@@ -13,13 +16,21 @@
   </template>
   
   <style lang="scss" scoped>
+  @import "@/assets/styles/styles.scss";
+  #TopBar {
+    position: fixed;
+    top: 0;
+    height: 6px;
+    background-color: $ngwcp_primary1;
+    width: 100%;
+  }
   #Header {
     height:80px;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid $ngwcp_primary1;
   }
   #Logo {
     position: fixed;
-    top: 0;
+    top: 6;
     left: 10px;
   
     img {

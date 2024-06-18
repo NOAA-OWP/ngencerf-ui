@@ -111,3 +111,8 @@ label {
   height: 100%;
   overflow: auto;
 }
+
+.disabled {
+  pointer-events: none;
+  color: #777777 !important;
+}

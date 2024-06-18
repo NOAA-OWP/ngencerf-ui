@@ -1,27 +1,34 @@
 <template>
     <div id="Footer">
+        <div class="topBar">&nbsp</div>
         <div class="version">
                 Version 0.01  06/17/2024
         </div>
         <div class="copyright">
-            Copyright 2024(C), Sombody
+            Copyright &COPY;, Sombody
         </div>
 
     </div>
 </template>
-<style lang="css" scoped>
+<style lang="scss" scoped>
+@import "@/assets/styles/styles.scss";
 #Footer {
+    font: 24px Roboto, sans-serif;
     position: absolute;
     bottom: 0;
     width: 100%;
     height: 80px;
-    border-top: 2px solid #000;
     color: #fff;
 }
+
+.topBar {
+    background-color: $ngwcp_primary3;
+    height: 5px;
+}
+
 .version, .copyright {
     display: block;
     margin-top: 10px;
-    font-size: 24px;
 }
 .version {
     float:left;

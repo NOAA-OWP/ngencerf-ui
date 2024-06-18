@@ -5,16 +5,16 @@
                 <NuxtLink to="/">Calibration</NuxtLink>
             </li>
             <li>
-                <NuxtLink to="/">Evaluation</NuxtLink>
+                <NuxtLink class="disabled" to="/">Evaluation</NuxtLink>
             </li>
             <li>
-                <NuxtLink to="/">Validation</NuxtLink>
+                <NuxtLink class="disabled" to="/">Validation</NuxtLink>
             </li>
             <li>
-                <NuxtLink to="/">Forecast</NuxtLink>
+                <NuxtLink class="disabled" to="/">Forecast</NuxtLink>
             </li>
             <li>
-                <NuxtLink to="/">Preferences</NuxtLink>
+                <NuxtLink class="disabled" to="/">Preferences</NuxtLink>
             </li>
         </ul>
     </nav>
@@ -23,10 +23,9 @@
 <script>
 </script>
 <style lang="scss" scoped>
-@import "@/assets/styles/global.scss";
+@import "@/assets/styles/styles.scss";
 #TopMenu {
     font-size: 28px;
-
     font: 28px Arial, sans-serif;
 
     margin-left: ul {

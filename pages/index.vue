@@ -8,6 +8,6 @@
 const appConfig = useAppConfig()
 onMounted(() => {
   //this can be removed once we implement the page
-   window.location.href = "landingpage";
+   window.location.href = "calibration";
 });
 </script>
