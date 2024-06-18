@@ -3,6 +3,12 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ["/assets/styles/styles.scss"],
   modules: ["@nuxtjs/google-fonts"],
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
   googleFonts: {
     families: {
       Roboto: true,

@@ -25,11 +25,12 @@
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 #TopMenu {
-    font-size: 28px;
-    font: 28px Arial, sans-serif;
+    font-size: 20px;
+    font: 20px Arial, sans-serif;
 
-    margin-left: ul {
+    ul {
         list-style: none;
+        margin-top: 20px;
     }
 
     li {

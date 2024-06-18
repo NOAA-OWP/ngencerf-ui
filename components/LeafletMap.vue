@@ -1,7 +1,7 @@
 <template>
   <main>
     <l-map ref="map" v-model:zoom="zoom" v-model:center="center" :useGlobalLeaflet="false">
-      <l-tile-layer url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png" layer-type="base"
+      <l-tile-layer url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png" layer-type="base"
         name="Stadia Maps Basemap"></l-tile-layer>
       <l-marker v-for="arcade in arcades.features" :lat-lng="arcade.geometry.coordinates.reverse()"></l-marker>
     </l-map>
@@ -27,7 +27,7 @@ body {
 }
 
 main {
-  height: 30vw;
-  width: 50vw;
+  height: 20vw; 
+  width: 40vw;
 }
 </style>
