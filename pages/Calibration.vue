@@ -1,35 +1,62 @@
 <template>
-    <div id="LeftColumn" class="grid grid-cols-4 gap-4">
-        <div>&nbsp;
-            <AllFonts />
+    <div id="LeftColumn" class="grid ">
+        <div id="Tabs" class="row">
+            <Tabs />
         </div>
-
+        <div id="Aside" class="row">
+            &nbsp;
+        </div>
+        <div id="ActionButtons">
+            <ActionButtonGroup />
+        </div>
     </div>
-    <div id="RightColumn" class="grid grid-cols-4 gap-4">
-        <div id="LeafletMap"><LeafletMap /></div>
+    <div id="RightColumn" class="grid ">
+        <div id="LeafletMap">
+            <!-- <LeafletMap /> -->
+        </div>
     </div>
 </template>
 <script lang="ts" setup>
-
+import Tabs from '~/components/Tabs.vue';
 
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-#LeftColumn, #RightColumn {
-    display: flex;
-    height:100%;
-}
-#LeftColumn {
-    width: 40%;
-    float:left;
 
+#LeftColumn,
+#RightColumn {   
+    display: flex;
+    height: 100%;
+}
+
+#LeftColumn {
+    width: 1170px;
+    float: left;
+    margin-left: 20px;
+}
+
+#Tabs {
+    width: 100%;
 }
 
 #RightColumn {
-    width: 50%;
-    float:right;
-
+    float: right;
 }
+
+#Aside {
+    // position: absolute;
+    margin-top: 59px;
+    position: fixed;
+    width: 1170px;
+    border: 1px solid #105D8E;
+    height: 714px;
+}
+
+#ActionButtons {
+    position: absolute;
+    bottom: 100px;
+}
+
 #LeafletMap {
     display: block;
 }
