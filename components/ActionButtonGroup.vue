@@ -1,12 +1,12 @@
 <template>
     <div id="BottomButtons">
-        <Button class="start actionBtn disabled">START</Button>
-        <Button class="stop actionBtn disabled">STOP</Button>
-        <Button class="save actionBtn">SAVE</Button>
-        <Button class="reset actionBtn">RESET</Button>
+        <button class="start actionBtn disabled">START</button>
+        <button class="stop actionBtn disabled">STOP</button>
+        <button class="save actionBtn">SAVE</button>
+        <button class="reset actionBtn">RESET</button>
         <div class="buttonSpacer">&nbsp;</div>
-        <Button class="prev actionBtnSmall">&#8678; Prev</Button>&nbsp;&nbsp;&nbsp;
-        <Button class="next actionBtnSmall">Next <span>&#8680;</span></Button>
+        <button class="prev actionBtnSmall">&#8678; Prev</button>&nbsp;&nbsp;&nbsp;
+        <button class="next actionBtnSmall">Next <span>&#8680;</span></button>
     </div>
 </template>
 
@@ -27,7 +27,6 @@
     width: 191.69px;
     height: 55px;
     border-radius: 20px;
-    Border: 5px;
     border: 5px solid #59B4C1;
     border-radius: 20px;
     margin-right: 20px;
@@ -39,7 +38,6 @@
     width: 105px;
     height: 55px;
     border-radius: 20px;
-    Border: 5px;
     border: 5px solid #59B4C1;
     border-radius: 20px;
     margin-right: 3px;
