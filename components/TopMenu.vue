@@ -1,3 +1,4 @@
+<!-- TopMenu.vue -->
 <template>
     <nav id="TopMenu">
         <ul>
@@ -14,7 +15,7 @@
                 <NuxtLink class="disabled" to="/">Forecast</NuxtLink>
             </li>
             <li>
-                <NuxtLink class="disabled" to="/">Preferences</NuxtLink>
+                <NuxtLink class="disabled" to="/">Verification</NuxtLink>
             </li>
         </ul>
     </nav>

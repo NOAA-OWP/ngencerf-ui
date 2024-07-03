@@ -1,14 +1,23 @@
+<!-- tabs.vue -->
 <template TABS>
-    <div id="MainTabs" class="flex">
-        <ul>
+    <div id="MainTabs" class="">
+        <!-- <ul class="@md:bg">
             <li class="tabs activeTab" v-on:click="tabClicked">Headwater Basin Gage</li>
             <li class="tabs" v-on:click="tabClicked">Formulation</li>
             <li class="tabs" v-on:click="tabClicked">Tuning Controls</li>
             <li class="tabs" v-on:click="tabClicked">Optimization</li>
             <li class="tabs" v-on:click="tabClicked">Metrics / Plotting</li>
             <li class="tabs" v-on:click="tabClicked">Run / Status</li>
+        </ul> -->
+        <div class="@md:bg" style="margin-left: 10px; overflow:hidden;">
+            <div class="tabs activeTab" v-on:click="tabClicked">Headwater Basin Gage</div>
+            <div class="tabs" v-on:click="tabClicked">Formulation</div>
+            <div class="tabs" v-on:click="tabClicked">Tuning Controls</div>
+            <div class="tabs" v-on:click="tabClicked">Optimization</div>
+            <div class="tabs" v-on:click="tabClicked">Metrics / Plotting</div>
+            <div class="tabs" v-on:click="tabClicked">Run / Status</div>
 
-        </ul>
+        </div>
     </div>
 </template>
 
@@ -31,12 +40,11 @@ const tabClicked = (event: Event) => {
 @import "@/assets/styles/styles.scss";
 
 #MainTabs {
-    // position: absolute;
     overflow-x: hidden;
 
     ul {
         z-index: 999;
-        width: 1170px;
+        width: 100%;
         margin-top: 10px;
         list-style: none;
         border-bottom: 2px solid #105D8E;
@@ -44,11 +52,14 @@ const tabClicked = (event: Event) => {
 
     li {
         display: inline-block;
-        margin-left: 1.5px;
+        // margin-left: 1.5px;
     }
 
     .tabs {
-        width: 193px;
+        font-size: .8vw;
+        display: inline-block;
+        vertical-align: bottom;
+        width: 16%;
         height: 48px;
         background-color: #ffffff;
         color: #000000;
