@@ -75,10 +75,7 @@ export default defineConfig({
     }),
 
     Components({
-      resolvers: [
-        PrimeVueResolvers.PrimeVueResolver({ importStyle: true, importIcons: true, importTheme: "saga-blue" }),
-      ],
-      dirs: ["./components", "./composables", "./utils", "./stores"],
+        dirs: ["./components", "./composables", "./utils", "./stores"],
       directoryAsNamespace: true,
       globalNamespaces: ["global"],
     }),
@@ -92,7 +89,7 @@ export default defineConfig({
     outputFile: { junit: "./junit.xml" },
     environment: "jsdom",
     exclude: ["**/tests-examples/**", "**/node_modules/**"],
-    setupFiles: ["./test/setupTests.ts"],
+    setupFiles: [],
     deps: {
       inline: [/@nuxt\/test-utils-edge/],
     },
