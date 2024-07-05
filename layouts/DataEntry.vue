@@ -24,11 +24,9 @@
 }
 .boxed {
   border: 0 1px 1px 0 solid #000;
-  height: 300px;
 }
 .leftBox {
   overflow: hidden;
-
   width: 62%;
   float: left;
 }
