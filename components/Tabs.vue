@@ -1,14 +1,6 @@
 <!-- tabs.vue -->
 <template TABS>
     <div id="MainTabs" class="">
-        <!-- <ul class="@md:bg">
-            <li class="tabs activeTab" v-on:click="tabClicked">Headwater Basin Gage</li>
-            <li class="tabs" v-on:click="tabClicked">Formulation</li>
-            <li class="tabs" v-on:click="tabClicked">Tuning Controls</li>
-            <li class="tabs" v-on:click="tabClicked">Optimization</li>
-            <li class="tabs" v-on:click="tabClicked">Metrics / Plotting</li>
-            <li class="tabs" v-on:click="tabClicked">Run / Status</li>
-        </ul> -->
         <div class="@md:bg" style="margin-left: 10px; overflow:hidden;">
             <div class="tabs activeTab" v-on:click="tabClicked">Headwater Basin Gage</div>
             <div class="tabs" v-on:click="tabClicked">Formulation</div>
@@ -41,19 +33,6 @@ const tabClicked = (event: Event) => {
 
 #MainTabs {
     overflow-x: hidden;
-
-    ul {
-        z-index: 999;
-        width: 100%;
-        margin-top: 10px;
-        list-style: none;
-        border-bottom: 2px solid #105D8E;
-    }
-
-    li {
-        display: inline-block;
-        // margin-left: 1.5px;
-    }
 
     .tabs {
         font-size: .8vw;
