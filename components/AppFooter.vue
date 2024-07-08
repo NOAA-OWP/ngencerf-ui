@@ -27,6 +27,7 @@ const info = json;
     width: 100%;
     height: 80px;
     color: #fff;
+    z-index: 9999;
 }
 
 .topBar {

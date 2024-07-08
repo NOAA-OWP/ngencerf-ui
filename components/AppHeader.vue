@@ -7,25 +7,79 @@
     <div>
       <TopMenu />
     </div>
-    <div id="userLink">
-      <span class="userCircle"></span>
-
+    <div id="UserLink">
+      <div id="UserLinkCircle">
+        <div id="UserCircle">
+          HH <span class="tglusermenu" v-on:click="ToggleUserMenu">v</span>
+        </div>
+      </div>
+      <div
+        id="UserMenu"
+        v-show="userMenuShowing"
+        v-on:mouseleave="ToggleUserMenu"
+      >
+        <a href="#">User Page</a>
+      </div>
     </div>
   </div>
 </template>
-
+<script lang="ts" setup>
+import { ref } from "vue";
+const userMenuShowing = ref(false);
+const ToggleUserMenu = () => {
+  setTimeout(function () {
+    userMenuShowing.value = !userMenuShowing.value;
+  }, 1000);
+};
+</script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-#userLink {
+#UserLink {
   position: fixed;
   right: 50px;
   top: 10px;
-  height: 60px;
-  width: 60px;
-  background-color: #bbb;
-  border-radius: 50%;
-  display: inline-block;
+  width: 150px;
+  height: auto;
+  text-align: center;
+  #UserLinkCircle {
+    z-index: 9;
+    text-align: center;
+    height: 60px;
+    width: 60px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    font-size: 22px;
+    #UserCircle {
+      text-align: center;
+      margin-top: 18px;
+    }
+    .tglusermenu {
+      cursor: pointer;
+    }
+  }
+  #UserMenu {
+    background-color: #ffffff;
+    border-radius: 20px;
+    height: 2em;
+    padding-top: 5px;
+  }
 }
+// #userLink {
+//   position: fixed;
+//   right: 50px;
+//   top: 10px;
+//   height: 60px;
+//   width: 60px;
+//   background-color: #bbb;
+//   border-radius: 50%;
+//   display: inline-block;
+//   font-size: 22px;
+//   .userCircle {
+//     text-align: center;
+//     margin-top: 18px;
+//   }
+// }
 #TopBar {
   position: fixed;
   top: 0;
@@ -65,6 +119,5 @@
   font-weight: bold;
   position: fixed;
   left: 20px;
-
 }
 </style>

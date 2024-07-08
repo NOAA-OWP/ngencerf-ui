@@ -3,19 +3,19 @@
     <nav id="TopMenu">
         <ul>
             <li>
-                <NuxtLink to="/">Calibration</NuxtLink>
+                <a to="/">Calibration</a>
             </li>
             <li>
-                <NuxtLink class="disabled" to="/">Evaluation</NuxtLink>
+                <a class="disabled" href="/">Evaluation</a>
             </li>
             <li>
-                <NuxtLink class="disabled" to="/">Validation</NuxtLink>
+                <a class="disabled" href="/">Validation</a>
             </li>
             <li>
-                <NuxtLink class="disabled" to="/">Forecast</NuxtLink>
+                <a class="disabled" href="/">Forecast</a>
             </li>
             <li>
-                <NuxtLink class="disabled" to="/">Verification</NuxtLink>
+                <a class="disabled" href="/">Verification</a>
             </li>
         </ul>
     </nav>

@@ -3,12 +3,14 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ["/assets/styles/styles.scss"],
   modules: ["@nuxtjs/google-fonts"],
+
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
     },
   },
+
   googleFonts: {
     families: {
       Roboto: true,
@@ -24,5 +26,7 @@ export default defineNuxtConfig({
         ital: '200..700',
       }
     }
-  }
+  },
+
+  compatibilityDate: '2024-07-05'
 })
