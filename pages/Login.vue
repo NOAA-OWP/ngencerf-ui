@@ -1,83 +1,132 @@
 <template>
-  <div id="LoginBox">
-    <h2 class="ttl">Login to Your Account</h2>
-    <!-- <div class="ttl">Login to Your Account</div>
-    <div class="userName inputBox">
-      <div><input type="text" placeholder=" Username" /></div>
-      <div class="forgot"><a href="#">Forgot Username</a></div>
+  <ClientOnly>
+    <div id="LoginBox" class="container">
+      <form>
+        <h2 class="ttl">Login to Your Account</h2>
+        <div class="inputBox">
+          <input
+            id="uname"
+            type="text"
+            v-model="UserName"
+            placeholder=" Username"
+          />
+          <a href="#" tabindex="-1" class="forgot">Forgot Username</a>
+        </div>
+        <div class="inputBox">
+          <input
+            id="pword"
+            type="password"
+            v-model="userPassword"
+            placeholder=" Password"
+          />
+          <a href="#" tabindex="-1" class="forgot">Forgot Password</a>
+        </div>
+        <div class="loginButton">
+          <button v-on:click="SubmitForm">Sign In</button>
+        </div>
+      </form>
+
+      <div id="NeedAccountBox">
+        <h2 class="needAccount">Need an Account?</h2>
+        <div class="signuptButton">
+          <button>Sign Up!</button>
+        </div>
+      </div>
     </div>
-    <div class="userPassword inputBox">
-      <div><input type="password" placeholder=" Password" /></div>
-      <div class="forgot"><a href="#">Forgot Password</a></div>
-    </div>
-    <div class="loginButton nextgenButton"><button>Sign In</button></div> -->
-    <div id="NeedAccountBox">
-      <!-- <div class="needAccount">Need an Account?</div>
-        <div class="signuptButton nextgenButton"><button>Sign Up!</button></div> -->
-    </div>
-  </div>
+    <!-- <div class="waitgif" v-if="loading"><img src="/assets/styles/img/wait.gif" /></div> -->
+  </ClientOnly>
 </template>
+<script setup lang="ts">
+import { ref } from "vue";
+
+const loading = ref(true);
+const UserName = ref();
+const userPassword = ref();
+
+const SubmitForm = () => {
+  console.log(
+    "Username: " + UserName.value + " Password: " + userPassword.value
+  );
+  alert("Username: " + UserName.value + "\nPassword: " + userPassword.value);
+};
+</script>
 <style lang="scss" scoped>
+// .waitgif {
+//   width: 100px;
+//   margin: 0 auto;
+// }
+
 #LoginBox {
+  position: relative;
   margin: 40px auto 0 auto;
   border-radius: 50px;
-}
-#LoginBox,
-#NeedAccountBox {
-  width: 35vw;
-  height: 40vw;
-  border: 4px solid #105d84;
-
+  min-width: 420px;
+  max-width: 420px;
+  max-height: 450px;
+  min-height: 450px;
   background-color: #c5d4c8;
-  #NeedAccountBox {
-    object-fit: cover;
-    overflow: hidden;
-    //position: relative;
-    height: 15.5%;
-    margin-top: 78%;
-    background-color: #5bb6c1;
-    margin-left: -3px;
-    border-radius: 0 0 50px 50px;
-  }
+  width: 35vw;
+  height: 36vw;
+  border: 4px solid #105d84;
+  max-height: 437px;
 }
+
+#NeedAccountBox {
+  position: absolute;
+  bottom: 0;
+  background-color: #5bb6c1;
+  border-radius: 0 0 50px 50px;
+  width: 100%;
+  border-top: 4px solid #105d84;
+}
+
 .ttl {
-    text-align: center;;
-   position: static;
-   margin-top: 28px;
-//   margin-left: 8%;
-  font-size: 36px;
+  text-align: center;
+  position: static;
+  margin-top: 20px;
+  font-size: 26px;
   font-weight: 600;
-  //   margin-top: 40px;
 }
 .needAccount {
   text-align: center;
-  font-size: 36px;
+  font-size: 26px;
   font-weight: 600;
   margin-top: 20px;
 }
 .inputBox {
   margin: 0 auto;
-  margin-top: 40px;
+  margin-top: 20px;
   width: 80%;
   input {
     height: 40px !important;
   }
 }
 .forgot {
-  padding-top: 5px;
   text-decoration: underline;
   color: #0c1db4;
 }
 .signuptButton,
 .loginButton {
-  font-size: 30px;
-  padding-top: 8px;
+  font-size: 20px;
   margin: 20px auto;
   text-align: center;
   border: 3px solid #000;
   background-color: #5bb6c1;
   border-radius: 20px;
-  width: 20vw;
-  height: 4vw;
+  width: 245px;
+  height: 50px;
+  padding-top: 8px;
 }
+.signuptButton {
+  background-color: #cccccc;
+}
+.loginButton:hover {
+  background-color: #105d84;
+  color: #ffffff;
+}
+.signuptButton:hover {
+  background-color: #5bb6c1;
+  color: #ffffff;
+}
+
 </style>

@@ -18,7 +18,7 @@ import arcades from "@/assets/arcades.json";
 const apiKey = "cbbe8e01-d964-4fa5-85d1-0e1690fd31d3";
 let zoom = ref(4.5)
 let center = ref([40, -100])
-console.log(LMap);
+
 </script>
 <style lang="css" scoped>
 html,

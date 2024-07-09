@@ -1,37 +1,34 @@
-<!-- AppHeader.vue -->
 <template>
+  <!-- AppHeader.vue -->
   <div id="Header" class="header">
     <div id="TopBar">&nbsp;</div>
-
-    <div id="PgmName">NEXTGEN</div>
-    <div>
+    <div id="PgmName"><a href="ngenhome">NEXTGEN</a></div>
+    <div v-show="location.name != 'Login' && location.name != 'NgenHome'">
       <TopMenu />
     </div>
     <div id="UserLink">
       <div id="UserLinkCircle">
         <div id="UserCircle">
-          HH <span class="tglusermenu" v-on:click="ToggleUserMenu">v</span>
+          <a href="user">HH</a>
         </div>
-      </div>
-      <div
-        id="UserMenu"
-        v-show="userMenuShowing"
-        v-on:mouseleave="ToggleUserMenu"
-      >
-        <a href="#">User Page</a>
       </div>
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
 import { ref } from "vue";
+import { useRoute } from "vue-router";
+const location = useRoute();
 const userMenuShowing = ref(false);
+
 const ToggleUserMenu = () => {
   setTimeout(function () {
     userMenuShowing.value = !userMenuShowing.value;
   }, 1000);
 };
 </script>
+
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 #UserLink {
@@ -65,21 +62,7 @@ const ToggleUserMenu = () => {
     padding-top: 5px;
   }
 }
-// #userLink {
-//   position: fixed;
-//   right: 50px;
-//   top: 10px;
-//   height: 60px;
-//   width: 60px;
-//   background-color: #bbb;
-//   border-radius: 50%;
-//   display: inline-block;
-//   font-size: 22px;
-//   .userCircle {
-//     text-align: center;
-//     margin-top: 18px;
-//   }
-// }
+
 #TopBar {
   position: fixed;
   top: 0;

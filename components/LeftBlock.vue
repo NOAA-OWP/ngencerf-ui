@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import HeadwaterBasinGage from '~/pages/HeadwaterBasinGage.vue';
+import HeadwaterBasinGage from '@/components/HeadwaterBasinGage.vue';
 </script>
 
 <template>

@@ -18,7 +18,7 @@ const info = json;
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@import "/assets/styles/styles.scss";
 
 #Footer {
     font: 18px NeueFrutigerWorld-Book, sans-serif;
