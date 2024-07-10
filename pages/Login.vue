@@ -1,5 +1,6 @@
 <template>
   <client-only>
+    <Transition>
     <div id="LoginBox" class="container">
       <form>
         <h2 class="ttl">Login to Your Account</h2>
@@ -36,6 +37,7 @@
       </div>
     </div>
     <!-- <div class="waitgif" v-if="loading"><img src="/assets/styles/img/wait.gif" /></div> -->
+  </Transition>
   </client-only>
 </template>
 <script setup lang="ts">
