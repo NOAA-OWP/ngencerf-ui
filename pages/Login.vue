@@ -1,5 +1,5 @@
 <template>
-  <ClientOnly>
+  <client-only>
     <div id="LoginBox" class="container">
       <form>
         <h2 class="ttl">Login to Your Account</h2>
@@ -9,6 +9,7 @@
             type="text"
             v-model="UserName"
             placeholder=" Username"
+            aria-label="Username"
           />
           <a href="#" tabindex="-1" class="forgot">Forgot Username</a>
         </div>
@@ -18,36 +19,36 @@
             type="password"
             v-model="userPassword"
             placeholder=" Password"
+            aria-label="Password"
           />
           <a href="#" tabindex="-1" class="forgot">Forgot Password</a>
         </div>
-        <div class="loginButton">
-          <button v-on:click="SubmitForm">Sign In</button>
+        <div class="loginButton" aria-label="sign in">
+          <button id="LoginButton" v-on:click="SubmitForm">Sign In</button>
         </div>
       </form>
 
       <div id="NeedAccountBox">
         <h2 class="needAccount">Need an Account?</h2>
-        <div class="signuptButton">
+        <div class="signuptButton" aria-label="sign up">
           <button>Sign Up!</button>
         </div>
       </div>
     </div>
     <!-- <div class="waitgif" v-if="loading"><img src="/assets/styles/img/wait.gif" /></div> -->
-  </ClientOnly>
+  </client-only>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-
 const loading = ref(true);
-const UserName = ref();
-const userPassword = ref();
+const UserName = ref("");
+const userPassword = ref("");
 
 const SubmitForm = () => {
   console.log(
     "Username: " + UserName.value + " Password: " + userPassword.value
   );
-  alert("Username: " + UserName.value + "\nPassword: " + userPassword.value);
+  //alert("Username: " + UserName.value + "\nPassword: " + userPassword.value);
 };
 </script>
 <style lang="scss" scoped>
@@ -128,5 +129,4 @@ const SubmitForm = () => {
   background-color: #5bb6c1;
   color: #ffffff;
 }
-
 </style>
