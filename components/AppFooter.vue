@@ -28,11 +28,14 @@ const info = json;
     height: 80px;
     color: #fff;
     z-index: 9999;
+    background-color: $ngwcp_primary3;
+   
 }
 
+
 .topBar {
-    background-color: $ngwcp_primary3;
-    height: 5px;
+    background-color: #156191;
+    height: 4px;
 }
 
 .version,
