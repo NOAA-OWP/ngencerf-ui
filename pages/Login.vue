@@ -37,14 +37,14 @@
         </div>
       </div>
     </div>
-    <!-- <div class="waitgif" v-if="loading"><img src="/assets/styles/img/wait.gif" /></div> -->
+
   </client-only>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
-const { isUserLoggedIn } = useUserDataStore();
+const { logUserIn, logUserOut } = useUserDataStore();
 
 const loading = ref(true);
 const userName = ref("");
@@ -58,17 +58,14 @@ function forgotPassword() {
 }
 function SubmitForm(e: Event) {
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
-    navigateTo({ path: "/NgenHome" });
+    logUserIn()
+    navigateTo({ path: "/LandingPage" });
   } else {
     alert("Please enter valid credentials");
   }
 }
 </script>
 <style lang="scss" scoped>
-// .waitgif {
-//   width: 100px;
-//   margin: 0 auto;
-// }
 
 #LoginBox {
   position: relative;

@@ -3,10 +3,12 @@
   <div id="Header" class="header">
     <div id="TopBar">&nbsp;</div>
     <div id="PgmName"><a href="ngenhome">NEXTGEN</a></div>
-    <div v-show="location.name != 'Login' && location.name != 'NgenHome'">
+    <!-- <div v-show="location.name != 'Login' && location.name != 'NgenHome'"> -->
+      <div v-show="isUserLoggedIn() && location.name != 'NgenHome'">
+
       <TopMenu />
     </div>
-    <div id="UserLink">
+    <div id="UserLink" v-if="isUserLoggedIn()">
       <div id="UserLinkCircle">
         <div id="UserCircle">
           <a href="user">HH</a>
@@ -19,6 +21,10 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { useRoute } from "vue-router";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+
+const { isUserLoggedIn } = useUserDataStore();
+
 const location = useRoute();
 const userMenuShowing = ref(false);
 

@@ -8,18 +8,18 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   function isUserLoggedIn() {
     return isLoggedIn.value;
   }
-
-  function logUserIn(info: boolean) {
+  function logUserIn() {
     console.log("User is logged In");
-    isLoggedIn.value = info;
+    isLoggedIn.value = true;
   }
-  function logUserOut(info: boolean) {
+  function logUserOut() {
     console.log("User is logged out");
-    return (isLoggedIn.value === info);
+    isLoggedIn.value = false;
   }
 
   return {
     isUserLoggedIn,
+    logUserIn,
     logUserOut,
   };
 });
