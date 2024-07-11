@@ -25,15 +25,18 @@
 </template>
 
 <script setup lang="ts">
+
 const activeTab = ref();
+
 import HeadwaterBasinGage from "@/components/HeadwaterBasinGage.vue";
 import Formulation from "./Formulation.vue";
 import TuningControls from "./TuningControls.vue";
 import Optimization from "./Optimization.vue";
 import MetricsPlotting from "./MetricsPlotting.vue";
 import RunStatus from "./RunStatus.vue";
-const tabChanged = (n) => {
-  activeTab.value = n;
+
+const tabChanged = (tabNum: number) => {
+  activeTab.value = tabNum;
   console.log(activeTab.value);
 };
 </script>

@@ -2,7 +2,16 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ["/assets/styles/styles.scss"],
-  modules: ["@nuxtjs/google-fonts"],
+  modules: [
+    [
+      "@pinia/nuxt",
+      {
+        // automatically imports `defineStore` and imports `defineStore` as `definePiniaStore`
+        autoImports: ["defineStore", ["defineStore", "definePiniaStore"], "acceptHMRUpdate"],
+      },
+    ],
+    "@nuxtjs/google-fonts"
+  ],
 
   postcss: {
     plugins: {

@@ -1,33 +1,34 @@
 <template>
   <client-only>
-    <Transition>
     <div id="LoginBox" class="container">
-      <form>
-        <h2 class="ttl">Login to Your Account</h2>
-        <div class="inputBox">
-          <input
-            id="uname"
-            type="text"
-            v-model="UserName"
-            placeholder=" Username"
-            aria-label="Username"
-          />
-          <a href="#" tabindex="-1" class="forgot">Forgot Username</a>
-        </div>
-        <div class="inputBox">
-          <input
-            id="pword"
-            type="password"
-            v-model="userPassword"
-            placeholder=" Password"
-            aria-label="Password"
-          />
-          <a href="#" tabindex="-1" class="forgot">Forgot Password</a>
-        </div>
-        <div class="loginButton" aria-label="sign in">
-          <button id="LoginButton" v-on:click="SubmitForm">Sign In</button>
-        </div>
-      </form>
+      <h2 class="ttl">Login to Your Account</h2>
+      <div class="inputBox">
+        <input
+          id="uname"
+          type="text"
+          v-model="userName"
+          placeholder=" Username"
+          aria-label="Username"
+        />
+        <button tabindex="-1" class="forgot" v-on:click="forgotUsername">
+          Forgot Username
+        </button>
+      </div>
+      <div class="inputBox">
+        <input
+          id="pword"
+          type="password"
+          v-model="userPassword"
+          placeholder=" Password"
+          aria-label="Password"
+        />
+        <button tabindex="-1" class="forgot" v-on:click="forgotPassword">
+          Forgot Password
+        </button>
+      </div>
+      <div class="loginButton" v-on:click="SubmitForm" aria-label="sign in">
+        <button id="LoginButton">Sign In</button>
+      </div>
 
       <div id="NeedAccountBox">
         <h2 class="needAccount">Need an Account?</h2>
@@ -37,21 +38,31 @@
       </div>
     </div>
     <!-- <div class="waitgif" v-if="loading"><img src="/assets/styles/img/wait.gif" /></div> -->
-  </Transition>
   </client-only>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+
+const { isUserLoggedIn } = useUserDataStore();
+
 const loading = ref(true);
-const UserName = ref("");
+const userName = ref("");
 const userPassword = ref("");
 
-const SubmitForm = () => {
-  console.log(
-    "Username: " + UserName.value + " Password: " + userPassword.value
-  );
-  //alert("Username: " + UserName.value + "\nPassword: " + userPassword.value);
-};
+function forgotUsername() {
+  alert("Not yet implemented");
+}
+function forgotPassword() {
+  alert("Not yet implemented");
+}
+function SubmitForm(e: Event) {
+  if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
+    navigateTo({ path: "/NgenHome" });
+  } else {
+    alert("Please enter valid credentials");
+  }
+}
 </script>
 <style lang="scss" scoped>
 // .waitgif {
@@ -118,7 +129,7 @@ const SubmitForm = () => {
   border-radius: 20px;
   width: 245px;
   height: 50px;
-  padding-top: 8px;
+  padding-top: 10px;
 }
 .signuptButton {
   background-color: #cccccc;
