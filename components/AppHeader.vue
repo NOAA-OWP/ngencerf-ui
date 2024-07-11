@@ -4,7 +4,7 @@
     <div id="TopBar">&nbsp;</div>
     <div id="PgmName"><a href="ngenhome">NEXTGEN</a></div>
     <!-- <div v-show="location.name != 'Login' && location.name != 'NgenHome'"> -->
-      <div v-show="isUserLoggedIn() && location.name != 'NgenHome'">
+      <div v-show="isUserLoggedIn() && location.name != 'LandingPage'">
 
       <TopMenu />
     </div>
