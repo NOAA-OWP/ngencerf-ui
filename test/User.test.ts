@@ -64,7 +64,7 @@ describe("Test Header component", () => {
     const btn = wrapper.find("#UpdateButton");
     await btn.trigger("click");
     let ud = wrapper.vm.passwordChanged;
-    expect(wrapper.vm.passwordChanged).toBe(true)
+    expect(wrapper.vm.passwordChanged).toBe(true);
   });
 
   test("Test unsuccessful Update Password Event", async () => {
@@ -76,6 +76,6 @@ describe("Test Header component", () => {
     const btn = wrapper.find("#UpdateButton");
     await btn.trigger("click");
     let ud = wrapper.vm.passwordChanged;
-    expect(wrapper.vm.passwordChanged).toBe(false)
+    expect(wrapper.vm.passwordChanged).toBe(false);
   });
 });

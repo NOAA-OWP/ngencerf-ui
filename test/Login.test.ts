@@ -3,11 +3,10 @@ import { beforeEach, describe, expect, it, test } from "vitest";
 import { jsdom } from "jsdom";
 import Login from "@/pages/Login.vue";
 
-
 describe("Test Header component", () => {
   let wrapper: VueWrapper = null;
   beforeEach(async () => {
-    wrapper = mount(Login)
+    wrapper = mount(Login);
   });
 
   test("Verify Program Name", () => {
@@ -16,31 +15,31 @@ describe("Test Header component", () => {
 
   test("Test Username Input", () => {
     let inputWrapper = wrapper.find("#uname");
-    inputWrapper.setValue('User Name');
-    expect(inputWrapper.element.value).toEqual('User Name')    
+    inputWrapper.setValue("User Name");
+    expect(inputWrapper.element.value).toEqual("User Name");
   });
 
-  test("Test Password Input", () => {  
+  test("Test Password Input", () => {
     let inputWrapper = wrapper.find("#pword");
-    inputWrapper.setValue('Password');
-    expect(inputWrapper.element.value).toEqual('Password')
+    inputWrapper.setValue("Password");
+    expect(inputWrapper.element.value).toEqual("Password");
   });
 
-  test('Click on Sign In and check reactative constants.', async () => {
+  test("Click on Sign In and check reactative constants.", async () => {
     let inputWrapper = wrapper.find("#uname");
-    inputWrapper.setValue('User Name');
+    inputWrapper.setValue("User Name");
     inputWrapper = wrapper.find("#pword");
-    inputWrapper.setValue('Password');
+    inputWrapper.setValue("Password");
     const btn = wrapper.find("#LoginButton");
-    await btn.trigger('click');      
+    await btn.trigger("click");
     let ud = wrapper.vm.UserName;
-    expect(wrapper.vm.UserName).toEqual('User Name')
+    expect(wrapper.vm.UserName).toEqual("User Name");
   });
 
-  test('Test aria-labels', () => {
+  test("Test aria-labels", () => {
     let inputWrapper = wrapper.find("#uname");
-    expect(inputWrapper.attributes()['aria-label']).toEqual('Username');
+    expect(inputWrapper.attributes()["aria-label"]).toEqual("Username");
     inputWrapper = wrapper.find("#pword");
-    expect(inputWrapper.attributes()['aria-label']).toEqual('Password');
+    expect(inputWrapper.attributes()["aria-label"]).toEqual("Password");
   });
 });

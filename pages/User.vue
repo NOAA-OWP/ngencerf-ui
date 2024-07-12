@@ -67,14 +67,13 @@ const passwordChanged = ref(false);
 
 const UpdatePassword = (e: Event) => {
   if (oldpass.value.trim() !== "" && newpass.value.trim() !== "") {
-    alert('Password has been changed');
+    alert("Password has been changed");
     passwordChanged.value = true;
   } else {
     alert("Please enter valid credentials");
     passwordChanged.value = false;
   }
-} 
-
+};
 </script>
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";

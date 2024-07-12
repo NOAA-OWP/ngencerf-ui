@@ -37,7 +37,6 @@
         </div>
       </div>
     </div>
-
   </client-only>
 </template>
 <script setup lang="ts">
@@ -66,7 +65,6 @@ function SubmitForm(e: Event) {
 }
 </script>
 <style lang="scss" scoped>
-
 #LoginBox {
   position: relative;
   margin: 40px auto 0 auto;
