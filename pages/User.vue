@@ -9,13 +9,33 @@
         <div class="passwordBox grid row-auto">
           <div class="chgpwd">Change Password</div>
           <div class="pwdspacer">Old password</div>
-          <div><input type="password" /></div>
+          <div>
+            <input
+              id="OldPass"
+              type="text"
+              v-model="oldpass"
+              aria-label="Enter old password here"
+            />
+          </div>
           <p>&nbsp;</p>
           <div>New password</div>
-          <div><input type="password" /></div>
+          <div>
+            <input
+              id="NewPass"
+              type="text"
+              v-model="newpass"
+              aria-label="Enter new password here"
+            />
+          </div>
         </div>
         <div class="buttonArea">
-          <button id="UpdateButton">Update</button>
+          <button
+            id="UpdateButton"
+            v-on:click="UpdatePassword"
+            aria-label="Update with new password"
+          >
+            Update
+          </button>
         </div>
       </div>
       <div class="col-span-7">
@@ -26,14 +46,11 @@
           <p>
             <strong>Password format:</strong><br />
             At least 12 characters long but 14 or more is better.<br /><br />
-
             A combination of uppercase letters,<br />
             lowercase letters, numbers, an14 ord symbols.<br /><br />
-
             Not a word that can be found in a dictionary<br />
             or the name of a person, character,<br />
             product, or organization.<br /><br />
-
             Significantly different from your previous password
           </p>
         </div>
@@ -44,10 +61,23 @@
 
 <script setup lang="ts">
 const accountName = "Herbert Hoover";
+const oldpass = ref("");
+const newpass = ref("");
+const passwordChanged = ref(false);
+
+const UpdatePassword = (e: Event) => {
+  if (oldpass.value.trim() !== "" && newpass.value.trim() !== "") {
+    alert('Password has been changed');
+    passwordChanged.value = true;
+  } else {
+    alert("Please enter valid credentials");
+    passwordChanged.value = false;
+  }
+} 
+
 </script>
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";
-
 
 #UserBox {
   margin: 30px auto 0 auto;
@@ -58,7 +88,7 @@ const accountName = "Herbert Hoover";
   #avatar {
     width: 150px;
     height: 150px;
-float:right;
+    float: right;
     margin: 20px 20px 40px 0;
 
     border: 1px solid #105d84;

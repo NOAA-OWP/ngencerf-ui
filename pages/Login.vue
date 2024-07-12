@@ -58,7 +58,7 @@ function forgotPassword() {
 }
 function SubmitForm(e: Event) {
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
-    logUserIn()
+    logUserIn();
     navigateTo({ path: "/LandingPage" });
   } else {
     alert("Please enter valid credentials");
