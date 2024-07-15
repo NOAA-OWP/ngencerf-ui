@@ -7,7 +7,7 @@
         <NuxtLink to="LandingPage">NEXTGEN</NuxtLink>
       </div>
       <div id="Col2" class="col-span-8">
-        <ul id="MainMenu">
+        <ul v-show="isUserLoggedIn() && location.name !== 'Login' && location.name !=='LandingPage'" id="MainMenu">
           <li>
             <a to="/">Calibration</a>
           </li>
@@ -27,7 +27,7 @@
       </div>
 
       <div id="Circles" class="col-span-2">
-        <NuxtLink to="user" id="UserCircle" class="userInitials">
+        <NuxtLink v-show="isUserLoggedIn() && location.name !== 'Login'" to="user" id="UserCircle" class="userInitials">
           {{ getUserInitials() }}
         </NuxtLink>
         <NuxtLink to="#" class="qmark" id="HelpCircle"> ? </NuxtLink>
@@ -46,6 +46,7 @@ const { isUserLoggedIn, getUserName } = useUserDataStore();
 const location = useRoute();
 const userMenuShowing = ref(false);
 
+console.log("Page: ", location.name);
 const getUserInitials = () => {
   const name = getUserName();
   let rgx = new RegExp(/(\p{L}{1})\p{L}+/, "gu");

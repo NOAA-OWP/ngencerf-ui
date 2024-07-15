@@ -37,8 +37,7 @@ body {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  overflow: hidden;
   min-width: 1060px;
 }
 
