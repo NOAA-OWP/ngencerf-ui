@@ -2,17 +2,35 @@
   <!-- AppHeader.vue -->
   <div id="Header" class="header">
     <div id="TopBar">&nbsp;</div>
-    <div id="PgmName"><a href="ngenhome">NEXTGEN</a></div>
-    <!-- <div v-show="location.name != 'Login' && location.name != 'NgenHome'"> -->
-      <div v-show="isUserLoggedIn() && location.name != 'LandingPage'">
+    <div class="grid grid-cols-12 gap-1" style="height: 80px">
+      <div id="PgmName" class="col-span-2">
+        <NuxtLink to="LandingPage">NEXTGEN</NuxtLink>
+      </div>
+      <div id="Col2" class="col-span-8">
+        <ul id="MainMenu">
+          <li>
+            <a to="/">Calibration</a>
+          </li>
+          <li>
+            <a class="disabled" href="/">Evaluation</a>
+          </li>
+          <li>
+            <a class="disabled" href="/">Validation</a>
+          </li>
+          <li>
+            <a class="disabled" href="/">Forecast</a>
+          </li>
+          <li>
+            <a class="disabled" href="/">Verification</a>
+          </li>
+        </ul>
+      </div>
 
-      <TopMenu />
-    </div>
-    <div id="UserLink" v-if="isUserLoggedIn()">
-      <div id="UserLinkCircle">
-        <div id="UserCircle">
-          <a href="user">HH</a>
-        </div>
+      <div id="Circles" class="col-span-2">
+        <NuxtLink to="user" id="UserCircle" class="userInitials">
+          {{ getUserInitials() }}
+        </NuxtLink>
+        <NuxtLink to="#" class="qmark" id="HelpCircle"> ? </NuxtLink>
       </div>
     </div>
   </div>
@@ -23,11 +41,20 @@ import { ref } from "vue";
 import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
-const { isUserLoggedIn } = useUserDataStore();
+const { isUserLoggedIn, getUserName } = useUserDataStore();
 
 const location = useRoute();
 const userMenuShowing = ref(false);
 
+const getUserInitials = () => {
+  const name = getUserName();
+  let rgx = new RegExp(/(\p{L}{1})\p{L}+/, "gu");
+  let initials = [...name.matchAll(rgx)] || [];
+  initials = (
+    (initials.shift()?.[1] || "") + (initials.pop()?.[1] || "")
+  ).toUpperCase();
+  return initials;
+};
 const ToggleUserMenu = () => {
   setTimeout(function () {
     userMenuShowing.value = !userMenuShowing.value;
@@ -37,38 +64,10 @@ const ToggleUserMenu = () => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-#UserLink {
-  position: fixed;
-  right: 50px;
-  top: 10px;
-  width: 150px;
-  height: auto;
-  text-align: center;
-  #UserLinkCircle {
-    z-index: 9;
-    text-align: center;
-    height: 60px;
-    width: 60px;
-    background-color: #bbb;
-    border-radius: 50%;
-    display: inline-block;
-    font-size: 22px;
-    #UserCircle {
-      text-align: center;
-      margin-top: 18px;
-    }
-    .tglusermenu {
-      cursor: pointer;
-    }
-  }
-  #UserMenu {
-    background-color: #ffffff;
-    border-radius: 20px;
-    height: 2em;
-    padding-top: 5px;
-  }
-}
 
+.bordered {
+  border: 1px solid #000;
+}
 #TopBar {
   position: fixed;
   top: 0;
@@ -79,34 +78,90 @@ const ToggleUserMenu = () => {
 #Header {
   height: 80px;
   border-bottom: 2px solid $ngwcp_primary1;
+  margin-bottom: 4px;
 }
 #Logo {
-  position: fixed;
-  top: 6;
-  left: 10px;
-  margin-top: 20px;
-
   img {
     width: 200px;
   }
 }
+
+#PgmName {
+  display: inline-block;
+  font: 40px "NeueFrutigerWorld-Bold", sans-serif;
+  font-weight: bold;
+  margin-left: 20px;
+}
 #TopMenu {
-  position: fixed;
-  font: 20px "ObjektivMk2_Rg", sans-serif;
-  right: 250px;
-  top: 15px;
+  display: inline;
+  font-size: 20px;
+  font: 20px Arial, sans-serif;
+}
+#MainMenu {
+  float: right;
+  margin-top: 20px;
   ul {
     list-style: none;
+    margin-top: 0px;
   }
+
   li {
     display: inline-block;
     margin-right: 20px;
+    font-size: 22px;
+    margin-top: 30px;
+    a {
+      text-decoration: none;
+      color: #000;
+    }
+    a:hover {
+      color: $ngwcp_primary1;
+      text-decoration: none;
+    }
   }
 }
-#PgmName {
-  font: 40px "NeueFrutigerWorld-Bold", sans-serif;
-  font-weight: bold;
-  position: fixed;
-  left: 20px;
+
+#Circles {
+  margin-right: 10px;
+  margin-top: 10px;
+  clear: none;
+  text-align: center;
+}
+
+#UserCircle,
+#HelpCircle {
+  display: inline-block;
+  height: 60px;
+  width: 60px;
+  background-color: #bbb;
+  border-radius: 50%;
+  font-size: 30px;
+  padding-top: 16px;
+  border: 1px solid #000;
+}
+#UserCircle {
+  margin-right: 10px;
+}
+#HelpCircle {
+  background-color: $ngwcp_primary2;
+}
+
+.userInitials {
+  text-align: center;
+}
+.qmark {
+  font-size: 35px;
+}
+
+#HelpLink {
+  z-index: 9;
+  text-align: center;
+  height: 60px;
+  width: 60px;
+  display: inline-block;
+  #HelpCircle {
+    text-align: center;
+    margin-top: 15px;
+  }
 }
 </style>
