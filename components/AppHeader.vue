@@ -15,9 +15,6 @@
             <NuxtLink class="disabled" to="/">Evaluation</NuxtLink>
           </li>
           <li>
-            <NuxtLink class="disabled" to="/">Validation</NuxtLink>
-          </li>
-          <li>
             <NuxtLink class="disabled" to="/">Forecast</NuxtLink>
           </li>
           <li>
@@ -27,8 +24,8 @@
       </div>
 
       <div id="Circles" class="col-span-2">
-        <NuxtLink v-show="isUserLoggedIn() && location.name !== 'Login'" to="user" id="UserCircle" class="userInitials">
-          {{ getUserInitials() }}
+        <NuxtLink v-show="isUserLoggedIn() && location.name !== 'Login'" to="user" id="UserCircle" PreviousRunsclass="userInitials">
+         {{ getUserInitials() }}
         </NuxtLink>
         <NuxtLink to="#" class="qmark" id="HelpCircle"> ? </NuxtLink>
       </div>
@@ -42,27 +39,19 @@ import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const { isUserLoggedIn, getUserName } = useUserDataStore();
-
 const location = useRoute();
 const userMenuShowing = ref(false);
 
 const getUserInitials = () => {
   const name = getUserName();
-  let rgx = new RegExp(/(\p{L}{1})\p{L}+/, "gu");
-  let initials = [...name.matchAll(rgx)] || [];
-  initials = (
-    (initials.shift()?.[1] || "") + (initials.pop()?.[1] || "")).toUpperCase();
-  return initials;
+  return (fullname=>fullname.map((n, i)=>(i==0||i==fullname.length-1)&&n[0]).filter(n=>n).join(""))
+  (name.split(" "));
 };
 </script>
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
-
-.bordered {
-  border: 1px solid #000;
-}
 #TopBar {
   position: fixed;
   top: 0;

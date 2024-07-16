@@ -1,43 +1,41 @@
 <template>
-  <client-only>
-    <div id="LoginBox" class="container">
-      <h2 class="ttl">Login to Your Account</h2>
-      <div class="inputBox">
-        <input
-          id="uname"
-          type="text"
-          v-model="userName"
-          placeholder=" Username"
-          aria-label="Username"
-        />
-        <button tabindex="-1" class="forgot" v-on:click="forgotUsername">
-          Forgot Username
-        </button>
-      </div>
-      <div class="inputBox">
-        <input
-          id="pword"
-          type="password"
-          v-model="userPassword"
-          placeholder=" Password"
-          aria-label="Password"
-        />
-        <button tabindex="-1" class="forgot" v-on:click="forgotPassword">
-          Forgot Password
-        </button>
-      </div>
-      <div class="loginButton" v-on:click="SubmitForm" aria-label="sign in">
-        <button id="LoginButton">Sign In</button>
-      </div>
+  <div id="LoginBox" class="container">
+    <h2 class="ttl">Login to Your Account</h2>
+    <div class="inputBox">
+      <input
+        id="uname"
+        type="text"
+        v-model="userName"
+        placeholder=" Username"
+        aria-label="Username"
+      />
+      <button tabindex="-1" class="forgot" v-on:click="forgotUsername">
+        Forgot Username
+      </button>
+    </div>
+    <div class="inputBox">
+      <input
+        id="pword"
+        type="password"
+        v-model="userPassword"
+        placeholder=" Password"
+        aria-label="Password"
+      />
+      <button tabindex="-1" class="forgot" v-on:click="forgotPassword">
+        Forgot Password
+      </button>
+    </div>
+    <div class="loginButton" v-on:click="SubmitForm" aria-label="sign in">
+      <button id="LoginButton">Sign In</button>
+    </div>
 
-      <div id="NeedAccountBox">
-        <h2 class="needAccount">Need an Account?</h2>
-        <div class="signupButton" aria-label="sign up">
-          <button>Sign Up!</button>
-        </div>
+    <div id="NeedAccountBox">
+      <h2 class="needAccount">Need an Account?</h2>
+      <div class="signupButton" aria-label="sign up">
+        <button>Sign Up!</button>
       </div>
     </div>
-  </client-only>
+  </div>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
@@ -49,20 +47,24 @@ const loading = ref(true);
 const userName = ref("");
 const userPassword = ref("");
 
-function forgotUsername() {
+const forgotUsername = () => {
   alert("Not yet implemented");
-}
-function forgotPassword() {
+};
+const forgotPassword = () => {
   alert("Not yet implemented");
-}
-function SubmitForm(e: Event) {
+};
+const SubmitForm = (e: Event) => {
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     logUserIn();
-    //navigateTo({ path: "/LandingPage" });
+    GoToLanding();
   } else {
     alert("Please enter valid credentials");
   }
-}
+};
+
+const GoToLanding = async () => {
+  await navigateTo({ path: "/LandingPage" });
+};
 </script>
 <style lang="scss" scoped>
 #LoginBox {

@@ -30,3 +30,4 @@ logs
 components.d.ts
 auto-imports.d.ts
 core.*
+package-lock.json

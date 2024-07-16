@@ -5,13 +5,13 @@ import { jsdom } from "jsdom";
 import User from "@/pages/User.vue";
 
 describe("Test Header component", () => {
-  const jsdomAlert = window.alert; // remember the jsdom alert
+  //const jsdomAlert = window.alert; // remember the jsdom alert
   window.alert = () => {}; // provide an empty implementation for window.alert
-  let wrapper: VueWrapper = null;
+  let wrapper: VueWrapper;
 
   beforeEach(async () => {
     wrapper = mount(User);
-  });
+  });``
 
   test("Verify Program Name", () => {
     expect(wrapper.html()).toContain("passwordBox");

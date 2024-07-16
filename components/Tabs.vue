@@ -5,15 +5,21 @@
       <div data-tab="1" class="tabs activeTab" v-on:click="tabClicked">
         Headwater Basin Gage
       </div>
-      <div data-tab="2" class="tabs" v-on:click="tabClicked">Formulation</div>
+      <div data-tab="2" class="tabs" v-on:click="tabClicked">
+        Formulation
+      </div>
       <div data-tab="3" class="tabs" v-on:click="tabClicked">
         Tuning Controls
       </div>
-      <div data-tab="4" class="tabs" v-on:click="tabClicked">Optimization</div>
+      <div data-tab="4" class="tabs" v-on:click="tabClicked">
+        Optimization
+      </div>
       <div data-tab="5" class="tabs" v-on:click="tabClicked">
         Metrics / Plotting
       </div>
-      <div data-tab="6" class="tabs" v-on:click="tabClicked">Run / Status</div>
+      <div data-tab="6" class="tabs" v-on:click="tabClicked">
+        Run / Status
+      </div>
     </div>
   </div>
 </template>
@@ -40,7 +46,6 @@ const tabActivate = (tab: number) => {
   const tabNum = tab;
   emit("tabNumber", tabNum);
 };
-
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";

@@ -1,24 +1,24 @@
 <template>
   <div>
-    <Tabs @tabNumber="tabChanged" />
+    <Tabs @tabNumber="tabChanged"/>
   </div>
   <div id="InputsArea">
-    <span v-if="activeTab == '1'">
+    <span v-if="activeTab == 1">
       <HeadwaterBasinGage />
     </span>
-    <span v-else-if="activeTab == '2'">
+    <span v-else-if="activeTab == 2">
       <Formulation />
     </span>
-    <span v-else-if="activeTab == '3'">
+    <span v-else-if="activeTab == 3">
       <TuningControls />
     </span>
-    <span v-else-if="activeTab == '4'">
+    <span v-else-if="activeTab == 4">
       <Optimization />
     </span>
-    <span v-else-if="activeTab == '5'">
+    <span v-else-if="activeTab == 5">
       <MetricsPlotting />
     </span>
-    <span v-else="activeTab == '6'">
+    <span v-else="activeTab == 6">
       <RunStatus />
     </span>
   </div>
