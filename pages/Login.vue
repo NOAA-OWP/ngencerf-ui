@@ -32,7 +32,7 @@
 
       <div id="NeedAccountBox">
         <h2 class="needAccount">Need an Account?</h2>
-        <div class="signuptButton" aria-label="sign up">
+        <div class="signupButton" aria-label="sign up">
           <button>Sign Up!</button>
         </div>
       </div>
@@ -58,7 +58,7 @@ function forgotPassword() {
 function SubmitForm(e: Event) {
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     logUserIn();
-    navigateTo({ path: "/LandingPage" });
+    //navigateTo({ path: "/LandingPage" });
   } else {
     alert("Please enter valid credentials");
   }
@@ -114,7 +114,7 @@ function SubmitForm(e: Event) {
   text-decoration: underline;
   color: #0c1db4;
 }
-.signuptButton,
+.signupButton,
 .loginButton {
   font-size: 20px;
   margin: 20px auto;
@@ -126,14 +126,14 @@ function SubmitForm(e: Event) {
   height: 50px;
   padding-top: 10px;
 }
-.signuptButton {
+.signupButton {
   background-color: #cccccc;
 }
 .loginButton:hover {
   background-color: #105d84;
   color: #ffffff;
 }
-.signuptButton:hover {
+.signupButton:hover {
   background-color: #5bb6c1;
   color: #ffffff;
 }

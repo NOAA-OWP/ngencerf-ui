@@ -1,15 +1,18 @@
 <!-- Calibration.vue -->
 <template>
   <DataEntry>
-    <!-- <div class="waitgif" v-if="loading"><img src="/assets/styles/img/wait.gif" /></div> -->
+
   </DataEntry>
 </template>
+
 <script lang="ts" setup>
 import DataEntry from "@/layouts/DataEntry.vue";
+
+//console.log(document.querySelectorAll('[data-tab="1"]'));
+//console.log(document.querySelector("[data-tab='1']"));
+
 </script>
+
 <style lang="scss" scoped>
-// .waitgif {
-//   width: 100px;
-//   margin: 0 auto;
-// }
+
 </style>

@@ -1,12 +1,19 @@
 import { VueWrapper, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, test } from "vitest";
+import { createTestingPinia } from "@pinia/testing";
 import { jsdom } from "jsdom";
 import Login from "@/pages/Login.vue";
 
 describe("Test Header component", () => {
-  let wrapper: VueWrapper = null;
+  let wrapper: VueWrapper;
   beforeEach(async () => {
-    wrapper = mount(Login);
+    setActivePinia(createPinia());
+
+    wrapper = mount(Login, {
+      global: {
+        plugins: [createTestingPinia()],
+      },
+    });
   });
 
   test("Verify Program Name", () => {
@@ -32,8 +39,8 @@ describe("Test Header component", () => {
     inputWrapper.setValue("Password");
     const btn = wrapper.find("#LoginButton");
     await btn.trigger("click");
-    let ud = wrapper.vm.UserName;
-    expect(wrapper.vm.UserName).toEqual("User Name");
+    let ud = wrapper.vm.userName;
+    expect(wrapper.vm.userName).toEqual("User Name");
   });
 
   test("Test aria-labels", () => {

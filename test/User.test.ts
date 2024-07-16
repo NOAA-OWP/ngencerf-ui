@@ -1,5 +1,6 @@
 import { VueWrapper, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, test } from "vitest";
+
 import { jsdom } from "jsdom";
 import User from "@/pages/User.vue";
 
@@ -7,6 +8,7 @@ describe("Test Header component", () => {
   const jsdomAlert = window.alert; // remember the jsdom alert
   window.alert = () => {}; // provide an empty implementation for window.alert
   let wrapper: VueWrapper = null;
+
   beforeEach(async () => {
     wrapper = mount(User);
   });

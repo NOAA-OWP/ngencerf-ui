@@ -9,19 +9,19 @@
       <div id="Col2" class="col-span-8">
         <ul v-show="isUserLoggedIn() && location.name !== 'Login' && location.name !=='LandingPage'" id="MainMenu">
           <li>
-            <a to="/">Calibration</a>
+            <NuxtLink to="/">Calibration</NuxtLink>
           </li>
           <li>
-            <a class="disabled" href="/">Evaluation</a>
+            <NuxtLink class="disabled" to="/">Evaluation</NuxtLink>
           </li>
           <li>
-            <a class="disabled" href="/">Validation</a>
+            <NuxtLink class="disabled" to="/">Validation</NuxtLink>
           </li>
           <li>
-            <a class="disabled" href="/">Forecast</a>
+            <NuxtLink class="disabled" to="/">Forecast</NuxtLink>
           </li>
           <li>
-            <a class="disabled" href="/">Verification</a>
+            <NuxtLink class="disabled" to="/">Verification</NuxtLink>
           </li>
         </ul>
       </div>
@@ -46,25 +46,19 @@ const { isUserLoggedIn, getUserName } = useUserDataStore();
 const location = useRoute();
 const userMenuShowing = ref(false);
 
-console.log("Page: ", location.name);
 const getUserInitials = () => {
   const name = getUserName();
   let rgx = new RegExp(/(\p{L}{1})\p{L}+/, "gu");
   let initials = [...name.matchAll(rgx)] || [];
   initials = (
-    (initials.shift()?.[1] || "") + (initials.pop()?.[1] || "")
-  ).toUpperCase();
+    (initials.shift()?.[1] || "") + (initials.pop()?.[1] || "")).toUpperCase();
   return initials;
-};
-const ToggleUserMenu = () => {
-  setTimeout(function () {
-    userMenuShowing.value = !userMenuShowing.value;
-  }, 1000);
 };
 </script>
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
 
 .bordered {
   border: 1px solid #000;

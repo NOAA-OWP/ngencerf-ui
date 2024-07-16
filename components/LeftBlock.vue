@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 
-const activeTab = ref();
+const activeTab = ref(1);
 
 import HeadwaterBasinGage from "@/components/HeadwaterBasinGage.vue";
 import Formulation from "./Formulation.vue";
@@ -37,7 +37,6 @@ import RunStatus from "./RunStatus.vue";
 
 const tabChanged = (tabNum: number) => {
   activeTab.value = tabNum;
-  console.log(activeTab.value);
 };
 </script>
 
