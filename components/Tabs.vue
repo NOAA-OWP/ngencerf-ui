@@ -12,13 +12,13 @@
         Tuning Controls
       </div>
       <div data-tab="4" class="tabs" v-on:click="tabClicked">
-        Optimization
+        Optimization / Metrics
       </div>
       <div data-tab="5" class="tabs" v-on:click="tabClicked">
-        Metrics / Plotting
+        Run / Status
       </div>
       <div data-tab="6" class="tabs" v-on:click="tabClicked">
-        Run / Status
+        Results
       </div>
     </div>
   </div>
