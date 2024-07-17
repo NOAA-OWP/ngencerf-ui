@@ -1,5 +1,4 @@
 <template>
-    <LeafletMap/>
     <div class="waitgif" v-if="loading">
       <img src="/assets/styles/img/wait.gif" />
     </div>

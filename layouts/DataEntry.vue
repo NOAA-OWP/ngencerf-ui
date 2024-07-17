@@ -23,15 +23,18 @@
   width: 100%;
 }
 .boxed {
-  border: 0 1px 1px 0 solid #000;
+  border: 1 solid #000;
 }
 .leftBox {
   overflow: hidden;
-  width: 62%;
+  width: 66%;
   float: left;
 }
 .rightBox {
-  width: 38%;
-  float: right;
+  overflow: hidden;
+  width: 34%;
+margin-right: 20px;
+margin-top: -40px;
+  float:right;
 }
 </style>

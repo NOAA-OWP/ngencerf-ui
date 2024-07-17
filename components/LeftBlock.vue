@@ -1,5 +1,5 @@
 <template>
-  <-- LeftBlock.vue ->
+   <!-- LeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
   </div>
