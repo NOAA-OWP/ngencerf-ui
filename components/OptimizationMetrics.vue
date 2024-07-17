@@ -1,5 +1,5 @@
 <template>
-    <h1>Optimization</h1>
+    <h1>Optimization / Metrics</h1>
     </template>
     
     <script lang="ts" setup>

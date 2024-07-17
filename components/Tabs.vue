@@ -31,13 +31,18 @@ const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele = event.currentTarget as HTMLElement;
   const allTabs = document.getElementsByClassName("tabs");
+
+  // Remove highlighting from all tabs
   Object.keys(allTabs).forEach(function (key) {
     allTabs[key as any].classList.remove("activeTab");
   });
+
+  // Note that the compiler sends errors when you don't check for null
   if (ele) {
     const cl = ele.classList;
     ele.classList.add("activeTab");
   }
+  
   const tabNum = ele.getAttribute("data-tab");
   emit("tabNumber", tabNum);
 };

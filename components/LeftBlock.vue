@@ -1,6 +1,7 @@
 <template>
+  <-- LeftBlock.vue ->
   <div>
-    <Tabs @tabNumber="tabChanged"/>
+    <Tabs @tabNumber="tabChanged" />
   </div>
   <div id="InputsArea">
     <span v-if="activeTab == 1">
@@ -13,28 +14,22 @@
       <TuningControls />
     </span>
     <span v-else-if="activeTab == 4">
-      <Optimization />
+      <OptimizationMetrics />
     </span>
     <span v-else-if="activeTab == 5">
-      <MetricsPlotting />
+      <RunStatus />
     </span>
     <span v-else="activeTab == 6">
-      <RunStatus />
+      <Results />
     </span>
   </div>
 </template>
 
 <script setup lang="ts">
-
+// Default to Tab 1, HeadwaterBasinGage
 const activeTab = ref(1);
 
-import HeadwaterBasinGage from "@/components/HeadwaterBasinGage.vue";
-import Formulation from "./Formulation.vue";
-import TuningControls from "./TuningControls.vue";
-import Optimization from "./Optimization.vue";
-import MetricsPlotting from "./MetricsPlotting.vue";
-import RunStatus from "./RunStatus.vue";
-
+// Activate new tab
 const tabChanged = (tabNum: number) => {
   activeTab.value = tabNum;
 };
