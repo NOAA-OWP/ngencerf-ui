@@ -36,7 +36,6 @@ import { useRouter } from "vue-router";
 
 //DataTable.use(DataTablesCore);
 
-//console.log(DataTable);
 
 const NewCalibration = async () => {
   await navigateTo("Calibration");

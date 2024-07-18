@@ -5,26 +5,24 @@
       <div data-tab="1" class="tabs activeTab" v-on:click="tabClicked">
         Headwater Basin Gage
       </div>
-      <div data-tab="2" class="tabs" v-on:click="tabClicked">
-        Formulation
-      </div>
+      <div data-tab="2" class="tabs" v-on:click="tabClicked">Formulation</div>
       <div data-tab="3" class="tabs" v-on:click="tabClicked">
         Tuning Controls
       </div>
       <div data-tab="4" class="tabs" v-on:click="tabClicked">
         Optimization / Metrics
       </div>
-      <div data-tab="5" class="tabs" v-on:click="tabClicked">
-        Run / Status
-      </div>
-      <div data-tab="6" class="tabs" v-on:click="tabClicked">
-        Results
-      </div>
+      <div data-tab="5" class="tabs" v-on:click="tabClicked">Run / Status</div>
+      <div data-tab="6" class="tabs" v-on:click="tabClicked">Results</div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { generalStore } from "@/stores/common/GeneralStore";
+
+const { getTabIndex, setTabIndex } = generalStore();
+
 const emit = defineEmits(["tabNumber"]);
 
 const tabClicked = (event: Event) => {
@@ -42,14 +40,12 @@ const tabClicked = (event: Event) => {
     const cl = ele.classList;
     ele.classList.add("activeTab");
   }
-  
-  const tabNum = ele.getAttribute("data-tab");
-  emit("tabNumber", tabNum);
-};
 
-const tabActivate = (tab: number) => {
-  const tabNum = tab;
-  emit("tabNumber", tabNum);
+  const tabNum = Number(ele.getAttribute("data-tab"));
+  if (tabNum) {
+    setTabIndex(tabNum);
+    emit("tabNumber", tabNum);
+  }
 };
 </script>
 <style lang="scss" scoped>

@@ -37,7 +37,6 @@
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-
 const { isUserLoggedIn, getUserName } = useUserDataStore();
 const location = useRoute();
 const userMenuShowing = ref(false);
