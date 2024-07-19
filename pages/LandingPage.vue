@@ -28,7 +28,7 @@ const GoPreviousRuns = () => {
   margin: 0 auto;
   width: 600px;
   height: 265px;
-  background-color: #cccccc;;
+  background-color: $ngwcp_groupsbkg;;
   border-radius: 50px;
   text-align: center;
 }

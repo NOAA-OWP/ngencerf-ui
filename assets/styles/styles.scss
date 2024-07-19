@@ -38,7 +38,7 @@ body {
   -ms-flex-direction: column;
   flex-direction: column;
   overflow: hidden;
-  min-width: 1560px;
+  min-width: 1600px;
   min-height: 820px;
 }
 
@@ -215,3 +215,19 @@ label {
 .NeueFrutigerWorld-MediumIt {
   font-family: "NeueFrutigerWorld-MediumIt";
 }
+
+
+// TimeDatePicker
+.dp__input {
+     height: 25px;
+     margin-bottom: 11px;
+     margin-left: 10px;
+     font-family:'Courier New', Courier, monospace !important;
+ }
+ 
+ .dp--clear-btn,
+ .dp__input_icon {
+  top: 30% !important;
+ }
+
+ 

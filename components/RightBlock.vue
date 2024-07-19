@@ -29,6 +29,7 @@ const props = defineProps<{
 
 </script>
 <style lang="scss" scoped>
+@import "@/assets/styles/styles.scss";
 #TopRightBlock {
   overflow: hidden;
   padding: 10px;
@@ -42,7 +43,7 @@ const props = defineProps<{
 }
 
 #ProgressGroup {
-  background-color: #cccccc;
+  background-color: $ngwcp_groupsbkg;
   border-radius: 30px;
   margin-left: 10px;
   padding: 10px;
@@ -52,7 +53,7 @@ const props = defineProps<{
 #MessagesGroup {
   height: auto;
   width: 100%;
-  background-color: #cccccc;
+  background-color: $ngwcp_groupsbkg;
   border-radius: 30px;
   border: 1px solid #000;
 }

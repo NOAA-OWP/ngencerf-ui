@@ -9,6 +9,9 @@ export default {
     "./error.vue",
   ],
   theme: {
+    colors: {
+      "buttonBackground": "#105d8e",
+    },
     extend: {
       fontFamily: {
         "ObjektivMk2_Bd": ['ObjektivMk2_Bd', 'sans-serif'],

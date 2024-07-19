@@ -1,5 +1,5 @@
 <template>
-  <div id="GageGroup" class="full-width mt-5 ml-20">
+  <div id="GageGroup" class="mt-5 ml-20">
     <div class="grid grid-rows-12">
       <div class="row-span-4">
         <div class="grid grid-cols-4 gap=1">
@@ -61,7 +61,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 #GageGroup {
-  background-color: #cccccc;
+  background-color: $ngwcp_groupsbkg;
   padding: 10px 10px 10px 20px;
   border-radius: 20px;
   height: 80px;

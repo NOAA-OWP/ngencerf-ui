@@ -1,27 +1,27 @@
 <template>
-   <!-- LeftBlock.vue -->
+  <!-- LeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
-  </div>
-  <div id="InputsArea">
-    <span v-if="activeTab == 1">
-      <HeadwaterBasinGage />
-    </span>
-    <span v-else-if="activeTab == 2">
-      <Formulation />
-    </span>
-    <span v-else-if="activeTab == 3">
-      <TuningControls />
-    </span>
-    <span v-else-if="activeTab == 4">
-      <OptimizationMetrics />
-    </span>
-    <span v-else-if="activeTab == 5">
-      <RunStatus />
-    </span>
-    <span v-else="activeTab == 6">
-      <Results />
-    </span>
+    <div id="InputsArea">
+      <span v-if="activeTab == 1">
+        <HeadwaterBasinGage />
+      </span>
+      <span v-else-if="activeTab == 2">
+        <Formulation />
+      </span>
+      <span v-else-if="activeTab == 3">
+        <TuningControls />
+      </span>
+      <span v-else-if="activeTab == 4">
+        <OptimizationMetrics />
+      </span>
+      <span v-else-if="activeTab == 5">
+        <RunStatus />
+      </span>
+      <span v-else="activeTab == 6">
+        <Results />
+      </span>
+    </div>
   </div>
 </template>
 
@@ -38,7 +38,7 @@ const tabChanged = (tabNum: number) => {
 <style lang="scss" scoped>
 #InputsArea {
   position: absolute;
-  width: 58.8%;
+  width: 104vh;
   margin-left: 10px;
   height: 20vw;
 }

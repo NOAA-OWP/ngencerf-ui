@@ -83,7 +83,7 @@ const UpdatePassword = (e: Event) => {
   width: 740px;
   height: 495px;
   border: 4px solid #105d84;
-  background-color: #cccccc;
+  background-color: $ngwcp_groupsbkg;
   #avatar {
     width: 150px;
     height: 150px;

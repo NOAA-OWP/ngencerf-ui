@@ -69,6 +69,7 @@ const GoToLanding = async () => {
 };
 </script>
 <style lang="scss" scoped>
+@import "@/assets/styles/styles.scss";
 #LoginBox {
   position: relative;
   margin: 40px auto 0 auto;
@@ -134,7 +135,7 @@ input::-webkit-input-placeholder {
   padding-top: 10px;
 }
 .signupButton {
-  background-color: #cccccc;
+  background-color: $ngwcp_groupsbkg;
 }
 .loginButton:hover {
   background-color: #105d84;
