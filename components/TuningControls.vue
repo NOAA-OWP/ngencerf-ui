@@ -8,7 +8,7 @@
               <div id="BoxTopLeft">
                 <span class="tabTitles">Calibration Time Controls</span>
               </div>
-              <div id="BoxBottomLeft">
+              <div id="BoxBottomLeft" class="pt-2">
                 <div class="timeBlocks">
                  <div>Simulation Start: <VueDatePicker class="datePickers dp__theme_dark" v-model="simStartTime" time-picker-inline utc format="yyyy-mm-dd  hh:mm" /></div>
                 <div>Simulation End: <VueDatePicker class="datePickers dp__theme_dark" v-model="simEndTime" time-picker-inline utc  format="yyyy-mm-dd  hh:mm"/></div>
@@ -20,12 +20,12 @@
           </div>
           <div class="col-span-1">
             <div id="BoxRight">
-              <div id="BoxTopRight">
+              <div id="BoxTopRight" class="pt-2">
                 <input type="checkbox" id="CheckTheBox" @change="AutoValChecked">Automatic Validation</input>
               </div>
-              <div id="BoxBottomRight">
-                <div v-if="!autoValidation" class="tabTitles" >
-                    Check the box above to enable Automaticdp--clear-btn Validation
+              <div id="BoxBottomRight" class="pt-2">
+                <div v-if="!autoValidation" class="tabTitles text-center" >
+                    Check the box above<br />to enable Automatic Validation
                 </div>
                 <div v-else>
                     <div class="timeBlocks">
@@ -99,7 +99,6 @@ const AutoValChecked = () => {
     font-size: .8em;
     text-align: right;
     margin-right: 20px;
-
 }
 
 :root .datePickers > div > div:nth-child(2) > div > div:nth-child(1) > div > input
