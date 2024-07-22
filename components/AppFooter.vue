@@ -1,7 +1,9 @@
 <template>
   <div id="Footer">
+    <div id="ActionButtons"><ActionButtonGroup /></div>
     <div class="topBar">&nbsp</div>
-    <div class="version">
+
+    <div id="FooterData" class="version">
       Version {{ info.program_info.version }},&nbsp;&nbsp;{{
         info.program_info.release_date
       }}
@@ -18,20 +20,28 @@ const info = json;
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";
 
+#ActionButtons {
+  padding: 8px 0 8px 0;
+  width: 67vw;
+}
 #Footer {
   font: 18px NeueFrutigerWorld-Book, sans-serif;
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 80px;
+  height: 120px;
   color: #fff;
   z-index: 9999;
   background-color: $ngwcp_primary3;
 }
 
+#FooterData {
+  height: 90px;
+}
+
 .topBar {
-  background-color: #156191;
-  height: 4px;
+  background-color: black;
+  height: 1px;
 }
 
 .version,

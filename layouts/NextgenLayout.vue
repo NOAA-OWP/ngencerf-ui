@@ -1,22 +1,19 @@
 <template>
-  <div class="h-full">
+  <div class="h-full min-h-screen flex flex-col">
     <div class="grid grid-rows-12">
-      <div class="row-span-1 boxed">
+      <div class="row-span-1">
         <div><AppHeader /></div>
       </div>
       <div class="h-full grid row-span-10 gap-2">
-        <div class="grid grid-cols-12 boxed">
-          <div class="col-span-8 boxed">
+        <div class="grid grid-cols-12">
+          <div class="col-span-8">
             <div class="h-full grid grid-rows-12">
-              <div class="grid row-span-11 boxed">
+              <div class="grid row-span-12">
                 <LeftBlock />
-              </div>
-              <div class="grid row-span-1 boxed">
-                <div id="ActionButtons"><ActionButtonGroup /></div>
               </div>
             </div>
           </div>
-          <div class="col-span-4 boxed">
+          <div class="col-span-4">
             <RightBlock/>
           </div>
         </div>
@@ -33,7 +30,5 @@ import RightBlock from "~/components/RightBlock.vue";
 
 </script>
 <style lang="scss" scoped>
-.boxed {
-  //border: 1px solid #000;
-}
+
 </style>

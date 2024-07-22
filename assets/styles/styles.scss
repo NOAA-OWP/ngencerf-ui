@@ -38,8 +38,12 @@ body {
   -ms-flex-direction: column;
   flex-direction: column;
   overflow: hidden;
-  min-width: 1600px;
+  min-width: 1530px !important;
   min-height: 820px;
+}
+
+.boxed {
+  border: 1px solid #000;
 }
 
 input {

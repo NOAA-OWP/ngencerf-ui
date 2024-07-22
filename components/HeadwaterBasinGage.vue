@@ -1,10 +1,9 @@
 <template>
   <client-only>
-  <div id="HeadwaterBasinGage">
-    <div id="GageSettings" class="mt-5 ml-20">
-      <div class="grid grid-rows-12">
-        <div class="row-span-4">
-          <div class="grid grid-cols-4 gap=1">
+  <div id="HeadwaterBasinGage" class="w-full">
+    <div id="GageSettings" class="mt-5">
+        <div  class="row-span-4 selRow">
+          <div class="grid grid-cols-4 gap=4">
             <div class="col-span-1">
               <label for="domain_dd">Domain: </label><br />
               <select id="domain_dd">
@@ -41,7 +40,7 @@
           </div>
         </div>
       </div>
-    </div>
+
     <div id="GageReport">
       <div id="GrBox">
         <table>
@@ -68,7 +67,7 @@
           <tr class="rowEven">
             <td class="dataName">Altitude</td>
             <td class="dataText">{{ gageData.altitude }}</td>
-          </tr>
+          </tr>boxed
           <tr class="rowOdd">
             <td class="dataName">Date Established</td>
             <td class="dataText">{{ gageData.date_established }}</td>
@@ -96,7 +95,6 @@ import Tabs from "@/components/Tabs.vue";
 const loading = ref(true);
 const showMap = ref(false);
 
-
 const gageData: GageData = {
   agency: "US Geological Survey",
   station_name: "LITTLE RIVER NEAR HANNOVER, CT",
@@ -118,18 +116,22 @@ onMounted(() => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 #GageSettings {
+  margin-left: 5vw;
   background-color: $ngwcp_groupsbkg;
   padding: 10px 10px 10px 20px;
   border-radius: 20px;
   height: 80px;
   border: 1px solid $ngwcp_primary1;
+  .selRow {
+    width: 55vw;
+      }
 }
 select {
   width: 90%;
 }
 
 #GageReport {
-  margin: 30px 0 0 118px;
+  margin: 30px auto 0 auto;
   width: 600px;
   height: 315px;
   background-color: $ngwcp_groupsbkg;

@@ -45,6 +45,11 @@ const progress: Progress = {
 }
 #MessagesGroup {
   max-height: 454px;
+  height: auto;
+  width: 98%;
+  background-color: $ngwcp_groupsbkg;
+  border-radius: 30px;
+  border: 1px solid #000;
 }
 #GageCutout {
   margin-right: 5px;
@@ -58,13 +63,6 @@ const progress: Progress = {
   border: 1px solid #000;
 }
 
-#MessagesGroup {
-  height: auto;
-  width: 100%;
-  background-color: $ngwcp_groupsbkg;
-  border-radius: 30px;
-  border: 1px solid #000;
-}
 .boxed {
   border: 1px solid #000;
 }
