@@ -9,3 +9,15 @@ export interface Progress {
   calibration_stop_criteria: Boolean;
   metrics_plot_inteval: Boolean;
 }
+
+export interface GageData {
+  agency: String;
+  station_name: String;
+  site_type: String;
+  latitude: String;
+  longitude: String;
+  altitude: String;
+  date_established:  String;
+  drainage_area: String;
+  huc:  String;  
+}

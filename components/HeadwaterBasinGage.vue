@@ -1,4 +1,5 @@
 <template>
+  <client-only>
   <div id="HeadwaterBasinGage">
     <div id="GageSettings" class="mt-5 ml-20">
       <div class="grid grid-rows-12">
@@ -87,6 +88,7 @@
   <div class="waitgif" v-if="loading">
     <img src="@/assets/styles/img/wait.gif" />
   </div>
+</client-only>
 </template>
 <script lang="ts" setup>
 import Tabs from "@/components/Tabs.vue";
@@ -94,7 +96,8 @@ import Tabs from "@/components/Tabs.vue";
 const loading = ref(true);
 const showMap = ref(false);
 
-const gageData = {
+
+const gageData: GageData = {
   agency: "US Geological Survey",
   station_name: "LITTLE RIVER NEAR HANNOVER, CT",
   site_type: "Stream",
@@ -106,10 +109,10 @@ const gageData = {
   huc: "01100002",
 };
 
-onMounted(() => {
+onMounted(() => { 
   setTimeout(() => {
     loading.value = false;
-  }, 500);
+  }, 500); 
 });
 </script>
 <style lang="scss" scoped>

@@ -15,8 +15,6 @@ onMounted(() => {
 });
 
 
-
-
 const progress: Progress = {
   headwater_basin_gage: true,
   formulation: false,
