@@ -1,5 +1,5 @@
 <template>
-  <div id="Formulation">
+  <div id="Formulation" class="shrink-0">
     <div class="grid grid-cols-12 gap-2">
       <div class="col-span-5 gap-20">
         <div class="grid grid-cols-2 gap-15">
@@ -43,19 +43,19 @@
           <div class="row-span-11">
             <div id="SlothBackground">
               <div class="slothTitle text-xl mb-2">SLoTH Output Variable</div>
-              <div class="ml-8">
-                <div class="text-right inline-block w-1/5 mr-4 mb-2">
+              <div>
+                <div class="text-right inline-block slothLable mr-4 mb-2">
                   SLoth Name:
                 </div>
                 <input class="w-3/5 rounded-lg" type="text" /><br />
-                <div class="text-right inline-block w-1/5 mr-4 mb-2">
+                <div class="text-right inline-block slothLable mr-4 mb-2">
                   For Module:
                 </div>
                 <select class="w-3/5 rounded-lg">
                   <option value="" selected disabled>...</option>
                 </select>
                 <br />
-                <div class="text-right inline-block w-1/5 mr-4 mb-2">
+                <div class="text-right inline-block slothLable mr-4 mb-2">
                   Module Param:
                 </div>
                 <input class="w-3/5 rounded-lg" type="text" /><br />
@@ -189,17 +189,17 @@ ul#ModulesList {
 }
 #SlothBackground {
   height: 301px;
-  width: 615px;
+  width: 35vw;
   background-color: $ngwcp_groupsbkg;
-  border-radius: 30px;
+  border-radius: 20px;
   border: 1px solid #000;
-  padding: 15px;
+  padding: 10px 15px;
   margin-left: 20px;
 }
 
 .nlgButton {
   width: 132px;
-  height: 75px;
+  height: 55px;
   background-color: $ngwcp_primary1;
   color: white;
   border-radius: 20px;
@@ -207,5 +207,10 @@ ul#ModulesList {
 h1 {
   margin-top: 20px;
   text-align: center;
+}
+
+.slothLable {
+  text-align: right;
+  width: 120px;
 }
 </style>

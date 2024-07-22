@@ -2,7 +2,7 @@
   <!-- LeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
-    <div id="InputsArea">
+    <div class="shrink-0" id="InputsArea">
       <span v-if="activeTab == 1">
         <HeadwaterBasinGage />
       </span>
@@ -40,5 +40,6 @@ const tabChanged = (tabNum: number) => {
   position: absolute;
   //margin-left: 100px;
   height: 20vw;
+  min-width: 960px;
 }
 </style>

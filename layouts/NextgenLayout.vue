@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full min-h-screen flex flex-col">
+  <div class="h-full min-h-screen ">
     <div class="grid grid-rows-12">
       <div class="row-span-1">
         <div><AppHeader /></div>
