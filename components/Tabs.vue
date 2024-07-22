@@ -20,10 +20,10 @@
 
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
-
 const { getTabIndex, setTabIndex } = generalStore();
 
 const emit = defineEmits(["tabNumber"]);
+const currentTab = ref(1);
 
 const tabClicked = (event: Event) => {
   event.preventDefault();
@@ -41,10 +41,10 @@ const tabClicked = (event: Event) => {
     ele.classList.add("activeTab");
   }
 
-  const tabNum = Number(ele.getAttribute("data-tab"));
-  if (tabNum) {
-    setTabIndex(tabNum);
-    emit("tabNumber", tabNum);
+ currentTab.value = Number(ele.getAttribute("data-tab"));
+  if (currentTab.value) {
+    setTabIndex(currentTab.value);
+    emit("tabNumber", currentTab.value);
   }
 };
 </script>

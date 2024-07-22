@@ -9,6 +9,14 @@
 import DataEntry from "@/layouts/DataEntry.vue";
 import type { Progress } from "~/composables/NextGenModel";
 
+
+onMounted(() => {
+  console.log(localStorage);
+});
+
+
+
+
 const progress: Progress = {
   headwater_basin_gage: true,
   formulation: false,

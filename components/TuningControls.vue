@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="TuningControls">
     <div class="grid grid-rows-12 gap-2">
       <div class="row-span-5">
         <div class="grid grid-cols-2">
@@ -28,14 +28,14 @@
                     Check the box above<br />to enable Automatic Validation
                 </div>
                 <div v-else>
-                    <div class="timeBlocks">
-                 <div>Simulation Start: <VueDatePicker class="datePickers dp__theme_dark" v-model="simStartTime" time-picker-inline utc  format="yyyy-mm-dd  hh:mm"/></div>
-                <div>Simulation End: <VueDatePicker class="datePickers dp__theme_dark" v-model="simEndTime" time-picker-inline utc  format="yyyy-mm-dd  hh:mm"/></div>
-                <div>Val Start: <VueDatePicker class="datePickers dp__theme_dark" v-model="calStartTime" time-picker-inline utc  format="yyyy-mm-dd  hh:mm"/></div>
-                <div>Val End: <VueDatePicker class="datePickers dp__theme_dark" v-model="calEndTime" time-picker-inline utc  format="yyyy-mm-dd  hh:mm"/></div>
+                    <div class="timeBlocks"> 
+                 <div>Simulation Start: <VueDatePicker class="datePickers dp__theme_dark" v-model="avSimStartTime" time-picker-inline utc  format="yyyy-mm-dd  hh:mm"/></div>
+                <div>Simulation End: <VueDatePicker class="datePickers dp__theme_dark" v-model="avSimEndTime" time-picker-inline utc  format="yyyy-mm-dd  hh:mm"/></div>
+                <div>Val Start: <VueDatePicker class="datePickers dp__theme_dark" v-model="avCalStartTime" time-picker-inline utc  format="yyyy-mm-dd  hh:mm"/></div>
+                <div>Val End: <VueDatePicker class="datePickers dp__theme_dark" v-model="avCalEndTime" time-picker-inline utc  format="yyyy-mm-dd  hh:mm"/></div>
                 </div>
                 </div>
-              </div>
+              </div> 
             </div>
           </div>
         </div>
@@ -43,7 +43,7 @@
 
       <div class="row-span-2"></div>
 
-      <div class="row-span-5"></div>
+      <div class="row-span-5"></div> 
     </div>
   </div>
 </template>
@@ -57,6 +57,11 @@ const simEndTime = ref();
 const calStartTime = ref();
 const calEndTime = ref();
 
+const avSimStartTime = ref();
+const avSimEndTime = ref();
+const avCalStartTime = ref();
+const avCalEndTime = ref();
+
 const autoValidation = ref(false);
 const datetime = ref();
 const AutoValChecked = () => {
@@ -67,6 +72,10 @@ const AutoValChecked = () => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+#TuningControls {
+  margin-left: 10px;
+  width: 60vw;
+}
 #BoxLeft {
   margin: 10px 0 0 30px;
 }

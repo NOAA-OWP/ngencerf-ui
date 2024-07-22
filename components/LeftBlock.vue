@@ -38,8 +38,7 @@ const tabChanged = (tabNum: number) => {
 <style lang="scss" scoped>
 #InputsArea {
   position: absolute;
-  width: 104vh;
-  margin-left: 10px;
+  //margin-left: 100px;
   height: 20vw;
 }
 </style>
