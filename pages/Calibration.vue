@@ -1,12 +1,12 @@
 <!-- Calibration.vue -->
 <template>
-  <DataEntry :progress="progress">
+  <NextgenLayout>
 
-  </DataEntry>
+  </NextgenLayout>
 </template>
 
 <script lang="ts" setup>
-import DataEntry from "@/layouts/DataEntry.vue";
+import NextgenLayout from "~/layouts/NextgenLayout.vue";
 import type { Progress } from "~/composables/NextGenModel";
 
 
