@@ -21,7 +21,7 @@
           <div class="col-span-1">
             <div id="BoxRight">
               <div id="BoxTopRight" class="pt-2">
-                <input type="checkbox" id="CheckTheBox" @change="AutoValChecked"></input>
+                <input type="checkbox" id="CheckTheBox" v-on:change="AutoValChecked"></input>
                 <label for="CheckTheBox">Automatic Validation</label>
               </div>
               <div id="BoxBottomRight" class="pt-2">
@@ -94,6 +94,10 @@
                 <select id="TuningParam" class="varInputs">
                   <option value="" selected disabled>...</option>
                 </select>
+                &nbsp;
+                <div id="AddUpdateBtn" class="inline">
+                  <button> Add / Update </button>
+              </div>
               </div>
             </div>
           </div>
@@ -109,7 +113,9 @@
         </div>
       </div>
 
-      <div class="row-span-5"></div>
+      <div class="row-span-5">
+        TABLE GOES HERE
+      </div>
     </div>
   </div>
 </template>
@@ -172,6 +178,15 @@ const AutoValChecked = () => {
   margin: 10px 0 0 50px;
 }
 
+#AddUpdateBtn {
+  height: 40px;
+  border: 1px solid black;
+  color: white;
+  padding: 8px;
+  border-radius: 10px;
+ background-color: $ngwcp_primary1;
+}
+
 .timeBlocks {
   font-size: 0.8em;
   text-align: right;
@@ -193,10 +208,10 @@ const AutoValChecked = () => {
 }
 
  .varInputs {
-  width: 300px;
+  width: 280px;
  }
 
  input, select {
-  border-radius: 8px;;
+  border-radius: 8px;
  }
 </style>
