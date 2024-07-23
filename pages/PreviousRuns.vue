@@ -3,6 +3,14 @@
     &nbsp;&nbsp;<span id="NewButton" @click="NewCalibration"><button>New</button></span></div>
   <div>   
     <div id="CalTable">
+      <DataTable :value="calibrationRuns" scrollable scroll-height="400px" table-style="min-width: 50rem">
+        <Column field="runId" header="Run ID" sortable></Column>
+        <Column field="formulationName" header="Formulation Name" sortable></Column>
+        <Column field="headwaterBasinGage" header="Headwater Basin Gage" sortable></Column>
+        <Column field="runDate" header="Run Date" sortable></Column>
+        <Column field="calibrationPeriod" header="Calibration Period" sortable></Column>
+        <Column field="status" header="Status" sortable></Column>
+      </DataTable>
     <!-- <DataTable
       class="display table table-hover table-striped"
       width="50%"
@@ -33,9 +41,23 @@ import { useRouter } from "vue-router";
 // import DataTablesCore from "datatables.net";
 // import "datatables.net-select";
 // import "datatables.net-responsive";
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import { useCalibrationRunStore } from "~/stores/CalibrationRunStore";
+import { storeToRefs } from "pinia";
 
+const calibrationRunStore = useCalibrationRunStore()
+const { calibrationRuns } = storeToRefs( calibrationRunStore )
+
+async function initCalibrationRuns() {
+  await calibrationRunStore.retrieveCalibrationRuns()
+}
 //DataTable.use(DataTablesCore);
-
+onMounted(() => {
+  console.log( 'onmounted' )
+  initCalibrationRuns()
+  console.log(localStorage);
+});
 
 const NewCalibration = async () => {
   await navigateTo("Calibration");
