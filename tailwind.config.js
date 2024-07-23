@@ -11,7 +11,7 @@ export default {
   ],
   theme: {
     colors: {
-      "buttonBackground": "#105d8e",
+      "buttonBackground": "$ngwcp_primary1",
     },
     extend: {
       fontFamily: {

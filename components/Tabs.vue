@@ -1,19 +1,31 @@
 <!-- tabs.vue -->
 <template TABS>
-  <div id="MainTabs" class="">
+  <div id="MainTabs">
     <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
       <div data-tab="1" class="tabs activeTab" v-on:click="tabClicked">
         Headwater Basin Gage
+        <div class="errorDot"></div>
       </div>
-      <div data-tab="2" class="tabs" v-on:click="tabClicked">Formulation</div>
+      <div data-tab="2" class="tabs" v-on:click="tabClicked">
+        Formulation
+        <div class="errorDot"></div>
+      </div>
       <div data-tab="3" class="tabs" v-on:click="tabClicked">
         Tuning Controls
+        <div class="errorDot"></div>
       </div>
       <div data-tab="4" class="tabs" v-on:click="tabClicked">
         Optimization / Metrics
+        <div class="errorDot"></div>
       </div>
-      <div data-tab="5" class="tabs" v-on:click="tabClicked">Run / Status</div>
-      <div data-tab="6" class="tabs" v-on:click="tabClicked">Results</div>
+      <div data-tab="5" class="tabs" v-on:click="tabClicked">
+        Run / Status
+        <div class="errorDot"></div>
+      </div>
+      <div data-tab="6" class="tabs" v-on:click="tabClicked">
+        Results
+        <div class="errorDot"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -41,7 +53,7 @@ const tabClicked = (event: Event) => {
     ele.classList.add("activeTab");
   }
 
- currentTab.value = Number(ele.getAttribute("data-tab"));
+  currentTab.value = Number(ele.getAttribute("data-tab"));
   if (currentTab.value) {
     setTabIndex(currentTab.value);
     emit("tabNumber", currentTab.value);
@@ -61,15 +73,23 @@ const tabClicked = (event: Event) => {
     width: 16%;
     height: 48px;
     background-color: #ffffff;
-    color: #000000;
+    color: $ngwcp_primary3;
     text-align: center;
     padding-top: 13px;
     border-radius: 30px 30px 0 0;
-    border: 1px solid #105d8e;
+    border: 1px solid $ngwcp_primary1;
   }
 
+  .errorDot {
+    display: inline-block;
+    background-color: black;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    margin-left: 3px;
+  }
   .activeTab {
-    background-color: #105d8e;
+    background-color: $ngwcp_primary1;
     color: #ffffff;
     font-weight: bold;
   }

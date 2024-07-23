@@ -9,10 +9,10 @@
 	.st3{clip-path:url(#SVGID_00000170995233113227578350000005114600884259282565_);}
 	.st4{fill:#FFFFFF;}
 	.st5{clip-path:url(#SVGID_00000170256277316753345530000000261717787414279603_);}
-	.st6{fill:#5BB6C1;}
-	.st7{display:inline;fill:#105D8E;}
+	.st6{fill:$ngwcp_primary2;}
+	.st7{display:inline;fill:$ngwcp_primary1;}
 	.st8{clip-path:url(#SVGID_00000027567232630727615100000008838162873684679332_);}
-	.st9{fill:#105D8E;}
+	.st9{fill:$ngwcp_primary1;}
 </style>
 <g id="Layer_1_00000082369083162098458950000008736377413136307384_" class="st0">
 	<g class="st1">

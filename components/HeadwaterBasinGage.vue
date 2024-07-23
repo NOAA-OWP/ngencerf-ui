@@ -116,15 +116,14 @@ onMounted(() => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 #GageSettings {
-  margin-left: 5vw;
+  width: 60vw;
+  //margin-left: 5vw;
+  margin: 20px auto;
   background-color: $ngwcp_groupsbkg;
   padding: 10px 10px 10px 20px;
   border-radius: 20px;
   height: 80px;
   border: 1px solid $ngwcp_primary1;
-  .selRow {
-    width: 55vw;
-      }
 }
 select {
   width: 90%;

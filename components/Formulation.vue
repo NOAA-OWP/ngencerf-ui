@@ -5,6 +5,12 @@
         <div class="grid grid-cols-2 gap-15">
           <div class="col-span-1">
             <div class="mt-2 text-center">Modules</div>
+            <div class="ml-6 mt-2">
+              Group:
+              <select id="ModuleGroupSelect" class="ml-3">
+                <option value="all" selected>All</option>
+              </select>
+            </div>
             <ul id="ModulesList">
               <li
                 v-for="(module, index) in formulation_modules"
@@ -162,7 +168,7 @@ const ModuleClicked = (e: MouseEvent) => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 #Formulation {
-  width: 60vw;
+  width: auto;
 }
 ul#ModulesList,
 ul#ModuleCoveredList {
@@ -178,6 +184,10 @@ ul#ModuleCoveredList {
   }
 }
 
+#ModuleGroupSelect {
+  width: 130px;
+
+}
 ul#ModulesList {
   li {
     background-color: $ngwcp_groupsbkg;
