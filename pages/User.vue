@@ -105,7 +105,7 @@ const UpdatePassword = (e: Event) => {
       margin: 20px auto;
       text-align: center;
       border: 3px solid #000;
-      background-color: #5bb6c1;
+      background-color: $ngwcp_primary2;
       border-radius: 20px;
       width: 245px;
       height: 50px;

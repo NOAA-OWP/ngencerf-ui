@@ -11,7 +11,7 @@ export default defineNuxtConfig({
       },
     ],
     '@pinia-plugin-persistedstate/nuxt',
-    "@nuxtjs/google-fonts"
+    "@nuxtjs/google-fonts",
   ],
 
   postcss: {

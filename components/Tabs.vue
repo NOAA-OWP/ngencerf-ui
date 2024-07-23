@@ -65,11 +65,11 @@ const tabClicked = (event: Event) => {
     text-align: center;
     padding-top: 13px;
     border-radius: 30px 30px 0 0;
-    border: 1px solid #105d8e;
+    border: 1px solid $ngwcp_primary1;
   }
 
   .activeTab {
-    background-color: #105d8e;
+    background-color: $ngwcp_primary1;
     color: #ffffff;
     font-weight: bold;
   }
