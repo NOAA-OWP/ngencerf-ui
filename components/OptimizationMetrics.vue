@@ -1,9 +1,9 @@
 <template>
   <div id="OptimizationMetrics">
-    <div class="grid grid-cols-2 p-6 gap-10 ml-5">
+    <div class="grid grid-cols-2 pt-3 gap-10 ml-5">
       <div class="grid col-span-1">
-        <div class="grid grid-rows-9">
-          <div class="row-span-2">
+        <div class="grid grid-rows-8">
+          <div class="row-span-1">
             <div id="OptAlg"  class="text-center bordered" >
               Optimization Algorithm<br />
               Name:&nbsp;&nbsp;
@@ -12,18 +12,18 @@
               </select>
             </div>
           </div>
-          <div class="row-span-5">
-            <div id="AlgParamtable"  class="text-center bordered" >
+          <div class="row-span-4 mt-5">
+            <div id="AlgParamtable"  class="text-center" >
               Algorithm Parameter(s)
-              <table style="height: 270px">
+              <table style="height: 270px; max-width: 480px; margin: 0 auto">
                 <tr>
                   <td>[table]</td>
                 </tr>
               </table>
+              <div id="ClearTableBtn" class="text-center"><button>Clear <i class="pi pi-arrow-up"></i></button></div>
             </div>
-            <div id="ClearTableBtn" class=""><button>Clear <i class="pi pi-arrow-up"></i></button></div>
           </div>
-          <div class="row-span-2 mt-3">
+          <div class="row-span-2">
             <div id="CalStop" class="text-center bordered">
               Calibration Stop Criteria:<br />
               <input type="number" /><br />
@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="grid col-span-1" style="border-left: 1px solid black">
-        <div class="grid grid-rows-3">
+        <div class="grid grid-rows-6">
           <div class="row-span-1">
             <div id="ObjFunct" class="text-center bordered" >
               Objective Function<br />
@@ -90,7 +90,6 @@ const ShowFlowThreshold = (e) => {
 #Metrics,
 #PlotGenFreq,
 #OptAlg {
-  // height: 104px;
   width: 381px;
   background-color: $ngwcp_groupsbkg;
   margin: 0 auto;
@@ -107,7 +106,6 @@ const ShowFlowThreshold = (e) => {
 #ObjFunct input,
 #FlowThreshold input,
 #PlotGenFreq input {
-  width: 50%;
   display: inline;
   width: 50%;
   height: 26px;
@@ -120,7 +118,7 @@ const ShowFlowThreshold = (e) => {
 }
 
 #AlgParamtable table {
-  width: 531px;
+  width: 100%;
   background-color: $ngwcp_groupsbkg;
 }
 
@@ -131,7 +129,7 @@ const ShowFlowThreshold = (e) => {
   color: white;
   border-radius: 10px;
   padding: 8px 0 0 8px;
-  margin: 8px 0 0 12px;
+  margin: 8px 0 0 62px;
   border: 1px solid #888888;
 }
 .rounded {

@@ -21,9 +21,15 @@
               </table>
             </div>
 
-            <div class="col-span-1" style="border-left: 1px solid #000">
-              <div class="mt-1">Status:</div>
-              <div>Display:</div>
+            <div class="col-span-1 pl-5" style="border-left: 1px solid #000">
+              <div class="mt-1">
+                Status: <ProgressBar :value="progress"></ProgressBar>
+              </div>
+              <div class="mt-4">Display: 
+                <select id="DisplayOptions">
+                    <option>Parameters</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -34,10 +40,13 @@
 </template>
 
 <script lang="ts" setup>
+import ProgressBar from "primevue/progressbar";
 const dashes = "---------------------------";
 const runningTime = ref();
 const startTime = ref();
 const iteration = ref();
+
+const progress = ref(30);
 </script>
 
 <style lang="scss" scoped>
@@ -53,9 +62,41 @@ const iteration = ref();
   border: 1px solid $ngwcp_primary1;
 }
 
+#DisplayOptions {
+    width: 60%;
+    margin-left: 10px;
+}
+.p-progressbar {
+  display: inline-block;
+  width: 200px;
+  height: 25px;
+}
+
 .leftSideText {
   width: 135px;
   text-align: right;
   padding-right: 20px;
+}
+
+</style>
+
+<style>
+:root {
+  .p-progressbar {
+    background: yellow;
+    vertical-align: text-bottom;
+    margin-left: 10px;
+    width: 80%;
+  }
+  .p-progressbar-value {
+    color: green;
+    background-color: green;
+  }
+  .p-progressbar-value {
+    color: black;
+  }
+  .p-progressbar-label {
+    color: white;
+  }
 }
 </style>

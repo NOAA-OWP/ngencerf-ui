@@ -168,7 +168,7 @@ const ModuleClicked = (e: MouseEvent) => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 #Formulation {
-  width: 60vw;
+  width: auto;
 }
 ul#ModulesList,
 ul#ModuleCoveredList {

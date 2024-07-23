@@ -124,9 +124,6 @@ onMounted(() => {
   border-radius: 20px;
   height: 80px;
   border: 1px solid $ngwcp_primary1;
-  .selRow {
-    //width: 55vw;
-      }
 }
 select {
   width: 90%;

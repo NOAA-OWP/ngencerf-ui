@@ -1,16 +1,16 @@
 <template>
   <div id="BottomButtons" class="grid grid-cols-7">
     <div>
-      <button class="start actionBtn">START</button>
+      <button class="start actionBtn">{{ getTabIndex() < 6 ? "SAVE" : "START" }}</button>
     </div>
     <div>
-      <button class="stop actionBtn">STOP</button>
+      <button class="stop actionBtn">{{ getTabIndex() < 6 ? "STOP" : "START" }}</button>
     </div>
     <div>
-      <button class="save actionBtn">SAVE</button>
+      <button class="">&nbsp;</button>
     </div>
     <div>
-      <button class="reset actionBtn">RESET</button>
+      <button class="">&nbsp;</button>
     </div>
     <div>
       <div class="buttonSpacer">&nbsp;</div>
@@ -24,8 +24,15 @@
   </div>
 </template>
 
-<script lang="ts" setup></script>
-4
+<script lang="ts" setup>
+import { generalStore } from "@/stores/common/GeneralStore";
+const { getTabIndex } = generalStore();
+
+const tabIndex = getTabIndex();
+
+
+</script>
+
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
