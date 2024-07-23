@@ -11,7 +11,8 @@ export default defineNuxtConfig({
       },
     ],
     '@pinia-plugin-persistedstate/nuxt',
-    "@nuxtjs/google-fonts"
+    "@nuxtjs/google-fonts",
+    "@primevue/nuxt-module"
   ],
 
   postcss: {
@@ -35,6 +36,12 @@ export default defineNuxtConfig({
         wght: '200..900',
         ital: '200..700',
       }
+    }
+  },
+
+  primevue: {
+    options: {
+      unstyled: true
     }
   },
 
