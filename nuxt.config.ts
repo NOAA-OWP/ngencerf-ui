@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import Aura from '@primevue/themes/aura';
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ["/assets/styles/styles.scss"],
@@ -12,7 +14,7 @@ export default defineNuxtConfig({
     ],
     '@pinia-plugin-persistedstate/nuxt',
     "@nuxtjs/google-fonts",
-    "@primevue/nuxt-module"
+    '@primevue/nuxt-module'
   ],
 
   postcss: {
@@ -41,7 +43,9 @@ export default defineNuxtConfig({
 
   primevue: {
     options: {
-      unstyled: true
+      theme: {
+        preset: Aura
+      },
     }
   },
 

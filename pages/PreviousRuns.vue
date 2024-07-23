@@ -3,7 +3,9 @@
     &nbsp;&nbsp;<span id="NewButton" @click="NewCalibration"><button>New</button></span></div>
   <div>   
     <div id="CalTable">
-      <DataTable :value="calibrationRuns" scrollable scroll-height="400px" table-style="min-width: 50rem">
+
+      <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu" :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+      <DataTable id="cr-list" :pt="{ thead: { class: '!bg-black' } }" :value="calibrationRuns" scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu">
         <Column field="runId" header="Run ID" sortable></Column>
         <Column field="formulationName" header="Formulation Name" sortable></Column>
         <Column field="headwaterBasinGage" header="Headwater Basin Gage" sortable></Column>
@@ -41,21 +43,51 @@ import { useRouter } from "vue-router";
 // import DataTablesCore from "datatables.net";
 // import "datatables.net-select";
 // import "datatables.net-responsive";
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
+import type { CalibrationRun } from "~/composables/NextGenModel";
+
 import { useCalibrationRunStore } from "~/stores/CalibrationRunStore";
 import { storeToRefs } from "pinia";
+
+const crContextMenu = ref() //calibration run context menu
+const selectedCalibrationRun = ref<CalibrationRun>()
+const cmCalibrationRun = ref([
+  { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun( selectedCalibrationRun ) },
+  { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun( selectedCalibrationRun ) },
+  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun( selectedCalibrationRun ) }
+])
+const onRowContextMenu = ( event: any ) => {
+  crContextMenu.value.show( event.originalEvent )
+}
 
 const calibrationRunStore = useCalibrationRunStore()
 const { calibrationRuns } = storeToRefs( calibrationRunStore )
 
-async function initCalibrationRuns() {
+async function initCalibrationRunList() {
   await calibrationRunStore.retrieveCalibrationRuns()
 }
+
+const openSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
+  console.log('open')
+  console.log( selectedCalibrationRun.value.runId )
+}
+
+const cloneSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
+  console.log('clone')
+  console.log( selectedCalibrationRun.value.runId )
+}
+
+const deleteSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
+  console.log('delete')
+  console.log( selectedCalibrationRun.value.runId )
+  const reducedCalibrationRuns = calibrationRuns.value.filter( ( cr ) => cr.runId != selectedCalibrationRun.value.runId )
+  calibrationRuns.value = reducedCalibrationRuns
+  selectedCalibrationRun.value = undefined
+}
+
 //DataTable.use(DataTablesCore);
 onMounted(() => {
   console.log( 'onmounted' )
-  initCalibrationRuns()
+  initCalibrationRunList()
   console.log(localStorage);
 });
 
@@ -94,5 +126,10 @@ const NewCalibration = async () => {
         }
     }
 }
+
+.bg-black {
+  background-color: #105D8E;
+}
+
 
 </style>

@@ -2,15 +2,7 @@
 
 import { defineStore } from "pinia";
 import { mockedCalibrationRunData } from "@/mockApi/calibrationRunData"
-
-interface CalibrationRun {
-  runId: number,
-  formulationName: string,
-  headwaterBasinGage: string,
-  runDate: string,
-  calibrationPeriod: string,
-  status: string
-}
+import type { CalibrationRun } from "~/composables/NextGenModel";
 
 export const useCalibrationRunStore = defineStore( 'CalibrationRunStore', () => {
   const calibrationRuns = ref<CalibrationRun[]>([])
@@ -37,5 +29,5 @@ export const useCalibrationRunStore = defineStore( 'CalibrationRunStore', () => 
    actions, and getters.
 */
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useCalibrationStore, import.meta.hot));
+  import.meta.hot.accept(acceptHMRUpdate(useCalibrationRunStore, import.meta.hot));
 }

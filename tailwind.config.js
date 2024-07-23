@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./components/**/*.{js,vue,ts}",
     "./layouts/**/*.vue",
@@ -22,10 +23,10 @@ export default {
         "NeueFrutigerWorld-BookIt": ["NeueFrutigerWorld-BookIt", 'sans-serif'],
         "NeueFrutigerWorld-Medium": ["NeueFrutigerWorld-Medium", 'sans-serif'],
         "NeueFrutigerWorld-MediumIt": ["NeueFrutigerWorld-MediumIt", 'sans-serif'],
-      },
+      }
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-primeui')],
 };
 
 
