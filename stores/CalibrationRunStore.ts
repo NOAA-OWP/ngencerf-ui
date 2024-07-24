@@ -9,12 +9,10 @@ export const useCalibrationRunStore = defineStore( 'CalibrationRunStore', () => 
 
   async function retrieveCalibrationRuns(): Promise<void> {
     const listCalibrationRuns = await mockedCalibrationRunData()
-    console.log( listCalibrationRuns )
     listCalibrationRuns.forEach( ( run_data, index ) => {
       console.log( run_data )
       calibrationRuns.value.push( run_data )
     })
-    console.log( listCalibrationRuns )
   }
 
   return {

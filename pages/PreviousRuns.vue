@@ -6,7 +6,7 @@
       <Toast />
       <ConfirmDialog></ConfirmDialog>
       <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu" :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-      <DataTable id="cr-list" :pt="{ thead: { class: '!bg-black' } }" :value="calibrationRuns" scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu">
+      <DataTable id="cr-list" :value="calibrationRuns" scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle">
         <Column field="runId" header="Run ID" sortable></Column>
         <Column field="formulationName" header="Formulation Name" sortable></Column>
         <Column field="headwaterBasinGage" header="Headwater Basin Gage" sortable></Column>
@@ -119,6 +119,11 @@ const acceptDelete = ( selectedRunId: number ) => {
   selectedCalibrationRun.value = undefined    
 }
 
+const rowStyle = ( data: any ) => {
+  if( !['Saved','Ready'].includes( data.status ) ) {
+    return { backgroundColor: 'gainsboro' }
+  }
+}
 //DataTable.use(DataTablesCore);
 onMounted(() => {
   console.log( 'onmounted' )
@@ -160,10 +165,6 @@ const NewCalibration = async () => {
             border: 1px solid #000;
         }
     }
-}
-
-.bg-black {
-  background-color: #105D8E;
 }
 
 
