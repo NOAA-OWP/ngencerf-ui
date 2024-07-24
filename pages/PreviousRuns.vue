@@ -75,11 +75,15 @@ async function initCalibrationRunList() {
 const openSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
   console.log('open')
   console.log( selectedCalibrationRun.value.runId )
+  if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open Results tab', life: 3000 })
+  if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open corresponding saved tab', life: 3000 })
+  if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open Run/Status tab', life: 3000 })
 }
 
 const cloneSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
   console.log('clone')
   console.log( selectedCalibrationRun.value.runId )
+  toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
 }
 
 const confirmDelte = useConfirm();
