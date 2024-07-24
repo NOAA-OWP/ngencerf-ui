@@ -67,7 +67,7 @@
           <tr class="rowEven">
             <td class="dataName">Altitude</td>
             <td class="dataText">{{ gageData.altitude }}</td>
-          </tr>boxed
+          </tr>
           <tr class="rowOdd">
             <td class="dataName">Date Established</td>
             <td class="dataText">{{ gageData.date_established }}</td>

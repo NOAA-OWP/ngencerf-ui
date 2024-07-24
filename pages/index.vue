@@ -1,6 +1,6 @@
 <template>
   <Head>
-    <Title>NEXTGEN</Title>
+    <Title>NgenCERF</Title>
   </Head>
 
 </template>
