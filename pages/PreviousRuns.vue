@@ -3,7 +3,8 @@
     &nbsp;&nbsp;<span id="NewButton" @click="NewCalibration"><button>New</button></span></div>
   <div>   
     <div id="CalTable">
-
+      <Toast />
+      <ConfirmDialog></ConfirmDialog>
       <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu" :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
       <DataTable id="cr-list" :pt="{ thead: { class: '!bg-black' } }" :value="calibrationRuns" scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu">
         <Column field="runId" header="Run ID" sortable></Column>
@@ -39,15 +40,20 @@
 </template>
 <script setup lang="ts">
 import { useRouter } from "vue-router";
+
 // import DataTable from "datatables.net-vue3";
 // import DataTablesCore from "datatables.net";
 // import "datatables.net-select";
 // import "datatables.net-responsive";
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+
 import type { CalibrationRun } from "~/composables/NextGenModel";
 
 import { useCalibrationRunStore } from "~/stores/CalibrationRunStore";
 import { storeToRefs } from "pinia";
 
+const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
 const selectedCalibrationRun = ref<CalibrationRun>()
 const cmCalibrationRun = ref([
@@ -76,12 +82,37 @@ const cloneSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
   console.log( selectedCalibrationRun.value.runId )
 }
 
+const confirmDelte = useConfirm();
+
 const deleteSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
-  console.log('delete')
-  console.log( selectedCalibrationRun.value.runId )
-  const reducedCalibrationRuns = calibrationRuns.value.filter( ( cr ) => cr.runId != selectedCalibrationRun.value.runId )
+  const confirm_delete = ref( false )
+  const selectedRunId = selectedCalibrationRun.value.runId
+  let confirmMessage = "Are you sure you want to delete?"
+  if( selectedCalibrationRun.value.status == "Running" ) confirmMessage += " The running calibration will be aborted."
+  
+  confirmDelte.require({
+    message: confirmMessage,
+    header: 'Confirm Delete',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Save',
+    },
+    accept: () => acceptDelete( selectedRunId ),
+    reject: () => {
+      //do nothing
+    }
+  })
+}
+const acceptDelete = ( selectedRunId: number ) => {
+  toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
+  const reducedCalibrationRuns = calibrationRuns.value.filter( ( cr ) => cr.runId != selectedRunId )
   calibrationRuns.value = reducedCalibrationRuns
-  selectedCalibrationRun.value = undefined
+  selectedCalibrationRun.value = undefined    
 }
 
 //DataTable.use(DataTablesCore);
