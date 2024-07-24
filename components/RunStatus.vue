@@ -16,7 +16,7 @@
       <div class="grid grid-cols-2">
         <div id="MetricsTable">
           <div class="col-span-1">
-            Metric(s) <super>*</super><br />
+            Metric(s) <sup>*</sup><br />
             <br />[table]
           </div>
           <div class="text-center">
