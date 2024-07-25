@@ -10,7 +10,7 @@
           placeholder=" Username"
           aria-label="Username"
         />
-        <button tabindex="-1" class="forgot" v-on:click="forgotUsername">
+        <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
           Forgot Username
         </button>
       </div>
@@ -22,7 +22,7 @@
           placeholder=" Password"
           aria-label="Password"
         />
-        <button tabindex="-1" class="forgot" v-on:click="forgotPassword">
+        <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
           Forgot Password
         </button>
       </div>
@@ -32,7 +32,7 @@
 
       <div id="NeedAccountBox">
         <h2 class="needAccount">Need an Account?</h2>
-        <div class="signupButton" aria-label="sign up">
+        <div class="signupButton" v-on:click="SignUp" aria-label="sign up">
           <button>Sign Up!</button>
         </div>
       </div>
@@ -49,18 +49,21 @@ const loading = ref(true);
 const userName = ref("");
 const userPassword = ref("");
 
-const forgotUsername = () => {
-  alert("Not yet implemented");
+const ForgotUsername = () => {
+//
 };
-const forgotPassword = () => {
-  alert("Not yet implemented");
+const ForgotPassword = () => {
+//
+};
+const SignUp = () => {
+//
 };
 const SubmitForm = (e: Event) => {
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     logUserIn();
     GoToLanding();
   } else {
-    alert("Please enter valid credentials");
+//
   }
 };
 
