@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
 // Default to Tab 1, HeadwaterBasinGage
+import Tabs from './Tabs.vue';
 const activeTab = ref(1);
 
 // Activate new tab
