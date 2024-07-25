@@ -14,37 +14,11 @@
         <Column field="calibrationPeriod" header="Calibration Period" sortable></Column>
         <Column field="status" header="Status" sortable></Column>
       </DataTable>
-    <!-- <DataTable
-      class="display table table-hover table-striped"
-      width="50%"
-    >
-      <thead>
-        <tr>
-          <th>Run ID</th>
-          <th>Forumulation Name</th>
-          <th>Headwater Basin Gage</th>
-          <th>Run Date</th>
-          <th>Calibration Period</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Hello</td>
-          <td>There</td>
-        </tr>
-      </tbody>
-    </DataTable> -->
 </div>
   </div>
 </template>
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-
-// import DataTable from "datatables.net-vue3";
-// import DataTablesCore from "datatables.net";
-// import "datatables.net-select";
-// import "datatables.net-responsive";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
@@ -124,7 +98,6 @@ const rowStyle = ( data: any ) => {
     return { backgroundColor: 'gainsboro' }
   }
 }
-//DataTable.use(DataTablesCore);
 onMounted(() => {
   console.log( 'onmounted' )
   initCalibrationRunList()
@@ -137,8 +110,6 @@ const NewCalibration = async () => {
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-//@import "datatables.net-dt";
-
 #PgTitle {
     text-align:center;
     font-size: 30px;
