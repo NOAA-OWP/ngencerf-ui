@@ -43,8 +43,6 @@
 import { ref } from "vue";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
-const { $toast } = useNuxtApp();
-
 const { logUserIn, logUserOut } = useUserDataStore();
 
 const loading = ref(true);
@@ -52,21 +50,20 @@ const userName = ref("");
 const userPassword = ref("");
 
 const ForgotUsername = () => {
-  $toast.warning("Not yet implemented");
+//
 };
 const ForgotPassword = () => {
-  $toast.warning("Not yet implemented");
+//
 };
 const SignUp = () => {
-  $toast.warning("Not yet implemented");
+//
 };
 const SubmitForm = (e: Event) => {
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     logUserIn();
-    $toast.success("You are now signed in");
     GoToLanding();
   } else {
-    $toast.warning("Please enter valid credentials");
+//
   }
 };
 
