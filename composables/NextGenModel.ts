@@ -21,3 +21,12 @@ export interface GageData {
   drainage_area: String;
   huc:  String;  
 }
+
+export interface CalibrationRun {
+  runId: number,
+  formulationName: string,
+  headwaterBasinGage: string,
+  runDate: string,
+  calibrationPeriod: string,
+  status: string
+}
