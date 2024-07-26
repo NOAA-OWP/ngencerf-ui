@@ -30,3 +30,11 @@ export interface CalibrationRun {
   calibrationPeriod: string,
   status: string
 }
+
+export interface SlothParameter {
+  outputVar: string,
+  metadata: string,
+  module: string,
+  moduleParam: string,
+  value: number
+}
