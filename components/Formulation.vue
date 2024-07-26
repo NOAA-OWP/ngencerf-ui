@@ -1,6 +1,6 @@
 <template>
   <div id="Formulation" class="shrink-0">
-    <div class="grid grid-cols-6 p-2 grid-cols-2 gap-2">
+    <div class="grid grid-cols-6 p-2 gap-2">
       <div class="col-1 col-span-1 row-span-2 p-2">
         <div class="mt-2 text-center">Modules</div>
         <div class="ml-6 mt-2">
