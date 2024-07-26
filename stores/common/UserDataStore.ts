@@ -3,7 +3,7 @@
 import { defineStore } from "pinia";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
-  const isLoggedIn = ref(false);
+  const isLoggedIn = ref(true);
 
   function isUserLoggedIn() {
     return isLoggedIn.value;
