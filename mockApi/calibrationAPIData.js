@@ -20,3 +20,12 @@ export const mockCalibrationTuningData = () => {
     }
   ]
 }
+
+export const mockAlogorithmParameterData = () => {
+  return [
+    {
+      parameter: "r",
+      initValue: 2000
+    }
+  ]
+}

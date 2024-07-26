@@ -45,3 +45,8 @@ export interface CalibrationTuningData {
   max: number,
   initValue: number
 }
+
+export interface AlgorithmParameter {
+  parameter: string,
+  initValue: number
+}
