@@ -38,3 +38,10 @@ export interface SlothParameter {
   moduleParam: string,
   value: number
 }
+
+export interface CalibrationTuningData {
+  parameter: string,
+  min: number,
+  max: number,
+  initValue: number
+}

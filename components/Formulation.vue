@@ -103,7 +103,7 @@
         <DataTable :value="slothParameters" scrollable scroll-height="300px" >
           <Column field="outputVar" header="SLoTH Output Var" sortable></Column>
           <Column field="metadata" header="Metadata Properties" sortable></Column>
-          <Column field="module" header="RFor Module" sortable></Column>
+          <Column field="module" header="For Module" sortable></Column>
           <Column field="moduleParam" header="Module Param" sortable></Column>
           <Column field="value" header="Value" sortable></Column>
         </DataTable> 
