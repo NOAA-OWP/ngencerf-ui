@@ -50,3 +50,12 @@ export interface AlgorithmParameter {
   parameter: string,
   initValue: number
 }
+
+export interface RunMetric {
+  metric: string
+}
+
+export interface RunDependentInput {
+  name: string,
+  value: string
+}

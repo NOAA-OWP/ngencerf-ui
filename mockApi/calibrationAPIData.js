@@ -29,3 +29,23 @@ export const mockAlogorithmParameterData = () => {
     }
   ]
 }
+
+export const mockRunStatusMetricData = () => {
+  return [
+    {
+      metric: 'RMSE'
+    },
+    {
+      metric: 'PBIAS'
+    }
+  ]
+}
+
+export const mockRunStatusDependentInputData = () => {
+  return [
+    {
+      name: 'root',
+      value: 'true'
+    }
+  ]
+}

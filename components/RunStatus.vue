@@ -17,7 +17,10 @@
         <div id="MetricsTable">
           <div class="col-span-1">
             Metric(s) <sup>*</sup><br />
-            <br />[table]
+            <br />
+            <DataTable :value="metricTableData" scrollable scroll-height="300px" >
+              <Column field="metric" header="Metric" sortable></Column>
+            </DataTable> 
           </div>
           <div class="text-center">
             * Right click on metric entry<br />for deletion options
@@ -29,7 +32,11 @@
               <div class="row-span-1">
                 <div class="col-span-1">
                   Dependent Input(s)<br />
-                  <br />[table]
+                  <br />
+                  <DataTable :value="dependentInputTableData" scrollable scroll-height="300px" >
+                    <Column field="name" header="Name" sortable></Column>
+                    <Column field="value" header="Value" sortable></Column>
+                  </DataTable> 
                 </div>
               </div>
             </div>
@@ -55,7 +62,21 @@
 </template>
 
 <script lang="ts" setup>
-//
+import type { RunDependentInput, RunMetric } from '~/composables/NextGenModel';
+import { mockRunStatusDependentInputData, mockRunStatusMetricData } from '~/mockApi/calibrationAPIData';
+
+const metricTableData = ref<RunMetric[]>([])
+const dependentInputTableData = ref<RunDependentInput[]>([])
+
+onMounted( () => {
+  mockRunStatusMetricData().forEach( (data, index ) => {
+    metricTableData.value.push( <RunMetric>data )
+  })
+
+  mockRunStatusDependentInputData().forEach( (data, index ) => {
+    dependentInputTableData.value.push( <RunDependentInput>data )
+  })
+})
 </script>
 
 <style lang="scss" scoped>
