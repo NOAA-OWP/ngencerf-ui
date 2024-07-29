@@ -26,9 +26,8 @@
 </template>
 
 <script setup lang="ts">
-import Tabs from './Tabs.vue';
+import Tabs from '@/components/Tabs.vue';
 // Default to Tab 1, HeadwaterBasinGage
-import Tabs from './Tabs.vue';
 const activeTab = ref(1);
 
 // Activate new tab
