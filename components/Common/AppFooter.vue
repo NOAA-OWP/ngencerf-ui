@@ -14,11 +14,13 @@
 
 <script lang="ts" setup>
 import json from "@/assets/versionInfo.json";
+import ActionButtonGroup from "../Calibration/ActionButtonGroup.vue";
 const info = json;
 </script>
 
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";
+
 
 #ActionButtons {
   padding: 8px 0 8px 0;

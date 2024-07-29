@@ -3,19 +3,18 @@ export interface created_calibration_run {
   calibration_run_id: Number
 }
 
-    export interface jobs_list {
-      job_list_item: job_list_item[]
-    }
+export interface jobs_list {
+  job_list_item: job_list_item[]
+}
 
-    export interface job_list_item {
-        run_date: String,
-        formulation_name: String,
-        calibration_run_id: Number,
-        gage_id: String,
-        calibration_start_period: String,
-        calibration_end_period: String
-    }
-
+export interface job_list_item {
+    run_date: String,
+    formulation_name: String,
+    calibration_run_id: Number,
+    gage_id: String,
+    calibration_start_period: String,
+    calibration_end_period: String
+}
 
 export interface footer_data {
   version: String,

@@ -1,8 +1,8 @@
 <template>
   <client-only>
-  <div id="HeadwaterBasinGage" class="w-full">
-    <div id="GageSettings" class="mt-5">
-        <div  class="row-span-4 selRow">
+    <div id="HeadwaterBasinGage" class="w-full">
+      <div id="GageSettings" class="mt-5">
+        <div class="row-span-4 selRow">
           <div class="grid grid-cols-4 gap=4">
             <div class="col-span-1">
               <label for="domain_dd">Domain: </label><br />
@@ -41,56 +41,56 @@
         </div>
       </div>
 
-    <div id="GageReport">
-      <div id="GrBox">
-        <table>
-          <tr class="rowOdd">
-            <td class="dataName">Agency</td>
-            <td class="dataText">{{ gageData.agency }}</td>
-          </tr>
-          <tr class="rowEven">
-            <td class="dataName">Station Name</td>
-            <td class="dataText">{{ gageData.station_name }}</td>
-          </tr>
-          <tr class="rowOdd">
-            <td class="dataName">Site Type</td>
-            <td class="dataText">{{ gageData.site_type }}</td>
-          </tr>
-          <tr class="rowEven">
-            <td class="dataName">Latitude</td>
-            <td class="dataText">{{ gageData.latitude }}</td>
-          </tr>
-          <tr class="rowOdd">
-            <td class="dataName">Longitude</td>
-            <td class="dataText">{{ gageData.longitude }}</td>
-          </tr>
-          <tr class="rowEven">
-            <td class="dataName">Altitude</td>
-            <td class="dataText">{{ gageData.altitude }}</td>
-          </tr>
-          <tr class="rowOdd">
-            <td class="dataName">Date Established</td>
-            <td class="dataText">{{ gageData.date_established }}</td>
-          </tr>
-          <tr class="rowEven">
-            <td class="dataName">Drainage Area</td>
-            <td class="dataText">{{ gageData.drainage_area }}</td>
-          </tr>
-          <tr class="rowOdd">
-            <td class="dataName">HUC</td>
-            <td class="dataText">{{ gageData.huc }}</td>
-          </tr>
-        </table>
+      <div id="GageReport">
+        <div id="GrBox">
+          <table>
+            <tr class="rowOdd">
+              <td class="dataName">Agency</td>
+              <td class="dataText">{{ gageData.agency }}</td>
+            </tr>
+            <tr class="rowEven">
+              <td class="dataName">Station Name</td>
+              <td class="dataText">{{ gageData.station_name }}</td>
+            </tr>
+            <tr class="rowOdd">
+              <td class="dataName">Site Type</td>
+              <td class="dataText">{{ gageData.site_type }}</td>
+            </tr>
+            <tr class="rowEven">
+              <td class="dataName">Latitude</td>
+              <td class="dataText">{{ gageData.latitude }}</td>
+            </tr>
+            <tr class="rowOdd">
+              <td class="dataName">Longitude</td>
+              <td class="dataText">{{ gageData.longitude }}</td>
+            </tr>
+            <tr class="rowEven">
+              <td class="dataName">Altitude</td>
+              <td class="dataText">{{ gageData.altitude }}</td>
+            </tr>
+            <tr class="rowOdd">
+              <td class="dataName">Date Established</td>
+              <td class="dataText">{{ gageData.date_established }}</td>
+            </tr>
+            <tr class="rowEven">
+              <td class="dataName">Drainage Area</td>
+              <td class="dataText">{{ gageData.drainage_area }}</td>
+            </tr>
+            <tr class="rowOdd">
+              <td class="dataName">HUC</td>
+              <td class="dataText">{{ gageData.huc }}</td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="waitgif" v-if="loading">
-    <img src="@/assets/styles/img/wait.gif" />
-  </div>
-</client-only>
+    <div class="waitgif" v-if="loading">
+      <img src="@/assets/styles/img/wait.gif" />
+    </div>
+  </client-only>
 </template>
 <script lang="ts" setup>
-import Tabs from "@/components/Tabs.vue";
+import Tabs from "~/components/Calibration/Tabs.vue";
 
 const loading = ref(true);
 const showMap = ref(false);
@@ -107,14 +107,15 @@ const gageData: GageData = {
   huc: "01100002",
 };
 
-onMounted(() => { 
+onMounted(() => {
   setTimeout(() => {
     loading.value = false;
-  }, 500); 
+  }, 500);
 });
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
 #GageSettings {
   width: 60vw;
   //margin-left: 5vw;
@@ -125,6 +126,7 @@ onMounted(() => {
   height: 80px;
   border: 1px solid $ngwcp_primary1;
 }
+
 select {
   width: 90%;
 }
@@ -137,10 +139,12 @@ select {
   border-radius: 20px;
   border: 1px solid $ngwcp_primary1;
   padding: 10px;
+
   table {
     width: 100%;
     margin: 10px auto;
     border: 1px solid $ngwcp_primary1;
+
     tr {
       line-height: 27px;
       border-bottom: 1px solid #333333;
@@ -156,6 +160,7 @@ select {
 .rowOdd {
   background-color: #dddddd;
 }
+
 .waitgif {
   position: absolute;
   top: 40%;

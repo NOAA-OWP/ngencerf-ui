@@ -24,9 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import AppFooter from "~/components/AppFooter.vue";
-import AppHeader from "~/components/AppHeader.vue";
-import RightBlock from "~/components/RightBlock.vue";
+import AppFooter from "~/components/Common/AppFooter.vue";
+import AppHeader from "~/components/Common/AppHeader.vue";
+import RightBlock from "~/components/Calibration/RightBlock.vue";
+import LeftBlock from "~/components/Calibration/LeftBlock.vue";
 
 </script>
 <style lang="scss" scoped>

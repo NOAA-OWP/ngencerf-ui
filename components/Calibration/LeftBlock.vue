@@ -26,7 +26,14 @@
 </template>
 
 <script setup lang="ts">
-import Tabs from '@/components/Tabs.vue';
+import Tabs from '~/components/Calibration/Tabs.vue';
+import HeadwaterBasinGage from '~/components/Calibration/HeadwaterBasinGage.vue';
+import Formulation from '~/components/Calibration/Formulation.vue';
+import TuningControls from '~/components/Calibration/TuningControls.vue';
+import OptimizationMetrics from '~/components/Calibration/OptimizationMetrics.vue';
+import RunStatus from '~/components/Calibration/RunStatus.vue';
+import Results from '~/components/Calibration/Results.vue';
+
 // Default to Tab 1, HeadwaterBasinGage
 const activeTab = ref(1);
 
