@@ -1,20 +1,44 @@
 <template>
-  <div class="pgTitle">Next Generation Water Prediction Capability (NGWPC) </div>
-  <div id="CenterBox">
-    <div>Welcome <strong>Herbert Hover</strong></div>
-    <div>You have 0 current processes running</div>
-    <div>You have 0 calibration setups to complete</div>
-    <div id="ContinueBtn" @click="GoPreviousRuns">
-    <button>Continue</button>
+  <div class="h-full min-h-screen ">
+    <div class="grid grid-rows-12">
+      <div class="row-span-1">
+        <div>
+          <AppHeader />
+        </div>
+      </div>
+      <div class="h-full grid row-span-10">
+        <div class="grid grid-rows-12">
+          <div class="row-span-2">
+            <div class="pgTitle">Next Generation Water Prediction Capability (NGWPC) </div>
+          </div>
+          <div class="row-span-10">
+            <div id="CenterBox">
+              <div>Welcome <strong>Herbert Hover</strong></div>
+              <div>You have 0 current processes running</div>
+              <div>You have 0 calibration setups to complete</div>
+              <div id="ContinueBtn" @click="GoPreviousRuns">
+                <button>Continue</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row-span-1">
+      <AppFooter />
+    </div>
   </div>
-  </div>
+
+
 
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import AppHeader from '~/components/Common/AppHeader.vue';
+import AppFooter from '~/components/Common/AppFooter.vue';
 
 const GoPreviousRuns = () => {
-   navigateTo("PreviousRuns");
+  navigateTo("PreviousRuns");
 }
 </script>
 <style lang="scss" scoped>
@@ -28,7 +52,8 @@ const GoPreviousRuns = () => {
   margin: 0 auto;
   width: 600px;
   height: 265px;
-  background-color: $ngwcp_groupsbkg;;
+  background-color: $ngwcp_groupsbkg;
+  ;
   border-radius: 50px;
   text-align: center;
 }
@@ -42,6 +67,7 @@ const GoPreviousRuns = () => {
   color: #ffffff;
   border: 2px solid #000;
 }
+
 #ContinueBtn:hover {
   background-color: $ngwcp_primary2;
   color: #000;
@@ -51,6 +77,5 @@ const GoPreviousRuns = () => {
   font-size: 30px;
   text-align: center;
   margin-top: 50px;
-  margin-bottom: 30px;
 }
 </style>
