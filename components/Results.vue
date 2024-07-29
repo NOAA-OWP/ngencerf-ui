@@ -8,15 +8,15 @@
               <table>
                 <tr>
                   <td class="text-right">Running Time:</td>
-                  <td class="pl-5">{{ runningTime ? runningTime : dashes }}</td>
+                  <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                 </tr>
                 <tr>
                   <td class="text-right">Start Time:</td>
-                  <td class="pl-5">{{ startTime ? startTime : dashes }}</td>
+                  <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                 </tr>
                 <tr>
                   <td class="text-right">Iteration:</td>
-                  <td class="pl-5">{{ iteration ? iteration : dashes }}</td>
+                  <td class="pl-5">{{ iteration ? iteration : '-'.repeat(30) }}</td>
                 </tr>
               </table>
             </div>
@@ -34,14 +34,18 @@
           </div>
         </div>
       </div>
-      <div row-span-1></div>
+      <div row-span-1>
+        <div id="ResultsArea" class="row-span-1">
+          <div><button>Go to Evaluation</button></div>
+
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import ProgressBar from "primevue/progressbar";
-const dashes = "---------------------------";
 const runningTime = ref();
 const startTime = ref();
 const iteration = ref();
@@ -53,15 +57,30 @@ const progress = ref(30);
 @import "@/assets/styles/styles.scss";
 #ResultsDisplay {
   width: 50vw;
-  //margin-left: 5vw;
   margin: 20px auto;
   background-color: $ngwcp_groupsbkg;
   padding: 10px 10px 10px 20px;
   border-radius: 20px;
   height: 100px;
   border: 1px solid $ngwcp_primary1;
+  min-width: 750px;
+ 
 }
 
+#ResultsArea {
+  text-align: center;
+
+  button {
+  background-color: $ngwcp_primary1;
+  height: 40px;
+  width: 200px;
+  color: white;
+  border-radius: 10px;
+  padding: 0;
+  margin: 8px 0 0 0;
+  border: 1px solid #888888;
+  }
+}
 #DisplayOptions {
     width: 60%;
     margin-left: 10px;

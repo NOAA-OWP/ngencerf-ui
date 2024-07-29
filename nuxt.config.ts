@@ -2,7 +2,7 @@
 import Aura from '@primevue/themes/aura';
 
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   css: ["/assets/styles/styles.scss"],
   modules: [
     [
