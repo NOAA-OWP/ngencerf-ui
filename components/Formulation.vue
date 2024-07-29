@@ -1,122 +1,122 @@
 <template>
   <div id="Formulation" class="shrink-0">
-    <div class="grid grid-cols-12 gap-2">
-      <div class="col-span-5 gap-20">
-        <div class="grid grid-cols-2 gap-15">
-          <div class="col-span-1">
-            <div class="mt-2 text-center">Modules</div>
-            <div class="ml-6 mt-2">
-              Group:
-              <select id="ModuleGroupSelect" class="ml-3">
-                <option value="all" selected>All</option>
-              </select>
-            </div>
-            <ul id="ModulesList">
-              <li
-                v-for="(module, index) in formulation_modules"
-                :index="index"
-                @click="ModuleClicked"
-              >
-                {{ module }}
-              </li>
-            </ul>
-          </div>
-
-          <div class="col-span-1">
-            <div class="mt-2 text-center">Groups CoveredBy Selections</div>
-            <div>
-              <ul id="ModuleCoveredList">
-                <li
-                  v-for="(module, index) in formulation_covered_groups"
-                  :index="index"
-                >
-                  {{ module }}
-                </li>
-              </ul>
-            </div>
-          </div>
+    <div class="grid grid-cols-6 p-2 gap-2">
+      <div class="col-1 col-span-1 row-span-2 p-2">
+        <div class="mt-2 text-center">Modules</div>
+        <div class="ml-6 mt-2">
+          Group:
+          <select id="ModuleGroupSelect" class="ml-3">
+            <option value="all" selected>All</option>
+          </select>
         </div>
+        <ul id="ModulesList">
+          <li
+            v-for="(module, index) in formulation_modules"
+            :index="index"
+            @click="ModuleClicked"
+          >
+            {{ module }}
+          </li>
+        </ul>
       </div>
-
-      <div class="col-span-7">
-        <div class="grid grid-rows-12 gap-3">
-          <div class="row-span-1">
-            <div id="FormulationName" class="inline-block ml-20 mr-5 mt-3">
-              Forumulation Name:
-            </div>
-            <div class="inline-block"><input type="text" /></div>
+      <div class="col-2 col-span-5 p-2">
+        <div class="group-cover-selection-wrapper w-60 float-left">
+          <div class="mt-2 text-center">Groups CoveredBy Selections</div>
+          <ul id="ModuleCoveredList">
+            <li
+              v-for="(module, index) in formulation_covered_groups"
+              :index="index"
+            >
+              {{ module }}
+            </li>
+          </ul>
+        </div><!-- /selection-wrapper -->
+        <div class="sloth-variable-input-form ml-60">
+          <div id="FormulationName" class="inline-block ml-20 mr-5 mt-3">
+            Forumulation Name:
           </div>
-          <div class="row-span-11">
-            <div id="SlothBackground">
-              <div class="slothTitle text-xl mb-2">SLoTH Output Variable</div>
-              <div>
-                <div class="text-right inline-block slothLable mr-4 mb-2">
-                  SLoth Name:
-                </div>
-                <input class="w-3/5 rounded-lg" type="text" /><br />
-                <div class="text-right inline-block slothLable mr-4 mb-2">
-                  For Module:
-                </div>
-                <select class="w-3/5 rounded-lg">
-                  <option value="" selected disabled>...</option>
-                </select>
-                <br />
-                <div class="text-right inline-block slothLable mr-4 mb-2">
-                  Module Param:
-                </div>
-                <input class="w-3/5 rounded-lg" type="text" /><br />
+          <div class="inline-block"><input type="text" /></div>
+          <div id="SlothBackground">
+            <div class="slothTitle text-xl mb-2">SLoTH Output Variable</div>
+            <div>
+              <div class="text-right inline-block slothLable mr-4 mb-2">
+                SLoth Name:
               </div>
+              <input class="w-3/5 rounded-lg" type="text" /><br />
+              <div class="text-right inline-block slothLable mr-4 mb-2">
+                For Module:
+              </div>
+              <select class="w-3/5 rounded-lg">
+                <option value="" selected disabled>...</option>
+              </select>
+              <br />
+              <div class="text-right inline-block slothLable mr-4 mb-2">
+                Module Param:
+              </div>
+              <input class="w-3/5 rounded-lg" type="text" /><br />
+            </div>
 
-              <div class="grid grid-rows-1 mt-4">
-                <div class="grid grid-cols-2">
-                  <div class="col-span-1">
-                    <div class="text-right inline-block w-1/5 mr-4 mb-2">
-                      Value:
-                    </div>
-                    <input class="w-3/5 rounded-lg" type="number" /><br />
-                    <div id="AddUpdate">
-                      <button class="nlgButton mt-4 ml-10">Add / Update</button>
-                    </div>
+            <div class="grid grid-rows-1 mt-4">
+              <div class="grid grid-cols-2">
+                <div class="col-span-1">
+                  <div class="text-right inline-block w-1/5 mr-4 mb-2">
+                    Value:
                   </div>
-                  <div class="col-span-1">
-                    <div class="text-right inline-block w-1/5 mr-4 mb-2">
-                      Count:
-                    </div>
-                    <input class="w-3/5 rounded-lg" type="number" /><br />
-                    <div class="text-right inline-block w-1/5 mr-4 mb-2">
-                      Type:
-                    </div>
-                    <select class="w-3/5 rounded-lg" type="number">
-                      <option value="" selected disabled>...</option>
-                    </select>
-                    <br />
-                    <div class="text-right inline-block w-1/5 mr-4 mb-2">
-                      Units:
-                    </div>
-                    <select class="w-3/5 rounded-lg" type="number">
-                      <option value="" selected disabled>...</option>
-                    </select>
-                    <br />
-                    <div class="text-right inline-block w-1/5 mr-4 mb-2">
-                      Location:
-                    </div>
-                    <select class="w-3/5 rounded-lg" type="number">
-                      <option value="" selected disabled>...</option>
-                    </select>
-                    <br />
+                  <input class="w-3/5 rounded-lg" type="number" /><br />
+                  <div id="AddUpdate">
+                    <button class="nlgButton mt-4 ml-10">Add / Update</button>
                   </div>
                 </div>
+                <div class="col-span-1">
+                  <div class="text-right inline-block w-1/5 mr-4 mb-2">
+                    Count:
+                  </div>
+                  <input class="w-3/5 rounded-lg" type="number" /><br />
+                  <div class="text-right inline-block w-1/5 mr-4 mb-2">
+                    Type:
+                  </div>
+                  <select class="w-3/5 rounded-lg" type="number">
+                    <option value="" selected disabled>...</option>
+                  </select>
+                  <br />
+                  <div class="text-right inline-block w-1/5 mr-4 mb-2">
+                    Units:
+                  </div>
+                  <select class="w-3/5 rounded-lg" type="number">
+                    <option value="" selected disabled>...</option>
+                  </select>
+                  <br />
+                  <div class="text-right inline-block w-1/5 mr-4 mb-2">
+                    Location:
+                  </div>
+                  <select class="w-3/5 rounded-lg" type="number">
+                    <option value="" selected disabled>...</option>
+                  </select>
+                  <br />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </div> <!-- /input-form-wrapper -->
+      </div>
+      <div class="col-2 col-span-5 p-2">
+        <DataTable :value="slothParameters" scrollable scroll-height="300px" >
+          <Column field="outputVar" header="SLoTH Output Var" sortable></Column>
+          <Column field="metadata" header="Metadata Properties" sortable></Column>
+          <Column field="module" header="For Module" sortable></Column>
+          <Column field="moduleParam" header="Module Param" sortable></Column>
+          <Column field="value" header="Value" sortable></Column>
+        </DataTable> 
       </div>
     </div>
+    
   </div>
 </template>
 
 <script lang="ts" setup>
 import Index from "~/pages/index.vue";
+import { mockFormulationSlothParametersData } from "~/mockApi/formulationSlothData";
+import type { SlothParameter } from "~/composables/NextGenModel";
 
 const formulation_modules = [
   "Sloth",
@@ -163,6 +163,15 @@ const ModuleClicked = (e: MouseEvent) => {
     iele.classList.add("liActive");
   }
 };
+
+const slothParameters = ref<SlothParameter[]>([])
+
+onMounted(() => {
+  mockFormulationSlothParametersData().forEach( ( slothData: any, index ) => {
+      console.log( slothData );
+      slothParameters.value.push( slothData )
+    })
+});
 </script>
 
 <style lang="scss" scoped>

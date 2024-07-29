@@ -112,9 +112,13 @@
           </div>
         </div>
       </div>
-
       <div class="row-span-5">
-        TABLE GOES HERE
+        <DataTable :value="calibrationTuningDataList" scrollable scroll-height="300px" >
+          <Column field="parameter" header="Parameter" sortable></Column>
+          <Column field="min" header="Min" sortable></Column>
+          <Column field="max" header="Max" sortable></Column>
+          <Column field="initValue" header="Initial Value" sortable></Column>
+        </DataTable> 
       </div>
     </div>
   </div>
@@ -123,6 +127,8 @@
 <script lang="ts" setup>
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import { mockCalibrationTuningData } from "~/mockApi/calibrationAPIData";
+import type { CalibrationTuningData } from "~/composables/NextGenModel";
 
 const simStartTime = ref();
 const simEndTime = ref();
@@ -140,6 +146,14 @@ const AutoValChecked = () => {
   const ele = <HTMLInputElement>document.getElementById("CheckTheBox");
   autoValidation.value = ele.checked as boolean;
 };
+
+const calibrationTuningDataList = ref<CalibrationTuningData[]>([])
+
+onMounted(() => {
+  mockCalibrationTuningData().forEach( ( tuningData, index ) => {
+      calibrationTuningDataList.value.push( <CalibrationTuningData>tuningData )
+    })
+});
 </script>
 
 <style lang="scss" scoped>

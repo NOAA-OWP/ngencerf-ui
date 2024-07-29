@@ -17,7 +17,12 @@
               Algorithm Parameter(s)
               <table style="height: 270px; max-width: 480px; margin: 0 auto">
                 <tr>
-                  <td>[table]</td>
+                  <td>
+                    <DataTable :value="algorithm_parameters" scrollable scroll-height="300px" >
+                      <Column field="parameter" header="Parameter" sortable></Column>
+                      <Column field="initValue" header="Initial Value" sortable></Column>
+                    </DataTable> 
+                  </td>
                 </tr>
               </table>
               <div id="ClearTableBtn" class="text-center"><button>Clear <i class="pi pi-arrow-up"></i></button></div>
@@ -73,6 +78,8 @@
 </template>
 
 <script lang="ts" setup>
+import type { AlgorithmParameter } from '~/composables/NextGenModel';
+import { mockAlogorithmParameterData } from '~/mockApi/calibrationAPIData';
 
 const showFlowThreshold = ref(false);
 
@@ -81,6 +88,14 @@ const ShowFlowThreshold = (e) => {
     showFlowThreshold.value = ele.checked as boolean;
 
 }
+
+const algorithm_parameters = ref<AlgorithmParameter[]>([])
+
+onMounted( () => {
+  mockAlogorithmParameterData().forEach( (param, index ) => {
+    algorithm_parameters.value.push( <AlgorithmParameter>param )
+  });
+})
 </script>
 
 <style lang="scss" scoped>
