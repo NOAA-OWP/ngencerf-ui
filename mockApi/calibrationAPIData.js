@@ -26,7 +26,27 @@ export const mockAlogorithmParameterData = () => {
     {
       parameter: "r",
       initValue: 2000
-    }
+    },
+    {
+      parameter: "r",
+      initValue: 2000
+    },
+    {
+      parameter: "r",
+      initValue: 2000
+    },
+    {
+      parameter: "r",
+      initValue: 2000
+    },
+    {
+      parameter: "r",
+      initValue: 2000
+    },
+    {
+      parameter: "r",
+      initValue: 2000
+    },
   ]
 }
 

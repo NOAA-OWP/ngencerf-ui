@@ -206,6 +206,7 @@ onMounted(() => {
   font-size: 0.8em;
   text-align: right;
   margin-right: 20px;
+
 }
 
 
