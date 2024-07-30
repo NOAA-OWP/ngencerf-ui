@@ -1,7 +1,7 @@
 <template>
-  <div class="grid grid-rows-4 ml-10 h-full w-full">
+  <div class="grid grid-rows-4 h-full w-full">
     <div class="row-span-1">
-      <div id="AdditionalMetrics" class="bordered">
+      <div id="AdditionalMetrics">
         <strong class="">Additional Metrics</strong>
         &nbsp;&nbsp;&nbsp;&nbsp;Name:&nbsp;&nbsp;
         <select>
@@ -12,45 +12,51 @@
         </div>
       </div>
     </div>
+
     <div class="grid grid-rows-3 mt-5">
       <div class="grid grid-cols-2">
-        <div id="MetricsTable">
-          <div class="col-span-1">
-            Metric(s) <sup>*</sup><br />
-            <br />
-            <DataTable :value="metricTableData" scrollable scroll-height="300px" >
-              <Column field="metric" header="Metric" sortable></Column>
-            </DataTable> 
-          </div>
-          <div class="text-center">
-            * Right click on metric entry<br />for deletion options
-          </div>
-        </div>
-        <div id="DepInputsTable">
-          <div class="col-span-1">
-            <div class="grid grid-rows-3">
-              <div class="row-span-1">
-                <div class="col-span-1">
-                  Dependent Input(s)<br />
-                  <br />
-                  <DataTable :value="dependentInputTableData" scrollable scroll-height="300px" >
-                    <Column field="name" header="Name" sortable></Column>
-                    <Column field="value" header="Value" sortable></Column>
-                  </DataTable> 
+        <!-- left -->
+        <div class="col-span-1 colWidth80">
+          <div class="grid grid-rows-1">
+            <div class="row-span-1">
+              <div id="MetricsTable">
+                Metric(s) <sup>*</sup>
+                <br />
+                <DataTable :value="metricTableData" scrollable scroll-height="300px" class="bordered"
+                  style="height: 400px;">
+                  <Column field="metric" header="Metric" sortable></Column>
+                </DataTable>
+                <div class="text-center mt-2">
+                  * Right click on metric entry<br />for deletion options
                 </div>
               </div>
             </div>
-            <div class="row-span-1">
+          </div>
+        </div>
+
+        <!-- right -->
+        <div class="col-span-1 colWidth80">
+          <div class="grid grid-rows-12 gap-2">
+            <div class="row-span-7">
+              <div id="DepInputsTable">
+                Dependent Input(s)<br />
+                <DataTable :value="dependentInputTableData" scrollable scroll-height="300px">
+                  <Column field="name" header="Name" sortable></Column>
+                  <Column field="value" header="Value" sortable></Column>
+                </DataTable>
+              </div>
+            </div>
+            <div class="row-span-3">
               <div id="PlotGenFreq">
                 <p class="mb-3">Plot Generation Frequency (0 = off)</p>
                 <div id="PlotGenFreqVal" class="mt-5">
-                  Once every:&nbsp;&nbsp;<input type="number"/>
+                  Once every:&nbsp;&nbsp;<input type="number" />
                   &nbsp;&nbsp;iterations
                 </div>
               </div>
             </div>
-            <div class="row-span-1">
-              <div id="ClearMetAndDep" class="mt-20">
+            <div class="row-span-2">
+              <div id="ClearMetAndDep">
                 <button>Clear Metrics and Dependent Inputs</button>
               </div>
             </div>
@@ -68,13 +74,13 @@ import { mockRunStatusDependentInputData, mockRunStatusMetricData } from '~/mock
 const metricTableData = ref<RunMetric[]>([])
 const dependentInputTableData = ref<RunDependentInput[]>([])
 
-onMounted( () => {
-  mockRunStatusMetricData().forEach( (data, index ) => {
-    metricTableData.value.push( <RunMetric>data )
+onMounted(() => {
+  mockRunStatusMetricData().forEach((data, index) => {
+    metricTableData.value.push(<RunMetric>data)
   })
 
-  mockRunStatusDependentInputData().forEach( (data, index ) => {
-    dependentInputTableData.value.push( <RunDependentInput>data )
+  mockRunStatusDependentInputData().forEach((data, index) => {
+    dependentInputTableData.value.push(<RunDependentInput>data)
   })
 })
 </script>
@@ -88,6 +94,8 @@ onMounted( () => {
   width: 600px;
   height: 70px;
   background-color: $ngwcp_groupsbkg;
+  border: 1px solid $ngwcp_primary3;
+  border-radius: 20px;
   select {
     width: 200px;
   }
@@ -106,9 +114,8 @@ onMounted( () => {
 
 #MetricsTable {
   margin: 0 auto;
-  width: 300px;
-  height: 100px;
-  background-color: $ngwcp_groupsbkg;
+  // width: 300px;
+  // height: 100px;
 }
 
 #PlotGenFreq {
@@ -117,6 +124,7 @@ onMounted( () => {
   height: 110px;
   background-color: $ngwcp_groupsbkg;
   border-radius: 10px;
+
   input {
     width: 200px;
   }
@@ -133,11 +141,18 @@ onMounted( () => {
   font-weight: 600;
   border: 2px solid black;
 }
+
 #ClearMetAndDep:hover {
   background-color: $ngwcp_primary3;
 }
+
+.colWidth80 {
+  width: 80%;
+  margin: 0 auto;
+}
+
 .bordered {
-  border-radius: 20px;
-  border: 1px solid #888888;
+
+  border: 1px solid $ngwcp_primary3;
 }
 </style>
