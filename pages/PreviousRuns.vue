@@ -10,7 +10,7 @@
       <div class="h-full grid row-span-10">
         <div class="grid grid-rows-12">
           <div class="row-span-2">
-            <div id="PgTitle">Previous Calibration Runs
+            <div id="PgTitle">Previous Calibration Runs *
               &nbsp;&nbsp;<span id="NewButton" @click="NewCalibration"><button>New</button></span>
             </div>
           </div>
@@ -32,7 +32,9 @@
                 <Column field="status" header="Status" sortable></Column>
               </DataTable>
             </div>
-
+            <div class="asteriskText">
+              * Double click on a row to recall a Calibration run, right-click for more options or click the New button.
+            </div>
           </div>
         </div>
       </div>
@@ -139,18 +141,6 @@ const NewCalibration = async () => {
 }
 </script>
 
-<style lang="css">
-  :root {
-    .p-datatable-thead tr th {
-      background-color: #105d8e;
-      color: white;
-    }
-    .p-datatable-sort-icon {
-      color: white;
-    }
-  }
-</style>
-
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
@@ -182,5 +172,12 @@ const NewCalibration = async () => {
       border: 1px solid #000;
     }
   }
+}
+
+.asteriskText {
+  text-align: center;
+  margin-top: 20px;
+  font-weight: bold;
+  font-size: 1.2em;
 }
 </style>

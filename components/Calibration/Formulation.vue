@@ -3,9 +3,8 @@
     <div class="grid grid-cols-6 p-2 gap-2">
       <div class="col-1 col-span-1 row-span-2 p-2">
         <div class="mt-2 text-center">Modules</div>
-        <div class="ml-6 mt-2">
-          Group:
-          <select id="ModuleGroupSelect" class="ml-3">
+        <div class="ml-6 mt-1">
+          <select id="ModuleGroupSelect" class="ml-2">
             <option value="all" selected>All</option>
           </select>
         </div>
@@ -207,7 +206,7 @@ onMounted(() => {
 ul#ModulesList,
 ul#ModuleCoveredList {
   border: 1px solid #000;
-  margin: 20px 0 0 20px;
+  margin: 5px 0 0 20px;
 
   li {
     background-color: $ngwcp_groupsbkg;
@@ -221,7 +220,7 @@ ul#ModuleCoveredList {
 }
 
 #ModuleGroupSelect {
-  width: 130px;
+  width: 125px;
 
 }
 

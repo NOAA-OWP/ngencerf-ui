@@ -1,66 +1,48 @@
 <template>
-  <div class="grid grid-rows-4 h-full w-full">
-    <div class="row-span-1">
-      <div id="AdditionalMetrics">
-        <strong class="">Additional Metrics</strong>
-        &nbsp;&nbsp;&nbsp;&nbsp;Name:&nbsp;&nbsp;
-        <select>
-          <option>RMSE</option>
-        </select>
-        <div id="AddButton" class="inline-block">
-          <button>Add</button>
+  <div id="ResultPage">
+    <div class="grid grid-rows-2">
+      <div row-span-1>
+        <div id="ResultsDisplay">
+          <div class="grid grid-cols-2">
+            <div class="col-span-1">
+              <table>
+                <tr>
+                  <td class="text-right">Running Time:</td>
+                  <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
+                </tr>
+                <tr>
+                  <td class="text-right">Start Time:</td>
+                  <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
+                </tr>
+                <tr>
+                  <td class="text-right">Iteration:</td>
+                  <td class="pl-5">{{ iteration ? iteration : '-'.repeat(30) }}</td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="col-span-1 pl-5" style="border-left: 1px solid #000">
+              <div class="mt-1">
+                Status: <span v-if="!progress">
+                  <input class="dummyProgress ml-2" disabled style="width: 296px;" />
+                </span>
+                <span v-else>
+                  <ProgressBar :value="progress"></ProgressBar>
+                </span>
+              </div>
+              <div class="mt-4">Display:
+                <select id="DisplayOptions">
+                  <option>Parameters</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+      <div row-span-1>
+        <div id="ResultsArea" class="row-span-1">
+          <div><button>Go to Evaluation</button></div>
 
-    <div class="grid grid-rows-3 mt-5">
-      <div class="grid grid-cols-2">
-        <!-- left -->
-        <div class="col-span-1 colWidth80">
-          <div class="grid grid-rows-1">
-            <div class="row-span-1">
-              <div id="MetricsTable">
-                Metric(s) <sup>*</sup>
-                <br />
-                <DataTable :value="metricTableData" scrollable scroll-height="300px" class="bordered"
-                  style="height: 400px;">
-                  <Column field="metric" header="Metric" sortable></Column>
-                </DataTable>
-                <div class="text-center mt-2">
-                  * Right click on metric entry<br />for deletion options
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- right -->
-        <div class="col-span-1 colWidth80">
-          <div class="grid grid-rows-12 gap-2">
-            <div class="row-span-7">
-              <div id="DepInputsTable">
-                Dependent Input(s)<br />
-                <DataTable :value="dependentInputTableData" scrollable scroll-height="300px">
-                  <Column field="name" header="Name" sortable></Column>
-                  <Column field="value" header="Value" sortable></Column>
-                </DataTable>
-              </div>
-            </div>
-            <div class="row-span-3">
-              <div id="PlotGenFreq">
-                <p class="mb-3">Plot Generation Frequency (0 = off)</p>
-                <div id="PlotGenFreqVal" class="mt-5">
-                  Once every:&nbsp;&nbsp;<input type="number" />
-                  &nbsp;&nbsp;iterations
-                </div>
-              </div>
-            </div>
-            <div class="row-span-2">
-              <div id="ClearMetAndDep">
-                <button>Clear Metrics and Dependent Inputs</button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -68,91 +50,82 @@
 </template>
 
 <script lang="ts" setup>
-import type { RunDependentInput, RunMetric } from '~/composables/NextGenModel';
-import { mockRunStatusDependentInputData, mockRunStatusMetricData } from '~/mockApi/calibrationAPIData';
+import ProgressBar from "primevue/progressbar";
+const runningTime = ref();
+const startTime = ref();
+const iteration = ref();
 
-const metricTableData = ref<RunMetric[]>([])
-const dependentInputTableData = ref<RunDependentInput[]>([])
-
-onMounted(() => {
-  mockRunStatusMetricData().forEach((data, index) => {
-    metricTableData.value.push(<RunMetric>data)
-  })
-
-  mockRunStatusDependentInputData().forEach((data, index) => {
-    dependentInputTableData.value.push(<RunDependentInput>data)
-  })
-})
+const progress = ref(0);
 </script>
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
-#AdditionalMetrics {
-  margin: 20px auto 0 auto;
-  padding: 20px;
-  width: 600px;
-  height: 70px;
+#ResultsDisplay {
+  width: 50vw;
+  margin: 20px auto;
   background-color: $ngwcp_groupsbkg;
-  border: 1px solid $ngwcp_primary3;
+  padding: 10px 10px 10px 20px;
   border-radius: 20px;
-  select {
+  height: 100px;
+  border: 1px solid $ngwcp_primary1;
+  min-width: 750px;
+
+}
+
+#ResultsArea {
+  text-align: center;
+
+  button {
+    background-color: $ngwcp_primary1;
+    height: 40px;
     width: 200px;
+    color: white;
+    border-radius: 10px;
+    padding: 0;
+    margin: 8px 0 0 0;
+    border: 1px solid #888888;
   }
 }
 
-#AddButton {
-  width: 72px;
-  height: 27px;
-  border-radius: 10px;
-  background-color: $ngwcp_primary1;
-  color: white;
-  text-align: center;
-  padding-top: 2px;
-  margin-left: 35px;
+#DisplayOptions {
+  width: 60%;
+  margin-left: 10px;
 }
 
-#MetricsTable {
-  margin: 0 auto;
-  // width: 300px;
-  // height: 100px;
+.p-progressbar {
+  display: inline-block;
+  width: 200px;
+  height: 25px;
 }
 
-#PlotGenFreq {
-  padding: 20px;
-  width: 425px;
-  height: 110px;
-  background-color: $ngwcp_groupsbkg;
-  border-radius: 10px;
+.leftSideText {
+  width: 135px;
+  text-align: right;
+  padding-right: 20px;
+}
+</style>
 
-  input {
-    width: 200px;
+<style>
+:root {
+  .p-progressbar {
+    background-color: yellow;
+    vertical-align: text-bottom;
+    margin-left: 10px;
+    width: 80%;
   }
-}
 
-#ClearMetAndDep {
-  width: 425px;
-  height: 60px;
-  border-radius: 20px;
-  background-color: $ngwcp_primary1;
-  color: white;
-  padding: 15px 10px;
-  text-align: center;
-  font-weight: 600;
-  border: 2px solid black;
-}
+  .p-progressbar-value {
+    color: green;
+    background-color: green;
+  }
 
-#ClearMetAndDep:hover {
-  background-color: $ngwcp_primary3;
-}
+  .p-progressbar-value {
+    color: black;
+  }
 
-.colWidth80 {
-  width: 80%;
-  margin: 0 auto;
-}
-
-.bordered {
-
-  border: 1px solid $ngwcp_primary3;
+  .p-progressbar-label {
+    color: white;
+  }
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
-  <div id="Footer" :class="location.name === 'PreviousRuns' || location.name === 'LandingPage' ? 'height80' : 'height120'">
+  <div id="Footer"
+    :class="location.name === 'PreviousRuns' || location.name === 'LandingPage' ? 'height80' : 'height120'">
     <div id="ActionButtons"
       v-if="isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns'">
       <ActionButtonGroup />
@@ -11,7 +12,7 @@
         info.program_info.release_date
       }}
     </div>
-    <div class="copyright">Copyright &COPY;, Somebody</div>
+    <div class="copyright">Copyright &COPY;2024, RTX</div>
   </div>
 </template>
 
@@ -26,7 +27,6 @@ const info = json;
 
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";
-
 
 #ActionButtons {
   padding: 8px 0 8px 0;

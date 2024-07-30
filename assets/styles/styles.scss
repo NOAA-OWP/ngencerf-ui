@@ -52,6 +52,10 @@ input {
   width: 100%;
 }
 
+ngenButton {
+
+}
+
 h2 {
   display: block;
 }
@@ -237,11 +241,13 @@ label {
 // DataTables
 
 .p-datatable-header-cell {
-padding: 8px 8px;
+  padding: 8px 8px;
 }
-.p-datatable-tbody > tr > td {
-  padding:8px;
+
+.p-datatable-tbody>tr>td {
+  padding: 8px;
 }
+
 .p-datatable-thead tr th {
   background-color: #105d8e;
   color: white;
