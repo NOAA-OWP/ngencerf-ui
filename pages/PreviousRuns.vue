@@ -14,24 +14,24 @@
               &nbsp;&nbsp;<span id="NewButton" @click="NewCalibration"><button>New</button></span>
             </div>
           </div>
-            <div class="row-span-10">
-              <div id="CalTable">
-                <Toast />
-                <ConfirmDialog></ConfirmDialog>
-                <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-                  :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-                <DataTable id="cr-list" :value="calibrationRuns" scrollable scroll-height="400px"
-                  table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
-                  contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
-                  :rowStyle="rowStyle">
-                  <Column field="runId" header="Run ID" sortable></Column>
-                  <Column field="formulationName" header="Formulation Name" sortable></Column>
-                  <Column field="headwaterBasinGage" header="Headwater Basin Gage" sortable></Column>
-                  <Column field="runDate" header="Run Date" sortable></Column>
-                  <Column field="calibrationPeriod" header="Calibration Period" sortable></Column>
-                  <Column field="status" header="Status" sortable></Column>
-                </DataTable>
-              </div>
+          <div class="row-span-10">
+            <div id="CalTable">
+              <Toast />
+              <ConfirmDialog></ConfirmDialog>
+              <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+                :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+              <DataTable id="cr-list" :value="calibrationRuns" scrollable scroll-height="400px"
+                table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
+                contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
+                :rowStyle="rowStyle">
+                <Column field="runId" header="Run ID" sortable></Column>
+                <Column field="formulationName" header="Formulation Name" sortable></Column>
+                <Column field="headwaterBasinGage" header="Headwater Basin Gage" sortable></Column>
+                <Column field="runDate" header="Run Date" sortable></Column>
+                <Column field="calibrationPeriod" header="Calibration Period" sortable></Column>
+                <Column field="status" header="Status" sortable></Column>
+              </DataTable>
+            </div>
 
           </div>
         </div>
@@ -44,6 +44,7 @@
 
   </div>
 </template>
+
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { useConfirm } from "primevue/useconfirm";
@@ -137,6 +138,19 @@ const NewCalibration = async () => {
   await navigateTo("Calibration");
 }
 </script>
+
+<style lang="css">
+  :root {
+    .p-datatable-thead tr th {
+      background-color: #105d8e;
+      color: white;
+    }
+    .p-datatable-sort-icon {
+      color: white;
+    }
+  }
+</style>
+
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 

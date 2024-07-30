@@ -83,7 +83,7 @@ import { mockAlogorithmParameterData } from '~/mockApi/calibrationAPIData';
 
 const showFlowThreshold = ref(false);
 
-const ShowFlowThreshold = (e) => {
+const ShowFlowThreshold = (e:MouseEvent) => {
   const ele = <HTMLInputElement>document.getElementById("CalcCatMetCB");
     showFlowThreshold.value = ele.checked as boolean;
 

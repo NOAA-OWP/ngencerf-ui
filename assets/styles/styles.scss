@@ -223,15 +223,30 @@ label {
 
 // TimeDatePicker
 .dp__input {
-     height: 25px;
-     margin-bottom: 11px;
-     margin-left: 10px;
-     font-family:'Courier New', Courier, monospace !important;
- }
- 
- .dp--clear-btn,
- .dp__input_icon {
-  top: 30% !important;
- }
+  height: 25px;
+  margin-bottom: 11px;
+  margin-left: 10px;
+  font-family: 'Courier New', Courier, monospace !important;
+}
 
- 
+.dp--clear-btn,
+.dp__input_icon {
+  top: 30% !important;
+}
+
+// DataTables
+
+.p-datatable-header-cell {
+padding: 8px 8px;
+}
+.p-datatable-tbody > tr > td {
+  padding:8px;
+}
+.p-datatable-thead tr th {
+  background-color: #105d8e;
+  color: white;
+}
+
+.p-datatable-sort-icon {
+  color: white;
+}

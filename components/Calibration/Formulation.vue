@@ -10,11 +10,7 @@
           </select>
         </div>
         <ul id="ModulesList">
-          <li
-            v-for="(module, index) in formulation_modules"
-            :index="index"
-            @click="ModuleClicked"
-          >
+          <li v-for="(module, index) in formulation_modules" :index="index" @click="ModuleClicked">
             {{ module }}
           </li>
         </ul>
@@ -23,20 +19,32 @@
         <div class="group-cover-selection-wrapper w-60 float-left">
           <div class="mt-2 text-center">Groups CoveredBy Selections</div>
           <ul id="ModuleCoveredList">
-            <li
-              v-for="(module, index) in formulation_covered_groups"
-              :index="index"
-            >
+            <li v-for="(module, index) in formulation_covered_groups" :index="index">
               {{ module }}
             </li>
           </ul>
-        </div><!-- /selection-wrapper -->
+        </div>
+
+        <!-- /selection-wrapper -->
         <div class="sloth-variable-input-form ml-60">
-          <div id="FormulationName" class="inline-block ml-20 mr-5 mt-3">
-            Forumulation Name:
+          <div class="grid grid-rows-2">
+            <div class="row-span-1">
+              <div id="FormulationName" class="inline-block ml-20 mr-5 mt-3">
+                Forumulation Name:
+              </div>
+              <div class="inline-block"><input type="text" /></div>
+            </div>
+            <div class="row-span-1">
+              <div class="inline-block  ml-20 mt-2">
+                <input type="checkbox" id="SlothCheck" @click="showSloth"/>
+              </div>
+              <label class="inline-block ml-2" for="SlothCheck">Add SLoTH output variable for formulation</label>
+            </div>
+
           </div>
-          <div class="inline-block"><input type="text" /></div>
-          <div id="SlothBackground">
+          
+          <!-- Sloth Variables -->
+          <div id="SlothBackground" v-if="showSlothVariables">
             <div class="slothTitle text-xl mb-2">SLoTH Output Variable</div>
             <div>
               <div class="text-right inline-block slothLable mr-4 mb-2">
@@ -97,19 +105,22 @@
               </div>
             </div>
           </div>
-        </div> <!-- /input-form-wrapper -->
+        </div>
+
+        <!-- /input-form-wrapper -->
       </div>
+
       <div class="col-2 col-span-5 p-2">
-        <DataTable :value="slothParameters" scrollable scroll-height="300px" >
+        <DataTable class="stripe ":value="slothParameters" scrollable scroll-height="300px">
           <Column field="outputVar" header="SLoTH Output Var" sortable></Column>
           <Column field="metadata" header="Metadata Properties" sortable></Column>
           <Column field="module" header="For Module" sortable></Column>
           <Column field="moduleParam" header="Module Param" sortable></Column>
           <Column field="value" header="Value" sortable></Column>
-        </DataTable> 
+        </DataTable>
       </div>
     </div>
-    
+
   </div>
 </template>
 
@@ -150,6 +161,14 @@ const formulation_covered_groups = [
   "Coastal",
 ];
 
+const showSlothVariables = ref(false);
+
+const showSloth = (e:MouseEvent) => {
+  const ele = <HTMLInputElement>document.getElementById("SlothCheck");
+    showSlothVariables.value = ele.checked as boolean;
+
+}
+
 const ModuleClicked = (e: MouseEvent) => {
   const ele = e.target as HTMLElement;
   const indexStr = ele.getAttribute("index");
@@ -167,27 +186,35 @@ const ModuleClicked = (e: MouseEvent) => {
 const slothParameters = ref<SlothParameter[]>([])
 
 onMounted(() => {
-  mockFormulationSlothParametersData().forEach( ( slothData: any, index ) => {
-      console.log( slothData );
-      slothParameters.value.push( slothData )
-    })
+  mockFormulationSlothParametersData().forEach((slothData: any, index) => {
+    console.log(slothData);
+    slothParameters.value.push(slothData)
+  })
 });
 </script>
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
 #Formulation {
   width: auto;
+}
+
+#SlothCheck {
+  height: 20px;
+  width: 20px;
 }
 ul#ModulesList,
 ul#ModuleCoveredList {
   border: 1px solid #000;
   margin: 20px 0 0 20px;
+
   li {
     background-color: $ngwcp_groupsbkg;
     border-bottom: 1px solid #000;
     padding: 2px 2px 2px 5px;
   }
+
   .liActive {
     background-color: #977752;
   }
@@ -197,15 +224,18 @@ ul#ModuleCoveredList {
   width: 130px;
 
 }
+
 ul#ModulesList {
   li {
     background-color: $ngwcp_groupsbkg;
   }
+
   li:hover {
     background-color: $ngwcp_primary3;
     color: white;
   }
 }
+
 #SlothBackground {
   height: 301px;
   width: 35vw;
@@ -223,6 +253,7 @@ ul#ModulesList {
   color: white;
   border-radius: 20px;
 }
+
 h1 {
   margin-top: 20px;
   text-align: center;
