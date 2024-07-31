@@ -1,7 +1,7 @@
 <template>
   <div id="ResultPage">
-    <div class="grid grid-rows-2">
-      <div row-span-1>
+    <div class="grid grid-rows-12">
+      <div class="row-span-2">
         <div id="ResultsDisplay">
           <div class="grid grid-cols-2">
             <div class="col-span-1">
@@ -39,9 +39,9 @@
           </div>
         </div>
       </div>
-      <div row-span-1>
-        <div id="ResultsArea" class="row-span-1 ngenButtonDiv">
-          <div><button>Go to Evaluation</button></div>
+      <div class="row-span-10">
+        <div id="GraphArea">
+         Data Display
 
         </div>
       </div>
@@ -83,10 +83,11 @@ onMounted(() => {
 
 }
 
-#ResultsArea {
-  height: 40px;
-  width: 200px;
+#GraphArea {
+  height: 500px;
+  width: 900px;
   margin: 8px auto 0 auto;
+  background-color: $ngwcp_groupsbkg;
 }
 
 #DisplayOptions {

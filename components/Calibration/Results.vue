@@ -1,7 +1,7 @@
 <template>
   <div id="ResultPage">
     <div class="grid grid-rows-2">
-      <div row-span-1>
+      <div Class="row-span-1">
         <div id="ResultsDisplay">
           <div class="grid grid-cols-2">
             <div class="col-span-1">
@@ -34,7 +34,7 @@
           </div>
         </div>
       </div>
-      <div row-span-1>
+      <div class="row-span-1">
         <div id="ResultsArea" class="row-span-1">
           <div><button>Go to Evaluation</button></div>
 
