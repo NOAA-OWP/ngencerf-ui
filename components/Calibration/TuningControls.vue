@@ -87,7 +87,7 @@
                   <option value="" selected disabled>...</option>
                 </select>
                 &nbsp;
-                <div id="AddUpdateBtn" class="inline">
+                <div id="AddUpdateBtn" class="inline ngenButtonDiv">
                   <button> Add / Update </button>
                 </div>
               </div>
@@ -191,11 +191,6 @@ onMounted(() => {
 
 #AddUpdateBtn {
   height: 40px;
-  border: 1px solid black;
-  color: white;
-  padding: 8px;
-  border-radius: 10px;
-  background-color: $ngwcp_primary1;
 }
 
 #TuningDataList {

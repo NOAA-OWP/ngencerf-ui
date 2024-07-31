@@ -20,7 +20,8 @@
                 <Column field="initValue" header="Initial Value" sortable></Column>
               </DataTable>
             </div>
-            <div id="ClearTableBtn" class="mb-5"><button>Clear <i class="pi pi-arrow-up"></i></button></div>
+            <div id="ClearTableBtn" class="mb-5 ngenButtonDiv"><button>Clear <i class="pi pi-arrow-up"></i></button>
+            </div>
           </div>
           <div class="flex-row">
             <div id="CalStop" class="bordered">
@@ -33,31 +34,31 @@
       </div>
       <div class="grid col-span-1" style="border-left: 1px solid black">
 
-          <div class="flex-row">
-            <div id="ObjFunct" class="bordered">
-              Objective Function<br />
-              Name:&nbsp;&nbsp;
-              <select class="rounded-md">
-                <option></option>
-              </select>
+        <div class="flex-row">
+          <div id="ObjFunct" class="bordered">
+            Objective Function<br />
+            Name:&nbsp;&nbsp;
+            <select class="rounded-md">
+              <option></option>
+            </select>
+          </div>
+        </div>
+        <div class="flex-row">
+          <div id="Metrics" class="bordered">
+            Metrics<br />
+            <input id="CalcCatMetCB" type="checkbox" class="h-5 w-5 mr-3 inline" @click="ShowFlowThreshold" />
+            <label for="CalcCatMetCB">Calculate Categorical Metrics</label>
+            <div v-if="showFlowThreshold" id="FlowThreshold" class="mt-3">
+              Flow Threshold: <input class="h-7" type="number" /> m3/s
             </div>
           </div>
-          <div class="flex-row">
-            <div id="Metrics" class="bordered">
-              Metrics<br />
-              <input id="CalcCatMetCB" type="checkbox" class="h-5 w-5 mr-3 inline" @click="ShowFlowThreshold" />
-              <label for="CalcCatMetCB">Calculate Categorical Metrics</label>
-              <div v-if="showFlowThreshold" id="FlowThreshold" class="mt-3">
-                Flow Threshold: <input class="h-7" type="number" /> m3/s
-              </div>
-            </div>
+        </div>
+        <div class="flex-row">
+          <div id="PlotGenFreq" class="text-center bordered">
+            Plot Generation Frequency (0 = off)<br />
+            Once Every:&nbsp;&nbsp;<input type="number" />&nbsp;&nbsp;Interations
           </div>
-          <div class="flex-row">
-            <div id="PlotGenFreq" class="text-center bordered">
-              Plot Generation Frequency (0 = off)<br />
-              Once Every:&nbsp;&nbsp;<input type="number" />&nbsp;&nbsp;Interations
-            </div>
-          </div>
+        </div>
 
       </div>
     </div>
@@ -102,6 +103,7 @@ onMounted(() => {
 #CalStop {
   margin-top: 20px;
 }
+
 #OptAlg select,
 #ObjFunct select,
 #Metrics select {
@@ -115,7 +117,7 @@ onMounted(() => {
   width: 50%;
   height: 26px;
 }
-Metrics
+
 #CalStop input,
 #PlotGenFreq input {
   width: 30%;
@@ -127,19 +129,14 @@ Metrics
   margin: 5px auto 5px auto;
   max-height: 160px !important;
   overflow: auto;
-
 }
 
 #ClearTableBtn {
-  background-color: $ngwcp_primary1;
-  text-align: center;
+
   height: 32px;
   width: 370px;
-  color: white;
-  border-radius: 10px;
   padding: 5px 0 0 5px;
-  margin:8px auto;
-  border: 1px solid #888888;
+  margin: 8px auto;
 }
 
 .rounded {

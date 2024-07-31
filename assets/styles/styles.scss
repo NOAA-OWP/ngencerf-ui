@@ -52,8 +52,18 @@ input {
   width: 100%;
 }
 
-ngenButton {
+.ngenButtonDiv {
+  border: 1px solid black;
+  color: white;
+  padding: 8px;
+  border-radius: 10px;
+  background-color: $ngwcp_primary1;
+  text-align: center;
+}
 
+.ngenButtonDiv:hover {
+  background-color: $ngwcp_primary2;
+  color: $ngwcp_primary1;
 }
 
 h2 {
@@ -239,9 +249,8 @@ label {
 }
 
 // DataTables
-
 .p-datatable-header-cell {
-  padding: 8px 8px;
+  padding: 5px 8px !important;
 }
 
 .p-datatable-tbody>tr>td {
@@ -251,8 +260,13 @@ label {
 .p-datatable-thead tr th {
   background-color: #105d8e;
   color: white;
+  border-left: 1px solid white;
 }
 
 .p-datatable-sort-icon {
-  color: white;
+  color: white !important;
+}
+
+.p-datatable-column-title {
+  font-size: 0.8em;
 }

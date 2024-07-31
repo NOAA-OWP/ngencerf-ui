@@ -170,3 +170,7 @@ export interface CalibrationRun {
   calibrationPeriod: String,
   status: String
 }
+
+export interface AlgorithmParameter {
+
+}

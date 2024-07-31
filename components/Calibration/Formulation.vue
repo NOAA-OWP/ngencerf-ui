@@ -70,8 +70,8 @@
                     Value:
                   </div>
                   <input class="w-3/5 rounded-lg" type="number" /><br />
-                  <div id="AddUpdate">
-                    <button class="nlgButton mt-4 ml-10">Add / Update</button>
+                  <div id="AddUpdate" class="ngenButtonDiv">
+                    <button>Add / Update</button>
                   </div>
                 </div>
                 <div class="col-span-1">
@@ -245,12 +245,12 @@ ul#ModulesList {
   margin-left: 20px;
 }
 
-.nlgButton {
+#AddUpdate {
   width: 132px;
-  height: 55px;
-  background-color: $ngwcp_primary1;
-  color: white;
-  border-radius: 20px;
+  height: 55px; 
+  button {
+    padding-top: 8px;
+  }
 }
 
 h1 {

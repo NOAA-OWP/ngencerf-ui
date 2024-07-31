@@ -40,7 +40,7 @@
         </div>
       </div>
       <div row-span-1>
-        <div id="ResultsArea" class="row-span-1">
+        <div id="ResultsArea" class="row-span-1 ngenButtonDiv">
           <div><button>Go to Evaluation</button></div>
 
         </div>
@@ -74,18 +74,9 @@ const progress = ref(0);
 }
 
 #ResultsArea {
-  text-align: center;
-
-  button {
-    background-color: $ngwcp_primary1;
     height: 40px;
     width: 200px;
-    color: white;
-    border-radius: 10px;
-    padding: 0;
-    margin: 8px 0 0 0;
-    border: 1px solid #888888;
-  }
+    margin: 8px auto 0 auto;
 }
 
 #DisplayOptions {
