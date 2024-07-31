@@ -41,16 +41,27 @@
         </div>
       </div>
     </div>
+    <div class="waitgif" v-if="loading">
+      <img src="@/assets/styles/img/wait.gif" />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import ProgressBar from "primevue/progressbar";
+const loading = ref(true);
+
 const runningTime = ref();
 const startTime = ref();
 const iteration = ref();
 
 const progress = ref(30);
+
+onMounted(() => {
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
+});
 </script>
 
 <style lang="scss" scoped>

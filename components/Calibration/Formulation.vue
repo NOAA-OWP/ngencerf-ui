@@ -35,13 +35,13 @@
             </div>
             <div class="row-span-1">
               <div class="inline-block  ml-20 mt-2">
-                <input type="checkbox" id="SlothCheck" @click="showSloth"/>
+                <input type="checkbox" id="SlothCheck" @click="showSloth" />
               </div>
               <label class="inline-block ml-2" for="SlothCheck">Add SLoTH output variable for formulation</label>
             </div>
 
           </div>
-          
+
           <!-- Sloth Variables -->
           <div id="SlothBackground" v-if="showSlothVariables">
             <div class="slothTitle text-xl mb-2">SLoTH Output Variable</div>
@@ -110,16 +110,20 @@
       </div>
 
       <div class="col-2 col-span-5 p-2">
-        <DataTable class="stripe ":value="slothParameters" scrollable scroll-height="300px">
-          <Column field="outputVar" header="SLoTH Output Var" sortable></Column>
-          <Column field="metadata" header="Metadata Properties" sortable></Column>
-          <Column field="module" header="For Module" sortable></Column>
-          <Column field="moduleParam" header="Module Param" sortable></Column>
-          <Column field="value" header="Value" sortable></Column>
-        </DataTable>
+        <div class=" flex items-center">
+          <DataTable class="stripe" :value="slothParameters" scrollable scroll-height="300px">
+            <Column field="outputVar" header="SLoTH Output Var" sortable></Column>
+            <Column field="metadata" header="Metadata Properties" sortable></Column>
+            <Column field="module" header="For Module" sortable></Column>
+            <Column field="moduleParam" header="Module Param" sortable></Column>
+            <Column field="value" header="Value" sortable></Column>
+          </DataTable>
+        </div>
       </div>
     </div>
-
+    <div class="waitgif" v-if="loading">
+      <img src="@/assets/styles/img/wait.gif" />
+    </div>
   </div>
 </template>
 
@@ -127,6 +131,8 @@
 import Index from "~/pages/index.vue";
 import { mockFormulationSlothParametersData } from "~/mockApi/formulationSlothData";
 import type { SlothParameter } from "~/composables/NextGenModel";
+
+const loading = ref(true);
 
 const formulation_modules = [
   "Sloth",
@@ -162,9 +168,15 @@ const formulation_covered_groups = [
 
 const showSlothVariables = ref(false);
 
-const showSloth = (e:MouseEvent) => {
+onMounted(() => {
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
+});
+
+const showSloth = (e: MouseEvent) => {
   const ele = <HTMLInputElement>document.getElementById("SlothCheck");
-    showSlothVariables.value = ele.checked as boolean;
+  showSlothVariables.value = ele.checked as boolean;
 
 }
 
@@ -203,6 +215,7 @@ onMounted(() => {
   height: 20px;
   width: 20px;
 }
+
 ul#ModulesList,
 ul#ModuleCoveredList {
   border: 1px solid #000;
@@ -247,7 +260,8 @@ ul#ModulesList {
 
 #AddUpdate {
   width: 132px;
-  height: 55px; 
+  height: 55px;
+
   button {
     padding-top: 8px;
   }

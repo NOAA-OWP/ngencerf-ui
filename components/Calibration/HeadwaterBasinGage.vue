@@ -161,12 +161,4 @@ select {
   background-color: #dddddd;
 }
 
-.waitgif {
-  position: absolute;
-  top: 40%;
-  left: 45%;
-  width: 50px;
-  margin: 0 auto;
-  z-index: 9999;
-}
 </style>

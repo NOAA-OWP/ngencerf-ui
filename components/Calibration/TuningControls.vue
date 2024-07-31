@@ -115,6 +115,9 @@
         </div>
       </div>
     </div>
+    <div class="waitgif" v-if="loading">
+      <img src="@/assets/styles/img/wait.gif" />
+    </div>
   </div>
 </template>
 
@@ -123,6 +126,8 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { mockCalibrationTuningData } from "~/mockApi/calibrationAPIData";
 import type { CalibrationTuningData } from "~/composables/NextGenModel";
+
+const loading = ref(true);
 
 const simStartTime = ref();
 const simEndTime = ref();
@@ -136,6 +141,13 @@ const avCalEndTime = ref();
 
 const autoValidation = ref(false);
 const datetime = ref();
+
+onMounted(() => {
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
+});
+
 const AutoValChecked = () => {
   const ele = <HTMLInputElement>document.getElementById("CheckTheBox");
   autoValidation.value = ele.checked as boolean;
@@ -197,13 +209,13 @@ onMounted(() => {
   margin: 0 auto;
   width: 750px;
 }
+
 .timeBlocks {
   font-size: 0.8em;
   text-align: right;
   margin-right: 20px;
 
 }
-
 
 .datePickers {
   width: 250px;

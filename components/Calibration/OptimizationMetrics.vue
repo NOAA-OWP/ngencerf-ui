@@ -26,8 +26,7 @@
           <div class="flex-row">
             <div id="CalStop" class="bordered">
               Calibration Stop Criteria:<br />
-              <input type="number" /><br />
-              Interations
+              <input type="number" /><span class="ml-2">Interations</span>
             </div>
           </div>
         </div>
@@ -54,13 +53,16 @@
           </div>
         </div>
         <div class="flex-row">
-          <div id="PlotGenFreq" class="text-center bordered">
+          <div id="PlotGenFreq" class="bordered">
             Plot Generation Frequency (0 = off)<br />
             Once Every:&nbsp;&nbsp;<input type="number" />&nbsp;&nbsp;Interations
           </div>
         </div>
 
       </div>
+    </div>
+    <div class="waitgif" v-if="loading">
+      <img src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
 </template>
@@ -69,6 +71,7 @@
 import type { AlgorithmParameter } from '~/composables/NextGenModel';
 import { mockAlogorithmParameterData } from '~/mockApi/calibrationAPIData';
 
+const loading = ref(true);
 const showFlowThreshold = ref(false);
 
 const ShowFlowThreshold = (e: MouseEvent) => {
@@ -82,6 +85,9 @@ onMounted(() => {
   mockAlogorithmParameterData().forEach((param, index) => {
     algorithm_parameters.value.push(<AlgorithmParameter>param)
   });
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
 })
 </script>
 
@@ -128,7 +134,7 @@ onMounted(() => {
   width: 370px;
   margin: 5px auto 5px auto;
   max-height: 160px !important;
-  overflow: auto;
+  overflow: hidden;
 }
 
 #ClearTableBtn {
