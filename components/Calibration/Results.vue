@@ -25,9 +25,9 @@
               <div class="mt-1">
                 Status: <ProgressBar :value="progress"></ProgressBar>
               </div>
-              <div class="mt-4">Display: 
+              <div class="mt-4">Display:
                 <select id="DisplayOptions">
-                    <option>Parameters</option>
+                  <option>Parameters</option>
                 </select>
               </div>
             </div>
@@ -66,6 +66,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
 #ResultsDisplay {
   width: 50vw;
   margin: 20px auto;
@@ -75,27 +76,29 @@ onMounted(() => {
   height: 100px;
   border: 1px solid $ngwcp_primary1;
   min-width: 750px;
- 
+
 }
 
 #ResultsArea {
   text-align: center;
 
   button {
-  background-color: $ngwcp_primary1;
-  height: 40px;
-  width: 200px;
-  color: white;
-  border-radius: 10px;
-  padding: 0;
-  margin: 8px 0 0 0;
-  border: 1px solid #888888;
+    background-color: $ngwcp_primary1;
+    height: 40px;
+    width: 200px;
+    color: white;
+    border-radius: 10px;
+    padding: 0;
+    margin: 8px 0 0 0;
+    border: 1px solid #888888;
   }
 }
+
 #DisplayOptions {
-    width: 60%;
-    margin-left: 10px;
+  width: 60%;
+  margin-left: 10px;
 }
+
 .p-progressbar {
   display: inline-block;
   width: 200px;
@@ -107,7 +110,6 @@ onMounted(() => {
   text-align: right;
   padding-right: 20px;
 }
-
 </style>
 
 <style>
@@ -118,13 +120,16 @@ onMounted(() => {
     margin-left: 10px;
     width: 80%;
   }
+
   .p-progressbar-value {
     color: green;
     background-color: green;
   }
+
   .p-progressbar-value {
     color: black;
   }
+
   .p-progressbar-label {
     color: white;
   }

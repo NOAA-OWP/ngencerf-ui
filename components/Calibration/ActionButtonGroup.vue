@@ -30,7 +30,6 @@ const { getTabIndex } = generalStore();
 
 const tabIndex = getTabIndex();
 
-
 </script>
 
 <style lang="scss" scoped>
@@ -41,6 +40,7 @@ const tabIndex = getTabIndex();
   color: #ffffff;
   font-weight: bold;
 }
+
 .actionBtn {
   display: inline-block;
   width: 95%;
@@ -86,23 +86,29 @@ const tabIndex = getTabIndex();
 .start {
   background-color: #155e29;
 }
+
 .stop {
   background-color: #922222;
 }
+
 .save {
   background-color: #333333;
 }
+
 .reset {
   background-color: #000000;
 }
+
 .prev {
   background-color: #000000;
   display: inline-block;
 }
+
 .next {
   background-color: #000000;
   display: inline-block;
 }
+
 .disabled {
   opacity: 0.8;
 }
