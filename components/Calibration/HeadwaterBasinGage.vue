@@ -5,21 +5,21 @@
         <div class="row-span-4 selRow">
           <div class="grid grid-cols-4 gap=4">
             <div class="col-span-1">
-              <label for="domain_dd">Domain: </label><br />
+              <p class="mb-1">Domain:</p>
               <select id="domain_dd">
                 <option value="" disabled selected>...</option>
                 <option>Select Domain</option>
               </select>
             </div>
             <div class="col-span-1">
-              <label for="gage_dd">Gage: </label><br />
+              <p class="mb-1" for="gage_dd">Gage: </p>
               <select id="gage_dd">
                 <option value="" disabled selected>...</option>
                 <option>Select Gage</option>
               </select>
             </div>
             <div class="col-span-1">
-              <label for="forcing_dd">Forcing: </label><br />
+              <p class="mb-1" for="forcing_dd">Forcing: </p>
               <select id="forcing_dd">
                 <option value="" disabled selected>...</option>
                 <option value="upload">Upload</option>
@@ -27,7 +27,7 @@
               </select>
             </div>
             <div class="col-span-1">
-              <label for="observational_dd">Observational: </label><br />
+              <p class="mb-1" for="observational_dd">Observational: </p>
               <select id="observational_dd">
                 <option value="" disabled selected>...</option>
                 <option value="upload">Upload</option>
@@ -117,41 +117,33 @@ onMounted(() => {
 @import "@/assets/styles/styles.scss";
 
 #GageSettings {
-  width: 60vw;
-  //margin-left: 5vw;
+  width: 900px;
   margin: 20px auto;
-  background-color: $ngwcp_groupsbkg;
-  padding: 10px 10px 10px 20px;
-  border-radius: 20px;
-  height: 80px;
-  border: 1px solid $ngwcp_primary1;
+  height: 80px; 
 }
 
 select {
   width: 90%;
+
 }
 
 #GageReport {
   margin: 30px auto 0 auto;
-  width: 600px;
+  width: 700px;
   height: 315px;
-  background-color: $ngwcp_groupsbkg;
-  border-radius: 20px;
-  border: 1px solid $ngwcp_primary1;
-  padding: 10px;
-
   table {
     width: 100%;
     margin: 10px auto;
     border: 1px solid $ngwcp_primary1;
-
+    font-size: 1.2em;
     tr {
       line-height: 27px;
       border-bottom: 1px solid #333333;
 
       td {
         width: 50%;
-        padding-left: 5px;
+        padding-left: 10px;
+        border-right: 1px solid black;
       }
     }
   }

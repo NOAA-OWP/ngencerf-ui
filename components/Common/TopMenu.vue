@@ -35,42 +35,5 @@ const { isUserLoggedIn } = useUserDataStore();
       background-color: $ngwcp_neutral1;
     }
   }
-  #UserLink {
-    #UserLinkCircle {
-      z-index: 9;
-      text-align: center;
-      height: 60px;
-      width: 60px;
-      background-color: #bbb;
-      border-radius: 50%;
-      display: inline-block;
-      font-size: 22px;
-      #UserCircle {
-        text-align: center;
-        margin-top: 18px;
-      }
-      .tglusermenu {
-        cursor: pointer;
-      }
-    }
-    #UserMenu {
-      background-color: #ffffff;
-      border-radius: 20px;
-      height: 2em;
-      padding-top: 5px;
-    }
-  }
-
-  #HelpLink {
-    z-index: 9;
-    text-align: center;
-    height: 60px;
-    width: 60px;
-    display: inline-block;
-    #HelpCircle {
-      text-align: center;
-      margin-top: 18px;
-    }
-  }
 }
 </style>

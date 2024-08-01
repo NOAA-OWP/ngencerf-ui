@@ -20,7 +20,7 @@ FormulationName<template>
           <div class="col-span-3">&nbsp;</div>
           <div class="col-span-2">
             <div class="mt-2 text-center"><strong>Modules</strong></div>
-            <div aria-label="Group Select" title="Group Select">
+            <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
               Groups: <select id="ModuleGroupSelect" class="ml-2">
                 <option value="all" selected>All</option>
               </select>
@@ -77,9 +77,9 @@ FormulationName<template>
           <input type="checkbox" id="SlothCheck" class="ml-4" @click="showSloth" />
           <label class="inline-block text-xl mb-2" for="SlothCheck">&nbsp;Add SLoTH output variable for
             formulation</label>
-          <label class="inline-block text-xl pl-3 pr-4" for="SlothName">SLoTH Name:</label><input
+          <label class="inline-block text-xl pl-10 pr-4" for="SlothName">SLoTH Name:</label><input
             class="inline-block w-auto" id="SlothName" type="text">
-          <div class="ngenButtonDiv ml-5 inline-block">
+          <div class="ngenButtonDiv ml-3 inline-block">
             <button id="SlothAddBtn">Add</button>
           </div>
           <div id="SlothDataTable" v-show="showSlothVariables" class="items-center ml-10 mr-10 mt-4">
@@ -211,12 +211,13 @@ ul#ModulesList {
   }
 
   li:hover {
-    background-color: $ngwcp_primary3;
-    color: white;
+    background-color: $ngwcp_secondary3;
+    color: black;
   }
 
-  .liActive {
-    background-color: #977752;
+ .liActive {
+    background-color: $ngwcp_primary3;
+    color: white;
   }
 }
 

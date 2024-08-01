@@ -1,6 +1,15 @@
 <template>
-  <div id="BottomButtons" class="grid grid-cols-7">
-    <div>
+  <div id="BottomButtons" class="grid grid-cols-12 w-full">
+    <div class="col-span-2"> <button class="start actionBtn">{{ getTabIndex() < 6 ? "SAVE" : "START" }}</button></div>
+    <div class="col-span-2"><button class="stop actionBtn">{{ getTabIndex() < 6 ? "RESET" : "STOP" }}</button></div>
+    <div class="col-span-1"></div>
+    <div class="col-span-1"></div>
+    <div class="col-span-1"></div>
+    <div class="col-span-1"></div>
+    <div class="col-span-2 text-right"><button class="prev actionBtnSmall">&#8678; Prev</button></div>
+    <div class="col-span-2"><button class="next actionBtnSmall">Next <span>&#8680;</span></button></div>
+ 
+    <!-- <div>
       <button class="start actionBtn">{{ getTabIndex() < 6 ? "SAVE" : "START" }}</button>
     </div>
     <div>
@@ -20,7 +29,7 @@
     </div>
     <div>
       <button class="next actionBtnSmall">Next <span>&#8680;</span></button>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -61,26 +70,11 @@ const tabIndex = getTabIndex();
   margin-right: 3px;
 }
 
-.buttonSpacer {
-  display: inline-block;
-  width: 60px;
-}
-
 .arrow {
   border: solid black;
   border-width: 0 3px 3px 0;
   display: inline-block;
   padding: 3px;
-}
-
-.right {
-  transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-}
-
-.left {
-  transform: rotate(135deg);
-  -webkit-transform: rotate(135deg);
 }
 
 .start {

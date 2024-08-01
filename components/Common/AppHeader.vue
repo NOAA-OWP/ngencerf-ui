@@ -122,7 +122,7 @@ const getUserInitials = () => {
   display: inline-block;
   height: 60px;
   width: 60px;
-  background-color: #bbb;
+  background-color: #eee;
   border-radius: 50%;
   font-size: 30px;
   padding-top: 16px;
@@ -131,8 +131,11 @@ const getUserInitials = () => {
 #UserCircle {
   margin-right: 10px;
 }
-#HelpCircle {
+#UserCircle:hover {
   background-color: $ngwcp_primary2;
+}
+#HelpCircle:hover {
+ background-color: $ngwcp_primary2;
 }
 
 .userInitials {
