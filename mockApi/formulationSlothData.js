@@ -20,6 +20,6 @@ export const mockFormulationSlothParametersData = () => {
       module: 'CFE',
       moduleParam: 'soil_moisture_profile',
       value: 0.0
-    },    
+    },
   ]
 }

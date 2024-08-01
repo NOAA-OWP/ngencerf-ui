@@ -4,7 +4,7 @@
       <button class="start actionBtn">{{ getTabIndex() < 6 ? "SAVE" : "START" }}</button>
     </div>
     <div>
-      <button class="stop actionBtn">{{ getTabIndex() < 6 ? "STOP" : "START" }}</button>
+      <button class="stop actionBtn">{{ getTabIndex() < 6 ? "RESET" : "STOP" }}</button>
     </div>
     <div>
       <button class="">&nbsp;</button>

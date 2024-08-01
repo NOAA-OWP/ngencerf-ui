@@ -1,130 +1,109 @@
-<template>
-  <div id="Formulation" class="shrink-0">
-    <div class="grid grid-cols-6 p-2 gap-2">
-      <div class="col-1 col-span-1 row-span-2 p-2">
-        <div class="mt-2 text-center">Modules</div>
-        <div class="ml-6 mt-1">
-          <select id="ModuleGroupSelect" class="ml-2">
-            <option value="all" selected>All</option>
-          </select>
-        </div>
-        <ul id="ModulesList">
-          <li v-for="(module, index) in formulation_modules" :index="index" @click="ModuleClicked">
-            {{ module }}
-          </li>
-        </ul>
-      </div>
-      <div class="col-2 col-span-5 p-2">
-        <div class="group-cover-selection-wrapper w-60 float-left">
-          <div class="mt-2 text-center">Groups CoveredBy Selections</div>
-          <ul id="ModuleCoveredList">
-            <li v-for="(module, index) in formulation_covered_groups" :index="index">
-              {{ module }}
-            </li>
-          </ul>
-        </div>
+FormulationName<template>
+  <div id="Formulation">
 
-        <!-- /selection-wrapper -->
-        <div class="sloth-variable-input-form ml-60">
-          <div class="grid grid-rows-2">
-            <div class="row-span-1">
-              <div id="FormulationName" class="inline-block ml-20 mr-5 mt-3">
-                Forumulation Name:
-              </div>
-              <div class="inline-block"><input type="text" /></div>
+    <div class="grid grid-rows-12">
+      <div class="grid row-span-1">
+        <div class="grid grid-cols-8">
+          <div class="col-span-2">&nbsp;</div>
+          <div class="col-span-4">
+            <div id="FormulationName" class="inline-block ml-20 mr-5 mt-3" aria-label="Forumulation Name" title="Formulation Name">
+              Forumulation Name:
             </div>
-            <div class="row-span-1">
-              <div class="inline-block  ml-20 mt-2">
-                <input type="checkbox" id="SlothCheck" @click="showSloth" />
-              </div>
-              <label class="inline-block ml-2" for="SlothCheck">Add SLoTH output variable for formulation</label>
-            </div>
-
+            <div class="inline-block" aria-label="Input Forumulation Name" title="Input Formulation Name" ><input type="text" /></div>
           </div>
+          <div class="col-span-2">&nbsp;</div>
+        </div>
+      </div>
 
-          <!-- Sloth Variables -->
-          <div id="SlothBackground" v-if="showSlothVariables">
-            <div class="slothTitle text-xl mb-2">SLoTH Output Variable</div>
-            <div>
-              <div class="text-right inline-block slothLable mr-4 mb-2">
-                SLoth Name:
-              </div>
-              <input class="w-3/5 rounded-lg" type="text" /><br />
-              <div class="text-right inline-block slothLable mr-4 mb-2">
-                For Module:
-              </div>
-              <select class="w-3/5 rounded-lg">
-                <option value="" selected disabled>...</option>
+      <div class="row-span-5">
+        <div class="grid grid-cols-12">
+          <div class="col-span-3">&nbsp;</div>
+          <div class="col-span-2">
+            <div class="mt-2 text-center"><strong>Modules</strong></div>
+            <div aria-label="Group Select" title="Group Select">
+              Groups: <select id="ModuleGroupSelect" class="ml-2">
+                <option value="all" selected>All</option>
               </select>
-              <br />
-              <div class="text-right inline-block slothLable mr-4 mb-2">
-                Module Param:
-              </div>
-              <input class="w-3/5 rounded-lg" type="text" /><br />
             </div>
+            <ul id="ModulesList">
+              <li v-for="(module, index) in formulation_modules" :index="index" @click="ModuleClicked">
+                {{ module }}
+              </li>
+            </ul>
+          </div>
+          <div class="col-span-2">&nbsp;</div>
+          <div class="col-span-5">
+            <div class="group-cover-selection-wrapper w-60 float-left">
+              <div class="mt-2 mb-2 text-center"  aria-label="List of groups covered by selection" title="List of groups covered by selection"><strong>Groups Covered <br />By Selections</strong></div>
+              <table id="CoveredBy" class="ml-10">
+                <tr>
+                  <td class="checkArea"><i v-if="true" class="pi pi-check font-bold"></i></td>
+                  <td class="pl-3">Glacier</td>
+                </tr>
+                <tr>
+                  <td class="checkArea"><i v-if="true" class="pi pi-check font-bold"></i></td>
+                  <td class="pl-3">Snowmelt</td>
+                </tr>
+                <tr>
+                  <td class="checkArea"><i v-if="true" class="pi pi-check font-bold"></i></td>
+                  <td class="pl-3">Evapotranspiration</td>
+                </tr>
+                <tr>
+                  <td class="checkArea"><i v-if="true" class="pi pi-check font-bold"></i></td>
+                  <td class="pl-3">Rainfall / Runoff</td>
+                </tr>
+                <tr>
+                  <td class="checkArea"><i v-if="true" class="pi pi-check font-bold"></i></td>
+                  <td class="pl-3">Soil Moisture</td>
+                </tr>
+                <tr>
+                  <td class="checkArea"><i v-if="true" class="pi pi-check font-bold"></i></td>
+                  <td class="pl-3">Channel Routing</td>
+                </tr>
+                <tr>
+                  <td class="checkArea"><i v-if="true" class="pi pi-check font-bold"></i></td>
+                  <td class="pl-3">Coastal</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div class="col-span-1">&nbsp;</div>
+        </div>
+      </div>
+      <div class="row-span-6">
 
-            <div class="grid grid-rows-1 mt-4">
-              <div class="grid grid-cols-2">
-                <div class="col-span-1">
-                  <div class="text-right inline-block w-1/5 mr-4 mb-2">
-                    Value:
-                  </div>
-                  <input class="w-3/5 rounded-lg" type="number" /><br />
-                  <div id="AddUpdate" class="ngenButtonDiv">
-                    <button>Add / Update</button>
-                  </div>
-                </div>
-                <div class="col-span-1">
-                  <div class="text-right inline-block w-1/5 mr-4 mb-2">
-                    Count:
-                  </div>
-                  <input class="w-3/5 rounded-lg" type="number" /><br />
-                  <div class="text-right inline-block w-1/5 mr-4 mb-2">
-                    Type:
-                  </div>
-                  <select class="w-3/5 rounded-lg" type="number">
-                    <option value="" selected disabled>...</option>
-                  </select>
-                  <br />
-                  <div class="text-right inline-block w-1/5 mr-4 mb-2">
-                    Units:
-                  </div>
-                  <select class="w-3/5 rounded-lg" type="number">
-                    <option value="" selected disabled>...</option>
-                  </select>
-                  <br />
-                  <div class="text-right inline-block w-1/5 mr-4 mb-2">
-                    Location:
-                  </div>
-                  <select class="w-3/5 rounded-lg" type="number">
-                    <option value="" selected disabled>...</option>
-                  </select>
-                  <br />
-                </div>
-              </div>
-            </div>
+
+        <div class="text-center">
+          <input type="checkbox" id="SlothCheck" class="ml-4" @click="showSloth" />
+          <label class="inline-block text-xl mb-2" for="SlothCheck">&nbsp;Add SLoTH output variable for
+            formulation</label>
+          <label class="inline-block text-xl pl-3 pr-4" for="SlothName">SLoTH Name:</label><input
+            class="inline-block w-auto" id="SlothName" type="text">
+          <div class="ngenButtonDiv ml-5 inline-block">
+            <button id="SlothAddBtn">Add</button>
+          </div>
+          <div id="SlothDataTable" v-show="showSlothVariables" class="items-center ml-10 mr-10 mt-4">
+            <DataTable class="stripe" :value="slothParameters" scrollable scroll-height="300px">
+              <Column field="outputVar" header="SLoTH Output Var" sortable></Column>
+              <Column field="COUNT" header="Count" sortable></Column>
+              <Column field="TYPE" header="Type" sortable></Column>
+              <Column field="UNITS" header="Units" sortable></Column>
+              <Column field="LOCATION" header="Location" sortable></Column>
+              <Column field="module" header="For Module" sortable></Column>
+              <Column field="moduleParam" header="Module Param" sortable></Column>
+              <Column field="value" header="Value" sortable></Column>
+            </DataTable>
           </div>
         </div>
 
-        <!-- /input-form-wrapper -->
+
       </div>
 
-      <div class="col-2 col-span-5 p-2">
-        <div class=" flex items-center">
-          <DataTable class="stripe" :value="slothParameters" scrollable scroll-height="300px">
-            <Column field="outputVar" header="SLoTH Output Var" sortable></Column>
-            <Column field="metadata" header="Metadata Properties" sortable></Column>
-            <Column field="module" header="For Module" sortable></Column>
-            <Column field="moduleParam" header="Module Param" sortable></Column>
-            <Column field="value" header="Value" sortable></Column>
-          </DataTable>
-        </div>
-      </div>
     </div>
-    <div class="waitgif" v-if="loading">
-      <img src="@/assets/styles/img/wait.gif" />
-    </div>
+
+
   </div>
+
 </template>
 
 <script lang="ts" setup>
@@ -211,20 +190,29 @@ onMounted(() => {
   width: auto;
 }
 
+#FormulationName {
+  font-size: 1.2em;
+}
+
 #SlothCheck {
   height: 20px;
   width: 20px;
 }
 
-ul#ModulesList,
-ul#ModuleCoveredList {
+ul#ModulesList {
   border: 1px solid #000;
-  margin: 5px 0 0 20px;
+  height: 250px;
+  overflow-y: scroll;
 
   li {
-    background-color: $ngwcp_groupsbkg;
+    background-color: #eee;
     border-bottom: 1px solid #000;
     padding: 2px 2px 2px 5px;
+  }
+
+  li:hover {
+    background-color: $ngwcp_primary3;
+    color: white;
   }
 
   .liActive {
@@ -237,14 +225,10 @@ ul#ModuleCoveredList {
 
 }
 
-ul#ModulesList {
-  li {
-    background-color: $ngwcp_groupsbkg;
-  }
+table#CoveredBy {
 
-  li:hover {
-    background-color: $ngwcp_primary3;
-    color: white;
+  tr td {
+    line-height: 2em;
   }
 }
 

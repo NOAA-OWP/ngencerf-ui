@@ -174,3 +174,7 @@ export interface CalibrationRun {
 export interface AlgorithmParameter {
 
 }
+
+export interface SlothParameter {
+  
+}
