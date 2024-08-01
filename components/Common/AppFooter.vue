@@ -1,18 +1,28 @@
 <template>
-  <div id="Footer"
-    :class="location.name === 'PreviousRuns' || location.name === 'LandingPage' ? 'height80' : 'height120'">
-    <div id="ActionButtons"
-      v-if="isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns'">
-      <ActionButtonGroup />
-    </div>
-    <div class="topBar">&nbsp</div>
+  <!-- <div id="Footer" :class="location.name === 'PreviousRuns' || location.name === 'LandingPage' ? 'height80' : 'height160'"> -->
+  <div id="Footer">
+    <div class="grid grid-rows-2 gap-1">
+      <div class="row-span-1">
+        <div class="grid grid-cols-3">
+          <div class="col-span-2">
+            <div id="ActionButtons" class="footerColor"
+              v-if="isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns'">
+              <ActionButtonGroup />
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <div id="FooterData" class="version">
-      Version {{ info.program_info.version }},&nbsp;&nbsp;{{
-        info.program_info.release_date
-      }}
+      <div class="row-span-1 footerColor">
+        <div class="topBar">&nbsp</div>
+        <div id="FooterData" class="version">
+          Version {{ info.program_info.version }},&nbsp;&nbsp;{{
+            info.program_info.release_date
+          }}
+        </div>
+        <div class="copyright">Copyright &COPY;2024, RTX</div>
+      </div>
     </div>
-    <div class="copyright">Copyright &COPY;2024, RTX</div>
   </div>
 </template>
 
@@ -29,16 +39,10 @@ const info = json;
 @import "/assets/styles/styles.scss";
 
 #ActionButtons {
-  padding: 8px 0 8px 0;
-  width: 67vw;
-}
-
-.height80 {
   height: 60px;
-}
-
-.hight120 {
-  height: 120px;
+  padding: 8px 0 8px 0;
+  height: 60px;
+  background: $ngwcp_footer;
 }
 
 #Footer {
@@ -46,12 +50,20 @@ const info = json;
   position: absolute;
   bottom: 0;
   width: 100%;
-  color: #fff;
+  color: black;
   z-index: 9999;
-  background-color: $ngwcp_primary3;
+
 }
 
+#FooterData {
+  height: 50px;
+  z-index: 9999;
+}
 
+.footerColor {
+  background-color: $ngwcp_footer;
+  ;
+}
 
 .topBar {
   background-color: black;

@@ -8,10 +8,11 @@
 @import "primeicons/primeicons.css";
 
 html {
-  background: hsla(210, 17%, 98%, 1);
+  /* background: hsla(210, 17%, 98%, 1);
   background: linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);
   background: -moz-linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);
-  background: -webkit-linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);
+  background: -webkit-linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%); */
+  background: $ngwcp_footer;
   height: 100%;
 }
 
@@ -39,7 +40,7 @@ body {
   flex-direction: column;
   overflow: hidden;
   min-width: 1530px !important;
-  min-height: 820px;
+  min-height: 945px !important;
 }
 
 .boxed {
