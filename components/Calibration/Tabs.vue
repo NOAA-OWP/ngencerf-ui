@@ -2,29 +2,29 @@
 <template TABS>
   <div id="MainTabs">
     <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
-      <div data-tab="1" class="tabs activeTab" v-on:click="tabClicked">
+      <div data-tab="1" class="tabs activeTab" v-on:click="tabClicked" aria-label="Headwater Basin Gage tab" title="Headwater Basin Gage tab">
         Headwater Basin Gage
-        <div class="errorDot"></div>
+        <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
-      <div data-tab="2" class="tabs" v-on:click="tabClicked">
+      <div data-tab="2" class="tabs" v-on:click="tabClicked" aria-label=" Formulation tab" title=" Formulation tab">
         Formulation
-        <div class="errorDot"></div>
+        <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
-      <div data-tab="3" class="tabs" v-on:click="tabClicked">
+      <div data-tab="3" class="tabs" v-on:click="tabClicked" aria-label="Tuning Controls tab" title="Tuning Controls tab">
         Tuning Controls
-        <div class="errorDot"></div>
+        <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
-      <div data-tab="4" class="tabs" v-on:click="tabClicked">
+      <div data-tab="4" class="tabs" v-on:click="tabClicked" aria-label=" Optimization / Metrics tab" title=" Optimization / Metrics tab">
         Optimization / Metrics
-        <div class="errorDot"></div>
+        <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
-      <div data-tab="5" class="tabs" v-on:click="tabClicked">
+      <div data-tab="5" class="tabs" v-on:click="tabClicked" aria-label="Run Status tab" title="Run Status tab">
         Run / Status
-        <div class="errorDot"></div>
+        <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
-      <div data-tab="6" class="tabs" v-on:click="tabClicked">
+      <div data-tab="6" class="tabs" v-on:click="tabClicked" aria-label="Results tab" title="Results tab">
         Results
-        <div class="errorDot"></div>
+        <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
     </div>
   </div>
@@ -36,6 +36,9 @@ const { getTabIndex, setTabIndex } = generalStore();
 
 const emit = defineEmits(["tabNumber"]);
 const currentTab = ref(1);
+
+// temporary. Will be replaced by logic from each tab
+const tabNotCompleted = ref(false);
 
 const tabClicked = (event: Event) => {
   event.preventDefault();
@@ -65,6 +68,7 @@ const tabClicked = (event: Event) => {
 
 #MainTabs {
   overflow-x: hidden;
+  margin-left: 20px;
 
   .tabs {
     font-size: 0.8vw;
@@ -76,6 +80,7 @@ const tabClicked = (event: Event) => {
     color: $ngwcp_primary3;
     text-align: center;
     padding-top: 13px;
+    padding-left: 10px;
     border-radius: 30px 30px 0 0;
     border: 1px solid $ngwcp_primary1;
   }
@@ -83,6 +88,14 @@ const tabClicked = (event: Event) => {
   .errorDot {
     display: inline-block;
     background-color: black;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    margin-left: 3px;
+  }
+  .noErrorDot {
+    display: inline-block;
+    background-color: transparent;
     width: 10px;
     height: 10px;
     border-radius: 100%;

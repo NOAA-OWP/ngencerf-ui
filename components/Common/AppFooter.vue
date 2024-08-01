@@ -1,5 +1,4 @@
 <template>
-  <!-- <div id="Footer" :class="location.name === 'PreviousRuns' || location.name === 'LandingPage' ? 'height80' : 'height160'"> -->
   <div id="Footer">
     <div class="grid grid-rows-2 gap-1">
       <div class="row-span-1">

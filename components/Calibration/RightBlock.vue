@@ -21,6 +21,8 @@
 </template>
 <script lang="ts" setup>
 import type { Progress } from "~/composables/NextGenModel";
+import ProgressGroup from "../Common/ProgressGroup.vue";
+import MessagesGroup from "../Common/MessagesGroup.vue";
 
 const progress: Progress = {
   headwater_basin_gage: true,
@@ -32,25 +34,24 @@ const progress: Progress = {
   objective_function: false,
   calibration_stop_criteria: false,
   metrics_plot_inteval: false,
-};
+};  // height: auto;
+// width: 98%;
 
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
 #TopRightBlock {
-  overflow: hidden;
   padding: 10px;
   height: fit-content;
+  border-bottom: 1px solid black;
 }
 
 #MessagesGroup {
-  max-height: 454px;
-  height: auto;
-  width: 98%;
-  background-color: $ngwcp_groupsbkg;
-  border-radius: 30px;
-  border: 1px solid #000;
+  //max-height: 454px;
+  // height: auto;
+  // width: 98%;
+  font-size: .9em;
 }
 
 #GageCutout {
@@ -58,11 +59,8 @@ const progress: Progress = {
 }
 
 #ProgressGroup {
-  background-color: $ngwcp_groupsbkg;
-  border-radius: 30px;
   margin-left: 10px;
   padding: 10px;
-  border: 1px solid #000;
 }
 
 .boxed {

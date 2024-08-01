@@ -8,17 +8,17 @@
       </div>
       <div id="Col2" class="col-span-8">
         <ul v-show="isUserLoggedIn() && location.name !== 'Login' && location.name !=='LandingPage'" id="MainMenu">
-          <li>
-            <NuxtLink to="/">Calibration</NuxtLink>
+          <li aria-label="Calibration" title="Calibration">
+            <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration">Calibration</NuxtLink>
           </li>
-          <li>
-            <NuxtLink class="disabled" to="/">Evaluation</NuxtLink>
+          <li aria-label="Evaluation" title="Evaluation">
+            <NuxtLink :class="location.name === 'Evaluation' ? 'isActive' : ''" to="#">Evaluation</NuxtLink>
           </li>
-          <li>
-            <NuxtLink class="disabled" to="/">Forecast</NuxtLink>
+          <li aria-label="Forecast" title="Forecast">
+            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="#">Forecast</NuxtLink>
           </li>
-          <li>
-            <NuxtLink class="disabled" to="/">Verification</NuxtLink>
+          <li aria-label="Verification" title="Verification">
+            <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="#">Verification</NuxtLink>
           </li>
         </ul>
       </div>
@@ -82,6 +82,7 @@ const getUserInitials = () => {
 }
 #MainMenu {
   float: right;
+  margin-right: 100px;
   margin-top: 20px;
   ul {
     list-style: none;
@@ -92,7 +93,7 @@ const getUserInitials = () => {
     display: inline-block;
     margin-right: 20px;
     font-size: 22px;
-    margin-top: 30px;
+    margin-top: 15px;
     a {
       text-decoration: none;
       color: #000;
@@ -100,6 +101,11 @@ const getUserInitials = () => {
     a:hover {
       color: $ngwcp_primary1;
       text-decoration: none;
+    }
+    .isActive {
+      font-weight: bold;
+      border-bottom: 1px solid #000;
+      padding-bottom: 3px;
     }
   }
 }
