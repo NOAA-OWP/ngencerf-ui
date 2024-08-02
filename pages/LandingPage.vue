@@ -3,7 +3,7 @@
   <div id="CenterBox">
     <div>Welcome <strong>Herbert Hover</strong></div>
     <div>You have 0 current processes running</div>
-    <div>You have 0 calibration setups to complete</div>
+    <div>You have {{ savedCalibrationJobs }} calibration setups to complete</div>
     <div id="ContinueBtn" @click="GoPreviousRuns">
     <button>Continue</button>
   </div>
@@ -12,6 +12,15 @@
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
+import { storeToRefs } from "pinia";
+const calibrationJobStore = useCalibrationJobStore()
+const { savedCalibrationJobs } = storeToRefs( calibrationJobStore )
+const { fetchCalibrationJobsList } = calibrationJobStore
+
+onMounted(() => {
+  fetchCalibrationJobsList()
+})
 
 const GoPreviousRuns = () => {
    navigateTo("PreviousRuns");

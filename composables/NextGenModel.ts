@@ -1,10 +1,17 @@
+export interface user {
+  uid: number,
+  first_name: string,
+  last_name: string,
+  email: string,
+}
+
 export interface created_calibration_run {
   message: String,
   calibration_run_id: Number
 }
 
 export interface jobs_list {
-  job_list_item: job_list_item[]
+  job_list_items: job_list_item[]
 }
 
 export interface job_list_item {
@@ -12,8 +19,9 @@ export interface job_list_item {
     formulation_name: String,
     calibration_run_id: Number,
     gage_id: String,
+    status: string,
     calibration_start_period: String,
-    calibration_end_period: String
+    calibration_end_period: String,
 }
 
 export interface footer_data {
