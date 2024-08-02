@@ -38,7 +38,7 @@
                 <label for="CheckTheBox">Automatic Validation</label>
               </div>
               <div id="BoxBottomRight" class="pt-2">
-                <div v-if="!autoValidation" class="tabTitles text-center">
+                <div v-if="!autoValidation" class="tabTitles">
                   Check the box above<br />to enable Automatic Validation
                 </div>
                 <div v-else>
@@ -97,7 +97,6 @@
                 </div>
               </div>
 
-
               <div class="col-span-1">
                 <div class="text-left ml-20">
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
@@ -110,38 +109,6 @@
               </div>
             </div>
           </div>
-
-
-          <!-- <div class="row-span-1 text-center">
-            <div class="grid grid-cols-2">
-              <div class="col-span-1">
-                <div class="mb-2">Output Variable to Calibrate</div>
-                <select id="OutVar" class="varInputs">
-                  <option value="" selected disabled>...</option>
-                </select>
-              </div>
-              <div class="col-span-1">
-                <div class="mb-2">Tuning Parameter</div>
-                Name:
-                <select id="TuningParam" class="varInputs">
-                  <option value="" selected disabled>...</option>
-                </select>
-                &nbsp;
-                <div id="AddUpdateBtn" class="inline ngenButtonDiv">
-                  <button> Add / Update </button>
-                </div>
-              </div>
-            </div>
-          </div> -->
-
-          <!-- <div class="row-span-1 mt-8">
-            <div class="grid grid-cols-6">
-              <div class="col-span-3">&nbsp;</div>
-              <div class="col-span-1">Min: <input class="mmiInputs" type="number" id="tpMin" /></div>
-              <div class="col-span-1">Max: <input class="mmiInputs" type="number" id="tpMax" /></div>
-              <div class="col-span-1">Initial: <input class="mmiInputs" type="number" id="tpInitial" /></div>
-            </div>
-          </div> -->
         </div>
       </div>
       <div class="row-span-6 mup30">

@@ -21,7 +21,7 @@ FormulationName<template>
         <div class="grid grid-cols-12">
           <div class="col-span-3">&nbsp;</div>
           <div class="col-span-2">
-            <div class="mt-2 text-center"><strong>Modules</strong></div>
+            <div class="mt-2 text-left"><strong>Modules</strong></div>
             <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
               Groups: <select id="ModuleGroupSelect" class="ml-2">
                 <option value="all" selected>All</option>
@@ -36,8 +36,8 @@ FormulationName<template>
           <div class="col-span-2">&nbsp;</div>
           <div class="col-span-5">
             <div class="group-cover-selection-wrapper w-60 float-left">
-              <div class="mt-2 mb-2 text-center" aria-label="List of groups covered by selection"
-                title="List of groups covered by selection"><strong>Groups Covered <br />By Selections</strong></div>
+              <div class="mt-2 mb-2" aria-label="List of groups covered by selection"
+                title="List of groups covered by selection"><strong>Groups Covered By Selections</strong></div>
               <table id="CoveredBy" class="ml-10">
                 <tr>
                   <td class="checkArea"><i v-if="true" class="pi pi-check font-bold"></i></td>
