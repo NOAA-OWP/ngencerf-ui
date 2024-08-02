@@ -12,7 +12,7 @@ html {
   background: linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);
   background: -moz-linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%);
   background: -webkit-linear-gradient(270deg, hsla(210, 17%, 98%, 1) 0%, hsla(203, 80%, 31%, 1) 91%, hsla(200, 81%, 25%, 1) 100%); */
-  background: $ngwcp_footer;
+  background: $ngwcp_background;
   height: 100%;
 }
 
@@ -64,7 +64,7 @@ input {
 
 .ngenButtonDiv:hover {
   background-color: $ngwcp_primary2;
-  color: $ngwcp_primary1;
+  color: black;
 }
 
 h2 {
@@ -99,6 +99,14 @@ fieldset {
 
 label {
   cursor: pointer;
+}
+
+select {
+  border: 1px solid #666666;
+  padding: 2px;
+}
+select option {
+  background-color: #fff;
 }
 
 .header {

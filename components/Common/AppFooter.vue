@@ -41,7 +41,7 @@ const info = json;
   height: 60px;
   padding: 8px 0 8px 0;
   height: 60px;
-  background: $ngwcp_footer;
+  background: $ngwcp_background;
 }
 
 #Footer {
@@ -60,7 +60,7 @@ const info = json;
 }
 
 .footerColor {
-  background-color: $ngwcp_footer;
+  background-color: $ngwcp_background;
   ;
 }
 

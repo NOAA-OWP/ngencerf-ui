@@ -8,28 +8,6 @@
     <div class="col-span-1"></div>
     <div class="col-span-2 text-right"><button class="prev actionBtnSmall">&#8678; Prev</button></div>
     <div class="col-span-2"><button class="next actionBtnSmall">Next <span>&#8680;</span></button></div>
- 
-    <!-- <div>
-      <button class="start actionBtn">{{ getTabIndex() < 6 ? "SAVE" : "START" }}</button>
-    </div>
-    <div>
-      <button class="stop actionBtn">{{ getTabIndex() < 6 ? "RESET" : "STOP" }}</button>
-    </div>
-    <div>
-      <button class="">&nbsp;</button>
-    </div>
-    <div>
-      <button class="">&nbsp;</button>
-    </div>
-    <div>
-      <div class="buttonSpacer">&nbsp;</div>
-    </div>
-    <div>
-      <button class="prev actionBtnSmall">&#8678; Prev</button>
-    </div>
-    <div>
-      <button class="next actionBtnSmall">Next <span>&#8680;</span></button>
-    </div> -->
   </div>
 </template>
 

@@ -74,7 +74,6 @@ onMounted(() => {
 #ResultsDisplay {
   width: 50vw;
   margin: 20px auto;
-  background-color: $ngwcp_groupsbkg;
   padding: 10px 10px 10px 20px;
   border-radius: 20px;
   height: 100px;
@@ -87,7 +86,7 @@ onMounted(() => {
   height: 500px;
   width: 900px;
   margin: 8px auto 0 auto;
-  background-color: $ngwcp_groupsbkg;
+  border: 1px solid black;
 }
 
 #DisplayOptions {

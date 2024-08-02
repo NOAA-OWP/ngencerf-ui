@@ -5,7 +5,7 @@
         <div class="grid grid-cols-2">
           <div class="col-span-1">
             <div id="BoxLeft">
-              <div id="BoxTopLeft">
+              <div id="BoxTopLeft" class="pt-2">
                 <span class="tabTitles">Calibration Time Controls</span>
               </div>
               <div id="BoxBottomLeft" class="pt-2">
@@ -28,12 +28,13 @@
                   </div>
                 </div>
               </div>
+              <div id="RangeDates">Range: {{ rangeDateFrom }} to {{  rangeDateTo }}</div>
             </div>
           </div>
           <div class="col-span-1">
             <div id="BoxRight">
-              <div id="BoxTopRight" class="pt-2">
-                <input type="checkbox" id="CheckTheBox" v-on:change="AutoValChecked"></input>
+              <div id="BoxTopRight" class="pt-2" @click="AutoValChecked">
+                <input type="checkbox" id="CheckTheBox" ></input>
                 <label for="CheckTheBox">Automatic Validation</label>
               </div>
               <div id="BoxBottomRight" class="pt-2">
@@ -70,18 +71,18 @@
         </div>
       </div>
 
-      <div class="row-span-3 mt-3">
+      <div class="row-span-3">
         <div class="grid grid-rows-2">
           <div class="row-span-1 text-center">
             <div class="grid grid-cols-2">
               <div class="col-span-1">
-                <label for="OutVar">Output Variable to Calibrate</label><br />
+                <div class="mb-2">Output Variable to Calibrate</div>
                 <select id="OutVar" class="varInputs">
                   <option value="" selected disabled>...</option>
                 </select>
               </div>
               <div class="col-span-1">
-                <label for="TuningParam">Tuning Parameter</label><br />
+                <div class="mb-2">Tuning Parameter</div>
                 Name:
                 <select id="TuningParam" class="varInputs">
                   <option value="" selected disabled>...</option>
@@ -94,7 +95,7 @@
             </div>
           </div>
 
-          <div class="row-span-1 mt-4">
+          <div class="row-span-1 mt-8">
             <div class="grid grid-cols-6">
               <div class="col-span-3">&nbsp;</div>
               <div class="col-span-1">Min: <input class="mmiInputs" type="number" id="tpMin" /></div>
@@ -104,7 +105,7 @@
           </div>
         </div>
       </div>
-      <div class="row-span-5">
+      <div class="row-span-5 -mt-8">
         <div id="TuningDataList">
           <DataTable :value="calibrationTuningDataList" scrollable scroll-height="300px">
             <Column field="parameter" header="Parameter" sortable></Column>
@@ -133,7 +134,7 @@ const simStartTime = ref();
 const simEndTime = ref();
 const calStartTime = ref();
 const calEndTime = ref();
-20
+
 const avSimStartTime = ref();
 const avSimEndTime = ref();
 const avCalStartTime = ref();
@@ -142,6 +143,9 @@ const avCalEndTime = ref();
 const autoValidation = ref(false);
 const datetime = ref();
 
+const rangeDateFrom = ref("1980-01-01");
+const rangeDateTo = ref("1024-05-31");
+
 onMounted(() => {
   setTimeout(() => {
     loading.value = false;
@@ -149,8 +153,10 @@ onMounted(() => {
 });
 
 const AutoValChecked = () => {
+  console.log("Clicked");
   const ele = <HTMLInputElement>document.getElementById("CheckTheBox");
   autoValidation.value = ele.checked as boolean;
+
 };
 
 const calibrationTuningDataList = ref<CalibrationTuningData[]>([])
@@ -171,7 +177,18 @@ onMounted(() => {
 }
 
 #BoxLeft {
-  margin: 10px 0 0 30px;
+  margin: 20px 0 0 30px;
+}
+
+#BoxRight {
+  margin: 20px 0 0 50px;
+}
+
+#BoxLeft,
+#BoxRight {
+  width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #BoxTopLeft,
@@ -197,10 +214,6 @@ onMounted(() => {
   background-color: $ngwcp_groupsbkg;
 }
 
-#BoxRight {
-  margin: 10px 0 0 50px;
-}
-
 #AddUpdateBtn {
   height: 40px;
 }
@@ -210,10 +223,17 @@ onMounted(() => {
   width: 750px;
 }
 
+#RangeDates {
+  position: relative;
+  top: -178px;
+  left: 269px;
+  width: 265px;
+}
+
 .timeBlocks {
   font-size: 0.8em;
   text-align: right;
-  margin-right: 20px;
+  margin-right: 34px;
 
 }
 

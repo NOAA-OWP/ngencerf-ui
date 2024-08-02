@@ -14,7 +14,7 @@
           </div>
           <div class="flex-row mt-2">
             <div class="text-center">Algorithm Parameter(s)</div>
-            <div id="AlgParamtable" class="text-center mt-3">
+            <div id="AlgParamtable" class="text-center mt-3 bordered p-3">
               <DataTable :value="algorithm_parameters" scrollable scroll-height="300px" fixedHeader=true>
                 <Column field="parameter" header="Parameter" sortable></Column>
                 <Column field="initValue" header="Initial Value" sortable></Column>
@@ -26,7 +26,7 @@
           <div class="flex-row">
             <div id="CalStop" class="bordered">
               Calibration Stop Criteria:<br />
-              <input type="number" /><span class="ml-2">Interations</span>
+              <input class="ml-20" type="number" /><span class="ml-2">Interations</span>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ onMounted(() => {
 #PlotGenFreq,
 #OptAlg {
   width: 381px;
-  background-color: $ngwcp_groupsbkg;
+  //background-color: $ngwcp_groupsbkg;
   margin: 0 auto;
   padding: 10px;
   line-height: 2em;
@@ -151,7 +151,7 @@ onMounted(() => {
 }
 
 .bordered {
-  border-radius: 20px;
+  border-radius: 8px;
   border: 1px solid #888888;
 }
 </style>

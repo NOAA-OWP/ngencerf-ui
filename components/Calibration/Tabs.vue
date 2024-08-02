@@ -77,11 +77,11 @@ const tabClicked = (event: Event) => {
     width: 16%;
     height: 48px;
     background-color: #ffffff;
-    color: $ngwcp_primary3;
+    color: black;//$ngwcp_primary3;
     text-align: center;
     padding-top: 13px;
     padding-left: 10px;
-    border-radius: 30px 30px 0 0;
+    border-radius: 10px 10px 0 0;
     border: 1px solid $ngwcp_primary1;
   }
 

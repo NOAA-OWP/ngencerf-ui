@@ -36,7 +36,7 @@
       </div>
       <div class="row-span-1">
         <div id="ResultsArea" class="row-span-1">
-          <div><button>Go to Evaluation</button></div>
+          <div><button class="ngenButtonDiv">Go to Evaluation</button></div>
 
         </div>
       </div>
@@ -70,11 +70,10 @@ onMounted(() => {
 #ResultsDisplay {
   width: 50vw;
   margin: 20px auto;
-  background-color: $ngwcp_groupsbkg;
   padding: 10px 10px 10px 20px;
   border-radius: 20px;
   height: 100px;
-  border: 1px solid $ngwcp_primary1;
+  border: 1px solid black;
   min-width: 750px;
 
 }
