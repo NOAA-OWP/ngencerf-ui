@@ -1,13 +1,15 @@
 <template>
-    <div>
-        <h1 class="text-center">Verification Page</h1>
-    </div>
-</template>
-
-<script setup lang="ts">
-
-</script>
-
-<style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
-</style>
+    <VerificationLayout>
+  
+    </VerificationLayout>
+  </template>
+  
+  <script lang="ts" setup>
+  import VerificationLayout from "~/layouts/VerificationLayout.vue";
+  
+  onMounted(() => {
+    console.log(localStorage);
+  });
+  
+  </script>
+  

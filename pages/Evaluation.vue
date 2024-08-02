@@ -1,13 +1,16 @@
 <template>
-    <div>
-        <h1 class="text-center">Evaluation Page</h1>
-    </div>
+  <EvaluationLayout>
+
+  </EvaluationLayout>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
+import EvaluationLayout from "~/layouts/EvaluationLayout.vue";
+import { generalStore } from "@/stores/common/GeneralStore";
+const { getTabIndex } = generalStore();
+
+onMounted(() => {
+  console.log(localStorage);
+});
 
 </script>
-
-<style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
-</style>

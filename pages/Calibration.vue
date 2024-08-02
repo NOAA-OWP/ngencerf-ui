@@ -6,10 +6,11 @@
 </template>
 
 <script lang="ts" setup>
-import NextgenLayout from "~/layouts/NextgenLayout.vue";
+import NextgenLayout from "~/layouts/CalibrationLayout.vue";
 
 onMounted(() => {
   console.log(localStorage);
+
 });
 
 </script>

@@ -35,7 +35,15 @@ import { generalStore } from "@/stores/common/GeneralStore";
 const { getTabIndex, setTabIndex } = generalStore();
 
 const emit = defineEmits(["tabNumber"]);
-const currentTab = ref(1);
+const currentTab = ref(getTabIndex());
+
+console.log("Tab Index: ", currentTab.value);
+
+onMounted(() => {
+  const allTabs = document.getElementsByClassName("tabs");
+  const tab = <HTMLElement>allTabs[currentTab.value - 1];
+  tab.click();
+});
 
 // temporary. Will be replaced by logic from each tab
 const tabNotCompleted = ref(false);

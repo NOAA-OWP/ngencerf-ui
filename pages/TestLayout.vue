@@ -6,5 +6,5 @@
   </template>
   
 <script>
-import NextgenLayout from "~/layouts/NextgenLayout.vue";
+import NextgenLayout from "~/layouts/CalibrationLayout.vue";
 </script>

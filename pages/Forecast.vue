@@ -1,13 +1,15 @@
 <template>
-    <div>
-        <h2 class="text-center">Forecast Page</h2>
-    </div>
-</template>
-
-<script setup lang="ts">
-
-</script>
-
-<style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
-</style>
+    <ForecastLayout>
+  
+    </ForecastLayout>
+  </template>
+  
+  <script lang="ts" setup>
+  import ForecastLayout from "~/layouts/ForecastLayout.vue";
+  
+  onMounted(() => {
+    console.log(localStorage);
+  });
+  
+  </script>
+  
