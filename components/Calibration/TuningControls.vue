@@ -192,10 +192,8 @@ onMounted(() => {
 });
 
 const AutoValChecked = () => {
-  console.log("Clicked");
   const ele = <HTMLInputElement>document.getElementById("CheckTheBox");
   autoValidation.value = ele.checked as boolean;
-
 };
 
 const calibrationTuningDataList = ref<CalibrationTuningData[]>([])

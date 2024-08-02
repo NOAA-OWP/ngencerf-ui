@@ -37,8 +37,6 @@ const { getTabIndex, setTabIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentTab = ref(getTabIndex());
 
-console.log("Tab Index: ", currentTab.value);
-
 onMounted(() => {
   const allTabs = document.getElementsByClassName("tabs");
   const tab = <HTMLElement>allTabs[currentTab.value - 1];
