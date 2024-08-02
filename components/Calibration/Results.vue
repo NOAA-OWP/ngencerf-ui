@@ -36,7 +36,7 @@
       </div>
       <div class="row-span-1">
         <div id="ResultsArea" class="row-span-1">
-          <div><button class="ngenButtonDiv">Go to Evaluation</button></div>
+          <button class="ngenButtonDiv">Go to Evaluation</button>
 
         </div>
       </div>
@@ -80,17 +80,7 @@ onMounted(() => {
 
 #ResultsArea {
   text-align: center;
-
-  button {
-    background-color: $ngwcp_primary1;
-    height: 40px;
-    width: 200px;
-    color: white;
-    border-radius: 10px;
-    padding: 0;
-    margin: 8px 0 0 0;
-    border: 1px solid #888888;
-  }
+  border-radius: 10px;
 }
 
 #DisplayOptions {
@@ -98,11 +88,6 @@ onMounted(() => {
   margin-left: 10px;
 }
 
-.p-progressbar {
-  display: inline-block;
-  width: 200px;
-  height: 25px;
-}
 
 .leftSideText {
   width: 135px;
@@ -114,10 +99,13 @@ onMounted(() => {
 <style>
 :root {
   .p-progressbar {
+    display: inline-block;
+    width: 300px;
+    height: 25px;
     background: yellow;
     vertical-align: text-bottom;
     margin-left: 10px;
-    width: 80%;
+    border: 1px solid black;
   }
 
   .p-progressbar-value {

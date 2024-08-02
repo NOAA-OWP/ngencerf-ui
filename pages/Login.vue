@@ -1,47 +1,69 @@
 <template>
   <client-only>
-    <div id="LoginBox" class="container">
-      <h2 class="ttl">Login to Your Account</h2>
-      <div class="inputBox">
-        <input
-          id="uname"
-          type="text"
-          v-model="userName"
-          placeholder=" Username"
-          aria-label="Username"
-        />
-        <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
-          Forgot Username
-        </button>
-      </div>
-      <div class="inputBox">
-        <input
-          id="pword"
-          type="password"
-          v-model="userPassword"
-          placeholder=" Password"
-          aria-label="Password"
-        />
-        <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
-          Forgot Password
-        </button>
-      </div>
-      <div class="loginButton" v-on:click="SubmitForm" aria-label="sign in">
-        <button id="LoginButton">Sign In</button>
-      </div>
 
-      <div id="NeedAccountBox">
-        <h2 class="needAccount">Need an Account?</h2>
-        <div class="signupButton" v-on:click="SignUp" aria-label="sign up">
-          <button>Sign Up!</button>
+    <div class="h-full min-h-screen ">
+      <div class="grid grid-rows-12">
+        <div class="row-span-1">
+          <div>
+            <AppHeader />
+          </div>
+        </div>
+        <div class="h-full grid row-span-10">
+          <div class="grid grid-rows-12">
+            <div class="row-span-12">
+
+              <div id="LoginBox" class="container">
+                <h2 class="ttl">Login to Your Account</h2>
+                <div class="inputBox">
+                  <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username" />
+                  <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
+                    Forgot Username
+                  </button>
+                </div>
+                <div class="inputBox">
+                  <input id="pword" type="password" v-model="userPassword" placeholder=" Password"
+                    aria-label="Password" />
+                  <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
+                    Forgot Password
+                  </button>
+                </div>
+                <div class="loginButton" v-on:click="SubmitForm" aria-label="sign in">
+                  <button id="LoginButton">Sign In</button>
+                </div>
+
+                <div id="NeedAccountBox">
+                  <h2 class="needAccount">Need an Account?</h2>
+                  <div class="signupButton" v-on:click="SignUp" aria-label="sign up">
+                    <button>Sign Up!</button>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
         </div>
       </div>
+      <div class="row-span-1">
+        <AppFooter />
+      </div>
     </div>
+
+
+
+
+
+
+
+
+
   </client-only>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import AppFooter from "~/components/Common/AppFooter.vue";
+import AppHeader from "~/components/Common/AppHeader.vue";
 
 const { logUserIn, logUserOut } = useUserDataStore();
 
@@ -50,20 +72,20 @@ const userName = ref("");
 const userPassword = ref("");
 
 const ForgotUsername = () => {
-//
+  //
 };
 const ForgotPassword = () => {
-//
+  //
 };
 const SignUp = () => {
-//
+  //
 };
 const SubmitForm = (e: Event) => {
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     logUserIn();
     GoToLanding();
   } else {
-//
+    //
   }
 };
 
@@ -73,9 +95,10 @@ const GoToLanding = async () => {
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
 #LoginBox {
   position: relative;
-  margin: 40px auto 0 auto;
+  margin: 60px auto 0 auto;
   border-radius: 50px;
   min-width: 420px;
   max-width: 420px;
@@ -98,8 +121,10 @@ const GoToLanding = async () => {
 }
 
 input::-webkit-input-placeholder {
-  opacity: 0.5; /*Change the opacity between 0 and 1*/
+  opacity: 0.5;
+  /*Change the opacity between 0 and 1*/
 }
+
 .ttl {
   text-align: center;
   position: static;
@@ -107,24 +132,29 @@ input::-webkit-input-placeholder {
   font-size: 26px;
   font-weight: 600;
 }
+
 .needAccount {
   text-align: center;
   font-size: 26px;
   font-weight: 600;
   margin-top: 20px;
 }
+
 .inputBox {
   margin: 0 auto;
   margin-top: 20px;
   width: 80%;
+
   input {
     height: 40px !important;
   }
 }
+
 .forgot {
   text-decoration: underline;
   color: #0c1db4;
 }
+
 .signupButton,
 .loginButton {
   font-size: 20px;
@@ -137,13 +167,16 @@ input::-webkit-input-placeholder {
   height: 50px;
   padding-top: 10px;
 }
+
 .signupButton {
   background-color: $ngwcp_groupsbkg;
 }
+
 .loginButton:hover {
   background-color: #105d84;
   color: #ffffff;
 }
+
 .signupButton:hover {
   background-color: $ngwcp_primary2;
   color: #ffffff;

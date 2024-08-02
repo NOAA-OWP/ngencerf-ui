@@ -1,13 +1,18 @@
 <template>
   <div id="BottomButtons" class="grid grid-cols-12 w-full">
-    <div class="col-span-2"><button class="start actionBtn">{{ getTabIndex() < 5 ? "SAVE" : "START" }}</button></div>
-    <div class="col-span-2"><button class="stop actionBtn">{{ getTabIndex() < 5 ? "RESET" : "STOP" }}</button></div>
+
+    <div class="col-span-2">
+      <button v-if="getTabIndex() < 6" class="start actionBtn">{{ getTabIndex() < 5 ? "SAVE" : "START" }}</button>
+    </div>
+    <div class="col-span-2">
+      <button v-if="getTabIndex() < 6" :class="getTabIndex() < 5 ? 'save' : 'stop'" class="actionBtn">{{ getTabIndex() < 5 ? "RESET" : "STOP" }}</button>
+    </div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-2 text-right"><button class="prev actionBtnSmall">&#8678; Prev</button></div>
-    <div class="col-span-2"><button class="next actionBtnSmall">Next <span>&#8680;</span></button></div>
+    <div class="col-span-2"><button v-if="getTabIndex() < 6" class="next actionBtnSmall">Next <span>&#8680;</span></button></div>
   </div>
 </template>
 
@@ -32,9 +37,8 @@ const tabIndex = getTabIndex();
   display: inline-block;
   width: 95%;
   height: 55px;
-  border-radius: 20px;
   border: 5px solid #59b4c1;
-  border-radius: 20px;
+  border-radius: 10px;
   margin-right: 20px;
 }
 
@@ -42,9 +46,8 @@ const tabIndex = getTabIndex();
   display: inline-block;
   width: 105px;
   height: 55px;
-  border-radius: 20px;
-  border: 5px solid #59b4c1;
-  border-radius: 20px;
+  border-radius: 10px;
+  border: 3px solid #59b4c1;
   margin-right: 3px;
 }
 
@@ -60,7 +63,7 @@ const tabIndex = getTabIndex();
 }
 
 .stop {
-  background-color: #922222;
+  background-color: #aa0000;
 }
 
 .save {

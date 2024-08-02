@@ -6,10 +6,12 @@ FormulationName<template>
         <div class="grid grid-cols-8">
           <div class="col-span-2">&nbsp;</div>
           <div class="col-span-4">
-            <div id="FormulationName" class="inline-block ml-20 mr-5 mt-3" aria-label="Forumulation Name" title="Formulation Name">
+            <div id="FormulationName" class="inline-block ml-20 mr-5 mt-3" aria-label="Forumulation Name"
+              title="Formulation Name">
               Forumulation Name:
             </div>
-            <div class="inline-block" aria-label="Input Forumulation Name" title="Input Formulation Name" ><input type="text" /></div>
+            <div class="inline-block" aria-label="Input Forumulation Name" title="Input Formulation Name"><input
+                type="text" /></div>
           </div>
           <div class="col-span-2">&nbsp;</div>
         </div>
@@ -34,7 +36,8 @@ FormulationName<template>
           <div class="col-span-2">&nbsp;</div>
           <div class="col-span-5">
             <div class="group-cover-selection-wrapper w-60 float-left">
-              <div class="mt-2 mb-2 text-center"  aria-label="List of groups covered by selection" title="List of groups covered by selection"><strong>Groups Covered <br />By Selections</strong></div>
+              <div class="mt-2 mb-2 text-center" aria-label="List of groups covered by selection"
+                title="List of groups covered by selection"><strong>Groups Covered <br />By Selections</strong></div>
               <table id="CoveredBy" class="ml-10">
                 <tr>
                   <td class="checkArea"><i v-if="true" class="pi pi-check font-bold"></i></td>
@@ -73,15 +76,19 @@ FormulationName<template>
       <div class="row-span-6">
 
 
-        <div class="text-center">
-          <input type="checkbox" id="SlothCheck" class="ml-4" @click="showSloth" />
-          <label class="inline-block text-xl mb-2" for="SlothCheck">&nbsp;Add SLoTH output variable for
-            formulation</label>
-          <label class="inline-block text-xl pl-10 pr-4" for="SlothName">SLoTH Name:</label><input
-            class="inline-block w-auto" id="SlothName" type="text">
-          <div class="ngenButtonDiv ml-3 inline-block">
-            <button id="SlothAddBtn">Add</button>
-          </div>
+        <div>
+          <span class="text-left ml-40">
+            <input type="checkbox" id="SlothCheck" class="ml-4" @click="showSloth" />
+            <label class="inline-block text-xl mb-2" for="SlothCheck">&nbsp;Add SLoTH output variable for
+              formulation</label>
+          </span>
+          <span v-show="showSlothVariables">
+            <label class="inline-block text-xl pl-10 pr-4" for="SlothName">SLoTH Name:</label><input
+              class="inline-block w-auto" id="SlothName" type="text">
+            <div class="ngenButtonDiv ml-3 inline-block">
+              <button id="SlothAddBtn">Add</button>
+            </div>
+          </span>
           <div id="SlothDataTable" v-show="showSlothVariables" class="items-center ml-10 mr-10 mt-4">
             <DataTable class="stripe" :value="slothParameters" scrollable scroll-height="300px">
               <Column field="outputVar" header="SLoTH Output Var" sortable></Column>
@@ -215,7 +222,7 @@ ul#ModulesList {
     color: black;
   }
 
- .liActive {
+  .liActive {
     background-color: $ngwcp_primary3;
     color: white;
   }

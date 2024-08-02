@@ -5,7 +5,7 @@
         <div class="grid grid-cols-3">
           <div class="col-span-2">
             <div id="ActionButtons" class="footerColor"
-              v-if="isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns'">
+              v-if="isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns' && location.name !== 'Login'">
               <ActionButtonGroup />
             </div>
           </div>

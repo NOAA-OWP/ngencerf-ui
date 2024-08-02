@@ -27,7 +27,7 @@
         <NuxtLink v-show="isUserLoggedIn() && location.name !== 'Login'" to="user" id="UserCircle" PreviousRunsclass="userInitials">
          {{ getUserInitials() }}
         </NuxtLink>
-        <NuxtLink to="#" class="qmark" id="HelpCircle"> ? </NuxtLink>
+        <NuxtLink to="#" class="qmark" id="HelpCircle" v-show="isUserLoggedIn()"> ? </NuxtLink>
       </div>
     </div>
   </div>
