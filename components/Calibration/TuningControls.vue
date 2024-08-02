@@ -1,7 +1,7 @@
 <template>
   <div id="TuningControls">
-    <div class="grid grid-rows-12 gap-2">
-      <div class="row-span-4">
+    <div class="grid grid-rows-12">
+      <div class="row-span-2">
         <div class="grid grid-cols-2">
           <div class="col-span-1">
             <div id="BoxLeft">
@@ -28,13 +28,13 @@
                   </div>
                 </div>
               </div>
-              <div id="RangeDates">Range: {{ rangeDateFrom }} to {{  rangeDateTo }}</div>
+              <div id="RangeDates">Range: {{ rangeDateFrom }} to {{ rangeDateTo }}</div>
             </div>
           </div>
           <div class="col-span-1">
             <div id="BoxRight">
               <div id="BoxTopRight" class="pt-2" @click="AutoValChecked">
-                <input type="checkbox" id="CheckTheBox" ></input>
+                <input type="checkbox" id="CheckTheBox"></input>
                 <label for="CheckTheBox">Automatic Validation</label>
               </div>
               <div id="BoxBottomRight" class="pt-2">
@@ -73,7 +73,46 @@
 
       <div class="row-span-3">
         <div class="grid grid-rows-2">
+
+
           <div class="row-span-1 text-center">
+            <div class="grid grid-cols-2">
+              <div class="col-span-1">
+
+                <div class="text-left ml-20">
+                  <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
+                  <div class="inline-block text-left">Parameters File (optional):</div><br />
+                  <select id="ParamFile" class="varInputs inline-block mt-2">
+                    <option value="" selected disabled>...</option>
+                  </select>
+                  <div id="UploadParams" class="ngenButtonDiv inline ml-3"><button>UPLOAD</button></div>
+                </div>
+
+                <div class="text-left ml-20 mt-5">
+                  <div class="inline-block text-left">Name:</div><br />
+                  <select id="ParamName" class="varInputs inline-block mt-2">
+                    <option value="" selected disabled>...</option>
+                  </select>
+                  <div id="UploadParams" class="ngenButtonDiv inline ml-3"><button>Add / Update</button></div>
+                </div>
+              </div>
+
+
+              <div class="col-span-1">
+                <div class="text-left ml-20">
+                  <div class="mb-2 font-bold">Output Variable To Calibrate</div>
+                  <div class="text-left mt-2">
+                    <select id="OutVar" class="varInputs">
+                      <option value="" selected disabled>...</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- <div class="row-span-1 text-center">
             <div class="grid grid-cols-2">
               <div class="col-span-1">
                 <div class="mb-2">Output Variable to Calibrate</div>
@@ -93,21 +132,21 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
 
-          <div class="row-span-1 mt-8">
+          <!-- <div class="row-span-1 mt-8">
             <div class="grid grid-cols-6">
               <div class="col-span-3">&nbsp;</div>
               <div class="col-span-1">Min: <input class="mmiInputs" type="number" id="tpMin" /></div>
               <div class="col-span-1">Max: <input class="mmiInputs" type="number" id="tpMax" /></div>
               <div class="col-span-1">Initial: <input class="mmiInputs" type="number" id="tpInitial" /></div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
-      <div class="row-span-5 -mt-8">
+      <div class="row-span-6 mup30">
         <div id="TuningDataList">
-          <DataTable :value="calibrationTuningDataList" scrollable scroll-height="300px">
+          <DataTable :value="calibrationTuningDataList" scrollable scroll-height="200px">
             <Column field="parameter" header="Parameter" sortable></Column>
             <Column field="min" header="Min" sortable></Column>
             <Column field="max" header="Max" sortable></Column>
@@ -221,6 +260,8 @@ onMounted(() => {
 #TuningDataList {
   margin: 0 auto;
   width: 750px;
+  border: 1px solid black;
+  padding: 8px;
 }
 
 #RangeDates {
@@ -228,6 +269,10 @@ onMounted(() => {
   top: -178px;
   left: 269px;
   width: 265px;
+}
+
+.mup30 {
+  margin-top: -140px;
 }
 
 .timeBlocks {
