@@ -1,7 +1,7 @@
 <template>
   <div id="BottomButtons" class="grid grid-cols-12 w-full">
-    <div class="col-span-2"> <button class="start actionBtn">{{ getTabIndex() < 6 ? "SAVE" : "START" }}</button></div>
-    <div class="col-span-2"><button class="stop actionBtn">{{ getTabIndex() < 6 ? "RESET" : "STOP" }}</button></div>
+    <div class="col-span-2"><button class="start actionBtn">{{ getTabIndex() < 5 ? "SAVE" : "START" }}</button></div>
+    <div class="col-span-2"><button class="stop actionBtn">{{ getTabIndex() < 5 ? "RESET" : "STOP" }}</button></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>

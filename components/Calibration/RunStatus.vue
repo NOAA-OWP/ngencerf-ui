@@ -75,7 +75,7 @@ onMounted(() => {
   width: 50vw;
   margin: 20px auto;
   padding: 10px 10px 10px 20px;
-  border-radius: 20px;
+  border-radius: 10px;
   height: 100px;
   border: 1px solid $ngwcp_primary1;
   min-width: 750px;

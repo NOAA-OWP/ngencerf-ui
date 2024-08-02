@@ -12,13 +12,13 @@
             <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration">Calibration</NuxtLink>
           </li>
           <li aria-label="Evaluation" title="Evaluation">
-            <NuxtLink :class="location.name === 'Evaluation' ? 'isActive' : ''" to="#">Evaluation</NuxtLink>
+            <NuxtLink :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="#">Forecast</NuxtLink>
+            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
-            <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="#">Verification</NuxtLink>
+            <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification">Verification</NuxtLink>
           </li>
         </ul>
       </div>
