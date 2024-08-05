@@ -2,50 +2,35 @@
 
 import { defineStore } from "pinia";
 import { mockedCalibrationRunData } from "@/mockApi/calibrationRunData"
+import { mockedJobListItemData } from "~/mockApi/calibrationAPIData";
 import { useUserDataStore } from "./common/UserDataStore";
 import type { CalibrationRun, jobs_list, job_list_item, user } from "~/composables/NextGenModel";
 
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
   const { getUserToken } = useUserDataStore()
-  const calibration_jobs_list = ref<job_list_item[]>([])
+  const selected_job = ref<number>(0)
 
-  const fetchCalibrationJobsList = async () => {
-    const headersInit: HeadersInit = {};
-    console.log( 'fetchCalibrationJobsList' )
-    //const { data }: any = await useFetch( '/mock_api_data/get_jobs.json' )
-    await $fetch( '/mock_api_data/get_jobs.json', {
-      method: 'GET',
-      onRequest( { request, options } ) {
-        // options.headers = headersInit || {}
-        // options.headers.authorization = getUserToken()
-      },
-      onResponse({ request, response, options }) {
-        response._data.forEach( ( job_data: job_list_item ) => {
-          calibration_jobs_list.value.push( job_data )          
-        })
-      }
-    })
-  }
-
-  const savedCalibrationJobs = computed( () => {
-    return calibration_jobs_list.value.reduce( ( total_saved_jobs: number, job: job_list_item  ) => {
-      if( job.status == 'saved' ) total_saved_jobs += 1;
-      return total_saved_jobs;
-    }, 0)
+  const { data: jobs_list_data, refresh: refresh_job_list_data } = useFetch( '/api/get_jobs', {
+    //headers: { authorization: getUserToken() }
   })
 
-  // async function retrieveCalibrationRuns(): Promise<void> {
-  //   const listCalibrationRuns = await mockedCalibrationRunData()
-  //   listCalibrationRuns.forEach( ( run_data, index ) => {
-  //     console.log( run_data )
-  //     calibrationRuns.value.push( run_data )
-  //   })
-  // }
+  const fetch_jobs_list_data = computed( () => {
+    return jobs_list_data.value?.data ?? []
+  })
+
+  const saved_calibration_jobs = computed( () => {
+    console.log( jobs_list_data.value )
+    return jobs_list_data.value?.data.reduce( ( total_saved_jobs: number, job: job_list_item  ) => {
+      if( job.status == 'saved' ) total_saved_jobs += 1;
+      return total_saved_jobs;
+    }, 0 )
+  })
 
   return {
-    calibration_jobs_list,
-    savedCalibrationJobs,
-    fetchCalibrationJobsList
+    fetch_jobs_list_data,
+    refresh_job_list_data,
+    selected_job,
+    saved_calibration_jobs,
   }
 })
 

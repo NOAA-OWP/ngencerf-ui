@@ -52,6 +52,20 @@ input {
   width: 100%;
 }
 
+.ngenButtonDiv {
+  border: 1px solid black;
+  color: white;
+  padding: 8px;
+  border-radius: 10px;
+  background-color: $ngwcp_primary1;
+  text-align: center;
+}
+
+.ngenButtonDiv:hover {
+  background-color: $ngwcp_primary2;
+  color: $ngwcp_primary1;
+}
+
 h2 {
   display: block;
 }
@@ -135,6 +149,14 @@ label {
   color: #777777 !important;
 }
 
+.waitgif {
+  position: absolute;
+  top: 40%;
+  left: 33%;
+  width: 80px;
+  margin: 0 auto;
+  z-index: 9999;
+}
 
 @layer base {
   @font-face {
@@ -223,15 +245,36 @@ label {
 
 // TimeDatePicker
 .dp__input {
-     height: 25px;
-     margin-bottom: 11px;
-     margin-left: 10px;
-     font-family:'Courier New', Courier, monospace !important;
- }
- 
- .dp--clear-btn,
- .dp__input_icon {
-  top: 30% !important;
- }
+  height: 25px;
+  margin-bottom: 11px;
+  margin-left: 10px;
+  font-family: 'Courier New', Courier, monospace !important;
+}
 
- 
+.dp--clear-btn,
+.dp__input_icon {
+  top: 30% !important;
+}
+
+// DataTables
+.p-datatable-header-cell {
+  padding: 5px 8px !important;
+}
+
+.p-datatable-tbody>tr>td {
+  padding: 8px;
+}
+
+.p-datatable-thead tr th {
+  background-color: #105d8e;
+  color: white;
+  border-left: 1px solid white;
+}
+
+.p-datatable-sort-icon {
+  color: white !important;
+}
+
+.p-datatable-column-title {
+  font-size: 0.8em;
+}

@@ -1,7 +1,7 @@
 <template>
   <div id="ResultPage">
     <div class="grid grid-rows-2">
-      <div row-span-1>
+      <div Class="row-span-1">
         <div id="ResultsDisplay">
           <div class="grid grid-cols-2">
             <div class="col-span-1">
@@ -25,36 +25,48 @@
               <div class="mt-1">
                 Status: <ProgressBar :value="progress"></ProgressBar>
               </div>
-              <div class="mt-4">Display: 
+              <div class="mt-4">Display:
                 <select id="DisplayOptions">
-                    <option>Parameters</option>
+                  <option>Parameters</option>
                 </select>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div row-span-1>
+      <div class="row-span-1">
         <div id="ResultsArea" class="row-span-1">
           <div><button>Go to Evaluation</button></div>
 
         </div>
       </div>
     </div>
+    <div class="waitgif" v-if="loading">
+      <img src="@/assets/styles/img/wait.gif" />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import ProgressBar from "primevue/progressbar";
+const loading = ref(true);
+
 const runningTime = ref();
 const startTime = ref();
 const iteration = ref();
 
 const progress = ref(30);
+
+onMounted(() => {
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
+});
 </script>
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
 #ResultsDisplay {
   width: 50vw;
   margin: 20px auto;
@@ -64,27 +76,29 @@ const progress = ref(30);
   height: 100px;
   border: 1px solid $ngwcp_primary1;
   min-width: 750px;
- 
+
 }
 
 #ResultsArea {
   text-align: center;
 
   button {
-  background-color: $ngwcp_primary1;
-  height: 40px;
-  width: 200px;
-  color: white;
-  border-radius: 10px;
-  padding: 0;
-  margin: 8px 0 0 0;
-  border: 1px solid #888888;
+    background-color: $ngwcp_primary1;
+    height: 40px;
+    width: 200px;
+    color: white;
+    border-radius: 10px;
+    padding: 0;
+    margin: 8px 0 0 0;
+    border: 1px solid #888888;
   }
 }
+
 #DisplayOptions {
-    width: 60%;
-    margin-left: 10px;
+  width: 60%;
+  margin-left: 10px;
 }
+
 .p-progressbar {
   display: inline-block;
   width: 200px;
@@ -96,7 +110,6 @@ const progress = ref(30);
   text-align: right;
   padding-right: 20px;
 }
-
 </style>
 
 <style>
@@ -107,13 +120,16 @@ const progress = ref(30);
     margin-left: 10px;
     width: 80%;
   }
+
   .p-progressbar-value {
     color: green;
     background-color: green;
   }
+
   .p-progressbar-value {
     color: black;
   }
+
   .p-progressbar-label {
     color: white;
   }

@@ -4,10 +4,7 @@
       <div id="TopRightBlock" class="row-span-5">
         <div class="grid grid-cols-2">
           <div id="GageCutout" class="col-span-1">
-            <img
-              id="GageCutoutImage"
-              src="@/assets/styles/img/gagecurout.png"
-            />
+            <img id="GageCutoutImage" src="@/assets/styles/img/gagecurout.png" />
           </div>
           <div id="ProgressGroup" class="col-span-1">
             <ProgressGroup :progress="progress" />
@@ -15,10 +12,12 @@
         </div>
       </div>
       <div id="BottomRightBlock" class="row-span-7">
-        <div id="MessagesGroup"><MessagesGroup /></div>
+        <div id="MessagesGroup">
+          <MessagesGroup />
+        </div>
       </div>
     </div>
-  </div> 
+  </div>
 </template>
 <script lang="ts" setup>
 import type { Progress } from "~/composables/NextGenModel";
@@ -38,11 +37,13 @@ const progress: Progress = {
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
 #TopRightBlock {
   overflow: hidden;
   padding: 10px;
   height: fit-content;
 }
+
 #MessagesGroup {
   max-height: 454px;
   height: auto;
@@ -51,6 +52,7 @@ const progress: Progress = {
   border-radius: 30px;
   border: 1px solid #000;
 }
+
 #GageCutout {
   margin-right: 5px;
 }
