@@ -26,11 +26,19 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
     }, 0 )
   })
 
+  const running_calibration_jobs = computed( () => {
+    return jobs_list_data.value?.data.reduce( ( total_running_jobs: number, job: job_list_item  ) => {
+      if( job.status == 'running' ) total_running_jobs += 1;
+      return total_running_jobs;
+    }, 0 )
+  })
+
   return {
     fetch_jobs_list_data,
     refresh_job_list_data,
     selected_job,
     saved_calibration_jobs,
+    running_calibration_jobs,
   }
 })
 

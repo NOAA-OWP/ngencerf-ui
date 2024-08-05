@@ -40,7 +40,7 @@
     "formulation_name": "lsam_noah_sft",
     "calibration_run_id": 121,
     "gage_id": "1123000",
-    "status": "saved",
+    "status": "running",
     "calibration_start_period": "2024-08-02T05:04:06.648Z",
     "calibration_end_period": "2024-08-02T05:04:06.648Z"
   },
