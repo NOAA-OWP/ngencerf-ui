@@ -40,8 +40,13 @@ export interface gage_data {
     longitude: Number,
     altitude: Number
   },
+  forcing_user_dir: string,
   forcing_source: String,
   forcing_user_filename: String,
+  observational_dir: string,
+  observational_source: string,
+  observational_user_filename: string,
+  domain_values: string [],
   gages: String[]
 }
 

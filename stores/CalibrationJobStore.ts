@@ -1,14 +1,18 @@
 // @ts-check
 
-import { defineStore } from "pinia";
+import { defineStore, storeToRefs } from "pinia";
 import { mockedCalibrationRunData } from "@/mockApi/calibrationRunData"
 import { mockedJobListItemData } from "~/mockApi/calibrationAPIData";
 import { useUserDataStore } from "./common/UserDataStore";
 import type { CalibrationRun, jobs_list, job_list_item, user } from "~/composables/NextGenModel";
+import { useGageStore } from "./calibration/GageStore";
 
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
   const { getUserToken } = useUserDataStore()
   const selected_job = ref<number>(0)
+  const gageStore = useGageStore() 
+  const { selected_calibration_run_id, fetch_gage_tab_data } = storeToRefs( gageStore )
+  const { refresh_gage_tab_data } = gageStore
 
   const { data: jobs_list_data, refresh: refresh_job_list_data } = useFetch( '/api/get_jobs', {
     //headers: { authorization: getUserToken() }
@@ -26,6 +30,11 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
     }, 0 )
   })
 
+  const show_gage_tab_data = computed( () => {
+    selected_calibration_run_id.value = selected_job.value
+    return fetch_gage_tab_data
+  })
+
   const running_calibration_jobs = computed( () => {
     return jobs_list_data.value?.data.reduce( ( total_running_jobs: number, job: job_list_item  ) => {
       if( job.status == 'running' ) total_running_jobs += 1;
@@ -39,6 +48,8 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
     selected_job,
     saved_calibration_jobs,
     running_calibration_jobs,
+    show_gage_tab_data,
+    refresh_gage_tab_data
   }
 })
 

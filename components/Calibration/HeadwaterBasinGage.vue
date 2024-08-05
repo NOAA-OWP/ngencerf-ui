@@ -91,6 +91,12 @@
 </template>
 <script lang="ts" setup>
 import Tabs from "~/components/Calibration/Tabs.vue";
+import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
+const calibrationJobStore = useCalibrationJobStore()
+const { show_gage_tab_data, selected_job } = calibrationJobStore
+
+console.log( `selected_job ${selected_job}` )
+console.log( show_gage_tab_data.value )
 
 const loading = ref(true);
 const showMap = ref(false);

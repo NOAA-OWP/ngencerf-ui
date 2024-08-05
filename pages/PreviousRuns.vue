@@ -60,7 +60,7 @@ import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
 const calibrationJobStore = useCalibrationJobStore()
-const { fetch_jobs_list_data } = storeToRefs( calibrationJobStore )
+const { fetch_jobs_list_data, selected_job } = storeToRefs( calibrationJobStore )
 const { refresh_job_list_data } = calibrationJobStore
 
 const toast = useToast();
@@ -86,6 +86,9 @@ const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
   if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 })
   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
+  selected_job.value = selectedCalibrationRun.value.calibration_run_id
+
+  navigateTo('/Calibration')
 }
 
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
