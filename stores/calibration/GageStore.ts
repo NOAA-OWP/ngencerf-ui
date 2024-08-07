@@ -16,6 +16,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
    const selected_gage_value = ref<string>("")
    const selected_forcing_value = ref<string>("")
    const selected_observational_value = ref<string>("")
+   const isNWMv3 = ref<boolean>(false)
 
    console.log( 'usefetch' )
    console.log( current_calibration_job_id.value )
@@ -90,15 +91,15 @@ export const useGageStore = defineStore( 'GageStore', () => {
    })
 
    const get_gage_options_list = computed( () => {
+      gage_options_list.value = []
       gage_tab_data.value?.gages.forEach( ( gage_value ) => {
-         console.log( selected_domain_value.value )
-         console.log( gage_value.domain )
-         console.log( gage_value.domain == selected_domain_value.value )
          if( gage_value.domain == selected_domain_value.value ) {
-            gage_options_list.value.push({
-               name: gage_value.gage_id,
-               code: gage_value.gage_id
-            })
+            if( ( isNWMv3.value == true && gage_value.nmnv3_calibrated_gage == true ) || isNWMv3.value == false ) {
+               gage_options_list.value.push({
+                  name: gage_value.gage_id,
+                  code: gage_value.gage_id
+               })
+            }
          }
       })
       console.log( gage_options_list.value)
@@ -139,7 +140,8 @@ export const useGageStore = defineStore( 'GageStore', () => {
       get_gage_options_list,
       get_forcing_options_list,
       get_observational_options_list,
-      save_gage_tab_data
+      save_gage_tab_data,
+      isNWMv3
    }
 })
 

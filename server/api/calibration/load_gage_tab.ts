@@ -235,13 +235,13 @@ const gage_tab_data_list: gage_data[] = [
         "gage_id": "01438950",
         "nsw_id": "01438950",
         "domain": "HAWAII",
-        "nmnv3_calibrated_gage": false
+        "nmnv3_calibrated_gage": true
       },
       {
         "gage_id": "02333300",
         "nsw_id": "02333300",
         "domain": "PUERTO RICO",
-        "nmnv3_calibrated_gage": false
+        "nmnv3_calibrated_gage": true
       },
       {
         "gage_id": "01249990",
