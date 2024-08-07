@@ -3,12 +3,13 @@
     <div class="grid-rows-12">
       <div id="TopRightBlock" class="row-span-5">
         <div class="grid grid-cols-2">
-          <div id="GageCutout" class="col-span-1">
-            <img id="GageCutoutImage" src="@/assets/styles/img/gagecurout.png" />
-          </div>
           <div id="ProgressGroup" class="col-span-1">
             <ProgressGroup :progress="progress" />
           </div>
+          <div id="GageCutout" class="col-span-1">
+            <GageCutout />
+          </div>
+
         </div>
       </div>
       <div id="BottomRightBlock" class="row-span-7">
@@ -23,6 +24,7 @@
 import type { Progress } from "~/composables/NextGenModel";
 import ProgressGroup from "../Common/ProgressGroup.vue";
 import MessagesGroup from "../Common/MessagesGroup.vue";
+import GageCutout from "../Common/GageCutout.vue";
 
 const progress: Progress = {
   headwater_basin_gage: true,
