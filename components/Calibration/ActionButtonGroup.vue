@@ -1,7 +1,8 @@
 <template>
+  <Toast />
   <div id="BottomButtons" class="grid grid-cols-7">
     <div>
-      <button class="start actionBtn">{{ getTabIndex() < 6 ? "SAVE" : "START" }}</button>
+      <button class="start actionBtn" @click="saveTabContent()">{{ getTabIndex() < 6 ? "SAVE" : "START" }}</button>
     </div>
     <div>
       <button class="stop actionBtn">{{ getTabIndex() < 6 ? "STOP" : "START" }}</button>
@@ -26,9 +27,25 @@
 
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useGageStore } from "~/stores/calibration/GageStore";
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
+
 const { getTabIndex } = generalStore();
 
 const tabIndex = getTabIndex();
+
+const saveTabContent =  async () => {
+  console.log( tabIndex )
+  if( tabIndex === 1 ) {
+    const save_tab_response = useGageStore().save_gage_tab_data()
+    console.log( save_tab_response )
+    save_tab_response.then( ( response ) => {
+      console.log( response )
+      toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
+    })    
+  }
+}
 
 </script>
 

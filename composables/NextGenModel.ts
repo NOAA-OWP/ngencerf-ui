@@ -29,11 +29,19 @@ export interface footer_data {
   contact_email: String
 }
 
+export interface gage_option_data {
+  gage_id: string,
+  nsw_id: string,
+  domain: string
+  nmnv3_calibrated_gage: boolean
+}
+
 export interface gage_data {
   calibration_run_id: Number,
   status: String,
+  domain_source: string,
   gage: {
-    gage_Id: String,
+    gage_Id: string,
     agency: String,
     station_name: String,
     latitude: Number,
@@ -41,13 +49,15 @@ export interface gage_data {
     altitude: Number
   },
   forcing_user_dir: string,
-  forcing_source: String,
+  forcing_source: string,
   forcing_user_filename: String,
   observational_dir: string,
   observational_source: string,
   observational_user_filename: string,
   domain_values: string [],
-  gages: String[]
+  gages: gage_option_data[],
+  forcing_values: select_option[],
+  observational_values: select_option[]
 }
 
 export interface gagetab_save {
@@ -113,6 +123,16 @@ export interface tuning_save {
       simulation_end_time: String
     }
  
+}
+
+export interface domain_gage_options {
+  domain_value: string,
+  gages: string[]
+}
+
+export interface select_option {
+  name: string,
+  code: string
 }
 
 export interface sloth_parameter_data {

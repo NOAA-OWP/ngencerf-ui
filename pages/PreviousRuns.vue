@@ -60,8 +60,8 @@ import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
 const calibrationJobStore = useCalibrationJobStore()
-const { fetch_jobs_list_data, selected_job } = storeToRefs( calibrationJobStore )
-const { refresh_job_list_data } = calibrationJobStore
+const { fetch_jobs_list_data, current_calibration_job_id } = storeToRefs( calibrationJobStore )
+const { refresh_job_list_data, fetch_new_calibration_run_id } = calibrationJobStore
 
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
@@ -86,7 +86,7 @@ const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
   if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 })
   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
-  selected_job.value = selectedCalibrationRun.value.calibration_run_id
+  current_calibration_job_id.value = selectedCalibrationRun.value.calibration_run_id
 
   navigateTo('/Calibration')
 }
@@ -146,7 +146,16 @@ onMounted(() => {
 });
 
 const NewCalibration = async () => {
-  await navigateTo("Calibration");
+  console.log( 'NewCalibration' )
+  const fetched_id = await fetch_new_calibration_run_id()
+  if( fetched_id != undefined ) {
+    current_calibration_job_id.value = fetched_id.value?.calibration_run_id ?? 0
+    if( current_calibration_job_id.value > 0 ) {
+      await navigateTo("Calibration");
+    } else {
+      toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 })
+    }
+  }
 }
 </script>
 
