@@ -14,11 +14,23 @@
             </div>
             <div class="col-span-1">
               <label for="forcing_dd">Forcing: </label><br />
+              <span v-if="selected_forcing_value != 'upload'">
               <Dropdown v-model="selected_forcing_value" :options="get_forcing_options_list" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
+              </span>
+              <span v-if="selected_forcing_value == 'upload'">
+                <FileUpload mode="basic" name="forcing_files[]" :multiple="true" url="/api/calibration/upload_forcing_data" :maxFileSize="1000000" @upload="onForcingFileUpload" />
+                <Button label="Cancel Upload" @click="selected_forcing_value=''"></Button>
+              </span>
             </div>
             <div class="col-span-1">
               <label for="observational_dd">Observational: </label><br />
+              <span v-if="selected_observational_value != 'upload'">
               <Dropdown v-model="selected_observational_value" :options="get_observational_options_list" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
+              </span>
+              <span v-if="selected_observational_value == 'upload'">
+                <FileUpload mode="basic" name="observational_files[]" :multiple="true" url="/api/calibration/upload_observational_data" :maxFileSize="1000000" @upload="onObservationalFileUpload" />
+                <Button label="Cancel Upload" @click="selected_observational_value=''"></Button>
+              </span>
             </div>
           </div>
         </div>
@@ -96,6 +108,14 @@ const gageData: GageData = {
   drainage_area: "30.0 Square miles",
   huc: "01100002",
 };
+
+const onForcingFileUpload = () => {
+
+}
+
+const onObservationalFileUpload = () => {
+  
+}
 
 onMounted(() => {  
   setTimeout(() => {
