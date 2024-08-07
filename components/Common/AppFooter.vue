@@ -1,5 +1,5 @@
 <template>
-  <div id="Footer">
+  <div id="Footer" class=" prevent-select cursor-default">
     <div class="grid grid-rows-2 gap-1">
       <div class="row-span-1">
         <div class="grid grid-cols-3">

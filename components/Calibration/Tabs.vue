@@ -2,27 +2,27 @@
 <template TABS>
   <div id="MainTabs">
     <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
-      <div data-tab="1" class="tabs activeTab" v-on:click="tabClicked" aria-label="Headwater Basin Gage tab" title="Headwater Basin Gage tab">
+      <div data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked" aria-label="Headwater Basin Gage tab" title="Headwater Basin Gage tab">
         Headwater Basin Gage
         <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
-      <div data-tab="2" class="tabs" v-on:click="tabClicked" aria-label=" Formulation tab" title=" Formulation tab">
+      <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label=" Formulation tab" title=" Formulation tab">
         Formulation
         <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
-      <div data-tab="3" class="tabs" v-on:click="tabClicked" aria-label="Tuning Controls tab" title="Tuning Controls tab">
+      <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Tuning Controls tab" title="Tuning Controls tab">
         Tuning Controls
         <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
-      <div data-tab="4" class="tabs" v-on:click="tabClicked" aria-label=" Optimization / Metrics tab" title=" Optimization / Metrics tab">
+      <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label=" Optimization / Metrics tab" title=" Optimization / Metrics tab">
         Optimization / Metrics
         <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
-      <div data-tab="5" class="tabs" v-on:click="tabClicked" aria-label="Run Status tab" title="Run Status tab">
+      <div data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Run Status tab" title="Run Status tab">
         Run / Status
         <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
-      <div data-tab="6" class="tabs" v-on:click="tabClicked" aria-label="Results tab" title="Results tab">
+      <div data-tab="6" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab" title="Results tab">
         Results
         <div :class="tabNotCompleted  ? 'errorDot' : 'noErrorDot'"></div>
       </div>
@@ -89,7 +89,8 @@ const tabClicked = (event: Event) => {
     padding-left: 10px;
     border-radius: 10px 10px 0 0;
     border: 1px solid $ngwcp_primary1;
-  }
+    cursor: pointer;
+    }
 
   .errorDot {
     display: inline-block;

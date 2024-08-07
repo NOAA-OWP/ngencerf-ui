@@ -11,7 +11,7 @@
         <div class="grid grid-rows-12">
           <div class="row-span-2">
             <div id="PgTitle">Previous Calibration Runs *
-              &nbsp;&nbsp;<span id="NewButton" @click="NewCalibration"><button>New</button></span>
+              &nbsp;&nbsp;<span id="NewButton" class="ngenButtonDiv inline" @click="NewCalibration"><button>New</button></span>
             </div>
           </div>
           <div class="row-span-10">
@@ -154,8 +154,6 @@ const NewCalibration = async () => {
 #NewButton {
   width: 147px;
   height: 33px;
-  background-color: #105D86;
-  color: #fff;
   padding: 10px;
   border-radius: 20px;
   font-size: 21px;

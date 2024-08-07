@@ -27,14 +27,13 @@
                     Forgot Password
                   </button>
                 </div>
-                <div class="loginButton" v-on:click="SubmitForm" aria-label="sign in">
+                <div class="loginButton ngenButtonDiv" v-on:click="SubmitForm" aria-label="sign in">
                   <button id="LoginButton">Sign In</button>
                 </div>
-
-                <div id="NeedAccountBox">
-                  <h2 class="needAccount">Need an Account?</h2>
-                  <div class="signupButton" v-on:click="SignUp" aria-label="sign up">
-                    <button>Sign Up!</button>
+                <div>
+                  <p class="needAccount">Need an Account?</p>
+                  <div class="signupButton ngenButtonDiv" v-on:click="SignUp" aria-label="sign up">
+                    <button>Request an Account</button>
                   </div>
                 </div>
               </div>
@@ -48,14 +47,6 @@
         <AppFooter />
       </div>
     </div>
-
-
-
-
-
-
-
-
 
   </client-only>
 </template>
@@ -100,29 +91,14 @@ const GoToLanding = async () => {
   position: relative;
   margin: 60px auto 0 auto;
   border-radius: 50px;
-  min-width: 420px;
-  max-width: 420px;
-  max-height: 450px;
-  min-height: 450px;
-  background-color: #c5d4c8;
-  width: 35vw;
-  height: 36vw;
-  border: 4px solid #105d84;
-  max-height: 437px;
-}
+  width: 420px;
+  height: 450px;
+  border: 2px solid #105d84;
 
-#NeedAccountBox {
-  position: absolute;
-  bottom: 0;
-  background-color: $ngwcp_primary2;
-  border-radius: 0 0 50px 50px;
-  width: 100%;
-  border-top: 4px solid #105d84;
 }
 
 input::-webkit-input-placeholder {
-  opacity: 0.5;
-  /*Change the opacity between 0 and 1*/
+  opacity: 0.8;
 }
 
 .ttl {
@@ -135,16 +111,15 @@ input::-webkit-input-placeholder {
 
 .needAccount {
   text-align: center;
-  font-size: 26px;
+  font-size: 18px;
   font-weight: 600;
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
 .inputBox {
   margin: 0 auto;
   margin-top: 20px;
   width: 80%;
-
   input {
     height: 40px !important;
   }
@@ -161,24 +136,13 @@ input::-webkit-input-placeholder {
   margin: 20px auto;
   text-align: center;
   border: 3px solid #000;
-  background-color: $ngwcp_primary2;
   border-radius: 20px;
   width: 245px;
   height: 50px;
   padding-top: 10px;
+
 }
 
-.signupButton {
-  background-color: $ngwcp_groupsbkg;
-}
 
-.loginButton:hover {
-  background-color: #105d84;
-  color: #ffffff;
-}
 
-.signupButton:hover {
-  background-color: $ngwcp_primary2;
-  color: #ffffff;
-}
 </style>

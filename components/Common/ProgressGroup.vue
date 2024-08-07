@@ -1,6 +1,6 @@
 <template>
    <client-only>
-    <table id="ProgressTable">
+    <table id="ProgressTable" class="prevent-select">
       <tr>
         <td class="ptype">Headwater Basin Gage</td>
         <td><i v-if="props.progress.headwater_basin_gage" class="pi pi-check font-bold"></i></td>        

@@ -1,6 +1,6 @@
 <template>
   <!-- AppHeader.vue -->
-  <div id="Header" class="header">
+  <div id="Header" class="header  prevent-select">
     <div id="TopBar">&nbsp;</div>
     <div class="grid grid-cols-12 gap-1" style="height: 80px">
       <div id="PgmName" class="col-span-2">
