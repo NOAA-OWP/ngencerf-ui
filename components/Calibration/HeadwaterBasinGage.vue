@@ -33,6 +33,12 @@
               </span>
             </div>
           </div>
+          <div class="grid grid-cols-4 gap=4">
+            <div class="col-span-4">
+              RFC <Dropdown v-model="selected_rfc" placeholder=" ... "></Dropdown>
+              <Checkbox v-model="isNWMv3" inputId="isNWMv3" name="isNWMv3" :binary="true" /> Calibrated in NWMv3
+            </div>
+          </div>
         </div>
       </div>
 
@@ -93,7 +99,8 @@ import { useGageStore } from "~/stores/calibration/GageStore";
 // const { show_gage_tab_data, selected_job } = calibrationJobStore
 const gageStore = useGageStore()
 const { gage_tab_data, selected_domain_value, selected_forcing_value, selected_gage_value, get_gage_options_list,selected_observational_value, get_domain_options_list, get_forcing_options_list, get_observational_options_list } = storeToRefs( gageStore )
-
+const isNWMv3 = ref<boolean>(false)
+const selected_rfc = ref<string>("")
 const loading = ref(true);
 const showMap = ref(false);
 
@@ -114,7 +121,7 @@ const onForcingFileUpload = () => {
 }
 
 const onObservationalFileUpload = () => {
-  
+
 }
 
 onMounted(() => {  
