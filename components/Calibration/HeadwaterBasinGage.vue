@@ -34,10 +34,13 @@
             </div>
           </div>
           <div class="grid grid-cols-4 gap=4">
-            <div class="col-span-4">
-              RFC <Dropdown v-model="selected_rfc" placeholder=" ... "></Dropdown>
-              <Checkbox v-model="isNWMv3" inputId="isNWMv3" name="isNWMv3" :binary="true" @change="toggle_isNWMv3" /> Calibrated in NWMv3
+            <div class="col-span-1">
+              <label for="select_rfc">RFC</label> <Dropdown id="select_rfc" v-model="selected_rfc" placeholder=" ... "></Dropdown>
             </div>
+            <div class="col-span-1 flex items-center">
+              <Checkbox v-model="isNWMv3" inputId="isNWMv3" name="isNWMv3" :binary="true" @change="toggle_isNWMv3" />&nbsp;&nbsp;Calibrated in NWMv3
+            </div>
+            <div class="col-span-2"></div>
           </div>
         </div>
       </div>
@@ -45,6 +48,14 @@
       <div id="GageReport" v-if="selected_gage_value">
         <div id="GrBox">
           <table>
+            <tr class="rowOdd">
+              <td class="dataName">Domain</td>
+              <td class="dataText">{{ gage_tab_data?.domain_source }}</td>
+            </tr>
+            <tr class="rowEven">
+              <td class="dataName">Gage ID</td>
+              <td class="dataText">{{ gage_tab_data?.gage.gage_Id }}</td>
+            </tr>            
             <tr class="rowOdd">
               <td class="dataName">Agency</td>
               <td class="dataText">{{ gage_tab_data?.gage.agency }}</td>
