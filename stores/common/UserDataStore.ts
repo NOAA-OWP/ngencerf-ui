@@ -19,11 +19,18 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   function getUserName() {
     return "Herbert Hover";
   }
+
+  function getUserToken() {
+    return 'token'
+  }
+
   return {
     isUserLoggedIn,
     logUserIn,
     logUserOut,
     getUserName,
+    getUserToken,
+
   };
 });
 

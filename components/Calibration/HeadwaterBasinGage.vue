@@ -4,53 +4,54 @@
       <div id="GageSettings" class="mt-5">
         <div class="row-span-4 selRow">
           <div class="grid grid-cols-4 gap=4">
-            <div class="col-span-1">
-              <p class="mb-1">Domain:</p>
-              <select id="domain_dd">
-                <option value="" disabled selected>...</option>
-                <option>Select Domain</option>
-              </select>
+            <div class="col-span-1">              
+              <label for="domain_dd">Domain: </label><br />
+              <Dropdown v-model="selected_domain_value" :options="get_domain_options_list" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
             </div>
             <div class="col-span-1">
-              <p class="mb-1" for="gage_dd">Gage: </p>
-              <select id="gage_dd">
-                <option value="" disabled selected>...</option>
-                <option>Select Gage</option>
-              </select>
+              <label for="gage_dd">Gage: </label><br />
+              <Dropdown v-model="selected_gage_value" filter :options="get_gage_options_list" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>              
             </div>
             <div class="col-span-1">
-              <p class="mb-1" for="forcing_dd">Forcing: </p>
-              <select id="forcing_dd">
-                <option value="" disabled selected>...</option>
-                <option value="upload">Upload</option>
-                <option value="aorc">AORC</option>
-              </select>
+              <label for="forcing_dd">Forcing: </label><br />
+              <span v-if="selected_forcing_value != 'upload'">
+              <Dropdown v-model="selected_forcing_value" :options="get_forcing_options_list" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
+              </span>
+              <span v-if="selected_forcing_value == 'upload'">
+                <FileUpload mode="basic" name="forcing_files[]" :multiple="true" url="/api/calibration/upload_forcing_data" :maxFileSize="1000000" @upload="onForcingFileUpload" />
+                <Button label="Cancel Upload" @click="selected_forcing_value=''"></Button>
+              </span>
             </div>
             <div class="col-span-1">
-              <p class="mb-1" for="observational_dd">Observational: </p>
-              <select id="observational_dd">
-                <option value="" disabled selected>...</option>
-                <option value="upload">Upload</option>
-                <option value="usgs">USGS</option>
-                <option value="usace">USACE</option>
-                <option value="ca_dwr">CA DWR</option>
-                <option value="env_canada">Environment Canada</option>
-              </select>
+              <label for="observational_dd">Observational: </label><br />
+              <span v-if="selected_observational_value != 'upload'">
+              <Dropdown v-model="selected_observational_value" :options="get_observational_options_list" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
+              </span>
+              <span v-if="selected_observational_value == 'upload'">
+                <FileUpload mode="basic" name="observational_files[]" :multiple="true" url="/api/calibration/upload_observational_data" :maxFileSize="1000000" @upload="onObservationalFileUpload" />
+                <Button label="Cancel Upload" @click="selected_observational_value=''"></Button>
+              </span>
+            </div>
+          </div>
+          <div class="grid grid-cols-4 gap=4">
+            <div class="col-span-4">
+              RFC <Dropdown v-model="selected_rfc" placeholder=" ... "></Dropdown>
+              <Checkbox v-model="isNWMv3" inputId="isNWMv3" name="isNWMv3" :binary="true" @change="toggle_isNWMv3" /> Calibrated in NWMv3
             </div>
           </div>
         </div>
       </div>
 
-      <div id="GageReport">
+      <div id="GageReport" v-if="selected_gage_value">
         <div id="GrBox">
           <table>
             <tr class="rowOdd">
               <td class="dataName">Agency</td>
-              <td class="dataText">{{ gageData.agency }}</td>
+              <td class="dataText">{{ gage_tab_data?.gage.agency }}</td>
             </tr>
             <tr class="rowEven">
               <td class="dataName">Station Name</td>
-              <td class="dataText">{{ gageData.station_name }}</td>
+              <td class="dataText">{{ gage_tab_data?.gage.station_name }}</td>
             </tr>
             <tr class="rowOdd">
               <td class="dataName">Site Type</td>
@@ -58,15 +59,15 @@
             </tr>
             <tr class="rowEven">
               <td class="dataName">Latitude</td>
-              <td class="dataText">{{ gageData.latitude }}</td>
+              <td class="dataText">{{ gage_tab_data?.gage.latitude }}</td>
             </tr>
             <tr class="rowOdd">
               <td class="dataName">Longitude</td>
-              <td class="dataText">{{ gageData.longitude }}</td>
+              <td class="dataText">{{ gage_tab_data?.gage.longitude }}</td>
             </tr>
             <tr class="rowEven">
               <td class="dataName">Altitude</td>
-              <td class="dataText">{{ gageData.altitude }}</td>
+              <td class="dataText">{{ gage_tab_data?.gage.altitude }}</td>
             </tr>
             <tr class="rowOdd">
               <td class="dataName">Date Established</td>
@@ -91,7 +92,15 @@
 </template>
 <script lang="ts" setup>
 import Tabs from "~/components/Calibration/Tabs.vue";
+import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
+import { storeToRefs } from "pinia";
+import { useGageStore } from "~/stores/calibration/GageStore";
+// const calibrationJobStore = useCalibrationJobStore()
+// const { show_gage_tab_data, selected_job } = calibrationJobStore
+const gageStore = useGageStore()
+const { isNWMv3, gage_tab_data, selected_domain_value, selected_forcing_value, selected_gage_value, get_gage_options_list,selected_observational_value, get_domain_options_list, get_forcing_options_list, get_observational_options_list } = storeToRefs( gageStore )
 
+const selected_rfc = ref<string>("")
 const loading = ref(true);
 const showMap = ref(false);
 
@@ -107,8 +116,24 @@ const gageData: GageData = {
   huc: "01100002",
 };
 
-onMounted(() => {
+const toggle_isNWMv3 = () => {
+  
+}
+
+const onForcingFileUpload = () => {
+
+}
+
+const onObservationalFileUpload = () => {
+
+}
+
+onMounted(() => {  
   setTimeout(() => {
+    selected_domain_value.value = gage_tab_data.value?.domain_source ?? ""
+    selected_gage_value.value = gage_tab_data.value?.gage.gage_Id ?? ""
+    selected_forcing_value.value = gage_tab_data.value?.forcing_source ?? ""
+    selected_observational_value.value = gage_tab_data.value?.observational_source ?? ""
     loading.value = false;
   }, 500);
 });

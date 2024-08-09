@@ -19,16 +19,16 @@
               <Toast />
               <ConfirmDialog></ConfirmDialog>
               <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-                :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-              <DataTable id="cr-list" :value="calibrationRuns" scrollable scroll-height="400px"
+                :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>               
+              <DataTable id="cr-list" :value="fetch_jobs_list_data" scrollable scroll-height="400px"
                 table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
                 contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
                 :rowStyle="rowStyle">
-                <Column field="runId" header="Run ID" sortable></Column>
-                <Column field="formulationName" header="Formulation Name" sortable></Column>
-                <Column field="headwaterBasinGage" header="Headwater Basin Gage" sortable></Column>
-                <Column field="runDate" header="Run Date" sortable></Column>
-                <Column field="calibrationPeriod" header="Calibration Period" sortable></Column>
+                <Column field="calibration_run_id" header="Run ID" sortable></Column>
+                <Column field="formulation_name" header="Formulation Name" sortable></Column>
+                <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
+                <Column field="run_date" header="Run Date" sortable></Column>
+                <Column field="calibration_start_period" header="Calibration Period" sortable></Column>
                 <Column field="status" header="Status" sortable></Column>
               </DataTable>
             </div>
@@ -54,14 +54,19 @@ import { useToast } from "primevue/usetoast";
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
 
-import type { CalibrationRun } from "~/composables/NextGenModel";
+import type { job_list_item } from "~/composables/NextGenModel";
 
-import { useCalibrationRunStore } from "~/stores/CalibrationRunStore";
+import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
+
+const calibrationJobStore = useCalibrationJobStore()
+const { fetch_jobs_list_data, current_calibration_job_id } = storeToRefs( calibrationJobStore )
+const { refresh_job_list_data, fetch_new_calibration_run_id } = calibrationJobStore
 
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
-const selectedCalibrationRun = ref<CalibrationRun>()
+//const selectedCalibrationRun = ref<CalibrationRun>()
+const selectedCalibrationRun = ref<job_list_item>()
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
@@ -71,32 +76,33 @@ const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent)
 }
 
-const calibrationRunStore = useCalibrationRunStore()
-const { calibrationRuns } = storeToRefs(calibrationRunStore)
-
-async function initCalibrationRunList() {
-  await calibrationRunStore.retrieveCalibrationRuns()
-}
+// async function initCalibrationRunList() {
+//   await fetchCalibrationJobsList()
+// }
 
 const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   console.log('open')
-  console.log(selectedCalibrationRun.value.runId)
-  if (['Done', 'Failed', 'SEVER_ERROR'].includes(selectedCalibrationRun.value.status)) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open Results tab', life: 3000 })
-  if (['Saved', 'Ready'].includes(selectedCalibrationRun.value.status)) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open corresponding saved tab', life: 3000 })
-  if (['Running'].includes(selectedCalibrationRun.value.status)) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open Run/Status tab', life: 3000 })
+  console.log( selectedCalibrationRun.value.calibration_run_id )
+  if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
+  if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 })
+  if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
+  current_calibration_job_id.value = selectedCalibrationRun.value.calibration_run_id
+
+  navigateTo('/Calibration')
 }
 
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   console.log('clone')
-  console.log(selectedCalibrationRun.value.runId)
+  console.log( selectedCalibrationRun.value.calibration_run_id )
   toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
+  //fetchCalibrationJobsList()
 }
 
 const confirmDelte = useConfirm();
 
-const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  const confirm_delete = ref(false)
-  const selectedRunId = selectedCalibrationRun.value.runId
+const deleteSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
+  const confirm_delete = ref( false )
+  const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   let confirmMessage = "Are you sure you want to delete?"
   if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
 
@@ -120,9 +126,10 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 const acceptDelete = (selectedRunId: number) => {
   toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
-  const reducedCalibrationRuns = calibrationRuns.value.filter((cr) => cr.runId != selectedRunId)
-  calibrationRuns.value = reducedCalibrationRuns
-  selectedCalibrationRun.value = undefined
+  // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id != selectedRunId )
+  // calibration_jobs_list.value = reduced_calibration_job_list
+  refresh_job_list_data()
+  selectedCalibrationRun.value = undefined    
 }
 
 const rowStyle = (data: any) => {
@@ -130,14 +137,25 @@ const rowStyle = (data: any) => {
     return { backgroundColor: 'gainsboro' }
   }
 }
+
+
 onMounted(() => {
-  console.log('onmounted')
-  initCalibrationRunList()
+  console.log( 'onmounted' )
+  //fetchCalibrationJobsList()
   console.log(localStorage);
 });
 
 const NewCalibration = async () => {
-  await navigateTo("Calibration");
+  console.log( 'NewCalibration' )
+  const fetched_id = await fetch_new_calibration_run_id()
+  if( fetched_id != undefined ) {
+    current_calibration_job_id.value = fetched_id.value?.calibration_run_id ?? 0
+    if( current_calibration_job_id.value > 0 ) {
+      await navigateTo("Calibration");
+    } else {
+      toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 })
+    }
+  }
 }
 </script>
 
