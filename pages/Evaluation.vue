@@ -11,7 +11,6 @@ const { setMenuIndex } = generalStore();
 
 onMounted(() => {
   setMenuIndex(2); // Saves the menu pointer
-  console.log("Evaluation Section Active");
 });
 
 </script>

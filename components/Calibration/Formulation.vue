@@ -121,7 +121,6 @@ import type { SlothParameter } from "~/composables/NextGenModel";
 const loading = ref(true);
 
 const formulation_modules = [
-  "Sloth",
   "GC2D",
   "TopFlow",
   "Noah-OWP",

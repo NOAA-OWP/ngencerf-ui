@@ -79,7 +79,7 @@
             <div class="grid grid-cols-2">
               <div class="col-span-1">
 
-                <div class="text-left ml-20">
+                <div class="text-left ml-40">
                   <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
                   <div class="inline-block text-left">Parameters File (optional):</div><br />
                   <select id="ParamFile" class="varInputs inline-block mt-2">
@@ -88,7 +88,7 @@
                   <div id="UploadParams" class="ngenButtonDiv inline ml-3"><button>UPLOAD</button></div>
                 </div>
 
-                <div class="text-left ml-20 mt-5">
+                <div class="text-left ml-40 mt-5">
                   <div class="inline-block text-left">Name:</div><br />
                   <select id="ParamName" class="varInputs inline-block mt-2">
                     <option value="" selected disabled>...</option>
@@ -98,7 +98,7 @@
               </div>
 
               <div class="col-span-1">
-                <div class="text-left ml-20">
+                <div class="text-left ml-40">
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
                   <div class="text-left mt-2">
                     <select id="OutVar" class="varInputs">

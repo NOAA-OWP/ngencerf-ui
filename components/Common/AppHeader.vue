@@ -55,7 +55,6 @@ const getUserInitials = () => {
 const MenuChanged = (e) => {
   const m = e.currentTarget.getAttribute('data-menu');
   setMenuIndex(m);
-  console.log("MenuChanged", m);
 }
 </script>
 

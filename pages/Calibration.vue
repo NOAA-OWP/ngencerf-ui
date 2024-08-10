@@ -12,7 +12,6 @@ const { setMenuIndex } = generalStore();
 
 onMounted(() => {
   setMenuIndex(1); // Saves the menu pointer
-  console.log("Calibration Page");
 });
 
 </script>
