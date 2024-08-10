@@ -90,7 +90,7 @@
   </client-only>
 </template>
 <script lang="ts" setup>
-import Tabs from "~/components/Calibration/Tabs.vue";
+import Tabs from "~/components/Calibration/CalibrationTabs.vue";
 
 const loading = ref(true);
 const showMap = ref(false);

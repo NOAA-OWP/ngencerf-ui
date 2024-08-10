@@ -7,6 +7,7 @@
         <NuxtLink to="LandingPage">NgenCERF</NuxtLink>
       </div>
       <div id="Col2" class="col-span-8">
+
         <ul v-show="isUserLoggedIn() && location.name !== 'Login' && location.name !=='LandingPage'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
             <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration">Calibration</NuxtLink>
@@ -21,6 +22,7 @@
             <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification">Verification</NuxtLink>
           </li>
         </ul>
+        
       </div>
 
       <div id="Circles" class="col-span-2">

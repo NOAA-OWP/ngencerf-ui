@@ -1,38 +1,38 @@
 <template>
-  <!-- LeftBlock.vue -->
+  <!-- EvaluationLeftBlock.vue -->
   <div>
-    <Tabs @tabNumber="tabChanged" />
+    <EvaluationTabs @tabNumber="tabChanged" />
     <div class="shrink-0" id="InputsArea">
       <span v-if="activeTab == 1">
-        <HeadwaterBasinGage />
+        <CalibrationRunsTab />
       </span>
       <span v-else-if="activeTab == 2">
-        <Formulation />
+        <EvaluateTab />
       </span>
       <span v-else-if="activeTab == 3">
-        <TuningControls />
+        <SetupValRunTab />
       </span>
       <span v-else-if="activeTab == 4">
-        <OptimizationMetrics />
+        <SelectParamsSetTab />
       </span>
       <span v-else-if="activeTab == 5">
-        <RunStatus />
+        <ReviewSetupRunTab />
       </span>
       <span v-else="activeTab == 6">
-        <Results />
+        <StatusTab />
       </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Tabs from '~/components/Calibration/Tabs.vue';
-import HeadwaterBasinGage from '~/components/Calibration/HeadwaterBasinGage.vue';
-import Formulation from '~/components/Calibration/Formulation.vue';
-import TuningControls from '~/components/Calibration/TuningControls.vue';
-import OptimizationMetrics from '~/components/Calibration/OptimizationMetrics.vue';
-import RunStatus from '~/components/Calibration/RunStatus.vue';
-import Results from '~/components/Calibration/Results.vue';
+import EvaluationTabs from '~/components/Evaluation/EvaluationTabs.vue';
+import EvaluateTab from './EvaluateTab.vue';
+import SetupValRunTab from './SetupValRunTab.vue';
+import SelectParamsSetTab from './SelectParamsSetTab.vue';
+import ReviewSetupRunTab from './ReviewSetupRunTab.vue';
+import StatusTab from './StatusTab.vue';
+import CalibrationRunsTab from './CalibrationRunsTab.vue';
 
 // Default to Tab 1, HeadwaterBasinGage
 const activeTab = ref(1);

@@ -7,15 +7,42 @@ import piniaPluginPersistedState from "pinia-plugin-persistedstate"
 export const generalStore = defineStore(
   "generalStore",
   () => {
-    const tabIndex = ref("1");
+    const calibrationTabIndex = ref("1");
+    const evaluationTabIndex = ref("1");
+    const menuIndex = ref("1");
 
-    function getTabIndex() {
-      return parseInt(tabIndex.value);
+    // Top Menu index
+    function getMenuIndex() {
+      return parseInt(menuIndex.value);
     }
-    function setTabIndex(tab: number) {
-      tabIndex.value = tab.toString();
+    function setMenuIndex(tab: number) {
+      menuIndex.value = tab.toString();
     }
-    return { getTabIndex, setTabIndex };
+    
+    // Calibration Tab index
+    function getCalibrationTabIndex() {
+      return parseInt(calibrationTabIndex.value);
+    }
+    function setCalibrationTabIndex(tab: number) {
+      calibrationTabIndex.value = tab.toString();
+    }
+
+    // Evaluation Tab index
+    function getEvaluationTabIndex() {
+      return parseInt(evaluationTabIndex.value);
+    }
+    function setEvaluationTabIndex(tab: number) {
+      evaluationTabIndex.value = tab.toString();
+    }
+
+    return { 
+      getMenuIndex,
+      setMenuIndex,      
+      getCalibrationTabIndex, 
+      setCalibrationTabIndex ,
+      getEvaluationTabIndex,
+      setEvaluationTabIndex
+    };
   },
   {
     persist: {
