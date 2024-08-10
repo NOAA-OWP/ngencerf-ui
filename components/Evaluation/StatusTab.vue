@@ -1,5 +1,5 @@
 <template>
-    <h1 class="text-center">Status</h1>
+    <h1 class="text-center mt-40">Status</h1>
 </template>
 
 <script setup lang="ts">
