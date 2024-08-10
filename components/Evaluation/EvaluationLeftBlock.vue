@@ -1,7 +1,7 @@
-<template>
+<template> 
   <!-- EvaluationLeftBlock.vue -->
   <div>
-    <EvaluationTabs @tabNumber="tabChanged" />
+    <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0" id="InputsArea">
       <span v-if="activeTab == 1">
         <CalibrationRunsTab />
@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import EvaluationTabs from '~/components/Evaluation/EvaluationTabs.vue';
+import Tabs from '~/components/Common/Tabs.vue'
 import EvaluateTab from './EvaluateTab.vue';
 import SetupValRunTab from './SetupValRunTab.vue';
 import SelectParamsSetTab from './SelectParamsSetTab.vue';
@@ -35,18 +35,21 @@ import StatusTab from './StatusTab.vue';
 import CalibrationRunsTab from './CalibrationRunsTab.vue';
 
 // Default to Tab 1, HeadwaterBasinGage
-const activeTab = ref(1);
+import { generalStore } from "@/stores/common/GeneralStore";
+const { getEvaluationTabIndex, setEvaluationTabIndex } = generalStore();
+
+// Default to Tab 1, HeadwaterBasinGage
+const activeTab = ref(getEvaluationTabIndex());
 
 // Activate new tab
 const tabChanged = (tabNum: number) => {
   activeTab.value = tabNum;
+  setEvaluationTabIndex(tabNum);
 };
 </script>
 
 <style lang="scss" scoped>
 #InputsArea {
-  //position: absolute;
-  //margin-left: 100px;
   height: 20vw;
   min-width: 960px;
 }
