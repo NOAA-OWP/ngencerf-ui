@@ -1,4 +1,8 @@
-import { defineEventHandler, readBody } from 'h3';
+/**
+ * This file contains a mock api/auth/jwt/create endpoint
+ */
+
+import { defineEventHandler, readBody, sendError, H3Error } from 'h3';
 import jwt from 'jsonwebtoken';
 
 /**
@@ -13,7 +17,7 @@ export interface AuthSuccessResponse {
  * Interface for an unsuccessful authentication response
  */
 export interface AuthErrorResponse {
-  non_field_errors: string[];
+  non_field_errors: string;
 }
 
 /**
@@ -22,16 +26,17 @@ export interface AuthErrorResponse {
 export type AuthResponse = AuthSuccessResponse | AuthErrorResponse;
 
 /**
- * Handles authentication request and generates JWT tokens if credentials are valid
- * @param event - event object containing the request context
- * @returns promise that resolves to an authentication response, either success or error
+ * Handles authentication request and generates JWT access and refresh tokens if credentials are valid
+ * @param event - event object containing request context
+ * @returns {Promise<AuthResponse>} that resolves to an authentication response, either success or error
  */
 export default defineEventHandler(async (event): Promise<AuthResponse> => {
   // Read the request body to get the username and password.
   const { username, password } = await readBody(event);
 
   // Check if the provided credentials are correct.
-  if (username === 'correctUsername' && password === 'correctPassword') {
+  if (username === 'username' && password === 'password') {
+    event.node.res.statusCode = 200;
     // Generate JWT tokens for valid credentials.
     const accessToken = jwt.sign({ username }, 'accessSecret', { expiresIn: '15m' });
     const refreshToken = jwt.sign({ username }, 'refreshSecret', { expiresIn: '1h' });
@@ -42,9 +47,11 @@ export default defineEventHandler(async (event): Promise<AuthResponse> => {
       refresh: refreshToken
     };
   } else {
+    const error = new H3Error('Invalid username or password');
+    event.node.res.statusCode = 401;
     // Return an error response for invalid credentials.
     return {
-      non_field_errors: ['Invalid username or password']
+      non_field_errors: error.message
     };
   }
 });

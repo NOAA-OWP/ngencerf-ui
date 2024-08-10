@@ -50,6 +50,7 @@
 
   </client-only>
 </template>
+
 <script setup lang="ts">
 import { ref } from "vue";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
@@ -58,9 +59,10 @@ import AppHeader from "~/components/Common/AppHeader.vue";
 
 const { logUserIn, logUserOut } = useUserDataStore();
 
-const loading = ref(true);
-const userName = ref("");
-const userPassword = ref("");
+const userDataStore = useUserDataStore();
+const loading = ref<boolean>(true);
+const userName = ref<string>("");
+const userPassword = ref<string>("");
 
 const ForgotUsername = () => {
   //
@@ -71,15 +73,34 @@ const ForgotPassword = () => {
 const SignUp = () => {
   //
 };
-const SubmitForm = (e: Event) => {
+/** 
+ * Submits the login form
+ * @param e - event object
+ */
+const SubmitForm = async (e: Event) => {
+  e.preventDefault(); // prevents the page from reloading
+
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
-    logUserIn();
-    GoToLanding();
-  } else {
-    //
+    const { data, error } = await useFetch<{ access: string; refresh: string }>('/api/auth/jwt/create', {
+      method: 'POST',
+      body: { username: userName.value, password: userPassword.value }
+    });
+
+    if (data.value && data.value.access && data.value.refresh) {
+      // store tokens in UserDataStore
+      userDataStore.setAccessToken(data.value.access);
+      userDataStore.setRefreshToken(data.value.refresh);
+      logUserIn();
+      await GoToLanding();
+    } else if (error.value) {
+    console.error("Login failed:", error.value);
+    }
   }
 };
 
+/**
+ * Navigates to the landing page.
+ */
 const GoToLanding = async () => {
   await navigateTo({ path: "/LandingPage" });
 };
