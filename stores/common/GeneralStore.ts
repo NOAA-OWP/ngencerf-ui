@@ -16,31 +16,25 @@ export const generalStore = defineStore(
     // Top Menu index
     function getMenuIndex() {
       return parseInt(menuIndex.value);
-      console.log("Getting Menu Index", menuIndex.value);
     }
     function setMenuIndex(tab: number) {
       menuIndex.value = tab.toString();
-      console.log("Setting Menu Index", menuIndex.value);
     }
     setEvaluationTabIndex
     // Calibration Tab index
     function getCalibrationTabIndex() {
       return parseInt(calibrationTabIndex.value);
-      console.log("Getting Calibration Index", calibrationTabIndex.value);
     }
     function setCalibrationTabIndex(tab: number) {
       calibrationTabIndex.value = tab.toString();
-      console.log("Setting Calibration Index", calibrationTabIndex.value);
     }
 
     // Evaluation Tab index
     function getEvaluationTabIndex() {
       return parseInt(evaluationTabIndex.value);
-      console.log("Getting evaluation Index", evaluationTabIndex.value);
     }
     function setEvaluationTabIndex(tab: number) {
       evaluationTabIndex.value = tab.toString();
-      console.log("Setting evaluation Index", evaluationTabIndex.value);
     }
 
     return { 
