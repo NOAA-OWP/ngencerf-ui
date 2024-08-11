@@ -10,8 +10,7 @@ FormulationName<template>
                      title="Formulation Name">
                      Forumulation Name:
                   </div>
-                  <div class="inline-block" aria-label="Input Forumulation Name" title="Input Formulation Name"><input
-                        type="text" /></div>
+                  <InputText v-model="formulation_name_input" class="inline-block w-64 p-1" aria-label="Input Forumulation Name" title="Input Formulation Name"></InputText>
                </div>
                <div class="col-span-2">&nbsp;</div>
             </div>
@@ -134,6 +133,7 @@ const loading = ref(true);
 onMounted(() => {
    setTimeout(() => {
       loading.value = false;
+      formulation_name_input.value = formulation_tab_data.value?.formulation_name ?? ""
       selected_module_values.value = formulation_tab_data.value?.module_sources ?? []
       use_sloth_parameters.value = formulation_tab_data.value?.use_sloth ?? false
       sloth_parameter_inputs.value = formulation_tab_data.value?.sloth_parameters ?? []
