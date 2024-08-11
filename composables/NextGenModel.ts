@@ -61,44 +61,55 @@ export interface gage_data {
 }
 
 export interface gagetab_save {
-    gage_id: String,
-    forcing_source: String,
-    forcing_user_filename: String,
-    calibration_run_id: Number
+   gage_id: String,
+   forcing_source: String,
+   forcing_user_filename: String,
+   calibration_run_id: Number
 }
 
-export interface forumlation_save {
-  calibration_run_id: Number,
-  status: String,
-  modules: module_data[],
-  sloth_parameters: sloth_parameter_data,
-  gages: String[]
+/**
+ * Model for Calibration's formulation tab
+ */
+export interface formulation_tab_data {
+   calibration_run_id: number,
+   formulation_name: string,
+   module_sources: string[],
+   modules: formulation_module_data[],
+   use_sloth: boolean,
+   sloth_parameters: sloth_parameter_data[],
+   status: string
+}
+
+export interface formulation_module_data {
+   name: string,
+   groups: string[]
 }
 
 export interface formulation_save {
-    calibration_run_id: Number,
-    formulation_name: String,
-    modules: String[],
-    sloth_parameters: sloth_parameter_data[]
+   calibration_run_id: number,
+   formulation_name: string,
+   modules: string[],
+   use_sloth: boolean,
+   sloth_parameters: sloth_parameter_data[]
 }
 
 export interface tuning_load {
 
-    calibration_run_id: Number,
-    status: String,
-    modules: module_data[],
-    calibration_times: {
+   calibration_run_id: Number,
+   status: String,
+   modules: module_data[],
+   calibration_times: {
       calibration_start_time: String,
       calibration_end_time: String,
       simulation_start_time: String,
       simulation_end_time: String
-    },
-    validation_times: {
+   },
+   validation_times: {
       validation_start_time: String,
       validatoin_end_time: String,
       simulation_start_time: String,
       simulation_end_time: String
-    }
+   }
 }
 
 export interface tuning_save {
@@ -133,17 +144,18 @@ export interface domain_gage_options {
 export interface select_option {
   name: string,
   code: string
+  selected?: boolean
 }
 
 export interface sloth_parameter_data {
-  name: String,
-  count: Number
-  type: String,
-  units: String,
-  location: String,
-  value: Number
-  module: module_params[],
-  module_param: String 
+  param_name: string,
+  param_count: number
+  param_type: string,
+  param_units: string,
+  param_location: string,
+  param_value: number
+  maps_to_module: string,
+  maps_to_variable_name: string
 }
 
 export interface module_data { 

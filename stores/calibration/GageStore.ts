@@ -115,6 +115,16 @@ export const useGageStore = defineStore( 'GageStore', () => {
       return gage_tab_data.value?.observational_values
    })
 
+   const get_selected_gage_domain_name = computed( () => {
+      gage_tab_data.value?.domain_values.forEach( ( domain_value ) => {
+         domain_options_list.value.push({
+            name: domain_value,
+            code: domain_value
+         })
+      })
+      selected_gage_value
+   })
+
    async function save_gage_tab_data() {
       const response = await $fetch( '/api/calibration/save_gage_tab', {
          method: "POST",
