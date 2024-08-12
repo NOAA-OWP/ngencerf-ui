@@ -1,6 +1,6 @@
 <template>
   <!-- EvaluationRightBlock -->
-  <div class="grid grid-cols-1">
+  <div v-if="displayRightBlock" id="EvaluationRightBlock" class="grid grid-cols-1">
     <div class="grid-rows-12">
       <div id="TopRightBlock" class="row-span-5">
         <div class="grid grid-cols-2">
@@ -26,6 +26,13 @@ import type { Progress } from "~/composables/NextGenModel";
 import ProgressGroup from "../Common/ProgressGroup.vue";
 import MessagesGroup from "../Common/MessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
+
+import { generalStore } from "@/stores/common/GeneralStore";
+const { getEvalRunSelected } = generalStore();
+
+const displayRightBlock = ref(getEvalRunSelected());
+
+
 
 const progress: Progress = {
   headwater_basin_gage: true,

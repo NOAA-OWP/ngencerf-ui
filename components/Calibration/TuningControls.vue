@@ -1,8 +1,12 @@
 <template>
   <div id="TuningControls">
-    <div class="grid grid-rows-12">
-      <div class="row-span-2">
+    <div class="w-full mt-2">
+      <div class="text-center mt-1" id="RangeDates">Range: {{ rangeDateFrom }} to {{ rangeDateTo }}</div>
+    </div>
+    <div class="grid grid-rows-10">
+      <div class="row-span-1">
         <div class="grid grid-cols-2">
+
           <div class="col-span-1">
             <div id="BoxLeft">
               <div id="BoxTopLeft" class="pt-2">
@@ -28,9 +32,10 @@
                   </div>
                 </div>
               </div>
-              <div id="RangeDates">Range: {{ rangeDateFrom }} to {{ rangeDateTo }}</div>
             </div>
           </div>
+
+
           <div class="col-span-1">
             <div id="BoxRight">
               <div id="BoxTopRight" class="pt-2" @click="AutoValChecked">
@@ -71,15 +76,14 @@
         </div>
       </div>
 
-      <div class="row-span-3">
+      <div class="row-span-2">
         <div class="grid grid-rows-2">
-
 
           <div class="row-span-1 text-center">
             <div class="grid grid-cols-2">
-              <div class="col-span-1">
+              <div class="col-span-1 m-auto">
 
-                <div class="text-left ml-40">
+                <div class="text-left ">
                   <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
                   <div class="inline-block text-left">Parameters File (optional):</div><br />
                   <select id="ParamFile" class="varInputs inline-block mt-2">
@@ -88,7 +92,7 @@
                   <div id="UploadParams" class="ngenButtonDiv inline ml-3"><button>UPLOAD</button></div>
                 </div>
 
-                <div class="text-left ml-40 mt-5">
+                <div class="text-left  mt-5">
                   <div class="inline-block text-left">Name:</div><br />
                   <select id="ParamName" class="varInputs inline-block mt-2">
                     <option value="" selected disabled>...</option>
@@ -97,10 +101,10 @@
                 </div>
               </div>
 
-              <div class="col-span-1">
-                <div class="text-left ml-40">
+              <div class="col-span-1 m-auto">
+                <div class="">
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
-                  <div class="text-left mt-2">
+                  <div class="mt-2">
                     <select id="OutVar" class="varInputs">
                       <option value="" selected disabled>...</option>
                     </select>
@@ -109,9 +113,20 @@
               </div>
             </div>
           </div>
+
+          <div id="TuningDataList">
+            <DataTable :value="calibrationTuningDataList" scrollable scroll-height="200px">
+              <Column field="parameter" header="Parameter" sortable></Column>
+              <Column field="min" header="Min" sortable></Column>
+              <Column field="max" header="Max" sortable></Column>
+              <Column field="initValue" header="Initial Value" sortable></Column>
+            </DataTable>
+          </div>
         </div>
+
       </div>
-      <div class="row-span-6 mup30">
+
+      <!-- <div class="row-span-1">
         <div id="TuningDataList">
           <DataTable :value="calibrationTuningDataList" scrollable scroll-height="200px">
             <Column field="parameter" header="Parameter" sortable></Column>
@@ -120,7 +135,12 @@
             <Column field="initValue" header="Initial Value" sortable></Column>
           </DataTable>
         </div>
+      </div> -->
+
+      <div class="row-span-6">
       </div>
+
+
     </div>
     <div class="waitgif" v-if="loading">
       <img src="@/assets/styles/img/wait.gif" />
@@ -180,14 +200,6 @@ onMounted(() => {
   width: 60vw;
 }
 
-#BoxLeft {
-  margin: 20px 0 0 30px;
-}
-
-#BoxRight {
-  margin: 20px 0 0 50px;
-}
-
 #BoxLeft,
 #BoxRight {
   width: 400px;
@@ -200,8 +212,16 @@ onMounted(() => {
   width: 200px;
   height: 35px;
   background-color: $ngwcp_groupsbkg;
-  border-radius: 20px 20px 0 0;
   font-size: 0.9em;
+}
+
+#BoxTopLeft {
+  border-radius: 20px 20px 0 0;
+}
+
+#BoxTopRight {
+  margin-left: 200px;
+  border-radius: 20px 20px 0 0;
 }
 
 #BoxTopRight input {
@@ -211,11 +231,13 @@ onMounted(() => {
 
 #BoxBottomLeft,
 #BoxBottomRight {
-  border-top-right-radius: 20px;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  border-radius: 0 20px 20px 20px;
   height: 150px;
   background-color: $ngwcp_groupsbkg;
+}
+
+#BoxBottomRight {
+  border-radius: 20px 0 20px 20px;
 }
 
 #AddUpdateBtn {
@@ -229,12 +251,6 @@ onMounted(() => {
   padding: 8px;
 }
 
-#RangeDates {
-  position: relative;
-  top: -178px;
-  left: 269px;
-  width: 265px;
-}
 
 .mup30 {
   margin-top: -140px;
@@ -262,11 +278,12 @@ onMounted(() => {
 }
 
 .varInputs {
-  width: 280px;
+  width: 220px;
 }
 
 input,
 select {
   border-radius: 5px;
 }
+
 </style>

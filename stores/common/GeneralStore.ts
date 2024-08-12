@@ -12,6 +12,9 @@ export const generalStore = defineStore(
     const calibrationTabIndex = ref("1");
     const evaluationTabIndex = ref("1");
     const menuIndex = ref("1");
+    
+    // Has the user selected a previous calibration run for Evaluation?
+    const evaluationRunSelected = ref(false);
 
     // Top Menu index
     function getMenuIndex() {
@@ -20,6 +23,8 @@ export const generalStore = defineStore(
     function setMenuIndex(tab: number) {
       menuIndex.value = tab.toString();
     }
+
+
     setEvaluationTabIndex
     // Calibration Tab index
     function getCalibrationTabIndex() {
@@ -29,6 +34,7 @@ export const generalStore = defineStore(
       calibrationTabIndex.value = tab.toString();
     }
 
+
     // Evaluation Tab index
     function getEvaluationTabIndex() {
       return parseInt(evaluationTabIndex.value);
@@ -37,13 +43,25 @@ export const generalStore = defineStore(
       evaluationTabIndex.value = tab.toString();
     }
 
+
+    // Previous calibration run for Evaluation
+    function getEvalRunSelected() {
+      return evaluationRunSelected.value;
+    }
+    
+    function setEvalRunSelected(b: boolean) {
+      evaluationRunSelected.value = b;
+    }
+
     return { 
       getMenuIndex,
       setMenuIndex,      
       getCalibrationTabIndex, 
       setCalibrationTabIndex,
       getEvaluationTabIndex,
-      setEvaluationTabIndex
+      setEvaluationTabIndex,
+      getEvalRunSelected,
+      setEvalRunSelected
     };
   },
   {

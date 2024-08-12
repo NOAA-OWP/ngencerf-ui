@@ -6,7 +6,10 @@ export const mockedCalibrationRunData = () => {
       headwaterBasinGage: '01123000',
       runDate: '2024-06-03',
       calibrationPeriod: '2018-06-01 00:00 to 2022-12-31',
-      status: 'Done'
+      status: 'Done',
+      objectiveFunction: "KGE",
+      optimizationAlgorithm: "DDS",
+      validationRuns: 3
     },
     {
       runId: 124,
@@ -14,7 +17,10 @@ export const mockedCalibrationRunData = () => {
       headwaterBasinGage: '01123000',
       runDate: '2024-06-05',
       calibrationPeriod: '2018-06-01 00:00 to 2022-12-31',
-      status: 'Failed'
+      status: 'Failed',
+      objectiveFunction: "KGE",
+      optimizationAlgorithm: "DDS",
+      validationRuns: 3
     },
     {
       runId: 265,
@@ -22,7 +28,10 @@ export const mockedCalibrationRunData = () => {
       headwaterBasinGage: '01123000',
       runDate: '2024-06-10',
       calibrationPeriod: '2018-06-01 00:00 to 2022-12-31',
-      status: 'Cancelled'
+      status: 'Cancelled',
+      objectiveFunction: "KGE",
+      optimizationAlgorithm: "DDS",
+      validationRuns: 3
     },
     {
       runId: 258,
@@ -30,7 +39,10 @@ export const mockedCalibrationRunData = () => {
       headwaterBasinGage: '01123000',
       runDate: '2024-06-12',
       calibrationPeriod: '2018-06-01 00:00 to 2022-12-31',
-      status: 'Ready'
+      status: 'Ready',
+      objectiveFunction: "KGE",
+      optimizationAlgorithm: "DDS",
+      validationRuns: 3
     },
     {
       runId: 308,
@@ -38,7 +50,10 @@ export const mockedCalibrationRunData = () => {
       headwaterBasinGage: '01123000',
       runDate: '2024-06-17',
       calibrationPeriod: '2018-06-01 00:00 to 2022-12-31',
-      status: 'Saved'
+      status: 'Saved',
+      objectiveFunction: "KGE",
+      optimizationAlgorithm: "DDS",
+      validationRuns: 3
     },
     {
       runId: 401,
@@ -46,7 +61,10 @@ export const mockedCalibrationRunData = () => {
       headwaterBasinGage: '01123000',
       runDate: '2024-06-20',
       calibrationPeriod: '2018-06-01 00:00 to 2022-12-31',
-      status: 'Running'
+      status: 'Running',
+      objectiveFunction: "KGE",
+      optimizationAlgorithm: "DDS",
+      validationRuns: 3
     },
   ]
 }
