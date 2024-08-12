@@ -80,8 +80,8 @@ const SignUp = () => {
  */
 const SubmitLoginForm = async (e: Event) => {
   e.preventDefault(); // prevents the page from reloading
-  const { baseUrl } = useBackendConfig();
-  console.log("baseUrl", baseUrl);
+  const { ngencerfBaseUrl } = useBackendConfig();
+  console.log("ngencerfBaseUrl", ngencerfBaseUrl);
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     const { data, error } = await useFetch<{ access: string; refresh: string }>('/api/auth/jwt/create', {

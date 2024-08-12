@@ -5,9 +5,9 @@
 import { useRuntimeConfig } from "#app";
 
 export const useBackendConfig = () => {
-  const { baseUrl } = useRuntimeConfig().public;
+  const { ngencerfBaseUrl } = useRuntimeConfig().public;
 
   return {
-    baseUrl
+    ngencerfBaseUrl
   };
 }
