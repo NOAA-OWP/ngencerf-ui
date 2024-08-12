@@ -1,5 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { Base } from '#build/components';
 import Aura from '@primevue/themes/aura';
+import { b } from 'vitest/dist/suite-IbNSsUWN.js';
 
 export default defineNuxtConfig({
   devtools: { enabled: false },
@@ -49,5 +51,11 @@ export default defineNuxtConfig({
     }
   },
 
-  compatibilityDate: '2024-07-05'
-})
+  compatibilityDate: '2024-07-05',
+
+  runtimeConfig: {
+    public: {
+      baseUrl: process.env.BASE_URL || 'http://localhost:8000'
+    }
+  }
+});

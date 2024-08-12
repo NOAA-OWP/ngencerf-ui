@@ -53,6 +53,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
@@ -79,6 +80,8 @@ const SignUp = () => {
  */
 const SubmitLoginForm = async (e: Event) => {
   e.preventDefault(); // prevents the page from reloading
+  const { baseUrl } = useBackendConfig();
+  console.log("baseUrl", baseUrl);
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     const { data, error } = await useFetch<{ access: string; refresh: string }>('/api/auth/jwt/create', {
