@@ -89,7 +89,7 @@ const SubmitLoginForm = async (e: Event) => {
       }
     });
 
-    if (data.value && data.value.access && data.value.refresh) {
+    if (data?.value?.access && data?.value?.refresh) {
       // store tokens in UserDataStore
       userDataStore.setAccessToken(data.value.access);
       userDataStore.setRefreshToken(data.value.refresh);
