@@ -27,7 +27,7 @@
                     Forgot Password
                   </button>
                 </div>
-                <div class="loginButton ngenButtonDiv" v-on:click="SubmitForm" aria-label="sign in">
+                <div class="loginButton ngenButtonDiv" v-on:click="SubmitLoginForm" aria-label="sign in">
                   <button id="LoginButton">Sign In</button>
                 </div>
                 <div>
@@ -77,13 +77,16 @@ const SignUp = () => {
  * Submits the login form
  * @param e - event object
  */
-const SubmitForm = async (e: Event) => {
+const SubmitLoginForm = async (e: Event) => {
   e.preventDefault(); // prevents the page from reloading
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     const { data, error } = await useFetch<{ access: string; refresh: string }>('/api/auth/jwt/create', {
       method: 'POST',
-      body: { username: userName.value, password: userPassword.value }
+      body: { 
+        username: userName.value,
+        password: userPassword.value
+      }
     });
 
     if (data.value && data.value.access && data.value.refresh) {
@@ -92,8 +95,12 @@ const SubmitForm = async (e: Event) => {
       userDataStore.setRefreshToken(data.value.refresh);
       logUserIn();
       await GoToLanding();
-    } else if (error.value) {
+    } 
+    else if (error.value) {
     console.error("Login failed:", error.value);
+    }
+    else {
+      console.error("Login failed: no data or error returned");
     }
   }
 };

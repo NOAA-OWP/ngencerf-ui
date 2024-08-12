@@ -2,7 +2,7 @@
  * This file contains a mock api/auth/jwt/create endpoint
  */
 
-import { defineEventHandler, readBody, sendError, H3Error } from 'h3';
+import { defineEventHandler, readBody, H3Error } from 'h3';
 import jwt from 'jsonwebtoken';
 
 /**
@@ -17,7 +17,7 @@ export interface AuthSuccessResponse {
  * Interface for an unsuccessful authentication response
  */
 export interface AuthErrorResponse {
-  non_field_errors: string;
+  non_field_errors: string[];
 }
 
 /**
@@ -31,27 +31,39 @@ export type AuthResponse = AuthSuccessResponse | AuthErrorResponse;
  * @returns {Promise<AuthResponse>} that resolves to an authentication response, either success or error
  */
 export default defineEventHandler(async (event): Promise<AuthResponse> => {
-  // Read the request body to get the username and password.
-  const { username, password } = await readBody(event);
+  // get request method
+  const requestMethod = event.node.req.method;
 
-  // Check if the provided credentials are correct.
-  if (username === 'username' && password === 'password') {
-    event.node.res.statusCode = 200;
-    // Generate JWT tokens for valid credentials.
-    const accessToken = jwt.sign({ username }, 'accessSecret', { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ username }, 'refreshSecret', { expiresIn: '1h' });
+  if (requestMethod == "POST") {
+    // Read the request body to get the username and password.
+    const { username, password } = await readBody(event);
 
-    // Return the access and refresh tokens.
-    return {
-      access: accessToken,
-      refresh: refreshToken
-    };
+    // Check if the provided credentials are correct
+    if (username === 'username' && password === 'password') {
+      event.node.res.statusCode = 200;
+      // Generate JWT tokens for valid credentials
+      const accessToken = jwt.sign({ username }, 'accessSecret', { expiresIn: '15m' });
+      const refreshToken = jwt.sign({ username }, 'refreshSecret', { expiresIn: '1h' });
+
+      // Return the access and refresh tokens
+      return {
+        access: accessToken,
+        refresh: refreshToken
+      };
+    } else {
+      const error = new H3Error('Invalid username or password');
+      event.node.res.statusCode = 401;
+      // Return an error response for invalid credentials
+      return {
+        non_field_errors: [error.message]
+      };
+    }
   } else {
-    const error = new H3Error('Invalid username or password');
-    event.node.res.statusCode = 401;
-    // Return an error response for invalid credentials.
+    const error = new H3Error('Method not allowed');
+    event.node.res.statusCode = 405;
+    // Return an error response for invalid method.
     return {
-      non_field_errors: error.message
+      non_field_errors: [error.message]
     };
   }
 });
