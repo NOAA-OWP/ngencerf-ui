@@ -53,6 +53,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { refreshAccessToken, verifyAccessToken } from "~/utils/UserAuth"
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import AppFooter from "~/components/Common/AppFooter.vue";
@@ -84,7 +85,7 @@ const SubmitLoginForm = async (e: Event) => {
   console.log("ngencerfBaseUrl", ngencerfBaseUrl);
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
-    const { data, error } = await useFetch<{ access: string; refresh: string }>('/api/auth/jwt/create', {
+    const { data, error } = await useFetch<{ access: string; refresh: string }>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
       body: { 
         username: userName.value,
@@ -96,6 +97,8 @@ const SubmitLoginForm = async (e: Event) => {
       // store tokens in UserDataStore
       userDataStore.setAccessToken(data.value.access);
       userDataStore.setRefreshToken(data.value.refresh);
+      // verifyAccessToken(ngencerfBaseUrl);
+      // refreshAccessToken(ngencerfBaseUrl);
       logUserIn();
       await GoToLanding();
     } 

@@ -9,7 +9,7 @@ import { useFetch } from '#app';
  * Verfies access token
  * @returns {boolean} true if access token is valid, false otherwise
  */
-export const verifyAccessToken = async (): Promise<boolean> => {
+export const verifyAccessToken = async (ngencerfBaseUrl: string): Promise<boolean> => {
   const userDataStore = useUserDataStore();
   const accessToken = userDataStore.getAccessToken();
 
@@ -20,7 +20,7 @@ export const verifyAccessToken = async (): Promise<boolean> => {
 
   // Make a request to the server to verify the access token
   // Response will be empty if token is valid or a string[] if token is invalid
-  const { data, error } = await useFetch<undefined | string[]>('/api/auth/jwt/verify', {
+  const { data, error } = await useFetch<undefined | string[]>(`${ngencerfBaseUrl}/auth/jwt/verify/`, {
     method: 'POST',
     body: { 
       token: accessToken
@@ -33,15 +33,9 @@ export const verifyAccessToken = async (): Promise<boolean> => {
     return false;
   } 
   else {
-    // Successful token verification has no response data
-    if (data.value === undefined || data.value === null) {
-      console.log('Token verification returns no errors');
+    // Access token is valid
+      console.log('Token verification successful');
       return true;
-    } 
-    else {
-      console.log('Token verification has no errors but it has unexpected data', data.value);
-      return true;
-    }
   }
 };
 
@@ -49,7 +43,7 @@ export const verifyAccessToken = async (): Promise<boolean> => {
  * Refreshes access token
  * @returns {boolean} true if access token is refreshed successfully, false otherwise
  */
-export const refreshAccessToken = async (): Promise<boolean> => {
+export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boolean> => {
   const userDataStore = useUserDataStore();
   const refreshToken = userDataStore.getRefreshToken();
 
@@ -59,7 +53,7 @@ export const refreshAccessToken = async (): Promise<boolean> => {
   }
 
   // Make a request to server to refresh the access token
-  const { data, error } = await useFetch<{ access: string }>('/api/auth/jwt/refresh', {
+  const { data, error } = await useFetch<{ access: string }>(`${ngencerfBaseUrl}/auth/jwt/refresh/`, {
     method: 'POST',
     body: { refresh: refreshToken },
   });
@@ -67,6 +61,7 @@ export const refreshAccessToken = async (): Promise<boolean> => {
   // If new access token is returned, update user data store with new access token
   if (data?.value?.access) {
     userDataStore.setAccessToken(data.value.access);
+    console.log('Access token refreshed successfully');
     return true;
   }
   // No access token returned. Refresh failed
@@ -87,18 +82,19 @@ export const refreshAccessToken = async (): Promise<boolean> => {
  * @returns response from the API call
  */
 export const makeProtectedApiCall = async <T>(
+  ngencerfBaseUrl: string,
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T | null> => {
   const userDataStore = useUserDataStore();
   
   try {
     // Verify access token before making the API call
-    const isValid = await verifyAccessToken();
+    const isValid = await verifyAccessToken(ngencerfBaseUrl);
 
     // If access token is invalid, attempt to refresh it
     if (!isValid) {
-      const refreshAccessTokenSuccess = await refreshAccessToken();
+      const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
       // if access token is invalid and refresh failed, log user out and redirect to login page
       if (!refreshAccessTokenSuccess) {
         userDataStore.logUserOut();
