@@ -50,48 +50,48 @@ FormulationName<template>
                      formulation</label>
                </span>
                <span v-show="use_sloth_parameters">
-                  <label class="inline-block text-xl pl-10 pr-4" for="SlothName">SLoTH Name:</label><input
-                     class="inline-block w-auto" id="SlothName" type="text">
+                  <label class="inline-block text-xl pl-10 pr-4" for="SlothName">SLoTH Name:</label>
+                  <input class="inline-block w-auto" id="SlothName" type="text" v-model="new_sloth_variable_name">
                   <div class="ngenButtonDiv ml-3 inline-block">
-                     <button id="SlothAddBtn">Add</button>
+                     <button id="SlothAddBtn" @click="AddSlothVariable">Add</button>
                   </div>
                </span>
                <div id="SlothDataTable" v-show="use_sloth_parameters" editMode="cell" class="items-center ml-10 mr-10 mt-4">
-                  <DataTable class="stripe" :value="sloth_parameter_inputs" editMode="cell" scrollable scroll-height="300px">
+                  <DataTable class="stripe" :value="sloth_parameter_inputs" editMode="cell" scrollable scroll-height="200px">
                      <Column field="param_name" header="SLoTH Output Var" sortable></Column>
                      <Column field="param_count" header="Count" sortable>
-                        <template #editor="{ data, field }">
-                           <InputText v-model="data[ field ]" autofocus class="w-12 p-1"></InputText>
+                        <template #editor="{ index }">
+                           <InputText v-model="sloth_parameter_inputs[ index ].param_count" autofocus class="w-12 p-1"></InputText>
                         </template>
                      </Column>
                      <Column field="param_type" header="Type" sortable>
-                        <template #editor="{ data, field }">
-                           <InputText v-model="data[ field ]" autofocus class="w-20 p-1"></InputText>
+                        <template #editor="{ index }">
+                           <InputText v-model="sloth_parameter_inputs[ index ].param_type" autofocus class="w-20 p-1"></InputText>
                         </template>
                      </Column>
                      <Column field="param_units" header="Units" sortable>
-                        <template #editor="{ data, field }">
-                           <InputText v-model="data[ field ]" autofocus class="w-12 p-1"></InputText>
+                        <template #editor="{ index }">
+                           <InputText v-model="sloth_parameter_inputs[ index ].param_units" autofocus class="w-12 p-1"></InputText>
                         </template>
                      </Column>
                      <Column field="param_location" header="Location" sortable>
-                        <template #editor="{ data, field }">
-                           <InputText v-model="data[ field ]" autofocus class="w-20 p-1"></InputText>
+                        <template #editor="{ index }">
+                           <InputText v-model="sloth_parameter_inputs[ index ].param_location" autofocus class="w-20 p-1"></InputText>
                         </template>
                      </Column>
                      <Column field="maps_to_module" header="For Module" sortable>
-                        <template #editor="{ data, field }">
-                           <InputText v-model="data[ field ]" autofocus class="w-16 p-1"></InputText>
+                        <template #editor="{ index}">
+                           <InputText v-model="sloth_parameter_inputs[ index ].maps_to_module" autofocus class="w-16 p-1"></InputText>
                         </template>
                      </Column>
                      <Column field="maps_to_variable_name" header="Module Param" sortable>
-                        <template #editor="{ data, field }">
-                           <InputText v-model="data[ field ]" autofocus fluid></InputText>
+                        <template #editor="{ index }">
+                           <InputText v-model="sloth_parameter_inputs[ index ].maps_to_variable_name" autofocus fluid></InputText>
                         </template>
                      </Column>
                      <Column field="param_value" header="Value" sortable>
-                        <template #editor="{ data, field }">
-                           <InputText v-model="data[ field ]" autofocus class="w-12 p-1"></InputText>
+                        <template #editor="{ index }">
+                           <InputText v-model="sloth_parameter_inputs[ index ].param_value" autofocus class="w-12 p-1"></InputText>
                         </template>
                      </Column>
                   </DataTable>
@@ -110,10 +110,10 @@ FormulationName<template>
 
 <script lang="ts" setup>
 import Index from "~/pages/index.vue";
-//import { mockFormulationSlothParametersData } from "~/mockApi/formulationSlothData";
-import type { SlothParameter } from "~/composables/NextGenModel";
 import { storeToRefs } from "pinia";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
+
+const new_sloth_variable_name = ref<string>("")
 
 const {
    filter_group,
@@ -125,10 +125,19 @@ const {
    fetch_formulation_module_options,
    fetch_formulation_module_covered_group_filter_options,
    fetch_formulation_module_covered_group_options, 
-   fetch_formulation_module_covered_groups
+   fetch_formulation_module_covered_groups   
 } = storeToRefs( useFormulationStore() )
 
+const { add_new_sloth_variable } = useFormulationStore()
+
 const loading = ref(true);
+
+const AddSlothVariable = () => {
+   if( new_sloth_variable_name.value.trim() != '') {
+      add_new_sloth_variable( new_sloth_variable_name.value )
+      new_sloth_variable_name.value = ''
+   }
+}
 
 onMounted(() => {
    setTimeout(() => {
@@ -154,8 +163,6 @@ const ModuleClicked = (e: MouseEvent) => {
       iele.classList.add("liActive");
    }
 };
-
-const slothParameters = ref<SlothParameter[]>([])
 
 </script>
 

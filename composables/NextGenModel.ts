@@ -220,10 +220,6 @@ export interface AlgorithmParameter {
 
 }
 
-export interface SlothParameter {
-  
-}
-
 export interface CalibrationTuningData {
   
 }

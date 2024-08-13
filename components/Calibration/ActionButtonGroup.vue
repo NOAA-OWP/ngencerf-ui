@@ -17,19 +17,23 @@
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { useToast } from "primevue/usetoast";
+import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 const { refresh_gage_tab_data, save_gage_tab_data } = useGageStore()
+const { refresh_formulation_tab_data, save_formulation_tab_data } = useFormulationStore()
+
 const toast = useToast();
 
 const { getTabIndex } = generalStore();
-
-const tabIndex = getTabIndex();
+const {  tabIndex } = storeToRefs( generalStore() )
+//const tabIndex = getTabIndex();
 
 const saveTabContent =  async () => {
   console.log( tabIndex )
-  if( tabIndex === 1 ) {
+  if( tabIndex.value === "1" ) {
     const save_tab_response = save_gage_tab_data()    
     console.log( save_tab_response )
     save_tab_response.then( ( response ) => {
@@ -37,6 +41,15 @@ const saveTabContent =  async () => {
       toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
       refresh_gage_tab_data()
     })    
+  }
+  if( tabIndex.value === "2" ) {
+    const save_formulation_response = save_formulation_tab_data()
+    console.log( save_formulation_response )
+    save_formulation_response.then( ( response ) => {
+      console.log( response )
+      toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
+      refresh_formulation_tab_data()
+    }) 
   }
 }
 

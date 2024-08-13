@@ -50,9 +50,12 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    function selected_module_covered_groups() {
       let selected_groups = <string[]>[]
       formulation_tab_data.value?.modules.forEach( ( module_data ) => {
-         if( formulation_tab_data.value?.module_sources.includes( module_data.name  ) ) {
+         if( selected_module_values.value.includes( module_data.name ) ) {
             selected_groups = selected_groups.concat( module_data.groups )
          }
+         // if( formulation_tab_data.value?.module_sources.includes( module_data.name  ) ) {
+         //    selected_groups = selected_groups.concat( module_data.groups )
+         // }
       })      
       return selected_groups
    }
@@ -87,6 +90,35 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       return group_options_list
    })
 
+   function add_new_sloth_variable( variable_name:string ): void {
+      sloth_parameter_inputs.value.push({
+         "param_name": variable_name,
+         "param_count": 1,
+         "param_type": "",
+         "param_units": "",
+         "param_location": "node",
+         "param_value": 0.0,
+         "maps_to_module": "",
+         "maps_to_variable_name": ""
+      })
+   }
+
+   async function save_formulation_tab_data() {
+      const response = await $fetch( '/api/calibration/save_formulation_tab', {
+         method: "POST",
+         headers: { authorization: useUserDataStore().getUserToken() },
+         body: JSON.stringify( { 
+            calibration_run_id: current_calibration_job_id.value, 
+            formulation_name: formulation_name_input.value, 
+            modules: selected_module_values.value, 
+            use_sloth: use_sloth_parameters.value,
+            sloth_parameters: sloth_parameter_inputs.value
+         })
+      })
+
+      return response
+   }
+
    return {
       formulation_tab_data,
       filter_group,
@@ -99,7 +131,9 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       fetch_formulation_module_options,
       fetch_formulation_module_covered_groups,
       fetch_formulation_module_covered_group_filter_options,
-      fetch_formulation_module_covered_group_options
+      fetch_formulation_module_covered_group_options,
+      add_new_sloth_variable,
+      save_formulation_tab_data
    }
 })
 

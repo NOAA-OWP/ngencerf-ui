@@ -15,7 +15,7 @@ export const generalStore = defineStore(
     function setTabIndex(tab: number) {
       tabIndex.value = tab.toString();
     }
-    return { getTabIndex, setTabIndex };
+    return { tabIndex, getTabIndex, setTabIndex };
   },
   {
     persist: {
