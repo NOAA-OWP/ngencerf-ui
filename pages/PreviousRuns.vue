@@ -33,7 +33,7 @@
               </DataTable>
             </div>
             <div class="asteriskText">
-              * Double click on a row to recall a Calibration run, right-click for more options or click the New button.
+              * Right click on a row for Open, Clone or Delete options, or click on then New button.
             </div>
           </div>
         </div>
@@ -193,7 +193,7 @@ const NewCalibration = async () => {
 .asteriskText {
   text-align: center;
   margin-top: 20px;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 1.2em;
 }
 </style>

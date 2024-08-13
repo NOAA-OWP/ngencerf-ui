@@ -9,12 +9,12 @@
           <div class="col-span-8">
             <div class="h-full grid grid-rows-12">
               <div class="grid row-span-12">
-                <LeftBlock />
+                <CalibrationLeftBlock/>
               </div>
             </div>
           </div>
           <div class="col-span-4">
-            <RightBlock/>
+            <CalibrationRightBlock/>
           </div>
         </div>
       </div>
@@ -26,8 +26,8 @@
 <script setup lang="ts">
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
-import RightBlock from "~/components/Calibration/RightBlock.vue";
-import LeftBlock from "~/components/Calibration/LeftBlock.vue";
+import RightBlock from "~/components/Calibration/CalibrationRightBlock.vue";
+import LeftBlock from "~/components/Calibration/CalibrationLeftBlock.vue";
 
 </script>
 <style lang="scss" scoped>

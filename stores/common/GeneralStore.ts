@@ -1,21 +1,50 @@
 // @ts-check
-
-
+/**
+ *  The General Store will be responsible for handling information OUTSIDE of the data needed for the back end.
+ *  Data will include the current menu status and the current tab status for each of the 4 menu items
+ */
 import { defineStore } from "pinia";
 import piniaPluginPersistedState from "pinia-plugin-persistedstate"
 
 export const generalStore = defineStore(
   "generalStore",
   () => {
-    const tabIndex = ref("1");
+    const calibrationTabIndex = ref("1");
+    const evaluationTabIndex = ref("1");
+    const menuIndex = ref("1");
 
-    function getTabIndex() {
-      return parseInt(tabIndex.value);
+    // Top Menu index
+    function getMenuIndex() {
+      return parseInt(menuIndex.value);
     }
-    function setTabIndex(tab: number) {
-      tabIndex.value = tab.toString();
+    function setMenuIndex(tab: number) {
+      menuIndex.value = tab.toString();
     }
-    return { tabIndex, getTabIndex, setTabIndex };
+    // setEvaluationTabIndex
+    // Calibration Tab index
+    function getCalibrationTabIndex() {
+      return parseInt(calibrationTabIndex.value);
+    }
+    function setCalibrationTabIndex(tab: number) {
+      calibrationTabIndex.value = tab.toString();
+    }
+
+    // Evaluation Tab index
+    function getEvaluationTabIndex() {
+      return parseInt(evaluationTabIndex.value);
+    }
+    function setEvaluationTabIndex(tab: number) {
+      evaluationTabIndex.value = tab.toString();
+    }
+
+    return { 
+      getMenuIndex,
+      setMenuIndex,      
+      getCalibrationTabIndex, 
+      setCalibrationTabIndex,
+      getEvaluationTabIndex,
+      setEvaluationTabIndex
+    };
   },
   {
     persist: {

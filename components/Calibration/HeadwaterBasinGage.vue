@@ -102,8 +102,6 @@
   </client-only>
 </template>
 <script lang="ts" setup>
-import Tabs from "~/components/Calibration/Tabs.vue";
-import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 import { useGageStore } from "~/stores/calibration/GageStore";
 // const calibrationJobStore = useCalibrationJobStore()

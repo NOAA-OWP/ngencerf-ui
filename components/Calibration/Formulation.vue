@@ -109,7 +109,6 @@ FormulationName<template>
 </template>
 
 <script lang="ts" setup>
-import Index from "~/pages/index.vue";
 import { storeToRefs } from "pinia";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 

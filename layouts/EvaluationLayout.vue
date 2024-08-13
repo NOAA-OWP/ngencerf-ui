@@ -7,10 +7,17 @@
         </div>
       </div>
       <div class="h-full grid row-span-10 gap-2">
-        <div class="h-full grid row-span-10 gap-2">
-
-          <h1 class="text-center mt-10">EVALUATION</h1>
-
+        <div class="grid grid-cols-12">
+          <div class="col-span-8">
+            <div class="h-full grid grid-rows-12">
+              <div class="grid row-span-12">
+                <EvaluationLeftBlock />
+              </div>
+            </div>
+          </div>
+          <div class="col-span-4">
+            <EvaluationRightBlock />
+          </div>
         </div>
       </div>
       <div class="row-span-1">
@@ -23,8 +30,8 @@
 <script setup lang="ts">
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
+import EvaluationRightBlock from "~/components/Evaluation/EvaluationRightBlock.vue";
+import EvaluationLeftBlock from "~/components/Evaluation/EvaluationLeftBlock.vue";
 
 </script>
-<style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
-</style>
+<style lang="scss" scoped></style>

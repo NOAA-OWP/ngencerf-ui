@@ -7,20 +7,22 @@
         <NuxtLink to="LandingPage">NgenCERF</NuxtLink>
       </div>
       <div id="Col2" class="col-span-8">
+
         <ul v-show="isUserLoggedIn() && location.name !== 'Login' && location.name !=='LandingPage'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
-            <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration">Calibration</NuxtLink>
+            <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1' @click="MenuChanged">Calibration</NuxtLink>
           </li>
           <li aria-label="Evaluation" title="Evaluation">
-            <NuxtLink :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation">Evaluation</NuxtLink>
+            <NuxtLink :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2' @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast">Forecast</NuxtLink>
+            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3' @click="MenuChanged">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
-            <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification">Verification</NuxtLink>
+            <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4' @click="MenuChanged">Verification</NuxtLink>
           </li>
         </ul>
+        
       </div>
 
       <div id="Circles" class="col-span-2">
@@ -37,6 +39,9 @@
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+
+const { setMenuIndex } = generalStore();
 const { isUserLoggedIn, getUserName } = useUserDataStore();
 const location = useRoute();
 const userMenuShowing = ref(false);
@@ -46,6 +51,11 @@ const getUserInitials = () => {
   return (fullname=>fullname.map((n, i)=>(i==0||i==fullname.length-1)&&n[0]).filter(n=>n).join(""))
   (name.split(" "));
 };
+
+const MenuChanged = (e) => {
+  const m = e.currentTarget.getAttribute('data-menu');
+  setMenuIndex(m);
+}
 </script>
 
 <style lang="scss" scoped>
