@@ -18,9 +18,9 @@
                         <Column field="runDate" header="Run Date" sortable></Column>
                         <Column field="formulationName" header="Formulation Name" sortable></Column>
                         <Column field="headwaterBasinGage" header="Headwater Basin Gage" sortable></Column>
-                        <Column field="objectiveFunction" header="ObjectiveFunction" sortable></Column>
+                        <Column field="objectiveFunction" header="Objective Function" sortable></Column>
                         <Column field="optimizationAlgorithm" header="Optimization Algorithm" sortable></Column>
-                        <Column field="validationRuns" header="ValidationRuns" sortable></Column>
+                        <Column field="validationRuns" header="Validation Runs" sortable></Column>
                     </DataTable>
                 </div>
             </div>
@@ -146,7 +146,7 @@ const NewCalibration = async () => {
 }
 
 #CalTable {
-    width: 80%;
+    width: 1000px;
     margin: 0 auto;
     border: 1px solid $ngwcp_primary1;
 

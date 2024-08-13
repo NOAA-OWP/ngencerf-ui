@@ -122,6 +122,7 @@ const griddedTempData = [
 </script>
 
 <style lang="scss" scoped>
+@import "/assets/styles/styles.scss";
 #ValRunSelects>div>div {
   margin: 0 auto;
 }
