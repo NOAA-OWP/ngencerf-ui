@@ -50,6 +50,7 @@ const props = defineProps<{
 <style lang="scss" scoped>
 #ProgressTable {
   width: 100%;
+  margin-left: 15px;
   tr {
     line-height: calc(1.3vw + 0.41vh);    // font-size: 14px;
   }

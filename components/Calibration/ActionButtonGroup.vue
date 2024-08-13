@@ -2,25 +2,25 @@
   <div id="BottomButtons" class="grid grid-cols-12 w-full">
 
     <div class="col-span-2">
-      <button v-if="getTabIndex() < 6" class="start actionBtn">{{ getTabIndex() < 5 ? "SAVE" : "START" }}</button>
+      <button v-if="getCalibrationTabIndex() < 6" class="start actionBtn">{{ getCalibrationTabIndex() < 5 ? "SAVE" : "START" }}</button>
     </div>
     <div class="col-span-2">
-      <button v-if="getTabIndex() < 6" :class="getTabIndex() < 5 ? 'save' : 'stop'" class="actionBtn">{{ getTabIndex() < 5 ? "RESET" : "STOP" }}</button>
+      <button v-if="getCalibrationTabIndex() < 6" :class="getCalibrationTabIndex() < 5 ? 'save' : 'stop'" class="actionBtn">{{ getCalibrationTabIndex() < 5 ? "RESET" : "STOP" }}</button>
     </div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-2 text-right"><button class="prev actionBtnSmall">&#8678; Prev</button></div>
-    <div class="col-span-2"><button v-if="getTabIndex() < 6" class="next actionBtnSmall">Next <span>&#8680;</span></button></div>
+    <div class="col-span-2"><button v-if="getCalibrationTabIndex() < 6" class="next actionBtnSmall">Next <span>&#8680;</span></button></div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
-const { getTabIndex } = generalStore();
+const { getCalibrationTabIndex } = generalStore();
 
-const tabIndex = getTabIndex();
+const tabIndex = getCalibrationTabIndex();
 
 </script>
 
