@@ -6,18 +6,27 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { select_option, sloth_parameter_data } from "~/composables/NextGenModel";
 
 export const useFormulationStore = defineStore( 'FormulationStore', () => {
+   /**
+    * init store
+    */
    const calibrationJobCommonStore = useCalibrationJobCommonStore()
-   const { current_calibration_job_id } = storeToRefs( calibrationJobCommonStore )
 
+   /**
+    * define ref
+    */
+   const { current_calibration_job_id } = storeToRefs( calibrationJobCommonStore )
    const filter_group = ref<string>("")
    const selected_module_values = ref<string[]>([])
    const formulation_name_input = ref<string>("")
    const sloth_parameter_inputs = ref<sloth_parameter_data[]>([])
    const use_sloth_parameters = ref<boolean>( false )
 
+   /**
+    * query load_formulation_tab API on store mount
+    */
    const { data: formulation_tab_data, refresh: refresh_formulation_tab_data, status: load_formulation_tab_status } = useFetch( '/api/calibration/load_formulation_tab', {
-      'method': 'POST',
-      headers: { authorization: useUserDataStore().getUserToken() },
+      method: 'POST',
+      headers: { Athorization: `Bearer: ${useUserDataStore().getAccessToken()}` },
       body: JSON.stringify( { calibration_run_id: current_calibration_job_id.value } )
    })
 
@@ -37,7 +46,6 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    function fetch_module_covered_group_list() {
       let groups_list = <string[]>[]
       formulation_tab_data.value?.modules.forEach( ( module_data ) => {
-         //groups_list = groups_list.concat( module_data.groups ).unique()
          groups_list = [ ...new Set([ ...groups_list, ...module_data.groups ]) ]
       })
       return groups_list
@@ -53,9 +61,6 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
          if( selected_module_values.value.includes( module_data.name ) ) {
             selected_groups = selected_groups.concat( module_data.groups )
          }
-         // if( formulation_tab_data.value?.module_sources.includes( module_data.name  ) ) {
-         //    selected_groups = selected_groups.concat( module_data.groups )
-         // }
       })      
       return selected_groups
    }
@@ -106,7 +111,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    async function save_formulation_tab_data() {
       const response = await $fetch( '/api/calibration/save_formulation_tab', {
          method: "POST",
-         headers: { authorization: useUserDataStore().getUserToken() },
+         headers: { Athorization: `Bearer: ${useUserDataStore().getAccessToken()}` },
          body: JSON.stringify( { 
             calibration_run_id: current_calibration_job_id.value, 
             formulation_name: formulation_name_input.value, 

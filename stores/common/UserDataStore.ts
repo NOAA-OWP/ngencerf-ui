@@ -3,25 +3,76 @@
 import { defineStore } from "pinia";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
-  const isLoggedIn = ref(true);
+  const isLoggedIn = ref<boolean>(true);
+  const accessToken = ref<string | null>(null);
+  const refreshToken = ref<string | null>(null);
 
-  function isUserLoggedIn() {
+  /**
+   * Checks if user is logged in
+   * @returns {boolean} true if user is logged in, false otherwise.
+   */
+  function isUserLoggedIn(): boolean {
     return isLoggedIn.value;
   }
-  function logUserIn() {
+
+  /**
+   * Logs user in by setting isLoggedIn to true
+   */
+  function logUserIn(): void {
     console.log("User is logged In");
     isLoggedIn.value = true;
   }
-  function logUserOut() {
+
+  /**
+   * Logs user out by setting isLoggedIn to false and setting access and refresh tokens to null
+   */
+  function logUserOut(): void {
     console.log("User is logged out");
     isLoggedIn.value = false;
-  }
-  function getUserName() {
-    return "Herbert Hover";
+    accessToken.value = null;
+    refreshToken.value = null;
   }
 
-  function getUserToken() {
-    return 'token'
+  /**
+   * Gets username
+   * @returns {string} name of user
+   */
+  function getUserName(): string {
+    return "Herbert Hoover";
+  }
+
+  /**
+   * Sets access token
+   * @param {string} token - access token
+   */
+  function setAccessToken(token: string): void {
+    accessToken.value = token;
+    console.log("Access token: ", getAccessToken());
+  }
+
+  /**
+   * Sets refresh token
+   * @param {string} token - refresh token
+   */
+  function setRefreshToken(token: string): void {
+    refreshToken.value = token;
+    console.log("Refresh token: ", getRefreshToken());
+  }
+
+  /**
+   * Gets access token
+   * @returns {string | null} access token, or null if not set
+   */
+  function getAccessToken(): string | null {
+    return accessToken.value;
+  }
+
+  /**
+   * Gets refresh token
+   * @returns {string | null} refresh token, or null if not set
+   */
+  function getRefreshToken(): string | null {
+    return refreshToken.value;
   }
 
   return {
@@ -29,8 +80,10 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     logUserIn,
     logUserOut,
     getUserName,
-    getUserToken,
-
+    setAccessToken,
+    setRefreshToken,
+    getAccessToken,
+    getRefreshToken,
   };
 });
 

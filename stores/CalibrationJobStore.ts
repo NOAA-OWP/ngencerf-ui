@@ -1,24 +1,20 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { mockedCalibrationRunData } from "@/mockApi/calibrationRunData"
 import { mockedJobListItemData } from "~/mockApi/calibrationAPIData";
 import { useUserDataStore } from "./common/UserDataStore";
-import type { CalibrationRun, jobs_list, job_list_item, user } from "~/composables/NextGenModel";
-//import { useGageStore } from "./calibration/GageStore";
+import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useCalibrationJobCommonStore } from "./calibration/CalibrationJobCommonStore";
+import type { CalibrationRun, jobs_list, job_list_item, user } from "~/composables/NextGenModel";
 
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
-  const { getUserToken } = useUserDataStore()
+  const { ngencerfBaseUrl } = useBackendConfig();
+  const { getAccessToken } = useUserDataStore()
   const calibrationJobCommonStore = useCalibrationJobCommonStore()
   const { current_calibration_job_id } = storeToRefs( calibrationJobCommonStore )
-  //const selected_job = ref<number>(0)
-  //const gageStore = useGageStore() 
-  // const { fetch_gage_tab_data } = storeToRefs( gageStore )
-  // const { refresh_gage_tab_data } = gageStore
 
   const { data: jobs_list_data, refresh: refresh_job_list_data } = useFetch( '/api/get_jobs', {
-    headers: { authorization: getUserToken() }
+    headers: { Athorization: `Bearer: ${getAccessToken()}` }
   })
 
   const fetch_jobs_list_data = computed( () => {
@@ -49,7 +45,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
   async function fetch_new_calibration_run_id() {
     const { data: new_calibration_job_id } = await useFetch( '/api/calibration/create_calibration_run', {
       method: "POST",
-      headers: { authorization: getUserToken() }
+      headers: { Athorization: `Bearer: ${getAccessToken()}` }
     })
     return new_calibration_job_id
   }
