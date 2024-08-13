@@ -126,17 +126,6 @@
 
       </div>
 
-      <!-- <div class="row-span-1">
-        <div id="TuningDataList">
-          <DataTable :value="calibrationTuningDataList" scrollable scroll-height="200px">
-            <Column field="parameter" header="Parameter" sortable></Column>
-            <Column field="min" header="Min" sortable></Column>
-            <Column field="max" header="Max" sortable></Column>
-            <Column field="initValue" header="Initial Value" sortable></Column>
-          </DataTable>
-        </div>
-      </div> -->
-
       <div class="row-span-6">
       </div>
 
