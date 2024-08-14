@@ -28,7 +28,7 @@ Make sure to install the dependencies:
 npm install
 ```
 
-## Development Server
+## Development
 
 If using `ngencerf-server`, set environment variable `NGENCERF_BASE_URL` to the Ngencerf server base URL you're using:
 
@@ -36,13 +36,37 @@ If using `ngencerf-server`, set environment variable `NGENCERF_BASE_URL` to the 
 export NGENCERF_BASE_URL=http://exampleurl
 ```
 
-Note it uses `http://localhost:8000`, which is the default local URL used by Ngencerf server, by default if `NGENCERF_BASE_URL` is not set
+Note `http://localhost:8000` is used by default if `NGENCERF_BASE_URL` is not set
 
 Start the development server on `http://localhost:3000`:
 
 ```bash
 # npm
 npm run dev
+```
+
+### Adding Authenticated API Calls to ngencerf-server
+
+If you need to make authenticated API calls to `ngencerf-server`, use the `makeProtectedApiCall` function from `~/utils/UserAuth.ts`. This function will automatically refresh the access token if it has expired. Access tokens expire every 15 minutes and refresh tokens expire every hour. When the refresh token expires, the user will be redirected to the login page and will need to log in again.
+
+Here is an example of how to use `makeProtectedApiCall`:
+
+```typescript
+import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+
+const userDataStore = useUserDataStore();
+
+const protectedApiCallOutput: string | null = await makeProtectedApiCall(
+  `${ngencerfBaseUrl}/calibration/get_footer/`,
+  {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${userDataStore.getAccessToken()}`
+    }
+  }
+);
+console.log("protectedApiCallOutput:", protectedApiCallOutput);
 ```
 
 ## Production
