@@ -4,10 +4,20 @@
       <div class="row-span-1">
         <div class="grid grid-cols-3">
           <div class="col-span-2">
-            <div id="ActionButtons" class="footerColor"
-              v-if="isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns' && location.name !== 'Login'">
-              <ActionButtonGroup />
-            </div>
+
+            <span v-if="location.name === 'Calibration'">
+              <div id="ActionButtons" class="footerColor"
+                v-if="isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns' && location.name !== 'Login'">
+                <CalibrationButtonGroup />
+              </div>
+            </span>
+
+            <span v-else>
+              <div id="ActionButtons" class="footerColor"
+                v-if="isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns' && location.name !== 'Login'">
+                <EvaluationButtonGroup/>
+              </div>             
+            </span>
           </div>
         </div>
       </div>
@@ -27,8 +37,11 @@
 
 <script lang="ts" setup>
 import json from "@/assets/versionInfo.json";
-import ActionButtonGroup from "../Calibration/ActionButtonGroup.vue";
+import CalibrationButtonGroup from "../Calibration/CalibrationButtonGroup.vue";
+import EvaluationButtonGroup from "../Evaluation/EvaluationButtonGroup.vue";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useRoute } from "vue-router";
+
 const { isUserLoggedIn, getUserName } = useUserDataStore();
 const location = useRoute();
 const info = json;

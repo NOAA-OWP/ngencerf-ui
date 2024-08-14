@@ -33,7 +33,6 @@
 
 </template>
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 import AppHeader from '~/components/Common/AppHeader.vue';
 import AppFooter from '~/components/Common/AppFooter.vue';
 

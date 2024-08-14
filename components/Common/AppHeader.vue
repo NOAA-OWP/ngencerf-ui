@@ -52,9 +52,12 @@ const getUserInitials = () => {
   (name.split(" "));
 };
 
-const MenuChanged = (e) => {
-  const m = e.currentTarget.getAttribute('data-menu');
-  setMenuIndex(m);
+const MenuChanged = (e: MouseEvent) => {
+  const ele = e.currentTarget as HTMLElement;
+  const m = ele.getAttribute('data-menu');
+  if(m) {
+    setMenuIndex(parseInt(m, 10));
+  }
 }
 </script>
 
