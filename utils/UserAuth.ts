@@ -7,6 +7,7 @@ import { useFetch } from '#app';
 
 /**
  * Verfies access token
+ * @param ngencerfBaseUrl
  * @returns {boolean} true if access token is valid, false otherwise
  */
 export const verifyAccessToken = async (ngencerfBaseUrl: string): Promise<boolean> => {
@@ -41,6 +42,7 @@ export const verifyAccessToken = async (ngencerfBaseUrl: string): Promise<boolea
 
 /**
  * Refreshes access token
+ * @param ngencerfBaseUrl
  * @returns {boolean} true if access token is refreshed successfully, false otherwise
  */
 export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boolean> => {
@@ -77,16 +79,19 @@ export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boole
 
 /**
  * This function makes a protected-API call to the server
+ * @param ngencerfBaseUrl
  * @param url 
  * @param options 
  * @returns response from the API call
  */
 export const makeProtectedApiCall = async <T>(
-  ngencerfBaseUrl: string,
   url: string,
   options: RequestInit = {},
 ): Promise<T | null> => {
   const userDataStore = useUserDataStore();
+  const parsedUrl = new URL(url);
+  const ngencerfBaseUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
+
   
   try {
     // Verify access token before making the API call

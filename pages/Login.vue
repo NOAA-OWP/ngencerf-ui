@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { refreshAccessToken, verifyAccessToken } from "~/utils/UserAuth"
+import { refreshAccessToken, verifyAccessToken } from "~/utils/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import AppFooter from "~/components/Common/AppFooter.vue";
@@ -97,8 +97,8 @@ const SubmitLoginForm = async (e: Event) => {
       // store tokens in UserDataStore
       userDataStore.setAccessToken(data.value.access);
       userDataStore.setRefreshToken(data.value.refresh);
-      // verifyAccessToken(ngencerfBaseUrl);
-      // refreshAccessToken(ngencerfBaseUrl);
+      // await verifyAccessToken(ngencerfBaseUrl);
+      // await refreshAccessToken(ngencerfBaseUrl);
       logUserIn();
       await GoToLanding();
     } 
