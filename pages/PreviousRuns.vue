@@ -48,7 +48,6 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import AppFooter from "~/components/Common/AppFooter.vue";

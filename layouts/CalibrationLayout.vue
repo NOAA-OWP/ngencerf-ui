@@ -26,8 +26,8 @@
 <script setup lang="ts">
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
-import RightBlock from "~/components/Calibration/CalibrationRightBlock.vue";
-import LeftBlock from "~/components/Calibration/CalibrationLeftBlock.vue";
+import CalibrationRightBlock from "~/components/Calibration/CalibrationRightBlock.vue";
+import CalibrationLeftBlock from "~/components/Calibration/CalibrationLeftBlock.vue";
 
 </script>
 <style lang="scss" scoped>

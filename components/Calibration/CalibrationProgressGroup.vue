@@ -1,8 +1,8 @@
 <template>
    <client-only>
-    <table id="ProgressTable" class="prevent-select">
+    <table id="CalibrationProgressTable" class="prevent-select">
       <tr>
-        <td><i v-if="props.progress.headwater_basin_gage" class="pi pi-check font-bold  checkMark"></i></td>        
+        <td><i v-if="props.progress.headwater_basin_gage" class="pi pi-check font-bold checkMark"></i></td>        
         <td class="ptype">Headwater Basin Gage</td>
       </tr>
       <tr>
@@ -15,7 +15,7 @@
       </tr>
       <tr>
         <td><i v-if="props.progress.calibration_stop_criteria" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype">calibration Output Variable</td>
+        <td class="ptype">Calibration Output Variable</td>
       </tr>
       <tr>
         <td><i v-if="props.progress.tuning_parameters" class="pi pi-check font-bold checkMark"></i></td>
@@ -23,7 +23,7 @@
       </tr>
       <tr>
         <td><i v-if="props.progress.optimization_algorithm" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype">optimization Algorithm</td>
+        <td class="ptype">Optimization Algorithm</td>
       </tr>
       <tr>
         <td><i v-if="props.progress.objective_function" class="pi pi-check font-bold checkMark"></i></td>
@@ -43,12 +43,12 @@
 
 <script lang="ts" setup>
 const props = defineProps<{
-  progress: Progress;
+  progress: CalibrationProgress;
 }>();
 </script>
 
 <style lang="scss" scoped>
-#ProgressTable {
+#CalibrationProgressTable {
   width: 100%;
   margin-left: 15px;
   tr {
