@@ -53,7 +53,10 @@ Here is an example of how to use `makeProtectedApiCall`:
 
 ```typescript
 import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+
+const { ngencerfBaseUrl } = useBackendConfig();
 
 const userDataStore = useUserDataStore();
 
