@@ -14,7 +14,7 @@ export const generalStore = defineStore(
     const menuIndex = ref("1");
     
     // Has the user selected a previous calibration run for Evaluation?
-    const evaluationRunSelected = ref(false);
+    const evaluationRunSelected = ref(true);
 
     // Top Menu index
     function getMenuIndex() {

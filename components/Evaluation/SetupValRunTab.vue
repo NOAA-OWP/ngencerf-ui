@@ -61,8 +61,8 @@
             </DataTable>
             <div class="mb-5 ngenButtonDiv clearTableBtn"><button>Clear <i class="pi pi-arrow-up"></i></button>
             </div>
-
           </div>
+
         </div>
 
         <div class="col-span-1">
@@ -74,8 +74,8 @@
             </DataTable>
             <div class="mb-5 ngenButtonDiv clearTableBtn"><button>Clear <i class="pi pi-arrow-up"></i></button>
             </div>
-
           </div>
+          
         </div>
       </div>
     </div>

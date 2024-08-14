@@ -5,7 +5,7 @@
       <div id="TopRightBlock" class="row-span-5">
         <div class="grid grid-cols-2">
           <div id="ProgressGroup" class="col-span-1">
-            <ProgressGroup :progress="progress" />
+            <EvaluatonProgressGroup :progress="progress" />
           </div>
           <div id="GageCutout" class="col-span-1">
             <GageCutout />
@@ -22,8 +22,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import type { Progress } from "~/composables/NextGenModel";
-import ProgressGroup from "../Common/ProgressGroup.vue";
+import type { EvaluationProgress } from "~/composables/NextGenModel";
+import EvaluatonProgressGroup from "./EvaluatonProgressGroup.vue";
 import MessagesGroup from "../Common/MessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 
@@ -33,19 +33,16 @@ const { getEvalRunSelected } = generalStore();
 const displayRightBlock = ref(getEvalRunSelected());
 
 
-
-const progress: Progress = {
+const progress: EvaluationProgress = {
   headwater_basin_gage: true,
   formulation: false,
-  start_and_end_times: false,
+  parameters_set: false,
   calibration_output_variable: false,
-  tuning_parameters: false,
-  optimization_algorithm: false,
-  objective_function: false,
-  calibration_stop_criteria: false,
-  metrics_plot_inteval: false,
-};  // height: auto;
-// width: 98%;
+  metrics: false,
+  time_period: false,
+  output_variable: false,
+  reference_dataset: false,
+};
 
 </script>
 <style lang="scss" scoped>
@@ -58,9 +55,6 @@ const progress: Progress = {
 }
 
 #MessagesGroup {
-  //max-height: 454px;
-  // height: auto;
-  // width: 98%;
   font-size: .9em;
 }
 
@@ -69,7 +63,6 @@ const progress: Progress = {
 }
 
 #ProgressGroup {
-  margin-left: 10px;
   padding: 10px;
 }
 

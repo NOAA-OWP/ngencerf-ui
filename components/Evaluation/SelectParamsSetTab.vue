@@ -1,9 +1,9 @@
 <template>
     <div class="grid grid-rows-2">
-        <div class="row-span-1">
-            <div class="tableTitle">Run Details</div>
-            <div id="RunDetailsTbl" class="text-center mt-3 boxed p-3">
-                <DataTable class="dtable" :value="runDetailData" scrollable scroll-height="200px" fixedHeader=true>
+        <div class="row-span-1">           
+            <div id="RunDetailsTbl" class="text-left mt-3 p-3">
+                <div class="tableTitle">Run Details</div>
+                <DataTable class="dtable boxed" :value="runDetailData" scrollable scroll-height="200px" fixedHeader=true>
                     <Column field="iteration" header="Iteration" sortable></Column>
                     <Column field="objective_function_value" header="Objective Function Value" sortable></Column>
                     <Column field="metric_1" header="Metric 1" sortable></Column>
@@ -14,10 +14,10 @@
                 </DataTable>
             </div>
         </div>
-        <div class="row-span-1 mt-3">
-            <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
-            <div id="CalTuningParamsTbl" class="text-center mt-3 boxed p-3">
-                <DataTable class="dtable" :value="tuningParamsData" scrollable scroll-height="200px" fixedHeader=true>
+        <div class="row-span-1 mt-3">           
+            <div id="CalTuningParamsTbl" class="text-left mt-3 p-3">
+                 <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
+                <DataTable class="dtable boxed" :value="tuningParamsData" scrollable scroll-height="200px" fixedHeader=true>
                     <Column field="iteration" header="Iteration" sortable></Column>
                     <Column field="param_1" header="Param 1" sortable></Column>
                     <Column field="param_2" header="Param 2" sortable></Column>
@@ -62,7 +62,7 @@ const tuningParamsData = [
 }
 
 .tableTitle {
-    margin: 15px 0 10px 100px;
+    margin: 15px 0 10px 0;
     font-size: 1.5em;
 
 }

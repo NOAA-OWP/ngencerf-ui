@@ -138,7 +138,7 @@ export interface name_description_type {
   data_type: String
 }
 
-export interface Progress {
+export interface CalibrationProgress {
   headwater_basin_gage: Boolean;
   formulation: Boolean;
   start_and_end_times: Boolean;
@@ -148,6 +148,17 @@ export interface Progress {
   objective_function: Boolean;
   calibration_stop_criteria: Boolean;
   metrics_plot_inteval: Boolean;
+}
+
+export interface EvaluationProgress {
+  headwater_basin_gage: Boolean;
+  formulation: Boolean;
+  parameters_set: Boolean;
+  calibration_output_variable: Boolean;
+  metrics: Boolean;
+  time_period: Boolean;
+  output_variable: Boolean;
+  reference_dataset: Boolean;
 }
 
 export interface GageData {
