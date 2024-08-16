@@ -26,7 +26,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
     */
    const { data: formulationTabData, refresh: refreshFormulationTabData, status: loadFormulationTabStatus } = useFetch( '/api/calibration/load_formulation_tab', {
       method: 'POST',
-      headers: { Athorization: `Bearer: ${useUserDataStore().getAccessToken()}` },
+      headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
       body: JSON.stringify( { calibration_run_id: currentCalibrationJobId.value } )
    })
 
@@ -111,7 +111,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    async function saveFormulationTabData() {
       const response = await $fetch( '/api/calibration/save_formulation_tab', {
          method: "POST",
-         headers: { Athorization: `Bearer: ${useUserDataStore().getAccessToken()}` },
+         headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
          body: JSON.stringify( { 
             calibration_run_id: currentCalibrationJobId.value, 
             formulation_name: formulationNameInput.value, 

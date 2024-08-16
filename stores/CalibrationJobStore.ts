@@ -13,7 +13,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    const { currentCalibrationJobId } = storeToRefs( calibrationJobCommonStore )
 
    const { data: jobsListData, refresh: refreshJobListData } = useFetch( '/api/get_jobs', {
-      headers: { Athorization: `Bearer: ${getAccessToken()}` }
+      headers: { Authorization: `Bearer ${getAccessToken()}` }
    })
 
    /**
@@ -54,7 +54,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    async function fetchNewCalibrationRunId() {
       const { data: new_calibration_job_id } = await useFetch( '/api/calibration/create_calibration_run', {
          method: "POST",
-         headers: { Athorization: `Bearer: ${getAccessToken()}` }
+         headers: { Authorization: `Bearer ${getAccessToken()}` }
       })
       return new_calibration_job_id
    }

@@ -24,7 +24,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
     */
    const { data: gageTabData, refresh: refreshGageTabData, status: loadGageTabStatus } = useFetch( '/api/calibration/load_gage_tab', {
       'method': 'POST',
-      headers: { Athorization: `Bearer: ${useUserDataStore().getAccessToken()}` },
+      headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
       body: JSON.stringify( { calibration_run_id: currentCalibrationJobId.value } )
    })
 
@@ -90,7 +90,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
    async function saveGageTabData() {
       const response = await $fetch( '/api/calibration/save_gage_tab', {
          method: "POST",
-         headers: { Athorization: `Bearer: ${useUserDataStore().getAccessToken()}` },
+         headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
          body: JSON.stringify( { calibration_run_id: currentCalibrationJobId.value, gage_id: selectedGageValue, forcing_source: selectedForcingValue, observational_source: selectedObservationalValue } )
       })
 
