@@ -6,30 +6,30 @@
           <div class="grid grid-cols-4 gap=4">
             <div class="col-span-1">              
               <label for="domain_dd">Domain: </label><br />
-              <Dropdown v-model="selected_domain_value" :options="get_domain_options_list" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
+              <Dropdown v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
             </div>
             <div class="col-span-1">
               <label for="gage_dd">Gage: </label><br />
-              <Dropdown v-model="selected_gage_value" filter :options="get_gage_options_list" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>              
+              <Dropdown v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>              
             </div>
             <div class="col-span-1">
               <label for="forcing_dd">Forcing: </label><br />
-              <span v-if="selected_forcing_value != 'upload'">
-              <Dropdown v-model="selected_forcing_value" :options="get_forcing_options_list" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
+              <span v-if="selectedForcingValue != 'upload'">
+              <Dropdown v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
               </span>
-              <span v-if="selected_forcing_value == 'upload'">
+              <span v-if="selectedForcingValue == 'upload'">
                 <FileUpload mode="basic" name="forcing_files[]" :multiple="true" url="/api/calibration/upload_forcing_data" :maxFileSize="1000000" @upload="onForcingFileUpload" />
-                <Button label="Cancel Upload" @click="selected_forcing_value=''"></Button>
+                <Button label="Cancel Upload" @click="selectedForcingValue=''"></Button>
               </span>
             </div>
             <div class="col-span-1">
               <label for="observational_dd">Observational: </label><br />
-              <span v-if="selected_observational_value != 'upload'">
-              <Dropdown v-model="selected_observational_value" :options="get_observational_options_list" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
+              <span v-if="selectedObservationalValue != 'upload'">
+              <Dropdown v-model="selectedObservationalValue" :options="getObservationalOptionsList" optionLabel="name" optionValue="code" placeholder=" ... " class="w-80"></Dropdown>
               </span>
-              <span v-if="selected_observational_value == 'upload'">
+              <span v-if="selectedObservationalValue == 'upload'">
                 <FileUpload mode="basic" name="observational_files[]" :multiple="true" url="/api/calibration/upload_observational_data" :maxFileSize="1000000" @upload="onObservationalFileUpload" />
-                <Button label="Cancel Upload" @click="selected_observational_value=''"></Button>
+                <Button label="Cancel Upload" @click="selectedObservationalValue=''"></Button>
               </span>
             </div>
           </div>
@@ -45,24 +45,24 @@
         </div>
       </div>
 
-      <div id="GageReport" v-if="selected_gage_value">
+      <div id="GageReport" v-if="selectedGageValue">
         <div id="GrBox">
           <table>
             <tr class="rowOdd">
               <td class="dataName">Domain</td>
-              <td class="dataText">{{ gage_tab_data?.domain_source }}</td>
+              <td class="dataText">{{ gageTabData?.domain_source }}</td>
             </tr>
             <tr class="rowEven">
               <td class="dataName">Gage ID</td>
-              <td class="dataText">{{ gage_tab_data?.gage.gage_Id }}</td>
+              <td class="dataText">{{ gageTabData?.gage.gage_Id }}</td>
             </tr>            
             <tr class="rowOdd">
               <td class="dataName">Agency</td>
-              <td class="dataText">{{ gage_tab_data?.gage.agency }}</td>
+              <td class="dataText">{{ gageTabData?.gage.agency }}</td>
             </tr>
             <tr class="rowEven">
               <td class="dataName">Station Name</td>
-              <td class="dataText">{{ gage_tab_data?.gage.station_name }}</td>
+              <td class="dataText">{{ gageTabData?.gage.station_name }}</td>
             </tr>
             <tr class="rowOdd">
               <td class="dataName">Site Type</td>
@@ -70,15 +70,15 @@
             </tr>
             <tr class="rowEven">
               <td class="dataName">Latitude</td>
-              <td class="dataText">{{ gage_tab_data?.gage.latitude }}</td>
+              <td class="dataText">{{ gageTabData?.gage.latitude }}</td>
             </tr>
             <tr class="rowOdd">
               <td class="dataName">Longitude</td>
-              <td class="dataText">{{ gage_tab_data?.gage.longitude }}</td>
+              <td class="dataText">{{ gageTabData?.gage.longitude }}</td>
             </tr>
             <tr class="rowEven">
               <td class="dataName">Altitude</td>
-              <td class="dataText">{{ gage_tab_data?.gage.altitude }}</td>
+              <td class="dataText">{{ gageTabData?.gage.altitude }}</td>
             </tr>
             <tr class="rowOdd">
               <td class="dataName">Date Established</td>
@@ -107,7 +107,7 @@ import { useGageStore } from "~/stores/calibration/GageStore";
 // const calibrationJobStore = useCalibrationJobStore()
 // const { show_gage_tab_data, selected_job } = calibrationJobStore
 const gageStore = useGageStore()
-const { isNWMv3, gage_tab_data, selected_domain_value, selected_forcing_value, selected_gage_value, get_gage_options_list,selected_observational_value, get_domain_options_list, get_forcing_options_list, get_observational_options_list } = storeToRefs( gageStore )
+const { isNWMv3, gageTabData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs( gageStore )
 
 const selected_rfc = ref<string>("")
 const loading = ref(true);
@@ -139,10 +139,10 @@ const onObservationalFileUpload = () => {
 
 onMounted(() => {  
   setTimeout(() => {
-    selected_domain_value.value = gage_tab_data.value?.domain_source ?? ""
-    selected_gage_value.value = gage_tab_data.value?.gage.gage_Id ?? ""
-    selected_forcing_value.value = gage_tab_data.value?.forcing_source ?? ""
-    selected_observational_value.value = gage_tab_data.value?.observational_source ?? ""
+    selectedDomainValue.value = gageTabData.value?.domain_source ?? ""
+    selectedGageValue.value = gageTabData.value?.gage.gage_Id ?? ""
+    selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
+    selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
     loading.value = false;
   }, 500);
 });

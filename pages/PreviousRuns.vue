@@ -20,7 +20,7 @@
               <ConfirmDialog></ConfirmDialog>
               <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
                 :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>               
-              <DataTable id="cr-list" :value="fetch_jobs_list_data" scrollable scroll-height="400px"
+              <DataTable id="cr-list" :value="fetchJobsListData" scrollable scroll-height="400px"
                 table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
                 contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
                 :rowStyle="rowStyle">
@@ -59,8 +59,8 @@ import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
 const calibrationJobStore = useCalibrationJobStore()
-const { fetch_jobs_list_data, current_calibration_job_id } = storeToRefs( calibrationJobStore )
-const { refresh_job_list_data, fetch_new_calibration_run_id } = calibrationJobStore
+const { fetchJobsListData, currentCalibrationJobId } = storeToRefs( calibrationJobStore )
+const { refreshJobListData, fetchNewCalibrationRunId } = calibrationJobStore
 
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
@@ -85,7 +85,7 @@ const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
   if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 })
   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
-  current_calibration_job_id.value = selectedCalibrationRun.value.calibration_run_id
+  currentCalibrationJobId.value = selectedCalibrationRun.value.calibration_run_id
 
   navigateTo('/Calibration')
 }
@@ -127,7 +127,7 @@ const acceptDelete = (selectedRunId: number) => {
   toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
   // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id != selectedRunId )
   // calibration_jobs_list.value = reduced_calibration_job_list
-  refresh_job_list_data()
+  refreshJobListData()
   selectedCalibrationRun.value = undefined    
 }
 
@@ -146,10 +146,10 @@ onMounted(() => {
 
 const NewCalibration = async () => {
   console.log( 'NewCalibration' )
-  const fetched_id = await fetch_new_calibration_run_id()
+  const fetched_id = await fetchNewCalibrationRunId()
   if( fetched_id != undefined ) {
-    current_calibration_job_id.value = fetched_id.value?.calibration_run_id ?? 0
-    if( current_calibration_job_id.value > 0 ) {
+    currentCalibrationJobId.value = fetched_id.value?.calibration_run_id ?? 0
+    if( currentCalibrationJobId.value > 0 ) {
       await navigateTo("Calibration");
     } else {
       toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 })

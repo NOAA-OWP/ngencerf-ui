@@ -10,26 +10,26 @@ export const useGageStore = defineStore( 'GageStore', () => {
     * ref section
     */
    const calibrationJobCommonStore = useCalibrationJobCommonStore()
-   const { current_calibration_job_id } = storeToRefs( calibrationJobCommonStore )
-   const domain_options_list = ref<select_option[]>([])
-   const gage_options_list = ref<select_option[]>([])
-   const selected_domain_value = ref<string>("")
-   const selected_gage_value = ref<string>("")
-   const selected_forcing_value = ref<string>("")
-   const selected_observational_value = ref<string>("")
+   const { currentCalibrationJobId } = storeToRefs( calibrationJobCommonStore )
+   const domainOptionsList = ref<select_option[]>([])
+   const gageOptionsList = ref<select_option[]>([])
+   const selectedDomainValue = ref<string>("")
+   const selectedGageValue = ref<string>("")
+   const selectedForcingValue = ref<string>("")
+   const selectedObservationalValue = ref<string>("")
    const isNWMv3 = ref<boolean>(false)
 
    /**
     * query load_gage_tab api on store mount
     */
-   const { data: gage_tab_data, refresh: refresh_gage_tab_data, status: load_gage_tab_status } = useFetch( '/api/calibration/load_gage_tab', {
+   const { data: gageTabData, refresh: refreshGageTabData, status: loadGageTabStatus } = useFetch( '/api/calibration/load_gage_tab', {
       'method': 'POST',
       headers: { Athorization: `Bearer: ${useUserDataStore().getAccessToken()}` },
-      body: JSON.stringify( { calibration_run_id: current_calibration_job_id.value } )
+      body: JSON.stringify( { calibration_run_id: currentCalibrationJobId.value } )
    })
 
-   const fetch_gage_tab_data = computed( () => {
-      return gage_tab_data.value ?? {
+   const fetchGageTabData = computed( () => {
+      return gageTabData.value ?? {
          "calibration_run_id": 0,
          "status": "",
          "gage": {
@@ -51,57 +51,47 @@ export const useGageStore = defineStore( 'GageStore', () => {
       }
    })
 
-   const get_domain_options_list = computed( () => {
-      gage_tab_data.value?.domain_values.forEach( ( domain_value ) => {
-         domain_options_list.value.push({
+   const getDomainOptionsList = computed( () => {
+      gageTabData.value?.domain_values.forEach( ( domain_value ) => {
+         domainOptionsList.value.push({
             name: domain_value,
             code: domain_value
          })
       })
       
-      return domain_options_list.value
+      return domainOptionsList.value
    })
 
-   const get_gage_options_list = computed( () => {
-      gage_options_list.value = []
-      gage_tab_data.value?.gages.forEach( ( gage_value ) => {
-         if( gage_value.domain == selected_domain_value.value ) {
+   const getGageOptionsList = computed( () => {
+      gageOptionsList.value = []
+      gageTabData.value?.gages.forEach( ( gage_value ) => {
+         if( gage_value.domain == selectedDomainValue.value ) {
             if( ( isNWMv3.value == true && gage_value.nmnv3_calibrated_gage == true ) || isNWMv3.value == false ) {
-               gage_options_list.value.push({
+               gageOptionsList.value.push({
                   name: gage_value.gage_id,
                   code: gage_value.gage_id
                })
             }
          }
       })
-      console.log( gage_options_list.value)
+      console.log( gageOptionsList.value)
 
-      return gage_options_list.value
+      return gageOptionsList.value
    })
 
-   const get_forcing_options_list = computed( () => {
-      return gage_tab_data.value?.forcing_values
+   const getForcingOptionsList = computed( () => {
+      return gageTabData.value?.forcing_values
    })
 
-   const get_observational_options_list = computed( () => {
-      return gage_tab_data.value?.observational_values
+   const getObservationalOptionsList = computed( () => {
+      return gageTabData.value?.observational_values
    })
 
-   const get_selected_gage_domain_name = computed( () => {
-      gage_tab_data.value?.domain_values.forEach( ( domain_value ) => {
-         domain_options_list.value.push({
-            name: domain_value,
-            code: domain_value
-         })
-      })
-      selected_gage_value
-   })
-
-   async function save_gage_tab_data() {
+   async function saveGageTabData() {
       const response = await $fetch( '/api/calibration/save_gage_tab', {
          method: "POST",
          headers: { Athorization: `Bearer: ${useUserDataStore().getAccessToken()}` },
-         body: JSON.stringify( { calibration_run_id: current_calibration_job_id.value, gage_id: selected_gage_value, forcing_source: selected_forcing_value, observational_source: selected_observational_value } )
+         body: JSON.stringify( { calibration_run_id: currentCalibrationJobId.value, gage_id: selectedGageValue, forcing_source: selectedForcingValue, observational_source: selectedObservationalValue } )
       })
 
       return response
@@ -109,20 +99,20 @@ export const useGageStore = defineStore( 'GageStore', () => {
 
    return {
       //selected_calibration_run_id,
-      selected_domain_value,
-      selected_forcing_value,
-      selected_gage_value,
-      selected_observational_value,
-      current_calibration_job_id,
-      fetch_gage_tab_data,
-      refresh_gage_tab_data,
-      gage_tab_data,
-      load_gage_tab_status,
-      get_domain_options_list,
-      get_gage_options_list,
-      get_forcing_options_list,
-      get_observational_options_list,
-      save_gage_tab_data,
+      selectedDomainValue,
+      selectedForcingValue,
+      selectedGageValue,
+      selectedObservationalValue,
+      currentCalibrationJobId,
+      fetchGageTabData,
+      refreshGageTabData,
+      gageTabData,
+      loadGageTabStatus,
+      getDomainOptionsList,
+      getGageOptionsList,
+      getForcingOptionsList,
+      getObservationalOptionsList,
+      saveGageTabData,
       isNWMv3
    }
 })

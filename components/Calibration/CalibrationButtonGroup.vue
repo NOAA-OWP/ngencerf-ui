@@ -22,8 +22,8 @@ import { generalStore } from "@/stores/common/GeneralStore";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { useToast } from "primevue/usetoast";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-const { refresh_gage_tab_data, save_gage_tab_data } = useGageStore()
-const { refresh_formulation_tab_data, save_formulation_tab_data } = useFormulationStore()
+const { refreshGageTabData, saveGageTabData } = useGageStore()
+const { refreshFormulationTabData, saveFormulationTabData } = useFormulationStore()
 const { getCalibrationTabIndex } = generalStore();
 
 const tabIndex = getCalibrationTabIndex();
@@ -35,21 +35,21 @@ const toast = useToast();
 const saveTabContent =  async () => {
   console.log( tabIndex )
   if( tabIndex === 1) {
-    const save_tab_response = save_gage_tab_data()    
+    const save_tab_response = saveGageTabData()    
     console.log( save_tab_response )
     save_tab_response.then( ( response ) => {
       console.log( response )
       toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
-      refresh_gage_tab_data()
+      refreshGageTabData()
     })    
   }
   if( tabIndex === 2 ) {
-    const save_formulation_response = save_formulation_tab_data()
+    const save_formulation_response = saveFormulationTabData()
     console.log( save_formulation_response )
     save_formulation_response.then( ( response ) => {
       console.log( response )
       toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
-      refresh_formulation_tab_data()
+      refreshFormulationTabData()
     }) 
   }
 }

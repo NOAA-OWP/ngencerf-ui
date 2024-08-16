@@ -10,7 +10,7 @@ FormulationName<template>
                      title="Formulation Name">
                      Forumulation Name:
                   </div>
-                  <InputText v-model="formulation_name_input" class="inline-block w-64 p-1" aria-label="Input Forumulation Name" title="Input Formulation Name"></InputText>
+                  <InputText v-model="formulationNameInput" class="inline-block w-64 p-1" aria-label="Input Forumulation Name" title="Input Formulation Name"></InputText>
                </div>
                <div class="col-span-2">&nbsp;</div>
             </div>
@@ -23,16 +23,16 @@ FormulationName<template>
                   <div class="mt-2 text-left"><strong>Modules</strong></div>
                   <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
                      Groups: 
-                     <Dropdown v-model="filter_group" :options="fetch_formulation_module_covered_group_filter_options" optionLabel="name" optionValue="code" class="ml-2" placeholder="ALL"></Dropdown>
+                     <Dropdown v-model="filterGroup" :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="name" optionValue="code" class="ml-2" placeholder="ALL"></Dropdown>
                   </div>
-                  <Listbox id="ModuleList" v-model="selected_module_values" :options="fetch_formulation_module_options" multiple optionLabel="name" optionValue="code" class="w-full h-60"></Listbox>
+                  <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModulOptions" multiple optionLabel="name" optionValue="code" class="w-full h-60"></Listbox>
                </div>
                <div class="col-span-2">&nbsp;</div>
                <div class="col-span-5">
                   <div class="group-cover-selection-wrapper w-60 float-left">
                      <div class="mt-2 mb-2" aria-label="List of groups covered by selection"
                         title="List of groups covered by selection"><strong>Groups Covered By Selections</strong></div>
-                     <Listbox id="CoveredBy" :options="fetch_formulation_module_covered_group_options" optionLabel="name" optionValue="code" scrollHeight="18rem" class="w-full h-72">
+                     <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name" optionValue="code" scrollHeight="18rem" class="w-full h-72">
                         <template #option="slotProps">
                            <div v-bind:class="( slotProps.option.selected == true)?'pi pi-check font-bold':'pl-5'">{{ slotProps.option.name }}</div>
                         </template>
@@ -45,53 +45,53 @@ FormulationName<template>
          <div class="row-span-6">
             <div>
                <span class="text-left ml-40">
-                  <input type="checkbox" id="SlothCheck" class="ml-4" v-model="use_sloth_parameters" />
+                  <input type="checkbox" id="SlothCheck" class="ml-4" v-model="useSlothParameters" />
                   <label class="inline-block text-xl mb-2" for="SlothCheck">&nbsp;Add SLoTH output variable for
                      formulation</label>
                </span>
-               <span v-show="use_sloth_parameters">
+               <span v-show="useSlothParameters">
                   <label class="inline-block text-xl pl-10 pr-4" for="SlothName">SLoTH Name:</label>
                   <input class="inline-block w-auto" id="SlothName" type="text" v-model="new_sloth_variable_name">
                   <div class="ngenButtonDiv ml-3 inline-block">
                      <button id="SlothAddBtn" @click="AddSlothVariable">Add</button>
                   </div>
                </span>
-               <div id="SlothDataTable" v-show="use_sloth_parameters" editMode="cell" class="items-center ml-10 mr-10 mt-4">
-                  <DataTable class="stripe" :value="sloth_parameter_inputs" editMode="cell" scrollable scroll-height="200px">
+               <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="items-center ml-10 mr-10 mt-4">
+                  <DataTable class="stripe" :value="slothParameterInputs" editMode="cell" scrollable scroll-height="200px">
                      <Column field="param_name" header="SLoTH Output Var" sortable></Column>
                      <Column field="param_count" header="Count" sortable>
                         <template #editor="{ index }">
-                           <InputText v-model="sloth_parameter_inputs[ index ].param_count" autofocus class="w-12 p-1"></InputText>
+                           <InputText v-model="slothParameterInputs[ index ].param_count" autofocus class="w-12 p-1"></InputText>
                         </template>
                      </Column>
                      <Column field="param_type" header="Type" sortable>
                         <template #editor="{ index }">
-                           <InputText v-model="sloth_parameter_inputs[ index ].param_type" autofocus class="w-20 p-1"></InputText>
+                           <InputText v-model="slothParameterInputs[ index ].param_type" autofocus class="w-20 p-1"></InputText>
                         </template>
                      </Column>
                      <Column field="param_units" header="Units" sortable>
                         <template #editor="{ index }">
-                           <InputText v-model="sloth_parameter_inputs[ index ].param_units" autofocus class="w-12 p-1"></InputText>
+                           <InputText v-model="slothParameterInputs[ index ].param_units" autofocus class="w-12 p-1"></InputText>
                         </template>
                      </Column>
                      <Column field="param_location" header="Location" sortable>
                         <template #editor="{ index }">
-                           <InputText v-model="sloth_parameter_inputs[ index ].param_location" autofocus class="w-20 p-1"></InputText>
+                           <InputText v-model="slothParameterInputs[ index ].param_location" autofocus class="w-20 p-1"></InputText>
                         </template>
                      </Column>
                      <Column field="maps_to_module" header="For Module" sortable>
                         <template #editor="{ index}">
-                           <InputText v-model="sloth_parameter_inputs[ index ].maps_to_module" autofocus class="w-16 p-1"></InputText>
+                           <InputText v-model="slothParameterInputs[ index ].maps_to_module" autofocus class="w-16 p-1"></InputText>
                         </template>
                      </Column>
                      <Column field="maps_to_variable_name" header="Module Param" sortable>
                         <template #editor="{ index }">
-                           <InputText v-model="sloth_parameter_inputs[ index ].maps_to_variable_name" autofocus fluid></InputText>
+                           <InputText v-model="slothParameterInputs[ index ].maps_to_variable_name" autofocus fluid></InputText>
                         </template>
                      </Column>
                      <Column field="param_value" header="Value" sortable>
                         <template #editor="{ index }">
-                           <InputText v-model="sloth_parameter_inputs[ index ].param_value" autofocus class="w-12 p-1"></InputText>
+                           <InputText v-model="slothParameterInputs[ index ].param_value" autofocus class="w-12 p-1"></InputText>
                         </template>
                      </Column>
                   </DataTable>
@@ -115,25 +115,25 @@ import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 const new_sloth_variable_name = ref<string>("")
 
 const {
-   filter_group,
-   use_sloth_parameters,
-   formulation_tab_data,
-   selected_module_values,
-   formulation_name_input,
-   sloth_parameter_inputs,
-   fetch_formulation_module_options,
-   fetch_formulation_module_covered_group_filter_options,
-   fetch_formulation_module_covered_group_options, 
-   fetch_formulation_module_covered_groups   
+   filterGroup,
+   useSlothParameters,
+   formulationTabData,
+   selectedModuleValues,
+   formulationNameInput,
+   slothParameterInputs,
+   fetchFormulationModulOptions,
+   fetchFormulationModuleCoveredGroupFilterOptions,
+   fetchFormulationModuleCoveredGroupOptions, 
+   fetchFormulationModuleCoveredGroups   
 } = storeToRefs( useFormulationStore() )
 
-const { add_new_sloth_variable } = useFormulationStore()
+const { addNewSlothVariable } = useFormulationStore()
 
 const loading = ref(true);
 
 const AddSlothVariable = () => {
    if( new_sloth_variable_name.value.trim() != '') {
-      add_new_sloth_variable( new_sloth_variable_name.value )
+      addNewSlothVariable( new_sloth_variable_name.value )
       new_sloth_variable_name.value = ''
    }
 }
@@ -141,11 +141,11 @@ const AddSlothVariable = () => {
 onMounted(() => {
    setTimeout(() => {
       loading.value = false;
-      formulation_name_input.value = formulation_tab_data.value?.formulation_name ?? ""
-      selected_module_values.value = formulation_tab_data.value?.module_sources ?? []
-      use_sloth_parameters.value = formulation_tab_data.value?.use_sloth ?? false
-      sloth_parameter_inputs.value = formulation_tab_data.value?.sloth_parameters ?? []
-      console.log( selected_module_values )
+      formulationNameInput.value = formulationTabData.value?.formulation_name ?? ""
+      selectedModuleValues.value = formulationTabData.value?.module_sources ?? []
+      useSlothParameters.value = formulationTabData.value?.use_sloth ?? false
+      slothParameterInputs.value = formulationTabData.value?.sloth_parameters ?? []
+      console.log( selectedModuleValues )
    }, 500);
 });
 

@@ -14,89 +14,89 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    /**
     * define ref
     */
-   const { current_calibration_job_id } = storeToRefs( calibrationJobCommonStore )
-   const filter_group = ref<string>("")
-   const selected_module_values = ref<string[]>([])
-   const formulation_name_input = ref<string>("")
-   const sloth_parameter_inputs = ref<sloth_parameter_data[]>([])
-   const use_sloth_parameters = ref<boolean>( false )
+   const { currentCalibrationJobId } = storeToRefs( calibrationJobCommonStore )
+   const filterGroup = ref<string>("")
+   const selectedModuleValues = ref<string[]>([])
+   const formulationNameInput = ref<string>("")
+   const slothParameterInputs = ref<sloth_parameter_data[]>([])
+   const useSlothParameters = ref<boolean>( false )
 
    /**
     * query load_formulation_tab API on store mount
     */
-   const { data: formulation_tab_data, refresh: refresh_formulation_tab_data, status: load_formulation_tab_status } = useFetch( '/api/calibration/load_formulation_tab', {
+   const { data: formulationTabData, refresh: refreshFormulationTabData, status: loadFormulationTabStatus } = useFetch( '/api/calibration/load_formulation_tab', {
       method: 'POST',
       headers: { Athorization: `Bearer: ${useUserDataStore().getAccessToken()}` },
-      body: JSON.stringify( { calibration_run_id: current_calibration_job_id.value } )
+      body: JSON.stringify( { calibration_run_id: currentCalibrationJobId.value } )
    })
 
-   const fetch_formulation_module_options = computed( () => {
+   const fetchFormulationModulOptions = computed( () => {
       let modules_list = <select_option[]>[]
-      formulation_tab_data.value?.modules.forEach( ( module_data ) => {
-         if( !filter_group.value || module_data.groups.includes( filter_group.value ) ) {
+      formulationTabData.value?.modules.forEach( ( moduleData ) => {
+         if( !filterGroup.value || moduleData.groups.includes( filterGroup.value ) ) {
             modules_list.push( {
-               name: module_data.name,
-               code: module_data.name
+               name: moduleData.name,
+               code: moduleData.name
             } )
          }
       })
       return modules_list
    })
 
-   function fetch_module_covered_group_list() {
-      let groups_list = <string[]>[]
-      formulation_tab_data.value?.modules.forEach( ( module_data ) => {
-         groups_list = [ ...new Set([ ...groups_list, ...module_data.groups ]) ]
+   function fetchModuleCoveredGroupList() {
+      let groupsList = <string[]>[]
+      formulationTabData.value?.modules.forEach( ( moduleData ) => {
+         groupsList = [ ...new Set([ ...groupsList, ...moduleData.groups ]) ]
       })
-      return groups_list
+      return groupsList
    }
 
-   const fetch_formulation_module_covered_groups = computed( () => {      
-      return fetch_module_covered_group_list()
+   const fetchFormulationModuleCoveredGroups = computed( () => {      
+      return fetchModuleCoveredGroupList()
    })
 
-   function selected_module_covered_groups() {
-      let selected_groups = <string[]>[]
-      formulation_tab_data.value?.modules.forEach( ( module_data ) => {
-         if( selected_module_values.value.includes( module_data.name ) ) {
-            selected_groups = selected_groups.concat( module_data.groups )
+   function selectedModuleCoveredGroups() {
+      let selectedGroups = <string[]>[]
+      formulationTabData.value?.modules.forEach( ( moduleData ) => {
+         if( selectedModuleValues.value.includes( moduleData.name ) ) {
+            selectedGroups = selectedGroups.concat( moduleData.groups )
          }
       })      
-      return selected_groups
+      return selectedGroups
    }
-   const fetch_formulation_module_covered_group_filter_options = computed( () => {
-      let group_options_list = <select_option[]>[{
+   const fetchFormulationModuleCoveredGroupFilterOptions = computed( () => {
+      let groupOptionsList = <select_option[]>[{
          name: "ALL",
          code: ""
       }]
-      let groups_list = fetch_module_covered_group_list()
+      let groups_list = fetchModuleCoveredGroupList()
       groups_list.forEach( ( group ) => {
-         group_options_list.push( {
+         groupOptionsList.push( {
             name: group,
             code: group
          } )
       })
-      return group_options_list
+      return groupOptionsList
    })
 
-   const fetch_formulation_module_covered_group_options = computed( () => {
-      let group_options_list = <select_option[]>[]
-      let groups_list = fetch_module_covered_group_list()
-      const selected_groups = selected_module_covered_groups()
-      groups_list.forEach( ( group ) => {
+   const fetchFormulationModuleCoveredGroupOptions = computed( () => {
+      let groupOptionsList = <select_option[]>[]
+      let groupsList = fetchModuleCoveredGroupList()
+      const selectedGroups = selectedModuleCoveredGroups()
+      groupsList.forEach( ( group ) => {
          let option_data = {
             name: group,
             code: group,
             selected: false
          }
-         if( selected_groups.includes( group ) ) option_data[ 'selected' ] = true
-         group_options_list.push( option_data )
+         if( selectedGroups.includes( group ) ) option_data[ 'selected' ] = true
+         groupOptionsList.push( option_data )
       })
-      return group_options_list
+      return groupOptionsList
    })
 
-   function add_new_sloth_variable( variable_name:string ): void {
-      sloth_parameter_inputs.value.push({
+   function addNewSlothVariable( variable_name:string ): void {
+      slothParameterInputs.value.push({
          "param_name": variable_name,
          "param_count": 1,
          "param_type": "",
@@ -108,16 +108,16 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       })
    }
 
-   async function save_formulation_tab_data() {
+   async function saveFormulationTabData() {
       const response = await $fetch( '/api/calibration/save_formulation_tab', {
          method: "POST",
          headers: { Athorization: `Bearer: ${useUserDataStore().getAccessToken()}` },
          body: JSON.stringify( { 
-            calibration_run_id: current_calibration_job_id.value, 
-            formulation_name: formulation_name_input.value, 
-            modules: selected_module_values.value, 
-            use_sloth: use_sloth_parameters.value,
-            sloth_parameters: sloth_parameter_inputs.value
+            calibration_run_id: currentCalibrationJobId.value, 
+            formulation_name: formulationNameInput.value, 
+            modules: selectedModuleValues.value, 
+            use_sloth: useSlothParameters.value,
+            sloth_parameters: slothParameterInputs.value
          })
       })
 
@@ -125,20 +125,20 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    }
 
    return {
-      formulation_tab_data,
-      filter_group,
-      use_sloth_parameters,
-      selected_module_values,
-      formulation_name_input,
-      sloth_parameter_inputs,
-      refresh_formulation_tab_data,
-      load_formulation_tab_status,
-      fetch_formulation_module_options,
-      fetch_formulation_module_covered_groups,
-      fetch_formulation_module_covered_group_filter_options,
-      fetch_formulation_module_covered_group_options,
-      add_new_sloth_variable,
-      save_formulation_tab_data
+      formulationTabData,
+      filterGroup,
+      useSlothParameters,
+      selectedModuleValues,
+      formulationNameInput,
+      slothParameterInputs,
+      refreshFormulationTabData,
+      loadFormulationTabStatus,
+      fetchFormulationModulOptions,
+      fetchFormulationModuleCoveredGroups,
+      fetchFormulationModuleCoveredGroupFilterOptions,
+      fetchFormulationModuleCoveredGroupOptions,
+      addNewSlothVariable,
+      saveFormulationTabData
    }
 })
 

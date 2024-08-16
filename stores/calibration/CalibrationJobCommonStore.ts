@@ -3,10 +3,10 @@
 import { defineStore } from "pinia";
 
 export const useCalibrationJobCommonStore = defineStore( 'CalibrationJobCommonStore', () => {
-  const current_calibration_job_id = ref<number>(0)
+  const currentCalibrationJobId = ref<number>(0)
   
   return {
-    current_calibration_job_id
+    currentCalibrationJobId
   }
 })
 
