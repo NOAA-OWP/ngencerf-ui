@@ -1,16 +1,15 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useCalibrationJobCommonStore } from "./CalibrationJobCommonStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { generalStore } from "../common/GeneralStore";
 import type { select_option } from "~/composables/NextGenModel";
 
 export const useGageStore = defineStore( 'GageStore', () => {
    /**
     * ref section
     */
-   const calibrationJobCommonStore = useCalibrationJobCommonStore()
-   const { currentCalibrationJobId } = storeToRefs( calibrationJobCommonStore )
+   const { calibrationJobId } = storeToRefs( generalStore() )
    const domainOptionsList = ref<select_option[]>([])
    const gageOptionsList = ref<select_option[]>([])
    const selectedDomainValue = ref<string>("")
@@ -25,7 +24,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
    const { data: gageTabData, refresh: refreshGageTabData, status: loadGageTabStatus } = useFetch( '/api/calibration/load_gage_tab', {
       'method': 'POST',
       headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
-      body: JSON.stringify( { calibration_run_id: currentCalibrationJobId.value } )
+      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    })
 
    const fetchGageTabData = computed( () => {
@@ -91,7 +90,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
       const response = await $fetch( '/api/calibration/save_gage_tab', {
          method: "POST",
          headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
-         body: JSON.stringify( { calibration_run_id: currentCalibrationJobId.value, gage_id: selectedGageValue, forcing_source: selectedForcingValue, observational_source: selectedObservationalValue } )
+         body: JSON.stringify( { calibration_run_id: calibrationJobId.value, gage_id: selectedGageValue, forcing_source: selectedForcingValue, observational_source: selectedObservationalValue } )
       })
 
       return response
@@ -103,7 +102,6 @@ export const useGageStore = defineStore( 'GageStore', () => {
       selectedForcingValue,
       selectedGageValue,
       selectedObservationalValue,
-      currentCalibrationJobId,
       fetchGageTabData,
       refreshGageTabData,
       gageTabData,

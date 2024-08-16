@@ -1,20 +1,15 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useCalibrationJobCommonStore } from "./CalibrationJobCommonStore";
+import { generalStore } from "../common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { select_option, sloth_parameter_data } from "~/composables/NextGenModel";
 
 export const useFormulationStore = defineStore( 'FormulationStore', () => {
    /**
-    * init store
-    */
-   const calibrationJobCommonStore = useCalibrationJobCommonStore()
-
-   /**
     * define ref
     */
-   const { currentCalibrationJobId } = storeToRefs( calibrationJobCommonStore )
+   const { calibrationJobId } = storeToRefs( generalStore() )
    const filterGroup = ref<string>("")
    const selectedModuleValues = ref<string[]>([])
    const formulationNameInput = ref<string>("")
@@ -27,7 +22,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    const { data: formulationTabData, refresh: refreshFormulationTabData, status: loadFormulationTabStatus } = useFetch( '/api/calibration/load_formulation_tab', {
       method: 'POST',
       headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
-      body: JSON.stringify( { calibration_run_id: currentCalibrationJobId.value } )
+      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    })
 
    const fetchFormulationModulOptions = computed( () => {
@@ -113,7 +108,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
          method: "POST",
          headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
          body: JSON.stringify( { 
-            calibration_run_id: currentCalibrationJobId.value, 
+            calibration_run_id: calibrationJobId.value, 
             formulation_name: formulationNameInput.value, 
             modules: selectedModuleValues.value, 
             use_sloth: useSlothParameters.value,

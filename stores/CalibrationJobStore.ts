@@ -3,14 +3,13 @@
 import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "./common/UserDataStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { useCalibrationJobCommonStore } from "./calibration/CalibrationJobCommonStore";
+import { generalStore } from "./common/GeneralStore";
 import type { job_list_item } from "~/composables/NextGenModel";
 
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
    const { ngencerfBaseUrl } = useBackendConfig();
    const { getAccessToken } = useUserDataStore()
-   const calibrationJobCommonStore = useCalibrationJobCommonStore()
-   const { currentCalibrationJobId } = storeToRefs( calibrationJobCommonStore )
+   const { calibrationJobId } = storeToRefs( generalStore() )
 
    const { data: jobsListData, refresh: refreshJobListData } = useFetch( '/api/get_jobs', {
       headers: { Authorization: `Bearer ${getAccessToken()}` }
@@ -62,7 +61,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    return {
       fetchJobsListData,
       refreshJobListData,
-      currentCalibrationJobId,
+      calibrationJobId,
       savedCalibrationJobs,
       runningCalibrationJobs,
       fetchNewCalibrationRunId

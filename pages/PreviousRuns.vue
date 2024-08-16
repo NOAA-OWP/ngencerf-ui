@@ -54,12 +54,13 @@ import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
 
 import type { job_list_item } from "~/composables/NextGenModel";
-
+import { generalStore } from "~/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
 const calibrationJobStore = useCalibrationJobStore()
-const { fetchJobsListData, currentCalibrationJobId } = storeToRefs( calibrationJobStore )
+const { calibrationJobId } = storeToRefs( generalStore() )
+const { fetchJobsListData } = storeToRefs( calibrationJobStore )
 const { refreshJobListData, fetchNewCalibrationRunId } = calibrationJobStore
 
 const toast = useToast();
@@ -85,7 +86,7 @@ const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
   if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 })
   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
-  currentCalibrationJobId.value = selectedCalibrationRun.value.calibration_run_id
+  calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id
 
   navigateTo('/Calibration')
 }
@@ -148,8 +149,8 @@ const NewCalibration = async () => {
   console.log( 'NewCalibration' )
   const fetched_id = await fetchNewCalibrationRunId()
   if( fetched_id != undefined ) {
-    currentCalibrationJobId.value = fetched_id.value?.calibration_run_id ?? 0
-    if( currentCalibrationJobId.value > 0 ) {
+    calibrationJobId.value = fetched_id.value?.calibration_run_id ?? 0
+    if( calibrationJobId.value > 0 ) {
       await navigateTo("Calibration");
     } else {
       toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 })
