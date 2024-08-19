@@ -40,6 +40,11 @@ import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 const calibrationJobStore = useCalibrationJobStore()
 const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs( calibrationJobStore )
+const { queryJobsListData } = calibrationJobStore
+
+onMounted(() => {
+  queryJobsListData()
+})
 
 const GoPreviousRuns = () => {
   navigateTo("PreviousRuns");

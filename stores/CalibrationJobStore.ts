@@ -4,16 +4,33 @@ import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "./common/UserDataStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { generalStore } from "./common/GeneralStore";
+import { makeProtectedApiCall } from "#imports";
 import type { job_list_item } from "~/composables/NextGenModel";
 
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
    const { ngencerfBaseUrl } = useBackendConfig();
    const { getAccessToken } = useUserDataStore()
    const { calibrationJobId } = storeToRefs( generalStore() )
+   const jobsListData = ref<job_list_item[]>([])
 
-   const { data: jobsListData, refresh: refreshJobListData } = useFetch( '/api/get_jobs', {
-      headers: { Authorization: `Bearer ${getAccessToken()}` }
-   })
+   // const { data: jobsListData, refresh: refreshJobListData } = useFetch( '/api/get_jobs', {
+   //    headers: { Authorization: `Bearer ${getAccessToken()}` }
+   // })
+
+   async function queryJobsListData() {
+      const jobsListDataResult = await makeProtectedApiCall<job_list_item[]>( `${ngencerfBaseUrl}/calibration/get_jobs/`, {
+         method: "POST",
+         headers: { Authorization: `Bearer ${getAccessToken()}` }
+      } )
+
+      jobsListData.value = jobsListDataResult??[]
+   }
+
+   async function refreshJobListData() {
+      queryJobsListData()
+   }
+
+
 
    /**
    * returns list of calibration job data from server
@@ -59,6 +76,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    }
 
    return {
+      queryJobsListData,
       fetchJobsListData,
       refreshJobListData,
       calibrationJobId,
