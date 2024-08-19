@@ -47,10 +47,11 @@
             </div>
 
             <div class="row-span-1 mt-4">
-              <div class="grid grid-cols-4 gap=4">
+              <!-- These controls temorarily commented out and will be dealt with with a later story NHS 8-19-2024-->
+              <!-- <div class="grid grid-cols-4 gap=4">
                 <div class="col-span-1">&nbsp;</div>
                 <div class="col-span-1">
-                  RFC: <Dropdown id="select_rfc" v-model="selected_rfc" placeholder=" ... "></Dropdown>
+                  RFC: <Dropdown id="select_rfc" v-model="selected_rfc" placeholder=" ... " class="w-40"></Dropdown>
                 </div>
                 <div class="col-span-1 flex items-center">
                   <Checkbox v-model="isNWMv3" inputId="isNWMv3" name="isNWMv3" :binary="true"
@@ -58,7 +59,7 @@
                   &nbsp;&nbsp;Calibrated in NWMv3
                 </div>
                 <div class="col-span-1"></div>
-              </div>
+              </div> -->
             </div>
           </div>
 
