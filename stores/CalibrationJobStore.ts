@@ -17,27 +17,29 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    //    headers: { Authorization: `Bearer ${getAccessToken()}` }
    // })
 
+   /**
+    * @return {void}
+    */
    async function queryJobsListData() {
-      const jobsListDataResult = await makeProtectedApiCall<job_list_item[]>( `${ngencerfBaseUrl}/calibration/get_jobs/`, {
+      const jobsListDataResult = await makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/get_jobs/`, {
          method: "POST",
          headers: { Authorization: `Bearer ${getAccessToken()}` }
       } )
 
-      jobsListData.value = jobsListDataResult??[]
+      console.log( jobsListDataResult.jobs )
+      jobsListData.value = jobsListDataResult.jobs??[]
    }
 
    async function refreshJobListData() {
-      queryJobsListData()
+      await queryJobsListData()
    }
-
-
 
    /**
    * returns list of calibration job data from server
    * @returns {job_list_item[]}
    */
    const fetchJobsListData = computed( () => {
-      return jobsListData.value?.data ?? []
+      return jobsListData.value ?? []
    })
 
    /**
@@ -45,9 +47,8 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    * @returns {number}
    */
    const savedCalibrationJobs = computed( () => {
-      console.log( jobsListData.value )
-      return jobsListData.value?.data.reduce( ( total_saved_jobs: number, job: job_list_item  ) => {
-         if( job.status == 'saved' ) total_saved_jobs += 1;
+      return jobsListData.value?.reduce( ( total_saved_jobs: number, job: job_list_item  ) => {
+         if( job.status.toLowerCase() == 'saved' ) total_saved_jobs += 1;
          return total_saved_jobs;
       }, 0 )
    })
@@ -57,8 +58,8 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    * @returns {number}
    */
    const runningCalibrationJobs = computed( () => {
-      return jobsListData.value?.data.reduce( ( total_running_jobs: number, job: job_list_item  ) => {
-         if( job.status == 'running' ) total_running_jobs += 1;
+      return jobsListData.value?.reduce( ( total_running_jobs: number, job: job_list_item  ) => {
+         if( job.status.toLowerCase() == 'running' ) total_running_jobs += 1;
          return total_running_jobs;
       }, 0 )
    })
@@ -68,12 +69,18 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    * @returns {number}
    */
    async function fetchNewCalibrationRunId() {
-      const { data: new_calibration_job_id } = await useFetch( '/api/calibration/create_calibration_run', {
+      const newCalibrationJobId = await makeProtectedApiCall<number>( `${ngencerfBaseUrl}/calibration/create_calibration_run/`, {
          method: "POST",
          headers: { Authorization: `Bearer ${getAccessToken()}` }
-      })
-      return new_calibration_job_id
+      } )
+      // const { data: new_calibration_job_id } = await useFetch( '/api/calibration/create_calibration_run', {
+      //    method: "POST",
+      //    headers: { Authorization: `Bearer ${getAccessToken()}` }
+      // })
+      console.log( newCalibrationJobId )
+      return newCalibrationJobId
    }
+
 
    return {
       queryJobsListData,

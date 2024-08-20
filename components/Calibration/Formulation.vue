@@ -127,7 +127,7 @@ const {
    fetchFormulationModuleCoveredGroups   
 } = storeToRefs( useFormulationStore() )
 
-const { addNewSlothVariable } = useFormulationStore()
+const { addNewSlothVariable, queryFormulationTabData } = useFormulationStore()
 
 const loading = ref(true);
 
@@ -141,6 +141,7 @@ const AddSlothVariable = () => {
 onMounted(() => {
    setTimeout(() => {
       loading.value = false;
+      queryFormulationTabData()
       formulationNameInput.value = formulationTabData.value?.formulation_name ?? ""
       selectedModuleValues.value = formulationTabData.value?.module_sources ?? []
       useSlothParameters.value = formulationTabData.value?.use_sloth ?? false

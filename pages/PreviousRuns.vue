@@ -146,7 +146,6 @@ onMounted(() => {
 });
 
 const NewCalibration = async () => {
-  console.log( 'NewCalibration' )
   const fetched_id = await fetchNewCalibrationRunId()
   if( fetched_id != undefined ) {
     calibrationJobId.value = fetched_id.value?.calibration_run_id ?? 0

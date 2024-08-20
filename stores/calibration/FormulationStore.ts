@@ -3,7 +3,9 @@
 import { defineStore, storeToRefs } from "pinia";
 import { generalStore } from "../common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
-import type { select_option, sloth_parameter_data } from "~/composables/NextGenModel";
+import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { useBackendConfig } from "~/composables/UseBackendConfig";
+import type { select_option, formulation_tab_data, sloth_parameter_data } from "~/composables/NextGenModel";
 
 export const useFormulationStore = defineStore( 'FormulationStore', () => {
    /**
@@ -15,15 +17,31 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    const formulationNameInput = ref<string>("")
    const slothParameterInputs = ref<sloth_parameter_data[]>([])
    const useSlothParameters = ref<boolean>( false )
+   const { ngencerfBaseUrl } = useBackendConfig();
+   const { getAccessToken } = useUserDataStore()
+   const formulationTabData = ref<formulation_tab_data>()
 
    /**
     * query load_formulation_tab API on store mount
     */
-   const { data: formulationTabData, refresh: refreshFormulationTabData, status: loadFormulationTabStatus } = useFetch( '/api/calibration/load_formulation_tab', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
-      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
-   })
+   // const { data: formulationTabData, refresh: refreshFormulationTabData, status: loadFormulationTabStatus } = useFetch( '/api/calibration/load_formulation_tab', {
+   //    method: 'POST',
+   //    headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
+   //    body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
+   // })
+
+   async function queryFormulationTabData() {
+      const formulationTabDataResult = await makeProtectedApiCall<formulation_tab_data>( `${ngencerfBaseUrl}/calibration/load_formulation_tab/`, {
+         method: "POST",
+         headers: { Authorization: `Bearer ${getAccessToken()}` }
+      } )
+
+      formulationTabData.value = formulationTabDataResult??undefined
+   }
+
+   async function refreshFormulationTabData() {
+      await queryFormulationTabData()
+   }
 
    const fetchFormulationModulOptions = computed( () => {
       let modules_list = <select_option[]>[]
@@ -126,8 +144,8 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       selectedModuleValues,
       formulationNameInput,
       slothParameterInputs,
+      queryFormulationTabData,
       refreshFormulationTabData,
-      loadFormulationTabStatus,
       fetchFormulationModulOptions,
       fetchFormulationModuleCoveredGroups,
       fetchFormulationModuleCoveredGroupFilterOptions,

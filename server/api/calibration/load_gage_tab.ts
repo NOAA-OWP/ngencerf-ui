@@ -1,12 +1,12 @@
-import { gage_data } from "~/composables/NextGenModel"
+import { gage_tab_data } from "~/composables/NextGenModel"
 
-const gage_tab_data_list: gage_data[] = [
+const gage_tab_data_list: gage_tab_data[] = [
   {
     "calibration_run_id": 6,
     "status": "",
     "domain_source": "",
     "gage": {
-      "gage_Id": "",
+      "gage_id": "",
       "agency": "",
       "station_name": "",
       "latitude": 0,
@@ -131,7 +131,7 @@ const gage_tab_data_list: gage_data[] = [
     "status": "saved",
     "domain_source": "CONUS",
     "gage": {
-      "gage_Id": "01241550",
+      "gage_id": "01241550",
       "agency": "US Geological Survey",
       "station_name": "ITTLE RIVER NEAR HANNOVER, CT",
       "latitude": 0.1,
@@ -253,7 +253,7 @@ const gage_tab_data_list: gage_data[] = [
   }
 ]
 
-export default defineEventHandler( async (event): Promise<gage_data | undefined> => {
+export default defineEventHandler( async (event): Promise<gage_tab_data | undefined> => {
   const { calibration_run_id } = await readBody(event);
   return gage_tab_data_list.find( ( gage_tab_data ) => gage_tab_data.calibration_run_id == calibration_run_id )
 })

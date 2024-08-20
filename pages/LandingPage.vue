@@ -43,7 +43,9 @@ const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs( calibratio
 const { queryJobsListData } = calibrationJobStore
 
 onMounted(() => {
-  queryJobsListData()
+  setTimeout( () => {
+    queryJobsListData()
+  }, 500)
 })
 
 const GoPreviousRuns = () => {
