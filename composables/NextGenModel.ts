@@ -40,14 +40,7 @@ export interface gage_data {
   calibration_run_id: Number,
   status: String,
   domain_source: string,
-  gage: {
-    gage_Id: string,
-    agency: String,
-    station_name: String,
-    latitude: Number,
-    longitude: Number,
-    altitude: Number
-  },
+  gage: gage,
   forcing_user_dir: string,
   forcing_source: string,
   forcing_user_filename: String,
@@ -58,6 +51,15 @@ export interface gage_data {
   gages: gage_option_data[],
   forcing_values: select_option[],
   observational_values: select_option[]
+}
+
+export interface gage {
+  gage_id: string,
+  agency: String,
+  station_name: String,
+  latitude: Number,
+  longitude: Number,
+  altitude: Number
 }
 
 export interface gagetab_save {

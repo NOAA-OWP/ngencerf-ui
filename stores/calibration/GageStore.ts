@@ -32,7 +32,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
          "calibration_run_id": 0,
          "status": "",
          "gage": {
-            "gage_Id": "",
+            "gage_id": "",
             "agency": "",
             "station_name": "",
             "latitude": null,
