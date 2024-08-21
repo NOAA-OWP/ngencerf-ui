@@ -140,8 +140,15 @@
 <script lang="ts" setup>
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+
+import { makeProtectedApiCall } from "~/utils/UserAuth";
 import { mockCalibrationTuningData } from "~/mockApi/calibrationAPIData";
 import type { CalibrationTuningData } from "~/composables/NextGenModel";
+import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+
+const { ngencerfBaseUrl } = useBackendConfig();
+const userDataStore = useUserDataStore();
 
 const loading = ref(true);
 
@@ -177,8 +184,20 @@ const calibrationTuningDataList = ref<CalibrationTuningData[]>([])
 onMounted(() => {
   mockCalibrationTuningData().forEach((tuningData, index) => {
     calibrationTuningDataList.value.push(<CalibrationTuningData>tuningData)
-  })
+  });
 });
+
+
+const protectedApiCallOutput: string | null = await makeProtectedApiCall(
+  `${ngencerfBaseUrl}/calibration/load_tuning_tab/?calibration_run_id=6`,
+  {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${userDataStore.getAccessToken()}`
+    }
+  }
+);
+console.log("protectedApiCallOutput:", protectedApiCallOutput);
 </script>
 
 <style lang="scss" scoped>
