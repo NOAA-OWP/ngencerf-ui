@@ -104,8 +104,8 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
 
    const fetchFormulationModuleCoveredGroupFilterOptions = computed( () => {
       let groupOptionsList = <select_option[]>[{
-         name: "ALL",
-         description: ""
+         name: "",
+         description: "ALL"
       }]
       let groups_list = fetchModuleCoveredGroupList()
       groups_list.forEach( ( group ) => {

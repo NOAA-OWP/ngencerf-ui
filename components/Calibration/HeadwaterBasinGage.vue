@@ -118,9 +118,9 @@
         <!-- </div> -->
       </div>
     </div>
-    <div class="waitgif" v-if="loading">
+    <!-- <div class="waitgif" v-if="loading">
       <img src="@/assets/styles/img/wait.gif" />
-    </div>
+    </div> -->
   </client-only>
 </template>
 <script lang="ts" setup>

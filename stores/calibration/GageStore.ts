@@ -63,7 +63,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
    }
 
    const fetchGageTabData = computed( () => {
-      return gageTabData.value ?? navigateTo('/PreviousRun');
+      return gageTabData.value ?? navigateTo('/PreviousRuns');
    })
 
    const getSavedDomainValue = computed( () => {
@@ -155,7 +155,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
       selectedForcingValue,
       selectedGageValue,
       selectedObservationalValue,
-      fetchGageTabData,
+      //fetchGageTabData,
       queryGageTabData,
       refreshGageTabData,
       getSavedDomainValue,
