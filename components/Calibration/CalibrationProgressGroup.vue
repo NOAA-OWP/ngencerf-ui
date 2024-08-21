@@ -58,7 +58,7 @@ const props = defineProps<{
     text-align: right;
   }
   .ptype {
-    width: 90%5%;
+    width: 90%;
 
   }
 }
