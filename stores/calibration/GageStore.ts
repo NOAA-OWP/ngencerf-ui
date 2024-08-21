@@ -23,6 +23,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
    const { getAccessToken } = useUserDataStore()
    const gageTabData = ref<gage_tab_data>()
    const gageData = ref<gage_data>()
+   const data_loading = ref<boolean>(true)
 
    /**
     * query load_gage_tab api on store mount
@@ -41,8 +42,14 @@ export const useGageStore = defineStore( 'GageStore', () => {
       },
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    } ).then( ( gageTabDataResult ) => {
-      console.log( gageTabDataResult )
+      console.log( 'gage tab data from gageStore', gageTabDataResult )
       gageTabData.value = gageTabDataResult??undefined
+      data_loading.value = false
+      selectedDomainValue.value = getSavedDomainValue.value ?? ""
+      selectedGageValue.value = gageTabData.value?.gage.gage_id ?? ""
+      selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
+      selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
+      gageData.value = gageTabData.value?.gage ?? undefined
    })
    
    async function queryGageTabData() {
@@ -135,19 +142,14 @@ export const useGageStore = defineStore( 'GageStore', () => {
          },
          body: JSON.stringify( { 
             calibration_run_id: calibrationJobId.value, 
-            gage_id: selectedGageValue, 
-            forcing_source: selectedForcingValue, 
-            observational_source: selectedObservationalValue 
+            gage_id: selectedGageValue.value, 
+            forcing_source: selectedForcingValue.value, 
+            observational_source: selectedObservationalValue.value
          } )
       })
-
+      
       return saveGageTabDataResponse
    }
-
-   selectedDomainValue.value = getSavedDomainValue.value ?? ""
-   selectedGageValue.value = gageTabData.value?.gage.gage_id ?? ""
-   selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
-   selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
 
    return {
       //selected_calibration_run_id,
@@ -167,7 +169,8 @@ export const useGageStore = defineStore( 'GageStore', () => {
       saveGageTabData,
       isNWMv3,
       fetchSelectedGageData,
-      gageData
+      gageData,
+      data_loading
    }
 })
 

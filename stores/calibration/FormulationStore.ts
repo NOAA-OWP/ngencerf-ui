@@ -37,8 +37,12 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       },
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    } ).then( ( formulationTabDataResult ) => {
-      console.log( formulationTabDataResult )
-      formulationTabData.value = formulationTabDataResult??undefined      
+      console.log( 'load formulation data from formulationStore', formulationTabDataResult )
+      formulationTabData.value = formulationTabDataResult??undefined
+      formulationNameInput.value = formulationTabData.value?.formulation_name ?? ""
+      selectedModuleValues.value = getSavedModuleSelection.value ?? []
+      useSlothParameters.value = formulationTabData.value?.use_sloth ?? false
+      slothParameterInputs.value = formulationTabData.value?.sloth_parameters ?? []
    })
 
 
@@ -147,25 +151,35 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    }
 
    async function saveFormulationTabData() {
-      const response = await $fetch( '/api/calibration/save_formulation_tab', {
+      // const response = await $fetch( '/api/calibration/save_formulation_tab', {
+      //    method: "POST",
+      //    headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
+      //    body: JSON.stringify( { 
+      //       calibration_run_id: calibrationJobId.value, 
+      //       formulation_name: formulationNameInput.value, 
+      //       modules: selectedModuleValues.value, 
+      //       use_sloth: useSlothParameters.value,
+      //       sloth_parameters: slothParameterInputs.value
+      //    })
+      // })
+
+      const saveFormulationTabDataResponse = await makeProtectedApiCall<formulation_save_response>( `${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
          method: "POST",
-         headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
+         headers: { 
+            "Authorization": `Bearer ${getAccessToken()}`,
+            "Content-Type": 'application/json'
+         },
          body: JSON.stringify( { 
             calibration_run_id: calibrationJobId.value, 
             formulation_name: formulationNameInput.value, 
             modules: selectedModuleValues.value, 
             use_sloth: useSlothParameters.value,
             sloth_parameters: slothParameterInputs.value
-         })
+         } )
       })
-
-      return response
+      
+      return saveFormulationTabDataResponse
    }
-
-   formulationNameInput.value = formulationTabData.value?.formulation_name ?? ""
-   selectedModuleValues.value = getSavedModuleSelection.value ?? []
-   useSlothParameters.value = formulationTabData.value?.use_sloth ?? false
-   slothParameterInputs.value = formulationTabData.value?.sloth_parameters ?? []
 
    return {
       formulationTabData,

@@ -22,7 +22,7 @@
                 Forcing:<br />
                 <span v-if="selectedForcingValue != 'upload'">
                   <Dropdown v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                    optionValue="description" placeholder=" ... " class="w-40"></Dropdown>
+                    optionValue="name" placeholder=" ... " class="w-40"></Dropdown>
                 </span>
                 <span v-if="selectedForcingValue == 'upload'">
                   <FileUpload mode="basic" name="forcing_files[]" :multiple="true"
@@ -34,7 +34,7 @@
                 Observational:<br />
                 <span v-if="selectedObservationalValue != 'upload'">
                   <Dropdown v-model="selectedObservationalValue" :options="getObservationalOptionsList"
-                    optionLabel="name" optionValue="description" placeholder=" ... " class="w-40"></Dropdown>
+                    optionLabel="name" optionValue="name" placeholder=" ... " class="w-40"></Dropdown>
                 </span>
                 <span v-if="selectedObservationalValue == 'upload'">
                   <FileUpload mode="basic" name="observational_files[]" :multiple="true"
@@ -118,9 +118,9 @@
         <!-- </div> -->
       </div>
     </div>
-    <!-- <div class="waitgif" v-if="loading">
+    <div class="waitgif" v-if="data_loading">
       <img src="@/assets/styles/img/wait.gif" />
-    </div> -->
+    </div>
   </client-only>
 </template>
 <script lang="ts" setup>
@@ -129,11 +129,10 @@ import { useGageStore } from "~/stores/calibration/GageStore";
 // const calibrationJobStore = useCalibrationJobStore()
 // const { show_gage_tab_data, selected_job } = calibrationJobStore
 const gageStore = useGageStore()
-const { gageData, gageTabData, selectedDomainValue, getSavedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
+const { gageData, gageTabData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
 const { queryGageTabData, fetchSelectedGageData } = gageStore
 
 const selected_rfc = ref<string>("")
-const loading = ref(true);
 const showMap = ref(false);
 
 // const gageData: GageData = {

@@ -117,6 +117,12 @@ export interface formulation_save {
    sloth_parameters: sloth_parameter_data[]
 }
 
+export interface formulation_save_response {
+  message: string,
+  calibration_run_id: number,
+  status: string,
+}
+
 export interface tuning_load {
 
    calibration_run_id: Number,

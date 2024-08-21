@@ -81,8 +81,6 @@ const onRowContextMenu = (event: any) => {
 // }
 
 const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  console.log('open')
-  console.log( selectedCalibrationRun.value.calibration_run_id )
   if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
   if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 })
   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
@@ -92,8 +90,6 @@ const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  console.log('clone')
-  console.log( selectedCalibrationRun.value.calibration_run_id )
   toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
   //fetchCalibrationJobsList()
 }
@@ -140,16 +136,16 @@ const rowStyle = (data: any) => {
 
 
 onMounted(() => {
-  console.log( 'onmounted' )
+  // console.log( 'onmounted' )
   queryJobsListData()
   //fetchCalibrationJobsList()
-  console.log(localStorage);
+  // console.log(localStorage);
 });
 
 const NewCalibration = async () => {
-  const fetched_id = await fetchNewCalibrationRunId()
-  if( fetched_id != undefined ) {
-    calibrationJobId.value = fetched_id.value?.calibration_run_id ?? 0
+  const fetchedId = await fetchNewCalibrationRunId()
+  if( fetchedId != undefined ) {
+    calibrationJobId.value = fetchedId
     if( calibrationJobId.value > 0 ) {
       await navigateTo("Calibration");
     } else {
