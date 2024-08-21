@@ -74,7 +74,7 @@
                 </tr>
                 <tr class="rowEven">
                   <td class="dataName">Gage ID</td>
-                  <td class="dataText">{{ gageTabData?.gage.gage_Id }}</td>
+                  <td class="dataText">{{ gageTabData?.gage.gage_id }}</td>
                 </tr>
                 <tr class="rowOdd">
                   <td class="dataName">Agency</td>
@@ -162,7 +162,7 @@ const onObservationalFileUpload = () => {
 onMounted(() => {
   setTimeout(() => {
     selectedDomainValue.value = gageTabData.value?.domain_source ?? ""
-    selectedGageValue.value = gageTabData.value?.gage.gage_Id ?? ""
+    selectedGageValue.value = gageTabData.value?.gage.gage_id ?? ""
     selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
     selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
     loading.value = false;

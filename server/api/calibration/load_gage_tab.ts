@@ -6,7 +6,7 @@ const gage_tab_data_list: gage_data[] = [
     "status": "",
     "domain_source": "",
     "gage": {
-      "gage_Id": "",
+      "gage_id": "",
       "agency": "",
       "station_name": "",
       "latitude": 0,
@@ -131,7 +131,7 @@ const gage_tab_data_list: gage_data[] = [
     "status": "saved",
     "domain_source": "CONUS",
     "gage": {
-      "gage_Id": "01241550",
+      "gage_id": "01241550",
       "agency": "US Geological Survey",
       "station_name": "ITTLE RIVER NEAR HANNOVER, CT",
       "latitude": 0.1,

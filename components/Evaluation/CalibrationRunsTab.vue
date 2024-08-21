@@ -1,30 +1,47 @@
 <template>
-   <div class="h-full min-h-screen ">
-      <div class="grid grid-rows-12">
-         <div class="row-span-2">
-               <div id="PgTitle">Previous Calibration Runs</div>
-         </div>
-         <div class="row-span-10">
-               <div id="CalTable">
-                  <Toast />
-                  <ConfirmDialog></ConfirmDialog>
-                  <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-                     :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>               
-                  <DataTable id="cr-list" :value="fetchJobsListData" scrollable scroll-height="400px"
-                     table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
-                     contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
-                     :rowStyle="rowStyle">
-                     <Column field="calibration_run_id" header="Run ID" sortable></Column>
-                     <Column field="formulation_name" header="Formulation Name" sortable></Column>
-                     <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-                     <Column field="run_date" header="Run Date" sortable></Column>
-                     <Column field="calibration_start_period" header="Calibration Period" sortable></Column>
-                     <Column field="status" header="Status" sortable></Column>
-                  </DataTable>
-               </div>
-         </div>
-      </div>
-   </div>
+    <div class="h-full min-h-screen ">
+        <div class="grid grid-rows-12">
+            <div class="row-span-2">
+                <div id="PgTitle">Previous Calibration Runs</div>
+            </div>
+            <div class="row-span-10">
+                <div id="CalTable">
+
+                    <div class="grid grid-cols-2 mb-5">
+                        <div class="grid-span-1">
+                            <select id="FilterCalRuns" class="w-40">
+                                <option value="">...</option>
+                            </select>
+                            <div class="inline ml-2">Filter Validation Runs</div>
+                        </div>
+
+                        <div class="grid-span-1">
+                            <div class="inline-block float-right">Headwater Basin Gage</div>
+                            <select id="HeadwaterBasinGage" class="w-40 inline float-right mr-2">
+                                <option value="">...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <Toast />
+                    <ConfirmDialog></ConfirmDialog>
+                    <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+                        :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+                    <DataTable id="cr-list" :value="fetchJobsListData" scrollable scroll-height="400px"
+                        table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
+                        contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
+                        @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" class="boxed">
+                        <Column field="calibration_run_id" header="Run ID" sortable></Column>
+                        <Column field="formulation_name" header="Formulation Name" sortable></Column>
+                        <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
+                        <Column field="run_date" header="Run Date" sortable></Column>
+                        <Column field="calibration_start_period" header="Calibration Period" sortable></Column>
+                        <Column field="status" header="Status" sortable></Column>
+                    </DataTable>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>setEvalRunSelected
 
 <script setup lang="ts">
@@ -101,11 +118,11 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
     })
 }
 const acceptDelete = (selectedRunId: number) => {
-  toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
-  // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id != selectedRunId )
-  // calibration_jobs_list.value = reduced_calibration_job_list
-  refreshJobListData()
-  selectedCalibrationRun.value = undefined    
+    toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
+    // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id != selectedRunId )
+    // calibration_jobs_list.value = reduced_calibration_job_list
+    refreshJobListData()
+    selectedCalibrationRun.value = undefined
 }
 
 const rowStyle = (data: any) => {
@@ -150,7 +167,7 @@ const NewCalibration = async () => {
 #CalTable {
     width: 1000px;
     margin: 0 auto;
-    border: 1px solid $ngwcp_primary1;
+    //border: 1px solid $ngwcp_primary1;
 
     .table {
         thead tr th {
