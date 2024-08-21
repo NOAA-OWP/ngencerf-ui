@@ -11,12 +11,12 @@
               <div class="col-span-1">
                 Domain:<br />
                 <Dropdown v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
-                  optionValue="description" placeholder=" ... " class="w-40 m-auto"></Dropdown>
+                  optionValue="name" placeholder=" ... " class="w-40 m-auto"></Dropdown>
               </div>
               <div class="col-span-1">
                 Gage:<br />
                 <Dropdown v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
-                  optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }" class="w-40"></Dropdown>
+                  optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }" class="w-40" @change="onGageSelectionChange"></Dropdown>
               </div>
               <div class="col-span-1">
                 Forcing:<br />
@@ -65,24 +65,24 @@
 
         </div>
         <!-- <div class="row-span-8"> -->
-          <div id="GageReport" v-if="selectedGageValue">
+          <div id="GageReport" v-if="gageData">
             <div id="GrBox">
               <table>
                 <tr class="rowOdd">
                   <td class="dataName">Domain</td>
-                  <td class="dataText">{{ getSelectedDomainValue }}</td>
+                  <td class="dataText">{{ selectedDomainValue }}</td>
                 </tr>
                 <tr class="rowEven">
                   <td class="dataName">Gage ID</td>
-                  <td class="dataText">{{ gageTabData?.gage.gage_id }}</td>
+                  <td class="dataText">{{ gageData?.gage_id }}</td>
                 </tr>
                 <tr class="rowOdd">
                   <td class="dataName">Agency</td>
-                  <td class="dataText">{{ gageTabData?.gage.agency }}</td>
+                  <td class="dataText">{{ gageData?.agency }}</td>
                 </tr>
                 <tr class="rowEven">
                   <td class="dataName">Station Name</td>
-                  <td class="dataText">{{ gageTabData?.gage.station_name }}</td>
+                  <td class="dataText">{{ gageData?.station_name }}</td>
                 </tr>
                 <tr class="rowOdd">
                   <td class="dataName">Site Type</td>
@@ -90,15 +90,15 @@
                 </tr>
                 <tr class="rowEven">
                   <td class="dataName">Latitude</td>
-                  <td class="dataText">{{ gageTabData?.gage.latitude }}</td>
+                  <td class="dataText">{{ gageData?.latitude }}</td>
                 </tr>
                 <tr class="rowOdd">
                   <td class="dataName">Longitude</td>
-                  <td class="dataText">{{ gageTabData?.gage.longitude }}</td>
+                  <td class="dataText">{{ gageData?.longitude }}</td>
                 </tr>
                 <tr class="rowEven">
                   <td class="dataName">Altitude</td>
-                  <td class="dataText">{{ gageTabData?.gage.altitude }}</td>
+                  <td class="dataText">{{ gageData?.altitude }}</td>
                 </tr>
                 <tr class="rowOdd">
                   <td class="dataName">Date Established</td>
@@ -129,8 +129,8 @@ import { useGageStore } from "~/stores/calibration/GageStore";
 // const calibrationJobStore = useCalibrationJobStore()
 // const { show_gage_tab_data, selected_job } = calibrationJobStore
 const gageStore = useGageStore()
-const { isNWMv3, gageTabData, selectedDomainValue, getSelectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
-const { queryGageTabData } = gageStore
+const { gageData, gageTabData, selectedDomainValue, getSavedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
+const { queryGageTabData, fetchSelectedGageData } = gageStore
 
 const selected_rfc = ref<string>("")
 const loading = ref(true);
@@ -152,6 +152,12 @@ const toggle_isNWMv3 = () => {
 
 }
 
+const onGageSelectionChange = () => {
+  console.log( selectedGageValue.value )
+  fetchSelectedGageData()
+
+}
+
 const onForcingFileUpload = () => {
 
 }
@@ -160,16 +166,16 @@ const onObservationalFileUpload = () => {
 
 }
 
-onMounted(() => {
-  setTimeout(() => {
-    queryGageTabData()
-    selectedDomainValue.value = getSelectedDomainValue.value ?? ""
-    selectedGageValue.value = gageTabData.value?.gage.gage_id ?? ""
-    selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
-    selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
-    loading.value = false;
-  }, 500);
-});
+//onMounted(() => {
+  //setTimeout(() => {
+  // queryGageTabData()
+  // selectedDomainValue.value = getSavedDomainValue.value ?? ""
+  // selectedGageValue.value = gageTabData.value?.gage.gage_id ?? ""
+  // selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
+  // selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
+  //loading.value = false;
+  //}, 500);
+//});
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";

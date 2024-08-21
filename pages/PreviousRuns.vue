@@ -61,7 +61,7 @@ import { storeToRefs } from "pinia";
 const calibrationJobStore = useCalibrationJobStore()
 const { calibrationJobId } = storeToRefs( generalStore() )
 const { fetchJobsListData } = storeToRefs( calibrationJobStore )
-const { refreshJobListData, fetchNewCalibrationRunId } = calibrationJobStore
+const { refreshJobListData, fetchNewCalibrationRunId, queryJobsListData } = calibrationJobStore
 
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
@@ -141,6 +141,7 @@ const rowStyle = (data: any) => {
 
 onMounted(() => {
   console.log( 'onmounted' )
+  queryJobsListData()
   //fetchCalibrationJobsList()
   console.log(localStorage);
 });

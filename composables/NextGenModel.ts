@@ -97,7 +97,6 @@ export interface save_gage_tab_response {
 export interface formulation_tab_data {
    calibration_run_id: number,
    formulation_name: string,
-   module_sources: string[],
    modules: formulation_module_data[],
    use_sloth: boolean,
    sloth_parameters: sloth_parameter_data[],
@@ -106,7 +105,8 @@ export interface formulation_tab_data {
 
 export interface formulation_module_data {
    name: string,
-   groups: string[]
+   groups: string[],
+   used_by_calibration_run: boolean
 }
 
 export interface formulation_save {

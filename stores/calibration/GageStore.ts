@@ -22,6 +22,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
    const { ngencerfBaseUrl } = useBackendConfig();
    const { getAccessToken } = useUserDataStore()
    const gageTabData = ref<gage_tab_data>()
+   const gageData = ref<gage_data>()
 
    /**
     * query load_gage_tab api on store mount
@@ -31,6 +32,18 @@ export const useGageStore = defineStore( 'GageStore', () => {
    //    headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
    //    body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    // })
+
+   makeProtectedApiCall<gage_tab_data>( `${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
+      method: "POST",
+      headers: { 
+         "Authorization": `Bearer ${getAccessToken()}`,
+         "Content-Type": 'application/json'
+      },
+      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
+   } ).then( ( gageTabDataResult ) => {
+      console.log( gageTabDataResult )
+      gageTabData.value = gageTabDataResult??undefined
+   })
    
    async function queryGageTabData() {
       const gageTabDataResult = await makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
@@ -53,8 +66,8 @@ export const useGageStore = defineStore( 'GageStore', () => {
       return gageTabData.value ?? navigateTo('/PreviousRun');
    })
 
-   const getSelectedDomainValue = computed( () => {
-      if( gageTabData.value?.gage && gageTabData.value?.gage.gage_id ) {
+   const getSavedDomainValue = computed( () => {
+      if( gageTabData.value?.gage == undefined || gageTabData.value?.gage.gage_id == "" ) {
          return ""
       } else {
          let selected_gage_item = gageTabData.value?.gages.find( ( gage_item ) => gage_item.gage_id == gageTabData.value?.gage.gage_id )
@@ -63,6 +76,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
    })
 
    const getDomainOptionsList = computed( () => {
+      domainOptionsList.value = []
       gageTabData.value?.domain_values.forEach( ( domain_value ) => {
          domainOptionsList.value.push({
             name: domain_value.name,
@@ -76,7 +90,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
    const getGageOptionsList = computed( () => {
       gageOptionsList.value = []
       gageTabData.value?.gages.forEach( ( gage_value ) => {
-         if( !selectedDomainValue.value || gage_value.domain == selectedDomainValue.value ) {
+         if( selectedDomainValue.value == "" || gage_value.domain == selectedDomainValue.value ) {
             if( ( isNWMv3.value == true && gage_value.nwm_v3_calibrated == true ) || isNWMv3.value == false ) {
                gageOptionsList.value.push({
                   name: gage_value.gage_id,
@@ -97,6 +111,20 @@ export const useGageStore = defineStore( 'GageStore', () => {
       return gageTabData.value?.observational_source_values
    })
 
+   async function fetchSelectedGageData(): Promise<void> {
+      const selectedGageDataResponse = await makeProtectedApiCall<gage_data>( `${ngencerfBaseUrl}/calibration/get_gage/`, {
+         method: "POST",
+         headers: { 
+            "Authorization": `Bearer ${getAccessToken()}`,
+            "Content-Type": 'application/json'
+         },
+         body: JSON.stringify( { 
+            gage_id: selectedGageValue.value
+         })
+      })
+      gageData.value = selectedGageDataResponse ?? undefined
+   }
+
    
    async function saveGageTabData(): Promise<save_gage_tab_response> {
       const saveGageTabDataResponse = await makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
@@ -116,6 +144,11 @@ export const useGageStore = defineStore( 'GageStore', () => {
       return saveGageTabDataResponse
    }
 
+   selectedDomainValue.value = getSavedDomainValue.value ?? ""
+   selectedGageValue.value = gageTabData.value?.gage.gage_id ?? ""
+   selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
+   selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
+
    return {
       //selected_calibration_run_id,
       selectedDomainValue,
@@ -125,14 +158,16 @@ export const useGageStore = defineStore( 'GageStore', () => {
       fetchGageTabData,
       queryGageTabData,
       refreshGageTabData,
-      getSelectedDomainValue,
+      getSavedDomainValue,
       gageTabData,
       getDomainOptionsList,
       getGageOptionsList,
       getForcingOptionsList,
       getObservationalOptionsList,
       saveGageTabData,
-      isNWMv3
+      isNWMv3,
+      fetchSelectedGageData,
+      gageData
    }
 })
 

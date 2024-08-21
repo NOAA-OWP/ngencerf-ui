@@ -23,7 +23,9 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    async function queryJobsListData() {
       const jobsListDataResult = await makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/get_jobs/`, {
          method: "POST",
-         headers: { Authorization: `Bearer ${getAccessToken()}` }
+         headers: { 
+            "Authorization": `Bearer ${getAccessToken()}`
+          }
       } )
 
       console.log( jobsListDataResult.jobs )
@@ -77,7 +79,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
       //    method: "POST",
       //    headers: { Authorization: `Bearer ${getAccessToken()}` }
       // })
-      console.log( newCalibrationJobId )
+      
       return newCalibrationJobId
    }
 
