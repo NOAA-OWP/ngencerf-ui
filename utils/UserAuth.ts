@@ -35,7 +35,6 @@ export const verifyAccessToken = async (ngencerfBaseUrl: string): Promise<boolea
   } 
   else {
     // Access token is valid
-      console.log('Token verification successful');
       return true;
   }
 };
@@ -63,7 +62,6 @@ export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boole
   // If new access token is returned, update user data store with new access token
   if (data?.value?.access) {
     userDataStore.setAccessToken(data.value.access);
-    console.log('Access token refreshed successfully');
     return true;
   }
   // No access token returned. Refresh failed
@@ -105,9 +103,6 @@ export const makeProtectedApiCall = async <T>(
         userDataStore.logUserOut();
         await navigateTo('/login');
         return null;
-      }
-      else {
-        console.log('Access token refreshed successfully', userDataStore.getAccessToken());
       }
     }
 

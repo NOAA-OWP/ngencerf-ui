@@ -19,7 +19,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * Logs user in by setting isLoggedIn to true
    */
   function logUserIn(): void {
-    console.log("User is logged In");
     isLoggedIn.value = true;
   }
 
@@ -27,7 +26,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * Logs user out by setting isLoggedIn to false and setting access and refresh tokens to null
    */
   function logUserOut(): void {
-    console.log("User is logged out");
     isLoggedIn.value = false;
     accessToken.value = null;
     refreshToken.value = null;
@@ -47,7 +45,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    */
   function setAccessToken(token: string): void {
     accessToken.value = token;
-    console.log("Access token: ", getAccessToken());
   }
 
   /**
@@ -56,7 +53,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    */
   function setRefreshToken(token: string): void {
     refreshToken.value = token;
-    console.log("Refresh token: ", getRefreshToken());
   }
 
   /**
