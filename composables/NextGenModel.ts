@@ -212,6 +212,47 @@ export interface name_description_type {
   data_type: String
 }
 
+export interface optimization_tab_data {
+  calibration_run_id: number,
+  status: string,
+  streamflow_threshold: number,
+  peak_flow_threshold: number,
+  metrics: optimization_metric_data[],
+  optimization: string,
+  optimization_inputs: optimization_input_data[],
+  objective_function: string,
+  optimizations: optimization_data[],
+  plot_frequency: number,
+  stop_criteria: string
+}
+
+export interface optimization_metric_data {
+  name: string,
+  description: string,
+  is_active: boolean,
+  categorical: boolean,
+  event_based: boolean
+}
+
+export interface optimization_input_data {
+  name: string,
+  value: number
+}
+
+export interface optimization_data {
+  name: string,
+  description: string,
+  is_active: boolean,
+  inputs: optimization_data_input_data[]
+}
+
+export interface optimization_data_input_data {
+  name: string,
+  description: string,
+  data_type: string,
+  is_active: boolean
+}
+
 export interface CalibrationProgress {
   headwater_basin_gage: Boolean;
   formulation: Boolean;
