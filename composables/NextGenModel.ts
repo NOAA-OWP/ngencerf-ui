@@ -95,47 +95,59 @@ export interface formulation_save {
    sloth_parameters: sloth_parameter_data[]
 }
 
-export interface tuning_load {
-
-   calibration_run_id: Number,
-   status: String,
-   modules: module_data[],
-   calibration_times: {
-      calibration_start_time: String,
-      calibration_end_time: String,
-      simulation_start_time: String,
-      simulation_end_time: String
-   },
-   validation_times: {
-      validation_start_time: String,
-      validatoin_end_time: String,
-      simulation_start_time: String,
-      simulation_end_time: String
-   }
+export interface load_tuning_tab_response {
+  calibration_run_id: Number,
+  calibration_times: {
+    calibration_start_time: String,
+    calibration_end_time: String,
+    simulation_start_time: String,
+    simulation_end_time: String
+  },
+  validation_times: {
+    validation_start_time: String,
+    validatoin_end_time: String,
+    simulation_start_time: String,
+    simulation_end_time: String
+  },
+  automatic_valiation: Boolean,
+  output_variable_to_calibrate: {
+    name: String,
+    module: String
+  },
+  time_range?: {
+    start_time: String,
+    end_time: String
+  },
+  modules: module_data[],
+  status: String
 }
 
-export interface tuning_save {
-    calibration_run_id: Number,
-    automatic_valiation: Boolean,
-    output_variable_to_calibrate: {
-      name: String,
-      module: String
-    },
-    module_output_variables: name_description_type[],
-    parameters: module_params[],
-    calibration_times: {
-      calibration_start_time: String,
-      calibration_end_time: String,
-      simulation_start_time: String,
-      simulation_end_time: String
-    },
-    validation_times: {
-      validation_start_time: String,
-      validatoin_end_time: String,
-      simulation_start_time: String,
-      simulation_end_time: String
-    }
- 
+export interface save_tuning_tab_request_body {
+  calibration_run_id: Number,
+  parameters: save_tuning_tab_parameter[],
+  calibration_times: {
+    calibration_start_time: String,
+    calibration_end_time: String,
+    simulation_start_time: String,
+    simulation_end_time: String
+  },
+  validation_times: {
+    validation_start_time: String,
+    validatoin_end_time: String,
+    simulation_start_time: String,
+    simulation_end_time: String
+  },
+  automatic_valiation: Boolean,
+  output_variable_to_calibrate: {
+    name: String,
+    module: String
+  }
+}
+
+export interface save_tuning_tab_response {
+  message: String,
+  calibration_run_id: Number,
+  status: String
 }
 
 export interface domain_gage_options {
@@ -162,17 +174,30 @@ export interface sloth_parameter_data {
 
 export interface module_data { 
     name: String,
-    groups: String[],
     parameters: module_params[],
-    module_output_variables:  module_params[]
+    output_variables:  output_variable[]
+}
+
+export interface output_variable {
+  name: String,
+  module: String
 }
 
 export interface module_params {
-    name: String,
-    module: String,
-    minimum: Number,
-    maximum: Number,
-    intial_value: 0
+  name: String,
+  data_type: String,
+  description: String,
+  minimum: Number,
+  maximum: Number,
+  initial_value: Number
+}
+
+export interface save_tuning_tab_parameter {
+  name: String,
+  minimum: Number,
+  maximum: Number,
+  initial_value: Number
+  module: String
 }
 
 export interface module_output {
