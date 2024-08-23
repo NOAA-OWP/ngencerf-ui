@@ -145,9 +145,11 @@ import { makeProtectedApiCall } from "~/utils/UserAuth";
 import { mockCalibrationTuningData } from "~/mockApi/calibrationAPIData";
 import type { CalibrationTuningData } from "~/composables/NextGenModel";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const { ngencerfBaseUrl } = useBackendConfig();
+const tuningStore = useTuningStore();
 const userDataStore = useUserDataStore();
 
 const loading = ref(true);

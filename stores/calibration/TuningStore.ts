@@ -35,8 +35,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
       console.log('load tuning data from tuningStore', tuningTabDataResult);
       loadTuningTabData.value = tuningTabDataResult ?? undefined; // TODO: add type guards
     } catch (error) {
-      console.error('Failed to load tuning data:', error);
-      // Handle the error, e.g., set a specific error state or show a message to the user
+      console.error('Failed to load tuning data:', error); // TODO: use toast
     }
   };
 
