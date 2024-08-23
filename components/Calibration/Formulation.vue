@@ -23,16 +23,16 @@ FormulationName<template>
                   <div class="mt-2 text-left"><strong>Modules</strong></div>
                   <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
                      Groups: 
-                     <Dropdown v-model="filterGroup" :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="name" optionValue="code" class="ml-2" placeholder="ALL"></Dropdown>
+                     <Dropdown v-model="filterGroup" :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description" optionValue="name" class="ml-2" placeholder="ALL"></Dropdown>
                   </div>
-                  <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModulOptions" multiple optionLabel="name" optionValue="code" class="w-full h-60"></Listbox>
+                  <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModulOptions" multiple optionLabel="name" optionValue="name" class="w-full h-60"></Listbox>
                </div>
                <div class="col-span-2">&nbsp;</div>
                <div class="col-span-5">
                   <div class="group-cover-selection-wrapper w-60 float-left">
                      <div class="mt-2 mb-2" aria-label="List of groups covered by selection"
                         title="List of groups covered by selection"><strong>Groups Covered By Selections</strong></div>
-                     <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name" optionValue="code" scrollHeight="18rem" class="w-full h-72">
+                     <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name" optionValue="name" scrollHeight="18rem" class="w-full h-72">
                         <template #option="slotProps">
                            <div v-bind:class="( slotProps.option.selected == true)?'pi pi-check font-bold':'pl-5'">{{ slotProps.option.name }}</div>
                         </template>
@@ -127,7 +127,7 @@ const {
    fetchFormulationModuleCoveredGroups   
 } = storeToRefs( useFormulationStore() )
 
-const { addNewSlothVariable } = useFormulationStore()
+const { addNewSlothVariable, queryFormulationTabData } = useFormulationStore()
 
 const loading = ref(true);
 
@@ -138,16 +138,17 @@ const AddSlothVariable = () => {
    }
 }
 
-onMounted(() => {
-   setTimeout(() => {
-      loading.value = false;
-      formulationNameInput.value = formulationTabData.value?.formulation_name ?? ""
-      selectedModuleValues.value = formulationTabData.value?.module_sources ?? []
-      useSlothParameters.value = formulationTabData.value?.use_sloth ?? false
-      slothParameterInputs.value = formulationTabData.value?.sloth_parameters ?? []
-      console.log( selectedModuleValues )
-   }, 500);
-});
+// onMounted(() => {
+//    setTimeout(() => {
+//       loading.value = false;
+//       queryFormulationTabData()
+//       formulationNameInput.value = formulationTabData.value?.formulation_name ?? ""
+//       selectedModuleValues.value = formulationTabData.value?.module_sources ?? []
+//       useSlothParameters.value = formulationTabData.value?.use_sloth ?? false
+//       slothParameterInputs.value = formulationTabData.value?.sloth_parameters ?? []
+//       console.log( selectedModuleValues )
+//    }, 500);
+// });
 
 const ModuleClicked = (e: MouseEvent) => {
    const ele = e.target as HTMLElement;

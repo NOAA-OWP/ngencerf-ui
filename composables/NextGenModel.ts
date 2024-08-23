@@ -33,27 +33,24 @@ export interface gage_option_data {
   gage_id: string,
   nsw_id: string,
   domain: string
-  nmnv3_calibrated_gage: boolean
+  nwm_v3_calibrated: boolean
+}
+
+export interface gage_tab_data {
+  status: string,
+  calibration_run_id: number,
+  forcing_source: string,
+  observational_source: string,
+  forcing_user_dir: string,
+  forcing_source_values: forcing_source_value_data,
+  observational_source_values: observational_source_value_data,
+  observational_user_filename: string,
+  gages: gage_option_data[]  
+  gage: gage_data,
+  domain_values: domain_value_data []
 }
 
 export interface gage_data {
-  calibration_run_id: Number,
-  status: String,
-  domain_source: string,
-  gage: gage,
-  forcing_user_dir: string,
-  forcing_source: string,
-  forcing_user_filename: String,
-  observational_dir: string,
-  observational_source: string,
-  observational_user_filename: string,
-  domain_values: string [],
-  gages: gage_option_data[],
-  forcing_values: select_option[],
-  observational_values: select_option[]
-}
-
-export interface gage {
   gage_id: string,
   agency: String,
   station_name: String,
@@ -62,11 +59,36 @@ export interface gage {
   altitude: Number
 }
 
-export interface gagetab_save {
+export interface domain_value_data {
+  name: string,
+  description: string,
+  is_active: true
+}
+
+export interface forcing_source_value_data {
+  name: string,
+  description: string,
+  is_active: boolean
+}
+
+export interface observational_source_value_data {
+  name: string,
+  description: string,
+  is_active: boolean
+}
+
+export interface save_gage_tab_payload {
    gage_id: String,
    forcing_source: String,
    forcing_user_filename: String,
    calibration_run_id: Number
+}
+
+export interface save_gage_tab_response {
+  message: string,
+  calibration_run_id: number,
+  status: string,
+  geopackage_image: string
 }
 
 /**
@@ -75,7 +97,6 @@ export interface gagetab_save {
 export interface formulation_tab_data {
    calibration_run_id: number,
    formulation_name: string,
-   module_sources: string[],
    modules: formulation_module_data[],
    use_sloth: boolean,
    sloth_parameters: sloth_parameter_data[],
@@ -84,7 +105,8 @@ export interface formulation_tab_data {
 
 export interface formulation_module_data {
    name: string,
-   groups: string[]
+   groups: string[],
+   used_by_calibration_run: boolean
 }
 
 export interface formulation_save {
@@ -93,6 +115,12 @@ export interface formulation_save {
    modules: string[],
    use_sloth: boolean,
    sloth_parameters: sloth_parameter_data[]
+}
+
+export interface formulation_save_response {
+  message: string,
+  calibration_run_id: number,
+  status: string,
 }
 
 export interface load_tuning_tab_response {
@@ -157,7 +185,7 @@ export interface domain_gage_options {
 
 export interface select_option {
   name: string,
-  code: string
+  description: string
   selected?: boolean
 }
 
@@ -210,6 +238,47 @@ export interface name_description_type {
   data_type: String
 }
 
+export interface optimization_tab_data {
+  calibration_run_id: number,
+  status: string,
+  streamflow_threshold: number,
+  peak_flow_threshold: number,
+  metrics: optimization_metric_data[],
+  optimization: string,
+  optimization_inputs: optimization_input_data[],
+  objective_function: string,
+  optimizations: optimization_data[],
+  plot_frequency: number,
+  stop_criteria: string
+}
+
+export interface optimization_metric_data {
+  name: string,
+  description: string,
+  is_active: boolean,
+  categorical: boolean,
+  event_based: boolean
+}
+
+export interface optimization_input_data {
+  name: string,
+  value: number
+}
+
+export interface optimization_data {
+  name: string,
+  description: string,
+  is_active: boolean,
+  inputs: optimization_data_input_data[]
+}
+
+export interface optimization_data_input_data {
+  name: string,
+  description: string,
+  data_type: string,
+  is_active: boolean
+}
+
 export interface CalibrationProgress {
   headwater_basin_gage: Boolean;
   formulation: Boolean;
@@ -233,17 +302,17 @@ export interface EvaluationProgress {
   reference_dataset: Boolean;
 }
 
-export interface GageData {
-  agency: String;
-  station_name: String;
-  site_type: String;
-  latitude: String;
-  longitude: String;
-  altitude: String;
-  date_established:  String;
-  drainage_area: String;
-  huc:  String;  
-}
+// export interface GageData {
+//   agency: String;
+//   station_name: String;
+//   site_type: String;
+//   latitude: String;
+//   longitude: String;
+//   altitude: String;
+//   date_established:  String;
+//   drainage_area: String;
+//   huc:  String;  
+// }
 
 export interface CalibrationRun {
   runId: number,
