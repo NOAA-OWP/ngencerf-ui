@@ -33,7 +33,7 @@ const toast = useToast();
 //const {  tabIndex } = storeToRefs( generalStore() )
 
 const saveTabContent =  async () => {
-  console.log( tabIndex )
+  console.log( `tabIndex in saveTabContent function: ${tabIndex}` )
   if( tabIndex === 1) {
     const save_tab_response = saveGageTabData()    
     console.log( save_tab_response )

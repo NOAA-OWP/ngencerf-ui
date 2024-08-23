@@ -1,6 +1,6 @@
-import { gage_data } from "~/composables/NextGenModel"
+import { gage_tab_data } from "~/composables/NextGenModel"
 
-const gage_tab_data_list: gage_data[] = [
+const gage_tab_data_list: gage_tab_data[] = [
   {
     "calibration_run_id": 6,
     "status": "",
@@ -253,7 +253,7 @@ const gage_tab_data_list: gage_data[] = [
   }
 ]
 
-export default defineEventHandler( async (event): Promise<gage_data | undefined> => {
+export default defineEventHandler( async (event): Promise<gage_tab_data | undefined> => {
   const { calibration_run_id } = await readBody(event);
   return gage_tab_data_list.find( ( gage_tab_data ) => gage_tab_data.calibration_run_id == calibration_run_id )
 })

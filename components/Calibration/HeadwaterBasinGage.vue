@@ -11,18 +11,18 @@
               <div class="col-span-1">
                 Domain:<br />
                 <Dropdown v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
-                  optionValue="code" placeholder=" ... " class="w-40 m-auto"></Dropdown>
+                  optionValue="name" placeholder=" ... " class="w-40 m-auto"></Dropdown>
               </div>
               <div class="col-span-1">
                 Gage:<br />
                 <Dropdown v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
-                  optionValue="code" placeholder=" ... " class="w-40"></Dropdown>
+                  optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }" class="w-40" @change="onGageSelectionChange"></Dropdown>
               </div>
               <div class="col-span-1">
                 Forcing:<br />
                 <span v-if="selectedForcingValue != 'upload'">
                   <Dropdown v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                    optionValue="code" placeholder=" ... " class="w-40"></Dropdown>
+                    optionValue="name" placeholder=" ... " class="w-40"></Dropdown>
                 </span>
                 <span v-if="selectedForcingValue == 'upload'">
                   <FileUpload mode="basic" name="forcing_files[]" :multiple="true"
@@ -34,7 +34,7 @@
                 Observational:<br />
                 <span v-if="selectedObservationalValue != 'upload'">
                   <Dropdown v-model="selectedObservationalValue" :options="getObservationalOptionsList"
-                    optionLabel="name" optionValue="code" placeholder=" ... " class="w-40"></Dropdown>
+                    optionLabel="name" optionValue="name" placeholder=" ... " class="w-40"></Dropdown>
                 </span>
                 <span v-if="selectedObservationalValue == 'upload'">
                   <FileUpload mode="basic" name="observational_files[]" :multiple="true"
@@ -65,52 +65,52 @@
 
         </div>
         <!-- <div class="row-span-8"> -->
-          <div id="GageReport" v-if="selectedGageValue">
+          <div id="GageReport" v-if="gageData">
             <div id="GrBox">
               <table>
                 <tr class="rowOdd">
                   <td class="dataName">Domain</td>
-                  <td class="dataText">{{ gageTabData?.domain_source }}</td>
+                  <td class="dataText">{{ selectedDomainValue }}</td>
                 </tr>
                 <tr class="rowEven">
                   <td class="dataName">Gage ID</td>
-                  <td class="dataText">{{ gageTabData?.gage.gage_id }}</td>
+                  <td class="dataText">{{ gageData?.gage_id }}</td>
                 </tr>
                 <tr class="rowOdd">
                   <td class="dataName">Agency</td>
-                  <td class="dataText">{{ gageTabData?.gage.agency }}</td>
+                  <td class="dataText">{{ gageData?.agency }}</td>
                 </tr>
                 <tr class="rowEven">
                   <td class="dataName">Station Name</td>
-                  <td class="dataText">{{ gageTabData?.gage.station_name }}</td>
+                  <td class="dataText">{{ gageData?.station_name }}</td>
                 </tr>
                 <tr class="rowOdd">
                   <td class="dataName">Site Type</td>
-                  <td class="dataText">{{ gageData.site_type }}</td>
+                  <td class="dataText"></td>
                 </tr>
                 <tr class="rowEven">
                   <td class="dataName">Latitude</td>
-                  <td class="dataText">{{ gageTabData?.gage.latitude }}</td>
+                  <td class="dataText">{{ gageData?.latitude }}</td>
                 </tr>
                 <tr class="rowOdd">
                   <td class="dataName">Longitude</td>
-                  <td class="dataText">{{ gageTabData?.gage.longitude }}</td>
+                  <td class="dataText">{{ gageData?.longitude }}</td>
                 </tr>
                 <tr class="rowEven">
                   <td class="dataName">Altitude</td>
-                  <td class="dataText">{{ gageTabData?.gage.altitude }}</td>
+                  <td class="dataText">{{ gageData?.altitude }}</td>
                 </tr>
                 <tr class="rowOdd">
                   <td class="dataName">Date Established</td>
-                  <td class="dataText">{{ gageData.date_established }}</td>
+                  <td class="dataText"></td>
                 </tr>
                 <tr class="rowEven">
                   <td class="dataName">Drainage Area</td>
-                  <td class="dataText">{{ gageData.drainage_area }}</td>
+                  <td class="dataText"></td>
                 </tr>
                 <tr class="rowOdd">
                   <td class="dataName">HUC</td>
-                  <td class="dataText">{{ gageData.huc }}</td>
+                  <td class="dataText"></td>
                 </tr>
               </table>
             </div>
@@ -118,7 +118,7 @@
         <!-- </div> -->
       </div>
     </div>
-    <div class="waitgif" v-if="loading">
+    <div class="waitgif" v-if="data_loading">
       <img src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
@@ -129,25 +129,31 @@ import { useGageStore } from "~/stores/calibration/GageStore";
 // const calibrationJobStore = useCalibrationJobStore()
 // const { show_gage_tab_data, selected_job } = calibrationJobStore
 const gageStore = useGageStore()
-const { isNWMv3, gageTabData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
+const { gageData, gageTabData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
+const { queryGageTabData, fetchSelectedGageData } = gageStore
 
 const selected_rfc = ref<string>("")
-const loading = ref(true);
 const showMap = ref(false);
 
-const gageData: GageData = {
-  agency: "US Geological Survey",
-  station_name: "LITTLE RIVER NEAR HANNOVER, CT",
-  site_type: "Stream",
-  latitude: "41.6717651",
-  longitude: "-72.05229807",
-  altitude: "220.32 feet",
-  date_established: "19510701",
-  drainage_area: "30.0 Square miles",
-  huc: "01100002",
-};
+// const gageData: GageData = {
+//   agency: "US Geological Survey",
+//   station_name: "LITTLE RIVER NEAR HANNOVER, CT",
+//   site_type: "Stream",
+//   latitude: "41.6717651",
+//   longitude: "-72.05229807",
+//   altitude: "220.32 feet",
+//   date_established: "19510701",
+//   drainage_area: "30.0 Square miles",
+//   huc: "01100002",
+// };
 
 const toggle_isNWMv3 = () => {
+
+}
+
+const onGageSelectionChange = () => {
+  console.log( selectedGageValue.value )
+  fetchSelectedGageData()
 
 }
 
@@ -159,15 +165,16 @@ const onObservationalFileUpload = () => {
 
 }
 
-onMounted(() => {
-  setTimeout(() => {
-    selectedDomainValue.value = gageTabData.value?.domain_source ?? ""
-    selectedGageValue.value = gageTabData.value?.gage.gage_id ?? ""
-    selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
-    selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
-    loading.value = false;
-  }, 500);
-});
+//onMounted(() => {
+  //setTimeout(() => {
+  // queryGageTabData()
+  // selectedDomainValue.value = getSavedDomainValue.value ?? ""
+  // selectedGageValue.value = gageTabData.value?.gage.gage_id ?? ""
+  // selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
+  // selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
+  //loading.value = false;
+  //}, 500);
+//});
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
