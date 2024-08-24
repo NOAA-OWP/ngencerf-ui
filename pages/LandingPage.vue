@@ -36,17 +36,20 @@
 import AppHeader from '~/components/Common/AppHeader.vue';
 import AppFooter from '~/components/Common/AppFooter.vue';
 import { useRouter } from 'vue-router'
+import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 const calibrationJobStore = useCalibrationJobStore()
 const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs( calibrationJobStore )
-const { queryJobsListData } = calibrationJobStore
+const { fetchUserCalibrationJobsListData } = useUserDataStore()
+//const { queryJobsListData } = calibrationJobStore
 
-onMounted(() => {
-  setTimeout( () => {
-    queryJobsListData()
-  }, 500)
-})
+// onMounted(() => {
+//   setTimeout( () => {
+//     queryJobsListData()
+//   }, 500)
+// })
+fetchUserCalibrationJobsListData()
 
 const GoPreviousRuns = () => {
   navigateTo("PreviousRuns");

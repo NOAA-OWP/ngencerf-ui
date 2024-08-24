@@ -1,53 +1,133 @@
 export interface user {
-  uid: number,
-  first_name: string,
-  last_name: string,
-  email: string,
-}
-
-export interface created_calibration_run {
-  message: String,
-  calibration_run_id: Number
-}
-
-export interface jobs_list {
-  job_list_items: job_list_item[]
-}
-
-export interface job_list_item {
-    run_date: String,
-    formulation_name: String,
-    calibration_run_id: Number,
-    gage_id: String,
-    status: string,
-    calibration_start_period: String,
-    calibration_end_period: String,
+   uid: number,
+   first_name: string,
+   last_name: string,
+   email: string
 }
 
 export interface footer_data {
-  version: String,
-  contact_email: String
+   version: String,
+   contact_email: String
+ }
+
+export interface created_calibration_run {
+   message: string,
+   calibration_run_id: number
 }
 
+/**
+ * model for calibration job list
+ */
+export interface jobs_list {
+   jobs: job_list_item[]
+}
+
+export interface job_list_item {
+   calibration_run_id: number,
+   gage_id: string,
+   status: string,  
+   calibration_start_period: Date,
+   calibration_end_period: Date,
+   formulation_name: string,
+   run_date: Date,
+   owner: string
+}
+
+/**
+ * module for user input calibration tab data
+ */
+export interface user_calibration_run_data {
+   calibration_run_id: number,
+   gage: gage_data,
+   forcing_source: string,
+   forcing_user_dir: string,
+   forcing_dir_path: string,
+   observational_source: string,
+   observational_user_filename: string,
+   observational_file_path: string,
+   geopackage_image_url: string,
+   modules: string[],
+   formulation_name: string,
+   use_sloth: boolean,
+   sloth_parameters: sloth_parameter_data[],
+   automatic_validation: boolean,
+   time_range: user_calibration_run_time_range_data,
+   calibration_times: user_calibration_run_calibration_times_data,
+   validation_times: user_calibration_run_validation_times_data,
+   output_variable_to_calibrate: user_calibration_run_output_variable_to_calibrate_data,
+   parameters: user_calibration_run_parameters_data[],
+   objective_function: string,
+   streamflow_threshold: number,
+   peak_flow_threshold: number,
+   optimization: string,
+   optimization_inputs: optimization_input_data[],
+   plot_frequency: number,
+   stop_criteria: number,
+   status: string
+}
+
+export interface user_calibration_run_time_range_data {
+   start_time: Date,
+   end_time: Date
+}
+
+export interface user_calibration_run_calibration_times_data {
+   calibration_start_time: Date,
+   calibration_end_time: Date,
+   simulation_start_time: Date,
+   simulation_end_time: Date
+}
+
+export interface user_calibration_run_validation_times_data {
+   validation_start_time: Date,
+   validation_end_time: Date,
+   simulation_start_time: Date,
+   simulation_end_time: Date
+}
+
+export interface user_calibration_run_output_variable_to_calibrate_data {
+   name: string,
+   module: string
+}
+
+export interface user_calibration_run_parameters_data {
+   name: string,
+   minimum: number,
+   maximum: number,
+   initial_value: number,
+   module: string
+}
+
+export interface sloth_parameter_data {
+   param_name: string,
+   param_count: number
+   param_type: string,
+   param_units: string,
+   param_location: string,
+   param_value: number
+   maps_to_module: string,
+   maps_to_variable_name: string
+ }
+
+/**
+ * Model for Calibration's Headwater Basin Gage tab
+ */
+export interface gage_tab_data {
+   status: string,
+   calibration_run_id: number,
+   forcing_source_values: forcing_source_value_data,
+   observational_source_values: observational_source_value_data,  
+   gages: gage_option_data[],
+   gage: gage_data,
+   geopackage_image_url: string,
+   domain_values: domain_value_data[]
+ }
+ 
 export interface gage_option_data {
   gage_id: string,
   nsw_id: string,
   domain: string
   nwm_v3_calibrated: boolean
-}
-
-export interface gage_tab_data {
-  status: string,
-  calibration_run_id: number,
-  forcing_source: string,
-  observational_source: string,
-  forcing_user_dir: string,
-  forcing_source_values: forcing_source_value_data,
-  observational_source_values: observational_source_value_data,
-  observational_user_filename: string,
-  gages: gage_option_data[]  
-  gage: gage_data,
-  domain_values: domain_value_data []
 }
 
 export interface gage_data {
@@ -96,10 +176,7 @@ export interface save_gage_tab_response {
  */
 export interface formulation_tab_data {
    calibration_run_id: number,
-   formulation_name: string,
    modules: formulation_module_data[],
-   use_sloth: boolean,
-   sloth_parameters: sloth_parameter_data[],
    status: string
 }
 
@@ -165,6 +242,9 @@ export interface tuning_save {
     }
 }
 
+/**
+ * mode for misc UI input field
+ */
 export interface domain_gage_options {
   domain_value: string,
   gages: string[]
@@ -174,17 +254,6 @@ export interface select_option {
   name: string,
   description: string
   selected?: boolean
-}
-
-export interface sloth_parameter_data {
-  param_name: string,
-  param_count: number
-  param_type: string,
-  param_units: string,
-  param_location: string,
-  param_value: number
-  maps_to_module: string,
-  maps_to_variable_name: string
 }
 
 export interface module_data { 
@@ -212,18 +281,14 @@ export interface name_description_type {
   data_type: String
 }
 
+/**
+ * Module for calibration's optimization tab
+ */
 export interface optimization_tab_data {
   calibration_run_id: number,
   status: string,
-  streamflow_threshold: number,
-  peak_flow_threshold: number,
   metrics: optimization_metric_data[],
-  optimization: string,
-  optimization_inputs: optimization_input_data[],
-  objective_function: string,
-  optimizations: optimization_data[],
-  plot_frequency: number,
-  stop_criteria: string
+  optimizations: optimization_data[]
 }
 
 export interface optimization_metric_data {

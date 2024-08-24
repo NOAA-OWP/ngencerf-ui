@@ -67,7 +67,7 @@
 
          </div>
       </div>
-      <div class="waitgif" v-if="loading">
+      <div class="waitgif" v-if="data_loading">
          <img src="@/assets/styles/img/wait.gif" />
       </div>
    </div>
@@ -75,9 +75,20 @@
 
 <script lang="ts" setup>
 import type { AlgorithmParameter } from '~/composables/NextGenModel';
-import { mockAlogorithmParameterData } from '~/mockApi/calibrationAPIData';
+import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 
-const loading = ref(true);
+const optimizationStore = useOptimizationStore()
+const { uiMetric,
+      uiObjectiveFunction,
+      uiOptimization,
+      uiOptimizationInputs,
+      uiPeakFlowThreshold,
+      uiPlotFrequency,
+      uiStopCriteria,
+      uiStreamFlowThreshold,
+      data_loading } = optimizationStore
+
+//const loading = ref(true);
 const showFlowThreshold = ref(false);
 
 const ShowFlowThreshold = (e: MouseEvent) => {

@@ -14,15 +14,19 @@ export const useGageStore = defineStore( 'GageStore', () => {
    const { calibrationJobId } = storeToRefs( generalStore() )
    const domainOptionsList = ref<select_option[]>([])
    const gageOptionsList = ref<select_option[]>([])
-   const selectedDomainValue = ref<string>("")
-   const selectedGageValue = ref<string>("")
-   const selectedForcingValue = ref<string>("")
-   const selectedObservationalValue = ref<string>("")
    const isNWMv3 = ref<boolean>(false)
    const { ngencerfBaseUrl } = useBackendConfig();
    const { getAccessToken } = useUserDataStore()
+   const userDataStore = useUserDataStore()
+   const { userCalibrationRunData } = storeToRefs( userDataStore )
    const gageTabData = ref<gage_tab_data>()
+   const geopackageImageUrl = ref<string>("")
+   const selectedDomainValue = ref<string>("")
+   const selectedGageValue = ref<string>("")
+   const selectedForcingValue = ref<string>( "")
+   const selectedObservationalValue = ref<string>("")
    const gageData = ref<gage_data>()
+   
    const data_loading = ref<boolean>(true)
 
    /**
@@ -33,37 +37,44 @@ export const useGageStore = defineStore( 'GageStore', () => {
    //    headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
    //    body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    // })
-
-   makeProtectedApiCall<gage_tab_data>( `${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
-      method: "POST",
-      headers: { 
-         "Authorization": `Bearer ${getAccessToken()}`,
-         "Content-Type": 'application/json'
-      },
-      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
-   } ).then( ( gageTabDataResult ) => {
-      console.log( 'gage tab data from gageStore', gageTabDataResult )
-      gageTabData.value = gageTabDataResult??undefined
-      data_loading.value = false
-      selectedDomainValue.value = getSavedDomainValue.value ?? ""
-      selectedGageValue.value = gageTabData.value?.gage.gage_id ?? ""
-      selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
-      selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
-      gageData.value = gageTabData.value?.gage ?? undefined
-   })
    
+   /**
+    * load gage tab data with provided calibration job id
+    * @return {void}
+    */
    async function queryGageTabData() {
-      const gageTabDataResult = await makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
+      makeProtectedApiCall<gage_tab_data>( `${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
          method: "POST",
          headers: { 
             "Authorization": `Bearer ${getAccessToken()}`,
             "Content-Type": 'application/json'
          },
          body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
-      } )
-      console.log( gageTabDataResult )
-      gageTabData.value = gageTabDataResult??undefined
+      } ).then( ( gageTabDataResult ) => {
+         console.log( 'gage tab data from gageStore', gageTabDataResult )
+         gageTabData.value = gageTabDataResult??undefined
+         data_loading.value = false
+         
+         //init ui model value
+         geopackageImageUrl.value = userCalibrationRunData.value?.geopackage_image_url ?? ""
+         selectedDomainValue.value = getSavedDomainValue.value ?? ""
+         selectedGageValue.value = userCalibrationRunData.value?.gage?.gage_id ?? ""
+         selectedForcingValue.value = userCalibrationRunData.value?.forcing_source ?? ""
+         selectedObservationalValue.value = userCalibrationRunData.value?.observational_source ?? ""
+         gageData.value = userCalibrationRunData.value?.gage ?? undefined
+      })
    }
+
+   const getSavedDomainValue = computed( () => {
+      if( userCalibrationRunData.value?.gage == undefined || userCalibrationRunData.value?.gage.gage_id == "" ) {
+         return ""
+      } else {
+         let selected_gage_item = gageTabData.value?.gages.find( ( gage_item ) => gage_item.gage_id == userCalibrationRunData.value?.gage.gage_id )
+         return selected_gage_item?.domain
+      }      
+   })
+
+   queryGageTabData()
 
    async function refreshGageTabData() {
       await queryGageTabData()
@@ -71,15 +82,6 @@ export const useGageStore = defineStore( 'GageStore', () => {
 
    const fetchGageTabData = computed( () => {
       return gageTabData.value ?? navigateTo('/PreviousRuns');
-   })
-
-   const getSavedDomainValue = computed( () => {
-      if( gageTabData.value?.gage == undefined || gageTabData.value?.gage.gage_id == "" ) {
-         return ""
-      } else {
-         let selected_gage_item = gageTabData.value?.gages.find( ( gage_item ) => gage_item.gage_id == gageTabData.value?.gage.gage_id )
-         return selected_gage_item?.domain
-      }      
    })
 
    const getDomainOptionsList = computed( () => {
@@ -170,7 +172,9 @@ export const useGageStore = defineStore( 'GageStore', () => {
       isNWMv3,
       fetchSelectedGageData,
       gageData,
-      data_loading
+      data_loading,
+      geopackageImageUrl,
+      userCalibrationRunData
    }
 })
 

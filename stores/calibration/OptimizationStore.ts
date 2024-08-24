@@ -17,6 +17,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
    /**
     * ref ui user input
     */
+   const data_loading = ref<boolean>(true)
    const optimizationTabData = ref<optimization_tab_data>()
    const uiStreamFlowThreshold = ref<number>()
    const uiPeakFlowThreshold = ref<number>()
@@ -37,10 +38,12 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
    } ).then( ( optimizationTabDataResult ) => {
       console.log( 'load optimization data from optimizationStore', optimizationTabDataResult )
       optimizationTabData.value = optimizationTabDataResult ?? undefined
+      data_loading.value = false
    })
 
    return {
       optimizationTabData,
+      data_loading,
       uiMetric,
       uiObjectiveFunction,
       uiOptimization,

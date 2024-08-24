@@ -163,7 +163,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       //    })
       // })
 
-      const saveFormulationTabDataResponse = await makeProtectedApiCall<formulation_save_response>( `${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
+      const saveFormulationTabDataResponse = await makeProtectedApiCall<formulation_save_response>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
          method: "POST",
          headers: { 
             "Authorization": `Bearer ${getAccessToken()}`,
