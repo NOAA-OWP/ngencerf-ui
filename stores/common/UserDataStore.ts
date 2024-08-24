@@ -5,7 +5,7 @@ import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { generalStore } from "./GeneralStore";
 import { makeProtectedApiCall } from "~/utils/UserAuth";
 
-import type { jobs_list, job_list_item, user_calibration_run_data } from "~/composables/NextGenModel";
+import type { JobsList, JobListItem, UserCalibrationRunData } from "~/composables/NextGenModel";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
   const isLoggedIn = ref<boolean>(true);
@@ -13,8 +13,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   const refreshToken = ref<string | null>(null);
   const { ngencerfBaseUrl } = useBackendConfig();
   const { calibrationJobId } = storeToRefs( generalStore() )
-  const userCalibrationJobsListData = ref<job_list_item[]>([])
-  const userCalibrationRunData = ref<user_calibration_run_data>()
+  const userCalibrationJobsListData = ref<JobListItem[]>([])
+  const userCalibrationRunData = ref<UserCalibrationRunData>()
 
   /**
    * Checks if user is logged in
@@ -89,7 +89,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     * @return {void}
     */
    async function fetchUserCalibrationJobsListData() {
-      const jobsListDataResult = await makeProtectedApiCall<jobs_list>( `${ngencerfBaseUrl}/calibration/get_jobs/`, {
+      const jobsListDataResult = await makeProtectedApiCall<JobsList>( `${ngencerfBaseUrl}/calibration/get_jobs/`, {
          method: "POST",
          headers: { 
             "Authorization": `Bearer ${getAccessToken()}`,
@@ -105,7 +105,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     * @return {void}
     */
    async function fetchUserCalibrationRunData() {
-      const userCalibrationRunDataResult = await makeProtectedApiCall<user_calibration_run_data>( `${ngencerfBaseUrl}/calibration/load_calibration_run/`, {
+      const userCalibrationRunDataResult = await makeProtectedApiCall<UserCalibrationRunData>( `${ngencerfBaseUrl}/calibration/load_calibration_run/`, {
          method: "POST",
          headers: { 
             "Authorization": `Bearer ${getAccessToken()}`,

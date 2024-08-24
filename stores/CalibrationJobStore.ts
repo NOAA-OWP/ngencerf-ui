@@ -5,44 +5,22 @@ import { useUserDataStore } from "./common/UserDataStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { generalStore } from "./common/GeneralStore";
 import { makeProtectedApiCall } from "#imports";
-import type { job_list_item } from "~/composables/NextGenModel";
+import type { JobListItem } from "~/composables/NextGenModel";
 
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
    const { ngencerfBaseUrl } = useBackendConfig();
    const { getAccessToken } = useUserDataStore()
    const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
    const { calibrationJobId } = storeToRefs( generalStore() )
-   //const jobsListData = ref<job_list_item[]>([])
+   //const jobsListData = ref<JobListItem[]>([])
 
    // const { data: jobsListData, refresh: refreshJobListData } = useFetch( '/api/get_jobs', {
    //    headers: { Authorization: `Bearer ${getAccessToken()}` }
    // })
 
    /**
-    * @return {void}
-    */
-   // async function queryJobsListData() {
-   //    const jobsListDataResult = await makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/get_jobs/`, {
-   //       method: "POST",
-   //       headers: { 
-   //          "Authorization": `Bearer ${getAccessToken()}`,
-   //          "Content-Type": 'application/json'
-   //       }
-   //    } )
-
-   //    jobsListData.value = jobsListDataResult.jobs??[]
-   // }
-
-   /**
-    * @return {void}
-    */
-   // async function refreshJobListData() {
-   //    await queryJobsListData()
-   // }
-
-   /**
    * returns list of calibration job data from server
-   * @returns {job_list_item[]}
+   * @returns {JobListItem[]}
    */
    const fetchJobsListData = computed( () => {
       return userCalibrationJobsListData.value ?? []
@@ -53,7 +31,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    * @returns {number}
    */
    const savedCalibrationJobs = computed( () => {
-      return userCalibrationJobsListData.value?.reduce( ( total_saved_jobs: number, job: job_list_item  ) => {
+      return userCalibrationJobsListData.value?.reduce( ( total_saved_jobs: number, job: JobListItem  ) => {
          if( job.status.toLowerCase() == 'saved' ) total_saved_jobs += 1;
          return total_saved_jobs;
       }, 0 )
@@ -64,7 +42,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    * @returns {number}
    */
    const runningCalibrationJobs = computed( () => {
-      return userCalibrationJobsListData.value?.reduce( ( total_running_jobs: number, job: job_list_item  ) => {
+      return userCalibrationJobsListData.value?.reduce( ( total_running_jobs: number, job: JobListItem  ) => {
          if( job.status.toLowerCase() == 'running' ) total_running_jobs += 1;
          return total_running_jobs;
       }, 0 )
@@ -72,10 +50,10 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
 
    /**
    * return a new calibration run id generated from the server
-   * @returns {created_calibration_run}
+   * @returns {CeatedCalibrationRun}
    */
    async function fetchNewCalibrationRunId() {
-      const newCalibrationJobId = await makeProtectedApiCall<created_calibration_run>( `${ngencerfBaseUrl}/calibration/create_calibration_run/`, {
+      const newCalibrationJobId = await makeProtectedApiCall<CeatedCalibrationRun>( `${ngencerfBaseUrl}/calibration/create_calibration_run/`, {
          method: "POST",
          headers: { 
             "Authorization": `Bearer ${getAccessToken()}`,

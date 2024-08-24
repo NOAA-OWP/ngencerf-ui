@@ -5,27 +5,27 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/utils/UserAuth"
-import type { select_option, gage_tab_data, save_gage_tab_response } from "~/composables/NextGenModel";
+import type { SelectOption, GageTabData, SaveGageTabResponse } from "~/composables/NextGenModel";
 
 export const useGageStore = defineStore( 'GageStore', () => {
    /**
     * ref section
     */
    const { calibrationJobId } = storeToRefs( generalStore() )
-   const domainOptionsList = ref<select_option[]>([])
-   const gageOptionsList = ref<select_option[]>([])
+   const domainOptionsList = ref<SelectOption[]>([])
+   const gageOptionsList = ref<SelectOption[]>([])
    const isNWMv3 = ref<boolean>(false)
    const { ngencerfBaseUrl } = useBackendConfig();
    const { getAccessToken } = useUserDataStore()
    const userDataStore = useUserDataStore()
    const { userCalibrationRunData } = storeToRefs( userDataStore )
-   const gageTabData = ref<gage_tab_data>()
+   const gageTabData = ref<GageTabData>()
    const geopackageImageUrl = ref<string>("")
    const selectedDomainValue = ref<string>("")
    const selectedGageValue = ref<string>("")
    const selectedForcingValue = ref<string>( "")
    const selectedObservationalValue = ref<string>("")
-   const gageData = ref<gage_data>()
+   const gageData = ref<GageData>()
    
    const data_loading = ref<boolean>(true)
 
@@ -39,11 +39,11 @@ export const useGageStore = defineStore( 'GageStore', () => {
    // })
    
    /**
-    * load gage tab data with provided calibration job id
+    * load static gage tab data with provided calibration job id
     * @return {void}
     */
    async function queryGageTabData() {
-      makeProtectedApiCall<gage_tab_data>( `${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
+      makeProtectedApiCall<GageTabData>( `${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
          method: "POST",
          headers: { 
             "Authorization": `Bearer ${getAccessToken()}`,
@@ -76,9 +76,9 @@ export const useGageStore = defineStore( 'GageStore', () => {
 
    queryGageTabData()
 
-   async function refreshGageTabData() {
-      await queryGageTabData()
-   }
+   // async function refreshGageTabData() {
+   //    await queryGageTabData()
+   // }
 
    const fetchGageTabData = computed( () => {
       return gageTabData.value ?? navigateTo('/PreviousRuns');
@@ -121,7 +121,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
    })
 
    async function fetchSelectedGageData(): Promise<void> {
-      const selectedGageDataResponse = await makeProtectedApiCall<gage_data>( `${ngencerfBaseUrl}/calibration/get_gage/`, {
+      const selectedGageDataResponse = await makeProtectedApiCall<GageData>( `${ngencerfBaseUrl}/calibration/get_gage/`, {
          method: "POST",
          headers: { 
             "Authorization": `Bearer ${getAccessToken()}`,
@@ -135,7 +135,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
    }
 
    
-   async function saveGageTabData(): Promise<save_gage_tab_response> {
+   async function saveGageTabData(): Promise<SaveGageTabResponse> {
       const saveGageTabDataResponse = await makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
          method: "POST",
          headers: { 
@@ -161,7 +161,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
       selectedObservationalValue,
       //fetchGageTabData,
       queryGageTabData,
-      refreshGageTabData,
+      //refreshGageTabData,
       getSavedDomainValue,
       gageTabData,
       getDomainOptionsList,

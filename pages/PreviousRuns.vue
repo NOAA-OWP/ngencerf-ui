@@ -57,7 +57,7 @@ import { useToast } from "primevue/usetoast";
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
 
-import type { job_list_item } from "~/composables/NextGenModel";
+import type { JobListItem } from "~/composables/NextGenModel";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
@@ -74,7 +74,7 @@ const { fetchNewCalibrationRunId } = calibrationJobStore
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
 //const selectedCalibrationRun = ref<CalibrationRun>()
-const selectedCalibrationRun = ref<job_list_item>()
+const selectedCalibrationRun = ref<JobListItem>()
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
