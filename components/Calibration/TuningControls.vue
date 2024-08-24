@@ -170,36 +170,44 @@ const datetime = ref();
 const rangeDateFrom = ref("1980-01-01");
 const rangeDateTo = ref("1024-05-31");
 
-onMounted(() => {
+const calibrationTuningDataList = ref<CalibrationTuningData[]>([])
+
+onMounted(async () => {
   setTimeout(() => {
     loading.value = false;
   }, 500);
-});
 
-const AutoValChecked = () => {
-  const ele = <HTMLInputElement>document.getElementById("CheckTheBox");
-  autoValidation.value = ele.checked as boolean;
-};
-
-const calibrationTuningDataList = ref<CalibrationTuningData[]>([])
-
-onMounted(() => {
   mockCalibrationTuningData().forEach((tuningData, index) => {
     calibrationTuningDataList.value.push(<CalibrationTuningData>tuningData)
   });
-});
 
-
-const protectedApiCallOutput: string | null = await makeProtectedApiCall(
+  const loadTuningTabOutput: string | null = await makeProtectedApiCall(
   `${ngencerfBaseUrl}/calibration/load_tuning_tab/?calibration_run_id=6`,
   {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${userDataStore.getAccessToken()}`
     }
-  }
-);
-console.log("protectedApiCallOutput:", protectedApiCallOutput);
+  });
+  console.log("loadTuningTabOutput:", loadTuningTabOutput);
+
+  const loadCalibrationRunOutput: string | null = await makeProtectedApiCall(
+  `${ngencerfBaseUrl}/calibration/load_calibration_run/?calibration_run_id=6`,
+  {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${userDataStore.getAccessToken()}`
+    }
+  });
+  console.log("loadCalibrationRunOutput:", loadCalibrationRunOutput);
+});
+
+
+
+const AutoValChecked = () => {
+  const ele = <HTMLInputElement>document.getElementById("CheckTheBox");
+  autoValidation.value = ele.checked as boolean;
+};
 </script>
 
 <style lang="scss" scoped>

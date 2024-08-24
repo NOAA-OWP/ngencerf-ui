@@ -123,59 +123,28 @@ export interface formulation_save_response {
   status: string,
 }
 
-export interface load_tuning_tab_response {
-  calibration_run_id: Number,
-  calibration_times: {
-    calibration_start_time: String,
-    calibration_end_time: String,
-    simulation_start_time: String,
-    simulation_end_time: String
-  },
-  validation_times: {
-    validation_start_time: String,
-    validatoin_end_time: String,
-    simulation_start_time: String,
-    simulation_end_time: String
-  },
-  automatic_valiation: Boolean,
-  output_variable_to_calibrate: {
-    name: String,
-    module: String
-  },
-  time_range?: {
-    start_time: String,
-    end_time: String
-  },
-  modules: module_data[],
-  status: String
+export interface LoadTuningTabResponse {
+  calibration_run_id: Number;
+  modules: ModuleData[];
+  status: String;
 }
 
-export interface save_tuning_tab_request_body {
-  calibration_run_id: Number,
-  parameters: save_tuning_tab_parameter[],
-  calibration_times: {
-    calibration_start_time: String,
-    calibration_end_time: String,
-    simulation_start_time: String,
-    simulation_end_time: String
-  },
-  validation_times: {
-    validation_start_time: String,
-    validatoin_end_time: String,
-    simulation_start_time: String,
-    simulation_end_time: String
-  },
-  automatic_valiation: Boolean,
+export interface SaveTuningTabRequestBody {
+  calibration_run_id: Number;
+  parameters: SaveTuningTabParameter[];
+  calibration_times: CalibrationTimes;
+  validation_times: ValidationTimes;
+  automatic_validation: Boolean;
   output_variable_to_calibrate: {
-    name: String,
-    module: String
+    name: String;
+    module: String;
   }
 }
 
-export interface save_tuning_tab_response {
-  message: String,
-  calibration_run_id: Number,
-  status: String
+export interface SaveTuningTabResponse {
+  message: String;
+  calibration_run_id: Number;
+  status: String;
 }
 
 export interface domain_gage_options {
@@ -200,32 +169,32 @@ export interface sloth_parameter_data {
   maps_to_variable_name: string
 }
 
-export interface module_data { 
+export interface ModuleData { 
     name: String,
-    parameters: module_params[],
-    output_variables:  output_variable[]
+    parameters: ModuleParameter[];
+    output_variables:  OutputVariable[];
 }
 
-export interface output_variable {
-  name: String,
-  module: String
+export interface OutputVariable {
+  name: String;
+  module: String;
 }
 
-export interface module_params {
-  name: String,
-  data_type: String,
-  description: String,
-  minimum: Number,
-  maximum: Number,
-  initial_value: Number
+export interface ModuleParameter {
+  name: String;
+  data_type: String;
+  description: String
+  minimum: Number;
+  maximum: Number;
+  initial_value: Number;
 }
 
-export interface save_tuning_tab_parameter {
-  name: String,
-  minimum: Number,
-  maximum: Number,
-  initial_value: Number
-  module: String
+export interface SaveTuningTabParameter {
+  name: String;
+  minimum: Number;
+  maximum: Number;
+  initial_value: Number;
+  module: String;
 }
 
 export interface module_output {
@@ -329,4 +298,18 @@ export interface AlgorithmParameter {
 
 export interface CalibrationTuningData {
   
+}
+
+interface CalibrationTimes {
+  calibration_start_time: string;
+  calibration_end_time: string;
+  simulation_start_time: string;
+  simulation_end_time: string;
+}
+
+interface ValidationTimes {
+  validation_start_time: string;
+  validation_end_time: string;
+  simulation_start_time: string;
+  simulation_end_time: string;
 }
