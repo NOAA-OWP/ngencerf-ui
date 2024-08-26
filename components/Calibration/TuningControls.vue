@@ -96,6 +96,10 @@
                   <div class="inline-block text-left">Name:</div><br />
                   <select id="ParamName" class="varInputs inline-block mt-2">
                     <option value="" selected disabled>...</option>
+                    <option v-for="parameter in calibrationTuningParameters" :key="parameter.name" :value="parameter.name">
+                      {{ parameter.name }}
+                    </option>
+                    <option value="" selected disabled>...</option>
                   </select>
                   <div id="UploadParams" class="ngenButtonDiv inline ml-3"><button>Add / Update</button></div>
                 </div>
@@ -147,6 +151,15 @@ import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const tuningStore = useTuningStore();
+const {
+  isDataFetched,
+  getLoadCalibrationRunData,
+  getLoadTuningTabData,
+  userCalibrationTimes,
+  userCalibrationTuningParameters,
+  userOuptutVariableToCalibrate,
+  fetchTuningTabData
+} = tuningStore;
 
 const loading = ref(true);
 
@@ -177,21 +190,31 @@ onMounted(async () => {
     calibrationTuningDataList.value.push(<CalibrationTuningData>tuningData)
   });
 
-  if (!tuningStore.isDataFetched) {
-    await tuningStore.fetchTuningTabData();    
+  if (!isDataFetched) {
+    await fetchTuningTabData();    
   }
 
-  const loadTuningTabData = tuningStore.getLoadTuningTabData();
-  const loadCalibratinRunData = tuningStore.getLoadCalibrationRunData();
+  const loadTuningTabData = getLoadTuningTabData();
+  const loadCalibrationRunData = getLoadCalibrationRunData();
   console.log("loadTuningTabData:", loadTuningTabData);
-  console.log("loadCalibrationRunData:", loadCalibratinRunData);
-  console.log("calibration_times:", loadCalibratinRunData.calibration_times);
-  console.log("calibration_start_time:", loadCalibratinRunData.calibration_times.calibration_start_time);
+  console.log("loadCalibrationRunData:", loadCalibrationRunData);
+  console.log("calibration_times:", loadCalibrationRunData.calibration_times);
 
-  const calibration_start_time = "2000-01-01T00:00:00Z";
-  loadCalibratinRunData.calibration_times.calibration_start_time = calibration_start_time;
+  const timeRange = loadCalibrationRunData.time_range;
+  if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
+    console.log("timeRange is null");
+    // set timeRange to test value. timeRange must encompass the entire time range of calibration_times
+  } else {
+    console.log("timeRange:", timeRange);
+  }
 
-  console.log("calibration_start_time:", loadCalibratinRunData.calibration_times.calibration_start_time);
+  const calibrationTuningModules = loadTuningTabData?.modules;
+  const calibrationTuningParameters = calibrationTuningModules?.flatMap(module => module.parameters);
+  console.log("calibrationTuningParameters:", calibrationTuningParameters);
+
+  for (const parameter of calibrationTuningParameters) {
+    console.log("Parameter:", parameter.name);
+  }
 });
 
 const AutoValChecked = () => {

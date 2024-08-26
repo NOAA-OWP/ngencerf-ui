@@ -172,7 +172,7 @@ export interface sloth_parameter_data {
 export interface ModuleData { 
     name: String,
     parameters: ModuleParameter[];
-    output_variables:  OutputVariable[];
+    output_variables:  OutputVariable; // TODO: will we receive one or multiple output variables?
 }
 
 export interface OutputVariable {
@@ -300,14 +300,14 @@ export interface CalibrationTuningData {
   
 }
 
-interface CalibrationTimes {
+export interface CalibrationTimes {
   calibration_start_time: string;
   calibration_end_time: string;
   simulation_start_time: string;
   simulation_end_time: string;
 }
 
-interface ValidationTimes {
+export interface ValidationTimes {
   validation_start_time: string;
   validation_end_time: string;
   simulation_start_time: string;

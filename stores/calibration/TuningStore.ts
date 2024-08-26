@@ -1,18 +1,25 @@
 // @ts-check
 
 import { defineStore } from "pinia";
-import type { LoadTuningTabResponse, SaveTuningTabRequestBody } from "~/composables/NextGenModel";
+import type { CalibrationTimes, ModuleParameter, LoadTuningTabResponse, OutputVariable, SaveTuningTabRequestBody } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 
 export const useTuningStore = defineStore('TuningStore', () => {
-  // state properties
-  const loadCalibrationRunData = ref<any>() // TODO: update to use LoadCalbrationRunData type
-  const loadTuningTabData = ref<any>() // TODO: update to use LoadTuningTabResponse type
+  // server-data properties
+  const loadCalibrationRunData = ref<any>(); // TODO: update to use LoadCalbrationRunData type
+  const loadTuningTabData = ref<any>(); // TODO: update to use LoadTuningTabResponse type
   // const saveTuningTabData = ref<SaveTuningTabRequestBody>()
+
+  // track if data has been fetched already
   const isDataFetched = ref(false);
+
+  // user-data properties
+  const userCalibrationTimes = ref<any>();
+  const userCalibrationTuningParameters = ref<any[]>();
+  const userOuptutVariableToCalibrate = ref<any[]>();
 
   const { ngencerfBaseUrl } = useBackendConfig();
   const userDataStore = useUserDataStore();
@@ -27,9 +34,9 @@ export const useTuningStore = defineStore('TuningStore', () => {
 
   /** 
    * get LoadTuningTabResponse data
-   * @returns {LoadTuningTabResponse | undefined} LoadTuningTabResponse data
+   * @returns {any}} LoadTuningTabResponse data
    */
-  function getLoadTuningTabData(): LoadTuningTabResponse | undefined {
+  function getLoadTuningTabData(): any {
     return loadTuningTabData.value;
   }
 
@@ -108,11 +115,15 @@ export const useTuningStore = defineStore('TuningStore', () => {
     isDataFetched,
     getLoadCalibrationRunData,
     getLoadTuningTabData,
+    userCalibrationTimes,
+    userCalibrationTuningParameters,
+    userOuptutVariableToCalibrate,
     fetchTuningTabData
-  }
-}, {
+  };
+}, 
+{
   persist: {
-    storage: sessionStorage
+    storage: persistedState.localStorage
   },
 });
 
