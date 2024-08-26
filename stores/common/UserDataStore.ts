@@ -3,7 +3,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { generalStore } from "./GeneralStore";
-import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { makeProtectedApiCall } from "~/composables/UserAuth";
 
 import type { JobsList, JobListItem, UserCalibrationRunData } from "~/composables/NextGenModel";
 

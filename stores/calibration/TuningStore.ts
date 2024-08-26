@@ -25,38 +25,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const userDataStore = useUserDataStore();
 
   /**
-   * get LoadCalibrationRun data
-   * @returns {any} LoadCalibrationRun data
-   */
-  function getLoadCalibrationRunData(): any {
-    return loadCalibrationRunData.value;
-  }
-
-  /** 
-   * get LoadTuningTabResponse data
-   * @returns {any}} LoadTuningTabResponse data
-   */
-  function getLoadTuningTabData(): any {
-    return loadTuningTabData.value;
-  }
-
-  // /**
-  //  * get SaveTuningTabResponse data
-  //  * @returns {SaveTuningTabResponse | undefined} SaveTuningTabResponse data
-  //  */
-  // function getSaveTuningTabData(): SaveTuningTabRequestBody | undefined {
-  //   return saveTuningTabData.value;
-  // }
-
-  // /**
-  //  * set save tuning tab data
-  //  * @param {SaveTuningTabRequestBody} data - SaveTuningTabRequestBody data
-  //  */
-  // function setSaveTuningTabData(data: SaveTuningTabRequestBody) {
-  //   saveTuningTabData.value = data
-  // }
-
-  /**
    * fetch Tuning Tab data
    */
   async function fetchTuningTabData(): Promise<void> {
@@ -107,18 +75,17 @@ export const useTuningStore = defineStore('TuningStore', () => {
   //       }
   //     });
   //     console.log("saveTuningTabOutput:", saveTuningTabOutput);
-  //     return saveTuningTabOutput;
   //   }
 
 
   return {
+    fetchTuningTabData,
+    loadCalibrationRunData,
+    loadTuningTabData,
     isDataFetched,
-    getLoadCalibrationRunData,
-    getLoadTuningTabData,
     userCalibrationTimes,
     userCalibrationTuningParameters,
-    userOuptutVariableToCalibrate,
-    fetchTuningTabData
+    userOuptutVariableToCalibrate
   };
 }, 
 {

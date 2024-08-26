@@ -96,10 +96,6 @@
                   <div class="inline-block text-left">Name:</div><br />
                   <select id="ParamName" class="varInputs inline-block mt-2">
                     <option value="" selected disabled>...</option>
-                    <option v-for="parameter in calibrationTuningParameters" :key="parameter.name" :value="parameter.name">
-                      {{ parameter.name }}
-                    </option>
-                    <option value="" selected disabled>...</option>
                   </select>
                   <div id="UploadParams" class="ngenButtonDiv inline ml-3"><button>Add / Update</button></div>
                 </div>
@@ -151,15 +147,17 @@ import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const tuningStore = useTuningStore();
+const { fetchTuningTabData } = tuningStore;
 const {
+  loadCalibrationRunData,
+  loadTuningTabData,
   isDataFetched,
-  getLoadCalibrationRunData,
-  getLoadTuningTabData,
+  // getLoadCalibrationRunData,
+  // getLoadTuningTabData,
   userCalibrationTimes,
   userCalibrationTuningParameters,
   userOuptutVariableToCalibrate,
-  fetchTuningTabData
-} = tuningStore;
+} = storeToRefs(tuningStore);
 
 const loading = ref(true);
 
@@ -186,36 +184,39 @@ onMounted(async () => {
     loading.value = false;
   }, 500);
 
-  mockCalibrationTuningData().forEach((tuningData, index) => {
-    calibrationTuningDataList.value.push(<CalibrationTuningData>tuningData)
-  });
+  // mockCalibrationTuningData().forEach((tuningData, index) => {
+  //   calibrationTuningDataList.value.push(<CalibrationTuningData>tuningData)
+  // });
 
-  if (!isDataFetched) {
+  if (!isDataFetched.value) {
     await fetchTuningTabData();    
   }
-
-  const loadTuningTabData = getLoadTuningTabData();
-  const loadCalibrationRunData = getLoadCalibrationRunData();
-  console.log("loadTuningTabData:", loadTuningTabData);
-  console.log("loadCalibrationRunData:", loadCalibrationRunData);
-  console.log("calibration_times:", loadCalibrationRunData.calibration_times);
-
-  const timeRange = loadCalibrationRunData.time_range;
-  if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
-    console.log("timeRange is null");
-    // set timeRange to test value. timeRange must encompass the entire time range of calibration_times
-  } else {
-    console.log("timeRange:", timeRange);
-  }
-
-  const calibrationTuningModules = loadTuningTabData?.modules;
-  const calibrationTuningParameters = calibrationTuningModules?.flatMap(module => module.parameters);
-  console.log("calibrationTuningParameters:", calibrationTuningParameters);
-
-  for (const parameter of calibrationTuningParameters) {
-    console.log("Parameter:", parameter.name);
-  }
 });
+
+console.log("loadTuningTabData:", loadTuningTabData.value);
+console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
+console.log("calibration_times:", loadCalibrationRunData.value.calibration_times);
+
+const timeRange = loadCalibrationRunData.value.time_range;
+if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
+  console.log("timeRange is null");
+  // set timeRange to a test value. timeRange must encompass the entire time range of calibration_times
+} else {
+  console.log("timeRange:", timeRange);
+}
+
+const calibrationTuningModules = loadTuningTabData.value?.modules;
+const calibrationTuningParameters = calibrationTuningModules?.flatMap((module: any) => module.parameters);
+console.log("calibrationTuningParameters:", calibrationTuningParameters);
+
+for (const parameter of calibrationTuningParameters) {
+  calibrationTuningDataList.value.push({
+    parameter: parameter.name,
+    min: parameter.minimum,
+    max: parameter.maximum,
+    initValue: parameter.initial_value,
+  });
+}
 
 const AutoValChecked = () => {
   const ele = <HTMLInputElement>document.getElementById("CheckTheBox");

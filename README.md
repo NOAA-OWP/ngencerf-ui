@@ -47,12 +47,12 @@ npm run dev
 
 ### Adding Authenticated API Calls to ngencerf-server
 
-If you need to make authenticated API calls to `ngencerf-server`, use the `makeProtectedApiCall` function from `~/utils/UserAuth.ts`. This function will automatically refresh the access token if it has expired. Access tokens expire every 15 minutes and refresh tokens expire every hour. When the refresh token expires, the user will be redirected to the login page and will need to log in again.
+If you need to make authenticated API calls to `ngencerf-server`, use the `makeProtectedApiCall` function from `/composables/UserAuth.ts`. This function will automatically refresh the access token if it has expired. Access tokens expire every 15 minutes and refresh tokens expire every hour. When the refresh token expires, the user will be redirected to the login page and will need to log in again.
 
 Here is an example of how to use `makeProtectedApiCall`:
 
 ```typescript
-import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
