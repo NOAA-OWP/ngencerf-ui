@@ -2,34 +2,46 @@
 
 ## Requirements
 
-To build and run the ngenCERF-UI container, you will need the following software installed and running on your system:
-- Docker
-- ngenCERF-server, listening on port 8000
-- PostgreSQL (recommend version 16), listening on port 5432
+To build and run the ngenCERF-UI application, you will need the following software installed and running on your system:
+- Docker Enginer
+- Docker Compose 
 
-## Building ngenCERF-UI Container
+You will also need a file containing your NGWPC gitlab Personal Access Token (PAT) written at ~/.gitlab_token.
 
-To build the ngenCERF-UI container, execute the following command:
-```
- docker build --tag=ngencerf-ui .
-```
-This will build the app for NodeJS's production mode.
+This will only start the ngenCERF UI application. If you need to connect to a backend server you will need to have that running at the address http://localhost:8000/.
 
 ## Running ngenCERF-UI Container
 
-To run the ngenCERF-UI container, execute the following command:
+It is recommended to use the [ngencerf-docker](https://gitlab.sh.nextgenwaterprediction.com/NGWPC/nwm-ngen/ngencerf-docker/) project to run the full ngenCERF application stack at once. However if you would like to just run the frontend application in isolation, execute the following command:
 ```
-docker run -it -p3000:3000 --add-host host.docker.internal:host-gateway -e NGENCERF_BASE_URL="http://host.docker.internal:8000" ngencerf-ui
+docker compose up
+```
 
+This will give you an instance of the ngenCERF-UI application running on your system at the address http://localhost:3000/. Pressing Ctrl + C will shutdown the application. You can also issue the command:
 ```
-This will give you an instance of the ngenCERF-UI application running on your system listening on local port 3000. Pressing Ctrl + C will shutdown the application.
+docker compose down
+```
 
-If you would like to run in the NodeJS dev mode run:
+## Troubleshooting
+
+### Executing custom commands in a running container
+
+If there is a need to connect to a container to issue commands from a terminal, perform the following steps:
+1. Get a list of the running containers by executing the following command:
 ```
-docker run -it -p3000:3000 --add-host host.docker.internal:host-gateway -e NGENCERF_BASE_URL="http://host.docker.internal:8000" ngencerf-ui run dev
+docker container ls
+```
+2. Attach a terminal to that container:
+```
+docker exec -it <container_id> bash
+```
+3. Execute any needed commands from that terminal.
+4. Issue the following command to disconnect:
+```
+exit
 ```
 
 ## Future Improvements 
 
-- Docker compose project that launces all necessary containers simultaneously.
+- Separate configuration to allow discrete production and development environments.
 
