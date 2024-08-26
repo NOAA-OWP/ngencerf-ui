@@ -1,48 +1,119 @@
 // @ts-check
 
-import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { generalStore } from "../common/GeneralStore";
-import type { load_tuning_tab_response, save_tuning_tab_request_body, save_tuning_tab_response } from "~/composables/NextGenModel";
-import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { defineStore } from "pinia";
+import type { LoadTuningTabResponse, SaveTuningTabRequestBody } from "~/composables/NextGenModel";
+import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+
 
 export const useTuningStore = defineStore('TuningStore', () => {
-  const { calibrationJobId } = storeToRefs(generalStore())
+  // state properties
+  const loadCalibrationRunData = ref<any>() // TODO: update to use LoadCalbrationRunData type
+  const loadTuningTabData = ref<any>() // TODO: update to use LoadTuningTabResponse type
+  // const saveTuningTabData = ref<SaveTuningTabRequestBody>()
+  const isDataFetched = ref(false);
+
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken } = useUserDataStore();
-  
-  const loadTuningTabData = ref<load_tuning_tab_response>()
-  const saveTuningTabData = ref<save_tuning_tab_response>()
+  const userDataStore = useUserDataStore();
 
   /**
-   * query load_tuning_tab API
+   * get LoadCalibrationRun data
+   * @returns {any} LoadCalibrationRun data
    */
-  const fetchTuningTabData = async () => {
-    try {
-      const tuningTabDataResult = await makeProtectedApiCall<load_tuning_tab_response>(
-        `${ngencerfBaseUrl}/calibration/load_tuning_tab/`,
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${getAccessToken()}`,
-            "Content-Type": 'application/json'
-          },
-          body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
-        }
-      );
+  function getLoadCalibrationRunData(): any {
+    return loadCalibrationRunData.value;
+  }
 
-      console.log('load tuning data from tuningStore', tuningTabDataResult);
-      loadTuningTabData.value = tuningTabDataResult ?? undefined; // TODO: add type guards
-    } catch (error) {
-      console.error('Failed to load tuning data:', error); // TODO: use toast
+  /** 
+   * get LoadTuningTabResponse data
+   * @returns {LoadTuningTabResponse | undefined} LoadTuningTabResponse data
+   */
+  function getLoadTuningTabData(): LoadTuningTabResponse | undefined {
+    return loadTuningTabData.value;
+  }
+
+  // /**
+  //  * get SaveTuningTabResponse data
+  //  * @returns {SaveTuningTabResponse | undefined} SaveTuningTabResponse data
+  //  */
+  // function getSaveTuningTabData(): SaveTuningTabRequestBody | undefined {
+  //   return saveTuningTabData.value;
+  // }
+
+  // /**
+  //  * set save tuning tab data
+  //  * @param {SaveTuningTabRequestBody} data - SaveTuningTabRequestBody data
+  //  */
+  // function setSaveTuningTabData(data: SaveTuningTabRequestBody) {
+  //   saveTuningTabData.value = data
+  // }
+
+  /**
+   * fetch Tuning Tab data
+   */
+  async function fetchTuningTabData(): Promise<void> {
+    const loadCalibrationRunOutput: string | null = await makeProtectedApiCall(
+      `${ngencerfBaseUrl}/calibration/load_calibration_run/?calibration_run_id=6`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${userDataStore.getAccessToken()}`
+        }
+      });
+      // console.log("loadCalibrationRunOutput:", loadCalibrationRunOutput);
+
+    if (loadCalibrationRunOutput) {
+      loadCalibrationRunData.value = loadCalibrationRunOutput;
+    }
+
+    const loadTuningTabOutput: string | null = await makeProtectedApiCall(
+      `${ngencerfBaseUrl}/calibration/load_tuning_tab/?calibration_run_id=6`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${userDataStore.getAccessToken()}`
+        }
+      });
+      // console.log("loadTuningTabOutput:", loadTuningTabOutput);
+
+    if (loadTuningTabOutput) {
+      loadTuningTabData.value = loadTuningTabOutput;
+    }
+
+    if (loadCalibrationRunData.value && loadTuningTabData.value) {
+      isDataFetched.value = true;
     }
   };
 
+  // /**
+  //  * post SaveTuningTab data
+  //  * @returns {Promise<any>} SaveTuningTab data
+  //  */
+  // async function postSaveTuningTabData(): Promise<any> {
+  //   const saveTuningTabOutput: string | null = await makeProtectedApiCall(
+  //     `${ngencerfBaseUrl}/calibration/save_tuning_tab/`,
+  //     {
+  //       method: 'POST',
+  //       headers: {
+  //         Authorization: `Bearer ${userDataStore.getAccessToken()}`
+  //       }
+  //     });
+  //     console.log("saveTuningTabOutput:", saveTuningTabOutput);
+  //     return saveTuningTabOutput;
+  //   }
+
+
   return {
-    loadTuningTabData,
+    isDataFetched,
+    getLoadCalibrationRunData,
+    getLoadTuningTabData,
     fetchTuningTabData
   }
+}, {
+  persist: {
+    storage: sessionStorage
+  },
 });
 
 /* Pinia supports Hot Module replacement so you can edit your stores

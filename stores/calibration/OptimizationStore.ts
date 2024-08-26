@@ -4,7 +4,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import type { optimization_tab_data, optimization_input_data, select_option } from "~/composables/NextGenModel";
-import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
 export const useOptimizationStore = defineStore( 'OptimizationStore', () => {

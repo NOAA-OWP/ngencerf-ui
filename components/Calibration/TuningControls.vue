@@ -141,16 +141,12 @@
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
-import { makeProtectedApiCall } from "~/utils/UserAuth";
 import { mockCalibrationTuningData } from "~/mockApi/calibrationAPIData";
 import type { CalibrationTuningData } from "~/composables/NextGenModel";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
-const { ngencerfBaseUrl } = useBackendConfig();
 const tuningStore = useTuningStore();
-const userDataStore = useUserDataStore();
 
 const loading = ref(true);
 
@@ -181,28 +177,22 @@ onMounted(async () => {
     calibrationTuningDataList.value.push(<CalibrationTuningData>tuningData)
   });
 
-  const loadTuningTabOutput: string | null = await makeProtectedApiCall(
-  `${ngencerfBaseUrl}/calibration/load_tuning_tab/?calibration_run_id=6`,
-  {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${userDataStore.getAccessToken()}`
-    }
-  });
-  console.log("loadTuningTabOutput:", loadTuningTabOutput);
+  if (!tuningStore.isDataFetched) {
+    await tuningStore.fetchTuningTabData();    
+  }
 
-  const loadCalibrationRunOutput: string | null = await makeProtectedApiCall(
-  `${ngencerfBaseUrl}/calibration/load_calibration_run/?calibration_run_id=6`,
-  {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${userDataStore.getAccessToken()}`
-    }
-  });
-  console.log("loadCalibrationRunOutput:", loadCalibrationRunOutput);
+  const loadTuningTabData = tuningStore.getLoadTuningTabData();
+  const loadCalibratinRunData = tuningStore.getLoadCalibrationRunData();
+  console.log("loadTuningTabData:", loadTuningTabData);
+  console.log("loadCalibrationRunData:", loadCalibratinRunData);
+  console.log("calibration_times:", loadCalibratinRunData.calibration_times);
+  console.log("calibration_start_time:", loadCalibratinRunData.calibration_times.calibration_start_time);
+
+  const calibration_start_time = "2000-01-01T00:00:00Z";
+  loadCalibratinRunData.calibration_times.calibration_start_time = calibration_start_time;
+
+  console.log("calibration_start_time:", loadCalibratinRunData.calibration_times.calibration_start_time);
 });
-
-
 
 const AutoValChecked = () => {
   const ele = <HTMLInputElement>document.getElementById("CheckTheBox");

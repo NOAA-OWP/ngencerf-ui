@@ -4,7 +4,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { makeProtectedApiCall } from "~/utils/UserAuth"
+import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { select_option, gage_tab_data, save_gage_tab_response } from "~/composables/NextGenModel";
 
 export const useGageStore = defineStore( 'GageStore', () => {

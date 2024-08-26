@@ -3,7 +3,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { generalStore } from "../common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import type { select_option, formulation_tab_data, sloth_parameter_data } from "~/composables/NextGenModel";
 
