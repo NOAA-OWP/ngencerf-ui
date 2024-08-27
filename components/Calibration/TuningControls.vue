@@ -229,52 +229,53 @@ onMounted(async () => {
 
 // watch for changes to the simulation and calibration times and handle validation
 watch([simStartTime, simEndTime, calStartTime, calEndTime], ([newSimStart, newSimEnd, newCalStart, newCalEnd]) => {
-  // Convert ISO strings to Date objects
+  // convert ISO strings to Date objects
   const simStartDate = new Date(newSimStart);
   const simEndDate = new Date(newSimEnd);
   const calStartDate = new Date(newCalStart);
   const calEndDate = new Date(newCalEnd);
 
+  // convert range dates to Date objects
   const rangeStartDate = new Date(rangeDateFrom.value);
   const rangeEndDate = new Date(rangeDateTo.value);
 
-  // Ensure Simulation Start is within timeRange
+  // ensure Simulation Start is within timeRange
   if (simStartDate < rangeStartDate || simStartDate > rangeEndDate) {
     alert('Simulation Start must be within the defined time range');
     simStartTime.value = rangeStartDate.toISOString();
   }
 
-  // Ensure Simulation End is within timeRange
+  // ensure Simulation End is within timeRange
   if (simEndDate < rangeStartDate || simEndDate > rangeEndDate) {
     alert('Simulation End must be within the defined time range');
     simEndTime.value = new Date(Math.min(rangeEndDate.getTime(), simStartDate.getTime() + 60 * 60 * 1000)).toISOString();
   }
 
-  // Ensure Calibration Start is within timeRange
+  // ensure Calibration Start is within timeRange
   if (calStartDate < rangeStartDate || calStartDate > rangeEndDate) {
     alert('Calibration Start must be within the defined time range');
     calStartTime.value = new Date(Math.max(rangeStartDate.getTime(), simStartDate.getTime())).toISOString();
   }
 
-  // Ensure Calibration End is within timeRange
+  // ensure Calibration End is within timeRange
   if (calEndDate < rangeStartDate || calEndDate > rangeEndDate) {
     alert('Calibration End must be within the defined time range');
     calEndTime.value = new Date(Math.min(rangeEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
   }
 
-  // Ensure Sim end is after Sim start
+  // ensure Sim end is after Sim start
   if (simEndDate <= simStartDate) {
     alert('Simulation End must be after Simulation Start');
     simEndTime.value = new Date(simStartDate.getTime() + 60 * 60 * 1000).toISOString();
   }
 
-  // Ensure Cal start is within Sim start and Sim end
+  // ensure Cal start is within Sim start and Sim end
   if (calStartDate < simStartDate || calStartDate > simEndDate) {
     alert('Calibration Start must be within Simulation Start and End');
     calStartTime.value = new Date(Math.max(simStartDate.getTime(), rangeStartDate.getTime())).toISOString();
   }
 
-  // Ensure Cal end is after Cal start and within Sim end
+  // ensure Cal end is after Cal start and within Sim end
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
     alert('Calibration End must be after Calibration Start and within Simulation End');
     calEndTime.value = new Date(Math.min(simEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
