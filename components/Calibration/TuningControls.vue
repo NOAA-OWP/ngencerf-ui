@@ -94,10 +94,14 @@
 
                 <div class="text-left  mt-5">
                   <div class="inline-block text-left">Name:</div><br />
-                  <select id="ParamName" class="varInputs inline-block mt-2">
-                    <option value="" selected disabled>...</option>
+                  <select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter">
+                    <option v-for="param in calibrationTuningParameters" :key="param.parameter" :value="param.parameter">
+                      {{ param.parameter }}
+                    </option>
                   </select>
-                  <div id="UploadParams" class="ngenButtonDiv inline ml-3"><button>Add / Update</button></div>
+                  <div id="UploadParams" class="ngenButtonDiv inline ml-3">
+                    <button @click="addParameterToTable">Add / Update</button>
+                  </div>
                 </div>
               </div>
 
@@ -152,8 +156,6 @@ const {
   loadCalibrationRunData,
   loadTuningTabData,
   isDataFetched,
-  // getLoadCalibrationRunData,
-  // getLoadTuningTabData,
   userCalibrationTimes,
   userCalibrationTuningParameters,
   userOuptutVariableToCalibrate,
@@ -177,46 +179,60 @@ const datetime = ref();
 const rangeDateFrom = ref("1980-01-01");
 const rangeDateTo = ref("1024-05-31");
 
-const calibrationTuningDataList = ref<CalibrationTuningData[]>([])
+const calibrationTuningDataList = ref<any[]>([])
+const calibrationTuningParameters = ref<any[]>([]);
+const selectedParameter = ref<any>(null);
+
 
 onMounted(async () => {
+  console.log("onMounted");
   setTimeout(() => {
     loading.value = false;
   }, 500);
 
-  // mockCalibrationTuningData().forEach((tuningData, index) => {
-  //   calibrationTuningDataList.value.push(<CalibrationTuningData>tuningData)
-  // });
-
+  console.log("isDataFetched:", isDataFetched.value);
   if (!isDataFetched.value) {
-    await fetchTuningTabData();    
+    await fetchTuningTabData();
   }
+
+  console.log("loadTuningTabData:", loadTuningTabData.value);
+  console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
+  console.log("calibration_times:", loadCalibrationRunData.value.calibration_times);
+
+  const timeRange = loadCalibrationRunData.value.time_range;
+  if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
+    console.log("timeRange is null");
+    // set timeRange to a test value. timeRange must encompass the entire time range of calibration_times
+  } else {
+    console.log("timeRange:", timeRange);
+  }
+
+  // set the calibration tuning parameters
+  const calibrationTuningModules = loadTuningTabData.value?.modules;
+  calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module.parameters.map((param: any) => ({
+    parameter: param.name,
+    min: param.minimum,
+    max: param.maximum,
+    initValue: param.initial_value
+  }))) || [];
 });
 
-console.log("loadTuningTabData:", loadTuningTabData.value);
-console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
-console.log("calibration_times:", loadCalibrationRunData.value.calibration_times);
 
-const timeRange = loadCalibrationRunData.value.time_range;
-if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
-  console.log("timeRange is null");
-  // set timeRange to a test value. timeRange must encompass the entire time range of calibration_times
-} else {
-  console.log("timeRange:", timeRange);
-}
+/**
+ * Add the selected calibration tuning parameter to the table
+ */
+const addParameterToTable = () => {
+  const parameter = calibrationTuningParameters.value.find(param => param.parameter === selectedParameter.value);
+  if (parameter) {
+    calibrationTuningDataList.value.push({
+      parameter: parameter.parameter,
+      min: parameter.min,
+      max: parameter.max,
+      initValue: parameter.initValue,
+    });
+  }
+};
 
-const calibrationTuningModules = loadTuningTabData.value?.modules;
-const calibrationTuningParameters = calibrationTuningModules?.flatMap((module: any) => module.parameters);
-console.log("calibrationTuningParameters:", calibrationTuningParameters);
-
-for (const parameter of calibrationTuningParameters) {
-  calibrationTuningDataList.value.push({
-    parameter: parameter.name,
-    min: parameter.minimum,
-    max: parameter.maximum,
-    initValue: parameter.initial_value,
-  });
-}
 
 const AutoValChecked = () => {
   const ele = <HTMLInputElement>document.getElementById("CheckTheBox");
