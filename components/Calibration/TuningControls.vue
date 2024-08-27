@@ -15,20 +15,20 @@
               <div id="BoxBottomLeft" class="pt-2">
                 <div class="timeBlocks">
                   <div>Simulation Start:
-                    <VueDatePicker class="datePickers dp__theme_dark" v-model="simStartTime" time-picker-inline utc
-                      format="yyyy-mm-dd  hh:mm" />
+                    <VueDatePicker class="datePickers dp__theme_dark" v-model="simStartTime" time-picker-inline
+                      format="yyyy-MM-dd  hh:00" />
                   </div>
                   <div>Simulation End:
-                    <VueDatePicker class="datePickers dp__theme_dark" v-model="simEndTime" time-picker-inline utc
-                      format="yyyy-mm-dd  hh:mm" />
+                    <VueDatePicker class="datePickers dp__theme_dark" v-model="simEndTime" time-picker-inline
+                      format="yyyy-MM-dd  hh:00" />
                   </div>
                   <div>Calibration Start:
-                    <VueDatePicker class="datePickers dp__theme_dark" v-model="calStartTime" time-picker-inline utc
-                      format="yyyy-mm-dd  hh:mm" />
+                    <VueDatePicker class="datePickers dp__theme_dark" v-model="calStartTime" time-picker-inline
+                      format="yyyy-MM-dd  hh:00" />
                   </div>
                   <div>Calibration End:
-                    <VueDatePicker class="datePickers dp__theme_dark" v-model="calEndTime" time-picker-inline utc
-                      format="yyyy-mm-dd  hh:mm" />
+                    <VueDatePicker class="datePickers dp__theme_dark" v-model="calEndTime" time-picker-inline
+                      format="yyyy-MM-dd  hh:00" />
                   </div>
                 </div>
               </div>
@@ -147,6 +147,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 
 import { mockCalibrationTuningData } from "~/mockApi/calibrationAPIData";
 import type { CalibrationTuningData } from "~/composables/NextGenModel";
+import { calculateTimeRange, convertTimeZone } from "~/utils/TimeHelpers";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
@@ -176,8 +177,8 @@ const avCalEndTime = ref();
 const autoValidation = ref(false);
 const datetime = ref();
 
-const rangeDateFrom = ref("1980-01-01");
-const rangeDateTo = ref("1024-05-31");
+const rangeDateFrom = ref<any>("1980-01-01");
+const rangeDateTo = ref<any>("2024-08-27");
 
 const calibrationTuningDataList = ref<any[]>([])
 const calibrationTuningParameters = ref<any[]>([]);
@@ -197,7 +198,16 @@ onMounted(async () => {
 
   console.log("loadTuningTabData:", loadTuningTabData.value);
   console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
-  console.log("calibration_times:", loadCalibrationRunData.value.calibration_times);
+  console.log("calibration_times:", loadCalibrationRunData.value?.calibration_times);
+
+  const calibrationTimes = loadCalibrationRunData.value?.calibration_times;
+  if (calibrationTimes) {
+    const { rangeStart, rangeEnd } = calculateTimeRange(calibrationTimes);
+    rangeDateFrom.value = rangeStart;
+    rangeDateTo.value = rangeEnd;
+  } else {
+    console.log("calibration_times is missing or invalid");
+  }
 
   const timeRange = loadCalibrationRunData.value.time_range;
   if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
@@ -217,9 +227,62 @@ onMounted(async () => {
   }))) || [];
 });
 
+// watch for changes to the simulation and calibration times and handle validation
+watch([simStartTime, simEndTime, calStartTime, calEndTime], ([newSimStart, newSimEnd, newCalStart, newCalEnd]) => {
+  // Convert ISO strings to Date objects
+  const simStartDate = new Date(newSimStart);
+  const simEndDate = new Date(newSimEnd);
+  const calStartDate = new Date(newCalStart);
+  const calEndDate = new Date(newCalEnd);
+
+  const rangeStartDate = new Date(rangeDateFrom.value);
+  const rangeEndDate = new Date(rangeDateTo.value);
+
+  // Ensure Simulation Start is within timeRange
+  if (simStartDate < rangeStartDate || simStartDate > rangeEndDate) {
+    alert('Simulation Start must be within the defined time range');
+    simStartTime.value = rangeStartDate.toISOString();
+  }
+
+  // Ensure Simulation End is within timeRange
+  if (simEndDate < rangeStartDate || simEndDate > rangeEndDate) {
+    alert('Simulation End must be within the defined time range');
+    simEndTime.value = new Date(Math.min(rangeEndDate.getTime(), simStartDate.getTime() + 60 * 60 * 1000)).toISOString();
+  }
+
+  // Ensure Calibration Start is within timeRange
+  if (calStartDate < rangeStartDate || calStartDate > rangeEndDate) {
+    alert('Calibration Start must be within the defined time range');
+    calStartTime.value = new Date(Math.max(rangeStartDate.getTime(), simStartDate.getTime())).toISOString();
+  }
+
+  // Ensure Calibration End is within timeRange
+  if (calEndDate < rangeStartDate || calEndDate > rangeEndDate) {
+    alert('Calibration End must be within the defined time range');
+    calEndTime.value = new Date(Math.min(rangeEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
+  }
+
+  // Ensure Sim end is after Sim start
+  if (simEndDate <= simStartDate) {
+    alert('Simulation End must be after Simulation Start');
+    simEndTime.value = new Date(simStartDate.getTime() + 60 * 60 * 1000).toISOString();
+  }
+
+  // Ensure Cal start is within Sim start and Sim end
+  if (calStartDate < simStartDate || calStartDate > simEndDate) {
+    alert('Calibration Start must be within Simulation Start and End');
+    calStartTime.value = new Date(Math.max(simStartDate.getTime(), rangeStartDate.getTime())).toISOString();
+  }
+
+  // Ensure Cal end is after Cal start and within Sim end
+  if (calEndDate <= calStartDate || calEndDate > simEndDate) {
+    alert('Calibration End must be after Calibration Start and within Simulation End');
+    calEndTime.value = new Date(Math.min(simEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
+  }
+});
 
 /**
- * Add the selected calibration tuning parameter to the table
+ * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
 const addParameterToTable = () => {
   const parameter = calibrationTuningParameters.value.find(param => param.parameter === selectedParameter.value);
