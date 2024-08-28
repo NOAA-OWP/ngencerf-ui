@@ -3,7 +3,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import type { optimization_tab_data, optimization_input_data, select_option } from "~/composables/NextGenModel";
+import type { OptimizationTabData, OptimizationInputData, SelectOption } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/utils/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
@@ -17,12 +17,13 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
    /**
     * ref ui user input
     */
-   const optimizationTabData = ref<optimization_tab_data>()
+   const data_loading = ref<boolean>(true)
+   const optimizationTabData = ref<OptimizationTabData>()
    const uiStreamFlowThreshold = ref<number>()
    const uiPeakFlowThreshold = ref<number>()
    const uiMetric = ref<string>("")
    const uiOptimization = ref<string>("")
-   const uiOptimizationInputs = ref<optimization_input_data[]>([])
+   const uiOptimizationInputs = ref<OptimizationInputData[]>([])
    const uiObjectiveFunction = ref<string>("")
    const uiPlotFrequency = ref<number>(0)
    const uiStopCriteria = ref<number>(0)
@@ -37,10 +38,12 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
    } ).then( ( optimizationTabDataResult ) => {
       console.log( 'load optimization data from optimizationStore', optimizationTabDataResult )
       optimizationTabData.value = optimizationTabDataResult ?? undefined
+      data_loading.value = false
    })
 
    return {
       optimizationTabData,
+      data_loading,
       uiMetric,
       uiObjectiveFunction,
       uiOptimization,

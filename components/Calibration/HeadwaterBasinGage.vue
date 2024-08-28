@@ -129,8 +129,8 @@ import { useGageStore } from "~/stores/calibration/GageStore";
 // const calibrationJobStore = useCalibrationJobStore()
 // const { show_gage_tab_data, selected_job } = calibrationJobStore
 const gageStore = useGageStore()
-const { gageData, gageTabData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
-const { queryGageTabData, fetchSelectedGageData } = gageStore
+const { gageData, gageTabData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs( gageStore )
+const {  fetchSelectedGageData } = gageStore
 
 const selected_rfc = ref<string>("")
 const showMap = ref(false);
