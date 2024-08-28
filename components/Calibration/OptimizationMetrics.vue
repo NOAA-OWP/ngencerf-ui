@@ -85,9 +85,12 @@
 import { storeToRefs } from "pinia";
 import type { AlgorithmParameter } from '~/composables/NextGenModel';
 import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
+import { useToast } from "primevue/usetoast";
+import { generalStore } from "~/stores/common/GeneralStore";
+import { useUserDataStore } from "~/stores/common/UserDataStore";
 
 const optimizationStore = useOptimizationStore()
-const { uiMetric,
+const { 
       uiObjectiveFunction,
       uiOptimization,
       uiOptimizationInputs,
@@ -95,10 +98,45 @@ const { uiMetric,
       uiPlotFrequency,
       uiStopCriteria,
       uiStreamFlowThreshold,
-      data_loading } = optimizationStore
+      data_loading,
+      getOptimizationAlgorithmOptionsList,
+      getObjectiveFunctionOptionsList,
+      showObjectiveFunctionPeakFlow,
+      showObjectiveFunctionStreamFlow,
+      getSelectedMetricInfo,
+      getOptimizationInputUserData
+      } = storeToRefs( optimizationStore )
+const { saveOptimizationTabData, resetOptimizationInputs } = optimizationStore
+const { fetchUserCalibrationRunData } = useUserDataStore()
+const { getCalibrationTabIndex } = generalStore()
+const toast = useToast()
+      
+const cbCategoricalDisabled = ref<boolean>( false )
+const cbEventBasedDisabled = ref<boolean>( false )
+const cbIsCategorical = ref<boolean>( false )
+const cbIsEvenBased = ref<boolean>( false )
+const showMetricPeakFlow = ref<boolean>( false )
+const showMetricStreamFlow = ref<boolean>( false )
 
-//const loading = ref(true);
-const showFlowThreshold = ref(false);
+/**
+ * update objective function and metric peak flow/stream flow field visibility
+ */
+const updateMetricFlowFieldVisibility = () => {
+   if( getSelectedMetricInfo.value ) {      
+      //reset toggleable field available property
+      cbCategoricalDisabled.value = false
+      cbEventBasedDisabled.value = false
+      showObjectiveFunctionStreamFlow.value = false
+      showObjectiveFunctionPeakFlow.value = false
+      uiStreamFlowThreshold.value = undefined
+      uiPeakFlowThreshold.value = undefined
+      showMetricStreamFlow.value = false
+      showMetricPeakFlow.value = false
+
+      const metricInfo = getSelectedMetricInfo.value?.pop()
+      
+      cbIsCategorical.value = metricInfo?.categorical ?? false
+      cbIsEvenBased.value = metricInfo?.event_based ?? false
 
       if( metricInfo?.categorical == true ) {
          showObjectiveFunctionStreamFlow.value = true

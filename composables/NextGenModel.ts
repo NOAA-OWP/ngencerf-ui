@@ -15,6 +15,12 @@ export interface CeatedCalibrationRun {
    calibration_run_id: number;
 }
 
+export interface GeneralSaveTabResponse {
+   message: string;
+   calibration_run_id: number;
+   status: string;
+}
+
 /**
  * model for calibration job list
  */
@@ -60,7 +66,7 @@ export interface UserCalibrationRunData {
    streamflow_threshold: number;
    peak_flow_threshold: number;
    optimization: string;
-   optimization_inputs: OptimizationInputData[];
+   optimization_inputs: UserCalibrationRunOptimizationInputData[];
    plot_frequency: number;
    stop_criteria: number;
    status: string;
@@ -96,6 +102,11 @@ export interface UserCalibrationRunParametersData {
    maximum: number;
    initial_value: number;
    module: string;
+}
+
+export interface UserCalibrationRunOptimizationInputData {
+   name: string;
+   value: number;
 }
 
 export interface SlothParameterData {
@@ -157,10 +168,7 @@ export interface ObservationalSourceValueData {
    is_active: boolean;
 }
 
-export interface SaveGageTabResponse {
-   message: string;
-   calibration_run_id: number;
-   status: string;
+export interface SaveGageTabResponse extends GeneralSaveTabResponse {
    geopackage_image: string;
 }
 
@@ -177,12 +185,6 @@ export interface FormulationModuleData {
    name: string;
    groups: string[];
    used_by_calibration_run: boolean;
-}
-
-export interface FormulationSaveResponse {
-  message: string;
-  calibration_run_id: number;
-  status: string;
 }
 
 export interface tuning_load {
@@ -277,11 +279,6 @@ export interface OptimizationMetricData {
    is_active: boolean;
    categorical: boolean;
    event_based: boolean;
-}
-
-export interface OptimizationInputData {
-   name: string;
-   value: number;
 }
 
 export interface OptimizationData {

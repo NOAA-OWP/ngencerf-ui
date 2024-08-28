@@ -20,7 +20,7 @@
               <ConfirmDialog></ConfirmDialog>
               <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
                 :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>               
-              <DataTable id="cr-list" :value="userCalibrationJobsListData" scrollable scroll-height="400px"
+              <DataTable id="cr-list" :value="userCalibrationJobsListData" sortField="calibration_run_id" :sortOrder="-1" scrollable scroll-height="400px"
                 table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
                 contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
                 :rowStyle="rowStyle">
@@ -67,13 +67,11 @@ const calibrationJobStore = useCalibrationJobStore()
 const { calibrationJobId } = storeToRefs( generalStore() )
 const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
 const { fetchUserCalibrationJobsListData } = useUserDataStore()
-//const { fetchJobsListData } = storeToRefs( calibrationJobStore )
-//const { refreshJobListData, fetchNewCalibrationRunId, queryJobsListData } = calibrationJobStore
 const { fetchNewCalibrationRunId } = calibrationJobStore
 
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
-//const selectedCalibrationRun = ref<CalibrationRun>()
+
 const selectedCalibrationRun = ref<JobListItem>()
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
@@ -149,37 +147,8 @@ const deleteSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
 }
 const acceptDelete = (selectedRunId: number) => {
   toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
-  // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id != selectedRunId )
-  // calibration_jobs_list.value = reduced_calibration_job_list
-  //refreshJobListData()
   fetchUserCalibrationJobsListData()
   selectedCalibrationRun.value = undefined    
-}
-
-const rowStyle = (data: any) => {
-  if (!['Saved', 'Ready'].includes(data.status)) {
-    return { backgroundColor: 'gainsboro' }
-  }
-}
-
-
-onMounted(() => {
-  // console.log( 'onmounted' )
-  //queryJobsListData()
-  //fetchCalibrationJobsList()
-  // console.log(localStorage);
-});
-
-const NewCalibration = async () => {
-  const fetchedId = await fetchNewCalibrationRunId()
-  if( fetchedId != undefined ) {
-    calibrationJobId.value = fetchedId.calibration_run_id
-    if( calibrationJobId.value > 0 ) {
-      await navigateTo("Calibration");
-    } else {
-      toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 })
-    }
-  }
 }
 </script>
 

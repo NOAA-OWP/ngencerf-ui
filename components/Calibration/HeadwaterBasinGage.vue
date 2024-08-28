@@ -132,7 +132,29 @@ import { useToast } from "primevue/usetoast";
 
 const gageStore = useGageStore()
 const { gageData, gageTabData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs( gageStore )
-const {  fetchSelectedGageData } = gageStore
+const {  fetchSelectedGageData, saveGageTabData } = gageStore
+const { getCalibrationTabIndex } = generalStore()
+const { fetchUserCalibrationRunData } = useUserDataStore()
+const toast = useToast()
+
+/**
+ * event bus for save click
+ */
+useListen( 'calibrationButtonGroup:buttonClick', ( actionButton ) => {
+  if( getCalibrationTabIndex() == 1 && actionButton == 'SAVE' ) {
+    const save_tab_response = saveGageTabData()    
+    console.log( `saveTabContent Gage, should be tabIndex 1, on tabIndex ${getCalibrationTabIndex()}, save response: `, save_tab_response )
+    save_tab_response.then( ( response ) => {
+      console.log( response )
+      toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
+      fetchUserCalibrationRunData()
+    }) 
+  }
+} )
+
+const onGageSelectionChange = () => {
+  fetchSelectedGageData()
+}
 
 /**
  * follow section waiting further detail to be implemented
