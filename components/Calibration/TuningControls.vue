@@ -89,7 +89,10 @@
                   <select id="ParamFile" class="varInputs inline-block mt-2">
                     <option value="" selected disabled>...</option>
                   </select>
-                  <div id="UploadParams" class="ngenButtonDiv inline ml-3"><button>UPLOAD</button></div>
+                  <div id="UploadParams" class="ngenButtonDiv inline ml-3">
+                    <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+                    <button @click="triggerFileInput">UPLOAD</button>
+                  </div>
                 </div>
 
                 <div class="text-left  mt-5">
@@ -150,7 +153,13 @@ import type { CalibrationTuningData } from "~/composables/NextGenModel";
 import { calculateTimeRange, convertTimeZone } from "~/utils/TimeHelpers";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { makeProtectedApiCall } from '~/composables/UserAuth';
+// import { useFileStorage } from 'nuxt-file-storage';
+import { useBackendConfig } from "~/composables/UseBackendConfig";
 
+const { ngencerfBaseUrl } = useBackendConfig();
+
+const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
 const { fetchTuningTabData } = tuningStore;
 const {
@@ -177,12 +186,13 @@ const avCalEndTime = ref();
 const autoValidation = ref(false);
 const datetime = ref();
 
-const rangeDateFrom = ref<any>("1980-01-01");
-const rangeDateTo = ref<any>("2024-08-27");
+const rangeDateFrom = ref();
+const rangeDateTo = ref();
 
 const calibrationTuningDataList = ref<any[]>([])
 const calibrationTuningParameters = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
 
 
 onMounted(async () => {
@@ -281,6 +291,50 @@ watch([simStartTime, simEndTime, calStartTime, calEndTime], ([newSimStart, newSi
     calEndTime.value = new Date(Math.min(simEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
   }
 });
+
+/**
+ * Trigger file input dialog
+ */
+const triggerFileInput = () => {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+};
+
+/**
+ * Handle parameter file upload
+ * @param event
+ */
+const handleFileUpload = async (event: Event) => {
+  console.log('Upload button clicked');
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) {
+    try {
+      const formData = new FormData();
+      formData.append('user_parameter_file', file);
+      formData.append('calibration_run_id', '6');
+
+      const response = await makeProtectedApiCall(
+        `${ngencerfBaseUrl}/calibration/upload_user_parameters/`, 
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${userDataStore.getAccessToken()}`,
+          },
+          body: formData,
+        });
+
+      if (response) {
+        console.log('File uploaded successfully:', response);
+      }
+    } catch (error) {
+      console.error('File upload failed:', error);
+    }
+  } else {
+    console.error('No file selected');
+  }
+};
 
 /**
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
