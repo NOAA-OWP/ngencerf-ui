@@ -123,10 +123,47 @@
 
           <div id="TuningDataList">
             <DataTable :value="calibrationTuningDataList" scrollable scroll-height="200px">
-              <Column field="parameter" header="Parameter" sortable></Column>
-              <Column field="min" header="Min" sortable></Column>
-              <Column field="max" header="Max" sortable></Column>
-              <Column field="initValue" header="Initial Value" sortable></Column>
+              <!-- parameter column, uneditable with light grey background -->
+              <Column field="parameter" header="Parameter" sortable>
+                <template #body="slotProps">
+                  <span style="background-color: lightgrey; padding: 4px; display: block;">
+                    {{ slotProps.data.parameter }}
+                  </span>
+                </template>
+              </Column>
+              
+              <!-- min column, editable -->
+              <Column field="min" header="Min" sortable>
+                <template #body="slotProps">
+                  <input
+                    type="text"
+                    v-model="slotProps.data.min"
+                    style="width: 100%;"
+                  />
+                </template>
+              </Column>
+
+              <!-- max column, editable -->
+              <Column field="max" header="Max" sortable>
+                <template #body="slotProps">
+                  <input
+                    type="text"
+                    v-model="slotProps.data.max"
+                    style="width: 100%;"
+                  />
+                </template>
+              </Column>
+
+              <!-- initValue column, editable -->
+              <Column field="initValue" header="Initial Value" sortable>
+                <template #body="slotProps">
+                  <input
+                    type="text"
+                    v-model="slotProps.data.initValue"
+                    style="width: 100%;"
+                  />
+                </template>
+              </Column>
             </DataTable>
           </div>
         </div>
@@ -189,7 +226,7 @@ const datetime = ref();
 const rangeDateFrom = ref();
 const rangeDateTo = ref();
 
-const calibrationTuningDataList = ref<any[]>([])
+const calibrationTuningDataList = ref<any[]>([]);
 const calibrationTuningParameters = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -315,7 +352,7 @@ const handleFileUpload = async (event: Event) => {
       formData.append('user_parameter_file', file);
       formData.append('calibration_run_id', '6');
 
-      const response = await makeProtectedApiCall(
+      const response: any = await makeProtectedApiCall<any>(
         `${ngencerfBaseUrl}/calibration/upload_user_parameters/`, 
         {
           method: 'POST',
@@ -327,6 +364,15 @@ const handleFileUpload = async (event: Event) => {
 
       if (response) {
         console.log('File uploaded successfully:', response);
+        // Populate the Parameter table with the data from user-uploaded file
+        response.user_parameter_file.forEach((param: any) => {
+          calibrationTuningDataList.value.push({
+            parameter: param.param,
+            min: param.min,
+            max: param.max,
+            initValue: param.init,
+          });
+        })
       }
     } catch (error) {
       console.error('File upload failed:', error);
