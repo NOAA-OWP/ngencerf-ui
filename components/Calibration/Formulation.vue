@@ -25,7 +25,7 @@ FormulationName<template>
                      Groups: 
                      <Dropdown v-model="filterGroup" :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description" optionValue="name" class="ml-2" placeholder="ALL"></Dropdown>
                   </div>
-                  <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModulOptions" multiple optionLabel="name" optionValue="name" class="w-full h-60"></Listbox>
+                  <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple optionLabel="name" optionValue="name" class="w-full h-60"></Listbox>
                </div>
                <div class="col-span-2">&nbsp;</div>
                <div class="col-span-5">
@@ -53,7 +53,7 @@ FormulationName<template>
                   <label class="inline-block text-xl pl-10 pr-4" for="SlothName">SLoTH Name:</label>
                   <input class="inline-block w-auto" id="SlothName" type="text" v-model="new_sloth_variable_name">
                   <div class="ngenButtonDiv ml-3 inline-block">
-                     <button id="SlothAddBtn" @click="AddSlothVariable">Add</button>
+                     <button id="SlothAddBtn" @click="addSlothVariable">Add</button>
                   </div>
                </span>
                <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="items-center ml-10 mr-10 mt-4">
@@ -97,72 +97,63 @@ FormulationName<template>
                   </DataTable>
                </div>
             </div>
-
-
          </div>
-
       </div>
-
-
+      <div class="waitgif" v-if="data_loading">
+         <img src="@/assets/styles/img/wait.gif" />
+      </div>
    </div>
-
 </template>
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
+import { generalStore } from "~/stores/common/GeneralStore";
+import { useToast } from "primevue/usetoast";
+import { useUserDataStore } from "~/stores/common/UserDataStore";
 
 const new_sloth_variable_name = ref<string>("")
 
 const {
    filterGroup,
    useSlothParameters,
-   formulationTabData,
    selectedModuleValues,
    formulationNameInput,
    slothParameterInputs,
-   fetchFormulationModulOptions,
+   fetchFormulationModuleOptions,
    fetchFormulationModuleCoveredGroupFilterOptions,
    fetchFormulationModuleCoveredGroupOptions, 
-   fetchFormulationModuleCoveredGroups   
+   data_loading
 } = storeToRefs( useFormulationStore() )
 
-const { addNewSlothVariable, queryFormulationTabData } = useFormulationStore()
+const { addNewSlothVariable, saveFormulationTabData } = useFormulationStore()
+const { fetchUserCalibrationRunData } = useUserDataStore()
+const { getCalibrationTabIndex } = generalStore()
+const toast = useToast();
 
-const loading = ref(true);
-
-const AddSlothVariable = () => {
+/**
+ * add sloth variable entry to table and reset name field
+ */
+const addSlothVariable = () => {
    if( new_sloth_variable_name.value.trim() != '') {
       addNewSlothVariable( new_sloth_variable_name.value )
       new_sloth_variable_name.value = ''
    }
 }
 
-// onMounted(() => {
-//    setTimeout(() => {
-//       loading.value = false;
-//       queryFormulationTabData()
-//       formulationNameInput.value = formulationTabData.value?.formulation_name ?? ""
-//       selectedModuleValues.value = formulationTabData.value?.module_sources ?? []
-//       useSlothParameters.value = formulationTabData.value?.use_sloth ?? false
-//       slothParameterInputs.value = formulationTabData.value?.sloth_parameters ?? []
-//       console.log( selectedModuleValues )
-//    }, 500);
-// });
-
-const ModuleClicked = (e: MouseEvent) => {
-   const ele = e.target as HTMLElement;
-   const indexStr = ele.getAttribute("index");
-   const index = parseInt(indexStr as string);
-   const list = document.getElementById("ModulesList") as HTMLElement;
-   const lines = list.querySelectorAll("li");
-   const iele = lines[index] as HTMLElement;
-   if (iele.classList.contains("liActive")) {
-      iele.classList.remove("liActive");
-   } else {
-      iele.classList.add("liActive");
+/**
+ * event bus for save click
+ */
+useListen( 'calibrationButtonGroup:buttonClick', ( actionButton ) => {
+   if( getCalibrationTabIndex() === 2 && actionButton == 'SAVE' ) {
+      const save_formulation_response = saveFormulationTabData()
+      console.log( `saveTabContent Formulation, should be tabIndex 2, on tabIndex ${getCalibrationTabIndex()}, save response: `, save_formulation_response )
+      save_formulation_response.then( ( response ) => {
+         toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
+         fetchUserCalibrationRunData()
+      }) 
    }
-};
+})
 
 </script>
 

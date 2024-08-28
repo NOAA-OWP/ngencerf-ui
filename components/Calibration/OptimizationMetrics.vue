@@ -7,24 +7,29 @@
                <div id="OptAlg" class="bordered">
                Optimization Algorithm<br />
                Name:&nbsp;&nbsp;
-               <Select clas="rounded-md"></Select>
+               <Select clas="rounded-md" v-model="uiOptimization" :options="getOptimizationAlgorithmOptionsList" optionLabel="name"
+               optionValue="name" placeholder="" @change="optimizationSelectChange"></Select>
                </div>
             </div>
             <div class="flex-row mt-2">
                <div class="text-center">Algorithm Parameter(s)</div>
                <div id="AlgParamtable" class="text-center mt-3 bordered p-3">
-               <DataTable :value="algorithm_parameters" scrollable scroll-height="300px" fixedHeader=true>
-                  <Column field="parameter" header="Parameter" sortable></Column>
-                  <Column field="initValue" header="Initial Value" sortable></Column>
+               <DataTable :value="uiOptimizationInputs" scrollable  editMode="cell" scroll-height="300px" fixedHeader=true>
+                  <Column field="name" header="Parameter" sortable></Column>
+                  <Column field="value" header="Initial Value" sortable>
+                     <template #editor="{ index }">
+                        <InputText v-model="uiOptimizationInputs[ index ].value" autofocus class="w-12 p-1"></InputText>
+                     </template>
+                  </Column>
                </DataTable>
                </div>
-               <div id="ClearTableBtn" class="mb-5 ngenButtonDiv"><button>Clear <i class="pi pi-arrow-up"></i></button>
+               <div id="ClearTableBtn" class="mb-5 ngenButtonDiv"><button @click="resetOptimizationInputs">Clear <i class="pi pi-arrow-up"></i></button>
                </div>
             </div>
             <div class="flex-row">
                <div id="CalStop" class="bordered">
                Calibration Stop Criteria:<br />
-               <InputNumber inputId="stop-criteria" showButtons :min="0"></InputNumber><span class="ml-2">Interations</span>
+               <InputNumber inputId="stop-criteria" v-model="uiStopCriteria" showButtons :min="0"></InputNumber><span class="ml-2">Interations</span>
                </div>
             </div>
          </div>
@@ -35,33 +40,36 @@
             <div id="ObjFunct" class="bordered">
                Objective Function<br />
                Name:&nbsp;&nbsp;
-               <Select class="rounded-md"></Select>
-               <br/>
-               Flow Threshold: <InputNumber inputId="ofCategoricalFlowThreshold" class="w-24"></InputNumber> m3/s
-               <br/>
-               Peak Flow Threshold: <InputNumber inputId="ofEventBasedFlowThreshold" class="w-24"></InputNumber> quantile
+               <Select class="rounded-md" v-model="uiObjectiveFunction" :options="getObjectiveFunctionOptionsList" optionLabel="name"
+               optionValue="name" placeholder="" @change="updateMetricFlowFieldVisibility"></Select>
+               <div v-if="showObjectiveFunctionStreamFlow">
+               Flow Threshold: <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold" class="w-24"></InputNumber> m3/s
+               </div>
+               <div v-if="showObjectiveFunctionPeakFlow">
+               Peak Flow Threshold: <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quantile
+               </div>
             </div>
          </div>
          <div class="flex-row">
             <div id="Metrics" class="bordered">
-               Metrics<br />
-               <Checkbox inputId="CalcCatMetCB" class="h-5 w-5 mr-3 inline" :binary="true" />
+               <div>Metrics</div>
+               <Checkbox inputId="CalcCatMetCB" class="h-5 w-5 mr-3 inline" :binary="true" v-model="cbIsCategorical" :disabled="cbCategoricalDisabled" @change="toggleMetricStreamFlowInput" />
                <label for="CalcCatMetCB">Calculate Categorical Metrics</label>
-               <div v-if="showFlowThreshold" id="FlowThreshold" class="mt-3">
-               Flow Threshold: <InputNumber inputId="metricCategoricalFlowThreshold" class="w-24"></InputNumber> m3/s
+               <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-3">
+               Flow Threshold: <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold" class="w-24"></InputNumber> m3/s
                </div>
                <br/><br/>
-               <Checkbox inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline" :binary="true" />
+               <Checkbox inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline" :binary="true" v-model="cbIsEvenBased" :disabled="cbEventBasedDisabled" @change="toggleMetricPeakFlowInput" />
                <label for="CalEventMetCB">Calculate Event Based Metrics</label>
-               <div v-if="showFlowThreshold" id="FlowThreshold" class="mt-3">
-               Peak Flow Threshold: <InputNumber inputId="metricEventBasedFlowThreshold" class="w-24"></InputNumber> quantile
+               <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-3">
+               Peak Flow Threshold: <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quantile
                </div>
             </div>
          </div>
          <div class="flex-row">
             <div id="PlotGenFreq" class="bordered">
                Plot Generation Frequency (0 = off)<br />
-               Once Every:&nbsp;&nbsp;<InputNumber inputId="plotFrequency" showButtons :min="0"></InputNumber> &nbsp;&nbsp;Interations
+               Once Every:&nbsp;&nbsp;<InputNumber inputId="plotFrequency" v-model="uiPlotFrequency" showButtons :min="0"></InputNumber> &nbsp;&nbsp;Interations
             </div>
          </div>
 
@@ -74,6 +82,7 @@
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
 import type { AlgorithmParameter } from '~/composables/NextGenModel';
 import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 
@@ -91,21 +100,91 @@ const { uiMetric,
 //const loading = ref(true);
 const showFlowThreshold = ref(false);
 
-const ShowFlowThreshold = (e: MouseEvent) => {
-   const ele = <HTMLInputElement>document.getElementById("CalcCatMetCB");
-   showFlowThreshold.value = ele.checked as boolean;
-
+      if( metricInfo?.categorical == true ) {
+         showObjectiveFunctionStreamFlow.value = true
+         cbCategoricalDisabled.value = true
+      }
+      if( metricInfo?.event_based == true ) {
+         showObjectiveFunctionPeakFlow.value = true
+         cbEventBasedDisabled.value = true
+      }   
+   }   
 }
-const algorithm_parameters = ref<AlgorithmParameter[]>([])
 
-// onMounted(() => {
-//   mockAlogorithmParameterData().forEach((param, index) => {
-//     algorithm_parameters.value.push(<AlgorithmParameter>param)
-//   });
-//   setTimeout(() => {
-//     loading.value = false;
-//   }, 500);
-// })
+/**
+ * metric stream flow field visibility toggle 
+ */
+const toggleMetricStreamFlowInput = () => {
+   if ( !cbCategoricalDisabled.value && cbIsCategorical.value ) {
+      showMetricStreamFlow.value = true
+   } else if( !cbIsCategorical.value ) {
+      showMetricStreamFlow.value = false
+      uiStreamFlowThreshold.value = undefined
+   }
+}
+
+/**
+ * metric peak flow field visibility toggle 
+ */
+const toggleMetricPeakFlowInput = () => {
+   if( !cbEventBasedDisabled.value && cbIsEvenBased.value ) {
+      showMetricPeakFlow.value = true
+   } else if ( !cbIsEvenBased.value ) {
+      showMetricPeakFlow.value = false
+      uiPeakFlowThreshold.value = undefined
+   }
+}
+
+/**
+ * explicitly reload optimization input table data
+ */
+const optimizationSelectChange = () => {
+   uiOptimizationInputs.value = getOptimizationInputUserData.value
+}
+
+/**
+ * event bus for save click
+ */
+useListen( 'calibrationButtonGroup:buttonClick', ( actionButton ) => {
+   console.log( getCalibrationTabIndex() )
+   console.log( actionButton )
+   if( getCalibrationTabIndex() === 4 && actionButton == 'SAVE' ) {
+      const save_optimization_response = saveOptimizationTabData()
+      console.log( `saveTabContent Optimization, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `, save_optimization_response )
+      save_optimization_response.then( ( response ) => {
+         console.log( response )
+         toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
+         fetchUserCalibrationRunData()
+      }) 
+   }
+})
+
+/**
+ * explicitly watching loading status, as onmount happen prior to store loading. 
+ * make sure we manage the display base on user input AFTER data loading has completed 
+ */
+watch( () => data_loading.value, ( loading_status ) => {
+   const metricInfo = getSelectedMetricInfo.value?.pop()
+   
+   if( metricInfo?.categorical == true ) {
+      showObjectiveFunctionStreamFlow.value = true
+      cbCategoricalDisabled.value = true
+      cbIsCategorical.value = true
+   } else if( metricInfo?.categorical == false && uiStreamFlowThreshold.value ) {
+      showMetricStreamFlow.value = true
+      cbIsCategorical.value = true
+   }
+
+   if( metricInfo?.event_based == true ) {
+      showObjectiveFunctionPeakFlow.value = true
+      cbEventBasedDisabled.value = true
+      cbIsEvenBased.value = true
+   } else if( metricInfo?.event_based == false && uiPeakFlowThreshold.value ) {
+      showMetricPeakFlow.value = true
+      cbIsEvenBased.value = true
+   }
+})
+
 </script>
 
 <style lang="scss" scoped>
