@@ -112,8 +112,10 @@
                 <div class="">
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
                   <div class="mt-2">
-                    <select id="OutVar" class="varInputs">
-                      <option value="" selected disabled>...</option>
+                    <select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
+                      <option v-for="outputVariable in outputVariablesToCalibrate" :key="outputVariable.name" :value="outputVariable.name">
+                        {{ outputVariable.name }}
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -228,7 +230,9 @@ const rangeDateTo = ref();
 
 const calibrationTuningDataList = ref<any[]>([]);
 const calibrationTuningParameters = ref<any[]>([]);
+const outputVariablesToCalibrate = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
+const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 
 
@@ -264,14 +268,22 @@ onMounted(async () => {
     console.log("timeRange:", timeRange);
   }
 
-  // set the calibration tuning parameters
   const calibrationTuningModules = loadTuningTabData.value?.modules;
+
+  // set the calibration tuning parameters
   calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module.parameters.map((param: any) => ({
     parameter: param.name,
     min: param.minimum,
     max: param.maximum,
     initValue: param.initial_value
   }))) || [];
+
+  // set output variables to calibrate
+  outputVariablesToCalibrate.value = calibrationTuningModules?.flatMap((module: any) => module.output_variables.map((outputVar: any) => ({
+    name: outputVar.name,
+    description: outputVar.description,
+  }))) || [];
+  console.log("outputVariablesToCalibrate:", outputVariablesToCalibrate.value);
 });
 
 // watch for changes to the simulation and calibration times and handle validation
