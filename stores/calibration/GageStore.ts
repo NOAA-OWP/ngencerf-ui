@@ -33,16 +33,6 @@ export const useGageStore = defineStore( 'GageStore', () => {
     * load static gage tab data with provided calibration job id
     * @return {void}
     */
-   // const { data: gageTabData, refresh: refreshGageTabData, status: loadGageTabStatus } = useFetch( '/api/calibration/load_gage_tab', {
-   //    'method': 'POST',
-   //    headers: { Authorization: `Bearer ${useUserDataStore().getAccessToken()}` },
-   //    body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
-   // })
-   
-   /**
-    * load static gage tab data with provided calibration job id
-    * @return {void}
-    */
    async function queryGageTabData() {
       makeProtectedApiCall<GageTabData>( `${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
          method: "POST",
@@ -66,6 +56,10 @@ export const useGageStore = defineStore( 'GageStore', () => {
       })
    }
 
+   /**
+    * get iser se;ected domain name based on the selected gage
+    * @returns {string}
+    */
    const getSavedDomainValue = computed( () => {
       if( userCalibrationRunData.value?.gage == undefined || userCalibrationRunData.value?.gage.gage_id == "" ) {
          return ""
@@ -77,14 +71,10 @@ export const useGageStore = defineStore( 'GageStore', () => {
 
    queryGageTabData()
 
-   // async function refreshGageTabData() {
-   //    await queryGageTabData()
-   // }
-
-   const fetchGageTabData = computed( () => {
-      return gageTabData.value ?? navigateTo('/PreviousRuns');
-   })
-
+   /**
+    * return list of domain options for Select input
+    * @returns {SelectOption[]}
+    */
    const getDomainOptionsList = computed( () => {
       domainOptionsList.value = []
       gageTabData.value?.domain_values.forEach( ( domain_value ) => {
@@ -143,9 +133,12 @@ export const useGageStore = defineStore( 'GageStore', () => {
       gageData.value = selectedGageDataResponse ?? undefined
    }
 
-   
-   async function saveGageTabData(): Promise<SaveGageTabResponse> {
-      const saveGageTabDataResponse = await makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
+   /**
+    * return saving gage tab response from the server
+    * @returns {SaveGageTabResponse}
+    */
+   async function saveGageTabData() {
+      const saveGageTabDataResponse = await makeProtectedApiCall<SaveGageTabResponse>( `${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
          method: "POST",
          headers: { 
             "Authorization": `Bearer ${getAccessToken()}`,
@@ -168,7 +161,6 @@ export const useGageStore = defineStore( 'GageStore', () => {
       selectedGageValue,
       selectedObservationalValue,
       queryGageTabData,
-      //refreshGageTabData,
       getSavedDomainValue,
       gageTabData,
       getDomainOptionsList,

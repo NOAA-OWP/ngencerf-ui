@@ -3,7 +3,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import type { OptimizationTabData, OptimizationInputData, SelectOption } from "~/composables/NextGenModel";
+import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralSaveTabResponse } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/utils/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
@@ -20,26 +20,76 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
     */
    const data_loading = ref<boolean>(true)
    const optimizationTabData = ref<OptimizationTabData>()
+   const { userCalibrationRunData } = storeToRefs( userDataStore )
    const uiStreamFlowThreshold = ref<number>()
    const uiPeakFlowThreshold = ref<number>()
    const uiOptimizationInputs = ref<UserCalibrationRunOptimizationInputData[]>([])
    const uiOptimization = ref<string>("")
-   const uiOptimizationInputs = ref<OptimizationInputData[]>([])
    const uiObjectiveFunction = ref<string>("")
-   const uiPlotFrequency = ref<number>(0)
-   const uiStopCriteria = ref<number>(0)
+   const uiPlotFrequency = ref<number>()
+   const uiStopCriteria = ref<number>()
+   const optimizationAlgorithmOptionsList = ref<SelectOption[]>([])
+   const objectiveFunctionOptionsList = ref<SelectOption[]>([])
+   const showObjectiveFunctionPeakFlow = ref<boolean>(false)
+   const showObjectiveFunctionStreamFlow = ref<boolean>(false)
 
-   makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {
-      method: "POST",
-      headers: { 
-         "Authorization": `Bearer ${getAccessToken()}`,
-         "Content-Type": 'application/json'
-      },
-      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
-   } ).then( ( optimizationTabDataResult ) => {
-      console.log( 'load optimization data from optimizationStore', optimizationTabDataResult )
-      optimizationTabData.value = optimizationTabDataResult ?? undefined
-      data_loading.value = false
+   /**
+   * load static optimization tab data with provided calibration job id and initialize ui field data 
+   * @return {void}
+   */
+   async function queryOptimizationTabData() {
+      makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {
+         method: "POST",
+         headers: { 
+            "Authorization": `Bearer ${getAccessToken()}`,
+            "Content-Type": 'application/json'
+         },
+         body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
+      } ).then( ( optimizationTabDataResult ) => {
+         console.log( 'optimization tab data from optimizationStore', optimizationTabDataResult )
+         optimizationTabData.value = optimizationTabDataResult ?? undefined
+         data_loading.value = false
+
+         uiStreamFlowThreshold.value = userCalibrationRunData.value?.streamflow_threshold ?? undefined
+         uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold ?? undefined
+         uiObjectiveFunction.value = userCalibrationRunData.value?.objective_function ?? ""
+         uiOptimization.value = userCalibrationRunData.value?.optimization ?? ""         
+         uiPlotFrequency.value = userCalibrationRunData.value?.plot_frequency ?? 0
+         uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 100
+         uiOptimizationInputs.value = getOptimizationInputUserData.value ?? []
+      })
+   }
+   /**
+    * init data on store mount
+    */
+   queryOptimizationTabData()
+
+   /**
+    * return select options for optimization algorithm field
+    * @returns {SelectOption[]}
+    */
+   const getOptimizationAlgorithmOptionsList = computed( () => {
+      optimizationAlgorithmOptionsList.value = []
+      optimizationTabData.value?.optimizations.forEach( ( optimization_value ) => {
+         optimizationAlgorithmOptionsList.value.push({
+            name: optimization_value.name,
+            description: optimization_value.name
+         })
+      })
+      
+      return optimizationAlgorithmOptionsList.value
+   })
+
+   const getObjectiveFunctionOptionsList = computed( () => {
+      objectiveFunctionOptionsList.value = []
+      optimizationTabData.value?.metrics.forEach( ( metric_option ) => {
+         objectiveFunctionOptionsList.value.push({
+            name: metric_option.name,
+            description: metric_option.name
+         })
+      })
+
+      return objectiveFunctionOptionsList.value
    })
 
    /**
@@ -106,7 +156,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
    return {
       optimizationTabData,
       data_loading,
-      uiMetric,
+      queryOptimizationTabData,
       uiObjectiveFunction,
       uiOptimization,
       uiOptimizationInputs,
