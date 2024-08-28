@@ -24,7 +24,8 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    const formulationTabData = ref<FormulationTabData>()
 
    /**
-    * query load_formulation_tab API on store mount
+    * load forumlation tab data and init ref data
+    * @returns {void}
     */
    // const { data: formulationTabData, refresh: refreshFormulationTabData, status: loadFormulationTabStatus } = useFetch( '/api/calibration/load_formulation_tab', {
    //    method: 'POST',
@@ -85,6 +86,10 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       return modules_list
    })
 
+   /**
+    * return list of unique groups from the module list
+    * @returns {string[]}
+    */
    function fetchModuleCoveredGroupList() {
       let groupsList = <string[]>[]
       formulationTabData.value?.modules.forEach( ( moduleData ) => {
@@ -97,6 +102,10 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       return fetchModuleCoveredGroupList()
    })
 
+   /**
+    * return list of selected group names
+    * @returns {string[]}
+    */
    function selectedModuleCoveredGroups() {
       let selectedGroups = <string[]>[]
       formulationTabData.value?.modules.forEach( ( moduleData ) => {
@@ -107,6 +116,10 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       return selectedGroups
    }
 
+   /**
+    * return list of selected module name
+    * @returns {string[]}
+    */
    const getSavedModuleSelection = computed( () => {
       let selectedModules = <string[]>[]
       formulationTabData.value?.modules.forEach( ( moduleData ) => {
@@ -115,6 +128,10 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       return selectedModules      
    })
 
+   /**
+    * return list of group options for the group filter field
+    * @returns {SelectOption[]}
+    */
    const fetchFormulationModuleCoveredGroupFilterOptions = computed( () => {
       let groupOptionsList = <SelectOption[]>[{
          name: "",
@@ -130,6 +147,10 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       return groupOptionsList
    })
 
+   /**
+    * return list of group options for the group listbox field
+    * @returns {SelectOption[]}
+    */
    const fetchFormulationModuleCoveredGroupOptions = computed( () => {
       let groupOptionsList = <SelectOption[]>[]
       let groupsList = fetchModuleCoveredGroupList()
@@ -146,6 +167,11 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       return groupOptionsList
    })
 
+   /**
+    * add new sloth parameter with some default value
+    * @param variable_name
+    * @returns {void}
+    */
    function addNewSlothVariable( variable_name:string ): void {
       slothParameterInputs.value.push({
          "param_name": variable_name,
@@ -159,6 +185,10 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       })
    }
 
+   /**
+    * return save formulation tab response from the server
+    * @returns {GeneralSaveTabResponse}
+    */
    async function saveFormulationTabData() {
       // const response = await $fetch( '/api/calibration/save_formulation_tab', {
       //    method: "POST",
@@ -204,7 +234,8 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       fetchFormulationModuleCoveredGroupFilterOptions,
       fetchFormulationModuleCoveredGroupOptions,
       addNewSlothVariable,
-      saveFormulationTabData
+      saveFormulationTabData,
+      data_loading
    }
 })
 

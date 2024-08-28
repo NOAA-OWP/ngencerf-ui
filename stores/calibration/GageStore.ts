@@ -28,9 +28,10 @@ export const useGageStore = defineStore( 'GageStore', () => {
    const gageData = ref<GageData>()
    
    const data_loading = ref<boolean>(true)
-
+   
    /**
-    * query load_gage_tab api on store mount
+    * load static gage tab data with provided calibration job id
+    * @return {void}
     */
    // const { data: gageTabData, refresh: refreshGageTabData, status: loadGageTabStatus } = useFetch( '/api/calibration/load_gage_tab', {
    //    'method': 'POST',
@@ -96,6 +97,10 @@ export const useGageStore = defineStore( 'GageStore', () => {
       return domainOptionsList.value
    })
 
+   /**
+    * generate list of gage option for Select input based on the domain value and nwm_v3 filter
+    * @returns {SelectOption[]}
+    */
    const getGageOptionsList = computed( () => {
       gageOptionsList.value = []
       gageTabData.value?.gages.forEach( ( gage_value ) => {
@@ -120,6 +125,10 @@ export const useGageStore = defineStore( 'GageStore', () => {
       return gageTabData.value?.observational_source_values
    })
 
+   /**
+    *  fetch gage data based on the selected gage value
+    *  @returns {void}
+    */
    async function fetchSelectedGageData(): Promise<void> {
       const selectedGageDataResponse = await makeProtectedApiCall<GageData>( `${ngencerfBaseUrl}/calibration/get_gage/`, {
          method: "POST",
@@ -154,12 +163,10 @@ export const useGageStore = defineStore( 'GageStore', () => {
    }
 
    return {
-      //selected_calibration_run_id,
       selectedDomainValue,
       selectedForcingValue,
       selectedGageValue,
       selectedObservationalValue,
-      //fetchGageTabData,
       queryGageTabData,
       //refreshGageTabData,
       getSavedDomainValue,

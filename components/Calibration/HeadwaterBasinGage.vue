@@ -10,19 +10,19 @@
               <div class="col-span-1">&nbsp;</div>
               <div class="col-span-1">
                 Domain:<br />
-                <Dropdown v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
-                  optionValue="name" placeholder=" ... " class="w-40 m-auto"></Dropdown>
+                <Select v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
+                  optionValue="name" placeholder=" ... " class="w-40 m-auto"></Select>
               </div>
               <div class="col-span-1">
                 Gage:<br />
-                <Dropdown v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
-                  optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }" class="w-40" @change="onGageSelectionChange"></Dropdown>
+                <Select v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
+                  optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }" class="w-40" @change="onGageSelectionChange"></Select>
               </div>
               <div class="col-span-1">
                 Forcing:<br />
                 <span v-if="selectedForcingValue != 'upload'">
-                  <Dropdown v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                    optionValue="name" placeholder=" ... " class="w-40"></Dropdown>
+                  <Select v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
+                    optionValue="name" placeholder=" ... " class="w-40"></Select>
                 </span>
                 <span v-if="selectedForcingValue == 'upload'">
                   <FileUpload mode="basic" name="forcing_files[]" :multiple="true"
@@ -33,8 +33,8 @@
               <div class="col-span-1">
                 Observational:<br />
                 <span v-if="selectedObservationalValue != 'upload'">
-                  <Dropdown v-model="selectedObservationalValue" :options="getObservationalOptionsList"
-                    optionLabel="name" optionValue="name" placeholder=" ... " class="w-40"></Dropdown>
+                  <Select v-model="selectedObservationalValue" :options="getObservationalOptionsList"
+                    optionLabel="name" optionValue="name" placeholder=" ... " class="w-40"></Select>
                 </span>
                 <span v-if="selectedObservationalValue == 'upload'">
                   <FileUpload mode="basic" name="observational_files[]" :multiple="true"
@@ -126,34 +126,20 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { useGageStore } from "~/stores/calibration/GageStore";
-// const calibrationJobStore = useCalibrationJobStore()
-// const { show_gage_tab_data, selected_job } = calibrationJobStore
+import { generalStore } from "~/stores/common/GeneralStore";
+import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useToast } from "primevue/usetoast";
+
 const gageStore = useGageStore()
 const { gageData, gageTabData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs( gageStore )
 const {  fetchSelectedGageData } = gageStore
 
+/**
+ * follow section waiting further detail to be implemented
+ */
 const selected_rfc = ref<string>("")
-const showMap = ref(false);
-
-// const gageData: GageData = {
-//   agency: "US Geological Survey",
-//   station_name: "LITTLE RIVER NEAR HANNOVER, CT",
-//   site_type: "Stream",
-//   latitude: "41.6717651",
-//   longitude: "-72.05229807",
-//   altitude: "220.32 feet",
-//   date_established: "19510701",
-//   drainage_area: "30.0 Square miles",
-//   huc: "01100002",
-// };
 
 const toggle_isNWMv3 = () => {
-
-}
-
-const onGageSelectionChange = () => {
-  console.log( selectedGageValue.value )
-  fetchSelectedGageData()
 
 }
 
@@ -165,16 +151,6 @@ const onObservationalFileUpload = () => {
 
 }
 
-//onMounted(() => {
-  //setTimeout(() => {
-  // queryGageTabData()
-  // selectedDomainValue.value = getSavedDomainValue.value ?? ""
-  // selectedGageValue.value = gageTabData.value?.gage.gage_id ?? ""
-  // selectedForcingValue.value = gageTabData.value?.forcing_source ?? ""
-  // selectedObservationalValue.value = gageTabData.value?.observational_source ?? ""
-  //loading.value = false;
-  //}, 500);
-//});
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
