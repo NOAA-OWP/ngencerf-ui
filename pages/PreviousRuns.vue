@@ -20,7 +20,7 @@
               <ConfirmDialog></ConfirmDialog>
               <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
                 :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>               
-              <DataTable id="cr-list" :value="fetchJobsListData" scrollable scroll-height="400px"
+              <DataTable id="cr-list" :value="userCalibrationJobsListData" scrollable scroll-height="400px"
                 table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
                 contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
                 :rowStyle="rowStyle">
@@ -28,7 +28,11 @@
                 <Column field="formulation_name" header="Formulation Name" sortable></Column>
                 <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
                 <Column field="run_date" header="Run Date" sortable></Column>
-                <Column field="calibration_start_period" header="Calibration Period" sortable></Column>
+                <Column header="Calibration Period" sortable>
+                  <template #body="slotProps">
+                    {{ slotProps.data.calibration_start_period }} <span v-if="slotProps.data.calibration_end_period">to</span> {{ slotProps.data.calibration_end_period }}
+                  </template>
+                </Column>
                 <Column field="status" header="Status" sortable></Column>
               </DataTable>
             </div>
@@ -53,20 +57,24 @@ import { useToast } from "primevue/usetoast";
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
 
-import type { job_list_item } from "~/composables/NextGenModel";
+import type { JobListItem } from "~/composables/NextGenModel";
+import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
 const calibrationJobStore = useCalibrationJobStore()
 const { calibrationJobId } = storeToRefs( generalStore() )
-const { fetchJobsListData } = storeToRefs( calibrationJobStore )
-const { refreshJobListData, fetchNewCalibrationRunId, queryJobsListData } = calibrationJobStore
+const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
+const { fetchUserCalibrationJobsListData } = useUserDataStore()
+//const { fetchJobsListData } = storeToRefs( calibrationJobStore )
+//const { refreshJobListData, fetchNewCalibrationRunId, queryJobsListData } = calibrationJobStore
+const { fetchNewCalibrationRunId } = calibrationJobStore
 
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
 //const selectedCalibrationRun = ref<CalibrationRun>()
-const selectedCalibrationRun = ref<job_list_item>()
+const selectedCalibrationRun = ref<JobListItem>()
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
@@ -124,7 +132,8 @@ const acceptDelete = (selectedRunId: number) => {
   toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
   // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id != selectedRunId )
   // calibration_jobs_list.value = reduced_calibration_job_list
-  refreshJobListData()
+  //refreshJobListData()
+  fetchUserCalibrationJobsListData()
   selectedCalibrationRun.value = undefined    
 }
 
@@ -137,7 +146,7 @@ const rowStyle = (data: any) => {
 
 onMounted(() => {
   // console.log( 'onmounted' )
-  queryJobsListData()
+  //queryJobsListData()
   //fetchCalibrationJobsList()
   // console.log(localStorage);
 });
@@ -145,7 +154,7 @@ onMounted(() => {
 const NewCalibration = async () => {
   const fetchedId = await fetchNewCalibrationRunId()
   if( fetchedId != undefined ) {
-    calibrationJobId.value = fetchedId
+    calibrationJobId.value = fetchedId.calibration_run_id
     if( calibrationJobId.value > 0 ) {
       await navigateTo("Calibration");
     } else {
