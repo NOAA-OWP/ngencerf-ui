@@ -19,7 +19,12 @@ export const useTuningStore = defineStore('TuningStore', () => {
   // user-data properties
   const userCalibrationTimes = ref<any>();
   const userCalibrationTuningParameters = ref<any[]>();
-  const userOuptutVariableToCalibrate = ref<any[]>();
+  const userOutputVariableToCalibrate = ref<{ name: string; module: string | null }>({
+    name: '',
+    module: null,
+  });
+  const automatic_validation = ref<boolean>(false);
+  const userValidationTimes = ref<any>({});
 
   const { ngencerfBaseUrl } = useBackendConfig();
   const userDataStore = useUserDataStore();
@@ -85,7 +90,9 @@ export const useTuningStore = defineStore('TuningStore', () => {
     isDataFetched,
     userCalibrationTimes,
     userCalibrationTuningParameters,
-    userOuptutVariableToCalibrate
+    userOutputVariableToCalibrate,
+    automatic_validation,
+    userValidationTimes
   };
 }, 
 {

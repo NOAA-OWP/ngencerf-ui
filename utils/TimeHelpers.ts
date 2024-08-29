@@ -13,6 +13,7 @@ export function convertTimeZone(date: any, tzString: String) {
 
 /**
  * This function is for creating a time range that encompasses the calibration and simulation times for testing
+ * Currently set to pad the range by one month before and after
  * @param {CalibrationTimes} CalibrationTimes - object containing calibration and simulation times
  * @returns time range
  */

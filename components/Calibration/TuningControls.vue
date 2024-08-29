@@ -43,30 +43,30 @@
                 <label for="CheckTheBox">Automatic Validation</label>
               </div>
               <div id="BoxBottomRight" class="pt-2">
-                <div v-if="!autoValidation" class="tabTitles">
+                <div v-if="!automatic_validation" class="tabTitles">
                   Check the box above<br />to enable Automatic Validation
                 </div>
                 <div v-else>
                   <div class="timeBlocks">
                     <div>
                       Simulation Start:
-                      <VueDatePicker class="datePickers dp__theme_dark" v-model="avSimStartTime" time-picker-inline utc
-                        format="yyyy-mm-dd  hh:mm" />
+                      <VueDatePicker class="datePickers dp__theme_dark" v-model="avSimStartTime" time-picker-inline
+                        format="yyyy-MM-dd  hh:00" />
                     </div>
                     <div>
                       Simulation End:
-                      <VueDatePicker class="datePickers dp__theme_dark" v-model="avSimEndTime" time-picker-inline utc
-                        format="yyyy-mm-dd  hh:mm" />
+                      <VueDatePicker class="datePickers dp__theme_dark" v-model="avSimEndTime" time-picker-inline
+                        format="yyyy-MM-dd  hh:00" />
                     </div>
                     <div>
                       Val Start:
-                      <VueDatePicker class="datePickers dp__theme_dark" v-model="avCalStartTime" time-picker-inline utc
-                        format="yyyy-mm-dd  hh:mm" />
+                      <VueDatePicker class="datePickers dp__theme_dark" v-model="avCalStartTime" time-picker-inline
+                        format="yyyy-MM-dd  hh:00" />
                     </div>
                     <div>
                       Val End:
-                      <VueDatePicker class="datePickers dp__theme_dark" v-model="avCalEndTime" time-picker-inline utc
-                        format="yyyy-mm-dd  hh:mm" />
+                      <VueDatePicker class="datePickers dp__theme_dark" v-model="avCalEndTime" time-picker-inline
+                        format="yyyy-MM-dd  hh:00" />
                     </div>
                   </div>
                 </div>
@@ -98,8 +98,8 @@
                 <div class="text-left  mt-5">
                   <div class="inline-block text-left">Name:</div><br />
                   <select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter">
-                    <option v-for="param in calibrationTuningParameters" :key="param.parameter" :value="param.parameter">
-                      {{ param.parameter }}
+                    <option v-for="param in userCalibrationTuningParameters" :key="param.name" :value="param.name">
+                      {{ param.name }}
                     </option>
                   </select>
                   <div id="UploadParams" class="ngenButtonDiv inline ml-3">
@@ -184,6 +184,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
@@ -196,6 +198,8 @@ import { makeProtectedApiCall } from '~/composables/UserAuth';
 // import { useFileStorage } from 'nuxt-file-storage';
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
+const toast = useToast();
+
 const { ngencerfBaseUrl } = useBackendConfig();
 
 const userDataStore = useUserDataStore();
@@ -207,7 +211,9 @@ const {
   isDataFetched,
   userCalibrationTimes,
   userCalibrationTuningParameters,
-  userOuptutVariableToCalibrate,
+  userOutputVariableToCalibrate,
+  automatic_validation,
+  userValidationTimes
 } = storeToRefs(tuningStore);
 
 const loading = ref(true);
@@ -222,14 +228,12 @@ const avSimEndTime = ref();
 const avCalStartTime = ref();
 const avCalEndTime = ref();
 
-const autoValidation = ref(false);
 const datetime = ref();
 
 const rangeDateFrom = ref();
 const rangeDateTo = ref();
 
 const calibrationTuningDataList = ref<any[]>([]);
-const calibrationTuningParameters = ref<any[]>([]);
 const outputVariablesToCalibrate = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
@@ -251,95 +255,181 @@ onMounted(async () => {
   console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
   console.log("calibration_times:", loadCalibrationRunData.value?.calibration_times);
 
+  // set server-provided calibration times and time range
   const calibrationTimes = loadCalibrationRunData.value?.calibration_times;
+  const timeRange = loadCalibrationRunData.value?.time_range;
+
   if (calibrationTimes) {
-    const { rangeStart, rangeEnd } = calculateTimeRange(calibrationTimes);
-    rangeDateFrom.value = rangeStart;
-    rangeDateTo.value = rangeEnd;
+    // check if timeRange is provided
+    if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
+      console.log("timeRange is null");
+      // timeRange not provided. set timeRange one month before and after the calibration times
+      const { rangeStart, rangeEnd } = calculateTimeRange(calibrationTimes);
+      rangeDateFrom.value = rangeStart;
+      rangeDateTo.value = rangeEnd;
+    } else {
+      console.log("timeRange:", timeRange);
+      rangeDateFrom.value = timeRange?.start_time;
+      rangeDateTo.value = timeRange?.end_time;
+    }
   } else {
     console.log("calibration_times is missing or invalid");
-  }
-
-  const timeRange = loadCalibrationRunData.value.time_range;
-  if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
-    console.log("timeRange is null");
-    // set timeRange to a test value. timeRange must encompass the entire time range of calibration_times
-  } else {
-    console.log("timeRange:", timeRange);
   }
 
   const calibrationTuningModules = loadTuningTabData.value?.modules;
 
   // set the calibration tuning parameters
-  calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module.parameters.map((param: any) => ({
-    parameter: param.name,
-    min: param.minimum,
-    max: param.maximum,
-    initValue: param.initial_value
+  userCalibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module.parameters.map((param: any) => ({
+    name: param.name,
+    minimum: param.minimum,
+    maximum: param.maximum,
+    initial_value: param.initial_value,
+    module: module.name,
   }))) || [];
 
   // set output variables to calibrate
   outputVariablesToCalibrate.value = calibrationTuningModules?.flatMap((module: any) => module.output_variables.map((outputVar: any) => ({
     name: outputVar.name,
     description: outputVar.description,
+    module: module.name,
   }))) || [];
   console.log("outputVariablesToCalibrate:", outputVariablesToCalibrate.value);
+
+  console.log("userCalirationTuningParameters:", userCalibrationTuningParameters.value);
 });
 
 // watch for changes to the simulation and calibration times and handle validation
-watch([simStartTime, simEndTime, calStartTime, calEndTime], ([newSimStart, newSimEnd, newCalStart, newCalEnd]) => {
+watch([simStartTime, simEndTime, calStartTime, calEndTime], () => {
   // convert ISO strings to Date objects
-  const simStartDate = new Date(newSimStart);
-  const simEndDate = new Date(newSimEnd);
-  const calStartDate = new Date(newCalStart);
-  const calEndDate = new Date(newCalEnd);
+  const simStartDate = simStartTime.value ? new Date(simStartTime.value) : null;
+  const simEndDate = simEndTime.value ? new Date(simEndTime.value) : null;
+  const calStartDate = calStartTime.value ? new Date(calStartTime.value) : null;
+  const calEndDate = calEndTime.value ? new Date(calEndTime.value) : null;
 
-  // convert range dates to Date objects
-  const rangeStartDate = new Date(rangeDateFrom.value);
-  const rangeEndDate = new Date(rangeDateTo.value);
+  if (simStartDate !== null || simEndDate !== null || calStartDate !== null || calEndDate !== null) {
+    // convert range dates to Date objects
+    const rangeStartDate = new Date(rangeDateFrom.value);
+    const rangeEndDate = new Date(rangeDateTo.value);
 
-  // ensure Simulation Start is within timeRange
-  if (simStartDate < rangeStartDate || simStartDate > rangeEndDate) {
-    alert('Simulation Start must be within the defined time range');
-    simStartTime.value = rangeStartDate.toISOString();
-  }
+    // ensure Simulation Start is within timeRange
+    if (simStartDate !== null && (simStartDate < rangeStartDate || simStartDate > rangeEndDate)) {
+      alert('Simulation Start must be within the defined time range');
+      simStartTime.value = rangeStartDate.toISOString();
+    }
 
-  // ensure Simulation End is within timeRange
-  if (simEndDate < rangeStartDate || simEndDate > rangeEndDate) {
-    alert('Simulation End must be within the defined time range');
-    simEndTime.value = new Date(Math.min(rangeEndDate.getTime(), simStartDate.getTime() + 60 * 60 * 1000)).toISOString();
-  }
+    // ensure Simulation End is within timeRange
+    if (simStartDate !== null && simEndDate !== null && (simEndDate < rangeStartDate || simEndDate > rangeEndDate)) {
+      alert('Simulation Start mucs be selected first and Simulation End must be within the defined time range');
+      simEndTime.value = new Date(Math.min(rangeEndDate.getTime(), simStartDate.getTime() + 60 * 60 * 1000)).toISOString();
+    }
 
-  // ensure Calibration Start is within timeRange
-  if (calStartDate < rangeStartDate || calStartDate > rangeEndDate) {
-    alert('Calibration Start must be within the defined time range');
-    calStartTime.value = new Date(Math.max(rangeStartDate.getTime(), simStartDate.getTime())).toISOString();
-  }
+    // ensure Calibration Start is within timeRange
+    if (simStartDate !== null &&  calStartDate !== null && (calStartDate < rangeStartDate || calStartDate > rangeEndDate)) {
+      alert('Simulation Start must be selected first and Calibration Start must be within the defined time range');
+      calStartTime.value = new Date(Math.max(rangeStartDate.getTime(), simStartDate.getTime())).toISOString();
+    }
 
-  // ensure Calibration End is within timeRange
-  if (calEndDate < rangeStartDate || calEndDate > rangeEndDate) {
-    alert('Calibration End must be within the defined time range');
-    calEndTime.value = new Date(Math.min(rangeEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
-  }
+    // ensure Calibration End is within timeRange
+    if (calStartDate !== null && calEndDate !== null && (calEndDate < rangeStartDate || calEndDate > rangeEndDate)) {
+      alert('Calibration Start must be selected first and Calibration End must be within the defined time range');
+      calEndTime.value = new Date(Math.min(rangeEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
+    }
 
-  // ensure Sim end is after Sim start
-  if (simEndDate <= simStartDate) {
-    alert('Simulation End must be after Simulation Start');
-    simEndTime.value = new Date(simStartDate.getTime() + 60 * 60 * 1000).toISOString();
-  }
+    // ensure Sim end is after Sim start
+    if (simStartDate !== null && simEndDate !== null && (simEndDate <= simStartDate) ){
+      alert('Simulation End must be after Simulation Start');
+      simEndTime.value = new Date(simStartDate.getTime() + 60 * 60 * 1000).toISOString();
+    }
 
-  // ensure Cal start is within Sim start and Sim end
-  if (calStartDate < simStartDate || calStartDate > simEndDate) {
-    alert('Calibration Start must be within Simulation Start and End');
-    calStartTime.value = new Date(Math.max(simStartDate.getTime(), rangeStartDate.getTime())).toISOString();
-  }
+    // ensure Cal start is within Sim start and Sim end
+    if (calStartDate !== null && simStartDate !== null && simEndDate !== null && (calStartDate < simStartDate || calStartDate > simEndDate)) {
+      alert('Simulation Start must be selected first and Calibration Start must be within Simulation Start and End');
+      calStartTime.value = new Date(Math.max(simStartDate.getTime(), rangeStartDate.getTime())).toISOString();
+    }
 
-  // ensure Cal end is after Cal start and within Sim end
-  if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    alert('Calibration End must be after Calibration Start and within Simulation End');
-    calEndTime.value = new Date(Math.min(simEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
+    // ensure Cal end is after Cal start and within Sim end
+    if (calEndDate !== null && calStartDate !== null && simEndDate !== null && (calEndDate <= calStartDate || calEndDate > simEndDate)) {
+      alert('Calibration End must be after Calibration Start and within Simulation End');
+      calEndTime.value = new Date(Math.min(simEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
+    }
+
+    // save times in userCalibrationTimes
+    userCalibrationTimes.value = {
+      simulation_start: simStartDate instanceof Date && !isNaN(simStartDate.getTime()) ? simStartDate.toISOString() : null,
+      simulation_end: simEndDate instanceof Date && !isNaN(simEndDate.getTime()) ? simEndDate.toISOString() : null,
+      calibration_start: calStartDate instanceof Date && !isNaN(calStartDate.getTime()) ? calStartDate.toISOString() : null,
+      calibration_end: calEndDate instanceof Date && !isNaN(calEndDate.getTime()) ? calEndDate.toISOString() : null,
+    };
+    console.log("userCalibrationTimes:", userCalibrationTimes.value);
   }
 });
+
+// watch for changes to selected output variable
+watch(selectedOutputVariable, () => {
+  const module = loadTuningTabData.value?.modules.find((module: any) => module.output_variables.find((outputVar: any) => outputVar.name === selectedOutputVariable.value));
+  console.log("module:", module);
+  userOutputVariableToCalibrate.value = {
+    name: selectedOutputVariable.value,
+    module: module.name,
+  }
+  console.log("selectedOutputVariable:", selectedOutputVariable.value);
+  console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
+});
+
+// watch for changes to automatic automatic validation times and handle validation
+watch([avSimStartTime, avSimEndTime, avCalStartTime, avCalEndTime], () => {
+  // Calibration time controls must be set before Automatic Validation times
+  if (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value) {
+    alert('Calibration Time Controls must be set before Automatic Validation times');
+    avSimStartTime.value = null;
+    avSimEndTime.value = null;
+    avCalStartTime.value = null;
+    avCalEndTime.value = null;
+  } else {
+    // convert ISO strings to Date objects
+    const avSimStartDate = avSimStartTime.value ? new Date(avSimStartTime.value) : null;
+    const avSimEndDate = avSimEndTime.value ? new Date(avSimEndTime.value) : null;
+    const avCalStartDate = avCalStartTime.value ? new Date(avCalStartTime.value) : null;
+    const avCalEndDate = avCalEndTime.value ? new Date(avCalEndTime.value) : null;
+
+    if (avSimStartDate !== null || avSimEndDate !== null || avCalStartDate !== null || avCalEndDate !== null) {
+      // convert range dates to Date objects
+      const rangeStartDate = new Date(rangeDateFrom.value);
+      const rangeEndDate = new Date(rangeDateTo.value);
+
+      const simStartDate = simStartTime.value ? new Date(simStartTime.value) : null;
+      const simEndDate = simEndTime.value ? new Date(simEndTime.value) : null;
+      const calStartDate = calStartTime.value ? new Date(calStartTime.value) : null;
+
+      // all av times need to be after simStartDate and simEndDate
+      if (avSimStartDate && avSimEndDate && avCalStartDate && avCalEndDate && simEndDate && 
+        (avSimStartDate <= simEndDate && avSimEndDate <= simEndDate && avCalStartDate <= simEndDate && avCalEndDate <= simEndDate)) {
+        alert('All Automatic Validation times must be after Simulation Start and before Simulation End');
+      }
+
+      // avSimEndDate must be after avSimStartDate
+      if (avSimStartDate && avSimEndDate && avSimEndDate <= avSimStartDate) {
+        alert('Automatic Validation Simulation End must be after Simulation Start');
+        avSimEndTime.value = new Date(avSimStartDate.getTime() + 60 * 60 * 1000).toISOString();
+      }
+
+      //avCalStartDate must be greater or equal to avSimStartDate and less than or equal to avSimEndDate
+      if (avSimStartDate && avSimEndDate && avCalStartDate && (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate)) {
+        alert('Automatic Validation Calibration Start must be within Simulation Start and End');
+        avCalStartTime.value = new Date(Math.max(avSimStartDate.getTime(), rangeStartDate.getTime())).toISOString();
+      }
+
+      // avCalEndDate must be greater to calStartDate and less than or equal to avSimEndDate
+      if (avSimStartDate && avSimEndDate && calStartDate && avCalEndDate && (avCalEndDate <= calStartDate || avCalEndDate > avSimEndDate)) {
+        alert('Automatic Validation Calibration End must be after Calibration Start and less than or eqaul to Automatic Validation Simulation End');
+        avCalEndTime.value = new Date(Math.min(avSimEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
+      }
+    }
+  }
+});
+  
+
+
 
 /**
  * Trigger file input dialog
@@ -398,21 +488,24 @@ const handleFileUpload = async (event: Event) => {
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
 const addParameterToTable = () => {
-  const parameter = calibrationTuningParameters.value.find(param => param.parameter === selectedParameter.value);
+  const parameter = userCalibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
   if (parameter) {
     calibrationTuningDataList.value.push({
-      parameter: parameter.parameter,
-      min: parameter.min,
-      max: parameter.max,
-      initValue: parameter.initValue,
+      parameter: parameter.name,
+      min: parameter.minimum,
+      max: parameter.maximum,
+      initValue: parameter.initial_value,
     });
   }
 };
 
-
+/**
+ * Handle automatic validation checkbox change
+ */
 const AutoValChecked = () => {
   const ele = <HTMLInputElement>document.getElementById("CheckTheBox");
-  autoValidation.value = ele.checked as boolean;
+  automatic_validation.value = ele.checked as boolean;
+  // console.log("automatic_validation:", automatic_validation.value);
 };
 </script>
 
