@@ -11,6 +11,7 @@ export const generalStore = defineStore(
   () => {
     const calibrationTabIndex = ref("1");
     const evaluationTabIndex = ref("1");
+    const forecastTabIndex = ref("1");
     const menuIndex = ref("1");
 
     const calibrationJobId = ref<number>(0)
@@ -34,7 +35,6 @@ export const generalStore = defineStore(
       calibrationTabIndex.value = tab.toString();
     }
 
-
     // Evaluation Tab index
     function getEvaluationTabIndex() {
       return parseInt(evaluationTabIndex.value);
@@ -43,6 +43,13 @@ export const generalStore = defineStore(
       evaluationTabIndex.value = tab.toString();
     }
 
+    //  Forecast Tab index
+    function getForecastTabIndex() {
+      return parseInt(forecastTabIndex.value);
+    }
+    function setForecastTabIndex(tab: number) {
+      forecastTabIndex.value = tab.toString();
+    }
 
     // Previous calibration run for Evaluation
     function getEvalRunSelected() {
@@ -60,6 +67,8 @@ export const generalStore = defineStore(
       setCalibrationTabIndex,
       getEvaluationTabIndex,
       setEvaluationTabIndex,
+      getForecastTabIndex,
+      setForecastTabIndex,
       getEvalRunSelected,
       setEvalRunSelected,
       calibrationJobId
