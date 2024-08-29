@@ -140,6 +140,7 @@
                   <input
                     type="text"
                     v-model="slotProps.data.min"
+                    @input="updateCalibrationData(slotProps.index, 'min', $event.target.value)"
                     style="width: 100%;"
                   />
                 </template>
@@ -151,6 +152,7 @@
                   <input
                     type="text"
                     v-model="slotProps.data.max"
+                    @input="updateCalibrationData(slotProps.index, 'max', $event.target.value)"
                     style="width: 100%;"
                   />
                 </template>
@@ -162,12 +164,19 @@
                   <input
                     type="text"
                     v-model="slotProps.data.initValue"
+                    @input="updateCalibrationData(slotProps.index, 'initValue', $event.target.value)"
                     style="width: 100%;"
                   />
                 </template>
               </Column>
             </DataTable>
           </div>
+
+          <div>
+            <!-- FOR TESTING ONLY! Button that calls postSaveTuningTabData when clicked -->
+            <button @click="postSaveTuningTabData" style="padding: 10px; font-size: 16px;">postSaveTuningTabData</button>
+          </div>
+
         </div>
 
       </div>
@@ -175,12 +184,13 @@
       <div class="row-span-6">
       </div>
 
-
     </div>
     <div class="waitgif" v-if="loading">
       <img src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
+
+  
 </template>
 
 <script lang="ts" setup>
@@ -204,7 +214,7 @@ const { ngencerfBaseUrl } = useBackendConfig();
 
 const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
-const { fetchTuningTabData } = tuningStore;
+const { fetchTuningTabData, postSaveTuningTabData } = tuningStore;
 const {
   loadCalibrationRunData,
   loadTuningTabData,
@@ -227,8 +237,6 @@ const avSimStartTime = ref();
 const avSimEndTime = ref();
 const avCalStartTime = ref();
 const avCalEndTime = ref();
-
-const datetime = ref();
 
 const rangeDateFrom = ref();
 const rangeDateTo = ref();
@@ -355,10 +363,10 @@ watch([simStartTime, simEndTime, calStartTime, calEndTime], () => {
 
     // save times in userCalibrationTimes
     userCalibrationTimes.value = {
-      simulation_start: simStartDate instanceof Date && !isNaN(simStartDate.getTime()) ? simStartDate.toISOString() : null,
-      simulation_end: simEndDate instanceof Date && !isNaN(simEndDate.getTime()) ? simEndDate.toISOString() : null,
-      calibration_start: calStartDate instanceof Date && !isNaN(calStartDate.getTime()) ? calStartDate.toISOString() : null,
-      calibration_end: calEndDate instanceof Date && !isNaN(calEndDate.getTime()) ? calEndDate.toISOString() : null,
+      simulation_start_time: simStartDate instanceof Date && !isNaN(simStartDate.getTime()) ? simStartDate.toISOString() : null,
+      simulation_end_time: simEndDate instanceof Date && !isNaN(simEndDate.getTime()) ? simEndDate.toISOString() : null,
+      calibration_start_time: calStartDate instanceof Date && !isNaN(calStartDate.getTime()) ? calStartDate.toISOString() : null,
+      calibration_end_time: calEndDate instanceof Date && !isNaN(calEndDate.getTime()) ? calEndDate.toISOString() : null,
     };
     console.log("userCalibrationTimes:", userCalibrationTimes.value);
   }
@@ -425,11 +433,16 @@ watch([avSimStartTime, avSimEndTime, avCalStartTime, avCalEndTime], () => {
         avCalEndTime.value = new Date(Math.min(avSimEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
       }
     }
+    // save times in userValidationTimes
+    userValidationTimes.value = {
+      simulation_start_time: avSimStartDate instanceof Date && !isNaN(avSimStartDate.getTime()) ? avSimStartDate.toISOString() : null,
+      simulation_end_time: avSimEndDate instanceof Date && !isNaN(avSimEndDate.getTime()) ? avSimEndDate.toISOString() : null,
+      validation_start_time: avCalStartDate instanceof Date && !isNaN(avCalStartDate.getTime()) ? avCalStartDate.toISOString() : null,
+      validation_end_time: avCalEndDate instanceof Date && !isNaN(avCalEndDate.getTime()) ? avCalEndDate.toISOString() : null,
+    };
+    console.log("userValidationTimes:", userValidationTimes.value);
   }
 });
-  
-
-
 
 /**
  * Trigger file input dialog
@@ -497,6 +510,38 @@ const addParameterToTable = () => {
       initValue: parameter.initial_value,
     });
   }
+};
+
+/**
+ * Update the calibrationTuningDataList with new values
+ * @param index The index of the item being updated
+ * @param field The field ('min', 'max', or 'initValue') being updated
+ * @param value The new value entered by the user
+ */
+ const updateCalibrationData = (index: number, field: string, value: string) => {
+  calibrationTuningDataList.value[index][field] = value; // this just tracks the data in the table and needs to be added to userCalibrationTuningParameters
+  console.log("updated calibrationTuningDataList:", calibrationTuningDataList.value);
+
+  // update the userCalibrationTuningParameters with the new values
+  const parameter = userCalibrationTuningParameters?.value?.find(param => param.name === calibrationTuningDataList.value[index].parameter);
+  if (parameter) {
+    if (field === 'min') {
+      parameter.minimum = value;
+    } else if (field === 'max') {
+      parameter.maximum = value;
+    } else if (field === 'initValue') {
+      parameter.initial_value = value;
+    }
+  }
+  console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
+};
+
+/**
+ * Delete the selected row from the calibrationTuningDataList
+ * @param index The index of the row to be deleted
+ */
+const deleteRow = (index: number) => {
+  calibrationTuningDataList.value.splice(index, 1);
 };
 
 /**
