@@ -2,7 +2,7 @@
 <template Tabs>
   <div id="MainTabs">
 
-    <span v-if="currentMenu === 1"> <!-- CALIBRATION TABLS -->
+    <span v-if="currentMenu === 1"> <!-- CALIBRATION TABS -->
       <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
         <div data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked"
           aria-label="Headwater Basin Gage tab" title="Headwater Basin Gage tab">
@@ -37,7 +37,7 @@
       </div>
     </span>
 
-    <span v-else-if="currentMenu === 2"> <!-- EVALUATION TABLS -->
+    <span v-else-if="currentMenu === 2"> <!-- EVALUATION TABS -->
       <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
         <div data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked"
           aria-label="Calibration Runs tab" title="Calibration Runs tab">
@@ -50,7 +50,7 @@
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
         <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup a Validation Run tab"
-          title="TSetup a Validation Run tab">
+          title="Setup a Validation Run tab">
           Setup a Validation Run
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
@@ -72,15 +72,48 @@
       </div>
     </span>
 
+    <span v-else-if="currentMenu === 3"> <!-- FORECAST TABS -->
+      <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
+        <div data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked" aria-label="Previous Runs tab"
+          title="Previous Runs tab">
+          Previous Runs
+          <div :class="tabNotCompleted ? 'erorDot' : 'noErrorDot'"></div>
+        </div>
+        <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast and Run Tab"
+          title="Setup Forecast / Run tab">
+          Setup Forecast / Run
+          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+        </div>
+        <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status tab" title="Status">
+          Status
+          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+        </div>
+        <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
+          title="Results tab">
+          Results
+          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+        </div>
+        <!-- <div data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label="" title="">
+
+          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+        </div>
+        <div data-tab="6" class="tabs prevent-select" v-on:click="tabClicked" aria-label="" title="">
+
+          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+        </div> -->
+      </div>
+    </span>
+
   </div>
 </template>
 
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
-const { getCalibrationTabIndex, getEvaluationTabIndex, getMenuIndex } = generalStore();
+const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 const currentEvaluationTab = ref(getEvaluationTabIndex());
+const currentForecastTab = ref(getForecastTabIndex());
 const currentMenu = ref(getMenuIndex());
 
 onMounted(() => {
@@ -96,7 +129,7 @@ const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele = event.currentTarget as HTMLElement;
   const allTabs = document.getElementsByClassName("tabs");
-
+  currentEvaluationTab
   // Remove highlighting from all tabs
   Object.keys(allTabs).forEach(function (key) {
     allTabs[key as any].classList.remove("activeTab");
@@ -115,6 +148,9 @@ const tabClicked = (event: Event) => {
   } else if (currentMenu.value === 2) {
     currentEvaluationTab.value = Number(ele.getAttribute("data-tab"));
     emit("tabNumber", currentEvaluationTab.value);
+  } else if (currentMenu.value === 3) {
+    currentForecastTab.value = Number(ele.getAttribute("data-tab"));
+    emit("tabNumber", currentForecastTab.value);
   }
 }
 </script>

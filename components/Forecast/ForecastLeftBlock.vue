@@ -4,32 +4,37 @@
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0" id="InputsArea">
       <span v-if="activeTab == 1">
-        <div style="text-center">Previous Runs</div>
+        <PreviousRunsTab />
       </span>
       <span v-else-if="activeTab == 2">
-        <div style="text-center">Setup Forecate / Run</div>
+       <SetupForecastRunTab />
       </span>
       <span v-else-if="activeTab == 3">
-        <div style="text-center">Status</div>
+        <StatusTab />
       </span>
       <span v-else-if="activeTab == 4">
-        <div style="text-center">Results</div>
+        <ResultsTab />
       </span>
-      <span v-else-if="activeTab == 5">
+      <!-- <span v-else-if="activeTab == 5">
         <div style="text-center"></div>
       </span>
       <span v-else="activeTab == 6">
         <div style="text-center"></div>
-      </span>
+      </span> -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Tabs from '~/components/Common/Tabs.vue'import PreviousRunsTab from "~/components/Forecast/"
+import Tabs from '~/components/Common/Tabs.vue'
+
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
+import PreviousRunsTab from './PreviousRunsTab.vue';
+import SetupForecastRunTab from './SetupForecastRunTab.vue';
+import StatusTab from './StatusTab.vue';
+import ResultsTab from './ResultsTab.vue';
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 
 // Default to Tab 1, HeadwaterBasinGage

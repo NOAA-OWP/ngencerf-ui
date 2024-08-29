@@ -318,6 +318,16 @@ export interface EvaluationProgress {
   reference_dataset: Boolean;
 }
 
+export interface ForecastProgress {
+   headwater_basin_gage: Boolean;
+   formulation: Boolean;
+   reference_dataset: Boolean;
+   time_period: Boolean;
+   scalar_gridded_vars: Boolean;
+   output_variable: Boolean;
+   parameters_set: Boolean;
+ }
+
 // export interface GageData {
 //   agency: String;
 //   station_name: String;

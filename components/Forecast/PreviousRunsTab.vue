@@ -1,5 +1,7 @@
 <template>
-    <div>Previous Runs</div>
+    <div class="text-center text-2xl mt-20">Previous Runs</div>
+    <div class="text-center text-2xl mt-20"><img class="m-auto construction-images" src="~/assets/styles/img/under_construction.png" /></div>
+
  </template>
 
 <script setup lang="ts">
@@ -10,31 +12,5 @@
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
-#PgTitle {
-    text-align: center;
-    font-size: 30px;
-    margin-top: 40px;
-    margin-bottom: 40px;
-}
 
-#NewButton {
-    width: 147px;
-    height: 33px;
-    padding: 10px;
-    border-radius: 20px;
-    font-size: 21px;
-}
-
-#CalTable {
-    width: 1000px;
-    margin: 0 auto;
-    //border: 1px solid $ngwcp_primary1;
-
-    .table {
-        thead tr th {
-            background-color: #F5A4A4;
-            border: 1px solid #000;
-        }
-    }
-}
 </style>
