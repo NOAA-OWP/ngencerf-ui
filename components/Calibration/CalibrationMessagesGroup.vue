@@ -93,6 +93,7 @@
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from 'pinia';
 import { useGageStore } from '~/stores/calibration/GageStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
@@ -101,7 +102,7 @@ const gageStore = useGageStore();
 const calRunStore = useUserDataStore();
 
 const { gageData, gageTabData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
-const { userCalibrationRunData } = useUserDataStore();
+const { userCalibrationRunData } = storeToRefs(calRunStore);
 
 const calData = ref(userCalibrationRunData);
 
