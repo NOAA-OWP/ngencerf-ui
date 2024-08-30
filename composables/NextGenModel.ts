@@ -10,7 +10,7 @@ export interface footer_data {
    contact_email: String
  }
 
-export interface CeatedCalibrationRun {
+export interface CreatedCalibrationRun {
    message: string;
    calibration_run_id: number;
 }
@@ -294,51 +294,6 @@ export interface OptimizationDataInputData {
    data_type: string;
    is_active: boolean;
 }
-
-export interface CalibrationProgress {
-  headwater_basin_gage: Boolean;
-  formulation: Boolean;
-  start_and_end_times: Boolean;
-  calibration_output_variable: Boolean;
-  tuning_parameters: Boolean;
-  optimization_algorithm: Boolean;
-  objective_function: Boolean;
-  calibration_stop_criteria: Boolean;
-  metrics_plot_inteval: Boolean;
-}
-
-export interface EvaluationProgress {
-  headwater_basin_gage: Boolean;
-  formulation: Boolean;
-  parameters_set: Boolean;
-  calibration_output_variable: Boolean;
-  metrics: Boolean;
-  time_period: Boolean;
-  output_variable: Boolean;
-  reference_dataset: Boolean;
-}
-
-export interface ForecastProgress {
-   headwater_basin_gage: Boolean;
-   formulation: Boolean;
-   reference_dataset: Boolean;
-   time_period: Boolean;
-   scalar_gridded_vars: Boolean;
-   output_variable: Boolean;
-   parameters_set: Boolean;
- }
-
-// export interface GageData {
-//   agency: String;
-//   station_name: String;
-//   site_type: String;
-//   latitude: String;
-//   longitude: String;
-//   altitude: String;
-//   date_established:  String;
-//   drainage_area: String;
-//   huc:  String;  
-// }
 
 export interface CalibrationRun {
    runId: number;

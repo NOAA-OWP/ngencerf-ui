@@ -2,39 +2,39 @@
    <client-only>
     <table id="CalibrationProgressTable" class="prevent-select">
       <tr>
-        <td><i v-if="props.progress.headwater_basin_gage" class="pi pi-check font-bold checkMark"></i></td>        
+        <td><i v-if="selectedDomainValue" :class="selectedDomainValue ? 'checkMark' : ''" class="pi pi-check font-bold"></i></td>        
         <td class="ptype">Headwater Basin Gage</td>
       </tr>
       <tr>
-        <td><i v-if="props.progress.formulation" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype">Formulation</td>
       </tr>
       <tr>
-        <td><i v-if="props.progress.start_and_end_times" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype">Start and End Times</td>
       </tr>
       <tr>
-        <td><i v-if="props.progress.calibration_stop_criteria" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype">Calibration Output Variable</td>
       </tr>
       <tr>
-        <td><i v-if="props.progress.tuning_parameters" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype">Tuning Parameters</td>
       </tr>
       <tr>
-        <td><i v-if="props.progress.optimization_algorithm" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype">Optimization Algorithm</td>
       </tr>
       <tr>
-        <td><i v-if="props.progress.objective_function" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype">Objective Function</td>
       </tr>
       <tr>
-        <td><i v-if="props.progress.calibration_stop_criteria" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype">Calibration Stop Criteria</td>
       </tr>
       <tr>
-        <td><i v-if="props.progress.metrics_plot_inteval" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype">Metrics / Plot Inteval</td>
       </tr>
     </table>
@@ -42,9 +42,13 @@
 </template>
 
 <script lang="ts" setup>
-const props = defineProps<{
-  progress: CalibrationProgress;
-}>();
+import { useGageStore } from '~/stores/calibration/GageStore';
+const gageStore = useGageStore();
+const { gageData, gageTabData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs( gageStore )
+
+// const props = defineProps<{
+//   progress: CalibrationProgress;
+// }>();
 </script>
 
 <style lang="scss" scoped>
