@@ -140,7 +140,7 @@
                   <input
                     type="text"
                     v-model="slotProps.data.min"
-                    @input="updateCalibrationData(slotProps.index, 'min', $event.target.value)"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'min', $event.target.value)"
                     style="width: 100%;"
                   />
                 </template>
@@ -152,7 +152,7 @@
                   <input
                     type="text"
                     v-model="slotProps.data.max"
-                    @input="updateCalibrationData(slotProps.index, 'max', $event.target.value)"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'max', $event.target.value)"
                     style="width: 100%;"
                   />
                 </template>
@@ -164,17 +164,12 @@
                   <input
                     type="text"
                     v-model="slotProps.data.initValue"
-                    @input="updateCalibrationData(slotProps.index, 'initValue', $event.target.value)"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'initValue', $event.target.value)"
                     style="width: 100%;"
                   />
                 </template>
               </Column>
             </DataTable>
-          </div>
-
-          <div>
-            <!-- FOR TESTING ONLY! Button that calls postSaveTuningTabData when clicked -->
-            <button @click="postSaveTuningTabData" style="padding: 10px; font-size: 16px;">postSaveTuningTabData</button>
           </div>
 
         </div>
@@ -202,6 +197,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import { mockCalibrationTuningData } from "~/mockApi/calibrationAPIData";
 import type { CalibrationTuningData } from "~/composables/NextGenModel";
 import { calculateTimeRange, convertTimeZone } from "~/utils/TimeHelpers";
+import { generalStore } from "~/stores/common/GeneralStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
@@ -210,6 +206,8 @@ import { useBackendConfig } from "~/composables/UseBackendConfig";
 
 const toast = useToast();
 
+const { calibrationJobId } = storeToRefs( generalStore() );
+const { getCalibrationTabIndex } = generalStore();
 const { ngencerfBaseUrl } = useBackendConfig();
 
 const userDataStore = useUserDataStore();
@@ -247,21 +245,20 @@ const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 
-
 onMounted(async () => {
-  console.log("onMounted");
+  //console.log("onMounted");
   setTimeout(() => {
     loading.value = false;
   }, 500);
 
-  console.log("isDataFetched:", isDataFetched.value);
+  //console.log("isDataFetched:", isDataFetched.value);
   if (!isDataFetched.value) {
     await fetchTuningTabData();
   }
 
-  console.log("loadTuningTabData:", loadTuningTabData.value);
-  console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
-  console.log("calibration_times:", loadCalibrationRunData.value?.calibration_times);
+  //console.log("loadTuningTabData:", loadTuningTabData.value);
+  //console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
+  //console.log("calibration_times:", loadCalibrationRunData.value?.calibration_times);
 
   // set server-provided calibration times and time range
   const calibrationTimes = loadCalibrationRunData.value?.calibration_times;
@@ -270,18 +267,18 @@ onMounted(async () => {
   if (calibrationTimes) {
     // check if timeRange is provided
     if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
-      console.log("timeRange is null");
+      //console.log("timeRange is null");
       // timeRange not provided. set timeRange one month before and after the calibration times
       const { rangeStart, rangeEnd } = calculateTimeRange(calibrationTimes);
       rangeDateFrom.value = rangeStart;
       rangeDateTo.value = rangeEnd;
     } else {
-      console.log("timeRange:", timeRange);
+      //console.log("timeRange:", timeRange);
       rangeDateFrom.value = timeRange?.start_time;
       rangeDateTo.value = timeRange?.end_time;
     }
   } else {
-    console.log("calibration_times is missing or invalid");
+    //console.log("calibration_times is missing or invalid");
   }
 
   const calibrationTuningModules = loadTuningTabData.value?.modules;
@@ -301,9 +298,9 @@ onMounted(async () => {
     description: outputVar.description,
     module: module.name,
   }))) || [];
-  console.log("outputVariablesToCalibrate:", outputVariablesToCalibrate.value);
+  //console.log("outputVariablesToCalibrate:", outputVariablesToCalibrate.value);
 
-  console.log("userCalirationTuningParameters:", userCalibrationTuningParameters.value);
+  //console.log("userCalirationTuningParameters:", userCalibrationTuningParameters.value);
 });
 
 // watch for changes to the simulation and calibration times and handle validation
@@ -368,20 +365,20 @@ watch([simStartTime, simEndTime, calStartTime, calEndTime], () => {
       calibration_start_time: calStartDate instanceof Date && !isNaN(calStartDate.getTime()) ? calStartDate.toISOString() : null,
       calibration_end_time: calEndDate instanceof Date && !isNaN(calEndDate.getTime()) ? calEndDate.toISOString() : null,
     };
-    console.log("userCalibrationTimes:", userCalibrationTimes.value);
+    //console.log("userCalibrationTimes:", userCalibrationTimes.value);
   }
 });
 
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
   const module = loadTuningTabData.value?.modules.find((module: any) => module.output_variables.find((outputVar: any) => outputVar.name === selectedOutputVariable.value));
-  console.log("module:", module);
+  //console.log("module:", module);
   userOutputVariableToCalibrate.value = {
     name: selectedOutputVariable.value,
     module: module.name,
   }
-  console.log("selectedOutputVariable:", selectedOutputVariable.value);
-  console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
+  //console.log("selectedOutputVariable:", selectedOutputVariable.value);
+  //console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
 });
 
 // watch for changes to automatic automatic validation times and handle validation
@@ -440,7 +437,7 @@ watch([avSimStartTime, avSimEndTime, avCalStartTime, avCalEndTime], () => {
       validation_start_time: avCalStartDate instanceof Date && !isNaN(avCalStartDate.getTime()) ? avCalStartDate.toISOString() : null,
       validation_end_time: avCalEndDate instanceof Date && !isNaN(avCalEndDate.getTime()) ? avCalEndDate.toISOString() : null,
     };
-    console.log("userValidationTimes:", userValidationTimes.value);
+    //console.log("userValidationTimes:", userValidationTimes.value);
   }
 });
 
@@ -458,14 +455,14 @@ const triggerFileInput = () => {
  * @param event
  */
 const handleFileUpload = async (event: Event) => {
-  console.log('Upload button clicked');
+  //console.log('Upload button clicked');
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (file) {
     try {
       const formData = new FormData();
       formData.append('user_parameter_file', file);
-      formData.append('calibration_run_id', '6');
+      formData.append('calibration_run_id', String(calibrationJobId.value));
 
       const response: any = await makeProtectedApiCall<any>(
         `${ngencerfBaseUrl}/calibration/upload_user_parameters/`, 
@@ -478,7 +475,6 @@ const handleFileUpload = async (event: Event) => {
         });
 
       if (response) {
-        console.log('File uploaded successfully:', response);
         // Populate the Parameter table with the data from user-uploaded file
         response.user_parameter_file.forEach((param: any) => {
           calibrationTuningDataList.value.push({
@@ -513,14 +509,14 @@ const addParameterToTable = () => {
 };
 
 /**
- * Update the calibrationTuningDataList with new values
+ * Update Calibration Tuning Parameter with new value
  * @param index The index of the item being updated
  * @param field The field ('min', 'max', or 'initValue') being updated
  * @param value The new value entered by the user
  */
- const updateCalibrationData = (index: number, field: string, value: string) => {
+ const updateCalibrationTuningParameter = (index: number, field: string, value: string) => {
   calibrationTuningDataList.value[index][field] = value; // this just tracks the data in the table and needs to be added to userCalibrationTuningParameters
-  console.log("updated calibrationTuningDataList:", calibrationTuningDataList.value);
+  //console.log("updated calibrationTuningDataList:", calibrationTuningDataList.value);
 
   // update the userCalibrationTuningParameters with the new values
   const parameter = userCalibrationTuningParameters?.value?.find(param => param.name === calibrationTuningDataList.value[index].parameter);
@@ -533,16 +529,26 @@ const addParameterToTable = () => {
       parameter.initial_value = value;
     }
   }
-  console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
+  //console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
 };
 
 /**
- * Delete the selected row from the calibrationTuningDataList
+ * Delete Calibration Tuning Parameter from the table and userCalibrationTuningParameters
  * @param index The index of the row to be deleted
  */
-const deleteRow = (index: number) => {
-  calibrationTuningDataList.value.splice(index, 1);
-};
+// const deleteCalibrationTuningParameter = (index: number) => {
+//   const parameter = calibrationTuningDataList.value[index].parameter;
+//   console.log("deleting parameter:", parameter);
+//   calibrationTuningDataList.value.splice(index, 1);
+//   console.log("updated calibrationTuningDataList:", calibrationTuningDataList.value);
+
+//   // remove the parameter from userCalibrationTuningParameters
+//   const paramIndex = userCalibrationTuningParameters?.value?.findIndex(param => param.name === parameter);
+//   if (paramIndex && paramIndex > -1) {
+//     userCalibrationTuningParameters?.value?.splice(paramIndex, 1);
+//   }
+//   console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
+// };
 
 /**
  * Handle automatic validation checkbox change
@@ -550,8 +556,21 @@ const deleteRow = (index: number) => {
 const AutoValChecked = () => {
   const ele = <HTMLInputElement>document.getElementById("CheckTheBox");
   automatic_validation.value = ele.checked as boolean;
-  // console.log("automatic_validation:", automatic_validation.value);
+  // //console.log("automatic_validation:", automatic_validation.value);
 };
+
+/**
+ * event bus for save click
+ */
+ useListen( 'calibrationButtonGroup:buttonClick', ( actionButton ) => {
+   if( getCalibrationTabIndex() === 3 && actionButton == 'SAVE' ) {
+      const saveTuningTabResponse = postSaveTuningTabData()
+      console.log( `saveTabContent Tuning, should be tabIndex 3, on tabIndex ${getCalibrationTabIndex()}, save response: `, saveTuningTabResponse )
+      saveTuningTabResponse.then( ( response ) => {
+         toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
+      }) 
+   }
+})
 </script>
 
 <style lang="scss" scoped>
