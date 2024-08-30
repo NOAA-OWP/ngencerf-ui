@@ -22,36 +22,15 @@ import { generalStore } from "@/stores/common/GeneralStore";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { useToast } from "primevue/usetoast";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-const { saveGageTabData } = useGageStore()
-const { saveFormulationTabData } = useFormulationStore()
+// const { saveGageTabData } = useGageStore()
+// const { saveFormulationTabData } = useFormulationStore()
 const { getCalibrationTabIndex } = generalStore();
 
 const tabIndex = getCalibrationTabIndex();
 const toast = useToast();
 
-//const { getTabIndex } = generalStore();
-//const {  tabIndex } = storeToRefs( generalStore() )
-
-const saveTabContent =  async () => {
-  console.log( `tabIndex in saveTabContent function: ${tabIndex}` )
-  if( tabIndex === 1) {
-    const save_tab_response = saveGageTabData()    
-    console.log( `saveTabContent Gage, should be tabIndex 1, on tabIndex ${tabIndex}, save response: `, save_tab_response )
-    save_tab_response.then( ( response ) => {
-      console.log( response )
-      toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
-      //refreshGageTabData()
-    })    
-  }
-  if( tabIndex === 2 ) {
-    const save_formulation_response = saveFormulationTabData()
-    console.log( `saveTabContent Formulation, should be tabIndex 2, on tabIndex ${tabIndex}, save response: `, save_formulation_response )
-    save_formulation_response.then( ( response ) => {
-      console.log( response )
-      toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
-      //refreshFormulationTabData()
-    }) 
-  }
+const saveTabContent =  async () => {  
+  useEvent( 'calibrationButtonGroup:buttonClick', getCalibrationTabIndex() < 5 ? "SAVE" : "START" )
 }
 
 </script>

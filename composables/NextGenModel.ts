@@ -1,212 +1,231 @@
-export interface user {
-   uid: number,
-   first_name: string,
-   last_name: string,
-   email: string
+export interface User {
+  uid: number;
+  first_name: string;
+  last_name: string;
+  email: string;
 }
 
-export interface footer_data {
-   version: String,
-   contact_email: String
- }
+export interface FooterData {
+  version: string;
+  contact_email: string;
+}
 
-export interface CeatedCalibrationRun {
-   message: string;
-   calibration_run_id: number;
+export interface CreatedCalibrationRun {
+  message: string;
+  calibration_run_id: number;
+}
+
+export interface GeneralSaveTabResponse {
+  message: string;
+  calibration_run_id: number;
+  status: string;
 }
 
 /**
  * model for calibration job list
  */
 export interface JobsList {
-   jobs: JobListItem[];
+  jobs: JobListItem[];
 }
 
 export interface JobListItem {
-   calibration_run_id: number;
-   gage_id: string;
-   status: string;  
-   calibration_start_period: Date;
-   calibration_end_period: Date;
-   formulation_name: string;
-   run_date: Date;
-   owner: string;
+  calibration_run_id: number;
+  gage_id: string;
+  status: string;
+  calibration_start_period: Date;
+  calibration_end_period: Date;
+  formulation_name: string;
+  run_date: Date;
+  owner: string;
 }
 
 /**
  * module for user input calibration tab data
  */
 export interface UserCalibrationRunData {
-   calibration_run_id: number;
-   gage: GageData;
-   forcing_source: string;
-   forcing_user_dir: string;
-   forcing_dir_path: string;
-   observational_source: string;
-   observational_user_filename: string;
-   observational_file_path: string;
-   geopackage_image_url: string;
-   modules: string[];
-   formulation_name: string;
-   use_sloth: boolean;
-   sloth_parameters: SlothParameterData[];
-   automatic_validation: boolean;
-   time_range: UserCalibrationRunTimeRangeData;
-   calibration_times: UserCalibrationRunCalibrationTimesData;
-   validation_times: UserCalibrationRunValidationTimesData;
-   output_variable_to_calibrate: UserCalibrationRunOutputVariableToCalibrateData;
-   parameters: UserCalibrationRunParametersData[];
-   objective_function: string;
-   streamflow_threshold: number;
-   peak_flow_threshold: number;
-   optimization: string;
-   optimization_inputs: OptimizationInputData[];
-   plot_frequency: number;
-   stop_criteria: number;
-   status: string;
+  calibration_run_id: number;
+  gage: GageData;
+  forcing_source: string;
+  forcing_user_dir: string;
+  forcing_dir_path: string;
+  observational_source: string;
+  observational_user_filename: string;
+  observational_file_path: string;
+  geopackage_image_url: string;
+  modules: string[];
+  formulation_name: string;
+  use_sloth: boolean;
+  sloth_parameters: SlothParameterData[];
+  automatic_validation: boolean;
+  time_range: UserCalibrationRunTimeRangeData;
+  calibration_times: UserCalibrationRunCalibrationTimesData;
+  validation_times: UserCalibrationRunValidationTimesData;
+  output_variable_to_calibrate: UserCalibrationRunOutputVariableToCalibrateData;
+  parameters: UserCalibrationRunParametersData[];
+  objective_function: string;
+  streamflow_threshold: number;
+  peak_flow_threshold: number;
+  optimization: string;
+  optimization_inputs: UserCalibrationRunOptimizationInputData[];
+  plot_frequency: number;
+  stop_criteria: number;
+  status: string;
 }
 
 export interface UserCalibrationRunTimeRangeData {
-   start_time: Date;
-   end_time: Date;
+  start_time: Date;
+  end_time: Date;
 }
 
 export interface UserCalibrationRunCalibrationTimesData {
-   calibration_start_time: Date;
-   calibration_end_time: Date;
-   simulation_start_time: Date;
-   simulation_end_time: Date;
+  calibration_start_time: Date;
+  calibration_end_time: Date;
+  simulation_start_time: Date;
+  simulation_end_time: Date;
 }
 
 export interface UserCalibrationRunValidationTimesData {
-   validation_start_time: Date;
-   validation_end_time: Date;
-   simulation_start_time: Date;
-   simulation_end_time: Date;
+  validation_start_time: Date;
+  validation_end_time: Date;
+  simulation_start_time: Date;
+  simulation_end_time: Date;
 }
 
 export interface UserCalibrationRunOutputVariableToCalibrateData {
-   name: string;
-   module: string;
+  name: string;
+  module: string;
 }
 
 export interface UserCalibrationRunParametersData {
-   name: string;
-   minimum: number;
-   maximum: number;
-   initial_value: number;
-   module: string;
+  name: string;
+  minimum: number;
+  maximum: number;
+  initial_value: number;
+  module: string;
+}
+
+export interface UserCalibrationRunOptimizationInputData {
+  name: string;
+  value: number;
 }
 
 export interface SlothParameterData {
-   param_name: string;
-   param_count: number;
-   param_type: string;
-   param_units: string;
-   param_location: string;
-   param_value: number;
-   maps_to_module: string;
-   maps_to_variable_name: string;
+  param_name: string;
+  param_count: number;
+  param_type: string;
+  param_units: string;
+  param_location: string;
+  param_value: number;
+  maps_to_module: string;
+  maps_to_variable_name: string;
 }
 
 /**
  * Model for Calibration's Headwater Basin Gage tab
  */
 export interface GageTabData {
-   status: string;
-   calibration_run_id: number;
-   forcing_source_values: ForcingSourceValueData;
-   observational_source_values: ObservationalSourceValueData;
-   gages: GageOptionData[];
-   gage: GageData;
-   geopackage_image_url: string;
-   domain_values: DomainValueData[];
+  status: string;
+  calibration_run_id: number;
+  forcing_source_values: ForcingSourceValueData;
+  observational_source_values: ObservationalSourceValueData;
+  gages: GageOptionData[];
+  gage: GageData;
+  geopackage_image_url: string;
+  domain_values: DomainValueData[];
 }
- 
+
 export interface GageOptionData {
-   gage_id: string;
-   nsw_id: string;
-   domain: string;
-   nwm_v3_calibrated: boolean;
+  gage_id: string;
+  nsw_id: string;
+  domain: string;
+  nwm_v3_calibrated: boolean;
 }
 
 export interface GageData {
-   gage_id: string;
-   agency: string;
-   station_name: string;
-   latitude: number;
-   longitude: number;
-   altitude: number;
+  gage_id: string;
+  agency: string;
+  station_name: string;
+  latitude: number;
+  longitude: number;
+  altitude: number;
 }
 
 export interface DomainValueData {
-   name: string;
-   description: string;
-   is_active: boolean;
+  name: string;
+  description: string;
+  is_active: boolean;
 }
 
 export interface ForcingSourceValueData {
-   name: string;
-   description: string;
-   is_active: boolean;
+  name: string;
+  description: string;
+  is_active: boolean;
 }
 
 export interface ObservationalSourceValueData {
-   name: string;
-   description: string;
-   is_active: boolean;
+  name: string;
+  description: string;
+  is_active: boolean;
 }
 
-export interface SaveGageTabResponse {
-   message: string;
-   calibration_run_id: number;
-   status: string;
-   geopackage_image: string;
+export interface SaveGageTabResponse extends GeneralSaveTabResponse {
+  geopackage_image: string;
 }
 
 /**
  * Model for Calibration's formulation tab
  */
 export interface FormulationTabData {
-   calibration_run_id: number;
-   modules: FormulationModuleData[];
-   status: string;
-}
-
-export interface FormulationModuleData {
-   name: string;
-   groups: string[];
-   used_by_calibration_run: boolean;
-}
-
-export interface FormulationSaveResponse {
-  message: string;
   calibration_run_id: number;
+  modules: FormulationModuleData[];
   status: string;
 }
 
-export interface LoadTuningTabResponse {
-  calibration_run_id: Number;
-  modules: ModuleData[];
-  status: String;
+export interface FormulationModuleData {
+  name: string;
+  groups: string[];
+  used_by_calibration_run: boolean;
 }
 
-export interface SaveTuningTabRequestBody {
-  calibration_run_id: Number;
-  parameters: SaveTuningTabParameter[];
-  calibration_times: CalibrationTimes;
-  validation_times: ValidationTimes;
-  automatic_validation: Boolean;
-  output_variable_to_calibrate: {
-    name: String;
-    module: String;
+export interface tuning_load {
+  calibration_run_id: number;
+  status: string;
+  modules: module_data[];
+  calibration_times: {
+    calibration_start_time: string;
+    calibration_end_time: string;
+    simulation_start_time: string;
+    simulation_end_time: string;
+  }
+  validation_times: {
+    validation_start_time: string;
+    validatoin_end_time: string;
+    simulation_start_time: string;
+    simulation_end_time: string;
   }
 }
 
-export interface SaveTuningTabResponse {
-  message: String;
-  calibration_run_id: Number;
-  status: String;
+export interface tuning_save {
+  calibration_run_id: number;
+  automatic_valiation: boolean;
+  output_variable_to_calibrate: {
+    name: string;
+    module: string;
+  }
+  module_output_variables: name_description_type[];
+  parameters: module_params[];
+  calibration_times: {
+    calibration_start_time: string;
+    calibration_end_time: string;
+    simulation_start_time: string;
+    simulation_end_time: string;
+  }
+  validation_times: {
+    validation_start_time: string;
+    validatoin_end_time: string;
+    simulation_start_time: string;
+    simulation_end_time: string;
+  }
 }
 
 /**
@@ -218,102 +237,111 @@ export interface SelectOption {
   selected?: boolean;
 }
 
-export interface ModuleData { 
-    name: String,
-    parameters: ModuleParameter[];
-    output_variables:  OutputVariable; // TODO: will we receive one or multiple output variables?
+export interface module_data {
+  name: string;
+  groups: string[];
+  parameters: module_params[];
+  module_output_variables: module_params[];
 }
 
-export interface OutputVariable {
-  name: String;
-  module: String;
+export interface module_params {
+  name: string;
+  module: string;
+  minimum: number;
+  maximum: number;
+  intial_value: 0;
 }
 
 export interface ModuleParameter {
-  name: String;
-  data_type: String;
-  description: String
-  minimum: Number;
-  maximum: Number;
-  initial_value: Number;
+  name: string;
+  data_type: string;
+  description: string;
+  minimum: number;
+  maximum: number;
+  initial_value: number;
 }
 
 export interface SaveTuningTabParameter {
-  name: String;
-  minimum: Number;
-  maximum: Number;
-  initial_value: Number;
-  module: String;
+  name: string;
+  minimum: number;
+  maximum: number;
+  initial_value: number;
+  module: string;
 }
 
 export interface module_output {
-  description: name_description_type[]
+  description: name_description_type[];
 }
 
 export interface name_description_type {
-  name: String,
-  description: String,
-  data_type: String
+  name: string;
+  description: string;
+  data_type: string;
 }
 
 /**
  * Module for calibration's optimization tab
  */
 export interface OptimizationTabData {
-   calibration_run_id: number;
-   status: string;
-   metrics: OptimizationMetricData[];
-   optimizations: OptimizationData[];
+  calibration_run_id: number;
+  status: string;
+  metrics: OptimizationMetricData[];
+  optimizations: OptimizationData[];
 }
 
 export interface OptimizationMetricData {
-   name: string;
-   description: string;
-   is_active: boolean;
-   categorical: boolean;
-   event_based: boolean;
-}
-
-export interface OptimizationInputData {
-   name: string;
-   value: number;
+  name: string;
+  description: string;
+  is_active: boolean;
+  categorical: boolean;
+  event_based: boolean;
 }
 
 export interface OptimizationData {
-   name: string;
-   description: string;
-   is_active: boolean;
-   inputs: OptimizationDataInputData[];
+  name: string;
+  description: string;
+  is_active: boolean;
+  inputs: OptimizationDataInputData[];
 }
 
 export interface OptimizationDataInputData {
-   name: string;
-   description: string;
-   data_type: string;
-   is_active: boolean;
+  name: string;
+  description: string;
+  data_type: string;
+  is_active: boolean;
 }
 
 export interface CalibrationProgress {
-  headwater_basin_gage: Boolean;
-  formulation: Boolean;
-  start_and_end_times: Boolean;
-  calibration_output_variable: Boolean;
-  tuning_parameters: Boolean;
-  optimization_algorithm: Boolean;
-  objective_function: Boolean;
-  calibration_stop_criteria: Boolean;
-  metrics_plot_inteval: Boolean;
+  headwater_basin_gage: boolean;
+  formulation: boolean;
+  start_and_end_times: boolean;
+  calibration_output_variable: boolean;
+  tuning_parameters: boolean;
+  optimization_algorithm: boolean;
+  objective_function: boolean;
+  calibration_stop_criteria: boolean;
+  metrics_plot_inteval: boolean;
 }
 
 export interface EvaluationProgress {
-  headwater_basin_gage: Boolean;
-  formulation: Boolean;
-  parameters_set: Boolean;
-  calibration_output_variable: Boolean;
-  metrics: Boolean;
-  time_period: Boolean;
-  output_variable: Boolean;
-  reference_dataset: Boolean;
+  headwater_basin_gage: boolean;
+  formulation: boolean;
+  parameters_set: boolean;
+  calibration_output_variable: boolean;
+  metrics: boolean;
+  time_period: boolean;
+  output_variable: boolean;
+  reference_dataset: boolean;
+}
+
+export interface ForecastProgress {
+  headwater_basin_gage: boolean;
+  formulation: boolean;
+  reference_dataset: boolean;
+  time_period: boolean;
+  scalar_gridded_vars: boolean;
+  output_variable: boolean;
+  parameters_set: boolean;
 }
 
 // export interface GageData {
@@ -329,12 +357,12 @@ export interface EvaluationProgress {
 // }
 
 export interface CalibrationRun {
-   runId: number;
-   formulationName: string;
-   headwaterBasinGage: string;
-   runDate: string;
-   calibrationPeriod: string;
-   status: string;
+  runId: number;
+  formulationName: string;
+  headwaterBasinGage: string;
+  runDate: string;
+  calibrationPeriod: string;
+  status: string;
 }
 
 export interface AlgorithmParameter {
@@ -342,19 +370,5 @@ export interface AlgorithmParameter {
 }
 
 export interface CalibrationTuningData {
-  
-}
 
-export interface CalibrationTimes {
-  calibration_start_time: string;
-  calibration_end_time: string;
-  simulation_start_time: string;
-  simulation_end_time: string;
-}
-
-export interface ValidationTimes {
-  validation_start_time: string;
-  validation_end_time: string;
-  simulation_start_time: string;
-  simulation_end_time: string;
 }
