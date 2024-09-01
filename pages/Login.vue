@@ -83,29 +83,30 @@ const SubmitLoginForm = async (e: Event) => {
   const { ngencerfBaseUrl } = useBackendConfig();
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
-    const { data, error } = await useFetch<{ access: string; refresh: string }>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
+    try {
+      const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
       body: { 
         username: userName.value,
         password: userPassword.value
       }
     });
+      const { access, refresh } = data;
+      console.log('Access Token:', access);
+      console.log('Refresh Token:', refresh);
 
-    if (data?.value?.access && data?.value?.refresh) {
-      // store tokens in UserDataStore
-      userDataStore.setAccessToken(data.value.access);
-      userDataStore.setRefreshToken(data.value.refresh);
-      // await verifyAccessToken(ngencerfBaseUrl);
-      // await refreshAccessToken(ngencerfBaseUrl);
-      logUserIn();
-      await GoToLanding();
-    } 
-    else if (error.value) {
-    console.error("Login failed:", error.value);
+      if (access && refresh) {
+        // store tokens in UserDataStore
+        userDataStore.setAccessToken(access);
+        userDataStore.setRefreshToken(refresh);
+        logUserIn();
+        await GoToLanding();
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
     }
-    else {
-      console.error("Login failed: no data or error returned");
-    }
+  } else {
+    console.error("Username and password are required.");
   }
 };
 

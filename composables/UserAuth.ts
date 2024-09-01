@@ -3,7 +3,7 @@
  */
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
-import { useFetch } from '#app';
+import type { FetchResponse } from 'ofetch';
 
 /**
  * Verfies access token
@@ -21,21 +21,18 @@ export const verifyAccessToken = async (ngencerfBaseUrl: string): Promise<boolea
 
   // Make a request to the server to verify the access token
   // Response will be empty if token is valid or a string[] if token is invalid
-  const { data, error } = await useFetch<undefined | string[]>(`${ngencerfBaseUrl}/auth/jwt/verify/`, {
-    method: 'POST',
-    body: { 
-      token: accessToken
-    },
-  });
-
-  // Access token verification failed
-  if (error.value) {
-    console.error('Token verification failed:', error.value);
+  try {
+    const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/verify/`, {
+      method: 'POST',
+      body: { 
+        token: accessToken
+      },
+    });
+    console.log('Token verification response:', data);
+    return true;
+  } catch (error) {
+    console.error('Error verifying token:', error);
     return false;
-  } 
-  else {
-    // Access token is valid
-      return true;
   }
 };
 
@@ -53,88 +50,84 @@ export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boole
     return false;
   }
 
-  // Make a request to server to refresh the access token
-  const { data, error } = await useFetch<{ access: string }>(`${ngencerfBaseUrl}/auth/jwt/refresh/`, {
-    method: 'POST',
-    body: { refresh: refreshToken },
-  });
+  try {
+    // Make a request to server to refresh the access token
+    const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/refresh/`, {
+      method: 'POST',
+      body: { refresh: refreshToken },
+    });
+    const { access } = data;
 
-  // If new access token is returned, update user data store with new access token
-  if (data?.value?.access) {
-    userDataStore.setAccessToken(data.value.access);
-    return true;
-  }
-  // No access token returned. Refresh failed
-  else if (error?.value) {
-    console.error('Token refresh failed:', error.value);
-    return false;
-  }
-  else {
-    console.error('Token refresh failed: no data returned');
+    // If new access token is returned, update user data store with new access token
+    if (access) {
+      console.log('Refreshed access token:', access);
+      console.log('Token refresh successful');
+      userDataStore.setAccessToken(access);
+      return true;
+    } else {
+      console.error('Token refresh failed');
+      return false
+    }
+  } catch (error) {
+    console.error('Error refreshing token:', error);
     return false;
   }
 };
 
 /**
  * This function makes a protected-API call to the server
- * @param ngencerfBaseUrl
  * @param url 
- * @param options 
+ * @param userOptions 
  * @returns response from the API call
  */
 export const makeProtectedApiCall = async <T>(
   url: string,
-  options: RequestInit = {},
-): Promise<T | null> => {
+  userOptions: any = {},
+): Promise<any> => {
   const userDataStore = useUserDataStore();
   const parsedUrl = new URL(url);
   const ngencerfBaseUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
+  let responseData: FetchResponse<any> | null = null;
 
-  
-  try {
-    // Verify access token before making the API call
-    const isValid = await verifyAccessToken(ngencerfBaseUrl);
+  // verify access token before making the API call
+  const isValid = await verifyAccessToken(ngencerfBaseUrl);
 
-    // If access token is invalid, attempt to refresh it
-    if (!isValid) {
-      const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
-      // if access token is invalid and refresh failed, log user out and redirect to login page
-      if (!refreshAccessTokenSuccess) {
-        userDataStore.logUserOut();
-        await navigateTo('/login');
-        return null;
-      }
-    }
-
-    // set access token in headers for API call
-    const headers: HeadersInit = {
-      ...options.headers,
-      Authorization: `Bearer ${userDataStore.getAccessToken()}`,
-    };
-
-    // format body based on type
-    const body: BodyInit | undefined = options.body 
-    ? (typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData) 
-      ? JSON.stringify(options.body) 
-      : options.body)
-    : undefined;
-
-    // make API call
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      body
-    });
+  // if access token is invalid, attempt to refresh it
+  if (!isValid) {
+    const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
     
-    if (!response.ok) {
-      console.error('API call failed:', response.statusText);
+    // if refresh fails, log the user out and redirect to login page
+    if (!refreshAccessTokenSuccess) {
+      userDataStore.logUserOut();
+      await navigateTo('/login');
       return null;
     }
-
-    return await response.json() as T;
   }
-  catch (error) {
-    console.error('Error making API call:', error);
+
+  // make API call
+  try {
+    const response = await $fetch.raw(url, {
+      ...userOptions,
+      async onRequest({ request, options }: { request: any, options: any } ) {
+        // stringify body if it is an object
+        if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
+          options.body = JSON.stringify(options.body);
+        }
+        console.log('Request:', request, options);
+      },
+      async onRequestError({ error }: { error: any }) {
+        console.error('Request error:', error);
+      },
+      async onResponseError({ response }: { response: any }) {
+        responseData = await response;
+      }
+    });
+
+    responseData = await response;
+    console.log('Response:', responseData);
+    return responseData._data;
+  } catch (error) {
+    console.error('API call failed:', responseData, error);
     return null;
   }
 };
