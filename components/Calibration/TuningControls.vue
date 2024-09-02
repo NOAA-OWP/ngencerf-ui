@@ -483,7 +483,7 @@ const handleFileUpload = async (event: Event) => {
             max: param.max,
             initValue: param.init,
           });
-        })
+        });
       }
     } catch (error) {
       console.error('File upload failed:', error);
