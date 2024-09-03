@@ -53,7 +53,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    * @returns {CeatedCalibrationRun}
    */
    async function fetchNewCalibrationRunId() {
-      const newCalibrationJobId = await makeProtectedApiCall<CeatedCalibrationRun>( `${ngencerfBaseUrl}/calibration/create_calibration_run/`, {
+      const newCalibrationJobId = await makeProtectedApiCall<CreatedCalibrationRun>( `${ngencerfBaseUrl}/calibration/create_calibration_run/`, {
          method: "POST",
          headers: { 
             "Authorization": `Bearer ${getAccessToken()}`,
