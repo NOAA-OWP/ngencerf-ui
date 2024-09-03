@@ -1,12 +1,12 @@
 <template>
-   <client-only>
+
     <table id="CalibrationProgressTable" class="prevent-select">
       <tr>
         <td><i v-if="selectedDomainValue" :class="selectedDomainValue ? 'checkMark' : ''" class="pi pi-check font-bold"></i></td>        
         <td class="ptype">Headwater Basin Gage</td>
       </tr>
       <tr>
-        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="formulationNameInput && selectedModuleValues.length" :class="formulationNameInput && selectedModuleValues.length ? 'checkMark' : ''"  class="pi pi-check font-bold"></i></td>
         <td class="ptype">Formulation</td>
       </tr>
       <tr>
@@ -38,17 +38,18 @@
         <td class="ptype">Metrics / Plot Inteval</td>
       </tr>
     </table>
-  </client-only>
+
 </template>
 
 <script lang="ts" setup>
 import { useGageStore } from '~/stores/calibration/GageStore';
+import { useFormulationStore } from '~/stores/calibration/FormulationStore';
+
+const forumlationStore = useFormulationStore();
+const { formulationNameInput, selectedModuleValues } = storeToRefs(forumlationStore);
+
 const gageStore = useGageStore();
 const { gageData, gageTabData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs( gageStore )
-
-// const props = defineProps<{
-//   progress: CalibrationProgress;
-// }>();
 </script>
 
 <style lang="scss" scoped>
