@@ -311,51 +311,6 @@ export interface OptimizationDataInputData {
   is_active: boolean;
 }
 
-export interface CalibrationProgress {
-  headwater_basin_gage: boolean;
-  formulation: boolean;
-  start_and_end_times: boolean;
-  calibration_output_variable: boolean;
-  tuning_parameters: boolean;
-  optimization_algorithm: boolean;
-  objective_function: boolean;
-  calibration_stop_criteria: boolean;
-  metrics_plot_inteval: boolean;
-}
-
-export interface EvaluationProgress {
-  headwater_basin_gage: boolean;
-  formulation: boolean;
-  parameters_set: boolean;
-  calibration_output_variable: boolean;
-  metrics: boolean;
-  time_period: boolean;
-  output_variable: boolean;
-  reference_dataset: boolean;
-}
-
-export interface ForecastProgress {
-  headwater_basin_gage: boolean;
-  formulation: boolean;
-  reference_dataset: boolean;
-  time_period: boolean;
-  scalar_gridded_vars: boolean;
-  output_variable: boolean;
-  parameters_set: boolean;
-}
-
-// export interface GageData {
-//   agency: String;
-//   station_name: String;
-//   site_type: String;
-//   latitude: String;
-//   longitude: String;
-//   altitude: String;
-//   date_established:  String;
-//   drainage_area: String;
-//   huc:  String;  
-// }
-
 export interface CalibrationRun {
   runId: number;
   formulationName: string;

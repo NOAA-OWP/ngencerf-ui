@@ -137,6 +137,9 @@ const { getCalibrationTabIndex } = generalStore()
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const toast = useToast()
 
+
+console.log(gageData.value);
+
 /**
  * event bus for save click
  */

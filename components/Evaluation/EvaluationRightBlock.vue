@@ -5,7 +5,7 @@
       <div id="TopRightBlock" class="row-span-5">
         <div class="grid grid-cols-2">
           <div id="ProgressGroup" class="col-span-1">
-            <EvaluatonProgressGroup :progress="progress" />
+            <EvaluationProgressGroup" />
           </div>
           <div id="GageCutout" class="col-span-1">
             <GageCutout />
@@ -15,34 +15,21 @@
       </div>
       <div id="BottomRightBlock" class="row-span-7">
         <div id="MessagesGroup">
-          <MessagesGroup />
+          <EvaluationMessagesGroup />
         </div>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import type { EvaluationProgress } from "~/composables/NextGenModel";
-import EvaluatonProgressGroup from "./EvaluatonProgressGroup.vue";
-import MessagesGroup from "../Common/MessagesGroup.vue";
+
+import EvaluationProgressGroup from "./EvaluationProgressGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getEvalRunSelected } = generalStore();
 
 const displayRightBlock = ref(getEvalRunSelected());
-
-
-const progress: EvaluationProgress = {
-  headwater_basin_gage: true,
-  formulation: false,
-  parameters_set: false,
-  calibration_output_variable: false,
-  metrics: false,
-  time_period: false,
-  output_variable: false,
-  reference_dataset: false,
-};
 
 </script>
 <style lang="scss" scoped>
