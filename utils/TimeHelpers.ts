@@ -13,7 +13,7 @@ export const formatDateForDisplay = ( d: string ) => {
   
 }
 
-function convertTimeZone(date: any, tzString: String) {
+export const convertTimeZone = (date: any, tzString: String) => {
   return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
 }
 

@@ -28,7 +28,7 @@ export const verifyAccessToken = async (ngencerfBaseUrl: string): Promise<boolea
         token: accessToken
       },
     });
-    console.log('Token verification response:', data);
+    // console.log('Token verification response:', data);
     return true;
   } catch (error) {
     console.error('Error verifying token:', error);
@@ -60,8 +60,8 @@ export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boole
 
     // If new access token is returned, update user data store with new access token
     if (access) {
-      console.log('Refreshed access token:', access);
-      console.log('Token refresh successful');
+      // console.log('Refreshed access token:', access);
+      // console.log('Token refresh successful');
       userDataStore.setAccessToken(access);
       return true;
     } else {

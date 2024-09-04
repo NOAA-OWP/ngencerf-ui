@@ -92,8 +92,8 @@ const SubmitLoginForm = async (e: Event) => {
       }
     });
       const { access, refresh } = data;
-      console.log('Access Token:', access);
-      console.log('Refresh Token:', refresh);
+      // console.log('Access Token:', access);
+      // console.log('Refresh Token:', refresh);
 
       if (access && refresh) {
         // store tokens in UserDataStore
