@@ -526,9 +526,11 @@ const handleFileUpload = async (event: Event) => {
         });
       }
     } catch (error) {
+      toast.add({ severity: 'error', summary: 'File upload failed', life: 10000 });
       console.error('File upload failed:', error);
     }
   } else {
+    toast.add({ severity: 'error', summary: 'No file selected', life: 10000 });
     console.error('No file selected');
   }
 };
