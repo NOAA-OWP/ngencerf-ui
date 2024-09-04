@@ -1,7 +1,9 @@
 <template>
   <div id="TuningControls">
     <div class="w-full mt-2">
-      <div class="text-center mt-1" id="RangeDates">Range: {{ rangeDateFrom }} to {{ rangeDateTo }}</div>
+      <div v-if="rangeDateFrom && rangeDateTo" class="text-center mt-1" id="RangeDates" >
+        Range: {{ rangeDateFrom }} to {{ rangeDateTo }}
+      </div>
     </div>
     <div class="grid grid-rows-10">
       <div class="row-span-1">
@@ -13,22 +15,46 @@
                 <span class="tabTitles">Calibration Time Controls</span>
               </div>
               <div id="BoxBottomLeft" class="pt-2">
-                <div class="timeBlocks">
+                <div class="timeBlocks datepicker-wrapper" @click="handleCalibrationTimeControlsClick">
                   <div>Simulation Start:
-                    <VueDatePicker class="datePickers dp__theme_dark" v-model="simStartTime" time-picker-inline
-                      format="yyyy-MM-dd  hh:00" />
+                    <VueDatePicker 
+                      class="datePickers dp__theme_dark" 
+                      v-model="simStartTime" 
+                      time-picker-inline
+                      format="yyyy-MM-dd  hh:00"
+                      :disabled="isCalibrationTuningControlsDisabled"
+                    />
+                    <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
                   </div>
                   <div>Simulation End:
-                    <VueDatePicker class="datePickers dp__theme_dark" v-model="simEndTime" time-picker-inline
-                      format="yyyy-MM-dd  hh:00" />
+                    <VueDatePicker 
+                      class="datePickers dp__theme_dark" 
+                      v-model="simEndTime" 
+                      time-picker-inline
+                      format="yyyy-MM-dd  hh:00"
+                      :disabled="isCalibrationTuningControlsDisabled"
+                    />
+                    <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
                   </div>
                   <div>Calibration Start:
-                    <VueDatePicker class="datePickers dp__theme_dark" v-model="calStartTime" time-picker-inline
-                      format="yyyy-MM-dd  hh:00" />
+                    <VueDatePicker 
+                      class="datePickers dp__theme_dark" 
+                      v-model="calStartTime" 
+                      time-picker-inline
+                      format="yyyy-MM-dd  hh:00"
+                      :disabled="isCalibrationTuningControlsDisabled"
+                    />
+                    <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
                   </div>
                   <div>Calibration End:
-                    <VueDatePicker class="datePickers dp__theme_dark" v-model="calEndTime" time-picker-inline
-                      format="yyyy-MM-dd  hh:00" />
+                    <VueDatePicker 
+                      class="datePickers dp__theme_dark" 
+                      v-model="calEndTime" 
+                      time-picker-inline
+                      format="yyyy-MM-dd  hh:00"
+                      :disabled="isCalibrationTuningControlsDisabled"
+                    />
+                    <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
                   </div>
                 </div>
               </div>
@@ -47,26 +73,30 @@
                   Check the box above<br />to enable Automatic Validation
                 </div>
                 <div v-else>
-                  <div class="timeBlocks">
+                  <div class="timeBlocks datepicker-wrapper" @click="handleCalibrationTimeControlsClick">
                     <div>
                       Simulation Start:
                       <VueDatePicker class="datePickers dp__theme_dark" v-model="avSimStartTime" time-picker-inline
-                        format="yyyy-MM-dd  hh:00" />
+                        format="yyyy-MM-dd  hh:00" :disabled="isCalibrationTuningControlsDisabled" />
+                      <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
                     </div>
                     <div>
                       Simulation End:
                       <VueDatePicker class="datePickers dp__theme_dark" v-model="avSimEndTime" time-picker-inline
-                        format="yyyy-MM-dd  hh:00" />
+                        format="yyyy-MM-dd  hh:00" :disabled="isCalibrationTuningControlsDisabled" />
+                      <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
                     </div>
                     <div>
                       Val Start:
                       <VueDatePicker class="datePickers dp__theme_dark" v-model="avCalStartTime" time-picker-inline
-                        format="yyyy-MM-dd  hh:00" />
+                        format="yyyy-MM-dd  hh:00" :disabled="isCalibrationTuningControlsDisabled" />
+                      <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
                     </div>
                     <div>
                       Val End:
                       <VueDatePicker class="datePickers dp__theme_dark" v-model="avCalEndTime" time-picker-inline
-                        format="yyyy-MM-dd  hh:00" />
+                        format="yyyy-MM-dd  hh:00" :disabled="isCalibrationTuningControlsDisabled" />
+                      <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
                     </div>
                   </div>
                 </div>
@@ -244,6 +274,9 @@ const outputVariablesToCalibrate = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
+const isCalibrationTuningControlsDisabled = computed(() => {
+  return !loadCalibrationRunData.value?.calibration_times || Object.keys(loadCalibrationRunData.value?.calibration_times).length === 0;
+});
 
 onMounted(async () => {
   //console.log("onMounted");
@@ -264,7 +297,7 @@ onMounted(async () => {
   const calibrationTimes = loadCalibrationRunData.value?.calibration_times;
   const timeRange = loadCalibrationRunData.value?.time_range;
 
-  if (calibrationTimes) {
+  if (!isCalibrationTuningControlsDisabled) {
     // check if timeRange is provided
     if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
       //console.log("timeRange is null");
@@ -278,7 +311,7 @@ onMounted(async () => {
       rangeDateTo.value = timeRange?.end_time;
     }
   } else {
-    //console.log("calibration_times is missing or invalid");
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration times are missing or empty', life: 10000 });
   }
 
   const calibrationTuningModules = loadTuningTabData.value?.modules;
@@ -302,6 +335,13 @@ onMounted(async () => {
 
   //console.log("userCalirationTuningParameters:", userCalibrationTuningParameters.value);
 });
+
+const handleCalibrationTimeControlsClick = (event: Event) => {
+  if (isCalibrationTuningControlsDisabled) {
+    event.preventDefault(); // Prevent any default action
+    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls as calibration_times are not set.', life: 10000 });
+  }
+}
 
 // watch for changes to the simulation and calibration times and handle validation
 watch([simStartTime, simEndTime, calStartTime, calEndTime], () => {
@@ -666,4 +706,19 @@ select {
   border-radius: 5px;
 }
 
+.datepicker-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0);
+  cursor: not-allowed;
+  z-index: 10; /* Ensure it sits above the date picker */
+}
 </style>
