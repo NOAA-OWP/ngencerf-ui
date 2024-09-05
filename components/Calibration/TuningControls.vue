@@ -170,7 +170,7 @@
                   <input
                     type="text"
                     v-model="slotProps.data.min"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'min', $event.target.value)"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'min', $event?.target?.value)"
                     style="width: 100%;"
                   />
                 </template>
@@ -182,7 +182,7 @@
                   <input
                     type="text"
                     v-model="slotProps.data.max"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'max', $event.target.value)"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'max', $event?.target?.value)"
                     style="width: 100%;"
                   />
                 </template>
@@ -194,7 +194,7 @@
                   <input
                     type="text"
                     v-model="slotProps.data.initValue"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'initValue', $event.target.value)"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'initValue', $event?.target?.value)"
                     style="width: 100%;"
                   />
                 </template>
@@ -279,23 +279,24 @@ const isCalibrationTuningControlsDisabled = computed(() => {
 });
 
 onMounted(async () => {
-  //console.log("onMounted");
+  console.log("onMounted");
   setTimeout(() => {
     loading.value = false;
   }, 500);
 
-  //console.log("isDataFetched:", isDataFetched.value);
+  console.log("isDataFetched:", isDataFetched.value);
   if (!isDataFetched.value) {
     await fetchTuningTabData();
   }
 
-  //console.log("loadTuningTabData:", loadTuningTabData.value);
-  //console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
-  //console.log("calibration_times:", loadCalibrationRunData.value?.calibration_times);
+  console.log("loadTuningTabData:", loadTuningTabData.value);
+  console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
+  console.log("calibration_times:", loadCalibrationRunData.value?.calibration_times);
 
   // set server-provided calibration times and time range
   const calibrationTimes = loadCalibrationRunData.value?.calibration_times;
   const timeRange = loadCalibrationRunData.value?.time_range;
+  console.log("timeRange:", timeRange);
 
   if (!isCalibrationTuningControlsDisabled) {
     // check if timeRange is provided
@@ -324,6 +325,7 @@ onMounted(async () => {
     initial_value: param.initial_value,
     module: module.name,
   }))) || [];
+  console.log("userCalirationTuningParameters:", userCalibrationTuningParameters.value);
 
   // set output variables to calibrate
   outputVariablesToCalibrate.value = calibrationTuningModules?.flatMap((module: any) => module.output_variables.map((outputVar: any) => ({
