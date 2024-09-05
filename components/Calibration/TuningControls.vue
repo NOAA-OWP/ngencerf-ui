@@ -159,7 +159,7 @@
               <Column field="parameter" header="Parameter" sortable>
                 <template #body="slotProps">
                   <span style="background-color: lightgrey; padding: 4px; display: block;">
-                    {{ slotProps.data.parameter }}
+                    {{ slotProps.data.name }}
                   </span>
                 </template>
               </Column>
@@ -169,8 +169,8 @@
                 <template #body="slotProps">
                   <input
                     type="text"
-                    v-model="slotProps.data.min"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'min', $event?.target?.value)"
+                    v-model="slotProps.data.minimum"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event?.target?.value)"
                     style="width: 100%;"
                   />
                 </template>
@@ -181,8 +181,8 @@
                 <template #body="slotProps">
                   <input
                     type="text"
-                    v-model="slotProps.data.max"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'max', $event?.target?.value)"
+                    v-model="slotProps.data.maximum"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event?.target?.value)"
                     style="width: 100%;"
                   />
                 </template>
@@ -193,8 +193,8 @@
                 <template #body="slotProps">
                   <input
                     type="text"
-                    v-model="slotProps.data.initValue"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'initValue', $event?.target?.value)"
+                    v-model="slotProps.data.initial_value"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event?.target?.value)"
                     style="width: 100%;"
                   />
                 </template>
@@ -520,10 +520,11 @@ const handleFileUpload = async (event: Event) => {
         // Populate the Parameter table with the data from user-uploaded file
         response.user_parameter_file.forEach((param: any) => {
           calibrationTuningDataList.value.push({
-            parameter: param.param,
-            min: param.min,
-            max: param.max,
-            initValue: param.init,
+            name: param.param,
+            minimum: param.min,
+            maximum: param.max,
+            initial_value: param.init,
+            module: param.model, // module?
           });
         });
       }
@@ -544,10 +545,11 @@ const addParameterToTable = () => {
   const parameter = userCalibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
   if (parameter) {
     calibrationTuningDataList.value.push({
-      parameter: parameter.name,
-      min: parameter.minimum,
-      max: parameter.maximum,
-      initValue: parameter.initial_value,
+      name: parameter.name,
+      minimum: parameter.minimum,
+      maximum: parameter.maximum,
+      initial_value: parameter.initial_value,
+      module: parameter.module,
     });
   }
 };
@@ -563,13 +565,13 @@ const addParameterToTable = () => {
   //console.log("updated calibrationTuningDataList:", calibrationTuningDataList.value);
 
   // update the userCalibrationTuningParameters with the new values
-  const parameter = userCalibrationTuningParameters?.value?.find(param => param.name === calibrationTuningDataList.value[index].parameter);
+  const parameter = userCalibrationTuningParameters?.value?.find(param => param.name === calibrationTuningDataList.value[index].name);
   if (parameter) {
-    if (field === 'min') {
+    if (field === 'minimum') {
       parameter.minimum = value;
-    } else if (field === 'max') {
+    } else if (field === 'maximum') {
       parameter.maximum = value;
-    } else if (field === 'initValue') {
+    } else if (field === 'initial_value') {
       parameter.initial_value = value;
     }
   }
@@ -581,7 +583,7 @@ const addParameterToTable = () => {
  * @param index The index of the row to be deleted
  */
 // const deleteCalibrationTuningParameter = (index: number) => {
-//   const parameter = calibrationTuningDataList.value[index].parameter;
+//   const parameter = calibrationTuningDataList.value[index].name;
 //   console.log("deleting parameter:", parameter);
 //   calibrationTuningDataList.value.splice(index, 1);
 //   console.log("updated calibrationTuningDataList:", calibrationTuningDataList.value);
