@@ -561,7 +561,7 @@ const addParameterToTable = () => {
  * @param value The new value entered by the user
  */
  const updateCalibrationTuningParameter = (index: number, field: string, value: string) => {
-  calibrationTuningDataList.value[index][field] = value; // this just tracks the data in the table and needs to be added to userCalibrationTuningParameters
+  calibrationTuningDataList.value[index][field] = value; // this just tracks the data in the table and still needs to be added to userCalibrationTuningParameters
   //console.log("updated calibrationTuningDataList:", calibrationTuningDataList.value);
 
   // update the userCalibrationTuningParameters with the new values
@@ -583,6 +583,7 @@ const addParameterToTable = () => {
  * @param index The index of the row to be deleted
  */
 // const deleteCalibrationTuningParameter = (index: number) => {
+//   // remove the parameter from calibrationTuningDataList and table
 //   const parameter = calibrationTuningDataList.value[index].name;
 //   console.log("deleting parameter:", parameter);
 //   calibrationTuningDataList.value.splice(index, 1);
