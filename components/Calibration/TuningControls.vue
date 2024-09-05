@@ -128,7 +128,7 @@
                 <div class="text-left  mt-5">
                   <div class="inline-block text-left">Name:</div><br />
                   <select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter">
-                    <option v-for="param in userCalibrationTuningParameters" :key="param.name" :value="param.name">
+                    <option v-for="param in calibrationTuningParameters" :key="param.name" :value="param.name">
                       {{ param.name }}
                     </option>
                   </select>
@@ -154,7 +154,7 @@
           </div>
 
           <div id="TuningDataList">
-            <DataTable :value="calibrationTuningDataList" scrollable scroll-height="200px">
+            <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px">
               <!-- parameter column, uneditable with light grey background -->
               <Column field="parameter" header="Parameter" sortable>
                 <template #body="slotProps">
@@ -269,7 +269,7 @@ const avCalEndTime = ref();
 const rangeDateFrom = ref();
 const rangeDateTo = ref();
 
-const calibrationTuningDataList = ref<any[]>([]);
+const calibrationTuningParameters = ref<any[]>([]);
 const outputVariablesToCalibrate = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
@@ -318,14 +318,14 @@ onMounted(async () => {
   const calibrationTuningModules = loadTuningTabData.value?.modules;
 
   // set the calibration tuning parameters
-  userCalibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module.parameters.map((param: any) => ({
+  calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module.parameters.map((param: any) => ({
     name: param.name,
     minimum: param.minimum,
     maximum: param.maximum,
     initial_value: param.initial_value,
     module: module.name,
   }))) || [];
-  console.log("userCalirationTuningParameters:", userCalibrationTuningParameters.value);
+  console.log("userCalirationTuningParameters:", calibrationTuningParameters.value);
 
   // set output variables to calibrate
   outputVariablesToCalibrate.value = calibrationTuningModules?.flatMap((module: any) => module.output_variables.map((outputVar: any) => ({
@@ -335,7 +335,7 @@ onMounted(async () => {
   }))) || [];
   //console.log("outputVariablesToCalibrate:", outputVariablesToCalibrate.value);
 
-  //console.log("userCalirationTuningParameters:", userCalibrationTuningParameters.value);
+  //console.log("userCalirationTuningParameters:", calibrationTuningParameters.value);
 });
 
 const handleCalibrationTimeControlsClick = (event: Event) => {
@@ -519,7 +519,7 @@ const handleFileUpload = async (event: Event) => {
       if (response) {
         // Populate the Parameter table with the data from user-uploaded file
         response.user_parameter_file.forEach((param: any) => {
-          calibrationTuningDataList.value.push({
+          userCalibrationTuningParameters?.value.push({
             name: param.param,
             minimum: param.min,
             maximum: param.max,
@@ -542,9 +542,9 @@ const handleFileUpload = async (event: Event) => {
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
 const addParameterToTable = () => {
-  const parameter = userCalibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
+  const parameter = calibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
   if (parameter) {
-    calibrationTuningDataList.value.push({
+    userCalibrationTuningParameters.value.push({
       name: parameter.name,
       minimum: parameter.minimum,
       maximum: parameter.maximum,
@@ -561,11 +561,11 @@ const addParameterToTable = () => {
  * @param value The new value entered by the user
  */
  const updateCalibrationTuningParameter = (index: number, field: string, value: string) => {
-  calibrationTuningDataList.value[index][field] = value; // this just tracks the data in the table and still needs to be added to userCalibrationTuningParameters
-  //console.log("updated calibrationTuningDataList:", calibrationTuningDataList.value);
+  userCalibrationTuningParameters.value[index][field] = value; // this just tracks the data in the table and still needs to be added to calibrationTuningParameters
+  //console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
 
-  // update the userCalibrationTuningParameters with the new values
-  const parameter = userCalibrationTuningParameters?.value?.find(param => param.name === calibrationTuningDataList.value[index].name);
+  // update the calibrationTuningParameters with the new values
+  const parameter = calibrationTuningParameters?.value?.find(param => param.name === userCalibrationTuningParameters.value[index].name);
   if (parameter) {
     if (field === 'minimum') {
       parameter.minimum = value;
@@ -575,26 +575,26 @@ const addParameterToTable = () => {
       parameter.initial_value = value;
     }
   }
-  //console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
+  //console.log("updated calibrationTuningParameters:", calibrationTuningParameters.value);
 };
 
 /**
- * Delete Calibration Tuning Parameter from the table and userCalibrationTuningParameters
+ * Delete Calibration Tuning Parameter from the table and calibrationTuningParameters
  * @param index The index of the row to be deleted
  */
 // const deleteCalibrationTuningParameter = (index: number) => {
-//   // remove the parameter from calibrationTuningDataList and table
-//   const parameter = calibrationTuningDataList.value[index].name;
+//   // remove the parameter from userCalibrationTuningParameters and table
+//   const parameter = userCalibrationTuningParameters.value[index].name;
 //   console.log("deleting parameter:", parameter);
-//   calibrationTuningDataList.value.splice(index, 1);
-//   console.log("updated calibrationTuningDataList:", calibrationTuningDataList.value);
-
-//   // remove the parameter from userCalibrationTuningParameters
-//   const paramIndex = userCalibrationTuningParameters?.value?.findIndex(param => param.name === parameter);
-//   if (paramIndex && paramIndex > -1) {
-//     userCalibrationTuningParameters?.value?.splice(paramIndex, 1);
-//   }
+//   userCalibrationTuningParameters.value.splice(index, 1);
 //   console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
+
+//   // remove the parameter from calibrationTuningParameters
+//   const paramIndex = calibrationTuningParameters?.value?.findIndex(param => param.name === parameter);
+//   if (paramIndex && paramIndex > -1) {
+//     calibrationTuningParameters?.value?.splice(paramIndex, 1);
+//   }
+//   console.log("updated calibrationTuningParameters:", calibrationTuningParameters.value);
 // };
 
 /**

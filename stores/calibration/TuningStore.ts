@@ -20,7 +20,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
 
   // user-data properties
   const userCalibrationTimes = ref<any>();
-  const userCalibrationTuningParameters = ref<any[]>();
+  const userCalibrationTuningParameters = ref<any[]>([]);
   const userOutputVariableToCalibrate = ref<{ name: string; module: string | null }>({
     name: '',
     module: null,
