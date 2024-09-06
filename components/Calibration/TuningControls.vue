@@ -143,7 +143,7 @@
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
                   <div class="mt-2">
                     <select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
-                      <option v-for="outputVariable in outputVariablesToCalibrate" :key="outputVariable.name" :value="outputVariable.name">
+                      <option v-for="outputVariable in outputVariables" :key="outputVariable.name" :value="outputVariable.name">
                         {{ outputVariable.name }}
                       </option>
                     </select>
@@ -253,6 +253,7 @@ const {
   userCalibrationTimes,
   userCalibrationTuningParameters,
   userOutputVariableToCalibrate,
+  outputVariables,
   automatic_validation,
   avSimStartTime,
   avSimEndTime,
@@ -266,7 +267,6 @@ const {
 const loading = ref(true);
 
 const calibrationTuningParameters = ref<any[]>([]);
-const outputVariablesToCalibrate = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -340,14 +340,19 @@ onMounted(async () => {
   console.log("userCalibrationTuningParameters:", calibrationTuningParameters.value);
 
   // set output variables to calibrate
-  outputVariablesToCalibrate.value = calibrationTuningModules?.flatMap((module: any) => module.output_variables.map((outputVar: any) => ({
+  outputVariables.value = calibrationTuningModules?.flatMap((module: any) => module.output_variables.map((outputVar: any) => ({
     name: outputVar.name,
     description: outputVar.description,
     module: module.name,
   }))) || [];
-  //console.log("outputVariablesToCalibrate:", outputVariablesToCalibrate.value);
 
-  //console.log("userCalirationTuningParameters:", calibrationTuningParameters.value);
+  // set ouputvariable_to_calibrate
+  if (loadCalibrationRunData.value.output_variable_to_calibrate) {
+    const { name, module } = loadCalibrationRunData.value.output_variable_to_calibrate;
+    userOutputVariableToCalibrate.value.name = name;
+    userOutputVariableToCalibrate.value.module = module;
+    selectedOutputVariable.value = name;
+  };
 });
 
 const handleCalibrationTimeControlsClick = (event: Event) => {

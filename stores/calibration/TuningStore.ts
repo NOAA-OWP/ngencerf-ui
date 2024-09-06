@@ -30,11 +30,13 @@ export const useTuningStore = defineStore('TuningStore', () => {
     calibration_start_time: calStartTime.value,
     calibration_end_time: calEndTime.value,
   }));
+
   const userCalibrationTuningParameters = ref<any[]>([]);
   const userOutputVariableToCalibrate = ref<{ name: string; module: string | null }>({
     name: '',
     module: null,
   });
+  const outputVariables = ref<any[]>([]);
   const automatic_validation = ref<boolean>(false);
 
   const avSimStartTime = ref<string>("");
@@ -138,6 +140,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     userCalibrationTimes,
     userCalibrationTuningParameters,
     userOutputVariableToCalibrate,
+    outputVariables,
     automatic_validation,
     avSimStartTime,
     avSimEndTime,
