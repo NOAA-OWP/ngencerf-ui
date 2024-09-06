@@ -5,7 +5,7 @@
       <div class="row-span-2">
         <div class="grid grid-cols-2 gap=1">
           <div class="col-span-1">
-            <p v-if="calData?.gage.gage_id">Gage: &nbsp;<span class="font-medium">{{ calData?.gage.gage_id }}</span></p>
+            <p v-if="calData?.gage?.gage_id">Gage: &nbsp;<span class="font-medium">{{ calData?.gage?.gage_id }}</span></p>
             <p v-if="calData?.forcing_source">Forcing Data: &nbsp;<span class="font-medium">{{ calData?.forcing_source
                 }}</span></p>
             <p v-if="calData?.formulation_name">Formulation Name: &nbsp;<span class="font-medium">{{
@@ -13,7 +13,7 @@
                 }}</span></p>
           </div>
           <div class="col-span-1">
-            <p v-if="calData?.gage.station_name"><span class="font-medium">{{ calData?.gage.station_name }}</span></p>
+            <p v-if="calData?.gage?.station_name"><span class="font-medium">{{ calData?.gage?.station_name }}</span></p>
             <p v-if="calData?.observational_source">Observational Data: &nbsp;<span class="font-medium">{{
               calData?.observational_source }}</span></p>
           </div>
