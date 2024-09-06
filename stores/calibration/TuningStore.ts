@@ -19,14 +19,37 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const isDataFetched = ref(false);
 
   // user-data properties
-  const userCalibrationTimes = ref<any>();
+  const simStartTime = ref<string>("");
+  const simEndTime = ref<string>("");
+  const calStartTime = ref<string>("");
+  const calEndTime = ref<string>("");
+
+  const userCalibrationTimes = computed(() => ({
+    simulation_start_time: simStartTime.value,
+    simulation_end_time: simEndTime.value,
+    calibration_start_time: calStartTime.value,
+    calibration_end_time: calEndTime.value,
+  }));
   const userCalibrationTuningParameters = ref<any[]>([]);
   const userOutputVariableToCalibrate = ref<{ name: string; module: string | null }>({
     name: '',
     module: null,
   });
   const automatic_validation = ref<boolean>(false);
-  const userValidationTimes = ref<any>({});
+
+  const avSimStartTime = ref<string>("");
+  const avSimEndTime = ref<string>("");
+  const avCalStartTime = ref<string>("");
+  const avCalEndTime = ref<string>("");
+  const userValidationTimes = computed(() => ({
+    simulation_start_time: avSimStartTime.value,
+    simulation_end_time: avSimEndTime.value,
+    validation_start_time: avCalStartTime.value,
+    validation_end_time: avCalEndTime.value,
+  }));
+
+  const rangeDateFrom = ref<any>();
+  const rangeDateTo = ref<any>();
 
   const { ngencerfBaseUrl } = useBackendConfig();
   const userDataStore = useUserDataStore();
@@ -108,11 +131,21 @@ export const useTuningStore = defineStore('TuningStore', () => {
     loadCalibrationRunData,
     loadTuningTabData,
     isDataFetched,
+    simStartTime,
+    simEndTime,
+    calStartTime,
+    calEndTime,
     userCalibrationTimes,
     userCalibrationTuningParameters,
     userOutputVariableToCalibrate,
     automatic_validation,
+    avSimStartTime,
+    avSimEndTime,
+    avCalStartTime,
+    avCalEndTime,
     userValidationTimes,
+    rangeDateFrom,
+    rangeDateTo,
     postSaveTuningTabData
   };
 }, 

@@ -231,7 +231,6 @@ import { generalStore } from "~/stores/common/GeneralStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
-// import { useFileStorage } from 'nuxt-file-storage';
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
 const toast = useToast();
@@ -247,27 +246,24 @@ const {
   loadCalibrationRunData,
   loadTuningTabData,
   isDataFetched,
+  simStartTime,
+  simEndTime,
+  calStartTime,
+  calEndTime,
   userCalibrationTimes,
   userCalibrationTuningParameters,
   userOutputVariableToCalibrate,
   automatic_validation,
-  userValidationTimes
+  avSimStartTime,
+  avSimEndTime,
+  avCalStartTime,
+  avCalEndTime,
+  userValidationTimes,
+  rangeDateFrom,
+  rangeDateTo,
 } = storeToRefs(tuningStore);
 
 const loading = ref(true);
-
-const simStartTime = ref();
-const simEndTime = ref();
-const calStartTime = ref();
-const calEndTime = ref();
-
-const avSimStartTime = ref();
-const avSimEndTime = ref();
-const avCalStartTime = ref();
-const avCalEndTime = ref();
-
-const rangeDateFrom = ref();
-const rangeDateTo = ref();
 
 const calibrationTuningParameters = ref<any[]>([]);
 const outputVariablesToCalibrate = ref<any[]>([]);
@@ -280,38 +276,54 @@ const isCalibrationTuningControlsDisabled = computed(() => {
 
 onMounted(async () => {
   console.log("onMounted");
-  setTimeout(() => {
-    loading.value = false;
-  }, 500);
 
   console.log("isDataFetched:", isDataFetched.value);
   if (!isDataFetched.value) {
-    await fetchTuningTabData();
+    console.log("fetching Tuning Tab Data...");
+    await fetchTuningTabData(); // only fetch data if not already fetched
   }
 
   console.log("loadTuningTabData:", loadTuningTabData.value);
   console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
   console.log("calibration_times:", loadCalibrationRunData.value?.calibration_times);
+  console.log("validation_times:", loadCalibrationRunData.value?.validation_times);
+  console.log("time_range:", loadCalibrationRunData.value?.time_range);
 
-  // set server-provided calibration times and time range
-  const calibrationTimes = loadCalibrationRunData.value?.calibration_times;
+  // set calibration times
+  if (loadCalibrationRunData.value?.calibration_times) {
+    const { simulation_start_time, simulation_end_time, calibration_start_time,  calibration_end_time } = loadCalibrationRunData.value.calibration_times;
+    simStartTime.value = simulation_start_time;
+    simEndTime.value = simulation_end_time;
+    calStartTime.value = calibration_start_time;
+    calEndTime.value = calibration_end_time;
+  };
+
+  // set automatic validation times
+  if (loadCalibrationRunData.value?.validation_times) {
+    const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = loadCalibrationRunData.value.validation_times;
+    
+    avSimStartTime.value = simulation_start_time;
+    avSimEndTime.value = simulation_end_time;
+    avCalStartTime.value = validation_start_time;
+    avCalEndTime.value = validation_end_time;
+  };
+
+  // set time range
   const timeRange = loadCalibrationRunData.value?.time_range;
-  console.log("timeRange:", timeRange);
 
-  if (!isCalibrationTuningControlsDisabled) {
-    // check if timeRange is provided
-    if (timeRange && Object.keys(timeRange).length === 0 && timeRange.constructor === Object) {
-      //console.log("timeRange is null");
-      // timeRange not provided. set timeRange one month before and after the calibration times
-      const { rangeStart, rangeEnd } = calculateTimeRange(calibrationTimes);
-      rangeDateFrom.value = rangeStart;
-      rangeDateTo.value = rangeEnd;
-    } else {
-      //console.log("timeRange:", timeRange);
-      rangeDateFrom.value = timeRange?.start_time;
-      rangeDateTo.value = timeRange?.end_time;
-    }
+  // check if timeRange is provided and not empty
+  if (timeRange && timeRange.constructor === Object && Object.keys(timeRange).length > 0) {
+    rangeDateFrom.value = timeRange?.start_time;
+    rangeDateTo.value = timeRange?.end_time;
   } else {
+    // timeRange not provided. set timeRange one month before and after the calibration times
+    console.log("timeRange is null");
+    const { rangeStart, rangeEnd } = calculateTimeRange(userCalibrationTimes);
+    rangeDateFrom.value = rangeStart;
+    rangeDateTo.value = rangeEnd;
+  }
+
+  if (isCalibrationTuningControlsDisabled) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration times are missing or empty', life: 10000 });
   }
 
@@ -325,7 +337,7 @@ onMounted(async () => {
     initial_value: param.initial_value,
     module: module.name,
   }))) || [];
-  console.log("userCalirationTuningParameters:", calibrationTuningParameters.value);
+  console.log("userCalibrationTuningParameters:", calibrationTuningParameters.value);
 
   // set output variables to calibrate
   outputVariablesToCalibrate.value = calibrationTuningModules?.flatMap((module: any) => module.output_variables.map((outputVar: any) => ({
@@ -401,13 +413,11 @@ watch([simStartTime, simEndTime, calStartTime, calEndTime], () => {
     }
 
     // save times in userCalibrationTimes
-    userCalibrationTimes.value = {
-      simulation_start_time: simStartDate instanceof Date && !isNaN(simStartDate.getTime()) ? simStartDate.toISOString() : null,
-      simulation_end_time: simEndDate instanceof Date && !isNaN(simEndDate.getTime()) ? simEndDate.toISOString() : null,
-      calibration_start_time: calStartDate instanceof Date && !isNaN(calStartDate.getTime()) ? calStartDate.toISOString() : null,
-      calibration_end_time: calEndDate instanceof Date && !isNaN(calEndDate.getTime()) ? calEndDate.toISOString() : null,
-    };
-    //console.log("userCalibrationTimes:", userCalibrationTimes.value);
+    simStartTime.value = simStartDate instanceof Date && !isNaN(simStartDate.getTime()) ? simStartDate.toISOString() : "";
+    simEndTime.value = simEndDate instanceof Date && !isNaN(simEndDate.getTime()) ? simEndDate.toISOString() : "";
+    calStartTime.value = calStartDate instanceof Date && !isNaN(calStartDate.getTime()) ? calStartDate.toISOString() : "";
+    calEndTime.value = calEndDate instanceof Date && !isNaN(calEndDate.getTime()) ? calEndDate.toISOString() : "";
+    console.log("userCalibrationTimes:", userCalibrationTimes);
   }
 });
 
@@ -427,11 +437,9 @@ watch(selectedOutputVariable, () => {
 watch([avSimStartTime, avSimEndTime, avCalStartTime, avCalEndTime], () => {
   // Calibration time controls must be set before Automatic Validation times
   if (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value) {
-    alert('Calibration Time Controls must be set before Automatic Validation times');
-    avSimStartTime.value = null;
-    avSimEndTime.value = null;
-    avCalStartTime.value = null;
-    avCalEndTime.value = null;
+    // TODO: don't empty values but prevent user from setting Automatic Validation times
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Time Controls must be set before Automatic Validation times', life: 10000 });
+
   } else {
     // convert ISO strings to Date objects
     const avSimStartDate = avSimStartTime.value ? new Date(avSimStartTime.value) : null;
@@ -473,13 +481,11 @@ watch([avSimStartTime, avSimEndTime, avCalStartTime, avCalEndTime], () => {
       }
     }
     // save times in userValidationTimes
-    userValidationTimes.value = {
-      simulation_start_time: avSimStartDate instanceof Date && !isNaN(avSimStartDate.getTime()) ? avSimStartDate.toISOString() : null,
-      simulation_end_time: avSimEndDate instanceof Date && !isNaN(avSimEndDate.getTime()) ? avSimEndDate.toISOString() : null,
-      validation_start_time: avCalStartDate instanceof Date && !isNaN(avCalStartDate.getTime()) ? avCalStartDate.toISOString() : null,
-      validation_end_time: avCalEndDate instanceof Date && !isNaN(avCalEndDate.getTime()) ? avCalEndDate.toISOString() : null,
-    };
-    //console.log("userValidationTimes:", userValidationTimes.value);
+    avSimStartTime.value = avSimStartDate instanceof Date && !isNaN(avSimStartDate.getTime()) ? avSimStartDate.toISOString() : "";
+    avSimEndTime.value =  avSimEndDate instanceof Date && !isNaN(avSimEndDate.getTime()) ? avSimEndDate.toISOString() : "";
+    avCalStartTime.value =  avCalStartDate instanceof Date && !isNaN(avCalStartDate.getTime()) ? avCalStartDate.toISOString() : "";
+    avCalEndTime.value =  avCalEndDate instanceof Date && !isNaN(avCalEndDate.getTime()) ? avCalEndDate.toISOString() : "";
+    console.log("userValidationTimes:", userValidationTimes);
   }
 });
 

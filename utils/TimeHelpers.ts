@@ -24,20 +24,15 @@ export const convertTimeZone = (date: any, tzString: String) => {
  * @param {CalibrationTimes} CalibrationTimes - object containing calibration and simulation times
  * @returns time range
  */
-export function calculateTimeRange(CalibrationTimes: {
-  calibration_start_time: string;
-  calibration_end_time: string;
-  simulation_start_time: string;
-  simulation_end_time: string;
-}): { rangeStart: string; rangeEnd: string } {
+export function calculateTimeRange(CalibrationTimes: any): { rangeStart: string; rangeEnd: string } {
   const startDates = [
-    DateTime.fromISO(CalibrationTimes.calibration_start_time),
-    DateTime.fromISO(CalibrationTimes.simulation_start_time),
+    DateTime.fromISO(CalibrationTimes.calStartTime),
+    DateTime.fromISO(CalibrationTimes.simStartTime),
   ];
 
   const endDates = [
-    DateTime.fromISO(CalibrationTimes.calibration_end_time),
-    DateTime.fromISO(CalibrationTimes.simulation_end_time),
+    DateTime.fromISO(CalibrationTimes.calEndTime),
+    DateTime.fromISO(CalibrationTimes.simEndTime),
   ];
 
   const minDate = DateTime.min(...startDates);
