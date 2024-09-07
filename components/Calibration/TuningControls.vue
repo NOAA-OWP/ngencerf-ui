@@ -270,8 +270,9 @@ const calibrationTuningParameters = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
+const isInitialSetupDone = ref(false);
 const isCalibrationTuningControlsDisabled = computed(() => {
-  return !loadCalibrationRunData.value?.calibration_times || Object.keys(loadCalibrationRunData.value?.calibration_times).length === 0;
+  return !loadCalibrationRunData.value || !loadCalibrationRunData.value?.calibration_times || Object.keys(loadCalibrationRunData.value?.calibration_times).length === 0;
 });
 
 onMounted(async () => {
@@ -318,13 +319,17 @@ onMounted(async () => {
   } else {
     // timeRange not provided. set timeRange one month before and after the calibration times
     console.log("timeRange is null");
-    const { rangeStart, rangeEnd } = calculateTimeRange(userCalibrationTimes);
+    const { rangeStart, rangeEnd } = calculateTimeRange(
+      calStartTime.value,
+      calEndTime.value,
+      simStartTime.value,
+      simEndTime.value
+    );
     rangeDateFrom.value = rangeStart;
     rangeDateTo.value = rangeEnd;
-  }
 
-  if (isCalibrationTuningControlsDisabled) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration times are missing or empty', life: 10000 });
+    console.log("rangeDateFrom:", rangeDateFrom.value);
+    console.log("rangeDateTo:", rangeDateTo.value);
   }
 
   const calibrationTuningModules = loadTuningTabData.value?.modules;
@@ -337,7 +342,7 @@ onMounted(async () => {
     initial_value: param.initial_value,
     module: module.name,
   }))) || [];
-  console.log("userCalibrationTuningParameters:", calibrationTuningParameters.value);
+  console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
 
   // set output variables to calibrate
   outputVariables.value = calibrationTuningModules?.flatMap((module: any) => module.output_variables.map((outputVar: any) => ({
@@ -353,6 +358,8 @@ onMounted(async () => {
     userOutputVariableToCalibrate.value.module = module;
     selectedOutputVariable.value = name;
   };
+
+  isInitialSetupDone.value = true; // set to true after initial setup
 });
 
 const handleCalibrationTimeControlsClick = (event: Event) => {
@@ -364,6 +371,8 @@ const handleCalibrationTimeControlsClick = (event: Event) => {
 
 // watch for changes to the simulation and calibration times and handle validation
 watch([simStartTime, simEndTime, calStartTime, calEndTime], () => {
+  if (!isInitialSetupDone.value && rangeDateFrom.value && rangeDateTo.value) return; // don't run this before initial setup
+
   // convert ISO strings to Date objects
   const simStartDate = simStartTime.value ? new Date(simStartTime.value) : null;
   const simEndDate = simEndTime.value ? new Date(simEndTime.value) : null;
@@ -407,7 +416,9 @@ watch([simStartTime, simEndTime, calStartTime, calEndTime], () => {
 
     // ensure Cal start is within Sim start and Sim end
     if (calStartDate !== null && simStartDate !== null && simEndDate !== null && (calStartDate < simStartDate || calStartDate > simEndDate)) {
-      alert('Simulation Start must be selected first and Calibration Start must be within Simulation Start and End');
+      // this alert is triggered when tab is first loaded
+      // alert('Simulation Start must be selected first and Calibration Start must be within Simulation Start and End');
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Start must be within Simulation Start and End', life: 10000 });
       calStartTime.value = new Date(Math.max(simStartDate.getTime(), rangeStartDate.getTime())).toISOString();
     }
 
@@ -428,6 +439,8 @@ watch([simStartTime, simEndTime, calStartTime, calEndTime], () => {
 
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
+  // if (!isInitialSetupDone.value) return; // don't run this before initial setup
+  
   const module = loadTuningTabData.value?.modules.find((module: any) => module.output_variables.find((outputVar: any) => outputVar.name === selectedOutputVariable.value));
   //console.log("module:", module);
   userOutputVariableToCalibrate.value = {
@@ -440,6 +453,8 @@ watch(selectedOutputVariable, () => {
 
 // watch for changes to automatic automatic validation times and handle validation
 watch([avSimStartTime, avSimEndTime, avCalStartTime, avCalEndTime], () => {
+  if (!isInitialSetupDone.value) return; // don't run this before initial setup
+
   // Calibration time controls must be set before Automatic Validation times
   if (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value) {
     // TODO: don't empty values but prevent user from setting Automatic Validation times

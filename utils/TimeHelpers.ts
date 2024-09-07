@@ -21,18 +21,30 @@ export const convertTimeZone = (date: any, tzString: String) => {
 /**
  * This function is for creating a time range that encompasses the calibration and simulation times for testing
  * Currently set to pad the range by one month before and after
- * @param {CalibrationTimes} CalibrationTimes - object containing calibration and simulation times
+ * @param calibration_start_time
+ * @param calibration_end_time
+ * @param simulation_start_time
+ * @param simulation_end_time
  * @returns time range
  */
-export function calculateTimeRange(CalibrationTimes: any): { rangeStart: string; rangeEnd: string } {
+export function calculateTimeRange(
+  calibration_start_time: string,
+  calibration_end_time: string,
+  simulation_start_time: string,
+  simulation_end_time: string
+): { rangeStart: string; rangeEnd: string } {
+  console.log("calibration_start_time", calibration_start_time);
+  console.log("calibration_end_time", calibration_end_time);
+  console.log("simulation_start_time", simulation_start_time);
+  console.log("simulation_end_time", simulation_end_time);
   const startDates = [
-    DateTime.fromISO(CalibrationTimes.calStartTime),
-    DateTime.fromISO(CalibrationTimes.simStartTime),
+    DateTime.fromISO(calibration_start_time),
+    DateTime.fromISO(simulation_start_time),
   ];
 
   const endDates = [
-    DateTime.fromISO(CalibrationTimes.calEndTime),
-    DateTime.fromISO(CalibrationTimes.simEndTime),
+    DateTime.fromISO(calibration_end_time),
+    DateTime.fromISO(simulation_end_time),
   ];
 
   const minDate = DateTime.min(...startDates);
