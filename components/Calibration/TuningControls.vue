@@ -675,7 +675,7 @@ const isOutputVariableValidated = (): boolean => {
 /**
  * Save Tuning Tab data
  */
-useListen('calibrationButtonGroup:buttonClick', (actionButton) => {
+useListen('calibrationButtonSaveStart', (actionButton) => {
   // handle saving Tuning Tab data
   const handleSaveTuningTab = async () => {
     try {
@@ -715,6 +715,15 @@ useListen('calibrationButtonGroup:buttonClick', (actionButton) => {
         life: 3000,
       });
     }
+  } else {
+    toast.add({
+      severity: 'error',
+      summary: 'Calibration Tab not 3 or actionButton not SAVE',
+      detail: 'Calibration Tab not 3 or actionButton not SAVE',
+      life: 3000,
+    });
+    console.error('getCalibrationTabIndex:', getCalibrationTabIndex());
+    console.error('actionButton:', actionButton);
   }
 });
 
