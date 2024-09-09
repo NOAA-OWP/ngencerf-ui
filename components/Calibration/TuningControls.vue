@@ -344,14 +344,14 @@ onMounted(async () => {
   }))) || [];
   console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
 
-  // set output variables to calibrate
+  // set output variables
   outputVariables.value = calibrationTuningModules?.flatMap((module: any) => module.output_variables.map((outputVar: any) => ({
     name: outputVar.name,
     description: outputVar.description,
     module: module.name,
   }))) || [];
 
-  // set ouputvariable_to_calibrate
+  // set ouput_variable_to_calibrate
   if (loadCalibrationRunData.value.output_variable_to_calibrate) {
     const { name, module } = loadCalibrationRunData.value.output_variable_to_calibrate;
     userOutputVariableToCalibrate.value.name = name;
@@ -439,10 +439,10 @@ watch([simStartTime, simEndTime, calStartTime, calEndTime], () => {
 
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
-  // if (!isInitialSetupDone.value) return; // don't run this before initial setup
-  
+  // find module for newly-selected output variable
   const module = loadTuningTabData.value?.modules.find((module: any) => module.output_variables.find((outputVar: any) => outputVar.name === selectedOutputVariable.value));
-  //console.log("module:", module);
+  
+  // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
     name: selectedOutputVariable.value,
     module: module.name,
@@ -587,10 +587,11 @@ const addParameterToTable = () => {
  * @param value The new value entered by the user
  */
  const updateCalibrationTuningParameter = (index: number, field: string, value: string) => {
-  userCalibrationTuningParameters.value[index][field] = value; // this just tracks the data in the table and still needs to be added to calibrationTuningParameters
+  // update userCalibrationTuningParameters with the new value
+  userCalibrationTuningParameters.value[index][field] = value;
   //console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
 
-  // update the calibrationTuningParameters with the new values
+  // update calibrationTuningParameters with the new value
   const parameter = calibrationTuningParameters?.value?.find(param => param.name === userCalibrationTuningParameters.value[index].name);
   if (parameter) {
     if (field === 'minimum') {
@@ -633,6 +634,52 @@ const AutoValChecked = () => {
 };
 
 /**
+ * Validate all Tuning tab data before saving
+ */
+const validateTuningTabData = () => {
+  // check if Calibration Time Controls are set
+  if (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Time Controls must be set', life: 10000 });
+    return false;
+  }
+
+  // check if Automatic Validation is enabled and Validation Times Controls are set
+  if (automatic_validation.value) {
+    if (!avSimStartTime.value || !avSimEndTime.value || !avCalStartTime.value || !avCalEndTime.value) {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set', life: 10000 });
+      return false;
+    }
+  }
+
+  // check if Output Variable to Calibrate is set
+  if (!userOutputVariableToCalibrate.value.name || !userOutputVariableToCalibrate.value.module) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Output Variable to Calibrate must be selected', life: 10000 });
+    return false;
+  }
+
+  // check if at least one Calibration Tuning Parameter is added
+  if (userCalibrationTuningParameters.value.length === 0) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'At least one Calibration Tuning Parameter must be added', life: 10000 });
+    return false;
+  }
+
+  return true;
+};
+
+/**
+ * Validate calibration_times
+ */
+const validateCalibrationTimes = () => {
+  
+};
+
+/**
+ * Validate validation_times
+ */
+const validateValidationTimes = () => {
+};
+
+/**
  * event bus for save click
  */
  useListen( 'calibrationButtonGroup:buttonClick', ( actionButton ) => {
@@ -643,7 +690,7 @@ const AutoValChecked = () => {
          toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
       }) 
    }
-})
+});
 </script>
 
 <style lang="scss" scoped>
