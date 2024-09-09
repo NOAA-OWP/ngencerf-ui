@@ -93,7 +93,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
       }
     });
 
-    userCalibrationJobsListData.value = jobsListDataResult?.jobs ?? [];
+    userCalibrationJobsListData.value = jobsListDataResult?._data?.jobs ?? [];
   }
 
   /**
@@ -110,7 +110,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
     })
 
-    userCalibrationRunData.value = userCalibrationRunDataResult ?? undefined;
+    userCalibrationRunData.value = userCalibrationRunDataResult._data ?? undefined;
   }
 
   return {

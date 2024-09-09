@@ -431,9 +431,9 @@ const handleFileUpload = async (event: Event) => {
           body: formData,
         });
 
-      if (response) {
+      if (response._data) {
         // Populate the Parameter table with the data from user-uploaded file
-        response.user_parameter_file.forEach((param: any) => {
+        response._data?.user_parameter_file.forEach((param: any) => {
           userCalibrationTuningParameters?.value.push({
             name: param.param,
             minimum: param.min,
@@ -526,20 +526,7 @@ const AutoValChecked = () => {
  * Validate all Tuning tab data before saving
  */
 const isTuningTabDataValidated = () => {
-  return areCalibrationTimesValidated() && areValidationTimesValidated();
-  // check if Output Variable to Calibrate is set
-  if (!userOutputVariableToCalibrate.value.name || !userOutputVariableToCalibrate.value.module) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Output Variable to Calibrate must be selected', life: 10000 });
-    return false;
-  }
-
-  // check if at least one Calibration Tuning Parameter is added
-  if (userCalibrationTuningParameters.value.length === 0) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'At least one Calibration Tuning Parameter must be added', life: 10000 });
-    return false;
-  }
-
-  return true;
+  return areCalibrationTimesValidated() && areValidationTimesValidated() && areParametersValidated() && isOutputVariableValidated();
 };
 
 /**
@@ -674,37 +661,73 @@ const areValidationTimesValidated = (): boolean => {
 };
 
 /**
+ * Validate parameters
+ */
+const areParametersValidated = (): boolean => {
+  // check if no Calibration Tuning Parameters have been added
+  if (userCalibrationTuningParameters.value.length === 0) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'At least one Calibration Tuning Parameter must be added', life: 10000 });
+    return false;
+  }
+
+  // TODO: add more parameter validation checks here. e.g. check if min < max, etc.
+  return true;
+};
+
+/**
+ * Validate output_variable_to_calibrate
+ */
+const isOutputVariableValidated = (): boolean => {
+  // check if Output Variable to Calibrate is set
+  if (!userOutputVariableToCalibrate.value.name || !userOutputVariableToCalibrate.value.module) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Output Variable to Calibrate must be selected', life: 10000 });
+    return false;
+  }
+  return true;
+
+/**
  * Save Tuning Tab data
  */
  useListen('calibrationButtonGroup:buttonClick', (actionButton) => {
+  // handle saving Tuning Tab data
+  const handleSaveTuningTab = async () => {
+  try {
+    const saveTuningTabResponse = await postSaveTuningTabData();
+    console.log(
+      `saveTabContent Tuning, should be tabIndex 3, on tabIndex ${getCalibrationTabIndex()}, save response: `,
+      saveTuningTabResponse
+    );
+
+    toast.add({
+      severity: 'info',
+      summary: 'Saved Tuning Tab data',
+      detail: 'Saved Tuning Tab data',
+      life: 3000,
+    });
+  } catch (error) {
+    console.error('Error saving tuning tab data:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error saving Tuning Tab data',
+      detail: 'Error saving Tuning Tab data',
+      life: 3000,
+    });
+  }
+};
+
+  // check if the current tab is the Tuning tab and the actionButton is 'SAVE'
   if (getCalibrationTabIndex() === 3 && actionButton === 'SAVE') {
-    // Use an async function to handle the await properly
-    const handleSaveTuningTab = async () => {
-      try {
-        const saveTuningTabResponse = await postSaveTuningTabData();
-        console.log(
-          `saveTabContent Tuning, should be tabIndex 3, on tabIndex ${getCalibrationTabIndex()}, save response: `,
-          saveTuningTabResponse
-        );
-
-        toast.add({
-          severity: 'info',
-          summary: 'Saved Tuning Tab data',
-          detail: saveTuningTabResponse,
-          life: 3000,
-        });
-      } catch (error) {
-        console.error('Error saving tuning tab data:', error);
-        toast.add({
-          severity: 'error',
-          summary: 'Error saving Tuning Tab data',
-          detail: 'Failed to save tuning tab data',
-          life: 3000,
-        });
-      }
-    };
-
-    handleSaveTuningTab();
+    // check if Tuning Tab data is validated before saving
+    if (isTuningTabDataValidated()) {
+      handleSaveTuningTab();
+    } else {
+      toast.add({
+        severity: 'error',
+        summary: 'Error saving Tuning Tab data',
+        detail: 'Tuning Tab data is not validated',
+        life: 3000,
+      });
+    }
   }
 });
 

@@ -46,8 +46,8 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
          },
          body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
       } ).then( ( optimizationTabDataResult ) => {
-         console.log( 'optimization tab data from optimizationStore', optimizationTabDataResult )
-         optimizationTabData.value = optimizationTabDataResult ?? undefined
+         console.log( 'optimization tab data from optimizationStore', optimizationTabDataResult._data )
+         optimizationTabData.value = optimizationTabDataResult._data ?? undefined
          data_loading.value = false
 
          uiStreamFlowThreshold.value = userCalibrationRunData.value?.streamflow_threshold ?? undefined
@@ -139,7 +139,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
          } )
       })
       
-      return saveOptimizationTabDataResponse
+      return saveOptimizationTabDataResponse._data
    }
 
    const getSelectedMetricInfo = computed( () => {

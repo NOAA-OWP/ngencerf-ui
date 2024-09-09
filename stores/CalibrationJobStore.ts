@@ -65,7 +65,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
       //    headers: { Authorization: `Bearer ${getAccessToken()}` }
       // })
       
-      return newCalibrationJobId?.calibration_run_id
+      return newCalibrationJobId?._data?.calibration_run_id
    }
 
 

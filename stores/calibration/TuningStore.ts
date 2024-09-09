@@ -60,7 +60,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
    * fetch Tuning Tab data
    */
   async function fetchTuningTabData(): Promise<void> {
-    const loadCalibrationRunOutput: string | null = await makeProtectedApiCall(
+    const loadCalibrationRunOutput: any = await makeProtectedApiCall(
       `${ngencerfBaseUrl}/calibration/load_calibration_run/?calibration_run_id=${calibrationJobId.value}`,
       {
         method: 'GET',
@@ -70,11 +70,11 @@ export const useTuningStore = defineStore('TuningStore', () => {
       });
       // console.log("loadCalibrationRunOutput:", loadCalibrationRunOutput);
 
-    if (loadCalibrationRunOutput) {
-      loadCalibrationRunData.value = loadCalibrationRunOutput;
+    if (loadCalibrationRunOutput._data) {
+      loadCalibrationRunData.value = loadCalibrationRunOutput._data;
     }
 
-    const loadTuningTabOutput: string | null = await makeProtectedApiCall(
+    const loadTuningTabOutput: any = await makeProtectedApiCall(
       `${ngencerfBaseUrl}/calibration/load_tuning_tab/?calibration_run_id=${calibrationJobId.value}`,
       {
         method: 'GET',
@@ -84,8 +84,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
       });
       // console.log("loadTuningTabOutput:", loadTuningTabOutput);
 
-    if (loadTuningTabOutput) {
-      loadTuningTabData.value = loadTuningTabOutput;
+    if (loadTuningTabOutput._data) {
+      loadTuningTabData.value = loadTuningTabOutput._data;
     }
 
     if (loadCalibrationRunData.value && loadTuningTabData.value) {
@@ -134,9 +134,9 @@ export const useTuningStore = defineStore('TuningStore', () => {
         },
         body: JSON.stringify(requestBody)
       });
-      console.log("saveTuningTabOutput:", saveTuningTabOutput);
+      console.log("saveTuningTabOutput:", saveTuningTabOutput._data);
     
-    return saveTuningTabOutput;
+    return saveTuningTabOutput._data;
   };
 
 

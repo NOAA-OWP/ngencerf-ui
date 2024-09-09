@@ -37,8 +37,8 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
          },
          body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
       } ).then( ( formulationTabDataResult ) => {
-         console.log( 'load formulation data from formulationStore', formulationTabDataResult )
-         formulationTabData.value = formulationTabDataResult ?? undefined
+         console.log( 'load formulation data from formulationStore', formulationTabDataResult._data )
+         formulationTabData.value = formulationTabDataResult._data ?? undefined
          formulationNameInput.value = userCalibrationRunData.value?.formulation_name ?? ""
          selectedModuleValues.value = getSavedModuleSelection.value ?? []
          useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false
@@ -186,7 +186,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
          } )
       })
       
-      return saveFormulationTabDataResponse
+      return saveFormulationTabDataResponse._data
    }
 
    return {
