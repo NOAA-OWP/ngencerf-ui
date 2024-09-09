@@ -671,17 +671,40 @@ const areValidationTimesValidated = (): boolean => {
 };
 
 /**
- * event bus for save click
+ * Save Tuning Tab data
  */
- useListen( 'calibrationButtonGroup:buttonClick', ( actionButton ) => {
-   if( getCalibrationTabIndex() === 3 && actionButton == 'SAVE' ) {
-      const saveTuningTabResponse = postSaveTuningTabData()
-      console.log( `saveTabContent Tuning, should be tabIndex 3, on tabIndex ${getCalibrationTabIndex()}, save response: `, saveTuningTabResponse )
-      saveTuningTabResponse.then( ( response ) => {
-         toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
-      }) 
-   }
+ useListen('calibrationButtonGroup:buttonClick', (actionButton) => {
+  if (getCalibrationTabIndex() === 3 && actionButton === 'SAVE') {
+    // Use an async function to handle the await properly
+    const handleSaveTuningTab = async () => {
+      try {
+        const saveTuningTabResponse = await postSaveTuningTabData();
+        console.log(
+          `saveTabContent Tuning, should be tabIndex 3, on tabIndex ${getCalibrationTabIndex()}, save response: `,
+          saveTuningTabResponse
+        );
+
+        toast.add({
+          severity: 'info',
+          summary: 'Saved Tuning Tab data',
+          detail: saveTuningTabResponse,
+          life: 3000,
+        });
+      } catch (error) {
+        console.error('Error saving tuning tab data:', error);
+        toast.add({
+          severity: 'error',
+          summary: 'Error saving Tuning Tab data',
+          detail: 'Failed to save tuning tab data',
+          life: 3000,
+        });
+      }
+    };
+
+    handleSaveTuningTab();
+  }
 });
+
 </script>
 
 <style lang="scss" scoped>
