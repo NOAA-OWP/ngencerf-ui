@@ -124,7 +124,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
 
     console.log("saveTuningTabData:", JSON.stringify(requestBody));
 
-    const saveTuningTabOutput: string | null = await makeProtectedApiCall(
+    const saveTuningTabOutput: any = await makeProtectedApiCall(
       `${ngencerfBaseUrl}/calibration/save_tuning_tab/`,
       {
         method: 'POST',
@@ -135,6 +135,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
         body: JSON.stringify(requestBody)
       });
       console.log("saveTuningTabOutput:", saveTuningTabOutput);
+    
+    return saveTuningTabOutput;
   };
 
 

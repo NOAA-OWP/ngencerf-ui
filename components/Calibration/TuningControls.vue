@@ -210,9 +210,9 @@
       </div>
 
     </div>
-    <div class="waitgif" v-if="loading">
+    <!-- <div class="waitgif" v-if="loading">
       <img src="@/assets/styles/img/wait.gif" />
-    </div>
+    </div> -->
   </div>
 
   
@@ -264,7 +264,7 @@ const {
   rangeDateTo,
 } = storeToRefs(tuningStore);
 
-const loading = ref(true);
+// const loading = ref(true);
 
 const calibrationTuningParameters = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
@@ -278,10 +278,13 @@ const isCalibrationTuningControlsDisabled = computed(() => {
 onMounted(async () => {
   console.log("onMounted");
 
-  console.log("isDataFetched:", isDataFetched.value);
   if (!isDataFetched.value) {
-    console.log("fetching Tuning Tab Data...");
+    toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
     await fetchTuningTabData(); // only fetch data if not already fetched
+    // loading.value = false;
+  } else {
+    // loading.value = true;
+    toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
   }
 
   console.log("loadTuningTabData:", loadTuningTabData.value);
