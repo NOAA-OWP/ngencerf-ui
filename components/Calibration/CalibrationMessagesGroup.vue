@@ -32,7 +32,7 @@
       <div class="row-span-9">
         <div class="grid grid-cols-2 gap=1">
           <div class="col-span-1">
-            <p v-if="true" class="text-center">Calibration Run</p>
+            <p v-if="calData?.calibration_times.simulation_start_time" class="text-center">Calibration Run</p>
             <p v-if="calData?.calibration_times.simulation_start_time">&nbsp;&nbsp;Sim Start:
             <div class="datePos"><span class="font-medium">
                 {{ formatDate(calData?.calibration_times.simulation_start_time) }}</span></div>
@@ -60,7 +60,7 @@
 
           </div>
           <div class="col-span-1">
-            <p v-if="true" class="text-center">Validation Run</p>
+            <p v-if="calData?.validation_times.simulation_start_time" class="text-center">Validation Run</p>
             <p v-if="calData?.validation_times.simulation_start_time">&nbsp;&nbsp;Sim Start:
             <div class="datePos"><span class="font-medium">
                 {{ formatDate(calData?.validation_times.simulation_start_time) }}</span></div>
@@ -78,7 +78,7 @@
                 {{ formatDate(calData?.validation_times.validation_end_time) }}</span></div>
             </p>
             <p>&nbsp;</p>
-            <p v-if="true">Tuning Parameters: &nbsp;<span class="font-medium">{{ null }}</span></p>
+            <p v-if="calData?.objective_function">Tuning Parameters: &nbsp;<span class="font-medium">{{ null }}</span></p>
             <p v-if="calData?.objective_function">Objective Function: <span class="font-medium">{{
               calData?.objective_function }}</span></p>
             <p v-if="calData?.plot_frequency">Plot Generation Frequency: &nbsp;<span class="font-medium">{{
