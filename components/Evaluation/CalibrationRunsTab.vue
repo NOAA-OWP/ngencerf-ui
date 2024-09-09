@@ -23,7 +23,6 @@
                         </div>
                     </div>
 
-                    <Toast />
                     <ConfirmDialog></ConfirmDialog>
                     <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
                         :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>

@@ -16,7 +16,6 @@
           </div>
           <div class="row-span-10">
             <div id="CalTable">
-              <Toast />
               <ConfirmDialog></ConfirmDialog>
               <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
                 :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>               
@@ -148,7 +147,7 @@ const deleteSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
 const acceptDelete = (selectedRunId: number) => {
   toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
   fetchUserCalibrationJobsListData()
-  selectedCalibrationRun.value = undefined    
+  selectedCalibrationRun.value = undefined 
 }
 </script>
 

@@ -83,7 +83,7 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import type { AlgorithmParameter } from '~/composables/NextGenModel';
+import type { AlgorithmParameter, GeneralErrorResponse } from '~/composables/NextGenModel';
 import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from "~/stores/common/GeneralStore";
@@ -106,7 +106,7 @@ const {
       getSelectedMetricInfo,
       getOptimizationInputUserData
       } = storeToRefs( optimizationStore )
-const { saveOptimizationTabData, resetOptimizationInputs } = optimizationStore
+const { saveOptimizationTabData, resetOptimizationInputs, resetUserSelection } = optimizationStore
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore()
 const toast = useToast()
@@ -181,11 +181,9 @@ const optimizationSelectChange = () => {
 }
 
 /**
- * event bus for save click
+ * event bus for calibration button group click
  */
-useListen( 'calibrationButtonGroup:buttonClick', ( actionButton ) => {
-   console.log( getCalibrationTabIndex() )
-   console.log( actionButton )
+useListen( 'calibrationButtonSaveStart', ( actionButton ) => {
    if( getCalibrationTabIndex() === 4 && actionButton == 'SAVE' ) {
       const save_optimization_response = saveOptimizationTabData()
       console.log( `saveTabContent Optimization, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `, save_optimization_response )
@@ -193,8 +191,16 @@ useListen( 'calibrationButtonGroup:buttonClick', ( actionButton ) => {
          console.log( response )
          toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
          fetchUserCalibrationRunData()
-      }) 
+      }).catch( ( error: GeneralErrorResponse ) => {
+         toast.add({ severity: 'error', summary: error.response_type, detail: error.validation_errors })
+      })
    }
+})
+
+useListen( 'calibrationButtonResetStop', ( actionButton) => {
+  if( getCalibrationTabIndex() == 4 && actionButton == 'RESET' ) {
+    resetUserSelection()
+  }
 })
 
 /**

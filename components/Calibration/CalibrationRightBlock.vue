@@ -42,6 +42,8 @@ import GageCutout from "../Common/GageCutout.vue";
 
 #GageCutout {
   margin-right: 5px;
+  max-height: 300px;
+  overflow: scroll;
 }
 
 #ProgressGroup {
