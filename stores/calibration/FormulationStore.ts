@@ -3,7 +3,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { generalStore } from "../common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, GeneralErrorResponse } from "~/composables/NextGenModel";
 
@@ -36,7 +36,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       },
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    } ).then( ( formulationTabDataResult ) => {
-      formulationTabData.value = formulationTabDataResult ?? undefined
+      formulationTabData.value = formulationTabDataResult._data ?? undefined
       setUserSelection()
       
       data_loading.value = false
@@ -185,7 +185,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
          } )
       })
       
-      return saveFormulationTabDataResponse
+      return saveFormulationTabDataResponse._data
    }
 
    /**

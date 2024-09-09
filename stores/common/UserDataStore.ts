@@ -3,7 +3,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { generalStore } from "./GeneralStore";
-import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { makeProtectedApiCall } from "~/composables/UserAuth";
 
 import type { JobsList, JobListItem, UserCalibrationRunData } from "~/composables/NextGenModel";
 
@@ -12,9 +12,9 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { calibrationJobId } = storeToRefs( generalStore() )
-  const userCalibrationJobsListData = ref<JobListItem[]>([])
-  const userCalibrationRunData = ref<UserCalibrationRunData>()
+  const { calibrationJobId } = storeToRefs( generalStore() );
+  const userCalibrationJobsListData = ref<JobListItem[]>([]);
+  const userCalibrationRunData = ref<UserCalibrationRunData>();
 
   /**
    * Checks if user is logged in
@@ -28,7 +28,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * Logs user in by setting isLoggedIn to true
    */
   function logUserIn(): void {
-    console.log("User is logged In");
     isLoggedIn.value = true;
   }
 
@@ -36,7 +35,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * Logs user out by setting isLoggedIn to false and setting access and refresh tokens to null
    */
   function logUserOut(): void {
-    console.log("User is logged out");
     isLoggedIn.value = false;
     accessToken.value = null;
     refreshToken.value = null;
@@ -56,7 +54,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    */
   function setAccessToken(token: string): void {
     accessToken.value = token;
-    console.log("Access token: ", getAccessToken());
   }
 
   /**
@@ -65,7 +62,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    */
   function setRefreshToken(token: string): void {
     refreshToken.value = token;
-    console.log("Refresh token: ", getRefreshToken());
   }
 
   /**
@@ -84,38 +80,38 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     return refreshToken.value;
   }
 
-   /**
-    * fetch user created calibration job list data
-    * @return {void}
-    */
-   async function fetchUserCalibrationJobsListData() {
-      const jobsListDataResult = await makeProtectedApiCall<JobsList>( `${ngencerfBaseUrl}/calibration/get_jobs/`, {
-         method: "POST",
-         headers: { 
-            "Authorization": `Bearer ${getAccessToken()}`,
-            "Content-Type": 'application/json'
-         }
-      } )
+  /**
+   * fetch user created calibration job list data
+   * @return {void}
+   */
+  async function fetchUserCalibrationJobsListData() {
+    const jobsListDataResult = await makeProtectedApiCall<JobsList>( `${ngencerfBaseUrl}/calibration/get_jobs/`, {
+      method: "POST",
+      headers: { 
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      }
+    });
 
-      userCalibrationJobsListData.value = jobsListDataResult?.jobs ?? []
-   }
+    userCalibrationJobsListData.value = jobsListDataResult?._data?.jobs ?? [];
+  }
 
-   /**
-    * fetch user selected calibration run user saved data
-    * @return {void}
-    */
-   async function fetchUserCalibrationRunData() {
-      const userCalibrationRunDataResult = await makeProtectedApiCall<UserCalibrationRunData>( `${ngencerfBaseUrl}/calibration/load_calibration_run/`, {
-         method: "POST",
-         headers: { 
-            "Authorization": `Bearer ${getAccessToken()}`,
-            "Content-Type": 'application/json'
-         },
-         body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
-      })
+  /**
+   * fetch user selected calibration run user saved data
+   * @return {void}
+   */
+  async function fetchUserCalibrationRunData() {
+    const userCalibrationRunDataResult = await makeProtectedApiCall<UserCalibrationRunData>( `${ngencerfBaseUrl}/calibration/load_calibration_run/`, {
+      method: "POST",
+      headers: { 
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
+    })
 
-      userCalibrationRunData.value = userCalibrationRunDataResult ?? undefined
-   }
+    userCalibrationRunData.value = userCalibrationRunDataResult._data ?? undefined;
+  }
 
   return {
     isUserLoggedIn,
@@ -131,6 +127,11 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     userCalibrationRunData,
     fetchUserCalibrationRunData
   };
+}, 
+{
+  persist: {
+    storage: persistedState.localStorage
+  },
 });
 
 /* Pinia supports Hot Module replacement so you can edit your stores

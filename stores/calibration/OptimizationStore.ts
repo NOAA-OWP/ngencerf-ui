@@ -4,7 +4,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralApiSaveResponse } from "~/composables/NextGenModel";
-import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
 export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
@@ -45,7 +45,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
       },
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    } ).then( ( optimizationTabDataResult ) => {
-      optimizationTabData.value = optimizationTabDataResult ?? undefined
+      optimizationTabData.value = optimizationTabDataResult._data ?? undefined
       data_loading.value = false
 
       setUserSelection()
@@ -136,7 +136,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
          } )
       })
       
-      return saveOptimizationTabDataResponse
+      return saveOptimizationTabDataResponse._data
    }
 
    const getSelectedMetricInfo = computed( () => {

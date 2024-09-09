@@ -4,7 +4,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { makeProtectedApiCall } from "~/utils/UserAuth"
+import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { SelectOption, GageTabData, GeneralApiSaveResponse, GeneralErrorResponse, SaveGageTabResponse } from "~/composables/NextGenModel";
 
 export const useGageStore = defineStore( 'GageStore', () => {
@@ -38,7 +38,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    } )
    .then( ( gageTabDataResult ) => {
-      gageTabData.value = gageTabDataResult??undefined
+      gageTabData.value = gageTabDataResult._data??undefined
       data_loading.value = false
       
       //init ui model value
@@ -118,7 +118,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
             gage_id: selectedGageValue.value
          })
       })
-      gageData.value = selectedGageDataResponse ?? undefined
+      gageData.value = selectedGageDataResponse._data ?? undefined
    }
 
    /**
@@ -142,7 +142,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
 
       geopackageImageUrl.value = saveGageTabDataResponse?.geopackage_image ?? ""
       
-      return saveGageTabDataResponse
+      return saveGageTabDataResponse._data
    }
 
    /**
