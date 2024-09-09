@@ -98,14 +98,31 @@ export const useTuningStore = defineStore('TuningStore', () => {
    * @returns {Promise<any>} SaveTuningTab data
    */
   async function postSaveTuningTabData(): Promise<any> {
-    console.log("saveTuningTabData:", JSON.stringify({
-      calibration_run_id: calibrationJobId.value,
-      calibration_times: userCalibrationTimes.value,
-      parameters: userCalibrationTuningParameters.value,
-      output_variable_to_calibrate: userOutputVariableToCalibrate.value,
-      automatic_validation: automatic_validation.value,
-      validation_times: userValidationTimes.value
-    }));
+    const requestBody: any = {}; // store all the data to be sent to the server
+
+    // add Tuning Tab data to request body
+    requestBody.calibration_run_id = calibrationJobId.value;
+    requestBody.calibration_times = {
+      simulation_start_time: simStartTime.value,
+      simulation_end_time: simEndTime.value,
+      calibration_start_time: calStartTime.value,
+      calibration_end_time: calEndTime.value
+    };
+    requestBody.parameters = userCalibrationTuningParameters.value;
+    requestBody.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
+    requestBody.automatic_validation = automatic_validation.value;
+
+    // add validation times if automatic validation is enabled
+    if (automatic_validation.value) {
+      requestBody.validation_times = {
+        simulation_start_time: avSimStartTime.value,
+        simulation_end_time: avSimEndTime.value,
+        validation_start_time: avCalStartTime.value,
+        validation_end_time: avCalEndTime.value
+      };
+    }
+
+    console.log("saveTuningTabData:", JSON.stringify(requestBody));
 
     const saveTuningTabOutput: string | null = await makeProtectedApiCall(
       `${ngencerfBaseUrl}/calibration/save_tuning_tab/`,
@@ -115,17 +132,10 @@ export const useTuningStore = defineStore('TuningStore', () => {
           Authorization: `Bearer ${userDataStore.getAccessToken()}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          calibration_run_id: calibrationJobId.value,
-          calibration_times: userCalibrationTimes.value,
-          parameters: userCalibrationTuningParameters.value,
-          output_variable_to_calibrate: userOutputVariableToCalibrate.value,
-          automatic_validation: automatic_validation.value,
-          validation_times: userValidationTimes.value
-        })
+        body: JSON.stringify(requestBody)
       });
       console.log("saveTuningTabOutput:", saveTuningTabOutput);
-    }
+  };
 
 
   return {

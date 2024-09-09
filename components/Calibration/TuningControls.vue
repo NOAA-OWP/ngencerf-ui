@@ -370,72 +370,7 @@ const handleCalibrationTimeControlsClick = (event: Event) => {
 }
 
 // watch for changes to the simulation and calibration times and handle validation
-watch([simStartTime, simEndTime, calStartTime, calEndTime], () => {
-  if (!isInitialSetupDone.value && rangeDateFrom.value && rangeDateTo.value) return; // don't run this before initial setup
-
-  // convert ISO strings to Date objects
-  const simStartDate = simStartTime.value ? new Date(simStartTime.value) : null;
-  const simEndDate = simEndTime.value ? new Date(simEndTime.value) : null;
-  const calStartDate = calStartTime.value ? new Date(calStartTime.value) : null;
-  const calEndDate = calEndTime.value ? new Date(calEndTime.value) : null;
-
-  if (simStartDate !== null || simEndDate !== null || calStartDate !== null || calEndDate !== null) {
-    // convert range dates to Date objects
-    const rangeStartDate = new Date(rangeDateFrom.value);
-    const rangeEndDate = new Date(rangeDateTo.value);
-
-    // ensure Simulation Start is within timeRange
-    if (simStartDate !== null && (simStartDate < rangeStartDate || simStartDate > rangeEndDate)) {
-      alert('Simulation Start must be within the defined time range');
-      simStartTime.value = rangeStartDate.toISOString();
-    }
-
-    // ensure Simulation End is within timeRange
-    if (simStartDate !== null && simEndDate !== null && (simEndDate < rangeStartDate || simEndDate > rangeEndDate)) {
-      alert('Simulation Start mucs be selected first and Simulation End must be within the defined time range');
-      simEndTime.value = new Date(Math.min(rangeEndDate.getTime(), simStartDate.getTime() + 60 * 60 * 1000)).toISOString();
-    }
-
-    // ensure Calibration Start is within timeRange
-    if (simStartDate !== null &&  calStartDate !== null && (calStartDate < rangeStartDate || calStartDate > rangeEndDate)) {
-      alert('Simulation Start must be selected first and Calibration Start must be within the defined time range');
-      calStartTime.value = new Date(Math.max(rangeStartDate.getTime(), simStartDate.getTime())).toISOString();
-    }
-
-    // ensure Calibration End is within timeRange
-    if (calStartDate !== null && calEndDate !== null && (calEndDate < rangeStartDate || calEndDate > rangeEndDate)) {
-      alert('Calibration Start must be selected first and Calibration End must be within the defined time range');
-      calEndTime.value = new Date(Math.min(rangeEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
-    }
-
-    // ensure Sim end is after Sim start
-    if (simStartDate !== null && simEndDate !== null && (simEndDate <= simStartDate) ){
-      alert('Simulation End must be after Simulation Start');
-      simEndTime.value = new Date(simStartDate.getTime() + 60 * 60 * 1000).toISOString();
-    }
-
-    // ensure Cal start is within Sim start and Sim end
-    if (calStartDate !== null && simStartDate !== null && simEndDate !== null && (calStartDate < simStartDate || calStartDate > simEndDate)) {
-      // this alert is triggered when tab is first loaded
-      // alert('Simulation Start must be selected first and Calibration Start must be within Simulation Start and End');
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Start must be within Simulation Start and End', life: 10000 });
-      calStartTime.value = new Date(Math.max(simStartDate.getTime(), rangeStartDate.getTime())).toISOString();
-    }
-
-    // ensure Cal end is after Cal start and within Sim end
-    if (calEndDate !== null && calStartDate !== null && simEndDate !== null && (calEndDate <= calStartDate || calEndDate > simEndDate)) {
-      alert('Calibration End must be after Calibration Start and within Simulation End');
-      calEndTime.value = new Date(Math.min(simEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
-    }
-
-    // save times in userCalibrationTimes
-    simStartTime.value = simStartDate instanceof Date && !isNaN(simStartDate.getTime()) ? simStartDate.toISOString() : "";
-    simEndTime.value = simEndDate instanceof Date && !isNaN(simEndDate.getTime()) ? simEndDate.toISOString() : "";
-    calStartTime.value = calStartDate instanceof Date && !isNaN(calStartDate.getTime()) ? calStartDate.toISOString() : "";
-    calEndTime.value = calEndDate instanceof Date && !isNaN(calEndDate.getTime()) ? calEndDate.toISOString() : "";
-    console.log("userCalibrationTimes:", userCalibrationTimes);
-  }
-});
+watch([simStartTime, simEndTime, calStartTime, calEndTime], () => areCalibrationTimesValidated());
 
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
@@ -453,59 +388,10 @@ watch(selectedOutputVariable, () => {
 
 // watch for changes to automatic automatic validation times and handle validation
 watch([avSimStartTime, avSimEndTime, avCalStartTime, avCalEndTime], () => {
-  if (!isInitialSetupDone.value) return; // don't run this before initial setup
-
-  // Calibration time controls must be set before Automatic Validation times
-  if (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value) {
-    // TODO: don't empty values but prevent user from setting Automatic Validation times
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Time Controls must be set before Automatic Validation times', life: 10000 });
-
-  } else {
-    // convert ISO strings to Date objects
-    const avSimStartDate = avSimStartTime.value ? new Date(avSimStartTime.value) : null;
-    const avSimEndDate = avSimEndTime.value ? new Date(avSimEndTime.value) : null;
-    const avCalStartDate = avCalStartTime.value ? new Date(avCalStartTime.value) : null;
-    const avCalEndDate = avCalEndTime.value ? new Date(avCalEndTime.value) : null;
-
-    if (avSimStartDate !== null || avSimEndDate !== null || avCalStartDate !== null || avCalEndDate !== null) {
-      // convert range dates to Date objects
-      const rangeStartDate = new Date(rangeDateFrom.value);
-      const rangeEndDate = new Date(rangeDateTo.value);
-
-      const simStartDate = simStartTime.value ? new Date(simStartTime.value) : null;
-      const simEndDate = simEndTime.value ? new Date(simEndTime.value) : null;
-      const calStartDate = calStartTime.value ? new Date(calStartTime.value) : null;
-
-      // all av times need to be after simStartDate and simEndDate
-      if (avSimStartDate && avSimEndDate && avCalStartDate && avCalEndDate && simEndDate && 
-        (avSimStartDate <= simEndDate && avSimEndDate <= simEndDate && avCalStartDate <= simEndDate && avCalEndDate <= simEndDate)) {
-        alert('All Automatic Validation times must be after Simulation Start and before Simulation End');
-      }
-
-      // avSimEndDate must be after avSimStartDate
-      if (avSimStartDate && avSimEndDate && avSimEndDate <= avSimStartDate) {
-        alert('Automatic Validation Simulation End must be after Simulation Start');
-        avSimEndTime.value = new Date(avSimStartDate.getTime() + 60 * 60 * 1000).toISOString();
-      }
-
-      //avCalStartDate must be greater or equal to avSimStartDate and less than or equal to avSimEndDate
-      if (avSimStartDate && avSimEndDate && avCalStartDate && (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate)) {
-        alert('Automatic Validation Calibration Start must be within Simulation Start and End');
-        avCalStartTime.value = new Date(Math.max(avSimStartDate.getTime(), rangeStartDate.getTime())).toISOString();
-      }
-
-      // avCalEndDate must be greater to calStartDate and less than or equal to avSimEndDate
-      if (avSimStartDate && avSimEndDate && calStartDate && avCalEndDate && (avCalEndDate <= calStartDate || avCalEndDate > avSimEndDate)) {
-        alert('Automatic Validation Calibration End must be after Calibration Start and less than or eqaul to Automatic Validation Simulation End');
-        avCalEndTime.value = new Date(Math.min(avSimEndDate.getTime(), calStartDate.getTime() + 60 * 60 * 1000)).toISOString();
-      }
-    }
-    // save times in userValidationTimes
-    avSimStartTime.value = avSimStartDate instanceof Date && !isNaN(avSimStartDate.getTime()) ? avSimStartDate.toISOString() : "";
-    avSimEndTime.value =  avSimEndDate instanceof Date && !isNaN(avSimEndDate.getTime()) ? avSimEndDate.toISOString() : "";
-    avCalStartTime.value =  avCalStartDate instanceof Date && !isNaN(avCalStartDate.getTime()) ? avCalStartDate.toISOString() : "";
-    avCalEndTime.value =  avCalEndDate instanceof Date && !isNaN(avCalEndDate.getTime()) ? avCalEndDate.toISOString() : "";
-    console.log("userValidationTimes:", userValidationTimes);
+  // check if automatic_validation is enabled and validation_times are set
+  if (avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value &&  automatic_validation.value) {
+    // validate validation_times
+    areValidationTimesValidated();
   }
 });
 
@@ -636,21 +522,8 @@ const AutoValChecked = () => {
 /**
  * Validate all Tuning tab data before saving
  */
-const validateTuningTabData = () => {
-  // check if Calibration Time Controls are set
-  if (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Time Controls must be set', life: 10000 });
-    return false;
-  }
-
-  // check if Automatic Validation is enabled and Validation Times Controls are set
-  if (automatic_validation.value) {
-    if (!avSimStartTime.value || !avSimEndTime.value || !avCalStartTime.value || !avCalEndTime.value) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set', life: 10000 });
-      return false;
-    }
-  }
-
+const isTuningTabDataValidated = () => {
+  return areCalibrationTimesValidated() && areValidationTimesValidated();
   // check if Output Variable to Calibrate is set
   if (!userOutputVariableToCalibrate.value.name || !userOutputVariableToCalibrate.value.module) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Output Variable to Calibrate must be selected', life: 10000 });
@@ -669,14 +542,132 @@ const validateTuningTabData = () => {
 /**
  * Validate calibration_times
  */
-const validateCalibrationTimes = () => {
+const areCalibrationTimesValidated = (): boolean => {
+  // check if time_range is not set
+  if (!rangeDateFrom.value || !rangeDateTo.value) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range must be set', life: 10000 });
+    return false;
+  }
   
+  // check if calibration_times are not set
+  if (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be set', life: 10000 });
+    return false;
+  }
+
+  // convert times to Date objects
+  const rangeStartDate = new Date(rangeDateFrom.value);
+  const rangeEndDate = new Date(rangeDateTo.value);
+  const simStartDate = new Date(simStartTime.value);
+  const simEndDate = new Date(simEndTime.value);
+  const calStartDate = new Date(calStartTime.value);
+  const calEndDate = new Date(calEndTime.value);
+
+  // check if time_range and calibration_times are null after converted to Date objects
+  if (!rangeStartDate || !rangeEndDate || !simStartDate || !simEndDate || !calStartDate || !calEndDate) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects', life: 10000 });
+    return false;
+  }
+
+  // set conditions to check if calibration_times are not within time_range
+  const isSimStartWithinRange = simStartDate >= rangeStartDate && simStartDate <= rangeEndDate;
+  const isSimEndWithinRange = simEndDate >= rangeStartDate && simEndDate <= rangeEndDate;
+  const isCalStartWithinRange = calStartDate >= rangeStartDate && calStartDate <= rangeEndDate;
+  const isCalEndWithinRange = calEndDate >= rangeStartDate && calEndDate <= rangeEndDate;
+
+  // check if calibration_times are not within time_range
+  if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be within time_range', life: 10000 });
+    return false;
+  }
+
+  // check if simulation_end_time is not after simulation_start_time
+  if (simStartDate >= simEndDate) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'simulation_end_time must be after simulation_start_time', life: 10000 });
+    return false;
+  }
+
+  // check if calibration_start_time is not within simulation_start_time and simulation_end_time
+  if (calStartDate <= simStartDate || calStartDate > simEndDate) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time', life: 10000 });
+    return false;
+  }
+
+  // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
+  if (calEndDate <= calStartDate || calEndDate > simEndDate) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time', life: 10000 });
+    return false;
+  }
+
+  return true;
 };
 
 /**
  * Validate validation_times
  */
-const validateValidationTimes = () => {
+const areValidationTimesValidated = (): boolean => {
+  // check if calibration_times are set and validated
+  if (!areCalibrationTimesValidated()) {
+    return false; // areCalibrationTimesValidated() will show error messages
+  }
+
+  // check if automatic_validation is enabled and validation_times are set
+  if (automatic_validation.value) {
+    if (!avSimStartTime.value || !avSimEndTime.value || !avCalStartTime.value || !avCalEndTime.value) {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set', life: 10000 });
+      return false;
+    }
+  }
+
+  // convert times to Date objects
+  const avSimStartDate = new Date(avSimStartTime.value);
+  const avSimEndDate = new Date(avSimEndTime.value);
+  const avCalStartDate = new Date(avCalStartTime.value);
+  const avCalEndDate = new Date(avCalEndTime.value);
+  const rangeStartDate = new Date(rangeDateFrom.value);
+  const rangeEndDate = new Date(rangeDateTo.value);
+
+  // check if Date objects are valid
+  if (!avSimStartDate || !avSimEndDate || !avCalStartDate || !avCalEndDate || !rangeStartDate || !rangeEndDate) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects', life: 10000 });
+    return false;
+  }
+
+  // convert simeEndTime to Date object. simEndTime is the lastest time within calibration_times
+  const simEndDate = new Date(simEndTime.value);
+
+  // set conditions to check if validation_times are not after calibration_times
+  const isAvSimStartAfterCalEnd = avSimStartDate > simEndDate;
+  const isAvSimEndAfterCalEnd = avSimEndDate > simEndDate;
+  const isAvCalStartAfterCalEnd = avCalStartDate > simEndDate;
+  const isAvCalEndAfterCalEnd = avCalEndDate > simEndDate;
+
+
+  // check if validation_times are not after calibration_times
+  if (isAvSimStartAfterCalEnd || isAvSimEndAfterCalEnd || isAvCalStartAfterCalEnd || isAvCalEndAfterCalEnd) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'All validation_times must be after calibration_times', life: 10000 });
+    return false;
+  }
+
+  // check if avSimEndDate is not after avSimStartDate
+  if (avSimStartDate >= avSimEndDate) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Simulation End must be after Simulation Start', life: 10000 });
+    return false;
+  }
+
+  // check if avCalStartDate is not within avSimStartDate and avSimEndDate
+  if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Calibration Start must be within Simulation Start and End', life: 10000 });
+    return false;
+  }
+
+  // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
+  if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Calibration End must be after Calibration Start and less than or equal to Automatic Validation Simulation End', life: 10000 });
+    return false;
+  }
+
+  return true
 };
 
 /**

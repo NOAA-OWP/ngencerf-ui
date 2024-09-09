@@ -25,7 +25,7 @@ export const convertTimeZone = (date: any, tzString: String) => {
  * @param calibration_end_time
  * @param simulation_start_time
  * @param simulation_end_time
- * @returns time range
+ * @returns {time_range} object with rangeStart and rangeEnd in ISO format
  */
 export function calculateTimeRange(
   calibration_start_time: string,
@@ -54,7 +54,8 @@ export function calculateTimeRange(
   const paddedStart = minDate.minus({ months: 1 });
   const paddedEnd = maxDate.plus({ months: 1 });
 
-  const formatDate = (date: DateTime): string => date.toFormat('yyyy-MM-dd HH:00 ZZ');
+  // convert a DateTime object to a string in ISO format
+  const formatDate = (date: DateTime): string => date.toISO();
 
   const rangeStart = formatDate(paddedStart);
   const rangeEnd = formatDate(paddedEnd);
