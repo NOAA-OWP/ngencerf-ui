@@ -1,11 +1,14 @@
 import mitt from 'mitt'
-
+import type { CalibrationButtonGroupClickEvent } from './NextGenModel'
 /**
  * define event groups
  */
-type ApplicationEvents = {
-   'calibrationButtonGroup:buttonClick': string
-}
+
+
+/**
+ * define events in NextGenModel and extend ApplicationEvents with & such as EventType1 & EventType2
+ */
+type ApplicationEvents = CalibrationButtonGroupClickEvent
 
 const emitter = mitt<ApplicationEvents>()
 

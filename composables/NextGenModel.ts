@@ -15,10 +15,20 @@ export interface CreatedCalibrationRun {
    calibration_run_id: number;
 }
 
-export interface GeneralSaveTabResponse {
+export interface GeneralApiSaveResponse {
    message: string;
    calibration_run_id: number;
    status: string;
+}
+
+export interface GeneralErrorResponse {
+   response_type: string,
+   message: string,
+   validation_errors: ValidationErrorObject[]
+}
+
+export interface ValidationErrorObject {
+   [key: string]: string
 }
 
 /**
@@ -126,8 +136,8 @@ export interface SlothParameterData {
 export interface GageTabData {
    status: string;
    calibration_run_id: number;
-   forcing_source_values: ForcingSourceValueData;
-   observational_source_values: ObservationalSourceValueData;
+   forcing_source_values: ForcingSourceValueData[];
+   observational_source_values: ObservationalSourceValueData[];
    gages: GageOptionData[];
    gage: GageData;
    geopackage_image_url: string;
@@ -168,7 +178,7 @@ export interface ObservationalSourceValueData {
    is_active: boolean;
 }
 
-export interface SaveGageTabResponse extends GeneralSaveTabResponse {
+export interface SaveGageTabResponse extends GeneralApiSaveResponse {
    geopackage_image: string;
 }
 
@@ -310,4 +320,35 @@ export interface AlgorithmParameter {
 
 export interface CalibrationTuningData {
   
+}
+
+/**
+ * Model for Calibration Run Status tab
+ */
+export interface CalibrationRunStatusTabData {
+   
+}
+
+export interface CalibrationIsReadyResponse {
+   message: string,
+   errors: string[]
+}
+
+export interface CalibrationPlotListNamesData {
+   calibration_run_id: number,
+   plot_list : CalibrationPlotListData
+}
+
+export interface CalibrationPlotListData extends SelectOption {
+   filename: string
+}
+
+/**
+ * Event Bus Interface
+ */
+export type CalibrationButtonGroupClickEvent = {
+   calibrationButtonSaveStart: string,
+   calibrationButtonResetStop: string,
+   calibrationButtonPrev: string,
+   calibrationButtonNext: string
 }
