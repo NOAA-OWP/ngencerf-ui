@@ -10,7 +10,7 @@ FormulationName<template>
                      title="Formulation Name">
                      Forumulation Name:
                   </div>
-                  <InputText v-model="formulationNameInput" class="inline-block w-64 p-1" aria-label="Input Forumulation Name" title="Input Formulation Name"></InputText>
+                  <InputText v-model="formulationNameInput" class="inline-block w-64 p-1" aria-label="Input Forumulation Name" title="Input Formulation Name" required></InputText>
                </div>
                <div class="col-span-2">&nbsp;</div>
             </div>
@@ -57,7 +57,10 @@ FormulationName<template>
                   </div>
                </span>
                <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="items-center ml-10 mr-10 mt-4">
-                  <DataTable class="stripe" :value="slothParameterInputs" editMode="cell" scrollable scroll-height="200px">
+                  <ContextMenu :pt="{ root: { id: 'sloth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
+                     :model="cmSlothParameterData" @hide="selectedSlothParameterData = undefined"></ContextMenu>   
+                  <DataTable class="stripe" :value="slothParameterInputs" editMode="cell" scrollable scroll-height="200px"
+                     contextMenu v-model:contextMenuSelection="selectedSlothParameterData" @rowContextmenu="onRowContextMenu">
                      <Column field="param_name" header="SLoTH Output Var" sortable></Column>
                      <Column field="param_count" header="Count" sortable>
                         <template #editor="{ index }">
@@ -111,9 +114,17 @@ import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
+import type { SlothParameterData } from '~/composables/NextGenModel';
 
 const new_sloth_variable_name = ref<string>("")
-
+const selectedSlothParameterData = ref<SlothParameterData>()
+const slothParamContextMenu = ref() //sloth parameter table context menu
+const cmSlothParameterData = ref([
+  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedSlothParameterData( selectedSlothParameterData ) }
+])
+const onRowContextMenu = (event: any) => {
+   slothParamContextMenu.value.show(event.originalEvent)
+}
 const {
    filterGroup,
    useSlothParameters,
@@ -126,7 +137,7 @@ const {
    data_loading
 } = storeToRefs( useFormulationStore() )
 
-const { addNewSlothVariable, saveFormulationTabData } = useFormulationStore()
+const { addNewSlothVariable, saveFormulationTabData, resetUserSelection } = useFormulationStore()
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore()
 const toast = useToast();
@@ -141,10 +152,34 @@ const addSlothVariable = () => {
    }
 }
 
+const deleteSelectedSlothParameterData = ( selectedSlothParameterData: SlothParameterData ) => {
+   slothParameterInputs
+   const selectedRunId = selectedSlothParameterData.param_name
+//   let confirmMessage = "Are you sure you want to delete?"
+//   if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
+
+//   confirmDelte.require({
+//     message: confirmMessage,
+//     header: 'Confirm Delete',
+//     icon: 'pi pi-exclamation-triangle',
+//     rejectProps: {
+//       label: 'Cancel',
+//       severity: 'secondary',
+//       outlined: true
+//     },
+//     acceptProps: {
+//       label: 'Save',
+//     },
+//     accept: () => acceptDelete(selectedRunId),
+//     reject: () => {
+//       //do nothing
+//     }
+//   })
+}
 /**
- * event bus for save click
+ * event bus for calibration button group click
  */
-useListen( 'calibrationButtonGroup:buttonClick', ( actionButton ) => {
+useListen( 'calibrationButtonSaveStart', ( actionButton ) => {
    if( getCalibrationTabIndex() === 2 && actionButton == 'SAVE' ) {
       const save_formulation_response = saveFormulationTabData()
       console.log( `saveTabContent Formulation, should be tabIndex 2, on tabIndex ${getCalibrationTabIndex()}, save response: `, save_formulation_response )
@@ -152,6 +187,18 @@ useListen( 'calibrationButtonGroup:buttonClick', ( actionButton ) => {
          toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
          fetchUserCalibrationRunData()
       }) 
+   }
+})
+
+useListen( 'calibrationButtonResetStop', ( actionButton) => {
+   if( getCalibrationTabIndex() == 2 && actionButton == 'RESET' ) {
+      resetUserSelection()
+   }
+})
+
+useListen( 'calibrationButtonPrev', ( actionButton ) => {
+   if( getCalibrationTabIndex() == 2 ) {
+      navigateTo("PreviousRuns")
    }
 })
 

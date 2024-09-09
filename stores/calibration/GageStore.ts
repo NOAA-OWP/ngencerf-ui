@@ -5,7 +5,7 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
-import type { SelectOption, GageTabData, SaveGageTabResponse } from "~/composables/NextGenModel";
+import type { SelectOption, GageTabData, GeneralApiSaveResponse, GeneralErrorResponse, SaveGageTabResponse } from "~/composables/NextGenModel";
 
 export const useGageStore = defineStore( 'GageStore', () => {
    /**
@@ -29,32 +29,22 @@ export const useGageStore = defineStore( 'GageStore', () => {
    
    const data_loading = ref<boolean>(true)
    
-   /**
-    * load static gage tab data with provided calibration job id
-    * @return {void}
-    */
-   async function queryGageTabData() {
-      makeProtectedApiCall<GageTabData>( `${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
-         method: "POST",
-         headers: { 
-            "Authorization": `Bearer ${getAccessToken()}`,
-            "Content-Type": 'application/json'
-         },
-         body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
-      } ).then( ( gageTabDataResult ) => {
-         console.log( 'gage tab data from gageStore', gageTabDataResult._data )
-         gageTabData.value = gageTabDataResult._data??undefined
-         data_loading.value = false
-         
-         //init ui model value
-         geopackageImageUrl.value = userCalibrationRunData.value?.geopackage_image_url ?? ""
-         selectedDomainValue.value = getSavedDomainValue.value ?? ""
-         selectedGageValue.value = userCalibrationRunData.value?.gage?.gage_id ?? ""
-         selectedForcingValue.value = userCalibrationRunData.value?.forcing_source ?? ""
-         selectedObservationalValue.value = userCalibrationRunData.value?.observational_source ?? ""
-         gageData.value = userCalibrationRunData.value?.gage ?? undefined
-      })
-   }
+   const gageTabDataResult = makeProtectedApiCall<GageTabData>( `${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
+      method: "POST",
+      headers: { 
+         "Authorization": `Bearer ${getAccessToken()}`,
+         "Content-Type": 'application/json'
+      },
+      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
+   } )
+   .then( ( gageTabDataResult ) => {
+      gageTabData.value = gageTabDataResult._data??undefined
+      data_loading.value = false
+      
+      //init ui model value
+      geopackageImageUrl.value = userCalibrationRunData.value?.geopackage_image_url ?? ""
+      setUserSelection()
+   })
 
    /**
     * get iser se;ected domain name based on the selected gage
@@ -68,8 +58,6 @@ export const useGageStore = defineStore( 'GageStore', () => {
          return selected_gage_item?.domain
       }      
    })
-
-   queryGageTabData()
 
    /**
     * return list of domain options for Select input
@@ -151,8 +139,83 @@ export const useGageStore = defineStore( 'GageStore', () => {
             observational_source: selectedObservationalValue.value
          } )
       })
+
+      geopackageImageUrl.value = saveGageTabDataResponse?.geopackage_image ?? ""
       
       return saveGageTabDataResponse._data
+   }
+
+   /**
+    * 
+    * @param formData 
+    * @returns {GeneralApiSaveResponse | GeneralErrorResponse}
+    */
+   async function saveUserForcingFiles( formData: FormData ) {
+      const saveUserForcingFilesResponse = await makeProtectedApiCall<GeneralApiSaveResponse | GeneralErrorResponse>( `${ngencerfBaseUrl}/calibration/upload_forcing_data/`, {
+         method: "POST",
+         headers: { 
+            "Authorization": `Bearer ${getAccessToken()}`
+         },
+         body: formData
+      })
+      
+      return saveUserForcingFilesResponse
+   } 
+
+   /**
+    * 
+    * @param formData 
+    * @returns {GeneralApiSaveResponse | GeneralErrorResponse}
+    */
+   async function saveUserObservationalFile( formData: FormData ) {
+      const saveUserObservationalFilesResponse = await makeProtectedApiCall<GeneralApiSaveResponse | GeneralErrorResponse>( `${ngencerfBaseUrl}/calibration/upload_observational_data/`, {
+         method: "POST",
+         headers: { 
+            "Authorization": `Bearer ${getAccessToken()}`
+         },
+         body: formData
+      })
+      
+      return saveUserObservationalFilesResponse
+   }   
+
+   async function saveUserGeopackageFile( formData: FormData ) {
+      const saveUserGeopackageFilesResponse = await makeProtectedApiCall<GeneralApiSaveResponse | GeneralErrorResponse>( `${ngencerfBaseUrl}/calibration/upload_geopackage_data/`, {
+         method: "POST",
+         headers: { 
+            "Authorization": `Bearer ${getAccessToken()}`
+         },
+         body: formData
+      })
+      
+      return saveUserGeopackageFilesResponse
+   }
+
+   /**
+    * private function for setting ui reactive field
+    * @returns {void}
+    */
+   const setUserSelection = (): void => {
+      selectedDomainValue.value = getSavedDomainValue.value ?? ""
+      selectedGageValue.value = userCalibrationRunData.value?.gage?.gage_id ?? ""
+      selectedForcingValue.value = userCalibrationRunData.value?.forcing_source ?? ""
+      selectedObservationalValue.value = userCalibrationRunData.value?.observational_source ?? ""
+      gageData.value = userCalibrationRunData.value?.gage ?? undefined
+   }
+
+   /**
+    * @returns {void}
+    */
+   const resetUserSelection = (): void => {
+      if( userCalibrationRunData.value?.gage ) {
+         setUserSelection()
+      } else {
+         selectedDomainValue.value = ""
+         selectedForcingValue.value = ""
+         selectedGageValue.value = ""
+         selectedObservationalValue.value = ""
+         gageData.value = undefined
+      }
    }
 
    return {
@@ -160,7 +223,6 @@ export const useGageStore = defineStore( 'GageStore', () => {
       selectedForcingValue,
       selectedGageValue,
       selectedObservationalValue,
-      queryGageTabData,
       getSavedDomainValue,
       gageTabData,
       getDomainOptionsList,
@@ -173,7 +235,11 @@ export const useGageStore = defineStore( 'GageStore', () => {
       gageData,
       data_loading,
       geopackageImageUrl,
-      userCalibrationRunData
+      userCalibrationRunData,
+      resetUserSelection,
+      saveUserForcingFiles,
+      saveUserObservationalFile,
+      saveUserGeopackageFile
    }
 })
 

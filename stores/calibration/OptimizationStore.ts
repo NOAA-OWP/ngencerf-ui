@@ -3,7 +3,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralSaveTabResponse } from "~/composables/NextGenModel";
+import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralApiSaveResponse } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
@@ -37,32 +37,29 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
    * load static optimization tab data with provided calibration job id and initialize ui field data 
    * @return {void}
    */
-   async function queryOptimizationTabData() {
-      makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {
-         method: "POST",
-         headers: { 
-            "Authorization": `Bearer ${getAccessToken()}`,
-            "Content-Type": 'application/json'
-         },
-         body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
-      } ).then( ( optimizationTabDataResult ) => {
-         console.log( 'optimization tab data from optimizationStore', optimizationTabDataResult._data )
-         optimizationTabData.value = optimizationTabDataResult._data ?? undefined
-         data_loading.value = false
+   makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {
+      method: "POST",
+      headers: { 
+         "Authorization": `Bearer ${getAccessToken()}`,
+         "Content-Type": 'application/json'
+      },
+      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
+   } ).then( ( optimizationTabDataResult ) => {
+      optimizationTabData.value = optimizationTabDataResult._data ?? undefined
+      data_loading.value = false
 
-         uiStreamFlowThreshold.value = userCalibrationRunData.value?.streamflow_threshold ?? undefined
-         uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold ?? undefined
-         uiObjectiveFunction.value = userCalibrationRunData.value?.objective_function ?? ""
-         uiOptimization.value = userCalibrationRunData.value?.optimization ?? ""         
-         uiPlotFrequency.value = userCalibrationRunData.value?.plot_frequency ?? 0
-         uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 100
-         uiOptimizationInputs.value = getOptimizationInputUserData.value ?? []
-      })
+      setUserSelection()
+   })
+
+   const setUserSelection = (): void => {      
+      uiStreamFlowThreshold.value = userCalibrationRunData.value?.streamflow_threshold ?? undefined
+      uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold ?? undefined
+      uiObjectiveFunction.value = userCalibrationRunData.value?.objective_function ?? ""
+      uiOptimization.value = userCalibrationRunData.value?.optimization ?? ""         
+      uiPlotFrequency.value = userCalibrationRunData.value?.plot_frequency ?? 0
+      uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 100
+      uiOptimizationInputs.value = getOptimizationInputUserData.value ?? []
    }
-   /**
-    * init data on store mount
-    */
-   queryOptimizationTabData()
 
    /**
     * return select options for optimization algorithm field
@@ -118,10 +115,10 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
 
    /**
     * return save formulation tab response from the server
-    * @returns {GeneralSaveTabResponse}
+    * @returns {GeneralApiSaveResponse}
     */
    async function saveOptimizationTabData() {
-      const saveOptimizationTabDataResponse = await makeProtectedApiCall<GeneralSaveTabResponse>( `${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
+      const saveOptimizationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
          method: "POST",
          headers: { 
             "Authorization": `Bearer ${getAccessToken()}`,
@@ -153,10 +150,26 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
       } )
    }
 
+   /**
+    * @returns {void}
+    */
+   const resetUserSelection = (): void => {
+      if( userCalibrationRunData.value?.gage ) {
+         setUserSelection()
+      } else {
+         uiStreamFlowThreshold.value = undefined
+         uiPeakFlowThreshold.value = undefined
+         uiObjectiveFunction.value = ""
+         uiOptimization.value = ""         
+         uiPlotFrequency.value = 0
+         uiStopCriteria.value = 100
+         uiOptimizationInputs.value = []
+      }
+   }
+
    return {
       optimizationTabData,
       data_loading,
-      queryOptimizationTabData,
       uiObjectiveFunction,
       uiOptimization,
       uiOptimizationInputs,
@@ -172,7 +185,8 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
       getSelectedMetricInfo,
       getOptimizationInputUserData,
       saveOptimizationTabData,
-      resetOptimizationInputs
+      resetOptimizationInputs,
+      resetUserSelection
    }
 })
 
