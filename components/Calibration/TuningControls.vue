@@ -475,7 +475,7 @@ const addParameterToTable = () => {
  * @param field The field ('min', 'max', or 'initValue') being updated
  * @param value The new value entered by the user
  */
- const updateCalibrationTuningParameter = (index: number, field: string, value: string) => {
+const updateCalibrationTuningParameter = (index: number, field: string, value: string) => {
   // update userCalibrationTuningParameters with the new value
   userCalibrationTuningParameters.value[index][field] = value;
   //console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
@@ -493,25 +493,6 @@ const addParameterToTable = () => {
   }
   //console.log("updated calibrationTuningParameters:", calibrationTuningParameters.value);
 };
-
-/**
- * Delete Calibration Tuning Parameter from the table and calibrationTuningParameters
- * @param index The index of the row to be deleted
- */
-// const deleteCalibrationTuningParameter = (index: number) => {
-//   // remove the parameter from userCalibrationTuningParameters and table
-//   const parameter = userCalibrationTuningParameters.value[index].name;
-//   console.log("deleting parameter:", parameter);
-//   userCalibrationTuningParameters.value.splice(index, 1);
-//   console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
-
-//   // remove the parameter from calibrationTuningParameters
-//   const paramIndex = calibrationTuningParameters?.value?.findIndex(param => param.name === parameter);
-//   if (paramIndex && paramIndex > -1) {
-//     calibrationTuningParameters?.value?.splice(paramIndex, 1);
-//   }
-//   console.log("updated calibrationTuningParameters:", calibrationTuningParameters.value);
-// };
 
 /**
  * Handle automatic validation checkbox change
@@ -596,6 +577,11 @@ const areCalibrationTimesValidated = (): boolean => {
  * Validate validation_times
  */
 const areValidationTimesValidated = (): boolean => {
+  // check if automatic_validation is not enabled
+  if (!automatic_validation.value) {
+    return true;
+  }
+
   // check if calibration_times are set and validated
   if (!areCalibrationTimesValidated()) {
     return false; // areCalibrationTimesValidated() will show error messages
@@ -684,36 +670,37 @@ const isOutputVariableValidated = (): boolean => {
     return false;
   }
   return true;
+};
 
 /**
  * Save Tuning Tab data
  */
- useListen('calibrationButtonGroup:buttonClick', (actionButton) => {
+useListen('calibrationButtonGroup:buttonClick', (actionButton) => {
   // handle saving Tuning Tab data
   const handleSaveTuningTab = async () => {
-  try {
-    const saveTuningTabResponse = await postSaveTuningTabData();
-    console.log(
-      `saveTabContent Tuning, should be tabIndex 3, on tabIndex ${getCalibrationTabIndex()}, save response: `,
-      saveTuningTabResponse
-    );
+    try {
+      const saveTuningTabResponse = await postSaveTuningTabData();
+      console.log(
+        `saveTabContent Tuning, should be tabIndex 3, on tabIndex ${getCalibrationTabIndex()}, save response: `,
+        saveTuningTabResponse
+      );
 
-    toast.add({
-      severity: 'info',
-      summary: 'Saved Tuning Tab data',
-      detail: 'Saved Tuning Tab data',
-      life: 3000,
-    });
-  } catch (error) {
-    console.error('Error saving tuning tab data:', error);
-    toast.add({
-      severity: 'error',
-      summary: 'Error saving Tuning Tab data',
-      detail: 'Error saving Tuning Tab data',
-      life: 3000,
-    });
-  }
-};
+      toast.add({
+        severity: 'info',
+        summary: 'Saved Tuning Tab data',
+        detail: 'Saved Tuning Tab data',
+        life: 3000,
+      });
+    } catch (error) {
+      console.error('Error saving tuning tab data:', error);
+      toast.add({
+        severity: 'error',
+        summary: 'Error saving Tuning Tab data',
+        detail: 'Error saving Tuning Tab data',
+        life: 3000,
+      });
+    }
+  };
 
   // check if the current tab is the Tuning tab and the actionButton is 'SAVE'
   if (getCalibrationTabIndex() === 3 && actionButton === 'SAVE') {
