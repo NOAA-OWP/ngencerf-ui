@@ -12,7 +12,7 @@
           <div class="grid grid-rows-12">
             <div class="row-span-12">
 
-              <div id="LoginBox" class="container">
+              <div id="LoginBox" class="container" :class="!showDialog ? 'loginBox' : 'createAccountBox'">
 
                 <div v-if="!showDialog">
                   <h2 class="ttl">Login to Your Account</h2>
@@ -33,9 +33,9 @@
                     <button id="LoginButton">Sign In</button>
                   </div>
                   <div>
-                    <p class="needAccount">Need an Account?</p>
+                    <!-- <p class="needAccount">Need an Account?</p> -->
                     <div class="signupButton ngenButtonDiv" aria-label="sign up">
-                      <button @click="openDialog">Request an Account</button>
+                      <button @click="openDialog">Create an Account</button>
                     </div>
                   </div>
                 </div>
@@ -211,14 +211,21 @@ const GoToLanding = async () => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
-#LoginBox {
+.loginBox, .createAccountBox {
   position: relative;
   margin: 60px auto 0 auto;
   border-radius: 50px;
   width: 420px;
   height: 450px;
-  border: 2px solid #105d84;
+  border: 2px solid #105d84;  
+}
 
+.loginBox {
+  height: 390px;
+}
+
+.createAccountBox {
+  height: 550px;
 }
 
 input::-webkit-input-placeholder {
@@ -237,7 +244,7 @@ input::-webkit-input-placeholder {
   text-align: center;
   font-size: 18px;
   font-weight: 600;
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 .inputBox {
