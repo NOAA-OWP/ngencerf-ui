@@ -13,28 +13,62 @@
             <div class="row-span-12">
 
               <div id="LoginBox" class="container">
-                <h2 class="ttl">Login to Your Account</h2>
-                <div class="inputBox">
-                  <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username" />
-                  <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
-                    Forgot Username
-                  </button>
+
+                <div v-if="!showDialog">
+                  <h2 class="ttl">Login to Your Account</h2>
+                  <div class="inputBox">
+                    <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username" />
+                    <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
+                      Forgot Username
+                    </button>
+                  </div>
+                  <div class="inputBox">
+                    <input id="pword" type="password" v-model="userPassword" placeholder=" Password"
+                      aria-label="Password" />
+                    <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
+                      Forgot Password
+                    </button>
+                  </div>
+                  <div class="loginButton ngenButtonDiv" v-on:click="SubmitLoginForm" aria-label="sign in">
+                    <button id="LoginButton">Sign In</button>
+                  </div>
+                  <div>
+                    <p class="needAccount">Need an Account?</p>
+                    <div class="signupButton ngenButtonDiv" aria-label="sign up">
+                      <button @click="openDialog">Request an Account</button>
+                    </div>
+                  </div>
                 </div>
-                <div class="inputBox">
-                  <input id="pword" type="password" v-model="userPassword" placeholder=" Password"
-                    aria-label="Password" />
-                  <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
-                    Forgot Password
-                  </button>
-                </div>
-                <div class="loginButton ngenButtonDiv" v-on:click="SubmitLoginForm" aria-label="sign in">
-                  <button id="LoginButton">Sign In</button>
-                </div>
-                <div>
-                  <CreateUserDialog v-if="showDialog" :visible="showDialog" v-bind:onClose="closeDialog" />
-                  <p class="needAccount">Need an Account?</p>
-                  <div class="signupButton ngenButtonDiv" aria-label="sign up">
-                    <button @click="openDialog">Request an Account</button>
+
+                <div v-if="showDialog">
+                  <div class="dialog-overlay" @click.self="closeDialog">
+                    <div class="dialog-content">
+                      <h2 class="ttl">Create an Account</h2>
+                      <form @submit.prevent="submitForm">
+                        <div class="form-group inputBox">
+                          <label for="username">Username</label>
+                          <input v-model="_username" id="username" type="text" required />
+                        </div>
+                        <div class="form-group inputBox">
+                          <label for="email">Email</label>
+                          <input v-model="userEmail" id="email" type="email" required />
+                        </div>
+                        <div class="form-group inputBox">
+                          <label for="password">Password</label>
+                          <input v-model="password" id="password" type="password" required />
+                        </div>
+                        <div class="form-group inputBox">
+                          <label for="confirmPassword">Confirm Password</label>
+                          <input v-model="confirmPassword" id="confirmPassword" type="password" required />
+                        </div>
+                        <div class="createAccountButton ngenButtonDiv">
+                          <button type="submit">Create Account</button>
+                        </div>
+                        <div class="cancelCreateAccountButton ngenButtonDiv">
+                          <button type="button" @click="closeDialog">Cancel</button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -53,7 +87,6 @@
 </template>
 
 <script setup lang="ts">
-import CreateUserDialog from "~/components/Common/CreateUserDialog.vue";
 
 import { ref } from "vue";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
@@ -70,8 +103,16 @@ const toast = useToast();
 const userDataStore = useUserDataStore();
 const userName = ref<string>("");
 const userPassword = ref<string>("");
-
 const showDialog = ref(false);
+
+const _username = ref('');
+const userEmail = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+
+onMounted(() => {
+  localStorage.clear();
+});
 
 const openDialog = () => {
   showDialog.value = true;
@@ -104,12 +145,12 @@ const SubmitLoginForm = async (e: Event) => {
     // try to create new access and refresh tokens
     try {
       const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
-      method: 'POST',
-      body: { 
-        username: userName.value,
-        password: userPassword.value
-      }
-    });
+        method: 'POST',
+        body: {
+          username: userName.value,
+          password: userPassword.value
+        }
+      });
       const { access, refresh } = data;
       // console.log('Access Token:', access);
       // console.log('Refresh Token:', refresh);
@@ -127,6 +168,37 @@ const SubmitLoginForm = async (e: Event) => {
   } else {
     console.error("Username and password are required.");
   }
+};
+
+const submitForm = async () => {
+  if (password.value !== confirmPassword.value) {
+    alert("Passwords do not match.");
+    return;
+  }
+
+  // let responseData: FetchResponse<any> | null = null;
+  // try to create a new account for user
+  const {data, error} = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
+    method: 'POST',
+    body: { 
+      username: _username.value,
+      email: userEmail.value,
+      password: password.value,
+      re_password: confirmPassword.value
+    }
+  });
+
+  if (error.value) {
+    console.error(error.value);
+    return;
+  }
+
+  const { email, username, id } = data.value;
+
+  if (email && username && id) {
+    alert("Account created successfully. Please log in.");
+    closeDialog()
+  };
 };
 
 /**
@@ -172,6 +244,7 @@ input::-webkit-input-placeholder {
   margin: 0 auto;
   margin-top: 20px;
   width: 80%;
+
   input {
     height: 40px !important;
   }
@@ -183,7 +256,9 @@ input::-webkit-input-placeholder {
 }
 
 .signupButton,
-.loginButton {
+.loginButton,
+.createAccountButton,
+.cancelCreateAccountButton {
   font-size: 20px;
   margin: 20px auto;
   text-align: center;
@@ -194,7 +269,4 @@ input::-webkit-input-placeholder {
   padding-top: 10px;
 
 }
-
-
-
 </style>
