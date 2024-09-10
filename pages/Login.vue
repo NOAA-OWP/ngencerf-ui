@@ -31,7 +31,7 @@
                   <button id="LoginButton">Sign In</button>
                 </div>
                 <div>
-                  <CreateUserDialog v-if="showDialog" :visible="showDialog" @onClose="closeDialog" />
+                  <CreateUserDialog v-if="showDialog" :visible="showDialog" v-bind:onClose="closeDialog" />
                   <p class="needAccount">Need an Account?</p>
                   <div class="signupButton ngenButtonDiv" aria-label="sign up">
                     <button @click="openDialog">Request an Account</button>
