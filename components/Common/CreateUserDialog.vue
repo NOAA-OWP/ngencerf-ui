@@ -75,7 +75,6 @@ const submitForm = async () => {
 };
 
 const closeDialog = () => {
-  console.log("closeDialog called from CreateUserDialog.vue");
   props.onClose?.();
 };
 </script>
