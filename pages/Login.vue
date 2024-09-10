@@ -31,9 +31,10 @@
                   <button id="LoginButton">Sign In</button>
                 </div>
                 <div>
+                  <CreateUserDialog v-if="showDialog" :visible="showDialog" @onClose="closeDialog" />
                   <p class="needAccount">Need an Account?</p>
-                  <div class="signupButton ngenButtonDiv" v-on:click="SignUp" aria-label="sign up">
-                    <button>Request an Account</button>
+                  <div class="signupButton ngenButtonDiv" aria-label="sign up">
+                    <button @click="openDialog">Request an Account</button>
                   </div>
                 </div>
               </div>
@@ -52,18 +53,34 @@
 </template>
 
 <script setup lang="ts">
+import CreateUserDialog from "~/components/Common/CreateUserDialog.vue";
+
 import { ref } from "vue";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
 
 const { logUserIn, logUserOut } = useUserDataStore();
+const { ngencerfBaseUrl } = useBackendConfig();
 
-const userDataStore = useUserDataStore();
 const loading = ref<boolean>(true);
+const toast = useToast();
+const userDataStore = useUserDataStore();
 const userName = ref<string>("");
 const userPassword = ref<string>("");
+
+const showDialog = ref(false);
+
+const openDialog = () => {
+  showDialog.value = true;
+};
+
+const closeDialog = () => {
+  console.log("closeDialog called from Login.vue");
+  showDialog.value = false;
+};
 
 const ForgotUsername = () => {
   //
@@ -71,18 +88,20 @@ const ForgotUsername = () => {
 const ForgotPassword = () => {
   //
 };
+
 const SignUp = () => {
   //
 };
+
 /** 
  * Submits the login form
  * @param e - event object
  */
 const SubmitLoginForm = async (e: Event) => {
   e.preventDefault(); // prevents the page from reloading
-  const { ngencerfBaseUrl } = useBackendConfig();
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
+    // try to create new access and refresh tokens
     try {
       const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
