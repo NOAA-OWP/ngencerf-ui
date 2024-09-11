@@ -12,28 +12,77 @@
           <div class="grid grid-rows-12">
             <div class="row-span-12">
 
-              <div id="LoginBox" class="container">
-                <h2 class="ttl">Login to Your Account</h2>
-                <div class="inputBox">
-                  <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username" />
-                  <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
-                    Forgot Username
-                  </button>
+              <div id="LoginBox" class="container" :class="!showDialog ? 'loginBox' : 'createAccountBox'">
+
+                <div v-if="!showDialog">
+                  <h2 class="ttl">Login to Your Account</h2>
+                  <div class="inputBox">
+                    <InputText id="uname" type="text" v-model="userName" placeholder=" Username"
+                      aria-label="Username" />
+                    <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
+                      Forgot Username
+                    </button>
+                  </div>
+                  <div class="inputBox">
+                    <Password id="pword" type="password" v-model="userPassword" placeholder=" Password"
+                      aria-label="Password" toggleMask />
+                    <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
+                      Forgot Password
+                    </button>
+                  </div>
+                  <div class="loginButton ngenButtonDiv" v-on:click="SubmitLoginForm" aria-label="sign in">
+                    <button id="LoginButton">Sign In</button>
+                  </div>
+                  <div>
+                    <!-- <p class="needAccount">Need an Account?</p> -->
+                    <div class="signupButton ngenButtonDiv" aria-label="sign up">
+                      <button @click="openDialog">Create an Account</button>
+                    </div>
+                  </div>
                 </div>
-                <div class="inputBox">
-                  <input id="pword" type="password" v-model="userPassword" placeholder=" Password"
-                    aria-label="Password" />
-                  <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
-                    Forgot Password
-                  </button>
-                </div>
-                <div class="loginButton ngenButtonDiv" v-on:click="SubmitLoginForm" aria-label="sign in">
-                  <button id="LoginButton">Sign In</button>
-                </div>
-                <div>
-                  <p class="needAccount">Need an Account?</p>
-                  <div class="signupButton ngenButtonDiv" v-on:click="SignUp" aria-label="sign up">
-                    <button>Request an Account</button>
+
+                <div v-if="showDialog">
+                  <div class="dialog-overlay" @click.self="closeDialog">
+                    <div class="dialog-content">
+                      <h2 class="ttl">Create an Account</h2>
+                      <form @submit.prevent="submitForm">
+                        <div class="form-group inputBox">
+                          <label for="username">Username</label>
+                          <InputText v-model="_username" id="username" type="text" required />
+                        </div>
+                        <div class="form-group inputBox">
+                          <label for="email">Email</label>
+                          <InputText v-model="userEmail" id="email" type="email" required />
+                        </div>
+                        <div class="form-group inputBox">
+                          <label for="password">Password</label>
+                          <Password v-model="password" id="password" type="password" required toggleMask>
+                            <template #header>
+                              <div class="font-semibold text-xm mb-4">Password</div>
+                            </template>
+                            <template #footer>
+                              <Divider />
+                              <ul class="pl-2 ml-2 my-0 leading-normal">
+                                <li>Cannot be a commonly used password</li>
+                                <li>Must be at least 8 characters long</li>
+                                <li>Must contain at least one non-numeric character</li>
+                              </ul>
+                            </template>
+                          </Password>
+                        </div>
+                        <div class="form-group inputBox">
+                          <label for="confirmPassword">Confirm Password</label>
+                          <Password v-model="confirmPassword" id="confirmPassword" type="password" :feedback="false"
+                            required toggleMask />
+                        </div>
+                        <div class="createAccountButton ngenButtonDiv">
+                          <button type="submit">Create Account</button>
+                        </div>
+                        <div class="cancelCreateAccountButton ngenButtonDiv">
+                          <button type="button" @click="closeDialog">Cancel</button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -52,18 +101,42 @@
 </template>
 
 <script setup lang="ts">
+
 import { ref } from "vue";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
 
 const { logUserIn, logUserOut } = useUserDataStore();
+const { ngencerfBaseUrl } = useBackendConfig();
 
-const userDataStore = useUserDataStore();
 const loading = ref<boolean>(true);
+const toast = useToast();
+const userDataStore = useUserDataStore();
 const userName = ref<string>("");
 const userPassword = ref<string>("");
+const showDialog = ref(false);
+
+const _username = ref('');
+const userEmail = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+
+onMounted(() => {
+  localStorage.clear();
+});
+
+const openDialog = () => {
+  showDialog.value = true;
+};
+
+const closeDialog = () => {
+  showDialog.value = false;
+};
 
 const ForgotUsername = () => {
   //
@@ -71,43 +144,77 @@ const ForgotUsername = () => {
 const ForgotPassword = () => {
   //
 };
+
 const SignUp = () => {
   //
 };
+
 /** 
  * Submits the login form
  * @param e - event object
  */
 const SubmitLoginForm = async (e: Event) => {
   e.preventDefault(); // prevents the page from reloading
-  const { ngencerfBaseUrl } = useBackendConfig();
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
-    try {
-      const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
+    // try to create new access and refresh tokens
+
+    const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
-      body: { 
+      body: {
         username: userName.value,
         password: userPassword.value
       }
     });
-      const { access, refresh } = data;
-      // console.log('Access Token:', access);
-      // console.log('Refresh Token:', refresh);
 
-      if (access && refresh) {
-        // store tokens in UserDataStore
-        userDataStore.setAccessToken(access);
-        userDataStore.setRefreshToken(refresh);
-        logUserIn();
-        await GoToLanding();
-      }
-    } catch (error) {
-      console.error("Login failed:", error);
+    if (error.value) {
+      toast.add({ severity: 'error', summary: 'Error', detail: error.value?.data.username[0], life: 3000 });
+      console.error("Error during user creation:", error.value?.message, error.value?.data);
+      return;
     }
-  } else {
-    console.error("Username and password are required.");
+
+    // store tokens in UserDataStore
+    userDataStore.setAccessToken(data.value.access);
+    userDataStore.setRefreshToken(data.value.refresh);
+    logUserIn();
+    await GoToLanding();
+  } else if (userName.value.trim() === "" || userPassword.value.trim() === "") {
+    toast.add({ severity: 'error', summary: 'Error', detail: "A Username and Password are required", life: 3000 });
   }
+}
+
+const submitForm = async () => {
+  if (password.value !== confirmPassword.value) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 3000 });
+    return;
+  }
+
+  // try to create a new account for user
+  const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
+    method: 'POST',
+    body: {
+      username: _username.value,
+      email: userEmail.value,
+      password: password.value,
+      re_password: confirmPassword.value
+    }
+  });
+
+  if (error.value) {
+    if (error.value?.data.username) {
+      let detail = error.value?.data.username[0];
+      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
+      return;
+    } else if (error.value?.data.password) {
+      error.value?.data.password.forEach((e: any) => toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 }));
+      return;
+    }
+  }
+
+  if (data.value.email && data.value.username && data.value.id) {
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 3000 });
+    closeDialog();
+  };
 };
 
 /**
@@ -120,14 +227,22 @@ const GoToLanding = async () => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
-#LoginBox {
+.loginBox,
+.createAccountBox {
   position: relative;
   margin: 60px auto 0 auto;
   border-radius: 50px;
   width: 420px;
   height: 450px;
   border: 2px solid #105d84;
+}
 
+.loginBox {
+  height: 390px;
+}
+
+.createAccountBox {
+  height: 550px;
 }
 
 input::-webkit-input-placeholder {
@@ -146,13 +261,14 @@ input::-webkit-input-placeholder {
   text-align: center;
   font-size: 18px;
   font-weight: 600;
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 .inputBox {
   margin: 0 auto;
   margin-top: 20px;
   width: 80%;
+
   input {
     height: 40px !important;
   }
@@ -164,7 +280,9 @@ input::-webkit-input-placeholder {
 }
 
 .signupButton,
-.loginButton {
+.loginButton,
+.createAccountButton,
+.cancelCreateAccountButton {
   font-size: 20px;
   margin: 20px auto;
   text-align: center;
@@ -175,7 +293,4 @@ input::-webkit-input-placeholder {
   padding-top: 10px;
 
 }
-
-
-
 </style>
