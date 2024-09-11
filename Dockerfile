@@ -1,4 +1,4 @@
-FROM rockylinux:9
+FROM registry.sh.nextgenwaterprediction.com/infrastructure/rockylinux/rockylinux:latest
 
 
 # runtime dependencies
