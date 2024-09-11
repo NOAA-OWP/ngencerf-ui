@@ -168,7 +168,8 @@ const SubmitLoginForm = async (e: Event) => {
     });
 
     if (error.value) {
-      toast.add({ severity: 'error', summary: 'Error', detail: error.value?.data.username[0], life: 3000 });
+      const e = error.value?.data?.detail; 
+      toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 });
       console.error("Error during user creation:", error.value?.message, error.value?.data);
       return;
     }
