@@ -114,11 +114,12 @@
               <div class="col-span-1 m-auto">
 
                 <div class="text-left ">
-                  <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
-                  <div class="inline-block text-left">Parameters File (optional):</div><br />
+                  <div class="mt-4 mb-4 font-bold">Calibration Tuning Parameters</div>
+                  <div class="inline-block text-left">Parameters File (optional):</div>
+                  <!-- <br />
                   <select id="ParamFile" class="varInputs inline-block mt-2">
-                    <option value="" selected disabled>...</option>
-                  </select>
+                    <option value="" selected disabled>...</option>                    
+                  </select> -->
                   <div id="UploadParams" class="ngenButtonDiv inline ml-3">
                     <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
                     <button @click="triggerFileInput">UPLOAD</button>
@@ -264,8 +265,6 @@ const {
   rangeDateTo,
 } = storeToRefs(tuningStore);
 
-// const loading = ref(true);
-
 const calibrationTuningParameters = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
@@ -279,12 +278,12 @@ onMounted(async () => {
   console.log("onMounted");
 
   if (!isDataFetched.value) {
-    toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
+    //toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
     await fetchTuningTabData(); // only fetch data if not already fetched
     // loading.value = false;
   } else {
     // loading.value = true;
-    toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
+    //toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
   }
 
   console.log("loadTuningTabData:", loadTuningTabData.value);
@@ -382,8 +381,8 @@ watch(selectedOutputVariable, () => {
   
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
-    name: selectedOutputVariable.value,
-    module: module.name,
+    name: selectedOutputVariable?.value,
+    module: module?.name,
   }
   //console.log("selectedOutputVariable:", selectedOutputVariable.value);
   //console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
@@ -782,7 +781,7 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 }
 
 #TuningDataList {
-  margin: 0 auto;
+  margin: 20px auto;
   width: 750px;
   border: 1px solid black;
   padding: 8px;

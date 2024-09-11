@@ -57,7 +57,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
       uiObjectiveFunction.value = userCalibrationRunData.value?.objective_function ?? ""
       uiOptimization.value = userCalibrationRunData.value?.optimization ?? ""         
       uiPlotFrequency.value = userCalibrationRunData.value?.plot_frequency ?? 0
-      uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 100
+      uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 0
       uiOptimizationInputs.value = getOptimizationInputUserData.value ?? []
    }
 
@@ -162,7 +162,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
          uiObjectiveFunction.value = ""
          uiOptimization.value = ""         
          uiPlotFrequency.value = 0
-         uiStopCriteria.value = 100
+         uiStopCriteria.value = 0
          uiOptimizationInputs.value = []
       }
    }

@@ -65,6 +65,10 @@ const loading = ref<boolean>(true);
 const userName = ref<string>("");
 const userPassword = ref<string>("");
 
+onMounted( () => {
+  localStorage.clear();
+})
+
 const ForgotUsername = () => {
   //
 };

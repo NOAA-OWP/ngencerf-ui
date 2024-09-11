@@ -118,6 +118,11 @@ const cbIsEvenBased = ref<boolean>( false )
 const showMetricPeakFlow = ref<boolean>( false )
 const showMetricStreamFlow = ref<boolean>( false )
 
+
+
+console.log("uiObjectiveFunction",uiObjectiveFunction);
+console.log("uiOptimization",uiOptimization);
+console.log("uiOptimizationInputs",uiOptimizationInputs);
 /**
  * update objective function and metric peak flow/stream flow field visibility
  */
