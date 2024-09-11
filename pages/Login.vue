@@ -17,14 +17,14 @@
                 <div v-if="!showDialog">
                   <h2 class="ttl">Login to Your Account</h2>
                   <div class="inputBox">
-                    <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username" />
+                    <InputText id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username" />
                     <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
                       Forgot Username
                     </button>
                   </div>
                   <div class="inputBox">
-                    <input id="pword" type="password" v-model="userPassword" placeholder=" Password"
-                      aria-label="Password" />
+                    <Password id="pword" type="password" v-model="userPassword" placeholder=" Password"
+                      aria-label="Password" toggleMask/>
                     <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
                       Forgot Password
                     </button>
@@ -47,19 +47,31 @@
                       <form @submit.prevent="submitForm">
                         <div class="form-group inputBox">
                           <label for="username">Username</label>
-                          <input v-model="_username" id="username" type="text" required />
+                          <InputText v-model="_username" id="username" type="text" required />
                         </div>
                         <div class="form-group inputBox">
                           <label for="email">Email</label>
-                          <input v-model="userEmail" id="email" type="email" required />
+                          <InputText v-model="userEmail" id="email" type="email" required />
                         </div>
                         <div class="form-group inputBox">
                           <label for="password">Password</label>
-                          <input v-model="password" id="password" type="password" required />
+                          <Password v-model="password" id="password" type="password" required toggleMask >
+                            <template #header>
+                              <div class="font-semibold text-xm mb-4">Password</div>
+                            </template>
+                            <template #footer>
+                              <Divider />
+                              <ul class="pl-2 ml-2 my-0 leading-normal">
+                                <li>Cannot be a commonly used password</li>
+                                <li>Must be at least 8 characters long</li>
+                                <li>Must contain at least one non-numeric character</li>
+                              </ul>
+                            </template>
+                          </Password>
                         </div>
                         <div class="form-group inputBox">
                           <label for="confirmPassword">Confirm Password</label>
-                          <input v-model="confirmPassword" id="confirmPassword" type="password" required />
+                          <Password v-model="confirmPassword" id="confirmPassword" type="password" :feedback="false" required toggleMask />
                         </div>
                         <div class="createAccountButton ngenButtonDiv">
                           <button type="submit">Create Account</button>
@@ -94,6 +106,8 @@ import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
 
 const { logUserIn, logUserOut } = useUserDataStore();
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -119,7 +133,6 @@ const openDialog = () => {
 };
 
 const closeDialog = () => {
-  console.log("closeDialog called from Login.vue");
   showDialog.value = false;
 };
 
@@ -172,11 +185,10 @@ const SubmitLoginForm = async (e: Event) => {
 
 const submitForm = async () => {
   if (password.value !== confirmPassword.value) {
-    alert("Passwords do not match.");
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 5000 });
     return;
   }
 
-  // let responseData: FetchResponse<any> | null = null;
   // try to create a new account for user
   const {data, error} = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
     method: 'POST',
@@ -189,14 +201,15 @@ const submitForm = async () => {
   });
 
   if (error.value) {
-    console.error(error.value);
+    toast.add({ severity: 'error', summary: 'Error', detail: error.value?.data, life: 5000 });
+    console.error("Error during user creation:", error.value?.message, error.value?.data);
     return;
   }
 
   const { email, username, id } = data.value;
 
   if (email && username && id) {
-    alert("Account created successfully. Please log in.");
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 5000 });
     closeDialog()
   };
 };
