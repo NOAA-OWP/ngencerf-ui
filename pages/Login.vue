@@ -17,14 +17,15 @@
                 <div v-if="!showDialog">
                   <h2 class="ttl">Login to Your Account</h2>
                   <div class="inputBox">
-                    <InputText id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username" />
+                    <InputText id="uname" type="text" v-model="userName" placeholder=" Username"
+                      aria-label="Username" />
                     <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
                       Forgot Username
                     </button>
                   </div>
                   <div class="inputBox">
                     <Password id="pword" type="password" v-model="userPassword" placeholder=" Password"
-                      aria-label="Password" toggleMask/>
+                      aria-label="Password" toggleMask />
                     <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
                       Forgot Password
                     </button>
@@ -55,7 +56,7 @@
                         </div>
                         <div class="form-group inputBox">
                           <label for="password">Password</label>
-                          <Password v-model="password" id="password" type="password" required toggleMask >
+                          <Password v-model="password" id="password" type="password" required toggleMask>
                             <template #header>
                               <div class="font-semibold text-xm mb-4">Password</div>
                             </template>
@@ -71,7 +72,8 @@
                         </div>
                         <div class="form-group inputBox">
                           <label for="confirmPassword">Confirm Password</label>
-                          <Password v-model="confirmPassword" id="confirmPassword" type="password" :feedback="false" required toggleMask />
+                          <Password v-model="confirmPassword" id="confirmPassword" type="password" :feedback="false"
+                            required toggleMask />
                         </div>
                         <div class="createAccountButton ngenButtonDiv">
                           <button type="submit">Create Account</button>
@@ -156,32 +158,31 @@ const SubmitLoginForm = async (e: Event) => {
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     // try to create new access and refresh tokens
-    try {
-      const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
-        method: 'POST',
-        body: {
-          username: userName.value,
-          password: userPassword.value
-        }
-      });
-      const { access, refresh } = data;
-      // console.log('Access Token:', access);
-      // console.log('Refresh Token:', refresh);
 
-      if (access && refresh) {
-        // store tokens in UserDataStore
-        userDataStore.setAccessToken(access);
-        userDataStore.setRefreshToken(refresh);
-        logUserIn();
-        await GoToLanding();
+    const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
+      method: 'POST',
+      body: {
+        username: userName.value,
+        password: userPassword.value
       }
-    } catch (error) {
-      console.error("Login failed:", error);
+    });
+
+    if (error.value) {
+      toast.add({ severity: 'error', summary: 'Error', detail: error.value?.data.username[0], life: 5000 });
+      console.error("Error during user creation:", error.value?.message, error.value?.data);
+      return;
     }
-  } else {
-    console.error("Username and password are required.");
+
+    // store tokens in UserDataStore
+    userDataStore.setAccessToken(data.value.access);
+    userDataStore.setRefreshToken(data.value.refresh);
+    logUserIn();
+    await GoToLanding();
+
   }
 };
+
+
 
 const submitForm = async () => {
   if (password.value !== confirmPassword.value) {
@@ -190,9 +191,9 @@ const submitForm = async () => {
   }
 
   // try to create a new account for user
-  const {data, error} = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
+  const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
     method: 'POST',
-    body: { 
+    body: {
       username: _username.value,
       email: userEmail.value,
       password: password.value,
@@ -201,16 +202,19 @@ const submitForm = async () => {
   });
 
   if (error.value) {
-    toast.add({ severity: 'error', summary: 'Error', detail: error.value?.data, life: 5000 });
-    console.error("Error during user creation:", error.value?.message, error.value?.data);
-    return;
-  }
+    if (error.value?.data.username) {
+      let detail = error.value?.data.username[0];
+      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 5000 });
+      return;
+    } else if (error.value?.data.password) {
+      error.value?.data.password.forEach((e:any) => toast.add({ severity: 'error', summary: 'Error', detail: e, life: 5000 }));
+      return;
+    }
+  } 
 
-  const { email, username, id } = data.value;
-
-  if (email && username && id) {
+  if (data.value.email && data.value.username && data.value.id) {
     toast.add({ severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 5000 });
-    closeDialog()
+    closeDialog();
   };
 };
 
@@ -224,13 +228,14 @@ const GoToLanding = async () => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
-.loginBox, .createAccountBox {
+.loginBox,
+.createAccountBox {
   position: relative;
   margin: 60px auto 0 auto;
   border-radius: 50px;
   width: 420px;
   height: 450px;
-  border: 2px solid #105d84;  
+  border: 2px solid #105d84;
 }
 
 .loginBox {
