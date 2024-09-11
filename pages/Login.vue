@@ -170,9 +170,13 @@ const SubmitLoginForm = async (e: Event) => {
         password: userPassword.value
       }
     });
-
+// error.value.statuscode
     if (error.value) {
-      const e = error.value?.data?.detail; 
+      let e = error.value?.data?.detail; 
+      if(!e) {
+        e = "Cannot reach server. Error code: " + error.value.statusCode;
+        console.log("StatusCode: ", e);
+      }
       toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 });
       console.error("Error during user creation:", error.value?.message, error.value?.data);
       return;
