@@ -168,7 +168,7 @@ const SubmitLoginForm = async (e: Event) => {
     });
 
     if (error.value) {
-      toast.add({ severity: 'error', summary: 'Error', detail: error.value?.data.username[0], life: 5000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: error.value?.data.username[0], life: 3000 });
       console.error("Error during user creation:", error.value?.message, error.value?.data);
       return;
     }
@@ -178,15 +178,14 @@ const SubmitLoginForm = async (e: Event) => {
     userDataStore.setRefreshToken(data.value.refresh);
     logUserIn();
     await GoToLanding();
-
+  } else if (userName.value.trim() === "" || userPassword.value.trim() === "") {
+    toast.add({ severity: 'error', summary: 'Error', detail: "A Username and Password are required", life: 3000 });
   }
-};
-
-
+}
 
 const submitForm = async () => {
   if (password.value !== confirmPassword.value) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 5000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 3000 });
     return;
   }
 
@@ -204,16 +203,16 @@ const submitForm = async () => {
   if (error.value) {
     if (error.value?.data.username) {
       let detail = error.value?.data.username[0];
-      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 5000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
       return;
     } else if (error.value?.data.password) {
-      error.value?.data.password.forEach((e:any) => toast.add({ severity: 'error', summary: 'Error', detail: e, life: 5000 }));
+      error.value?.data.password.forEach((e: any) => toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 }));
       return;
     }
-  } 
+  }
 
   if (data.value.email && data.value.username && data.value.id) {
-    toast.add({ severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 5000 });
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 3000 });
     closeDialog();
   };
 };
