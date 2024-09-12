@@ -24,15 +24,17 @@
             <div class="col-span-1 pl-5" style="border-left: 1px solid #000">
               <div class="mt-1">
                 Status: <span v-if="!progress">
-                  <input class="dummyProgress ml-2" disabled style="width: 296px;" />
+                  <input class="dummyProgress ml-2" v-model="status" disabled style="width: 296px;" />
                 </span>
                 <span v-else>
                   <ProgressBar :value="progress"></ProgressBar>
                 </span>
               </div>
               <div class="mt-4">Display:
-                <select id="DisplayOptions">
-                  <option>Parameters</option>
+                <select id="DisplayOptions" v-model="selectedPlotName">
+                  <option v-for="plot in plotList" :key="plot.name" :value="plot.name">
+                    {{ plot.name }}
+                  </option>
                 </select>
               </div>
             </div>
@@ -54,17 +56,79 @@
 
 <script lang="ts" setup>
 import ProgressBar from "primevue/progressbar";
+
+import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
+import { useToast } from 'primevue/usetoast';
+
+const runStatusStore = useRunStatusStore();
+const toast = useToast();
+
+const {
+  queryCalibrationIsReady,
+  queryGetPlotNames,
+  executeRunCalibration,
+  queryReportIteration
+} = runStatusStore;
+
 const loading = ref(true);
 const runningTime = ref();
 const startTime = ref();
 const iteration = ref();
+const status = ref();
+const plotList = ref();
+const selectedPlotName = ref();
 
 const progress = ref(0);
 
-onMounted(() => {
-  setTimeout(() => {
-    loading.value = false;
-  }, 500);
+onMounted(async () => {
+  // setTimeout(() => {
+  //   loading.value = false;
+  // }, 500);
+
+  // Get Calibration Ready status
+  const isCalibrationReady = await queryCalibrationIsReady();
+  // console.log('isCalibrationReady:', isCalibrationReady);
+  if (!isCalibrationReady) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Ready status', life: 5000 });
+  } else {
+    const message: string = isCalibrationReady?._data?.message;
+    if (message && message.includes('is ready')) {
+      // add 'Ready' to Status
+      status.value = 'Ready';
+    }
+    else if (message && message.includes('is not ready')) {
+      // add 'Not Ready' to Status
+      status.value = 'Not Ready';
+      toast.add({ severity: 'info', summary: 'Calibration job is not ready to run', life: 5000 });
+    }
+  }
+
+  // Get Plot Names
+  const plotNames = await queryGetPlotNames();
+  if (plotNames) {
+    console.log('plotNames:', plotNames);
+    // plotList.value = plotNames?._data?.plot_list;
+    const plotData = {
+      "calibration_run_id": 1,
+      "plot_list": [
+        {
+          "name": "string",
+          "description": "string",
+          "filename": "string"
+        },
+        {
+          "name": "string2",
+          "description": "string2",
+          "filename": "string2"
+        }
+      ]
+    };
+    plotList.value = plotData.plot_list;
+
+  } else {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
+  }
+  
 });
 </script>
 
