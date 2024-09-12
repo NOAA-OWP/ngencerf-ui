@@ -12,11 +12,6 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
    const { getAccessToken } = useUserDataStore()
    const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
    const { calibrationJobId } = storeToRefs( generalStore() )
-   //const jobsListData = ref<JobListItem[]>([])
-
-   // const { data: jobsListData, refresh: refreshJobListData } = useFetch( '/api/get_jobs', {
-   //    headers: { Authorization: `Bearer ${getAccessToken()}` }
-   // })
 
    /**
    * returns list of calibration job data from server
