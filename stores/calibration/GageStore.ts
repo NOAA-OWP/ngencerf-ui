@@ -6,6 +6,7 @@ import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { SelectOption, GageTabData, GeneralApiSaveResponse, GeneralErrorResponse, SaveGageTabResponse } from "~/composables/NextGenModel";
+import { useCalibrationTabValidation } from "~/composables/CalibrationTabValidations";
 
 export const useGageStore = defineStore( 'GageStore', () => {
    /**
@@ -126,23 +127,37 @@ export const useGageStore = defineStore( 'GageStore', () => {
     * @returns {SaveGageTabResponse}
     */
    async function saveGageTabData() {
-      const saveGageTabDataResponse = await makeProtectedApiCall<SaveGageTabResponse>( `${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
-         method: "POST",
-         headers: { 
-            "Authorization": `Bearer ${getAccessToken()}`,
-            "Content-Type": 'application/json'
-         },
-         body: JSON.stringify( { 
-            calibration_run_id: calibrationJobId.value, 
-            gage_id: selectedGageValue.value, 
-            forcing_source: selectedForcingValue.value, 
-            observational_source: selectedObservationalValue.value
-         } )
+      const saveGageTabDataValidation = useCalibrationTabValidation({
+         gage_id: selectedGageValue.value, 
+         forcing_source: selectedForcingValue.value, 
+         observational_source: selectedObservationalValue.value
       })
 
-      geopackageImageUrl.value = saveGageTabDataResponse?.geopackage_image ?? ""
-      
-      return saveGageTabDataResponse._data
+      if ( saveGageTabDataValidation.errors.value.length == 0)  {
+         const saveGageTabDataResponse = await makeProtectedApiCall<SaveGageTabResponse>( `${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
+            method: "POST",
+            headers: { 
+               "Authorization": `Bearer ${getAccessToken()}`,
+               "Content-Type": 'application/json'
+            },
+            body: JSON.stringify( { 
+               calibration_run_id: calibrationJobId.value, 
+               gage_id: selectedGageValue.value, 
+               forcing_source: selectedForcingValue.value, 
+               observational_source: selectedObservationalValue.value
+            } )
+         })
+
+         geopackageImageUrl.value = saveGageTabDataResponse?.geopackage_image ?? ""
+
+         return saveGageTabDataResponse._data
+      } else {
+         return Promise.resolve({
+            message: "Missing required field(s)",
+            calibration_run_id: calibrationJobId.value,
+            status: "error"
+         })
+      }
    }
 
    /**
