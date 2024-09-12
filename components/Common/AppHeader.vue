@@ -37,17 +37,17 @@
             </NuxtLink>
           </div>
           <div class="col-span-1">
-            <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" id="HelpCircle"
-              @click="displayHelp">?</button>
+            <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" id="HelpCircle" title="Help"
+              aria-lable="help" @click="displayHelp">?</button>
           </div>
         </div>
       </div>
 
       <Transition name="slide-fade">
         <div v-if="showHelp" id="HelpWindow">
-          <div class="text-center">
-            <img src="~/assets/styles/img/xclose.png" width="32" class="fixed cursor-pointer boxed"
-              @click="closeHelp" />
+          <div class="text-right">
+            <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+              class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
           </div>
           <div v-if="location.name === 'LandingPage'">
             <HelpLandingPageHelp />
@@ -107,7 +107,7 @@ import { ref } from "vue";
 import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
-import HelpLandingPageHelp from "../Help/CalibrationLandingPageHelp.vue";
+import HelpLandingPageHelp from "../Help/LandingPageHelp.vue";
 import HelpPreviousRunsHelp from "../Help/PreviousRunsHelp.vue";
 import HelpHeadwaterBasinGageHelp from "../Help/HeadwaterBasinGageHelp.vue";
 import HelpTuningControlsHelp from "../Help/TuningControlsHelp.vue";
