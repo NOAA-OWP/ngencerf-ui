@@ -153,7 +153,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
    /**
     * @returns {void}
     */
-   const resetUserSelection = (): void => {
+   const resetUserSelectionOptimization = (): void => {
       if( userCalibrationRunData.value?.gage ) {
          setUserSelection()
       } else {
@@ -164,6 +164,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
          uiPlotFrequency.value = 0
          uiStopCriteria.value = 0
          uiOptimizationInputs.value = []
+         console.log("OptimizationStore Reset");
       }
    }
 
@@ -186,7 +187,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
       getOptimizationInputUserData,
       saveOptimizationTabData,
       resetOptimizationInputs,
-      resetUserSelection
+      resetUserSelectionOptimization
    }
 })
 

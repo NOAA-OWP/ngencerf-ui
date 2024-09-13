@@ -29,12 +29,18 @@
       </div>
 
       <div id="Circles" class="col-span-2">
-        <div class="grid grid-cols-2">
+        <div id="UserGroup" class="grid grid-cols-2">
           <div class="col-span-1">
-            <NuxtLink class="float-right userInitials" v-show="isUserLoggedIn() && location.name !== 'Login'" to="user"
-              id="UserCircle">
+            <div v-if="isUserLoggedIn() && location.name !== 'Login'" id="UserCircle" class="float-right userInitials" @click="showUserMenu">
               {{ getUserInitials() }}
-            </NuxtLink>
+            </div>
+
+          </div>
+          <div id="userMenu">
+            <ul>
+              <li @click="gotoAccount">Account</li>
+              <li @click="logoutUser">Logout</li>
+            </ul>
           </div>
           <div class="col-span-1">
             <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" id="HelpCircle" title="Help"
@@ -56,7 +62,7 @@
           <div v-if="location.name === 'PreviousRuns'">
             <HelpPreviousRunsHelp />
           </div>
-
+          7
           <div v-if="location.name === 'Calibration'">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
@@ -103,10 +109,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useGageStore } from "~/stores/calibration/GageStore";
+import { useFormulationStore } from "~/stores/calibration/FormulationStore";
+import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
+
 import HelpLandingPageHelp from "../Help/LandingPageHelp.vue";
 import HelpPreviousRunsHelp from "../Help/PreviousRunsHelp.vue";
 import HelpHeadwaterBasinGageHelp from "../Help/HeadwaterBasinGageHelp.vue";
@@ -116,20 +127,25 @@ import HelpOptimizationMetricsHelp from "../Help/OptimizationMetricsHelp.vue"
 import HelpRunStatusHelp from "../Help/RunStatusHelp.vue"
 import HelpResultsHelp from "../Help/ResultsHelp.vue"
 
+const  { resetUserSelectionGage } = useGageStore();
+const { resetUserSelectionFormulation } = useFormulationStore();
+const { resetUserSelectionOptimization } = useOptimizationStore();
 
-const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, setEvalRunSelected } = generalStore();
+const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
-const { isUserLoggedIn, getUserName } = useUserDataStore();
+const { isUserLoggedIn, getUserName, setAccessToken, setRefreshToken, logUserOut } = useUserDataStore();
+
 const location = useRoute();
 const userMenuShowing = ref(false);
 
 const showHelp = ref(false);
 let observer = null;
 
+const isOnDiv = ref(false);
 onMounted(() => {
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
-    let headerHeight = document.getElementById('Header')?.clientHeight;
+    let hnavigateToeaderHeight = document.getElementById('Header')?.clientHeight;
     let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
     if (footerTop && headerHeight) {
       let h = (footerTop - headerHeight) + 54;
@@ -138,6 +154,7 @@ onMounted(() => {
       if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
     };
   });
+  document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 });
 
 onUnmounted(() => {
@@ -157,6 +174,34 @@ const sizeHelpWindow = () => {
     if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
   };
 };
+
+const gotoAccount = async () => {
+  await navigateTo('user');
+}
+
+const logoutUser = async () => {
+  resetUserSelectionGage();
+  resetUserSelectionFormulation();
+  resetUserSelectionOptimization();
+  logUserOut();
+  await navigateTo('login');
+}
+
+const showUserMenu = () => {
+  console.log("Show Menu")
+  const ele = document.getElementById('userMenu') as HTMLElement;
+  ele.style.display = "block";
+}
+
+const hideUserMenu = () => {
+  console.log(isOnDiv.value)
+  if (isOnDiv.value) { return };
+  setTimeout(() => {
+    console.log("Hide Menu")
+    const ele = document.getElementById('userMenu') as HTMLElement;
+    ele.style.display = "none";
+  }, 1500);
+}
 
 const closeHelp = () => {
   showHelp.value = false;
@@ -251,6 +296,25 @@ const MenuChanged = (e: MouseEvent) => {
   }
 }
 
+#userMenu {
+  display: none;
+  background-color: white;
+  border: 1px solid black;
+  position: fixed;
+  top: 7px;
+  margin-left: 50px;
+  padding: 5px 0;
+
+  ul li {
+    padding: 3px;
+  }
+
+  ul li:hover {
+    background-color: #ccc;
+  }
+
+}
+
 .fade {
   animation: fading 1s forwards; // "fading" is the keyframe animation you created
 }
@@ -264,7 +328,7 @@ const MenuChanged = (e: MouseEvent) => {
 
 #UserCircle,
 #HelpCircle {
-  display: inline-block;
+  display: inlingreye-block;
   height: 60px;
   width: 60px;
   background-color: #eee;
