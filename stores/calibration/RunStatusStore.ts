@@ -20,6 +20,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    */
   const data_loading = ref<boolean>(true)
   const calibrationIsReady = ref<boolean>(false)
+  const calibrationStatus = ref<string>();
 
   /**
    * Check if Calibration is in 'Ready' state
@@ -76,6 +77,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   return {
+    calibrationIsReady,
+    calibrationStatus,
     queryCalibrationIsReady,
     queryGetPlotNames,
     executeRunCalibration,

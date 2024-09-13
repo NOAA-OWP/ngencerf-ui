@@ -54,6 +54,7 @@ export interface JobListItem {
  */
 export interface UserCalibrationRunData {
   calibration_run_id: number;
+  run_date: string; // e.g. "2024-09-13T05:50:22.334Z"
   gage: GageData;
   forcing_source: string;
   forcing_user_dir: string;
@@ -346,25 +347,25 @@ export interface CalibrationRunStatusTabData {
 }
 
 export interface CalibrationIsReadyResponse {
-   message: string,
-   errors: string[]
+   message: string;
+   errors: string[];
 }
 
 export interface CalibrationPlotListNamesData {
-   calibration_run_id: number,
-   plot_list : CalibrationPlotListData
+   calibration_run_id: number;
+   plot_list : CalibrationPlotListData;
 }
 
 export interface CalibrationPlotListData extends SelectOption {
-   filename: string
+   filename: string;
 }
 
 /**
  * Event Bus Interface
  */
 export type CalibrationButtonGroupClickEvent = {
-   calibrationButtonSaveStart: string,
-   calibrationButtonResetStop: string,
-   calibrationButtonPrev: string,
-   calibrationButtonNext: string
+   calibrationButtonSaveStart: string;
+   calibrationButtonResetCancel: string;
+   calibrationButtonPrev: string;
+   calibrationButtonNext: string;
 }

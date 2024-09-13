@@ -24,7 +24,7 @@
             <div class="col-span-1 pl-5" style="border-left: 1px solid #000">
               <div class="mt-1">
                 Status: <span v-if="!progress">
-                  <input class="dummyProgress ml-2" v-model="status" disabled style="width: 296px;" />
+                  <input class="dummyProgress ml-2" v-model="calibrationStatus" disabled style="width: 296px;" />
                 </span>
                 <span v-else>
                   <ProgressBar :value="progress"></ProgressBar>
@@ -47,21 +47,39 @@
 
         </div>
       </div>
+      <div class="row-span-1">
+        <div id="ResultsArea" class="row-span-1" v-if="calibrationStatus == 'Done'">
+          <button class="ngenButtonDiv">Go to Evaluation</button>
+
+        </div>
+      </div>
     </div>
-    <div class="waitgif" v-if="loading">
+    <!-- <div class="waitgif" v-if="loading">
       <img src="@/assets/styles/img/wait.gif" />
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script lang="ts" setup>
 import ProgressBar from "primevue/progressbar";
 
+import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
+import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useToast } from 'primevue/usetoast';
 
+const _generalStore = generalStore();
 const runStatusStore = useRunStatusStore();
+const userDataStore = useUserDataStore();
 const toast = useToast();
+
+const { calibrationJobId } = storeToRefs(_generalStore);
+const { 
+  calibrationIsReady,
+  calibrationStatus
+ } = storeToRefs(runStatusStore);
+const { userCalibrationRunData } = storeToRefs(userDataStore);
+const { fetchUserCalibrationRunData } = userDataStore;
 
 const {
   queryCalibrationIsReady,
@@ -73,8 +91,9 @@ const {
 const loading = ref(true);
 const runningTime = ref();
 const startTime = ref();
+const stopCriteria = ref();
 const iteration = ref();
-const status = ref();
+
 const plotList = ref();
 const selectedPlotName = ref();
 
@@ -85,7 +104,10 @@ onMounted(async () => {
   //   loading.value = false;
   // }, 500);
 
-  // Get Calibration Ready status
+  // Get User Calibration Run Data
+  await fetchUserCalibrationRunData();
+
+  // Get Calibration Status
   const isCalibrationReady = await queryCalibrationIsReady();
   // console.log('isCalibrationReady:', isCalibrationReady);
   if (!isCalibrationReady) {
@@ -94,11 +116,11 @@ onMounted(async () => {
     const message: string = isCalibrationReady?._data?.message;
     if (message && message.includes('is ready')) {
       // add 'Ready' to Status
-      status.value = 'Ready';
+      calibrationStatus.value = 'Ready';
     }
     else if (message && message.includes('is not ready')) {
       // add 'Not Ready' to Status
-      status.value = 'Not Ready';
+      calibrationStatus.value = 'Not Ready';
       toast.add({ severity: 'info', summary: 'Calibration job is not ready to run', life: 5000 });
     }
   }
@@ -112,12 +134,12 @@ onMounted(async () => {
       "calibration_run_id": 1,
       "plot_list": [
         {
-          "name": "string",
+          "name": "plotName1",
           "description": "string",
           "filename": "string"
         },
         {
-          "name": "string2",
+          "name": "plotName2",
           "description": "string2",
           "filename": "string2"
         }
@@ -128,8 +150,59 @@ onMounted(async () => {
   } else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
   }
-  
 });
+
+// Handle changes in Calibration Status
+watch(calibrationStatus, async () => {
+  if (calibrationStatus.value === 'Not Ready') {
+    
+  }
+
+  else if (calibrationStatus.value === 'Ready') {
+    // Enable Run Calibration Button
+    // const runCalibrationResponse = await executeRunCalibration(); // add this to button click
+  }
+
+  else if (calibrationStatus.value === 'Running') {
+    // Get run_date from load_calibration_run endpoint
+    if (userCalibrationRunData.value) {
+      startTime.value = userCalibrationRunData.value?.run_date;
+
+      if (!startTime.value) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No Start Time', life: 5000 });
+      }
+    } 
+
+    // Get iteration from report_iteration endpoint
+    const iterationData = await queryReportIteration();
+    if (iterationData) {
+      iteration.value = iterationData?._data?.iteration;
+
+      if (!iteration.value) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No Iteration', life: 5000 });
+      } else {
+        calculateProgress();
+      }
+    }
+  }
+
+  else if (calibrationStatus.value === 'Done') {
+
+  }
+});
+
+/**
+ * Calculate Progress
+ */
+const calculateProgress = (): number | void => {
+  stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
+  if (stopCriteria.value) {
+    progress.value = (iteration.value / stopCriteria.value) * 100;
+    return progress.value;
+  } else {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'No Stop Criteria', life: 5000 });
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -144,6 +217,11 @@ onMounted(async () => {
   border: 1px solid $ngwcp_primary1;
   min-width: 750px;
 
+}
+
+#ResultsArea {
+  text-align: center;
+  border-radius: 10px;
 }
 
 #GraphArea {

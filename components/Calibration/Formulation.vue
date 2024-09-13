@@ -190,7 +190,7 @@ useListen( 'calibrationButtonSaveStart', ( actionButton ) => {
    }
 })
 
-useListen( 'calibrationButtonResetStop', ( actionButton) => {
+useListen( 'calibrationButtonResetCancel', ( actionButton) => {
    if( getCalibrationTabIndex() == 2 && actionButton == 'RESET' ) {
       resetUserSelection()
    }
