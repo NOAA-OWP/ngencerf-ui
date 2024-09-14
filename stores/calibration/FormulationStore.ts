@@ -6,6 +6,7 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, GeneralErrorResponse } from "~/composables/NextGenModel";
+import { useCalibrationTabValidation } from "~/composables/CalibrationTabValidations";
 
 export const useFormulationStore = defineStore( 'FormulationStore', () => {
    /**
@@ -166,26 +167,48 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    }
 
    /**
+    * delete sloth parameter matching sloth param name
+    * @param variable_name
+    * @returns {void}
+    */
+   function deleteSlothVariable( variable_name: string ): void {
+      slothParameterInputs.value = slothParameterInputs.value.filter( param => param.param_name != variable_name )
+   }
+
+   /**
     * return save formulation tab response from the server
     * @returns {GeneralApiSaveResponse}
     */
    async function saveFormulationTabData() {
-      const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
-         method: "POST",
-         headers: { 
-            "Authorization": `Bearer ${getAccessToken()}`,
-            "Content-Type": 'application/json'
-         },
-         body: JSON.stringify( { 
-            calibration_run_id: calibrationJobId.value, 
-            formulation_name: formulationNameInput.value, 
-            modules: selectedModuleValues.value, 
-            use_sloth: useSlothParameters.value,
-            sloth_parameters: slothParameterInputs.value
-         } )
+      const saveFormulationTabDataValidation = useCalibrationTabValidation({
+         formulation_name: formulationNameInput.value, 
+         modules: selectedModuleValues.value,
+         sloth_parameters: slothParameterInputs.value
       })
-      
-      return saveFormulationTabDataResponse._data
+
+      if ( saveFormulationTabDataValidation.errors.value.length == 0)  {
+         const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
+            method: "POST",
+            headers: { 
+               "Authorization": `Bearer ${getAccessToken()}`,
+               "Content-Type": 'application/json'
+            },
+            body: JSON.stringify( { 
+               calibration_run_id: calibrationJobId.value, 
+               formulation_name: formulationNameInput.value, 
+               modules: selectedModuleValues.value, 
+               use_sloth: useSlothParameters.value,
+               sloth_parameters: slothParameterInputs.value
+            } )
+         })
+         return saveFormulationTabDataResponse._data
+      } else {
+         return Promise.resolve({
+            message: "Missing required field(s)",
+            calibration_run_id: calibrationJobId.value,
+            status: "error"
+         })
+      }
    }
 
    /**
@@ -217,7 +240,8 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       addNewSlothVariable,
       saveFormulationTabData,
       data_loading,
-      resetUserSelectionFormulation
+      resetUserSelectionFormulation,
+      deleteSlothVariable
    }
 })
 

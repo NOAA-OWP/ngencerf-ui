@@ -57,9 +57,11 @@ FormulationName<template>
                   </div>
                </span>
                <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="items-center ml-10 mr-10 mt-4">
-                  <ContextMenu :pt="{ root: { id: 'sloth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
-                     :model="cmSlothParameterData" @hide="selectedSlothParameterData = undefined"></ContextMenu>   
-                  <DataTable class="stripe" :value="slothParameterInputs" editMode="cell" scrollable scroll-height="200px"
+
+                  <ContextMenu :pt="{ root: { id: 'loth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
+                :model="cmSlothParameterData"></ContextMenu>               
+                  <DataTable  class="stripe" id="sloth-params-list" :value="slothParameterInputs" editMode="cell" scrollable scroll-height="400px"
+                     table-style="min-width: 50rem" v-model:selection="selectedSlothParameterData" selectionMode="single"
                      contextMenu v-model:contextMenuSelection="selectedSlothParameterData" @rowContextmenu="onRowContextMenu">
                      <Column field="param_name" header="SLoTH Output Var" sortable></Column>
                      <Column field="param_count" header="Count" sortable>
@@ -137,7 +139,7 @@ const {
    data_loading
 } = storeToRefs( useFormulationStore() )
 
-const { addNewSlothVariable, saveFormulationTabData, resetUserSelection } = useFormulationStore()
+const { addNewSlothVariable, saveFormulationTabData, resetUserSelection, deleteSlothVariable } = useFormulationStore()
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore()
 const toast = useToast();
@@ -152,40 +154,23 @@ const addSlothVariable = () => {
    }
 }
 
-const deleteSelectedSlothParameterData = ( selectedSlothParameterData: SlothParameterData ) => {
-   slothParameterInputs
-   const selectedRunId = selectedSlothParameterData.param_name
-//   let confirmMessage = "Are you sure you want to delete?"
-//   if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
-
-//   confirmDelte.require({
-//     message: confirmMessage,
-//     header: 'Confirm Delete',
-//     icon: 'pi pi-exclamation-triangle',
-//     rejectProps: {
-//       label: 'Cancel',
-//       severity: 'secondary',
-//       outlined: true
-//     },
-//     acceptProps: {
-//       label: 'Save',
-//     },
-//     accept: () => acceptDelete(selectedRunId),
-//     reject: () => {
-//       //do nothing
-//     }
-//   })
+const deleteSelectedSlothParameterData = ( selectedSlothParameterData: any ) => {
+   deleteSlothVariable( selectedSlothParameterData.value.param_name )
 }
 /**
  * event bus for calibration button group click
  */
 useListen( 'calibrationButtonSaveStart', ( actionButton ) => {
    if( getCalibrationTabIndex() === 2 && actionButton == 'SAVE' ) {
+      toast.removeAllGroups()
       const save_formulation_response = saveFormulationTabData()
-      console.log( `saveTabContent Formulation, should be tabIndex 2, on tabIndex ${getCalibrationTabIndex()}, save response: `, save_formulation_response )
       save_formulation_response.then( ( response ) => {
-         toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
-         fetchUserCalibrationRunData()
+         if ( response?.status == 'error' ) {
+            toast.add({ severity: response?.status, summary: 'Error Saving Formulation Tab Data', detail: response?.message })
+         } else {
+            toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
+            fetchUserCalibrationRunData()
+         }         
       }) 
    }
 })

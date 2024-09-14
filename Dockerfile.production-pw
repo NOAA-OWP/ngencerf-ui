@@ -25,6 +25,8 @@ RUN set -eux; \
 
 COPY . .
 
+ENV NGENCERF_BASE_URL=/api/
+
 RUN set -eux; \
     npm run build
 

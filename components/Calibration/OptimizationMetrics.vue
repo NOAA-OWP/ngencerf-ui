@@ -190,14 +190,16 @@ const optimizationSelectChange = () => {
  */
 useListen( 'calibrationButtonSaveStart', ( actionButton ) => {
    if( getCalibrationTabIndex() === 4 && actionButton == 'SAVE' ) {
+      toast.removeAllGroups()
       const save_optimization_response = saveOptimizationTabData()
-      console.log( `saveTabContent Optimization, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `, save_optimization_response )
+      
       save_optimization_response.then( ( response ) => {
-         console.log( response )
-         toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
-         fetchUserCalibrationRunData()
-      }).catch( ( error: GeneralErrorResponse ) => {
-         toast.add({ severity: 'error', summary: error.response_type, detail: error.validation_errors })
+         if ( response?.status == 'error' ) {
+            toast.add({ severity: response?.status, summary: 'Error Saving Optimization Metrics Tab Data', detail: response?.message })
+         } else {
+            toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message, life: 3000 })
+            fetchUserCalibrationRunData()
+         }
       })
    }
 })

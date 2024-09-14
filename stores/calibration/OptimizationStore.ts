@@ -6,6 +6,7 @@ import { generalStore } from "../common/GeneralStore";
 import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralApiSaveResponse } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useCalibrationTabValidation } from "~/composables/CalibrationTabValidations";
 
 export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
    /**
@@ -118,25 +119,39 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
     * @returns {GeneralApiSaveResponse}
     */
    async function saveOptimizationTabData() {
-      const saveOptimizationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
-         method: "POST",
-         headers: { 
-            "Authorization": `Bearer ${getAccessToken()}`,
-            "Content-Type": 'application/json'
-         },
-         body: JSON.stringify( { 
-            calibration_run_id: calibrationJobId.value, 
-            optimization_inputs: uiOptimizationInputs.value,
-            optimization: uiOptimization.value,
-            objective_function: uiObjectiveFunction.value,
-            streamflow_threshold: uiStreamFlowThreshold.value,
-            peak_flow_threshold: uiPeakFlowThreshold.value,
-            stop_criteria: uiStopCriteria.value,
-            plot_frequency: uiPlotFrequency.value
-         } )
+      const saveOptimizationTabDataValidation = useCalibrationTabValidation({
+         optimization_inputs: uiOptimizationInputs.value,
+         optimization: uiOptimization.value, 
+         objective_function: uiObjectiveFunction.value
       })
-      
-      return saveOptimizationTabDataResponse._data
+
+      if ( saveOptimizationTabDataValidation.errors.value.length == 0)  {
+         const saveOptimizationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
+            method: "POST",
+            headers: { 
+               "Authorization": `Bearer ${getAccessToken()}`,
+               "Content-Type": 'application/json'
+            },
+            body: JSON.stringify( { 
+               calibration_run_id: calibrationJobId.value, 
+               optimization_inputs: uiOptimizationInputs.value,
+               optimization: uiOptimization.value,
+               objective_function: uiObjectiveFunction.value,
+               streamflow_threshold: uiStreamFlowThreshold.value,
+               peak_flow_threshold: uiPeakFlowThreshold.value,
+               stop_criteria: uiStopCriteria.value,
+               plot_frequency: uiPlotFrequency.value
+            } )
+         })
+         
+         return saveOptimizationTabDataResponse._data
+      } else {
+         return Promise.resolve({
+            message: "Missing required field(s)",
+            calibration_run_id: calibrationJobId.value,
+            status: "error"
+         })
+      }      
    }
 
    const getSelectedMetricInfo = computed( () => {
