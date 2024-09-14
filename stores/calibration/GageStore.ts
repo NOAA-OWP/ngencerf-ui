@@ -221,15 +221,15 @@ export const useGageStore = defineStore( 'GageStore', () => {
    /**
     * @returns {void}
     */
-   const resetUserSelection = (): void => {
+   const resetUserSelectionGage = (): void => {
       if( userCalibrationRunData.value?.gage ) {
-         setUserSelection()
       } else {
          selectedDomainValue.value = ""
          selectedForcingValue.value = ""
          selectedGageValue.value = ""
          selectedObservationalValue.value = ""
          gageData.value = undefined
+         console.log("GagenStore Reset");
       }
    }
 
@@ -251,7 +251,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
       data_loading,
       geopackageImageUrl,
       userCalibrationRunData,
-      resetUserSelection,
+      resetUserSelectionGage,
       saveUserForcingFiles,
       saveUserObservationalFile,
       saveUserGeopackageFile

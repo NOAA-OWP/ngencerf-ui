@@ -32,4 +32,6 @@ auto-imports.d.ts
 core.*
 package-lock.json
 nuxt.config.ts
+ToDo.txt
+
 

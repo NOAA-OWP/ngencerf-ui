@@ -137,7 +137,7 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 
 const gageStore = useGageStore()
 const { gageData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
-const { fetchSelectedGageData, saveGageTabData, resetUserSelection, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore
+const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore
 const { getCalibrationTabIndex } = generalStore()
 const { calibrationJobId } = storeToRefs(generalStore())
 const { fetchUserCalibrationRunData } = useUserDataStore()
@@ -282,7 +282,7 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 
 useListen('calibrationButtonResetStop', (actionButton) => {
   if (getCalibrationTabIndex() == 1 && actionButton == 'RESET') {
-    resetUserSelection()
+    resetUserSelectionGage()
   }
 })
 

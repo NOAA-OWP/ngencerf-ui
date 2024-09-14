@@ -214,7 +214,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
    /**
     * @returns {void}
     */
-   const resetUserSelection = (): void => {
+   const resetUserSelectionFormulation = (): void => {
       if( userCalibrationRunData.value?.gage ) {
          setUserSelection()
       } else {
@@ -222,6 +222,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
          selectedModuleValues.value = []
          useSlothParameters.value = false
          slothParameterInputs.value = []
+         console.log("ForumlationStore Reset");
       }
    }
 
@@ -239,7 +240,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       addNewSlothVariable,
       saveFormulationTabData,
       data_loading,
-      resetUserSelection,
+      resetUserSelectionFormulation,
       deleteSlothVariable
    }
 })
