@@ -114,9 +114,9 @@ import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { generalStore } from "@/stores/common/GeneralStore";
-import { useGageStore } from "~/stores/calibration/GageStore";
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
+// import { useGageStore } from "~/stores/calibration/GageStore";
+// import { useFormulationStore } from "~/stores/calibration/FormulationStore";
+// import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
 
 import HelpLandingPageHelp from "../Help/LandingPageHelp.vue";
 import HelpPreviousRunsHelp from "../Help/PreviousRunsHelp.vue";
@@ -127,9 +127,9 @@ import HelpOptimizationMetricsHelp from "../Help/OptimizationMetricsHelp.vue"
 import HelpRunStatusHelp from "../Help/RunStatusHelp.vue"
 import HelpResultsHelp from "../Help/ResultsHelp.vue"
 
-const  { resetUserSelectionGage } = useGageStore();
-const { resetUserSelectionFormulation } = useFormulationStore();
-const { resetUserSelectionOptimization } = useOptimizationStore();
+// const  { resetUserSelectionGage } = useGageStore();
+// const { resetUserSelectionFormulation } = useFormulationStore();
+// const { resetUserSelectionOptimization } = useOptimizationStore();
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
@@ -145,7 +145,7 @@ const isOnDiv = ref(false);
 onMounted(() => {
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
-    let hnavigateToeaderHeight = document.getElementById('Header')?.clientHeight;
+    let headerHeight = document.getElementById('Header')?.clientHeight;
     let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
     if (footerTop && headerHeight) {
       let h = (footerTop - headerHeight) + 54;
@@ -180,9 +180,9 @@ const gotoAccount = async () => {
 }
 
 const logoutUser = async () => {
-  resetUserSelectionGage();
-  resetUserSelectionFormulation();
-  resetUserSelectionOptimization();
+  // resetUserSelectionGage();
+  // resetUserSelectionFormulation();
+  // resetUserSelectionOptimization();
   logUserOut();
   await navigateTo('login');
 }
