@@ -13,18 +13,6 @@ export default {
     colors: {
       "buttonBackground": "$ngwcp_primary1",
     },
-    extend: {
-      fontFamily: {
-        "ObjektivMk2_Bd": ['ObjektivMk2_Bd', 'sans-serif'],
-        "ObjektivMk2_Lt": ["ObjektivMk2_Lt", 'sans-serif'],
-        "ObjektivMk2_Rg": ["ObjektivMk2_Rg", 'sans-serif'],
-        "NeueFrutigerWorld-Bold": ["NeueFrutigerWorld-Bold", 'sans-serif'],
-        "NeueFrutigerWorld-Book": ["NeueFrutigerWorld-Book", 'sans-serif'],
-        "NeueFrutigerWorld-BookIt": ["NeueFrutigerWorld-BookIt", 'sans-serif'],
-        "NeueFrutigerWorld-Medium": ["NeueFrutigerWorld-Medium", 'sans-serif'],
-        "NeueFrutigerWorld-MediumIt": ["NeueFrutigerWorld-MediumIt", 'sans-serif'],
-      }
-    },
   },
   plugins: [require('tailwindcss-primeui')],
 };
