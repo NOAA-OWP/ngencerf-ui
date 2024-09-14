@@ -114,9 +114,6 @@ import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { generalStore } from "@/stores/common/GeneralStore";
-// import { useGageStore } from "~/stores/calibration/GageStore";
-// import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-// import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
 
 import HelpLandingPageHelp from "../Help/LandingPageHelp.vue";
 import HelpPreviousRunsHelp from "../Help/PreviousRunsHelp.vue";
@@ -127,16 +124,11 @@ import HelpOptimizationMetricsHelp from "../Help/OptimizationMetricsHelp.vue"
 import HelpRunStatusHelp from "../Help/RunStatusHelp.vue"
 import HelpResultsHelp from "../Help/ResultsHelp.vue"
 
-// const  { resetUserSelectionGage } = useGageStore();
-// const { resetUserSelectionFormulation } = useFormulationStore();
-// const { resetUserSelectionOptimization } = useOptimizationStore();
-
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
 const { isUserLoggedIn, getUserName, setAccessToken, setRefreshToken, logUserOut } = useUserDataStore();
 
 const location = useRoute();
-const userMenuShowing = ref(false);
 
 const showHelp = ref(false);
 let observer = null;
@@ -180,9 +172,6 @@ const gotoAccount = async () => {
 }
 
 const logoutUser = async () => {
-  // resetUserSelectionGage();
-  // resetUserSelectionFormulation();
-  // resetUserSelectionOptimization();
   logUserOut();
   await navigateTo('login');
 }
@@ -302,7 +291,7 @@ const MenuChanged = (e: MouseEvent) => {
   border: 1px solid black;
   position: fixed;
   top: 7px;
-  margin-left: 50px;
+  margin-left: 54px;
   padding: 5px 0;
 
   ul li {
