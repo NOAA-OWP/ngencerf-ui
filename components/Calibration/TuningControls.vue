@@ -226,7 +226,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 
 import { mockCalibrationTuningData } from "~/mockApi/calibrationAPIData";
 import type { CalibrationTuningData } from "~/composables/NextGenModel";
-import { calculateTimeRange, convertTimeZone } from "~/utils/TimeHelpers";
+import { calculateTimeRange } from "~/utils/TimeHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";

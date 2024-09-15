@@ -13,8 +13,21 @@ export const formatDateForDisplay = ( d: string ) => {
   
 }
 
-export const convertTimeZone = (date: any, tzString: String) => {
-  return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
+/**
+ * Takes a date object and converts it to a string in the specified timezone format
+ * @param date 
+ * @returns string in the format "2021-06-01 12:00:00"
+ */
+export const convertTimeZone = (date: Date, locale: string = 'en-US'): string => {
+  return date.toLocaleString(locale, {
+    year: 'numeric',
+    month: 'long',  // Full month name (e.g., June)
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false // Use 24-hour format
+  });  
 }
 
 
@@ -61,4 +74,18 @@ export function calculateTimeRange(
   const rangeEnd = formatDate(paddedEnd);
 
   return { rangeStart, rangeEnd };
+}
+
+/**
+ * Calculates the elapsed time between two Date objects
+ * @param start_time Date object representing the start time
+ * @param end_time Date object representing the end time
+ * @returns {string} string of the elapsed time in '0 days, 01:23:45' format
+ */
+export function calculateElapsedTime(start_time: Date, end_time: Date): string {
+  const start = DateTime.fromJSDate(start_time);
+  const end = DateTime.fromJSDate(end_time);
+  const diff = end.diff(start, ["days", "hours", "minutes", "seconds"]);
+  
+  return diff.toFormat("d 'Days,' hh:mm:ss");
 }
