@@ -106,7 +106,7 @@ const {
       getSelectedMetricInfo,
       getOptimizationInputUserData
       } = storeToRefs( optimizationStore )
-const { saveOptimizationTabData, resetOptimizationInputs, resetUserSelection } = optimizationStore
+const { saveOptimizationTabData, resetOptimizationInputs, resetUserSelectionOptimization} = optimizationStore
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore()
 const toast = useToast()
@@ -206,7 +206,7 @@ useListen( 'calibrationButtonSaveStart', ( actionButton ) => {
 
 useListen( 'calibrationButtonResetStop', ( actionButton) => {
   if( getCalibrationTabIndex() == 4 && actionButton == 'RESET' ) {
-    resetUserSelection()
+    resetUserSelectionOptimization()
   }
 })
 

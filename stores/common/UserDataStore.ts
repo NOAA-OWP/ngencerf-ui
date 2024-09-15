@@ -9,6 +9,7 @@ import type { JobsList, JobListItem, UserCalibrationRunData } from "~/composable
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
   const isLoggedIn = ref<boolean>(true);
+  const userName = ref("");
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -45,7 +46,29 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * @returns {string} name of user
    */
   function getUserName(): string {
-    return "Herbert Hoover";
+    return userName.value;
+  }
+
+  /**
+   * Gets username
+   * @returns {string} name of user
+   */
+  function getUserInitials(): string {
+    let n = userName.value;
+    let at = n.indexOf("@")+1;
+    if(n.includes("@")) {
+      return (n[0] + n.substring(at, at+1)).toUpperCase();
+    } else {
+      return n;
+    }
+  }
+
+  /**
+   * Sets username
+   * @returns void
+   */
+  function setUserName(user:string) {
+    userName.value = user;
   }
 
   /**
@@ -118,6 +141,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     logUserIn,
     logUserOut,
     getUserName,
+    setUserName,
+    getUserInitials,
     setAccessToken,
     setRefreshToken,
     getAccessToken,

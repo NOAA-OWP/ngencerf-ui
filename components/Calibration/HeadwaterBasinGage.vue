@@ -166,7 +166,7 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 
 useListen('calibrationButtonResetStop', (actionButton) => {
    if (getCalibrationTabIndex() == 1 && actionButton == 'RESET') {
-      resetUserSelection()
+      resetUserSelectionGage()
    }
 })
 

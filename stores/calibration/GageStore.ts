@@ -39,7 +39,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    } )
    .then( ( gageTabDataResult ) => {
-      gageTabData.value = gageTabDataResult._data??undefined
+      gageTabData.value = gageTabDataResult?._data??undefined
       data_loading.value = false
       
       //init ui model value
@@ -229,7 +229,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
          selectedGageValue.value = ""
          selectedObservationalValue.value = ""
          gageData.value = undefined
-         console.log("GagenStore Reset");
+         console.log("Gage Store Reset");
       }
    }
 

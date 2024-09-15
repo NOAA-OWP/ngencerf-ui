@@ -4,7 +4,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import type { CalibrationIsReadyResponse, CalibrationPlotListNamesData } from "~/composables/NextGenModel";
-import { makeProtectedApiCall } from "~/utils/UserAuth";
+import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
 export const useRunStatusStore = defineStore( 'RunStatusStore', () => {
