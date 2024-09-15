@@ -129,7 +129,6 @@ const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele = event.currentTarget as HTMLElement;
   const allTabs = document.getElementsByClassName("tabs");
-  currentEvaluationTab
   // Remove highlighting from all tabs
   Object.keys(allTabs).forEach(function (key) {
     allTabs[key as any].classList.remove("activeTab");

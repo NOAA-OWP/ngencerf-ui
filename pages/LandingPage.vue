@@ -13,7 +13,7 @@
           </div>
           <div class="row-span-10">
             <div id="CenterBox">
-              <div>Welcome <strong>Herbert Hover</strong></div>
+              <div>Welcome <strong>{{ getUserName() }}</strong></div>
               <div>You have {{ runningCalibrationJobs }} current processes running</div>
               <div>You have {{ savedCalibrationJobs }}  calibration setups to complete</div>
               <div id="ContinueBtn" @click="GoPreviousRuns">
@@ -35,20 +35,13 @@
 <script setup lang="ts">
 import AppHeader from '~/components/Common/AppHeader.vue';
 import AppFooter from '~/components/Common/AppFooter.vue';
-import { useRouter } from 'vue-router'
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 const calibrationJobStore = useCalibrationJobStore()
 const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs( calibrationJobStore )
-const { fetchUserCalibrationJobsListData } = useUserDataStore()
-//const { queryJobsListData } = calibrationJobStore
+const { fetchUserCalibrationJobsListData, getUserName } = useUserDataStore()
 
-// onMounted(() => {
-//   setTimeout( () => {
-//     queryJobsListData()
-//   }, 500)
-// })
 fetchUserCalibrationJobsListData()
 
 const GoPreviousRuns = () => {

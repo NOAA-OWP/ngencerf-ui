@@ -139,6 +139,26 @@ export const useTuningStore = defineStore('TuningStore', () => {
     return saveTuningTabOutput._data;
   };
 
+     /**
+    * @returns {void}
+    */
+     const resetUserSelectionTuning = (): void => {
+      if( loadCalibrationRunData.value ) {   // not sure if loadCalibrationRunData.value  is the correct variable to use here, if any
+      } else {
+         simStartTime.value = "";
+         simEndTime.value = "";
+         calStartTime.value = "";
+         calEndTime.value = "";
+         outputVariables.value = [];
+         automatic_validation.value = false;
+      
+         avSimStartTime.value = "";
+         avSimEndTime.value = "";
+         avCalStartTime.value = "";
+         avCalEndTime.value = "";
+         console.log("Tuning Store Reset");
+      }
+   }
 
   return {
     fetchTuningTabData,
@@ -161,7 +181,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
     userValidationTimes,
     rangeDateFrom,
     rangeDateTo,
-    postSaveTuningTabData
+    postSaveTuningTabData,
+    resetUserSelectionTuning
   };
 }, 
 {

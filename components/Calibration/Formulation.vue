@@ -139,7 +139,7 @@ const {
    data_loading
 } = storeToRefs( useFormulationStore() )
 
-const { addNewSlothVariable, saveFormulationTabData, resetUserSelection, deleteSlothVariable } = useFormulationStore()
+const { addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore()
 const toast = useToast();
@@ -177,7 +177,7 @@ useListen( 'calibrationButtonSaveStart', ( actionButton ) => {
 
 useListen( 'calibrationButtonResetStop', ( actionButton) => {
    if( getCalibrationTabIndex() == 2 && actionButton == 'RESET' ) {
-      resetUserSelection()
+      resetUserSelectionFormulation()
    }
 })
 

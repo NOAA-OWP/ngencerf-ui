@@ -218,10 +218,10 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       if( userCalibrationRunData.value?.gage ) {
          setUserSelection()
       } else {
-         formulationNameInput.value = ""
-         selectedModuleValues.value = []
-         useSlothParameters.value = false
-         slothParameterInputs.value = []
+         formulationNameInput.value = "";
+         selectedModuleValues.value = [];
+         useSlothParameters.value = false;
+         slothParameterInputs.value = [];
          console.log("ForumlationStore Reset");
       }
    }

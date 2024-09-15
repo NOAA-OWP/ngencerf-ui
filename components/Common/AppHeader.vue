@@ -31,12 +31,11 @@
       <div id="Circles" class="col-span-2">
         <div id="UserGroup" class="grid grid-cols-2">
           <div class="col-span-1">
-            <div v-if="isUserLoggedIn() && location.name !== 'Login'" id="UserCircle" class="float-right userInitials" @click="showUserMenu">
+            <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle" class="float-right userInitials" @click="showUserMenu">
               {{ getUserInitials() }}
             </div>
-
           </div>
-          <div id="userMenu">
+          <div v-show="uMenu" id="userMenu">
             <ul>
               <li @click="gotoAccount">Account</li>
               <li @click="logoutUser">Logout</li>
@@ -112,6 +111,10 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useGageStore } from "~/stores/calibration/GageStore";
+import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
+import { useTuningStore } from "~/stores/calibration/TuningStore";
+import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 
@@ -126,9 +129,11 @@ import HelpResultsHelp from "../Help/ResultsHelp.vue"
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
-const { isUserLoggedIn, getUserName, setAccessToken, setRefreshToken, logUserOut } = useUserDataStore();
+const { isUserLoggedIn, getUserName, getUserInitials, setAccessToken, setRefreshToken, logUserOut } = useUserDataStore();
 
 const location = useRoute();
+
+const uMenu = ref(false);
 
 const showHelp = ref(false);
 let observer = null;
@@ -173,23 +178,28 @@ const gotoAccount = async () => {
 
 const logoutUser = async () => {
   logUserOut();
+  const { resetUserSelectionGage } = useGageStore();
+  const { resetUserSelectionOptimization } = useOptimizationStore();
+  const { resetUserSelectionTuning} = useTuningStore();
+  const { resetUserSelectionFormulation } = useFormulationStore();
+  resetUserSelectionGage();
+  resetUserSelectionFormulation();
+  resetUserSelectionTuning();
+  resetUserSelectionOptimization();
+
   await navigateTo('login');
 }
 
 const showUserMenu = () => {
-  console.log("Show Menu")
-  const ele = document.getElementById('userMenu') as HTMLElement;
-  ele.style.display = "block";
+  uMenu.value = true;
 }
 
 const hideUserMenu = () => {
   console.log(isOnDiv.value)
   if (isOnDiv.value) { return };
   setTimeout(() => {
-    console.log("Hide Menu")
-    const ele = document.getElementById('userMenu') as HTMLElement;
-    ele.style.display = "none";
-  }, 1500);
+    uMenu.value = false;
+  }, 1000);
 }
 
 const closeHelp = () => {
@@ -200,11 +210,11 @@ const displayHelp = () => {
   setTimeout(function () { sizeHelpWindow() }, 0);
 }
 
-const getUserInitials = () => {
-  const name = getUserName();
-  return (fullname => fullname.map((n, i) => (i == 0 || i == fullname.length - 1) && n[0]).filter(n => n).join(""))
-    (name.split(" "));
-};
+// const getUserInitials = () => {
+//   const name = getUserName();
+//   return (fullname => fullname.map((n, i) => (i == 0 || i == fullname.length - 1) && n[0]).filter(n => n).join(""))
+//     (name.split(" "));
+// };
 
 const MenuChanged = (e: MouseEvent) => {
   const ele = e.currentTarget as HTMLElement;
@@ -286,7 +296,6 @@ const MenuChanged = (e: MouseEvent) => {
 }
 
 #userMenu {
-  display: none;
   background-color: white;
   border: 1px solid black;
   position: fixed;
