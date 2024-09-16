@@ -247,7 +247,7 @@ const showGeopackagFileUploadDialog= ( headerText: string ) => {
          },
          data: {
             selectMultiple: false,
-            fileExtension: null,
+            fileExtension: ".gpkg",
             inputName: 'geopackage_file',
             calibrationRunId: calibrationJobId.value,
             formFileField: 'geopackage_file',
