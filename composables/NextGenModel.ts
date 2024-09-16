@@ -369,3 +369,7 @@ export type CalibrationButtonGroupClickEvent = {
    calibrationButtonPrev: string,
    calibrationButtonNext: string
 }
+
+export type LogoutEvent = {
+  logoutEvent: string;
+}

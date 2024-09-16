@@ -31,7 +31,8 @@
       <div id="Circles" class="col-span-2">
         <div id="UserGroup" class="grid grid-cols-2">
           <div class="col-span-1">
-            <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle" class="float-right userInitials" @click="showUserMenu">
+            <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle"
+              class="float-right userInitials" @click="showUserMenu">
               {{ getUserInitials() }}
             </div>
           </div>
@@ -63,7 +64,7 @@
           </div>
           7
           <div v-if="location.name === 'Calibration'">
-            <div v-if="getMenuIndex() === '1'">
+            <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
                 <HelpHeadwaterBasinGageHelp />
               </span>
@@ -126,10 +127,13 @@ import HelpFormulationHelp from "../Help/FormulationHelp.vue";
 import HelpOptimizationMetricsHelp from "../Help/OptimizationMetricsHelp.vue"
 import HelpRunStatusHelp from "../Help/RunStatusHelp.vue"
 import HelpResultsHelp from "../Help/ResultsHelp.vue"
+import { useLogout } from "~/composables/UseEventBus";
+
+const emit = defineEmits(["logoutEvent"]);
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
-const { isUserLoggedIn, getUserName, getUserInitials, setAccessToken, setRefreshToken, logUserOut } = useUserDataStore();
+const { isUserLoggedIn,  getUserInitials, hardResetUserDataStore } = useUserDataStore();
 
 const location = useRoute();
 
@@ -177,16 +181,8 @@ const gotoAccount = async () => {
 }
 
 const logoutUser = async () => {
-  logUserOut();
-  // const { resetUserSelectionGage } = useGageStore();
-  // const { resetUserSelectionOptimization } = useOptimizationStore();
-  // const { resetUserSelectionTuning} = useTuningStore();
-  // const { resetUserSelectionFormulation } = useFormulationStore();
-  // resetUserSelectionGage();
-  // resetUserSelectionFormulation();
-  // resetUserSelectionTuning();
-  // resetUserSelectionOptimization();
-
+  console.log("Logging out...");
+  useLogout("logoutEvent", "");
   await navigateTo('login');
 }
 
@@ -195,7 +191,6 @@ const showUserMenu = () => {
 }
 
 const hideUserMenu = () => {
-  console.log(isOnDiv.value)
   if (isOnDiv.value) { return };
   setTimeout(() => {
     uMenu.value = false;
@@ -220,7 +215,7 @@ const MenuChanged = (e: MouseEvent) => {
   const ele = e.currentTarget as HTMLElement;
   const m = ele.getAttribute('data-menu');
   if (m) {
-    setMenuIndex( parseInt(m, 10) );
+    setMenuIndex(parseInt(m, 10));
   }
 }
 </script>

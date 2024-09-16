@@ -136,6 +136,10 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     userCalibrationRunData.value = userCalibrationRunDataResult._data ?? undefined;
   }
 
+  useLogoutListen('logoutEvent', () => {
+    hardResetUserDataStore();
+  })
+
   /**
    * Hard Reset User Data Store
    */
@@ -146,6 +150,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     refreshToken.value = null;
     userCalibrationJobsListData.value = [];
     userCalibrationRunData.value = undefined;
+    console.log("User Data Store Reset");
   }
 
   return {

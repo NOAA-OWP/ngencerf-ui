@@ -222,6 +222,10 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
     }
   }
 
+  useLogoutListen('logoutEvent', () => {
+    resetFormulationStore();
+  })
+
   /**
   * @return {void}
   */
@@ -230,6 +234,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
     selectedModuleValues.value = [];
     useSlothParameters.value = false;
     slothParameterInputs.value = [];
+    console.log("Formulation Store Reset")
   }
 
   return {

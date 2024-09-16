@@ -10,7 +10,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 export const useTuningStore = defineStore('TuningStore', () => {
   // server-data properties
-  const { calibrationJobId } = storeToRefs( generalStore() )
+  const { calibrationJobId } = storeToRefs(generalStore())
   const loadCalibrationRunData = ref<any>(); // TODO: update to use LoadCalbrationRunData type
   const loadTuningTabData = ref<any>(); // TODO: update to use LoadTuningTabResponse type
   // const saveTuningTabData = ref<SaveTuningTabRequestBody>()
@@ -56,7 +56,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
           Authorization: `Bearer ${userDataStore.getAccessToken()}`
         }
       });
-      // console.log("loadCalibrationRunOutput:", loadCalibrationRunOutput);
+    // console.log("loadCalibrationRunOutput:", loadCalibrationRunOutput);
 
     if (loadCalibrationRunOutput._data) {
       loadCalibrationRunData.value = loadCalibrationRunOutput._data;
@@ -70,7 +70,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
           Authorization: `Bearer ${userDataStore.getAccessToken()}`
         }
       });
-      // console.log("loadTuningTabOutput:", loadTuningTabOutput);
+    // console.log("loadTuningTabOutput:", loadTuningTabOutput);
 
     if (loadTuningTabOutput._data) {
       loadTuningTabData.value = loadTuningTabOutput._data;
@@ -122,10 +122,15 @@ export const useTuningStore = defineStore('TuningStore', () => {
         },
         body: JSON.stringify(requestBody)
       });
-      console.log("saveTuningTabOutput:", saveTuningTabOutput._data);
-    
+    console.log("saveTuningTabOutput:", saveTuningTabOutput._data);
+
     return saveTuningTabOutput._data;
   };
+
+
+  useLogoutListen('logoutEvent', () => {
+    hardResetTuningStore();
+  })
 
   /**
    * Hard Reset Tuning Store
@@ -150,7 +155,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     avCalEndTime.value = "";
     rangeDateFrom.value = null;
     rangeDateTo.value = null;
-    console.log("Tuning Store hard reset");
+    console.log("Tuning Store Reset")
   };
 
   return {
@@ -175,12 +180,12 @@ export const useTuningStore = defineStore('TuningStore', () => {
     postSaveTuningTabData,
     hardResetTuningStore
   };
-}, 
-{
-  persist: {
-    storage: persistedState.localStorage
-  },
-});
+},
+  {
+    persist: {
+      storage: persistedState.localStorage
+    },
+  });
 
 /* Pinia supports Hot Module replacement so you can edit your stores
    and interact with them directly in your app without reloading the page,

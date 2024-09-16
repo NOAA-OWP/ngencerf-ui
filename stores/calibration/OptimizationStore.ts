@@ -8,11 +8,11 @@ import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useCalibrationTabValidation } from "~/composables/CalibrationTabValidations";
 
-export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
+export const useOptimizationStore = defineStore('OptimizationStore', () => {
   /**
   * ref section
   */
-  const { calibrationJobId } = storeToRefs( generalStore() )
+  const { calibrationJobId } = storeToRefs(generalStore())
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore()
   const userDataStore = useUserDataStore()
@@ -21,7 +21,7 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
   */
   const data_loading = ref<boolean>(true)
   const optimizationTabData = ref<OptimizationTabData>()
-  const { userCalibrationRunData } = storeToRefs( userDataStore )
+  const { userCalibrationRunData } = storeToRefs(userDataStore)
   const uiStreamFlowThreshold = ref<number>()
   const uiPeakFlowThreshold = ref<number>()
   const uiOptimizationInputs = ref<UserCalibrationRunOptimizationInputData[]>([])
@@ -38,25 +38,25 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
  * load static optimization tab data with provided calibration job id and initialize ui field data 
  * @return {void}
  */
-  makeProtectedApiCall<any>( `${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {
+  makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {
     method: "POST",
-    headers: { 
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
+    headers: {
+      "Authorization": `Bearer ${getAccessToken()}`,
+      "Content-Type": 'application/json'
     },
-    body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
-  } ).then( ( optimizationTabDataResult ) => {
+    body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+  }).then((optimizationTabDataResult) => {
     optimizationTabData.value = optimizationTabDataResult._data ?? undefined
     data_loading.value = false
 
     setUserSelection()
   })
 
-  const setUserSelection = (): void => {      
+  const setUserSelection = (): void => {
     uiStreamFlowThreshold.value = userCalibrationRunData.value?.streamflow_threshold ?? undefined
     uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold ?? undefined
     uiObjectiveFunction.value = userCalibrationRunData.value?.objective_function ?? ""
-    uiOptimization.value = userCalibrationRunData.value?.optimization ?? ""         
+    uiOptimization.value = userCalibrationRunData.value?.optimization ?? ""
     uiPlotFrequency.value = userCalibrationRunData.value?.plot_frequency ?? 0
     uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 0
     uiOptimizationInputs.value = getOptimizationInputUserData.value ?? []
@@ -66,25 +66,25 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
   * return select options for optimization algorithm field
   * @returns {SelectOption[]}
   */
-  const getOptimizationAlgorithmOptionsList = computed( () => {
+  const getOptimizationAlgorithmOptionsList = computed(() => {
     optimizationAlgorithmOptionsList.value = []
-    optimizationTabData.value?.optimizations.forEach( ( optimization_value ) => {
-        optimizationAlgorithmOptionsList.value.push({
-          name: optimization_value.name,
-          description: optimization_value.name
-        })
+    optimizationTabData.value?.optimizations.forEach((optimization_value) => {
+      optimizationAlgorithmOptionsList.value.push({
+        name: optimization_value.name,
+        description: optimization_value.name
+      })
     })
-    
+
     return optimizationAlgorithmOptionsList.value
   })
 
-  const getObjectiveFunctionOptionsList = computed( () => {
+  const getObjectiveFunctionOptionsList = computed(() => {
     objectiveFunctionOptionsList.value = []
-    optimizationTabData.value?.metrics.forEach( ( metric_option ) => {
-        objectiveFunctionOptionsList.value.push({
-          name: metric_option.name,
-          description: metric_option.name
-        })
+    optimizationTabData.value?.metrics.forEach((metric_option) => {
+      objectiveFunctionOptionsList.value.push({
+        name: metric_option.name,
+        description: metric_option.name
+      })
     })
 
     return objectiveFunctionOptionsList.value
@@ -94,23 +94,23 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
   * return computed array of UserCalibrationRunOptimizationInputData type 
   * @return {UserCalibrationRunOptimizationInputData[]}
   */
-  const getOptimizationInputUserData = computed( () => { 
-    let data_items: UserCalibrationRunOptimizationInputData[] = []  
-    let optimization_data = optimizationTabData.value?.optimizations.filter( ( optimization_option ) => optimization_option.name ==  uiOptimization.value )
-    
-    optimization_data?.forEach( ( data ) => {
-        data.inputs.forEach( ( data_input ) => {
-          let data_item = {
-              name: data_input.name,
-              value: 0
-          }
-          let user_optimization_input = userCalibrationRunData.value?.optimization_inputs.filter( ( optimization_input ) => optimization_input.name == data_input.name )
-          if( user_optimization_input && user_optimization_input.length ) data_item.value = user_optimization_input[0].value
-          
-          data_items.push( data_item )
-        } )
+  const getOptimizationInputUserData = computed(() => {
+    let data_items: UserCalibrationRunOptimizationInputData[] = []
+    let optimization_data = optimizationTabData.value?.optimizations.filter((optimization_option) => optimization_option.name == uiOptimization.value)
+
+    optimization_data?.forEach((data) => {
+      data.inputs.forEach((data_input) => {
+        let data_item = {
+          name: data_input.name,
+          value: 0
+        }
+        let user_optimization_input = userCalibrationRunData.value?.optimization_inputs.filter((optimization_input) => optimization_input.name == data_input.name)
+        if (user_optimization_input && user_optimization_input.length) data_item.value = user_optimization_input[0].value
+
+        data_items.push(data_item)
+      })
     })
-    
+
     return data_items
   })
 
@@ -120,73 +120,78 @@ export const useOptimizationStore = defineStore( 'OptimizationStore', () => {
   */
   async function saveOptimizationTabData() {
     const saveOptimizationTabDataValidation = useCalibrationTabValidation({
-        optimization_inputs: uiOptimizationInputs.value,
-        optimization: uiOptimization.value, 
-        objective_function: uiObjectiveFunction.value
+      optimization_inputs: uiOptimizationInputs.value,
+      optimization: uiOptimization.value,
+      objective_function: uiObjectiveFunction.value
     })
 
-    if ( saveOptimizationTabDataValidation.errors.value.length == 0)  {
-        const saveOptimizationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
-          method: "POST",
-          headers: { 
-              "Authorization": `Bearer ${getAccessToken()}`,
-              "Content-Type": 'application/json'
-          },
-          body: JSON.stringify( { 
-              calibration_run_id: calibrationJobId.value, 
-              optimization_inputs: uiOptimizationInputs.value,
-              optimization: uiOptimization.value,
-              objective_function: uiObjectiveFunction.value,
-              streamflow_threshold: uiStreamFlowThreshold.value,
-              peak_flow_threshold: uiPeakFlowThreshold.value,
-              stop_criteria: uiStopCriteria.value,
-              plot_frequency: uiPlotFrequency.value
-          } )
-        })
-        
-        return saveOptimizationTabDataResponse._data
-    } else {
-        return Promise.resolve({
-          message: "Missing required field(s)",
+    if (saveOptimizationTabDataValidation.errors.value.length == 0) {
+      const saveOptimizationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>(`${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+        },
+        body: JSON.stringify({
           calibration_run_id: calibrationJobId.value,
-          status: "error"
+          optimization_inputs: uiOptimizationInputs.value,
+          optimization: uiOptimization.value,
+          objective_function: uiObjectiveFunction.value,
+          streamflow_threshold: uiStreamFlowThreshold.value,
+          peak_flow_threshold: uiPeakFlowThreshold.value,
+          stop_criteria: uiStopCriteria.value,
+          plot_frequency: uiPlotFrequency.value
         })
-    }      
+      })
+
+      return saveOptimizationTabDataResponse._data
+    } else {
+      return Promise.resolve({
+        message: "Missing required field(s)",
+        calibration_run_id: calibrationJobId.value,
+        status: "error"
+      })
+    }
   }
 
-  const getSelectedMetricInfo = computed( () => {
-    const selectedMetric = optimizationTabData.value?.metrics.filter( (metric_data) => metric_data.name == uiObjectiveFunction.value )
+  const getSelectedMetricInfo = computed(() => {
+    const selectedMetric = optimizationTabData.value?.metrics.filter((metric_data) => metric_data.name == uiObjectiveFunction.value)
     return selectedMetric
   })
 
   const resetOptimizationInputs = () => {
-    uiOptimizationInputs.value.forEach( ( input_data ) => {
-        input_data.value = 0
-    } )
+    uiOptimizationInputs.value.forEach((input_data) => {
+      input_data.value = 0
+    })
   }
 
   /**
   * @returns {void}
   */
   const resetUserSelectionOptimization = (): void => {
-    if( userCalibrationRunData.value?.gage ) {
-        setUserSelection()
+    if (userCalibrationRunData.value?.gage) {
+      setUserSelection()
     } else {
-        resetOptimizationStore()
+      resetOptimizationStore()
     }
   }
+
+  useLogoutListen('logoutEvent', () => {
+    resetOptimizationStore();
+  })
 
   /**
   * @returns {void}
   */
   const resetOptimizationStore = (): void => {
-    uiStreamFlowThreshold.value = undefined
-    uiPeakFlowThreshold.value = undefined
-    uiObjectiveFunction.value = ""
-    uiOptimization.value = ""         
-    uiPlotFrequency.value = 0
-    uiStopCriteria.value = 0
-    uiOptimizationInputs.value = []
+    uiStreamFlowThreshold.value = undefined;
+    uiPeakFlowThreshold.value = undefined;
+    uiObjectiveFunction.value = "";
+    uiOptimization.value = "";
+    uiPlotFrequency.value = 0;
+    uiStopCriteria.value = 0;
+    uiOptimizationInputs.value = [];
+    console.log("Optimization Store Reset");
   }
 
   return {
