@@ -94,7 +94,8 @@ const {
 const loading = ref(true);
 const isCalibrationReady = ref();
 const runningTime = ref();
-const startTime = ref(); // server gives us "yyyy-MM-ddTHH:mm:ss.SSSZ" but display in local time
+const startTimeDate = ref();
+const startTime = ref();
 const stopCriteria = ref();
 const iteration = ref();
 
@@ -182,28 +183,24 @@ watch(calibrationStatus, async () => {
     await fetchUserCalibrationRunData();
     // Get run_date from load_calibration_run endpoint
     if (userCalibrationRunData.value) {
-      startTime.value = userCalibrationRunData.value?.run_date; // do we need to keep setting this after the first time? will value change after status is Running?
-      
-      if (startTime.value) {
-        const startTimeDate = new Date(startTime.value);
+      startTimeDate.value = new Date(userCalibrationRunData.value?.run_date); // do we need to keep setting this after the first time? will value change after status is Running?
 
-        // Calculate Running Time
-        if (startTimeDate && startTimeDate instanceof Date && !isNaN(startTimeDate.getTime())) {
-          runningTime.value = calculateElapsedTime(startTimeDate, new Date());
+      // Calculate Running Time
+      if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
+        startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date in local time format
+        runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
-          if (!runningTimeIntervalId) {
-            runningTimeIntervalId = setInterval(() => {
-              if (!stopCriteriaMet.value) {
-                // Calculate Running Time every second
-                runningTime.value = calculateElapsedTime(startTimeDate, new Date());
-              }
-            }, 1000);
-          }
-        } else {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Invalid Start Time', life: 5000 });
-        } 
+        // If an interval is not already running to update runningTime every second, start one
+        if (!runningTimeIntervalId) {
+          runningTimeIntervalId = setInterval(() => {
+            if (!stopCriteriaMet.value) {
+              // Calculate Running Time every second
+              runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+            }
+          }, 1000);
+        }
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No Start Time', life: 5000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object', life: 5000 });
       }
     } 
 
@@ -296,7 +293,7 @@ useListen('calibrationButtonSaveStart', async (actionButton) => {
       if (runCalibrationResponse?._data.status && runCalibrationResponse?._data.status === 'Running') {
         calibrationStatus.value = runCalibrationResponse?._data.status;
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START', life: 5000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running. Cannot Start Calibration run', life: 5000 });
       }
     } catch (error) {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration', life: 5000 });
