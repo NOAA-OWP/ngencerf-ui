@@ -55,11 +55,16 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    */
   function getUserInitials(): string {
     let n = userName.value;
-    let at = n.indexOf("@")+1;
-    if(n.includes("@")) {
-      return (n[0] + n.substring(at, at+1)).toUpperCase();
+    let atSignPos = n.indexOf("@");
+    if( atSignPos !== -1 ) {
+      let name = n.substring(0, atSignPos);
+      let dotPos = name.lastIndexOf('.');
+      if( dotPos !== -1 ) {
+        return (name[0] + name.substring(dotPos+1)[0]).toUpperCase();
+      }
+      return userName.value.toUpperCase()[0];
     } else {
-      return n;
+      return userName.value.toUpperCase()[0];  
     }
   }
 

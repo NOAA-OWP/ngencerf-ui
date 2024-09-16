@@ -205,12 +205,6 @@ const displayHelp = () => {
   setTimeout(function () { sizeHelpWindow() }, 0);
 }
 
-// const getUserInitials = () => {
-//   const name = getUserName();
-//   return (fullname => fullname.map((n, i) => (i == 0 || i == fullname.length - 1) && n[0]).filter(n => n).join(""))
-//     (name.split(" "));
-// };
-
 const MenuChanged = (e: MouseEvent) => {
   const ele = e.currentTarget as HTMLElement;
   const m = ele.getAttribute('data-menu');
