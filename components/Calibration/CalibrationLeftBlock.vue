@@ -1,5 +1,5 @@
 <template>
-  <!-- LeftBlock.vue --> 
+  <!-- LeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0" id="InputsArea">
@@ -42,8 +42,10 @@ const activeTab = ref(getCalibrationTabIndex());
 
 // Activate new tab
 const tabChanged = (tabNum: number) => {
-  activeTab.value = tabNum;
-  setCalibrationTabIndex(tabNum);
+  if (activeTab.value !== tabNum) {
+    activeTab.value = tabNum;
+    setCalibrationTabIndex(tabNum);
+  }
 };
 </script>
 

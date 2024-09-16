@@ -66,6 +66,18 @@ onMounted(() => {
     loading.value = false;
   }, 500);
 });
+
+useListen( 'calibrationButtonPrev', ( actionButton ) => {
+   const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[3];
+  e.click();
+})
+
+useListen('calibrationButtonNext', (actionButton) => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[5];
+  e.click();
+})
 </script>
 
 <style lang="scss" scoped>

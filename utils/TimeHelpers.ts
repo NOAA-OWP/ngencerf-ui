@@ -33,10 +33,10 @@ export function calculateTimeRange(
   simulation_start_time: string,
   simulation_end_time: string
 ): { rangeStart: string; rangeEnd: string } {
-  console.log("calibration_start_time", calibration_start_time);
-  console.log("calibration_end_time", calibration_end_time);
-  console.log("simulation_start_time", simulation_start_time);
-  console.log("simulation_end_time", simulation_end_time);
+  // console.log("calibration_start_time", calibration_start_time);
+  // console.log("calibration_end_time", calibration_end_time);
+  // console.log("simulation_start_time", simulation_start_time);
+  // console.log("simulation_end_time", simulation_end_time);
 
   const startDates = [
     DateTime.fromISO(calibration_start_time),

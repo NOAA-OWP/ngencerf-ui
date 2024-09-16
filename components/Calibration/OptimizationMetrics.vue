@@ -210,6 +210,17 @@ useListen( 'calibrationButtonResetStop', ( actionButton) => {
   }
 })
 
+useListen( 'calibrationButtonPrev', ( actionButton ) => {
+   const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[2];
+  e.click();
+})
+
+useListen('calibrationButtonNext', (actionButton) => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[4];
+  e.click();
+})
 /**
  * explicitly watching loading status, as onmount happen prior to store loading. 
  * make sure we manage the display base on user input AFTER data loading has completed 
