@@ -48,7 +48,7 @@
         </div>
       </div>
       <div class="row-span-1">
-        <div id="ResultsArea" class="row-span-1" v-if="calibrationStatus == 'Done'">
+        <div id="ResultsArea" class="row-span-1" v-if="calibrationStatus === 'Done'">
           <button class="ngenButtonDiv">Go to Evaluation</button>
 
         </div>
@@ -66,6 +66,7 @@ import ProgressBar from "primevue/progressbar";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
+import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
 
 const _generalStore = generalStore();
@@ -100,12 +101,14 @@ const iteration = ref();
 const plotNames = ref();
 const plotList = ref();
 const selectedPlotName = ref();
+const selectedPlotFilename = ref();
 
 const iterationData = ref();
 const progress = ref();
 
 const stopCriteriaMet = ref(false);
-let intervalId: NodeJS.Timeout | undefined = undefined;
+let runningTimeIntervalId: NodeJS.Timeout | undefined = undefined;
+let iterationIntervalId: NodeJS.Timeout | undefined = undefined;
 
 onMounted(async () => {
   // setTimeout(() => {
@@ -153,6 +156,8 @@ onMounted(async () => {
   plotNames.value = await queryGetPlotNames();
   if (plotNames.value) {
     console.log('plotNames:', plotNames.value);
+
+    // setting plotList and selectedPlotName will populate the dropdown
     plotList.value = plotNames.value?._data?.plot_list;
     if (!selectedPlotName.value) {
       selectedPlotName.value = plotList.value[0]?.name;
@@ -173,21 +178,33 @@ watch(calibrationStatus, async () => {
   }
 
   else if (calibrationStatus.value === 'Running') {
+    // fetch Calibration Run Data to get run_date
+    await fetchUserCalibrationRunData();
     // Get run_date from load_calibration_run endpoint
     if (userCalibrationRunData.value) {
       startTime.value = userCalibrationRunData.value?.run_date; // do we need to keep setting this after the first time? will value change after status is Running?
+      
+      if (startTime.value) {
+        const startTimeDate = new Date(startTime.value);
 
-      if (!startTime.value) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No Start Time', life: 5000 });
-      } else {
         // Calculate Running Time
-        const start = new Date(startTime.value);
-        const now = new Date();
-        const diff = now.getTime() - start.getTime();
-        const hours = Math.floor(diff / 1000 / 60 / 60);
-        const minutes = Math.floor(diff / 1000 / 60) % 60;
-        const seconds = Math.floor(diff / 1000) % 60;
-        runningTime.value = `${hours}h ${minutes}m ${seconds}s`;
+        if (startTimeDate && startTimeDate instanceof Date && !isNaN(startTimeDate.getTime())) {
+          runningTime.value = calculateElapsedTime(startTimeDate, new Date());
+
+          if (!runningTimeIntervalId) {
+            runningTimeIntervalId = setInterval(() => {
+              if (!stopCriteriaMet.value) {
+                // Calculate Running Time every second
+                runningTime.value = calculateElapsedTime(startTimeDate, new Date());
+              }
+            }, 1000);
+          }
+        } else {
+          toast.add({ severity: 'error', summary: 'Error', detail: 'Invalid Start Time', life: 5000 });
+        } 
+      } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No Start Time', life: 5000 });
+      }
     } 
 
     // Get iteration from report_iteration endpoint
@@ -199,8 +216,8 @@ watch(calibrationStatus, async () => {
       if (!iteration.value) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No Iteration', life: 5000 });
       } else {
-        if (!intervalId) {
-          intervalId = setInterval(async () => {
+        if (!iterationIntervalId) {
+          iterationIntervalId = setInterval(async () => {
             if (!stopCriteriaMet.value) {
               iterationData.value = await queryReportIteration();
               iteration.value = iterationData.value?._data?.iteration;
@@ -216,13 +233,15 @@ watch(calibrationStatus, async () => {
 
   else if (calibrationStatus.value === 'Done') {
     stopCriteriaMet.value = true;
-    clearInterval(intervalId);
+    clearInterval(iterationIntervalId);
+    clearInterval(runningTimeIntervalId);
     progress.value = null; // should disable progress bar
   }
 
   else if (calibrationStatus.value === 'Cancelled') {
     stopCriteriaMet.value = false; // this should already be false, but just in case
-    clearInterval(intervalId);
+    clearInterval(iterationIntervalId);
+    clearInterval(runningTimeIntervalId);
     progress.value = null; // should disable progress bar
   }
 
@@ -234,20 +253,21 @@ watch(calibrationStatus, async () => {
 // Handle iteration changes
 watch(iteration, async (newIteration, oldIteration, onCleanup) => {
   if (calibrationStatus.value === 'Running') {
-    if (intervalId) {
+    if (iterationIntervalId) {
       calculateProgress();
 
-      // if progress reaches 100, verify Calibration status is Done, set stopCriteria to true, clear interval, and set progress to null
+      // if progress reaches 100, verify Calibration status is Done. calibrationStatus watch function will set stopCriteriaMet to true, clear intervals, and set progress to null
       if (progress.value >= 100) {
         isCalibrationReady.value = await queryCalibrationIsReady();
         if (isCalibrationReady.value?._data?.status === 'Done') {
+          await fetchUserCalibrationRunData(); // update Calibration data
           calibrationStatus.value = 'Done';
           } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Status is not Done after progress reached 100', life: 5000 });
           }
       }
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'intervalId was not set when status was initially set to Running', life: 5000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: 'iterationIntervalId was not set when status was initially set to Running', life: 5000 });
     }
   } else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Status is not Running but iteration was changed somehow', life: 5000 });
@@ -255,10 +275,16 @@ watch(iteration, async (newIteration, oldIteration, onCleanup) => {
 
   onCleanup(() => {
     // if stop criteria met before interval is cleared, clear interval
-    if (intervalId && stopCriteriaMet.value) {
-      clearInterval(intervalId);
+    if (iterationIntervalId && stopCriteriaMet.value) {
+      clearInterval(iterationIntervalId);
     }
   });
+});
+
+// Handle selectedPlotName changes
+watch(selectedPlotName, () => {
+  // update selectedPlotFilename to match updated selectedPlotName
+  selectedPlotFilename.value = plotList.value.find((plot: any) => plot.name === selectedPlotName.value)?.filename;
 });
 
 // Run Calibration Job
