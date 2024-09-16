@@ -8,7 +8,7 @@ import { makeProtectedApiCall } from "~/composables/UserAuth";
 import type { JobsList, JobListItem, UserCalibrationRunData } from "~/composables/NextGenModel";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
-  const isLoggedIn = ref<boolean>(true);
+  const isLoggedIn = ref<boolean>(false);
   const userName = ref("");
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
@@ -136,6 +136,18 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     userCalibrationRunData.value = userCalibrationRunDataResult._data ?? undefined;
   }
 
+  /**
+   * Hard Reset User Data Store
+   */
+  const hardResetUserDataStore = (): void => {
+    isLoggedIn.value = false;
+    userName.value = "";
+    accessToken.value = null;
+    refreshToken.value = null;
+    userCalibrationJobsListData.value = [];
+    userCalibrationRunData.value = undefined;
+  }
+
   return {
     isUserLoggedIn,
     logUserIn,
@@ -150,7 +162,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     fetchUserCalibrationJobsListData,
     userCalibrationJobsListData,
     userCalibrationRunData,
-    fetchUserCalibrationRunData
+    fetchUserCalibrationRunData,
+    hardResetUserDataStore
   };
 }, 
 {

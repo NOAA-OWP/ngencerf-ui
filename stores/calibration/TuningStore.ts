@@ -24,13 +24,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const calStartTime = ref<string>("");
   const calEndTime = ref<string>("");
 
-  const userCalibrationTimes = computed(() => ({
-    simulation_start_time: simStartTime.value,
-    simulation_end_time: simEndTime.value,
-    calibration_start_time: calStartTime.value,
-    calibration_end_time: calEndTime.value,
-  }));
-
   const userCalibrationTuningParameters = ref<any[]>([]);
   const userOutputVariableToCalibrate = ref<{ name: string; module: string | null }>({
     name: '',
@@ -43,12 +36,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const avSimEndTime = ref<string>("");
   const avCalStartTime = ref<string>("");
   const avCalEndTime = ref<string>("");
-  const userValidationTimes = computed(() => ({
-    simulation_start_time: avSimStartTime.value,
-    simulation_end_time: avSimEndTime.value,
-    validation_start_time: avCalStartTime.value,
-    validation_end_time: avCalEndTime.value,
-  }));
+
 
   const rangeDateFrom = ref<any>();
   const rangeDateTo = ref<any>();
@@ -139,26 +127,31 @@ export const useTuningStore = defineStore('TuningStore', () => {
     return saveTuningTabOutput._data;
   };
 
-     /**
-    * @returns {void}
-    */
-     const resetUserSelectionTuning = (): void => {
-      if( loadCalibrationRunData.value ) {   // not sure if loadCalibrationRunData.value  is the correct variable to use here, if any
-      } else {
-         simStartTime.value = "";
-         simEndTime.value = "";
-         calStartTime.value = "";
-         calEndTime.value = "";
-         outputVariables.value = [];
-         automatic_validation.value = false;
-      
-         avSimStartTime.value = "";
-         avSimEndTime.value = "";
-         avCalStartTime.value = "";
-         avCalEndTime.value = "";
-         console.log("Tuning Store Reset");
-      }
-   }
+  /**
+   * Hard Reset Tuning Store
+   */
+  const hardResetTuningStore = (): void => {
+    loadCalibrationRunData.value = null;
+    loadTuningTabData.value = null;
+    isDataFetched.value = false;
+    simStartTime.value = "";
+    simEndTime.value = "";
+    calStartTime.value = "";
+    calEndTime.value = "";
+    userCalibrationTuningParameters.value = [];
+    userOutputVariableToCalibrate.value.name = '';
+    userOutputVariableToCalibrate.value.module = null;
+    outputVariables.value = [];
+    automatic_validation.value = false;
+
+    avSimStartTime.value = "";
+    avSimEndTime.value = "";
+    avCalStartTime.value = "";
+    avCalEndTime.value = "";
+    rangeDateFrom.value = null;
+    rangeDateTo.value = null;
+    console.log("Tuning Store hard reset");
+  };
 
   return {
     fetchTuningTabData,
@@ -169,7 +162,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
     simEndTime,
     calStartTime,
     calEndTime,
-    userCalibrationTimes,
     userCalibrationTuningParameters,
     userOutputVariableToCalibrate,
     outputVariables,
@@ -178,11 +170,10 @@ export const useTuningStore = defineStore('TuningStore', () => {
     avSimEndTime,
     avCalStartTime,
     avCalEndTime,
-    userValidationTimes,
     rangeDateFrom,
     rangeDateTo,
     postSaveTuningTabData,
-    resetUserSelectionTuning
+    hardResetTuningStore
   };
 }, 
 {
