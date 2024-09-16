@@ -336,6 +336,7 @@ export interface AlgorithmParameter {
 }
 
 export interface CalibrationTuningData {
+  
 
 }
 

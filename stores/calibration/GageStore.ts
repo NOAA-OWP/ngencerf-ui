@@ -6,6 +6,7 @@ import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { SelectOption, GageTabData, GeneralApiSaveResponse, GeneralErrorResponse, SaveGageTabResponse } from "~/composables/NextGenModel";
+import { useCalibrationTabValidation } from "~/composables/CalibrationTabValidations";
 
 export const useGageStore = defineStore( 'GageStore', () => {
    /**
@@ -38,7 +39,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
    } )
    .then( ( gageTabDataResult ) => {
-      gageTabData.value = gageTabDataResult._data??undefined
+      gageTabData.value = gageTabDataResult?._data??undefined
       data_loading.value = false
       
       //init ui model value
@@ -126,23 +127,37 @@ export const useGageStore = defineStore( 'GageStore', () => {
     * @returns {SaveGageTabResponse}
     */
    async function saveGageTabData() {
-      const saveGageTabDataResponse = await makeProtectedApiCall<SaveGageTabResponse>( `${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
-         method: "POST",
-         headers: { 
-            "Authorization": `Bearer ${getAccessToken()}`,
-            "Content-Type": 'application/json'
-         },
-         body: JSON.stringify( { 
-            calibration_run_id: calibrationJobId.value, 
-            gage_id: selectedGageValue.value, 
-            forcing_source: selectedForcingValue.value, 
-            observational_source: selectedObservationalValue.value
-         } )
+      const saveGageTabDataValidation = useCalibrationTabValidation({
+         gage_id: selectedGageValue.value, 
+         forcing_source: selectedForcingValue.value, 
+         observational_source: selectedObservationalValue.value
       })
 
-      geopackageImageUrl.value = saveGageTabDataResponse?.geopackage_image ?? ""
-      
-      return saveGageTabDataResponse._data
+      if ( saveGageTabDataValidation.errors.value.length == 0)  {
+         const saveGageTabDataResponse = await makeProtectedApiCall<SaveGageTabResponse>( `${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
+            method: "POST",
+            headers: { 
+               "Authorization": `Bearer ${getAccessToken()}`,
+               "Content-Type": 'application/json'
+            },
+            body: JSON.stringify( { 
+               calibration_run_id: calibrationJobId.value, 
+               gage_id: selectedGageValue.value, 
+               forcing_source: selectedForcingValue.value, 
+               observational_source: selectedObservationalValue.value
+            } )
+         })
+
+         geopackageImageUrl.value = saveGageTabDataResponse?.geopackage_image ?? ""
+
+         return saveGageTabDataResponse._data
+      } else {
+         return Promise.resolve({
+            message: "Missing required field(s)",
+            calibration_run_id: calibrationJobId.value,
+            status: "error"
+         })
+      }
    }
 
    /**
@@ -206,15 +221,15 @@ export const useGageStore = defineStore( 'GageStore', () => {
    /**
     * @returns {void}
     */
-   const resetUserSelection = (): void => {
+   const resetUserSelectionGage = (): void => {
       if( userCalibrationRunData.value?.gage ) {
-         setUserSelection()
       } else {
          selectedDomainValue.value = ""
          selectedForcingValue.value = ""
          selectedGageValue.value = ""
          selectedObservationalValue.value = ""
          gageData.value = undefined
+         console.log("Gage Store Reset");
       }
    }
 
@@ -236,7 +251,7 @@ export const useGageStore = defineStore( 'GageStore', () => {
       data_loading,
       geopackageImageUrl,
       userCalibrationRunData,
-      resetUserSelection,
+      resetUserSelectionGage,
       saveUserForcingFiles,
       saveUserObservationalFile,
       saveUserGeopackageFile

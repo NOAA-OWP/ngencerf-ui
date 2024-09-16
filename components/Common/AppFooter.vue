@@ -63,13 +63,13 @@ const info = json;
   bottom: 0;
   width: 100%;
   color: black;
-  z-index: 9999;
+  z-index: 9000;
 
 }
 
 #FooterData {
   height: 50px;
-  z-index: 9999;
+  z-index: 9000;
 }
 
 .footerColor {

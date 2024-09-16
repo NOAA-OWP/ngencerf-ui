@@ -50,6 +50,7 @@ export function calculateTimeRange(
   console.log("calibration_end_time", calibration_end_time);
   console.log("simulation_start_time", simulation_start_time);
   console.log("simulation_end_time", simulation_end_time);
+
   const startDates = [
     DateTime.fromISO(calibration_start_time),
     DateTime.fromISO(simulation_start_time),
@@ -58,6 +59,16 @@ export function calculateTimeRange(
   const endDates = [
     DateTime.fromISO(calibration_end_time),
     DateTime.fromISO(simulation_end_time),
+  ];
+
+  const zStartDates = [
+    new DateTime(calibration_start_time).toFormat("yyyy/MM/dd  HH:mm:ss"),
+    new DateTime(simulation_start_time).toFormat("yyyy/MM/dd  HH:mm:ss")
+  ];
+
+  const zEendDates = [
+    new DateTime(calibration_end_time).toFormat("yyyy/MM/dd  HH:mm:ss"),
+    new DateTime(simulation_end_time).toFormat("yyyy/MM/dd  HH:mm:ss")
   ];
 
   const minDate = DateTime.min(...startDates);

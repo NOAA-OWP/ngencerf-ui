@@ -1,0 +1,10 @@
+name: ngencerf-ui
+
+services:
+  ngencerf-app:
+    extends:
+      file: compose.yaml
+      service: ngencerf-app
+    build: 
+      dockerfile: ./Dockerfile.production-pw
+

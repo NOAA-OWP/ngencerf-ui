@@ -1,6 +1,6 @@
 <template>
    <!-- CalibrationRightBlock -->
-  <div class="grid grid-cols-1">
+  <div id="RightBlock" class="grid grid-cols-1">
     <div class="grid-rows-12">
       <div id="TopRightBlock" class="row-span-5">
         <div class="grid grid-cols-2">
@@ -29,6 +29,10 @@ import GageCutout from "../Common/GageCutout.vue";
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
+#RightBlock {
+  width: 567px;
+}
 
 #TopRightBlock {
   padding: 10px;

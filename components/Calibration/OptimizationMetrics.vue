@@ -106,7 +106,7 @@ const {
       getSelectedMetricInfo,
       getOptimizationInputUserData
       } = storeToRefs( optimizationStore )
-const { saveOptimizationTabData, resetOptimizationInputs, resetUserSelection } = optimizationStore
+const { saveOptimizationTabData, resetOptimizationInputs, resetUserSelectionOptimization} = optimizationStore
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore()
 const toast = useToast()
@@ -118,6 +118,11 @@ const cbIsEvenBased = ref<boolean>( false )
 const showMetricPeakFlow = ref<boolean>( false )
 const showMetricStreamFlow = ref<boolean>( false )
 
+
+
+console.log("uiObjectiveFunction",uiObjectiveFunction);
+console.log("uiOptimization",uiOptimization);
+console.log("uiOptimizationInputs",uiOptimizationInputs);
 /**
  * update objective function and metric peak flow/stream flow field visibility
  */
@@ -185,21 +190,23 @@ const optimizationSelectChange = () => {
  */
 useListen( 'calibrationButtonSaveStart', ( actionButton ) => {
    if( getCalibrationTabIndex() === 4 && actionButton == 'SAVE' ) {
+      toast.removeAllGroups()
       const save_optimization_response = saveOptimizationTabData()
-      console.log( `saveTabContent Optimization, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `, save_optimization_response )
+      
       save_optimization_response.then( ( response ) => {
-         console.log( response )
-         toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
-         fetchUserCalibrationRunData()
-      }).catch( ( error: GeneralErrorResponse ) => {
-         toast.add({ severity: 'error', summary: error.response_type, detail: error.validation_errors })
+         if ( response?.status == 'error' ) {
+            toast.add({ severity: response?.status, summary: 'Error Saving Optimization Metrics Tab Data', detail: response?.message })
+         } else {
+            toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message, life: 3000 })
+            fetchUserCalibrationRunData()
+         }
       })
    }
 })
 
 useListen( 'calibrationButtonResetCancel', ( actionButton) => {
   if( getCalibrationTabIndex() == 4 && actionButton == 'RESET' ) {
-    resetUserSelection()
+    resetUserSelectionOptimization()
   }
 })
 

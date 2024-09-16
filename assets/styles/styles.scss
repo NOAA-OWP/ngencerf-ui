@@ -211,3 +211,45 @@ select option {
 .p-datatable-column-title {
   font-size: 0.8em;
 }
+
+// Help Pages
+
+._help-page {
+  padding: 10px;
+}
+
+._help-title {
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+._help-subtitle {
+  text-align: left;
+  font-weight: bold;
+  margin: 15px 30px;
+  padding: 0 50px; 
+}
+
+._help-table {
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+._help-table .td1 {
+  text-align: right;
+  padding-right: 30px;
+  width: 350px;
+  vertical-align: top !important;
+  font-weight: 600;
+}
+
+._help-table .td2 {
+  width: auto;
+}
+
+
+._help-page p {
+  line-height: 2em;
+}
