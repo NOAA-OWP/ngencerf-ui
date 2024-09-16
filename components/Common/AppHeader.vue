@@ -63,7 +63,7 @@
           </div>
           7
           <div v-if="location.name === 'Calibration'">
-            <div v-if="getMenuIndex() === 1">
+            <div v-if="getMenuIndex() === '1'">
               <span v-if="getCalibrationTabIndex() === 1">
                 <HelpHeadwaterBasinGageHelp />
               </span>
@@ -178,14 +178,14 @@ const gotoAccount = async () => {
 
 const logoutUser = async () => {
   logUserOut();
-  const { resetUserSelectionGage } = useGageStore();
-  const { resetUserSelectionOptimization } = useOptimizationStore();
-  const { resetUserSelectionTuning} = useTuningStore();
-  const { resetUserSelectionFormulation } = useFormulationStore();
-  resetUserSelectionGage();
-  resetUserSelectionFormulation();
-  resetUserSelectionTuning();
-  resetUserSelectionOptimization();
+  // const { resetUserSelectionGage } = useGageStore();
+  // const { resetUserSelectionOptimization } = useOptimizationStore();
+  // const { resetUserSelectionTuning} = useTuningStore();
+  // const { resetUserSelectionFormulation } = useFormulationStore();
+  // resetUserSelectionGage();
+  // resetUserSelectionFormulation();
+  // resetUserSelectionTuning();
+  // resetUserSelectionOptimization();
 
   await navigateTo('login');
 }
@@ -220,7 +220,7 @@ const MenuChanged = (e: MouseEvent) => {
   const ele = e.currentTarget as HTMLElement;
   const m = ele.getAttribute('data-menu');
   if (m) {
-    setMenuIndex(parseInt(m, 10));
+    setMenuIndex( parseInt(m, 10) );
   }
 }
 </script>

@@ -7,14 +7,14 @@
 
             <span v-if="location.name === 'Calibration'">
               <div id="ActionButtons" class="footerColor"
-                v-if="isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns' && location.name !== 'Login'">
+                v-if="canDisplayBeforeRun">
                 <CalibrationButtonGroup />
               </div>
             </span>
 
             <span v-else>
               <div id="ActionButtons" class="footerColor"
-                v-if="isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns' && location.name !== 'Login'">
+                v-if="canDisplayBeforeRun">
                 <EvaluationButtonGroup/>
               </div>             
             </span>
@@ -45,6 +45,11 @@ import { useRoute } from "vue-router";
 const { isUserLoggedIn, getUserName } = useUserDataStore();
 const location = useRoute();
 const info = json;
+
+const canDisplayBeforeRun = computed(() => {
+  return isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns' && location.name !== 'Login';
+});
+
 </script>
 
 <style lang="scss" scoped>

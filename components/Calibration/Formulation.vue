@@ -182,9 +182,15 @@ useListen( 'calibrationButtonResetStop', ( actionButton) => {
 })
 
 useListen( 'calibrationButtonPrev', ( actionButton ) => {
-   if( getCalibrationTabIndex() == 2 ) {
-      navigateTo("PreviousRuns")
-   }
+   const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[0];
+  e.click();
+})
+
+useListen('calibrationButtonNext', (actionButton) => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[2];
+  e.click();
 })
 
 </script>

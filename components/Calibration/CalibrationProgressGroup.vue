@@ -60,8 +60,9 @@ import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getMenuIndex } = generalStore();
+
 const currentCalibrationTab = ref(getCalibrationTabIndex());
-const currentMenu = ref(getMenuIndex());
+
 const emit = defineEmits(["tabNumber"]);
 
 const tuningStore = useTuningStore();
@@ -120,7 +121,7 @@ const tabClicked = (event: Event) => {
   e.click();
 
   // Send the selected tab info to the active tab set with emit
-  if (currentMenu.value === 1) {
+  if (getMenuIndex() === 1) {
     currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
     emit("tabNumber", currentCalibrationTab.value);
   }
