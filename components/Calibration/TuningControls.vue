@@ -252,7 +252,6 @@ const {
   simEndTime,
   calStartTime,
   calEndTime,
-  userCalibrationTimes,
   userCalibrationTuningParameters,
   userOutputVariableToCalibrate,
   outputVariables,
@@ -261,7 +260,6 @@ const {
   avSimEndTime,
   avCalStartTime,
   avCalEndTime,
-  userValidationTimes,
   rangeDateFrom,
   rangeDateTo,
 } = storeToRefs(tuningStore);

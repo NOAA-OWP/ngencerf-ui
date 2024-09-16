@@ -136,6 +136,18 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     userCalibrationRunData.value = userCalibrationRunDataResult._data ?? undefined;
   }
 
+  /**
+   * Hard Reset User Data Store
+   */
+  const hardResetUserDataStore = (): void => {
+    isLoggedIn.value = false;
+    userName.value = "";
+    accessToken.value = null;
+    refreshToken.value = null;
+    userCalibrationJobsListData.value = [];
+    userCalibrationRunData.value = undefined;
+  }
+
   return {
     isUserLoggedIn,
     logUserIn,
@@ -150,7 +162,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     fetchUserCalibrationJobsListData,
     userCalibrationJobsListData,
     userCalibrationRunData,
-    fetchUserCalibrationRunData
+    fetchUserCalibrationRunData,
+    hardResetUserDataStore
   };
 }, 
 {
