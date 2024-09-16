@@ -127,29 +127,11 @@ onMounted(async () => {
   if (!isCalibrationReady.value) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Ready status', life: 5000 });
   } else {
-    const message: string = isCalibrationReady?.value?._data?.message;
-    if (message && message.includes('Saved')) {
-      // add 'Saved' to Status
-      calibrationStatus.value = 'Saved';
-      toast.add({ severity: 'warn', summary: 'Calibration job is in Saved status. It is not ready to run', life: 5000 });
-    }
-    else if (message && message.includes('Ready')) {
-      // add 'Ready' to Status
-      calibrationStatus.value = 'Ready';
-      toast.add({ severity: 'info', summary: 'Calibration job is ready to run', life: 5000 });
-    }
-    else if (message && message.includes('Running')) {
-      // add 'Running' to Status
-      calibrationStatus.value = 'Running';
-      toast.add({ severity: 'info', summary: 'Calibration job is running', life: 5000 });
-    }
-    else if (message && message.includes('Done')) {
-      // add 'Done' to Status
-      calibrationStatus.value = 'Done';
-      toast.add({ severity: 'success', summary: 'Calibration job is done', life: 5000 });
-    }
-    else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Unknown Calibration job status', life: 5000 });
+    calibrationStatus.value = isCalibrationReady?.value?._data?.status;
+    if (calibrationStatus.value) {
+      toast.add({ severity: 'info', summary: 'Calibration Status', detail: calibrationStatus.value, life: 5000 });
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Status', life: 5000 });
     }
   }
 
@@ -286,35 +268,39 @@ watch(selectedPlotName, () => {
 
 // Run Calibration Job
 useListen('calibrationButtonSaveStart', async (actionButton) => {
-  if (getCalibrationTabIndex() === 5 && actionButton === 'START') {
+  if (getCalibrationTabIndex() === 5 && actionButton === 'START' && calibrationStatus.value === 'Ready') {
     try {
       const runCalibrationResponse = await executeRunCalibration();
 
       if (runCalibrationResponse?._data.status && runCalibrationResponse?._data.status === 'Running') {
-        calibrationStatus.value = runCalibrationResponse?._data.status;
+        calibrationStatus.value = runCalibrationResponse?._data.status; // update calibratonStatus to Running
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running. Cannot Start Calibration run', life: 5000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START', life: 5000 });
       }
     } catch (error) {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration', life: 5000 });
     }
+  } else {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Ready. Cannot run Calibration', life: 5000 });
   }
 });
 
 // Cancel Calibration Job
 useListen('calibrationButtonResetCancel', async (actionButton) => {
-  if (getCalibrationTabIndex() === 5 && actionButton === 'CANCEL') {
+  if (getCalibrationTabIndex() === 5 && actionButton === 'CANCEL' && calibrationStatus.value === 'Running') {
     try {
       const cancelCalibrationResponse = await cancelCalibrationJob();
 
       if (cancelCalibrationResponse?._data.status && cancelCalibrationResponse?._data.status === 'Cancelled') {
-        calibrationStatus.value = cancelCalibrationResponse.status;
+        calibrationStatus.value = cancelCalibrationResponse.status; // update calibratonStatus to Cancelled
       } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL', life: 5000 });
       }
     } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration', life: 5000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run', life: 5000 });
     }
+  } else {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration', life: 5000 });
   }
 });
 
