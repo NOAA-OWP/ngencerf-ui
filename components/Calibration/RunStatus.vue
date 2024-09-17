@@ -157,7 +157,7 @@ watch(calibrationStatus, async () => {
   }
 
   else if (calibrationStatus.value === 'Ready') {
-    // Enable Run Calibration Button
+
   }
 
   else if (calibrationStatus.value === 'Running') {
@@ -169,7 +169,7 @@ watch(calibrationStatus, async () => {
 
       // Calculate Running Time
       if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
-        startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date in local time format
+        startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
         runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
         // If an interval is not already running to update runningTime every second, start one
@@ -184,6 +184,8 @@ watch(calibrationStatus, async () => {
       } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object', life: 5000 });
       }
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
     } 
 
     // Get iteration from report_iteration endpoint

@@ -15,7 +15,8 @@ export const formatDateForDisplay = ( d: string ) => {
 
 /**
  * Takes a date object and converts it to a string in the specified timezone format
- * @param date 
+ * @param date
+ * @param locale 
  * @returns string in the format "2021-06-01 12:00:00"
  */
 export const convertTimeZone = (date: Date, locale: string = 'en-US'): string => {
