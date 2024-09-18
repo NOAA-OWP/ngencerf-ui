@@ -87,7 +87,7 @@ const {
   queryCalibrationIsReady,
   queryGetPlotNames,
   executeRunCalibration,
-  queryReportIteration,
+  queryIteration,
   cancelCalibrationJob,
 } = runStatusStore;
 
@@ -97,7 +97,7 @@ const runningTime = ref();
 const startTimeDate = ref();
 const startTime = ref();
 const stopCriteria = ref();
-const iteration = ref();
+const iterations = ref();
 
 const plotNames = ref();
 const plotList = ref();
@@ -120,14 +120,15 @@ onMounted(async () => {
   await fetchUserCalibrationRunData();
 
   stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
+  console.log('stopCriteria:', stopCriteria.value);
 
   // Get Calibration Status
   isCalibrationReady.value = await queryCalibrationIsReady();
-  // console.log('isCalibrationReady:', isCalibrationReady);
-  if (!isCalibrationReady.value) {
+  console.log('isCalibrationReady:', isCalibrationReady.value._data);
+  if (!isCalibrationReady.value._data) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Ready status', life: 5000 });
   } else {
-    calibrationStatus.value = isCalibrationReady?.value?._data?.status;
+    calibrationStatus.value = isCalibrationReady.value?._data?.status;
     if (calibrationStatus.value) {
       toast.add({ severity: 'info', summary: 'Calibration Status', detail: calibrationStatus.value, life: 5000 });
     } else {
@@ -138,12 +139,13 @@ onMounted(async () => {
   // Get Plot Names
   plotNames.value = await queryGetPlotNames();
   if (plotNames.value) {
-    console.log('plotNames:', plotNames.value);
+    console.log('plotNames:', plotNames.value?._data);
 
     // setting plotList and selectedPlotName will populate the dropdown
     plotList.value = plotNames.value?._data?.plot_list;
     if (!selectedPlotName.value) {
       selectedPlotName.value = plotList.value[0]?.name;
+      console.log('selectedPlotName:', selectedPlotName.value);
     }
   } else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
@@ -165,7 +167,9 @@ watch(calibrationStatus, async () => {
     await fetchUserCalibrationRunData();
     // Get run_date from load_calibration_run endpoint
     if (userCalibrationRunData.value) {
+      console.log('userCalibrationRunData:', userCalibrationRunData.value);
       startTimeDate.value = new Date(userCalibrationRunData.value?.run_date); // do we need to keep setting this after the first time? will value change after status is Running?
+      console.log('startTimeDate:', startTimeDate.value);
 
       // Calculate Running Time
       if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
@@ -189,26 +193,28 @@ watch(calibrationStatus, async () => {
     } 
 
     // Get iteration from report_iteration endpoint
-    iterationData.value = await queryReportIteration();
-    if (iterationData.value) {
+    iterationData.value = await queryIteration();
+    console.log('iterationData:', iterationData.value._data);
+    if (iterationData.value._data) {
       // set iteration value for the first time
-      iteration.value = iterationData.value?._data?.iteration;
+      iterations.value = iterationData.value?._data?.iterations;
+      console.log('iterations:', iterations.value);
 
-      if (!iteration.value) {
+      if (!iterations.value) { // iterations is 0 right now since we're fakinng data. so this is evaluating to falsey
         toast.add({ severity: 'error', summary: 'Error', detail: 'No Iteration', life: 5000 });
       } else {
         if (!iterationIntervalId) {
           iterationIntervalId = setInterval(async () => {
             if (!stopCriteriaMet.value) {
-              iterationData.value = await queryReportIteration();
-              iteration.value = iterationData.value?._data?.iteration;
+              iterationData.value = await queryIteration();
+              iterations.value = iterationData.value?._data?.iterations;
               calculateProgress();
             }
           }, 60000);
         }
       }
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Iteration', life: 5000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Iterations', life: 5000 });
     }
   }
 
@@ -231,8 +237,8 @@ watch(calibrationStatus, async () => {
   }
 });
 
-// Handle iteration changes
-watch(iteration, async (newIteration, oldIteration, onCleanup) => {
+// Handle iterations changes
+watch(iterations, async (newIterations, oldIterations, onCleanup) => {
   if (calibrationStatus.value === 'Running') {
     if (iterationIntervalId) {
       calculateProgress();
@@ -251,7 +257,7 @@ watch(iteration, async (newIteration, oldIteration, onCleanup) => {
       toast.add({ severity: 'error', summary: 'Error', detail: 'iterationIntervalId was not set when status was initially set to Running', life: 5000 });
     }
   } else {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Status is not Running but iteration was changed somehow', life: 5000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Status is not Running but iterations was changed somehow', life: 5000 });
   }
 
   onCleanup(() => {
@@ -311,7 +317,7 @@ useListen('calibrationButtonResetCancel', async (actionButton) => {
  */
 const calculateProgress = (): void => {
   if (stopCriteria.value && !stopCriteriaMet.value) {
-    progress.value = (iteration.value / stopCriteria.value) * 100;
+    progress.value = (iterations.value / stopCriteria.value) * 100;
   } else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'No Stop Criteria value set or Stop Criteria already met', life: 5000 });
   }

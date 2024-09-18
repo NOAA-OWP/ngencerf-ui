@@ -1,17 +1,21 @@
 <template>
   <div id="BottomButtons" class="grid grid-cols-12 w-full">
     <div class="col-span-2">
-      <button v-if="showOrHideSaveStartButton()" class="save-start actionBtn" @click="SaveStartTabContent">{{ getCalibrationTabIndex() < 5 ? "SAVE" : "START" }}</button>
+      <button v-if="showOrHideSaveStartButton()" class="save-start actionBtn" @click="SaveStartTabContent">{{
+        getCalibrationTabIndex() < 5 ? "SAVE" : "START" }}</button>
     </div>
     <div class="col-span-2">
-      <button v-if="showOrHideResetCancelButton()" :class="getCalibrationTabIndex() < 5 ? 'reset' : 'cancel'" class="actionBtn" @click="ResetStopTabContent">{{ getCalibrationTabIndex() < 5 ? "RESET" : "CANCEL" }}</button>
+      <button v-if="showOrHideResetCancelButton()" :class="getCalibrationTabIndex() < 5 ? 'reset' : 'cancel'"
+        class="actionBtn" @click="ResetStopTabContent">{{ getCalibrationTabIndex() < 5 ? "RESET" : "CANCEL" }}</button>
     </div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
-    <div class="col-span-2 text-right"><button v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5" class="prev actionBtnSmall" @click="NavigatePrevContent">&#8678; Prev</button></div>
-    <div class="col-span-2"><button v-if="getCalibrationTabIndex() < 5" class="next actionBtnSmall" @click="NavigateNextContent">Next <span>&#8680;</span></button></div>
+    <div class="col-span-2 text-right"><button v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5"
+        class="prev actionBtnSmall" @click="NavigatePrevContent">&#8678; Prev</button></div>
+    <div class="col-span-2"><button v-if="getCalibrationTabIndex() < 5" class="next actionBtnSmall"
+        @click="NavigateNextContent">Next <span>&#8680;</span></button></div>
   </div>
 </template>
 
@@ -28,26 +32,26 @@ const { calibrationStatus } = storeToRefs(runStatusStore);
 const tabIndex = getCalibrationTabIndex();
 //const toast = useToast();
 
-const SaveStartTabContent =  async () => {  
-  useEvent( 'calibrationButtonSaveStart', getCalibrationTabIndex() < 5 ? "SAVE" : "START" );
+const SaveStartTabContent = async () => {
+  useEvent('calibrationButtonSaveStart', getCalibrationTabIndex() < 5 ? "SAVE" : "START");
 };
 
 const ResetStopTabContent = async () => {
-  useEvent( 'calibrationButtonResetCancel', getCalibrationTabIndex() < 5 ? "RESET" : "CANCEL" );
+  useEvent('calibrationButtonResetCancel', getCalibrationTabIndex() < 5 ? "RESET" : "CANCEL");
 };
 
 const NavigatePrevContent = () => {
-  useEvent( 'calibrationButtonPrev', "PREV" );
+  useEvent('calibrationButtonPrev', "PREV");
 };
 
 const NavigateNextContent = () => {
-  useEvent( 'calibrationButtonNext', "NEXT" );
+  useEvent('calibrationButtonNext', "NEXT");
 };
 
 const showOrHideSaveStartButton = (): boolean => {
   if (getCalibrationTabIndex() < 4) {
     return true;
-  } 
+  }
   else if (getCalibrationTabIndex() === 5) {
     if (calibrationStatus.value === "Done") {
       return false;
@@ -64,7 +68,7 @@ const showOrHideSaveStartButton = (): boolean => {
 const showOrHideResetCancelButton = (): boolean => {
   if (getCalibrationTabIndex() < 4) {
     return true;
-  } 
+  }
   else if (getCalibrationTabIndex() === 5) {
     if (calibrationStatus.value === "Done") {
       return false;

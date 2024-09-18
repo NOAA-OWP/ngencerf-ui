@@ -53,19 +53,18 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   const executeRunCalibration = async (): Promise<any> => {
-    const runCalibrationResponse = makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/run_calibration/`, {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/run_calibration/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
-    })
-    return runCalibrationResponse
+    });
   }
 
-  const queryReportIteration = async (): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/report_iteration/`, {
+  const queryIteration = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_iteration/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -92,7 +91,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     queryCalibrationIsReady,
     queryGetPlotNames,
     executeRunCalibration,
-    queryReportIteration,
+    queryIteration,
     cancelCalibrationJob,
   };
 },
