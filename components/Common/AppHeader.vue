@@ -111,12 +111,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
-import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { useGageStore } from "~/stores/calibration/GageStore";
-import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
-import { useTuningStore } from "~/stores/calibration/TuningStore";
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-
+import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 
 import HelpLandingPageHelp from "../Help/LandingPageHelp.vue";

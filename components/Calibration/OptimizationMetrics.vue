@@ -106,11 +106,14 @@ const {
       getSelectedMetricInfo,
       getOptimizationInputUserData
       } = storeToRefs( optimizationStore )
-const { saveOptimizationTabData, resetOptimizationInputs, resetUserSelectionOptimization} = optimizationStore
+const { loadOptimizationTabStaticData, saveOptimizationTabData, resetOptimizationInputs, resetUserSelectionOptimization } = optimizationStore
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore()
 const toast = useToast()
-      
+
+//load tab static data
+loadOptimizationTabStaticData()
+
 const cbCategoricalDisabled = ref<boolean>( false )
 const cbEventBasedDisabled = ref<boolean>( false )
 const cbIsCategorical = ref<boolean>( false )

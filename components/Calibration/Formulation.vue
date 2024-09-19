@@ -117,6 +117,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
+import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
@@ -139,10 +140,13 @@ const {
    data_loading
 } = storeToRefs( useFormulationStore() )
 
-const { addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
+const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore()
 const toast = useToast();
+
+//load static data of this tab
+loadFormulationTabStaticData()
 
 /**
  * add sloth variable entry to table and reset name field
@@ -165,8 +169,10 @@ useListen( 'calibrationButtonSaveStart', ( actionButton ) => {
       toast.removeAllGroups()
       const save_formulation_response = saveFormulationTabData()
       save_formulation_response.then( ( response ) => {
-         if ( response?.status == 'error' ) {
-            toast.add({ severity: response?.status, summary: 'Error Saving Formulation Tab Data', detail: response?.message })
+         if ( response?.validation_errors ) {
+            useApiErrorResponseValidator( response?.validation_errors ).forEach( ( message: String ) => {
+               toast.add({ severity: "error", summary: 'Error Saving Formulation Tab Data', detail: message })
+            })            
          } else {
             toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
             fetchUserCalibrationRunData()

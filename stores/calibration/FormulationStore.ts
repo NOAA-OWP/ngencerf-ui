@@ -6,7 +6,7 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, GeneralErrorResponse } from "~/composables/NextGenModel";
-import { useCalibrationTabValidation } from "~/composables/CalibrationTabValidations";
+import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
 export const useFormulationStore = defineStore( 'FormulationStore', () => {
   /**
@@ -29,19 +29,22 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
   * load forumlation tab data and init ref data
   * @returns {void}
   */
-  makeProtectedApiCall<FormulationTabData>( `${ngencerfBaseUrl}/calibration/load_formulation_tab/`, {
-    method: "POST",
-    headers: { 
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-    },
-    body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
-  } ).then( ( formulationTabDataResult ) => {
-    formulationTabData.value = formulationTabDataResult._data ?? undefined
-    setUserSelection()
-    
-    data_loading.value = false
-  })
+  const loadFormulationTabStaticData = () => {
+    data_loading.value = true
+    makeProtectedApiCall<FormulationTabData>( `${ngencerfBaseUrl}/calibration/load_formulation_tab/`, {
+      method: "POST",
+      headers: { 
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+      },
+      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
+    } ).then( ( formulationTabDataResult ) => {
+      formulationTabData.value = formulationTabDataResult._data ?? undefined
+      setUserSelection()
+      
+      data_loading.value = false
+    })
+  }
 
   const setUserSelection = (): void => {      
     formulationNameInput.value = userCalibrationRunData.value?.formulation_name ?? ""
@@ -185,26 +188,28 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
         modules: selectedModuleValues.value,
         sloth_parameters: slothParameterInputs.value
     })
-
-    if ( saveFormulationTabDataValidation.errors.value.length == 0)  {
-        const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
-          method: "POST",
-          headers: { 
-              "Authorization": `Bearer ${getAccessToken()}`,
-              "Content-Type": 'application/json'
-          },
-          body: JSON.stringify( { 
-              calibration_run_id: calibrationJobId.value, 
-              formulation_name: formulationNameInput.value, 
-              modules: selectedModuleValues.value, 
-              use_sloth: useSlothParameters.value,
-              sloth_parameters: slothParameterInputs.value
-          } )
-        })
-        return saveFormulationTabDataResponse._data
+    
+    if ( Object.keys( saveFormulationTabDataValidation.errors.value ).length == 0)  {
+      const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
+        method: "POST",
+        headers: { 
+            "Authorization": `Bearer ${getAccessToken()}`,
+            "Content-Type": 'application/json'
+        },
+        body: JSON.stringify( { 
+            calibration_run_id: calibrationJobId.value, 
+            formulation_name: formulationNameInput.value, 
+            modules: selectedModuleValues.value, 
+            use_sloth: useSlothParameters.value,
+            sloth_parameters: slothParameterInputs.value
+        } )
+      })
+      
+      return saveFormulationTabDataResponse._data
     } else {
         return Promise.resolve({
           message: "Missing required field(s)",
+          validation_errors: saveFormulationTabDataValidation.errors.value,
           calibration_run_id: calibrationJobId.value,
           status: "error"
         })
@@ -253,7 +258,8 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
     data_loading,
     resetUserSelectionFormulation,
     deleteSlothVariable,
-    resetFormulationStore
+    resetFormulationStore,
+    loadFormulationTabStaticData
   }
 })
 
