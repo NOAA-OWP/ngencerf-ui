@@ -71,7 +71,10 @@ export const generalStore = defineStore(
       setForecastTabIndex,
       getEvalRunSelected,
       setEvalRunSelected,
-      calibrationJobId
+      calibrationJobId,
+      calibrationTabIndex,
+      evaluationTabIndex,
+      forecastTabIndex
     };
   },
   {

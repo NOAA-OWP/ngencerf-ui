@@ -231,6 +231,10 @@ const submitForm = async () => {
 const GoToLanding = async () => {
   await navigateTo({ path: "/LandingPage" });
 };
+
+onMounted( () => {
+  localStorage.clear()
+})
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";

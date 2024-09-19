@@ -54,6 +54,10 @@
 
 <script lang="ts" setup>
 import ProgressBar from "primevue/progressbar";
+import { generalStore } from "~/stores/common/GeneralStore";
+import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
+const { getCalibrationTabIndex } = generalStore()
+
 const loading = ref(true);
 const runningTime = ref();
 const startTime = ref();

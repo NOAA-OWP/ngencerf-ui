@@ -193,6 +193,21 @@ export const useGageStore = defineStore('GageStore', () => {
       body: formData
     })
 
+   /**
+    * @returns {void}
+    */
+   const resetUserSelection = (): void => {
+      console.log( 'click reset')
+      if( userCalibrationRunData.value?.gage ) {
+         setUserSelection()
+      } else {
+         selectedDomainValue.value = ""
+         selectedForcingValue.value = ""
+         selectedGageValue.value = ""
+         selectedObservationalValue.value = ""
+         gageData.value = undefined
+      }
+   }
     return saveUserObservationalFilesResponse
   }
 

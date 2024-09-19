@@ -87,7 +87,8 @@ import type { AlgorithmParameter, GeneralErrorResponse } from '~/composables/Nex
 import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from "~/stores/common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "~/stores/common/UserDataStore"
+import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 
 const optimizationStore = useOptimizationStore()
 const { 

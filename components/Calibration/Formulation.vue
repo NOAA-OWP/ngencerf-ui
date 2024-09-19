@@ -117,6 +117,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
+import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
 const new_sloth_variable_name = ref<string>("")
@@ -199,6 +200,11 @@ useListen('calibrationButtonNext', (actionButton) => {
   e.click();
 })
 
+useListen('calibrationButtonNext', ( actionIndex: number ) => {
+   if ( actionIndex == 2 ) {
+      calibrationNextTabNavigate( actionIndex )
+   }
+})
 </script>
 
 <style lang="scss" scoped>
