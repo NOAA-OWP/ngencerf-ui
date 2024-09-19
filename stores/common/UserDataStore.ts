@@ -8,7 +8,7 @@ import { makeProtectedApiCall } from "~/composables/UserAuth";
 import type { JobsList, JobListItem, UserCalibrationRunData } from "~/composables/NextGenModel";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
-  const isLoggedIn = ref<boolean>(true);
+  const isLoggedIn = ref<boolean>(false);
   const userName = ref("");
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
@@ -55,11 +55,16 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    */
   function getUserInitials(): string {
     let n = userName.value;
-    let at = n.indexOf("@")+1;
-    if(n.includes("@")) {
-      return (n[0] + n.substring(at, at+1)).toUpperCase();
+    let atSignPos = n.indexOf("@");
+    if( atSignPos !== -1 ) {
+      let name = n.substring(0, atSignPos);
+      let dotPos = name.lastIndexOf('.');
+      if( dotPos !== -1 ) {
+        return (name[0] + name.substring(dotPos+1)[0]).toUpperCase();
+      }
+      return userName.value.toUpperCase()[0];
     } else {
-      return n;
+      return userName.value.toUpperCase()[0];  
     }
   }
 
@@ -136,6 +141,23 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     userCalibrationRunData.value = userCalibrationRunDataResult._data ?? undefined;
   }
 
+  useLogoutListen('logoutEvent', () => {
+    hardResetUserDataStore();
+  })
+
+  /**
+   * Hard Reset User Data Store
+   */
+  const hardResetUserDataStore = (): void => {
+    isLoggedIn.value = false;
+    userName.value = "";
+    accessToken.value = null;
+    refreshToken.value = null;
+    userCalibrationJobsListData.value = [];
+    userCalibrationRunData.value = undefined;
+    console.log("User Data Store Reset");
+  }
+
   return {
     isUserLoggedIn,
     logUserIn,
@@ -150,7 +172,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     fetchUserCalibrationJobsListData,
     userCalibrationJobsListData,
     userCalibrationRunData,
-    fetchUserCalibrationRunData
+    fetchUserCalibrationRunData,
+    hardResetUserDataStore
   };
 }, 
 {

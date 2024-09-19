@@ -322,6 +322,18 @@ const calculateProgress = (): void => {
     toast.add({ severity: 'error', summary: 'Error', detail: 'No Stop Criteria value set or Stop Criteria already met', life: 5000 });
   }
 };
+
+useListen( 'calibrationButtonPrev', ( actionButton ) => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[3];
+  e.click();
+})
+
+useListen('calibrationButtonNext', (actionButton) => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[5];
+  e.click();
+})
 </script>
 
 <style lang="scss" scoped>

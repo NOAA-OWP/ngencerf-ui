@@ -10,7 +10,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 export const useTuningStore = defineStore('TuningStore', () => {
   // server-data properties
-  const { calibrationJobId } = storeToRefs( generalStore() )
+  const { calibrationJobId } = storeToRefs(generalStore())
   const loadCalibrationRunData = ref<any>(); // TODO: update to use LoadCalbrationRunData type
   const loadTuningTabData = ref<any>(); // TODO: update to use LoadTuningTabResponse type
   // const saveTuningTabData = ref<SaveTuningTabRequestBody>()
@@ -24,13 +24,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const calStartTime = ref<string>("");
   const calEndTime = ref<string>("");
 
-  const userCalibrationTimes = computed(() => ({
-    simulation_start_time: simStartTime.value,
-    simulation_end_time: simEndTime.value,
-    calibration_start_time: calStartTime.value,
-    calibration_end_time: calEndTime.value,
-  }));
-
   const userCalibrationTuningParameters = ref<any[]>([]);
   const userOutputVariableToCalibrate = ref<{ name: string; module: string | null }>({
     name: '',
@@ -43,12 +36,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const avSimEndTime = ref<string>("");
   const avCalStartTime = ref<string>("");
   const avCalEndTime = ref<string>("");
-  const userValidationTimes = computed(() => ({
-    simulation_start_time: avSimStartTime.value,
-    simulation_end_time: avSimEndTime.value,
-    validation_start_time: avCalStartTime.value,
-    validation_end_time: avCalEndTime.value,
-  }));
+
 
   const rangeDateFrom = ref<any>();
   const rangeDateTo = ref<any>();
@@ -68,7 +56,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
           Authorization: `Bearer ${userDataStore.getAccessToken()}`
         }
       });
-      // console.log("loadCalibrationRunOutput:", loadCalibrationRunOutput);
+    // console.log("loadCalibrationRunOutput:", loadCalibrationRunOutput);
 
     if (loadCalibrationRunOutput._data) {
       loadCalibrationRunData.value = loadCalibrationRunOutput._data;
@@ -82,7 +70,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
           Authorization: `Bearer ${userDataStore.getAccessToken()}`
         }
       });
-      // console.log("loadTuningTabOutput:", loadTuningTabOutput);
+    // console.log("loadTuningTabOutput:", loadTuningTabOutput);
 
     if (loadTuningTabOutput._data) {
       loadTuningTabData.value = loadTuningTabOutput._data;
@@ -134,31 +122,41 @@ export const useTuningStore = defineStore('TuningStore', () => {
         },
         body: JSON.stringify(requestBody)
       });
-      console.log("saveTuningTabOutput:", saveTuningTabOutput._data);
-    
+    console.log("saveTuningTabOutput:", saveTuningTabOutput._data);
+
     return saveTuningTabOutput._data;
   };
 
-     /**
-    * @returns {void}
-    */
-     const resetUserSelectionTuning = (): void => {
-      if( loadCalibrationRunData.value ) {   // not sure if loadCalibrationRunData.value  is the correct variable to use here, if any
-      } else {
-         simStartTime.value = "";
-         simEndTime.value = "";
-         calStartTime.value = "";
-         calEndTime.value = "";
-         outputVariables.value = [];
-         automatic_validation.value = false;
-      
-         avSimStartTime.value = "";
-         avSimEndTime.value = "";
-         avCalStartTime.value = "";
-         avCalEndTime.value = "";
-         console.log("Tuning Store Reset");
-      }
-   }
+
+  useLogoutListen('logoutEvent', () => {
+    hardResetTuningStore();
+  })
+
+  /**
+   * Hard Reset Tuning Store
+   */
+  const hardResetTuningStore = (): void => {
+    loadCalibrationRunData.value = null;
+    loadTuningTabData.value = null;
+    isDataFetched.value = false;
+    simStartTime.value = "";
+    simEndTime.value = "";
+    calStartTime.value = "";
+    calEndTime.value = "";
+    userCalibrationTuningParameters.value = [];
+    userOutputVariableToCalibrate.value.name = '';
+    userOutputVariableToCalibrate.value.module = null;
+    outputVariables.value = [];
+    automatic_validation.value = false;
+
+    avSimStartTime.value = "";
+    avSimEndTime.value = "";
+    avCalStartTime.value = "";
+    avCalEndTime.value = "";
+    rangeDateFrom.value = null;
+    rangeDateTo.value = null;
+    console.log("Tuning Store Reset")
+  };
 
   return {
     fetchTuningTabData,
@@ -169,7 +167,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
     simEndTime,
     calStartTime,
     calEndTime,
-    userCalibrationTimes,
     userCalibrationTuningParameters,
     userOutputVariableToCalibrate,
     outputVariables,
@@ -178,18 +175,17 @@ export const useTuningStore = defineStore('TuningStore', () => {
     avSimEndTime,
     avCalStartTime,
     avCalEndTime,
-    userValidationTimes,
     rangeDateFrom,
     rangeDateTo,
     postSaveTuningTabData,
-    resetUserSelectionTuning
+    hardResetTuningStore
   };
-}, 
-{
-  persist: {
-    storage: persistedState.localStorage
-  },
-});
+},
+  {
+    persist: {
+      storage: persistedState.localStorage
+    },
+  });
 
 /* Pinia supports Hot Module replacement so you can edit your stores
    and interact with them directly in your app without reloading the page,

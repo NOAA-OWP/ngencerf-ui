@@ -31,7 +31,8 @@
       <div id="Circles" class="col-span-2">
         <div id="UserGroup" class="grid grid-cols-2">
           <div class="col-span-1">
-            <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle" class="float-right userInitials" @click="showUserMenu">
+            <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle"
+              class="float-right userInitials" @click="showUserMenu">
               {{ getUserInitials() }}
             </div>
           </div>
@@ -126,10 +127,13 @@ import HelpFormulationHelp from "../Help/FormulationHelp.vue";
 import HelpOptimizationMetricsHelp from "../Help/OptimizationMetricsHelp.vue"
 import HelpRunStatusHelp from "../Help/RunStatusHelp.vue"
 import HelpResultsHelp from "../Help/ResultsHelp.vue"
+import { useLogout } from "~/composables/UseEventBus";
+
+const emit = defineEmits(["logoutEvent"]);
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
-const { isUserLoggedIn, getUserName, getUserInitials, setAccessToken, setRefreshToken, logUserOut } = useUserDataStore();
+const { isUserLoggedIn,  getUserInitials, hardResetUserDataStore } = useUserDataStore();
 
 const location = useRoute();
 
@@ -177,16 +181,8 @@ const gotoAccount = async () => {
 }
 
 const logoutUser = async () => {
-  logUserOut();
-  const { resetUserSelectionGage } = useGageStore();
-  const { resetUserSelectionOptimization } = useOptimizationStore();
-  const { resetUserSelectionTuning} = useTuningStore();
-  const { resetUserSelectionFormulation } = useFormulationStore();
-  resetUserSelectionGage();
-  resetUserSelectionFormulation();
-  resetUserSelectionTuning();
-  resetUserSelectionOptimization();
-
+  console.log("Logging out...");
+  useLogout("logoutEvent", "");
   await navigateTo('login');
 }
 
@@ -195,7 +191,6 @@ const showUserMenu = () => {
 }
 
 const hideUserMenu = () => {
-  console.log(isOnDiv.value)
   if (isOnDiv.value) { return };
   setTimeout(() => {
     uMenu.value = false;
@@ -209,12 +204,6 @@ const displayHelp = () => {
   showHelp.value = true;
   setTimeout(function () { sizeHelpWindow() }, 0);
 }
-
-// const getUserInitials = () => {
-//   const name = getUserName();
-//   return (fullname => fullname.map((n, i) => (i == 0 || i == fullname.length - 1) && n[0]).filter(n => n).join(""))
-//     (name.split(" "));
-// };
 
 const MenuChanged = (e: MouseEvent) => {
   const ele = e.currentTarget as HTMLElement;

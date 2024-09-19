@@ -252,7 +252,6 @@ const {
   simEndTime,
   calStartTime,
   calEndTime,
-  userCalibrationTimes,
   userCalibrationTuningParameters,
   userOutputVariableToCalibrate,
   outputVariables,
@@ -261,7 +260,6 @@ const {
   avSimEndTime,
   avCalStartTime,
   avCalEndTime,
-  userValidationTimes,
   rangeDateFrom,
   rangeDateTo,
 } = storeToRefs(tuningStore);
@@ -276,8 +274,6 @@ const isCalibrationTuningControlsDisabled = computed(() => {
 });
 
 onMounted(async () => {
-  console.log("onMounted");
-
   if (!isDataFetched.value) {
     //toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
     await fetchTuningTabData(); // only fetch data if not already fetched
@@ -287,11 +283,11 @@ onMounted(async () => {
     //toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
   }
 
-  console.log("loadTuningTabData:", loadTuningTabData.value);
-  console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
-  console.log("calibration_times:", loadCalibrationRunData.value?.calibration_times);
-  console.log("validation_times:", loadCalibrationRunData.value?.validation_times);
-  console.log("time_range:", loadCalibrationRunData.value?.time_range);
+  // console.log("loadTuningTabData:", loadTuningTabData.value);
+  // console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
+  // console.log("calibration_times:", loadCalibrationRunData.value?.calibration_times);
+  // console.log("validation_times:", loadCalibrationRunData.value?.validation_times);
+  // console.log("time_range:", loadCalibrationRunData.value?.time_range);
 
   // set calibration times
   if (loadCalibrationRunData.value?.calibration_times) {
@@ -727,6 +723,17 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
   }
 });
 
+useListen( 'calibrationButtonPrev', ( actionButton ) => {
+   const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[1];
+  e.click();
+});
+
+useListen('calibrationButtonNext', (actionButton) => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[3];
+  e.click();
+});
 </script>
 
 <style lang="scss" scoped>
