@@ -6,7 +6,7 @@ import { generalStore } from "../common/GeneralStore";
 import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralApiSaveResponse } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { useCalibrationTabValidation } from "~/composables/CalibrationTabValidations";
+import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
 export const useOptimizationStore = defineStore('OptimizationStore', () => {
   /**
@@ -35,22 +35,25 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   const showObjectiveFunctionStreamFlow = ref<boolean>(false)
 
   /**
- * load static optimization tab data with provided calibration job id and initialize ui field data 
- * @return {void}
- */
-  makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${getAccessToken()}`,
-      "Content-Type": 'application/json'
-    },
-    body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
-  }).then((optimizationTabDataResult) => {
-    optimizationTabData.value = optimizationTabDataResult._data ?? undefined
-    data_loading.value = false
+   * load static optimization tab data with provided calibration job id and initialize ui field data 
+   * @return {void}
+   */
+  const loadOptimizationTabStaticData = () => {
+    data_loading.value = true
+    makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+    }).then((optimizationTabDataResult) => {
+      optimizationTabData.value = optimizationTabDataResult._data ?? undefined
+      data_loading.value = false
 
-    setUserSelection()
-  })
+      setUserSelection()
+    })
+  }
 
   const setUserSelection = (): void => {
     uiStreamFlowThreshold.value = userCalibrationRunData.value?.streamflow_threshold ?? undefined
@@ -214,7 +217,8 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     saveOptimizationTabData,
     resetOptimizationInputs,
     resetUserSelectionOptimization,
-    resetOptimizationStore
+    resetOptimizationStore,
+    loadOptimizationTabStaticData
   }
 })
 

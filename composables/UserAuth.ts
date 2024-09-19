@@ -128,6 +128,6 @@ export const makeProtectedApiCall = async <T>(
     return responseData;
   } catch (error) {
     console.error('API call failed:', responseData, error);
-    return null;
+    return responseData;
   }
 };

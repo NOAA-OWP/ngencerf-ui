@@ -141,11 +141,13 @@ import TabPanels from "primevue/tabpanels";
 
 const gageStore = useGageStore();
 const { gageData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore);
-const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore;
+const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore;
 const { getCalibrationTabIndex } = generalStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const toast = useToast();
+
+loadGageTabStaticData()
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
