@@ -64,10 +64,11 @@
 
           <div class="col-span-1">
             <div id="BoxRight">
-              <!-- <div id="BoxTopRight" class="pt-2" @click="AutoValChecked">
-                <input type="checkbox" id="CheckTheBox"></input>
-                <label for="CheckTheBox">Automatic Validation</label>
-              </div> -->
+              <!-- <div id="BoxTopRight" class="pt-2" @click="AutoValChecked"> -->
+              <div id="BoxTopRight" class="pt-2">
+                  <!-- <input type="checkbox" id="CheckTheBox"></input> -->
+                <label for="CheckTheBox"><span class="tabTitles">Automatic Validation</span></label>
+              </div> 
               <div id="BoxBottomRight" class="pt-2">
                 <div v-if="!automatic_validation" class="tabTitles">
                   Check the box above<br />to enable Automatic Validation
