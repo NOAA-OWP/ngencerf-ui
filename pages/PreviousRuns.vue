@@ -67,88 +67,98 @@ const { calibrationJobId } = storeToRefs( generalStore() )
 const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
 const { fetchUserCalibrationJobsListData } = useUserDataStore()
 const { fetchNewCalibrationRunId } = calibrationJobStore
-
+const { 
+      calibrationTabIndex,
+      evaluationTabIndex,
+      forecastTabIndex } = storeToRefs( generalStore() )
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
 
 const selectedCalibrationRun = ref<JobListItem>()
 const cmCalibrationRun = ref([
-  { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun) }
+   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
+   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
+   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun) }
 ])
 const onRowContextMenu = (event: any) => {
-  crContextMenu.value.show(event.originalEvent)
+   crContextMenu.value.show(event.originalEvent)
 }
 
-const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  //keep the following for references purpose
-  /*
-  if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
-  if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 })
-  if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
-  */
-  calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id
+const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
+   //keep the following for references purpose
+   /*
+   if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
+   if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 })
+   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
+   */
+   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id
 
-  navigateTo('/Calibration')
-}
+   await navigateTo('/Calibration')
+   }
 
 const rowStyle = (data: any) => {
-  if (!['Saved', 'Ready'].includes(data.status)) {
-    return { backgroundColor: 'gainsboro' }
-  }
+   if (!['Saved', 'Ready'].includes(data.status)) {
+      return { backgroundColor: 'gainsboro' }
+   }
 }
 
 const createNewCalibration = async () => {
-  const fetchedId = await fetchNewCalibrationRunId()
-  if( fetchedId != undefined ) {
-    calibrationJobId.value = fetchedId
-    if( calibrationJobId.value > 0 ) {
-      await navigateTo("Calibration");
-    } else {
-      toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 })
-    }
-  }
+   const fetchedId = await fetchNewCalibrationRunId()
+   if( fetchedId != undefined ) {
+      calibrationJobId.value = fetchedId
+      if( calibrationJobId.value > 0 ) {
+         await navigateTo("Calibration");
+      } else {
+         toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 })
+      }
+   }
 }
 
 /**
  * following section require backend api before them can be implemented
  */
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
-  fetchUserCalibrationJobsListData()
+   toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
+   fetchUserCalibrationJobsListData()
 }
 
 const confirmDelte = useConfirm();
 const deleteSelectedCalibrationRun = ( selectedCalibrationRun: any ) => {
-  const confirm_delete = ref( false )
-  const selectedRunId = selectedCalibrationRun.value.calibration_run_id
-  let confirmMessage = "Are you sure you want to delete?"
-  if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
+   const confirm_delete = ref( false )
+   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
+   let confirmMessage = "Are you sure you want to delete?"
+   if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
 
-  confirmDelte.require({
-    message: confirmMessage,
-    header: 'Confirm Delete',
-    icon: 'pi pi-exclamation-triangle',
-    rejectProps: {
-      label: 'Cancel',
-      severity: 'secondary',
-      outlined: true
-    },
-    acceptProps: {
-      label: 'Save',
-    },
-    accept: () => acceptDelete(selectedRunId),
-    reject: () => {
-      //do nothing
-    }
-  })
+   confirmDelte.require({
+      message: confirmMessage,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary',
+         outlined: true
+      },
+      acceptProps: {
+         label: 'Save',
+      },
+      accept: () => acceptDelete(selectedRunId),
+      reject: () => {
+         //do nothing
+      }
+   })
 }
 const acceptDelete = (selectedRunId: number) => {
-  toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
-  fetchUserCalibrationJobsListData()
-  selectedCalibrationRun.value = undefined 
+   toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
+   fetchUserCalibrationJobsListData()
+   selectedCalibrationRun.value = undefined 
 }
+
+onMounted( () => {
+   console.log('reset tab index')
+   calibrationTabIndex.value = "1"
+   evaluationTabIndex.value = "1"
+   forecastTabIndex.value = "1"
+})
 </script>
 
 <style lang="scss" scoped>

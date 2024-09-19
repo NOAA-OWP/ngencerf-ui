@@ -44,8 +44,8 @@ const { fetchUserCalibrationJobsListData, getUserName } = useUserDataStore()
 
 fetchUserCalibrationJobsListData()
 
-const GoPreviousRuns = () => {
-  navigateTo("PreviousRuns");
+const GoPreviousRuns = async () => {
+  await navigateTo("PreviousRuns");
 }
 </script>
 <style lang="scss" scoped>
