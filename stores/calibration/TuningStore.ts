@@ -30,7 +30,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     module: null,
   });
   const outputVariables = ref<any[]>([]);
-  const automatic_validation = ref<boolean>(false);
+  const automatic_validation = ref<boolean>(true);
 
   const avSimStartTime = ref<string>("");
   const avSimEndTime = ref<string>("");
@@ -147,7 +147,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     userOutputVariableToCalibrate.value.name = '';
     userOutputVariableToCalibrate.value.module = null;
     outputVariables.value = [];
-    automatic_validation.value = false;
+    automatic_validation.value = true;
 
     avSimStartTime.value = "";
     avSimEndTime.value = "";
