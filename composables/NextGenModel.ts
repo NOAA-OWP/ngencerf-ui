@@ -374,3 +374,12 @@ export type CalibrationButtonGroupClickEvent = {
 export type LogoutEvent = {
   logoutEvent: string;
 }
+
+export const ValidationFormFields = {
+  formulation_name: "Formulation Name",
+  sloth_parameters: "Sloth Parameters",
+  maps_to_module: "Sloth Parameter For Module",
+  maps_to_variable_name: "Sloth Parameter Module Param",
+  param_type: "Sloth Parameter Type",
+  param_units: "Sloth Parameter Units"
+}

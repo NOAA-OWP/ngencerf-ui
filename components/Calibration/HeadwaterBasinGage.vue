@@ -135,17 +135,20 @@ import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { useToast } from "primevue/usetoast";
+import { calibrationNextTabNavigate } from "~/composables/TabClickEvent";
 import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import TabPanels from "primevue/tabpanels";
 
 const gageStore = useGageStore();
 const { gageData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore);
-const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore;
+const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore;
 const { getCalibrationTabIndex } = generalStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const toast = useToast();
+
+loadGageTabStaticData()
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
@@ -277,11 +280,6 @@ const selected_rfc = ref<string>("")
 const toggle_isNWMv3 = () => {
 
 }
-
-const onObservationalFileUpload = () => {
-
-}
-
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";

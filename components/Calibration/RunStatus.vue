@@ -16,7 +16,7 @@
                 </tr>
                 <tr>
                   <td class="text-right">Iteration:</td>
-                  <td class="pl-5">{{ iteration ? iteration : '-'.repeat(30) }}</td>
+                  <td class="pl-5">{{ iterations ? iterations : '-'.repeat(30) }}</td>
                 </tr>
               </table>
             </div>
@@ -69,13 +69,12 @@ import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
 
-const _generalStore = generalStore();
 const runStatusStore = useRunStatusStore();
 const userDataStore = useUserDataStore();
 const toast = useToast();
 
-const { calibrationJobId } = storeToRefs(_generalStore);
-const { getCalibrationTabIndex } = _generalStore;
+const { calibrationJobId } = storeToRefs(generalStore());
+const { getCalibrationTabIndex } = generalStore();
 const { 
   calibrationIsReady,
   calibrationStatus
