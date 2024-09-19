@@ -19,7 +19,7 @@
         <td class="td2">Start the Calibration.</td>
       </tr>
       <tr>
-        <td class="td1">STOP Button:</td>
+        <td class="td1">CANCEL Button:</td> 
         <td class="td2">Stop/cancel the calibration before it has completed.</td>
       </tr>
     </table>

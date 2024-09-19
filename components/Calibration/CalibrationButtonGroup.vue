@@ -1,51 +1,108 @@
 <template>
   <div id="BottomButtons" class="grid grid-cols-12 w-full">
     <div class="col-span-2">
-      <button v-if="showOrHideSaveStartButton()" class="save-start actionBtn" @click="SaveStartTabContent">{{
-        getCalibrationTabIndex() < 5 ? "SAVE" : "START" }}</button>
+      <button v-if="showOrHideSaveStartButton()" class="save-start actionBtn" @click="SaveStartTabContent"
+        :title="btnSaveOrStart() + ' Button'" :aria-label="btnSaveOrStart() + ' Button'">
+        {{ btnSaveOrStart() }}</button>
     </div>
     <div class="col-span-2">
       <button v-if="showOrHideResetCancelButton()" :class="getCalibrationTabIndex() < 5 ? 'reset' : 'cancel'"
-        class="actionBtn" @click="ResetStopTabContent">{{ getCalibrationTabIndex() < 5 ? "RESET" : "CANCEL" }}</button>
+        class="actionBtn" @click="ResetCancelTabContent" :title="btnResetOrCancel() + 'Button'"
+        :aria-label="btnResetOrCancel() + 'Button'">{{ btnResetOrCancel() }}</button>
     </div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-2 text-right"><button v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5"
-        class="prev actionBtnSmall" @click="NavigatePrevContent">&#8678; Prev</button></div>
+        class="prev actionBtnSmall" @click="NavigatePrevContent" title="Previous" aria-label="Previous">&#8678;
+        Prev</button></div>
     <div class="col-span-2"><button v-if="getCalibrationTabIndex() < 5" class="next actionBtnSmall"
-        @click="NavigateNextContent">Next <span>&#8680;</span></button></div>
+        @click="NavigateNextContent" title="Next" aria-label="Next">Next <span>&#8680;</span></button></div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
-//import { useToast } from "primevue/usetoast";
 
-const { getCalibrationTabIndex } = generalStore();
+const { getMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex } = generalStore();
 
 const runStatusStore = useRunStatusStore();
 const { calibrationStatus } = storeToRefs(runStatusStore);
 
-const tabIndex = getCalibrationTabIndex();
-//const toast = useToast();
+const btnSaveOrStart = () => {
+  switch (getMenuIndex()) {
+    case 1: return getCalibrationTabIndex() < 5 ? "SAVE" : "START"; break;
+    case 2: break;
+    case 3: break;
+    case 4: break;
+    default: break;
+  }
 
-const SaveStartTabContent = async () => {
-  useEvent('calibrationButtonSaveStart', getCalibrationTabIndex() < 5 ? "SAVE" : "START");
 };
 
-const ResetStopTabContent = async () => {
-  useEvent('calibrationButtonResetCancel', getCalibrationTabIndex() < 5 ? "RESET" : "CANCEL");
+const btnResetOrCancel = () => {
+  switch (getMenuIndex()) {
+    case 1: return getCalibrationTabIndex() < 5 ? "RESET" : "CANCEL"; break;
+    case 2: break;
+    case 3: break;
+    case 4: break;
+    default: break;
+  }
 };
 
-const NavigatePrevContent = () => {
-  useEvent('calibrationButtonPrev', "PREV");
+const SaveStartTabContent = async (e: MouseEvent) => {
+  e.preventDefault();
+  e.stopPropagation();
+  switch (getMenuIndex()) {
+    case 1: useEvent('calibrationButtonSaveStart', getCalibrationTabIndex() < 5 ? "SAVE" : "START"); break;
+    case 2: break;
+    case 3: break;
+    case 4: break;
+    default: break;
+  }
+  console.log("Save/Start Triggered")
 };
 
-const NavigateNextContent = () => {
-  useEvent('calibrationButtonNext', "NEXT");
+const ResetCancelTabContent = async (e: MouseEvent) => {
+  e.preventDefault();
+  e.stopPropagation();
+  switch (getMenuIndex()) {
+    case 1: useEvent('calibrationButtonResetCancel', getCalibrationTabIndex() < 5 ? "RESET" : "CANCEL"); break;
+    case 2: break;
+    case 3: break;
+    case 4: break;
+    default: break;
+  }
+
+  console.log("Stop/Reset Triggered")
+};
+
+const NavigatePrevContent = (e: MouseEvent) => {
+  e.preventDefault();
+  e.stopPropagation();
+  switch (getMenuIndex()) {
+    case 1: useEvent('calibrationButtonPrev', "PREV"); break;
+    case 2: break;
+    case 3: break;
+    case 4: break;
+    default: break;
+  }
+  console.log("PREV Triggered")
+};
+
+const NavigateNextContent = (e: MouseEvent) => {
+  e.preventDefault();
+  e.stopPropagation();
+  switch (getMenuIndex()) {
+    case 1: useEvent('calibrationButtonNext', "NEXT"); break;
+    case 2: break;
+    case 3: break;
+    case 4: break;
+    default: break;
+  }
+  console.log("NEXT Triggered");
 };
 
 const showOrHideSaveStartButton = (): boolean => {
