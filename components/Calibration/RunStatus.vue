@@ -135,19 +135,21 @@ onMounted(async () => {
     }
   }
 
-  // Get Plot Names
-  plotNames.value = await queryGetPlotNames();
-  if (plotNames.value) {
-    console.log('plotNames:', plotNames.value?._data);
+  if (calibrationStatus.value === 'Runnning' || calibrationStatus.value === 'Done') {
+    // Get Plot Names
+    plotNames.value = await queryGetPlotNames();
+    if (plotNames.value) {
+      console.log('plotNames:', plotNames.value?._data);
 
-    // setting plotList and selectedPlotName will populate the dropdown
-    plotList.value = plotNames.value?._data?.plot_list;
-    if (!selectedPlotName.value) {
-      selectedPlotName.value = plotList.value[0]?.name;
-      console.log('selectedPlotName:', selectedPlotName.value);
+      // setting plotList and selectedPlotName will populate the dropdown
+      plotList.value = plotNames.value?._data?.plot_list;
+      if (!selectedPlotName.value) {
+        selectedPlotName.value = plotList.value[0]?.name;
+        console.log('selectedPlotName:', selectedPlotName.value);
+      }
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
     }
-  } else {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
   }
 });
 
