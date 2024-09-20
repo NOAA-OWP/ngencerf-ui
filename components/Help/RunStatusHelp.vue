@@ -6,13 +6,11 @@
     <div class="_help-subtitle">The Status field will indicate if the required data has been
       entered.</div>
     <div class="_help-subtitle">If so the Status will be Ready and the Start button will be activated. Once the
-      calibration run has
-      started, the user can stop it before it completes by clicking the Stop button. While a calibration is running, the
-      running time, start time, iteration number and percentage complete will be displayed.</div>
-    <div class="_help-subtitle">Plots will be generated at the user selected frequency which can be viewed while the calibration is being performed. Once the calibration and
-      optional validation run are complete the user will be taken to the Results tab to view the final plots generated
-      by ngen-cal.</div>
-
+      calibration run has started, the user can stop it before it completes by clicking the Stop button. 
+      While a calibration is running, the running time is updated.</div>
+    <div class="_help-subtitle">Plots will be generated at the user selected frequency which can be viewed while
+      the calibration is being performed and when the calibration and validation run are complete.
+    </div>
     <table class="_help-table">
       <tr>
         <td class="td1">START Button:</td>
