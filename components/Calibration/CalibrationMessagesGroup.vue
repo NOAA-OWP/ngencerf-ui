@@ -81,8 +81,8 @@
             <p v-if="calData?.objective_function">Tuning Parameters: &nbsp;<span class="font-medium">{{ null }}</span></p>
             <p v-if="calData?.objective_function">Objective Function: <span class="font-medium">{{
               calData?.objective_function }}</span></p>
-            <p v-if="calData?.plot_frequency">Plot Generation Frequency: &nbsp;<span class="font-medium">{{
-              calData?.plot_frequency }}</span></p>
+            <p v-if="calData?.save_plot_iteration_frequency">Plot Generation Frequency: &nbsp;<span class="font-medium">{{
+              calData?.save_plot_iteration_frequency }}</span></p>
 
           </div>
         </div>
