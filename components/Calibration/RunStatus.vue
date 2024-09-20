@@ -14,10 +14,10 @@
                   <td class="text-right">Start Time:</td>
                   <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                 </tr>
-                <tr>
+                <!-- <tr>
                   <td class="text-right">Iteration:</td>
                   <td class="pl-5">{{ iterations ? iterations : '-'.repeat(30) }}</td>
-                </tr>
+                </tr> -->
               </table>
             </div>
 
@@ -107,6 +107,7 @@ const iterationData = ref();
 const progress = ref();
 
 const stopCriteriaMet = ref(false);
+let statusIntervalId: NodeJS.Timeout | undefined = undefined;
 let runningTimeIntervalId: NodeJS.Timeout | undefined = undefined;
 let iterationIntervalId: NodeJS.Timeout | undefined = undefined;
 
@@ -177,7 +178,7 @@ watch(calibrationStatus, async () => {
         startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
         runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
-        // If an interval is not already running to update runningTime every second, start one
+        // Create an interval to update runningTime every second
         if (!runningTimeIntervalId) {
           runningTimeIntervalId = setInterval(() => {
             if (!stopCriteriaMet.value) {
@@ -189,48 +190,32 @@ watch(calibrationStatus, async () => {
       } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object', life: 5000 });
       }
+
+      // Create an interval to update calibrationStatus every 10 seconds
+      if (!statusIntervalId) {
+        statusIntervalId = setInterval(async () => {
+          isCalibrationReady.value = await queryCalibrationIsReady();
+          if (isCalibrationReady.value?._data?.status === 'Done') {
+            calibrationStatus.value = 'Done';
+          }
+        }, 10000);
+      }
+
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
-    } 
-
-    // Get iteration from report_iteration endpoint
-    iterationData.value = await queryIteration();
-    console.log('iterationData:', iterationData.value._data);
-    if (iterationData.value._data) {
-      // set iteration value for the first time
-      iterations.value = iterationData.value?._data?.iterations;
-      console.log('iterations:', iterations.value);
-
-      if (!iterations.value) { // iterations is 0 right now since we're fakinng data. so this is evaluating to falsey
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No Iteration', life: 5000 });
-      } else {
-        if (!iterationIntervalId) {
-          iterationIntervalId = setInterval(async () => {
-            if (!stopCriteriaMet.value) {
-              iterationData.value = await queryIteration();
-              iterations.value = iterationData.value?._data?.iterations;
-              calculateProgress();
-            }
-          }, 60000);
-        }
-      }
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Iterations', life: 5000 });
     }
   }
 
   else if (calibrationStatus.value === 'Done') {
     stopCriteriaMet.value = true;
-    clearInterval(iterationIntervalId);
     clearInterval(runningTimeIntervalId);
-    progress.value = null; // should disable progress bar
+    clearInterval(statusIntervalId);
   }
 
   else if (calibrationStatus.value === 'Cancelled') {
     stopCriteriaMet.value = false; // this should already be false, but just in case
-    clearInterval(iterationIntervalId);
     clearInterval(runningTimeIntervalId);
-    progress.value = null; // should disable progress bar
+    clearInterval(statusIntervalId);
   }
 
   else {
@@ -238,36 +223,36 @@ watch(calibrationStatus, async () => {
   }
 });
 
-// Handle iterations changes
-watch(iterations, async (newIterations, oldIterations, onCleanup) => {
-  if (calibrationStatus.value === 'Running') {
-    if (iterationIntervalId) {
-      calculateProgress();
+// // Handle iterations changes
+// watch(iterations, async (newIterations, oldIterations, onCleanup) => {
+//   if (calibrationStatus.value === 'Running') {
+//     if (iterationIntervalId) {
+//       calculateProgress();
 
-      // if progress reaches 100, verify Calibration status is Done. calibrationStatus watch function will set stopCriteriaMet to true, clear intervals, and set progress to null
-      if (progress.value >= 100) {
-        isCalibrationReady.value = await queryCalibrationIsReady();
-        if (isCalibrationReady.value?._data?.status === 'Done') {
-          await fetchUserCalibrationRunData(); // update Calibration data
-          calibrationStatus.value = 'Done';
-          } else {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Status is not Done after progress reached 100', life: 5000 });
-          }
-      }
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'iterationIntervalId was not set when status was initially set to Running', life: 5000 });
-    }
-  } else {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Status is not Running but iterations was changed somehow', life: 5000 });
-  }
+//       // if progress reaches 100, verify Calibration status is Done. calibrationStatus watch function will set stopCriteriaMet to true, clear intervals, and set progress to null
+//       if (progress.value >= 100) {
+//         isCalibrationReady.value = await queryCalibrationIsReady();
+//         if (isCalibrationReady.value?._data?.status === 'Done') {
+//           await fetchUserCalibrationRunData(); // update Calibration data
+//           calibrationStatus.value = 'Done';
+//           } else {
+//             toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Status is not Done after progress reached 100', life: 5000 });
+//           }
+//       }
+//     } else {
+//       toast.add({ severity: 'error', summary: 'Error', detail: 'iterationIntervalId was not set when status was initially set to Running', life: 5000 });
+//     }
+//   } else {
+//     toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Status is not Running but iterations was changed somehow', life: 5000 });
+//   }
 
-  onCleanup(() => {
-    // if stop criteria met before interval is cleared, clear interval
-    if (iterationIntervalId && stopCriteriaMet.value) {
-      clearInterval(iterationIntervalId);
-    }
-  });
-});
+//   onCleanup(() => {
+//     // if stop criteria met before interval is cleared, clear interval
+//     if (iterationIntervalId && stopCriteriaMet.value) {
+//       clearInterval(iterationIntervalId);
+//     }
+//   });
+// });
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, () => {
@@ -313,16 +298,16 @@ useListen('calibrationButtonResetCancel', async (actionButton) => {
   }
 });
 
-/**
- * Calculate Progress
- */
-const calculateProgress = (): void => {
-  if (stopCriteria.value && !stopCriteriaMet.value) {
-    progress.value = (iterations.value / stopCriteria.value) * 100;
-  } else {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'No Stop Criteria value set or Stop Criteria already met', life: 5000 });
-  }
-};
+// /**
+//  * Calculate Progress
+//  */
+// const calculateProgress = (): void => {
+//   if (stopCriteria.value && !stopCriteriaMet.value) {
+//     progress.value = (iterations.value / stopCriteria.value) * 100;
+//   } else {
+//     toast.add({ severity: 'error', summary: 'Error', detail: 'No Stop Criteria value set or Stop Criteria already met', life: 5000 });
+//   }
+// };
 
 useListen( 'calibrationButtonPrev', ( actionButton ) => {
   const tabs = document.getElementsByClassName("tabs");
