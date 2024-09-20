@@ -119,38 +119,14 @@ onMounted(async () => {
   // Get User Calibration Run Data
   await fetchUserCalibrationRunData();
 
-  stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
-  console.log('stopCriteria:', stopCriteria.value);
+  if (userCalibrationRunData.value) {
+    stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
+    console.log('stopCriteria:', stopCriteria.value);
 
-  // Get Calibration Status
-  isCalibrationReady.value = await queryCalibrationIsReady();
-  console.log('isCalibrationReady:', isCalibrationReady?.value._data);
-  if (!isCalibrationReady?.value._data) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Ready status', life: 5000 });
+    calibrationStatus.value = userCalibrationRunData.value?.status;
+    console.log('calibrationStatus:', calibrationStatus.value);
   } else {
-    calibrationStatus.value = isCalibrationReady.value?._data?.status;
-    if (calibrationStatus.value) {
-      toast.add({ severity: 'info', summary: 'Calibration Status', detail: calibrationStatus.value, life: 5000 });
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Status', life: 5000 });
-    }
-  }
-
-  if (calibrationStatus.value === 'Runnning' || calibrationStatus.value === 'Done') {
-    // Get Plot Names
-    plotNames.value = await queryGetPlotNames();
-    if (plotNames.value) {
-      console.log('plotNames:', plotNames.value?._data);
-
-      // setting plotList and selectedPlotName will populate the dropdown
-      plotList.value = plotNames.value?._data?.plot_list;
-      if (!selectedPlotName.value) {
-        selectedPlotName.value = plotList.value[0]?.name;
-        console.log('selectedPlotName:', selectedPlotName.value);
-      }
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
-    }
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
   }
 });
 
@@ -194,8 +170,8 @@ watch(calibrationStatus, async () => {
       // Create an interval to update calibrationStatus every 10 seconds
       if (!statusIntervalId) {
         statusIntervalId = setInterval(async () => {
-          isCalibrationReady.value = await queryCalibrationIsReady();
-          if (isCalibrationReady.value?._data?.status === 'Done') {
+          await fetchUserCalibrationRunData();
+          if (userCalibrationRunData?.value?.status === 'Done') {
             calibrationStatus.value = 'Done';
           }
         }, 10000);
@@ -211,7 +187,7 @@ watch(calibrationStatus, async () => {
       console.log('plotNames:', plotNames.value?._data);
 
       // setting plotList and selectedPlotName will populate the dropdown
-      plotList.value = plotNames.value?._data?.plot_list;
+      plotList.value = plotNames.value?._data?.plot_names;
       if (!selectedPlotName.value) {
         selectedPlotName.value = plotList.value[0]?.name;
         console.log('selectedPlotName:', selectedPlotName.value);
@@ -222,13 +198,26 @@ watch(calibrationStatus, async () => {
   }
 
   else if (calibrationStatus.value === 'Done') {
+    if (userCalibrationRunData.value) {
+      startTimeDate.value = new Date(userCalibrationRunData.value?.run_date); // do we need to keep setting this after the first time? will value change after status is Running?
+      console.log('startTimeDate:', startTimeDate.value);
+
+      if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
+        startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
+      } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object', life: 5000 });
+      }
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
+    }
+
     // Update Plot Names
     plotNames.value = await queryGetPlotNames();
     if (plotNames.value) {
       console.log('plotNames:', plotNames.value?._data);
 
       // setting plotList and selectedPlotName will populate the dropdown
-      plotList.value = plotNames.value?._data?.plot_list;
+      plotList.value = plotNames.value?._data?.plot_names;
       if (!selectedPlotName.value) {
         selectedPlotName.value = plotList.value[0]?.name;
         console.log('selectedPlotName:', selectedPlotName.value);
@@ -236,6 +225,8 @@ watch(calibrationStatus, async () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
     }
+
+    // clear intervals and set stopCriteriaMet to true
     stopCriteriaMet.value = true;
     clearInterval(runningTimeIntervalId);
     clearInterval(statusIntervalId);
