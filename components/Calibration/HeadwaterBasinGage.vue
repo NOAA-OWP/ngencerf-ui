@@ -160,7 +160,7 @@ const onGageSelectionChange = () => {
   fetchSelectedGageData()
 }
 
-useListen('calibrationButtonResetStop', (actionButton) => {
+useListen('calibrationButtonResetCancel', (actionButton) => {
   console.log("Action Button: ", actionButton);
   if (getCalibrationTabIndex() == 1 && actionButton == 'RESET') {
     resetUserSelectionGage();
@@ -279,7 +279,7 @@ if (getCalibrationTabIndex() == 1 && actionButton == 'SAVE') {
 }
 })
 
-useListen('calibrationButtonResetStop', (actionButton) => {
+useListen('calibrationButtonResetCancel', (actionButton) => {
 if (getCalibrationTabIndex() == 1 && actionButton == 'RESET') {
   resetUserSelectionGage()
 }

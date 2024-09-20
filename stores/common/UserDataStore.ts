@@ -138,7 +138,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
     })
 
-    userCalibrationRunData.value = userCalibrationRunDataResult._data ?? undefined;
+    userCalibrationRunData.value = userCalibrationRunDataResult?._data ?? undefined;
   }
 
   useLogoutListen('logoutEvent', () => {

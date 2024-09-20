@@ -126,7 +126,7 @@ export const useGageStore = defineStore('GageStore', () => {
         gage_id: selectedGageValue.value
       })
     })
-    gageData.value = selectedGageDataResponse._data ?? undefined
+    gageData.value = selectedGageDataResponse?._data ?? undefined
   }
 
   /**
@@ -159,7 +159,7 @@ export const useGageStore = defineStore('GageStore', () => {
 
       geopackageImageUrl.value = saveGageTabDataResponse?.geopackage_image_url ?? ""
 
-      return saveGageTabDataResponse._data
+      return saveGageTabDataResponse?._data
     } else {
       return Promise.resolve({
         message: "Missing required field(s)",

@@ -1,5 +1,5 @@
 /**
- * This file contains utility functions for user authentication and making JWT-based API calls
+ * This Composable contains utility functions for user authentication and making JWT-based API calls
  */
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
