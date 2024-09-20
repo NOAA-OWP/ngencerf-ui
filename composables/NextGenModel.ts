@@ -61,6 +61,8 @@ export interface UserCalibrationRunData {
   observational_source: string;
   observational_user_filename: string;
   observational_file_path: string;
+  geopackage_source: string;
+  geopackage_hydrofabric_file_path: string;
   geopackage_image_url: string;
   modules: string[];
   formulation_name: string;
@@ -77,7 +79,8 @@ export interface UserCalibrationRunData {
   peak_flow_threshold: number;
   optimization: string;
   optimization_inputs: UserCalibrationRunOptimizationInputData[];
-  plot_frequency: number;
+  save_plot_iteration_frequency: number;
+  save_output_iteration: boolean;
   stop_criteria: number;
   status: string;
 }
@@ -138,6 +141,7 @@ export interface GageTabData {
    calibration_run_id: number;
    forcing_source_values: ForcingSourceValueData[];
    observational_source_values: ObservationalSourceValueData[];
+   geopackage_source_values: GeopackageSourceValueData[];
    gages: GageOptionData[];
    gage: GageData;
    geopackage_image_url: string;
@@ -177,6 +181,12 @@ export interface ObservationalSourceValueData {
   description: string;
   is_active: boolean;
 }
+
+export interface GeopackageSourceValueData {
+  name: string;
+  description: string;
+}
+
 
 export interface SaveGageTabResponse extends GeneralApiSaveResponse {
    geopackage_image: string;
