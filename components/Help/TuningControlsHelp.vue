@@ -1,11 +1,10 @@
 <template>
   <div class="_help-page">
     <div class="_help-title">ngenCERF Calibration Workflow - Tuning Controls Tab</div>
-    <div class="_help-subtitle">This tab provides the user the ability to select the time period to run the simulation,
-      the time period to run the calibration within the simulation period, the option to run an automatic validation
-      after calibration is complete based on the best set of parameters determined during the calibration process and
-      which module parameters for the selected formulation to tune during calibration.</div>
-
+    <div class="_help-subtitle">This tab provides the user the ability to select the time periods to run the calibration,
+      the time periods for an automatic validation fter calibration is complete based on the best set of parameters 
+      determined during the calibration process and which module parameters for the selected formulation to tune during calibration.
+    </div>
     <table class="_help-table">
       <tr>
         <td class="td1">Range:</td>
@@ -19,13 +18,6 @@
           the period of time to perform the entire run. The Calibration Start and End reflect the period of time to
           actually calibrate using the tuning parameters. This allows for a “warm-up” period prior to performing the
           calibration.</td>
-      </tr>
-      <tr>
-        <td class="td1">Perform Validation:</td>
-        <td class="td2">This checkbox provides the ability to automatically perform a validation run with the best
-          parameter set from the calibration run. If checked the Validation time controls will be displayed and are
-          required.
-        </td>
       </tr>
       <tr>
         <td class="td1">Validation Time Controls:</td>
