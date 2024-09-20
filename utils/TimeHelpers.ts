@@ -17,17 +17,17 @@ export const formatDateForDisplay = ( d: string ) => {
  * Takes a date object and converts it to a string in the specified timezone format
  * @param date
  * @param locale 
- * @returns string in the format "2021-06-01 12:00:00"
+ * @returns string in the format "Sep 8, 2024 14:10:43"
  */
 export const convertTimeZone = (date: Date, locale: string = 'en-US'): string => {
   return date.toLocaleString(locale, {
     year: 'numeric',
-    month: 'long',  // Full month name (e.g., June)
+    month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    hour12: false // Use 24-hour format
+    hour12: false,
   });  
 }
 
