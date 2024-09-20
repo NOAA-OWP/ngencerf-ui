@@ -58,8 +58,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
       });
     // console.log("loadCalibrationRunOutput:", loadCalibrationRunOutput);
 
-    if (loadCalibrationRunOutput._data) {
-      loadCalibrationRunData.value = loadCalibrationRunOutput._data;
+    if (loadCalibrationRunOutput?._data) {
+      loadCalibrationRunData.value = loadCalibrationRunOutput?._data;
     }
 
     const loadTuningTabOutput: any = await makeProtectedApiCall(
@@ -72,8 +72,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
       });
     // console.log("loadTuningTabOutput:", loadTuningTabOutput);
 
-    if (loadTuningTabOutput._data) {
-      loadTuningTabData.value = loadTuningTabOutput._data;
+    if (loadTuningTabOutput?._data) {
+      loadTuningTabData.value = loadTuningTabOutput?._data;
     }
 
     if (loadCalibrationRunData.value && loadTuningTabData.value) {
@@ -122,9 +122,9 @@ export const useTuningStore = defineStore('TuningStore', () => {
         },
         body: JSON.stringify(requestBody)
       });
-    console.log("saveTuningTabOutput:", saveTuningTabOutput._data);
+    console.log("saveTuningTabOutput:", saveTuningTabOutput?._data);
 
-    return saveTuningTabOutput._data;
+    return saveTuningTabOutput?._data;
   };
 
 

@@ -48,7 +48,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
       },
       body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     }).then((optimizationTabDataResult) => {
-      optimizationTabData.value = optimizationTabDataResult._data ?? undefined
+      optimizationTabData.value = optimizationTabDataResult?._data ?? undefined
       data_loading.value = false
 
       setUserSelection()
@@ -147,7 +147,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
         })
       })
 
-      return saveOptimizationTabDataResponse._data
+      return saveOptimizationTabDataResponse?._data
     } else {
       return Promise.resolve({
         message: "Missing required field(s)",

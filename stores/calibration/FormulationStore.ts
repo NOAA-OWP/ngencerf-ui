@@ -39,7 +39,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       },
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
     } ).then( ( formulationTabDataResult ) => {
-      formulationTabData.value = formulationTabDataResult._data ?? undefined
+      formulationTabData.value = formulationTabDataResult?._data ?? undefined
       setUserSelection()
       
       data_loading.value = false
@@ -205,7 +205,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
         } )
       })
       
-      return saveFormulationTabDataResponse._data
+      return saveFormulationTabDataResponse?._data
     } else {
         return Promise.resolve({
           message: "Missing required field(s)",

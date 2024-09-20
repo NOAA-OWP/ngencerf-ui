@@ -77,7 +77,10 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
 const { 
   calibrationIsReady,
-  calibrationStatus
+  calibrationStatus,
+  startTimeDate,
+  startTime,
+  runningTime,
  } = storeToRefs(runStatusStore);
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
@@ -92,9 +95,6 @@ const {
 
 const loading = ref(true);
 const isCalibrationReady = ref();
-const runningTime = ref();
-const startTimeDate = ref();
-const startTime = ref();
 const stopCriteria = ref();
 const iterations = ref();
 
@@ -124,8 +124,8 @@ onMounted(async () => {
 
   // Get Calibration Status
   isCalibrationReady.value = await queryCalibrationIsReady();
-  console.log('isCalibrationReady:', isCalibrationReady.value._data);
-  if (!isCalibrationReady.value._data) {
+  console.log('isCalibrationReady:', isCalibrationReady?.value._data);
+  if (!isCalibrationReady?.value._data) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Ready status', life: 5000 });
   } else {
     calibrationStatus.value = isCalibrationReady.value?._data?.status;
@@ -204,9 +204,38 @@ watch(calibrationStatus, async () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
     }
+
+    // Get Plot Names
+    plotNames.value = await queryGetPlotNames();
+    if (plotNames.value) {
+      console.log('plotNames:', plotNames.value?._data);
+
+      // setting plotList and selectedPlotName will populate the dropdown
+      plotList.value = plotNames.value?._data?.plot_list;
+      if (!selectedPlotName.value) {
+        selectedPlotName.value = plotList.value[0]?.name;
+        console.log('selectedPlotName:', selectedPlotName.value);
+      }
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
+    }
   }
 
   else if (calibrationStatus.value === 'Done') {
+    // Update Plot Names
+    plotNames.value = await queryGetPlotNames();
+    if (plotNames.value) {
+      console.log('plotNames:', plotNames.value?._data);
+
+      // setting plotList and selectedPlotName will populate the dropdown
+      plotList.value = plotNames.value?._data?.plot_list;
+      if (!selectedPlotName.value) {
+        selectedPlotName.value = plotList.value[0]?.name;
+        console.log('selectedPlotName:', selectedPlotName.value);
+      }
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
+    }
     stopCriteriaMet.value = true;
     clearInterval(runningTimeIntervalId);
     clearInterval(statusIntervalId);
@@ -223,7 +252,7 @@ watch(calibrationStatus, async () => {
   }
 });
 
-// // Handle iterations changes
+// // WE WILL USE THIS LATER. Handle iterations changes
 // watch(iterations, async (newIterations, oldIterations, onCleanup) => {
 //   if (calibrationStatus.value === 'Running') {
 //     if (iterationIntervalId) {
@@ -299,7 +328,7 @@ useListen('calibrationButtonResetCancel', async (actionButton) => {
 });
 
 // /**
-//  * Calculate Progress
+//  * Calculate Progress. WE WILL USE THIS LATER.
 //  */
 // const calculateProgress = (): void => {
 //   if (stopCriteria.value && !stopCriteriaMet.value) {
