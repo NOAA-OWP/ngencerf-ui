@@ -47,9 +47,12 @@
                 <div class="col-span-4"></div>
                 <div class="col-span-4">
                   <div>
-                    <div class="mb-2"> Geopackage: </div>
-                    <Button label="Upload File" icon="pi pi-upload"
-                      @click="showGeopackagFileUploadDialog('Geopackage File')"></Button>
+                    <div class="mb-2"> Geopackage: </div>                          
+                    <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList"
+                    optionLabel="name" optionValue="name" placeholder=" ... " class="w-40"></Select>
+                    <div v-if="selectedGeopackageValue.toLowerCase() == 'upload'">
+                        <Button label="Upload File" icon="pi pi-upload" @click="showGeopackagFileUploadDialog( 'Geopackage File' )"></Button>  
+                    </div>  
                   </div>
                   <!-- These controls temorarily commented out and will be dealt with with a later story NHS 8-19-2024-->
                   <!-- <div class="grid grid-cols-4 gap=4">
@@ -140,13 +143,13 @@ import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import TabPanels from "primevue/tabpanels";
 
-const gageStore = useGageStore();
-const { gageData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore);
-const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore;
-const { getCalibrationTabIndex } = generalStore();
-const { calibrationJobId } = storeToRefs(generalStore());
-const { fetchUserCalibrationRunData } = useUserDataStore();
-const toast = useToast();
+const gageStore = useGageStore()
+const { gageData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
+const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore
+const { getCalibrationTabIndex } = generalStore()
+const { calibrationJobId } = storeToRefs(generalStore())
+const { fetchUserCalibrationRunData } = useUserDataStore()
+const toast = useToast()
 
 loadGageTabStaticData()
 
@@ -154,23 +157,8 @@ const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
 
 const onGageSelectionChange = () => {
-  fetchSelectedGageData();
+  fetchSelectedGageData()
 }
-
-/**
- * event bus for calibration button group click
- */
-useListen('calibrationButtonSaveStart', (actionButton) => {
-  console.log("Action Button: ", actionButton);
-  if (getCalibrationTabIndex() == 1 && actionButton == 'SAVE') {
-    const save_tab_response = saveGageTabData();
-    console.log(`saveTabContent Gage, should be tabIndex 1, on tabIndex ${getCalibrationTabIndex()}, save response: `, save_tab_response);
-    save_tab_response.then((response) => {
-      toast.add({ severity: 'info', summary: 'Open', detail: response?.message, life: 3000 })
-      fetchUserCalibrationRunData();
-    })
-  }
-})
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
   console.log("Action Button: ", actionButton);
@@ -271,6 +259,37 @@ const showGeopackagFileUploadDialog = (headerText: string) => {
     fileUploadDialogOpened.value = true
   }
 }
+
+/**
+ * event bus for calibration button group click
+ */
+useListen('calibrationButtonSaveStart', (actionButton) => {
+if (getCalibrationTabIndex() == 1 && actionButton == 'SAVE') {
+  toast.removeAllGroups()
+  const save_tab_response = saveGageTabData()
+  
+  save_tab_response.then((response) => {
+    if ( response?.status == 'error' ) {
+        toast.add({ severity: response?.status, summary: 'Error Saving Gage Tab Data', detail: response?.message })
+    } else {
+        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 })
+        fetchUserCalibrationRunData()
+    }
+  })
+}
+})
+
+useListen('calibrationButtonResetCancel', (actionButton) => {
+if (getCalibrationTabIndex() == 1 && actionButton == 'RESET') {
+  resetUserSelectionGage()
+}
+})
+
+useListen('calibrationButtonPrev', (actionButton) => {
+if (getCalibrationTabIndex() == 1) {
+  navigateTo("PreviousRuns")
+}
+})
 
 /**
  * follow section waiting further detail to be implemented

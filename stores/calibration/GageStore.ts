@@ -26,6 +26,7 @@ export const useGageStore = defineStore('GageStore', () => {
   const selectedGageValue = ref<string>("")
   const selectedForcingValue = ref<string>("")
   const selectedObservationalValue = ref<string>("")
+  const selectedGeopackageValue = ref<string>("")
   const gageData = ref<GageData>()
 
   const data_loading = ref<boolean>(true)
@@ -106,6 +107,10 @@ export const useGageStore = defineStore('GageStore', () => {
     return gageTabData.value?.observational_source_values
   })
 
+  const getGeopackageOptionsList = computed(() => {
+    return gageTabData.value?.geopackage_source_values
+  })
+
   /**
   *  fetch gage data based on the selected gage value
   *  @returns {void}
@@ -132,10 +137,11 @@ export const useGageStore = defineStore('GageStore', () => {
     const saveGageTabDataValidation = useCalibrationTabValidation({
       gage_id: selectedGageValue.value,
       forcing_source: selectedForcingValue.value,
-      observational_source: selectedObservationalValue.value
+      observational_source: selectedObservationalValue.value,
+      geopackage_source: selectedGeopackageValue.value
     })
-
-    if (saveGageTabDataValidation.errors.value.length == 0) {
+    
+    if ( Object.keys( saveGageTabDataValidation.errors.value ).length == 0) {
       const saveGageTabDataResponse = await makeProtectedApiCall<SaveGageTabResponse>(`${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
         method: "POST",
         headers: {
@@ -146,11 +152,12 @@ export const useGageStore = defineStore('GageStore', () => {
           calibration_run_id: calibrationJobId.value,
           gage_id: selectedGageValue.value,
           forcing_source: selectedForcingValue.value,
-          observational_source: selectedObservationalValue.value
+          observational_source: selectedObservationalValue.value,
+          geopackage_source: selectedGeopackageValue.value
         })
       })
 
-      geopackageImageUrl.value = saveGageTabDataResponse?.geopackage_image ?? ""
+      geopackageImageUrl.value = saveGageTabDataResponse?.geopackage_image_url ?? ""
 
       return saveGageTabDataResponse?._data
     } else {
@@ -193,25 +200,11 @@ export const useGageStore = defineStore('GageStore', () => {
       body: formData
     })
 
-   /**
-    * @returns {void}
-    */
-   const resetUserSelection = (): void => {
-      console.log( 'click reset')
-      if( userCalibrationRunData.value?.gage ) {
-         setUserSelection()
-      } else {
-         selectedDomainValue.value = ""
-         selectedForcingValue.value = ""
-         selectedGageValue.value = ""
-         selectedObservationalValue.value = ""
-         gageData.value = undefined
-      }
-   }
     return saveUserObservationalFilesResponse
   }
 
   async function saveUserGeopackageFile(formData: FormData) {
+    formData.append('return_geopackage_url', String( true ) )
     const saveUserGeopackageFilesResponse = await makeProtectedApiCall<GeneralApiSaveResponse | GeneralErrorResponse>(`${ngencerfBaseUrl}/calibration/upload_geopackage_data/`, {
       method: "POST",
       headers: {
@@ -232,6 +225,7 @@ export const useGageStore = defineStore('GageStore', () => {
     selectedGageValue.value = userCalibrationRunData.value?.gage?.gage_id ?? ""
     selectedForcingValue.value = userCalibrationRunData.value?.forcing_source ?? ""
     selectedObservationalValue.value = userCalibrationRunData.value?.observational_source ?? ""
+    selectedGeopackageValue.value = userCalibrationRunData.value?.geopackage_source ?? ""
     gageData.value = userCalibrationRunData.value?.gage ?? undefined
   }
 
@@ -258,6 +252,7 @@ export const useGageStore = defineStore('GageStore', () => {
     selectedForcingValue.value = "";
     selectedGageValue.value = "";
     selectedObservationalValue.value = "";
+    selectedGeopackageValue.value = ""
     gageData.value = undefined;
     geopackageImageUrl.value = "";
     console.log("Gage Store Reset");
@@ -269,11 +264,13 @@ export const useGageStore = defineStore('GageStore', () => {
     selectedGageValue,
     selectedObservationalValue,
     getSavedDomainValue,
+    selectedGeopackageValue,
     gageTabData,
     getDomainOptionsList,
     getGageOptionsList,
     getForcingOptionsList,
     getObservationalOptionsList,
+    getGeopackageOptionsList,
     saveGageTabData,
     isNWMv3,
     fetchSelectedGageData,

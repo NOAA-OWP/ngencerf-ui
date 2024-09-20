@@ -29,15 +29,37 @@
         <td class="td2">&nbsp;</td>
       </tr>
       <tr>
-        <td class="td1"><span class="text-2xl">Selections</span></td>
-        <td class="td2"></td>
+        <td class="td1"><span class="text-2xl">SLoTH Variables</span></td>
+        <td class="td2">Simple Logical Tautology Handler (SLoTH) variables enable testing a module without having all necessary upstream
+          modules in the formulation. The user defines a SLoTH variable to hold expected output and maps it to
+          the module variable requiring the data. For more details see 
+          <a href="https://github.com/NOAA-OWP/SLoTH" target="_blank"  class="underline">NOAA-OWP SLoTH Repository</a> REAMDE file.<br />
+        </td>
       </tr>
       <tr>
-        <td class="td1">Add SLoTH output Variables:</td>
-        <td class="td2">Selecting this checkbox allows the user to add multiple SLoTH variables for use in the
-          formulation. The use of SLoTH variables provides the ability to test a module without having all necessary
-          upstream modules in the formulation. The user defines a SLoTH variable to hold expected output and maps it to
-          the module variable requiring the data. </td>
+        <td class="td1">Add SLoTH output Variables Checkbox:</td>
+        <td class="td2">Selecting this checkbox will present the user with a field to create the name SLoTH variable and a 
+          button to add it to the formulation.</td>
+      </tr>
+      <tr>
+        <td class="td1">Add Button:</td>
+        <td class="td2">Adds SLoTH variable name specified in the name field to the table of SLoTH Variables.
+          User must supply all fields in the table row for the added variable.
+        </td>
+      </tr>
+      <tr>
+        <td class="td1">SLoTH Variable Table:</td>
+        <td class="td2">Columns:<br>
+          &nbsp;&nbsp; <b>SLoTH Output Var</b>: User defined name.<br />
+          &nbsp;&nbsp; <b>Count</b>: Number of variables<br />
+          &nbsp;&nbsp; <b>Type</b>: Data type of elements<br />
+          &nbsp;&nbsp; <b>Units</b>: Dimensions<br />
+          &nbsp;&nbsp; <b>Location</b>: node (always node)<br />
+          &nbsp;&nbsp; <b>For Module</b>: Name of module to received SLoTH variable<br />
+          &nbsp;&nbsp; <b>Module Param</b>: Module Parameter name to receive the SLoTH variable value<br />
+          &nbsp;&nbsp; <b>Value</b>: Value of variable<br />
+          <br />
+        </td>
       </tr>
       <tr>
         <td class="td1">SAVE Button:</td>

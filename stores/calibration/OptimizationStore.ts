@@ -60,7 +60,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold ?? undefined
     uiObjectiveFunction.value = userCalibrationRunData.value?.objective_function ?? ""
     uiOptimization.value = userCalibrationRunData.value?.optimization ?? ""
-    uiPlotFrequency.value = userCalibrationRunData.value?.plot_frequency ?? 0
+    uiPlotFrequency.value = userCalibrationRunData.value?.save_plot_iteration_frequency ?? 0
     uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 0
     uiOptimizationInputs.value = getOptimizationInputUserData.value ?? []
   }
@@ -128,7 +128,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
       objective_function: uiObjectiveFunction.value
     })
 
-    if (saveOptimizationTabDataValidation.errors.value.length == 0) {
+    if ( Object.keys( saveOptimizationTabDataValidation.errors.value ).length == 0) {
       const saveOptimizationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>(`${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
         method: "POST",
         headers: {
@@ -143,7 +143,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
           streamflow_threshold: uiStreamFlowThreshold.value,
           peak_flow_threshold: uiPeakFlowThreshold.value,
           stop_criteria: uiStopCriteria.value,
-          plot_frequency: uiPlotFrequency.value
+          save_plot_iteration_frequency: uiPlotFrequency.value
         })
       })
 
