@@ -1,62 +1,63 @@
-FormulationName<template>
-   <div id="Formulation">
+<template>
+   <div id="Formulation" class="ml-6">
 
-      <div class="grid grid-rows-12">
+      <div class="grid grid-rows-12 pt-4 text-sm">
          <div class="grid row-span-1">
             <div class="grid grid-cols-8">
-               <div class="col-span-2">&nbsp;</div>
-               <div class="col-span-4">
-                  <div id="FormulationName" class="inline-block ml-20 mr-5 mt-3" aria-label="Forumulation Name"
+               <div class="col-span-8">
+                  <div id="FormulationName" class="block mt-3" aria-label="Forumulation Name"
                      title="Formulation Name">
-                     Forumulation Name:
+                     <label for="formulationNameInput">Forumulation Name:</label>
                   </div>
-                  <InputText v-model="formulationNameInput" class="inline-block w-64 p-1" aria-label="Input Forumulation Name" title="Input Formulation Name" required></InputText>
+                  <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1" aria-label="Input Forumulation Name" title="Input Formulation Name" required></InputText>
                </div>
-               <div class="col-span-2">&nbsp;</div>
             </div>
          </div>
 
          <div class="row-span-5">
+            <div class="mt-1 mb-3 hr"></div>
             <div class="grid grid-cols-12">
-               <div class="col-span-3">&nbsp;</div>
-               <div class="col-span-2">
-                  <div class="mt-2 text-left"><strong>Modules</strong></div>
+               <div class="col-span-5">
+                  <div class="mt-2 text-left"><strong>Select Modules</strong></div>
                   <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
-                     Groups: 
-                     <Dropdown v-model="filterGroup" :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description" optionValue="name" class="ml-2" placeholder="ALL"></Dropdown>
+                     <label for="Groups">Groups:</label>
+                     <Dropdown id="Groups"
+ v-model="filterGroup" :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description" optionValue="name" placeholder="ALL"></Dropdown>
                   </div>
                   <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple optionLabel="name" optionValue="name" class="w-full h-60"></Listbox>
                </div>
                <div class="col-span-2">&nbsp;</div>
                <div class="col-span-5">
                   <div class="group-cover-selection-wrapper w-60 float-left">
-                     <div class="mt-2 mb-2" aria-label="List of groups covered by selection"
-                        title="List of groups covered by selection"><strong>Groups Covered By Selections</strong></div>
-                     <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name" optionValue="name" scrollHeight="18rem" class="w-full h-72">
+                     <div class="mt-2 mb-2 pl-4" aria-label="List of groups covered by selection"
+                        title="List of groups covered by selection"><strong>Groups Covered By Selections:</strong></div>
+                     <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name" optionValue="name" scrollHeight="18rem" class="w-full border-0">
                         <template #option="slotProps">
-                           <div v-bind:class="( slotProps.option.selected == true)?'pi pi-check font-bold':'pl-5'">{{ slotProps.option.name }}</div>
+                           <div v-bind:class="( slotProps.option.selected == true)?'pi pi-check font-bold':'pl-5'"><span class="font-ui pl-2">{{ slotProps.option.name }}</span></div>
                         </template>
                      </Listbox>
                   </div>
                </div>
                <div class="col-span-1">&nbsp;</div>
             </div>
+            <div class="mt-3 mb-5 hr"></div>
          </div>
          <div class="row-span-6">
             <div>
-               <span class="text-left ml-40">
-                  <input type="checkbox" id="SlothCheck" class="ml-4" v-model="useSlothParameters" />
-                  <label class="inline-block text-xl mb-2" for="SlothCheck">&nbsp;Add SLoTH output variable for
-                     formulation</label>
-               </span>
-               <span v-show="useSlothParameters">
-                  <label class="inline-block text-xl pl-10 pr-4" for="SlothName">SLoTH Name:</label>
-                  <input class="inline-block w-auto" id="SlothName" type="text" v-model="new_sloth_variable_name">
-                  <div class="ngenButtonDiv ml-3 inline-block">
-                     <button id="SlothAddBtn" @click="addSlothVariable">Add</button>
-                  </div>
-               </span>
-               <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="items-center ml-10 mr-10 mt-4">
+               <div class="flex">
+                  <span class="text-left pt-1">
+                     <input type="checkbox" id="SlothCheck" class="ml-2" v-model="useSlothParameters" />
+                     <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for formulation</label>
+                  </span>
+                  <span v-show="useSlothParameters" class="ml-auto pr-2">
+                     <label class="inline-block  text-[16px] pl-10 pr-4" for="SlothName">SLoTH Name:</label>
+                     <input class="inline-block w-auto" id="SlothName" type="text" v-model="new_sloth_variable_name">
+                     <div class="ngenButtonDiv ml-3 inline-block">
+                        <button id="SlothAddBtn" @click="addSlothVariable">Add</button>
+                     </div>
+                  </span>
+               </div>
+               <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="w-full items-center pl-2 pr-2 mt-2">
 
                   <ContextMenu :pt="{ root: { id: 'loth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
                 :model="cmSlothParameterData"></ContextMenu>               

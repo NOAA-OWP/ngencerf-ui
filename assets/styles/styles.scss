@@ -13,17 +13,17 @@ html {
 }
 
 h1 {
-  font-size: 20px;
+  font-size: 30px;
   margin: 0;
 }
 
 h2 {
-  font-size: 14px;
+  font-size: 24px;
 }
 
- .construction-images {
+.construction-images {
   width: 30%;
- }
+}
 
 body {
   margin: 0;
@@ -43,30 +43,106 @@ body {
   min-height: 945px !important;
 }
 
+.font-ui {
+  font-family: ui-sans-serif, system-ui, sans-serif, sans-serif, Arial, Helvetica;
+}
+
 .boxed {
   border: 1px solid #000;
 }
 
-input {
-  border: solid #aaaaaa;
-  border-width: 2px;
+label {font-weight: bold;}
+
+input, .p-select, .varInputs {
   width: 100%;
+  padding: 5px 10px !important;
+  border-radius: 2px !important;
+}
+.bg-white,
+.white-tall-content-box {
+  input, .p-select, .p-inputtext, .p-password-input, .varInputs {
+    background-color: $ngwcp_neutral_gray_lt;  
+    border: 0px solid $ngwcp_neutral_gray_md;
+  }
+}
+
+input::-webkit-input-placeholder {
+  opacity: 0.8;
+}
+
+.inputBox {
+  margin-top: 20px;
+}
+
+.h-screen-inner {
+  height: Calc(100vh - 180px);
+}
+.h-screen-inner-less {
+  height: Calc(100vh - 240px);
+}
+
+.bg-white {
+  background-color: #fff;
+}
+
+.underline,
+.underline button {
+  text-decoration: underline;
 }
 
 .ngenButtonDiv {
   cursor: pointer;
-  border: 1px solid black;
   color: white;
-  padding: 8px;
-  border-radius: 10px;
+  padding: 6px 25px;
+  border-radius: 28px;
   background-color: $ngwcp_primary1;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
+  border: 0px;
+  display: inline-block;
 }
 
 .ngenButtonDiv:hover {
-  background-color: $ngwcp_primary2;
-  color: black;
+  background-color: $ngwcp_primary3;
+  color: white;
+}
+
+.ngenButtonDiv-alt {
+  cursor: pointer;
+  color: white;
+  padding: 5px 20px;
+  border-radius: 28px;
+  background-color: $ngwcp_primary4;
+  text-align: center;
+  font-size: 16px;
+  border: 0px;
+  display: inline-block;
+}
+.ngenButtonDiv-alt:hover {
+  background-color: $ngwcp_primary3;
+  color: white;
+}
+.ngenButtonDiv-alt button,
+.ngenButtonDiv-alt button:hover,
+.ngenButtonDiv-alt button:focus {
+  outline: none; /* Remove default focus outline */
+  box-shadow: 0px; /* Optional: Add a subtle shadow on focus */
+  background-color: inherit;
+  border: 0px;
+}
+
+
+.btn-left {
+  margin-right: auto;
+  margin-left: 0px;
+}
+.btn-right {
+  margin-right: 0px;
+  margin-left: auto;
+}
+.btn-center {
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .prevent-select {
@@ -123,8 +199,6 @@ select option {
   height: 1.5rem;
 }
 
-/* End temporary styles */
-
 .default-style {
   min-width: 100%;
   min-height: 100vh;
@@ -178,15 +252,25 @@ select option {
 
 // TimeDatePicker
 .dp__input {
-  height: 25px;
-  margin-bottom: 11px;
-  margin-left: 10px;
+  height: 35px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  padding-left: 50px;
   font-family: 'Courier New', Courier, monospace !important;
+  text-align: center;
+  vertical-align: middle;
 }
-
+.dp__input_icons {
+  padding: 10px 12px !important;
+}
 .dp--clear-btn,
 .dp__input_icon {
-  top: 30% !important;
+  /*top: 40% !important;*/
+  top: 16px !important;
+}
+.p-listbox-option {
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 
 // DataTables
@@ -199,9 +283,14 @@ select option {
 }
 
 .p-datatable-thead tr th {
-  background-color: #105d8e;
+  background-color: $ngwcp_primary1;
   color: white;
   border-left: 1px solid white;
+}
+
+.p-datatable-thead tr th:hover {
+  background-color: $ngwcp_primary3 !important;
+  color: white !important;
 }
 
 .p-datatable-sort-icon {
@@ -211,6 +300,55 @@ select option {
 .p-datatable-column-title {
   font-size: 0.8em;
 }
+
+// default color ovewrites
+.bg-green { background-color: $ngwcp_secondary4 !important; }
+.bg-blue1 { background-color: $ngwcp_primary1 !important; }
+.bg-blue2 { background-color: $ngwcp_primary2 !important; }
+.bg-blue3 { background-color: $ngwcp_primary3 !important; }
+.bg-blue4 { background-color: $ngwcp_primary4 !important; }
+.bg-white { background-color: white !important; }
+.c-blue { color: $color-blue !important; }
+.c-blue-primary1 { color: $ngwcp_primary1 !important; }
+.c-black { color: $black !important; }
+
+.c-gray-bg {background-color: $ngwcp_background !important }
+.bg-gray-md {background-color: $ngwcp_neutral_gray_md !important }
+
+
+#ProgressGroup {
+  width: 100%;
+  padding: 0px 10px 0 0;
+  tr {
+    line-height: calc(1.3vw + 0.41vh); 
+  }
+  .checkMark {
+    text-align: right;
+  }
+  .ptype {
+    width: 90%;
+  }
+  table {
+    th, td {
+      padding-left: 8px;
+    }
+    tr:nth-child(even) {
+      background-color: $ngwcp_neutral_gray_lt;
+    }
+    tr:nth-child(odd) {
+      background-color: $ngwcp_neutral_gray_md;
+    }
+  }
+}
+
+//ATTENTION to DEVELOPERS: TEMORARY: REMOVE THIS AFTER geopackageImageUrl is working
+#GageCutout {
+  background-image: url(http://localhost:3000/_nuxt/assets/images/temp-progress.png);
+  background-repeat: no-repeat; 
+  background-size: cover;
+  background-position: center; 
+}
+
 
 // Help Pages
 

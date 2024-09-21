@@ -7,12 +7,12 @@
             <div class="col-span-1">
               <table>
                 <tr>
-                  <td class="text-right">Running Time:</td>
-                  <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
+                  <td class="text-right font-bold">Start Time:</td>
+                  <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                 </tr>
                 <tr>
-                  <td class="text-right">Start Time:</td>
-                  <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
+                  <td class="text-right font-bold">Running Time:</td>
+                  <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                 </tr>
                 <!-- <tr>
                   <td class="text-right">Iteration:</td>
@@ -21,28 +21,38 @@
               </table>
             </div>
 
-            <div class="col-span-1 pl-5" style="border-left: 1px solid #000">
-              <div class="mt-1">
-                Status: <span v-if="!progress">
-                  <input class="dummyProgress ml-2" v-model="calibrationStatus" disabled style="width: 296px;" />
-                </span>
-                <span v-else>
-                  <ProgressBar :value="progress"></ProgressBar>
-                </span>
-              </div>
-              <div class="mt-4">Display:
-                <select id="DisplayOptions" v-model="selectedPlotName">
-                  <option v-for="plot in plotList" :key="plot.name" :value="plot.name">
-                    {{ plot.name }}
-                  </option>
-                </select>
-              </div>
+
+            <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
+              <table>
+                <tr>
+                  <td class="text-right"><label for="RunStatus">Status:</label></td>
+                  <td class="pl-5">
+                    <span v-if="!progress">
+                      <input id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;" v-model="calibrationStatus" disabled />
+                    </span>
+                    <span v-else>
+                      <ProgressBar :value="progress"></ProgressBar>
+                    </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-right"><label for="DisplayOptions">Display:</label></td>
+                      <td class="pl-5">
+                    <select id="DisplayOptions" class="p-select" v-model="selectedPlotName">
+                      <option v-for="plot in plotList" :key="plot.name" :value="plot.name">
+                        {{ plot.name }}
+                      </option>
+                    </select>
+                  </td>
+                </tr>
+              </table>
             </div>
+
           </div>
         </div>
       </div>
       <div class="row-span-10">
-        <div id="GraphArea">
+        <div id="GraphArea" class="p-2">
          Data Display
 
         </div>
@@ -351,26 +361,22 @@ useListen('calibrationButtonNext', (actionButton) => {
   padding: 10px 10px 10px 20px;
   border-radius: 10px;
   height: 100px;
-  border: 1px solid $ngwcp_primary1;
+  border: 0px solid $ngwcp_neutral_gray_md;
   min-width: 750px;
 
-}
-
-#ResultsArea {
-  text-align: center;
-  border-radius: 10px;
 }
 
 #GraphArea {
   height: 500px;
   width: 900px;
   margin: 8px auto 0 auto;
-  border: 1px solid black;
+  border: 1px solid  $ngwcp_neutral_gray_md;
 }
 
+#RunStatus,
 #DisplayOptions {
-  width: 60%;
-  margin-left: 10px;
+  width:250px;
+  margin-left: 0px;
 }
 
 .p-progressbar {

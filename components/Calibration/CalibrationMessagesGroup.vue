@@ -1,92 +1,95 @@
 <template>
   <div id="Messages">
-    <div class="grid grid-rows-12">
+    <!--<div class="grid grid-rows-12">-->
+    <div class="">
+      
+      <h2 class="mt-5">Previous Calibration Run Setup</h2>
 
-      <div class="row-span-2">
-        <div class="grid grid-cols-2 gap=1">
+      <!--<div class="row-span-2">-->
+        <div class="grid grid-cols-2 gap=1 text-sm mt-4">
           <div class="col-span-1">
-            <p v-if="calData?.gage?.gage_id">Gage: &nbsp;<span class="font-medium">{{ calData?.gage?.gage_id }}</span></p>
-            <p v-if="calData?.forcing_source">Forcing Data: &nbsp;<span class="font-medium">{{ calData?.forcing_source
-                }}</span></p>
-            <p v-if="calData?.formulation_name">Formulation Name: &nbsp;<span class="font-medium">{{
+            <p v-if="calData?.gage?.gage_id"><span class="font-medium">Gage:</span> {{ calData?.gage?.gage_id }}</p>
+            <p v-if="calData?.forcing_source"><span class="font-medium">Forcing Data:</span> {{ calData?.forcing_source
+                }}</p>
+            <p v-if="calData?.formulation_name"><span class="font-medium">Formulation Name:</span> {{
               calData?.formulation_name
-                }}</span></p>
+                }}</p>
           </div>
           <div class="col-span-1">
             <p v-if="calData?.gage?.station_name"><span class="font-medium">{{ calData?.gage?.station_name }}</span></p>
-            <p v-if="calData?.observational_source">Observational Data: &nbsp;<span class="font-medium">{{
-              calData?.observational_source }}</span></p>
+            <p v-if="calData?.observational_source"><span class="font-medium">Observational Data:</span> {{
+              calData?.observational_source }}</p>
           </div>
         </div>
-      </div>
+      <!--</div>
 
-      <div class="row-span-1">
-        <div class="grid grid-cols=1">
+      <div class="row-span-1">-->
+        <div class="grid grid-cols=1 gap=1 text-sm mt-4">
           <div class="col-span-1">
-            <p v-if="calData?.modules.length">Modules: &nbsp;<span class="font-medium">{{ getModuleList() }}</span></p>
+            <p v-if="calData?.modules.length"><span class="font-medium">Modules:</span>{{ getModuleList() }}</p>
           </div>
         </div>
-      </div>
+      <!--</div>
 
 
-      <div class="row-span-9">
-        <div class="grid grid-cols-2 gap=1">
+      <div class="row-span-9">-->
+        <div class="grid grid-cols-2 gap=1 text-sm text-left mt-4">
           <div class="col-span-1">
-            <p v-if="calData?.calibration_times.simulation_start_time" class="text-center">Calibration Run</p>
-            <p v-if="calData?.calibration_times.simulation_start_time">&nbsp;&nbsp;Sim Start:
-            <div class="datePos"><span class="font-medium">
-                {{ formatDate(calData?.calibration_times.simulation_start_time) }}</span></div>
+            <p v-if="calData?.calibration_times.simulation_start_time"><span class="font-medium">Calibration Run</span></p>
+            <p v-if="calData?.calibration_times.simulation_start_time"><span class="font-medium">Sim Start:</span>
+            <div class="datePos">
+                {{ formatDate(calData?.calibration_times.simulation_start_time) }}</div>
             </p>
-            <p v-if="calData?.calibration_times.simulation_end_time">&nbsp;&nbsp;&nbsp;&nbsp;Sim End:
-            <div class="datePos"><span class="font-medium">
-                {{ formatDate(calData?.calibration_times.simulation_end_time) }}</span></div>
+            <p v-if="calData?.calibration_times.simulation_end_time"><span class="font-medium">Sim End:</span>
+            <div class="datePos">
+                {{ formatDate(calData?.calibration_times.simulation_end_time) }}</div>
             </p>
-            <p v-if="calData?.calibration_times.calibration_start_time">Calib Start:
-            <div class="datePos"><span class="font-medium">
-                {{ formatDate(calData?.calibration_times.calibration_start_time) }}</span></div>
+            <p v-if="calData?.calibration_times.calibration_start_time"><span class="font-medium">Calib Start:</span>
+            <div class="datePos">
+                {{ formatDate(calData?.calibration_times.calibration_start_time) }}</div>
             </p>
-            <p v-if="calData?.calibration_times.calibration_end_time">&nbsp;&nbsp;Calib End:
-            <div class="datePos"><span class="font-medium">
-                {{ formatDate(calData?.calibration_times.calibration_end_time) }}</span></div>
+            <p v-if="calData?.calibration_times.calibration_end_time"><span class="font-medium">Calib End:</span>
+            <div class="datePos">
+                {{ formatDate(calData?.calibration_times.calibration_end_time) }}</div>
             </p>
             <p>&nbsp;</p>
-            <p v-if="calData?.output_variable_to_calibrate.name">Cal Output Variable: &nbsp;<span class="font-medium">
-                {{ calData?.output_variable_to_calibrate.name }}</span></p>
-            <p v-if="calData?.optimization">Optimization Algorithm: &nbsp;<span class="font-medium">
-                {{ calData?.optimization }}</span></p>
-            <p v-if="calData?.stop_criteria">Calibration Stop Criteria: &nbsp;<span class="font-medium">
-                {{ calData?.stop_criteria }}</span></p>
-            <p v-if="false">Metrics: &nbsp;<span class="font-medium">{{ null }}</span></p>
+            <p v-if="calData?.output_variable_to_calibrate.name"><span class="font-medium">Cal Output Variable:</span>
+                {{ calData?.output_variable_to_calibrate.name }}</p>
+            <p v-if="calData?.optimization"><span class="font-medium">Optimization Algorithm:</span>
+                {{ calData?.optimization }}</p>
+            <p v-if="calData?.stop_criteria"><span class="font-medium">Calibration Stop Criteria:</span>
+                {{ calData?.stop_criteria }}</p>
+            <p v-if="false"><span class="font-medium">Metrics:</span> {{ null }}</p>
 
           </div>
           <div class="col-span-1">
-            <p v-if="calData?.validation_times.simulation_start_time" class="text-center">Validation Run</p>
-            <p v-if="calData?.validation_times.simulation_start_time">&nbsp;&nbsp;Sim Start:
-            <div class="datePos"><span class="font-medium">
-                {{ formatDate(calData?.validation_times.simulation_start_time) }}</span></div>
+            <p v-if="calData?.validation_times.simulation_start_time"><span class="font-medium">Validation Run</span></p>
+            <p v-if="calData?.validation_times.simulation_start_time"><span class="font-medium">Sim Start:</span>
+            <div class="datePos">
+                {{ formatDate(calData?.validation_times.simulation_start_time) }}</div>
             </p>
-            <p v-if="calData?.validation_times.simulation_end_time">&nbsp;&nbsp;&nbsp;&nbsp;Sim End:
-            <div class="datePos"><span class="font-medium">
-                {{ formatDate(calData?.validation_times.simulation_end_time) }}</span></div>
+            <p v-if="calData?.validation_times.simulation_end_time"><span class="font-medium">Sim End:</span>
+            <div class="datePos">
+                {{ formatDate(calData?.validation_times.simulation_end_time) }}</div>
             </p>
-            <p v-if="calData?.validation_times.validation_start_time">&nbsp;&nbsp;Val Start:
-            <div class="datePos"><span class="font-medium">
-                {{ formatDate(calData?.validation_times.validation_start_time) }}</span></div>
+            <p v-if="calData?.validation_times.validation_start_time"><span class="font-medium">Val Start:</span>
+            <div class="datePos">
+                {{ formatDate(calData?.validation_times.validation_start_time) }}</div>
             </p>
-            <p v-if="calData?.validation_times.validation_end_time">&nbsp;&nbsp;&nbsp;&nbsp;Val End:
-            <div class="datePos"><span class="font-medium">
-                {{ formatDate(calData?.validation_times.validation_end_time) }}</span></div>
+            <p v-if="calData?.validation_times.validation_end_time"><span class="font-medium">Val End:</span>
+            <div class="datePos">
+                {{ formatDate(calData?.validation_times.validation_end_time) }}</div>
             </p>
             <p>&nbsp;</p>
-            <p v-if="calData?.objective_function">Tuning Parameters: &nbsp;<span class="font-medium">{{ null }}</span></p>
-            <p v-if="calData?.objective_function">Objective Function: <span class="font-medium">{{
-              calData?.objective_function }}</span></p>
-            <p v-if="calData?.save_plot_iteration_frequency">Plot Generation Frequency: &nbsp;<span class="font-medium">{{
-              calData?.save_plot_iteration_frequency }}</span></p>
+            <p v-if="calData?.objective_function"><span class="font-medium">Tuning Parameters:</span> {{ null }}</p>
+            <p v-if="calData?.objective_function"><span class="font-medium">Objective Function:</span> {{
+              calData?.objective_function }}</p>
+            <p v-if="calData?.save_plot_iteration_frequency"><span class="font-medium">Plot Generation Frequency:</span> {{
+              calData?.save_plot_iteration_frequency }}</p>
 
           </div>
         </div>
-      </div>
+      <!--</div>-->
     </div>
   </div>
 
@@ -130,7 +133,7 @@ const formatDate = (d: any) => {
 <style lang="scss" scoped>
 #Messages {
   padding: 15px;
-  font-size: 1.1em;
+  font-size: 1.2em;
 }
 
 p {
