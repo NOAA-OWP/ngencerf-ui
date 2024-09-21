@@ -1,5 +1,5 @@
 <template>
-   <!-- CalibrationRightBlock -->
+  <!-- CalibrationRightBlock -->
   <div id="RightBlock" class="grid grid-cols-1">
     <div class="grid-rows-12">
       <div id="TopRightBlock" class="row-span-5">
@@ -21,12 +21,12 @@
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
 import CalibrationProgressGroup from "./CalibrationProgressGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
-
-
 </script>
+
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 

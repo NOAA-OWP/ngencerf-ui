@@ -62,7 +62,6 @@ const SaveStartTabContent = async (e: MouseEvent) => {
     case 4: break;
     default: break;
   }
-  console.log("Save/Start Triggered")
 };
 
 const ResetCancelTabContent = async (e: MouseEvent) => {
@@ -76,7 +75,6 @@ const ResetCancelTabContent = async (e: MouseEvent) => {
     default: break;
   }
 
-  console.log("Stop/Reset Triggered")
 };
 
 const NavigatePrevContent = (e: MouseEvent) => {
@@ -89,7 +87,6 @@ const NavigatePrevContent = (e: MouseEvent) => {
     case 4: break;
     default: break;
   }
-  console.log("PREV Triggered")
 };
 
 const NavigateNextContent = (e: MouseEvent) => {
@@ -102,7 +99,6 @@ const NavigateNextContent = (e: MouseEvent) => {
     case 4: break;
     default: break;
   }
-  console.log("NEXT Triggered");
 };
 
 const showOrHideSaveStartButton = (): boolean => {

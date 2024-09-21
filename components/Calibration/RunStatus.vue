@@ -14,10 +14,6 @@
                   <td class="text-right">Start Time:</td>
                   <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                 </tr>
-                <!-- <tr>
-                  <td class="text-right">Iteration:</td>
-                  <td class="pl-5">{{ iterations ? iterations : '-'.repeat(30) }}</td>
-                </tr> -->
               </table>
             </div>
 
@@ -30,12 +26,12 @@
                   <ProgressBar :value="progress"></ProgressBar>
                 </span>
               </div>
-              <div class="mt-4">Display:
-                <select id="DisplayOptions" v-model="selectedPlotName">
+              <div class="mt-2">Display:
+                <Select id="DisplayOptions" v-model="selectedPlotName">
                   <option v-for="plot in plotList" :key="plot.name" :value="plot.name">
                     {{ plot.name }}
                   </option>
-                </select>
+                </Select>
               </div>
             </div>
           </div>
@@ -54,9 +50,9 @@
         </div>
       </div>
     </div>
-    <!-- <div class="waitgif" v-if="loading">
+    <div class="waitgif" v-if="isLoading">
       <img src="@/assets/styles/img/wait.gif" />
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -93,8 +89,8 @@ const {
   cancelCalibrationJob,
 } = runStatusStore;
 
-const loading = ref(true);
-const isCalibrationReady = ref();
+const isLoading = ref(true);
+//const isCalibrationReady = ref();
 const stopCriteria = ref();
 const iterations = ref();
 
@@ -112,10 +108,6 @@ let runningTimeIntervalId: NodeJS.Timeout | undefined = undefined;
 let iterationIntervalId: NodeJS.Timeout | undefined = undefined;
 
 onMounted(async () => {
-  // setTimeout(() => {
-  //   loading.value = false;
-  // }, 500);
-
   // Get User Calibration Run Data
   await fetchUserCalibrationRunData();
 
@@ -128,6 +120,7 @@ onMounted(async () => {
   } else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
   }
+  isLoading.value = false;
 });
 
 // Handle calibrationStatus changes

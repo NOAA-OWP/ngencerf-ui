@@ -127,12 +127,13 @@
         </div>
       </div>
     </div>
-    <div class="waitgif" v-if="data_loading">
+    <div class="waitgif" v-if="isLoading">
       <img src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
 </template>
 <script lang="ts" setup>
+import { getCurrentInstance } from 'vue';
 import { storeToRefs } from "pinia";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
@@ -141,7 +142,6 @@ import { useToast } from "primevue/usetoast";
 import { calibrationNextTabNavigate } from "~/composables/TabClickEvent";
 import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
-import TabPanels from "primevue/tabpanels";
 
 const gageStore = useGageStore()
 const { gageData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
@@ -151,7 +151,13 @@ const { calibrationJobId } = storeToRefs(generalStore())
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const toast = useToast()
 
-loadGageTabStaticData()
+const isLoading = ref(true);
+onMounted( () => {
+  loadGageTabStaticData();
+  setTimeout( () => {
+    isLoading.value = false;
+  }, 500)  
+})
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
@@ -161,15 +167,12 @@ const onGageSelectionChange = () => {
 }
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
-  console.log("Action Button: ", actionButton);
   if (getCalibrationTabIndex() == 1 && actionButton == 'RESET') {
     resetUserSelectionGage();
-    console.log("resetUserSelectionGage reset");
   }
 })
 
 useListen('calibrationButtonNext', (actionButton) => {
-  console.log("Action Button: ", actionButton);
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[1];
   e.click()

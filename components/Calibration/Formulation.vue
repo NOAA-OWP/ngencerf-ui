@@ -104,7 +104,7 @@ FormulationName<template>
             </div>
          </div>
       </div>
-      <div class="waitgif" v-if="data_loading">
+      <div class="waitgif" v-if="isLoading">
          <img src="@/assets/styles/img/wait.gif" />
       </div>
    </div>
@@ -120,9 +120,14 @@ import type { SlothParameterData } from '~/composables/NextGenModel';
 import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
+const isLoading = ref(true);
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
 const slothParamContextMenu = ref() //sloth parameter table context menu
+
+onMounted( () => {
+   isLoading.value = false;
+})
 const cmSlothParameterData = ref([
   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedSlothParameterData( selectedSlothParameterData ) }
 ])

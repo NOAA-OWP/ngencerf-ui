@@ -5,7 +5,6 @@ import { b } from 'vitest/dist/suite-IbNSsUWN.js';
 
 export default defineNuxtConfig({
   devtools: { enabled: false },
-  app: {},
   css: ["/assets/styles/styles.scss"],
   modules: [
     [

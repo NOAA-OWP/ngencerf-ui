@@ -32,17 +32,17 @@
       <div class="grid grid-cols-2">
         <div class="col-span-1">
           Scalar Values<br />
-          <select id="ScalarValues" class="selects mt-2">
+          <Select id="ScalarValues" class="selects mt-2">
             <option>...</option>
-          </select>
+          </Select>
           <button class="ngenButtonDiv addBtn">Add</button>
         </div>
 
         <div class="col-span-1">
           Gridded/semi-distributed Variables<br />
-          <select id="GriddedVars" class="selects mt-2">
+          <Select id="GriddedVars" class="selects mt-2">
             <option>...</option>
-          </select>
+          </Select>
           <button class="ngenButtonDiv addBtn">Add</button>
         </div>
       </div>

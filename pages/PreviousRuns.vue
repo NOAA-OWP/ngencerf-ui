@@ -45,9 +45,10 @@
         <AppFooter />
       </div>
     </div>
-
-
   </div>
+  <div class="waitgif" v-if="data_loading">
+      <img src="@/assets/styles/img/wait.gif" />
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -61,6 +62,13 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
+
+const data_loading = ref(true);
+onMounted( () => {
+  setTimeout( function() {
+    data_loading.value = false;
+  }, 500)
+});
 
 const calibrationJobStore = useCalibrationJobStore()
 const { calibrationJobId } = storeToRefs( generalStore() )
@@ -154,7 +162,6 @@ const acceptDelete = (selectedRunId: number) => {
 }
 
 onMounted( () => {
-   console.log('reset tab index')
    calibrationTabIndex.value = "1"
    evaluationTabIndex.value = "1"
    forecastTabIndex.value = "1"
