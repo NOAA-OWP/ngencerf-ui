@@ -7,29 +7,6 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   app: {},
   css: ["/assets/styles/styles.scss"],
-
-  preprocessorOptions: {
-    scss: {
-      quietDeps: true
-    },
-    css: {
-      preprocessorOptions: {
-        scss: {
-          silenceDeprecations: ['legacy-js-api'],
-        },
-      },
-    },
-  },
-  vite: {
-    css: {
-      preprocessorOptions: {
-        scss: {
-          api: 'modern-compiler', // or 'modern'
-        },
-      },
-    },
-  },
-
   modules: [
     [
       "@pinia/nuxt",
