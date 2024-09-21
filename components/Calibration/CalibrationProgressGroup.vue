@@ -101,11 +101,6 @@ const {
   avCalEndTime,
 } = storeToRefs(tuningStore);
 
-const changeTab = (tab: number) => {
-  //
-}
-
-
 const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele = event.currentTarget as HTMLElement;

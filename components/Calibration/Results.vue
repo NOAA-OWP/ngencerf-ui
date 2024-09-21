@@ -25,10 +25,10 @@
               <div class="mt-1">
                 Status: <ProgressBar :value="progress"></ProgressBar>
               </div>
-              <div class="mt-4">Display:
-                <select id="DisplayOptions">
+              <div class="mt-2">Display:
+                <Select id="DisplayOptions">
                   <option>Parameters</option>
-                </select>
+                </Select>
               </div>
             </div>
           </div>
@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <div class="waitgif" v-if="loading">
+    <div class="waitgif" v-if="isLoading">
       <img src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
@@ -52,7 +52,7 @@ import ProgressBar from "primevue/progressbar";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 const { getCalibrationTabIndex } = generalStore()
-const loading = ref(true);
+const isLoading = ref(true);
 
 const runningTime = ref();
 const startTime = ref();
@@ -62,7 +62,7 @@ const progress = ref(30);
 
 onMounted(() => {
   setTimeout(() => {
-    loading.value = false;
+    isLoading.value = false;
   }, 500);
 });
 

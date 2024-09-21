@@ -76,8 +76,9 @@
                         </div>
                         <div class="form-group inputBox">
                           <label for="confirmPassword">Confirm Password</label>
-                          <Password class="passwordBoxes" yv-model="confirmPassword" id="confirmPassword" type="password"
-                            :feedback="false" required toggleMask />
+                          <Password class="passwordBoxes" model="confirmPassword" id="new-password" type="password"
+                            name="confirmPassword" autocomplete="confirm-password" :feedback="false" required
+                            toggleMask />
                         </div>
                         <div class="createAccountButton ngenButtonDiv">
                           <button type="submit">Create Account</button>
@@ -159,7 +160,6 @@ const autoSubmit = (e: KeyboardEvent) => {
   if (e.key === "Enter" && (userName.value.trim() !== "" && userPassword.value.trim() !== "")) {
     SubmitLoginForm(e);
   }
-
 }
 
 /** 

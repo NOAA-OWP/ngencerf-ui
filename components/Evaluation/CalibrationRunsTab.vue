@@ -9,17 +9,17 @@
 
                     <div class="grid grid-cols-2 mb-5">
                         <div class="grid-span-1">
-                            <select id="FilterCalRuns" class="w-40">
+                            <Select id="FilterCalRuns" class="w-40">
                                 <option value="">...</option>
-                            </select>
+                            </Select>
                             <div class="inline ml-2">Filter Validation Runs</div>
                         </div>
 
                         <div class="grid-span-1">
                             <div class="inline-block float-right">Headwater Basin Gage</div>
-                            <select id="HeadwaterBasinGage" class="w-40 inline float-right mr-2">
+                            <Select id="HeadwaterBasinGage" class="w-40 inline float-right mr-2">
                                 <option value="">...</option>
-                            </select>
+                            </Select>
                         </div>
                     </div>
 
@@ -127,16 +127,6 @@ const rowStyle = (data: any) => {
         return { backgroundColor: 'gainsboro' }
     }
 }
-onMounted(() => {
-    // const ele = document.getElementById("EvaluationRightBlock");
-    // console.log("Element: ", ele);
-    // if (ele) {
-    //     ele.setAttribute('opacity', "0");
-    // }
-    console.log('onmounted')
-    //initCalibrationRunList()
-    console.log(localStorage);
-});
 
 const NewCalibration = async () => {
     // Hide this tab and active forumulation tab

@@ -118,9 +118,9 @@
                   <div class="mt-4 mb-4 font-bold">Calibration Tuning Parameters</div>
                   <div class="inline-block text-left">Parameters File (optional):</div>
                   <!-- <br />
-                  <select id="ParamFile" class="varInputs inline-block mt-2">
+                  <Select id="ParamFile" class="varInputs inline-block mt-2">
                     <option value="" selected disabled>...</option>                    
-                  </select> -->
+                  </Select> -->
                   <div id="UploadParams" class="ngenButtonDiv inline ml-3">
                     <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
                     <button @click="triggerFileInput">UPLOAD</button>
@@ -129,12 +129,12 @@
 
                 <div class="text-left  mt-5">
                   <div class="inline-block text-left">Name:</div><br />
-                  <select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter">
+                  <Select id="ParamName" class="varInputs mt-2 w-4" v-model="selectedParameter">
                     <option v-for="param in calibrationTuningParameters" :key="param.name" :value="param.name">
                       {{ param.name }}
                     </option>
-                  </select>
-                  <div id="UploadParams" class="ngenButtonDiv inline ml-3">
+                  </Select>
+                  <div id="UploadParams" class="ngenButtonDiv inline-block ml-3">
                     <button @click="addParameterToTable">Add / Update</button>
                   </div>
                 </div>
@@ -144,11 +144,11 @@
                 <div class="">
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
                   <div class="mt-2">
-                    <select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
+                    <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
                       <option v-for="outputVariable in outputVariables" :key="outputVariable.name" :value="outputVariable.name">
                         {{ outputVariable.name }}
                       </option>
-                    </select>
+                    </Select>
                   </div>
                 </div>
               </div>
@@ -212,23 +212,21 @@
       </div>
 
     </div>
-    <!-- <div class="waitgif" v-if="loading">
+    <div class="waitgif" v-if="isLoading">
       <img src="@/assets/styles/img/wait.gif" />
-    </div> -->
+    </div>
   </div>
 
   
 </template>
 
 <script lang="ts" setup>
-import { useConfirm } from "primevue/useconfirm";
+
 import { useToast } from "primevue/usetoast";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { DateTime } from "luxon";
 
-import { mockCalibrationTuningData } from "~/mockApi/calibrationAPIData";
-import type { CalibrationTuningData } from "~/composables/NextGenModel";
 import { calculateTimeRange } from "~/utils/TimeHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
@@ -238,6 +236,8 @@ import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 
 const toast = useToast();
+
+const isLoading = ref(true);
 
 const { calibrationJobId } = storeToRefs( generalStore() );
 const { getCalibrationTabIndex } = generalStore();
@@ -362,6 +362,8 @@ onMounted(async () => {
   };
 
   isInitialSetupDone.value = true; // set to true after initial setup
+
+  isLoading.value = false;
 });
 
 const handleCalibrationTimeControlsClick = (event: Event) => {

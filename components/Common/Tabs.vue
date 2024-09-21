@@ -149,7 +149,6 @@ const tabClicked = (event: Event) => {
    if (currentMenu.value === 1) {
       currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
       emit("tabNumber", currentCalibrationTab.value);
-      console.log('tabClick', currentCalibrationTab.value )
    } else if (currentMenu.value === 2) {
       currentEvaluationTab.value = Number(ele.getAttribute("data-tab"));
       emit("tabNumber", currentEvaluationTab.value);

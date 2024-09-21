@@ -62,7 +62,7 @@
           <div v-if="location.name === 'PreviousRuns'">
             <HelpPreviousRunsHelp />
           </div>
-          7
+
           <div v-if="location.name === 'Calibration'">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
@@ -160,7 +160,6 @@ onUnmounted(() => {
 });
 
 const sizeHelpWindow = () => {
-  console.log("called")
   let headerHeight = document.getElementById('Header')?.clientHeight;
   let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
   if (footerTop && headerHeight) {
