@@ -6,11 +6,37 @@
           <AppHeader />
         </div>
       </div>
-      <div class="h-full grid row-span-10 gap-2">
 
-        <h1 class="text-center mt-10">VERIFICATION</h1>
+      <div class="grid row-span-10 gap-2">
+        <div class="grid grid-cols-12">
+          <div class="col-span-8">
+            <div class="grid grid-rows-12 mx-auto px-4 py-2">
+              <div class="grid row-span-12 white-tall-content-box">
+                <div class="overflow-auto">
+                  
+                  <h1 class="text-center mt-10">VERIFICATION</h1>
+                  left column content placeholder
 
+                  <div class="ActionButtons-bg-mask"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-4">
+            <div class="grid grid-rows-12 mx-auto px-4 py-2">
+              <div class="grid row-span-12 white-tall-content-box">
+                <div class="overflow-auto">
+
+                  <h1 class="text-center mt-10">VERIFICATION</h1>
+                  right column content placeholder
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
       <div class="row-span-1">
         <AppFooter />
       </div>

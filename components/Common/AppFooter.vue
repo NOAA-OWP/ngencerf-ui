@@ -23,7 +23,7 @@
       </div>
 
       <div class="row-span-1 footerColor">
-        <div class="topBar">&nbsp</div>
+        <!--<div class="topBar">&nbsp</div>-->
         <div id="FooterData" class="version">
           Version {{ info.program_info.version }},&nbsp;&nbsp;{{
             info.program_info.release_date
@@ -56,10 +56,17 @@ const canDisplayBeforeRun = computed(() => {
 @import "/assets/styles/styles.scss";
 
 #ActionButtons {
-  height: 60px;
-  padding: 8px 0 8px 0;
-  height: 60px;
-  background: $ngwcp_background;
+  width: Calc(100% - 70px);
+  background: transparent;
+  /*border: 1px solid black;*/
+  margin-left: 20px;
+  margin-top:-20px;
+  background-color: white;
+  padding-top: 10px;
+  height: 54px;
+}
+.ActionButtons-bg-mask{
+  height: 54px; display: block; width: 100%;
 }
 
 #Footer {
@@ -68,24 +75,24 @@ const canDisplayBeforeRun = computed(() => {
   bottom: 0;
   width: 100%;
   color: black;
-  z-index: 9000;
+  z-index: 9999;
 
 }
 
 #FooterData {
   height: 50px;
-  z-index: 9000;
+  z-index: 9999;
 }
 
 .footerColor {
   background-color: $ngwcp_background;
   ;
 }
-
+/*
 .topBar {
   background-color: black;
   height: 1px;
-}
+}*/
 
 .version,
 .copyright {

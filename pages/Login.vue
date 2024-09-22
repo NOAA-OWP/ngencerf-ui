@@ -10,34 +10,33 @@
         </div>
         <div class="h-full grid row-span-10">
           <div class="grid grid-rows-12">
-            <div class="row-span-12">
+            <div class="row-span-12 flex items-center justify-center h-screen-inner">
 
-              <div id="LoginBox" class="container" :class="!showDialog ? 'loginBox' : 'createAccountBox'">
+              <div id="LoginBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md" :class="!showDialog ? 'loginBox' : 'createAccountBox'">
 
-                <div v-if="!showDialog">
+                <div v-if="!showDialog" class="mx-auto px-8 text-left">
                   <form onsubmit="return false">
-                    <h2 class="ttl">Login to Your Account</h2>
+                    <h1>Login in</h1>
                     <div class="inputBox">
                       <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username"
-                        autocomplete="username" v-on:keypress="autoSubmit" />
-                      <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
+                        autocomplete="username" v-on:keypress="autoSubmit"/>
+                      <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Username
                       </button>
                     </div>
                     <div class="inputBox">
-                      <Password id="pword" class="passwordBoxes" type="password" autocomplete="current-password"
-                        v-model="userPassword" placeholder=" Password" aria-label="Password" toggleMask
-                        :feedback="false" v-on:keypress="autoSubmit" />
-                      <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
+                      <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
+                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block" v-on:keypress="autoSubmit"/>
+                      <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
                         Forgot Password
                       </button>
                     </div>
-                    <div class="loginButton ngenButtonDiv" v-on:click="SubmitLoginForm" aria-label="sign in">
+                    <div class="ngenButtonDiv bg-blue1 btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">
                       <button id="LoginButton">Sign In</button>
                     </div>
                     <div>
-                      <div class="signupButton ngenButtonDiv" aria-label="sign up">
-                        <button @click="openDialog">Create an Account</button>
+                      <div class="signupButton underline text-base" aria-label="sign up">
+                        <button @click="openDialog" class="c-blue">Create an Account</button>
                       </div>
                     </div>
 
@@ -47,7 +46,7 @@
                 <div v-if="showDialog">
                   <div class="dialog-overlay" @click.self="closeDialog">
                     <div class="dialog-content">
-                      <h2 class="ttl">Create an Account</h2>
+                      <h1>Create an Account</h1>
                       <form @submit.prevent="submitForm">
                         <div class="form-group inputBox">
                           <label for="username">Username</label>
@@ -59,8 +58,7 @@
                         </div>
                         <div class="form-group inputBox">
                           <label for="password">Password</label>
-                          <Password v-model="newPassword" id="password" class="passwordBoxes" type="password"
-                            name="password" autocomplete="current-password" required toggleMask>
+                          <Password v-model="newPassword" id="password" type="password" name="password" autocomplete="current-password" required toggleMask class="block">
                             <template #header>
                               <div class="font-semibold text-xm mb-4">Password</div>
                             </template>
@@ -76,15 +74,14 @@
                         </div>
                         <div class="form-group inputBox">
                           <label for="confirmPassword">Confirm Password</label>
-                          <Password class="passwordBoxes" model="confirmPassword" id="new-password" type="password"
-                            name="confirmPassword" autocomplete="confirm-password" :feedback="false" required
-                            toggleMask />
+                          <Password v-model="confirmPassword" id="confirmPassword" type="password" :feedback="false"
+                            required toggleMask class="block" />
                         </div>
-                        <div class="createAccountButton ngenButtonDiv">
+                        <div class="ngenButtonDiv bg-blue1 btn-left mt-4">
                           <button type="submit">Create Account</button>
                         </div>
-                        <div class="cancelCreateAccountButton ngenButtonDiv">
-                          <button type="button" @click="closeDialog">Cancel</button>
+                        <div class="signupButton underline text-base inline pl-6">
+                          <button type="button" @click="closeDialog" class="c-blue">Cancel</button>
                         </div>
                       </form>
                     </div>
@@ -249,75 +246,14 @@ onMounted(() => {
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-
-.loginBox,
-.createAccountBox {
-  position: relative;
-  margin: 60px auto 0 auto;
-  border-radius: 50px;
-  width: 420px;
-  height: 450px;
-  border: 2px solid #105d84;
-}
-
-.loginBox {
-  height: 390px;
-}
-
-.createAccountBox {
-  height: 550px;
-}
-
-input::-webkit-input-placeholder {
-  opacity: 0.8;
-}
-
-.ttl {
-  text-align: center;
-  position: static;
-  margin-top: 20px;
-  font-size: 26px;
-  font-weight: 600;
-}
-
 .needAccount {
-  text-align: center;
   font-size: 18px;
   font-weight: 600;
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
-.inputBox {
-  margin: 0 auto;
-  margin-top: 20px;
-  width: 80%;
-
-  input {
-    height: 40px !important;
-  }
-}
-
-.passwordBoxes {
-  width: 332px;
-}
-
-.forgot {
-  text-decoration: underline;
-  color: #0c1db4;
-}
-
-.signupButton,
-.loginButton,
-.createAccountButton,
-.cancelCreateAccountButton {
-  font-size: 20px;
-  margin: 20px auto;
-  text-align: center;
-  border: 3px solid #000;
-  border-radius: 20px;
-  width: 245px;
-  height: 50px;
-  padding-top: 10px;
-
+.signupButton {
+  border: 0px;
+  margin: 20px auto 0 0;
 }
 </style>

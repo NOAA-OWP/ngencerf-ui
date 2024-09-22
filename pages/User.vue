@@ -1,27 +1,48 @@
 <template>
   <!-- User Page -->
-  <div id="UserBox">
-    <div class="grid grid-cols-12 gap-3">
-      <div class="col-span-5">
-        <div class="ttl">Your Account</div>
-        <div class="name">{{ accountName }}</div>
+
+  <div class="h-full min-h-screen ">
+      <div class="grid grid-rows-12">
+        <div class="row-span-1">
+          <div>
+            <AppHeader />
+          </div>
+        </div>
+        <div class="h-full grid row-span-10">
+          <div class="grid grid-rows-12">
+            <div class="row-span-12 flex items-center justify-center h-screen-inner">
+
+              <div id="UserBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md">
+                <div class="grid grid-cols-12 gap-3">
+                  <div class="col-span-5">
+                    <div class="ttl">Your Account</div>
+                    <div class="name">{{ accountName }}</div>
         <form @submit.prevent="changePassword">
           <div class="passwordBox grid row-auto">
             <div class="chgpwd">Change Password</div>
-            <div class="mt-4">Old password</div>
+            <div class="pwdspacer">Old password</div>
+            <div>
             <Password id="OldPass" type="password" name="password" :inputProps="{ autocomplete: true }" autocomplete="current-password" v-model="oldpass"
               aria-label="Enter old password here" toggleMask :feedback="false" />
 
-            <div class="mt-2">New password</div>
+            </div>
+              <p>&nbsp;</p>
+              <div>New password</div>
+              <div>
             <Password id="NewPass" type="password" name="password" :inputProps="{ autocomplete: true }" autocomplete="new-password" v-model="newpass"
               aaria-label="Enter new password here" toggleMask :feedback="true" />
 
-            <div class="mt-2">Confirm New password</div>
+                        </div>
+              <p>&nbsp;</p>
+              <div>Confirm New password</div>
+              <div>
             <Password id="ReNewPass" type="password" name="password" :inputProps="{ autocomplete: true }" autocomplete="new-password" v-model="confirmNewpass"
               aria-label="Password" toggleMask :feedback="false" />
 
-          </div>
-          <div class="buttonArea">
+                      </div>
+                    </div>
+                    <div class="buttonArea">
+
             <button id="UpdateButton" v-on:click="changePassword" aria-label="Update with new password">
               Update
             </button>
@@ -47,6 +68,14 @@
       </div>
     </div>
   </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--<div class="row-span-1">
+        <AppFooter />
+      </div>-->
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -117,32 +146,28 @@ const changePassword = async () => {
 @import "/assets/styles/styles.scss";
 
 #UserBox {
-  margin: 30px auto 0 auto;
+  /*margin: 30px auto 0 auto;
   width: 740px;
   height: 495px;
   border: 4px solid #105d84;
-  background-color: $ngwcp_groupsbkg;
-
+  background-color: $ngwcp_groupsbkg;*/
   #avatar {
     width: 150px;
     height: 150px;
     float: right;
     margin: 20px 20px 40px 0;
 
-    border: 1px solid #105d84;
+    /*border: 1px solid #105d84;*/
     text-align: right;
     vertical-align: top;
   }
-
   #passwordNotes p {
     text-align: left;
     margin-left: 20px;
   }
-
   .buttonArea {
     text-align: center;
-
-    #UpdateButton {
+    /*#UpdateButton {
       font-size: 20px;
       margin: 20px auto;
       text-align: center;
@@ -152,28 +177,27 @@ const changePassword = async () => {
       width: 245px;
       height: 50px;
       padding-top: 3px;
-    }
+    }*/
   }
-
   .ttl {
+    //margin: 30px 0 0 30px;
     font-size: 40px;
     margin-top: 20px;
     text-align: center;
   }
-
   .name {
     font-size: 30px;
     text-align: center;
     margin-top: 30px;
   }
-
   .chgpwd {
     font-size: 30px;
   }
-
   .passwordBox {
-    margin: 60px 0 0 20px;
+    margin: 120px 0 0 20px;
   }
-
+  .pwdspacer {
+    margin-top: 40px;
+  }
 }
 </style>

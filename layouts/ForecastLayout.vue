@@ -6,17 +6,26 @@
           <AppHeader />
         </div>
       </div>
-      <div class="h-full grid row-span-10 gap-2">
+      <div class="grid row-span-10 gap-2">
         <div class="grid grid-cols-12">
           <div class="col-span-8">
-            <div class="h-full grid grid-rows-12">
-              <div class="grid row-span-12">
-                <ForecastLeftBlock />
+            <div class="grid grid-rows-12 mx-auto px-4 py-2">
+              <div class="grid row-span-12 white-tall-content-box">
+                <div class="overflow-auto">
+                  <ForecastLeftBlock />
+                  <div class="ActionButtons-bg-mask"></div>
+                </div>
               </div>
             </div>
           </div>
           <div class="col-span-4">
-            <ForecastRightBlock />
+            <div class="grid grid-rows-12 mx-auto px-4 py-2">
+              <div class="grid row-span-12 white-tall-content-box">
+                <div class="overflow-auto">
+                  <ForecastRightBlock />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
