@@ -1,104 +1,173 @@
 <template>
-  <div id="TuningControls">
-    <div class="w-full mt-2">
-      <div v-if="rangeDateFrom && rangeDateTo" class="text-center mt-1" id="RangeDates" >
-        Range:&nbsp; <span class="font-bold">{{ rangeDateFrom }}</span>&nbsp; to  &nbsp;<span class="font-bold">{{ rangeDateTo }}</span>
+  <div id="TuningControls pl-8" class="pl-4">
+    <div class="w-full mt-3 mb-2">
+      <div v-if="rangeDateFrom && rangeDateTo" class="w-full text-left mt-1 text-xl c-blue-primary1 font-bold" id="RangeDates" >
+        RANGE: {{ rangeDateFrom }} to {{ rangeDateTo }}
       </div>
     </div>
-    <div class="grid grid-rows-10">
-      <div class="row-span-1">
+    <div class="">
+      <div class="">
         <div class="grid grid-cols-2">
 
-          <div class="col-span-1">
-            <div id="BoxLeft">
+          <div class="col-span-2">
+            <div id="BoxLeft" class="text-left">
               <div id="BoxTopLeft" class="pt-2">
-                <span class="tabTitles">Calibration Time Controls</span>
+                <span class="tabTitles font-bold">Calibration Time Controls</span>
               </div>
               <div id="BoxBottomLeft" class="pt-2">
                 <div class="timeBlocks datepicker-wrapper" @click="handleCalibrationTimeControlsClick">
-                  <div>Simulation Start:
-                    <VueDatePicker 
-                      class="datePickers" 
+                  
+                  <table class="table-auto border-collapse ml-0 w-[695px]">
+                    <tr>
+
+                      <td class="w-[105px]">
+
+                        <label for="SimulationStart" class="whitespace-nowrap w-[105px]">Simulation Start:</label>
+                        
+                      </td>
+                      <td class="text-left">
+
+                    <VueDatePicker id="SimulationStart"
+                      class="datePickers dp__theme_dark" 
                       v-model="simStartTime" 
                       time-picker-inline
                       format="yyyy-MM-dd  hh:00"
                       :disabled="isCalibrationTuningControlsDisabled"
                     />
                     <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
-                  </div>
-                  <div>Simulation End:
-                    <VueDatePicker 
-                      class="datePickers" 
+
+                      </td>
+                      <td class="pl-6 w-[105px]">
+
+                        <label for="SimulationEnd" class="whitespace-nowrap w-[105px]">Simulation End:</label>
+
+                      </td>
+                      <td class="text-left">
+
+                    <VueDatePicker id="SimulationEnd"
+                      class="datePickers dp__theme_dark" 
                       v-model="simEndTime" 
                       time-picker-inline
                       format="yyyy-MM-dd  hh:00"
                       :disabled="isCalibrationTuningControlsDisabled"
                     />
                     <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
-                  </div>
-                  <div>Calibration Start:
-                    <VueDatePicker 
-                      class="datePickers" 
+
+                      </td>
+
+                    </tr>
+                    <tr>
+
+                      <td>
+
+                        <label for="CalibrationStart" class="whitespace-nowrap">Calibration Start:</label>
+
+                      </td>
+                      <td class="text-left">
+
+                    <VueDatePicker id="CalibrationStart"
+                      class="datePickers dp__theme_dark" 
                       v-model="calStartTime" 
                       time-picker-inline
                       format="yyyy-MM-dd  hh:00"
                       :disabled="isCalibrationTuningControlsDisabled"
                     />
                     <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
-                  </div>
-                  <div>Calibration End:
-                    <VueDatePicker 
-                      class="datePickers" 
+
+                      </td>
+                      <td class="pl-6">
+
+                        <label for="CalibrationEnd" class="whitespace-nowrap">Calibration End:</label>
+
+                      </td>
+                      <td class="text-left">
+
+                    <VueDatePicker id="CalibrationEnd"
+                      class="datePickers dp__theme_dark" 
                       v-model="calEndTime" 
                       time-picker-inline
                       format="yyyy-MM-dd  hh:00"
                       :disabled="isCalibrationTuningControlsDisabled"
                     />
                     <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
-                  </div>
+
+                      </td>
+
+                    </tr>
+                    </table>
+
                 </div>
               </div>
+<!--
             </div>
           </div>
 
 
-          <div class="col-span-1">
-            <div id="BoxRight">
-              <!-- <div id="BoxTopRight" class="pt-2" @click="AutoValChecked"> -->
-              <div id="BoxTopRight" class="pt-2">
-                  <!-- <input type="checkbox" id="CheckTheBox"></input> -->
-                <label for="CheckTheBox"><span class="tabTitles">Automatic Validation</span></label>
+          <div class="col-span-2">
+            <div id="BoxRight" class="text-left mt-2">
+-->
+              <!-- <div id="BoxTopRight" class="pt-4" @click="AutoValChecked"> -->
+              <div id="BoxTopRight" class="pt-4">
+                  <!-- <input type="checkbox" id="CheckTheBox" class="inline w-auto mr-2"></input> -->
+                <label for="CheckTheBox" class="inline">Automatic Validation</label>
               </div> 
-              <div id="BoxBottomRight" class="pt-2">
+              <div id="BoxBottomRight" class="pt-0 ml-0">
                 <div v-if="!automatic_validation" class="tabTitles">
-                  Check the box above<br />to enable Automatic Validation
+                  Check the box above to enable Automatic Validation
                 </div>
+              
                 <div v-else>
                   <div class="timeBlocks datepicker-wrapper" @click="handleCalibrationTimeControlsClick">
-                    <div>
-                      Simulation Start:
-                      <VueDatePicker class="datePickers" v-model="avSimStartTime" time-picker-inline
+
+                    <table class="table-auto border-collapse ml-0 w-[695px]">
+                      <tr>
+
+                        <td class="w-[105px]">
+                          <label for="ValSimulationStart" class="whitespace-nowrap w-[105px]">Simulation Start:</label>
+                        </td>
+                        <td class="text-left">
+                      <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark" v-model="avSimStartTime" time-picker-inline
                         format="yyyy-MM-dd  hh:00" :disabled="isCalibrationTuningControlsDisabled" />
                       <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
-                    </div>
-                    <div>
-                      Simulation End:
-                      <VueDatePicker class="datePickers" v-model="avSimEndTime" time-picker-inline
+                        
+                        </td>
+                        <td class="pl-6">
+                          <label for="ValSimulationEnd" class="whitespace-nowrap">Simulation End:</label>
+                        </td>
+                        <td class="text-left">
+                            
+
+                      <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark" v-model="avSimEndTime" time-picker-inline
                         format="yyyy-MM-dd  hh:00" :disabled="isCalibrationTuningControlsDisabled" />
                       <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
-                    </div>
-                    <div>
-                      Val Start:
-                      <VueDatePicker class="datePickers" v-model="avCalStartTime" time-picker-inline
+                        </td>
+
+                      </tr>
+                      <tr>
+
+                        <td class="pl-6 w-[105px]">
+                          <label for="ValidationStart" class="whitespace-nowrap w-[105px]">Validation Start:</label>    
+                        </td>
+                        <td class="text-left">
+                            
+
+                      <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark" v-model="avCalStartTime" time-picker-inline
                         format="yyyy-MM-dd  hh:00" :disabled="isCalibrationTuningControlsDisabled" />
                       <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
-                    </div>
-                    <div>
-                      Val End:
-                      <VueDatePicker class="datePickers" v-model="avCalEndTime" time-picker-inline
+                        </td>
+                        <td class="pl-6">
+                          <label for="ValidationEnd" class="whitespace-nowrap">Validation End:</label>
+                        </td>
+                        <td class="text-left">                            
+
+                      <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime" time-picker-inline
                         format="yyyy-MM-dd  hh:00" :disabled="isCalibrationTuningControlsDisabled" />
                       <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
-                    </div>
+
+                        </td>
+
+                      </tr>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -107,44 +176,18 @@
         </div>
       </div>
 
-      <div class="row-span-2">
+      <div class="">
         <div class="grid grid-rows-2">
 
-          <div class="row-span-1 text-center">
+          <div class="row-span-1 text-left">
             <div class="grid grid-cols-2">
-              <div class="col-span-1 m-auto">
-
-                <div class="text-left ">
-                  <div class="mt-4 mb-4 font-bold">Calibration Tuning Parameters</div>
-                  <div class="inline-block text-left">Parameters File (optional):</div>
-                  <!-- <br />
-                  <Select id="ParamFile" class="varInputs inline-block mt-2">
-                    <option value="" selected disabled>...</option>                    
-                  </Select> -->
-                  <div id="UploadParams" class="ngenButtonDiv inline ml-3">
-                    <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-                    <button @click="triggerFileInput">UPLOAD</button>
-                  </div>
-                </div>
-
-                <div class="text-left  mt-5">
-                  <div class="inline-block text-left">Name:</div><br />
-                  <Select id="ParamName" class="varInputs mt-2 w-4" v-model="selectedParameter">
-                    <option v-for="param in calibrationTuningParameters" :key="param.name" :value="param.name">
-                      {{ param.name }}
-                    </option>
-                  </Select>
-                  <div id="UploadParams" class="ngenButtonDiv inline-block ml-3">
-                    <button @click="addParameterToTable">Add / Update</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-span-1 m-auto">
+              
+              <div class="col-span-2">
                 <div class="">
+                  <div class="mt-1 mb-3 hr"></div>
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
-                  <div class="mt-2">
-                    <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
+                  <div class="mt-2 text-sm">
+                    <select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
                       <option v-for="outputVariable in outputVariables" :key="outputVariable.name" :value="outputVariable.name">
                         {{ outputVariable.name }}
                       </option>
@@ -152,10 +195,39 @@
                   </div>
                 </div>
               </div>
+
+              <div class="col-span-2">
+                <div class="mt-5 mb-3 hr"></div>
+                <div class="text-left">
+                  <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
+                  <div class="inline-block text-left text-sm"><label for="ParamFile">Parameters File (optional):</label></div><br />
+                  <!-- <br />
+                  <select id="ParamFile" class="varInputs inline-block mt-2 text-sm">
+                    <option value="" selected disabled>...</option>                    
+                  </select> -->
+                  <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
+                    <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+                    <button @click="triggerFileInput">Load</button>
+                  </div>
+                </div>
+
+                <div class="text-left mt-3 text-sm">
+                  <div class="inline-block text-left"><label for="ParamName">Name:</label></div><br />
+                  <select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter">
+                    <option v-for="param in calibrationTuningParameters" :key="param.name" :value="param.name">
+                      {{ param.name }}
+                    </option>
+                  </select>
+                  <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
+                    <button @click="addParameterToTable">Add</button>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <div id="TuningDataList">
+          <div id="TuningDataList" class="mt-5">
             <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px">
               <!-- parameter column, uneditable with light grey background -->
               <Column field="parameter" header="Parameter" sortable>
@@ -208,8 +280,8 @@
 
       </div>
 
-      <div class="row-span-6">
-      </div>
+      <!--<div class="row-span-6">
+      </div>-->
 
     </div>
     <div class="waitgif" v-if="isLoading">
@@ -744,62 +816,9 @@ useListen('calibrationButtonNext', (actionButton) => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
-#TuningControls {
-  margin-left: 10px;
-  width: 60vw;
-}
-
-#BoxLeft,
-#BoxRight {
-  width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-#BoxTopLeft,
-#BoxTopRight {
-  width: 200px;
-  height: 35px;
-  background-color: $ngwcp_groupsbkg;
-  font-size: 0.9em;
-}
-
-#BoxTopLeft {
-  border-radius: 20px 20px 0 0;
-}
-
-#BoxTopRight {
-  margin-left: 200px;
-  border-radius: 20px 20px 0 0;
-}
-
-#BoxTopRight input {
-  width: 20px;
-  margin: 2px 0 0 20px;
-}
-
-#BoxBottomLeft,
-#BoxBottomRight {
-  border-radius: 0 20px 20px 20px;
-  height: 150px;
-  background-color: $ngwcp_groupsbkg;
-}
-
-#BoxBottomRight {
-  border-radius: 20px 0 20px 20px;
-}
-
 #AddUpdateBtn {
   height: 40px;
 }
-
-#TuningDataList {
-  margin: 20px auto;
-  width: 750px;
-  border: 1px solid black;
-  padding: 8px;
-}
-
 
 .mup30 {
   margin-top: -140px;
@@ -807,19 +826,12 @@ useListen('calibrationButtonNext', (actionButton) => {
 
 .timeBlocks {
   font-size: 0.8em;
-  text-align: right;
-  margin-right: 34px;
 }
 
 .datePickers {
-  width: 250px;
+  width: 230px;
   display: inline-block;
-  border-radius: 5px;
-  font-weight: 600;
-}
-
-.tabTitles {
-  padding: 15px;
+  text-align: center;
 }
 
 .mmiInputs {
@@ -827,17 +839,7 @@ useListen('calibrationButtonNext', (actionButton) => {
 }
 
 .varInputs {
-  width: 220px;
-}
-
-input,
-select {
-  border-radius: 5px;
-}
-
-.datepicker-wrapper {
-  position: relative;
-  display: inline-block;
+  width: 400px;
 }
 
 .overlay {
@@ -848,6 +850,6 @@ select {
   height: 100%;
   background-color: rgba(255, 255, 255, 0);
   cursor: not-allowed;
-  z-index: 10; /* Ensure it sits above the date picker */
+  z-index: 10;  
 }
 </style>

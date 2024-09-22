@@ -7,15 +7,24 @@
           <AppHeader />
         </div>
       </div>
-      <div class="h-full grid row-span-10">
+      <div class="grid row-span-10">
         <div class="grid grid-rows-12">
-          <div class="row-span-2">
-            <div id="PgTitle">Previous Calibration Runs *
-              &nbsp;&nbsp;<span id="NewButton" class="ngenButtonDiv inline" @click="createNewCalibration"><button>New</button></span>
-            </div>
-          </div>
-          <div class="row-span-10">
-            <div id="CalTable">
+          <div class="row-span-12 flex items-center justify-center h-screen-inner mt-2">
+          <div id="CenterBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-xlg h-screen-inner">
+            <div class="mx-auto px-8 text-center overflow-auto">
+
+                <div class="flex mt-2">
+                  <div class="">
+                    <h1 class="mt-1 mb-8 text-3xl font-bold">Previous Calibration Runs *</h1>
+                  </div>
+                  <div class="ml-auto mt-2">
+                    <span id="NewButton" class="ngenButtonDiv-alt bg-blue4" @click="createNewCalibration"><button>New</button></span>
+                  </div>
+                </div>
+
+                <div class="width-full">
+
+                  <div id="CalTable" class="w-full">
               <ConfirmDialog></ConfirmDialog>
               <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
                 :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>               
@@ -35,10 +44,17 @@
                 <Column field="status" header="Status" sortable></Column>
               </DataTable>
             </div>
-            <div class="asteriskText">
-              * Right click on a row for Open, Clone or Delete options, or click on then New button.
-            </div>
-          </div>
+                  <div class="asteriskText text-left mt-2">
+                    * Right click on a row for Open, Clone or Delete options, or click on then New button.
+                  </div>
+
+                </div>
+
+              </div>
+            </div>  
+          </div>  
+
+
         </div>
       </div>
       <div class="row-span-1">
@@ -171,6 +187,18 @@ onMounted( () => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
+#CalTable {
+  border: 1px solid $ngwcp_primary1;
+
+  /*.table {
+    thead tr th {
+      background-color: #F5A4A4;
+      border: 1px solid #000;
+    }
+  }*/
+}
+
+/*
 #PgTitle {
   text-align: center;
   font-size: 30px;
@@ -204,5 +232,5 @@ onMounted( () => {
   margin-top: 20px;
   font-weight: 500;
   font-size: 1.2em;
-}
+}*/
 </style>

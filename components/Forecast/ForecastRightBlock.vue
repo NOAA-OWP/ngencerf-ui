@@ -3,8 +3,8 @@
   <div v-if="displayRightBlock" id="ForecastRightBlock" class="grid grid-cols-1">
     <div class="grid-rows-12">
       <div id="TopRightBlock" class="row-span-5">
-        <div class="grid grid-cols-2">
-          <div id="ProgressGroup" class="col-span-1">
+        <div class="grid grid-cols-3">
+          <div id="ProgressGroup" class="col-span-2">
             <ForecastProgressGroup" />
           </div>
           <div id="GageCutout" class="col-span-1">
