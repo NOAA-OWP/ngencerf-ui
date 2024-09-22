@@ -81,6 +81,13 @@ const {
   startTimeDate,
   startTime,
   runningTime,
+  plotNames,
+  plotList,
+  selectedPlotName,
+  selectedPlotFilename,
+  selectedPlotFileUrl,
+  stopCriteria,
+  stopCriteriaMet,
  } = storeToRefs(runStatusStore);
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
@@ -88,6 +95,7 @@ const { fetchUserCalibrationRunData } = userDataStore;
 const {
   queryCalibrationIsReady,
   queryGetPlotNames,
+  queryGetPlot,
   executeRunCalibration,
   queryIteration,
   cancelCalibrationJob,
@@ -95,18 +103,11 @@ const {
 
 const loading = ref(true);
 const isCalibrationReady = ref();
-const stopCriteria = ref();
+
 const iterations = ref();
-
-const plotNames = ref();
-const plotList = ref();
-const selectedPlotName = ref();
-const selectedPlotFilename = ref();
-
 const iterationData = ref();
 const progress = ref();
 
-const stopCriteriaMet = ref(false);
 let statusIntervalId: NodeJS.Timeout | undefined = undefined;
 let runningTimeIntervalId: NodeJS.Timeout | undefined = undefined;
 let iterationIntervalId: NodeJS.Timeout | undefined = undefined;
@@ -275,9 +276,19 @@ watch(calibrationStatus, async () => {
 // });
 
 // Handle selectedPlotName changes
-watch(selectedPlotName, () => {
-  // update selectedPlotFilename to match updated selectedPlotName
-  selectedPlotFilename.value = plotList.value.find((plot: any) => plot.name === selectedPlotName.value)?.filename;
+watch(selectedPlotName, async () => {
+  // get selected plot file name and url from server
+  const response: any  = await queryGetPlot(selectedPlotName.value);
+
+  if (response?.value?._data) {
+    selectedPlotFilename.value = response.value?._data?.plot_file_name;
+    selectedPlotFileUrl.value = response.value?._data?.plot_url;
+    console.log('selectedPlotFilename:', selectedPlotFilename.value);
+    console.log('selectedPlotFileUrl:', selectedPlotFileUrl.value);
+    console.log('typeof selectedPlotFileUrl:', typeof selectedPlotFileUrl.value);
+  } else {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot', life: 5000 });
+  }
 });
 
 // Run Calibration Job

@@ -8,22 +8,27 @@ import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
-  /**
-   * default ref section
-   */
-  const { calibrationJobId } = storeToRefs(generalStore())
+  const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken } = useUserDataStore()
-  const userDataStore = useUserDataStore()
-  /**
-   * ref ui user input
-   */
-  const data_loading = ref<boolean>(true)
-  const calibrationIsReady = ref<boolean>(false)
+  const { getAccessToken } = useUserDataStore();
+  const userDataStore = useUserDataStore();
+
+  // refs
+  const data_loading = ref<boolean>(true);
+  const calibrationIsReady = ref<boolean>(false);
   const calibrationStatus = ref<string>();
   const runningTime = ref();
   const startTimeDate = ref();
   const startTime = ref();
+
+  const plotNames = ref();
+  const plotList = ref();
+  const selectedPlotName = ref();
+  const selectedPlotFilename = ref();
+  const selectedPlotFileUrl = ref();
+
+  const stopCriteria = ref();
+  const stopCriteriaMet = ref(false);
 
   /**
    * Check if Calibration is in 'Ready' state
@@ -52,6 +57,26 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+    });
+  };
+
+  /**
+   * Get Calibration Plot
+   * @return {any}
+   */
+  const queryGetPlot = async (plotName: string): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(
+        { 
+          calibration_run_id: calibrationJobId.value,
+          plot_name: plotName
+        }
+      )
     });
   };
 
@@ -91,11 +116,19 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   return {
     calibrationIsReady,
     calibrationStatus,
-    runningTime,
     startTimeDate,
     startTime,
+    runningTime,
+    plotNames,
+    plotList,
+    selectedPlotName,
+    selectedPlotFilename,
+    selectedPlotFileUrl,
+    stopCriteria,
+    stopCriteriaMet,
     queryCalibrationIsReady,
     queryGetPlotNames,
+    queryGetPlot,
     executeRunCalibration,
     queryIteration,
     cancelCalibrationJob,
