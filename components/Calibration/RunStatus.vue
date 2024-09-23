@@ -47,12 +47,17 @@
           </div>
         </div>
       </div>
+
       <div class="row-span-10">
-        <div id="GraphArea" class="p-2">
+        <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
+          <img :src="selectedPlotFileUrl" alt="Image" />
+        </div>
+        <div id="GraphArea" class="p-2" v-else>
          Data Display
 
         </div>
       </div>
+      
       <div class="row-span-1">
         <div id="ResultsArea" class="row-span-1" v-if="calibrationStatus === 'Done'">
           <button class="ngenButtonDiv">Go to Evaluation</button>
@@ -241,6 +246,12 @@ watch(calibrationStatus, async () => {
     clearInterval(statusIntervalId);
   }
 
+  else if (calibrationStatus.value === 'Failed') {
+    stopCriteriaMet.value = false; // this should already be false, but just in case
+    clearInterval(runningTimeIntervalId);
+    clearInterval(statusIntervalId);
+  }
+
   else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Unknown Calibration Status', life: 5000 });
   }
@@ -282,9 +293,9 @@ watch(selectedPlotName, async () => {
   // get selected plot file name and url from server
   const response: any  = await queryGetPlot(selectedPlotName.value);
 
-  if (response?.value?._data) {
-    selectedPlotFilename.value = response.value?._data?.plot_file_name;
-    selectedPlotFileUrl.value = response.value?._data?.plot_url;
+  if (response?._data?.plot_file_name && response?._data?.plot_url) {
+    selectedPlotFilename.value = response?._data?.plot_file_name;
+    selectedPlotFileUrl.value = response?._data?.plot_url;
     console.log('selectedPlotFilename:', selectedPlotFilename.value);
     console.log('selectedPlotFileUrl:', selectedPlotFileUrl.value);
     console.log('typeof selectedPlotFileUrl:', typeof selectedPlotFileUrl.value);
