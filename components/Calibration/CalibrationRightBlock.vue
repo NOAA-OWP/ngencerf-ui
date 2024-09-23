@@ -1,5 +1,4 @@
 <template>
-
    <!-- CalibrationRightBlock -->
   <div id="RightBlock" class="grid grid-cols-1">
     <div class="grid-rows-12">
@@ -9,7 +8,7 @@
             <h2>Progress</h2>
           </div>
           <div id="ProgressGroup" class="col-span-2">
-            <CalibrationProgressGroup" />
+            <CalibrationProgressGroup />
           </div>
           <div id="GageCutout" class="col-span-1">
             <GageCutout />
@@ -28,6 +27,7 @@
 
 <script lang="ts" setup>
 import CalibrationProgressGroup from "./CalibrationProgressGroup.vue";
+import CalibrationMessagesGroup from "./CalibrationMessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 </script>
 
@@ -46,13 +46,9 @@ import GageCutout from "../Common/GageCutout.vue";
 #GageCutout {
   margin-right: 5px;
   max-height: 300px;
-  //overflow: scroll;
+
 }
-/*
-#ProgressGroup {
-  padding: 10px;
-}
-*/
+
 .boxed {
   border: 1px solid #000;
 }

@@ -7,8 +7,5 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useGageStore } from '~/stores/calibration/GageStore';
-
 const { geopackageImageUrl } = storeToRefs( useGageStore() )
 </script>
-
-<style></style>

@@ -332,18 +332,12 @@ select option {
     th, td {
       padding-left: 8px;
     }
-    tr:nth-child(even) {
-      background-color: $ngwcp_neutral_gray_lt;
-    }
-    tr:nth-child(odd) {
-      background-color: $ngwcp_neutral_gray_md;
-    }
   }
 }
 
 //ATTENTION to DEVELOPERS: TEMORARY: REMOVE THIS AFTER geopackageImageUrl is working
 #GageCutout {
-  background-image: url(http://localhost:3000/_nuxt/assets/images/temp-progress.png);
+  background-image: url("~/assets/styles/img/temp-progress.png");
   background-repeat: no-repeat; 
   background-size: cover;
   background-position: center; 

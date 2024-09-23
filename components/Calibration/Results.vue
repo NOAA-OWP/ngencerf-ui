@@ -6,18 +6,20 @@
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
-                <tr>
-                  <td class="text-right">Running Time:</td>
-                  <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
-                </tr>
-                <tr>
-                  <td class="text-right">Start Time:</td>
-                  <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
-                </tr>
-                <tr>
-                  <td class="text-right">Iteration:</td>
-                  <td class="pl-5">{{ iteration ? iteration : '-'.repeat(30) }}</td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td class="text-right">Running Time:</td>
+                    <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">Start Time:</td>
+                    <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">Iteration:</td>
+                    <td class="pl-5">{{ iteration ? iteration : '-'.repeat(30) }}</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
 
@@ -50,8 +52,6 @@
 <script lang="ts" setup>
 import ProgressBar from "primevue/progressbar";
 import { generalStore } from "~/stores/common/GeneralStore";
-import { calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
-const { getCalibrationTabIndex } = generalStore()
 const isLoading = ref(true);
 
 const runningTime = ref();
@@ -66,8 +66,8 @@ onMounted(() => {
   }, 500);
 });
 
-useListen( 'calibrationButtonPrev', ( actionButton ) => {
-   const tabs = document.getElementsByClassName("tabs");
+useListen('calibrationButtonPrev', (actionButton) => {
+  const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[4];
   e.click();
 })

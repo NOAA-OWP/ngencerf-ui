@@ -2,7 +2,7 @@
   <!-- LeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
-    <div class="shrink-0" id="InputsArea">
+    <div class="shrink-0">
       <span v-if="activeTab == 1">
         <HeadwaterBasinGage />
       </span>
@@ -26,15 +26,18 @@
 </template>
 
 <script setup lang="ts">
-import Tabs from '~/components/Common/Tabs.vue'
+import { defineAsyncComponent } from 'vue'
+// Let HeadwaterBasinGage load right away
 import HeadwaterBasinGage from '~/components/Calibration/HeadwaterBasinGage.vue';
-import Formulation from '~/components/Calibration/Formulation.vue';
-import TuningControls from '~/components/Calibration/TuningControls.vue';
-import OptimizationMetrics from '~/components/Calibration/OptimizationMetrics.vue';
-import RunStatus from '~/components/Calibration/RunStatus.vue';
-import Results from '~/components/Calibration/Results.vue';
-
+// Load the
+const Tabs = defineAsyncComponent(() => import('~/components/Common/Tabs.vue'))
+const Formulation = defineAsyncComponent(() => import('~/components/Calibration/Formulation.vue'))
+const TuningControls = defineAsyncComponent(() => import('~/components/Calibration/TuningControls.vue'))
+const OptimizationMetrics = defineAsyncComponent(() => import('~/components/Calibration/OptimizationMetrics.vue'))
+const RunStatus = defineAsyncComponent(() => import('~/components/Calibration/RunStatus.vue'))
+const Results = defineAsyncComponent(() => import('~/components/Calibration/Results.vue'))
 import { generalStore } from "@/stores/common/GeneralStore";
+
 const { getCalibrationTabIndex, setCalibrationTabIndex } = generalStore();
 
 // Default to Tab 1, HeadwaterBasinGage
@@ -49,11 +52,3 @@ const tabChanged = (tabNum: number) => {
 };
 </script>
 
-<style lang="scss" scoped>
-#InputsArea {
-  //position: absolute;
-  //margin-left: 100px;
-  //height: 20vw;
-  //min-width: 960px;
-}
-</style>

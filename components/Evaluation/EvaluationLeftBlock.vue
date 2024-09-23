@@ -2,7 +2,7 @@
   <!-- EvaluationLeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
-    <div class="shrink-0" id="InputsArea">
+    <div class="shrink-0">
       <span v-if="activeTab == 1">
         <CalibrationRunsTab />
       </span>
@@ -26,13 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import Tabs from '~/components/Common/Tabs.vue'
-import EvaluateTab from './EvaluateTab.vue';
-import SetupValRunTab from './SetupValRunTab.vue';
-import SelectParamsSetTab from './SelectParamsSetTab.vue';
-import ReviewSetupRunTab from './ReviewSetupRunTab.vue';
-import StatusTab from './StatusTab.vue';
-import CalibrationRunsTab from './CalibrationRunsTab.vue';
+const Tabs = defineAsyncComponent(() => import('~/components/Common/Tabs.vue'))
+const EvaluateTab = defineAsyncComponent(() => import('./EvaluateTab.vue'))
+const SetupValRunTab = defineAsyncComponent(() => import('./SetupValRunTab.vue'))
+const SelectParamsSetTab = defineAsyncComponent(() => import('./SelectParamsSetTab.vue'))
+const ReviewSetupRunTab = defineAsyncComponent(() => import('./ReviewSetupRunTab.vue'))
+const StatusTab = defineAsyncComponent(() => import('./StatusTab.vue'))
+const CalibrationRunsTab = defineAsyncComponent(() => import('./CalibrationRunsTab.vue'))
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -48,9 +48,3 @@ const tabChanged = (tabNum: number) => {
 };
 </script>
 
-<style lang="scss" scoped>
-#InputsArea {
-  height: 20vw;
-  min-width: 960px;
-}
-</style>

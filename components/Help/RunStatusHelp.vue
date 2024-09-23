@@ -6,20 +6,22 @@
     <div class="_help-subtitle">The Status field will indicate if the required data has been
       entered.</div>
     <div class="_help-subtitle">If so the Status will be Ready and the Start button will be activated. Once the
-      calibration run has started, the user can stop it before it completes by clicking the Stop button. 
+      calibration run has started, the user can stop it before it completes by clicking the Stop button.
       While a calibration is running, the running time is updated.</div>
     <div class="_help-subtitle">Plots will be generated at the user selected frequency which can be viewed while
       the calibration is being performed and when the calibration and validation run are complete.
     </div>
     <table class="_help-table">
-      <tr>
-        <td class="td1">START Button:</td>
-        <td class="td2">Start the Calibration.</td>
-      </tr>
-      <tr>
-        <td class="td1">CANCEL Button:</td> 
-        <td class="td2">Stop/cancel the calibration before it has completed.</td>
-      </tr>
+      <tbody>
+        <tr>
+          <td class="td1">START Button:</td>
+          <td class="td2">Start the Calibration.</td>
+        </tr>
+        <tr>
+          <td class="td1">CANCEL Button:</td>
+          <td class="td2">Stop/cancel the calibration before it has completed.</td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </template>
