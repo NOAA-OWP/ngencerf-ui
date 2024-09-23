@@ -1,28 +1,31 @@
 <template>
-<div id="BottomButtons" class="flex">
-  <div>
-
+  <div id="BottomButtons" class="flex">
+    <div>
       <div class="inline ngenButtonDiv bg-green mr-6" v-if="showOrHideSaveStartButton()">
-      	<button v-if="showOrHideSaveStartButton()" class="font-normal" @click="SaveStartTabContent"
-        :title="btnSaveOrStart() + ' Button'" :aria-label="btnSaveOrStart() + ' Button'">
-        {{ btnSaveOrStart() }}</button>
+        <button v-if="showOrHideSaveStartButton()" class="font-normal" @click="SaveStartTabContent"
+          :title="btnSaveOrStart() + ' Button'" :aria-label="btnSaveOrStart() + ' Button'">
+          {{ btnSaveOrStart() }}</button>
       </div>
 
       <div class="inline mr-3" v-if="showOrHideResetCancelButton()">
-      	<button v-if="showOrHideResetCancelButton()" :class="getCalibrationTabIndex() < 5 ? 'reset' : 'cancel'"
-        class="c-blue font-normal underline" @click="ResetCancelTabContent" :title="btnResetOrCancel() + 'Button'"
-        :aria-label="btnResetOrCancel() + 'Button'">{{ btnResetOrCancel() }}</button>
+        <button v-if="showOrHideResetCancelButton()" :class="getCalibrationTabIndex() < 5 ? 'reset' : 'cancel'"
+          class="c-blue font-normal underline" @click="ResetCancelTabContent" :title="btnResetOrCancel() + 'Button'"
+          :aria-label="btnResetOrCancel() + 'Button'">{{ btnResetOrCancel() }}</button>
       </div>
-</div>
+    </div>
 
-  <div class="ml-auto">
-    <div class="inline ngenButtonDiv c-gray-md" v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5"><button v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5"
-        class="prev actionBtnSmall font-normal" @click="NavigatePrevContent" title="Previous" aria-label="Previous"><!--&#8678; -->Prev</button></div>
-    <div v-if="getCalibrationTabIndex() < 5" class="inline ngenButtonDiv ml-6"><button v-if="getCalibrationTabIndex() < 5" class="font-normal"
-        @click="NavigateNextContent" title="Next" aria-label="Next">Next<!-- <span>&#8680;</span>--></button></div>
+    <div class="ml-auto">
+      <div class="inline ngenButtonDiv c-gray-md" v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5">
+        <button v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5"
+          class="prev actionBtnSmall font-normal" @click="NavigatePrevContent" title="Previous"
+          aria-label="Previous"><!--&#8678; -->Prev</button>
+      </div>
+      <div v-if="getCalibrationTabIndex() < 5" class="inline ngenButtonDiv ml-6"><button
+          v-if="getCalibrationTabIndex() < 5" class="font-normal" @click="NavigateNextContent" title="Next"
+          aria-label="Next">Next<!-- <span>&#8680;</span>--></button></div>
+    </div>
+
   </div>
-
-</div>
 </template>
 
 <script lang="ts" setup>
@@ -42,7 +45,6 @@ const btnSaveOrStart = () => {
     case 4: break;
     default: break;
   }
-
 };
 
 const btnResetOrCancel = () => {
@@ -77,7 +79,6 @@ const ResetCancelTabContent = async (e: MouseEvent) => {
     case 4: break;
     default: break;
   }
-
 };
 
 const NavigatePrevContent = (e: MouseEvent) => {
@@ -148,12 +149,14 @@ const showOrHideResetCancelButton = (): boolean => {
   color: #ffffff;
   font-weight: bold;
 }
+
 .arrow {
   border: solid black;
   border-width: 0 3px 3px 0;
   display: inline-block;
   padding: 3px;
 }
+
 .disabled {
   opacity: 0.8;
 }

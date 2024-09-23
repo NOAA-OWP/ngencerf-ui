@@ -111,10 +111,6 @@
 import { storeToRefs } from "pinia";
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getMenuIndex } = generalStore();
-const { 
-      calibrationTabIndex,
-      evaluationTabIndex,
-      forecastTabIndex } = storeToRefs( generalStore() )
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 const currentEvaluationTab = ref(getEvaluationTabIndex());

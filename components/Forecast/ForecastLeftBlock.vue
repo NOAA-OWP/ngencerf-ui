@@ -2,7 +2,7 @@
   <!-- ForecastLeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
-    <div class="shrink-0" id="InputsArea">
+    <div class="shrink-0">
       <span v-if="activeTab == 1">
         <PreviousRunsTab />
       </span>
@@ -31,10 +31,11 @@ import Tabs from '~/components/Common/Tabs.vue'
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
-import PreviousRunsTab from './PreviousRunsTab.vue';
-import SetupForecastRunTab from './SetupForecastRunTab.vue';
-import StatusTab from './StatusTab.vue';
-import ResultsTab from './ResultsTab.vue';
+const PreviousRunsTab = defineAsyncComponent(() => import('./PreviousRunsTab.vue'))
+const SetupForecastRunTab = defineAsyncComponent(() => import('./SetupForecastRunTab.vue'))
+const StatusTab = defineAsyncComponent(() => import('./StatusTab.vue'))
+const ResultsTab = defineAsyncComponent(() => import('./ResultsTab.vue'))
+
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 
 // Default to Tab 1, HeadwaterBasinGage
@@ -46,10 +47,3 @@ const tabChanged = (tabNum: number) => {
   setForecastTabIndex(tabNum);
 };
 </script>
-
-<style lang="scss" scoped>
-#InputsArea {
-  height: 20vw;
-  min-width: 960px;
-}
-</style>
