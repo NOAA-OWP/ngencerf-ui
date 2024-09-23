@@ -387,6 +387,7 @@ export type LogoutEvent = {
 
 export const ValidationFormFields = {
   formulation_name: "Formulation Name",
+  modules: "Formulation Modules",
   sloth_parameters: "Sloth Parameters",
   maps_to_module: "Sloth Parameter For Module",
   maps_to_variable_name: "Sloth Parameter Module Param",

@@ -217,12 +217,6 @@ useListen('calibrationButtonNext', (actionButton) => {
   const e = <HTMLElement>tabs[2];
   e.click();
 })
-
-useListen('calibrationButtonNext', (actionIndex: number) => {
-  if (actionIndex == 2) {
-    calibrationNextTabNavigate(actionIndex)
-  }
-})
 </script>
 
 <style lang="scss" scoped>

@@ -183,37 +183,22 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
   * @returns {GeneralApiSaveResponse}
   */
   async function saveFormulationTabData() {
-    const saveFormulationTabDataValidation = useCalibrationTabValidation({
-        formulation_name: formulationNameInput.value, 
-        modules: selectedModuleValues.value,
-        sloth_parameters: slothParameterInputs.value
+    const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
+      method: "POST",
+      headers: { 
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+      },
+      body: JSON.stringify( { 
+          calibration_run_id: calibrationJobId.value, 
+          formulation_name: formulationNameInput.value, 
+          modules: selectedModuleValues.value, 
+          use_sloth: useSlothParameters.value,
+          sloth_parameters: slothParameterInputs.value
+      } )
     })
     
-    if ( Object.keys( saveFormulationTabDataValidation.errors.value ).length == 0)  {
-      const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
-        method: "POST",
-        headers: { 
-            "Authorization": `Bearer ${getAccessToken()}`,
-            "Content-Type": 'application/json'
-        },
-        body: JSON.stringify( { 
-            calibration_run_id: calibrationJobId.value, 
-            formulation_name: formulationNameInput.value, 
-            modules: selectedModuleValues.value, 
-            use_sloth: useSlothParameters.value,
-            sloth_parameters: slothParameterInputs.value
-        } )
-      })
-      
-      return saveFormulationTabDataResponse?._data
-    } else {
-        return Promise.resolve({
-          message: "Missing required field(s)",
-          validation_errors: saveFormulationTabDataValidation.errors.value,
-          calibration_run_id: calibrationJobId.value,
-          status: "error"
-        })
-    }
+    return saveFormulationTabDataResponse?._data
   }
 
   /**
