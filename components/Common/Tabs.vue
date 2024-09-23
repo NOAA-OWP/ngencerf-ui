@@ -1,6 +1,6 @@
 <!-- Tabs.vue -->
 <template Tabs>
-  <div id="MainTabs">
+  <div id="MainTabs" class="sticky top-0 bg-white mr-2">
 
     <span v-if="currentMenu === 1"> <!-- CALIBRATION TABS -->
       <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
@@ -29,11 +29,11 @@
           Run / Status
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="6" data-menu-tab="16" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
+        <!--<div data-tab="6" data-menu-tab="16" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
           title="Results tab">
           Results
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
+        </div>-->
       </div>
     </span>
 
@@ -149,7 +149,6 @@ const tabClicked = (event: Event) => {
    if (currentMenu.value === 1) {
       currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
       emit("tabNumber", currentCalibrationTab.value);
-      console.log('tabClick', currentCalibrationTab.value )
    } else if (currentMenu.value === 2) {
       currentEvaluationTab.value = Number(ele.getAttribute("data-tab"));
       emit("tabNumber", currentEvaluationTab.value);
@@ -164,22 +163,23 @@ const tabClicked = (event: Event) => {
 
 #MainTabs {
   overflow-x: hidden;
-  margin-left: 20px;
+  border-bottom: 3px solid #d9d9d9;
+  z-index: 11;
 
   .tabs {
-    font-size: 0.8vw;
+    font-size: 16px;
     display: inline-block;
     vertical-align: bottom;
-    width: 16%;
-    height: 48px;
-    background-color: #ffffff;
-    color: black; //$ngwcp_primary3;
+    height: 43px;
+    color: black;
+    font-weight: bold;
     text-align: center;
     padding-top: 13px;
     padding-left: 10px;
-    border-radius: 10px 10px 0 0;
-    border: 1px solid $ngwcp_primary1;
     cursor: pointer;
+  }
+  .tabs:hover {
+    color: $ngwcp_primary1;
   }
 
   .errorDot {
@@ -188,7 +188,6 @@ const tabClicked = (event: Event) => {
     width: 10px;
     height: 10px;
     border-radius: 100%;
-    margin-left: 3px;
   }
 
   .noErrorDot {
@@ -197,13 +196,10 @@ const tabClicked = (event: Event) => {
     width: 10px;
     height: 10px;
     border-radius: 100%;
-    margin-left: 3px;
   }
 
   .activeTab {
-    background-color: $ngwcp_primary1;
-    color: #ffffff;
-    font-weight: bold;
+    border-bottom: 5px solid $ngwcp_primary1;
   }
 }
 </style>

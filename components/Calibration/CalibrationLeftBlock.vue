@@ -53,7 +53,7 @@ const tabChanged = (tabNum: number) => {
 #InputsArea {
   //position: absolute;
   //margin-left: 100px;
-  height: 20vw;
-  min-width: 960px;
+  //height: 20vw;
+  //min-width: 960px;
 }
 </style>

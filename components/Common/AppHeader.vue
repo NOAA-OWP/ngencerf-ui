@@ -3,7 +3,7 @@
   <div id="Header" class="header  prevent-select">
     <div id="TopBar">&nbsp;</div>
     <div class="grid grid-cols-12 gap-1" style="height: 80px">
-      <div id="PgmName" class="col-span-2 mt-4">
+      <div id="PgmName" class="col-span-2 mt-6">
         <NuxtLink to="LandingPage">NgenCERF</NuxtLink>
       </div>
       <div id="Col2" class="col-span-8">
@@ -26,6 +26,7 @@
               @click="MenuChanged">Verification</NuxtLink>
           </li>
         </ul>
+        
       </div>
 
       <div id="Circles" class="col-span-2">
@@ -43,7 +44,7 @@
             </ul>
           </div>
           <div class="col-span-1">
-            <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" id="HelpCircle" title="Help"
+            <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px" id="HelpCircle" title="Help"
               aria-lable="help" @click="displayHelp">?</button>
           </div>
         </div>
@@ -62,7 +63,7 @@
           <div v-if="location.name === 'PreviousRuns'">
             <HelpPreviousRunsHelp />
           </div>
-          7
+
           <div v-if="location.name === 'Calibration'">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
@@ -160,7 +161,6 @@ onUnmounted(() => {
 });
 
 const sizeHelpWindow = () => {
-  console.log("called")
   let headerHeight = document.getElementById('Header')?.clientHeight;
   let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
   if (footerTop && headerHeight) {
@@ -219,13 +219,10 @@ const MenuChanged = (e: MouseEvent) => {
   background-color: $ngwcp_primary1;
   width: 100%;
 }
-
 #Header {
   height: 80px;
-  border-bottom: 2px solid $ngwcp_primary1;
   margin-bottom: 4px;
 }
-
 #Logo {
   img {
     width: 200px;
@@ -238,18 +235,15 @@ const MenuChanged = (e: MouseEvent) => {
   font-weight: bold;
   margin-left: 20px;
 }
-
 #TopMenu {
   display: inline;
   font-size: 20px;
   font: 20px Arial, sans-serif;
 }
-
 #MainMenu {
   float: right;
   margin-right: 100px;
   margin-top: 20px;
-
   ul {
     list-style: none;
     margin-top: 0px;
@@ -257,94 +251,74 @@ const MenuChanged = (e: MouseEvent) => {
 
   li {
     display: inline-block;
-    margin-right: 20px;
-    font-size: 22px;
-    margin-top: 15px;
+    margin: 20px 7px 0;
+    font-size: 22px;  
 
     a {
       text-decoration: none;
       color: #000;
+      font-weight: bold;
+      background-color: $ngwcp_neutral_gray_md;  
+      border-radius: 5px;
+      padding:15px 28px;
     }
-
     a:hover {
-      color: $ngwcp_primary1;
+      background-color: $gray-20;
       text-decoration: none;
     }
-
     .isActive {
-      font-weight: bold;
-      border-bottom: 1px solid #000;
-      padding-bottom: 3px;
+      color: #fff;
+      background-color: $ngwcp_primary1;
+    }
+    .isActive:hover {
+      color: #fff;
+      background-color: $ngwcp_primary1;
     }
   }
-}
-
-#userMenu {
-  background-color: white;
-  border: 1px solid black;
-  position: fixed;
-  top: 7px;
-  margin-left: 54px;
-  padding: 5px 0;
-
-  ul li {
-    padding: 3px;
-  }
-
-  ul li:hover {
-    background-color: #ccc;
-  }
-
-}
-
-.fade {
-  animation: fading 1s forwards; // "fading" is the keyframe animation you created
 }
 
 #Circles {
-  margin-right: 10px;
-  margin-top: 10px;
+  margin-right: 20px;
+  margin-left: auto;
   clear: none;
   text-align: center;
 }
 
-#UserCircle,
-#HelpCircle {
-  display: inlingreye-block;
-  height: 60px;
-  width: 60px;
-  background-color: #eee;
+#UserCircle{
+  display: inline-block;
+  height: 70px;
+  width: 70px;
+  margin-top: 10px;
+  background-color: $ngwcp_neutral_gray_md;
   border-radius: 50%;
   font-size: 30px;
-  padding-top: 16px;
+  padding-top: 20px;
+}
+#HelpCircle {
+  display: inline-block;
+  height: 50px;
+  width: 50px;
+  margin-top: 20px;
+  background-color: $ngwcp_primary2;
+  color: white;
+  border-radius: 50%;
+  font-size: 38px;
+  padding-top: 12px;
   border: 1px solid #000;
 }
-
 #UserCircle {
   margin-right: 10px;
 }
-
 #UserCircle:hover {
   background-color: $ngwcp_primary2;
 }
-
-#HelpCircle {
-  padding-top: 0;
-}
-
 #HelpCircle:hover {
-  background-color: $ngwcp_primary2;
-}
-
-.help_close_button {
-  margin: 20px auto;
-  width: 100px;
+ background-color: $ngwcp_primary2;
 }
 
 .userInitials {
   text-align: center;
 }
-
 .qmark {
   font-size: 35px;
 }

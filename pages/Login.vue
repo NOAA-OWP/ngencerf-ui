@@ -10,33 +10,33 @@
         </div>
         <div class="h-full grid row-span-10">
           <div class="grid grid-rows-12">
-            <div class="row-span-12">
+            <div class="row-span-12 flex items-center justify-center h-screen-inner">
 
-              <div id="LoginBox" class="container" :class="!showDialog ? 'loginBox' : 'createAccountBox'">
+              <div id="LoginBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md" :class="!showDialog ? 'loginBox' : 'createAccountBox'">
 
-                <div v-if="!showDialog">
+                <div v-if="!showDialog" class="mx-auto px-8 text-left">
                   <form onsubmit="return false">
-                    <h2 class="ttl">Login to Your Account</h2>
+                    <h1>Login in</h1>
                     <div class="inputBox">
                       <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username"
-                        autocomplete="username" />
-                      <button tabindex="-1" class="forgot" v-on:click="ForgotUsername">
+                        autocomplete="username" v-on:keypress="autoSubmit"/>
+                      <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Username
                       </button>
                     </div>
                     <div class="inputBox">
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
-                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" />
-                      <button tabindex="-1" class="forgot" v-on:click="ForgotPassword">
+                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block" v-on:keypress="autoSubmit"/>
+                      <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
                         Forgot Password
                       </button>
                     </div>
-                    <div class="loginButton ngenButtonDiv" v-on:click="SubmitLoginForm" aria-label="sign in">
+                    <div class="ngenButtonDiv bg-blue1 btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">
                       <button id="LoginButton">Sign In</button>
                     </div>
                     <div>
-                      <div class="signupButton ngenButtonDiv" aria-label="sign up">
-                        <button @click="openDialog">Create an Account</button>
+                      <div class="signupButton underline text-base" aria-label="sign up">
+                        <button @click="openDialog" class="c-blue">Create an Account</button>
                       </div>
                     </div>
 
@@ -46,19 +46,19 @@
                 <div v-if="showDialog">
                   <div class="dialog-overlay" @click.self="closeDialog">
                     <div class="dialog-content">
-                      <h2 class="ttl">Create an Account</h2>
+                      <h1>Create an Account</h1>
                       <form @submit.prevent="submitForm">
                         <div class="form-group inputBox">
                           <label for="username">Username</label>
-                          <InputText v-model="_username" id="username" type="text" required />
+                          <InputText v-model="newUsername" id="username" type="text" required />
                         </div>
                         <div class="form-group inputBox">
                           <label for="email">Email</label>
-                          <InputText v-model="userEmail" id="email" type="email" required />
+                          <InputText v-model="newEmail" id="email" type="email" required />
                         </div>
                         <div class="form-group inputBox">
                           <label for="password">Password</label>
-                          <Password v-model="password" id="password" type="password" name="password" autocomplete="current-password" required toggleMask>
+                          <Password v-model="newPassword" id="password" type="password" name="password" autocomplete="current-password" required toggleMask class="block">
                             <template #header>
                               <div class="font-semibold text-xm mb-4">Password</div>
                             </template>
@@ -75,13 +75,13 @@
                         <div class="form-group inputBox">
                           <label for="confirmPassword">Confirm Password</label>
                           <Password v-model="confirmPassword" id="confirmPassword" type="password" :feedback="false"
-                            required toggleMask />
+                            required toggleMask class="block" />
                         </div>
-                        <div class="createAccountButton ngenButtonDiv">
+                        <div class="ngenButtonDiv bg-blue1 btn-left mt-4">
                           <button type="submit">Create Account</button>
                         </div>
-                        <div class="cancelCreateAccountButton ngenButtonDiv">
-                          <button type="button" @click="closeDialog">Cancel</button>
+                        <div class="signupButton underline text-base inline pl-6">
+                          <button type="button" @click="closeDialog" class="c-blue">Cancel</button>
                         </div>
                       </form>
                     </div>
@@ -123,9 +123,9 @@ const userName = ref<string>("");
 const userPassword = ref<string>("");
 const showDialog = ref(false);
 
-const _username = ref('');
-const userEmail = ref('');
-const password = ref('');
+const newUsername = ref('');
+const newEmail = ref('');
+const newPassword = ref('');
 const confirmPassword = ref('');
 
 onMounted(() => {
@@ -151,6 +151,14 @@ const ForgotPassword = () => {
   //
 };
 
+const autoSubmit = (e: KeyboardEvent) => {
+  const u = document.getElementById("uname");
+  const p = document.getElementById('pword');
+  if (e.key === "Enter" && (userName.value.trim() !== "" && userPassword.value.trim() !== "")) {
+    SubmitLoginForm(e);
+  }
+}
+
 /** 
  * Submits the login form
  * @param e - event object
@@ -170,12 +178,12 @@ const SubmitLoginForm = async (e: Event) => {
     });
     // error.value.statuscode
     if (error.value) {
-      let e = error.value?.data?.detail;
-      if (!e) {
-        e = "Cannot reach server. Error code: " + error.value.statusCode;
+      let err = error.value?.data?.detail;
+      if (!err) {
+        err = "Cannot reach server. Error code: " + error.value.statusCode;
         console.log("StatusCode: ", e);
       }
-      toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: err, life: 3000 });
       console.error("Error during user creation:", error.value?.message, error.value?.data);
       return;
     }
@@ -192,7 +200,7 @@ const SubmitLoginForm = async (e: Event) => {
 }
 
 const submitForm = async () => {
-  if (password.value !== confirmPassword.value) {
+  if (newPassword.value !== confirmPassword.value) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 3000 });
     return;
   }
@@ -201,9 +209,9 @@ const submitForm = async () => {
   const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
     method: 'POST',
     body: {
-      username: _username.value,
-      email: userEmail.value,
-      password: password.value,
+      username: newUsername.value,
+      email: newEmail.value,
+      password: newPassword.value,
       re_password: confirmPassword.value
     }
   });
@@ -232,77 +240,20 @@ const GoToLanding = async () => {
   await navigateTo({ path: "/LandingPage" });
 };
 
-onMounted( () => {
+onMounted(() => {
   localStorage.clear()
 })
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-
-.loginBox,
-.createAccountBox {
-  position: relative;
-  margin: 60px auto 0 auto;
-  border-radius: 50px;
-  width: 420px;
-  height: 450px;
-  border: 2px solid #105d84;
-}
-
-.loginBox {
-  height: 390px;
-}
-
-.createAccountBox {
-  height: 550px;
-}
-
-input::-webkit-input-placeholder {
-  opacity: 0.8;
-}
-
-.ttl {
-  text-align: center;
-  position: static;
-  margin-top: 20px;
-  font-size: 26px;
-  font-weight: 600;
-}
-
 .needAccount {
-  text-align: center;
   font-size: 18px;
   font-weight: 600;
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
-.inputBox {
-  margin: 0 auto;
-  margin-top: 20px;
-  width: 80%;
-
-  input {
-    height: 40px !important;
-  }
-}
-
-.forgot {
-  text-decoration: underline;
-  color: #0c1db4;
-}
-
-.signupButton,
-.loginButton,
-.createAccountButton,
-.cancelCreateAccountButton {
-  font-size: 20px;
-  margin: 20px auto;
-  text-align: center;
-  border: 3px solid #000;
-  border-radius: 20px;
-  width: 245px;
-  height: 50px;
-  padding-top: 10px;
-
+.signupButton {
+  border: 0px;
+  margin: 20px auto 0 0;
 }
 </style>

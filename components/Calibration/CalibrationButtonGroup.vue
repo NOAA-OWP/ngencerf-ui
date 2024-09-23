@@ -1,25 +1,28 @@
 <template>
-  <div id="BottomButtons" class="grid grid-cols-12 w-full">
-    <div class="col-span-2">
-      <button v-if="showOrHideSaveStartButton()" class="save-start actionBtn" @click="SaveStartTabContent"
+<div id="BottomButtons" class="flex">
+  <div>
+
+      <div class="inline ngenButtonDiv bg-green mr-6" v-if="showOrHideSaveStartButton()">
+      	<button v-if="showOrHideSaveStartButton()" class="font-normal" @click="SaveStartTabContent"
         :title="btnSaveOrStart() + ' Button'" :aria-label="btnSaveOrStart() + ' Button'">
         {{ btnSaveOrStart() }}</button>
-    </div>
-    <div class="col-span-2">
-      <button v-if="showOrHideResetCancelButton()" :class="getCalibrationTabIndex() < 5 ? 'reset' : 'cancel'"
-        class="actionBtn" @click="ResetCancelTabContent" :title="btnResetOrCancel() + 'Button'"
+      </div>
+
+      <div class="inline mr-3" v-if="showOrHideResetCancelButton()">
+      	<button v-if="showOrHideResetCancelButton()" :class="getCalibrationTabIndex() < 5 ? 'reset' : 'cancel'"
+        class="c-blue font-normal underline" @click="ResetCancelTabContent" :title="btnResetOrCancel() + 'Button'"
         :aria-label="btnResetOrCancel() + 'Button'">{{ btnResetOrCancel() }}</button>
-    </div>
-    <div class="col-span-1"></div>
-    <div class="col-span-1"></div>
-    <div class="col-span-1"></div>
-    <div class="col-span-1"></div>
-    <div class="col-span-2 text-right"><button v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5"
-        class="prev actionBtnSmall" @click="NavigatePrevContent" title="Previous" aria-label="Previous">&#8678;
-        Prev</button></div>
-    <div class="col-span-2"><button v-if="getCalibrationTabIndex() < 5" class="next actionBtnSmall"
-        @click="NavigateNextContent" title="Next" aria-label="Next">Next <span>&#8680;</span></button></div>
+      </div>
+</div>
+
+  <div class="ml-auto">
+    <div class="inline ngenButtonDiv c-gray-md" v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5"><button v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5"
+        class="prev actionBtnSmall font-normal" @click="NavigatePrevContent" title="Previous" aria-label="Previous"><!--&#8678; -->Prev</button></div>
+    <div v-if="getCalibrationTabIndex() < 5" class="inline ngenButtonDiv ml-6"><button v-if="getCalibrationTabIndex() < 5" class="font-normal"
+        @click="NavigateNextContent" title="Next" aria-label="Next">Next<!-- <span>&#8680;</span>--></button></div>
   </div>
+
+</div>
 </template>
 
 <script lang="ts" setup>
@@ -62,7 +65,6 @@ const SaveStartTabContent = async (e: MouseEvent) => {
     case 4: break;
     default: break;
   }
-  console.log("Save/Start Triggered")
 };
 
 const ResetCancelTabContent = async (e: MouseEvent) => {
@@ -76,7 +78,6 @@ const ResetCancelTabContent = async (e: MouseEvent) => {
     default: break;
   }
 
-  console.log("Stop/Reset Triggered")
 };
 
 const NavigatePrevContent = (e: MouseEvent) => {
@@ -89,7 +90,6 @@ const NavigatePrevContent = (e: MouseEvent) => {
     case 4: break;
     default: break;
   }
-  console.log("PREV Triggered")
 };
 
 const NavigateNextContent = (e: MouseEvent) => {
@@ -102,7 +102,6 @@ const NavigateNextContent = (e: MouseEvent) => {
     case 4: break;
     default: break;
   }
-  console.log("NEXT Triggered");
 };
 
 const showOrHideSaveStartButton = (): boolean => {
@@ -149,58 +148,12 @@ const showOrHideResetCancelButton = (): boolean => {
   color: #ffffff;
   font-weight: bold;
 }
-
-.actionBtn {
-  display: inline-block;
-  width: 95%;
-  height: 55px;
-  border: 5px solid #59b4c1;
-  border-radius: 10px;
-  margin-right: 20px;
-}
-
-.actionBtnSmall {
-  display: inline-block;
-  width: 105px;
-  height: 55px;
-  border-radius: 10px;
-  border: 3px solid #59b4c1;
-  margin-right: 3px;
-}
-
 .arrow {
   border: solid black;
   border-width: 0 3px 3px 0;
   display: inline-block;
   padding: 3px;
 }
-
-.save-start {
-  background-color: #155e29;
-}
-
-.cancel {
-  background-color: #aa0000;
-}
-
-.reset {
-  background-color: #333333;
-}
-
-.reset {
-  background-color: #000000;
-}
-
-.prev {
-  background-color: #000000;
-  display: inline-block;
-}
-
-.next {
-  background-color: #000000;
-  display: inline-block;
-}
-
 .disabled {
   opacity: 0.8;
 }

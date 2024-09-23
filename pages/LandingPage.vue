@@ -6,18 +6,21 @@
           <AppHeader />
         </div>
       </div>
-      <div class="h-full grid row-span-10">
+      <div class="grid row-span-10">
         <div class="grid grid-rows-12">
-          <div class="row-span-2">
-            <div class="pgTitle">Next Generation Water Prediction Capability (NGWPC) </div>
-          </div>
-          <div class="row-span-10">
-            <div id="CenterBox">
+
+          <div class="row-span-12 flex items-center justify-center h-screen-inner">
+
+            <div id="CenterBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-lg">
+              <div class="mx-auto px-8 text-center text-2xl">
+                <h1 class="mt-8 mb-4 text-4xl font-bold">Next Generation Water Prediction Center </h1>
+
               <div>Welcome <strong>{{ getUserName() }}</strong></div>
               <div>You have {{ runningCalibrationJobs }} current processes running</div>
               <div>You have {{ savedCalibrationJobs }}  calibration setups to complete</div>
-              <div id="ContinueBtn" @click="GoPreviousRuns">
+              <div id="ContinueBtn" class="ngenButtonDiv bg-blue1 btn-center mt-4" @click="GoPreviousRuns">
                 <button>Continue</button>
+                </div>
               </div>
             </div>
           </div>
@@ -50,7 +53,7 @@ const GoPreviousRuns = async () => {
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-
+/*
 #CenterBox {
   border: 4px solid #105D84;
   line-height: 2em;
@@ -63,8 +66,9 @@ const GoPreviousRuns = async () => {
   ;
   border-radius: 50px;
   text-align: center;
-}
+}*/
 
+/*
 #ContinueBtn {
   margin: 30px auto 0 auto;
   width: 120px;
@@ -78,6 +82,10 @@ const GoPreviousRuns = async () => {
 #ContinueBtn:hover {
   background-color: $ngwcp_primary2;
   color: #000;
+}*/
+
+#ContinueBtn {
+  max-width: 110px;
 }
 
 .pgTitle {

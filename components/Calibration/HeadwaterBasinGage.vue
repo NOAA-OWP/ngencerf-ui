@@ -1,59 +1,53 @@
 <template>
-  <client-only>
-    <div id="HeadwaterBasinGage" class="w-full">
-      <div id="GageSettings" class="mt-5">
-        <div class="grid grid-rows-2">
-          <div class="row-span-2 selRow">
+   <client-only>
+      <div id="HeadwaterBasinGage" class="w-full mt-4">
+         <div id="GageSettings" class="mt-5">
+            <div class="grid grid-rows-2">
+               <div class="row-span-2 selRow">
 
-            <div class="grid grid-cols-6 gap-4">
-              <div class="col-span-1">&nbsp;</div>
-              <div class="col-span-1">
-                Domain:<br />
-                <Select v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
-                  optionValue="name" placeholder=" ... " class="w-40 m-auto"></Select>
-              </div>
-              <div class="col-span-1">
-                Gage:<br />
-                <Select v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
-                  optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }" class="w-40"
-                  @change="onGageSelectionChange"></Select>
-              </div>
-              <div class="col-span-1">
-                Forcing:<br />
-                <Select v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                  optionValue="name" placeholder=" ... " class="w-40"></Select>
-                <div v-if="selectedForcingValue.toLowerCase() == 'upload'">
-                  <Button label="Upload File" icon="pi pi-upload"
-                    @click="showForcingFileUploadDialog('Forcing Files')"></Button>
+                  <div class="grid grid-cols-3 gap-4">
+                     <div class="col-span-1">
+                        <label for="Domain">Domain:</label><br />
+                        <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
+                           optionValue="name" placeholder=" ... " class="w-full"></Select>
+                     </div>
+                     <div class="col-span-1">
+                        <label for="Gage">Gage:</label><br />
+                        <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
+                           optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
+                           @change="onGageSelectionChange" class="w-full"></Select>
+                     </div>
+                     <div class="col-span-1">&nbsp;<!--empty space used for layout--></div>     
+                     
+                     <div class="col-span-1">
+                        <label for="Forcing">Forcing:</label><br />
+                        <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
+                           optionValue="name" placeholder=" ... " class="w-full"></Select>
+                        <!-- 1) undecided: additional icons: <button icon="pi pi-upload"...>
+                              2) undecided: alternative label: <button label="Upload File" ...> -->
+                        <div v-if="selectedForcingValue.toLowerCase() == 'upload'" class="ngenButtonDiv-alt bg-blue4 clear-left mt-1">
+                  <Button label="Upload" @click="showForcingFileUploadDialog('Forcing Files')"></Button>
 
 
                 </div>
               </div>
               <div class="col-span-1">
-                Observational:<br />
-                <Select v-model="selectedObservationalValue" :options="getObservationalOptionsList" optionLabel="name"
-                  optionValue="name" placeholder=" ... " class="w-40"></Select>
+                <label for="Observational">Observational:</label><br />
+                        <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList" optionLabel="name"
+                  optionValue="name" placeholder=" ... " class="w-full"></Select>
 
-                <div v-if="selectedObservationalValue.toLowerCase() == 'upload'">
-                  <Button label="Upload File" icon="pi pi-upload"
-                    @click="showObservationalFileUploadDialog('Observational File')"></Button>
-                </div>
-              </div>
-              <div class="col-span-1">&nbsp;</div>
-            </div>
-
-            <div class="row-span-1 mt-4">
-              <div class="grid grid-cols-10">
-                <div class="col-span-4"></div>
-                <div class="col-span-4">
-                  <div>
-                    <div class="mb-2"> Geopackage: </div>                          
-                    <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList"
-                    optionLabel="name" optionValue="name" placeholder=" ... " class="w-40"></Select>
-                    <div v-if="selectedGeopackageValue.toLowerCase() == 'upload'">
-                        <Button label="Upload File" icon="pi pi-upload" @click="showGeopackagFileUploadDialog( 'Geopackage File' )"></Button>  
-                    </div>  
-                  </div>
+                <div v-if="selectedObservationalValue.toLowerCase() == 'upload'" class="ngenButtonDiv-alt bg-blue4 clear-left mt-1">
+                  <Button label="Upload" @click="showObservationalFileUploadDialog('Observational File')"></Button>
+                        </div>
+                     </div>
+                     <div class="col-span-1">
+                        <label for="Geopackage">Geopackage:</label><br />
+                       
+                           <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList"
+	                    optionLabel="name" optionValue="name" placeholder=" ... " class="w-full"></Select>
+                           <div v-if="selectedGeopackageValue.toLowerCase() == 'upload'" class="ngenButtonDiv-alt bg-blue4 clear-left mt-1">
+	                        <Button label="Upload" @click="showGeopackagFileUploadDialog( 'Geopackage File' )"></Button>  
+                           </div>
                   <!-- These controls temorarily commented out and will be dealt with with a later story NHS 8-19-2024-->
                   <!-- <div class="grid grid-cols-4 gap=4">
                         <div class="col-span-1">&nbsp;</div>
@@ -67,72 +61,83 @@
                         </div>
                         <div class="col-span-1"></div>
                      </div> -->
-                </div>
-              </div>
+                     </div>
+                  </div>
+
+                  <div class="row-span-1 mt-4">
+                     <div class="grid grid-cols-10">
+                        <div class="col-span-4"></div>
+                        
+                     </div>
+                  </div>
+                  <DynamicDialog />
+                  <!-- <div class="row-span-8"> -->
+                  <div id="GageReport" v-if="gageData" class="text-sm inline ml-0">
+                     <div id="GrBox" class="mt-6">
+                        <table class="table-auto">
+                           <tr class="rowOdd">
+                              <td class="dataName">Domain</td>
+                              <td class="dataText">{{ selectedDomainValue }}</td>
+                           </tr>
+                           <tr class="rowEven">
+                              <td class="dataName">Gage ID</td>
+                              <td class="dataText">{{ gageData?.gage_id }}</td>
+                           </tr>
+                           <tr class="rowOdd">
+                              <td class="dataName">Agency</td>
+                              <td class="dataText">{{ gageData?.agency }}</td>
+                           </tr>
+                           <tr class="rowEven">
+                              <td class="dataName">Station Name</td>
+                              <td class="dataText">{{ gageData?.station_name }}</td>
+                           </tr>
+                           <tr class="rowOdd">
+                              <td class="dataName">Site Type</td>
+                              <td class="dataText"></td>
+                           </tr>
+                           <tr class="rowEven">
+                              <td class="dataName">Latitude</td>
+                              <td class="dataText">{{ gageData?.latitude }}</td>
+                           </tr>
+                           <tr class="rowOdd">
+                              <td class="dataName">Longitude</td>
+                              <td class="dataText">{{ gageData?.longitude }}</td>
+                           </tr>
+                           <tr class="rowEven">
+                              <td class="dataName">Altitude</td>
+                              <td class="dataText">{{ gageData?.altitude }}</td>
+                           </tr>
+                           <tr class="rowOdd">
+                              <td class="dataName">Date Established</td>
+                              <td class="dataText"></td>
+                           </tr>
+                           <tr class="rowEven">
+                              <td class="dataName">Drainage Area</td>
+                              <td class="dataText"></td>
+                           </tr>
+                           <tr class="rowOdd">
+                              <td class="dataName">HUC</td>
+                              <td class="dataText"></td>
+                           </tr>
+                        </table>
+
+                        <br clear="all" />
+                        <br clear="all" />
+                        <br clear="all" />
+                     </div>
+                  </div>
+                  <!-- </div> -->
+               </div>
             </div>
-            <DynamicDialog />
-            <!-- <div class="row-span-8"> -->
-            <div id="GageReport" v-if="gageData">
-              <div id="GrBox">
-                <table>
-                  <tr class="rowOdd">
-                    <td class="dataName">Domain</td>
-                    <td class="dataText">{{ selectedDomainValue }}</td>
-                  </tr>
-                  <tr class="rowEven">
-                    <td class="dataName">Gage ID</td>
-                    <td class="dataText">{{ gageData?.gage_id }}</td>
-                  </tr>
-                  <tr class="rowOdd">
-                    <td class="dataName">Agency</td>
-                    <td class="dataText">{{ gageData?.agency }}</td>
-                  </tr>
-                  <tr class="rowEven">
-                    <td class="dataName">Station Name</td>
-                    <td class="dataText">{{ gageData?.station_name }}</td>
-                  </tr>
-                  <tr class="rowOdd">
-                    <td class="dataName">Site Type</td>
-                    <td class="dataText"></td>
-                  </tr>
-                  <tr class="rowEven">
-                    <td class="dataName">Latitude</td>
-                    <td class="dataText">{{ gageData?.latitude }}</td>
-                  </tr>
-                  <tr class="rowOdd">
-                    <td class="dataName">Longitude</td>
-                    <td class="dataText">{{ gageData?.longitude }}</td>
-                  </tr>
-                  <tr class="rowEven">
-                    <td class="dataName">Altitude</td>
-                    <td class="dataText">{{ gageData?.altitude }}</td>
-                  </tr>
-                  <tr class="rowOdd">
-                    <td class="dataName">Date Established</td>
-                    <td class="dataText"></td>
-                  </tr>
-                  <tr class="rowEven">
-                    <td class="dataName">Drainage Area</td>
-                    <td class="dataText"></td>
-                  </tr>
-                  <tr class="rowOdd">
-                    <td class="dataName">HUC</td>
-                    <td class="dataText"></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <!-- </div> -->
-          </div>
-        </div>
+         </div>
       </div>
-    </div>
-    <div class="waitgif" v-if="data_loading">
-      <img src="@/assets/styles/img/wait.gif" />
-    </div>
-  </client-only>
+      <div class="waitgif" v-if="data_loading">
+         <img src="@/assets/styles/img/wait.gif" />
+      </div>
+   </client-only>
 </template>
 <script lang="ts" setup>
+import { getCurrentInstance } from 'vue';
 import { storeToRefs } from "pinia";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
@@ -141,7 +146,6 @@ import { useToast } from "primevue/usetoast";
 import { calibrationNextTabNavigate } from "~/composables/TabClickEvent";
 import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
-import TabPanels from "primevue/tabpanels";
 
 const gageStore = useGageStore()
 const { gageData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
@@ -151,7 +155,13 @@ const { calibrationJobId } = storeToRefs(generalStore())
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const toast = useToast()
 
-loadGageTabStaticData()
+const isLoading = ref(true);
+onMounted( () => {
+  loadGageTabStaticData();
+  setTimeout( () => {
+    isLoading.value = false;
+  }, 500)  
+})
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
@@ -161,15 +171,12 @@ const onGageSelectionChange = () => {
 }
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
-  console.log("Action Button: ", actionButton);
   if (getCalibrationTabIndex() == 1 && actionButton == 'RESET') {
     resetUserSelectionGage();
-    console.log("resetUserSelectionGage reset");
   }
 })
 
 useListen('calibrationButtonNext', (actionButton) => {
-  console.log("Action Button: ", actionButton);
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[1];
   e.click()
@@ -304,30 +311,35 @@ const toggle_isNWMv3 = () => {
 @import "@/assets/styles/styles.scss";
 
 #GageReport {
-  margin: 30px auto 0 auto;
-  width: 700px;
-  height: 315px;
+   margin: 50px auto 0 0;
+   /*margin: 30px auto 0 auto;
+   width: 700px;
+   height: 315px;*/
 
-  table {
-    width: 100%;
-    margin: 10px auto;
-    border: 1px solid $ngwcp_primary1;
-    font-size: 1.2em;
+   table {
+      width: 100%;
+      margin: 10px auto;
+      border: 1px solid $ngwcp_neutral_gray_md;
+      font-size: 1.2em;
 
-    tr {
-      line-height: 27px;
-      border-bottom: 1px solid #333333;
+      tr {
+         line-height: 27px;
+         border-bottom: 1px solid $ngwcp_neutral_gray_md;
 
-      td {
-        width: 50%;
-        padding-left: 10px;
-        border-right: 1px solid black;
+         td {
+            width: 50%;
+            padding-left: 10px;
+            /*border-right: 1px solid black;*/
+         }
       }
-    }
-  }
+   }
+      
 }
 
 .rowOdd {
-  background-color: #dddddd;
+   /*background-color: #dddddd;*/
 }
+
+
+
 </style>
