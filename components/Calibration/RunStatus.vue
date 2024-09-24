@@ -296,11 +296,8 @@ watch(selectedPlotName, async () => {
   if (response?._data?.plot_file_name && response?._data?.plot_url) {
     selectedPlotFilename.value = response?._data?.plot_file_name;
     selectedPlotFileUrl.value = response?._data?.plot_url;
-    console.log('selectedPlotFilename:', selectedPlotFilename.value);
-    console.log('selectedPlotFileUrl:', selectedPlotFileUrl.value);
-    console.log('typeof selectedPlotFileUrl:', typeof selectedPlotFileUrl.value);
   } else {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot', life: 5000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot', life: 5000 });
   }
 });
 

@@ -15,9 +15,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const loadTuningTabData = ref<any>(); // TODO: update to use LoadTuningTabResponse type
   // const saveTuningTabData = ref<SaveTuningTabRequestBody>()
 
-  // track if data has been fetched already
-  const isDataFetched = ref(false);
-
   // user-data properties
   const simStartTime = ref<string>("");
   const simEndTime = ref<string>("");
@@ -74,10 +71,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
 
     if (loadTuningTabOutput?._data) {
       loadTuningTabData.value = loadTuningTabOutput?._data;
-    }
-
-    if (loadCalibrationRunData.value && loadTuningTabData.value) {
-      isDataFetched.value = true;
     }
   };
 
@@ -138,7 +131,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const hardResetTuningStore = (): void => {
     loadCalibrationRunData.value = null;
     loadTuningTabData.value = null;
-    isDataFetched.value = false;
     simStartTime.value = "";
     simEndTime.value = "";
     calStartTime.value = "";
@@ -162,7 +154,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
     fetchTuningTabData,
     loadCalibrationRunData,
     loadTuningTabData,
-    isDataFetched,
     simStartTime,
     simEndTime,
     calStartTime,

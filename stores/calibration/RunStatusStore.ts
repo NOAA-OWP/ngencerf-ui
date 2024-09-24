@@ -11,10 +11,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
-  const userDataStore = useUserDataStore();
-
+  
   // refs
-  const data_loading = ref<boolean>(true);
   const calibrationIsReady = ref<boolean>(false);
   const calibrationStatus = ref<string>();
   const runningTime = ref();
@@ -80,6 +78,10 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     });
   };
 
+  /**
+   * Run Calibration
+   * @return {any}
+   */
   const executeRunCalibration = async (): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/run_calibration/`, {
       method: "POST",
@@ -91,6 +93,10 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     });
   }
 
+  /**
+   * Get Calibration Iteration
+   * @returns {any}
+   */
   const queryIteration = async (): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_iteration/`, {
       method: "POST",
@@ -102,6 +108,10 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     });
   };
 
+  /**
+   * Cancel Calibration Job
+   * @returns {any}
+   */
   const cancelCalibrationJob = async (): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/cancel_job/`, {
       method: "POST",
@@ -112,6 +122,24 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     });
   };
+
+  /**
+   * Hard Reset Run/Status Store
+   */
+  const hardResetRunStatusStore = (): void => {
+    calibrationIsReady.value = false;
+    calibrationStatus.value = "";
+    runningTime.value = "";
+    startTimeDate.value = "";
+    startTime.value = "";
+    plotNames.value = "";
+    plotList.value = "";
+    selectedPlotName.value = "";
+    selectedPlotFilename.value = "";
+    selectedPlotFileUrl.value = "";
+    stopCriteria.value = "";
+    stopCriteriaMet.value = false;
+  }
 
   return {
     calibrationIsReady,
@@ -132,6 +160,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     executeRunCalibration,
     queryIteration,
     cancelCalibrationJob,
+    hardResetRunStatusStore
   };
 },
 {
