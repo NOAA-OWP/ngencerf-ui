@@ -1,14 +1,13 @@
 <template>
    <div id="OptimizationMetrics" class="pl-5 pr-3">
       <div class="grid grid-cols-2 pt-3 gap-10">
-         <div class="col-span-1">            
-            
+         <div class="col-span-1">
+
             <div id="OptAlg" class="mt-2">
-
                <label for="OptimizationAlgorithm">Optimization Algorithm</label>
-               <Select id="OptimizationAlgorithm" class="mt-1" v-model="uiOptimization" :options="getOptimizationAlgorithmOptionsList" optionLabel="name"
-               optionValue="name" placeholder="" @change="optimizationSelectChange"></Select>
-
+               <Select id="OptimizationAlgorithm" class="mt-1" v-model="uiOptimization"
+                  :options="getOptimizationAlgorithmOptionsList" optionLabel="name" optionValue="name" placeholder=""
+                  @change="optimizationSelectChange"></Select>
             </div>
 
          </div>
@@ -19,84 +18,83 @@
                   <div class="flex mt-2 w-full">
                      <div class="text-left font-bold">Algorithm Parameter(s)</div>
                      <div id="ClearTableBtn" class="ml-auto">
-		        <button @click="resetOptimizationInputs" class="c-blue font-normal underline">Clear <!-- <i class="pi pi-arrow-up"></i>--></button>			
+                        <button @click="resetOptimizationInputs" class="c-blue font-normal underline">Clear
+                           <!-- <i class="pi pi-arrow-up"></i>--></button>
                      </div>
                   </div>
-               
+
                   <div id="AlgParamtable" class="w-full mt-1">
-                     <DataTable :value="uiOptimizationInputs" scrollable  editMode="cell" scroll-height="300px" fixedHeader=true>
+                     <DataTable :value="uiOptimizationInputs" scrollable editMode="cell" scroll-height="300px"
+                        fixedHeader=true>
                         <Column field="name" header="Parameter" sortable></Column>
                         <Column field="value" header="Initial Value" sortable>
                            <template #editor="{ index }">
-                              <InputText v-model="uiOptimizationInputs[ index ].value" autofocus class="w-12 p-1"></InputText>
+                              <InputText v-model="uiOptimizationInputs[index].value" autofocus class="w-12 p-1">
+                              </InputText>
                            </template>
                         </Column>
                      </DataTable>
-                  </div>    
-               </div>              
+                  </div>
+               </div>
 
             </div>
-           
          </div>
 
-         
-
-         <div class="col-span-2">        
+         <div class="col-span-2">
             <div class="hr"></div>
          </div>
 
-         <div class="col-span-1">   
+         <div class="col-span-1">
             <div id="ObjFunct">
                <label for="ObjectiveFunction<">Objective Function</label>
-               <Select id="ObjectiveFunction" class="rounded-md" v-model="uiObjectiveFunction" :options="getObjectiveFunctionOptionsList" optionLabel="name"
-               optionValue="name" placeholder="" @change="updateMetricFlowFieldVisibility"></Select>
+               <Select id="ObjectiveFunction" class="rounded-md" v-model="uiObjectiveFunction"
+                  :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
+                  @change="updateMetricFlowFieldVisibility"></Select>
                <div v-if="showObjectiveFunctionStreamFlow">
-               Flow Threshold: <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold" class="w-24"></InputNumber> m3/s
+                  Flow Threshold: <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
+                     class="w-24">
+                  </InputNumber> m3/s
                </div>
                <div v-if="showObjectiveFunctionPeakFlow">
-               Peak Flow Threshold: <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
+                  Peak Flow Threshold: <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
+                     class="w-24"></InputNumber> quartile
                </div>
             </div>
          </div>
 
-         <div class="col-span-1">   
+         <div class="col-span-1">
             <div id="Metrics">
-
                <div class="font-bold">Metrics</div><br>
 
-               <Checkbox id="CalcCatMetCB" inputId="CalcCatMetCB" class="h-5 w-5 mr-3" style="display:inline-block" :binary="true" v-model="cbIsCategorical" :disabled="cbCategoricalDisabled" @change="toggleMetricStreamFlowInput" />
+               <Checkbox id="CalcCatMetCB" inputId="CalcCatMetCB" class="h-5 w-5 mr-3" style="display:inline-block"
+                  :binary="true" v-model="cbIsCategorical" :disabled="cbCategoricalDisabled"
+                  @change="toggleMetricStreamFlowInput" />
                <label for="CalcCatMetCB" class="inline">Calculate Categorical Metrics</label><br clear="all">
                <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-1">
-                  Flow Threshold: <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold" class="w-24"></InputNumber> m3/s
-               </div><br/>
+                  Flow Threshold: <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
+                     class="w-24"></InputNumber> m3/s
+               </div><br />
 
-               <Checkbox id="CalEventMetCB" inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline" style="display:inline-block" :binary="true" v-model="cbIsEvenBased" :disabled="cbEventBasedDisabled" @change="toggleMetricPeakFlowInput" />
+               <Checkbox id="CalEventMetCB" inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline"
+                  style="display:inline-block" :binary="true" v-model="cbIsEvenBased" :disabled="cbEventBasedDisabled"
+                  @change="toggleMetricPeakFlowInput" />
                <label for="CalEventMetCB" class="inline">Calculate Event Based Metrics</label><br clear="all">
                <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-1">
-                  Peak Flow Threshold: <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
+                  Peak Flow Threshold: <InputNumber inputId="metricEventBasedFlowThreshold"
+                     v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
                </div>
-
             </div>
          </div>
 
-         <div class="col-span-2">        
+         <div class="col-span-2">
             <div class="hr"></div>
          </div>
-<!-- This part is not in development branch anymore, I'm commenting it out for now… 
-         <div class="col-span-1">       
 
-            <div id="CalStop">
-               <label for="OptimizationAlgorithm">Calibration Stop Criteria</label><br>
-               <InputNumber id="OptimizationAlgorithm" class="w-[100px]" inputId="stop-criteria" v-model="uiStopCriteria" showButtons :min="0"></InputNumber> 
-               <span class="text-sm ml-2">Interations per Worker</span>
-            </div>
-
-         </div>
--->
-         <div class="col-span-1">   
+         <div class="col-span-1">
             <div id="PlotGenFreq" class="bordered">
                <label for="PlotFrequency">Plot Generation Frequency (0 = off)</label><br>
-               Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency" v-model="uiPlotFrequency" showButtons :min="0"></InputNumber>
+               Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency"
+                  v-model="uiPlotFrequency" showButtons :min="0"></InputNumber>
                <span class="text-sm ml-2">Interations</span>
             </div>
          </div>
@@ -113,12 +111,10 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import type { AlgorithmParameter, GeneralErrorResponse } from '~/composables/NextGenModel';
 import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore"
-import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 
 const optimizationStore = useOptimizationStore();
 const {
@@ -144,12 +140,12 @@ const toast = useToast();
 
 const isLoading = ref(true);
 
+//load tab static data
+loadOptimizationTabStaticData();
+
 onMounted(() => {
-   //load tab static data
-   loadOptimizationTabStaticData();
    isLoading.value = false;
 })
-
 
 const cbCategoricalDisabled = ref<boolean>(false)
 const cbEventBasedDisabled = ref<boolean>(false)

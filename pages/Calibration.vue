@@ -29,9 +29,10 @@ onBeforeMount( () => {
   };
 });
 
+fetchUserCalibrationRunData();
 
 onMounted(() => {
-  fetchUserCalibrationRunData()
+
   setMenuIndex(1); // Saves the menu pointer
 });
 

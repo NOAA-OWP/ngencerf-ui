@@ -5,10 +5,12 @@
       The user can select the Evaluate button to view time-series data generated during the calibration run.</div>
 
     <table class="_help-table">
-      <tr>
-        <td class="td1">EVALUATE Button:</td>
-        <td class="td2">Go to the Evaluation Workflow Evaluate tab. (Under Construction)</td>
-      </tr>
+      <tbody>
+        <tr>
+          <td class="td1">EVALUATE Button:</td>
+          <td class="td2">Go to the Evaluation Workflow Evaluate tab. (Under Construction)</td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </template>

@@ -114,16 +114,16 @@ import { ref, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
-
-import HelpLandingPageHelp from "../Help/LandingPageHelp.vue";
-import HelpPreviousRunsHelp from "../Help/PreviousRunsHelp.vue";
-import HelpHeadwaterBasinGageHelp from "../Help/HeadwaterBasinGageHelp.vue";
-import HelpTuningControlsHelp from "../Help/TuningControlsHelp.vue";
-import HelpFormulationHelp from "../Help/FormulationHelp.vue";
-import HelpOptimizationMetricsHelp from "../Help/OptimizationMetricsHelp.vue"
-import HelpRunStatusHelp from "../Help/RunStatusHelp.vue"
-import HelpResultsHelp from "../Help/ResultsHelp.vue"
 import { useLogout } from "~/composables/UseEventBus";
+
+const HelpLandingPageHelp = defineAsyncComponent(() => import("../Help/LandingPageHelp.vue"))
+const HelpPreviousRunsHelp = defineAsyncComponent(() => import("../Help/PreviousRunsHelp.vue"))
+const HelpHeadwaterBasinGageHelp = defineAsyncComponent(() => import("../Help/HeadwaterBasinGageHelp.vue"))
+const HelpTuningControlsHelp = defineAsyncComponent(() => import("../Help/TuningControlsHelp.vue"))
+const HelpFormulationHelp = defineAsyncComponent(() => import("../Help/FormulationHelp.vue"))
+const HelpOptimizationMetricsHelp = defineAsyncComponent(() => import("../Help/OptimizationMetricsHelp.vue"))
+const HelpRunStatusHelp = defineAsyncComponent(() => import("../Help/RunStatusHelp.vue"))
+const HelpResultsHelp = defineAsyncComponent(() => import("../Help/ResultsHelp.vue"))
 
 const emit = defineEmits(["logoutEvent"]);
 

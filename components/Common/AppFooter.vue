@@ -23,7 +23,6 @@
       </div>
 
       <div class="row-span-1 footerColor">
-        <!--<div class="topBar">&nbsp</div>-->
         <div id="FooterData" class="version">
           Version {{ info.program_info.version }},&nbsp;&nbsp;{{
             info.program_info.release_date
@@ -42,7 +41,7 @@ import EvaluationButtonGroup from "../Evaluation/EvaluationButtonGroup.vue";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRoute } from "vue-router";
 
-const { isUserLoggedIn, getUserName } = useUserDataStore();
+const { isUserLoggedIn } = useUserDataStore();
 const location = useRoute();
 const info = json;
 

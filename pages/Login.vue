@@ -1,6 +1,5 @@
 <template>
   <client-only>
-
     <div class="h-full min-h-screen ">
       <div class="grid grid-rows-12">
         <div class="row-span-1">
@@ -98,7 +97,6 @@
         <AppFooter />
       </div>
     </div>
-
   </client-only>
 </template>
 
@@ -116,7 +114,6 @@ import Password from 'primevue/password';
 const { logUserIn, setUserName } = useUserDataStore();
 const { ngencerfBaseUrl } = useBackendConfig();
 
-const loading = ref<boolean>(true);
 const toast = useToast();
 const userDataStore = useUserDataStore();
 const userName = ref<string>("");
@@ -139,10 +136,6 @@ const openDialog = () => {
 const closeDialog = () => {
   showDialog.value = false;
 };
-
-onMounted(() => {
-  localStorage.clear();
-})
 
 const ForgotUsername = () => {
   //
@@ -240,9 +233,6 @@ const GoToLanding = async () => {
   await navigateTo({ path: "/LandingPage" });
 };
 
-onMounted(() => {
-  localStorage.clear()
-})
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";

@@ -4,6 +4,9 @@
     <div class="grid-rows-12">
       <div id="TopRightBlock" class="row-span-5">
         <div class="grid grid-cols-3">
+          <div class="col-span-3 mb-3">
+            <h2>Progress</h2>
+          </div>
           <div id="ProgressGroup" class="col-span-2">
             <ForecastProgressGroup" />
           </div>
@@ -34,7 +37,6 @@ const displayRightBlock = ref(getEvalRunSelected());
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-
 #TopRightBlock {
   padding: 10px;
   height: fit-content;
