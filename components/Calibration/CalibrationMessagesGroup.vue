@@ -1,7 +1,7 @@
 <template>
   <div id="Messages">
     <div class="">
-      <h2 class="mt-5">Previous Calibration Run Setup</h2>
+      <h2 class="mt-5">Calibration Run Setup</h2>
 
       <div class="grid grid-cols-2 gap=1 text-sm mt-4">
         <div class="col-span-1">
