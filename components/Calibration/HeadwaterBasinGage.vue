@@ -73,51 +73,51 @@
               </div>
             </div>
             <DynamicDialog />
-            <div id="GageReport" v-if="gageData" class="text-sm inline ml-0">
+            <div id="GageReport" v-if="gageData" class="inline ml-0">
               <div id="GrBox" class="mt-6">
-                <table class="table-auto">
+                <table class="table-auto alt-row-colors cols-bordered">
                   <tbody>
-                    <tr v-if="selectedDomainValue" class="rowOdd">
+                    <tr v-if="selectedDomainValue">
                       <td class="dataName">Domain:</td>
                       <td class="dataText">{{ selectedDomainValue }}</td>
                     </tr>
-                    <tr v-if="gageData?.gage_id" lass="rowEven">
+                    <tr v-if="gageData?.gage_id">
                       <td class="dataName">Gage ID:</td>
                       <td class="dataText">{{ gageData?.gage_id }}</td>
                     </tr>
-                    <tr v-if="gageData?.agency" class="rowOdd">
+                    <tr v-if="gageData?.agency">
                       <td class="dataName">Agency:</td>
                       <td class="dataText">{{ gageData?.agency }}</td>
                     </tr>
-                    <tr v-if="gageData?.station_name" class="rowEven">
+                    <tr v-if="gageData?.station_name">
                       <td class="dataName">Station Name:</td>
                       <td class="dataText">{{ gageData?.station_name }}</td>
                     </tr>
-                    <!-- <tr v-if="" class="rowOdd">
+                    <!-- <tr v-if="">
                               <td class="dataName">Site Type:</td>
                               <td class="dataText"></td>
                            </tr> -->
-                    <tr v-if="gageData?.latitude" class="rowEven">
+                    <tr v-if="gageData?.latitude">
                       <td class="dataName">Latitude:</td>
                       <td class="dataText">{{ gageData?.latitude }}</td>
                     </tr>
-                    <tr v-if="gageData?.longitude" class="rowOdd">
+                    <tr v-if="gageData?.longitude">
                       <td class="dataName">Longitude:</td>
                       <td class="dataText">{{ gageData?.longitude }}</td>
                     </tr>
-                    <tr v-if="gageData?.altitude" class="rowEven">
+                    <tr v-if="gageData?.altitude">
                       <td class="dataName">Altitude:</td>
                       <td class="dataText">{{ gageData?.altitude }}</td>
                     </tr>
-                    <!-- <tr v-if="" class="rowOdd">
+                    <!-- <tr v-if="">
                               <td class="dataName">Date Established:</td>
                               <td class="dataText"></td>
                            </tr> -->
-                    <!-- <tr v-if="" class="rowEven">
+                    <!-- <tr v-if="">
                               <td class="dataName">Drainage Area:</td>
                               <td class="dataText"></td>
                            </tr> -->
-                    <!-- <tr v-if="" class="rowOdd">
+                    <!-- <tr v-if="">
                               <td class="dataName">HUC:</td>
                               <td class="dataText"></td>
                            </tr> -->
@@ -313,26 +313,18 @@ const toggle_isNWMv3 = () => {
 @import "@/assets/styles/styles.scss";
 
 #GageReport {
-  margin: 50px auto 0 0;
 
   table {
 
     width: 60%;
-    margin: 10px auto;
-    border: 5px solid $ngwcp_neutral_gray_md;
-
-
-    font-size: 1.2em;
+    margin: 6vh auto;
 
     tr {
       line-height: 27px;
-      border-bottom: 1px solid $gray-50;
 
       td {
-        width: 50%;
-        padding: 4px;
+        padding: 4px 15px;
         cursor: default;
-        background-color: $ngwcp_neutral_gray_lt;
       }
     }
   }

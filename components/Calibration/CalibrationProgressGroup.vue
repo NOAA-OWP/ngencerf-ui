@@ -133,28 +133,4 @@ const tabClicked = (event: Event) => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-
-#CalibrationProgressTable {
-  width: 100%;
-  margin-left: 15px;
-
-  table {
-    tr {
-      line-height: calc(1.3vw + 0.41vh); // font-size: 14px;
-    }
-
-    .checkMark {
-      text-align: right;
-    }
-
-    .ptype {
-      width: 90%;
-      cursor: pointer;
-    }
-
-    .ptype:hover {
-      color: $ngwcp_primary1;
-    }
-  }
-}
 </style>

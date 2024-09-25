@@ -31,40 +31,47 @@
 
       <div id="Circles" class="col-span-2">
         <div id="UserGroup" class="grid grid-cols-2">
+
           <div class="col-span-1">
+
+            <div v-show="uMenu" id="userMenu" class="pt-5 pr-5">
+              <ul>
+                <li @click="gotoAccount" class="pt-2 cursor-pointer hover:underline">Account</li>
+                <li @click="logoutUser" class="pt-2 cursor-pointer hover:underline">Logout</li>
+              </ul>
+            </div>
+
             <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle"
               class="float-right userInitials" @click="showUserMenu">
               {{ getUserInitials() }}
-            </div>
-          </div>
-          <div v-show="uMenu" id="userMenu">
-            <ul>
-              <li @click="gotoAccount">Account</li>
-              <li @click="logoutUser">Logout</li>
-            </ul>
+            </div>    
+
           </div>
           <div class="col-span-1">
             <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px" id="HelpCircle" title="Help"
               aria-lable="help" @click="displayHelp">?</button>
           </div>
+
+          
+
         </div>
       </div>
 
       <Transition name="slide-fade">
         <div v-if="showHelp" id="HelpWindow">
-          <div class="text-right">
+          <div class="text-right sticky top-0">
             <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
               class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
           </div>
-          <div v-if="location.name === 'LandingPage'">
+          <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
             <HelpLandingPageHelp />
           </div>
 
-          <div v-if="location.name === 'PreviousRuns'">
+          <div v-if="location.name === 'PreviousRuns'" class="py-10 px-1">
             <HelpPreviousRunsHelp />
           </div>
 
-          <div v-if="location.name === 'Calibration'">
+          <div v-if="location.name === 'Calibration'" class="py-10 px-1">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
                 <HelpHeadwaterBasinGageHelp />
@@ -278,7 +285,7 @@ const MenuChanged = (e: MouseEvent) => {
 }
 
 #Circles {
-  margin-right: 20px;
+  margin-right: 0px;
   margin-left: auto;
   clear: none;
   text-align: center;
@@ -338,13 +345,13 @@ const MenuChanged = (e: MouseEvent) => {
 
 #HelpWindow {
   z-index: 9999;
-  border: 2px solid black;
+  border: 1px solid black;
   position: absolute;
   right: 2%;
   top: 84px;
-  width: 80%;
+  width: 50%;
   background-color: white;
-  overflow-y: auto;
+  overflow: auto;
 }
 
 /*

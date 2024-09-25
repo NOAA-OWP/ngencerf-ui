@@ -47,7 +47,7 @@
          <div class="col-span-1">
             <div id="ObjFunct">
                <label for="ObjectiveFunction<">Objective Function</label>
-               <Select id="ObjectiveFunction" class="rounded-md" v-model="uiObjectiveFunction"
+               <Select id="ObjectiveFunction" class="rounded-md mb-2" v-model="uiObjectiveFunction"
                   :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
                   @change="updateMetricFlowFieldVisibility"></Select>
                <div v-if="showObjectiveFunctionStreamFlow">
