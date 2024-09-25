@@ -122,39 +122,25 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   * @returns {GeneralApiSaveResponse}
   */
   async function saveOptimizationTabData() {
-    const saveOptimizationTabDataValidation = useCalibrationTabValidation({
-      optimization_inputs: uiOptimizationInputs.value,
-      optimization: uiOptimization.value,
-      objective_function: uiObjectiveFunction.value
+    const saveOptimizationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>(`${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        calibration_run_id: calibrationJobId.value,
+        optimization_inputs: uiOptimizationInputs.value,
+        optimization: uiOptimization.value,
+        objective_function: uiObjectiveFunction.value,
+        streamflow_threshold: uiStreamFlowThreshold.value,
+        peak_flow_threshold: uiPeakFlowThreshold.value,
+        stop_criteria: uiStopCriteria.value,
+        save_plot_iteration_frequency: uiPlotFrequency.value
+      })
     })
 
-    if ( Object.keys( saveOptimizationTabDataValidation.errors.value ).length == 0) {
-      const saveOptimizationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>(`${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-        body: JSON.stringify({
-          calibration_run_id: calibrationJobId.value,
-          optimization_inputs: uiOptimizationInputs.value,
-          optimization: uiOptimization.value,
-          objective_function: uiObjectiveFunction.value,
-          streamflow_threshold: uiStreamFlowThreshold.value,
-          peak_flow_threshold: uiPeakFlowThreshold.value,
-          stop_criteria: uiStopCriteria.value,
-          save_plot_iteration_frequency: uiPlotFrequency.value
-        })
-      })
-
-      return saveOptimizationTabDataResponse?._data
-    } else {
-      return Promise.resolve({
-        message: "Missing required field(s)",
-        calibration_run_id: calibrationJobId.value,
-        status: "error"
-      })
-    }
+    return saveOptimizationTabDataResponse?._data
   }
 
   const getSelectedMetricInfo = computed(() => {
@@ -220,6 +206,11 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     resetOptimizationStore,
     loadOptimizationTabStaticData
   }
+}, 
+{
+  persist: {
+    storage: persistedState.localStorage
+  },
 })
 
 /* Pinia supports Hot Module replacement so you can edit your stores

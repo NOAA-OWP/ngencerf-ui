@@ -22,9 +22,9 @@ export interface GeneralApiSaveResponse {
 }
 
 export interface GeneralErrorResponse {
-  response_type: string,
-  message: string,
-  validation_errors: ValidationErrorObject[]
+  response_type: string;
+  message: string;
+  validation_errors: ValidationErrorObject[];
 }
 
 export interface ValidationErrorObject {
@@ -387,6 +387,7 @@ export type LogoutEvent = {
 
 export const ValidationFormFields = {
   formulation_name: "Formulation Name",
+  modules: "Formulation Modules",
   sloth_parameters: "Sloth Parameters",
   maps_to_module: "Sloth Parameter For Module",
   maps_to_variable_name: "Sloth Parameter Module Param",

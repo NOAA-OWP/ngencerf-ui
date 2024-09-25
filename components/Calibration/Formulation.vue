@@ -118,7 +118,7 @@
         </div>
       </div>
     </div>
-    <div class="waitgif" v-if="isLoading">
+    <div class="waitgif" v-if="data_loading">
       <img src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
@@ -134,14 +134,11 @@ import type { SlothParameterData } from '~/composables/NextGenModel';
 import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
-const isLoading = ref(true);
+//const isLoading = ref(true);
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
 const slothParamContextMenu = ref() //sloth parameter table context menu
 
-onMounted(() => {
-  isLoading.value = false;
-})
 const cmSlothParameterData = ref([
   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedSlothParameterData(selectedSlothParameterData) }
 ])
@@ -149,6 +146,7 @@ const onRowContextMenu = (event: any) => {
   slothParamContextMenu.value.show(event.originalEvent)
 }
 const {
+  data_loading,
   filterGroup,
   useSlothParameters,
   selectedModuleValues,
@@ -157,16 +155,20 @@ const {
   fetchFormulationModuleOptions,
   fetchFormulationModuleCoveredGroupFilterOptions,
   fetchFormulationModuleCoveredGroupOptions,
-} = storeToRefs(useFormulationStore())
+} = storeToRefs(useFormulationStore());
 
 const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore()
 const toast = useToast();
 
-//load static data of this tab
-loadFormulationTabStaticData()
 
+onMounted(() => {
+  toast.removeAllGroups()
+  //load static data of this tab
+  loadFormulationTabStaticData()
+  //isLoading.value = false;
+})
 /**
  * add sloth variable entry to table and reset name field
  */
@@ -216,12 +218,6 @@ useListen('calibrationButtonNext', (actionButton) => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[2];
   e.click();
-})
-
-useListen('calibrationButtonNext', (actionIndex: number) => {
-  if (actionIndex == 2) {
-    calibrationNextTabNavigate(actionIndex)
-  }
 })
 </script>
 

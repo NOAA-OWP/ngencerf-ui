@@ -125,10 +125,9 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   }
 
   /**
-   * fetch user selected calibration run user saved data
-   * @return {void}
+   * @returns {Promise<any>}
    */
-  async function fetchUserCalibrationRunData() {
+  async function queryUserCalibrationRunData() {
     const userCalibrationRunDataResult = await makeProtectedApiCall<UserCalibrationRunData>( `${ngencerfBaseUrl}/calibration/load_calibration_run/`, {
       method: "POST",
       headers: { 
@@ -137,6 +136,16 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
       },
       body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
     })
+
+    return userCalibrationRunDataResult
+  }
+
+  /**
+   * fetch user selected calibration run user saved data
+   * @return {void}
+   */
+  async function fetchUserCalibrationRunData() {
+    const userCalibrationRunDataResult = await queryUserCalibrationRunData()
 
     userCalibrationRunData.value = userCalibrationRunDataResult?._data ?? undefined;
   }
@@ -158,6 +167,13 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     console.log("User Data Store Reset");
   }
 
+  /**
+   * reset user calibration run selection
+   */
+  const clearUserCalibrationRunData = () => {
+    userCalibrationRunData.value = undefined;
+  }
+
   return {
     isUserLoggedIn,
     logUserIn,
@@ -172,8 +188,10 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     fetchUserCalibrationJobsListData,
     userCalibrationJobsListData,
     userCalibrationRunData,
+    queryUserCalibrationRunData,
     fetchUserCalibrationRunData,
-    hardResetUserDataStore
+    hardResetUserDataStore,
+    clearUserCalibrationRunData
   };
 }, 
 {
