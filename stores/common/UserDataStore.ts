@@ -13,7 +13,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { calibrationJobId } = storeToRefs( generalStore() );
+  const { calibrationJobId, evaluateCalibrationRunId } = storeToRefs( generalStore() );
   const userCalibrationJobsListData = ref<JobListItem[]>([]);
   const userCalibrationRunData = ref<UserCalibrationRunData>();
 
