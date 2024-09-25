@@ -37,11 +37,11 @@
                   <tr>
                     <td class="text-right"><label for="DisplayOptions">Display:</label></td>
                     <td class="pl-5">
-                      <select id="DisplayOptions" class="p-select" v-model="selectedPlotName">
+                      <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName">
                         <option v-for="plot in plotList" :key="plot.name" :value="plot.name">
                           {{ plot.name }}
                         </option>
-                      </select>
+                      </Select>
                     </td>
                   </tr>
                 </tbody>
