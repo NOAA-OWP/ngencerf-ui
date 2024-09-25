@@ -144,7 +144,9 @@ onMounted(async () => {
 });
 
 // Handle calibrationStatus changes
-watch(calibrationStatus, async () => {
+watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
+  console.log('inside calibrationStatus watch');
+  console.log('calibrationStatus:', calibrationStatus.value);
   if (calibrationStatus.value === 'Saved') {
 
   }
@@ -184,8 +186,12 @@ watch(calibrationStatus, async () => {
       if (!statusIntervalId) {
         statusIntervalId = setInterval(async () => {
           await fetchUserCalibrationRunData();
-          if (userCalibrationRunData?.value?.status === 'Done') {
-            calibrationStatus.value = 'Done';
+
+          // if Calibration status changes to Done, Cancelled, or Failed, set stopCriteriaMet to true, clear intervals, and set progress to null
+          if (userCalibrationRunData.value?.status === 'Done' || userCalibrationRunData.value?.status === 'Cancelled' || userCalibrationRunData.value?.status === 'Failed') {
+            clearInterval(runningTimeIntervalId);
+            clearInterval(statusIntervalId);
+            calibrationStatus.value = userCalibrationRunData.value?.status; // set this last so that the watch function gets called after clearing intervals
           }
         }, 10000);
       }
@@ -201,8 +207,8 @@ watch(calibrationStatus, async () => {
 
       // setting plotList and selectedPlotName will populate the dropdown
       plotList.value = plotNames.value?._data?.plot_names;
-      if (!selectedPlotName.value) {
-        selectedPlotName.value = plotList.value[0]?.name;
+      if (plotList.value && !selectedPlotName.value) {
+        selectedPlotName.value = plotList?.value[0]?.name;
         console.log('selectedPlotName:', selectedPlotName.value);
       }
     } else {
@@ -260,6 +266,16 @@ watch(calibrationStatus, async () => {
   else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Unknown Calibration Status', life: 5000 });
   }
+
+  onCleanup(() => {
+    console.log('Cleaning up calibrationStatus watch');
+    // if Calibration status changes to anything but Running or Done while still executing this watch function, clear intervals (stop pinging server)
+    if (calibrationStatus.value !== 'Running' && calibrationStatus.value !== 'Done') {
+      stopCriteriaMet.value = false;
+      clearInterval(runningTimeIntervalId);
+      clearInterval(statusIntervalId);
+    }
+  });
 });
 
 // // WE WILL USE THIS LATER. Handle iterations changes
@@ -310,11 +326,12 @@ watch(selectedPlotName, async () => {
 useListen('calibrationButtonSaveStart', async (actionButton) => {
   if (getCalibrationTabIndex() === 5 && actionButton === 'START' && calibrationStatus.value === 'Ready') {
     try {
+      console.log('hitting run_calibration endpoint');
       const runCalibrationResponse = await executeRunCalibration();
 
       if (runCalibrationResponse?._data.status) {
         calibrationStatus.value = runCalibrationResponse?._data.status;
-        if (runCalibrationResponse?._data.status != 'Running') {
+        if (calibrationStatus.value != 'Running') {
           toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START', life: 5000 });
         }
       } else {
@@ -332,11 +349,13 @@ useListen('calibrationButtonSaveStart', async (actionButton) => {
 useListen('calibrationButtonResetCancel', async (actionButton) => {
   if (getCalibrationTabIndex() === 5 && actionButton === 'CANCEL' && calibrationStatus.value === 'Running') {
     try {
+      console.log('hitting cancel_job endpoint');
       const cancelCalibrationResponse = await cancelCalibrationJob();
 
       if (cancelCalibrationResponse?._data.status) {
         calibrationStatus.value = cancelCalibrationResponse?._data.status;
-        if (cancelCalibrationResponse?._data.status != 'Cancelled') {
+        console.log('calibrationStatus:', calibrationStatus.value);
+        if (calibrationStatus.value != 'Cancelled') {
           toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL', life: 5000 });
         }
       } else {
