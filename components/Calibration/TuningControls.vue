@@ -153,7 +153,7 @@
                   <div class="mt-1 mb-3 hr"></div>
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
                   <div class="mt-2 text-sm">
-                    <select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
+                    <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
                       <option v-for="outputVariable in outputVariables" :key="outputVariable.name"
                         :value="outputVariable.name">
                         {{ outputVariable.name }}
@@ -170,9 +170,9 @@
                   <div class="inline-block text-left text-sm"><label for="ParamFile">Parameters File (optional):</label>
                   </div><br />
                   <!-- <br />
-                  <select id="ParamFile" class="varInputs inline-block mt-2 text-sm">
+                  <Select id="ParamFile" class="varInputs inline-block mt-2 text-sm">
                     <option value="" selected disabled>...</option>                    
-                  </select> -->
+                  </Select> -->
                   <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
                     <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
                     <button @click="triggerFileInput">Load</button>
@@ -181,11 +181,11 @@
 
                 <div class="text-left mt-3 text-sm">
                   <div class="inline-block text-left"><label for="ParamName">Name:</label></div><br />
-                  <select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter">
+                  <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter">
                     <option v-for="param in calibrationTuningParameters" :key="param.name" :value="param.name">
                       {{ param.name }}
                     </option>
-                  </select>
+                  </Select>
                   <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
                     <button @click="addParameterToTable">Add</button>
                   </div>
@@ -276,7 +276,6 @@ const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchTuningTabData, postSaveTuningTabData } = tuningStore;
 const {
   loadTuningTabData,
-  isDataFetched,
   simStartTime,
   simEndTime,
   calStartTime,
@@ -300,9 +299,8 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const isInitialSetupDone = ref(false);
 
 onMounted(async () => {
-  await fetchUserCalibrationRunData();
-  loadTuningTabData.value =  await fetchTuningTabData(); // only fetch data if not already fetched
-
+  await fetchUserCalibrationRunData(); // this sets userCalibrationRunData
+  loadTuningTabData.value =  await fetchTuningTabData();
 
   // console.log("loadTuningTabData:", loadTuningTabData?.value?._data);
   // console.log("userCalibrationRunData:", userCalibrationRunData.value);
@@ -407,7 +405,7 @@ watch([simStartTime, simEndTime, calStartTime, calEndTime], () => areCalibration
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
   // find module for newly-selected output variable
-  const module = loadTuningTabData.value?._data?.modules.find((module: any) => module.output_variables.find((outputVar: any) => outputVar.name === selectedOutputVariable.value));
+  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === selectedOutputVariable?.value));
 
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {

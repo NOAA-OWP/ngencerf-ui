@@ -17,9 +17,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const { getAccessToken } = userDataStore;
   const { ngencerfBaseUrl } = useBackendConfig();
 
-  // track if data has been fetched already
-  const isDataFetched = ref(false);
-
   // user-data properties
   const simStartTime = ref<string>("");
   const simEndTime = ref<string>("");
@@ -113,7 +110,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
    */
   const hardResetTuningStore = (): void => {
     loadTuningTabData.value = null;
-    isDataFetched.value = false;
     simStartTime.value = "";
     simEndTime.value = "";
     calStartTime.value = "";
@@ -136,7 +132,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
   return {
     fetchTuningTabData,
     loadTuningTabData,
-    isDataFetched,
     simStartTime,
     simEndTime,
     calStartTime,

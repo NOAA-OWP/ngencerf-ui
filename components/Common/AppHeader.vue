@@ -45,7 +45,7 @@
           </div>
           <div class="col-span-1">
             <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px" id="HelpCircle" title="Help"
-              aria-lable="help" @click="displayHelp">?</button>
+              aria-label="help" @click="displayHelp">?</button>
           </div>
         </div>
       </div>
