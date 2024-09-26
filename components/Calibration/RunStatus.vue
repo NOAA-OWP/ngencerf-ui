@@ -187,11 +187,15 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         statusIntervalId = setInterval(async () => {
           await fetchUserCalibrationRunData();
 
-          // if Calibration status changes to Done, Cancelled, or Failed, set stopCriteriaMet to true, clear intervals, and set progress to null
-          if (userCalibrationRunData.value?.status === 'Done' || userCalibrationRunData.value?.status === 'Cancelled' || userCalibrationRunData.value?.status === 'Failed') {
-            clearInterval(runningTimeIntervalId);
-            clearInterval(statusIntervalId);
-            calibrationStatus.value = userCalibrationRunData.value?.status; // set this last so that the watch function gets called after clearing intervals
+          if (userCalibrationRunData.value && userCalibrationRunData.value?.status) {
+            // if Calibration status changes to Done, Cancelled, or Failed, set stopCriteriaMet to true, clear intervals, and set progress to null
+            if (userCalibrationRunData.value?.status === 'Done' || userCalibrationRunData.value?.status === 'Cancelled' || userCalibrationRunData.value?.status === 'Failed') {
+              clearInterval(runningTimeIntervalId);
+              clearInterval(statusIntervalId);
+            }
+            calibrationStatus.value = userCalibrationRunData.value?.status; // set this last so that the watch function gets triggered after handling Done, Cancelled, or Failed status
+          } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
           }
         }, 10000);
       }
