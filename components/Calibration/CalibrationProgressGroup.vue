@@ -1,7 +1,5 @@
 <template>
-
   <table id="CalibrationProgressTable" class="prevent-select">
-
     <tbody>
       <tr>
         <td><i v-if="selectedDomainValue" :class="selectedDomainValue ? 'checkMark' : ''"
@@ -129,7 +127,6 @@ const tabClicked = (event: Event) => {
   }
 }
 </script>
-
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
