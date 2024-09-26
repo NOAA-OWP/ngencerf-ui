@@ -275,7 +275,6 @@ const { fetchTuningTabData, postSaveTuningTabData } = tuningStore;
 const {
   loadCalibrationRunData,
   loadTuningTabData,
-  isDataFetched,
   simStartTime,
   simEndTime,
   calStartTime,
@@ -302,13 +301,11 @@ const isCalibrationTuningControlsDisabled = computed(() => {
 });
 
 onMounted(async () => {
-  if (!isDataFetched.value) {
+  if (!loadCalibrationRunData.value || !loadTuningTabData.value) {
     //toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
     await fetchTuningTabData(); // only fetch data if not already fetched
     console.log("automatic_validation:", automatic_validation.value);
-    // loading.value = false;
   } else {
-    // loading.value = true;
     //toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
   }
 
@@ -405,7 +402,7 @@ watch([simStartTime, simEndTime, calStartTime, calEndTime], () => areCalibration
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
   // find module for newly-selected output variable
-  const module = loadTuningTabData.value?.modules.find((module: any) => module.output_variables.find((outputVar: any) => outputVar.name === selectedOutputVariable.value));
+  const module = loadTuningTabData?.value?.modules?.find((module: any) => module.output_variables.find((outputVar: any) => outputVar.name === selectedOutputVariable.value));
 
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
