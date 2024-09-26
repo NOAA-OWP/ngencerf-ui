@@ -79,7 +79,6 @@
             calData?.objective_function }}</p>
           <p v-if="calData?.save_plot_iteration_frequency"><span class="font-medium">Plot Generation Frequency:</span>
             {{ calData?.save_plot_iteration_frequency }}</p>
-
         </div>
       </div>
     </div>
@@ -124,7 +123,7 @@ const formatDate = (d: any) => {
 }
 
 p {
-  line-height: 1.4em;
+  line-height: 1.5em;
 }
 
 .datePos {

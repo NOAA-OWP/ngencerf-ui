@@ -153,7 +153,7 @@
                   <div class="mt-1 mb-3 hr"></div>
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
                   <div class="mt-2 text-sm">
-                    <select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
+                    <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
                       <option v-for="outputVariable in outputVariables" :key="outputVariable.name"
                         :value="outputVariable.name">
                         {{ outputVariable.name }}
@@ -170,9 +170,9 @@
                   <div class="inline-block text-left text-sm"><label for="ParamFile">Parameters File (optional):</label>
                   </div><br />
                   <!-- <br />
-                  <select id="ParamFile" class="varInputs inline-block mt-2 text-sm">
+                  <Select id="ParamFile" class="varInputs inline-block mt-2 text-sm">
                     <option value="" selected disabled>...</option>                    
-                  </select> -->
+                  </Select> -->
                   <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
                     <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
                     <button @click="triggerFileInput">Load</button>
@@ -181,11 +181,11 @@
 
                 <div class="text-left mt-3 text-sm">
                   <div class="inline-block text-left"><label for="ParamName">Name:</label></div><br />
-                  <select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter">
+                  <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter">
                     <option v-for="param in calibrationTuningParameters" :key="param.name" :value="param.name">
                       {{ param.name }}
                     </option>
-                  </select>
+                  </Select>
                   <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
                     <button @click="addParameterToTable">Add</button>
                   </div>
