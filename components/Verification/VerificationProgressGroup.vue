@@ -1,31 +1,31 @@
 <template>
-  <table id="VerificationProgressTable" class="prevent-select">
+  <table id="VerificationProgressTable" class="progressTable prevent-select">
     <tbody>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold  checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="1" title="Calibration Run" aria-lable="Calibration Run"
+        <td class="ptype whitespace-nowrap" data-tab="1" title="Calibration Run" aria-label="Calibration Run"
           @click="tabClicked">
           Calibration Run</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype" data-tab="2" title="Parameter Set" aria-lable="Parameter Set" @click="tabClicked">
+        <td class="ptype" data-tab="2" title="Parameter Set" aria-label="Parameter Set" @click="tabClicked">
           Parameter Set</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="3" title="Run Type" aria-lable="Run Type"
+        <td class="ptype whitespace-nowrap" data-tab="3" title="Run Type" aria-label="Run Type"
           @click="tabClicked">
           Run Type</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype whitespace-nowrap" data-tab="3" title="Forcing Source"
-          aria-lable="Forcing Source" @click="tabClicked">Forcing Source</td>
+          aria-label="Forcing Source" @click="tabClicked">Forcing Source</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="3" title="Time Period" aria-lable="Time Period"
+        <td class="ptype whitespace-nowrap" data-tab="3" title="Time Period" aria-label="Time Period"
           @click="tabClicked">Time Period</td>
       </tr>
     </tbody>
@@ -60,30 +60,3 @@ const tabClicked = (event: Event) => {
 }
 </script>
 
-<style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
-
-#VerificationProgressTable {
-  width: 100%;
-  margin-left: 15px;
-
-  table {
-    tr {
-      line-height: calc(1.3vw + 0.41vh); // font-size: 14px;
-    }
-
-    .checkMark {
-      text-align: right;
-    }
-
-    .ptype {
-      width: 90%;
-      cursor: pointer;
-    }
-
-    .ptype:hover {
-      color: $ngwcp_primary1;
-    }
-  }
-}
-</style>

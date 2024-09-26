@@ -17,7 +17,7 @@
       </div>
       <div id="BottomRightBlock" class="row-span-7">
         <div id="MessagesGroup">
-          <!-- <MessagesGroup /> -->
+          <!-- <CalibrationMessagesGroup /> -->
            <MessagesGroup />
         </div>
       </div>

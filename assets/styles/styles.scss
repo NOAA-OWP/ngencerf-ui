@@ -385,7 +385,6 @@ select option {
 }
 
 /* Right Side Blocks */
-
 #TopRightBlock {
   padding: 10px;
   height: fit-content;
@@ -399,4 +398,28 @@ select option {
   margin-right: 5px;
   max-height: 300px;
 
+}
+
+/* Progress Tables */
+.progressTable {
+  width: 100%;
+  margin-left: 15px;
+
+  table {
+    tr {
+      line-height: calc(1.3vw + 0.41vh); // font-size: 14px;
+    }
+  }
+}
+.checkMark {
+  text-align: right;
+}
+
+.ptype {
+  width: 90%;
+  cursor: pointer;
+}
+
+.ptype:hover {
+  color: $ngwcp_primary1;
 }
