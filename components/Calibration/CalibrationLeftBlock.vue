@@ -46,6 +46,7 @@ const activeTab = ref(getCalibrationTabIndex());
 // Activate new tab
 const tabChanged = (tabNum: number) => {
   if (activeTab.value !== tabNum) {
+    activeTab.value = tabNum;
     setCalibrationTabIndex(tabNum);
   }
 };

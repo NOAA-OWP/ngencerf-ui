@@ -2,7 +2,7 @@
   <div class="h-full min-h-screen ">
     <div class="grid grid-rows-4">
       <div class="row-span-2">
-        <div class="grid grid-cols-2 mb-5 mt-10">
+        <div class="grid grid-cols-2  mb-5 mt-10">
           <div class="col-span-1 ml-10">
             Select Run Typ:e<br />
             <div class="mt-5">

@@ -4,13 +4,13 @@
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
       <span v-if="activeTab == 1">
-        <PreviousRunsTab />
+        <ResultsTab />
       </span>
       <span v-else-if="activeTab == 2">
-       <SetupForecastRunTab />
+        <ResultsTab />
       </span>
       <span v-else-if="activeTab == 3">
-        <StatusTab />
+        <ResultsTab />
       </span>
       <span v-else-if="activeTab == 4">
         <ResultsTab />
@@ -22,22 +22,18 @@
 <script setup lang="ts">
 import Tabs from '~/components/Common/Tabs.vue'
 
-
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
-const PreviousRunsTab = defineAsyncComponent(() => import('~/components/Forecast/PreviousRunsTab.vue'))
-const SetupForecastRunTab = defineAsyncComponent(() => import('./SetupForecastRunTab.vue'))
-const StatusTab = defineAsyncComponent(() => import('./StatusTab.vue'))
 const ResultsTab = defineAsyncComponent(() => import('./ResultsTab.vue'))
 
-const { getForecastTabIndex, setForecastTabIndex } = generalStore();
+const { getVerificationTabIndex, setVerificationTabIndex } = generalStore();
 
 // Default to Tab 1, HeadwaterBasinGage
-const activeTab = ref(getForecastTabIndex());
+const activeTab = ref(getVerificationTabIndex());
 
 // Activate new tab
 const tabChanged = (tabNum: number) => {
   activeTab.value = tabNum;
-  setForecastTabIndex(tabNum);
+  setVerificationTabIndex(tabNum);
 };
 </script>
