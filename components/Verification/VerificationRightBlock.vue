@@ -1,16 +1,17 @@
+
 <template>
-  <!-- ForecastRightBlock -->
-  <div id="ForecastRightBlock" class="grid grid-cols-1">
+  <!-- VerificationRightBlock -->
+  <div id="VerificationRightBlock" class="grid grid-cols-1">
     <div class="grid-rows-12">
       <div id="TopRightBlock" class="row-span-5">
-        <div class="grid grid-cols-5">
-          <div class="col-span-5 mb-3">
+        <div class="grid grid-cols-3">
+          <div class="col-span-3 mb-3">
             <h2>Progress</h2>
           </div>
-          <div id="ProgressGroup" class="col-span-3">
-            <ForecastProgressGroup" />
+          <div id="ProgressGroup" class="col-span-2">
+            <VerificationProgressGroup />
           </div>
-          <div id="GageCutout" class="col-span-2">
+          <div id="GageCutout" class="col-span-1">
             <GageCutout />
           </div>
         </div>
@@ -24,8 +25,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import ForecastProgressGroup from "./ForecastProgressGroup.vue";
+import VerificationProgressGroup from "./VerificationProgressGroup.vue"
 import MessagesGroup from "../Common/MessagesGroup.vue";
-//import ForecastMessagesGroup from "./ForecastMessagesGroup.vue";
+//import VerificationMessagesGroup from "./VerificationMessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 </script>

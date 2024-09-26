@@ -8,19 +8,21 @@
                 <div id="CalTable">
 
                     <div class="grid grid-cols-2 mb-5">
-                        <div class="grid-span-1">
-                            <Select id="FilterCalRuns" class="w-40">
+                        <div class="col-span-1">
+                            <div class="inline ml-2">Filter Validation Runs: 
+                            <Select id="FilterCalRuns" class="">
                                 <option value="">...</option>
                             </Select>
-                            <div class="inline ml-2">Filter Validation Runs</div>
+                        </div>    
                         </div>
 
-                        <div class="grid-span-1">
-                            <div class="inline-block float-right">Headwater Basin Gage</div>
-                            <Select id="HeadwaterBasinGage" class="w-40 inline float-right mr-2">
+                        <div class="col-span-1">
+                            <div class="inline ">Headwater Basin Gage:
+                            <Select id="HeadwaterBasinGage" class="mr-2">
                                 <option value="">...</option>
                             </Select>
                         </div>
+                    </div>
                     </div>
 
                     <ConfirmDialog></ConfirmDialog>
@@ -41,7 +43,7 @@
             </div>
         </div>
     </div>
-</template>setEvalRunSelected
+</template>
 
 <script setup lang="ts">
 import { useConfirm } from "primevue/useconfirm";
@@ -162,5 +164,10 @@ const NewCalibration = async () => {
             border: 1px solid #000;
         }
     }
+}
+.p-select {
+    width: 300px;
+    border: 1px solid #ccc !important;
+    height: 40px;
 }
 </style>
