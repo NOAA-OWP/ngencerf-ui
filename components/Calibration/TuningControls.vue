@@ -27,8 +27,8 @@
                         <td class="text-left">
                           <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
-                            :disabled="isCalibrationTuningControlsDisabled" />
-                          <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
+                            :disabled="isCalibrationTuningControlsDisabled()" />
+                          <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
                         </td>
                         <td class="pl-6 w-[105px]">
                           <label for="SimulationEnd" class="whitespace-nowrap w-[105px]">Simulation End:</label>
@@ -36,8 +36,8 @@
                         <td class="text-left">
                           <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
-                            :disabled="isCalibrationTuningControlsDisabled" />
-                          <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
+                            :disabled="isCalibrationTuningControlsDisabled()" />
+                          <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
                         </td>
                       </tr>
                       <tr>
@@ -47,8 +47,8 @@
                         <td class="text-left">
                           <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
-                            :disabled="isCalibrationTuningControlsDisabled" />
-                          <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
+                            :disabled="isCalibrationTuningControlsDisabled()" />
+                          <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
                         </td>
                         <td class="pl-6">
                           <label for="CalibrationEnd" class="whitespace-nowrap">Calibration End:</label>
@@ -56,8 +56,8 @@
                         <td class="text-left">
                           <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
-                            :disabled="isCalibrationTuningControlsDisabled" />
-                          <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
+                            :disabled="isCalibrationTuningControlsDisabled()" />
+                          <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
                         </td>
 
                       </tr>
@@ -89,8 +89,8 @@
                           <td class="text-left">
                             <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
                               v-model="avSimStartTime" time-picker-inline format="yyyy-MM-dd  hh:00"
-                              :disabled="isCalibrationTuningControlsDisabled" />
-                            <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
+                              :disabled="isCalibrationTuningControlsDisabled()" />
+                            <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
 
                           </td>
                           <td class="pl-6">
@@ -101,8 +101,8 @@
 
                             <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark"
                               v-model="avSimEndTime" time-picker-inline format="yyyy-MM-dd  hh:00"
-                              :disabled="isCalibrationTuningControlsDisabled" />
-                            <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
+                              :disabled="isCalibrationTuningControlsDisabled()" />
+                            <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
                           </td>
 
                         </tr>
@@ -116,8 +116,8 @@
 
                             <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark"
                               v-model="avCalStartTime" time-picker-inline format="yyyy-MM-dd  hh:00"
-                              :disabled="isCalibrationTuningControlsDisabled" />
-                            <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
+                              :disabled="isCalibrationTuningControlsDisabled()" />
+                            <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
                           </td>
                           <td class="pl-6">
                             <label for="ValidationEnd" class="whitespace-nowrap">Validation End:</label>
@@ -126,8 +126,8 @@
 
                             <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
                               time-picker-inline format="yyyy-MM-dd  hh:00"
-                              :disabled="isCalibrationTuningControlsDisabled" />
-                            <div v-if="isCalibrationTuningControlsDisabled" class="overlay"></div>
+                              :disabled="isCalibrationTuningControlsDisabled()" />
+                            <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
 
                           </td>
 
@@ -271,9 +271,10 @@ const { ngencerfBaseUrl } = useBackendConfig();
 
 const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
+const { fetchUserCalibrationRunData, getAccessToken } = userDataStore;
+const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchTuningTabData, postSaveTuningTabData } = tuningStore;
 const {
-  loadCalibrationRunData,
   loadTuningTabData,
   isDataFetched,
   simStartTime,
@@ -297,30 +298,21 @@ const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isInitialSetupDone = ref(false);
-const isCalibrationTuningControlsDisabled = computed(() => {
-  return !loadCalibrationRunData.value || !loadCalibrationRunData.value?.calibration_times || Object.keys(loadCalibrationRunData.value?.calibration_times).length === 0;
-});
 
 onMounted(async () => {
-  if (!isDataFetched.value) {
-    //toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
-    await fetchTuningTabData(); // only fetch data if not already fetched
-    console.log("automatic_validation:", automatic_validation.value);
-    // loading.value = false;
-  } else {
-    // loading.value = true;
-    //toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
-  }
+  await fetchUserCalibrationRunData();
+  loadTuningTabData.value =  await fetchTuningTabData(); // only fetch data if not already fetched
 
-  // console.log("loadTuningTabData:", loadTuningTabData.value);
-  // console.log("loadCalibrationRunData:", loadCalibrationRunData.value);
-  // console.log("calibration_times:", loadCalibrationRunData.value?.calibration_times);
-  // console.log("validation_times:", loadCalibrationRunData.value?.validation_times);
-  // console.log("time_range:", loadCalibrationRunData.value?.time_range);
+
+  // console.log("loadTuningTabData:", loadTuningTabData?.value?._data);
+  // console.log("userCalibrationRunData:", userCalibrationRunData.value);
+  // console.log("calibration_times:", userCalibrationRunData.value?.calibration_times);
+  // console.log("validation_times:", userCalibrationRunData.value?.validation_times);
+  // console.log("time_range:", userCalibrationRunData.value?.time_range);
 
   // set calibration times
-  if (loadCalibrationRunData.value?.calibration_times) {
-    const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = loadCalibrationRunData.value.calibration_times;
+  if (userCalibrationRunData.value?.calibration_times) {
+    const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
     simStartTime.value = simulation_start_time;
     simEndTime.value = simulation_end_time;
     calStartTime.value = calibration_start_time;
@@ -328,8 +320,8 @@ onMounted(async () => {
   };
 
   // set automatic validation times
-  if (loadCalibrationRunData.value?.validation_times) {
-    const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = loadCalibrationRunData.value.validation_times;
+  if (userCalibrationRunData.value?.validation_times) {
+    const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
 
     avSimStartTime.value = simulation_start_time;
     avSimEndTime.value = simulation_end_time;
@@ -338,7 +330,7 @@ onMounted(async () => {
   };
 
   // set time range
-  const timeRange = loadCalibrationRunData.value?.time_range;
+  const timeRange = userCalibrationRunData.value?.time_range;
 
   // check if timeRange is provided and not empty
   if (timeRange && timeRange.constructor === Object && Object.keys(timeRange).length > 0) {
@@ -360,7 +352,7 @@ onMounted(async () => {
     console.log("rangeDateTo:", rangeDateTo.value);
   }
 
-  const calibrationTuningModules = loadTuningTabData.value?.modules;
+  const calibrationTuningModules = loadTuningTabData.value?._data?.modules;
 
   // set the calibration tuning parameters
   calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module.parameters.map((param: any) => ({
@@ -380,8 +372,8 @@ onMounted(async () => {
   }))) || [];
 
   // set ouput_variable_to_calibrate
-  if (loadCalibrationRunData.value.output_variable_to_calibrate) {
-    const { name, module } = loadCalibrationRunData.value.output_variable_to_calibrate;
+  if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
+    const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
     userOutputVariableToCalibrate.value.name = name;
     userOutputVariableToCalibrate.value.module = module;
     selectedOutputVariable.value = name;
@@ -392,20 +384,30 @@ onMounted(async () => {
   isLoading.value = false;
 });
 
+const isCalibrationTuningControlsDisabled = (): boolean => {
+  const timeRange = userCalibrationRunData?.value?.time_range;
+  
+  if (timeRange && Object.keys(timeRange).length > 0) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
 const handleCalibrationTimeControlsClick = (event: Event) => {
-  if (isCalibrationTuningControlsDisabled) {
+  if (isCalibrationTuningControlsDisabled()) {
     event.preventDefault(); // Prevent any default action
     toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls as calibration_times are not set.', life: 10000 });
   }
 }
 
 // watch for changes to the simulation and calibration times and handle validation
-watch([simStartTime, simEndTime, calStartTime, calEndTime], () => areCalibrationTimesValidated());
+watch([simStartTime, simEndTime, calStartTime, calEndTime], () => areCalibrationTimesValidated(false));
 
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
   // find module for newly-selected output variable
-  const module = loadTuningTabData.value?.modules.find((module: any) => module.output_variables.find((outputVar: any) => outputVar.name === selectedOutputVariable.value));
+  const module = loadTuningTabData.value?._data?.modules.find((module: any) => module.output_variables.find((outputVar: any) => outputVar.name === selectedOutputVariable.value));
 
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
@@ -416,7 +418,7 @@ watch(selectedOutputVariable, () => {
   //console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
 });
 
-// watch for changes to automatic automatic validation times and handle validation
+// watch for changes to automatic validation times and handle validation
 watch([avSimStartTime, avSimEndTime, avCalStartTime, avCalEndTime], () => {
   // check if automatic_validation is enabled and validation_times are set
   if (avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value && automatic_validation.value) {
@@ -441,7 +443,7 @@ const triggerFileInput = () => {
 const handleFileUpload = async (event: Event) => {
   //console.log('Upload button clicked');
   const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
+  const file = target.files?.[0]; // get the first file we see
   if (file) {
     try {
       const formData = new FormData();
@@ -453,15 +455,15 @@ const handleFileUpload = async (event: Event) => {
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${userDataStore.getAccessToken()}`,
+            Authorization: `Bearer ${getAccessToken()}`,
           },
           body: formData,
         });
 
       if (response._data) {
         // Populate the Parameter table with the data from user-uploaded file
-        response._data?.user_parameter_file.forEach((param: any) => {
-          userCalibrationTuningParameters?.value.push({
+        response._data?.user_parameter_file?.forEach((param: any) => {
+          userCalibrationTuningParameters?.value?.push({
             name: param.param,
             minimum: param.min,
             maximum: param.max,
@@ -486,7 +488,7 @@ const handleFileUpload = async (event: Event) => {
 const addParameterToTable = () => {
   const parameter = calibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
   if (parameter) {
-    userCalibrationTuningParameters.value.push({
+    userCalibrationTuningParameters?.value?.push({
       name: parameter.name,
       minimum: parameter.minimum,
       maximum: parameter.maximum,
@@ -539,16 +541,17 @@ const isTuningTabDataValidated = () => {
 
 /**
  * Validate calibration_times
+ * @param fullValidation If true, perform full validation. If false, perform partial validation
  */
-const areCalibrationTimesValidated = (): boolean => {
+const areCalibrationTimesValidated = (fullValidation: boolean = true): boolean => {
   // check if time_range is not set
-  if (!rangeDateFrom.value || !rangeDateTo.value) {
+  if (fullValidation && (!rangeDateFrom.value || !rangeDateTo.value)) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'time_range must be set', life: 10000 });
     return false;
   }
 
   // check if calibration_times are not set
-  if (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value) {
+  if (fullValidation && (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value)) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be set', life: 10000 });
     return false;
   }
@@ -645,9 +648,14 @@ const areValidationTimesValidated = (): boolean => {
   const isAvCalStartAfterCalEnd = avCalStartDate > simEndDate;
   const isAvCalEndAfterCalEnd = avCalEndDate > simEndDate;
 
+  // console.log('avSimStartDate:', avSimStartDate);
+  // console.log('avSimEndDate:', avSimEndDate);
+  // console.log('avCalStartDate:', avCalStartDate);
+  // console.log('avCalEndDate:', avCalEndDate);
+  // console.log('simEndDate:', simEndDate);
 
   // check if validation_times are not after calibration_times
-  if (isAvSimStartAfterCalEnd || isAvSimEndAfterCalEnd || isAvCalStartAfterCalEnd || isAvCalEndAfterCalEnd) {
+  if (!isAvSimStartAfterCalEnd || !isAvSimEndAfterCalEnd || !isAvCalStartAfterCalEnd || !isAvCalEndAfterCalEnd) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'All validation_times must be after calibration_times', life: 10000 });
     return false;
   }

@@ -87,22 +87,22 @@ export interface UserCalibrationRunData {
 }
 
 export interface UserCalibrationRunTimeRangeData {
-  start_time: Date;
-  end_time: Date;
+  start_time: string;
+  end_time: string;
 }
 
 export interface UserCalibrationRunCalibrationTimesData {
-  calibration_start_time: Date;
-  calibration_end_time: Date;
-  simulation_start_time: Date;
-  simulation_end_time: Date;
+  calibration_start_time: string;
+  calibration_end_time: string;
+  simulation_start_time: string;
+  simulation_end_time: string;
 }
 
 export interface UserCalibrationRunValidationTimesData {
-  validation_start_time: Date;
-  validation_end_time: Date;
-  simulation_start_time: Date;
-  simulation_end_time: Date;
+  validation_start_time: string;
+  validation_end_time: string;
+  simulation_start_time: string;
+  simulation_end_time: string;
 }
 
 export interface UserCalibrationRunOutputVariableToCalibrateData {
