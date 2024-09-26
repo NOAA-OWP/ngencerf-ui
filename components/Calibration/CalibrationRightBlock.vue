@@ -17,7 +17,8 @@
       </div>
       <div id="BottomRightBlock" class="row-span-7">
         <div id="MessagesGroup">
-          <CalibrationMessagesGroup />
+          <!-- <MessagesGroup /> -->
+           <MessagesGroup />
         </div>
       </div>
     </div>
@@ -26,6 +27,7 @@
 
 <script lang="ts" setup>
 import CalibrationProgressGroup from "./CalibrationProgressGroup.vue";
-import CalibrationMessagesGroup from "./CalibrationMessagesGroup.vue";
+import MessagesGroup from "../Common/MessagesGroup.vue";
+//import CalibrationMessagesGroup from "./CalibrationMessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 </script>

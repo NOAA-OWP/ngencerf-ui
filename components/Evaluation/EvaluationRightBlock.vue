@@ -18,7 +18,7 @@
       </div>
       <div id="BottomRightBlock" class="row-span-7">
         <div id="MessagesGroup">
-          <EvaluationMessagesGroup />
+          <MessagesGroup />
         </div>
       </div>
     </div>
@@ -27,7 +27,8 @@
 <script lang="ts" setup>
 
 import EvaluationProgressGroup from "./EvaluationProgressGroup.vue";
-import EvaluationMessagesGroup from "./EvaluationMessagesGroup.vue";
+import MessagesGroup from "../Common/MessagesGroup.vue";
+//import EvaluationMessagesGroup from "./EvaluationMessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 import { generalStore } from "@/stores/common/GeneralStore";
 </script>

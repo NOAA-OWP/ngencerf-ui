@@ -17,7 +17,7 @@
       </div>
       <div id="BottomRightBlock" class="row-span-7">
         <div id="MessagesGroup">
-          <ForecastMessagesGroup />
+          <MessagesGroup />
         </div>
       </div>
     </div>
@@ -25,6 +25,7 @@
 </template>
 <script lang="ts" setup>
 import ForecastProgressGroup from "./ForecastProgressGroup.vue";
-import ForecastMessagesGroup from "./ForecastMessagesGroup.vue";
+import MessagesGroup from "../Common/MessagesGroup.vue";
+//import ForecastMessagesGroup from "./ForecastMessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 </script>

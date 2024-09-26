@@ -18,7 +18,7 @@
       </div>
       <div id="BottomRightBlock" class="row-span-7">
         <div id="MessagesGroup">
-          <VerificationMessagesGroup />
+          <MessagesGroup />
         </div>
       </div>
     </div>
@@ -26,6 +26,7 @@
 </template>
 <script lang="ts" setup>
 import VerificationProgressGroup from "./VerificationProgressGroup.vue"
-import VerificationMessagesGroup from "./VerificationMessagesGroup.vue";
+import MessagesGroup from "../Common/MessagesGroup.vue";
+//import VerificationMessagesGroup from "./VerificationMessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 </script>
