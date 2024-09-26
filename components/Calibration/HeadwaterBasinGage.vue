@@ -157,12 +157,11 @@ const toast = useToast()
 
 const isLoading = ref(true);
 
-loadGageTabStaticData();
+
 
 onMounted(() => {
-  setTimeout(() => {
-    isLoading.value = false;
-  }, 500)
+  toast.removeAllGroups();
+  loadGageTabStaticData();
 })
 
 const dialog = useDialog();
@@ -277,13 +276,15 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
     toast.removeAllGroups()
     const save_tab_response = saveGageTabData()
 
-    save_tab_response.then((response) => {
-      if (response?.status == 'error') {
-        toast.add({ severity: response?.status, summary: 'Error Saving Gage Tab Data', detail: response?.message })
+    save_tab_response.then( ( response ) => {
+      if ( response?.validation_errors ) {
+          useApiErrorResponseValidator( response?.validation_errors ).forEach( ( message: String ) => {
+            toast.add({ severity: "error", summary: 'Error Saving Gage Tab Data', detail: message })
+          })            
       } else {
-        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 })
-        fetchUserCalibrationRunData()
-      }
+          toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 })
+          fetchUserCalibrationRunData()
+      }         
     })
   }
 })

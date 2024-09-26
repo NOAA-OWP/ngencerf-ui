@@ -82,14 +82,15 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
+import { useGageStore } from "~/stores/calibration/GageStore";
 
 const loading = ref(true);
 
-const calibrationJobStore = useCalibrationJobStore()
-const { calibrationJobId } = storeToRefs(generalStore())
-const { userCalibrationJobsListData } = storeToRefs(useUserDataStore())
-const { fetchUserCalibrationJobsListData } = useUserDataStore()
-const { fetchNewCalibrationRunId } = calibrationJobStore
+const calibrationJobStore = useCalibrationJobStore();
+const { calibrationJobId } = storeToRefs(generalStore());
+const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs( useUserDataStore() );
+const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
+const { fetchNewCalibrationRunId } = calibrationJobStore;
 const {
   calibrationTabIndex,
   evaluationTabIndex,
@@ -102,18 +103,20 @@ const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun) }
-])
+]);
 const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent)
-}
+};
 
 onMounted(() => {
-  calibrationTabIndex.value = "1"
-  evaluationTabIndex.value = "1"
-  forecastTabIndex.value = "1"
+  calibrationTabIndex.value = "1";
+  evaluationTabIndex.value = "1";
+  forecastTabIndex.value = "1";
+  useGageStore().resetGageStore();
+  clearUserCalibrationRunData();
   setTimeout(function () {
     loading.value = false;
-  }, 500)
+  }, 500);
 })
 
 const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
@@ -124,14 +127,16 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 })
   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
   */
-  calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id
-
-  await navigateTo('/Calibration')
+  calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
+  queryUserCalibrationRunData().then( queryResponse => {
+    userCalibrationRunData.value = queryResponse?._data;
+    navigateTo('/Calibration');
+  });
 }
 
 const rowStyle = (data: any) => {
   if (!['Saved', 'Ready'].includes(data.status)) {
-    return { backgroundColor: 'gainsboro' }
+    return { backgroundColor: 'gainsboro' };
   }
 }
 
@@ -140,9 +145,12 @@ const createNewCalibration = async () => {
   if (fetchedId != undefined) {
     calibrationJobId.value = fetchedId
     if (calibrationJobId.value > 0) {
-      await navigateTo("Calibration");
+      queryUserCalibrationRunData().then( queryResponse => {
+        userCalibrationRunData.value = queryResponse?._data;
+        navigateTo('/Calibration');
+      });
     } else {
-      toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 })
+      toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 });
     }
   }
 }
@@ -152,7 +160,7 @@ const createNewCalibration = async () => {
  */
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
-  fetchUserCalibrationJobsListData()
+  fetchUserCalibrationJobsListData();
 }
 
 const confirmDelte = useConfirm();
