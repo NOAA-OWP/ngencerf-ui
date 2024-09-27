@@ -392,7 +392,7 @@ onMounted(async () => {
 const handleCalibrationTimeControlsClick = (event: Event) => {
   if (isCalibrationTuningControlsDisabled) {
     event.preventDefault(); // Prevent any default action
-    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls as calibration_times are not set.', life: 10000 });
+    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls as calibration_times are not set.', life: 3000 });
   }
 }
 
@@ -468,11 +468,11 @@ const handleFileUpload = async (event: Event) => {
         });
       }
     } catch (error) {
-      toast.add({ severity: 'error', summary: 'File upload failed', life: 10000 });
+      toast.add({ severity: 'error', summary: 'File upload failed', life: 3000 });
       console.error('File upload failed:', error);
     }
   } else {
-    toast.add({ severity: 'error', summary: 'No file selected', life: 10000 });
+    toast.add({ severity: 'error', summary: 'No file selected', life: 3000 });
     console.error('No file selected');
   }
 };
@@ -540,13 +540,13 @@ const isTuningTabDataValidated = () => {
 const areCalibrationTimesValidated = (): boolean => {
   // check if time_range is not set
   if (!rangeDateFrom.value || !rangeDateTo.value) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range must be set', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range must be set', life: 3000 });
     return false;
   }
 
   // check if calibration_times are not set
   if (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be set', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be set', life: 3000 });
     return false;
   }
 
@@ -560,7 +560,7 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if time_range and calibration_times are null after converted to Date objects
   if (!rangeStartDate || !rangeEndDate || !simStartDate || !simEndDate || !calStartDate || !calEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects', life: 3000 });
     return false;
   }
 
@@ -572,25 +572,25 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be within time_range', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be within time_range', life: 3000 });
     return false;
   }
 
   // check if simulation_end_time is not after simulation_start_time
   if (simStartDate >= simEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'simulation_end_time must be after simulation_start_time', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'simulation_end_time must be after simulation_start_time', life: 3000 });
     return false;
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
   if (calStartDate <= simStartDate || calStartDate > simEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time', life: 3000 });
     return false;
   }
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time', life: 3000 });
     return false;
   }
 
@@ -614,7 +614,7 @@ const areValidationTimesValidated = (): boolean => {
   // check if automatic_validation is enabled and validation_times are set
   if (automatic_validation.value) {
     if (!avSimStartTime.value || !avSimEndTime.value || !avCalStartTime.value || !avCalEndTime.value) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set', life: 10000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set', life: 3000 });
       return false;
     }
   }
@@ -629,7 +629,7 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if Date objects are valid
   if (!avSimStartDate || !avSimEndDate || !avCalStartDate || !avCalEndDate || !rangeStartDate || !rangeEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects', life: 3000 });
     return false;
   }
 
@@ -645,25 +645,25 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if validation_times are not after calibration_times
   if (isAvSimStartAfterCalEnd || isAvSimEndAfterCalEnd || isAvCalStartAfterCalEnd || isAvCalEndAfterCalEnd) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'All validation_times must be after calibration_times', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'All validation_times must be after calibration_times', life: 3000 });
     return false;
   }
 
   // check if avSimEndDate is not after avSimStartDate
   if (avSimStartDate >= avSimEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Simulation End must be after Simulation Start', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Simulation End must be after Simulation Start', life: 3000 });
     return false;
   }
 
   // check if avCalStartDate is not within avSimStartDate and avSimEndDate
   if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Calibration Start must be within Simulation Start and End', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Calibration Start must be within Simulation Start and End', life: 3000 });
     return false;
   }
 
   // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
   if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Calibration End must be after Calibration Start and less than or equal to Automatic Validation Simulation End', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Calibration End must be after Calibration Start and less than or equal to Automatic Validation Simulation End', life: 3000 });
     return false;
   }
 
@@ -676,7 +676,7 @@ const areValidationTimesValidated = (): boolean => {
 const areParametersValidated = (): boolean => {
   // check if no Calibration Tuning Parameters have been added
   if (userCalibrationTuningParameters.value.length === 0) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'At least one Calibration Tuning Parameter must be added', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'At least one Calibration Tuning Parameter must be added', life: 3000 });
     return false;
   }
 
@@ -690,7 +690,7 @@ const areParametersValidated = (): boolean => {
 const isOutputVariableValidated = (): boolean => {
   // check if Output Variable to Calibrate is set
   if (!userOutputVariableToCalibrate.value.name || !userOutputVariableToCalibrate.value.module) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Output Variable to Calibrate must be selected', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Output Variable to Calibrate must be selected', life: 3000 });
     return false;
   }
   return true;
@@ -758,10 +758,34 @@ useListen('calibrationButtonPrev', (actionButton) => {
 });
 
 useListen('calibrationButtonNext', (actionButton) => {
+    if (getCalibrationTabIndex() == 3 && actionButton === "NEXT") {
+      emitterOff('calibrationButtonNext');
+    let hasError = false;
+    if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
+      hasError = true;
+    }
+    if (!(avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value)) {
+      hasError = true;
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
+    }
+    if (!userOutputVariableToCalibrate.value.name) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "No Output Variable selected.", life: 3000 })
+      hasError = true;
+    }
+    if (hasError) {
+      setTimeout(() => gotoNext(), 3000);
+      return;
+    }
+    gotoNext();
+  }
+});
+
+const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[3];
   e.click();
-});
+}
 </script>
 
 <style lang="scss" scoped>

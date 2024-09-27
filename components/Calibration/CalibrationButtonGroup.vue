@@ -18,11 +18,11 @@
       <div class="inline ngenButtonDiv c-gray-md" v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5">
         <button v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5"
           class="prev actionBtnSmall font-normal" @click="NavigatePrevContent" title="Previous"
-          aria-label="Previous"><!--&#8678; -->Prev</button>
+          aria-label="Previous">Prev</button>
       </div>
       <div v-if="getCalibrationTabIndex() < 5" class="inline ngenButtonDiv ml-6"><button
           v-if="getCalibrationTabIndex() < 5" class="font-normal" @click="NavigateNextContent" title="Next"
-          aria-label="Next">Next<!-- <span>&#8680;</span>--></button></div>
+          aria-label="Next">Next</button></div>
     </div>
 
   </div>

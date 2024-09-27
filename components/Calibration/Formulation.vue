@@ -208,17 +208,36 @@ useListen('calibrationButtonResetCancel', (actionButton) => {
   }
 })
 
+useListen('calibrationButtonNext', (actionButton) => {
+  if (getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
+    emitterOff('calibrationButtonNext');
+    if (!formulationNameInput.value) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Forumulation Name is required.", life: 3000 })
+    }
+    if (!selectedModuleValues.value.length) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "Module Selection is required.", life: 3000 })
+    }
+    if (!formulationNameInput.value || !selectedModuleValues.value.length) {
+      setTimeout(() => gotoNext(), 3000);
+      setTimeout(() => gotoNext(), 3000);
+      return;
+    }
+    gotoNext();
+  }
+})
+
+const gotoNext = () => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[2];
+  e.click();
+}
+
 useListen('calibrationButtonPrev', (actionButton) => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[0];
   e.click();
 })
 
-useListen('calibrationButtonNext', (actionButton) => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[2];
-  e.click();
-})
 </script>
 
 <style lang="scss" scoped>
