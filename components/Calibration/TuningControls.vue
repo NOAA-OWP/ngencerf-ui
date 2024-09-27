@@ -138,7 +138,7 @@
       </div>
 
       <div class="">
-        <div class="grid grid-rows-2" @click="handleFormulationNotSet">
+        <div class="grid grid-rows-2">
 
           <div class="row-span-1 text-left">
             <div class="grid grid-cols-2">
@@ -152,11 +152,11 @@
                       id="OutVar"
                       class="varInputs"
                       v-model="selectedOutputVariable"
-                      :disabled="!isFormulationDataSet()" >
-                      <option v-for="outputVariable in outputVariables" :key="outputVariable.name"
-                        :value="outputVariable.name">
-                        {{ outputVariable.name }}
-                      </option>
+                      :disabled="!isFormulationDataSet()" 
+                      :options="outputVariables"
+                      optionLabel="name"
+                      optionValue="name"
+                    >
                     </Select>
                     <div v-if="!isFormulationDataSet()" class="overlay"></div>
                   </div>
@@ -182,10 +182,15 @@
 
                 <div class="text-left mt-3 text-sm" style="position: relative;">
                   <div class="inline-block text-left"><label for="ParamName">Name:</label></div><br />
-                  <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter" :disabled="!isFormulationDataSet()">
-                    <option v-for="param in calibrationTuningParameters" :key="param.name" :value="param.name">
-                      {{ param.name }}
-                    </option>
+                  <Select 
+                    id="ParamName" 
+                    class="varInputs inline-block mt-2"
+                    v-model="selectedParameter" 
+                    :disabled="!isFormulationDataSet()"
+                    :options="calibrationTuningParameters"
+                    optionLabel="name"
+                    optionValue="name"
+                  >
                   </Select>
                   <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
                     <button @click="addParameterToTable" :disabled="!isFormulationDataSet()">Add</button>
@@ -402,10 +407,8 @@ const isTimeRangeSet = (): boolean => {
  */
 const isFormulationDataSet = (): boolean => {
   if (formulationNameInput.value == "" && selectedModuleValues?.value.length === 0 && slothParameterInputs?.value.length === 0) {
-    console.log("Formulation data not set");
     return false;
   } else {
-    console.log("Formulation data set");
     return true;
   }
 };
