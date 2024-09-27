@@ -187,7 +187,7 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
  * event bus for calibration button group click
  */
 useListen('calibrationButtonSaveStart', (actionButton) => {
-  if (getCalibrationTabIndex() === 2 && actionButton == 'SAVE') {
+  if (getCalibrationTabIndex() === 3 && actionButton == 'SAVE') {
     toast.removeAllGroups()
     const save_formulation_response = saveFormulationTabData()
     save_formulation_response.then((response) => {
@@ -204,13 +204,13 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 })
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
-  if (getCalibrationTabIndex() == 2 && actionButton == 'RESET') {
+  if (getCalibrationTabIndex() == 3 && actionButton == 'RESET') {
     resetUserSelectionFormulation()
   }
 })
 
 useListen('calibrationButtonNext', (actionButton) => {
-  if (getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
+  if (getCalibrationTabIndex() == 3 && actionButton === "NEXT") {
     emitterOff('calibrationButtonNext');
     if (!formulationNameInput.value) {
       toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Forumulation Name is required.", life: 3000 })

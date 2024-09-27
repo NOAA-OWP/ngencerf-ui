@@ -705,7 +705,7 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
     try {
       const saveTuningTabResponse = await postSaveTuningTabData();
       console.log(
-        `saveTabContent Tuning, should be tabIndex 3, on tabIndex ${getCalibrationTabIndex()}, save response: `,
+        `saveTabContent Tuning, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `,
         saveTuningTabResponse
       );
 
@@ -727,7 +727,7 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
   };
 
   // check if the current tab is the Tuning tab and the actionButton is 'SAVE'
-  if (getCalibrationTabIndex() === 3 && actionButton === 'SAVE') {
+  if (getCalibrationTabIndex() === 4 && actionButton === 'SAVE') {
     // check if Tuning Tab data is validated before saving
     if (isTuningTabDataValidated()) {
       handleSaveTuningTab();
@@ -758,7 +758,7 @@ useListen('calibrationButtonPrev', (actionButton) => {
 });
 
 useListen('calibrationButtonNext', (actionButton) => {
-    if (getCalibrationTabIndex() == 3 && actionButton === "NEXT") {
+    if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
       emitterOff('calibrationButtonNext');
     let hasError = false;
     if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {

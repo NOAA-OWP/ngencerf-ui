@@ -172,7 +172,7 @@ const onGageSelectionChange = () => {
 }
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
-  if (getCalibrationTabIndex() == 1 && actionButton == 'RESET') {
+  if (getCalibrationTabIndex() == 2 && actionButton == 'RESET') {
     resetUserSelectionGage();
   }
 })
@@ -267,7 +267,7 @@ const showGeopackagFileUploadDialog = (headerText: string) => {
  * event bus for calibration button group click
  */
 useListen('calibrationButtonSaveStart', (actionButton) => {
-  if (getCalibrationTabIndex() == 1 && actionButton == 'SAVE') {
+  if (getCalibrationTabIndex() == 2 && actionButton == 'SAVE') {
     toast.removeAllGroups()
     const save_tab_response = saveGageTabData()
 
@@ -285,13 +285,13 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 })
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
-  if (getCalibrationTabIndex() == 1 && actionButton == 'RESET') {
+  if (getCalibrationTabIndex() == 2 && actionButton == 'RESET') {
     resetUserSelectionGage()
   }
 })
 
 useListen('calibrationButtonNext', (actionButton) => {  
-  if ( getCalibrationTabIndex() == 1 && actionButton === "NEXT") {
+  if ( getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
     emitterOff('calibrationButtonNext');
     if (!selectedDomainValue.value) {
       toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Domain is required.", life: 3000 })

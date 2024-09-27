@@ -236,7 +236,7 @@ const optimizationSelectChange = () => {
  * event bus for calibration button group click
  */
 useListen('calibrationButtonSaveStart', (actionButton) => {
-   if (getCalibrationTabIndex() === 4 && actionButton == 'SAVE') {
+   if (getCalibrationTabIndex() === 5 && actionButton == 'SAVE') {
       toast.removeAllGroups()
       const save_optimization_response = saveOptimizationTabData()
       save_optimization_response.then((response) => {
@@ -253,13 +253,13 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 })
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
-   if (getCalibrationTabIndex() == 4 && actionButton == 'RESET') {
+   if (getCalibrationTabIndex() == 5 && actionButton == 'RESET') {
       resetUserSelectionOptimization()
    }
 })
 
 useListen('calibrationButtonNext', (actionButton) => {
-   if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
+   if (getCalibrationTabIndex() == 5 && actionButton === "NEXT") {
       emitterOff('calibrationButtonNext');
       if (!uiOptimization.value) {
          toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })

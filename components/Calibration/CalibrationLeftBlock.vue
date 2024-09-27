@@ -4,21 +4,23 @@
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
       <span v-if="activeTab == 1">
+        <CalibrationRunsTab />
+      </span> <span v-if="activeTab == 2">
         <HeadwaterBasinGage />
       </span>
-      <span v-else-if="activeTab == 2">
+      <span v-else-if="activeTab == 3">
         <Formulation />
       </span>
-      <span v-else-if="activeTab == 3">
+      <span v-else-if="activeTab == 4">
         <TuningControls />
       </span>
-      <span v-else-if="activeTab == 4">
+      <span v-else-if="activeTab == 5">
         <OptimizationMetrics />
       </span>
-      <span v-else-if="activeTab == 5">
+      <span v-else-if="activeTab == 6">
         <RunStatus />
       </span>
-      <span v-else="activeTab == 6">
+      <span v-else="activeTab == 7">
         <Results />
       </span>
     </div>
@@ -36,6 +38,7 @@ const TuningControls = defineAsyncComponent(() => import('~/components/Calibrati
 const OptimizationMetrics = defineAsyncComponent(() => import('~/components/Calibration/OptimizationMetrics.vue'))
 const RunStatus = defineAsyncComponent(() => import('~/components/Calibration/RunStatus.vue'))
 const Results = defineAsyncComponent(() => import('~/components/Calibration/Results.vue'))
+const CalibrationRunsTab = defineAsyncComponent(() => import('~/components/Calibration/CalibrationRunsTab.vue'))
 import { generalStore } from "@/stores/common/GeneralStore";
 
 const { getCalibrationTabIndex, setCalibrationTabIndex } = generalStore();
@@ -51,4 +54,3 @@ const tabChanged = (tabNum: number) => {
   }
 };
 </script>
-

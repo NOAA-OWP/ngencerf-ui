@@ -2,12 +2,7 @@
 
   <div class="h-full min-h-screen ">
     <div class="grid grid-rows-12">
-      <div class="row-span-1">
-        <div>
-          <AppHeader />
-        </div>
-      </div>
-      <div class="grid row-span-10">
+      <div class="grid row-span-11">
         <div class="grid grid-rows-12">
           <div class="row-span-12 flex items-center justify-center h-screen-inner mt-2">
             <div id="CenterBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-xlg h-screen-inner">
@@ -35,7 +30,8 @@
                       v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
                       :rowStyle="rowStyle">
                       <Column field="calibration_run_id" header="Run ID" sortable></Column>
-                      <Column field="formulation_name" header="Formulation Name" sortable></Column>
+                      <Column field="formulation_name" header="Formulation Name" sortable>
+                      </Column>
                       <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
                       <Column field="run_date" header="Run Date" sortable></Column>
                       <Column header="Calibration Period" sortable>
@@ -49,20 +45,15 @@
                     </DataTable>
                   </div>
                   <div class="asteriskText text-left mt-2">
-                    * Right click on a row for Open, Clone or Delete options, or click on then New button.
+                    * Right click on a row for Open, Clone or Delete options, or click on then New
+                    button.
                   </div>
 
                 </div>
-
               </div>
             </div>
           </div>
-
-
         </div>
-      </div>
-      <div class="row-span-1">
-        <AppFooter />
       </div>
     </div>
   </div>
@@ -74,8 +65,7 @@
 <script setup lang="ts">
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import AppFooter from "~/components/Common/AppFooter.vue";
-import AppHeader from "~/components/Common/AppHeader.vue";
+
 
 import type { JobListItem } from "~/composables/NextGenModel";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
@@ -88,7 +78,7 @@ const loading = ref(true);
 
 const calibrationJobStore = useCalibrationJobStore();
 const { calibrationJobId } = storeToRefs(generalStore());
-const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs( useUserDataStore() );
+const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId } = calibrationJobStore;
 const {
@@ -128,9 +118,14 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
   */
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
-  queryUserCalibrationRunData().then( queryResponse => {
+  queryUserCalibrationRunData().then(queryResponse => {
     userCalibrationRunData.value = queryResponse?._data;
-    navigateTo('/Calibration');
+
+    const allTabs = document.getElementsByClassName("tabs");
+    const e = allTabs[1] as HTMLElement;
+    e.click();
+
+    //navigateTo('/Calibration');
   });
 }
 
@@ -145,7 +140,7 @@ const createNewCalibration = async () => {
   if (fetchedId != undefined) {
     calibrationJobId.value = fetchedId
     if (calibrationJobId.value > 0) {
-      queryUserCalibrationRunData().then( queryResponse => {
+      queryUserCalibrationRunData().then(queryResponse => {
         userCalibrationRunData.value = queryResponse?._data;
         navigateTo('/Calibration');
       });
@@ -203,10 +198,10 @@ const acceptDelete = (selectedRunId: number) => {
   border: 1px solid $ngwcp_primary1;
 
   /*.table {
-    thead tr th {
-      background-color: #F5A4A4;
-      border: 1px solid #000;
-    }
-  }*/
+      thead tr th {
+        background-color: #F5A4A4;
+        border: 1px solid #000;
+      }
+    }*/
 }
 </style>
