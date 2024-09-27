@@ -6,7 +6,7 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, GeneralErrorResponse } from "~/composables/NextGenModel";
-import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
+import { useCalibrationTabValidation, useCalibrationFormulationSlothTableValidation } from "~/composables/ValidationHandlers";
 
 export const useFormulationStore = defineStore( 'FormulationStore', () => {
   /**
@@ -136,19 +136,67 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
   * @returns {SelectOption[]}
   */
   const fetchFormulationModuleCoveredGroupOptions = computed( () => {
-    let groupOptionsList = <SelectOption[]>[]
-    let groupsList = fetchModuleCoveredGroupList()
-    const selectedGroups = selectedModuleCoveredGroups()
+    let groupOptionsList = <SelectOption[]>[];
+    let groupsList = fetchModuleCoveredGroupList();
+    const selectedGroups = selectedModuleCoveredGroups();
     groupsList.forEach( ( group ) => {
         let option_data = {
           name: group,
           description: group,
           selected: false
-        }
-        if( selectedGroups.includes( group ) ) option_data[ 'selected' ] = true
-        groupOptionsList.push( option_data )
+        };
+        if( selectedGroups.includes( group ) ) option_data[ 'selected' ] = true;
+        groupOptionsList.push( option_data );
     })
-    return groupOptionsList
+    return groupOptionsList;
+  });
+
+  /**
+  * return hard coded list of sloth parameter type options
+  * @returns {SelectOption[]}
+  */
+  const fetchFormulationSlothParameterTypeOptions = computed( () => {
+    return [{
+      name: 'integer',
+      description: 'integer'
+    }, {
+      name: 'double',
+      description: 'double'
+    }]
+  });
+  
+  /**
+  * return hard coded list of sloth parameter unit options
+  * @returns {SelectOption[]}
+  */
+  const fetchFormulationSlothParameterUnitOptions = computed( () => {
+    return [{
+      name: 'none',
+      description: 'none'
+    }, {
+      name: 'm',
+      description: 'm'
+    }]
+  });
+
+  /**
+  * return list of selected module options
+  * @returns {SelectOption[]}
+  */
+   /**
+  * return list of Module Options based on the filter selection
+  * @returns {SelectOption[]}
+  */
+   const fetchSelectedFormulationModuleOptions = computed( () => {
+    let modules_list = <SelectOption[]>[]
+    selectedModuleValues.value.forEach( ( moduleName: string ) => {
+      modules_list.push( {
+        name: moduleName,
+        description: moduleName
+      } );
+    });
+
+    return modules_list;
   })
 
   /**
@@ -183,22 +231,33 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
   * @returns {GeneralApiSaveResponse}
   */
   async function saveFormulationTabData() {
-    const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
-      method: "POST",
-      headers: { 
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-      },
-      body: JSON.stringify( { 
-          calibration_run_id: calibrationJobId.value, 
-          formulation_name: formulationNameInput.value, 
-          modules: selectedModuleValues.value, 
-          use_sloth: useSlothParameters.value,
-          sloth_parameters: slothParameterInputs.value
-      } )
-    })
-    
-    return saveFormulationTabDataResponse?._data
+    const slothParametersValidation = useCalibrationFormulationSlothTableValidation( slothParameterInputs.value );
+    console.log( 'saveFormulationTabData slothParametersValidation: ', slothParametersValidation.value )
+    if ( Object.keys( slothParametersValidation.value ).length == 0 ) {
+      const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
+        method: "POST",
+        headers: { 
+            "Authorization": `Bearer ${getAccessToken()}`,
+            "Content-Type": 'application/json'
+        },
+        body: JSON.stringify( { 
+            calibration_run_id: calibrationJobId.value, 
+            formulation_name: formulationNameInput.value, 
+            modules: selectedModuleValues.value, 
+            use_sloth: useSlothParameters.value,
+            sloth_parameters: slothParameterInputs.value
+        } )
+      });
+
+      return saveFormulationTabDataResponse?._data;
+    } else {
+      return Promise.resolve({
+        message: "Missing required field(s)",
+        validation_errors: slothParametersValidation.value,
+        calibration_run_id: calibrationJobId.value,
+        status: "error"
+      })
+    }
   }
 
   /**
@@ -238,6 +297,9 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
     fetchFormulationModuleCoveredGroups,
     fetchFormulationModuleCoveredGroupFilterOptions,
     fetchFormulationModuleCoveredGroupOptions,
+    fetchFormulationSlothParameterTypeOptions,
+    fetchFormulationSlothParameterUnitOptions,
+    fetchSelectedFormulationModuleOptions,
     addNewSlothVariable,
     saveFormulationTabData,
     data_loading,

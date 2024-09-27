@@ -2,7 +2,7 @@
   <table id="CalibrationProgressTable" class="progressTable prevent-select">
     <tbody>
       <tr>
-        <td><i v-if="selectedDomainValue" :class="selectedDomainValue ? 'checkMark' : ''"
+        <td><i v-if="selectedDomainValue && selectedGageValue" :class="(selectedDomainValue && selectedGageValue) ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
         <td class="ptype whitespace-nowrap" data-tab="1" title="Headwater Basin Gage" aria-label="Headwater Basin Gage"
           @click="tabClicked">

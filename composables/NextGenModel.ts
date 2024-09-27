@@ -392,5 +392,11 @@ export const ValidationFormFields = {
   maps_to_module: "Sloth Parameter For Module",
   maps_to_variable_name: "Sloth Parameter Module Param",
   param_type: "Sloth Parameter Type",
-  param_units: "Sloth Parameter Units"
+  param_units: "Sloth Parameter Units",
+  stop_criteria: "Stop Criteria",
+  save_plot_iteration_frequency: "Plot Generation Frequency",
+  streamflow_threshold: "Flow Threshold",
+  peak_flow_threshold: "Peak Flow Threshold",
+  objective_function: "Objective Function",
+  optimization: "Optimization Algorithm"
 }
