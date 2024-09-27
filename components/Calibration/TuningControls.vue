@@ -374,6 +374,7 @@ onMounted(async () => {
     userOutputVariableToCalibrate.value.name = name;
     userOutputVariableToCalibrate.value.module = module;
     selectedOutputVariable.value = name;
+    console.log('selectedOutputVariable:', selectedOutputVariable.value);
   };
 
   isInitialSetupDone.value = true; // set to true after initial setup
