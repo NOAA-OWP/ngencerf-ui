@@ -14,11 +14,12 @@ const emitter = mitt<ApplicationEvents>()
 
 export const useEvent = emitter.emit
 export const useListen = emitter.on
+export const emitterOff = emitter.off
 
 
 type logoutEvents = LogoutEvent
 
-const logouEmitter = mitt<LogoutEvent>()
+const logoutEmitter = mitt<LogoutEvent>()
 
-export const useLogout = logouEmitter.emit
-export const useLogoutListen = logouEmitter.on
+export const useLogout = logoutEmitter.emit
+export const useLogoutListen = logoutEmitter.on
