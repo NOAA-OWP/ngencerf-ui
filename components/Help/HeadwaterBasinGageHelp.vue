@@ -29,8 +29,8 @@
             Time, LWDOWN, PFC, Q2D, RAINRATE, SWDOWN, T2D, U2D, V2D<br />
             <br>
             Example:<br />
-            <img :src=image1 /><br />
-            <img :src=image2 width="70%" class="mb-2" />
+            <a :href=image1 target="_blank"><img :src=image1 /></a><br />
+            <img :src=image2 width="90%" class="mb-2" />
           </td>
         </tr>
         <tr>

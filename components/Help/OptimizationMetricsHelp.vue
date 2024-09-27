@@ -57,7 +57,7 @@
       </tbody>
     </table>
     <div class="mt-4">
-      <img class="mx-auto" width="70%" :src="image1" />
+      <img class="mx-auto" width="90%" :src="image1" />
     </div>
   </div>
 </template>

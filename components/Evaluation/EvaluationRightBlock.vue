@@ -3,14 +3,14 @@
   <div id="EvaluationRightBlock" class="grid grid-cols-1">
     <div class="grid-rows-12">
       <div id="TopRightBlock" class="row-span-5">
-        <div class="grid grid-cols-3">
-          <div class="col-span-3 mb-3">
+        <div class="grid grid-cols-5">
+          <div class="col-span-5 mb-3">
             <h2>Progress</h2>
           </div>
-          <div id="ProgressGroup" class="col-span-2">
-            <EvaluationProgressGroup />
+          <div id="ProgressGroup" class="col-span-3">
+            <EvaluationProgressGroup" />
           </div>
-          <div id="GageCutout" class="col-span-1">
+          <div id="GageCutout" class="col-span-2">
             <GageCutout />
           </div>
 

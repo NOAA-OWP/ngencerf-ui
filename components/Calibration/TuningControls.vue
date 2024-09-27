@@ -16,24 +16,24 @@
                 <span class="tabTitles font-bold">Calibration Time Controls</span>
               </div>
               <div id="BoxBottomLeft" class="pt-2">
-                <div class="timeBlocks datepicker-wrapper" @click="handleCalibrationTimeControlsClick">
+                <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
 
-                  <table class="table-auto border-collapse ml-0 w-[695px]">
+                  <table class="table-auto border-collapse ml-0 table-fixed">
                     <tbody>
                       <tr>
-                        <td class="w-[105px]">
-                          <label for="SimulationStart" class="whitespace-nowrap w-[105px]">Simulation Start:</label>
+                        <td class="w-1/6">
+                          <label for="SimulationStart" class="whitespace-nowrap">Simulation Start:</label>
                         </td>
-                        <td class="text-left" style="position: relative;">
+                        <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
-                        <td class="pl-6 w-[105px]">
-                          <label for="SimulationEnd" class="whitespace-nowrap w-[105px]">Simulation End:</label>
+                        <td class="pl-6 w-1/6">
+                          <label for="SimulationEnd" class="whitespace-nowrap">Simulation End:</label>
                         </td>
-                        <td class="text-left" style="position: relative;">
+                        <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
                             :disabled="!isTimeRangeSet()" />
@@ -41,19 +41,19 @@
                         </td>
                       </tr>
                       <tr>
-                        <td>
+                        <td class="w-1/6">
                           <label for="CalibrationStart" class="whitespace-nowrap">Calibration Start:</label>
                         </td>
-                        <td class="text-left" style="position: relative;">
+                        <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
-                        <td class="pl-6">
+                        <td class="pl-6 w-1/6">
                           <label for="CalibrationEnd" class="whitespace-nowrap">Calibration End:</label>
                         </td>
-                        <td class="text-left" style="position: relative;">
+                        <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
                             :disabled="!isTimeRangeSet()" />
@@ -68,7 +68,7 @@
 
               <div id="BoxTopRight" class="pt-4">
                 <!-- <input type="checkbox" id="CheckTheBox" class="inline w-auto mr-2"></input> -->
-                <label for="CheckTheBox" class="inline">Automatic Validation</label>
+                <label for="CheckTheBox" class="inline">Automatic Validation Time Controls</label>
               </div>
               <div id="BoxBottomRight" class="pt-0 ml-0">
                 <div v-if="!automatic_validation" class="tabTitles">
@@ -76,29 +76,27 @@
                 </div>
 
                 <div v-else>
-                  <div class="timeBlocks datepicker-wrapper" @click="handleCalibrationTimeControlsClick">
+                  <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
 
-                    <table class="table-auto border-collapse ml-0 w-[695px]">
+                    <table class="table-auto border-collapse ml-0 table-fixed">
                       <tbody>
                         <tr>
 
-                          <td class="w-[105px]">
-                            <label for="ValSimulationStart" class="whitespace-nowrap w-[105px]">Simulation
+                          <td class="w-1/6">
+                            <label for="ValSimulationStart" class="whitespace-nowrap">Simulation
                               Start:</label>
                           </td>
-                          <td class="text-left" style="position: relative;">
+                          <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
                               v-model="avSimStartTime" time-picker-inline format="yyyy-MM-dd  hh:00"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
                           </td>
-                          <td class="pl-6">
+                          <td class="pl-6 w-1/6">
                             <label for="ValSimulationEnd" class="whitespace-nowrap">Simulation End:</label>
                           </td>
-                          <td class="text-left" style="position: relative;">
-
-
+                          <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark"
                               v-model="avSimEndTime" time-picker-inline format="yyyy-MM-dd  hh:00"
                               :disabled="!isTimeRangeSet()" />
@@ -108,22 +106,19 @@
                         </tr>
                         <tr>
 
-                          <td class="pl-6 w-[105px]">
-                            <label for="ValidationStart" class="whitespace-nowrap w-[105px]">Validation Start:</label>
+                          <td class="w-1/6">
+                            <label for="ValidationStart" class="whitespace-nowrap">Validation Start:</label>
                           </td>
-                          <td class="text-left" style="position: relative;">
-
-
+                          <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark"
                               v-model="avCalStartTime" time-picker-inline format="yyyy-MM-dd  hh:00"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
-                          <td class="pl-6">
+                          <td class="pl-6 w-1/6">
                             <label for="ValidationEnd" class="whitespace-nowrap">Validation End:</label>
                           </td>
-                          <td class="text-left" style="position: relative;">
-
+                          <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
                               time-picker-inline format="yyyy-MM-dd  hh:00"
                               :disabled="!isTimeRangeSet()" />
@@ -150,7 +145,7 @@
 
               <div class="col-span-2">
                 <div class="">
-                  <div class="mt-1 mb-3 hr"></div>
+                  <div class="mt-6 mb-3 hr"></div>
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
                   <div class="mt-2 text-sm" style="position: relative;">
                     <Select
@@ -498,11 +493,11 @@ const handleFileUpload = async (event: Event) => {
         });
       }
     } catch (error) {
-      toast.add({ severity: 'error', summary: 'File upload failed', life: 10000 });
+      toast.add({ severity: 'error', summary: 'File upload failed', life: 3000 });
       console.error('File upload failed:', error);
     }
   } else {
-    toast.add({ severity: 'error', summary: 'No file selected', life: 10000 });
+    toast.add({ severity: 'error', summary: 'No file selected', life: 3000 });
     console.error('No file selected');
   }
 };
@@ -591,7 +586,7 @@ const areCalibrationTimesValidated = (fullValidation: boolean = true): boolean =
 
   // check if time_range and calibration_times are null after converted to Date objects
   if (!rangeStartDate || !rangeEndDate || !simStartDate || !simEndDate || !calStartDate || !calEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects', life: 3000 });
     return false;
   }
 
@@ -603,25 +598,25 @@ const areCalibrationTimesValidated = (fullValidation: boolean = true): boolean =
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be within time_range', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be within time_range', life: 3000 });
     return false;
   }
 
   // check if simulation_end_time is not after simulation_start_time
   if (simStartDate >= simEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'simulation_end_time must be after simulation_start_time', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'simulation_end_time must be after simulation_start_time', life: 3000 });
     return false;
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
   if (calStartDate <= simStartDate || calStartDate > simEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time', life: 3000 });
     return false;
   }
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time', life: 3000 });
     return false;
   }
 
@@ -645,7 +640,7 @@ const areValidationTimesValidated = (): boolean => {
   // check if automatic_validation is enabled and validation_times are set
   if (automatic_validation.value) {
     if (!avSimStartTime.value || !avSimEndTime.value || !avCalStartTime.value || !avCalEndTime.value) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set', life: 10000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set', life: 3000 });
       return false;
     }
   }
@@ -660,7 +655,7 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if Date objects are valid
   if (!avSimStartDate || !avSimEndDate || !avCalStartDate || !avCalEndDate || !rangeStartDate || !rangeEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects', life: 3000 });
     return false;
   }
 
@@ -687,19 +682,19 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if avSimEndDate is not after avSimStartDate
   if (avSimStartDate >= avSimEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Simulation End must be after Simulation Start', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Simulation End must be after Simulation Start', life: 3000 });
     return false;
   }
 
   // check if avCalStartDate is not within avSimStartDate and avSimEndDate
   if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Calibration Start must be within Simulation Start and End', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Calibration Start must be within Simulation Start and End', life: 3000 });
     return false;
   }
 
   // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
   if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Calibration End must be after Calibration Start and less than or equal to Automatic Validation Simulation End', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Automatic Validation Calibration End must be after Calibration Start and less than or equal to Automatic Validation Simulation End', life: 3000 });
     return false;
   }
 
@@ -712,7 +707,7 @@ const areValidationTimesValidated = (): boolean => {
 const areParametersValidated = (): boolean => {
   // check if no Calibration Tuning Parameters have been added
   if (userCalibrationTuningParameters.value.length === 0) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'At least one Calibration Tuning Parameter must be added', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'At least one Calibration Tuning Parameter must be added', life: 3000 });
     return false;
   }
 
@@ -726,7 +721,7 @@ const areParametersValidated = (): boolean => {
 const isOutputVariableValidated = (): boolean => {
   // check if Output Variable to Calibrate is set
   if (!userOutputVariableToCalibrate.value.name || !userOutputVariableToCalibrate.value.module) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Output Variable to Calibrate must be selected', life: 10000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Output Variable to Calibrate must be selected', life: 3000 });
     return false;
   }
   return true;
@@ -794,10 +789,34 @@ useListen('calibrationButtonPrev', (actionButton) => {
 });
 
 useListen('calibrationButtonNext', (actionButton) => {
+    if (getCalibrationTabIndex() == 3 && actionButton === "NEXT") {
+      emitterOff('calibrationButtonNext');
+    let hasError = false;
+    if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
+      hasError = true;
+    }
+    if (!(avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value)) {
+      hasError = true;
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
+    }
+    if (!userOutputVariableToCalibrate.value.name) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "No Output Variable selected.", life: 3000 })
+      hasError = true;
+    }
+    if (hasError) {
+      setTimeout(() => gotoNext(), 3000);
+      return;
+    }
+    gotoNext();
+  }
+});
+
+const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[3];
   e.click();
-});
+}
 </script>
 
 <style lang="scss" scoped>
