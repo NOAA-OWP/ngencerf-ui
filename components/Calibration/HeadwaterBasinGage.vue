@@ -326,26 +326,18 @@ const toggle_isNWMv3 = () => {
 @import "@/assets/styles/styles.scss";
 
 #GageReport {
-  margin: 50px auto 0 0;
 
   table {
 
     width: 60%;
-    margin: 10px auto;
-    border: 5px solid $ngwcp_neutral_gray_md;
-
-
-    font-size: 1.2em;
+    margin: 6vh auto;
 
     tr {
       line-height: 27px;
-      border-bottom: 1px solid $gray-50;
 
       td {
-        width: 50%;
-        padding: 4px;
+        padding: 4px 15px;
         cursor: default;
-        background-color: $ngwcp_neutral_gray_lt;
       }
     }
   }

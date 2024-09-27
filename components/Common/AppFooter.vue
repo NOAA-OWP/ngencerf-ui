@@ -74,13 +74,13 @@ const canDisplayBeforeRun = computed(() => {
   bottom: 0;
   width: 100%;
   color: black;
-  z-index: 9999;
+  z-index: 9;
 
 }
 
 #FooterData {
   height: 50px;
-  z-index: 9999;
+  z-index: 9;
 }
 
 .footerColor {

@@ -36,7 +36,7 @@
                      </DataTable>
                   </div>
                </div>
-
+	       
             </div>
          </div>
 
@@ -69,8 +69,9 @@
                <Checkbox id="CalcCatMetCB" inputId="CalcCatMetCB" class="h-5 w-5 mr-3" style="display:inline-block"
                   :binary="true" v-model="cbIsCategorical" :disabled="cbCategoricalDisabled"
                   @change="toggleMetricStreamFlowInput" />
-               <label for="CalcCatMetCB" class="inline">Calculate Categorical Metrics</label><br clear="all">
-               <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-1">
+               <label for="CalcCatMetCB" class="inline">Calculate Categorical Metrics</label>
+               <div class="pl-8">(POD, CSI, FAR)</div>
+               <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-1 pl-8">
                   Flow Threshold: <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
                      class="w-24"></InputNumber> m3/s
                </div><br />
@@ -78,8 +79,9 @@
                <Checkbox id="CalEventMetCB" inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline"
                   style="display:inline-block" :binary="true" v-model="cbIsEvenBased" :disabled="cbEventBasedDisabled"
                   @change="toggleMetricPeakFlowInput" />
-               <label for="CalEventMetCB" class="inline">Calculate Event Based Metrics</label><br clear="all">
-               <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-1">
+               <label for="CalEventMetCB" class="inline">Calculate Event Based Metrics</label>
+               <div class="pl-8">(PKBIAS, PKTE, EVBIAS)</div>
+               <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-1 pl-8">
                   Peak Flow Threshold: <InputNumber inputId="metricEventBasedFlowThreshold"
                      v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
                </div>
@@ -88,6 +90,16 @@
 
          <div class="col-span-2">
             <div class="hr"></div>
+         </div>
+
+         <div class="col-span-1">
+            <!--REVIVING LOST CONTENT HERE-->
+            <div id="CalibrationStopCriteria" class="bordered">
+               <label for="StopCriteria">Calibration Stop Criteria:</label><br>
+               <InputNumber id="StopCriteria" inputId="stopCriteria"
+               v-model="uiStopCriteria" showButtons :min="0"></InputNumber>
+               <div>Iterations per Worker</div>
+            </div>
          </div>
 
          <div class="col-span-1">
