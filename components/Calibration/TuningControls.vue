@@ -365,9 +365,11 @@ onMounted(async () => {
     description: outputVar.description,
     module: module.name,
   }))) || [];
+  console.log("outputVariables:", outputVariables.value);
 
   // set ouput_variable_to_calibrate
   if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
+    console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
     const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
     userOutputVariableToCalibrate.value.name = name;
     userOutputVariableToCalibrate.value.module = module;
@@ -399,10 +401,10 @@ const isTimeRangeSet = (): boolean => {
  */
 const isFormulationDataSet = (): boolean => {
   if (formulationNameInput.value == "" && selectedModuleValues?.value.length === 0 && slothParameterInputs?.value.length === 0) {
-    // console.log("Formulation data not set");
+    console.log("Formulation data not set");
     return false;
   } else {
-    // console.log("Formulation data set");
+    console.log("Formulation data set");
     return true;
   }
 };
