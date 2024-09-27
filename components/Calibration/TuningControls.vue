@@ -27,8 +27,8 @@
                         <td class="text-left" style="position: relative;">
                           <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
-                            :disabled="isCalibrationTuningControlsDisabled()" />
-                          <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
+                            :disabled="!isTimeRangeSet()" />
+                          <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
                         <td class="pl-6 w-[105px]">
                           <label for="SimulationEnd" class="whitespace-nowrap w-[105px]">Simulation End:</label>
@@ -36,8 +36,8 @@
                         <td class="text-left" style="position: relative;">
                           <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
-                            :disabled="isCalibrationTuningControlsDisabled()" />
-                          <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
+                            :disabled="!isTimeRangeSet()" />
+                          <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
                       </tr>
                       <tr>
@@ -47,8 +47,8 @@
                         <td class="text-left" style="position: relative;">
                           <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
-                            :disabled="isCalibrationTuningControlsDisabled()" />
-                          <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
+                            :disabled="!isTimeRangeSet()" />
+                          <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
                         <td class="pl-6">
                           <label for="CalibrationEnd" class="whitespace-nowrap">Calibration End:</label>
@@ -56,8 +56,8 @@
                         <td class="text-left" style="position: relative;">
                           <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
                             time-picker-inline format="yyyy-MM-dd  hh:00"
-                            :disabled="isCalibrationTuningControlsDisabled()" />
-                          <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
+                            :disabled="!isTimeRangeSet()" />
+                          <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
 
                       </tr>
@@ -89,8 +89,8 @@
                           <td class="text-left" style="position: relative;">
                             <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
                               v-model="avSimStartTime" time-picker-inline format="yyyy-MM-dd  hh:00"
-                              :disabled="isCalibrationTuningControlsDisabled()" />
-                            <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
+                              :disabled="!isTimeRangeSet()" />
+                            <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
                           </td>
                           <td class="pl-6">
@@ -101,8 +101,8 @@
 
                             <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark"
                               v-model="avSimEndTime" time-picker-inline format="yyyy-MM-dd  hh:00"
-                              :disabled="isCalibrationTuningControlsDisabled()" />
-                            <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
+                              :disabled="!isTimeRangeSet()" />
+                            <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
 
                         </tr>
@@ -116,8 +116,8 @@
 
                             <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark"
                               v-model="avCalStartTime" time-picker-inline format="yyyy-MM-dd  hh:00"
-                              :disabled="isCalibrationTuningControlsDisabled()" />
-                            <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
+                              :disabled="!isTimeRangeSet()" />
+                            <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
                           <td class="pl-6">
                             <label for="ValidationEnd" class="whitespace-nowrap">Validation End:</label>
@@ -126,8 +126,8 @@
 
                             <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
                               time-picker-inline format="yyyy-MM-dd  hh:00"
-                              :disabled="isCalibrationTuningControlsDisabled()" />
-                            <div v-if="isCalibrationTuningControlsDisabled()" class="overlay"></div>
+                              :disabled="!isTimeRangeSet()" />
+                            <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
                           </td>
 
@@ -143,7 +143,7 @@
       </div>
 
       <div class="">
-        <div class="grid grid-rows-2">
+        <div class="grid grid-rows-2" @click="handleFormulationNotSet">
 
           <div class="row-span-1 text-left">
             <div class="grid grid-cols-2">
@@ -152,13 +152,18 @@
                 <div class="">
                   <div class="mt-1 mb-3 hr"></div>
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
-                  <div class="mt-2 text-sm">
-                    <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable">
+                  <div class="mt-2 text-sm" style="position: relative;">
+                    <Select
+                      id="OutVar"
+                      class="varInputs"
+                      v-model="selectedOutputVariable"
+                      :disabled="!isFormulationDataSet()" >
                       <option v-for="outputVariable in outputVariables" :key="outputVariable.name"
                         :value="outputVariable.name">
                         {{ outputVariable.name }}
                       </option>
                     </Select>
+                    <div v-if="!isFormulationDataSet()" class="overlay"></div>
                   </div>
                 </div>
               </div>
@@ -173,29 +178,31 @@
                   <Select id="ParamFile" class="varInputs inline-block mt-2 text-sm">
                     <option value="" selected disabled>...</option>                    
                   </Select> -->
-                  <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
+                  <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
                     <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-                    <button @click="triggerFileInput">Load</button>
+                    <button @click="triggerFileInput" :disabled="!isFormulationDataSet()">Load</button>
+                    <div v-if="!isFormulationDataSet()" class="overlay"></div>
                   </div>
                 </div>
 
-                <div class="text-left mt-3 text-sm">
+                <div class="text-left mt-3 text-sm" style="position: relative;">
                   <div class="inline-block text-left"><label for="ParamName">Name:</label></div><br />
-                  <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter">
+                  <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter" :disabled="!isFormulationDataSet()">
                     <option v-for="param in calibrationTuningParameters" :key="param.name" :value="param.name">
                       {{ param.name }}
                     </option>
                   </Select>
                   <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
-                    <button @click="addParameterToTable">Add</button>
+                    <button @click="addParameterToTable" :disabled="!isFormulationDataSet()">Add</button>
                   </div>
+                  <div v-if="!isFormulationDataSet()" class="overlay"></div>
                 </div>
               </div>
 
             </div>
           </div>
 
-          <div id="TuningDataList" class="mt-5">
+          <div id="TuningDataList" class="mt-5" style="position: relative;">
             <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px">
               <!-- parameter column, uneditable with light grey background -->
               <Column field="parameter" header="Parameter" sortable>
@@ -233,6 +240,7 @@
                 </template>
               </Column>
             </DataTable>
+            <div v-if="!isFormulationDataSet()" class="overlay"></div>
           </div>
 
         </div>
@@ -256,6 +264,7 @@ import { DateTime } from "luxon";
 
 import { calculateTimeRange } from "~/utils/TimeHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
+import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
@@ -266,6 +275,12 @@ const { getCalibrationTabIndex } = generalStore();
 const { ngencerfBaseUrl } = useBackendConfig();
 const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
+
+const {
+  formulationNameInput,
+  selectedModuleValues,
+  slothParameterInputs
+} = storeToRefs(useFormulationStore());
 
 const { fetchUserCalibrationRunData, getAccessToken } = userDataStore;
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -369,22 +384,47 @@ onMounted(async () => {
   isLoading.value = false;
 });
 
-const isCalibrationTuningControlsDisabled = (): boolean => {
+/**
+ * Check if time_range is set
+ * @returns boolean
+ */
+const isTimeRangeSet = (): boolean => {
   const timeRange = userCalibrationRunData?.value?.time_range;
   
   if (timeRange && Object.keys(timeRange).length > 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+/**
+ * Check if formulation data is set
+ * @returns boolean
+ */
+const isFormulationDataSet = (): boolean => {
+  if (formulationNameInput.value == "" && selectedModuleValues?.value.length === 0 && slothParameterInputs?.value.length === 0) {
+    // console.log("Formulation data not set");
     return false;
   } else {
+    // console.log("Formulation data set");
     return true;
   }
 };
 
 const handleCalibrationTimeControlsClick = (event: Event) => {
-  if (isCalibrationTuningControlsDisabled()) {
-    event.preventDefault(); // Prevent any default action
-    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls as calibration_times are not set.', life: 10000 });
+  if (!isTimeRangeSet()) {
+    event.preventDefault(); // Prevent any default action if time_range is not set
+    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because calibration_times are not set.', life: 10000 });
   }
-}
+};
+
+const handleFormulationNotSet = (event: Event) => {
+  if (!isFormulationDataSet()) {
+    event.preventDefault(); // Prevent any default action
+    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or paraemters because formulation data is not set.', life: 10000 });
+  }
+};
 
 // watch for changes to the simulation and calibration times and handle validation
 watch([simStartTime, simEndTime, calStartTime, calEndTime], () => areCalibrationTimesValidated(false));
