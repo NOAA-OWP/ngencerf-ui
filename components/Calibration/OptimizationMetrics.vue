@@ -6,7 +6,7 @@
             <div id="OptAlg" class="mt-2">
                <label for="OptimizationAlgorithm">Optimization Algorithm</label>
                <Select id="OptimizationAlgorithm" class="mt-1" v-model="uiOptimization"
-                  :options="getOptimizationAlgorithmOptionsList" optionLabel="name" optionValue="name" placeholder=""
+                  :options="getOptimizationAlgorithmOptionsList" filter optionLabel="name" optionValue="name" placeholder=""
                   @change="optimizationSelectChange"></Select>
             </div>
 
@@ -47,7 +47,7 @@
          <div class="col-span-1">
             <div id="ObjFunct">
                <label for="ObjectiveFunction<">Objective Function</label>
-               <Select id="ObjectiveFunction" class="rounded-md" v-model="uiObjectiveFunction"
+               <Select id="ObjectiveFunction" class="rounded-md" filter v-model="uiObjectiveFunction"
                   :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
                   @change="updateMetricFlowFieldVisibility"></Select>
                <div v-if="showObjectiveFunctionStreamFlow">
