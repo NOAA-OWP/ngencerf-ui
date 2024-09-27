@@ -106,7 +106,7 @@ const NavigateNextContent = (e: MouseEvent) => {
 };
 
 const showOrHideSaveStartButton = (): boolean => {
-  if (getCalibrationTabIndex() < 4) {
+  if (getCalibrationTabIndex() <= 4) {
     return true;
   }
   else if (getCalibrationTabIndex() === 5) {
