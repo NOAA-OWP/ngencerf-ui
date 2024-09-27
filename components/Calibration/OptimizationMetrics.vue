@@ -70,7 +70,9 @@
                   :binary="true" v-model="cbIsCategorical" :disabled="cbCategoricalDisabled"
                   @change="toggleMetricStreamFlowInput" />
                <label for="CalcCatMetCB" class="inline">Calculate Categorical Metrics</label>
-               <div class="pl-8">(POD, CSI, FAR)</div>
+               <div class="pl-8">
+                  <span class="text-sm ml-2">(POD, CSI, FAR)</span>
+               </div>
                <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-1 pl-8">
                   Flow Threshold: <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
                      class="w-24"></InputNumber> m3/s
@@ -80,7 +82,9 @@
                   style="display:inline-block" :binary="true" v-model="cbIsEvenBased" :disabled="cbEventBasedDisabled"
                   @change="toggleMetricPeakFlowInput" />
                <label for="CalEventMetCB" class="inline">Calculate Event Based Metrics</label>
-               <div class="pl-8">(PKBIAS, PKTE, EVBIAS)</div>
+               <div class="pl-8">
+                  <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
+               </div>
                <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-1 pl-8">
                   Peak Flow Threshold: <InputNumber inputId="metricEventBasedFlowThreshold"
                      v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
@@ -106,8 +110,8 @@
             <div id="PlotGenFreq" class="bordered">
                <label for="PlotFrequency">Plot Generation Frequency (0 = off)</label><br>
                Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency"
-                  v-model="uiPlotFrequency" showButtons :min="0"></InputNumber>
-               <span class="text-sm ml-2">Interations</span>
+                  v-model="uiPlotFrequency" showButtons :min="0"></InputNumber>&nbsp;&nbsp;Iterations
+
             </div>
          </div>
 

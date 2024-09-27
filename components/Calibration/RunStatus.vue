@@ -7,11 +7,11 @@
             <div class="col-span-1">
               <table>
                 <tbody>
-                  <tr>
+                  <tr height="45px">
                     <td class="text-right font-bold">Start Time:</td>
                     <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr>
+                  <tr height="45px">
                     <td class="text-right font-bold">Running Time:</td>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
