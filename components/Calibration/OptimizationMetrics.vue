@@ -261,7 +261,7 @@ useListen('calibrationButtonResetCancel', (actionButton) => {
 })
 
 useListen('calibrationButtonNext', (actionButton) => {
-   if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
+   if (getCalibrationTabIndex() == 5 && actionButton === "NEXT") {
       emitterOff('calibrationButtonNext');
       if (!uiOptimization.value) {
          toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
@@ -271,7 +271,6 @@ useListen('calibrationButtonNext', (actionButton) => {
       }
       if (!uiOptimization.value || !uiObjectiveFunction.value) {
          setTimeout(() => gotoNext(), 3000);
-         return;
       }
       gotoNext();
    }
