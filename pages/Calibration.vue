@@ -32,7 +32,7 @@ onBeforeMount(() => {
 onMounted(() => {
   const allTabs = document.getElementsByClassName("tabs");
   console.log("All Tabs: ", allTabs)
-  const e = allTabs[1] as HTMLElement;
+  const e = allTabs[0] as HTMLElement;
   e.click();
   setMenuIndex(1); // Saves the menu pointer
 });

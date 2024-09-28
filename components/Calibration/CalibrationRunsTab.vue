@@ -142,12 +142,18 @@ const createNewCalibration = async () => {
     if (calibrationJobId.value > 0) {
       queryUserCalibrationRunData().then(queryResponse => {
         userCalibrationRunData.value = queryResponse?._data;
-        navigateTo('/Calibration');
+        gotoHeadwaterBasinGage();
       });
     } else {
       toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 });
     }
   }
+}
+
+const gotoHeadwaterBasinGage = () => {
+const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[1];
+  e.click();
 }
 
 /**

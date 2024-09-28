@@ -5,7 +5,7 @@
         <div class="grid grid-cols-3">
           <div class="col-span-2">
 
-            <span v-if="location.name === 'Calibration' && currentCalibrationTab > 1">
+            <span v-if="location.name === 'Calibration' && getCalibrationTabIndex() > 1">
               <div id="ActionButtons" class="footerColor"
                 v-if="canDisplayBeforeRun">
                 <CalibrationButtonGroup />
@@ -44,7 +44,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRoute } from "vue-router";
 
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
-const currentCalibrationTab = ref(getCalibrationTabIndex());
+//const currentCalibrationTab = ref(getCalibrationTabIndex());
 
 const { isUserLoggedIn } = useUserDataStore();
 const location = useRoute();
