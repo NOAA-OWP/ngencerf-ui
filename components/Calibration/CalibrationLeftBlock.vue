@@ -20,9 +20,6 @@
       <span v-else-if="activeTab == 6">
         <RunStatus />
       </span>
-      <span v-else="activeTab == 7">
-        <Results />
-      </span>
     </div>
   </div>
 </template>
@@ -37,7 +34,6 @@ const Formulation = defineAsyncComponent(() => import('~/components/Calibration/
 const TuningControls = defineAsyncComponent(() => import('~/components/Calibration/TuningControls.vue'))
 const OptimizationMetrics = defineAsyncComponent(() => import('~/components/Calibration/OptimizationMetrics.vue'))
 const RunStatus = defineAsyncComponent(() => import('~/components/Calibration/RunStatus.vue'))
-const Results = defineAsyncComponent(() => import('~/components/Calibration/Results.vue'))
 const CalibrationRunsTab = defineAsyncComponent(() => import('~/components/Calibration/CalibrationRunsTab.vue'))
 import { generalStore } from "@/stores/common/GeneralStore";
 

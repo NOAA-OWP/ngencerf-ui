@@ -752,14 +752,17 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 });
 
 useListen('calibrationButtonPrev', (actionButton) => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[1];
-  e.click();
+  if (getCalibrationTabIndex() == 4 && actionButton === "PREV") {
+    emitterOff('calibrationButtonPrev');
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[2];
+    e.click();
+  }
 });
 
 useListen('calibrationButtonNext', (actionButton) => {
-    if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
-      emitterOff('calibrationButtonNext');
+  if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
+    emitterOff('calibrationButtonNext');
     let hasError = false;
     if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
       toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
@@ -783,7 +786,7 @@ useListen('calibrationButtonNext', (actionButton) => {
 
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[3];
+  const e = <HTMLElement>tabs[4];
   e.click();
 }
 </script>

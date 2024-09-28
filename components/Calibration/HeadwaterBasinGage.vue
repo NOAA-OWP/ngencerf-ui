@@ -171,13 +171,6 @@ const onGageSelectionChange = () => {
   fetchSelectedGageData()
 }
 
-useListen('calibrationButtonResetCancel', (actionButton) => {
-  if (getCalibrationTabIndex() == 2 && actionButton == 'RESET') {
-    resetUserSelectionGage();
-  }
-})
-
-
 const showForcingFileUploadDialog = (headerText: string) => {
   if (!fileUploadDialogOpened.value) {
     dialog.open(FileUploadDialog, {
@@ -268,6 +261,7 @@ const showGeopackagFileUploadDialog = (headerText: string) => {
  */
 useListen('calibrationButtonSaveStart', (actionButton) => {
   if (getCalibrationTabIndex() == 2 && actionButton == 'SAVE') {
+    emitterOff('calibrationButtonSaveStart');
     toast.removeAllGroups()
     const save_tab_response = saveGageTabData()
 
@@ -286,6 +280,7 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
   if (getCalibrationTabIndex() == 2 && actionButton == 'RESET') {
+    emitterOff('calibrationButtonResetCancel');
     resetUserSelectionGage()
   }
 })
@@ -309,7 +304,7 @@ useListen('calibrationButtonNext', (actionButton) => {
 
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[1];
+  const e = <HTMLElement>tabs[2];
   e.click();
 }
 

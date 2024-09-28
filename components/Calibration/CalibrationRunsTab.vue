@@ -99,11 +99,11 @@ const onRowContextMenu = (event: any) => {
 };
 
 onMounted(() => {
-  calibrationTabIndex.value = "1";
-  evaluationTabIndex.value = "1";
-  forecastTabIndex.value = "1";
-  useGageStore().resetGageStore();
-  clearUserCalibrationRunData();
+  // calibrationTabIndex.value = "1";
+  // evaluationTabIndex.value = "1";
+  // forecastTabIndex.value = "1";
+  // useGageStore().resetGageStore();
+  // clearUserCalibrationRunData();
   setTimeout(function () {
     loading.value = false;
   }, 500);
@@ -120,12 +120,9 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
   queryUserCalibrationRunData().then(queryResponse => {
     userCalibrationRunData.value = queryResponse?._data;
-
     const allTabs = document.getElementsByClassName("tabs");
     const e = allTabs[1] as HTMLElement;
     e.click();
-
-    //navigateTo('/Calibration');
   });
 }
 
@@ -136,6 +133,10 @@ const rowStyle = (data: any) => {
 }
 
 const createNewCalibration = async () => {
+  // Clear out old data
+  useGageStore().resetGageStore();
+  clearUserCalibrationRunData();
+
   const fetchedId = await fetchNewCalibrationRunId()
   if (fetchedId != undefined) {
     calibrationJobId.value = fetchedId
@@ -151,7 +152,7 @@ const createNewCalibration = async () => {
 }
 
 const gotoHeadwaterBasinGage = () => {
-const tabs = document.getElementsByClassName("tabs");
+  const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[1];
   e.click();
 }
