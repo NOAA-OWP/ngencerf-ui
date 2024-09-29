@@ -753,7 +753,6 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 
 useListen('calibrationButtonPrev', (actionButton) => {
   if (getCalibrationTabIndex() == 4 && actionButton === "PREV") {
-    emitterOff('calibrationButtonPrev');
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[2];
     e.click();
@@ -762,7 +761,6 @@ useListen('calibrationButtonPrev', (actionButton) => {
 
 useListen('calibrationButtonNext', (actionButton) => {
   if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
-    emitterOff('calibrationButtonNext');
     let hasError = false;
     if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
       toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })

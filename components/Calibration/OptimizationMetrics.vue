@@ -237,7 +237,6 @@ const optimizationSelectChange = () => {
  */
 useListen('calibrationButtonSaveStart', (actionButton) => {
    if (getCalibrationTabIndex() === 4 && actionButton == 'SAVE') {
-      emitterOff('calibrationButtonSaveStart');
       toast.removeAllGroups()
       const save_optimization_response = saveOptimizationTabData()
       save_optimization_response.then((response) => {
@@ -255,14 +254,12 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
    if (getCalibrationTabIndex() == 4 && actionButton == 'RESET') {
-      emitterOff('calibrationButtonResetCancel');
       resetUserSelectionOptimization()
    }
 })
 
 useListen('calibrationButtonNext', (actionButton) => {
    if (getCalibrationTabIndex() == 5 && actionButton === "NEXT") {
-      emitterOff('calibrationButtonNext');
       if (!uiOptimization.value) {
          toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
       }
@@ -284,7 +281,6 @@ const gotoNext = () => {
 
 useListen('calibrationButtonPrev', (actionButton) => {
    if (getCalibrationTabIndex() == 5 && actionButton === "PREV") {
-      emitterOff('calibrationButtonPrev');
       const tabs = document.getElementsByClassName("tabs");
       const e = <HTMLElement>tabs[3];
       e.click();

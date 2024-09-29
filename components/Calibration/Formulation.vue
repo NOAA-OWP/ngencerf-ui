@@ -216,7 +216,6 @@ useListen('calibrationButtonResetCancel', (actionButton) => {
 
 useListen('calibrationButtonNext', (actionButton) => {
   if (getCalibrationTabIndex() == 3 && actionButton === "NEXT") {
-    emitterOff('calibrationButtonNext');
     if (!formulationNameInput.value) {
       toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Forumulation Name is required.", life: 3000 })
     }
@@ -240,7 +239,6 @@ const gotoNext = () => {
 
 useListen('calibrationButtonPrev', (actionButton) => {
   if (getCalibrationTabIndex() == 3 && actionButton === "PREV") {
-    emitterOff('calibrationButtonPrev');
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[1];
     e.click();

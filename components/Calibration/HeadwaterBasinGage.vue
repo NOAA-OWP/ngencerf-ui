@@ -261,7 +261,6 @@ const showGeopackagFileUploadDialog = (headerText: string) => {
  */
 useListen('calibrationButtonSaveStart', (actionButton) => {
   if (getCalibrationTabIndex() == 2 && actionButton == 'SAVE') {
-    emitterOff('calibrationButtonSaveStart');
     toast.removeAllGroups()
     const save_tab_response = saveGageTabData()
 
@@ -280,14 +279,12 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
   if (getCalibrationTabIndex() == 2 && actionButton == 'RESET') {
-    emitterOff('calibrationButtonResetCancel');
     resetUserSelectionGage()
   }
 })
 
 useListen('calibrationButtonNext', (actionButton) => {  
   if ( getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
-    emitterOff('calibrationButtonNext');
     if (!selectedDomainValue.value) {
       toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Domain is required.", life: 3000 })
     }
