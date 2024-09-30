@@ -91,7 +91,6 @@ const toast = useToast();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
 const {
-  calibrationIsReady,
   calibrationStatus,
   startTimeDate,
   startTime,
@@ -109,7 +108,7 @@ const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
 
 const {
-  queryCalibrationIsReady,
+  queryGetCalibrationStatus,
   queryGetPlotNames,
   queryGetPlot,
   executeRunCalibration,
@@ -118,7 +117,6 @@ const {
 } = runStatusStore;
 
 const isLoading = ref(true);
-//const isCalibrationReady = ref();
 const iterations = ref();
 const iterationData = ref();
 const progress = ref();
@@ -290,8 +288,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 //       // if progress reaches 100, verify Calibration status is Done. calibrationStatus watch function will set stopCriteriaMet to true, clear intervals, and set progress to null
 //       if (progress.value >= 100) {
-//         isCalibrationReady.value = await queryCalibrationIsReady();
-//         if (isCalibrationReady.value?._data?.status === 'Done') {
+//         calibrationStatus.value = await queryGetCalibrationStatus();
+//         if (calibrationStatus.value?._data?.status === 'Done') {
 //           await fetchUserCalibrationRunData(); // update Calibration data
 //           calibrationStatus.value = 'Done';
 //           } else {
