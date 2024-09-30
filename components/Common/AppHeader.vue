@@ -8,7 +8,7 @@
       </div>
       <div id="Col2" class="col-span-8">
 
-        <ul v-show="isUserLoggedIn() && location.name !== 'Login' && location.name !== 'LandingPage'" id="MainMenu">
+        <ul v-show="isUserLoggedIn() && location.name !== 'Login'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
             <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
               @click="MenuChanged">Calibration</NuxtLink>

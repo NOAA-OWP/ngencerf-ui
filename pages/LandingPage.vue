@@ -18,9 +18,6 @@
               <div>Welcome <strong>{{ getUserName() }}</strong></div>
               <div>You have {{ runningCalibrationJobs }} current processes running</div>
               <div>You have {{ savedCalibrationJobs }}  calibration setups to complete</div>
-              <div id="ContinueBtn" class="ngenButtonDiv bg-blue1 btn-center mt-4" @click="GoPreviousRuns">
-                <button>Continue</button>
-                </div>
               </div>
             </div>
           </div>
@@ -45,49 +42,14 @@ const calibrationJobStore = useCalibrationJobStore()
 const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs( calibrationJobStore )
 const { fetchUserCalibrationJobsListData, getUserName } = useUserDataStore()
 
-fetchUserCalibrationJobsListData()
+onMounted( () => {
+  fetchUserCalibrationJobsListData();
+})
 
-const GoPreviousRuns = async () => {
-  await navigateTo("Calibration");
-}
+
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-/*
-#CenterBox {
-  border: 4px solid #105D84;
-  line-height: 2em;
-  font-size: 22px;
-  padding-top: 20px;
-  margin: 0 auto;
-  width: 600px;
-  height: 265px;
-  background-color: $ngwcp_groupsbkg;
-  ;
-  border-radius: 50px;
-  text-align: center;
-}*/
-
-/*
-#ContinueBtn {
-  margin: 30px auto 0 auto;
-  width: 120px;
-  height: 50px;
-  background-color: $ngwcp_primary1;
-  border-radius: 30px;
-  color: #ffffff;
-  border: 2px solid #000;
-}
-
-#ContinueBtn:hover {
-  background-color: $ngwcp_primary2;
-  color: #000;
-}*/
-
-#ContinueBtn {
-  max-width: 110px;
-}
-
 .pgTitle {
   font-size: 30px;
   text-align: center;

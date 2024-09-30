@@ -34,7 +34,7 @@ const Formulation = defineAsyncComponent(() => import('~/components/Calibration/
 const TuningControls = defineAsyncComponent(() => import('~/components/Calibration/TuningControls.vue'))
 const OptimizationMetrics = defineAsyncComponent(() => import('~/components/Calibration/OptimizationMetrics.vue'))
 const RunStatus = defineAsyncComponent(() => import('~/components/Calibration/RunStatus.vue'))
-const CalibrationRunsTab = defineAsyncComponent(() => import('~/components/Calibration/CalibrationRunsTab.vue'))
+const CalibrationRunsTab = defineAsyncComponent(() => import('~/components/Calibration/PreviousCalibrationRuns.vue'))
 import { generalStore } from "@/stores/common/GeneralStore";
 
 const { getCalibrationTabIndex, setCalibrationTabIndex } = generalStore();
