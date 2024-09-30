@@ -26,7 +26,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
-                            time-picker-inline format="yyyy-MM-dd  hh:00"
+                            time-picker-inline text-input format="yyyy-MM-dd hh:00"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -35,7 +35,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
-                            time-picker-inline format="yyyy-MM-dd  hh:00"
+                            time-picker-inline text-input format="yyyy-MM-dd hh:00"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -46,7 +46,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
-                            time-picker-inline format="yyyy-MM-dd  hh:00"
+                            time-picker-inline text-input format="yyyy-MM-dd hh:00"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -55,7 +55,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
-                            time-picker-inline format="yyyy-MM-dd  hh:00"
+                            time-picker-inline text-input format="yyyy-MM-dd hh:00"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -88,7 +88,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
-                              v-model="avSimStartTime" time-picker-inline format="yyyy-MM-dd  hh:00"
+                              v-model="avSimStartTime" time-picker-inline text-input format="yyyy-MM-dd hh:00"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
@@ -98,7 +98,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark"
-                              v-model="avSimEndTime" time-picker-inline format="yyyy-MM-dd  hh:00"
+                              v-model="avSimEndTime" time-picker-inline text-input format="yyyy-MM-dd hh:00"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
@@ -111,7 +111,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark"
-                              v-model="avCalStartTime" time-picker-inline format="yyyy-MM-dd  hh:00"
+                              v-model="avCalStartTime" time-picker-inline text-input format="yyyy-MM-dd hh:00"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
@@ -120,7 +120,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
-                              time-picker-inline format="yyyy-MM-dd  hh:00"
+                              time-picker-inline text-input format="yyyy-MM-dd hh:00"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
@@ -348,14 +348,14 @@ onMounted(async () => {
     rangeDateFrom.value = timeRange?.start_time;
     rangeDateTo.value = timeRange?.end_time;
   } else {
-    // timeRange not provided. set timeRange one month before and after the calibration times
+    // time_range is not set. Cannot proceed
     toast.add({ severity: 'warn', summary: 'time_range is not set', life: 10000 });
   }
 
   const calibrationTuningModules = loadTuningTabData.value?._data?.modules;
 
   // set the calibration tuning parameters
-  calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module.parameters.map((param: any) => ({
+  calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
     name: param.name,
     minimum: param.minimum,
     maximum: param.maximum,
@@ -365,7 +365,7 @@ onMounted(async () => {
   console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
 
   // set output variables
-  outputVariables.value = calibrationTuningModules?.flatMap((module: any) => module.output_variables.map((outputVar: any) => ({
+  outputVariables.value = calibrationTuningModules?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
     name: outputVar.name,
     description: outputVar.description,
     module: module.name,
@@ -416,7 +416,7 @@ const isFormulationDataSet = (): boolean => {
 const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
-    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because calibration_times are not set.', life: 10000 });
+    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because time_range is not set.', life: 10000 });
   }
 };
 
@@ -426,9 +426,6 @@ const handleFormulationNotSet = (event: Event) => {
     toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or paraemters because formulation data is not set.', life: 10000 });
   }
 };
-
-// watch for changes to the simulation and calibration times and handle validation
-watch([simStartTime, simEndTime, calStartTime, calEndTime], () => areCalibrationTimesValidated(false));
 
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
@@ -442,15 +439,6 @@ watch(selectedOutputVariable, () => {
   }
   //console.log("selectedOutputVariable:", selectedOutputVariable.value);
   //console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
-});
-
-// watch for changes to automatic validation times and handle validation
-watch([avSimStartTime, avSimEndTime, avCalStartTime, avCalEndTime], () => {
-  // check if automatic_validation is enabled and validation_times are set
-  if (avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value && automatic_validation.value) {
-    // validate validation_times
-    areValidationTimesValidated();
-  }
 });
 
 /**
