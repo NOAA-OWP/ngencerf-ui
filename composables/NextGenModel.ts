@@ -357,8 +357,10 @@ export interface CalibrationRunStatusTabData {
 
 }
 
-export interface CalibrationIsReadyResponse {
+export interface CalibrationStatus {
   message: string;
+  calibration_run_id: number;
+  status: string;
   errors: string[];
 }
 
