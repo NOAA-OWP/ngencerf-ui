@@ -328,7 +328,7 @@ watch(selectedPlotName, async () => {
 
 // Run Calibration Job
 useListen('calibrationButtonSaveStart', async (actionButton) => {
-  if (getCalibrationTabIndex() === 5 && actionButton === 'START' && calibrationStatus.value === 'Ready') {
+  if (getCalibrationTabIndex() === 6 && actionButton === 'START' && calibrationStatus.value === 'Ready') {
     try {
       console.log('hitting run_calibration endpoint');
       const runCalibrationResponse = await executeRunCalibration();
@@ -351,7 +351,7 @@ useListen('calibrationButtonSaveStart', async (actionButton) => {
 
 // Cancel Calibration Job
 useListen('calibrationButtonResetCancel', async (actionButton) => {
-  if (getCalibrationTabIndex() === 5 && actionButton === 'CANCEL' && calibrationStatus.value === 'Running') {
+  if (getCalibrationTabIndex() === 6 && actionButton === 'CANCEL' && calibrationStatus.value === 'Running') {
     try {
       console.log('hitting cancel_job endpoint');
       const cancelCalibrationResponse = await cancelCalibrationJob();

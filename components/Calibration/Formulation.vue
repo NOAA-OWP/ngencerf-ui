@@ -21,8 +21,9 @@
             <div class="mt-2 text-left"><strong>Select Modules</strong></div>
             <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
               <label for="Groups">Groups:</label>
-              <Select id="Groups" v-model="filterGroup" filter :options="fetchFormulationModuleCoveredGroupFilterOptions"
-                optionLabel="description" optionValue="name" placeholder="ALL"></Select>
+              <Select id="Groups" v-model="filterGroup" filter
+                :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description" optionValue="name"
+                placeholder="ALL"></Select>
             </div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
               optionLabel="name" optionValue="name" class="w-full h-60"></Listbox>
@@ -79,12 +80,14 @@
               </Column>
               <Column field="param_type" header="Type" sortable>
                 <template #editor="{ index }">
-                  <Select v-model="slothParameterInputs[index].param_type" :options="fetchFormulationSlothParameterTypeOptions" optionLabel="name" optionValue="name"></Select>
+                  <Select v-model="slothParameterInputs[index].param_type"
+                    :options="fetchFormulationSlothParameterTypeOptions" optionLabel="name" optionValue="name"></Select>
                 </template>
               </Column>
               <Column field="param_units" header="Units" sortable>
                 <template #editor="{ index }">
-                  <Select v-model="slothParameterInputs[index].param_units" :options="fetchFormulationSlothParameterUnitOptions" optionLabel="name" optionValue="name"></Select>
+                  <Select v-model="slothParameterInputs[index].param_units"
+                    :options="fetchFormulationSlothParameterUnitOptions" optionLabel="name" optionValue="name"></Select>
                 </template>
               </Column>
               <Column field="param_location" header="Location" sortable>
@@ -94,8 +97,9 @@
                 </template>
               </Column>
               <Column field="maps_to_module" header="For Module" sortable>
-                <template #editor="{ index }">                  
-                  <Select v-model="slothParameterInputs[index].maps_to_module" filter :options="fetchSelectedFormulationModuleOptions" optionLabel="name" optionValue="name"></Select>
+                <template #editor="{ index }">
+                  <Select v-model="slothParameterInputs[index].maps_to_module" filter
+                    :options="fetchSelectedFormulationModuleOptions" optionLabel="name" optionValue="name"></Select>
                 </template>
               </Column>
               <Column field="maps_to_variable_name" header="Module Param" sortable>
@@ -106,7 +110,8 @@
               </Column>
               <Column field="param_value" header="Value" sortable>
                 <template #editor="{ index }">
-                  <InputNumber v-model="slothParameterInputs[index].param_value" autofocus :minFractionDigits="0" :maxFractionDigits="2" class="w-12 p-1" fluid>
+                  <InputNumber v-model="slothParameterInputs[index].param_value" autofocus :minFractionDigits="0"
+                    :maxFractionDigits="2" class="w-12 p-1" fluid>
                   </InputNumber>
                 </template>
               </Column>
@@ -187,7 +192,7 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
  * event bus for calibration button group click
  */
 useListen('calibrationButtonSaveStart', (actionButton) => {
-  if (getCalibrationTabIndex() === 2 && actionButton == 'SAVE') {
+  if (getCalibrationTabIndex() === 3 && actionButton == 'SAVE') {
     toast.removeAllGroups()
     const save_formulation_response = saveFormulationTabData()
     save_formulation_response.then((response) => {
@@ -204,14 +209,13 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 })
 
 useListen('calibrationButtonResetCancel', (actionButton) => {
-  if (getCalibrationTabIndex() == 2 && actionButton == 'RESET') {
+  if (getCalibrationTabIndex() == 3 && actionButton == 'RESET') {
     resetUserSelectionFormulation()
   }
 })
 
 useListen('calibrationButtonNext', (actionButton) => {
-  if (getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
-    emitterOff('calibrationButtonNext');
+  if (getCalibrationTabIndex() == 3 && actionButton === "NEXT") {
     if (!formulationNameInput.value) {
       toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Forumulation Name is required.", life: 3000 })
     }
@@ -229,14 +233,16 @@ useListen('calibrationButtonNext', (actionButton) => {
 
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[2];
+  const e = <HTMLElement>tabs[3];
   e.click();
 }
 
 useListen('calibrationButtonPrev', (actionButton) => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[0];
-  e.click();
+  if (getCalibrationTabIndex() == 3 && actionButton === "PREV") {
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[1];
+    e.click();
+  }
 })
 
 </script>
