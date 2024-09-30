@@ -12,6 +12,8 @@ export const generalStore = defineStore(
     const calibrationTabIndex = ref("1");
     const evaluationTabIndex = ref("1");
     const forecastTabIndex = ref("1");
+    const verificationTabIndex = ref("1");
+
     const menuIndex = ref("1");
 
     const calibrationJobId = ref<number>( 0 );
@@ -52,24 +54,34 @@ export const generalStore = defineStore(
       forecastTabIndex.value = tab.toString();
     }
 
+    //  Verification Tab index
+    function getVerificationTabIndex() {
+      return parseInt(verificationTabIndex.value);
+    }
+    function setVerificationTabIndex(tab: number) {
+      verificationTabIndex.value = tab.toString();
+    }
+
     // Previous calibration run for Evaluation
     function getEvalRunSelected() {
       return evaluationRunSelected.value;
     }
-    
+
     function setEvalRunSelected(b: boolean) {
       evaluationRunSelected.value = b;
     }
 
-    return { 
+    return {
       getMenuIndex,
-      setMenuIndex,      
-      getCalibrationTabIndex, 
+      setMenuIndex,
+      getCalibrationTabIndex,
       setCalibrationTabIndex,
       getEvaluationTabIndex,
       setEvaluationTabIndex,
       getForecastTabIndex,
       setForecastTabIndex,
+      getVerificationTabIndex,
+      setVerificationTabIndex,
       getEvalRunSelected,
       setEvalRunSelected,
       calibrationJobId,

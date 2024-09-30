@@ -12,24 +12,24 @@ export const useGageStore = defineStore('GageStore', () => {
   /**
   * ref section
   */
-  const { calibrationJobId } = storeToRefs(generalStore())
-  const domainOptionsList = ref<SelectOption[]>([])
-  const gageOptionsList = ref<SelectOption[]>([])
-  const isNWMv3 = ref<boolean>(false)
+  const { calibrationJobId } = storeToRefs(generalStore());
+  const domainOptionsList = ref<SelectOption[]>([]);
+  const gageOptionsList = ref<SelectOption[]>([]);
+  const isNWMv3 = ref<boolean>(false);
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken } = useUserDataStore()
-  const userDataStore = useUserDataStore()
-  const { userCalibrationRunData } = storeToRefs(userDataStore)
-  const gageTabData = ref<GageTabData>()
-  const geopackageImageUrl = ref<string>("")
-  const selectedDomainValue = ref<string>("")
-  const selectedGageValue = ref<string>("")
-  const selectedForcingValue = ref<string>("")
-  const selectedObservationalValue = ref<string>("")
-  const selectedGeopackageValue = ref<string>("")
-  const gageData = ref<GageData>()
+  const { getAccessToken } = useUserDataStore();
+  const userDataStore = useUserDataStore();
+  const { userCalibrationRunData } = storeToRefs(userDataStore);
+  const gageTabData = ref<GageTabData>();
+  const geopackageImageUrl = ref<string>("");
+  const selectedDomainValue = ref<string>("");
+  const selectedGageValue = ref<string>("");
+  const selectedForcingValue = ref<string>("");
+  const selectedObservationalValue = ref<string>("");
+  const selectedGeopackageValue = ref<string>("");
+  const gageData = ref<GageData>();
 
-  const data_loading = ref<boolean>(true)
+  const data_loading = ref<boolean>(true);
 
   const loadGageTabStaticData = () => { 
     data_loading.value = true
@@ -149,7 +149,7 @@ export const useGageStore = defineStore('GageStore', () => {
       })
     })
 
-    geopackageImageUrl.value = saveGageTabDataResponse?.geopackage_image_url ?? ""
+    geopackageImageUrl.value = saveGageTabDataResponse?._data?.geopackage_image_url ?? ""
 
     return saveGageTabDataResponse?._data
   }
@@ -270,6 +270,11 @@ export const useGageStore = defineStore('GageStore', () => {
     resetGageStore,
     loadGageTabStaticData
   }
+}, 
+{
+  persist: {
+    storage: persistedState.localStorage
+  },
 })
 
 /* Pinia supports Hot Module replacement so you can edit your stores

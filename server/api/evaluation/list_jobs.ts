@@ -84,7 +84,5 @@ const evaluation_jobs = [
 
 
 export default defineEventHandler( () => {
-  return {
-    evaluation_jobs,
-  }
+  return evaluation_jobs
 })

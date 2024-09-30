@@ -206,6 +206,11 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     resetOptimizationStore,
     loadOptimizationTabStaticData
   }
+}, 
+{
+  persist: {
+    storage: persistedState.localStorage
+  },
 })
 
 /* Pinia supports Hot Module replacement so you can edit your stores

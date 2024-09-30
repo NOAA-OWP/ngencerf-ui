@@ -1,12 +1,10 @@
 <template>
-
-  <table id="CalibrationProgressTable" class="prevent-select">
-
+  <table id="CalibrationProgressTable" class="progressTable prevent-select">
     <tbody>
       <tr>
-        <td><i v-if="selectedDomainValue" :class="selectedDomainValue ? 'checkMark' : ''"
+        <td><i v-if="selectedDomainValue && selectedGageValue" :class="(selectedDomainValue && selectedGageValue) ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="1" title="Headwater Basin Gage" aria-lable="Headwater Basin Gage"
+        <td class="ptype whitespace-nowrap" data-tab="1" title="Headwater Basin Gage" aria-label="Headwater Basin Gage"
           @click="tabClicked">
           Headwater Basin Gage</td>
       </tr>
@@ -14,46 +12,46 @@
         <td><i v-if="formulationNameInput && selectedModuleValues.length"
             :class="formulationNameInput && selectedModuleValues.length ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td class="ptype" data-tab="2" title="Formulation" aria-lable="Formulation" @click="tabClicked">Formulation</td>
+        <td class="ptype" data-tab="2" title="Formulation" aria-label="Formulation" @click="tabClicked">Formulation</td>
       </tr>
       <tr>
         <td><i v-if="calStartTime && calEndTime && simStartTime && simEndTime"
             class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="3" title="Start and End Times" aria-lable="Start and End Times"
+        <td class="ptype whitespace-nowrap" data-tab="3" title="Start and End Times" aria-label="Start and End Times"
           @click="tabClicked">
           Start and End Times</td>
       </tr>
       <tr>
         <td><i v-if="userOutputVariableToCalibrate.name" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype whitespace-nowrap" data-tab="3" title="Calibration Output Variable"
-          aria-lable="Calibration Output Variable" @click="tabClicked">Calibration Output Variable</td>
+          aria-label="Calibration Output Variable" @click="tabClicked">Calibration Output Variable</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationTuningParameters.length" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="3" title="Tuning Parameters" aria-lable="Tuning Parameters"
+        <td class="ptype whitespace-nowrap" data-tab="3" title="Tuning Parameters" aria-label="Tuning Parameters"
           @click="tabClicked">Tuning
           Parameters</td>
       </tr>
       <tr>
         <td><i v-if="uiOptimization" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype whitespace-nowrap" data-tab="4" title="Optimization Algorithm"
-          aria-lable="Optimization Algorithm" @click="tabClicked">Optimization Algorithm</td>
+          aria-label="Optimization Algorithm" @click="tabClicked">Optimization Algorithm</td>
       </tr>
       <tr>
         <td><i v-if="uiObjectiveFunction" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="4" title="Objective Function" aria-lable="Objective Function"
+        <td class="ptype whitespace-nowrap" data-tab="4" title="Objective Function" aria-label="Objective Function"
           @click="tabClicked">
           Objective Function</td>
       </tr>
       <tr>
         <td><i v-if="uiStopCriteria" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype whitespace-nowrap" data-tab="4" title="Calibration Stop Criteria"
-          aria-lable="Calibration Stop Criteria" @click="tabClicked">Calibration Stop Criteria</td>
+          aria-label="Calibration Stop Criteria" @click="tabClicked">Calibration Stop Criteria</td>
       </tr>
       <tr>
         <td><i v-if="uiPlotFrequency" class="pi pi-check font-bold checkMark"></i></td>
         <td class="ptype whitespace-nowrap" data-tab="4" title="Metrics and Plot Inteval"
-          aria-lable="Metrics and Plot Inteval" @click="tabClicked">Metrics / Plot Inteval</td>
+          aria-label="Metrics and Plot Inteval" @click="tabClicked">Metrics / Plot Inteval</td>
       </tr>
     </tbody>
   </table>
@@ -131,30 +129,3 @@ const tabClicked = (event: Event) => {
 </script>
 
 
-<style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
-
-#CalibrationProgressTable {
-  width: 100%;
-  margin-left: 15px;
-
-  table {
-    tr {
-      line-height: calc(1.3vw + 0.41vh); // font-size: 14px;
-    }
-
-    .checkMark {
-      text-align: right;
-    }
-
-    .ptype {
-      width: 90%;
-      cursor: pointer;
-    }
-
-    .ptype:hover {
-      color: $ngwcp_primary1;
-    }
-  }
-}
-</style>

@@ -318,18 +318,49 @@ select option {
 #ProgressGroup {
   width: 100%;
   padding: 0px 10px 0 0;
-  tr {
-    line-height: calc(1.3vw + 0.41vh); 
-  }
-  .checkMark {
-    text-align: right;
-  }
-  .ptype {
-    width: 90%;
-  }
+  margin-left: 0px;  
   table {
     th, td {
-      padding-left: 8px;
+      padding-left: 5px;
+      font-size: 97%;
+    }
+    td:first-child {
+      padding-left: 0px;
+    }
+    tr {
+      line-height: calc(1.3vw + 0.41vh); 
+    }
+    .checkMark {
+      text-align: right;
+    }
+    .ptype {
+        width: 90%;
+        cursor: pointer;
+    }
+    .ptype:hover {
+        color: $ngwcp_primary1;
+    }
+  }
+}
+
+table.alt-row-colors {
+  th, td {
+    padding-left: 8px;
+  }
+  tr:nth-child(even) {
+    background-color: $ngwcp_neutral_gray_lt;
+  }
+  tr:nth-child(odd) {
+    background-color: $ngwcp_neutral_gray_md;
+  }
+}
+table.cols-bordered {
+  border: 1px solid #e6e6e6;
+  border-width: 3px 0 3px 3px;
+  tr {
+
+    td {
+      border-right: 3px solid #e6e6e6;
     }
   }
 }
@@ -353,6 +384,7 @@ select option {
   font-size: 2em;
   font-weight: bold;
   margin-bottom: 10px;
+  line-height: 1.3em;
 }
 
 ._help-subtitle {
@@ -382,4 +414,44 @@ select option {
 
 ._help-page p {
   line-height: 2em;
+}
+
+/* Right Side Blocks */
+#TopRightBlock {
+  padding: 10px;
+  height: fit-content;
+}
+
+#MessagesGroup {
+  font-size: .9em;
+}
+
+#GageCutout {
+  margin-right: 5px;
+  max-height: 300px;
+
+}
+
+/* Progress Tables */
+.progressTable {
+  width: 100%;
+  margin-left: 15px;
+
+  table {
+    tr {
+      line-height: calc(1.3vw + 0.41vh); // font-size: 14px;
+    }
+  }
+}
+.checkMark {
+  text-align: right;
+}
+
+.ptype {
+  width: 90%;
+  cursor: pointer;
+}
+
+.ptype:hover {
+  color: $ngwcp_primary1;
 }

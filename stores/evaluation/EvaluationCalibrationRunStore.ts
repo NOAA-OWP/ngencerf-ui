@@ -5,20 +5,56 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
-import type { SelectOption, GageTabData, GeneralApiSaveResponse, GeneralErrorResponse, SaveGageTabResponse } from "~/composables/NextGenModel";
+import type { SelectOption } from "~/composables/NextGenModel";
 import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {
    const calibrationRunList = ref<any[]>([]);
+   const userSelectedEvalCalibrationRunId = ref<number>( 0 )
+   const uiGageId = ref<string>( "" );
 
    const fetchEvaluationCalibrationRunList = async () => {
       const { data, status, error } = await useFetch('/api/evaluation/list_jobs');
-      console.log( data )
+      calibrationRunList.value = data.value ?? [];
    };
 
+   /**
+    * @returns {SelectOption[]}
+    */
+   const evaluationCalibrationRunGageList = computed( () => {
+      let gageOptionList = <SelectOption[]>[];
+      calibrationRunList.value.forEach( runItem => {
+         const checkGageIndex = gageOptionList.findIndex( gageOption => {
+            gageOption.name === runItem.gage_id 
+         });
+         
+         if ( checkGageIndex == -1 ) {
+            gageOptionList.push({
+               'name': runItem.gage_id,
+               'description': runItem.gage_id
+            });
+         }
+      });
+      return gageOptionList;
+   });
+
+   const filteredEvaluationCalibrationRunList = computed( () => {
+      let runList = <any[]>[];
+      calibrationRunList.value.forEach( runItem => {
+         if ( uiGageId.value == "" || uiGageId.value == runItem.gage_id ) {
+            runList.push( runItem );
+         }
+      });
+      return runList;
+   });
+
    return {
+      uiGageId,
       calibrationRunList,
-      fetchEvaluationCalibrationRunList
+      fetchEvaluationCalibrationRunList,
+      filteredEvaluationCalibrationRunList,
+      evaluationCalibrationRunGageList,
+      userSelectedEvalCalibrationRunId
    }
 })
 

@@ -1,4 +1,5 @@
 import { ref } from "vue"
+import type { SlothParameterData } from "./NextGenModel";
 import { ValidationFormFields } from "./NextGenModel";
 
 /**
@@ -26,23 +27,45 @@ export const useCalibrationTabValidation = ( requiredFields: any ) => {
 }
 
 /**
+ * @param SlothParameterData[] 
+ * @returns [<string>messages]
+ */
+export const useCalibrationFormulationSlothTableValidation = ( slothParameters: SlothParameterData[] ) => {
+   const BreakException = {};
+   const errors = ref<any>({});
+   try {
+      slothParameters.forEach( ( slothParameter ) => {
+         Object.keys( slothParameter ).forEach( key => {
+            if ( slothParameter[ key as keyof SlothParameterData ] == "" ) {
+               throw new Error( key )
+            }
+         })
+      });
+   } catch ( error: any ) {
+      errors.value[ error?.message as keyof typeof errors ] = [ 'All sloth parameter fields are required.' ];
+   }
+   console.log ( errors )
+   return errors;
+}
+
+/**
  * @param validationErrors 
  * @returns [<string>messages]
  */
 export const useApiErrorResponseValidator = ( validationErrors: any ) => {
-   let errors = <String[]>[]
+   let errors = <String[]>[];
    Object.keys( validationErrors ).forEach( key => {
-      let field_label = key
-      if ( key in ValidationFormFields ) field_label = ValidationFormFields[ key as keyof typeof ValidationFormFields ]
+      let field_label = key;
+      if ( key in ValidationFormFields ) field_label = ValidationFormFields[ key as keyof typeof ValidationFormFields ];
       validationErrors[ key ].forEach( ( validation_error: any ) => {
          if ( typeof validation_error == "string" ) {
-            errors.push( `${field_label} ${validation_error}`)
+            errors.push( `${field_label} ${validation_error}`);
          }
          if ( typeof validation_error == "object" ) {
-            let error_messages = useApiErrorResponseValidator( validation_error )
-            errors = errors.concat( error_messages )
+            let error_messages = useApiErrorResponseValidator( validation_error );
+            errors = errors.concat( error_messages );
          }
       })
    })
-   return errors
+   return errors;
 }

@@ -21,8 +21,8 @@
             <div class="mt-2 text-left"><strong>Select Modules</strong></div>
             <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
               <label for="Groups">Groups:</label>
-              <Dropdown id="Groups" v-model="filterGroup" :options="fetchFormulationModuleCoveredGroupFilterOptions"
-                optionLabel="description" optionValue="name" placeholder="ALL"></Dropdown>
+              <Select id="Groups" v-model="filterGroup" filter :options="fetchFormulationModuleCoveredGroupFilterOptions"
+                optionLabel="description" optionValue="name" placeholder="ALL"></Select>
             </div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
               optionLabel="name" optionValue="name" class="w-full h-60"></Listbox>
@@ -79,14 +79,12 @@
               </Column>
               <Column field="param_type" header="Type" sortable>
                 <template #editor="{ index }">
-                  <InputText v-model="slothParameterInputs[index].param_type" autofocus class="w-20 p-1">
-                  </InputText>
+                  <Select v-model="slothParameterInputs[index].param_type" :options="fetchFormulationSlothParameterTypeOptions" optionLabel="name" optionValue="name"></Select>
                 </template>
               </Column>
               <Column field="param_units" header="Units" sortable>
                 <template #editor="{ index }">
-                  <InputText v-model="slothParameterInputs[index].param_units" autofocus class="w-12 p-1">
-                  </InputText>
+                  <Select v-model="slothParameterInputs[index].param_units" :options="fetchFormulationSlothParameterUnitOptions" optionLabel="name" optionValue="name"></Select>
                 </template>
               </Column>
               <Column field="param_location" header="Location" sortable>
@@ -96,9 +94,8 @@
                 </template>
               </Column>
               <Column field="maps_to_module" header="For Module" sortable>
-                <template #editor="{ index }">
-                  <InputText v-model="slothParameterInputs[index].maps_to_module" autofocus class="w-16 p-1">
-                  </InputText>
+                <template #editor="{ index }">                  
+                  <Select v-model="slothParameterInputs[index].maps_to_module" filter :options="fetchSelectedFormulationModuleOptions" optionLabel="name" optionValue="name"></Select>
                 </template>
               </Column>
               <Column field="maps_to_variable_name" header="Module Param" sortable>
@@ -109,8 +106,8 @@
               </Column>
               <Column field="param_value" header="Value" sortable>
                 <template #editor="{ index }">
-                  <InputText v-model="slothParameterInputs[index].param_value" autofocus class="w-12 p-1">
-                  </InputText>
+                  <InputNumber v-model="slothParameterInputs[index].param_value" autofocus :minFractionDigits="0" :maxFractionDigits="2" class="w-12 p-1" fluid>
+                  </InputNumber>
                 </template>
               </Column>
             </DataTable>
@@ -118,7 +115,7 @@
         </div>
       </div>
     </div>
-    <div class="waitgif" v-if="isLoading">
+    <div class="waitgif" v-if="data_loading">
       <img src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
@@ -134,14 +131,12 @@ import type { SlothParameterData } from '~/composables/NextGenModel';
 import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
-const isLoading = ref(true);
+//const isLoading = ref(true);
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
 const slothParamContextMenu = ref() //sloth parameter table context menu
 
-onMounted(() => {
-  isLoading.value = false;
-})
+
 const cmSlothParameterData = ref([
   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedSlothParameterData(selectedSlothParameterData) }
 ])
@@ -149,6 +144,7 @@ const onRowContextMenu = (event: any) => {
   slothParamContextMenu.value.show(event.originalEvent)
 }
 const {
+  data_loading,
   filterGroup,
   useSlothParameters,
   selectedModuleValues,
@@ -157,16 +153,23 @@ const {
   fetchFormulationModuleOptions,
   fetchFormulationModuleCoveredGroupFilterOptions,
   fetchFormulationModuleCoveredGroupOptions,
-} = storeToRefs(useFormulationStore())
+  fetchFormulationSlothParameterTypeOptions,
+  fetchFormulationSlothParameterUnitOptions,
+  fetchSelectedFormulationModuleOptions
+} = storeToRefs(useFormulationStore());
 
 const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore()
 const toast = useToast();
 
-//load static data of this tab
-loadFormulationTabStaticData()
 
+onMounted(() => {
+  toast.removeAllGroups()
+  //load static data of this tab
+  loadFormulationTabStaticData()
+  //isLoading.value = false;
+})
 /**
  * add sloth variable entry to table and reset name field
  */
@@ -206,17 +209,36 @@ useListen('calibrationButtonResetCancel', (actionButton) => {
   }
 })
 
+useListen('calibrationButtonNext', (actionButton) => {
+  if (getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
+    emitterOff('calibrationButtonNext');
+    if (!formulationNameInput.value) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Forumulation Name is required.", life: 3000 })
+    }
+    if (!selectedModuleValues.value.length) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "Module Selection is required.", life: 3000 })
+    }
+    if (!formulationNameInput.value || !selectedModuleValues.value.length) {
+      setTimeout(() => gotoNext(), 3000);
+      setTimeout(() => gotoNext(), 3000);
+      return;
+    }
+    gotoNext();
+  }
+})
+
+const gotoNext = () => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[2];
+  e.click();
+}
+
 useListen('calibrationButtonPrev', (actionButton) => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[0];
   e.click();
 })
 
-useListen('calibrationButtonNext', (actionButton) => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[2];
-  e.click();
-})
 </script>
 
 <style lang="scss" scoped>
