@@ -20,6 +20,7 @@
           class="prev actionBtnSmall font-normal" @click.stop="NavigatePrevContent" title="Previous"
           aria-label="Previous">Prev</button>
       </div>
+      
       <div v-show="getCalibrationTabIndex() < 6" class="inline ngenButtonDiv ml-6"><button
           v-show="getCalibrationTabIndex() < 6" class="font-normal" @click.stop="NavigateNextContent" title="Next"
           aria-label="Next">Next</button></div>
@@ -37,9 +38,14 @@ const { getMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecast
 const runStatusStore = useRunStatusStore();
 const { calibrationStatus } = storeToRefs(runStatusStore);
 
+/**
+ * Route the emmited command to the proper page
+ * 1. Check to see what menu we are on 1 = Calibration, 2 = Evaluation, 3 = Forecaset, 4 = Verification
+ * 2. See what tab
+ */
 const btnSaveOrStart = () => {
   switch (getMenuIndex()) {
-    case 1: return getCalibrationTabIndex() < 6 ? "SAVE" : "START"; break;
+    case 1: return getCalibrationTabIndex() < 6 ? "SAVE" : "START";break;
     case 2: break;
     case 3: break;
     case 4: break;
