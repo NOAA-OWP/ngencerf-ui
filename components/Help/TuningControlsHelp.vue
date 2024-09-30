@@ -7,7 +7,7 @@
       determined during the calibration process and which module parameters for the selected formulation to tune during
       calibration.
     </div>
-    <p style="text-align:center;color:red;">
+    <p class="text-center" style="color:red;">
       NOTE: Times are hourly and must be specified to the top of the hour (hh:00). 
     </p>
     <table class="_help-table">
