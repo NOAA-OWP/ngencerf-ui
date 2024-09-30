@@ -6,8 +6,8 @@
             <div id="OptAlg" class="mt-2">
                <label for="OptimizationAlgorithm">Optimization Algorithm</label>
                <Select id="OptimizationAlgorithm" class="mt-1" v-model="uiOptimization"
-                  :options="getOptimizationAlgorithmOptionsList" filter optionLabel="name" optionValue="name" placeholder=""
-                  @change="optimizationSelectChange"></Select>
+                  :options="getOptimizationAlgorithmOptionsList" filter optionLabel="name" optionValue="name"
+                  placeholder="" @change="optimizationSelectChange"></Select>
             </div>
 
          </div>
@@ -36,7 +36,7 @@
                      </DataTable>
                   </div>
                </div>
-	       
+
             </div>
          </div>
 
@@ -100,8 +100,8 @@
             <!--REVIVING LOST CONTENT HERE-->
             <div id="CalibrationStopCriteria" class="bordered">
                <label for="StopCriteria">Calibration Stop Criteria:</label><br>
-               <InputNumber id="StopCriteria" inputId="stopCriteria"
-               v-model="uiStopCriteria" showButtons :min="0"></InputNumber>
+               <InputNumber id="StopCriteria" inputId="stopCriteria" v-model="uiStopCriteria" showButtons :min="0">
+               </InputNumber>
                <div>Iterations per Worker</div>
             </div>
          </div>
@@ -259,17 +259,15 @@ useListen('calibrationButtonResetCancel', (actionButton) => {
 })
 
 useListen('calibrationButtonNext', (actionButton) => {
-   if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
-      emitterOff('calibrationButtonNext');
+   if (getCalibrationTabIndex() == 5 && actionButton === "NEXT") {
       if (!uiOptimization.value) {
          toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
       }
       if (!uiObjectiveFunction.value) {
          toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
       }
-      if (!uiOptimization.value || !uiObjectiveFunction.value ) {
+      if (!uiOptimization.value || !uiObjectiveFunction.value) {
          setTimeout(() => gotoNext(), 3000);
-         return;
       }
       gotoNext();
    }
@@ -277,15 +275,18 @@ useListen('calibrationButtonNext', (actionButton) => {
 
 const gotoNext = () => {
    const tabs = document.getElementsByClassName("tabs");
-   const e = <HTMLElement>tabs[4];
+   const e = <HTMLElement>tabs[5];
    e.click();
 }
 
 useListen('calibrationButtonPrev', (actionButton) => {
-   const tabs = document.getElementsByClassName("tabs");
-   const e = <HTMLElement>tabs[2];
-   e.click();
+   if (getCalibrationTabIndex() == 5 && actionButton === "PREV") {
+      const tabs = document.getElementsByClassName("tabs");
+      const e = <HTMLElement>tabs[3];
+      e.click();
+   }
 });
+
 
 /**
  * explicitly watching loading status, as onmount happen prior to store loading. 

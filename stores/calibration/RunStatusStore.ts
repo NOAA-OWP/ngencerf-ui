@@ -3,7 +3,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import type { CalibrationIsReadyResponse, CalibrationPlotListNamesData } from "~/composables/NextGenModel";
+import type { CalibrationStatus, CalibrationPlotListNamesData } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
@@ -13,7 +13,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { getAccessToken } = useUserDataStore();
   
   // refs
-  const calibrationIsReady = ref<boolean>(false);
   const calibrationStatus = ref<string>();
   const runningTime = ref();
   const startTimeDate = ref();
@@ -29,11 +28,11 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const stopCriteriaMet = ref(false);
 
   /**
-   * Check if Calibration is in 'Ready' state
+   * Get Calibration Status
    * @return {any}
    */
-  const queryCalibrationIsReady = async (): Promise<any> => {
-    return makeProtectedApiCall<CalibrationIsReadyResponse>(`${ngencerfBaseUrl}/calibration/is_ready/`, {
+  const queryGetCalibrationStatus = async (): Promise<any> => {
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -127,7 +126,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Hard Reset Run/Status Store
    */
   const hardResetRunStatusStore = (): void => {
-    calibrationIsReady.value = false;
     calibrationStatus.value = "";
     runningTime.value = "";
     startTimeDate.value = "";
@@ -142,7 +140,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   }
 
   return {
-    calibrationIsReady,
     calibrationStatus,
     startTimeDate,
     startTime,
@@ -154,7 +151,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     selectedPlotFileUrl,
     stopCriteria,
     stopCriteriaMet,
-    queryCalibrationIsReady,
+    queryGetCalibrationStatus,
     queryGetPlotNames,
     queryGetPlot,
     executeRunCalibration,

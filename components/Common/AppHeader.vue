@@ -8,7 +8,7 @@
       </div>
       <div id="Col2" class="col-span-8">
 
-        <ul v-show="isUserLoggedIn() && location.name !== 'Login' && location.name !== 'LandingPage'" id="MainMenu">
+        <ul v-show="isUserLoggedIn() && location.name !== 'Login'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
             <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
               @click="MenuChanged">Calibration</NuxtLink>
@@ -26,7 +26,7 @@
               @click="MenuChanged">Verification</NuxtLink>
           </li>
         </ul>
-        
+
       </div>
 
       <div id="Circles" class="col-span-2">
@@ -44,15 +44,15 @@
             <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle"
               class="float-right userInitials" @click="showUserMenu">
               {{ getUserInitials() }}
-            </div>    
+            </div>
 
           </div>
           <div class="col-span-1">
-            <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px" id="HelpCircle" title="Help"
-              aria-label="help" @click="displayHelp">?</button>
+            <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px"
+              id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</button>
           </div>
 
-          
+
 
         </div>
       </div>
@@ -67,28 +67,27 @@
             <HelpLandingPageHelp />
           </div>
 
-          <div v-if="location.name === 'PreviousRuns'" class="py-10 px-1">
-            <HelpPreviousRunsHelp />
-          </div>
-
           <div v-if="location.name === 'Calibration'" class="py-10 px-1">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
-                <HelpHeadwaterBasinGageHelp />
+                <HelpPreviousRunsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 2">
-                <HelpFormulationHelp />
+                <HelpHeadwaterBasinGageHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 3">
-                <HelpTuningControlsHelp />
+                <HelpFormulationHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 4">
-                <HelpOptimizationMetricsHelp />
+                <HelpTuningControlsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 5">
-                <HelpRunStatusHelp />
+                <HelpOptimizationMetricsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 6">
+                <HelpRunStatusHelp />
+              </span>
+              <span v-else-if="getCalibrationTabIndex() === 7">
                 <HelpResultsHelp />
               </span>
             </div>
@@ -136,7 +135,7 @@ const emit = defineEmits(["logoutEvent"]);
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
-const { isUserLoggedIn,  getUserInitials, hardResetUserDataStore } = useUserDataStore();
+const { isUserLoggedIn, getUserInitials, hardResetUserDataStore } = useUserDataStore();
 
 const location = useRoute();
 
@@ -226,10 +225,12 @@ const MenuChanged = (e: MouseEvent) => {
   background-color: $ngwcp_primary1;
   width: 100%;
 }
+
 #Header {
   height: 80px;
   margin-bottom: 4px;
 }
+
 #Logo {
   img {
     width: 200px;
@@ -242,15 +243,18 @@ const MenuChanged = (e: MouseEvent) => {
   font-weight: bold;
   margin-left: 20px;
 }
+
 #TopMenu {
   display: inline;
   font-size: 20px;
   font: 20px Arial, sans-serif;
 }
+
 #MainMenu {
   float: right;
   margin-right: 100px;
   margin-top: 20px;
+
   ul {
     list-style: none;
     margin-top: 0px;
@@ -259,24 +263,27 @@ const MenuChanged = (e: MouseEvent) => {
   li {
     display: inline-block;
     margin: 20px 7px 0;
-    font-size: 22px;  
+    font-size: 22px;
 
     a {
       text-decoration: none;
       color: #000;
       font-weight: bold;
-      background-color: $ngwcp_neutral_gray_md;  
+      background-color: $ngwcp_neutral_gray_md;
       border-radius: 5px;
-      padding:15px 28px;
+      padding: 15px 28px;
     }
+
     a:hover {
       background-color: $gray-20;
       text-decoration: none;
     }
+
     .isActive {
       color: #fff;
       background-color: $ngwcp_primary1;
     }
+
     .isActive:hover {
       color: #fff;
       background-color: $ngwcp_primary1;
@@ -291,7 +298,7 @@ const MenuChanged = (e: MouseEvent) => {
   text-align: center;
 }
 
-#UserCircle{
+#UserCircle {
   display: inline-block;
   height: 70px;
   width: 70px;
@@ -301,6 +308,7 @@ const MenuChanged = (e: MouseEvent) => {
   font-size: 30px;
   padding-top: 20px;
 }
+
 #HelpCircle {
   display: inline-block;
   height: 50px;
@@ -313,19 +321,23 @@ const MenuChanged = (e: MouseEvent) => {
   padding-top: 12px;
   border: 1px solid #000;
 }
+
 #UserCircle {
   margin-right: 10px;
 }
+
 #UserCircle:hover {
   background-color: $ngwcp_primary2;
 }
+
 #HelpCircle:hover {
- background-color: $ngwcp_primary2;
+  background-color: $ngwcp_primary2;
 }
 
 .userInitials {
   text-align: center;
 }
+
 .qmark {
   font-size: 35px;
 }
