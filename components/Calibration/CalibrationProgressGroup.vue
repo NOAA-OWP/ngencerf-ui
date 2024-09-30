@@ -140,7 +140,7 @@ const tabClicked = (event: Event) => {
   e.click();
 
   // Send the selected tab info to the active tab set with emit
-  if (getMenuIndex() === 1) {
+  if (getMenuIndex() === 2) {
     currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
     emit("tabNumber", currentCalibrationTab.value);
   }
