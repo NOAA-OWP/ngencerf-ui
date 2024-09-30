@@ -729,7 +729,7 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
     try {
       const saveTuningTabResponse = await postSaveTuningTabData();
       console.log(
-        `saveTabContent Tuning, should be tabIndex 3, on tabIndex ${getCalibrationTabIndex()}, save response: `,
+        `saveTabContent Tuning, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `,
         saveTuningTabResponse
       );
 
@@ -751,7 +751,7 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
   };
 
   // check if the current tab is the Tuning tab and the actionButton is 'SAVE'
-  if (getCalibrationTabIndex() === 3 && actionButton === 'SAVE') {
+  if (getCalibrationTabIndex() === 4 && actionButton === 'SAVE') {
     // check if Tuning Tab data is validated before saving
     if (isTuningTabDataValidated()) {
       handleSaveTuningTab();
@@ -776,14 +776,15 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
 });
 
 useListen('calibrationButtonPrev', (actionButton) => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[1];
-  e.click();
+  if (getCalibrationTabIndex() == 4 && actionButton === "PREV") {
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[2];
+    e.click();
+  }
 });
 
 useListen('calibrationButtonNext', (actionButton) => {
-    if (getCalibrationTabIndex() == 3 && actionButton === "NEXT") {
-      emitterOff('calibrationButtonNext');
+  if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
     let hasError = false;
     if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
       toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
@@ -807,7 +808,7 @@ useListen('calibrationButtonNext', (actionButton) => {
 
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[3];
+  const e = <HTMLElement>tabs[4];
   e.click();
 }
 </script>
