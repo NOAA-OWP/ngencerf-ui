@@ -3,7 +3,6 @@
     <div id="GageSettings" class="mt-5">
       <div class="grid grid-rows-2">
         <div class="row-span-2 selRow">
-
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
               <label for="Domain">Domain:</label><br />
@@ -78,49 +77,33 @@
               <table class="table-auto">
                 <tbody>
                   <tr v-if="selectedDomainValue" class="rowOdd">
-                    <td class="dataName">Domain:</td>
-                    <td class="dataText">{{ selectedDomainValue }}</td>
+                    <td class="dataName td1">Domain:</td>
+                    <td class="dataText td2">{{ selectedDomainValue }}</td>
                   </tr>
                   <tr v-if="gageData?.gage_id" lass="rowEven">
-                    <td class="dataName">Gage ID:</td>
-                    <td class="dataText">{{ gageData?.gage_id }}</td>
+                    <td class="dataName td1">Gage ID:</td>
+                    <td class="dataText td2">{{ gageData?.gage_id }}</td>
                   </tr>
                   <tr v-if="gageData?.agency" class="rowOdd">
-                    <td class="dataName">Agency:</td>
-                    <td class="dataText">{{ gageData?.agency }}</td>
+                    <td class="dataName td1">Agency:</td>
+                    <td class="dataText td2">{{ gageData?.agency }}</td>
                   </tr>
                   <tr v-if="gageData?.station_name" class="rowEven">
-                    <td class="dataName">Station Name:</td>
-                    <td class="dataText">{{ gageData?.station_name }}</td>
+                    <td class="dataName td1">Station Name:</td>
+                    <td class="dataText td2">{{ gageData?.station_name }}</td>
                   </tr>
-                  <!-- <tr v-if="" class="rowOdd">
-                              <td class="dataName">Site Type:</td>
-                              <td class="dataText"></td>
-                           </tr> -->
                   <tr v-if="gageData?.latitude" class="rowEven">
-                    <td class="dataName">Latitude:</td>
-                    <td class="dataText">{{ gageData?.latitude }}</td>
+                    <td class="dataName td1">Latitude:</td>
+                    <td class="dataText td2">{{ gageData?.latitude }}</td>
                   </tr>
                   <tr v-if="gageData?.longitude" class="rowOdd">
-                    <td class="dataName">Longitude:</td>
-                    <td class="dataText">{{ gageData?.longitude }}</td>
+                    <td class="dataName td1">Longitude:</td>
+                    <td class="dataText td2">{{ gageData?.longitude }}</td>
                   </tr>
                   <tr v-if="gageData?.altitude" class="rowEven">
-                    <td class="dataName">Altitude:</td>
-                    <td class="dataText">{{ gageData?.altitude }}</td>
+                    <td class="dataName td1">Altitude:</td>
+                    <td class="dataText td2">{{ gageData?.altitude }}</td>
                   </tr>
-                  <!-- <tr v-if="" class="rowOdd">
-                              <td class="dataName">Date Established:</td>
-                              <td class="dataText"></td>
-                           </tr> -->
-                  <!-- <tr v-if="" class="rowEven">
-                              <td class="dataName">Drainage Area:</td>
-                              <td class="dataText"></td>
-                           </tr> -->
-                  <!-- <tr v-if="" class="rowOdd">
-                              <td class="dataName">HUC:</td>
-                              <td class="dataText"></td>
-                           </tr> -->
                 </tbody>
               </table>
 
@@ -320,8 +303,8 @@ const toggle_isNWMv3 = () => {
 #GageReport {
 
   table {
-
-    width: 60%;
+    border: 1px solid #ccc;
+    width: auto;
     margin: 6vh auto;
 
     tr {
@@ -330,6 +313,15 @@ const toggle_isNWMv3 = () => {
       td {
         padding: 4px 15px;
         cursor: default;
+        border-bottom: 1px solid #ccc;
+        background-color: $ngwcp_neutral_gray_lt;
+      }
+      .td1 {
+        text-align: right;
+        width: 20%;
+      }
+      .td2 {
+        font-weight: 600;
       }
     }
   }
