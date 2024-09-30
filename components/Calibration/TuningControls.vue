@@ -26,7 +26,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
-                            time-picker-inline text-input format="yyyy-MM-dd hh:00"
+                            time-picker-inline text-input format="yyyy-MM-dd HH:00"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -35,7 +35,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
-                            time-picker-inline text-input format="yyyy-MM-dd hh:00"
+                            time-picker-inline text-input format="yyyy-MM-dd HH:00"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -46,7 +46,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
-                            time-picker-inline text-input format="yyyy-MM-dd hh:00"
+                            time-picker-inline text-input format="yyyy-MM-dd HH:00"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -55,7 +55,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
-                            time-picker-inline text-input format="yyyy-MM-dd hh:00"
+                            time-picker-inline text-input format="yyyy-MM-dd HH:00"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -88,7 +88,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
-                              v-model="avSimStartTime" time-picker-inline text-input format="yyyy-MM-dd hh:00"
+                              v-model="avSimStartTime" time-picker-inline text-input format="yyyy-MM-dd HH:00"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
@@ -98,7 +98,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark"
-                              v-model="avSimEndTime" time-picker-inline text-input format="yyyy-MM-dd hh:00"
+                              v-model="avSimEndTime" time-picker-inline text-input format="yyyy-MM-dd HH:00"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
@@ -111,7 +111,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark"
-                              v-model="avCalStartTime" time-picker-inline text-input format="yyyy-MM-dd hh:00"
+                              v-model="avCalStartTime" time-picker-inline text-input format="yyyy-MM-dd HH:00"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
@@ -120,7 +120,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
-                              time-picker-inline text-input format="yyyy-MM-dd hh:00"
+                              time-picker-inline text-input format="yyyy-MM-dd HH:00"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
