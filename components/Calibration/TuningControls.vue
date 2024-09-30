@@ -189,8 +189,7 @@
                     :disabled="!isFormulationDataSet()"
                     :options="calibrationTuningParameters"
                     optionLabel="name"
-                    optionValue="name"
-                  >
+                    optionValue="name" >
                   </Select>
                   <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
                     <button @click="addParameterToTable" :disabled="!isFormulationDataSet()">Add</button>
