@@ -19,11 +19,11 @@
           </li>
           <li aria-label="Forecast" title="Forecast">
             <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
-              @click="MenuChanged">Forecast</NuxtLink>
+              @click="" class="disabled">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
             <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
-              @click="MenuChanged">Verification</NuxtLink>
+              @click="" class="disabled">Verification</NuxtLink>
           </li>
         </ul>
 
@@ -364,6 +364,10 @@ const MenuChanged = (e: MouseEvent) => {
   width: 50%;
   background-color: white;
   overflow: auto;
+}
+
+.disabled, .disabled:hover {
+  background-color: $ngwcp_neutral_gray_md !important;
 }
 
 /*

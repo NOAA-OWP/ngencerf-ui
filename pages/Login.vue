@@ -121,6 +121,7 @@ import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 
+const { calibrationJobId } = storeToRefs(generalStore());
 
 const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
 const { resetGeneralStore } = generalStore();
@@ -146,8 +147,9 @@ const confirmPassword = ref('');
 
 onMounted(() => {
   localStorage.clear();
-  // hardResetUserDataStore();
-  //resetGeneralStore();
+  calibrationJobId.value = 0;
+  hardResetUserDataStore();
+  resetGeneralStore();
   resetGageStore();
   resetFormulationStore();
   resetOptimizationStore();
