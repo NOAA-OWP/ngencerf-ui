@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import Toast from "primevue/toast";
 
 
 //https://moment.github.io/luxon/api-docs/index.html
@@ -7,17 +8,32 @@ export const formatTime = (time: string) => {
   return DateTime.fromISO(time).toUTC().toFormat("yyyy/MM/dd  HH:mm:ss");
 };
 
-// 2017-12-31T00:00:00Z => 2017-12-31 00
+// 2017-12-31T00:00:00Z => 2017-12-31 00:00
 export const formatDateForDisplay = ( d: string | Date ): string => {
-  if (typeof d === 'string') {
-    d = new Date(d);
-  }
-  const year = d.getUTCFullYear();
-  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  const hours = String(d.getUTCHours()).padStart(2, '0');
+  console.log('inside formatDateForDisplay');
+  let dateTime;
 
-  return `${year}-${month}-${day} ${hours}`;
+  // Check if the input is already in 'yyyy-MM-dd HH:mm' format
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(d)) {
+    // If it's already in 'yyyy-MM-dd HH:00' format, return it directly
+    console.log('d is already in yyyy-MM-dd HH:mm format', d);
+    return d;
+  }
+
+  // Handle ISO format strings or Date objects
+  if (typeof d === 'string') {
+    // Check if the string is in ISO format and parse it
+    console.log('d is a string but not in yyyy-MM-dd HH:mm format', d);
+    dateTime = DateTime.fromISO(d, { zone: 'utc' });
+  } else {
+    // Convert Date object to Luxon DateTime in UTC
+    console.log('d is a Date object', d);
+    dateTime = DateTime.fromJSDate(d, { zone: 'utc' });
+  }
+
+  // Return the formatted date in 'yyyy-MM-dd HH:mm' format
+  console.log('returning formatted date', dateTime.toFormat('yyyy-MM-dd HH:mm'));
+  return dateTime.toFormat('yyyy-MM-dd HH:mm');
 }
 
 /**
