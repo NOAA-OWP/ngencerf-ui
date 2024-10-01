@@ -8,12 +8,14 @@ export const formatTime = (time: string) => {
 };
 
 // 2017-12-31T00:00:00Z => 2017-12-31 00
-export const formatDateForDisplay = ( d: string ): string => {
-  const date = new Date(d);
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  const hours = String(date.getUTCHours()).padStart(2, '0');
+export const formatDateForDisplay = ( d: string | Date ): string => {
+  if (typeof d === 'string') {
+    d = new Date(d);
+  }
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const hours = String(d.getUTCHours()).padStart(2, '0');
 
   return `${year}-${month}-${day} ${hours}`;
 }
