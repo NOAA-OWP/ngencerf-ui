@@ -146,8 +146,8 @@ const confirmPassword = ref('');
 
 onMounted(() => {
   localStorage.clear();
-  hardResetUserDataStore();
-  resetGeneralStore();
+  // hardResetUserDataStore();
+  //resetGeneralStore();
   resetGageStore();
   resetFormulationStore();
   resetOptimizationStore();
