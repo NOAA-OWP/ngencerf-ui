@@ -7,7 +7,7 @@
         <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
           <div data-tab="1" data-menu-tab="11" class="tabs activeTab prevent-select" v-on:click="tabClicked"
             aria-label="Calibration Runs tab" title="Calibration Runs tab">
-            Calibration Runs
+            Calibration Runs {{ calibrationJobId }}
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
           <div data-tab="2" data-menu-tab="12" class="tabs prevent-select" v-on:click="tabClicked"
@@ -131,7 +131,7 @@
 import { onMounted } from "vue";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
-const { userCalibrationRunData } = useUserDataStore();
+const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
@@ -146,7 +146,7 @@ onMounted(() => {
   tab.click();
 });
 
-// temporary. Will be replaced by logic from each tab
+// temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
 
 const tabClicked = (event: Event) => {
