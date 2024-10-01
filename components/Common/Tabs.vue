@@ -47,7 +47,7 @@
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
         <div data-tab="2" data-menu-tab="22" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Evaluate Tab" title=" Evaluate tab">
+          aria-label="Evaluate Tab" title=" Evaluate tab" :disabled="true">
           Evaluate
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
@@ -130,6 +130,8 @@
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useUserDataStore } from "~/stores/common/UserDataStore";
+const { userCalibrationRunData } = useUserDataStore();
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());

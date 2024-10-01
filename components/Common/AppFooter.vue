@@ -6,17 +6,15 @@
           <div class="col-span-2">
 
             <span v-if="location.name === 'Calibration' && getCalibrationTabIndex() > 1">
-              <div id="ActionButtons" class="footerColor"
-                v-if="canDisplayBeforeRun">
+              <div id="ActionButtons" class="footerColor" v-if="canDisplayBeforeRun">
                 <CalibrationButtonGroup />
               </div>
             </span>
 
             <span v-else-if="location.name !== 'Calibration'">
-              <div id="ActionButtons" class="footerColor"
-                v-if="canDisplayBeforeRun">
-                <EvaluationButtonGroup/>
-              </div>             
+              <div id="ActionButtons" class="footerColor" v-if="canDisplayBeforeRun">
+                <EvaluationButtonGroup />
+              </div>
             </span>
           </div>
         </div>
@@ -28,6 +26,9 @@
             info.program_info.release_date
           }}
         </div>
+        <!-- <div class="text-center">
+          Job ID: {{userCalibrationRunData?.calibration_run_id}}, 
+        </div> -->
         <div class="copyright">Copyright &COPY;2024, RTX</div>
       </div>
     </div>
@@ -39,19 +40,17 @@ import json from "@/assets/versionInfo.json";
 import CalibrationButtonGroup from "../Calibration/CalibrationButtonGroup.vue";
 import EvaluationButtonGroup from "../Evaluation/EvaluationButtonGroup.vue";
 import { generalStore } from "~/stores/common/GeneralStore";
-
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRoute } from "vue-router";
 
-const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
-//const currentCalibrationTab = ref(getCalibrationTabIndex());
+const { getCalibrationTabIndex } = generalStore();
 
-const { isUserLoggedIn } = useUserDataStore();
+const { isUserLoggedIn, userCalibrationRunData } = useUserDataStore();
 const location = useRoute();
 const info = json;
 
 const canDisplayBeforeRun = computed(() => {
-  return isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'PreviousRuns' && location.name !== 'Login';
+  return isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'Login';
 });
 
 </script>
@@ -64,13 +63,16 @@ const canDisplayBeforeRun = computed(() => {
   background: transparent;
   /*border: 1px solid black;*/
   margin-left: 20px;
-  margin-top:-20px;
+  margin-top: -20px;
   background-color: white;
   padding-top: 10px;
   height: 54px;
 }
-.ActionButtons-bg-mask{
-  height: 54px; display: block; width: 100%;
+
+.ActionButtons-bg-mask {
+  height: 54px;
+  display: block;
+  width: 100%;
 }
 
 #Footer {
@@ -92,6 +94,7 @@ const canDisplayBeforeRun = computed(() => {
   background-color: $ngwcp_background;
   ;
 }
+
 /*
 .topBar {
   background-color: black;

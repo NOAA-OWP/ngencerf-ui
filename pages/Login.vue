@@ -11,21 +11,23 @@
           <div class="grid grid-rows-12">
             <div class="row-span-12 flex items-center justify-center h-screen-inner">
 
-              <div id="LoginBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md" :class="!showDialog ? 'loginBox' : 'createAccountBox'">
+              <div id="LoginBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md"
+                :class="!showDialog ? 'loginBox' : 'createAccountBox'">
 
                 <div v-if="!showDialog" class="mx-auto px-8 text-left">
                   <form onsubmit="return false">
                     <h1>Login in</h1>
                     <div class="inputBox">
                       <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username"
-                        autocomplete="username" v-on:keypress="autoSubmit"/>
+                        autocomplete="username" v-on:keypress="autoSubmit" />
                       <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Username
                       </button>
                     </div>
                     <div class="inputBox">
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
-                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block" v-on:keypress="autoSubmit"/>
+                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block"
+                        v-on:keypress="autoSubmit" />
                       <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
                         Forgot Password
                       </button>
@@ -57,7 +59,8 @@
                         </div>
                         <div class="form-group inputBox">
                           <label for="password">Password</label>
-                          <Password v-model="newPassword" id="password" type="password" name="password" autocomplete="current-password" required toggleMask class="block">
+                          <Password v-model="newPassword" id="password" type="password" name="password"
+                            autocomplete="current-password" required toggleMask class="block">
                             <template #header>
                               <div class="font-semibold text-xm mb-4">Password</div>
                             </template>
@@ -111,7 +114,23 @@ import AppHeader from "~/components/Common/AppHeader.vue";
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 
-const { logUserIn, setUserName } = useUserDataStore();
+import { useGageStore } from "~/stores/calibration/GageStore";
+import { useFormulationStore } from "~/stores/calibration/FormulationStore";
+import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+import { useTuningStore } from "~/stores/calibration/TuningStore";
+import { generalStore } from "~/stores/common/GeneralStore";
+
+
+const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
+const { resetGeneralStore } = generalStore();
+const { resetGageStore } = useGageStore();
+const { resetFormulationStore } = useFormulationStore();
+const { resetOptimizationStore } = useOptimizationStore();
+const { hardResetRunStatusStore } = useRunStatusStore();
+const { hardResetTuningStore } = useTuningStore();
+
+
 const { ngencerfBaseUrl } = useBackendConfig();
 
 const toast = useToast();
@@ -127,6 +146,13 @@ const confirmPassword = ref('');
 
 onMounted(() => {
   localStorage.clear();
+  hardResetUserDataStore();
+  resetGeneralStore();
+  resetGageStore();
+  resetFormulationStore();
+  resetOptimizationStore();
+  hardResetRunStatusStore();
+  hardResetTuningStore();
 });
 
 const openDialog = () => {
@@ -236,6 +262,7 @@ const GoToLanding = async () => {
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
 .needAccount {
   font-size: 18px;
   font-weight: 600;
