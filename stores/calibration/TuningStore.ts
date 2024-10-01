@@ -1,7 +1,6 @@
 // @ts-check
 
 import { defineStore } from "pinia";
-import type { CalibrationTimes, ModuleParameter, LoadTuningTabResponse, OutputVariable, SaveTuningTabRequestBody } from "~/composables/NextGenModel";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
