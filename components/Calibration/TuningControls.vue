@@ -329,8 +329,7 @@ onMounted(async () => {
     
     calStartTime.value = calibration_start_time;
     calEndTime.value = calibration_end_time;
-    simStartTime.value = new Date(simulation_start_time).toISOString();
-    console.log("simStartTime:", simStartTime.value);
+    simStartTime.value = simulation_start_time;
     simEndTime.value = simulation_end_time;
   };
 
