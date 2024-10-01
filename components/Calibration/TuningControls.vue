@@ -248,7 +248,7 @@
 </template>
 
 <script lang="ts" setup>
-
+import { onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -297,7 +297,8 @@ const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isInitialSetupDone = ref(false);
 const isCalibrationTuningControlsDisabled = computed(() => {
-  return !loadCalibrationRunData.value || !loadCalibrationRunData.value?.calibration_times || Object.keys(loadCalibrationRunData.value?.calibration_times).length === 0;
+  return false;
+  //return !loadCalibrationRunData.value || !loadCalibrationRunData.value?.calibration_times || Object.keys(loadCalibrationRunData.value?.calibration_times).length === 0;
 });
 
 onMounted(async () => {

@@ -123,6 +123,7 @@
 </template>
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";

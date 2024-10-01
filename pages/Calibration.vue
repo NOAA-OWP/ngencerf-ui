@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts" setup>
-import { } from "vue"
+import { onMounted } from "vue";
 import NextgenLayout from "~/layouts/CalibrationLayout.vue";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore"

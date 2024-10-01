@@ -15,6 +15,7 @@ const emitter = mitt<ApplicationEvents>()
 export const useEvent = emitter.emit
 export const useListen = emitter.on
 export const emitterOff = emitter.off
+export const emitterAll = emitter.all
 
 
 type logoutEvents = LogoutEvent

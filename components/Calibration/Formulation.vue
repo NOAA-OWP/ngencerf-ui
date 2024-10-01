@@ -128,6 +128,7 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
@@ -136,7 +137,7 @@ import type { SlothParameterData } from '~/composables/NextGenModel';
 import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
-//const isLoading = ref(true);
+const isLoading = ref(true);
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
 const slothParamContextMenu = ref() //sloth parameter table context menu
@@ -173,7 +174,7 @@ onMounted(() => {
   toast.removeAllGroups()
   //load static data of this tab
   loadFormulationTabStaticData()
-  //isLoading.value = false;
+  isLoading.value = false;
 })
 /**
  * add sloth variable entry to table and reset name field

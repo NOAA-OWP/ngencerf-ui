@@ -77,6 +77,7 @@
 
 <script lang="ts" setup>
 import ProgressBar from "primevue/progressbar";
+import { onMounted } from "vue";
 
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';

@@ -128,7 +128,7 @@
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);

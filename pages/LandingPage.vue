@@ -33,6 +33,7 @@
 
 </template>
 <script setup lang="ts">
+import { onMounted } from "vue";
 import AppHeader from '~/components/Common/AppHeader.vue';
 import AppFooter from '~/components/Common/AppFooter.vue';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
