@@ -1,6 +1,6 @@
 <template>
   <div class="file-upload">
-    <FileUpload :name="inputName" customUpload="true" @uploader="onUpload($event)" :multiple="selectMultiple"
+    <FileUpload :name="inputName" :customUpload="true" @uploader="onUpload($event)" :multiple="selectMultiple"
       :accept="fileExtension" />
   </div>
 </template>

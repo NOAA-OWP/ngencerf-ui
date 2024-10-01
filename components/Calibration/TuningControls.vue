@@ -3,7 +3,7 @@
     <div class="w-full mt-3 mb-2">
       <div v-if="rangeDateFrom && rangeDateTo" class="w-full text-left mt-1 text-xl c-blue-primary1 font-bold"
         id="RangeDates">
-        RANGE: {{ rangeDateFrom }} to {{ rangeDateTo }}
+        RANGE: {{ formatDateForDisplay(rangeDateFrom) }} GMT to {{ formatDateForDisplay(rangeDateTo) }} GMT
       </div>
     </div>
     <div class="">
@@ -13,6 +13,7 @@
           <div class="col-span-2">
             <div id="BoxLeft" class="text-left">
               <div id="BoxTopLeft" class="pt-2">
+                <small>* All times entered must be in GMT</small><br>
                 <span class="tabTitles font-bold">Calibration Time Controls</span>
               </div>
               <div id="BoxBottomLeft" class="pt-2">
@@ -26,7 +27,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
-                            time-picker-inline text-input format="yyyy-MM-dd HH:00"
+                            time-picker-inline text-input utc format="yyyy-MM-dd HH"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -35,7 +36,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
-                            time-picker-inline text-input format="yyyy-MM-dd HH:00"
+                            time-picker-inline text-input utc format="yyyy-MM-dd HH"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -46,7 +47,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
-                            time-picker-inline text-input format="yyyy-MM-dd HH:00"
+                            time-picker-inline text-input utc format="yyyy-MM-dd HH"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -55,7 +56,7 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
-                            time-picker-inline text-input format="yyyy-MM-dd HH:00"
+                            time-picker-inline text-input utc format="yyyy-MM-dd HH"
                             :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
@@ -88,7 +89,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
-                              v-model="avSimStartTime" time-picker-inline text-input format="yyyy-MM-dd HH:00"
+                              v-model="avSimStartTime" time-picker-inline text-input utc format="yyyy-MM-dd HH"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
@@ -98,7 +99,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark"
-                              v-model="avSimEndTime" time-picker-inline text-input format="yyyy-MM-dd HH:00"
+                              v-model="avSimEndTime" time-picker-inline text-input utc format="yyyy-MM-dd HH"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
@@ -111,7 +112,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark"
-                              v-model="avCalStartTime" time-picker-inline text-input format="yyyy-MM-dd HH:00"
+                              v-model="avCalStartTime" time-picker-inline text-input utc format="yyyy-MM-dd HH"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
@@ -120,7 +121,7 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
-                              time-picker-inline text-input format="yyyy-MM-dd HH:00"
+                              time-picker-inline text-input utc format="yyyy-MM-dd HH"
                               :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
@@ -261,7 +262,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { DateTime } from "luxon";
 
-import { calculateTimeRange } from "~/utils/TimeHelpers";
+import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
@@ -323,20 +324,22 @@ onMounted(async () => {
   // set calibration times
   if (userCalibrationRunData.value?.calibration_times) {
     const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
-    simStartTime.value = simulation_start_time;
-    simEndTime.value = simulation_end_time;
+    
     calStartTime.value = calibration_start_time;
     calEndTime.value = calibration_end_time;
+    simStartTime.value = new Date(simulation_start_time).toISOString();
+    console.log("simStartTime:", simStartTime.value);
+    simEndTime.value = simulation_end_time;
   };
 
   // set automatic validation times
   if (userCalibrationRunData.value?.validation_times) {
     const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
 
-    avSimStartTime.value = simulation_start_time;
-    avSimEndTime.value = simulation_end_time;
     avCalStartTime.value = validation_start_time;
     avCalEndTime.value = validation_end_time;
+    avSimStartTime.value = simulation_start_time;
+    avSimEndTime.value = simulation_end_time;
   };
 
   // set time range
@@ -439,6 +442,40 @@ watch(selectedOutputVariable, () => {
   //console.log("selectedOutputVariable:", selectedOutputVariable.value);
   //console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
 });
+
+// watch for changes to simStartTime only once
+watch(simStartTime, () => {
+  // set calStartTime to one year after simStartTime
+  console.log('watch simStartTime called');
+
+  if (!calStartTime.value) {
+    const simStartDate = new Date(simStartTime.value);
+    const calStartDate = DateTime.fromJSDate(simStartDate).plus({ years: 1 }).toISO();
+    
+    // format calStartDate to 'yyyy-MM-dd HH' and set calStartTime
+    calStartTime.value = DateTime.fromISO(calStartDate);
+    console.log('calStartTime:', calStartTime.value);
+  }
+},
+{ once: true }
+);
+
+// watch for changes to avSimStartTime only once
+watch(avSimStartTime, () => {
+  console.log('watch avSimStartTime called');
+
+  if (!avCalStartTime.value) {
+    // set avCalStartTime to one year after avSimStartTime
+    const avSimStartDate = new Date(avSimStartTime.value);
+    const avCalStartDate = DateTime.fromJSDate(avSimStartDate).plus({ years: 1 }).toISO();
+    
+    // format avCalStartDate to 'yyyy-MM-dd HH' and set avCalStartTime
+    avCalStartTime.value = DateTime.fromISO(avCalStartDate);
+    console.log('avCalStartTime:', avCalStartTime.value);
+  }
+},
+{ once: true }
+);
 
 /**
  * Trigger file input dialog
@@ -726,26 +763,24 @@ const isOutputVariableValidated = (): boolean => {
 useListen('calibrationButtonSaveStart', (actionButton) => {
   // handle saving Tuning Tab data
   const handleSaveTuningTab = async () => {
-    try {
-      const saveTuningTabResponse = await postSaveTuningTabData();
-      console.log(
-        `saveTabContent Tuning, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `,
-        saveTuningTabResponse
-      );
+    const saveTuningTabResponse = await postSaveTuningTabData();
+    console.log(
+      `saveTabContent Tuning, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `,
+      saveTuningTabResponse
+    );
 
+    if (saveTuningTabResponse?.status === 200) {
       toast.add({
-        severity: 'info',
+        severity: 'success',
         summary: 'Saved Tuning Tab data',
         detail: 'Saved Tuning Tab data',
         life: 3000,
       });
-    } catch (error) {
-      console.error('Error saving tuning tab data:', error);
+    } else {
       toast.add({
         severity: 'error',
         summary: 'Error saving Tuning Tab data',
-        detail: 'Error saving Tuning Tab data',
-        life: 3000,
+        detail: saveTuningTabResponse?._data?.message || 'Error saving Tuning Tab data'
       });
     }
   };

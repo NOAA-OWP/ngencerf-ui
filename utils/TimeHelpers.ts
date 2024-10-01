@@ -7,10 +7,15 @@ export const formatTime = (time: string) => {
   return DateTime.fromISO(time).toUTC().toFormat("yyyy/MM/dd  HH:mm:ss");
 };
 
-// 2017-12-31T00:00:00Z => 2017-12-31 00:00
-export const formatDateForDisplay = ( d: string ) => {
-  return d.replace('T', ' ').replace("Z", "").substring(0, 16 );
-  
+// 2017-12-31T00:00:00Z => 2017-12-31 00
+export const formatDateForDisplay = ( d: string ): string => {
+  const date = new Date(d);
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}`;
 }
 
 /**
