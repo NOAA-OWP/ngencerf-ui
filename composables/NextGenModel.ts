@@ -374,6 +374,19 @@ export interface CalibrationPlotListData extends SelectOption {
 }
 
 /**
+ * Evaluation models
+ */
+export interface EvaluationCalibrationRunListItem {
+  calibration_run_id: number;
+  formulation_name: string;
+  run_date: Date;
+  gage_id: string;
+  objective_function: string;
+  optimization: string;
+  validation_runs: number;
+}
+
+/**
  * Event Bus Interface
  */
 export type CalibrationButtonGroupClickEvent = {
@@ -381,6 +394,10 @@ export type CalibrationButtonGroupClickEvent = {
   calibrationButtonResetCancel: string;
   calibrationButtonPrev: string;
   calibrationButtonNext: string;
+}
+
+export type EvaluationButtonGroupClickEvent = {
+  evaluationResetUiClick: number;
 }
 
 export type LogoutEvent = {

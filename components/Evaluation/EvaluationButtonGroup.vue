@@ -3,7 +3,9 @@
 
     <div class="col-span-2">
       <span v-if="getEvaluationTabIndex() === 1">
-        <button class="start actionBtn">Evaluate</button>
+        <Button class="start actionBtn">Evaluate</Button>
+        
+        <Button v-if="validatedCalibrationRunList.length > 0" class="start actionBtn" @click.stop="EvalValidateCalibrateReset">Back</Button>
       </span>
       <span v-if="getEvaluationTabIndex() >= 5">
         <button class="start actionBtn">Run</button>
@@ -25,10 +27,27 @@
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
+import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
+import { useEvent } from "~/composables/UseEventBus";
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getEvaluationTabIndex } = generalStore();
+const { validatedCalibrationRunList } = storeToRefs( useEvaluationCalibrationRunStore() )
+const showValidateCalibrationListBackButton = ref<boolean>( false )
 
 const tabIndex = getEvaluationTabIndex();
+
+const EvalValidateCalibrateReset = async ( e: Event ) => {
+  useEvent( 'evaluationResetUiClick', 1  );
+}
+
+watch( validatedCalibrationRunList, async ( newList, oldList ) => {
+  if ( newList.length > 0 ) {
+    showValidateCalibrationListBackButton.value = true;
+  } else {
+    showValidateCalibrationListBackButton.value = false;
+  }
+})
 
 </script>
 

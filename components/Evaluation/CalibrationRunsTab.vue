@@ -1,48 +1,58 @@
 <template>
-    <div class="h-full min-h-screen ">
-        <div class="grid grid-rows-12">
-            <div class="row-span-2">
-                <div id="PgTitle">Previous Calibration Runs</div>
-            </div>
-            <div class="row-span-10">
-                <div id="CalTable">
-
-                    <div class="grid grid-cols-2 mb-5">
-                        <div class="col-span-1">
-                            <div class="inline ml-2">Filter Validation Runs: 
-                            <Select id="FilterCalRuns" class="">
-                                <option value="">...</option>
-                            </Select>
-                        </div>    
-                        </div>
-
-                        <div class="col-span-1">
-                            <div class="inline ">Headwater Basin Gage:
-                            <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
-                            :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder=""></Select>
-                        </div>
-                    </div>
-                    </div>
-                    
-                    <ConfirmDialog></ConfirmDialog>
-                    <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-                        :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-                    <DataTable id="cr-list" :value="filteredEvaluationCalibrationRunList" scrollable scroll-height="400px"
-                        table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
-                        contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-                        @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
-                        <Column field="calibration_run_id" header="Run ID" sortable></Column>
-                        <Column field="run_date" header="Run Date" sortable></Column>
-                        <Column field="formulation_name" header="formulation_name" sortable></Column>
-                        <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-                        <Column field="objective_function" header="Objective Function" sortable></Column>                        
-                        <Column field="Optimization" header="Optimization Algorithm" sortable></Column>
-                        <Column field="validation_runs" header="Validation Runs" sortable></Column>
-                    </DataTable>
-                </div>
-            </div>
+  <div class="h-full min-h-screen ">
+    <div class="grid grid-rows-12">
+      <div class="row-span-2">
+        <div id="PgTitle">Previous Calibration Runs</div>
+      </div>
+      <Button id="btn-new-validation" class="start actionBtn" v-if="userSelectedEvalCalibrationRunId > 0">New Validation</Button>
+      <div class="row-span-10" v-if="validatedCalibrationRunList.length == 0">
+        <div id="CalTable">
+          <div class="grid grid-cols-2 mb-5">
+              <div class="col-span-1">
+                  <div class="inline ">Headwater Basin Gage:
+                  <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
+                  :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder=""></Select>
+              </div>
+          </div>
+          </div>
+          
+          <ConfirmDialog></ConfirmDialog>
+          <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+              :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+          <DataTable id="cr-list" :value="filteredEvaluationCalibrationRunList" scrollable scroll-height="400px"
+              table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
+              contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
+              @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
+              <Column field="calibration_run_id" header="Run ID" sortable></Column>
+              <Column field="run_date" header="Run Date" sortable></Column>
+              <Column field="formulation_name" header="formulation_name" sortable></Column>
+              <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
+              <Column field="objective_function" header="Objective Function" sortable></Column>                        
+              <Column field="Optimization" header="Optimization Algorithm" sortable></Column>
+              <Column field="validation_runs" header="Validation Runs" sortable></Column>
+          </DataTable>
+          <!--
+          <div v-if="getReferenceDataSetOptions.length > 0">
+              <label>Reference Data Set:</label>
+              <Select id="referenceDataSets" v-model="uiReferenceDataSet" :options="getReferenceDataSetOptions" optionLabel="description"
+              optionValue="name" class="w-full"></Select>
+          </div>
+          -->
         </div>
+      </div>
+      <div class="row-span-10" v-if="validatedCalibrationRunList.length > 0">
+        <div id="evaluationCalibrationList">
+          <DataTable id="cr-list" :value="validatedCalibrationRunList" scrollable scroll-height="400px"
+            table-style="min-width: 50rem" selectionMode="single" v-model:selection="userSelectedValidatedCalibrationRunId" :rowStyle="rowStyle" class="boxed">
+            <Column field="validation_id" header="Validation Run ID" sortable></Column>
+            <Column field="run_date" header="Run Date" sortable></Column>
+            <Column field="validation_start" header="Validation Start" sortable></Column>
+            <Column field="validation_end" header="Validation End" sortable></Column>
+          </DataTable>
+        </div>        
+      </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -56,8 +66,23 @@ import { generalStore } from "@/stores/common/GeneralStore";
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
-const { filteredEvaluationCalibrationRunList, uiGageId, evaluationCalibrationRunGageList, userSelectedEvalCalibrationRunId } = storeToRefs( evaluationCalibrationRunStore )
-const { fetchEvaluationCalibrationRunList } = evaluationCalibrationRunStore;
+const { 
+  filteredEvaluationCalibrationRunList,
+  uiGageId, evaluationCalibrationRunGageList,
+  getReferenceDataSetOptions,
+  uiReferenceDataSet, 
+  userSelectedEvalCalibrationRunId,
+  validatedCalibrationRunList,
+  userSelectedValidatedCalibrationRunId
+} = storeToRefs( evaluationCalibrationRunStore )
+const { 
+  fetchEvaluationCalibrationRunList,
+  loadSelectedCalibrationRun,
+  resetUserSelectedEvalCalibrationRun,
+  fetchValidatedCalibrationRunList,
+  resetValidatedCalibrationRunList,
+  resetEvaluationCalibrationRunStore
+} = evaluationCalibrationRunStore;
 
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
@@ -76,11 +101,17 @@ const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 
 const onEvalCalibrationRowSelect = ( event: any ) => {
-    userSelectedEvalCalibrationRunId.value = event.data.calibration_run_id;
+  loadSelectedCalibrationRun( event.data.calibration_run_id );
+  
+  if ( event.data.validation_runs > 1 ) {
+    fetchValidatedCalibrationRunList();
+  } else {
+    resetValidatedCalibrationRunList();
+  }
 }
 
 const onEvalCalibrationRowUnSelect = ( event: any ) => {
-    userSelectedEvalCalibrationRunId.value = 0;
+    resetUserSelectedEvalCalibrationRun();
 }
 
 const rowStyle = (data: any) => {
@@ -89,7 +120,15 @@ const rowStyle = (data: any) => {
     }
 }
 
+useListen('evaluationResetUiClick', ( actionId ) => {
+   if ( actionId == 1 ) {
+    selectedCalibrationRun.value = undefined;
+    resetUserSelectedEvalCalibrationRun();
+   }
+});
+
 onMounted( () => {
+  resetEvaluationCalibrationRunStore();
   fetchEvaluationCalibrationRunList();
 })
 </script>
@@ -110,6 +149,19 @@ onMounted( () => {
     padding: 10px;
     border-radius: 20px;
     font-size: 21px;
+}
+
+.actionBtn {
+  display: inline-block;
+  width: 95%;
+  height: 55px;
+  border: 5px solid #59b4c1;
+  border-radius: 10px;
+  margin-right: 20px;
+}
+
+.start {
+  background-color: #155e29;
 }
 
 #CalTable {
