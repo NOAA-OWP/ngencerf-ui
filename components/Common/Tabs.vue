@@ -56,7 +56,7 @@
         </div>
         <div data-tab="4" data-menu-tab="24" class="tabs prevent-select" v-on:click="tabClicked"
           aria-label="Select Parameters Set tab" title=" Select Parameters Set tab tab">
-          Select Parameters Set
+          Select Alternale Iteration
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
         <div data-tab="5" data-menu-tab="25" class="tabs prevent-select" v-on:click="tabClicked"
