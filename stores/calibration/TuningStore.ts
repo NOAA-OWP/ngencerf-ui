@@ -95,9 +95,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
         },
         body: JSON.stringify(requestBody)
       });
-    console.log("saveTuningTabOutput:", saveTuningTabOutput?._data);
 
-    return saveTuningTabOutput?._data;
+    return saveTuningTabOutput;
   };
 
 

@@ -534,7 +534,6 @@ watch(selectedOutputVariable, () => {
 
 // watch for changes to simStartTime
 watch(simStartTime, () => {
-  // set calStartTime to one year after simStartTime
   console.log('watch simStartTime called');
   console.log('typeof simStartTime:', typeof simStartTime.value);
   console.log('simStartTime:', simStartTime.value);
@@ -542,7 +541,7 @@ watch(simStartTime, () => {
   console.log('simStartTimeString:', simStartTimeString);
 
   if (simStartTime.value && typeof simStartTime.value === 'object') {
-    calStartTime.value = simStartTime.value.plus({ years: 1 });
+    calStartTime.value = simStartTime.value.plus({ years: 1 }); // set calStartTime to one year after simStartTime
     console.log('calStartTime:', calStartTime.value);
     const calStartTimeString = calStartTime.value.toISO();
     console.log('calStartTimeString:', calStartTimeString);
@@ -558,13 +557,21 @@ watch(simStartTime, () => {
 // watch for changes to avSimStartTime
 watch(avSimStartTime, () => {
   console.log('watch avSimStartTime called');
+  console.log('typeof avSimStartTime:', typeof avSimStartTime.value);
+  console.log('avSimStartTime:', avSimStartTime.value);
+  const avSimStartTimeString = avSimStartTime.value.toISO();
+  console.log('avSimStartTimeString:', avSimStartTimeString);
 
-  if (avSimStartTime.value) {
-    // set avCalStartTime to one year after avSimStartTime
+  if (avSimStartTime.value && typeof avSimStartTime.value === 'object') {
+    avCalStartTime.value = avSimStartTime.value.plus({ years: 1 });
+    console.log('avCalStartTime:', avCalStartTime.value);
+    const avCalStartTimeString = avCalStartTime.value.toISO();
+    console.log('avCalStartTimeString:', avCalStartTimeString);
+  }
+  else if (avSimStartTime.value && typeof avSimStartTime.value === 'string') {
+    console.log('avSimStartTime.value is a string. This should not happen'); // the avSimStartTime binding might call this watch function when it is a string. ooof.
     const avSimStartDateTime = DateTime.fromISO(avSimStartTime.value, { zone: 'utc' });
-    const avCalStartDateTime = avSimStartDateTime.plus({ years: 1 });
-    
-    avCalStartTime.value = avCalStartDateTime.toISO();
+    avCalStartTime.value = avSimStartDateTime.value.plus({ years: 1 });
     console.log('avCalStartTime:', avCalStartTime.value);
   }
 });
@@ -861,7 +868,7 @@ useListen('calibrationButtonSaveStart', (actionButton) => {
       saveTuningTabResponse
     );
 
-    if (saveTuningTabResponse?.status === 200) {
+    if (saveTuningTabResponse?.ok) {
       toast.add({
         severity: 'success',
         summary: 'Saved Tuning Tab data',
