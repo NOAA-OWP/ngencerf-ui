@@ -18,8 +18,8 @@
               @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
-              @click="" class="disabled">Forecast</NuxtLink>
+            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3' @click=""
+              class="disabled">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
             <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
@@ -33,17 +33,10 @@
         <div id="UserGroup" class="grid grid-cols-2">
 
           <div class="col-span-1">
-
-            <div v-show="uMenu" id="userMenu" class="pt-5 pr-5">
-              <ul>
-                <li @click="gotoAccount" class="pt-2 cursor-pointer hover:underline">Account</li>
-                <li @click="logoutUser" class="pt-2 cursor-pointer hover:underline">Logout</li>
-              </ul>
-            </div>
-
             <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle"
-              class="float-right userInitials" @click="showUserMenu">
-              {{ getUserInitials() }}
+              class="float-right userInitials" @contextmenu="onImageRightClick" @click="onImageRightClick">
+              {{ getUserInitials() }}<i class="pi pi-angle-down"></i>
+              <ContextMenu ref="userContextMenu" :model="userItems" :autoZIndex="true" />
             </div>
 
           </div>
@@ -51,8 +44,6 @@
             <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px"
               id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</button>
           </div>
-
-
 
         </div>
       </div>
@@ -113,14 +104,21 @@
 
     </div>
   </div>
+  <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
+      <UserAccount />
+    </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted} from "vue";
 import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
+import ContextMenu from 'primevue/contextmenu';
+
 import { useLogout } from "~/composables/UseEventBus";
+
+import UserAccount from "~/components/Common/UserAccount.vue";
 
 const HelpLandingPageHelp = defineAsyncComponent(() => import("../Help/LandingPageHelp.vue"))
 const HelpPreviousRunsHelp = defineAsyncComponent(() => import("../Help/PreviousRunsHelp.vue"))
@@ -133,11 +131,20 @@ const HelpResultsHelp = defineAsyncComponent(() => import("../Help/ResultsHelp.v
 
 const emit = defineEmits(["logoutEvent"]);
 
+const accountOverlay = ref();
+
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
 const { isUserLoggedIn, getUserInitials, hardResetUserDataStore } = useUserDataStore();
 
 const location = useRoute();
+
+const userItems = ref([
+  { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
+  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
+])
+
+const userContextMenu = ref();
 
 const uMenu = ref(false);
 
@@ -145,6 +152,12 @@ const showHelp = ref(false);
 let observer = null;
 
 const isOnDiv = ref(false);
+
+const onImageRightClick = (event: any) => {
+  console.log("Activating user manu")
+  userContextMenu.value.show(event)
+}
+
 onMounted(() => {
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
@@ -177,9 +190,17 @@ const sizeHelpWindow = () => {
   };
 };
 
+/**
+ * 
+ */
 const gotoAccount = async () => {
-  await navigateTo('user');
+  accountOverlay.value.style.display = "block";
 }
+
+useAccountEventListen('accountEvent', () => {
+  const ele = document.getElementById('UserAccountOverlay') as HTMLElement;
+  ele.style.display = "none";
+})
 
 const logoutUser = async () => {
   console.log("Logging out...");
@@ -366,7 +387,8 @@ const MenuChanged = (e: MouseEvent) => {
   overflow: auto;
 }
 
-.disabled, .disabled:hover {
+.disabled,
+.disabled:hover {
   background-color: $ngwcp_neutral_gray_md !important;
 }
 

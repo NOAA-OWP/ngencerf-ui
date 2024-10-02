@@ -387,6 +387,10 @@ export type LogoutEvent = {
   logoutEvent: string;
 }
 
+export type AccountEvent = {
+  accountEvent: string;
+}
+
 export const ValidationFormFields = {
   formulation_name: "Formulation Name",
   modules: "Formulation Modules",

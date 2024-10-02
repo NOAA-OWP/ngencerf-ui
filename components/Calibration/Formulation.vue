@@ -134,7 +134,6 @@ import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
-import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
 const isLoading = ref(true);
