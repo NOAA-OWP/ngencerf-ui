@@ -27,8 +27,8 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
-                            time-picker-inline text-input utc format="yyyy-MM-dd HH:00"
-                            :disabled="!isTimeRangeSet()" />
+                            time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
+                            @update:model-value="handleSimStartUpdate" :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
                         <td class="pl-6 w-1/6">
@@ -36,8 +36,8 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
-                            time-picker-inline text-input utc format="yyyy-MM-dd HH:00"
-                            :disabled="!isTimeRangeSet()" />
+                            time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
+                            @update:model-value="handleSimEndUpdate" :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
                       </tr>
@@ -47,8 +47,8 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
-                            time-picker-inline text-input utc format="yyyy-MM-dd HH:00"
-                            :disabled="!isTimeRangeSet()" />
+                            time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
+                            @update:model-value="handleCalStartUpdate" :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
                         <td class="pl-6 w-1/6">
@@ -56,8 +56,8 @@
                         </td>
                         <td class="text-left w-2/6" style="position: relative;">
                           <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
-                            time-picker-inline text-input utc format="yyyy-MM-dd HH:00"
-                            :disabled="!isTimeRangeSet()" />
+                            time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
+                            @update:model-value="handleCalEndUpdate" :disabled="!isTimeRangeSet()" />
                           <div v-if="!isTimeRangeSet()" class="overlay"></div>
                         </td>
 
@@ -89,8 +89,8 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
-                              v-model="avSimStartTime" time-picker-inline text-input utc format="yyyy-MM-dd HH:00"
-                              :disabled="!isTimeRangeSet()" />
+                              v-model="avSimStartTime" time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
+                              @update:model-value="handleAvSimStartUpdate" :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
                           </td>
@@ -99,8 +99,8 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark"
-                              v-model="avSimEndTime" time-picker-inline text-input utc format="yyyy-MM-dd HH:00"
-                              :disabled="!isTimeRangeSet()" />
+                              v-model="avSimEndTime" time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
+                              @update:model-value="handleAvSimEndUpdate" :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
 
@@ -112,8 +112,8 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark"
-                              v-model="avCalStartTime" time-picker-inline text-input utc format="yyyy-MM-dd HH:00"
-                              :disabled="!isTimeRangeSet()" />
+                              v-model="avCalStartTime" time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
+                              @update:model-value="handleAvCalStartUpdate" :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
                           </td>
                           <td class="pl-6 w-1/6">
@@ -121,8 +121,8 @@
                           </td>
                           <td class="text-left w-2/6" style="position: relative;">
                             <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
-                              time-picker-inline text-input utc format="yyyy-MM-dd HH:00"
-                              :disabled="!isTimeRangeSet()" />
+                              time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
+                              @update:model-value="handleAvCalEndUpdate" :disabled="!isTimeRangeSet()" />
                             <div v-if="!isTimeRangeSet()" class="overlay"></div>
 
                           </td>
@@ -328,20 +328,34 @@ onMounted(async () => {
   if (userCalibrationRunData.value?.calibration_times) {
     const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
     
-    calStartTime.value = calibration_start_time;
-    calEndTime.value = calibration_end_time;
-    simStartTime.value = simulation_start_time;
-    simEndTime.value = simulation_end_time;
+    simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+    console.log("simStartTime:", simStartTime.value);
+
+    simEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+    console.log("simEndTime:", simEndTime.value);
+
+    calStartTime.value = DateTime.fromISO(calibration_start_time, { zone: 'utc' });
+    console.log("calStartTime:", calStartTime.value);
+
+    calEndTime.value = DateTime.fromISO(calibration_end_time, { zone: 'utc' });
+    console.log("calEndTime:", calEndTime.value);
   };
 
   // set automatic validation times
   if (userCalibrationRunData.value?.validation_times) {
     const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
 
-    avCalStartTime.value = validation_start_time;
-    avCalEndTime.value = validation_end_time;
-    avSimStartTime.value = simulation_start_time;
-    avSimEndTime.value = simulation_end_time;
+    avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+    console.log("avSimStartTime:", avSimStartTime.value);
+
+    avSimEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+    console.log("avSimEndTime:", avSimEndTime.value);
+
+    avCalStartTime.value = DateTime.fromISO(validation_start_time, { zone: 'utc' });
+    console.log("avCalStartTime:", avCalStartTime.value);
+
+    avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
+    console.log("avCalEndTime:", avCalEndTime.value);
   };
 
   // set time range
@@ -431,6 +445,79 @@ const handleFormulationNotSet = (event: Event) => {
   }
 };
 
+const handleSimStartUpdate = (value: any) => {
+  console.log('handleSimStartUpdate called');
+  if (typeof value === 'string') {
+    simStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+  console.log('typeof simStartTime:', typeof simStartTime.value);
+  console.log('simStartTime:', simStartTime.value);
+};
+
+const handleSimEndUpdate = (value: any) => {
+  console.log('handleSimEndUpdate called');
+  if (typeof value === 'string') {
+    simEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+  console.log('typeof simEndTime:', typeof simEndTime.value);
+  console.log('simEndTime:', simEndTime.value);
+};
+
+const handleCalStartUpdate = (value: any) => {
+  console.log('handleCalStartUpdate called');
+  if (typeof value === 'string') {
+    calStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+  console.log('typeof calStartTime:', typeof calStartTime.value);
+  console.log('calStartTime:', calStartTime.value);
+};
+
+const handleCalEndUpdate = (value: any) => {
+  console.log('handleCalEndUpdate called');
+  if (typeof value === 'string') {
+    calEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+  console.log('typeof calEndTime:', typeof calEndTime.value);
+  console.log('calEndTime:', calEndTime.value);
+};
+
+const handleAvSimStartUpdate = (value: any) => {
+  console.log('handleAvSimStartUpdate called');
+  if (typeof value === 'string') {
+    avSimStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+  console.log('typeof avSimStartTime:', typeof avSimStartTime.value);
+  console.log('avSimStartTime:', avSimStartTime.value);
+};
+
+const handleAvSimEndUpdate = (value: any) => {
+  console.log('handleAvSimEndUpdate called');
+  if (typeof value === 'string') {
+    avSimEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+  console.log('typeof avSimEndTime:', typeof avSimEndTime.value);
+  console.log('avSimEndTime:', avSimEndTime.value);
+};
+
+const handleAvCalStartUpdate = (value: any) => {
+  console.log('handleAvCalStartUpdate called');
+  if (typeof value === 'string') {
+    avCalStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+  console.log('typeof avCalStartTime:', typeof avCalStartTime.value);
+  console.log('avCalStartTime:', avCalStartTime.value);
+};
+
+const handleAvCalEndUpdate = (value: any) => {
+  console.log('handleAvCalEndUpdate called');
+  if (typeof value === 'string') {
+    avCalEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+  console.log('typeof avCalEndTime:', typeof avCalEndTime.value);
+  console.log('avCalEndTime:', avCalEndTime.value);
+  console.log('avCalEndTimeString:', avCalEndTime.value.toISO());
+};
+
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
   // find module for newly-selected output variable
@@ -449,14 +536,21 @@ watch(selectedOutputVariable, () => {
 watch(simStartTime, () => {
   // set calStartTime to one year after simStartTime
   console.log('watch simStartTime called');
+  console.log('typeof simStartTime:', typeof simStartTime.value);
+  console.log('simStartTime:', simStartTime.value);
+  const simStartTimeString = simStartTime.value.toISO();
+  console.log('simStartTimeString:', simStartTimeString);
 
-  if (simStartTime.value) {
-    const simStartDateTime = DateTime.fromISO(simStartTime.value);
-    console.log('calStartTime:', simStartDateTime.plus({ years: 1 }));
-    const calStartDate = simStartDateTime.plus({ years: 1 });
-    
-    // save as ISO string
-    calStartTime.value = calStartDate.toISO();
+  if (simStartTime.value && typeof simStartTime.value === 'object') {
+    calStartTime.value = simStartTime.value.plus({ years: 1 });
+    console.log('calStartTime:', calStartTime.value);
+    const calStartTimeString = calStartTime.value.toISO();
+    console.log('calStartTimeString:', calStartTimeString);
+  }
+  else if (simStartTime.value && typeof simStartTime.value === 'string') {
+    console.log('simStartTime.value is a string. This should not happen'); // the simStartTime binding might call this watch function when it is a string. ooof.
+    const simStartDateTime = DateTime.fromISO(simStartTime.value, { zone: 'utc' });
+    calStartTime.value = simStartDateTime.value.plus({ years: 1 });
     console.log('calStartTime:', calStartTime.value);
   }
 });
@@ -465,12 +559,12 @@ watch(simStartTime, () => {
 watch(avSimStartTime, () => {
   console.log('watch avSimStartTime called');
 
-  if (!avCalStartTime.value) {
+  if (avSimStartTime.value) {
     // set avCalStartTime to one year after avSimStartTime
-    const avSimStartDate = new Date(avSimStartTime.value);
-    const avCalStartDate = DateTime.fromJSDate(avSimStartDate).plus({ years: 1 });
+    const avSimStartDateTime = DateTime.fromISO(avSimStartTime.value, { zone: 'utc' });
+    const avCalStartDateTime = avSimStartDateTime.plus({ years: 1 });
     
-    avCalStartTime.value = avCalStartDate.toISO();
+    avCalStartTime.value = avCalStartDateTime.toISO();
     console.log('avCalStartTime:', avCalStartTime.value);
   }
 });
@@ -607,10 +701,10 @@ const areCalibrationTimesValidated = (fullValidation: boolean = true): boolean =
   // convert times to Date objects
   const rangeStartDate = new Date(rangeDateFrom.value);
   const rangeEndDate = new Date(rangeDateTo.value);
-  const simStartDate = new Date(simStartTime.value);
-  const simEndDate = new Date(simEndTime.value);
-  const calStartDate = new Date(calStartTime.value);
-  const calEndDate = new Date(calEndTime.value);
+  const simStartDate = simStartTime.value.toJSDate();
+  const simEndDate = simEndTime.value.toJSDate();
+  const calStartDate = calStartTime.value.toJSDate();
+  const calEndDate = calEndTime.value.toJSDate();
 
   // check if time_range and calibration_times are null after converted to Date objects
   if (!rangeStartDate || !rangeEndDate || !simStartDate || !simEndDate || !calStartDate || !calEndDate) {
@@ -674,11 +768,11 @@ const areValidationTimesValidated = (): boolean => {
   }
 
   // convert times to Date objects
-  const avSimStartDate = new Date(avSimStartTime.value);
-  const avSimEndDate = new Date(avSimEndTime.value);
-  const avCalStartDate = new Date(avCalStartTime.value);
-  const avCalEndDate = new Date(avCalEndTime.value);
-  const rangeStartDate = new Date(rangeDateFrom.value);
+  const avSimStartDate = avSimStartTime.value.toJSDate();
+  const avSimEndDate = avSimEndTime.value.toJSDate();
+  const avCalStartDate = avCalStartTime.value.toJSDate();
+  const avCalEndDate = avCalEndTime.value.toJSDate();
+  const rangeStartDate = new Date(rangeDateFrom.value)
   const rangeEndDate = new Date(rangeDateTo.value);
 
   // check if Date objects are valid
@@ -688,7 +782,7 @@ const areValidationTimesValidated = (): boolean => {
   }
 
   // convert simeEndTime to Date object. simEndTime is the lastest time within calibration_times
-  const simEndDate = new Date(simEndTime.value);
+  const simEndDate = simEndTime.value.toJSDate();
 
   // set conditions to check if validation_times are not after calibration_times
   const isAvSimStartAfterCalEnd = avSimStartDate > simEndDate;

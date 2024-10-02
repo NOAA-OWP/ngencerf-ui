@@ -18,10 +18,10 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
 
   // user-data properties
-  const simStartTime = ref<string>("");
-  const simEndTime = ref<string>("");
-  const calStartTime = ref<string>("");
-  const calEndTime = ref<string>("");
+  const simStartTime = ref<any>("");
+  const simEndTime = ref<any>("");
+  const calStartTime = ref<any>("");
+  const calEndTime = ref<any>("");
 
   const userCalibrationTuningParameters = ref<any[]>([]);
   const userOutputVariableToCalibrate = ref<{ name: string; module: string | null }>({
@@ -31,10 +31,10 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const outputVariables = ref<any[]>([]);
   const automatic_validation = ref<boolean>(true);
 
-  const avSimStartTime = ref<string>("");
-  const avSimEndTime = ref<string>("");
-  const avCalStartTime = ref<string>("");
-  const avCalEndTime = ref<string>("");
+  const avSimStartTime = ref<any>("");
+  const avSimEndTime = ref<any>("");
+  const avCalStartTime = ref<any>("");
+  const avCalEndTime = ref<any>("");
 
   const rangeDateFrom = ref<any>();
   const rangeDateTo = ref<any>();
