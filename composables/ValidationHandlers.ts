@@ -33,10 +33,11 @@ export const useCalibrationTabValidation = ( requiredFields: any ) => {
 export const useCalibrationFormulationSlothTableValidation = ( slothParameters: SlothParameterData[] ) => {
    const BreakException = {};
    const errors = ref<any>({});
+   
    try {
       slothParameters.forEach( ( slothParameter ) => {
          Object.keys( slothParameter ).forEach( key => {
-            if ( slothParameter[ key as keyof SlothParameterData ] == "" ) {
+            if ( slothParameter[ key as keyof SlothParameterData ] === "" ) {
                throw new Error( key )
             }
          })
@@ -44,7 +45,7 @@ export const useCalibrationFormulationSlothTableValidation = ( slothParameters: 
    } catch ( error: any ) {
       errors.value[ error?.message as keyof typeof errors ] = [ 'All sloth parameter fields are required.' ];
    }
-   console.log ( errors )
+   
    return errors;
 }
 
