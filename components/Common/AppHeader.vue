@@ -105,16 +105,17 @@
     </div>
   </div>
   <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
-      <UserAccount />
-    </div>
+    <UserAccount />
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted} from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 import ContextMenu from 'primevue/contextmenu';
+import ConfirmPopup from 'primevue/confirmpopup';
 
 import { useLogout } from "~/composables/UseEventBus";
 
@@ -203,9 +204,11 @@ useAccountEventListen('accountEvent', () => {
 })
 
 const logoutUser = async () => {
-  console.log("Logging out...");
-  useLogout("logoutEvent", "");
-  await navigateTo('login');
+  if (confirm("Are you sure you want to logout?") == true) {
+    console.log("Logging out...");
+    useLogout("logoutEvent", "");
+    await navigateTo('login');
+  }
 }
 
 const showUserMenu = () => {
