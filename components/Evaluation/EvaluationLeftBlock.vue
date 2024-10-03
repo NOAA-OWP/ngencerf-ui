@@ -10,16 +10,7 @@
         <EvaluateTab />
       </span>
       <span v-else-if="activeTab == 3">
-        <SetupValRunTab />
-      </span>
-      <span v-else-if="activeTab == 4">
-        <SelectParamsSetTab />
-      </span>
-      <span v-else-if="activeTab == 5">
-        <ReviewSetupRunTab />
-      </span>
-      <span v-else="activeTab == 6">
-        <StatusTab />
+        <SelectAltIterationTab />
       </span>
     </div>
   </div>
@@ -29,10 +20,7 @@
 import Tabs from '~/components/Common/Tabs.vue'
 
 import EvaluateTab from './EvaluateTab.vue'
-import SetupValRunTab from './SetupValRunTab.vue'
-import SelectParamsSetTab from './SelectParamsSetTab.vue'
-import ReviewSetupRunTab from './ReviewSetupRunTab.vue'
-import StatusTab from './StatusTab.vue'
+import SelectAltIterationTab from './SelectAltIterationTab.vue'
 import CalibrationRunsTab from './CalibrationRunsTab.vue'
 
 // Default to Tab 1, HeadwaterBasinGage
