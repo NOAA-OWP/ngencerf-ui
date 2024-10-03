@@ -48,7 +48,8 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
 
   const setUserSelection = (): void => {      
     formulationNameInput.value = userCalibrationRunData.value?.formulation_name ?? ""
-    selectedModuleValues.value = getSavedModuleSelection.value ?? []
+    //selectedModuleValues.value = getSavedModuleSelection.value ?? []
+    selectedModuleValues.value = userCalibrationRunData.value?.modules ?? []
     useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false
     slothParameterInputs.value = userCalibrationRunData.value?.sloth_parameters ?? []
   }
