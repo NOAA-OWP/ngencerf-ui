@@ -262,6 +262,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { DateTime } from "luxon";
 
+import { isValidDateTime } from "~/utils/TimeHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
@@ -540,13 +541,13 @@ watch(simStartTime, () => {
   const simStartTimeString = simStartTime.value.toISO();
   console.log('simStartTimeString:', simStartTimeString);
 
-  if (simStartTime.value && typeof simStartTime.value === 'object') {
+  if ((!calStartTime.value || !isValidDateTime(calStartTime.value)) && simStartTime.value && isValidDateTime(simStartTime.value)) {
     calStartTime.value = simStartTime.value.plus({ years: 1 }); // set calStartTime to one year after simStartTime
     console.log('calStartTime:', calStartTime.value);
     const calStartTimeString = calStartTime.value.toISO();
     console.log('calStartTimeString:', calStartTimeString);
   }
-  else if (simStartTime.value && typeof simStartTime.value === 'string') {
+  else if ((!calStartTime.value || !isValidDateTime(calStartTime.value)) && simStartTime.value && typeof simStartTime.value === 'string') {
     console.log('simStartTime.value is a string. This should not happen'); // the simStartTime binding might call this watch function when it is a string. ooof.
     const simStartDateTime = DateTime.fromISO(simStartTime.value, { zone: 'utc' });
     calStartTime.value = simStartDateTime.value.plus({ years: 1 });
@@ -562,13 +563,13 @@ watch(avSimStartTime, () => {
   const avSimStartTimeString = avSimStartTime.value.toISO();
   console.log('avSimStartTimeString:', avSimStartTimeString);
 
-  if (avSimStartTime.value && typeof avSimStartTime.value === 'object') {
+  if ((!avCalStartTime.value || !isValidDateTime(avCalStartTime.value)) && avSimStartTime.value && isValidDateTime(avSimStartTime.value)) {
     avCalStartTime.value = avSimStartTime.value.plus({ years: 1 });
     console.log('avCalStartTime:', avCalStartTime.value);
     const avCalStartTimeString = avCalStartTime.value.toISO();
     console.log('avCalStartTimeString:', avCalStartTimeString);
   }
-  else if (avSimStartTime.value && typeof avSimStartTime.value === 'string') {
+  else if ((!avCalStartTime.value || !isValidDateTime(avCalStartTime.value)) && avSimStartTime.value && typeof avSimStartTime.value === 'string') {
     console.log('avSimStartTime.value is a string. This should not happen'); // the avSimStartTime binding might call this watch function when it is a string. ooof.
     const avSimStartDateTime = DateTime.fromISO(avSimStartTime.value, { zone: 'utc' });
     avCalStartTime.value = avSimStartDateTime.value.plus({ years: 1 });
