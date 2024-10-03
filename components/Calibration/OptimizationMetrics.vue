@@ -235,7 +235,7 @@ const optimizationSelectChange = () => {
  * event bus for calibration button group click
  */
 useListen('calibrationButtonSaveStart', (actionButton) => {
-   if (getCalibrationTabIndex() === 4 && actionButton == 'SAVE') {
+   if (getCalibrationTabIndex() === 5 && actionButton == 'SAVE') {
       toast.removeAllGroups()
       const save_optimization_response = saveOptimizationTabData()
       save_optimization_response.then((response) => {
