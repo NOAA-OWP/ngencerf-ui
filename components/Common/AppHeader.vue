@@ -160,6 +160,7 @@ const onImageRightClick = (event: any) => {
 }
 
 onMounted(() => {
+  console.log('MOUNTED: AppHeader');
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
     let headerHeight = document.getElementById('Header')?.clientHeight;

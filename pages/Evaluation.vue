@@ -11,6 +11,7 @@ import { generalStore } from "@/stores/common/GeneralStore";
 const { setMenuIndex } = generalStore();
 
 onMounted(() => {
+  console.log('MOUNTED: Evaluation');
   setMenuIndex(2); // Saves the menu pointer
 });
 

@@ -6,8 +6,9 @@
 </template>
 <script lang="ts" setup>
 import { onMounted } from "vue";
-const appConfig = useAppConfig();
+
 onMounted(() => {
+  console.log('MOUNTED: Index.vue');
    window.location.href = "login";
 });
 </script>

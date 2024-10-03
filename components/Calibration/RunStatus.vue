@@ -127,6 +127,7 @@ let runningTimeIntervalId: NodeJS.Timeout | undefined = undefined;
 let iterationIntervalId: NodeJS.Timeout | undefined = undefined;
 
 onMounted(async () => {
+  console.log('MOUNTED: Formulation');
   // Get User Calibration Run Data
   await fetchUserCalibrationRunData();
 

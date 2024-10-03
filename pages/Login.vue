@@ -146,6 +146,7 @@ const newPassword = ref('');
 const confirmPassword = ref('');
 
 onMounted(() => {
+  console.log('MOUNTED: Login');
   localStorage.clear();
   calibrationJobId.value = 0;
   hardResetUserDataStore();

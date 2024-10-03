@@ -302,6 +302,7 @@ const isCalibrationTuningControlsDisabled = computed(() => {
 });
 
 onMounted(async () => {
+  console.log('MOUNTED: Tuning Controls');
   if (!loadCalibrationRunData.value || !loadTuningTabData.value) {
     //toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
     await fetchTuningTabData(); // only fetch data if not already fetched

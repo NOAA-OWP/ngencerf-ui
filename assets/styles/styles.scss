@@ -328,7 +328,7 @@ select option {
       padding-left: 0px;
     }
     tr {
-      line-height: calc(1.3vw + 0.41vh); 
+      line-height: calc(1.1vw + 0.41vh); 
     }
     .checkMark {
       text-align: right;
@@ -433,7 +433,7 @@ table.cols-bordered {
 }
 
 /* Progress Tables */
-.progressTable {
+/* .progressTable {
   width: 100%;
   margin-left: 15px;
 
@@ -454,7 +454,7 @@ table.cols-bordered {
 
 .ptype:hover {
   color: $ngwcp_primary1;
-}
+} */
 
 
 /* Toast */

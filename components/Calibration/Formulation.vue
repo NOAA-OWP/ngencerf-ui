@@ -170,10 +170,12 @@ const toast = useToast();
 
 
 onMounted(() => {
-  toast.removeAllGroups()
-  //load static data of this tab
-  loadFormulationTabStaticData()
-  isLoading.value = false;
+  if (isLoading.value) {
+    //toast.removeAllGroups()
+    //load static data of this tab
+    loadFormulationTabStaticData();
+    isLoading.value = false;
+  }
 })
 /**
  * add sloth variable entry to table and reset name field
