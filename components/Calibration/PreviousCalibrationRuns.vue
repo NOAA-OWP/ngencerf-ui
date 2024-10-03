@@ -89,6 +89,7 @@ onMounted(() => {
   // forecastTabIndex.value = "1";
   // useGageStore().resetGageStore();
   // clearUserCalibrationRunData();
+  fetchUserCalibrationJobsListData();
   setTimeout(function () {
     loading.value = false;
   }, 500);
