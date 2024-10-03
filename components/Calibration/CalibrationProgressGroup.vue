@@ -115,7 +115,7 @@ const {
 } = storeToRefs(optimizationStore)
 
 const gageStore = useGageStore();
-const { gageData, gageTabData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
+const { gageData, gageTabData, selectedDomainValue, gageStore_data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
 
 const {
   simStartTime,

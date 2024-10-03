@@ -125,11 +125,11 @@ const { calibrationJobId } = storeToRefs(generalStore());
 
 const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
 const { resetGeneralStore } = generalStore();
-const { resetGageStore } = useGageStore();
-const { resetFormulationStore } = useFormulationStore();
-const { resetOptimizationStore } = useOptimizationStore();
+const { resetGageStore, gageStore_data_loading } = useGageStore();
+const { resetFormulationStore, formulationStore_data_loading } = useFormulationStore();
+const { resetOptimizationStore, optimizationStore_data_loading } = useOptimizationStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
-const { hardResetTuningStore } = useTuningStore();
+const { hardResetTuningStore, tuningStore_data_loading} = useTuningStore();
 
 
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -146,7 +146,6 @@ const newPassword = ref('');
 const confirmPassword = ref('');
 
 onMounted(() => {
-  console.log('MOUNTED: Login');
   localStorage.clear();
   calibrationJobId.value = 0;
   hardResetUserDataStore();

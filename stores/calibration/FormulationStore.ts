@@ -23,14 +23,14 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
   const userDataStore = useUserDataStore()
   const { userCalibrationRunData } = storeToRefs( userDataStore )
   const formulationTabData = ref<FormulationTabData>()
-  const data_loading =ref<boolean>(true)
+  const formulationStore_data_loading = ref<boolean>(true)
 
   /**
   * load forumlation tab data and init ref data
   * @returns {void}
   */
   const loadFormulationTabStaticData = () => {
-    data_loading.value = true
+    formulationStore_data_loading.value = true
     makeProtectedApiCall<FormulationTabData>( `${ngencerfBaseUrl}/calibration/load_formulation_tab/`, {
       method: "POST",
       headers: { 
@@ -42,7 +42,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
       formulationTabData.value = formulationTabDataResult?._data ?? undefined
       setUserSelection()
       
-      data_loading.value = false
+      formulationStore_data_loading.value = false
     })
   }
 
@@ -302,7 +302,7 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
     fetchSelectedFormulationModuleOptions,
     addNewSlothVariable,
     saveFormulationTabData,
-    data_loading,
+    formulationStore_data_loading,
     resetUserSelectionFormulation,
     deleteSlothVariable,
     resetFormulationStore,

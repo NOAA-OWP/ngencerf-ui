@@ -119,7 +119,7 @@
          <br clear="all">
          <br clear="all">
       </div>
-      <div class="waitgif" v-if="data_loading">
+      <div class="waitgif" v-if="optimizationStore_data_loading">
          <img src="@/assets/styles/img/wait.gif" />
       </div>
    </div>
@@ -143,7 +143,7 @@ const {
    uiPlotFrequency,
    uiStopCriteria,
    uiStreamFlowThreshold,
-   data_loading,
+   optimizationStore_data_loading,
    getOptimizationAlgorithmOptionsList,
    getObjectiveFunctionOptionsList,
    showObjectiveFunctionPeakFlow,
@@ -159,10 +159,7 @@ const toast = useToast();
 //const isLoading = ref(true);
 
 onMounted(() => {
-   toast.removeAllGroups()
-   //load tab static data
-   loadOptimizationTabStaticData();
-   //isLoading.value = false;
+   toast.removeAllGroups();
 })
 
 const cbCategoricalDisabled = ref<boolean>(false)
@@ -294,7 +291,7 @@ useListen('calibrationButtonPrev', (actionButton) => {
  * explicitly watching loading status, as onmount happen prior to store loading. 
  * make sure we manage the display base on user input AFTER data loading has completed 
  */
-watch(() => data_loading.value, (loading_status) => {
+watch(() => optimizationStore_data_loading.value, (loading_status) => {
    const metricInfo = getSelectedMetricInfo.value?.pop()
 
    if (metricInfo?.categorical == true) {

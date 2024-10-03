@@ -74,6 +74,7 @@ export interface UserCalibrationRunData {
   calibration_times: UserCalibrationRunCalibrationTimesData;
   validation_times: UserCalibrationRunValidationTimesData;
   output_variable_to_calibrate: UserCalibrationRunOutputVariableToCalibrateData;
+  parameters_selected: boolean;
   parameters: UserCalibrationRunParametersData[];
   objective_function: string;
   streamflow_threshold: number;

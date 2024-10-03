@@ -263,7 +263,7 @@ import { useBackendConfig } from "~/composables/UseBackendConfig";
 
 const toast = useToast();
 
-const isLoading = ref(true);
+const isLoading = ref(false);
 
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
@@ -302,7 +302,7 @@ const isCalibrationTuningControlsDisabled = computed(() => {
 });
 
 onMounted(async () => {
-  console.log('MOUNTED: Tuning Controls');
+  toast.removeAllGroups();
   if (!loadCalibrationRunData.value || !loadTuningTabData.value) {
     //toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
     await fetchTuningTabData(); // only fetch data if not already fetched
@@ -388,7 +388,6 @@ onMounted(async () => {
 
   isInitialSetupDone.value = true; // set to true after initial setup
 
-  isLoading.value = false;
 });
 
 const handleCalibrationTimeControlsClick = (event: Event) => {

@@ -117,7 +117,7 @@ const {
   cancelCalibrationJob,
 } = runStatusStore;
 
-const isLoading = ref(true);
+const isLoading = ref(false);
 const iterations = ref();
 const iterationData = ref();
 const progress = ref();
@@ -127,7 +127,6 @@ let runningTimeIntervalId: NodeJS.Timeout | undefined = undefined;
 let iterationIntervalId: NodeJS.Timeout | undefined = undefined;
 
 onMounted(async () => {
-  console.log('MOUNTED: Formulation');
   // Get User Calibration Run Data
   await fetchUserCalibrationRunData();
 
@@ -140,7 +139,6 @@ onMounted(async () => {
   } else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
   }
-  isLoading.value = false;
 });
 
 // Handle calibrationStatus changes

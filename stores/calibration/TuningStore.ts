@@ -39,10 +39,13 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const userDataStore = useUserDataStore();
 
+  const tuningStore_data_loading = ref(true)
+
   /**
    * fetch Tuning Tab data
    */
   async function fetchTuningTabData(): Promise<void> {
+    tuningStore_data_loading.value = true;
     const loadCalibrationRunOutput: any = await makeProtectedApiCall(
       `${ngencerfBaseUrl}/calibration/load_calibration_run/?calibration_run_id=${calibrationJobId.value}`,
       {
@@ -51,7 +54,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
           Authorization: `Bearer ${userDataStore.getAccessToken()}`
         }
       });
-    // console.log("loadCalibrationRunOutput:", loadCalibrationRunOutput);
 
     if (loadCalibrationRunOutput?._data) {
       loadCalibrationRunData.value = loadCalibrationRunOutput?._data;
@@ -65,11 +67,11 @@ export const useTuningStore = defineStore('TuningStore', () => {
           Authorization: `Bearer ${userDataStore.getAccessToken()}`
         }
       });
-    // console.log("loadTuningTabOutput:", loadTuningTabOutput);
 
     if (loadTuningTabOutput?._data) {
       loadTuningTabData.value = loadTuningTabOutput?._data;
     }
+    tuningStore_data_loading.value = false;
   };
 
   /**
@@ -149,6 +151,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
   };
 
   return {
+    tuningStore_data_loading,
     fetchTuningTabData,
     loadCalibrationRunData,
     loadTuningTabData,
