@@ -77,6 +77,7 @@
 
 <script lang="ts" setup>
 import ProgressBar from "primevue/progressbar";
+import { onMounted } from "vue";
 
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
@@ -116,7 +117,7 @@ const {
   cancelCalibrationJob,
 } = runStatusStore;
 
-const isLoading = ref(true);
+const isLoading = ref(false);
 const iterations = ref();
 const iterationData = ref();
 const progress = ref();
@@ -138,7 +139,6 @@ onMounted(async () => {
   } else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
   }
-  isLoading.value = false;
 });
 
 // Handle calibrationStatus changes

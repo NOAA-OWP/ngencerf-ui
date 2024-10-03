@@ -25,16 +25,14 @@
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
-// Let HeadwaterBasinGage load right away
 import HeadwaterBasinGage from '~/components/Calibration/HeadwaterBasinGage.vue';
-// Load the
-const Tabs = defineAsyncComponent(() => import('~/components/Common/Tabs.vue'))
-const Formulation = defineAsyncComponent(() => import('~/components/Calibration/Formulation.vue'))
-const TuningControls = defineAsyncComponent(() => import('~/components/Calibration/TuningControls.vue'))
-const OptimizationMetrics = defineAsyncComponent(() => import('~/components/Calibration/OptimizationMetrics.vue'))
-const RunStatus = defineAsyncComponent(() => import('~/components/Calibration/RunStatus.vue'))
-const CalibrationRunsTab = defineAsyncComponent(() => import('~/components/Calibration/PreviousCalibrationRuns.vue'))
+import Tabs from '~/components/Common/Tabs.vue'
+import Formulation from '~/components/Calibration/Formulation.vue'
+import TuningControls from '~/components/Calibration/TuningControls.vue'
+import OptimizationMetrics from '~/components/Calibration/OptimizationMetrics.vue'
+import RunStatus from '~/components/Calibration/RunStatus.vue'
+import CalibrationRunsTab from '~/components/Calibration/PreviousCalibrationRuns.vue'
+
 import { generalStore } from "@/stores/common/GeneralStore";
 
 const { getCalibrationTabIndex, setCalibrationTabIndex } = generalStore();

@@ -100,7 +100,7 @@ export const makeProtectedApiCall = async <T>(
     // TODO: navigateTo needs to be moved. It cannot be called by Pinia store files. Have components call this function instead.
     if (!refreshAccessTokenSuccess) {
       userDataStore.logUserOut();
-      await navigateTo('/login');
+      await navigateTo('login');
       return null;
     }
   }

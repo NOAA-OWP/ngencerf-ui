@@ -120,7 +120,7 @@
         </div>
       </div>
     </div>
-    <div class="waitgif" v-if="data_loading">
+    <div class="waitgif" v-if="formulationStore_data_loading">
       <img src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
@@ -128,15 +128,15 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
-import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
-//const isLoading = ref(true);
+const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
 const slothParamContextMenu = ref() //sloth parameter table context menu
@@ -149,7 +149,7 @@ const onRowContextMenu = (event: any) => {
   slothParamContextMenu.value.show(event.originalEvent)
 }
 const {
-  data_loading,
+  formulationStore_data_loading,
   filterGroup,
   useSlothParameters,
   selectedModuleValues,
@@ -170,10 +170,7 @@ const toast = useToast();
 
 
 onMounted(() => {
-  toast.removeAllGroups()
-  //load static data of this tab
-  loadFormulationTabStaticData()
-  //isLoading.value = false;
+  toast.removeAllGroups();
 })
 /**
  * add sloth variable entry to table and reset name field

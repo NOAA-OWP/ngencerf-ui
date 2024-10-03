@@ -70,6 +70,10 @@ export const generalStore = defineStore(
       evaluationRunSelected.value = b;
     }
 
+    function resetGeneralStore() {
+      calibrationJobId.value = 0;
+    }
+    
     return {
       getMenuIndex,
       setMenuIndex,
@@ -86,7 +90,8 @@ export const generalStore = defineStore(
       calibrationJobId,
       calibrationTabIndex,
       evaluationTabIndex,
-      forecastTabIndex
+      forecastTabIndex,
+      resetGeneralStore
     };
   },
   {

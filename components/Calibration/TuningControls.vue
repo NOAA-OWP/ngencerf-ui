@@ -18,7 +18,7 @@
               <div id="BoxBottomLeft" class="pt-2">
                 <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
 
-                  <table class="table-auto border-collapse ml-0 table-fixed">
+                  <table class="table-auto border-collapse ml-0">
                     <tbody>
                       <tr>
                         <td class="w-1/6">
@@ -78,7 +78,7 @@
                 <div v-else>
                   <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
 
-                    <table class="table-auto border-collapse ml-0 table-fixed">
+                    <table class="table-auto border-collapse ml-0">
                       <tbody>
                         <tr>
 
@@ -210,7 +210,7 @@
               <Column field="min" header="Min" sortable>
                 <template #body="slotProps">
                   <input type="text" v-model="slotProps.data.minimum"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event?.target?.value)"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)"
                     style="width: 100%;" />
                 </template>
               </Column>
@@ -219,7 +219,7 @@
               <Column field="max" header="Max" sortable>
                 <template #body="slotProps">
                   <input type="text" v-model="slotProps.data.maximum"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event?.target?.value)"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)"
                     style="width: 100%;" />
                 </template>
               </Column>
@@ -228,7 +228,7 @@
               <Column field="initValue" header="Initial Value" sortable>
                 <template #body="slotProps">
                   <input type="text" v-model="slotProps.data.initial_value"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event?.target?.value)"
+                    @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)"
                     style="width: 100%;" />
                 </template>
               </Column>
@@ -248,7 +248,7 @@
 </template>
 
 <script lang="ts" setup>
-
+import { onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -263,7 +263,7 @@ import { useBackendConfig } from "~/composables/UseBackendConfig";
 
 const toast = useToast();
 
-const isLoading = ref(true);
+const isLoading = ref(false);
 
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
@@ -297,10 +297,12 @@ const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isInitialSetupDone = ref(false);
 const isCalibrationTuningControlsDisabled = computed(() => {
-  return !loadCalibrationRunData.value || !loadCalibrationRunData.value?.calibration_times || Object.keys(loadCalibrationRunData.value?.calibration_times).length === 0;
+  return false;
+  //return !loadCalibrationRunData.value || !loadCalibrationRunData.value?.calibration_times || Object.keys(loadCalibrationRunData.value?.calibration_times).length === 0;
 });
 
 onMounted(async () => {
+  toast.removeAllGroups();
   if (!loadCalibrationRunData.value || !loadTuningTabData.value) {
     //toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
     await fetchTuningTabData(); // only fetch data if not already fetched
@@ -386,7 +388,6 @@ onMounted(async () => {
 
   isInitialSetupDone.value = true; // set to true after initial setup
 
-  isLoading.value = false;
 });
 
 const handleCalibrationTimeControlsClick = (event: Event) => {
@@ -499,10 +500,11 @@ const addParameterToTable = () => {
  * @param field The field ('min', 'max', or 'initValue') being updated
  * @param value The new value entered by the user
  */
-const updateCalibrationTuningParameter = (index: number, field: string, value: string) => {
+const updateCalibrationTuningParameter = (index: number, field: string, ev: Event) => {
+  const valEv = ev.target as HTMLInputElement;
+  const value = valEv?.value;
   // update userCalibrationTuningParameters with the new value
   userCalibrationTuningParameters.value[index][field] = value;
-  //console.log("updated userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
 
   // update calibrationTuningParameters with the new value
   const parameter = calibrationTuningParameters?.value?.find(param => param.name === userCalibrationTuningParameters.value[index].name);
