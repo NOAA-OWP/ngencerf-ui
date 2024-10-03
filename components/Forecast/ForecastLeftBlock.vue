@@ -25,10 +25,10 @@ import Tabs from '~/components/Common/Tabs.vue'
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
-const PreviousRunsTab = defineAsyncComponent(() => import('~/components/Forecast/PreviousRunsTab.vue'))
-const SetupForecastRunTab = defineAsyncComponent(() => import('./SetupForecastRunTab.vue'))
-const StatusTab = defineAsyncComponent(() => import('./StatusTab.vue'))
-const ResultsTab = defineAsyncComponent(() => import('./ResultsTab.vue'))
+import PreviousRunsTab from '~/components/Forecast/PreviousRunsTab.vue'
+import SetupForecastRunTab from './SetupForecastRunTab.vue'
+import StatusTab from './StatusTab.vue'
+import ResultsTab from './ResultsTab.vue'
 
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 

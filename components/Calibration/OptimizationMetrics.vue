@@ -119,7 +119,7 @@
          <br clear="all">
          <br clear="all">
       </div>
-      <div class="waitgif" v-if="data_loading">
+      <div class="waitgif" v-if="optimizationStore_data_loading">
          <img src="@/assets/styles/img/wait.gif" />
       </div>
    </div>
@@ -127,6 +127,8 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
+
 import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from "~/stores/common/GeneralStore";
@@ -141,7 +143,7 @@ const {
    uiPlotFrequency,
    uiStopCriteria,
    uiStreamFlowThreshold,
-   data_loading,
+   optimizationStore_data_loading,
    getOptimizationAlgorithmOptionsList,
    getObjectiveFunctionOptionsList,
    showObjectiveFunctionPeakFlow,
@@ -157,10 +159,7 @@ const toast = useToast();
 //const isLoading = ref(true);
 
 onMounted(() => {
-   toast.removeAllGroups()
-   //load tab static data
-   loadOptimizationTabStaticData();
-   //isLoading.value = false;
+   toast.removeAllGroups();
 })
 
 const cbCategoricalDisabled = ref<boolean>(false)
@@ -236,7 +235,7 @@ const optimizationSelectChange = () => {
  * event bus for calibration button group click
  */
 useListen('calibrationButtonSaveStart', (actionButton) => {
-   if (getCalibrationTabIndex() === 4 && actionButton == 'SAVE') {
+   if (getCalibrationTabIndex() === 5 && actionButton == 'SAVE') {
       toast.removeAllGroups()
       const save_optimization_response = saveOptimizationTabData()
       save_optimization_response.then((response) => {
@@ -292,7 +291,7 @@ useListen('calibrationButtonPrev', (actionButton) => {
  * explicitly watching loading status, as onmount happen prior to store loading. 
  * make sure we manage the display base on user input AFTER data loading has completed 
  */
-watch(() => data_loading.value, (loading_status) => {
+watch(() => optimizationStore_data_loading.value, (loading_status) => {
    const metricInfo = getSelectedMetricInfo.value?.pop()
 
    if (metricInfo?.categorical == true) {

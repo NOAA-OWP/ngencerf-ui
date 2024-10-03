@@ -38,42 +38,54 @@
         * Right click on a row for Open, Clone or Delete options, or click on then New
         button.
       </div>
+      <!-- <div>
+        <div v-if="!gageStore_data_loading">Gage store loaded</div>
+        <div v-if="!formulationStore_data_loading">Formulation store loaded</div>
+        <div v-if="!optimizationStore_data_loading">Optimization store loaded</div>
+        <div v-if="!tuningStore_data_loading">Tuning store loaded</div>
+      </div> -->
 
     </div>
   </div>
 
-  <div class="waitgif" v-if="loading">
+  <div class="waitgif" v-if="isLoading">
     <img src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-
-
 import type { JobListItem } from "~/composables/NextGenModel";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 import { useGageStore } from "~/stores/calibration/GageStore";
+import { useFormulationStore } from "~/stores/calibration/FormulationStore";
+import { useTuningStore } from "~/stores/calibration/TuningStore";
+import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
 
-const loading = ref(true);
+const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
+const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
+const { loadOptimizationTabStaticData, optimizationStore_data_loading } = useOptimizationStore();
+const { fetchTuningTabData, tuningStore_data_loading } = useTuningStore();
+
+const isLoading = ref(false);
 
 const calibrationJobStore = useCalibrationJobStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId } = calibrationJobStore;
-const {
-  calibrationTabIndex,
-  evaluationTabIndex,
-  forecastTabIndex } = storeToRefs(generalStore())
+const { calibrationTabIndex, evaluationTabIndex, forecastTabIndex } = storeToRefs(generalStore());
+
+
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
 
-const selectedCalibrationRun = ref<JobListItem>()
+const selectedCalibrationRun = ref<JobListItem>();
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
@@ -89,13 +101,10 @@ onMounted(() => {
   // forecastTabIndex.value = "1";
   // useGageStore().resetGageStore();
   // clearUserCalibrationRunData();
-  setTimeout(function () {
-    loading.value = false;
-  }, 500);
 })
 
 const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
-  loading.value = true;
+  isLoading.value = true;
   //keep the following for references purpose
   /*
   if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
@@ -105,10 +114,37 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
   queryUserCalibrationRunData().then(queryResponse => {
     userCalibrationRunData.value = queryResponse?._data;
-    const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[1] as HTMLElement;
-    e.click();
+    loadEntireRun();
   });
+}
+
+const loadEntireRun = () => {
+  loadGageTabStaticData();
+  loadFormulationTabStaticData();
+  fetchTuningTabData();
+  loadOptimizationTabStaticData();
+
+  // const nowTime = new Date().getTime();
+  // const endTime = nowTime + 5000;
+
+  // console.log("NowTime: ", nowTime)
+  // console.log("EndTime: ", nowTime)
+  // while (new Date().getTime() < endTime &&
+  //   (
+  //     gageStore_data_loading ||
+  //     formulationStore_data_loading ||
+  //     optimizationStore_data_loading ||
+  //     tuningStore_data_loading)
+  // ) {
+  // }
+  // console.log("FINISHED LOADING")
+  isLoading.value = false;
+  gotoRunStatusTab();
+}
+const gotoRunStatusTab = () => {
+  const allTabs = document.getElementsByClassName("tabs");
+  const e = allTabs[5] as HTMLElement;
+  e.click();
 }
 
 const rowStyle = (data: any) => {

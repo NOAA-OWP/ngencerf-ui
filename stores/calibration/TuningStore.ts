@@ -1,12 +1,10 @@
 // @ts-check
 
 import { defineStore } from "pinia";
-import type { CalibrationTimes, ModuleParameter, LoadTuningTabResponse, OutputVariable, SaveTuningTabRequestBody } from "~/composables/NextGenModel";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-
 
 export const useTuningStore = defineStore('TuningStore', () => {
   // server-data properties
@@ -39,12 +37,16 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const rangeDateFrom = ref<any>();
   const rangeDateTo = ref<any>();
 
+  const tuningStore_data_loading = ref(true);
+
   /**
    * Get Tuning Tab data
    * @returns {Promise<any>}
    */
   async function fetchTuningTabData(): Promise<any> {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_tuning_tab/`, {
+    tuningStore_data_loading.value = true;
+
+    const fetchTuningTabDataOutput =  makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_tuning_tab/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -52,6 +54,9 @@ export const useTuningStore = defineStore('TuningStore', () => {
       },
       body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     });
+
+    tuningStore_data_loading.value = false;
+    return fetchTuningTabDataOutput;
   };
 
   /**
@@ -90,7 +95,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
       {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${userDataStore.getAccessToken()}`,
+          Authorization: `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestBody)
@@ -118,7 +123,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
     userOutputVariableToCalibrate.value.module = null;
     outputVariables.value = [];
     automatic_validation.value = true;
-
     avSimStartTime.value = "";
     avSimEndTime.value = "";
     avCalStartTime.value = "";
@@ -129,6 +133,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
   };
 
   return {
+    tuningStore_data_loading,
     fetchTuningTabData,
     loadTuningTabData,
     simStartTime,

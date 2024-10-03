@@ -116,13 +116,14 @@
       </div>
     </div>
   </div>
-  <div class="waitgif" v-if="data_loading">
+  <div class="waitgif" v-if="gageStore_data_loading">
     <img src="@/assets/styles/img/wait.gif" />
   </div>
 
 </template>
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
@@ -131,20 +132,17 @@ import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 
 const gageStore = useGageStore()
-const { gageData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
+const { gageData, selectedDomainValue, gageStore_data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
 const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore
 const { getCalibrationTabIndex } = generalStore()
 const { calibrationJobId } = storeToRefs(generalStore())
 const { fetchUserCalibrationRunData } = useUserDataStore()
 const toast = useToast()
 
-const isLoading = ref(true);
-
-
+const isLoading = ref(false);
 
 onMounted(() => {
   toast.removeAllGroups();
-  loadGageTabStaticData();
 })
 
 const dialog = useDialog();
