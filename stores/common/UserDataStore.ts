@@ -13,7 +13,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { calibrationJobId } = storeToRefs( generalStore() );
+  const { calibrationJobId } = storeToRefs(generalStore());
   const userCalibrationJobsListData = ref<JobListItem[]>([]);
   const userCalibrationRunData = ref<UserCalibrationRunData>();
 
@@ -56,15 +56,15 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   function getUserInitials(): string {
     let n = userName.value;
     let atSignPos = n.indexOf("@");
-    if( atSignPos !== -1 ) {
+    if (atSignPos !== -1) {
       let name = n.substring(0, atSignPos);
       let dotPos = name.lastIndexOf('.');
-      if( dotPos !== -1 ) {
-        return (name[0] + name.substring(dotPos+1)[0]).toUpperCase();
+      if (dotPos !== -1) {
+        return (name[0] + name.substring(dotPos + 1)[0]).toUpperCase();
       }
       return userName.value.toUpperCase()[0];
     } else {
-      return userName.value.toUpperCase()[0];  
+      return userName.value.toUpperCase()[0];
     }
   }
 
@@ -72,7 +72,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * Sets username
    * @returns void
    */
-  function setUserName(user:string) {
+  function setUserName(user: string) {
     userName.value = user;
   }
 
@@ -113,9 +113,9 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * @return {void}
    */
   async function fetchUserCalibrationJobsListData() {
-    const jobsListDataResult = await makeProtectedApiCall<JobsList>( `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`, {
+    const jobsListDataResult = await makeProtectedApiCall<JobsList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs/`, {
       method: "POST",
-      headers: { 
+      headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       }
@@ -128,13 +128,13 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * @returns {Promise<any>}
    */
   async function queryUserCalibrationRunData() {
-    const userCalibrationRunDataResult = await makeProtectedApiCall<UserCalibrationRunData>( `${ngencerfBaseUrl}/calibration/load_calibration_run/`, {
+    const userCalibrationRunDataResult = await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/load_calibration_run/`, {
       method: "POST",
-      headers: { 
+      headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify( { calibration_run_id: calibrationJobId.value } )
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     })
 
     return userCalibrationRunDataResult
@@ -149,6 +149,42 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
 
     userCalibrationRunData.value = userCalibrationRunDataResult?._data ?? undefined;
   }
+
+  /**
+ * Delete a job
+ */
+  async function deleteCalibrationRun(runId: number) {
+    const deleteCalibrationRunResult = await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/delete_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: runId })
+    }).then(function(result) {
+      console.log("Result: ", deleteCalibrationRunResult)
+      fetchUserCalibrationJobsListData();
+    });
+  }
+
+  /**
+ * Clone a job
+ */
+  async function cloneCalibrationRun(runId: number) {
+    const cloneCalibrationRunResult = await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/clone_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: runId })
+    }).then(function(result) {
+      console.log("Result: ", cloneCalibrationRunResult)
+       fetchUserCalibrationJobsListData();
+    });
+  }
+
+
 
   useLogoutListen('logoutEvent', () => {
     hardResetUserDataStore();
@@ -189,16 +225,18 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     userCalibrationJobsListData,
     userCalibrationRunData,
     queryUserCalibrationRunData,
+    deleteCalibrationRun,
+    cloneCalibrationRun,
     fetchUserCalibrationRunData,
     hardResetUserDataStore,
-    clearUserCalibrationRunData
+    clearUserCalibrationRunData,   
   };
-}, 
-{
-  persist: {
-    storage: persistedState.localStorage
-  },
-});
+},
+  {
+    persist: {
+      storage: persistedState.localStorage
+    },
+  });
 
 /* Pinia supports Hot Module replacement so you can edit your stores
    and interact with them directly in your app without reloading the page,

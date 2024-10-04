@@ -77,7 +77,7 @@ const isLoading = ref(false);
 const calibrationJobStore = useCalibrationJobStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
-const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
+const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData, deleteCalibrationRun, cloneCalibrationRun } = useUserDataStore();
 const { fetchNewCalibrationRunId } = calibrationJobStore;
 const { calibrationTabIndex, evaluationTabIndex, forecastTabIndex } = storeToRefs(generalStore());
 
@@ -104,7 +104,7 @@ onMounted(() => {
 })
 
 const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
-  isLoading.value = true;
+  //isLoading.value = true;
   //keep the following for references purpose
   /*
   if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
@@ -138,7 +138,7 @@ const loadEntireRun = () => {
   // ) {
   // }
   // console.log("FINISHED LOADING")
-  isLoading.value = false;
+  //isLoading.value = false;
   gotoRunStatusTab();
 }
 const gotoRunStatusTab = () => {
@@ -182,7 +182,9 @@ const gotoHeadwaterBasinGage = () => {
  * following section require backend api before them can be implemented
  */
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
+  //toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
+  const selectedRunId = selectedCalibrationRun.value.calibration_run_id
+  cloneCalibrationRun(selectedRunId);
   fetchUserCalibrationJobsListData();
 }
 
@@ -190,7 +192,7 @@ const confirmDelte = useConfirm();
 const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const confirm_delete = ref(false)
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
-  let confirmMessage = "Are you sure you want to delete?"
+  let confirmMessage = "Are you sure you want to delete this run?"
   if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
 
   confirmDelte.require({
@@ -203,7 +205,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
       outlined: true
     },
     acceptProps: {
-      label: 'Save',
+      label: 'DELETE RUN',
     },
     accept: () => acceptDelete(selectedRunId),
     reject: () => {
@@ -213,7 +215,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 const acceptDelete = (selectedRunId: number) => {
   toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
-  fetchUserCalibrationJobsListData()
+  deleteCalibrationRun(selectedRunId);
   selectedCalibrationRun.value = undefined
 }
 
