@@ -46,7 +46,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
   async function fetchTuningTabData(): Promise<any> {
     tuningStore_data_loading.value = true;
 
-    const fetchTuningTabDataOutput =  makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_tuning_tab/`, {
+    loadTuningTabData.value =  await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_tuning_tab/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -56,7 +56,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     });
 
     tuningStore_data_loading.value = false;
-    return fetchTuningTabDataOutput;
+    return loadTuningTabData.value;
   };
 
   /**

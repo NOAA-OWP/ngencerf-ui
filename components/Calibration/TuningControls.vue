@@ -317,16 +317,18 @@ const isInitialSetupDone = ref(false);
 
 onMounted(async () => {
   toast.removeAllGroups();
+  // console.log('userCalibrationRunData:', userCalibrationRunData.value);
+  // console.log('loadTuningTabData:', loadTuningTabData.value);
   
   if (!userCalibrationRunData.value || !loadTuningTabData.value) {
-    //toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
+    // toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
     await fetchTuningTabData(); // only fetch data if not already fetched
-    console.log("automatic_validation:", automatic_validation.value);
+    // console.log("automatic_validation:", automatic_validation.value);
   } else {
-    //toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
+    // toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
   }
 
-  // console.log("loadTuningTabData:", loadTuningTabData?.value?._data);
+  // console.log("loadTuningTabData:", loadTuningTabData?.value._data);
   // console.log("userCalibrationRunData:", userCalibrationRunData.value);
   // console.log("calibration_times:", userCalibrationRunData.value?.calibration_times);
   // console.log("validation_times:", userCalibrationRunData.value?.validation_times);
@@ -337,16 +339,16 @@ onMounted(async () => {
     const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
     
     simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
-    console.log("simStartTime:", simStartTime.value);
+    // console.log("simStartTime:", simStartTime.value);
 
     simEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
-    console.log("simEndTime:", simEndTime.value);
+    // console.log("simEndTime:", simEndTime.value);
 
     calStartTime.value = DateTime.fromISO(calibration_start_time, { zone: 'utc' });
-    console.log("calStartTime:", calStartTime.value);
+    // console.log("calStartTime:", calStartTime.value);
 
     calEndTime.value = DateTime.fromISO(calibration_end_time, { zone: 'utc' });
-    console.log("calEndTime:", calEndTime.value);
+    // console.log("calEndTime:", calEndTime.value);
   };
 
   // set automatic validation times
@@ -354,16 +356,16 @@ onMounted(async () => {
     const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
 
     avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
-    console.log("avSimStartTime:", avSimStartTime.value);
+    // console.log("avSimStartTime:", avSimStartTime.value);
 
     avSimEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
-    console.log("avSimEndTime:", avSimEndTime.value);
+    // console.log("avSimEndTime:", avSimEndTime.value);
 
     avCalStartTime.value = DateTime.fromISO(validation_start_time, { zone: 'utc' });
-    console.log("avCalStartTime:", avCalStartTime.value);
+    // console.log("avCalStartTime:", avCalStartTime.value);
 
     avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
-    console.log("avCalEndTime:", avCalEndTime.value);
+    // console.log("avCalEndTime:", avCalEndTime.value);
   };
 
   // set time range
@@ -388,7 +390,7 @@ onMounted(async () => {
     initial_value: param.initial_value,
     module: module.name,
   }))) || [];
-  console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
+  // console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
 
   // set output variables
   outputVariables.value = calibrationTuningModules?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
@@ -396,7 +398,7 @@ onMounted(async () => {
     description: outputVar.description,
     module: module.name,
   }))) || [];
-  console.log("outputVariables:", outputVariables.value);
+  // console.log("outputVariables:", outputVariables.value);
 
   // set ouput_variable_to_calibrate
   if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
@@ -405,7 +407,7 @@ onMounted(async () => {
     userOutputVariableToCalibrate.value.name = name;
     userOutputVariableToCalibrate.value.module = module;
     selectedOutputVariable.value = name;
-    console.log('selectedOutputVariable:', selectedOutputVariable.value);
+    // console.log('selectedOutputVariable:', selectedOutputVariable.value);
   };
 
   isInitialSetupDone.value = true; // set to true after initial setup
@@ -453,76 +455,76 @@ const handleFormulationNotSet = (event: Event) => {
 };
 
 const handleSimStartUpdate = (value: any) => {
-  console.log('handleSimStartUpdate called');
+  // console.log('handleSimStartUpdate called');
   if (typeof value === 'string') {
     simStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  console.log('typeof simStartTime:', typeof simStartTime.value);
-  console.log('simStartTime:', simStartTime.value);
+  // console.log('typeof simStartTime:', typeof simStartTime.value);
+  // console.log('simStartTime:', simStartTime.value);
 };
 
 const handleSimEndUpdate = (value: any) => {
-  console.log('handleSimEndUpdate called');
+  // console.log('handleSimEndUpdate called');
   if (typeof value === 'string') {
     simEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  console.log('typeof simEndTime:', typeof simEndTime.value);
-  console.log('simEndTime:', simEndTime.value);
+  // console.log('typeof simEndTime:', typeof simEndTime.value);
+  // console.log('simEndTime:', simEndTime.value);
 };
 
 const handleCalStartUpdate = (value: any) => {
-  console.log('handleCalStartUpdate called');
+  // console.log('handleCalStartUpdate called');
   if (typeof value === 'string') {
     calStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  console.log('typeof calStartTime:', typeof calStartTime.value);
-  console.log('calStartTime:', calStartTime.value);
+  // console.log('typeof calStartTime:', typeof calStartTime.value);
+  // console.log('calStartTime:', calStartTime.value);
 };
 
 const handleCalEndUpdate = (value: any) => {
-  console.log('handleCalEndUpdate called');
+  // console.log('handleCalEndUpdate called');
   if (typeof value === 'string') {
     calEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  console.log('typeof calEndTime:', typeof calEndTime.value);
-  console.log('calEndTime:', calEndTime.value);
+  // console.log('typeof calEndTime:', typeof calEndTime.value);
+  // console.log('calEndTime:', calEndTime.value);
 };
 
 const handleAvSimStartUpdate = (value: any) => {
-  console.log('handleAvSimStartUpdate called');
+  // console.log('handleAvSimStartUpdate called');
   if (typeof value === 'string') {
     avSimStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  console.log('typeof avSimStartTime:', typeof avSimStartTime.value);
-  console.log('avSimStartTime:', avSimStartTime.value);
+  // console.log('typeof avSimStartTime:', typeof avSimStartTime.value);
+  // console.log('avSimStartTime:', avSimStartTime.value);
 };
 
 const handleAvSimEndUpdate = (value: any) => {
-  console.log('handleAvSimEndUpdate called');
+  // console.log('handleAvSimEndUpdate called');
   if (typeof value === 'string') {
     avSimEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  console.log('typeof avSimEndTime:', typeof avSimEndTime.value);
-  console.log('avSimEndTime:', avSimEndTime.value);
+//   console.log('typeof avSimEndTime:', typeof avSimEndTime.value);
+//   console.log('avSimEndTime:', avSimEndTime.value);
 };
 
 const handleAvCalStartUpdate = (value: any) => {
-  console.log('handleAvCalStartUpdate called');
+  // console.log('handleAvCalStartUpdate called');
   if (typeof value === 'string') {
     avCalStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  console.log('typeof avCalStartTime:', typeof avCalStartTime.value);
-  console.log('avCalStartTime:', avCalStartTime.value);
+  // console.log('typeof avCalStartTime:', typeof avCalStartTime.value);
+  // console.log('avCalStartTime:', avCalStartTime.value);
 };
 
 const handleAvCalEndUpdate = (value: any) => {
-  console.log('handleAvCalEndUpdate called');
+  // console.log('handleAvCalEndUpdate called');
   if (typeof value === 'string') {
     avCalEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  console.log('typeof avCalEndTime:', typeof avCalEndTime.value);
-  console.log('avCalEndTime:', avCalEndTime.value);
-  console.log('avCalEndTimeString:', avCalEndTime.value.toISO());
+  // console.log('typeof avCalEndTime:', typeof avCalEndTime.value);
+  // console.log('avCalEndTime:', avCalEndTime.value);
+  // console.log('avCalEndTimeString:', avCalEndTime.value.toISO());
 };
 
 // watch for changes to selected output variable
@@ -541,45 +543,45 @@ watch(selectedOutputVariable, () => {
 
 // watch for changes to simStartTime
 watch(simStartTime, () => {
-  console.log('watch simStartTime called');
-  console.log('typeof simStartTime:', typeof simStartTime.value);
-  console.log('simStartTime:', simStartTime.value);
+  // console.log('watch simStartTime called');
+  // console.log('typeof simStartTime:', typeof simStartTime.value);
+  // console.log('simStartTime:', simStartTime.value);
   const simStartTimeString = simStartTime.value.toISO();
-  console.log('simStartTimeString:', simStartTimeString);
+  // console.log('simStartTimeString:', simStartTimeString);
 
   if ((!calStartTime.value || !isValidDateTime(calStartTime.value)) && simStartTime.value && isValidDateTime(simStartTime.value)) {
     calStartTime.value = simStartTime.value.plus({ years: 1 }); // set calStartTime to one year after simStartTime
-    console.log('calStartTime:', calStartTime.value);
+    // console.log('calStartTime:', calStartTime.value);
     const calStartTimeString = calStartTime.value.toISO();
-    console.log('calStartTimeString:', calStartTimeString);
+    // console.log('calStartTimeString:', calStartTimeString);
   }
   else if ((!calStartTime.value || !isValidDateTime(calStartTime.value)) && simStartTime.value && typeof simStartTime.value === 'string') {
-    console.log('simStartTime.value is a string. This should not happen'); // the simStartTime binding might call this watch function when it is a string. ooof.
+    // console.log('simStartTime.value is a string. This should not happen'); // the simStartTime binding might call this watch function when it is a string. ooof.
     const simStartDateTime = DateTime.fromISO(simStartTime.value, { zone: 'utc' });
     calStartTime.value = simStartDateTime.value.plus({ years: 1 });
-    console.log('calStartTime:', calStartTime.value);
+    // console.log('calStartTime:', calStartTime.value);
   }
 });
 
 // watch for changes to avSimStartTime
 watch(avSimStartTime, () => {
-  console.log('watch avSimStartTime called');
-  console.log('typeof avSimStartTime:', typeof avSimStartTime.value);
-  console.log('avSimStartTime:', avSimStartTime.value);
+  // console.log('watch avSimStartTime called');
+  // console.log('typeof avSimStartTime:', typeof avSimStartTime.value);
+  // console.log('avSimStartTime:', avSimStartTime.value);
   const avSimStartTimeString = avSimStartTime.value.toISO();
-  console.log('avSimStartTimeString:', avSimStartTimeString);
+  // console.log('avSimStartTimeString:', avSimStartTimeString);
 
   if ((!avCalStartTime.value || !isValidDateTime(avCalStartTime.value)) && avSimStartTime.value && isValidDateTime(avSimStartTime.value)) {
     avCalStartTime.value = avSimStartTime.value.plus({ years: 1 });
-    console.log('avCalStartTime:', avCalStartTime.value);
+    // console.log('avCalStartTime:', avCalStartTime.value);
     const avCalStartTimeString = avCalStartTime.value.toISO();
-    console.log('avCalStartTimeString:', avCalStartTimeString);
+    // console.log('avCalStartTimeString:', avCalStartTimeString);
   }
   else if ((!avCalStartTime.value || !isValidDateTime(avCalStartTime.value)) && avSimStartTime.value && typeof avSimStartTime.value === 'string') {
-    console.log('avSimStartTime.value is a string. This should not happen'); // the avSimStartTime binding might call this watch function when it is a string. ooof.
+    // console.log('avSimStartTime.value is a string. This should not happen'); // the avSimStartTime binding might call this watch function when it is a string. ooof.
     const avSimStartDateTime = DateTime.fromISO(avSimStartTime.value, { zone: 'utc' });
     avCalStartTime.value = avSimStartDateTime.value.plus({ years: 1 });
-    console.log('avCalStartTime:', avCalStartTime.value);
+    // console.log('avCalStartTime:', avCalStartTime.value);
   }
 });
 
