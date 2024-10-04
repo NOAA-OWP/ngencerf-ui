@@ -54,23 +54,8 @@
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
         <div data-tab="3" data-menu-tab="23" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Setup a Validation Run tab" title="Setup a Validation Run tab">
-          Setup a Validation Run
-          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
-        <div data-tab="4" data-menu-tab="24" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Select Parameters Set tab" title=" Select Parameters Set tab tab">
-          Select Parameters Set
-          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
-        <div data-tab="5" data-menu-tab="25" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Review Setup and Run tab" title="Review Setup and Run tab">
-          Review Setup / Run
-          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
-        <div data-tab="6" data-menu-tab="26" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status tab"
-          title="Status tab">
-          Status
+          aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
+          Select Alternate Iteration
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
       </div>

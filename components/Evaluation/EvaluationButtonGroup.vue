@@ -2,25 +2,24 @@
   <div id="BottomButtons" class="grid grid-cols-12 w-full">
 
     <div class="col-span-2">
-      <span v-if="getEvaluationTabIndex() === 1">
-        <button class="start actionBtn">Evaluate</button>
-      </span>
-      <span v-if="getEvaluationTabIndex() >= 5">
-        <button class="start actionBtn">Run</button>
+      <span v-if="getEvaluationTabIndex() === 2">
+        <!-- <button class="start actionBtn">Evaluate</button> -->
       </span>
     </div>
     <div class="col-span-2">
-      <button v-if="getEvaluationTabIndex() >= 5" class="stop actionBtn">Cancel</button>
+      <!-- <button v-if="getEvaluationTabIndex() >= 5" class="stop actionBtn">Cancel</button> -->
     </div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-2 text-right">
-      <button v-if="getEvaluationTabIndex() === 4" class="prev actionBtnSmall">&#8678; Prev</button>
+      <!-- <button v-if="getEvaluationTabIndex() === 4" class="prev actionBtnSmall">&#8678; Prev</button> -->
     </div>
-    <div class="col-span-2"><button v-if="getEvaluationTabIndex() === 3 || getEvaluationTabIndex() === 4"
-        class="next actionBtnSmall">Next <span>&#8680;</span></button></div>
+    <div class="col-span-2">
+      <!-- <button v-if="getEvaluationTabIndex() === 3 || getEvaluationTabIndex() === 4" class="next actionBtnSmall">Next
+        <span>&#8680;</span></button> -->
+    </div>
   </div>
 </template>
 
