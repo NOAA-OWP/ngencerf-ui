@@ -28,7 +28,6 @@
 
 import EvaluationProgressGroup from "./EvaluationProgressGroup.vue";
 import MessagesGroup from "../Common/MessagesGroup.vue";
-//import EvaluationMessagesGroup from "./EvaluationMessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 import { generalStore } from "@/stores/common/GeneralStore";
 </script>
