@@ -184,37 +184,39 @@ const autoSubmit = (e: KeyboardEvent) => {
  * Submits the login form
  * @param e - event object
  */
-const SubmitLoginForm = async (e: Event) => {
+ const SubmitLoginForm = async (e: Event) => {
   e.preventDefault(); // prevents the page from reloading
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     // try to create new access and refresh tokens
 
-    const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
+    await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
       body: {
         username: userName.value,
         password: userPassword.value
       }
-    });
-    // error.value.statuscode
-    if (error.value) {
-      let err = error.value?.data?.detail;
-      if (!err) {
-        err = "Cannot reach server. Error code: " + error.value.statusCode;
-        console.log("StatusCode: ", e);
-      }
-      toast.add({ severity: 'error', summary: 'Error', detail: err, life: 3000 });
-      console.error("Error during user creation:", error.value?.message, error.value?.data);
-      return;
+    }).then(response => {
+      console.log("Response: ", response)
+      setUserName(userName.value);
+      // store tokens in UserDataStore
+      userDataStore.setAccessToken(response.access);
+      userDataStore.setRefreshToken(response.refresh);
+      logUserIn();
+      GoToLanding();
     }
-
-    setUserName(userName.value);
-    // store tokens in UserDataStore
-    userDataStore.setAccessToken(data.value.access);
-    userDataStore.setRefreshToken(data.value.refresh);
-    logUserIn();
-    await GoToLanding();
+    ).catch(error => {
+      console.log(error);
+      if (error) {
+        let err = error.data?.detail;
+        if (!err) {
+          err = "Cannot reach server. Error code: " + error.statusCode;
+          console.log("StatusCode: ", e);
+        }
+        toast.add({ severity: 'error', summary: 'Error', detail: err, life: 3000 });
+        console.error("Error during user creation:", error.message, error.data.detail); 
+      }
+    });
   } else if (userName.value.trim() === "" || userPassword.value.trim() === "") {
     toast.add({ severity: 'error', summary: 'Error', detail: "A Username and Password are required", life: 3000 });
   }
