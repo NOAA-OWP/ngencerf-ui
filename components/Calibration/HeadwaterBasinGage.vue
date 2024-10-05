@@ -116,7 +116,7 @@
       </div>
     </div>
   </div>
-  <div class="waitgif" v-if="gageStore_data_loading">
+  <div class="waitgif" v-if="isLoading">
     <img src="@/assets/styles/img/wait.gif" />
   </div>
 
@@ -131,18 +131,21 @@ import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 
-const gageStore = useGageStore()
-const { gageData, selectedDomainValue, gageStore_data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
-const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore
-const { getCalibrationTabIndex } = generalStore()
-const { calibrationJobId } = storeToRefs(generalStore())
-const { fetchUserCalibrationRunData } = useUserDataStore()
-const toast = useToast()
+const { gageData, selectedDomainValue, gageStore_data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList,
+  selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
+  getObservationalOptionsList } = storeToRefs(useGageStore());
+const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
+  saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
+const { getCalibrationTabIndex } = generalStore();
+const { calibrationJobId } = storeToRefs(generalStore());
+const { fetchUserCalibrationRunData } = useUserDataStore();
+const toast = useToast();
 
-const isLoading = ref(false);
+const isLoading = ref(true);
 
 onMounted(() => {
   toast.removeAllGroups();
+  isLoading.value = false;
 })
 
 const dialog = useDialog();
@@ -264,8 +267,8 @@ useListen('calibrationButtonResetCancel', (actionButton) => {
   }
 })
 
-useListen('calibrationButtonNext', (actionButton) => {  
-  if ( getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
+useListen('calibrationButtonNext', (actionButton) => {
+  if (getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
     if (!selectedDomainValue.value) {
       toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Domain is required.", life: 3000 })
     }
@@ -299,7 +302,6 @@ const toggle_isNWMv3 = () => {
 @import "@/assets/styles/styles.scss";
 
 #GageReport {
-
   table {
     border: 1px solid #ccc;
     width: auto;
@@ -314,15 +316,16 @@ const toggle_isNWMv3 = () => {
         border-bottom: 1px solid #ccc;
         background-color: $ngwcp_neutral_gray_lt;
       }
+
       .td1 {
         text-align: right;
         width: 20%;
       }
+
       .td2 {
         font-weight: 600;
       }
     }
   }
-
 }
 </style>

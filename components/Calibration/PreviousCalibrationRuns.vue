@@ -38,13 +38,6 @@
         * Right click on a row for Open, Clone or Delete options, or click on then New
         button.
       </div>
-      <!-- <div>
-        <div v-if="!gageStore_data_loading">Gage store loaded</div>
-        <div v-if="!formulationStore_data_loading">Formulation store loaded</div>
-        <div v-if="!optimizationStore_data_loading">Optimization store loaded</div>
-        <div v-if="!tuningStore_data_loading">Tuning store loaded</div>
-      </div> -->
-
     </div>
   </div>
 
@@ -71,20 +64,15 @@ const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
 const { loadOptimizationTabStaticData, optimizationStore_data_loading } = useOptimizationStore();
 const { fetchTuningTabData, tuningStore_data_loading } = useTuningStore();
-
-const isLoading = ref(false);
-
-const calibrationJobStore = useCalibrationJobStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
-const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
-const { fetchNewCalibrationRunId } = calibrationJobStore;
-const { calibrationTabIndex, evaluationTabIndex, forecastTabIndex } = storeToRefs(generalStore());
-
+const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData,
+  deleteCalibrationRun, cloneCalibrationRun } = useUserDataStore();
+const { fetchNewCalibrationRunId } = useCalibrationJobStore();
 
 const toast = useToast();
-const crContextMenu = ref() //calibration run context menu
-
+const crContextMenu = ref(); //calibration run context menu
+const isLoading = ref(true);
 const selectedCalibrationRun = ref<JobListItem>();
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
@@ -92,15 +80,11 @@ const cmCalibrationRun = ref([
   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun) }
 ]);
 const onRowContextMenu = (event: any) => {
-  crContextMenu.value.show(event.originalEvent)
+  crContextMenu.value.show(event.originalEvent);
 };
 
 onMounted(() => {
-  // calibrationTabIndex.value = "1";
-  // evaluationTabIndex.value = "1";
-  // forecastTabIndex.value = "1";
-  // useGageStore().resetGageStore();
-  // clearUserCalibrationRunData();
+  isLoading.value = false;
 })
 
 const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
@@ -115,31 +99,21 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   queryUserCalibrationRunData().then(queryResponse => {
     userCalibrationRunData.value = queryResponse?._data;
     loadEntireRun();
+    isLoading.value = false;
   });
 }
 
 const loadEntireRun = () => {
-  loadGageTabStaticData();
-  loadFormulationTabStaticData();
-  fetchTuningTabData();
-  loadOptimizationTabStaticData();
+  isLoading.value = true;
+  nextTick(() => {
+    loadGageTabStaticData();
+    loadFormulationTabStaticData();
+    fetchTuningTabData();
+    loadOptimizationTabStaticData();
+    isLoading.value = false;
+    gotoRunStatusTab();
+  })
 
-  // const nowTime = new Date().getTime();
-  // const endTime = nowTime + 5000;
-
-  // console.log("NowTime: ", nowTime)
-  // console.log("EndTime: ", nowTime)
-  // while (new Date().getTime() < endTime &&
-  //   (
-  //     gageStore_data_loading ||
-  //     formulationStore_data_loading ||
-  //     optimizationStore_data_loading ||
-  //     tuningStore_data_loading)
-  // ) {
-  // }
-  // console.log("FINISHED LOADING")
-  isLoading.value = false;
-  gotoRunStatusTab();
 }
 const gotoRunStatusTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
@@ -173,16 +147,25 @@ const createNewCalibration = async () => {
 }
 
 const gotoHeadwaterBasinGage = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[1];
-  e.click();
+  nextTick(() => {
+    loadGageTabStaticData();
+    loadFormulationTabStaticData();
+    fetchTuningTabData();
+    loadOptimizationTabStaticData();
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[1];
+    e.click();
+  })
+
 }
 
 /**
  * following section require backend api before them can be implemented
  */
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
+  //toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
+  const selectedRunId = selectedCalibrationRun.value.calibration_run_id
+  cloneCalibrationRun(selectedRunId);
   fetchUserCalibrationJobsListData();
 }
 
@@ -190,7 +173,7 @@ const confirmDelte = useConfirm();
 const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const confirm_delete = ref(false)
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
-  let confirmMessage = "Are you sure you want to delete?"
+  let confirmMessage = "Are you sure you want to delete this run?"
   if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
 
   confirmDelte.require({
@@ -203,7 +186,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
       outlined: true
     },
     acceptProps: {
-      label: 'Save',
+      label: 'DELETE RUN',
     },
     accept: () => acceptDelete(selectedRunId),
     reject: () => {
@@ -213,7 +196,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 const acceptDelete = (selectedRunId: number) => {
   toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
-  fetchUserCalibrationJobsListData()
+  deleteCalibrationRun(selectedRunId);
   selectedCalibrationRun.value = undefined
 }
 
@@ -224,12 +207,5 @@ const acceptDelete = (selectedRunId: number) => {
 
 #CalTable {
   border: 1px solid $ngwcp_primary1;
-
-  /*.table {
-      thead tr th {
-        background-color: #F5A4A4;
-        border: 1px solid #000;
-      }
-    }*/
 }
 </style>

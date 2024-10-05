@@ -8,7 +8,7 @@
       </div>
         <div id="CenterBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-lg">
           <div class="mx-auto px-8 text-center text-2xl">
-            <h1 class="mt-8 mb-4 text-4xl font-bold">Next Generation Water Prediction Center </h1>
+            <h1 class="mt-8 mb-4 text-4xl font-bold">Next Generation Water Prediction Center</h1>
             <div>Welcome <strong>{{ getUserName() }}</strong></div>
             <div>You have {{ runningCalibrationJobs }} current processes running</div>
             <div>You have {{ savedCalibrationJobs }} calibration setups to complete</div>
@@ -22,31 +22,21 @@
 
 </template>
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, nextTick} from "vue";
 import AppHeader from '~/components/Common/AppHeader.vue';
 import AppFooter from '~/components/Common/AppFooter.vue';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
 import { storeToRefs } from "pinia";
-import CalibrationLayout from "~/layouts/CalibrationLayout.vue";
 
-const calibrationJobStore = useCalibrationJobStore()
-const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs(calibrationJobStore)
+const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs(useCalibrationJobStore());
 const { fetchUserCalibrationJobsListData, getUserName } = useUserDataStore()
 
 onMounted(() => {
-  console.log('MOUNTED: LandingPage');
-  fetchUserCalibrationJobsListData();
+  console.log('MOUNTED: LandingPage');  
+  nextTick(() => {
+    fetchUserCalibrationJobsListData();
+  })
 })
 
-
 </script>
-<style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
-
-.pgTitle {
-  font-size: 30px;
-  text-align: center;
-  margin-top: 50px;
-}
-</style>
