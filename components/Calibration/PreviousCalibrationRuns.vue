@@ -38,13 +38,6 @@
         * Right click on a row for Open, Clone or Delete options, or click on then New
         button.
       </div>
-      <!-- <div>
-        <div v-if="!gageStore_data_loading">Gage store loaded</div>
-        <div v-if="!formulationStore_data_loading">Formulation store loaded</div>
-        <div v-if="!optimizationStore_data_loading">Optimization store loaded</div>
-        <div v-if="!tuningStore_data_loading">Tuning store loaded</div>
-      </div> -->
-
     </div>
   </div>
 
@@ -71,20 +64,15 @@ const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
 const { loadOptimizationTabStaticData, optimizationStore_data_loading } = useOptimizationStore();
 const { fetchTuningTabData, tuningStore_data_loading } = useTuningStore();
-
-const isLoading = ref(false);
-
-const calibrationJobStore = useCalibrationJobStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
-const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData, deleteCalibrationRun, cloneCalibrationRun } = useUserDataStore();
-const { fetchNewCalibrationRunId } = calibrationJobStore;
-const { calibrationTabIndex, evaluationTabIndex, forecastTabIndex } = storeToRefs(generalStore());
-
+const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData,
+  deleteCalibrationRun, cloneCalibrationRun } = useUserDataStore();
+const { fetchNewCalibrationRunId } = useCalibrationJobStore();
 
 const toast = useToast();
-const crContextMenu = ref() //calibration run context menu
-
+const crContextMenu = ref(); //calibration run context menu
+const isLoading = ref(true);
 const selectedCalibrationRun = ref<JobListItem>();
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
@@ -92,19 +80,15 @@ const cmCalibrationRun = ref([
   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun) }
 ]);
 const onRowContextMenu = (event: any) => {
-  crContextMenu.value.show(event.originalEvent)
+  crContextMenu.value.show(event.originalEvent);
 };
 
 onMounted(() => {
-  // calibrationTabIndex.value = "1";
-  // evaluationTabIndex.value = "1";
-  // forecastTabIndex.value = "1";
-  // useGageStore().resetGageStore();
-  // clearUserCalibrationRunData();
+  isLoading.value = false;
 })
 
 const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
-  //isLoading.value = true;
+  isLoading.value = true;
   //keep the following for references purpose
   /*
   if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
@@ -115,31 +99,21 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   queryUserCalibrationRunData().then(queryResponse => {
     userCalibrationRunData.value = queryResponse?._data;
     loadEntireRun();
+    isLoading.value = false;
   });
 }
 
 const loadEntireRun = () => {
-  loadGageTabStaticData();
-  loadFormulationTabStaticData();
-  fetchTuningTabData();
-  loadOptimizationTabStaticData();
+  isLoading.value = true;
+  nextTick(() => {
+    loadGageTabStaticData();
+    loadFormulationTabStaticData();
+    fetchTuningTabData();
+    loadOptimizationTabStaticData();
+    isLoading.value = false;
+    gotoRunStatusTab();
+  })
 
-  // const nowTime = new Date().getTime();
-  // const endTime = nowTime + 5000;
-
-  // console.log("NowTime: ", nowTime)
-  // console.log("EndTime: ", nowTime)
-  // while (new Date().getTime() < endTime &&
-  //   (
-  //     gageStore_data_loading ||
-  //     formulationStore_data_loading ||
-  //     optimizationStore_data_loading ||
-  //     tuningStore_data_loading)
-  // ) {
-  // }
-  // console.log("FINISHED LOADING")
-  //isLoading.value = false;
-  gotoRunStatusTab();
 }
 const gotoRunStatusTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
@@ -173,9 +147,16 @@ const createNewCalibration = async () => {
 }
 
 const gotoHeadwaterBasinGage = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[1];
-  e.click();
+  nextTick(() => {
+    loadGageTabStaticData();
+    loadFormulationTabStaticData();
+    fetchTuningTabData();
+    loadOptimizationTabStaticData();
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[1];
+    e.click();
+  })
+
 }
 
 /**
@@ -226,12 +207,5 @@ const acceptDelete = (selectedRunId: number) => {
 
 #CalTable {
   border: 1px solid $ngwcp_primary1;
-
-  /*.table {
-      thead tr th {
-        background-color: #F5A4A4;
-        border: 1px solid #000;
-      }
-    }*/
 }
 </style>

@@ -259,8 +259,8 @@ const submitForm = async () => {
 /**
  * Navigates to the landing page.
  */
-const GoToLanding = async () => {
-  await navigateTo("LandingPage");
+const GoToLanding = () => {
+  navigateTo("LandingPage");
 };
 
 </script>
