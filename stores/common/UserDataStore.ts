@@ -151,10 +151,10 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   }
 
   /**
- * Delete a job
- */
+  * Delete a job
+  */
   async function deleteCalibrationRun(runId: number) {
-    const deleteCalibrationRunResult = await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/delete_job/`, {
+    await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/delete_job/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -162,7 +162,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
       },
       body: JSON.stringify({ calibration_run_id: runId })
     }).then(function(result) {
-      console.log("Result: ", deleteCalibrationRunResult)
+      console.log("Result: ", result)
       fetchUserCalibrationJobsListData();
     });
   }
@@ -171,7 +171,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
  * Clone a job
  */
   async function cloneCalibrationRun(runId: number) {
-    const cloneCalibrationRunResult = await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/clone_job/`, {
+    await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/clone_job/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -179,7 +179,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
       },
       body: JSON.stringify({ calibration_run_id: runId })
     }).then(function(result) {
-      console.log("Result: ", cloneCalibrationRunResult)
+      console.log("Result: ", result)
        fetchUserCalibrationJobsListData();
     });
   }

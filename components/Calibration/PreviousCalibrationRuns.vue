@@ -1,25 +1,21 @@
 <template>
 
   <div class="mx-auto px-8 text-center overflow-auto">
-    <div class="flex mt-10">
-      <div class="">
-        <h1 class="mt-1 mb-8 text-3xl font-bold">Previous Calibration Runs *</h1>
-      </div>
-      <div class="ml-auto mt-2">
-        <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"
-          @click="createNewCalibration"><button>New</button></span>
-      </div>
-    </div>
-
     <div class="width-full">
-      <div id="CalTable" class="w-full">
+        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs *</h1>
+        <span class="ngenButtonDiv-alt bg-blue4 ml-8"
+          @click="createNewCalibration"><button>New</button>
+        </span>
+
+      <div id="CalTable" class="w-1/2 mx-auto">
         <ConfirmDialog></ConfirmDialog>
         <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
           :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
         <DataTable id="cr-list" :value="userCalibrationJobsListData" sortField="calibration_run_id" :sortOrder="-1"
           scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
           selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-          @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle">
+          @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle"
+          @rowDblselect="openSelectedCalibrationRun(selectedCalibrationRun)">
           <Column field="calibration_run_id" header="Run ID" sortable></Column>
           <Column field="formulation_name" header="Formulation Name" sortable>
           </Column>
@@ -34,7 +30,7 @@
           <Column field="status" header="Status" sortable></Column>
         </DataTable>
       </div>
-      <div class="asteriskText text-left mt-2">
+      <div class="mt-4 mx-auto">
         * Right click on a row for Open, Clone or Delete options, or click on then New
         button.
       </div>
@@ -53,7 +49,7 @@ import { useToast } from "primevue/usetoast";
 import type { JobListItem } from "~/composables/NextGenModel";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "~/stores/common/GeneralStore";
-import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
+import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
@@ -166,7 +162,6 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   //toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   cloneCalibrationRun(selectedRunId);
-  fetchUserCalibrationJobsListData();
 }
 
 const confirmDelte = useConfirm();
