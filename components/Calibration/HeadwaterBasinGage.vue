@@ -131,10 +131,10 @@ import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 
-const { gageData, selectedDomainValue, gageStore_data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList,
+const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
   getObservationalOptionsList } = storeToRefs(useGageStore());
-const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
+const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
   saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
 const { getCalibrationTabIndex } = generalStore();
 const { calibrationJobId } = storeToRefs(generalStore());
