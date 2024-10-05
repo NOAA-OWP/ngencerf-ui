@@ -8,16 +8,18 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 export const useTuningStore = defineStore('TuningStore', () => {
   // server-data properties
-  const { calibrationJobId } = storeToRefs(generalStore())
-  const loadCalibrationRunData = ref<any>(); // TODO: update to use LoadCalbrationRunData type
+  const userDataStore = useUserDataStore();
   const loadTuningTabData = ref<any>(); // TODO: update to use LoadTuningTabResponse type
   // const saveTuningTabData = ref<SaveTuningTabRequestBody>()
+  const { calibrationJobId } = storeToRefs(generalStore())
+  const { getAccessToken } = userDataStore;
+  const { ngencerfBaseUrl } = useBackendConfig();
 
   // user-data properties
-  const simStartTime = ref<string>("");
-  const simEndTime = ref<string>("");
-  const calStartTime = ref<string>("");
-  const calEndTime = ref<string>("");
+  const simStartTime = ref<any>("");
+  const simEndTime = ref<any>("");
+  const calStartTime = ref<any>("");
+  const calEndTime = ref<any>("");
 
   const userCalibrationTuningParameters = ref<any[]>([]);
   const userOutputVariableToCalibrate = ref<{ name: string; module: string | null }>({
@@ -27,51 +29,34 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const outputVariables = ref<any[]>([]);
   const automatic_validation = ref<boolean>(true);
 
-  const avSimStartTime = ref<string>("");
-  const avSimEndTime = ref<string>("");
-  const avCalStartTime = ref<string>("");
-  const avCalEndTime = ref<string>("");
-
+  const avSimStartTime = ref<any>("");
+  const avSimEndTime = ref<any>("");
+  const avCalStartTime = ref<any>("");
+  const avCalEndTime = ref<any>("");
 
   const rangeDateFrom = ref<any>();
   const rangeDateTo = ref<any>();
 
-  const { ngencerfBaseUrl } = useBackendConfig();
-  const userDataStore = useUserDataStore();
-
-  const tuningStore_data_loading = ref(true)
+  const tuningStore_data_loading = ref(true);
 
   /**
-   * fetch Tuning Tab data
+   * Get Tuning Tab data
+   * @returns {Promise<any>}
    */
-  async function fetchTuningTabData(): Promise<void> {
+  async function fetchTuningTabData(): Promise<any> {
     tuningStore_data_loading.value = true;
-    const loadCalibrationRunOutput: any = await makeProtectedApiCall(
-      `${ngencerfBaseUrl}/calibration/load_calibration_run/?calibration_run_id=${calibrationJobId.value}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${userDataStore.getAccessToken()}`
-        }
-      });
 
-    if (loadCalibrationRunOutput?._data) {
-      loadCalibrationRunData.value = loadCalibrationRunOutput?._data;
-    }
+    loadTuningTabData.value =  await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_tuning_tab/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+    });
 
-    const loadTuningTabOutput: any = await makeProtectedApiCall(
-      `${ngencerfBaseUrl}/calibration/load_tuning_tab/?calibration_run_id=${calibrationJobId.value}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${userDataStore.getAccessToken()}`
-        }
-      });
-
-    if (loadTuningTabOutput?._data) {
-      loadTuningTabData.value = loadTuningTabOutput?._data;
-    }
     tuningStore_data_loading.value = false;
+    return loadTuningTabData.value;
   };
 
   /**
@@ -110,14 +95,13 @@ export const useTuningStore = defineStore('TuningStore', () => {
       {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${userDataStore.getAccessToken()}`,
+          Authorization: `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestBody)
       });
-    console.log("saveTuningTabOutput:", saveTuningTabOutput?._data);
 
-    return saveTuningTabOutput?._data;
+    return saveTuningTabOutput;
   };
 
 
@@ -129,7 +113,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
    * Hard Reset Tuning Store
    */
   const hardResetTuningStore = (): void => {
-    loadCalibrationRunData.value = null;
     loadTuningTabData.value = null;
     simStartTime.value = "";
     simEndTime.value = "";
@@ -140,7 +123,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
     userOutputVariableToCalibrate.value.module = null;
     outputVariables.value = [];
     automatic_validation.value = true;
-
     avSimStartTime.value = "";
     avSimEndTime.value = "";
     avCalStartTime.value = "";
@@ -153,7 +135,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
   return {
     tuningStore_data_loading,
     fetchTuningTabData,
-    loadCalibrationRunData,
     loadTuningTabData,
     simStartTime,
     simEndTime,
