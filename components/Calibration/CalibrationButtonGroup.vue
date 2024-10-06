@@ -75,7 +75,7 @@ const SaveStartTabContent = async (e: MouseEvent) => {
 
 const ResetCancelTabContent = async (e: MouseEvent) => {
   switch (getMenuIndex()) {
-    case 1: useEvent('calibrationButtonResetCancel', getCalibrationTabIndex() < 6 ? "RESET" : "CANCEL"); break;
+    case 1: useEvent('calibrationButtonResetCancel', getCalibrationTabIndex() < 6 ? "RESET" : "CANCEL");  break;
     case 2: break;
     case 3: break;
     case 4: break;
@@ -86,7 +86,7 @@ const ResetCancelTabContent = async (e: MouseEvent) => {
 const NavigatePrevContent = (e: MouseEvent) => {
   console.log("Previous Click");
   switch (getMenuIndex()) {
-    case 1: useEvent('calibrationButtonPrev', "PREV"); emitterOff('calibrationButtonPrev'); break;
+    case 1: useEvent('calibrationButtonPrev', "PREV"); break;
     case 2: break;
     case 3: break;
     case 4: break;
@@ -97,7 +97,7 @@ const NavigatePrevContent = (e: MouseEvent) => {
 const NavigateNextContent = (e: MouseEvent) => {
   console.log("Next Click");
   switch (getMenuIndex()) {
-    case 1: useEvent('calibrationButtonNext', "NEXT"); emitterOff('calibrationButtonNext'); break;
+    case 1: useEvent('calibrationButtonNext', "NEXT");  break;
     case 2: break;
     case 3: break;
     case 4: break;

@@ -33,7 +33,7 @@
             </div>
             <div data-tab="6" data-menu-tab="16" class="tabs prevent-select" v-on:click="tabClicked"
               aria-label="Run Status tab" title="Run Status tab">
-              Run / Status
+              Run
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
           </span>
