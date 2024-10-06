@@ -183,7 +183,7 @@ onMounted(() => {
         toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Gage is required.", life: 3000 })
       }
       if (!selectedDomainValue.value || !selectedGageValue.value) {
-        setTimeout(() => gotoNext(), 3000);
+        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: "Please select a Domain and Gage", life: 3000 })
         return;
       }
       gotoNext();
