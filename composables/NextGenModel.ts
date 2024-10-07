@@ -376,14 +376,30 @@ export interface CalibrationPlotListData extends SelectOption {
 /**
  * Evaluation models
  */
-export interface EvaluationCalibrationRunListItem {
-  calibration_run_id: number;
-  formulation_name: string;
-  run_date: Date;
-  gage_id: string;
+export interface ValidatedCalibrationRunListItem extends JobListItem {
   objective_function: string;
-  optimization: string;
-  validation_runs: number;
+  optimization_algorithm: string;
+  validation_runs: number
+}
+
+export interface ValidatedCalibrationRunList {
+  jobs: ValidatedCalibrationRunListItem[];
+}
+
+export interface CalibrationValidationRunData {
+  validation_run_id: number;
+  run_date: Date;
+  parameters: CalibrationValidationParameter[];
+}
+
+export interface CalibrationValidationParameter {
+  name: string;
+  value: number;
+}
+
+export interface DynamicTableColumn {
+  field: any;
+  header: string;
 }
 
 /**

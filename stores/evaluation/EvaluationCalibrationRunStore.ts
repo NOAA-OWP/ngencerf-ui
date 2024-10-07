@@ -2,37 +2,39 @@
 
 import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { useGageStore } from "../calibration/GageStore";
 import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
-import type { SelectOption, UserCalibrationRunData } from "~/composables/NextGenModel";
+import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, DynamicTableColumn } from "~/composables/NextGenModel";
 import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {  
   const { calibrationJobId, validatedCalibrationRunId } = storeToRefs( generalStore() );
   const { fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
   const calibrationRunList = ref<any[]>([]);
-  const validatedCalibrationRunList = ref<any[]>([]);
   const userSelectedEvalCalibrationRunId = ref<number>( 0 );
+  const { ngencerfBaseUrl } = useBackendConfig();
+  const { getAccessToken } = useUserDataStore();
   const uiGageId = ref<string>( "" );   
   const userSelectedEvalCalibrationRun = ref<any>();
-  const userSelectedValidatedCalibrationRunId = ref<number>( 0 );
+  const userSelectedCalibrationValidationRunId = ref<number>( 0 );
   const uiReferenceDataSet = ref<string>( "" );
-
-  const fetchEvaluationCalibrationRunList = async () => {
-    const { data, status, error } = await useFetch('/api/evaluation/list_jobs', {
-      'method': 'POST'
-    });
-    calibrationRunList.value = data.value ?? [];
-  };
+  /**
+   * list of calibration jobs with validation data
+   */
+  const userEvaluationCalibrationRunListData = ref<ValidatedCalibrationRunListItem[]>( [] );
+  /**
+   * list of validation jobs of a selected calibration job id
+   */
+  const userSelectedCalibrationValidationRunList = ref<CalibrationValidationRunData[]>( [] );
+  //const validatedCalbrationRunParamColumns = ref<DynamicTableColumn[]>( [] );
 
   /**
   * @returns {SelectOption[]}
   */
   const evaluationCalibrationRunGageList = computed( () => {
     let gageOptionList = <SelectOption[]>[];
-    calibrationRunList.value.forEach( runItem => {
+    userEvaluationCalibrationRunListData.value.forEach( runItem => {
         const checkGageIndex = gageOptionList.findIndex( gageOption => {
           gageOption.name === runItem.gage_id 
         });
@@ -47,9 +49,32 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     return gageOptionList;
   });
 
+  /**
+   * fetch user created calibration job list data
+   * @return {void}
+   */
+  async function fetchUserValidatedCalibrationJobsListData() {
+    const runListDataResult = await makeProtectedApiCall<ValidatedCalibrationRunList>( `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`, {
+      method: "POST",
+      headers: { 
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify( { include_validations: true } )
+    });
+
+    if ( runListDataResult?._data?.jobs.length > 0 ) {
+      runListDataResult?._data?.jobs.forEach( ( runItem: ValidatedCalibrationRunListItem ) => {
+        if ( runItem.status.toLowerCase() == "done" && runItem.run_date != null ) {
+          userEvaluationCalibrationRunListData.value.push( runItem );
+        }
+      });
+    }
+  }
+
   const filteredEvaluationCalibrationRunList = computed( () => {
     let runList = <any[]>[];
-    calibrationRunList.value.forEach( runItem => {
+    userEvaluationCalibrationRunListData.value.forEach( runItem => {
         if ( uiGageId.value == "" || uiGageId.value == runItem.gage_id ) {
           runList.push( runItem );
         }
@@ -57,23 +82,55 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     return runList;
   });
 
+  const fetchUserSelectedCalibrationValidationRunList = async () => {
+    const runListDataResult = await makeProtectedApiCall<ValidatedCalibrationRunList>( `${ngencerfBaseUrl}/calibration/get_validation_jobs/`, {
+      method: "POST",
+      headers: { 
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify( { calibration_run_id: userSelectedEvalCalibrationRunId.value } )
+    });
+
+    userSelectedCalibrationValidationRunList.value = runListDataResult._data?.validation_jobs ?? [];
+  }
+
+  /**
+   * return processed 
+   */
+  const loadUserSelectedCalibrationValidationRunList = computed( () => {
+    const queryset = ref<any[]>([]);
+    userSelectedCalibrationValidationRunList.value.forEach( rowData => {
+      let newRowData : any = {
+        'validation_run_id': rowData.validation_run_id,
+        'run_date': rowData.run_date
+      };
+      rowData.parameters.forEach( parameter => {
+        newRowData[ parameter.name ] = parameter.value;
+      })
+      queryset.value.push( newRowData );
+    });
+
+    return queryset.value;
+  })
+
   const loadSelectedCalibrationRun = async ( calibration_run_id: number ) => {
     calibrationJobId.value = userSelectedEvalCalibrationRunId.value = calibration_run_id;
     fetchUserCalibrationRunData();
   }
 
-  const fetchValidatedCalibrationRunList = async () => {
-    const { data, status, error } = await useFetch('/api/evaluation/list_validated_calibration_runs', {
-      'method': 'POST',
-      body: JSON.stringify({ calibration_run_id: userSelectedEvalCalibrationRunId.value })
-    });
-    
-    validatedCalibrationRunList.value = data.value ?? [];
+  const resetUserSelectedCalibrationValidationRunList = () => {
+    userSelectedCalibrationValidationRunList.value = [];
   }
 
-  const resetValidatedCalibrationRunList = () => {
-    validatedCalibrationRunList.value = [];
-  }
+  const validatedCalbrationRunParamColumns = computed( () => {
+    let columns = ref<DynamicTableColumn[]>( [] );
+    userSelectedCalibrationValidationRunList.value[0]['parameters'].forEach( parameter => {
+      columns.value.push({ field: parameter.name, header: parameter.name });
+    })
+    
+    return columns.value;
+  })
 
   /**
    * @returns {SelectOption[]}
@@ -97,7 +154,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     calibrationJobId.value = userSelectedEvalCalibrationRunId.value = 0;
     uiGageId.value = "";
     userSelectedEvalCalibrationRun.value = undefined;
-    validatedCalibrationRunList.value = [];
+    userSelectedCalibrationValidationRunList.value = [];
     //uiReferenceDataSet.value = "";
     clearUserCalibrationRunData();
   }
@@ -108,27 +165,32 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const resetUserSelectedEvalCalibrationRun = (): void => {
     calibrationJobId.value = userSelectedEvalCalibrationRunId.value = 0;
     userSelectedEvalCalibrationRun.value = undefined;
-    validatedCalibrationRunList.value = [];
+    userSelectedCalibrationValidationRunList.value = [];
     clearUserCalibrationRunData();
   }
+
+  useLogoutListen('logoutEvent', () => {
+    resetEvaluationCalibrationRunStore();
+  })
 
   return {
     validatedCalibrationRunId,
     uiGageId,
     uiReferenceDataSet,
     calibrationRunList,
-    fetchEvaluationCalibrationRunList,
     filteredEvaluationCalibrationRunList,
     evaluationCalibrationRunGageList,
     userSelectedEvalCalibrationRunId,
     loadSelectedCalibrationRun,
     resetEvaluationCalibrationRunStore,
+    fetchUserValidatedCalibrationJobsListData,
     resetUserSelectedEvalCalibrationRun,
     getReferenceDataSetOptions,
-    validatedCalibrationRunList,
-    fetchValidatedCalibrationRunList,
-    resetValidatedCalibrationRunList,
-    userSelectedValidatedCalibrationRunId
+    resetUserSelectedCalibrationValidationRunList,
+    userSelectedCalibrationValidationRunId,
+    fetchUserSelectedCalibrationValidationRunList,
+    validatedCalbrationRunParamColumns,
+    loadUserSelectedCalibrationValidationRunList
   }
 })
 

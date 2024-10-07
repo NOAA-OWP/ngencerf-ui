@@ -13,7 +13,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { calibrationJobId, validatedCalibrationRunId } = storeToRefs( generalStore() );
+  const { calibrationJobId } = storeToRefs( generalStore() );
   const userCalibrationJobsListData = ref<JobListItem[]>([]);
   const userCalibrationRunData = ref<UserCalibrationRunData>();
 
@@ -113,7 +113,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * @return {void}
    */
   async function fetchUserCalibrationJobsListData() {
-    const jobsListDataResult = await makeProtectedApiCall<JobsList>( `${ngencerfBaseUrl}/calibration/get_jobs/`, {
+    const jobsListDataResult = await makeProtectedApiCall<JobsList>( `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`, {
       method: "POST",
       headers: { 
         "Authorization": `Bearer ${getAccessToken()}`,

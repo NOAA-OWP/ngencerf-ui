@@ -5,7 +5,7 @@
         <div id="PgTitle">Previous Calibration Runs</div>
       </div>
       <Button id="btn-new-validation" class="start actionBtn" v-if="userSelectedEvalCalibrationRunId > 0">New Validation</Button>
-      <div class="row-span-10" v-if="validatedCalibrationRunList.length == 0">
+      <div class="row-span-10" v-if="loadUserSelectedCalibrationValidationRunList.length <= 1">
         <div id="CalTable">
           <div class="grid grid-cols-2 mb-5">
               <div class="col-span-1">
@@ -16,13 +16,9 @@
           </div>
           </div>
           
-          <ConfirmDialog></ConfirmDialog>
-          <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
           <DataTable id="cr-list" :value="filteredEvaluationCalibrationRunList" scrollable scroll-height="400px"
               table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
-              contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-              @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
+              :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
               <Column field="calibration_run_id" header="Run ID" sortable></Column>
               <Column field="run_date" header="Run Date" sortable></Column>
               <Column field="formulation_name" header="formulation_name" sortable></Column>
@@ -40,14 +36,13 @@
           -->
         </div>
       </div>
-      <div class="row-span-10" v-if="validatedCalibrationRunList.length > 0">
+      <div class="row-span-10" v-if="loadUserSelectedCalibrationValidationRunList.length > 1">
         <div id="evaluationCalibrationList">
-          <DataTable id="cr-list" :value="validatedCalibrationRunList" scrollable scroll-height="400px"
-            table-style="min-width: 50rem" selectionMode="single" v-model:selection="userSelectedValidatedCalibrationRunId" :rowStyle="rowStyle" class="boxed">
-            <Column field="validation_id" header="Validation Run ID" sortable></Column>
+          <DataTable id="cr-list" :value="loadUserSelectedCalibrationValidationRunList" scrollable scroll-height="400px"
+            table-style="min-width: 50rem" selectionMode="single" v-model:selection="userSelectedCalibrationValidationRunId" :rowStyle="rowStyle" class="boxed">
+            <Column field="validation_run_id" header="Validation Run ID" sortable></Column>
             <Column field="run_date" header="Run Date" sortable></Column>
-            <Column field="validation_start" header="Validation Start" sortable></Column>
-            <Column field="validation_end" header="Validation End" sortable></Column>
+            <Column v-for="col of validatedCalbrationRunParamColumns" :key="col.field" :field="col.field" :header="col.header"></Column>
           </DataTable>
         </div>        
       </div>
@@ -61,7 +56,7 @@ import { useToast } from "primevue/usetoast";
 import type { CalibrationRun } from "~/composables/NextGenModel";
 import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
 import { storeToRefs } from "pinia";
-
+import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
@@ -72,42 +67,28 @@ const {
   getReferenceDataSetOptions,
   uiReferenceDataSet, 
   userSelectedEvalCalibrationRunId,
-  validatedCalibrationRunList,
-  userSelectedValidatedCalibrationRunId
-} = storeToRefs( evaluationCalibrationRunStore )
+  userSelectedCalibrationValidationRunId,
+  loadUserSelectedCalibrationValidationRunList,
+  validatedCalbrationRunParamColumns,
+} = storeToRefs( evaluationCalibrationRunStore );
+
 const { 
-  fetchEvaluationCalibrationRunList,
+  fetchUserSelectedCalibrationValidationRunList,
   loadSelectedCalibrationRun,
   resetUserSelectedEvalCalibrationRun,
-  fetchValidatedCalibrationRunList,
-  resetValidatedCalibrationRunList,
+  fetchUserValidatedCalibrationJobsListData,
+  resetUserSelectedCalibrationValidationRunList,
   resetEvaluationCalibrationRunStore
 } = evaluationCalibrationRunStore;
 
-const toast = useToast();
-const crContextMenu = ref() //calibration run context menu
-const selectedCalibrationRun = ref<CalibrationRun>()
-const cmCalibrationRun = ref([
-    { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) }
-])
-const onRowContextMenu = (event: any) => {
-    crContextMenu.value.show( event.originalEvent );
-}
 
-const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-    if (['Done', 'Failed', 'SEVER_ERROR'].includes(selectedCalibrationRun.value.status)) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open Forumulation tab', life: 3000 })
-    if (['Saved', 'Ready'].includes(selectedCalibrationRun.value.status)) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open corresponding saved tab', life: 3000 })
-    if (['Running'].includes(selectedCalibrationRun.value.status)) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open Run/Status tab', life: 3000 })
-}
+const toast = useToast();
+const selectedCalibrationRun = ref<CalibrationRun>()
 
 const onEvalCalibrationRowSelect = ( event: any ) => {
   loadSelectedCalibrationRun( event.data.calibration_run_id );
   
-  if ( event.data.validation_runs > 1 ) {
-    fetchValidatedCalibrationRunList();
-  } else {
-    resetValidatedCalibrationRunList();
-  }
+  fetchUserSelectedCalibrationValidationRunList();
 }
 
 const onEvalCalibrationRowUnSelect = ( event: any ) => {
@@ -129,7 +110,7 @@ useListen('evaluationResetUiClick', ( actionId ) => {
 
 onMounted( () => {
   resetEvaluationCalibrationRunStore();
-  fetchEvaluationCalibrationRunList();
+  fetchUserValidatedCalibrationJobsListData();
 })
 </script>
 
