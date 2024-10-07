@@ -195,7 +195,7 @@ onUnmounted( () => {
   emitterOff('calibrationButtonSaveStart');
   emitterOff('calibrationButtonResetCancel');
   emitterOff('calibrationButtonNext');
-})
+});
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);

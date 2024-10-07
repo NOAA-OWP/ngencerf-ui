@@ -5,7 +5,7 @@
       <div class="grid row-span-1">
         <div class="grid grid-cols-8">
           <div class="col-span-8">
-            <div id="FormulationName" class="block mt-3" aria-label="Forumulation Name" title="Formulation Name">
+            <div id="FormulationName" class="block mt-2" aria-label="Forumulation Name" title="Formulation Name">
               <label for="formulationNameInput">Forumulation Name:</label>
             </div>
             <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
@@ -15,23 +15,26 @@
       </div>
 
       <div class="row-span-5">
-        <div class="mt-1 mb-3 hr"></div>
+        <div class="mb-2 hr"></div>
         <div class="grid grid-cols-12">
           <div class="col-span-5">
-            <div class="mt-2 text-left"><strong>Select Modules</strong></div>
+            <div class="text-left text-lg"><strong>Formulation Modules</strong></div>
             <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
-              <label for="Groups">Groups:</label>
-              <Select id="Groups" v-model="filterGroup" filter
-                :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description" optionValue="name"
-                placeholder="ALL"></Select>
+
+              <div class="font-bold">Groups Filter
+                <Select id="Groups" class="" v-model="filterGroup" filter
+                  :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description"
+                  optionValue="name" placeholder="ALL"></Select>
+              </div>
             </div>
+            <div class="mb-1 font-bold">Select Modules:</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
               optionLabel="name" optionValue="name" class="w-full h-60"></Listbox>
           </div>
           <div class="col-span-2">&nbsp;</div>
           <div class="col-span-5">
-            <div class="group-cover-selection-wrapper w-60 float-left">
-              <div class="mt-2 mb-2 pl-4" aria-label="List of groups covered by selection"
+            <div class="group-cover-selection-wrapper w-80 float-left">
+              <div class="mt-2 mb-2 pl-4 text-lg" aria-label="List of groups covered by selection"
                 title="List of groups covered by selection"><strong>Groups Covered By Selections:</strong></div>
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
                 optionValue="name" scrollHeight="18rem" class="w-full border-0">
