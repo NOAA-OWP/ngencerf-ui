@@ -113,11 +113,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * @return {void}
    */
   async function fetchUserCalibrationJobsListData() {
-<<<<<<< HEAD
-    const jobsListDataResult = await makeProtectedApiCall<JobsList>( `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`, {
-=======
     const jobsListDataResult = await makeProtectedApiCall<JobsList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs/`, {
->>>>>>> development
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
