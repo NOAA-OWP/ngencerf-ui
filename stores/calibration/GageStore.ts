@@ -29,10 +29,11 @@ export const useGageStore = defineStore('GageStore', () => {
   const selectedGeopackageValue = ref<string>("");
   const gageData = ref<GageData>();
 
-  const data_loading = ref<boolean>(true);
+  const gageStore_data_loading = ref<boolean>(true);
+
 
   const loadGageTabStaticData = () => { 
-    data_loading.value = true
+    gageStore_data_loading.value = true
     makeProtectedApiCall<GageTabData>(`${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
     method: "POST",
     headers: {
@@ -43,7 +44,7 @@ export const useGageStore = defineStore('GageStore', () => {
   })
     .then((gageTabDataResult) => {
       gageTabData.value = gageTabDataResult?._data ?? undefined
-      data_loading.value = false
+      gageStore_data_loading.value = false
       console.log( 'gageTabData', gageTabData.value )
       //init ui model value
       geopackageImageUrl.value = userCalibrationRunData.value?.geopackage_image_url ?? ""
@@ -260,7 +261,7 @@ export const useGageStore = defineStore('GageStore', () => {
     isNWMv3,
     fetchSelectedGageData,
     gageData,
-    data_loading,
+    gageStore_data_loading,
     geopackageImageUrl,
     userCalibrationRunData,
     resetUserSelectionGage,

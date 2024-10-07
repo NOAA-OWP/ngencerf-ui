@@ -10,31 +10,33 @@
             Calibration Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div data-tab="2" data-menu-tab="12" class="tabs prevent-select" v-on:click="tabClicked"
-            aria-label="Headwater Basin Gage tab" title="Headwater Basin Gage tab">
-            Headwater Basin Gage
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div data-tab="3" data-menu-tab="13" class="tabs prevent-select" v-on:click="tabClicked"
-            aria-label=" Formulation tab" title=" Formulation tab">
-            Formulation
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div data-tab="4" data-menu-tab="14" class="tabs prevent-select" v-on:click="tabClicked"
-            aria-label="Tuning Controls tab" title="Tuning Controls tab">
-            Tuning Controls
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div data-tab="5" data-menu-tab="15" class="tabs prevent-select" v-on:click="tabClicked"
-            aria-label=" Optimization / Metrics tab" title=" Optimization / Metrics tab">
-            Optimization / Metrics
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div data-tab="6" data-menu-tab="16" class="tabs prevent-select" v-on:click="tabClicked"
-            aria-label="Run Status tab" title="Run Status tab">
-            Run / Status
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
+          <span v-show="calibrationJobId">
+            <div data-tab="2" data-menu-tab="12" class="tabs prevent-select" v-on:click="tabClicked"
+              aria-label="Headwater Basin Gage tab" title="Headwater Basin Gage tab">
+              Headwater Basin Gage
+              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+            </div>
+            <div data-tab="3" data-menu-tab="13" class="tabs prevent-select" v-on:click="tabClicked"
+              aria-label=" Formulation tab" title=" Formulation tab">
+              Formulation
+              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+            </div>
+            <div data-tab="4" data-menu-tab="14" class="tabs prevent-select" v-on:click="tabClicked"
+              aria-label="Tuning Controls tab" title="Tuning Controls tab">
+              Tuning Controls
+              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+            </div>
+            <div data-tab="5" data-menu-tab="15" class="tabs prevent-select" v-on:click="tabClicked"
+              aria-label=" Optimization / Metrics tab" title=" Optimization / Metrics tab">
+              Optimization / Metrics
+              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+            </div>
+            <div data-tab="6" data-menu-tab="16" class="tabs prevent-select" v-on:click="tabClicked"
+              aria-label="Run Status tab" title="Run Status tab">
+              Run
+              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+            </div>
+          </span>
         </div>
       </div>
     </span>
@@ -47,28 +49,13 @@
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
         <div data-tab="2" data-menu-tab="22" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Evaluate Tab" title=" Evaluate tab">
+          aria-label="Evaluate Tab" title=" Evaluate tab" :disabled="true">
           Evaluate
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
         <div data-tab="3" data-menu-tab="23" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Setup a Validation Run tab" title="Setup a Validation Run tab">
-          Setup a Validation Run
-          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
-        <div data-tab="4" data-menu-tab="24" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Select Parameters Set tab" title=" Select Parameters Set tab tab">
-          Select Parameters Set
-          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
-        <div data-tab="5" data-menu-tab="25" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Review Setup and Run tab" title="Review Setup and Run tab">
-          Review Setup / Run
-          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
-        <div data-tab="6" data-menu-tab="26" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status tab"
-          title="Status tab">
-          Status
+          aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
+          Select Alternate Iteration
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
       </div>
@@ -128,8 +115,10 @@
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useUserDataStore } from "~/stores/common/UserDataStore";
+const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
@@ -139,12 +128,13 @@ const currentVerificationTab = ref(getVerificationTabIndex());
 const currentMenu = ref(getMenuIndex());
 
 onMounted(() => {
+  console.log('MOUNTED: Tabs');
   const allTabs = document.getElementsByClassName("tabs");
   const tab = currentMenu.value === 1 ? <HTMLElement>allTabs[currentCalibrationTab.value - 1] : <HTMLElement>allTabs[currentEvaluationTab.value - 1];
   tab.click();
 });
 
-// temporary. Will be replaced by logic from each tab
+// temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
 
 const tabClicked = (event: Event) => {

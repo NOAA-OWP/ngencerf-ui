@@ -7,22 +7,29 @@
         
         <Button v-if="loadUserSelectedCalibrationValidationRunList.length > 0" class="start actionBtn" @click.stop="EvalValidateCalibrateReset">Back</Button>
       </span>
+      <!--
       <span v-if="getEvaluationTabIndex() >= 5">
         <button class="start actionBtn">Run</button>
       </span>
+      -->
+      <span v-if="getEvaluationTabIndex() === 2">
+        <!-- <button class="start actionBtn">Evaluate</button> -->
+      </span>
     </div>
     <div class="col-span-2">
-      <button v-if="getEvaluationTabIndex() >= 5" class="stop actionBtn">Cancel</button>
+      <!-- <button v-if="getEvaluationTabIndex() >= 5" class="stop actionBtn">Cancel</button> -->
     </div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-1"></div>
     <div class="col-span-2 text-right">
-      <button v-if="getEvaluationTabIndex() === 4" class="prev actionBtnSmall">&#8678; Prev</button>
+      <!-- <button v-if="getEvaluationTabIndex() === 4" class="prev actionBtnSmall">&#8678; Prev</button> -->
     </div>
-    <div class="col-span-2"><button v-if="getEvaluationTabIndex() === 3 || getEvaluationTabIndex() === 4"
-        class="next actionBtnSmall">Next <span>&#8680;</span></button></div>
+    <div class="col-span-2">
+      <!-- <button v-if="getEvaluationTabIndex() === 3 || getEvaluationTabIndex() === 4" class="next actionBtnSmall">Next
+        <span>&#8680;</span></button> -->
+    </div>
   </div>
 </template>
 

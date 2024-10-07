@@ -116,35 +116,85 @@
       </div>
     </div>
   </div>
-  <div class="waitgif" v-if="data_loading">
+  <div class="waitgif" v-if="isLoading">
     <img src="@/assets/styles/img/wait.gif" />
   </div>
 
 </template>
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import { onMounted, onUnmounted } from "vue";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
+import InputNumber from "primevue/inputnumber";
 
-const gageStore = useGageStore()
-const { gageData, selectedDomainValue, data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
-const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = gageStore
-const { getCalibrationTabIndex } = generalStore()
-const { calibrationJobId } = storeToRefs(generalStore())
-const { fetchUserCalibrationRunData } = useUserDataStore()
-const toast = useToast()
+const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
+  selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
+  getObservationalOptionsList } = storeToRefs(useGageStore());
+const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
+  saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
+const { getCalibrationTabIndex } = generalStore();
+const { calibrationJobId } = storeToRefs(generalStore());
+const { fetchUserCalibrationRunData } = useUserDataStore();
+const toast = useToast();
 
 const isLoading = ref(true);
 
-
-
 onMounted(() => {
   toast.removeAllGroups();
-  loadGageTabStaticData();
+  isLoading.value = false;
+  /**
+ * event bus for calibration button group click
+ */
+  useListen('calibrationButtonSaveStart', (actionButton) => {
+    if (getCalibrationTabIndex() == 2 && actionButton == 'SAVE') {
+      toast.removeAllGroups()
+      const save_tab_response = saveGageTabData()
+
+      save_tab_response.then((response) => {
+        if (response?.validation_errors) {
+          useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
+            toast.add({ severity: "error", summary: 'Error Saving Gage Tab Data', detail: message })
+          })
+        } else {
+          toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 })
+          fetchUserCalibrationRunData()
+        }
+      })
+    }
+  })
+
+  useListen('calibrationButtonResetCancel', (actionButton) => {
+    if (getCalibrationTabIndex() == 2 && actionButton == 'RESET') {
+      resetUserSelectionGage()
+    }
+  })
+
+  useListen('calibrationButtonNext', (actionButton) => {
+    if (getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
+      if (!selectedDomainValue.value) {
+        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Domain is required.", life: 3000 })
+      }
+      if (!!selectedGageValue.value) {
+        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Gage is required.", life: 3000 })
+      }
+      if (!selectedDomainValue.value || !selectedGageValue.value) {
+        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: "Please select a Domain and Gage", life: 3000 })
+        return;
+      }
+      gotoNext();
+    }
+  })
+})
+
+onUnmounted( () => {
+  emitterOff('calibrationButtonSaveStart');
+  emitterOff('calibrationButtonResetCancel');
+  emitterOff('calibrationButtonNext');
 })
 
 const dialog = useDialog();
@@ -239,6 +289,7 @@ const showGeopackagFileUploadDialog = (headerText: string) => {
   }
 }
 
+<<<<<<< HEAD
 /**
  * event bus for calibration button group click
  */
@@ -282,6 +333,8 @@ useListen('calibrationButtonNext', (actionButton) => {
   }
 })
 
+=======
+>>>>>>> development
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[2];
@@ -301,7 +354,6 @@ const toggle_isNWMv3 = () => {
 @import "@/assets/styles/styles.scss";
 
 #GageReport {
-
   table {
     border: 1px solid #ccc;
     width: auto;
@@ -316,15 +368,16 @@ const toggle_isNWMv3 = () => {
         border-bottom: 1px solid #ccc;
         background-color: $ngwcp_neutral_gray_lt;
       }
+
       .td1 {
         text-align: right;
         width: 20%;
       }
+
       .td2 {
         font-weight: 600;
       }
     }
   }
-
 }
 </style>

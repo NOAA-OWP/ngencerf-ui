@@ -120,7 +120,7 @@
         </div>
       </div>
     </div>
-    <div class="waitgif" v-if="data_loading">
+    <div class="waitgif" v-if="formulationStore_data_loading">
       <img src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
@@ -128,15 +128,15 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import { onMounted, onUnmounted } from "vue";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
-import { calibrationNextTabNavigate, calibrationPrevTabNavigate } from "~/composables/TabClickEvent";
 import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
-//const isLoading = ref(true);
+const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
 const slothParamContextMenu = ref() //sloth parameter table context menu
@@ -149,7 +149,7 @@ const onRowContextMenu = (event: any) => {
   slothParamContextMenu.value.show(event.originalEvent)
 }
 const {
-  data_loading,
+  formulationStore_data_loading,
   filterGroup,
   useSlothParameters,
   selectedModuleValues,
@@ -170,11 +170,66 @@ const toast = useToast();
 
 
 onMounted(() => {
-  toast.removeAllGroups()
-  //load static data of this tab
-  loadFormulationTabStaticData()
-  //isLoading.value = false;
+  toast.removeAllGroups();
+  /**
+ * event bus for calibration button group click
+ */
+  useListen('calibrationButtonSaveStart', (actionButton) => {
+    if (getCalibrationTabIndex() === 3 && actionButton == 'SAVE') {
+      toast.removeAllGroups()
+      const save_formulation_response = saveFormulationTabData()
+      save_formulation_response.then((response) => {
+        if (response?.validation_errors) {
+          useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
+            toast.add({ severity: "error", summary: 'Error Saving Formulation Tab Data', detail: message })
+          })
+        } else {
+          toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
+          fetchUserCalibrationRunData();
+        }
+      })
+    }
+  })
+
+  useListen('calibrationButtonResetCancel', (actionButton) => {
+    if (getCalibrationTabIndex() == 3 && actionButton == 'RESET') {
+      resetUserSelectionFormulation()
+    }
+  })
+
+  useListen('calibrationButtonNext', (actionButton) => {
+    if (getCalibrationTabIndex() == 3 && actionButton === "NEXT") {
+      if (!formulationNameInput.value) {
+        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Forumulation Name is required.", life: 3000 })
+      }
+      if (!selectedModuleValues.value.length) {
+        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "Module Selection is required.", life: 3000 })
+      }
+      if (!formulationNameInput.value || !selectedModuleValues.value.length) {
+        return;
+      }
+      const tabs = document.getElementsByClassName("tabs");
+      const e = <HTMLElement>tabs[3];
+      e.click();
+    }
+  })
+
+  useListen('calibrationButtonPrev', (actionButton) => {
+    if (getCalibrationTabIndex() == 3 && actionButton === "PREV") {
+      const tabs = document.getElementsByClassName("tabs");
+      const e = <HTMLElement>tabs[1];
+      e.click();
+    }
+  })
 })
+
+onUnmounted(() => {
+  emitterOff('calibrationButtonSaveStart');
+  emitterOff('calibrationButtonPrev');
+  emitterOff('calibrationButtonNext');
+})
+
+
 /**
  * add sloth variable entry to table and reset name field
  */
@@ -188,62 +243,6 @@ const addSlothVariable = () => {
 const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
   deleteSlothVariable(selectedSlothParameterData.value.param_name)
 }
-/**
- * event bus for calibration button group click
- */
-useListen('calibrationButtonSaveStart', (actionButton) => {
-  if (getCalibrationTabIndex() === 3 && actionButton == 'SAVE') {
-    toast.removeAllGroups()
-    const save_formulation_response = saveFormulationTabData()
-    save_formulation_response.then((response) => {
-      if (response?.validation_errors) {
-        useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-          toast.add({ severity: "error", summary: 'Error Saving Formulation Tab Data', detail: message })
-        })
-      } else {
-        toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
-        fetchUserCalibrationRunData()
-      }
-    })
-  }
-})
-
-useListen('calibrationButtonResetCancel', (actionButton) => {
-  if (getCalibrationTabIndex() == 3 && actionButton == 'RESET') {
-    resetUserSelectionFormulation()
-  }
-})
-
-useListen('calibrationButtonNext', (actionButton) => {
-  if (getCalibrationTabIndex() == 3 && actionButton === "NEXT") {
-    if (!formulationNameInput.value) {
-      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Forumulation Name is required.", life: 3000 })
-    }
-    if (!selectedModuleValues.value.length) {
-      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "Module Selection is required.", life: 3000 })
-    }
-    if (!formulationNameInput.value || !selectedModuleValues.value.length) {
-      setTimeout(() => gotoNext(), 3000);
-      setTimeout(() => gotoNext(), 3000);
-      return;
-    }
-    gotoNext();
-  }
-})
-
-const gotoNext = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[3];
-  e.click();
-}
-
-useListen('calibrationButtonPrev', (actionButton) => {
-  if (getCalibrationTabIndex() == 3 && actionButton === "PREV") {
-    const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[1];
-    e.click();
-  }
-})
 
 </script>
 

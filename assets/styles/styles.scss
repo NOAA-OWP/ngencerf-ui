@@ -328,7 +328,7 @@ select option {
       padding-left: 0px;
     }
     tr {
-      line-height: calc(1.3vw + 0.41vh); 
+      line-height: calc(1.1vw + 0.41vh); 
     }
     .checkMark {
       text-align: right;
@@ -433,7 +433,7 @@ table.cols-bordered {
 }
 
 /* Progress Tables */
-.progressTable {
+/* .progressTable {
   width: 100%;
   margin-left: 15px;
 
@@ -454,4 +454,22 @@ table.cols-bordered {
 
 .ptype:hover {
   color: $ngwcp_primary1;
+} */
+
+
+/* Toast */
+.p-toast {
+  width: min(25rem, 100vw) !important;
+
+}
+.p-toast-top-center {
+  top: 20px !important;
+  left: 500px !important;
+  right: 0 !important;
+  //margin: 0 auto 0 auto !important;
+
+}
+
+.p-toast-message {
+  border: 2px solid red;
 }

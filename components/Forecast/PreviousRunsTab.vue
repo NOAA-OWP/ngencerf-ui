@@ -44,7 +44,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { CalibrationRun } from "~/composables/NextGenModel";
 //import { useCalibrationRunStore } from "~/stores/CalibrationRunStore";
-import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
+import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";

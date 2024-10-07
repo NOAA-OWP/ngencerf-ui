@@ -10,29 +10,18 @@
         <EvaluateTab />
       </span>
       <span v-else-if="activeTab == 3">
-        <SetupValRunTab />
-      </span>
-      <span v-else-if="activeTab == 4">
-        <SelectParamsSetTab />
-      </span>
-      <span v-else-if="activeTab == 5">
-        <ReviewSetupRunTab />
-      </span>
-      <span v-else="activeTab == 6">
-        <StatusTab />
+        <SelectAltIterationTab />
       </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const Tabs = defineAsyncComponent(() => import('~/components/Common/Tabs.vue'))
-const EvaluateTab = defineAsyncComponent(() => import('./EvaluateTab.vue'))
-const SetupValRunTab = defineAsyncComponent(() => import('./SetupValRunTab.vue'))
-const SelectParamsSetTab = defineAsyncComponent(() => import('./SelectParamsSetTab.vue'))
-const ReviewSetupRunTab = defineAsyncComponent(() => import('./ReviewSetupRunTab.vue'))
-const StatusTab = defineAsyncComponent(() => import('./StatusTab.vue'))
-const CalibrationRunsTab = defineAsyncComponent(() => import('./CalibrationRunsTab.vue'))
+import Tabs from '~/components/Common/Tabs.vue'
+
+import EvaluateTab from './EvaluateTab.vue'
+import SelectAltIterationTab from './SelectAltIterationTab.vue'
+import CalibrationRunsTab from './CalibrationRunsTab.vue'
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
