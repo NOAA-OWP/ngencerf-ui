@@ -2,9 +2,8 @@
   <div class="_help-page">
     <div class="_help-title">ngenCERF Calibration Workflow - Tuning Controls Tab</div>
     <div class="_help-subtitle">This tab provides the user the ability to select the time periods to run the
-      calibration,
-      the time periods for an automatic validation fter calibration is complete based on the best set of parameters
-      determined during the calibration process and which module parameters for the selected formulation to tune during
+      calibration, the time periods for an automatic validation after calibration is complete based on the best set of parameters
+      determined during the calibration process, and which module parameters for the selected formulation to tune during
       calibration.
     </div>
     <p class="text-center" style="color:red;">
@@ -32,6 +31,11 @@
           </td>
         </tr>
         <tr>
+          <td class="td1">Output Variable to Calibrate:</td>
+          <td class="td2">Dropdown field to select the output variable to calibratte based on the chosen formulation.
+          </td>
+        </tr>
+        <tr>
           <td class="td1">Calibration Tuning Parameters</td>
           <td class="td2">Either upload from a file or select from the available calibratable parameters based on the
             formulation chosen.</td>
@@ -50,25 +54,20 @@
             dropdown or uploaded from a file. User must supply the minimum, maximum and initial values.</td>
         </tr>
         <tr>
-          <td class="td1">Output Variable to Calibrate:</td>
-          <td class="td2">Dropdown field to select the output variable to calculate based on the chosen formulation.
-          </td>
-        </tr>
-        <tr>
-          <td class="td1">SAVE Button:</td>
+          <td class="td1">Save Button:</td>
           <td class="td2">Save data from the tab. Partial saves are allowed.</td>
         </tr>
         <tr>
-          <td class="td1">RESET Button:</td>
+          <td class="td1">Reset Link:</td>
           <td class="td2">Reset data to default information for the Tuning Controls Tab only.</td>
         </tr>
         <tr>
-          <td class="td1">NEXT Button:</td>
+          <td class="td1">Next Button:</td>
           <td class="td2">Move to the Tuning Controls Tab. If there is any unsaved data, the user will first be prompted
             to save.</td>
         </tr>
         <tr>
-          <td class="td1">Prev Button:</td>
+          <td class="td1">Previous Button:</td>
           <td class="td2">Move to the Formulation Tab. If there is any unsaved data, the user will first be prompted to
             save.</td>
         </tr>
