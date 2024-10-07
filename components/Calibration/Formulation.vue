@@ -29,7 +29,13 @@
             </div>
             <div class="mb-1 font-bold">Select Modules:</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="w-full h-60"></Listbox>
+              optionLabel="name" optionValue="name" class="w-full h-60">
+              <template #option="slotProps">
+                <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'">
+                  <div class="font-ui pl-2 leading-none"><strong>{{ slotProps.option.name }}</strong> &nbsp;&nbsp; ({{ getGroups(slotProps.option.groups) }})</div>
+                </div>
+              </template>
+            </Listbox>
           </div>
           <div class="col-span-2">&nbsp;</div>
           <div class="col-span-5">
@@ -245,6 +251,18 @@ const addSlothVariable = () => {
 
 const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
   deleteSlothVariable(selectedSlothParameterData.value.param_name)
+}
+
+
+const getGroups = (groups: string[]) => {
+  let txt = "";
+  groups.forEach(element => {
+    txt += element;
+    if (groups[groups.length - 1] !== element) {
+      txt += ", ";
+    }
+  });
+  return txt;
 }
 
 </script>

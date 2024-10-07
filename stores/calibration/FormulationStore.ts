@@ -60,11 +60,12 @@ export const useFormulationStore = defineStore( 'FormulationStore', () => {
   */
   const fetchFormulationModuleOptions = computed( () => {
     let modules_list = <SelectOption[]>[]
-    formulationTabData.value?.modules.forEach( ( moduleData ) => {
+      formulationTabData.value?.modules.forEach( ( moduleData ) => {
         if( !filterGroup.value || moduleData.groups.includes( filterGroup.value ) ) {
           modules_list.push( {
               name: moduleData.name,
-              description: moduleData.name
+              description: moduleData.name,
+              groups: moduleData.groups
           } )
         }
     })

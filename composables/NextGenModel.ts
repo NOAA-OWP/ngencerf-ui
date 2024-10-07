@@ -257,6 +257,7 @@ export interface SelectOption {
   name: string;
   description: string;
   selected?: boolean;
+  groups: string[];
 }
 
 export interface module_data {
