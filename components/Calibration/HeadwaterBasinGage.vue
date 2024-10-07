@@ -289,52 +289,6 @@ const showGeopackagFileUploadDialog = (headerText: string) => {
   }
 }
 
-<<<<<<< HEAD
-/**
- * event bus for calibration button group click
- */
-useListen('calibrationButtonSaveStart', (actionButton) => {
-  if (getCalibrationTabIndex() == 2 && actionButton == 'SAVE') {
-    toast.removeAllGroups()
-    const save_tab_response = saveGageTabData()
-
-    save_tab_response.then((response) => {
-      if (response?.validation_errors) {
-        useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-          toast.add({ severity: "error", summary: 'Error Saving Gage Tab Data', detail: message })
-        })
-      } else {
-          toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 })
-          fetchUserCalibrationRunData()
-      }         
-    })
-  }
-})
-
-useListen('calibrationButtonResetCancel', (actionButton) => {
-  if (getCalibrationTabIndex() == 2 && actionButton == 'RESET') {
-    resetUserSelectionGage()
-  }
-})
-
-useListen('calibrationButtonNext', (actionButton) => {  
-  if ( getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
-    if (!selectedDomainValue.value) {
-      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Domain is required.", life: 3000 })
-    }
-    if (!!selectedGageValue.value) {
-      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Gage is required.", life: 3000 })
-    }
-    if (!selectedDomainValue.value || !selectedGageValue.value) {
-      setTimeout(() => gotoNext(), 3000);
-      return;
-    }
-    gotoNext();
-  }
-})
-
-=======
->>>>>>> development
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[2];

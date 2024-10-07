@@ -287,47 +287,6 @@ const optimizationSelectChange = () => {
   uiOptimizationInputs.value = getOptimizationInputUserData.value
 }
 
-/**
- * event bus for calibration button group click
- */
-useListen('calibrationButtonSaveStart', (actionButton) => {
-   if (getCalibrationTabIndex() === 4 && actionButton == 'SAVE') {
-      toast.removeAllGroups()
-      const save_optimization_response = saveOptimizationTabData()
-      save_optimization_response.then((response) => {
-         if (response?.validation_errors) {
-            useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-               toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: message })
-            })
-         } else {
-            toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message, life: 3000 })
-            fetchUserCalibrationRunData()
-         }
-      })
-   }
-})
-
-useListen('calibrationButtonResetCancel', (actionButton) => {
-  if (getCalibrationTabIndex() == 4 && actionButton == 'RESET') {
-    resetUserSelectionOptimization()
-  }
-})
-
-useListen('calibrationButtonNext', (actionButton) => {
-   if (getCalibrationTabIndex() == 5 && actionButton === "NEXT") {
-      if (!uiOptimization.value) {
-         toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
-      }
-      if (!uiObjectiveFunction.value) {
-         toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
-      }
-      if (!uiOptimization.value || !uiObjectiveFunction.value) {
-         setTimeout(() => gotoNext(), 3000);
-      }
-      gotoNext();
-   }
-});
-
 const gotoNext = () => {
    const tabs = document.getElementsByClassName("tabs");
    const e = <HTMLElement>tabs[5];
