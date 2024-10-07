@@ -33,7 +33,6 @@ const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs(useCalibrat
 const { fetchUserCalibrationJobsListData, getUserName } = useUserDataStore()
 
 onMounted(() => {
-  console.log('MOUNTED: LandingPage');  
   nextTick(() => {
     fetchUserCalibrationJobsListData();
   })
