@@ -35,10 +35,6 @@
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
                 optionValue="name" placeholder=" ... " class="w-full"
                 @change="uploadGeopackageDlgOpen($event)"></Select>
-              <!-- <div v-if="selectedGeopackageValue.toLowerCase() == 'upload'"
-                class="ngenButtonDiv-alt bg-blue4 clear-left mt-1">
-                <Button label="Upload" @click="showGeopackagFileUploadDialog('Geopackage File')"></Button>
-              </div> -->
             </div>
 
           </div>
