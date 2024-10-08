@@ -22,9 +22,9 @@
             <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
 
               <div class="font-bold">Groups Filter
-                <Select id="Groups" class="" v-model="filterGroup" filter
+                <Select id="Groups" v-model="filterGroup" filter
                   :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description"
-                  optionValue="name" placeholder="ALL"></Select>
+                  optionValue="name" placeholder="Select group..."></Select>
               </div>
             </div>
             <div class="mb-1 font-bold">Select Modules:</div>
@@ -32,7 +32,8 @@
               optionLabel="name" optionValue="name" class="w-full h-60">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'">
-                  <div class="font-ui pl-2 leading-none"><strong>{{ slotProps.option.name }}</strong> &nbsp;&nbsp; ({{ getGroups(slotProps.option.groups) }})</div>
+                  <div class="font-ui pl-2 leading-none"><strong>{{ slotProps.option.name }}</strong> &nbsp;&nbsp; ({{
+                    getGroups(slotProps.option.groups) }})</div>
                 </div>
               </template>
             </Listbox>

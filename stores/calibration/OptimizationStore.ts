@@ -74,7 +74,9 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     optimizationTabData.value?.optimizations.forEach((optimization_value) => {
       optimizationAlgorithmOptionsList.value.push({
         name: optimization_value.name,
-        description: optimization_value.name
+        description: optimization_value.name,
+        selected: false,
+        groups: []
       })
     })
 
@@ -86,7 +88,9 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     optimizationTabData.value?.metrics.forEach((metric_option) => {
       objectiveFunctionOptionsList.value.push({
         name: metric_option.name,
-        description: metric_option.name
+        description: metric_option.name,
+        selected: false,
+        groups: []
       })
     })
 
