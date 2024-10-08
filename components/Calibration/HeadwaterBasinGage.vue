@@ -20,49 +20,27 @@
             <div class="col-span-1">
               <label for="Forcing">Forcing:</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                optionValue="name" placeholder=" ... " class="w-full"></Select>
-              <!-- 1) undecided: additional icons: <button icon="pi pi-upload"...>
-                              2) undecided: alternative label: <button label="Upload File" ...> -->
-              <div v-if="selectedForcingValue.toLowerCase() == 'upload'"
-                class="ngenButtonDiv-alt bg-blue4 clear-left mt-1">
-                <Button label="Upload" @click="showForcingFileUploadDialog('Forcing Files')"></Button>
-
-
-              </div>
+                optionValue="name" placeholder=" ... " class="w-full" @change="uploadForcingDlgOpen($event)"></Select>
             </div>
+
             <div class="col-span-1">
               <label for="Observational">Observational:</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
-                optionLabel="name" optionValue="name" placeholder=" ... " class="w-full"></Select>
-
-              <div v-if="selectedObservationalValue.toLowerCase() == 'upload'"
-                class="ngenButtonDiv-alt bg-blue4 clear-left mt-1">
-                <Button label="Upload" @click="showObservationalFileUploadDialog('Observational File')"></Button>
-              </div>
+                optionLabel="name" optionValue="name" placeholder=" ... " class="w-full"
+                @change="uploadObservationalDlgOpen($event)"></Select>
             </div>
+
             <div class="col-span-1">
               <label for="Geopackage">Geopackage:</label><br />
-
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
-                optionValue="name" placeholder=" ... " class="w-full"></Select>
-              <div v-if="selectedGeopackageValue.toLowerCase() == 'upload'"
+                optionValue="name" placeholder=" ... " class="w-full"
+                @change="uploadGeopackageDlgOpen($event)"></Select>
+              <!-- <div v-if="selectedGeopackageValue.toLowerCase() == 'upload'"
                 class="ngenButtonDiv-alt bg-blue4 clear-left mt-1">
                 <Button label="Upload" @click="showGeopackagFileUploadDialog('Geopackage File')"></Button>
-              </div>
-              <!-- These controls temorarily commented out and will be dealt with with a later story NHS 8-19-2024-->
-              <!-- <div class="grid grid-cols-4 gap=4">
-                        <div class="col-span-1">&nbsp;</div>
-                        <div class="col-span-1">
-                           RFC: <Dropdown id="select_rfc" v-model="selected_rfc" placeholder=" ... " class="w-40"></Dropdown>
-                        </div>
-                        <div class="col-span-1 flex items-center">
-                           <Checkbox v-model="isNWMv3" inputId="isNWMv3" name="isNWMv3" :binary="true"
-                           @change="toggle_isNWMv3" />
-                           &nbsp;&nbsp;Calibrated in NWMv3
-                        </div>
-                        <div class="col-span-1"></div>
-                     </div> -->
+              </div> -->
             </div>
+
           </div>
 
           <div class="row-span-1 mt-4">
@@ -131,6 +109,7 @@ import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import InputNumber from "primevue/inputnumber";
+import type { DropdownChangeEvent } from "primevue/dropdown";
 
 const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
@@ -191,7 +170,7 @@ onMounted(() => {
   })
 })
 
-onUnmounted( () => {
+onUnmounted(() => {
   emitterOff('calibrationButtonSaveStart');
   emitterOff('calibrationButtonResetCancel');
   emitterOff('calibrationButtonNext');
@@ -202,6 +181,12 @@ const fileUploadDialogOpened = ref<boolean>(false);
 
 const onGageSelectionChange = () => {
   fetchSelectedGageData()
+}
+
+const uploadForcingDlgOpen = (e: MouseEvent) => {
+  if (e && e.value === 'Upload') {
+    showForcingFileUploadDialog('Forcing Files')
+  }
 }
 
 const showForcingFileUploadDialog = (headerText: string) => {
@@ -237,6 +222,12 @@ const handleDialogClose = (opt: any) => {
   fileUploadDialogOpened.value = false
 }
 
+const uploadObservationalDlgOpen = (e: MouseEvent) => {
+  if (e && e.value === 'Upload') {
+    showObservationalFileUploadDialog('Observational File')
+  }
+}
+
 const showObservationalFileUploadDialog = (headerText: string) => {
   if (!fileUploadDialogOpened.value) {
     dialog.open(FileUploadDialog, {
@@ -263,7 +254,13 @@ const showObservationalFileUploadDialog = (headerText: string) => {
   }
 }
 
-const showGeopackagFileUploadDialog = (headerText: string) => {
+const uploadGeopackageDlgOpen = (e: MouseEvent) => {
+  if (e && e.value === 'Upload') {
+    showGeopackageFileUploadDialog('Geopackage File')
+  }
+}
+
+const showGeopackageFileUploadDialog = (headerText: string) => {
   if (!fileUploadDialogOpened.value) {
     dialog.open(FileUploadDialog, {
       props: {
