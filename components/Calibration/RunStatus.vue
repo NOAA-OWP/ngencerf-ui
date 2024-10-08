@@ -157,7 +157,7 @@ useListen('calibrationButtonSaveStart', async (actionButton) => {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration', life: 5000 });
     }
   } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Ready. Cannot run Calibration', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Ready. Cannot run Calibration' });
   }
 });
 
