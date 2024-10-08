@@ -18,7 +18,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const uiGageId = ref<string>( "" );   
   const userSelectedEvalCalibrationRun = ref<any>();
   const userSelectedCalibrationValidationRunId = ref<number>( 0 );
-  const uiReferenceDataSet = ref<string>( "" );
   /**
    * list of calibration jobs with validation data
    */
@@ -156,7 +155,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     uiGageId.value = "";
     userSelectedEvalCalibrationRun.value = undefined;
     userSelectedCalibrationValidationRunList.value = [];
-    uiReferenceDataSet.value = "";
     clearUserCalibrationRunData();
   }
 
@@ -177,7 +175,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   return {
     validatedCalibrationRunId,
     uiGageId,
-    uiReferenceDataSet,
     calibrationRunList,
     filteredEvaluationCalibrationRunList,
     evaluationCalibrationRunGageList,

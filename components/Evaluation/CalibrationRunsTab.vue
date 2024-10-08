@@ -4,6 +4,9 @@
       <div class="row-span-2">
         <div id="PgTitle">Previous Calibration Runs</div>
       </div>
+      <div class="waitgif" v-if="isLoadingCalibrationSummary">
+        <img src="@/assets/styles/img/wait.gif" />
+      </div>
       <Button id="btn-new-validation" class="start actionBtn" v-if="userSelectedEvalCalibrationRunId > 0" @click.stop="navigateToNewValidation">New Validation</Button>
       <div class="row-span-10" v-if="loadUserSelectedCalibrationValidationRunList.length <= 1">
         <div id="CalTable">
@@ -26,14 +29,7 @@
               <Column field="objective_function" header="Objective Function" sortable></Column>                        
               <Column field="Optimization" header="Optimization Algorithm" sortable></Column>
               <Column field="validation_runs" header="Validation Runs" sortable></Column>
-          </DataTable>
-          
-          <div v-if="getReferenceDataSetOptions.length > 0">
-              <label>Reference Data Set:</label>
-              <Select id="referenceDataSets" v-model="uiReferenceDataSet" :options="getReferenceDataSetOptions" optionLabel="description"
-              optionValue="name" class="w-full"></Select>
-          </div>
-          
+          </DataTable>                    
         </div>
       </div>
       <div class="row-span-10" v-if="loadUserSelectedCalibrationValidationRunList.length > 1">
@@ -65,7 +61,6 @@ const {
   filteredEvaluationCalibrationRunList,
   uiGageId, evaluationCalibrationRunGageList,
   getReferenceDataSetOptions,
-  uiReferenceDataSet, 
   userSelectedEvalCalibrationRunId,
   userSelectedCalibrationValidationRunId,
   loadUserSelectedCalibrationValidationRunList,
@@ -81,16 +76,34 @@ const {
   resetEvaluationCalibrationRunStore
 } = evaluationCalibrationRunStore;
 
+const { userCalibrationRunData } = storeToRefs( useUserDataStore() );
+const loadUserCalibrationRunData = reactive( {userCalibrationRunData} );
+const { clearUserCalibrationRunData } = useUserDataStore();
+const isLoadingCalibrationSummary = ref<boolean>( false );
+
 
 const toast = useToast();
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRun>()
 
-const onEvalCalibrationRowSelect = ( event: any ) => {
+const onEvalCalibrationRowSelect = async ( event: any ) => {  
   loadSelectedCalibrationRun( event.data.calibration_run_id );
+  isLoadingCalibrationSummary.value = true;
+  // console.log( 'onEvalCalibrationRowSelect', userCalibrationRunData.value );
   
-  fetchUserSelectedCalibrationValidationRunList();
+  // await nextTick();
+  
+  // if ( Object.keys( userCalibrationRunData.value ?? {} ).length > 0 ) {
+  //   console.log('here')
+  //fetchUserSelectedCalibrationValidationRunList(); 
 }
+
+watch( () => userCalibrationRunData.value, ( updatedRunData, initialRunData ) => {
+  if ( updatedRunData != undefined && Object.keys( updatedRunData ).length > 0 ) {
+    fetchUserSelectedCalibrationValidationRunList(); 
+    isLoadingCalibrationSummary.value = false;
+  }
+});
 
 const onEvalCalibrationRowUnSelect = ( event: any ) => {
     resetUserSelectedEvalCalibrationRun();
@@ -109,7 +122,10 @@ const rowStyle = (data: any) => {
 }
 
 onMounted( () => {
+  //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
+  clearUserCalibrationRunData();
   resetEvaluationCalibrationRunStore();
+
   fetchUserValidatedCalibrationJobsListData();
 
   useListen('evaluateCalibrationRubTabAction', ( action ) => {
