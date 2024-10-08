@@ -245,13 +245,13 @@ onUnmounted(() => {
  */
 const addSlothVariable = () => {
   if (new_sloth_variable_name.value.trim() != '') {
-    addNewSlothVariable(new_sloth_variable_name.value)
-    new_sloth_variable_name.value = ''
+    addNewSlothVariable(new_sloth_variable_name.value);
+    new_sloth_variable_name.value = '';
   }
 }
 
 const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
-  deleteSlothVariable(selectedSlothParameterData.value.param_name)
+  deleteSlothVariable(selectedSlothParameterData.value.param_name);
 }
 
 
