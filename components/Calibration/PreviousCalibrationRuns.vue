@@ -7,7 +7,7 @@
           @click="createNewCalibration"><button>New</button>
         </span>
 
-      <div id="CalTable" class="w-1/2 mx-auto">
+      <div id="CalTable" class="w-max mx-auto">
         <ConfirmDialog></ConfirmDialog>
         <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
           :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>

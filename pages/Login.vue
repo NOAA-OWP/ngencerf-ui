@@ -129,7 +129,7 @@ const { resetGageStore, gageStore_data_loading } = useGageStore();
 const { resetFormulationStore, formulationStore_data_loading } = useFormulationStore();
 const { resetOptimizationStore, optimizationStore_data_loading } = useOptimizationStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
-const { hardResetTuningStore, tuningStore_data_loading} = useTuningStore();
+const { hardResetTuningStore, tuningStore_data_loading } = useTuningStore();
 
 
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -146,15 +146,17 @@ const newPassword = ref('');
 const confirmPassword = ref('');
 
 onMounted(() => {
-  localStorage.clear();
-  calibrationJobId.value = 0;
-  hardResetUserDataStore();
-  resetGeneralStore();
-  resetGageStore();
-  resetFormulationStore();
-  resetOptimizationStore();
-  hardResetRunStatusStore();
-  hardResetTuningStore();
+  nextTick(() => {
+    localStorage.clear();
+    calibrationJobId.value = 0;
+    hardResetUserDataStore();
+    resetGeneralStore();
+    resetGageStore();
+    resetFormulationStore();
+    resetOptimizationStore();
+    hardResetRunStatusStore();
+    hardResetTuningStore();
+  })
 });
 
 const openDialog = () => {
@@ -184,7 +186,7 @@ const autoSubmit = (e: KeyboardEvent) => {
  * Submits the login form
  * @param e - event object
  */
- const SubmitLoginForm = async (e: Event) => {
+const SubmitLoginForm = async (e: Event) => {
   e.preventDefault(); // prevents the page from reloading
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
@@ -214,7 +216,7 @@ const autoSubmit = (e: KeyboardEvent) => {
           console.log("StatusCode: ", e);
         }
         toast.add({ severity: 'error', summary: 'Error', detail: err, life: 3000 });
-        console.error("Error during user creation:", error.message, error.data.detail); 
+        console.error("Error during user creation:", error.message, error.data.detail);
       }
     });
   } else if (userName.value.trim() === "" || userPassword.value.trim() === "") {
