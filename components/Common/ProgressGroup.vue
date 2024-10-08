@@ -1,15 +1,14 @@
 <template>
   <table id="CalibrationProgressTable" class="prevent-select">
     <tbody>
-      <template  v-for="(v, index) in CalibrationProgress">
-      <tr>
-        <td><i v-if="v.vif" key="{{v.vif}}" :class="v.vif ? 'checkMark' : ''"
-            class="pi pi-check font-bold"></i></td>
-        <td class="ptype whitespace-nowrap" :data-tab="index + 1" :title="v.title" :aria-label="v.title"
-          @click="tabClicked">
-          {{ v.content }}</td>
-      </tr>
-    </template>
+      <template v-for="(v, index) in CalibrationProgress">
+        <tr>
+          <td><i v-if="v.vif" key="{{v.vif}}" :class="v.vif ? 'checkMark' : ''" class="pi pi-check font-bold"></i></td>
+          <td class="ptype whitespace-nowrap" :data-tab="index + 1" :title="v.title" :aria-label="v.title"
+            @click="tabClicked">
+            {{ v.content }}</td>
+        </tr>
+      </template>
     </tbody>
   </table>
 
@@ -30,25 +29,15 @@ const emit = defineEmits(["tabNumber"]);
 const tuningStore = useTuningStore();
 const forumlationStore = useFormulationStore();
 const { formulationNameInput, selectedModuleValues } = storeToRefs(forumlationStore);
-const optimizationStore = useOptimizationStore()
+const optimizationStore = useOptimizationStore();
 const {
   uiObjectiveFunction,
   uiOptimization,
-  uiOptimizationInputs,
-  uiPeakFlowThreshold,
   uiPlotFrequency,
-  uiStopCriteria,
-  uiStreamFlowThreshold,
-  getOptimizationAlgorithmOptionsList,
-  getObjectiveFunctionOptionsList,
-  showObjectiveFunctionPeakFlow,
-  showObjectiveFunctionStreamFlow,
-  getSelectedMetricInfo,
-  getOptimizationInputUserData
-} = storeToRefs(optimizationStore)
+  uiStopCriteria
+} = storeToRefs(optimizationStore);
 
-const gageStore = useGageStore();
-const { gageData, gageTabData, selectedDomainValue, gageStore_data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
+const {  selectedDomainValue } = storeToRefs(useGageStore());
 
 const {
   simStartTime,
@@ -57,10 +46,6 @@ const {
   calEndTime,
   userCalibrationTuningParameters,
   userOutputVariableToCalibrate,
-  avSimStartTime,
-  avSimEndTime,
-  avCalStartTime,
-  avCalEndTime,
 } = storeToRefs(tuningStore);
 
 

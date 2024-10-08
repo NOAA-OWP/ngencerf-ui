@@ -32,8 +32,8 @@
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
             <div data-tab="6" data-menu-tab="16" class="tabs prevent-select" v-on:click="tabClicked"
-              aria-label="Run Status tab" title="Run Status tab">
-              Run / Status
+              aria-label="Status Run tab" title="Status Run tab">
+              Status / Run
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
           </span>
@@ -115,9 +115,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue";
 import { generalStore } from "@/stores/common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
@@ -126,13 +124,6 @@ const currentEvaluationTab = ref(getEvaluationTabIndex());
 const currentForecastTab = ref(getForecastTabIndex());
 const currentVerificationTab = ref(getVerificationTabIndex());
 const currentMenu = ref(getMenuIndex());
-
-onMounted(() => {
-  console.log('MOUNTED: Tabs');
-  const allTabs = document.getElementsByClassName("tabs");
-  const tab = currentMenu.value === 1 ? <HTMLElement>allTabs[currentCalibrationTab.value - 1] : <HTMLElement>allTabs[currentEvaluationTab.value - 1];
-  tab.click();
-});
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
