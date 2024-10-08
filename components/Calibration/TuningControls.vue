@@ -317,15 +317,35 @@ const isInitialSetupDone = ref(false);
 
 onMounted(async () => {
   toast.removeAllGroups();
-  // console.log('userCalibrationRunData:', userCalibrationRunData.value);
-  // console.log('loadTuningTabData:', loadTuningTabData.value);
+
+  // fetch user calibration data
+  await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
   
-  if (!userCalibrationRunData.value || !loadTuningTabData.value) {
-    // toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
+  // if Tuning Tab static data is not loaded, fetch it
+  if (!loadTuningTabData?.value?._data.modules) {
+    toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
     await fetchTuningTabData(); // only fetch data if not already fetched
-    // console.log("automatic_validation:", automatic_validation.value);
+    const calibrationTuningModules = loadTuningTabData.value?._data?.modules;
+
+    // set calibration tuning parameters
+    calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
+      name: param.name,
+      minimum: param.minimum,
+      maximum: param.maximum,
+      initial_value: param.initial_value,
+      module: module.name,
+    }))) || [];
+    // console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
+
+    // set output variables
+    outputVariables.value = calibrationTuningModules?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
+      name: outputVar.name,
+      description: outputVar.description,
+      module: module.name,
+    }))) || [];
+    // console.log("outputVariables:", outputVariables.value);
   } else {
-    // toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
+    toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
   }
 
   // console.log("loadTuningTabData:", loadTuningTabData?.value._data);
@@ -370,7 +390,6 @@ onMounted(async () => {
 
   // set time range
   const timeRange = userCalibrationRunData.value?.time_range;
-
   // check if timeRange is provided and not empty
   if (timeRange && timeRange.constructor === Object && Object.keys(timeRange).length > 0) {
     rangeDateFrom.value = timeRange?.start_time;
@@ -380,27 +399,7 @@ onMounted(async () => {
     toast.add({ severity: 'warn', summary: 'time_range is not set', life: 10000 });
   }
 
-  const calibrationTuningModules = loadTuningTabData.value?._data?.modules;
-
-  // set the calibration tuning parameters
-  calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
-    name: param.name,
-    minimum: param.minimum,
-    maximum: param.maximum,
-    initial_value: param.initial_value,
-    module: module.name,
-  }))) || [];
-  // console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
-
-  // set output variables
-  outputVariables.value = calibrationTuningModules?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
-    name: outputVar.name,
-    description: outputVar.description,
-    module: module.name,
-  }))) || [];
-  // console.log("outputVariables:", outputVariables.value);
-
-  // set ouput_variable_to_calibrate
+  // set ouput variable to calibrate
   if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
     console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
     const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
