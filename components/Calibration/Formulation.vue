@@ -5,7 +5,7 @@
       <div class="grid row-span-1">
         <div class="grid grid-cols-8">
           <div class="col-span-8">
-            <div id="FormulationName" class="block mt-3" aria-label="Forumulation Name" title="Formulation Name">
+            <div id="FormulationName" class="block mt-2" aria-label="Forumulation Name" title="Formulation Name">
               <label for="formulationNameInput">Forumulation Name:</label>
             </div>
             <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
@@ -15,23 +15,33 @@
       </div>
 
       <div class="row-span-5">
-        <div class="mt-1 mb-3 hr"></div>
+        <div class="mb-2 hr"></div>
         <div class="grid grid-cols-12">
           <div class="col-span-5">
-            <div class="mt-2 text-left"><strong>Select Modules</strong></div>
+            <div class="text-left text-lg"><strong>Formulation Modules</strong></div>
             <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
-              <label for="Groups">Groups:</label>
-              <Select id="Groups" v-model="filterGroup" filter
-                :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description" optionValue="name"
-                placeholder="ALL"></Select>
+
+              <div class="font-bold">Groups Filter
+                <Select id="Groups" v-model="filterGroup" filter
+                  :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description"
+                  optionValue="name" placeholder="Select group..."></Select>
+              </div>
             </div>
+            <div class="mb-1 font-bold">Select Modules:</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="w-full h-60"></Listbox>
+              optionLabel="name" optionValue="name" class="w-full h-60">
+              <template #option="slotProps">
+                <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'">
+                  <div class="font-ui pl-2 leading-none"><strong>{{ slotProps.option.name }}</strong> &nbsp;&nbsp; ({{
+                    getGroups(slotProps.option.groups) }})</div>
+                </div>
+              </template>
+            </Listbox>
           </div>
           <div class="col-span-2">&nbsp;</div>
           <div class="col-span-5">
-            <div class="group-cover-selection-wrapper w-60 float-left">
-              <div class="mt-2 mb-2 pl-4" aria-label="List of groups covered by selection"
+            <div class="group-cover-selection-wrapper w-80 float-left">
+              <div class="mt-2 mb-2 pl-4 text-lg" aria-label="List of groups covered by selection"
                 title="List of groups covered by selection"><strong>Groups Covered By Selections:</strong></div>
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
                 optionValue="name" scrollHeight="18rem" class="w-full border-0">
@@ -235,13 +245,25 @@ onUnmounted(() => {
  */
 const addSlothVariable = () => {
   if (new_sloth_variable_name.value.trim() != '') {
-    addNewSlothVariable(new_sloth_variable_name.value)
-    new_sloth_variable_name.value = ''
+    addNewSlothVariable(new_sloth_variable_name.value);
+    new_sloth_variable_name.value = '';
   }
 }
 
 const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
-  deleteSlothVariable(selectedSlothParameterData.value.param_name)
+  deleteSlothVariable(selectedSlothParameterData.value.param_name);
+}
+
+
+const getGroups = (groups: string[]) => {
+  let txt = "";
+  groups.forEach(element => {
+    txt += element;
+    if (groups[groups.length - 1] !== element) {
+      txt += ", ";
+    }
+  });
+  return txt;
 }
 
 </script>

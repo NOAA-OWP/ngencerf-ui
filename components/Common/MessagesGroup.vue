@@ -21,7 +21,7 @@
 
       <div class="grid grid-cols=1 gap=1 text-sm mt-4">
         <div class="col-span-1">
-          <p v-if="calData?.modules?.length"><span class="font-medium">Modules:</span>{{ getModuleList() }}</p>
+          <p v-if="calData?.modules?.length"><span class="font-medium">Modules: </span>{{ getModuleList() }}</p>
         </div>
       </div>
 
