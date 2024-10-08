@@ -9,7 +9,7 @@
           Headwater Basin Gage</td>
       </tr>
       <tr>
-        <td><i v-if="selectedForcingValue"
+        <td><i v-if="userCalibrationRunData?.external_data_statu"
             :class="selectedForcingValue ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
         <td class="ptype" data-tab="3" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing</td>
