@@ -414,7 +414,7 @@ export type CalibrationButtonGroupClickEvent = {
 }
 
 export type EvaluationButtonGroupClickEvent = {
-  evaluationResetUiClick: number;
+  evaluateCalibrationRubTabAction: string;
 }
 
 export type LogoutEvent = {

@@ -3,7 +3,7 @@
 
     <div class="col-span-2">
       <span v-if="getEvaluationTabIndex() === 1">
-        <Button class="start actionBtn">Evaluate</Button>
+        <Button class="start actionBtn" @click.stop="EvaluateSelectedCalibration">Evaluate</Button>
         
         <Button v-if="loadUserSelectedCalibrationValidationRunList.length > 0" class="start actionBtn" @click.stop="EvalValidateCalibrateReset">Back</Button>
       </span>
@@ -45,7 +45,11 @@ const { loadUserSelectedCalibrationValidationRunList } = storeToRefs( useEvaluat
 const tabIndex = getEvaluationTabIndex();
 
 const EvalValidateCalibrateReset = async ( e: Event ) => {
-  useEvent( 'evaluationResetUiClick', 1  );
+  useEvent( 'evaluateCalibrationRubTabAction', "ValidateListReset"  );
+}
+
+const EvaluateSelectedCalibration = async ( e: Event ) => {
+  useEvent( 'evaluateCalibrationRubTabAction', "EvaluateCalibrationRun"  );
 }
 
 </script>

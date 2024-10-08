@@ -54,6 +54,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    * @return {void}
    */
   async function fetchUserValidatedCalibrationJobsListData() {
+    userEvaluationCalibrationRunListData.value = [];
     const runListDataResult = await makeProtectedApiCall<ValidatedCalibrationRunList>( `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`, {
       method: "POST",
       headers: { 
@@ -155,7 +156,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     uiGageId.value = "";
     userSelectedEvalCalibrationRun.value = undefined;
     userSelectedCalibrationValidationRunList.value = [];
-    //uiReferenceDataSet.value = "";
+    uiReferenceDataSet.value = "";
     clearUserCalibrationRunData();
   }
 

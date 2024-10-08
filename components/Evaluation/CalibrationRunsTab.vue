@@ -4,7 +4,7 @@
       <div class="row-span-2">
         <div id="PgTitle">Previous Calibration Runs</div>
       </div>
-      <Button id="btn-new-validation" class="start actionBtn" v-if="userSelectedEvalCalibrationRunId > 0">New Validation</Button>
+      <Button id="btn-new-validation" class="start actionBtn" v-if="userSelectedEvalCalibrationRunId > 0" @click.stop="navigateToNewValidation">New Validation</Button>
       <div class="row-span-10" v-if="loadUserSelectedCalibrationValidationRunList.length <= 1">
         <div id="CalTable">
           <div class="grid grid-cols-2 mb-5">
@@ -27,13 +27,13 @@
               <Column field="Optimization" header="Optimization Algorithm" sortable></Column>
               <Column field="validation_runs" header="Validation Runs" sortable></Column>
           </DataTable>
-          <!--
+          
           <div v-if="getReferenceDataSetOptions.length > 0">
               <label>Reference Data Set:</label>
               <Select id="referenceDataSets" v-model="uiReferenceDataSet" :options="getReferenceDataSetOptions" optionLabel="description"
               optionValue="name" class="w-full"></Select>
           </div>
-          -->
+          
         </div>
       </div>
       <div class="row-span-10" v-if="loadUserSelectedCalibrationValidationRunList.length > 1">
@@ -83,6 +83,7 @@ const {
 
 
 const toast = useToast();
+//this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRun>()
 
 const onEvalCalibrationRowSelect = ( event: any ) => {
@@ -95,23 +96,42 @@ const onEvalCalibrationRowUnSelect = ( event: any ) => {
     resetUserSelectedEvalCalibrationRun();
 }
 
+const navigateToNewValidation = ( event : any ) => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[2];
+  e.click();
+}
+
 const rowStyle = (data: any) => {
     if (!['Saved', 'Ready'].includes(data.status)) {
         return { backgroundColor: 'gainsboro' }
     }
 }
 
-useListen('evaluationResetUiClick', ( actionId ) => {
-   if ( actionId == 1 ) {
-    selectedCalibrationRun.value = undefined;
-    resetUserSelectedEvalCalibrationRun();
-   }
-});
-
 onMounted( () => {
   resetEvaluationCalibrationRunStore();
   fetchUserValidatedCalibrationJobsListData();
-})
+
+  useListen('evaluateCalibrationRubTabAction', ( action ) => {
+    if ( action == "ValidateListReset" ) {
+      selectedCalibrationRun.value = undefined;
+      resetUserSelectedEvalCalibrationRun();
+    }
+  });
+
+  useListen('evaluateCalibrationRubTabAction', ( action ) => {
+    if ( action == "EvaluateCalibrationRun" ) {
+      const tabs = document.getElementsByClassName("tabs");
+      const e = <HTMLElement>tabs[1];
+      e.click();
+    }
+  });  
+});
+
+onUnmounted(() => {
+  emitterOff('evaluateCalibrationRubTabAction');
+});
+
 </script>
 
 <style lang="scss" scoped>
