@@ -300,6 +300,7 @@ const {
 } = storeToRefs(tuningStore);
 
 const toast = useToast();
+const calibrationTuningModules = ref<any>();
 const calibrationTuningParameters = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
@@ -314,13 +315,14 @@ onMounted(async () => {
   
   // if Tuning Tab static data is not loaded, fetch it
   if (!loadTuningTabData?.value?._data.modules) {
-    toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
+    // toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
+    await fetchTuningTabData();
+  }
+  calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
 
-    await fetchTuningTabData(); // only fetch data if not already fetched
-    const calibrationTuningModules = loadTuningTabData.value?._data?.modules;
-
+  if (calibrationTuningModules.value) {
     // set calibration tuning parameters
-    calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
+    calibrationTuningParameters.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
       name: param.name,
       minimum: param.minimum,
       maximum: param.maximum,
@@ -330,15 +332,16 @@ onMounted(async () => {
     // console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
 
     // set output variables
-    outputVariables.value = calibrationTuningModules?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
+    outputVariables.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
       name: outputVar.name,
       description: outputVar.description,
       module: module.name,
     }))) || [];
-    // console.log("outputVariables:", outputVariables.value);
   } else {
-    toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
+    toast.add({ severity: 'warn', summary: 'Tuning Modules not loaded', detail: 'Must set Formulation data before proceeding' });
   }
+
+  // console.log("outputVariables:", outputVariables.value);
 
   // console.log("loadTuningTabData:", loadTuningTabData?.value._data);
   // console.log("userCalibrationRunData:", userCalibrationRunData.value);
@@ -347,7 +350,7 @@ onMounted(async () => {
   // console.log("time_range:", userCalibrationRunData.value?.time_range);
 
   // set calibration times
-  if (userCalibrationRunData.value?.calibration_times) {
+  if (userCalibrationRunData?.value?.calibration_times) {
     const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
 
     simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
@@ -364,7 +367,7 @@ onMounted(async () => {
   };
 
   // set automatic validation times
-  if (userCalibrationRunData.value?.validation_times) {
+  if (userCalibrationRunData?.value?.validation_times) {
     const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
 
     avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
@@ -381,14 +384,14 @@ onMounted(async () => {
   };
 
   // set time range
-  const timeRange = userCalibrationRunData.value?.time_range;
+  const timeRange = userCalibrationRunData?.value?.time_range;
   // check if timeRange is provided and not empty
   if (timeRange && timeRange.constructor === Object && Object.keys(timeRange).length > 0) {
     rangeDateFrom.value = timeRange?.start_time;
     rangeDateTo.value = timeRange?.end_time;
   } else {
     // time_range is not set. Cannot proceed
-    toast.add({ severity: 'warn', summary: 'time_range is not set', life: 10000 });
+    toast.add({ severity: 'warn', summary: 'Time Range not set', detail: 'Must set Forcing and Observational data before proceeding' });
   }
 
   // set ouput variable to calibrate
@@ -402,81 +405,74 @@ onMounted(async () => {
   };
 
   isInitialSetupDone.value = true; // set to true after initial setup
+});
 
-  useListen('calibrationButtonPrev', (actionButton) => {
-    if (getCalibrationTabIndex() == 4 && actionButton === "PREV") {
-      const tabs = document.getElementsByClassName("tabs");
-      const e = <HTMLElement>tabs[2];
-      e.click();
+useListen('calibrationButtonPrev', (actionButton) => {
+  if (getCalibrationTabIndex() == 4 && actionButton === "PREV") {
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[2];
+    e.click();
+  }
+});
+
+useListen('calibrationButtonNext', (actionButton) => {
+  if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
+    if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
     }
-  });
-
-  useListen('calibrationButtonNext', (actionButton) => {
-    if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
-      if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
-      }
-      if (!(avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value)) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
-      }
-      if (!userOutputVariableToCalibrate.value.name) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "No Output Variable selected.", life: 3000 })
-      }
-      toast.removeAllGroups();
-      gotoNext();
+    if (!(avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value)) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
     }
-  });
+    if (!userOutputVariableToCalibrate.value.name) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "No Output Variable selected.", life: 3000 })
+    }
+    toast.removeAllGroups();
+    gotoNext();
+  }
+});
 
-  /**
+/**
  * Save Tuning Tab data
  */
-  useListen('calibrationButtonSaveStart', (actionButton) => {
-    // handle saving Tuning Tab data
-    const handleSaveTuningTab = async () => {
-      const saveTuningTabResponse = await postSaveTuningTabData();
-      console.log(
-        `saveTabContent Tuning, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `,
-        saveTuningTabResponse
-      );
+useListen('calibrationButtonSaveStart', (actionButton) => {
+  // handle saving Tuning Tab data
+  const handleSaveTuningTab = async () => {
+    const saveTuningTabResponse = await postSaveTuningTabData();
+    console.log(
+      `saveTabContent Tuning, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `,
+      saveTuningTabResponse
+    );
 
-      if (saveTuningTabResponse?.ok) {
-        toast.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Saved Tuning Tab data',
-          life: 3000,
-        });
-      } else {
-        toast.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error saving Tuning Tab data'
-        });
-      }
-    };
-
-    // check if the current tab is the Tuning tab and the actionButton is 'SAVE'
-    if (getCalibrationTabIndex() === 4 && actionButton === 'SAVE') {
-      // check if Tuning Tab data is validated before saving
-      if (isTuningTabDataValidated()) {
-        handleSaveTuningTab();
-      } else {
-        toast.add({
-          severity: 'warn',
-          summary: 'Tuning Tab data is not validated',
-        });
-      }
+    if (saveTuningTabResponse?.ok) {
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Saved Tuning Tab data',
+        life: 3000,
+      });
     } else {
       toast.add({
         severity: 'error',
-        summary: 'Calibration Tab not 3 or actionButton not SAVE',
-        detail: 'Calibration Tab not 3 or actionButton not SAVE',
+        summary: 'Error',
+        detail: 'Error saving Tuning Tab data'
       });
-      console.error('getCalibrationTabIndex:', getCalibrationTabIndex());
-      console.error('actionButton:', actionButton);
     }
-  });
+  };
 
+  // check if the current tab is the Tuning tab and the actionButton is 'SAVE'
+  if (getCalibrationTabIndex() === 4 && actionButton === 'SAVE') {
+    // check if Tuning Tab data is validated before saving
+    if (isTuningTabDataValidated()) {
+      handleSaveTuningTab();
+    }
+  } else {
+    toast.add({
+      severity: 'error',
+      summary: 'Calibration Tab not 3 or actionButton not SAVE',
+    });
+    console.error('getCalibrationTabIndex:', getCalibrationTabIndex());
+    console.error('actionButton:', actionButton);
+  }
 });
 
 onUnmounted(() => {
