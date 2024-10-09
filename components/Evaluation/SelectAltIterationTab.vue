@@ -1,35 +1,39 @@
 <template>
-    <div class="grid grid-rows-2">
-        <div class="row-span-1">           
-            <div id="RunDetailsTbl" class="text-left mt-3 p-3">
-                <div class="tableTitle">Run Details</div>
-                <DataTable class="dtable boxed" :value="runDetailData" scrollable scroll-height="200px" fixedHeader=true>
-                    <Column field="iteration" header="Iteration" sortable></Column>
-                    <Column field="objective_function_value" header="Objective Function Value" sortable></Column>
-                    <Column field="metric_1" header="Metric 1" sortable></Column>
-                    <Column field="metric_2" header="Metric 2" sortable></Column>
-                    <Column field="metric_3" header="Metric 3" sortable></Column>
-                    <Column field="metric_4" header="Metric 4" sortable></Column>
-                    <Column field="metric_5" header="Metric 5" sortable></Column>
-                </DataTable>
-            </div>
+    
+    <div class="pl-6 pr-2 pt-2">
+            
+        <div id="RunDetailsTbl" class="text-left mt-3 p-3">
+            <div class="text-left font-bold mb-2">Run Details</div>
+            <DataTable class="dtable boxed" :value="runDetailData" scrollable scroll-height="200px" fixedHeader=true>
+                <Column field="iteration" header="Iteration" sortable></Column>
+                <Column field="objective_function_value" header="Objective Function Value" sortable></Column>
+                <Column field="metric_1" header="Metric 1" sortable></Column>
+                <Column field="metric_2" header="Metric 2" sortable></Column>
+                <Column field="metric_3" header="Metric 3" sortable></Column>
+                <Column field="metric_4" header="Metric 4" sortable></Column>
+                <Column field="metric_5" header="Metric 5" sortable></Column>
+            </DataTable>
         </div>
-        <div class="row-span-1 mt-3">           
-            <div id="CalTuningParamsTbl" class="text-left mt-3 p-3">
-                 <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
-                <DataTable class="dtable boxed" :value="tuningParamsData" scrollable scroll-height="200px" fixedHeader=true>
-                    <Column field="iteration" header="Iteration" sortable></Column>
-                    <Column field="param_1" header="Param 1" sortable></Column>
-                    <Column field="param_2" header="Param 2" sortable></Column>
-                    <Column field="param_3" header="Param 3" sortable></Column>
-                    <Column field="param_4" header="Param 4" sortable></Column>
-                    <Column field="param_5" header="Param 5" sortable></Column>
-                    <Column field="param_6" header="Param 6" sortable></Column>
-                </DataTable>
-            </div>
+            
+        <div id="CalTuningParamsTbl" class="text-left mt-5 p-3">
+                <div class="text-left font-bold mb-2">Corresponding Calibration Tuning Parameters</div>
+            <DataTable class="dtable boxed" :value="tuningParamsData" scrollable scroll-height="200px" fixedHeader=true>
+                <Column field="iteration" header="Iteration" sortable></Column>
+                <Column field="param_1" header="Param 1" sortable></Column>
+                <Column field="param_2" header="Param 2" sortable></Column>
+                <Column field="param_3" header="Param 3" sortable></Column>
+                <Column field="param_4" header="Param 4" sortable></Column>
+                <Column field="param_5" header="Param 5" sortable></Column>
+                <Column field="param_6" header="Param 6" sortable></Column>
+            </DataTable>
         </div>
 
+        <br clear="all">
+        <br clear="all">
+        <br clear="all">
+        
     </div>
+
 </template>
 
 <script setup lang="ts">
@@ -53,9 +57,18 @@ const tuningParamsData = [
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "/assets/styles/styles.scss";
-
+#RunDetailsTbl .p-datatable-tbody > tr:nth-child(1) {
+    background-color: #D8FFD8; 
+}
+#RunDetailsTbl .p-datatable-tbody > tr:nth-child(2) {
+    background-color: #D8FFFF; 
+}
+#CalTuningParamsTbl .p-datatable-tbody > tr:nth-child(1) {
+    background-color: #D8FFD8; 
+}
+/*
 #RunDetailsTbl, #CalTuningParamsTbl {
     width: 900px;
     margin: 0 auto;
@@ -66,4 +79,5 @@ const tuningParamsData = [
     font-size: 1.5em;
 
 }
+*/
 </style>
