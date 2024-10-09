@@ -183,7 +183,7 @@
                 </div>
 
                 <div class="text-left mt-3 text-sm" style="position: relative;">
-                  <div class="inline-block text-left"><label for="ParamName">Name:</label></div><br />
+                  <div class="inline-block text-left"><label for="ParamName">Calibratable Parameters:</label></div><br />
                   <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter"
                     :disabled="!isFormulationDataSet()" :options="calibrationTuningParameters" optionLabel="name"
                     optionValue="name">
