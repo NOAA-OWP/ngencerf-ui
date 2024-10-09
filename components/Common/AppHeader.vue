@@ -8,7 +8,7 @@
       </div>
       <div id="Col2" class="col-span-8">
 
-        <ul v-show="isUserLoggedIn() && location.name !== 'Login' && location.name !== 'LandingPage'" id="MainMenu">
+        <ul v-show="isUserLoggedIn() && location.name !== 'Login'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
             <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
               @click="MenuChanged">Calibration</NuxtLink>
@@ -18,70 +18,67 @@
               @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
-              @click="MenuChanged">Forecast</NuxtLink>
+            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3' @click=""
+              class="disabled">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
             <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
-              @click="MenuChanged">Verification</NuxtLink>
+              @click="" class="disabled">Verification</NuxtLink>
           </li>
         </ul>
-        
+
       </div>
 
       <div id="Circles" class="col-span-2">
         <div id="UserGroup" class="grid grid-cols-2">
+
           <div class="col-span-1">
             <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle"
-              class="float-right userInitials" @click="showUserMenu">
-              {{ getUserInitials() }}
+              class="float-right userInitials" @contextmenu="onImageRightClick" @click="onImageRightClick">
+              {{ getUserInitials() }}<i class="pi pi-angle-down"></i>
+              <ContextMenu ref="userContextMenu" :model="userItems" :autoZIndex="true" />
             </div>
-          </div>
-          <div v-show="uMenu" id="userMenu">
-            <ul>
-              <li @click="gotoAccount">Account</li>
-              <li @click="logoutUser">Logout</li>
-            </ul>
+
           </div>
           <div class="col-span-1">
-            <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px" id="HelpCircle" title="Help"
-              aria-lable="help" @click="displayHelp">?</button>
+            <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px"
+              id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</button>
           </div>
+
         </div>
       </div>
 
       <Transition name="slide-fade">
         <div v-if="showHelp" id="HelpWindow">
-          <div class="text-right">
+          <div class="text-right sticky top-0">
             <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
               class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
           </div>
-          <div v-if="location.name === 'LandingPage'">
+          <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
             <HelpLandingPageHelp />
           </div>
 
-          <div v-if="location.name === 'PreviousRuns'">
-            <HelpPreviousRunsHelp />
-          </div>
-
-          <div v-if="location.name === 'Calibration'">
+          <div v-if="location.name === 'Calibration'" class="py-10 px-1">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
-                <HelpHeadwaterBasinGageHelp />
+                <HelpPreviousRunsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 2">
-                <HelpFormulationHelp />
+                <HelpHeadwaterBasinGageHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 3">
-                <HelpTuningControlsHelp />
+                <HelpFormulationHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 4">
-                <HelpOptimizationMetricsHelp />
+                <HelpTuningControlsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 5">
-                <HelpRunStatusHelp />
+                <HelpOptimizationMetricsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 6">
+                <HelpRunStatusHelp />
+              </span>
+              <span v-else-if="getCalibrationTabIndex() === 7">
                 <HelpResultsHelp />
               </span>
             </div>
@@ -107,6 +104,9 @@
 
     </div>
   </div>
+  <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
+    <UserAccount />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -114,7 +114,12 @@ import { ref, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
+import ContextMenu from 'primevue/contextmenu';
+import ConfirmPopup from 'primevue/confirmpopup';
+
 import { useLogout } from "~/composables/UseEventBus";
+
+import UserAccount from "~/components/Common/UserAccount.vue";
 
 const HelpLandingPageHelp = defineAsyncComponent(() => import("../Help/LandingPageHelp.vue"))
 const HelpPreviousRunsHelp = defineAsyncComponent(() => import("../Help/PreviousRunsHelp.vue"))
@@ -127,11 +132,20 @@ const HelpResultsHelp = defineAsyncComponent(() => import("../Help/ResultsHelp.v
 
 const emit = defineEmits(["logoutEvent"]);
 
+const accountOverlay = ref();
+
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
-const { isUserLoggedIn,  getUserInitials, hardResetUserDataStore } = useUserDataStore();
+const { isUserLoggedIn, getUserInitials, hardResetUserDataStore } = useUserDataStore();
 
 const location = useRoute();
+
+const userItems = ref([
+  { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
+  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
+])
+
+const userContextMenu = ref();
 
 const uMenu = ref(false);
 
@@ -139,7 +153,14 @@ const showHelp = ref(false);
 let observer = null;
 
 const isOnDiv = ref(false);
+
+const onImageRightClick = (event: any) => {
+  console.log("Activating user manu")
+  userContextMenu.value.show(event)
+}
+
 onMounted(() => {
+  console.log('MOUNTED: AppHeader');
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
     let headerHeight = document.getElementById('Header')?.clientHeight;
@@ -171,14 +192,24 @@ const sizeHelpWindow = () => {
   };
 };
 
+/**
+ * 
+ */
 const gotoAccount = async () => {
-  await navigateTo('user');
+  accountOverlay.value.style.display = "block";
 }
 
+useAccountEventListen('accountEvent', () => {
+  const ele = document.getElementById('UserAccountOverlay') as HTMLElement;
+  ele.style.display = "none";
+})
+
 const logoutUser = async () => {
-  console.log("Logging out...");
-  useLogout("logoutEvent", "");
-  await navigateTo('login');
+  if (confirm("Are you sure you want to logout?") == true) {
+    console.log("Logging out...");
+    useLogout("logoutEvent", "");
+    await navigateTo('login');
+  }
 }
 
 const showUserMenu = () => {
@@ -219,10 +250,12 @@ const MenuChanged = (e: MouseEvent) => {
   background-color: $ngwcp_primary1;
   width: 100%;
 }
+
 #Header {
   height: 80px;
   margin-bottom: 4px;
 }
+
 #Logo {
   img {
     width: 200px;
@@ -235,15 +268,18 @@ const MenuChanged = (e: MouseEvent) => {
   font-weight: bold;
   margin-left: 20px;
 }
+
 #TopMenu {
   display: inline;
   font-size: 20px;
   font: 20px Arial, sans-serif;
 }
+
 #MainMenu {
   float: right;
   margin-right: 100px;
   margin-top: 20px;
+
   ul {
     list-style: none;
     margin-top: 0px;
@@ -252,24 +288,27 @@ const MenuChanged = (e: MouseEvent) => {
   li {
     display: inline-block;
     margin: 20px 7px 0;
-    font-size: 22px;  
+    font-size: 22px;
 
     a {
       text-decoration: none;
       color: #000;
       font-weight: bold;
-      background-color: $ngwcp_neutral_gray_md;  
+      background-color: $ngwcp_neutral_gray_md;
       border-radius: 5px;
-      padding:15px 28px;
+      padding: 15px 28px;
     }
+
     a:hover {
       background-color: $gray-20;
       text-decoration: none;
     }
+
     .isActive {
       color: #fff;
       background-color: $ngwcp_primary1;
     }
+
     .isActive:hover {
       color: #fff;
       background-color: $ngwcp_primary1;
@@ -278,13 +317,13 @@ const MenuChanged = (e: MouseEvent) => {
 }
 
 #Circles {
-  margin-right: 20px;
+  margin-right: 0px;
   margin-left: auto;
   clear: none;
   text-align: center;
 }
 
-#UserCircle{
+#UserCircle {
   display: inline-block;
   height: 70px;
   width: 70px;
@@ -294,6 +333,7 @@ const MenuChanged = (e: MouseEvent) => {
   font-size: 30px;
   padding-top: 20px;
 }
+
 #HelpCircle {
   display: inline-block;
   height: 50px;
@@ -306,19 +346,23 @@ const MenuChanged = (e: MouseEvent) => {
   padding-top: 12px;
   border: 1px solid #000;
 }
+
 #UserCircle {
   margin-right: 10px;
 }
+
 #UserCircle:hover {
   background-color: $ngwcp_primary2;
 }
+
 #HelpCircle:hover {
- background-color: $ngwcp_primary2;
+  background-color: $ngwcp_primary2;
 }
 
 .userInitials {
   text-align: center;
 }
+
 .qmark {
   font-size: 35px;
 }
@@ -338,13 +382,18 @@ const MenuChanged = (e: MouseEvent) => {
 
 #HelpWindow {
   z-index: 9999;
-  border: 2px solid black;
+  border: 1px solid black;
   position: absolute;
   right: 2%;
   top: 84px;
-  width: 80%;
+  width: 50%;
   background-color: white;
-  overflow-y: auto;
+  overflow: auto;
+}
+
+.disabled,
+.disabled:hover {
+  background-color: $ngwcp_neutral_gray_md !important;
 }
 
 /*

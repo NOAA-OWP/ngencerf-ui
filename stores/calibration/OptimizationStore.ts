@@ -19,7 +19,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   /**
   * ref ui user input
   */
-  const data_loading = ref<boolean>(true)
+  const optimizationStore_data_loading = ref<boolean>(true)
   const optimizationTabData = ref<OptimizationTabData>()
   const { userCalibrationRunData } = storeToRefs(userDataStore)
   const uiStreamFlowThreshold = ref<number>()
@@ -39,7 +39,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
    * @return {void}
    */
   const loadOptimizationTabStaticData = () => {
-    data_loading.value = true
+    optimizationStore_data_loading.value = true
     makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {
       method: "POST",
       headers: {
@@ -49,7 +49,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
       body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     }).then((optimizationTabDataResult) => {
       optimizationTabData.value = optimizationTabDataResult?._data ?? undefined
-      data_loading.value = false
+      optimizationStore_data_loading.value = false
 
       setUserSelection()
     })
@@ -74,7 +74,9 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     optimizationTabData.value?.optimizations.forEach((optimization_value) => {
       optimizationAlgorithmOptionsList.value.push({
         name: optimization_value.name,
-        description: optimization_value.name
+        description: optimization_value.name,
+        selected: false,
+        groups: []
       })
     })
 
@@ -86,7 +88,9 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     optimizationTabData.value?.metrics.forEach((metric_option) => {
       objectiveFunctionOptionsList.value.push({
         name: metric_option.name,
-        description: metric_option.name
+        description: metric_option.name,
+        selected: false,
+        groups: []
       })
     })
 
@@ -185,7 +189,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
 
   return {
     optimizationTabData,
-    data_loading,
+    optimizationStore_data_loading,
     uiObjectiveFunction,
     uiOptimization,
     uiOptimizationInputs,

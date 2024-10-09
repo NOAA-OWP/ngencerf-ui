@@ -63,6 +63,7 @@ export interface UserCalibrationRunData {
   observational_user_filename: string;
   observational_file_path: string;
   geopackage_source: string;
+  external_data_errors: ExternalDataErrors[];
   geopackage_hydrofabric_file_path: string;
   geopackage_image_url: string;
   modules: string[];
@@ -74,6 +75,7 @@ export interface UserCalibrationRunData {
   calibration_times: UserCalibrationRunCalibrationTimesData;
   validation_times: UserCalibrationRunValidationTimesData;
   output_variable_to_calibrate: UserCalibrationRunOutputVariableToCalibrateData;
+  parameters_selected: boolean;
   parameters: UserCalibrationRunParametersData[];
   objective_function: string;
   streamflow_threshold: number;
@@ -86,23 +88,28 @@ export interface UserCalibrationRunData {
   status: string;
 }
 
+export interface ExternalDataErrors {
+  name: string,
+  message: string
+}
+
 export interface UserCalibrationRunTimeRangeData {
-  start_time: Date;
-  end_time: Date;
+  start_time: string;
+  end_time: string;
 }
 
 export interface UserCalibrationRunCalibrationTimesData {
-  calibration_start_time: Date;
-  calibration_end_time: Date;
-  simulation_start_time: Date;
-  simulation_end_time: Date;
+  calibration_start_time: string;
+  calibration_end_time: string;
+  simulation_start_time: string;
+  simulation_end_time: string;
 }
 
 export interface UserCalibrationRunValidationTimesData {
-  validation_start_time: Date;
-  validation_end_time: Date;
-  simulation_start_time: Date;
-  simulation_end_time: Date;
+  validation_start_time: string;
+  validation_end_time: string;
+  simulation_start_time: string;
+  simulation_end_time: string;
 }
 
 export interface UserCalibrationRunOutputVariableToCalibrateData {
@@ -256,6 +263,7 @@ export interface SelectOption {
   name: string;
   description: string;
   selected?: boolean;
+  groups: string[];
 }
 
 export interface module_data {
@@ -357,8 +365,10 @@ export interface CalibrationRunStatusTabData {
 
 }
 
-export interface CalibrationIsReadyResponse {
+export interface CalibrationStatus {
   message: string;
+  calibration_run_id: number;
+  status: string;
   errors: string[];
 }
 
@@ -385,6 +395,10 @@ export type LogoutEvent = {
   logoutEvent: string;
 }
 
+export type AccountEvent = {
+  accountEvent: string;
+}
+
 export const ValidationFormFields = {
   formulation_name: "Formulation Name",
   modules: "Formulation Modules",
@@ -392,5 +406,11 @@ export const ValidationFormFields = {
   maps_to_module: "Sloth Parameter For Module",
   maps_to_variable_name: "Sloth Parameter Module Param",
   param_type: "Sloth Parameter Type",
-  param_units: "Sloth Parameter Units"
+  param_units: "Sloth Parameter Units",
+  stop_criteria: "Stop Criteria",
+  save_plot_iteration_frequency: "Plot Generation Frequency",
+  streamflow_threshold: "Flow Threshold",
+  peak_flow_threshold: "Peak Flow Threshold",
+  objective_function: "Objective Function",
+  optimization: "Optimization Algorithm"
 }

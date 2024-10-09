@@ -5,8 +5,10 @@
 
 </template>
 <script lang="ts" setup>
-const appConfig = useAppConfig();
+import { onMounted } from "vue";
+
 onMounted(() => {
+  console.log('MOUNTED: Index.vue');
    window.location.href = "login";
 });
 </script>

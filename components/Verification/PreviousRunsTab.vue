@@ -1,40 +1,33 @@
 <template>
     <div class="h-full min-h-screen ">
-        <div class="grid grid-rows-12">
-            <div class="row-span-2">
-                <div id="PgTitle">Previous Calibration Runs</div>
+        <div id="PgTitle">Previous Calibration Runs</div>
+
+        <div id="CalTable">
+
+            <div class="inline">Headwater Basin Gage:
+                <Select id="HeadwaterBasinGage" class="mr-2">
+                    <option value="">...</option>
+                </Select>
             </div>
-            <div class="row-span-10">
-                <div id="CalTable">
 
-                    <div class="grid grid-cols-2 mb-5">
-                        <div class="col-span-1">
-                            <div class="inline ">Headwater Basin Gage:
-                                <Select id="HeadwaterBasinGage" class="mr-2">
-                                    <option value="">...</option>
-                                </Select>
-                            </div>
-                        </div>
-                        <div class="col-span-1"></div>
-                    </div>
-
-                    <ConfirmDialog></ConfirmDialog>
-                    <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-                        :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-                    <DataTable id="cr-list" :value="fetchJobsListData" scrollable scroll-height="400px"
-                        table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
-                        contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-                        @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" class="boxed">
-                        <Column field="calibration_run_id" header="Run ID" sortable></Column>
-                        <Column field="formulation_name" header="Formulation Name" sortable></Column>
-                        <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-                        <Column field="run_date" header="Run Date" sortable></Column>
-                        <Column field="calibration_start_period" header="Calibration Period" sortable></Column>
-                        <Column field="status" header="Status" sortable></Column>
-                    </DataTable>
-                </div>
+            <div class="mt-8">
+                <ConfirmDialog></ConfirmDialog>
+                <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+                    :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+                <DataTable id="cr-list" :value="fetchJobsListData" scrollable scroll-height="400px"
+                    table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
+                    contextMenu v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
+                    :rowStyle="rowStyle" class="boxed">
+                    <Column field="calibration_run_id" header="Run ID" sortable></Column>
+                    <Column field="formulation_name" header="Formulation Name" sortable></Column>
+                    <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
+                    <Column field="run_date" header="Run Date" sortable></Column>
+                    <Column field="calibration_start_period" header="Calibration Period" sortable></Column>
+                    <Column field="status" header="Status" sortable></Column>
+                </DataTable>
             </div>
         </div>
+
     </div>
 </template>
 

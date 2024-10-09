@@ -1,47 +1,58 @@
 <template>
-    <div class="h-full min-h-screen ">
-        <div class="grid grid-rows-12">
-            <div class="row-span-2">
-                <div id="PgTitle">Previous Calibration Runs</div>
+    <div class="pl-6 pr-2 pt-2">
+
+        <div class="flex mt-2">
+            <div class="">
+            <h1 class="mt-1 mb-6 font-bold">Previous Calibration Runs</h1>
             </div>
-            <div class="row-span-10">
-                <div id="CalTable">
-
-                    <div class="grid grid-cols-2 mb-5">
-                        <div class="grid-span-1">
-                            <Select id="FilterCalRuns" class="w-40">
-                                <option value="">...</option>
-                            </Select>
-                            <div class="inline ml-2">Filter Validation Runs</div>
-                        </div>
-
-                        <div class="grid-span-1">
-                            <div class="inline-block float-right">Headwater Basin Gage</div>
-                            <Select id="HeadwaterBasinGage" class="w-40 inline float-right mr-2">
-                                <option value="">...</option>
-                            </Select>
-                        </div>
-                    </div>
-
-                    <ConfirmDialog></ConfirmDialog>
-                    <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-                        :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-                    <DataTable id="cr-list" :value="fetchJobsListData" scrollable scroll-height="400px"
-                        table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
-                        contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-                        @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" class="boxed">
-                        <Column field="calibration_run_id" header="Run ID" sortable></Column>
-                        <Column field="formulation_name" header="Formulation Name" sortable></Column>
-                        <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-                        <Column field="run_date" header="Run Date" sortable></Column>
-                        <Column field="calibration_start_period" header="Calibration Period" sortable></Column>
-                        <Column field="status" header="Status" sortable></Column>
-                    </DataTable>
-                </div>
+            <div class="ml-auto mt-2">
+                <!--TO-DO: this is supposed to be a conditional display-->
+                <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button>New Validation</button></span>
             </div>
         </div>
+        
+        <div id="CalTable">
+
+            <div class="grid grid-cols-3 mb-5">
+                <!--<div class="col-span-1">
+                    <div class="inline ml-2">Filter Validation Runs: 
+                        <Select id="FilterCalRuns" class="">
+                            <option value="">...</option>
+                        </Select>
+                    </div>    
+                </div>-->
+
+                <div class="col-span-1">
+                    <label for="HeadwaterBasinGage">Headwater Basin Gage:</label><br/>
+                    <!--TO-DO: this is a placeholder for the button that needs to be added-->
+                    <Select id="HeadwaterBasinGage" class="p-select">
+                        <option value="">...</option>
+                    </Select>
+                </div>
+            </div>
+
+            <ConfirmDialog></ConfirmDialog>
+            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+                :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+            <DataTable id="cr-list boxed" :value="fetchJobsListData" scrollable scroll-height="400px"
+                table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
+                contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
+                @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" class="">
+                <Column field="calibration_run_id" header="Run ID" sortable></Column>
+                <Column field="formulation_name" header="Formulation Name" sortable></Column>
+                <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
+                <Column field="run_date" header="Run Date" sortable></Column>
+                <Column field="calibration_start_period" header="Calibration Period" sortable></Column>
+                <Column field="status" header="Status" sortable></Column>
+            </DataTable>
+        </div>
+
+        <br clear="all">
+        <br clear="all">
+        <br clear="all">
+
     </div>
-</template>setEvalRunSelected
+</template>
 
 <script setup lang="ts">
 import { useConfirm } from "primevue/useconfirm";
@@ -49,7 +60,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { CalibrationRun } from "~/composables/NextGenModel";
 //import { useCalibrationRunStore } from "~/stores/CalibrationRunStore";
-import { useCalibrationJobStore } from "~/stores/CalibrationJobStore";
+import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -135,32 +146,4 @@ const NewCalibration = async () => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-
-#PgTitle {
-    text-align: center;
-    font-size: 30px;
-    margin-top: 40px;
-    margin-bottom: 40px;
-}
-
-#NewButton {
-    width: 147px;
-    height: 33px;
-    padding: 10px;
-    border-radius: 20px;
-    font-size: 21px;
-}
-
-#CalTable {
-    width: 1000px;
-    margin: 0 auto;
-    //border: 1px solid $ngwcp_primary1;
-
-    .table {
-        thead tr th {
-            background-color: #F5A4A4;
-            border: 1px solid #000;
-        }
-    }
-}
 </style>

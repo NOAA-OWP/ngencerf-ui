@@ -1,14 +1,30 @@
 <template>
   <div class="_help-page">
     <div class="_help-title">ngenCERF Calibration Workflow - Tuning Controls Tab</div>
-    <div class="_help-subtitle">This tab provides the user the ability to select the time periods to run the
-      calibration,
-      the time periods for an automatic validation fter calibration is complete based on the best set of parameters
-      determined during the calibration process and which module parameters for the selected formulation to tune during
-      calibration.
+    <div class="_help-subtitle">
+        This tab provides the user the ability to select the time periods to run the calibration, 
+        the time periods for an automatic validation after calibration is complete based on the best set of parameters
+        determined during the calibration process, and which module parameters for the selected formulation to tune during
+        calibration.
     </div>
+    <p class="text-center" style="color:red;">
+      NOTE: Times are hourly and must be specified to the top of the hour (hh:00).
+    </p>
     <table class="_help-table">
       <tbody>
+        <tr>
+          <td class="td1">Entering Times:</td>
+          <td class="td2">Times are UTC.<br >
+            Times can be selected using the date picker or entered manually.<br />
+            Manual Format: YYYY-MM-DD HH:MM<br />
+            Cut and paste can be used.<br />
+            When manually entering data, the <b>Enter</b> key must be hit otherwise data in that field will be discarded.
+          </td>
+        </tr>
+        <tr>
+          <td class="td1">&nbsp;</td>
+          <td class="td2">&nbsp;</td>
+        </tr>
         <tr>
           <td class="td1">Range:</td>
           <td class="td2">Non-editable field displaying the available time range for running calibration and validation.
@@ -26,6 +42,11 @@
           <td class="td1">Validation Time Controls:</td>
           <td class="td2">Same rules as the Calibration Time Controls except the time range is further constrained to be
             outside of the time ranges chosen for the Calibration run.
+          </td>
+        </tr>
+        <tr>
+          <td class="td1">Output Variable to Calibrate:</td>
+          <td class="td2">Dropdown field to select the output variable to calibratte based on the chosen formulation.
           </td>
         </tr>
         <tr>
@@ -47,25 +68,20 @@
             dropdown or uploaded from a file. User must supply the minimum, maximum and initial values.</td>
         </tr>
         <tr>
-          <td class="td1">Output Variable to Calibrate:</td>
-          <td class="td2">Dropdown field to select the output variable to calculate based on the chosen formulation.
-          </td>
-        </tr>
-        <tr>
-          <td class="td1">SAVE Button:</td>
+          <td class="td1">Save Button:</td>
           <td class="td2">Save data from the tab. Partial saves are allowed.</td>
         </tr>
         <tr>
-          <td class="td1">RESET Button:</td>
+          <td class="td1">Reset Link:</td>
           <td class="td2">Reset data to default information for the Tuning Controls Tab only.</td>
         </tr>
         <tr>
-          <td class="td1">NEXT Button:</td>
+          <td class="td1">Next Button:</td>
           <td class="td2">Move to the Tuning Controls Tab. If there is any unsaved data, the user will first be prompted
             to save.</td>
         </tr>
         <tr>
-          <td class="td1">Prev Button:</td>
+          <td class="td1">Previous Button:</td>
           <td class="td2">Move to the Formulation Tab. If there is any unsaved data, the user will first be prompted to
             save.</td>
         </tr>

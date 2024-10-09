@@ -1,0 +1,14 @@
+<template>
+  <!-- <div class="text-center text-2xl mt-20">Results</div> -->
+  <div class="text-center text-2xl mt-20"><img class="m-auto construction-images" src="~/assets/styles/img/under_construction.png" /></div>
+</template>
+
+<script setup lang="ts">
+//
+</script>
+
+<style lang="scss" scoped>
+@import "@/assets/styles/styles.scss";
+
+
+</style>

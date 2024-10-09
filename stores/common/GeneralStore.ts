@@ -12,10 +12,12 @@ export const generalStore = defineStore(
     const calibrationTabIndex = ref("1");
     const evaluationTabIndex = ref("1");
     const forecastTabIndex = ref("1");
+    const verificationTabIndex = ref("1");
+
     const menuIndex = ref("1");
 
     const calibrationJobId = ref<number>(0)
-    
+
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
 
@@ -51,30 +53,45 @@ export const generalStore = defineStore(
       forecastTabIndex.value = tab.toString();
     }
 
+    //  Verification Tab index
+    function getVerificationTabIndex() {
+      return parseInt(verificationTabIndex.value);
+    }
+    function setVerificationTabIndex(tab: number) {
+      verificationTabIndex.value = tab.toString();
+    }
+
     // Previous calibration run for Evaluation
     function getEvalRunSelected() {
       return evaluationRunSelected.value;
     }
-    
+
     function setEvalRunSelected(b: boolean) {
       evaluationRunSelected.value = b;
     }
 
-    return { 
+    function resetGeneralStore() {
+      calibrationJobId.value = 0;
+    }
+    
+    return {
       getMenuIndex,
-      setMenuIndex,      
-      getCalibrationTabIndex, 
+      setMenuIndex,
+      getCalibrationTabIndex,
       setCalibrationTabIndex,
       getEvaluationTabIndex,
       setEvaluationTabIndex,
       getForecastTabIndex,
       setForecastTabIndex,
+      getVerificationTabIndex,
+      setVerificationTabIndex,
       getEvalRunSelected,
       setEvalRunSelected,
       calibrationJobId,
       calibrationTabIndex,
       evaluationTabIndex,
-      forecastTabIndex
+      forecastTabIndex,
+      resetGeneralStore
     };
   },
   {

@@ -1,28 +1,29 @@
 <template>
   <div id="BottomButtons" class="flex">
     <div>
-      <div class="inline ngenButtonDiv bg-green mr-6" v-if="showOrHideSaveStartButton()">
-        <button v-if="showOrHideSaveStartButton()" class="font-normal" @click="SaveStartTabContent"
+      <div class="inline ngenButtonDiv bg-green mr-6" v-show="showOrHideSaveStartButton()">
+        <button v-show="showOrHideSaveStartButton()" class="font-normal" @click="SaveStartTabContent"
           :title="btnSaveOrStart() + ' Button'" :aria-label="btnSaveOrStart() + ' Button'">
           {{ btnSaveOrStart() }}</button>
       </div>
 
-      <div class="inline mr-3" v-if="showOrHideResetCancelButton()">
-        <button v-if="showOrHideResetCancelButton()" :class="getCalibrationTabIndex() < 5 ? 'reset' : 'cancel'"
+      <div class="inline mr-3" v-show="showOrHideResetCancelButton()">
+        <button v-show="showOrHideResetCancelButton()" :class="getCalibrationTabIndex() < 6 ? 'reset' : 'cancel'"
           class="c-blue font-normal underline" @click="ResetCancelTabContent" :title="btnResetOrCancel() + 'Button'"
           :aria-label="btnResetOrCancel() + 'Button'">{{ btnResetOrCancel() }}</button>
       </div>
     </div>
 
     <div class="ml-auto">
-      <div class="inline ngenButtonDiv c-gray-md" v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5">
-        <button v-if="getCalibrationTabIndex() > 1 && getCalibrationTabIndex() < 5"
+      <div class="inline ngenButtonDiv c-gray-md" v-show="getCalibrationTabIndex() > 2 && getCalibrationTabIndex() < 6">
+        <button v-show="getCalibrationTabIndex() > 2 && getCalibrationTabIndex() < 6"
           class="prev actionBtnSmall font-normal" @click="NavigatePrevContent" title="Previous"
-          aria-label="Previous"><!--&#8678; -->Prev</button>
+          aria-label="Previous">Prev</button>
       </div>
-      <div v-if="getCalibrationTabIndex() < 5" class="inline ngenButtonDiv ml-6"><button
-          v-if="getCalibrationTabIndex() < 5" class="font-normal" @click="NavigateNextContent" title="Next"
-          aria-label="Next">Next<!-- <span>&#8680;</span>--></button></div>
+      
+      <div v-show="getCalibrationTabIndex() < 6" class="inline ngenButtonDiv ml-6"><button
+          v-show="getCalibrationTabIndex() < 6" class="font-normal" @click="NavigateNextContent" title="Next"
+          aria-label="Next">Next</button></div>
     </div>
 
   </div>
@@ -37,9 +38,14 @@ const { getMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecast
 const runStatusStore = useRunStatusStore();
 const { calibrationStatus } = storeToRefs(runStatusStore);
 
+/**
+ * Route the emmited command to the proper page
+ * 1. Check to see what menu we are on 1 = Calibration, 2 = Evaluation, 3 = Forecaset, 4 = Verification
+ * 2. See what tab
+ */
 const btnSaveOrStart = () => {
   switch (getMenuIndex()) {
-    case 1: return getCalibrationTabIndex() < 5 ? "SAVE" : "START"; break;
+    case 1: return getCalibrationTabIndex() < 6 ? "SAVE" : "START";break;
     case 2: break;
     case 3: break;
     case 4: break;
@@ -49,7 +55,7 @@ const btnSaveOrStart = () => {
 
 const btnResetOrCancel = () => {
   switch (getMenuIndex()) {
-    case 1: return getCalibrationTabIndex() < 5 ? "RESET" : "CANCEL"; break;
+    case 1: return getCalibrationTabIndex() < 6 ? "RESET" : "CANCEL"; break;
     case 2: break;
     case 3: break;
     case 4: break;
@@ -58,10 +64,8 @@ const btnResetOrCancel = () => {
 };
 
 const SaveStartTabContent = async (e: MouseEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
   switch (getMenuIndex()) {
-    case 1: useEvent('calibrationButtonSaveStart', getCalibrationTabIndex() < 5 ? "SAVE" : "START"); break;
+    case 1: useEvent('calibrationButtonSaveStart', getCalibrationTabIndex() < 6 ? "SAVE" : "START"); break;
     case 2: break;
     case 3: break;
     case 4: break;
@@ -70,10 +74,8 @@ const SaveStartTabContent = async (e: MouseEvent) => {
 };
 
 const ResetCancelTabContent = async (e: MouseEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
   switch (getMenuIndex()) {
-    case 1: useEvent('calibrationButtonResetCancel', getCalibrationTabIndex() < 5 ? "RESET" : "CANCEL"); break;
+    case 1: useEvent('calibrationButtonResetCancel', getCalibrationTabIndex() < 6 ? "RESET" : "CANCEL");  break;
     case 2: break;
     case 3: break;
     case 4: break;
@@ -82,8 +84,7 @@ const ResetCancelTabContent = async (e: MouseEvent) => {
 };
 
 const NavigatePrevContent = (e: MouseEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
+  console.log("Previous Click");
   switch (getMenuIndex()) {
     case 1: useEvent('calibrationButtonPrev', "PREV"); break;
     case 2: break;
@@ -94,10 +95,9 @@ const NavigatePrevContent = (e: MouseEvent) => {
 };
 
 const NavigateNextContent = (e: MouseEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
+  console.log("Next Click");
   switch (getMenuIndex()) {
-    case 1: useEvent('calibrationButtonNext', "NEXT"); break;
+    case 1: useEvent('calibrationButtonNext', "NEXT");  break;
     case 2: break;
     case 3: break;
     case 4: break;
@@ -106,10 +106,10 @@ const NavigateNextContent = (e: MouseEvent) => {
 };
 
 const showOrHideSaveStartButton = (): boolean => {
-  if (getCalibrationTabIndex() < 4) {
+  if (getCalibrationTabIndex() <= 5) {
     return true;
   }
-  else if (getCalibrationTabIndex() === 5) {
+  else if (getCalibrationTabIndex() === 6) {
     if (calibrationStatus.value === "Done") {
       return false;
     }
@@ -123,10 +123,10 @@ const showOrHideSaveStartButton = (): boolean => {
 };
 
 const showOrHideResetCancelButton = (): boolean => {
-  if (getCalibrationTabIndex() < 4) {
+  if (getCalibrationTabIndex() < 5) {
     return true;
   }
-  else if (getCalibrationTabIndex() === 5) {
+  else if (getCalibrationTabIndex() === 6) {
     if (calibrationStatus.value === "Done") {
       return false;
     }

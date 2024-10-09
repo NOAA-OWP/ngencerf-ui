@@ -11,21 +11,23 @@
           <div class="grid grid-rows-12">
             <div class="row-span-12 flex items-center justify-center h-screen-inner">
 
-              <div id="LoginBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md" :class="!showDialog ? 'loginBox' : 'createAccountBox'">
+              <div id="LoginBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md"
+                :class="!showDialog ? 'loginBox' : 'createAccountBox'">
 
                 <div v-if="!showDialog" class="mx-auto px-8 text-left">
                   <form onsubmit="return false">
                     <h1>Login in</h1>
                     <div class="inputBox">
                       <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username"
-                        autocomplete="username" v-on:keypress="autoSubmit"/>
+                        autocomplete="username" v-on:keypress="autoSubmit" />
                       <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Username
                       </button>
                     </div>
                     <div class="inputBox">
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
-                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block" v-on:keypress="autoSubmit"/>
+                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block"
+                        v-on:keypress="autoSubmit" />
                       <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
                         Forgot Password
                       </button>
@@ -57,7 +59,8 @@
                         </div>
                         <div class="form-group inputBox">
                           <label for="password">Password</label>
-                          <Password v-model="newPassword" id="password" type="password" name="password" autocomplete="current-password" required toggleMask class="block">
+                          <Password v-model="newPassword" id="password" type="password" name="password"
+                            autocomplete="current-password" required toggleMask class="block">
                             <template #header>
                               <div class="font-semibold text-xm mb-4">Password</div>
                             </template>
@@ -102,7 +105,7 @@
 
 <script setup lang="ts">
 
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
@@ -111,7 +114,24 @@ import AppHeader from "~/components/Common/AppHeader.vue";
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 
-const { logUserIn, setUserName } = useUserDataStore();
+import { useGageStore } from "~/stores/calibration/GageStore";
+import { useFormulationStore } from "~/stores/calibration/FormulationStore";
+import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+import { useTuningStore } from "~/stores/calibration/TuningStore";
+import { generalStore } from "~/stores/common/GeneralStore";
+
+const { calibrationJobId } = storeToRefs(generalStore());
+
+const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
+const { resetGeneralStore } = generalStore();
+const { resetGageStore, gageStore_data_loading } = useGageStore();
+const { resetFormulationStore, formulationStore_data_loading } = useFormulationStore();
+const { resetOptimizationStore, optimizationStore_data_loading } = useOptimizationStore();
+const { hardResetRunStatusStore } = useRunStatusStore();
+const { hardResetTuningStore, tuningStore_data_loading } = useTuningStore();
+
+
 const { ngencerfBaseUrl } = useBackendConfig();
 
 const toast = useToast();
@@ -126,7 +146,17 @@ const newPassword = ref('');
 const confirmPassword = ref('');
 
 onMounted(() => {
-  localStorage.clear();
+  nextTick(() => {
+    localStorage.clear();
+    calibrationJobId.value = 0;
+    hardResetUserDataStore();
+    resetGeneralStore();
+    resetGageStore();
+    resetFormulationStore();
+    resetOptimizationStore();
+    hardResetRunStatusStore();
+    hardResetTuningStore();
+  })
 });
 
 const openDialog = () => {
@@ -162,31 +192,33 @@ const SubmitLoginForm = async (e: Event) => {
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     // try to create new access and refresh tokens
 
-    const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
+    await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
       body: {
         username: userName.value,
         password: userPassword.value
       }
-    });
-    // error.value.statuscode
-    if (error.value) {
-      let err = error.value?.data?.detail;
-      if (!err) {
-        err = "Cannot reach server. Error code: " + error.value.statusCode;
-        console.log("StatusCode: ", e);
-      }
-      toast.add({ severity: 'error', summary: 'Error', detail: err, life: 3000 });
-      console.error("Error during user creation:", error.value?.message, error.value?.data);
-      return;
+    }).then(response => {
+      console.log("Response: ", response)
+      setUserName(userName.value);
+      // store tokens in UserDataStore
+      userDataStore.setAccessToken(response.access);
+      userDataStore.setRefreshToken(response.refresh);
+      logUserIn();
+      GoToLanding();
     }
-
-    setUserName(userName.value);
-    // store tokens in UserDataStore
-    userDataStore.setAccessToken(data.value.access);
-    userDataStore.setRefreshToken(data.value.refresh);
-    logUserIn();
-    await GoToLanding();
+    ).catch(error => {
+      console.log(error);
+      if (error) {
+        let err = error.data?.detail;
+        if (!err) {
+          err = "Cannot reach server. Error code: " + error.statusCode;
+          console.log("StatusCode: ", e);
+        }
+        toast.add({ severity: 'error', summary: 'Error', detail: err, life: 3000 });
+        console.error("Error during user creation:", error.message, error.data.detail);
+      }
+    });
   } else if (userName.value.trim() === "" || userPassword.value.trim() === "") {
     toast.add({ severity: 'error', summary: 'Error', detail: "A Username and Password are required", life: 3000 });
   }
@@ -229,13 +261,14 @@ const submitForm = async () => {
 /**
  * Navigates to the landing page.
  */
-const GoToLanding = async () => {
-  await navigateTo({ path: "/LandingPage" });
+const GoToLanding = () => {
+  navigateTo("LandingPage");
 };
 
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
 .needAccount {
   font-size: 18px;
   font-weight: 600;

@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import Toast from "primevue/toast";
 
 
 //https://moment.github.io/luxon/api-docs/index.html
@@ -8,9 +9,26 @@ export const formatTime = (time: string) => {
 };
 
 // 2017-12-31T00:00:00Z => 2017-12-31 00:00
-export const formatDateForDisplay = ( d: string ) => {
-  return d.replace('T', ' ').replace("Z", "").substring(0, 16 );
-  
+export const formatDateForDisplay = ( d: string | Date ): string => {
+  let dateTime;
+
+  // Check if the input is already in 'yyyy-MM-dd HH:mm' format
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(d)) {
+    // If it's already in 'yyyy-MM-dd HH:00' format, return it directly
+    return d;
+  }
+
+  // Handle ISO format strings or Date objects
+  if (typeof d === 'string') {
+    // Check if the string is in ISO format and parse it
+    dateTime = DateTime.fromISO(d, { zone: 'utc' });
+  } else {
+    // Convert Date object to Luxon DateTime in UTC
+    dateTime = DateTime.fromJSDate(d, { zone: 'utc' });
+  }
+
+  // Return the formatted date in 'yyyy-MM-dd HH:mm' format
+  return dateTime.toFormat('yyyy-MM-dd HH:mm');
 }
 
 /**

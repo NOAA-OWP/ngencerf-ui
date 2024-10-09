@@ -7,11 +7,11 @@
             <div class="col-span-1">
               <table>
                 <tbody>
-                  <tr>
+                  <tr height="45px">
                     <td class="text-right font-bold">Start Time:</td>
                     <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr>
+                  <tr height="45px">
                     <td class="text-right font-bold">Running Time:</td>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
@@ -37,11 +37,11 @@
                   <tr>
                     <td class="text-right"><label for="DisplayOptions">Display:</label></td>
                     <td class="pl-5">
-                      <select id="DisplayOptions" class="p-select" v-model="selectedPlotName">
+                      <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName">
                         <option v-for="plot in plotList" :key="plot.name" :value="plot.name">
                           {{ plot.name }}
                         </option>
-                      </select>
+                      </Select>
                     </td>
                   </tr>
                 </tbody>
@@ -57,11 +57,11 @@
           <img :src="selectedPlotFileUrl" alt="Image" />
         </div>
         <div id="GraphArea" class="p-2" v-else>
-         Data Display
+          Data Display
 
         </div>
       </div>
-      
+
       <div class="row-span-1">
         <div id="ResultsArea" class="row-span-1" v-if="calibrationStatus === 'Done'">
           <button class="ngenButtonDiv">Go to Evaluation</button>
@@ -77,7 +77,7 @@
 
 <script lang="ts" setup>
 import ProgressBar from "primevue/progressbar";
-
+import { onMounted, onUnmounted } from "vue";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
@@ -91,7 +91,6 @@ const toast = useToast();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
 const {
-  calibrationIsReady,
   calibrationStatus,
   startTimeDate,
   startTime,
@@ -109,7 +108,7 @@ const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
 
 const {
-  queryCalibrationIsReady,
+  queryGetCalibrationStatus,
   queryGetPlotNames,
   queryGetPlot,
   executeRunCalibration,
@@ -117,8 +116,7 @@ const {
   cancelCalibrationJob,
 } = runStatusStore;
 
-const isLoading = ref(true);
-//const isCalibrationReady = ref();
+const isLoading = ref(false);
 const iterations = ref();
 const iterationData = ref();
 const progress = ref();
@@ -128,20 +126,72 @@ let runningTimeIntervalId: NodeJS.Timeout | undefined = undefined;
 let iterationIntervalId: NodeJS.Timeout | undefined = undefined;
 
 onMounted(async () => {
-  // Get User Calibration Run Data
-  await fetchUserCalibrationRunData();
-
-  if (userCalibrationRunData.value) {
+  toast.removeAllGroups();
+  nextTick( () => {
+    if(userCalibrationRunData.value) {
     stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
     console.log('stopCriteria:', stopCriteria.value);
 
     calibrationStatus.value = userCalibrationRunData.value?.status;
     console.log('calibrationStatus:', calibrationStatus.value);
-  } else {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
   }
-  isLoading.value = false;
 });
+
+
+// Run Calibration Job
+useListen('calibrationButtonSaveStart', async (actionButton) => {
+  if (getCalibrationTabIndex() === 6 && actionButton === 'START' && calibrationStatus.value === 'Ready') {
+    toast.removeAllGroups();
+    try {
+      console.log('hitting run_calibration endpoint');
+      const runCalibrationResponse = await executeRunCalibration();
+      if (runCalibrationResponse?._data.status) {
+        calibrationStatus.value = runCalibrationResponse?._data.status;
+        if (calibrationStatus.value != 'Running') {
+          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START', life: 5000 });
+        }
+      } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration', life: 5000 });
+      }
+    } catch (error) {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration', life: 5000 });
+    }
+  } else {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Ready. Cannot run Calibration' });
+  }
+});
+
+// Cancel Calibration Job
+useListen('calibrationButtonResetCancel', async (actionButton) => {
+  if (getCalibrationTabIndex() === 6 && actionButton === 'CANCEL' && calibrationStatus.value === 'Running') {
+    toast.removeAllGroups();
+    try {
+      console.log('hitting cancel_job endpoint');
+      const cancelCalibrationResponse = await cancelCalibrationJob();
+
+      if (cancelCalibrationResponse?._data.status) {
+        calibrationStatus.value = cancelCalibrationResponse?._data.status;
+        console.log('calibrationStatus:', calibrationStatus.value);
+        if (calibrationStatus.value != 'Cancelled') {
+          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL', life: 5000 });
+        }
+      } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run', life: 5000 });
+      }
+    } catch (error) {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run', life: 5000 });
+    }
+  } else {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration', life: 5000 });
+  }
+});
+
+});
+
+onUnmounted(() => {
+  emitterOff('calibrationButtonSaveStart');
+  emitterOff('calibrationButtonResetCancel');
+})
 
 // Handle calibrationStatus changes
 watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
@@ -179,6 +229,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           }, 1000);
         }
       } else {
+        toast.removeAllGroups();
         toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object', life: 5000 });
       }
 
@@ -195,6 +246,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             }
             calibrationStatus.value = userCalibrationRunData.value?.status; // set this last so that the watch function gets triggered after handling Done, Cancelled, or Failed status
           } else {
+            toast.removeAllGroups();
             toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
           }
         }, 10000);
@@ -216,6 +268,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         console.log('selectedPlotName:', selectedPlotName.value);
       }
     } else {
+      toast.removeAllGroups();
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
     }
   }
@@ -246,6 +299,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         console.log('selectedPlotName:', selectedPlotName.value);
       }
     } else {
+      toast.removeAllGroups();
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names', life: 5000 });
     }
 
@@ -268,6 +322,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
   }
 
   else {
+    toast.removeAllGroups();
     toast.add({ severity: 'error', summary: 'Error', detail: 'Unknown Calibration Status', life: 5000 });
   }
 
@@ -290,8 +345,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 //       // if progress reaches 100, verify Calibration status is Done. calibrationStatus watch function will set stopCriteriaMet to true, clear intervals, and set progress to null
 //       if (progress.value >= 100) {
-//         isCalibrationReady.value = await queryCalibrationIsReady();
-//         if (isCalibrationReady.value?._data?.status === 'Done') {
+//         calibrationStatus.value = await queryGetCalibrationStatus();
+//         if (calibrationStatus.value?._data?.status === 'Done') {
 //           await fetchUserCalibrationRunData(); // update Calibration data
 //           calibrationStatus.value = 'Done';
 //           } else {
@@ -316,62 +371,17 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   // get selected plot file name and url from server
-  const response: any  = await queryGetPlot(selectedPlotName.value);
+  const response: any = await queryGetPlot(selectedPlotName.value);
 
   if (response?._data?.plot_file_name && response?._data?.plot_url) {
     selectedPlotFilename.value = response?._data?.plot_file_name;
     selectedPlotFileUrl.value = response?._data?.plot_url;
   } else {
+    toast.removeAllGroups();
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot', life: 5000 });
   }
 });
 
-// Run Calibration Job
-useListen('calibrationButtonSaveStart', async (actionButton) => {
-  if (getCalibrationTabIndex() === 5 && actionButton === 'START' && calibrationStatus.value === 'Ready') {
-    try {
-      console.log('hitting run_calibration endpoint');
-      const runCalibrationResponse = await executeRunCalibration();
-
-      if (runCalibrationResponse?._data.status) {
-        calibrationStatus.value = runCalibrationResponse?._data.status;
-        if (calibrationStatus.value != 'Running') {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START', life: 5000 });
-        }
-      } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration', life: 5000 });
-      }
-    } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration', life: 5000 });
-    }
-  } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Ready. Cannot run Calibration', life: 5000 });
-  }
-});
-
-// Cancel Calibration Job
-useListen('calibrationButtonResetCancel', async (actionButton) => {
-  if (getCalibrationTabIndex() === 5 && actionButton === 'CANCEL' && calibrationStatus.value === 'Running') {
-    try {
-      console.log('hitting cancel_job endpoint');
-      const cancelCalibrationResponse = await cancelCalibrationJob();
-
-      if (cancelCalibrationResponse?._data.status) {
-        calibrationStatus.value = cancelCalibrationResponse?._data.status;
-        console.log('calibrationStatus:', calibrationStatus.value);
-        if (calibrationStatus.value != 'Cancelled') {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL', life: 5000 });
-        }
-      } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run', life: 5000 });
-      }
-    } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run', life: 5000 });
-    }
-  } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration', life: 5000 });
-  }
-});
 
 // /**
 //  * Calculate Progress. WE WILL USE THIS LATER.
@@ -384,17 +394,6 @@ useListen('calibrationButtonResetCancel', async (actionButton) => {
 //   }
 // };
 
-useListen('calibrationButtonPrev', (actionButton) => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[3];
-  e.click();
-})
-
-useListen('calibrationButtonNext', (actionButton) => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[5];
-  e.click();
-})
 </script>
 
 <style lang="scss" scoped>
