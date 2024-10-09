@@ -8,7 +8,7 @@
       </div>
         <div id="CenterBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-lg">
           <div class="mx-auto px-8 text-center text-2xl">
-            <h1 class="mt-8 mb-4 text-4xl font-bold">Next Generation Water Prediction Center</h1>
+            <h1 class="mt-8 mb-4 text-4xl font-bold">Next Generation Water Prediction Capability</h1>
             <div>Welcome <strong>{{ getUserName() }}</strong></div>
             <div>You have {{ runningCalibrationJobs }} current processes running</div>
             <div>You have {{ savedCalibrationJobs }} calibration setups to complete</div>
