@@ -142,28 +142,28 @@ const tabClicked = (event: Event) => {
     const cl = ele.classList;
     ele.classList.add("activeTab");
   }
-nextTick( () => {
-  // Send the selected tab info to the active tab set with emit
-  if (currentMenu.value === 1) {
-    currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
-    emit("tabNumber", currentCalibrationTab.value);
-  } else if (currentMenu.value === 2) {
-    currentEvaluationTab.value = Number(ele.getAttribute("data-tab"));
-    emit("tabNumber", currentEvaluationTab.value);
-  } else if (currentMenu.value === 3) {
-    currentForecastTab.value = Number(ele.getAttribute("data-tab"));
-    emit("tabNumber", currentForecastTab.value);
-  } else if (currentMenu.value === 4) {
-    currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
-    emit("tabNumber", currentVerificationTab.value);
-  } else if (currentMenu.value === 5) {
-    currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
-    emit("tabNumber", currentVerificationTab.value);
-  } else if (currentMenu.value === 6) {
-    currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
-    emit("tabNumber", currentVerificationTab.value);
-  }
-})
+  nextTick(() => {
+    // Send the selected tab info to the active tab set with emit
+    if (currentMenu.value === 1) {
+      currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentCalibrationTab.value);
+    } else if (currentMenu.value === 2) {
+      currentEvaluationTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentEvaluationTab.value);
+    } else if (currentMenu.value === 3) {
+      currentForecastTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentForecastTab.value);
+    } else if (currentMenu.value === 4) {
+      currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentVerificationTab.value);
+    } else if (currentMenu.value === 5) {
+      currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentVerificationTab.value);
+    } else if (currentMenu.value === 6) {
+      currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentVerificationTab.value);
+    }
+  })
 
 }
 </script>
