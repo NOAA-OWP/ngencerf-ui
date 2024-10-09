@@ -104,8 +104,6 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
-import InputNumber from "primevue/inputnumber";
-import type { DropdownChangeEvent } from "primevue/dropdown";
 
 const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
@@ -191,7 +189,7 @@ const showForcingFileUploadDialog = (headerText: string) => {
       props: {
         header: `Upload ${headerText}`,
         style: {
-          width: '70vw',
+          width: 'auto',
         },
         modal: true,
       },
@@ -230,7 +228,7 @@ const showObservationalFileUploadDialog = (headerText: string) => {
       props: {
         header: `Upload ${headerText}`,
         style: {
-          width: '70vw',
+          width: 'auto',
         },
         modal: true,
       },
@@ -262,7 +260,7 @@ const showGeopackageFileUploadDialog = (headerText: string) => {
       props: {
         header: `Upload ${headerText}`,
         style: {
-          width: '70vw',
+          width: 'auto',
         },
         modal: true,
       },

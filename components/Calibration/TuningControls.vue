@@ -153,8 +153,12 @@
                   <div class="mb-2 font-bold">Output Variable To Calibrate</div>
                   <div class="mt-2 text-sm" style="position: relative;">
                     <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable"
-                      :disabled="!isFormulationDataSet()" :options="outputVariables" optionLabel="name"
-                      optionValue="name">
+                      :disabled="!isFormulationDataSet()" :options="outputVariables" optionLabel="name">
+                      <!-- <template #optiongroup="slotProps">
+                        <div class="flex items-left">
+                          <div>{{ slotProps.option.name }} </div>
+                        </div>
+                      </template> -->
                     </Select>
                     <div v-if="!isFormulationDataSet()" class="overlay"></div>
                   </div>
@@ -248,11 +252,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted , onUnmounted} from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { DateTime } from "luxon";
+import Select from "primevue/select";
 
 import { isValidDateTime } from "~/utils/CommonHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
@@ -389,7 +394,7 @@ onMounted(async () => {
     description: outputVar.description,
     module: module.name,
   }))) || [];
-  // console.log("outputVariables:", outputVariables.value);
+  console.log("outputVariables:", outputVariables.value);
 
   // set ouput_variable_to_calibrate
   if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
@@ -943,6 +948,18 @@ const gotoNext = () => {
   const e = <HTMLElement>tabs[4];
   e.click();
 }
+
+// const getGroups = (groups: string[]) => {
+//   let txt = "";
+//   groups.forEach(element => {
+//     txt += element;
+//     if (groups[groups.length - 1] !== element) {
+//       txt += ", ";
+//     }
+//   });
+//   return txt;
+// }
+
 </script>
 
 <style lang="scss" scoped>

@@ -32,8 +32,7 @@
               optionLabel="name" optionValue="name" class="w-full h-60">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'">
-                  <div class="font-ui pl-2 leading-none"><strong>{{ slotProps.option.name }}</strong> &nbsp;&nbsp; ({{
-                    getGroups(slotProps.option.groups) }})</div>
+                  <div class="font-ui pl-2 leading-none">{{ slotProps.option.name }}</div>
                 </div>
               </template>
             </Listbox>
@@ -252,18 +251,6 @@ const addSlothVariable = () => {
 
 const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
   deleteSlothVariable(selectedSlothParameterData.value.param_name);
-}
-
-
-const getGroups = (groups: string[]) => {
-  let txt = "";
-  groups.forEach(element => {
-    txt += element;
-    if (groups[groups.length - 1] !== element) {
-      txt += ", ";
-    }
-  });
-  return txt;
 }
 
 </script>

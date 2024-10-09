@@ -142,7 +142,7 @@ const tabClicked = (event: Event) => {
     const cl = ele.classList;
     ele.classList.add("activeTab");
   }
-
+nextTick( () => {
   // Send the selected tab info to the active tab set with emit
   if (currentMenu.value === 1) {
     currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
@@ -163,6 +163,8 @@ const tabClicked = (event: Event) => {
     currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
     emit("tabNumber", currentVerificationTab.value);
   }
+})
+
 }
 </script>
 <style lang="scss" scoped>

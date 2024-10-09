@@ -9,20 +9,20 @@
           Headwater Basin Gage</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.external_data_statu"
-            :class="selectedForcingValue ? 'checkMark' : ''"
+        <td><i v-if="userCalibrationRunData?.external_data_status?.forcing"
+            :class="userCalibrationRunData?.external_data_status?.forcing ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
         <td class="ptype" data-tab="3" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing</td>
       </tr>
       <tr>
-        <td><i v-if="selectedObservationalValue"
-            :class="selectedObservationalValue ? 'checkMark' : ''"
+        <td><i v-if="userCalibrationRunData?.external_data_status?.observational"
+            :class="userCalibrationRunData?.external_data_status?.observational ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
         <td class="ptype" data-tab="3" title="Observational" aria-label="Observational" @click="tabClicked">Observational</td>
       </tr>
       <tr>
-        <td><i v-if="selectedGageValue"
-            :class="selectedGageValue ? 'checkMark' : ''"
+        <td><i v-if="userCalibrationRunData?.external_data_status?.geopackage"
+            :class="userCalibrationRunData?.external_data_status?.geopackage ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
         <td class="ptype" data-tab="3" title="Geopackage" aria-label="Geopackage" @click="tabClicked">Geopackage</td>
       </tr>
