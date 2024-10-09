@@ -314,7 +314,8 @@ onMounted(async () => {
   await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
   
   // if Tuning Tab static data is not loaded, fetch it
-  if (!loadTuningTabData?.value?._data.modules) {
+  console.log("loadTuningTabData:", loadTuningTabData?.value);
+  if (loadTuningTabData?.value?._data.modules.length === 0) {
     // toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
     await fetchTuningTabData();
   }
@@ -397,7 +398,7 @@ onMounted(async () => {
   // set time range
   const timeRange = userCalibrationRunData?.value?.time_range;
   // check if timeRange is provided and not empty
-  if (timeRange && timeRange.constructor === Object && Object.keys(timeRange).length > 0) {
+  if (timeRange?.start_time && timeRange?.end_time) {
     rangeDateFrom.value = timeRange?.start_time;
     rangeDateTo.value = timeRange?.end_time;
   } else {

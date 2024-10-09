@@ -145,16 +145,17 @@ useListen('calibrationButtonSaveStart', async (actionButton) => {
     try {
       console.log('hitting run_calibration endpoint');
       const runCalibrationResponse = await executeRunCalibration();
+
       if (runCalibrationResponse?._data.status) {
         calibrationStatus.value = runCalibrationResponse?._data.status;
         if (calibrationStatus.value != 'Running') {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START', life: 5000 });
+          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
         }
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration', life: 5000 });
+        toast.add({ severity: 'error', summary: 'Error running Calibration', detail: 'Cannot get Calibration status' });
       }
     } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration', life: 5000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration' });
     }
   } else {
     toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Ready. Cannot run Calibration' });
@@ -173,16 +174,16 @@ useListen('calibrationButtonResetCancel', async (actionButton) => {
         calibrationStatus.value = cancelCalibrationResponse?._data.status;
         console.log('calibrationStatus:', calibrationStatus.value);
         if (calibrationStatus.value != 'Cancelled') {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL', life: 5000 });
+          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL'});
         }
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run', life: 5000 });
+        toast.add({ severity: 'error', summary: 'Error cancelling Calibration', detail: 'Cannot get Calibration status' });
       }
     } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run', life: 5000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run'});
     }
   } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration' });
   }
 });
 
@@ -219,10 +220,12 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
         runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
-        // Create an interval to update runningTime every second
+        // Create an interval to update runningTime every second while status is Running
         if (!runningTimeIntervalId) {
-          runningTimeIntervalId = setInterval(() => {
-            if (!stopCriteriaMet.value) {
+          runningTimeIntervalId = setInterval(async () => {
+            await fetchUserCalibrationRunData();
+
+            if (userCalibrationRunData?.value?.status && userCalibrationRunData?.value?.status !== 'Running') {
               // Calculate Running Time every second
               runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
             }
@@ -230,7 +233,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         }
       } else {
         toast.removeAllGroups();
-        toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object', life: 5000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object'});
       }
 
       // Create an interval to update calibrationStatus every 10 seconds
@@ -247,13 +250,13 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             calibrationStatus.value = userCalibrationRunData.value?.status; // set this last so that the watch function gets triggered after handling Done, Cancelled, or Failed status
           } else {
             toast.removeAllGroups();
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data' });
           }
         }, 10000);
       }
 
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data', life: 5000 });
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data'});
     }
 
     // Get Plot Names
@@ -289,7 +292,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
     // Update Plot Names
     plotNames.value = await queryGetPlotNames();
-    if (plotNames.value) {
+    if (plotNames?.value?._data) {
       console.log('plotNames:', plotNames.value?._data);
 
       // setting plotList and selectedPlotName will populate the dropdown
