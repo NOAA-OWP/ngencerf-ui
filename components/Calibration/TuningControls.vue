@@ -141,106 +141,108 @@
         </div>
       </div>
 
-      <div class="">
-        <div class="grid grid-rows-2">
 
-          <div class="row-span-1 text-left">
-            <div class="grid grid-cols-2">
+      <div class="grid grid-rows-2">
 
-              <div class="col-span-2">
-                <div class="">
-                  <div class="mt-6 mb-3 hr"></div>
-                  <div class="mb-2 font-bold">Output Variable To Calibrate</div>
-                  <div class="mt-2 text-sm" style="position: relative;">
-                    <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable"
-                      :disabled="!isFormulationDataSet()" :options="outputVariables" optionLabel="name"
-                      optionValue="name">
-                    </Select>
-                    <div v-if="!isFormulationDataSet()" class="overlay"></div>
-                  </div>
-                </div>
+        <div class="row-span-1 text-left">
+          <div class="grid grid-cols-2">
+
+            <div class="col-span-2">
+              <div class="mt-6 mb-3 hr"></div>
+              <div class="mb-2 font-bold">Output Variable To Calibrate</div>
+              <div class="mt-2 text-sm" style="position: relative;">
+                <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable"
+                  :disabled="!isFormulationDataSet()" :options="outputVariables" optionLabel="name">
+                  <!-- <template #optiongroup="slotProps">
+                        <div class="flex items-left">
+                          <div>{{ slotProps.option.name }} </div>
+                        </div>
+                      </template> -->
+                </Select>
+                <div v-if="!isFormulationDataSet()" class="overlay"></div>
               </div>
+            </div>
 
-              <div class="col-span-2">
-                <div class="mt-5 mb-3 hr"></div>
-                <div class="text-left">
-                  <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
-                  <div class="inline-block text-left text-sm"><label for="ParamFile">Parameters File (optional):</label>
-                  </div><br />
-                  <!-- <br />
+            <div class="col-span-2">
+              <div class="mt-5 mb-3 hr"></div>
+              <div class="text-left">
+                <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
+                <div class="inline-block text-left text-sm"><label for="ParamFile">Parameters File (optional):</label>
+                </div><br />
+                <!-- <br />
                   <Select id="ParamFile" class="varInputs inline-block mt-2 text-sm">
                     <option value="" selected disabled>...</option>                    
                   </Select> -->
-                  <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
-                    <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-                    <button @click="triggerFileInput" :disabled="!isFormulationDataSet()">Load</button>
-                    <div v-if="!isFormulationDataSet()" class="overlay"></div>
-                  </div>
-                </div>
-
-                <div class="text-left mt-3 text-sm" style="position: relative;">
-                  <div class="inline-block text-left"><label for="ParamName">Name:</label></div><br />
-                  <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter"
-                    :disabled="!isFormulationDataSet()" :options="calibrationTuningParameters" optionLabel="name"
-                    optionValue="name">
-                  </Select>
-                  <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
-                    <button @click="addParameterToTable" :disabled="!isFormulationDataSet()">Add</button>
-                  </div>
+                <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
+                  <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+                  <button @click="triggerFileInput" :disabled="!isFormulationDataSet()">Load</button>
                   <div v-if="!isFormulationDataSet()" class="overlay"></div>
                 </div>
               </div>
 
+              <div class="text-left mt-3 text-sm" style="position: relative;">
+                <div class="inline-block text-left"><label for="ParamName">Calibratable Parameters:</label></div>
+                <br />
+                <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter"
+                  :disabled="!isFormulationDataSet()" :options="calibrationTuningParameters" optionLabel="name"
+                  optionValue="name">
+                </Select>
+                <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
+                  <button @click="addParameterToTable" :disabled="!isFormulationDataSet()">Add</button>
+                </div>
+                <div v-if="!isFormulationDataSet()" class="overlay"></div>
+              </div>
             </div>
+
           </div>
+        </div>
 
-          <div id="TuningDataList" class="mt-5" style="position: relative;">
-            <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px">
-              <!-- parameter column, uneditable with light grey background -->
-              <Column field="parameter" header="Parameter" sortable>
-                <template #body="slotProps">
-                  <span style="background-color: lightgrey; padding: 4px; display: block;">
-                    {{ slotProps.data.name }}
-                  </span>
-                </template>
-              </Column>
+        <div id="TuningDataList" class="mt-5" style="position: relative;">
+          <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px">
+            <!-- parameter column, uneditable with light grey background -->
+            <Column field="parameter" header="Parameter" sortable>
+              <template #body="slotProps">
+                <span style="background-color: lightgrey; padding: 4px; display: block;">
+                  {{ slotProps.data.name }}
+                </span>
+              </template>
+            </Column>
 
-              <!-- min column, editable -->
-              <Column field="min" header="Min" sortable>
-                <template #body="slotProps">
-                  <input type="text" v-model="slotProps.data.minimum"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)"
-                    style="width: 100%;" />
-                </template>
-              </Column>
+            <!-- min column, editable -->
+            <Column field="min" header="Min" sortable>
+              <template #body="slotProps">
+                <input type="text" v-model="slotProps.data.minimum"
+                  @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;" />
+              </template>
+            </Column>
 
-              <!-- max column, editable -->
-              <Column field="max" header="Max" sortable>
-                <template #body="slotProps">
-                  <input type="text" v-model="slotProps.data.maximum"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)"
-                    style="width: 100%;" />
-                </template>
-              </Column>
+            <!-- max column, editable -->
+            <Column field="max" header="Max" sortable>
+              <template #body="slotProps">
+                <input type="text" v-model="slotProps.data.maximum"
+                  @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;" />
+              </template>
+            </Column>
 
-              <!-- initValue column, editable -->
-              <Column field="initValue" header="Initial Value" sortable>
-                <template #body="slotProps">
-                  <input type="text" v-model="slotProps.data.initial_value"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)"
-                    style="width: 100%;" />
-                </template>
-              </Column>
-            </DataTable>
-            <div v-if="!isFormulationDataSet()" class="overlay"></div>
-          </div>
-
+            <!-- initValue column, editable -->
+            <Column field="initValue" header="Initial Value" sortable>
+              <template #body="slotProps">
+                <input type="text" v-model="slotProps.data.initial_value"
+                  @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)"
+                  style="width: 100%;" />
+              </template>
+            </Column>
+          </DataTable>
+          <div v-if="!isFormulationDataSet()" class="overlay"></div>
         </div>
 
       </div>
-    </div>
-    <div class="waitgif" v-if="isLoading">
-      <img src="@/assets/styles/img/wait.gif" />
+
+
+
+      <div class="waitgif" v-if="isLoading">
+        <img src="@/assets/styles/img/wait.gif" />
+      </div>
     </div>
   </div>
 
@@ -248,11 +250,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted , onUnmounted} from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { DateTime } from "luxon";
+import Select from "primevue/select";
 
 import { isValidDateTime } from "~/utils/CommonHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
@@ -954,6 +957,18 @@ const gotoNext = () => {
   const e = <HTMLElement>tabs[4];
   e.click();
 }
+
+// const getGroups = (groups: string[]) => {
+//   let txt = "";
+//   groups.forEach(element => {
+//     txt += element;
+//     if (groups[groups.length - 1] !== element) {
+//       txt += ", ";
+//     }
+//   });
+//   return txt;
+// }
+
 </script>
 
 <style lang="scss" scoped>
