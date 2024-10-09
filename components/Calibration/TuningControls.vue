@@ -321,15 +321,26 @@ onMounted(async () => {
   calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
 
   if (calibrationTuningModules.value) {
-    // set calibration tuning parameters
+    // set calibration tuning parameters dropdown
     calibrationTuningParameters.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
       name: param.name,
       minimum: param.minimum,
       maximum: param.maximum,
       initial_value: param.initial_value,
+      user_selected_for_tuning: param.user_selected_for_tuning,
       module: module.name,
     }))) || [];
     // console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
+
+    // set calibration tuning parameters data table with user-selected parameters but without the user_selected_for_tuning flag
+    userCalibrationTuningParameters.value = calibrationTuningParameters.value?.filter((param: any) => param?.user_selected_for_tuning)?.map((param: any) => ({
+      name: param.name,
+      minimum: param.minimum,
+      maximum: param.maximum,
+      initial_value: param.initial_value,
+      module: param.module,
+    })) || [];
+    console.log("userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
 
     // set output variables
     outputVariables.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
@@ -713,7 +724,10 @@ const handleFileUpload = async (event: Event) => {
  */
 const addParameterToTable = () => {
   const parameter = calibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
-  if (parameter) {
+  const isParameterAlreadyInTable = userCalibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
+
+  // add parameter to table if it is not already in the table
+  if (!isParameterAlreadyInTable && parameter) {
     userCalibrationTuningParameters?.value?.push({
       name: parameter.name,
       minimum: parameter.minimum,
