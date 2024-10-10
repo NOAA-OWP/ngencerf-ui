@@ -63,7 +63,7 @@ export interface UserCalibrationRunData {
   observational_user_filename: string;
   observational_file_path: string;
   geopackage_source: string;
-  external_data_errors: ExternalDataErrors[];
+  external_data_status: ExternalDataStatus;
   geopackage_hydrofabric_file_path: string;
   geopackage_image_url: string;
   modules: string[];
@@ -88,9 +88,10 @@ export interface UserCalibrationRunData {
   status: string;
 }
 
-export interface ExternalDataErrors {
-  name: string,
-  message: string
+export interface ExternalDataStatus {
+  observational: boolean;
+  forcing: boolean;
+  geopackage: boolean;
 }
 
 export interface UserCalibrationRunTimeRangeData {
