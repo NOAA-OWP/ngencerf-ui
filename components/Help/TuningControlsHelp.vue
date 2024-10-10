@@ -1,16 +1,30 @@
 <template>
   <div class="_help-page">
     <div class="_help-title">ngenCERF Calibration Workflow - Tuning Controls Tab</div>
-    <div class="_help-subtitle">This tab provides the user the ability to select the time periods to run the
-      calibration, the time periods for an automatic validation after calibration is complete based on the best set of parameters
-      determined during the calibration process, and which module parameters for the selected formulation to tune during
-      calibration.
+    <div class="_help-subtitle">
+        This tab provides the user the ability to select the time periods to run the calibration, 
+        the time periods for an automatic validation after calibration is complete based on the best set of parameters
+        determined during the calibration process, and which module parameters for the selected formulation to tune during
+        calibration.
     </div>
     <p class="text-center" style="color:red;">
-      NOTE: Times are hourly and must be specified to the top of the hour (hh:00). 
+      NOTE: Times are hourly and must be specified to the top of the hour (hh:00).
     </p>
     <table class="_help-table">
       <tbody>
+        <tr>
+          <td class="td1">Entering Times:</td>
+          <td class="td2">Times are UTC.<br >
+            Times can be selected using the date picker or entered manually.<br />
+            Manual Format: YYYY-MM-DD HH:MM<br />
+            Cut and paste can be used.<br />
+            When manually entering data, the <b>Enter</b> key must be hit otherwise data in that field will be discarded.
+          </td>
+        </tr>
+        <tr>
+          <td class="td1">&nbsp;</td>
+          <td class="td2">&nbsp;</td>
+        </tr>
         <tr>
           <td class="td1">Range:</td>
           <td class="td2">Non-editable field displaying the available time range for running calibration and validation.
