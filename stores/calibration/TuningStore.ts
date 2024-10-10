@@ -1,6 +1,7 @@
 // @ts-check
 
 import { defineStore } from "pinia";
+import { isValidDateTime } from "~/utils/CommonHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
@@ -68,18 +69,31 @@ export const useTuningStore = defineStore('TuningStore', () => {
 
     // add Tuning Tab data to request body
     requestBody.calibration_run_id = calibrationJobId.value;
-    requestBody.calibration_times = {
-      simulation_start_time: simStartTime.value,
-      simulation_end_time: simEndTime.value,
-      calibration_start_time: calStartTime.value,
-      calibration_end_time: calEndTime.value
-    };
-    requestBody.parameters = userCalibrationTuningParameters.value;
-    requestBody.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
+
+    // add calibration times if they are provided
+    if (isValidDateTime(simStartTime.value) && isValidDateTime(simEndTime.value) && isValidDateTime(calStartTime.value) && isValidDateTime(calEndTime.value)) {
+      requestBody.calibration_times = {
+        simulation_start_time: simStartTime.value,
+        simulation_end_time: simEndTime.value,
+        calibration_start_time: calStartTime.value,
+        calibration_end_time: calEndTime.value
+      };
+    }
+
+    // add user calibration tuning parameters if they are provided
+    if (userCalibrationTuningParameters.value && userCalibrationTuningParameters.value.length > 0) {
+      requestBody.parameters = userCalibrationTuningParameters.value;
+    }
+
+    // add user output variable to calibrate if it is provided
+    if (userOutputVariableToCalibrate.value.name && userOutputVariableToCalibrate.value.module) {
+      requestBody.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
+    }
+
     requestBody.automatic_validation = automatic_validation.value;
 
-    // add validation times if automatic validation is enabled
-    if (automatic_validation.value) {
+    // add validation times if automatic validation is enabled and the times are provided
+    if (automatic_validation.value && isValidDateTime(avSimStartTime.value) && isValidDateTime(avSimEndTime.value) && isValidDateTime(avCalStartTime.value) && isValidDateTime(avCalEndTime.value)) {
       requestBody.validation_times = {
         simulation_start_time: avSimStartTime.value,
         simulation_end_time: avSimEndTime.value,

@@ -799,8 +799,8 @@ const areCalibrationTimesValidated = (fullValidation: boolean = true): boolean =
   }
 
   // check if calibration_times are not set
-  if (fullValidation && (!simStartTime.value || !simEndTime.value || !calStartTime.value || !calEndTime.value)) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_times must be set' });
+  if (fullValidation && (!isValidDateTime(simStartTime.value) || !isValidDateTime(simEndTime.value) || !isValidDateTime(calStartTime.value) || !isValidDateTime(calEndTime.value))) {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'all calibration_times must be set'});
     return false;
   }
 
@@ -814,7 +814,7 @@ const areCalibrationTimesValidated = (fullValidation: boolean = true): boolean =
 
   // check if time_range and calibration_times are null after converted to Date objects
   if (!rangeStartDate || !rangeEndDate || !simStartDate || !simEndDate || !calStartDate || !calEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects' });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects'});
     return false;
   }
 
@@ -826,25 +826,25 @@ const areCalibrationTimesValidated = (fullValidation: boolean = true): boolean =
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_times must be within time_range' });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_times must be within time_range'});
     return false;
   }
 
   // check if simulation_end_time is not after simulation_start_time
   if (simStartDate >= simEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'simulation_end_time must be after simulation_start_time' });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'simulation_end_time must be after simulation_start_time'});
     return false;
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
   if (calStartDate <= simStartDate || calStartDate > simEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time' });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time'});
     return false;
   }
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time' });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time'});
     return false;
   }
 
@@ -860,10 +860,10 @@ const areValidationTimesValidated = (): boolean => {
     return true;
   }
 
-  // check if automatic_validation is enabled and validation_times are set
+  // check if automatic_validation is enabled and validation_times are not set
   if (automatic_validation.value) {
-    if (!avSimStartTime.value || !avSimEndTime.value || !avCalStartTime.value || !avCalEndTime.value) {
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set' });
+    if (!isValidDateTime(avSimStartTime.value) || !isValidDateTime(avSimEndTime.value) || !isValidDateTime(avCalStartTime.value) || !isValidDateTime(avCalEndTime.value)) {
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set'});
       return false;
     }
   }
@@ -878,12 +878,12 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if Date objects are valid
   if (!avSimStartDate || !avSimEndDate || !avCalStartDate || !avCalEndDate || !rangeStartDate || !rangeEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects' });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects'});
     return false;
   }
 
   // if calibration_times are set, check if validation_times are not after calibration_times
-  if ((simStartTime.value && simEndTime.value && calStartTime.value && calEndTime.value)) {
+  if ((isValidDateTime(simStartTime.value) && isValidDateTime(simEndTime.value) && isValidDateTime(calStartTime.value) && isValidDateTime(calEndTime.value))) {
     // convert simeEndTime to Date object. simEndTime is the lastest time within calibration_times
     const simEndDate = simEndTime.value.toJSDate();
 
@@ -924,20 +924,19 @@ const areValidationTimesValidated = (): boolean => {
     return false;
   }
 
-  return true
+  return true;
 };
 
 /**
  * Validate parameters
  */
 const areParametersValidated = (): boolean => {
-  // check if no Calibration Tuning Parameters have been added
+  // check if no Calibration Tuning Parameters have been added TODO: add more parameter validation checks here. e.g. check if min < max, etc.
   if (userCalibrationTuningParameters.value.length === 0) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'At least one Calibration Tuning Parameter must be added' });
+    // toast.add({ severity: 'warn', summary: 'Warning', detail: 'At least one Calibration Tuning Parameter must be added' });
     return false;
   }
 
-  // TODO: add more parameter validation checks here. e.g. check if min < max, etc.
   return true;
 };
 
@@ -947,7 +946,7 @@ const areParametersValidated = (): boolean => {
 const isOutputVariableValidated = (): boolean => {
   // check if Output Variable to Calibrate is set
   if (!userOutputVariableToCalibrate.value.name || !userOutputVariableToCalibrate.value.module) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Output Variable to Calibrate must be selected' });
+    // toast.add({ severity: 'warn', summary: 'Warning', detail: 'Output Variable to Calibrate must be selected' });
     return false;
   }
   return true;
