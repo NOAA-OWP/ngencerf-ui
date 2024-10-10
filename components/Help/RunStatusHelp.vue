@@ -5,12 +5,16 @@
       in the summary area on the right side of the GUI.</div>
     <div class="_help-subtitle">The Status field will indicate if the required data has been
       entered.</div>
-    <div class="_help-subtitle">If so the Status will be Ready and the Start button will be activated. Once the
+    <div class="_help-subtitle">If the status is Ready Click the Start button to begin the calibration run. Once the
       calibration run has started, the user can stop it before it completes by clicking the Stop button.
       While a calibration is running, the running time is updated.</div>
-    <div class="_help-subtitle">Plots will be generated at the user selected frequency which can be viewed while
-      the calibration is being performed and when the calibration and validation run are complete.
+    <div class="_help-subtitle">Plots will be generated at the user selected frequency and can be viewed while
+      the calibration is being performed as well as when the calibration and validation run are complete.
     </div>
+    <p class="text-center" style="color:orange;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+    </p>
+
     <table class="_help-table">
       <tbody>
         <tr>
