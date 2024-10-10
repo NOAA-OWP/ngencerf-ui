@@ -784,7 +784,7 @@ const AutoValChecked = () => {
  * Validate all Tuning tab data before saving
  */
 const isTuningTabDataValidated = () => {
-  return areCalibrationTimesValidated() && areValidationTimesValidated() && areParametersValidated() && isOutputVariableValidated();
+  return areCalibrationTimesValidated() || areValidationTimesValidated() || areParametersValidated() || isOutputVariableValidated();
 };
 
 /**
@@ -860,11 +860,6 @@ const areValidationTimesValidated = (): boolean => {
     return true;
   }
 
-  // check if calibration_times are set and validated
-  if (!areCalibrationTimesValidated()) {
-    return false; // areCalibrationTimesValidated() will show warn messages
-  }
-
   // check if automatic_validation is enabled and validation_times are set
   if (automatic_validation.value) {
     if (!avSimStartTime.value || !avSimEndTime.value || !avCalStartTime.value || !avCalEndTime.value) {
@@ -887,25 +882,28 @@ const areValidationTimesValidated = (): boolean => {
     return false;
   }
 
-  // convert simeEndTime to Date object. simEndTime is the lastest time within calibration_times
-  const simEndDate = simEndTime.value.toJSDate();
+  // if calibration_times are set, check if validation_times are not after calibration_times
+  if ((simStartTime.value && simEndTime.value && calStartTime.value && calEndTime.value)) {
+    // convert simeEndTime to Date object. simEndTime is the lastest time within calibration_times
+    const simEndDate = simEndTime.value.toJSDate();
 
-  // set conditions to check if validation_times are not after calibration_times
-  const isAvSimStartAfterCalEnd = avSimStartDate > simEndDate;
-  const isAvSimEndAfterCalEnd = avSimEndDate > simEndDate;
-  const isAvCalStartAfterCalEnd = avCalStartDate > simEndDate;
-  const isAvCalEndAfterCalEnd = avCalEndDate > simEndDate;
+    // set conditions to check if validation_times are not after calibration_times
+    const isAvSimStartAfterCalEnd = avSimStartDate > simEndDate;
+    const isAvSimEndAfterCalEnd = avSimEndDate > simEndDate;
+    const isAvCalStartAfterCalEnd = avCalStartDate > simEndDate;
+    const isAvCalEndAfterCalEnd = avCalEndDate > simEndDate;
 
-  // console.log('avSimStartDate:', avSimStartDate);
-  // console.log('avSimEndDate:', avSimEndDate);
-  // console.log('avCalStartDate:', avCalStartDate);
-  // console.log('avCalEndDate:', avCalEndDate);
-  // console.log('simEndDate:', simEndDate);
+    // console.log('avSimStartDate:', avSimStartDate);
+    // console.log('avSimEndDate:', avSimEndDate);
+    // console.log('avCalStartDate:', avCalStartDate);
+    // console.log('avCalEndDate:', avCalEndDate);
+    // console.log('simEndDate:', simEndDate);
 
-  // check if validation_times are not after calibration_times
-  if (!isAvSimStartAfterCalEnd || !isAvSimEndAfterCalEnd || !isAvCalStartAfterCalEnd || !isAvCalEndAfterCalEnd) {
-    toast.add({ severity: 'warn', summary: 'Warn', detail: 'All validation_times must be after calibration_times' });
-    return false;
+    // check if validation_times are not after calibration_times
+    if (!isAvSimStartAfterCalEnd || !isAvSimEndAfterCalEnd || !isAvCalStartAfterCalEnd || !isAvCalEndAfterCalEnd) {
+      toast.add({ severity: 'warn', summary: 'Warn', detail: 'All validation_times must be after calibration_times' });
+      return false;
+    }
   }
 
   // check if avSimEndDate is not after avSimStartDate
