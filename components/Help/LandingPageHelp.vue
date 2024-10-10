@@ -10,7 +10,10 @@
     <br />
     <br />
     <p style="text-align:center;">
-      Click on a <strong>Workflow</strong> button in the header to proceed.
+      To setup or run a Calibration, click on the <strong>Calibration</strong> button in the header.
+    </p>
+    <p style="text-align:center;">
+      To view the results of a calibration, validation, or run a new validation, click on the <strong>Evaluate</strong> button in the header.
     </p>
   </div>
 </template>

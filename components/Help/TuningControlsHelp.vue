@@ -7,6 +7,9 @@
         determined during the calibration process, and which module parameters for the selected formulation to tune during
         calibration.
     </div>
+    <p class="text-center" style="color:orange;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+    </p>
     <p class="text-center" style="color:red;">
       NOTE: Times are hourly and must be specified to the top of the hour (hh:00).
     </p>
