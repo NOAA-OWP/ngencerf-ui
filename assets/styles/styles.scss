@@ -48,7 +48,7 @@ body {
 }
 
 .boxed {
-  border: 1px solid #000;
+  border: 1px solid #BBBBBF;
 }
 
 label {font-weight: bold;}
@@ -63,6 +63,9 @@ input, .p-select, .varInputs {
   input, .p-select, .p-inputtext, .p-password-input, .varInputs {
     background-color: $ngwcp_neutral_gray_lt;  
     border: 0px solid $ngwcp_neutral_gray_md;
+  }
+  .p-select-dropdown {
+    color: #000000;
   }
 }
 
@@ -97,7 +100,7 @@ input::-webkit-input-placeholder {
   border-radius: 28px;
   background-color: $ngwcp_primary1;
   text-align: center;
-  font-size: 16px;
+  font-size: 18px;
   border: 0px;
   display: inline-block;
 }
@@ -114,7 +117,7 @@ input::-webkit-input-placeholder {
   border-radius: 28px;
   background-color: $ngwcp_primary4;
   text-align: center;
-  font-size: 16px;
+  font-size: 18px;
   border: 0px;
   display: inline-block;
 }
@@ -280,12 +283,21 @@ select option {
 
 .p-datatable-tbody > tr > td {
   padding: 5px !important;
+  border-color: #BBBBBF !important;
+}
+.p-datatable-tbody {
+  border-right: 1px solid #BBBBBF;
+  border-left: 1px solid #BBBBBF;
 }
 
 .p-datatable-thead tr th {
-  background-color: $ngwcp_primary1;
+  /*background-color: $ngwcp_primary1;*/
+  background-color: #003D64;
   color: white;
   border-left: 1px solid white;
+}
+.p-datatable-thead tr th:first-child {
+  border-left: 1px solid #003D64;
 }
 
 .p-datatable-thead tr th:hover {
@@ -460,14 +472,8 @@ table.cols-bordered {
 /* Toast */
 .p-toast {
   width: min(25rem, 100vw) !important;
-
 }
 .p-toast-top-center {
-  top: 20px !important;
-  left: 500px !important;
-  right: 0 !important;
-  //margin: 0 auto 0 auto !important;
-
 }
 
 .p-toast-message {
