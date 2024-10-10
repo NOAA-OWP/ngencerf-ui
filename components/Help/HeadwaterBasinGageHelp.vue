@@ -2,6 +2,9 @@
   <div class="_help-page">
     <div class="_help-title">ngenCERF Calibration Workflow - Headwater Basin Gage Tab</div>
     <div class="_help-subtitle">&nbsp</div>
+    <p class="text-center" style="color:orange;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+    </p>
 
     <table class="_help-table">
       <tbody>
