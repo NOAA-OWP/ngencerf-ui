@@ -38,19 +38,17 @@ onMounted(() => {
   })
 })
 
-onBeforeMount( () => {
-    window.addEventListener("beforeunload", event => {
-      debugger;
-      event.preventDefault()
-      return true;
-    })
-  });
+// onBeforeMount( () => {
+//     window.addEventListener("beforeunload", event => {
+//       event.preventDefault()
+//       return true;
+//     })
+//   });
 
-onUnmounted( () => {
-  window.removeEventListener("beforeunload", event => {
-      debugger;
-      event.preventDefault()
-      return true;
-    })
-})
+// onUnmounted( () => {
+//   window.removeEventListener("beforeunload", event => {
+//       event.preventDefault()
+//       return true;
+//     })
+// })
 </script>
