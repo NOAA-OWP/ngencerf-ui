@@ -318,11 +318,14 @@ onMounted(async () => {
   
   // if Tuning Tab static data is not loaded, fetch it
   console.log("loadTuningTabData:", loadTuningTabData?.value);
-  if (loadTuningTabData?.value?._data.modules.length === 0) {
-    // toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
+  if (loadTuningTabData?.value?._data?.modules.length === 0) {
+    console.log("fetching Tuning Tab data");
     await fetchTuningTabData();
+  } else {
+    console.log("Tuning Tab data already loaded");
   }
   calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
+  console.log("calibrationTuningModules:", calibrationTuningModules.value);
 
   if (calibrationTuningModules.value) {
     // set calibration tuning parameters dropdown
@@ -432,13 +435,13 @@ onMounted(async () => {
   useListen('calibrationButtonNext', (actionButton) => {
     if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
       if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
+        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required."})
       }
       if (!(avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value)) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
+        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required."})
       }
       if (!userOutputVariableToCalibrate.value.name) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "No Output Variable selected.", life: 3000 })
+        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "No Output Variable selected."})
       }
       toast.removeAllGroups();
       gotoNext();
@@ -516,12 +519,15 @@ const isTimeRangeSet = (): boolean => {
  * @returns boolean
  */
 const isFormulationDataSet = (): boolean => {
-  console.log("formulationNameInput:", formulationNameInput.value);
+  // console.log("formulationNameInput:", formulationNameInput.value);
+  // console.log("selectedModuleValues:", selectedModuleValues?.value);
+  // console.log("slothParameterInputs:", slothParameterInputs?.value);
+
   if (formulationNameInput.value == "" && selectedModuleValues?.value.length === 0 && slothParameterInputs?.value.length === 0) {
-    console.log('formulation is not set');
+    // console.log('formulation is not set');
     return false;
   } else {
-    console.log('formulation is set');
+    // console.log('formulation is set');
     return true;
   }
 };
