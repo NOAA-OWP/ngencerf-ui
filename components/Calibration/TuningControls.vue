@@ -239,10 +239,7 @@
           </DataTable>
           <div v-if="!isFormulationDataSaved()" class="overlay"></div>
         </div>
-
       </div>
-
-
 
       <div class="waitgif" v-if="isLoading">
         <img src="@/assets/styles/img/wait.gif" />

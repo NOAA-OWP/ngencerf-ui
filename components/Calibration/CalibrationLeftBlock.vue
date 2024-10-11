@@ -36,7 +36,6 @@ import CalibrationRunsTab from '~/components/Calibration/PreviousCalibrationRuns
 import { generalStore } from "@/stores/common/GeneralStore";
 
 const { getCalibrationTabIndex, setCalibrationTabIndex } = generalStore();
-
 // Default to Tab 1, HeadwaterBasinGage
 const activeTab = ref(getCalibrationTabIndex());
 
