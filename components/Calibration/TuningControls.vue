@@ -235,10 +235,7 @@
           </DataTable>
           <div v-if="!isFormulationDataSet()" class="overlay"></div>
         </div>
-
       </div>
-
-
 
       <div class="waitgif" v-if="isLoading">
         <img src="@/assets/styles/img/wait.gif" />

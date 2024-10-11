@@ -8,7 +8,6 @@
 import { onMounted } from "vue";
 
 onMounted(() => {
-  console.log('MOUNTED: Index.vue');
    window.location.href = "login";
 });
 </script>

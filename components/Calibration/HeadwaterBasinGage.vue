@@ -104,6 +104,7 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
+import type { SelectChangeEvent } from "primevue/select";
 
 const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
@@ -177,7 +178,7 @@ const onGageSelectionChange = () => {
   fetchSelectedGageData()
 }
 
-const uploadForcingDlgOpen = (e: MouseEvent) => {
+const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
   if (e && e.value === 'Upload') {
     showForcingFileUploadDialog('Forcing Files')
   }
@@ -216,7 +217,7 @@ const handleDialogClose = (opt: any) => {
   fileUploadDialogOpened.value = false
 }
 
-const uploadObservationalDlgOpen = (e: MouseEvent) => {
+const uploadObservationalDlgOpen = (e: SelectChangeEvent) => {
   if (e && e.value === 'Upload') {
     showObservationalFileUploadDialog('Observational File')
   }
@@ -248,7 +249,7 @@ const showObservationalFileUploadDialog = (headerText: string) => {
   }
 }
 
-const uploadGeopackageDlgOpen = (e: MouseEvent) => {
+const uploadGeopackageDlgOpen = (e: SelectChangeEvent) => {
   if (e && e.value === 'Upload') {
     showGeopackageFileUploadDialog('Geopackage File')
   }
