@@ -41,10 +41,10 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const tuningStore_data_loading = ref(true);
 
   /**
-   * Get Tuning Tab data
+   * Load Tuning Tab data
    * @returns {Promise<any>}
    */
-  async function fetchTuningTabData(): Promise<any> {
+  async function loadTuningTabStaticData(): Promise<any> {
     tuningStore_data_loading.value = true;
 
     loadTuningTabData.value =  await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_tuning_tab/`, {
@@ -61,10 +61,10 @@ export const useTuningStore = defineStore('TuningStore', () => {
   };
 
   /**
-   * post SaveTuningTab data
+   * Save Tuning Tab data
    * @returns {Promise<any>} SaveTuningTab data
    */
-  async function postSaveTuningTabData(): Promise<any> {
+  async function saveTuningTabData(): Promise<any> {
     const requestBody: any = {}; // store all the data to be sent to the server
 
     // add Tuning Tab data to request body
@@ -148,7 +148,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
 
   return {
     tuningStore_data_loading,
-    fetchTuningTabData,
+    loadTuningTabStaticData,
     loadTuningTabData,
     simStartTime,
     simEndTime,
@@ -164,7 +164,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     avCalEndTime,
     rangeDateFrom,
     rangeDateTo,
-    postSaveTuningTabData,
+    saveTuningTabData,
     hardResetTuningStore
   };
 },

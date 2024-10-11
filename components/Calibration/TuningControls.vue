@@ -152,14 +152,14 @@
               <div class="mb-2 font-bold">Output Variable To Calibrate</div>
               <div class="mt-2 text-sm" style="position: relative;">
                 <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable"
-                  :disabled="!isFormulationDataSet()" :options="outputVariables" optionLabel="name">
+                  :disabled="!isFormulationDataSaved()" :options="outputVariables" optionLabel="name">
                   <!-- <template #optiongroup="slotProps">
                         <div class="flex items-left">
                           <div>{{ slotProps.option.name }} </div>
                         </div>
                       </template> -->
                 </Select>
-                <div v-if="!isFormulationDataSet()" class="overlay"></div>
+                <div v-if="!isFormulationDataSaved()" class="overlay"></div>
               </div>
             </div>
 
@@ -175,8 +175,8 @@
                   </Select> -->
                 <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
                   <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-                  <button @click="triggerFileInput" :disabled="!isFormulationDataSet()">Load</button>
-                  <div v-if="!isFormulationDataSet()" class="overlay"></div>
+                  <button @click="triggerFileInput" :disabled="!isFormulationDataSaved()">Load</button>
+                  <div v-if="!isFormulationDataSaved()" class="overlay"></div>
                 </div>
               </div>
 
@@ -184,13 +184,13 @@
                 <div class="inline-block text-left"><label for="ParamName">Calibratable Parameters:</label></div>
                 <br />
                 <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter"
-                  :disabled="!isFormulationDataSet()" :options="calibrationTuningParameters" optionLabel="name"
+                  :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="name"
                   optionValue="name">
                 </Select>
                 <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
-                  <button @click="addParameterToTable" :disabled="!isFormulationDataSet()">Add</button>
+                  <button @click="addParameterToTable" :disabled="!isFormulationDataSaved()">Add</button>
                 </div>
-                <div v-if="!isFormulationDataSet()" class="overlay"></div>
+                <div v-if="!isFormulationDataSaved()" class="overlay"></div>
               </div>
             </div>
 
@@ -233,7 +233,7 @@
               </template>
             </Column>
           </DataTable>
-          <div v-if="!isFormulationDataSet()" class="overlay"></div>
+          <div v-if="!isFormulationDataSaved()" class="overlay"></div>
         </div>
 
       </div>
@@ -283,7 +283,7 @@ const {
 
 const { fetchUserCalibrationRunData, getAccessToken } = userDataStore;
 const { userCalibrationRunData } = storeToRefs(userDataStore);
-const { fetchTuningTabData, postSaveTuningTabData } = tuningStore;
+const { loadTuningTabStaticData, saveTuningTabData } = tuningStore;
 const {
   loadTuningTabData,
   simStartTime,
@@ -320,14 +320,14 @@ onMounted(async () => {
   console.log("loadTuningTabData:", loadTuningTabData?.value);
   if (loadTuningTabData?.value?._data?.modules.length === 0) {
     console.log("fetching Tuning Tab data");
-    await fetchTuningTabData();
+    await loadTuningTabStaticData();
   } else {
     console.log("Tuning Tab data already loaded");
   }
   calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
   console.log("calibrationTuningModules:", calibrationTuningModules.value);
 
-  if (calibrationTuningModules.value) {
+  if (calibrationTuningModules?.value.length > 0) {
     // set calibration tuning parameters dropdown
     calibrationTuningParameters.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
       name: param.name,
@@ -356,7 +356,7 @@ onMounted(async () => {
       module: module.name,
     }))) || [];
   } else {
-    toast.add({ severity: 'warn', summary: 'Tuning Modules not loaded', detail: 'Must set Formulation data before proceeding' });
+    toast.add({ severity: 'warn', summary: 'Tuning Modules not loaded', detail: 'Must save Formulation data before proceeding' });
   }
 
   // console.log("outputVariables:", outputVariables.value);
@@ -435,13 +435,13 @@ onMounted(async () => {
   useListen('calibrationButtonNext', (actionButton) => {
     if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
       if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required."})
+        toast.add({ severity: 'warn', summary: `Data requirement warning`, detail: "All Calibration Times are required."})
       }
       if (!(avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value)) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required."})
+        toast.add({ severity: 'warn', summary: `Data requirement warning`, detail: "All Automatic Validation Times are required."})
       }
       if (!userOutputVariableToCalibrate.value.name) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "No Output Variable selected."})
+        toast.add({ severity: 'warn', summary: `Data requirement warning`, detail: "No Output Variable selected."})
       }
       toast.removeAllGroups();
       gotoNext();
@@ -454,7 +454,7 @@ onMounted(async () => {
   useListen('calibrationButtonSaveStart', (actionButton) => {
     // handle saving Tuning Tab data
     const handleSaveTuningTab = async () => {
-      const saveTuningTabResponse = await postSaveTuningTabData();
+      const saveTuningTabResponse = await saveTuningTabData();
       console.log(
         `saveTabContent Tuning, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `,
         saveTuningTabResponse
@@ -515,10 +515,10 @@ const isTimeRangeSet = (): boolean => {
 };
 
 /**
- * Check if formulation data is set
+ * Check if formulation data has been saved
  * @returns boolean
  */
-const isFormulationDataSet = (): boolean => {
+const isFormulationDataSaved = (): boolean => {
   // console.log("formulationNameInput:", formulationNameInput.value);
   // console.log("selectedModuleValues:", selectedModuleValues?.value);
   // console.log("slothParameterInputs:", slothParameterInputs?.value);
@@ -539,10 +539,10 @@ const handleCalibrationTimeControlsClick = (event: Event) => {
   }
 };
 
-const handleFormulationNotSet = (event: Event) => {
-  if (!isFormulationDataSet()) {
+const handleOutputVariablesParametersClick = (event: Event) => {
+  if (!isFormulationDataSaved()) {
     event.preventDefault(); // Prevent any default action
-    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or paraemters because Formulation data is not set.' });
+    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or paraemters because Formulation data has not been saved.' });
   }
 };
 
@@ -633,7 +633,7 @@ watch(selectedOutputVariable, () => {
   console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
 });
 
-// watch for changes to simStartTime
+// watch for changes to simStartTime. If simStartTime is set, set calStartTime to one year after simStartTime
 watch(simStartTime, () => {
   // console.log('watch simStartTime called');
   // console.log('typeof simStartTime:', typeof simStartTime.value);
@@ -655,7 +655,7 @@ watch(simStartTime, () => {
   }
 });
 
-// watch for changes to avSimStartTime
+// watch for changes to avSimStartTime. If avSimStartTime is set, set avCalStartTime to one year after avSimStartTime
 watch(avSimStartTime, () => {
   // console.log('watch avSimStartTime called');
   // console.log('typeof avSimStartTime:', typeof avSimStartTime.value);
@@ -710,24 +710,30 @@ const handleFileUpload = async (event: Event) => {
           body: formData,
         });
 
-      if (response._data) {
+      if (response?._data.user_parameter_file) {
         // Populate the Parameter table with the data from user-uploaded file
         response._data?.user_parameter_file?.forEach((param: any) => {
-          userCalibrationTuningParameters?.value?.push({
-            name: param.param,
-            minimum: param.min,
-            maximum: param.max,
-            initial_value: param.init,
-            module: param.model, // module?
-          });
+          if (param.param && param.min && param.max && param.init && param.model) {
+            userCalibrationTuningParameters?.value?.push({
+              name: param.param,
+              minimum: param.min,
+              maximum: param.max,
+              initial_value: param.init,
+              module: param.model, // module?
+            });
+          } else {
+            toast.add({ severity: 'warn', summary: 'Invalid data in parameter file' });
+          }
         });
+      } else {
+        toast.add({ severity: 'warn', summary: 'No data in parameter file'});
       }
     } catch (error) {
-      toast.add({ severity: 'error', summary: 'File upload failed' });
+      toast.add({ severity: 'warn', summary: 'File upload failed' });
       console.error('File upload failed:', error);
     }
   } else {
-    toast.add({ severity: 'error', summary: 'No file selected' });
+    toast.add({ severity: 'warn', summary: 'No file selected' });
     console.error('No file selected');
   }
 };
