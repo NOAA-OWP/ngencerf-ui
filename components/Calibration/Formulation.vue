@@ -128,6 +128,29 @@
           </div>
         </div>
       </div>
+      <div class="grid grid-rows-1" id="Formulationbuttons">
+        <div id="FormulationBottomButtons" class="grid grid-cols-8">
+          <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
+            <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
+              Save
+            </button>
+          </div>
+          <div class="col-span-1 mr-3">
+            <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetFormulationData()"
+              aria-label="Reset Button">Reset</button>
+          </div>
+          <div class="col-span-4">&nbsp;</div>
+          <div class="col-span-1">
+            <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button" aria-label="Previous Tab Button"
+              @click="goPrevTab()">Prev</button></div>
+          </div>
+          <div class="col-span-1 mr-4">
+            <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+                @click="goNextTab()">Next</button></div>
+          </div>
+
+        </div>
+      </div>
     </div>
     <div class="waitgif" v-if="formulationStore_data_loading">
       <img src="@/assets/styles/img/wait.gif" />
@@ -180,64 +203,7 @@ const toast = useToast();
 
 onMounted(() => {
   toast.removeAllGroups();
-  /**
- * event bus for calibration button group click
- */
-  useListen('calibrationButtonSaveStart', (actionButton) => {
-    if (getCalibrationTabIndex() === 3 && actionButton == 'SAVE') {
-      toast.removeAllGroups()
-      const save_formulation_response = saveFormulationTabData()
-      save_formulation_response.then((response) => {
-        if (response?.validation_errors) {
-          useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-            toast.add({ severity: "error", summary: 'Error Saving Formulation Tab Data', detail: message })
-          })
-        } else {
-          toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
-          fetchUserCalibrationRunData();
-        }
-      })
-    }
-  })
-
-  useListen('calibrationButtonResetCancel', (actionButton) => {
-    if (getCalibrationTabIndex() == 3 && actionButton == 'RESET') {
-      resetUserSelectionFormulation()
-    }
-  })
-
-  useListen('calibrationButtonNext', (actionButton) => {
-    if (getCalibrationTabIndex() == 3 && actionButton === "NEXT") {
-      if (!formulationNameInput.value) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Forumulation Name is required.", life: 3000 })
-      }
-      if (!selectedModuleValues.value.length) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "Module Selection is required.", life: 3000 })
-      }
-      if (!formulationNameInput.value || !selectedModuleValues.value.length) {
-        return;
-      }
-      const tabs = document.getElementsByClassName("tabs");
-      const e = <HTMLElement>tabs[3];
-      e.click();
-    }
-  })
-
-  useListen('calibrationButtonPrev', (actionButton) => {
-    if (getCalibrationTabIndex() == 3 && actionButton === "PREV") {
-      const tabs = document.getElementsByClassName("tabs");
-      const e = <HTMLElement>tabs[1];
-      e.click();
-    }
-  })
 })
-
-onUnmounted(() => {
-  emitterOff('calibrationButtonSaveStart');
-  emitterOff('calibrationButtonPrev');
-  emitterOff('calibrationButtonNext');
-})
-
 
 /**
  * add sloth variable entry to table and reset name field
@@ -251,6 +217,50 @@ const addSlothVariable = () => {
 
 const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
   deleteSlothVariable(selectedSlothParameterData.value.param_name);
+}
+
+
+/**
+* event bus for calibration button group click
+*/
+const saveFormulationData = () => {
+    toast.removeAllGroups()
+    const save_formulation_response = saveFormulationTabData()
+    save_formulation_response.then((response) => {
+      if (response?.validation_errors) {
+        useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
+          toast.add({ severity: "error", summary: 'Error Saving Formulation Tab Data', detail: message })
+        })
+      } else {
+        toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
+        fetchUserCalibrationRunData();
+      }
+    })
+}
+
+const resetFormulationData = () => {
+    resetUserSelectionFormulation()
+}
+
+const goNextTab = () => {
+    if (!formulationNameInput.value) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Forumulation Name is required.", life: 3000 })
+    }
+    if (!selectedModuleValues.value.length) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "Module Selection is required.", life: 3000 })
+    }
+    if (!formulationNameInput.value || !selectedModuleValues.value.length) {
+      return;
+    }
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[3];
+    e.click(); 
+}
+
+const goPrevTab = () => {
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[1];
+    e.click();
 }
 
 </script>
@@ -332,5 +342,10 @@ h1 {
 .slothLable {
   text-align: right;
   width: 120px;
+}
+
+#FormulationBottomButtons {
+  height: 54px;
+  width: 100%;
 }
 </style>

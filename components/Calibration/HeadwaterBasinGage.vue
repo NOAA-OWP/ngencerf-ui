@@ -89,7 +89,28 @@
         </div>
       </div>
     </div>
+    <div class="grid grid-rows-1" id="HBCbuttons">
+      <div id="HBGBottomButtons" class="grid grid-cols-8">
+        <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
+          <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
+            Save
+          </button>
+        </div>
+        <div class="col-span-1 mr-3">
+          <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
+            aria-label="Reset Button">Reset</button>
+        </div>
+        <div class="col-span-4">&nbsp;</div>
+        <div class="col-span-1">&nbsp;</div>
+        <div class="col-span-1 mr-4">
+          <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next" @click="goNextTab()">Next</button></div>
+        </div>
+
+      </div>
+    </div>
   </div>
+
+
   <div class="waitgif" v-if="isLoading">
     <img src="@/assets/styles/img/wait.gif" />
   </div>
@@ -121,55 +142,7 @@ const isLoading = ref(true);
 onMounted(() => {
   toast.removeAllGroups();
   isLoading.value = false;
-  /**
- * event bus for calibration button group click
- */
-  useListen('calibrationButtonSaveStart', (actionButton) => {
-    if (getCalibrationTabIndex() == 2 && actionButton == 'SAVE') {
-      toast.removeAllGroups()
-      const save_tab_response = saveGageTabData()
-
-      save_tab_response.then((response) => {
-        if (response?.validation_errors) {
-          useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-            toast.add({ severity: "error", summary: 'Error Saving Gage Tab Data', detail: message })
-          })
-        } else {
-          toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 })
-          fetchUserCalibrationRunData()
-        }
-      })
-    }
-  })
-
-  useListen('calibrationButtonResetCancel', (actionButton) => {
-    if (getCalibrationTabIndex() == 2 && actionButton == 'RESET') {
-      resetUserSelectionGage()
-    }
-  })
-
-  useListen('calibrationButtonNext', (actionButton) => {
-    if (getCalibrationTabIndex() == 2 && actionButton === "NEXT") {
-      if (!selectedDomainValue.value) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Domain is required.", life: 3000 })
-      }
-      if (!!selectedGageValue.value) {
-        toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Gage is required.", life: 3000 })
-      }
-      if (!selectedDomainValue.value || !selectedGageValue.value) {
-        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: "Please select a Domain and Gage", life: 3000 })
-        return;
-      }
-      gotoNext();
-    }
-  })
 })
-
-onUnmounted(() => {
-  emitterOff('calibrationButtonSaveStart');
-  emitterOff('calibrationButtonResetCancel');
-  emitterOff('calibrationButtonNext');
-});
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
@@ -295,6 +268,41 @@ const selected_rfc = ref<string>("")
 const toggle_isNWMv3 = () => {
 
 }
+
+const saveTabData = () => {
+    toast.removeAllGroups();
+    const save_tab_response = saveGageTabData();
+    save_tab_response.then((response) => {
+      if (response?.validation_errors) {
+        useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
+          toast.add({ severity: "error", summary: 'Error Saving Gage Tab Data', detail: message });
+        })
+      } else {
+        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 });
+        fetchUserCalibrationRunData()
+      }
+    })
+
+};
+
+const resetTabData = () => {
+    resetUserSelectionGage();
+};
+
+const goNextTab = () => {
+    if (!selectedDomainValue.value) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Domain is required.", life: 3000 });
+    }
+    if (!!selectedGageValue.value) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Gage is required.", life: 3000 });
+    }
+    if (!selectedDomainValue.value || !selectedGageValue.value) {
+      toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: "Please select a Domain and Gage", life: 3000 });
+      return;
+    }
+    gotoNext();
+};
+
 </script>
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
@@ -325,5 +333,10 @@ const toggle_isNWMv3 = () => {
       }
     }
   }
+}
+
+#HBCbuttons {
+  height: 54px;
+  width: 100%;
 }
 </style>

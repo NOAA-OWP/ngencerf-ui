@@ -1,25 +1,6 @@
 <template>
   <div id="Footer" class=" prevent-select cursor-default">
-    <div class="grid grid-rows-2 gap-1">
-      <div class="row-span-1">
-        <div class="grid grid-cols-3">
-          <div class="col-span-2">
-
-            <span v-if="location.name === 'Calibration' && getCalibrationTabIndex() > 1">
-              <div id="ActionButtons" class="footerColor" v-if="canDisplayBeforeRun">
-                <CalibrationButtonGroup />
-              </div>
-            </span>
-
-            <span v-else-if="location.name !== 'Calibration'">
-              <div id="ActionButtons" class="footerColor" v-if="canDisplayBeforeRun">
-                <EvaluationButtonGroup />
-              </div>
-            </span>
-          </div>
-        </div>
-      </div>
-
+    <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor">
         <div id="FooterData" class="version">
           Version {{ info.program_info.version }},&nbsp;&nbsp;{{

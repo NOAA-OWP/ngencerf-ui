@@ -119,6 +119,29 @@
          <br clear="all">
          <br clear="all">
       </div>
+
+      <div class="grid grid-rows-1" id="OptMetbuttons">
+         <div id="OptMetBottomButtons" class="grid grid-cols-8">
+            <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
+               <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()">
+                  Save
+               </button>
+            </div>
+            <div class="col-span-1 mr-3">
+            </div>
+            <div class="col-span-4">&nbsp;</div>
+            <div class="col-span-1">
+               <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+                     aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
+            </div>
+            <div class="col-span-1 mr-4">
+               <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button"
+                     aria-label="Next Tab Button" @click="goNextTab()">Next</button></div>
+            </div>
+
+         </div>
+      </div>
+
       <div class="waitgif" v-if="optimizationStore_data_loading">
          <img src="@/assets/styles/img/wait.gif" />
       </div>
@@ -167,62 +190,6 @@ const showMetricStreamFlow = ref<boolean>(false)
 
 onMounted(() => {
    toast.removeAllGroups();
-   /**
- * event bus for calibration button group click
- */
-   useListen('calibrationButtonSaveStart', (actionButton) => {
-      if (getCalibrationTabIndex() === 5 && actionButton == 'SAVE') {
-         toast.removeAllGroups()
-         const save_optimization_response = saveOptimizationTabData()
-         save_optimization_response.then((response) => {
-            if (response?.validation_errors) {
-               useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-                  toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: message })
-               })
-            } else {
-               toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message, life: 3000 })
-               fetchUserCalibrationRunData()
-            }
-         })
-      }
-   })
-
-   useListen('calibrationButtonResetCancel', (actionButton) => {
-      if (getCalibrationTabIndex() == 4 && actionButton == 'RESET') {
-         resetUserSelectionOptimization()
-      }
-   })
-
-   useListen('calibrationButtonNext', (actionButton) => {
-      if (getCalibrationTabIndex() == 5 && actionButton === "NEXT") {
-         if (!uiOptimization.value) {
-            toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
-         }
-         if (!uiObjectiveFunction.value) {
-            toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
-         }
-         if (!uiOptimization.value || !uiObjectiveFunction.value) {
-            setTimeout(() => gotoNext(), 3000);
-         }
-         gotoNext();
-      }
-   });
-
-   useListen('calibrationButtonPrev', (actionButton) => {
-      if (getCalibrationTabIndex() == 5 && actionButton === "PREV") {
-         const tabs = document.getElementsByClassName("tabs");
-         const e = <HTMLElement>tabs[3];
-         e.click();
-      }
-   });
-
-})
-
-onUnmounted(() => {
-  emitterOff('calibrationButtonSaveStart');
-  emitterOff('calibrationButtonResetCancel');
-  emitterOff('calibrationButtonPrev');
-  emitterOff('calibrationButtonNext');
 })
 
 /**
@@ -320,6 +287,44 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
       cbIsEvenBased.value = true
    }
 })
+
+
+/**
+* event bus for calibration button group click
+*/
+const saveOptMetData = () => {
+   toast.removeAllGroups()
+   const save_optimization_response = saveOptimizationTabData()
+   save_optimization_response.then((response) => {
+      if (response?.validation_errors) {
+         useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
+            toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: message })
+         })
+      } else {
+         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message, life: 3000 })
+         fetchUserCalibrationRunData()
+      }
+   })
+};
+
+const goNextTab = () => {
+   if (!uiOptimization.value) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
+   }
+   if (!uiObjectiveFunction.value) {
+      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
+   }
+   if (!uiOptimization.value || !uiObjectiveFunction.value) {
+      setTimeout(() => gotoNext(), 3000);
+   }
+   gotoNext();
+};
+
+const goPrevTab = () => {
+   const tabs = document.getElementsByClassName("tabs");
+   const e = <HTMLElement>tabs[3];
+   e.click();
+};
 
 </script>
 
