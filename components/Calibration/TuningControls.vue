@@ -188,7 +188,7 @@
                   optionValue="name">
                 </Select>
                 <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
-                  <button @click="addParameterToTable" :disabled="!isFormulationDataSaved()">Add</button>
+                  <button @click="addCalibrationTuningParameter" :disabled="!isFormulationDataSaved()">Add</button>
                 </div>
                 <div v-if="!isFormulationDataSaved()" class="overlay"></div>
               </div>
@@ -198,7 +198,11 @@
         </div>
 
         <div id="TuningDataList" class="mt-5" style="position: relative;">
-          <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px">
+          <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
+            :model="cmTuningParameterData"></ContextMenu>
+          <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px"
+            v-model:selection="selectedTuningParamaterData" selectionMode="single" contextMenu 
+            v-model:contextMenuSelection="selectedTuningParamaterData" @rowContextmenu="onRowContextMenu" >
             <!-- parameter column, uneditable with light grey background -->
             <Column field="parameter" header="Parameter" sortable>
               <template #body="slotProps">
@@ -309,6 +313,16 @@ const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isInitialSetupDone = ref(false);
+const selectedTuningParamaterData = ref();
+const tuningContextMenu = ref();
+
+const cmTuningParameterData = ref([
+  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteCalibrationTuningParameter(selectedTuningParamaterData) }
+]);
+
+const onRowContextMenu = (event: any) => {
+  tuningContextMenu.value.show(event.originalEvent);
+};
 
 onMounted(async () => {
   toast.removeAllGroups();
@@ -741,7 +755,7 @@ const handleFileUpload = async (event: Event) => {
 /**
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
-const addParameterToTable = () => {
+const addCalibrationTuningParameter = () => {
   const parameter = calibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
   const isParameterAlreadyInTable = userCalibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
 
@@ -784,6 +798,13 @@ const updateCalibrationTuningParameter = (index: number, field: string, ev: Even
 };
 
 /**
+ * Delete Calibration Tuning Parameter from the table
+ */
+const deleteCalibrationTuningParameter = (selectedTuningParamaterData: any) => {
+  userCalibrationTuningParameters.value = userCalibrationTuningParameters.value.filter((param: any) => param.name !== selectedTuningParamaterData.value.name);
+};
+
+/**
  * Handle automatic validation checkbox change
  */
 const AutoValChecked = () => {
@@ -812,7 +833,7 @@ const areCalibrationTimesValidated = (fullValidation: boolean = true): boolean =
 
   // check if calibration_times are not set
   if (fullValidation && (!isValidDateTime(simStartTime.value) || !isValidDateTime(simEndTime.value) || !isValidDateTime(calStartTime.value) || !isValidDateTime(calEndTime.value))) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'all calibration_times must be set'});
+    // toast.add({ severity: 'warn', summary: 'Warning', detail: 'all calibration_times must be set'});
     return false;
   }
 
@@ -875,7 +896,7 @@ const areValidationTimesValidated = (): boolean => {
   // check if automatic_validation is enabled and validation_times are not set
   if (automatic_validation.value) {
     if (!isValidDateTime(avSimStartTime.value) || !isValidDateTime(avSimEndTime.value) || !isValidDateTime(avCalStartTime.value) || !isValidDateTime(avCalEndTime.value)) {
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set'});
+      // toast.add({ severity: 'warn', summary: 'Warning', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set'});
       return false;
     }
   }
