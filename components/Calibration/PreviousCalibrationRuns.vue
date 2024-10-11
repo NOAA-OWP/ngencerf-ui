@@ -59,7 +59,7 @@ import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
 const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
 const { loadOptimizationTabStaticData, optimizationStore_data_loading } = useOptimizationStore();
-const { fetchTuningTabData, tuningStore_data_loading } = useTuningStore();
+const { loadTuningTabStaticData, tuningStore_data_loading } = useTuningStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData,
@@ -104,7 +104,7 @@ const loadEntireRun = () => {
   nextTick(() => {
     loadGageTabStaticData();
     loadFormulationTabStaticData();
-    fetchTuningTabData();
+    loadTuningTabStaticData();
     loadOptimizationTabStaticData();
     isLoading.value = false;
     gotoRunStatusTab();
@@ -146,7 +146,7 @@ const gotoHeadwaterBasinGage = () => {
   nextTick(() => {
     loadGageTabStaticData();
     loadFormulationTabStaticData();
-    fetchTuningTabData();
+    loadTuningTabStaticData();
     loadOptimizationTabStaticData();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[1];
