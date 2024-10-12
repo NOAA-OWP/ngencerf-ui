@@ -1,5 +1,5 @@
 <template>
-  <div id="Formulation" class="ml-6">
+  <div id="Formulation" class="w-full">
     <div class="grid grid-rows-7 pt-4 text-sm">
       <div class="row-span-5">
         <div class="grid grid-cols-8">
@@ -126,7 +126,7 @@
       </div>
 
 
-      <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-2">
+      <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3">
         <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
           <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
             Save

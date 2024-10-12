@@ -2,26 +2,26 @@
   <!-- LeftBlock.vue -->
   <div>
     <CommonTabs @tabNumber="tabChanged" />
-    <div class="shrink-0">
-      <span v-if="activeTab == 1">
-        <CalibrationCalibrationRunsTab />
-      </span> <span v-if="activeTab == 2">
-        <CalibrationHeadwaterBasinGage />
-      </span>
-      <span v-else-if="activeTab == 3">
-        <CalibrationFormulation />
-      </span>
-      <span v-else-if="activeTab == 4">
-        <CalibrationTuningControls />
-      </span>
-      <span v-else-if="activeTab == 5">
-        <CalibrationOptimizationMetrics />
-      </span>
-      <span v-else-if="activeTab == 6">
-        <CalibrationRunStatus />
-      </span>
-    </div>
+
+    <span v-if="activeTab == 1">
+      <CalibrationCalibrationRunsTab />
+    </span> <span v-if="activeTab == 2">
+      <CalibrationHeadwaterBasinGage />
+    </span>
+    <span v-else-if="activeTab == 3">
+      <CalibrationFormulation />
+    </span>
+    <span v-else-if="activeTab == 4">
+      <CalibrationTuningControls />
+    </span>
+    <span v-else-if="activeTab == 5">
+      <CalibrationOptimizationMetrics />
+    </span>
+    <span v-else-if="activeTab == 6">
+      <CalibrationRunStatus />
+    </span>
   </div>
+
 </template>
 
 <script setup lang="ts">

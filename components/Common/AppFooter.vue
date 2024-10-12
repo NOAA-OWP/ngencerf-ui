@@ -37,23 +37,6 @@ const canDisplayBeforeRun = computed(() => {
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";
 
-#ActionButtons {
-  width: Calc(100% - 70px);
-  background: transparent;
-  /*border: 1px solid black;*/
-  margin-left: 20px;
-  margin-top: -20px;
-  background-color: white;
-  padding-top: 10px;
-  height: 54px;
-}
-
-.ActionButtons-bg-mask {
-  height: 54px;
-  display: block;
-  width: 100%;
-}
-
 #Footer {
   font: 18px NeueFrutigerWorld-Book, sans-serif;
   position: absolute;

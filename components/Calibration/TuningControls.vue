@@ -1,6 +1,6 @@
 <template>
-  <div id="TuningControls pl-8" class="pl-4">
-    <div class="w-full mt-3 mb-2">
+  <div id="TuningControls" class="w-full">
+    <div class="mt-3 mb-2">
       <div v-if="rangeDateFrom && rangeDateTo" class="w-full text-left mt-1 text-xl c-blue-primary1 font-bold"
         id="RangeDates">
         RANGE: {{ format(rangeDateFrom) }} GMT to {{ format(rangeDateTo) }} GMT
@@ -231,7 +231,7 @@
         </div>
       </div>
 
-      <div class="grid grid-rows-1 pt-2" id="Tuningbuttons">
+      <div class="grid grid-rows-1 mt-8" id="Tuningbuttons">
         <div id="TuningBottomButtons" class="grid grid-cols-8">
           <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
             <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()">

@@ -1,22 +1,31 @@
 <template>
-  <div id="HeadwaterBasinGage" class="w-full mt-4">
-    <div id="GageSettings" class="mt-5">
-      <div class="grid grid-rows-2">
-        <div class="row-span-2 selRow">
+  <div id="HeadwaterBasinGage" class="w-full">
+    <div id="GageSettings" class="mt-4">
+      <div class="grid grid-rows-8 gap-6">
+
+        <div class="row-span-1">
+
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
-              <label for="Domain">Domain:</label><br />
-              <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
-                optionValue="name" placeholder=" ... " class="w-full"></Select>
+              <div class="col-span-1">
+                <label for="Domain">Domain:</label><br />
+                <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
+                  optionValue="name" placeholder=" ... " class="w-full"></Select>
+              </div>
             </div>
+
             <div class="col-span-1">
               <label for="Gage">Gage:</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
                 @change="onGageSelectionChange" class="w-full"></Select>
             </div>
-            <div class="col-span-1">&nbsp;<!--empty space used for layout--></div>
 
+            <div class="col-span-1">&nbsp;</div>
+          </div>
+        </div>
+        <div class="row-span-1">
+          <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
               <label for="Forcing">Forcing:</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
@@ -35,20 +44,16 @@
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
                 optionValue="name" placeholder=" ... " class="w-full"
                 @change="uploadGeopackageDlgOpen($event)"></Select>
-            </div>
-
-          </div>
-
-          <div class="row-span-1 mt-4">
-            <div class="grid grid-cols-10">
-              <div class="col-span-4"></div>
 
             </div>
           </div>
-          <DynamicDialog />
 
+        </div>
+        <DynamicDialog />
+
+        <div class="row-span-5">
           <div id="GageReport" v-if="gageData" class="text-sm inline ml-0">
-            <div id="GrBox" class="mt-6">
+            <div id="GrBox" class="mt-5">
               <table class="table-auto">
                 <tbody>
                   <tr v-if="selectedDomainValue" class="rowOdd">
@@ -81,39 +86,39 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
 
-              <br clear="all" />
-              <br clear="all" />
-              <br clear="all" />
+        </div>
+
+        <div class="row-span-1 mt-4">
+          <div class="grid grid-cols-8">
+            <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
+              <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
+                Save
+              </button>
+            </div>
+            <div class="col-span-1 mr-3">
+              <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
+                aria-label="Reset Button">Reset</button>
+            </div>
+            <div class="col-span-4">&nbsp;</div>
+            <div class="col-span-1">&nbsp;</div>
+            <div class="col-span-1 mr-4">
+              <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next"
+                  @click="goNextTab()">Next</button></div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="grid grid-rows-1" id="HBCbuttons">
-      <div id="HBGBottomButtons" class="grid grid-cols-8">
-        <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
-          <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
-            Save
-          </button>
-        </div>
-        <div class="col-span-1 mr-3">
-          <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
-            aria-label="Reset Button">Reset</button>
-        </div>
-        <div class="col-span-4">&nbsp;</div>
-        <div class="col-span-1">&nbsp;</div>
-        <div class="col-span-1 mr-4">
-          <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next" @click="goNextTab()">Next</button></div>
-        </div>
 
       </div>
+
     </div>
-  </div>
 
 
-  <div class="waitgif" v-if="isLoading">
-    <img src="@/assets/styles/img/wait.gif" />
+    <div class="waitgif" v-if="isLoading">
+      <img src="@/assets/styles/img/wait.gif" />
+    </div>
   </div>
 
 </template>
@@ -271,37 +276,37 @@ const toggle_isNWMv3 = () => {
 }
 
 const saveTabData = () => {
-    toast.removeAllGroups();
-    const save_tab_response = saveGageTabData();
-    save_tab_response.then((response) => {
-      if (response?.validation_errors) {
-        useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-          toast.add({ severity: "error", summary: 'Error Saving Gage Tab Data', detail: message });
-        })
-      } else {
-        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 });
-        fetchUserCalibrationRunData()
-      }
-    })
+  toast.removeAllGroups();
+  const save_tab_response = saveGageTabData();
+  save_tab_response.then((response) => {
+    if (response?.validation_errors) {
+      useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
+        toast.add({ severity: "error", summary: 'Error Saving Gage Tab Data', detail: message });
+      })
+    } else {
+      toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 });
+      fetchUserCalibrationRunData()
+    }
+  })
 
 };
 
 const resetTabData = () => {
-    resetUserSelectionGage();
+  resetUserSelectionGage();
 };
 
 const goNextTab = () => {
-    if (!selectedDomainValue.value) {
-      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Domain is required.", life: 3000 });
-    }
-    if (!!selectedGageValue.value) {
-      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Gage is required.", life: 3000 });
-    }
-    if (!selectedDomainValue.value || !selectedGageValue.value) {
-      toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: "Please select a Domain and Gage", life: 3000 });
-      return;
-    }
-    gotoNext();
+  if (!selectedDomainValue.value) {
+    toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Domain is required.", life: 3000 });
+  }
+  if (!!selectedGageValue.value) {
+    toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Gage is required.", life: 3000 });
+  }
+  if (!selectedDomainValue.value || !selectedGageValue.value) {
+    toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: "Please select a Domain and Gage", life: 3000 });
+    return;
+  }
+  gotoNext();
 };
 
 </script>
@@ -312,7 +317,7 @@ const goNextTab = () => {
   table {
     border: 1px solid #ccc;
     width: auto;
-    margin: 6vh auto;
+    margin: 0 auto;
 
     tr {
       line-height: 27px;
