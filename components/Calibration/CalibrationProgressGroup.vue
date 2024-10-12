@@ -122,7 +122,7 @@ const {
   simEndTime,
   calStartTime,
   calEndTime,
-  userCalibrationTuningParameters,
+  userSelectedCalibrationTuningParameters,
   userOutputVariableToCalibrate,
   avSimStartTime,
   avSimEndTime,

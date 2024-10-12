@@ -200,13 +200,13 @@
         <div id="TuningDataList" class="mt-5" style="position: relative;">
           <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
             :model="cmTuningParameterData"></ContextMenu>
-          <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px"
+          <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
             v-model:selection="selectedTuningParamaterData" selectionMode="single" contextMenu 
             v-model:contextMenuSelection="selectedTuningParamaterData" @rowContextmenu="onRowContextMenu" >
             <!-- parameter column, uneditable with light grey background -->
             <Column field="parameter" header="Parameter" sortable>
               <template #body="slotProps">
-                <span style="background-color: lightgrey; padding: 4px; display: block;">
+                <span style="padding: 4px; display: block;">
                   {{ slotProps.data.name }}
                 </span>
               </template>
@@ -291,7 +291,8 @@ const {
   simEndTime,
   calStartTime,
   calEndTime,
-  userCalibrationTuningParameters,
+  calibrationTuningParameters,
+  userSelectedCalibrationTuningParameters,
   userOutputVariableToCalibrate,
   outputVariables,
   automatic_validation,
@@ -305,7 +306,6 @@ const {
 
 const toast = useToast();
 const calibrationTuningModules = ref<any>();
-const calibrationTuningParameters = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -326,111 +326,113 @@ onMounted(async () => {
 
   // fetch user calibration data
   await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
+  console.log("userCalibrationRunData:", userCalibrationRunData.value);
   
+  console.log("loadTuningTabData before fetch from Tuning tab:", loadTuningTabData?.value);
+
   // if Tuning Tab static data is not loaded, fetch it
-  console.log("loadTuningTabData:", loadTuningTabData?.value);
   if (loadTuningTabData?.value?._data?.modules.length === 0) {
     console.log("fetching Tuning Tab data");
     await loadTuningTabStaticData();
+    console.log("loadTuningTabData after fetch from Tuning tab:", loadTuningTabData.value);
   } else {
-    console.log("Tuning Tab data already loaded");
+    console.log("Tuning Tab data already loaded. No need to fetch");
   }
+
+  // set time range
+  const timeRange = loadTuningTabData.value?._data?.time_range;
+  // check if timeRange is provided and not empty
+  if (timeRange?.start_time && timeRange?.end_time) {
+    rangeDateFrom.value = timeRange?.start_time;
+    rangeDateTo.value = timeRange?.end_time;
+    console.log("rangeDateFrom:", rangeDateFrom.value);
+    console.log("rangeDateTo:", rangeDateTo.value);
+  } else {
+    // time_range is not set. Cannot proceed
+    toast.add({ severity: 'warn', summary: 'Time Range not set', detail: 'Must set Forcing and Observational data before proceeding' });
+  }
+
   calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
   console.log("calibrationTuningModules:", calibrationTuningModules.value);
 
   if (calibrationTuningModules?.value.length > 0) {
-    // set calibration tuning parameters dropdown
-    calibrationTuningParameters.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
-      name: param.name,
-      minimum: param.minimum,
-      maximum: param.maximum,
-      initial_value: param.initial_value,
-      user_selected_for_tuning: param.user_selected_for_tuning,
-      module: module.name,
-    }))) || [];
-    // console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
+    // set calibration tuning parameters dropdown if not already set
+    if (!calibrationTuningParameters.value || calibrationTuningParameters.value.length === 0) {
+      calibrationTuningParameters.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
+        name: param.name,
+        minimum: param.minimum,
+        maximum: param.maximum,
+        initial_value: param.initial_value,
+        user_selected_for_tuning: param.user_selected_for_tuning,
+        module: module.name,
+      }))) || [];
+      console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
+    }
 
-    // set calibration tuning parameters data table with user-selected parameters but without the user_selected_for_tuning flag
-    userCalibrationTuningParameters.value = calibrationTuningParameters.value?.filter((param: any) => param?.user_selected_for_tuning)?.map((param: any) => ({
-      name: param.name,
-      minimum: param.minimum,
-      maximum: param.maximum,
-      initial_value: param.initial_value,
-      module: param.module,
-    })) || [];
-    console.log("userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
+    // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
+    if (!userSelectedCalibrationTuningParameters.value || userSelectedCalibrationTuningParameters.value.length === 0) {
+      userSelectedCalibrationTuningParameters.value = calibrationTuningParameters.value?.filter((param: any) => param?.user_selected_for_tuning)?.map((param: any) => ({
+        name: param.name,
+        minimum: param.minimum,
+        maximum: param.maximum,
+        initial_value: param.initial_value,
+        module: param.module,
+      })) || [];
+      console.log("userSelectedCalibrationTuningParameters:", userSelectedCalibrationTuningParameters.value);
+    }
 
-    // set output variables
-    outputVariables.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
-      name: outputVar.name,
-      description: outputVar.description,
-      module: module.name,
-    }))) || [];
+    // set output variables if not already set
+    if (!outputVariables.value || outputVariables.value.length === 0) {
+      outputVariables.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
+        name: outputVar.name,
+        description: outputVar.description,
+        module: module.name,
+      }))) || [];
+      console.log("outputVariables:", outputVariables.value);
+    }
   } else {
     toast.add({ severity: 'warn', summary: 'Tuning Modules not loaded', detail: 'Must save Formulation data before proceeding' });
   }
-
-  // console.log("outputVariables:", outputVariables.value);
-
-  // console.log("loadTuningTabData:", loadTuningTabData?.value._data);
-  // console.log("userCalibrationRunData:", userCalibrationRunData.value);
-  // console.log("calibration_times:", userCalibrationRunData.value?.calibration_times);
-  // console.log("validation_times:", userCalibrationRunData.value?.validation_times);
-  // console.log("time_range:", userCalibrationRunData.value?.time_range);
 
   // set calibration times
   if (userCalibrationRunData?.value?.calibration_times) {
     const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
 
-    simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
-    // console.log("simStartTime:", simStartTime.value);
-
-    simEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
-    // console.log("simEndTime:", simEndTime.value);
-
-    calStartTime.value = DateTime.fromISO(calibration_start_time, { zone: 'utc' });
-    // console.log("calStartTime:", calStartTime.value);
-
-    calEndTime.value = DateTime.fromISO(calibration_end_time, { zone: 'utc' });
-    // console.log("calEndTime:", calEndTime.value);
+    // set calibration times only if they are not already set
+    // if a user purposely removes all times, they will be reset to the default values. Is that what we want?
+    if (!isValidDateTime(simStartTime.value) && !isValidDateTime(simEndTime.value) && !isValidDateTime(calStartTime.value) && !isValidDateTime(calEndTime.value)) {
+      simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+      simEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+      calStartTime.value = DateTime.fromISO(calibration_start_time, { zone: 'utc' });
+      calEndTime.value = DateTime.fromISO(calibration_end_time, { zone: 'utc' });
+    }
   };
 
   // set automatic validation times
   if (userCalibrationRunData?.value?.validation_times) {
     const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
 
-    avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
-    // console.log("avSimStartTime:", avSimStartTime.value);
-
-    avSimEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
-    // console.log("avSimEndTime:", avSimEndTime.value);
-
-    avCalStartTime.value = DateTime.fromISO(validation_start_time, { zone: 'utc' });
-    // console.log("avCalStartTime:", avCalStartTime.value);
-
-    avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
-    // console.log("avCalEndTime:", avCalEndTime.value);
+    // set automatic validation times only if they are not already set
+    // if a user purposely removes all times, they will be reset to the default values. Is that what we want?
+    if (!isValidDateTime(avSimStartTime.value) && !isValidDateTime(avSimEndTime.value) && !isValidDateTime(avCalStartTime.value) && !isValidDateTime(avCalEndTime.value)) {
+      avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+      avSimEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+      avCalStartTime.value = DateTime.fromISO(validation_start_time, { zone: 'utc' });
+      avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
+    }
   };
-
-  // set time range
-  const timeRange = userCalibrationRunData?.value?.time_range;
-  // check if timeRange is provided and not empty
-  if (timeRange?.start_time && timeRange?.end_time) {
-    rangeDateFrom.value = timeRange?.start_time;
-    rangeDateTo.value = timeRange?.end_time;
-  } else {
-    // time_range is not set. Cannot proceed
-    toast.add({ severity: 'warn', summary: 'Time Range not set', detail: 'Must set Forcing and Observational data before proceeding' });
-  }
 
   // set ouput variable to calibrate
   if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
     console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
     const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
-    userOutputVariableToCalibrate.value.name = name;
-    userOutputVariableToCalibrate.value.module = module;
-    selectedOutputVariable.value = userOutputVariableToCalibrate.value;
-    // console.log('selectedOutputVariable:', selectedOutputVariable.value);
+
+    // set output variable to calibrate only if it is not already set
+    if (!selectedOutputVariable.value || (!selectedOutputVariable?.value.name && !selectedOutputVariable?.value.module)) {
+      userOutputVariableToCalibrate.value.name = name;
+      userOutputVariableToCalibrate.value.module = module;
+      selectedOutputVariable.value = userOutputVariableToCalibrate.value;
+    }
   };
 
   isInitialSetupDone.value = true; // set to true after initial setup
@@ -646,17 +648,9 @@ watch(selectedOutputVariable, () => {
 
 // watch for changes to simStartTime. If simStartTime is set, set calStartTime to one year after simStartTime
 watch(simStartTime, () => {
-  // console.log('watch simStartTime called');
-  // console.log('typeof simStartTime:', typeof simStartTime.value);
-  // console.log('simStartTime:', simStartTime.value);
-  const simStartTimeString = simStartTime.value.toISO();
-  // console.log('simStartTimeString:', simStartTimeString);
-
   if ((!calStartTime.value || !isValidDateTime(calStartTime.value)) && simStartTime.value && isValidDateTime(simStartTime.value)) {
     calStartTime.value = simStartTime.value.plus({ years: 1 }); // set calStartTime to one year after simStartTime
     // console.log('calStartTime:', calStartTime.value);
-    const calStartTimeString = calStartTime.value.toISO();
-    // console.log('calStartTimeString:', calStartTimeString);
   }
   else if ((!calStartTime.value || !isValidDateTime(calStartTime.value)) && simStartTime.value && typeof simStartTime.value === 'string') {
     // console.log('simStartTime.value is a string. This should not happen'); // the simStartTime binding might call this watch function when it is a string. ooof.
@@ -668,17 +662,9 @@ watch(simStartTime, () => {
 
 // watch for changes to avSimStartTime. If avSimStartTime is set, set avCalStartTime to one year after avSimStartTime
 watch(avSimStartTime, () => {
-  // console.log('watch avSimStartTime called');
-  // console.log('typeof avSimStartTime:', typeof avSimStartTime.value);
-  // console.log('avSimStartTime:', avSimStartTime.value);
-  const avSimStartTimeString = avSimStartTime.value.toISO();
-  // console.log('avSimStartTimeString:', avSimStartTimeString);
-
   if ((!avCalStartTime.value || !isValidDateTime(avCalStartTime.value)) && avSimStartTime.value && isValidDateTime(avSimStartTime.value)) {
     avCalStartTime.value = avSimStartTime.value.plus({ years: 1 });
     // console.log('avCalStartTime:', avCalStartTime.value);
-    const avCalStartTimeString = avCalStartTime.value.toISO();
-    // console.log('avCalStartTimeString:', avCalStartTimeString);
   }
   else if ((!avCalStartTime.value || !isValidDateTime(avCalStartTime.value)) && avSimStartTime.value && typeof avSimStartTime.value === 'string') {
     // console.log('avSimStartTime.value is a string. This should not happen'); // the avSimStartTime binding might call this watch function when it is a string. ooof.
@@ -725,7 +711,7 @@ const handleFileUpload = async (event: Event) => {
         // Populate the Parameter table with the data from user-uploaded file
         response._data?.user_parameter_file?.forEach((param: any) => {
           if (param.param && param.min && param.max && param.init && param.model) {
-            userCalibrationTuningParameters?.value?.push({
+            userSelectedCalibrationTuningParameters?.value?.push({
               name: param.param,
               minimum: param.min,
               maximum: param.max,
@@ -754,11 +740,11 @@ const handleFileUpload = async (event: Event) => {
  */
 const addCalibrationTuningParameter = () => {
   const parameter = calibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
-  const isParameterAlreadyInTable = userCalibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
+  const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
 
   // add parameter to table if it is not already in the table
   if (!isParameterAlreadyInTable && parameter) {
-    userCalibrationTuningParameters?.value?.push({
+    userSelectedCalibrationTuningParameters?.value?.push({
       name: parameter.name,
       minimum: parameter.minimum,
       maximum: parameter.maximum,
@@ -777,11 +763,11 @@ const addCalibrationTuningParameter = () => {
 const updateCalibrationTuningParameter = (index: number, field: string, ev: Event) => {
   const valEv = ev.target as HTMLInputElement;
   const value = valEv?.value;
-  // update userCalibrationTuningParameters with the new value
-  userCalibrationTuningParameters.value[index][field] = value;
+  // update userSelectedCalibrationTuningParameters with the new value
+  userSelectedCalibrationTuningParameters.value[index][field] = value;
 
   // update calibrationTuningParameters with the new value
-  const parameter = calibrationTuningParameters?.value?.find(param => param.name === userCalibrationTuningParameters.value[index].name);
+  const parameter = calibrationTuningParameters?.value?.find(param => param.name === userSelectedCalibrationTuningParameters.value[index].name);
   if (parameter) {
     if (field === 'minimum') {
       parameter.minimum = value;
@@ -798,7 +784,7 @@ const updateCalibrationTuningParameter = (index: number, field: string, ev: Even
  * Delete Calibration Tuning Parameter from the table
  */
 const deleteCalibrationTuningParameter = (selectedTuningParamaterData: any) => {
-  userCalibrationTuningParameters.value = userCalibrationTuningParameters.value.filter((param: any) => param.name !== selectedTuningParamaterData.value.name);
+  userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters.value.filter((param: any) => param.name !== selectedTuningParamaterData.value.name);
 };
 
 /**
@@ -819,18 +805,22 @@ const isTuningTabDataValidated = () => {
 
 /**
  * Validate calibration_times
- * @param fullValidation If true, perform full validation. If false, perform partial validation
  */
-const areCalibrationTimesValidated = (fullValidation: boolean = true): boolean => {
+const areCalibrationTimesValidated = (): boolean => {
   // check if time_range is not set
-  if (fullValidation && (!rangeDateFrom.value || !rangeDateTo.value)) {
+  if (!rangeDateFrom.value || !rangeDateTo.value) {
     toast.add({ severity: 'warn', summary: 'Warning', detail: 'time_range must be set' });
     return false;
   }
 
-  // check if calibration_times are not set
-  if (fullValidation && (!isValidDateTime(simStartTime.value) || !isValidDateTime(simEndTime.value) || !isValidDateTime(calStartTime.value) || !isValidDateTime(calEndTime.value))) {
-    // toast.add({ severity: 'warn', summary: 'Warning', detail: 'all calibration_times must be set'});
+  // check if all calibration_times are not set
+  if (!isValidDateTime(simStartTime.value) && !isValidDateTime(simEndTime.value) && !isValidDateTime(calStartTime.value) && !isValidDateTime(calEndTime.value)) {
+    return false;
+  } 
+
+  // check if calibration_times are incomplete
+  if (!isValidDateTime(simStartTime.value) || !isValidDateTime(simEndTime.value) || !isValidDateTime(calStartTime.value) || !isValidDateTime(calEndTime.value)) {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration times cannot be saved if they are incomplete'});
     return false;
   }
 
@@ -890,12 +880,15 @@ const areValidationTimesValidated = (): boolean => {
     return true;
   }
 
-  // check if automatic_validation is enabled and validation_times are not set
-  if (automatic_validation.value) {
-    if (!isValidDateTime(avSimStartTime.value) || !isValidDateTime(avSimEndTime.value) || !isValidDateTime(avCalStartTime.value) || !isValidDateTime(avCalEndTime.value)) {
-      // toast.add({ severity: 'warn', summary: 'Warning', detail: 'If Automatic Validation is enabled, Validation Times Controls must be set'});
-      return false;
-    }
+  // check if all validation_times are not set
+  if (!isValidDateTime(avSimStartTime.value) && !isValidDateTime(avSimEndTime.value) && !isValidDateTime(avCalStartTime.value) && !isValidDateTime(avCalEndTime.value)) {
+    return false;
+  }
+
+  // check if validation_times are incomplete
+  if (!isValidDateTime(avSimStartTime.value) || !isValidDateTime(avSimEndTime.value) || !isValidDateTime(avCalStartTime.value) || !isValidDateTime(avCalEndTime.value)) {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Validation times cannot be saved if they are incomplete'});
+    return false;
   }
 
   // convert times to Date objects
@@ -962,7 +955,7 @@ const areValidationTimesValidated = (): boolean => {
  */
 const areParametersValidated = (): boolean => {
   // check if no Calibration Tuning Parameters have been added TODO: add more parameter validation checks here. e.g. check if min < max, etc.
-  if (userCalibrationTuningParameters.value.length === 0) {
+  if (userSelectedCalibrationTuningParameters.value.length === 0) {
     // toast.add({ severity: 'warn', summary: 'Warning', detail: 'At least one Calibration Tuning Parameter must be added' });
     return false;
   }

@@ -44,7 +44,7 @@ const {
   simEndTime,
   calStartTime,
   calEndTime,
-  userCalibrationTuningParameters,
+  userSelectedCalibrationTuningParameters,
   userOutputVariableToCalibrate,
 } = storeToRefs(tuningStore);
 
@@ -71,7 +71,7 @@ const CalibrationProgress = [
     content: "Calibration Output Variable"
   },
   {
-    vif: userCalibrationTuningParameters.value.length,
+    vif: userSelectedCalibrationTuningParameters.value.length,
     title: "Parameters",
     content: "Parameters"
   },
