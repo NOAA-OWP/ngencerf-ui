@@ -1,6 +1,6 @@
 <template>
   <div id="ResultPage">
-    <div class="grid grid-rows-12">
+    <div class="grid grid-rows-10">
       <div class="row-span-2">
         <div id="ResultsDisplay">
           <div class="grid grid-cols-2">
@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <div class="row-span-10">
+      <div class="row-span-8">
         <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
           <img :src="selectedPlotFileUrl" alt="Image" />
         </div>
@@ -60,30 +60,44 @@
         </div>
       </div>
 
-      <div class="row-span-1">
+      <!-- <div class="row-span-1">
         <div id="ResultsArea" class="row-span-1" v-if="calibrationStatus === 'Done'">
           <button class="ngenButtonDiv">Go to Evaluation</button>
         </div>
-      </div>
+      </div> -->
     </div>
-    <div class="grid grid-rows-1" id="HBCbuttons">
-      <div id="StausRunBottomButtons" class="grid grid-cols-8">
-        <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
-          <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
-            Run
-          </button>
-        </div>
-        <div class="col-span-1 mr-3">
-          <button class="c-blue font-normal text-xl underline pt-1" title="Cancel Button" @click="cancelRun()"
-            aria-label="Cancel Button">Cancel</button>
-        </div>
-        <div class="col-span-4">&nbsp;</div>
-        <div class="col-span-1">&nbsp;</div>
-        <div class="col-span-1 mr-4">
-        </div>
-      </div>
 
+
+    <div class="grid grid-rows-1" id="HBCbuttons">
+      <div class="row-span-1">
+          <span v-if="calibrationStatus === 'Done'">
+          <div id="ResultsArea" class="ngenButtonDiv row-span-1">
+            <button class="font-normal">Go to Evaluation</button>
+          </div>
+          <div class="col-span-7">&nbsp;</div>
+        </span>
+
+        <span v-else>
+          <div id="StausRunBottomButtons" class="grid grid-cols-8">
+            <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
+              <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
+                Run
+              </button>
+            </div>
+            <div class="col-span-1 mr-3">
+              <button class="c-blue font-normal text-xl underline pt-1" title="Cancel Button" @click="cancelRun()"
+                aria-label="Cancel Button">Cancel</button>
+            </div>
+            <div class="col-span-4">&nbsp;</div>
+            <div class="col-span-1">&nbsp;</div>
+            <div class="col-span-1 mr-4">
+            </div>
+          </div>
+        </span>
+      </div>
     </div>
+
+
     <div class="waitgif" v-if="isLoading">
       <img src="@/assets/styles/img/wait.gif" />
     </div>

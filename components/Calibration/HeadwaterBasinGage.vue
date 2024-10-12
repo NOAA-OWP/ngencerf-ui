@@ -46,6 +46,7 @@
             </div>
           </div>
           <DynamicDialog />
+
           <div id="GageReport" v-if="gageData" class="text-sm inline ml-0">
             <div id="GrBox" class="mt-6">
               <table class="table-auto">

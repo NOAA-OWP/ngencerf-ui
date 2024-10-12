@@ -13,8 +13,7 @@
           <div class="col-span-2">
             <div id="BoxLeft" class="text-left">
               <div id="BoxTopLeft" class="pt-2">
-                <small>* All times entered must be in GMT</small><br>
-                <span class="tabTitles font-bold">Calibration Time Controls</span>
+                <span class="tabTitles font-bold">Calibration Time Controls <span class="font-normal"><small>(* All times entered must be in GMT)</small></span></span>
               </div>
               <div id="BoxBottomLeft" class="pt-2">
                 <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
@@ -147,43 +146,19 @@
         <div class="row-span-1 text-left">
           <div class="grid grid-cols-2">
 
-            <div class="col-span-2">
+            <div class="col-span-1">
               <div class="mt-6 mb-3 hr"></div>
               <div class="mb-2 font-bold">Output Variable To Calibrate</div>
-              <div class="mt-2 text-sm" style="position: relative;">
+              <div class="mt-2 text-sm">
                 <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable"
                   :disabled="!isFormulationDataSaved()" :options="outputVariables" optionLabel="name">
-                  <!-- <template #optiongroup="slotProps">
-                        <div class="flex items-left">
-                          <div>{{ slotProps.option.name }} </div>
-                        </div>
-                      </template> -->
                 </Select>
                 <div v-if="!isFormulationDataSaved()" class="overlay"></div>
               </div>
-            </div>
 
-            <div class="col-span-2">
-              <div class="mt-5 mb-3 hr"></div>
-              <div class="text-left">
-                <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
-                <div class="inline-block text-left text-sm"><label for="ParamFile">Parameters File (optional):</label>
-                </div><br />
-                <!-- <br />
-                  <Select id="ParamFile" class="varInputs inline-block mt-2 text-sm">
-                    <option value="" selected disabled>...</option>                    
-                  </Select> -->
-                <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
-                  <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-                  <button @click="triggerFileInput" :disabled="!isFormulationDataSaved()">Load</button>
-                  <div v-if="!isFormulationDataSaved()" class="overlay"></div>
-                </div>
-              </div>
-
-              <div class="text-left mt-3 text-sm" style="position: relative;">
-                <div class="inline-block text-left"><label for="ParamName">Calibratable Parameters:</label></div>
-                <br />
-                <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter"
+              <div class="text-left mt-2">
+                <div class="font-bold">Calibratable Parameters:</div>
+                <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
                   :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="name"
                   optionValue="name">
                 </Select>
@@ -192,12 +167,27 @@
                 </div>
                 <div v-if="!isFormulationDataSaved()" class="overlay"></div>
               </div>
+
+            </div>
+
+            <div class="col-span-1">
+              <div class="mt-5 mb-3 hr"></div>
+
+              <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
+              <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
+                <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+                <button @click="triggerFileInput" :disabled="!isFormulationDataSaved()">Load Parameters File
+                  (optional)</button>
+                <div v-if="!isFormulationDataSaved()" class="overlay"></div>
+              </div>
+
+
             </div>
 
           </div>
         </div>
 
-        <div id="TuningDataList" class="mt-5" style="position: relative;">
+        <div id="TuningDataList" class="mt-2 mb-2" style="position: relative;">
           <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
             :model="cmTuningParameterData"></ContextMenu>
           <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px"
@@ -241,7 +231,7 @@
         </div>
       </div>
 
-      <div class="grid grid-rows-1" id="Tuningbuttons">
+      <div class="grid grid-rows-1 pt-2" id="Tuningbuttons">
         <div id="TuningBottomButtons" class="grid grid-cols-8">
           <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
             <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()">
@@ -959,5 +949,9 @@ const goNextTab = () => {
   background-color: rgba(255, 255, 255, 0);
   cursor: not-allowed;
   z-index: 10;
+}
+
+.p-select-width {
+  width: 100%;
 }
 </style>
