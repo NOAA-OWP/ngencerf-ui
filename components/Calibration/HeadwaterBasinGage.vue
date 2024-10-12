@@ -256,7 +256,7 @@ const showGeopackageFileUploadDialog = (headerText: string) => {
 
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[2];
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_formulation];
   e.click();
 }
 

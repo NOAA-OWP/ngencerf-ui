@@ -860,7 +860,7 @@ const isOutputVariableValidated = (): boolean => {
 
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[4];
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_optimizationMetrics];
   e.click();
 }
 
@@ -901,7 +901,7 @@ const saveTuningData = () => {
 
 const goPrevTab = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[2];
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_formulation];
   e.click();
 };
 

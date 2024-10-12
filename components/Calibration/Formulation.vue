@@ -1,24 +1,20 @@
 <template>
   <div id="Formulation" class="ml-6">
-
-    <div class="grid grid-rows-12 pt-4 text-sm">
-      <div class="grid row-span-1">
+    <div class="grid grid-rows-10 pt-4 text-sm">
+      <div class="row-span-6">
         <div class="grid grid-cols-8">
           <div class="col-span-8">
-            <div id="FormulationName" class="block mt-2" aria-label="Forumulation Name" title="Formulation Name">
-              <label for="formulationNameInput">Forumulation Name:</label>
-            </div>
+            <div id="FormulationName" class="block mt-1" aria-label="Forumulation Name" title="Formulation Name">
+              <span >Forumulation Name: </span>           
             <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
               aria-label="Input Forumulation Name" title="Input Formulation Name" required></InputText>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="row-span-5">
         <div class="mb-2 hr"></div>
         <div class="grid grid-cols-12">
           <div class="col-span-5">
-            <div class="text-left text-lg"><strong>Formulation Modules</strong></div>
+            <div class="text-left text-lg mt-2"><strong>Formulation Modules</strong></div>
             <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
 
               <div class="font-bold">Groups Filter
@@ -40,7 +36,7 @@
           <div class="col-span-2">&nbsp;</div>
           <div class="col-span-5">
             <div class="group-cover-selection-wrapper w-80 float-left">
-              <div class="mt-2 mb-2 pl-4 text-lg" aria-label="List of groups covered by selection"
+              <div class="mt-4 mb-2 pl-4 text-lg" aria-label="List of groups covered by selection"
                 title="List of groups covered by selection"><strong>Groups Covered By Selections:</strong></div>
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
                 optionValue="name" scrollHeight="18rem" class="w-full border-0">
@@ -55,7 +51,7 @@
         </div>
         <div class="mt-3 mb-5 hr"></div>
       </div>
-      <div class="row-span-6">
+      <div class="row-span-4">
         <div>
           <div class="flex">
             <span class="text-left pt-1">
@@ -253,13 +249,13 @@ const goNextTab = () => {
       return;
     }
     const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[3];
+    const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
     e.click(); 
 }
 
 const goPrevTab = () => {
     const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[1];
+    const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
     e.click();
 }
 

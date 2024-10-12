@@ -257,7 +257,7 @@ const optimizationSelectChange = () => {
 
 const gotoNext = () => {
    const tabs = document.getElementsByClassName("tabs");
-   const e = <HTMLElement>tabs[5];
+   const e = <HTMLElement>tabs[CalibrationTabs.tab_statusRun];
    e.click();
 }
 
@@ -322,7 +322,7 @@ const goNextTab = () => {
 
 const goPrevTab = () => {
    const tabs = document.getElementsByClassName("tabs");
-   const e = <HTMLElement>tabs[3];
+   const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
    e.click();
 };
 

@@ -18,8 +18,6 @@
 
 <script lang="ts" setup>
 import json from "@/assets/versionInfo.json";
-import CalibrationButtonGroup from "../Calibration/CalibrationButtonGroup.vue";
-import EvaluationButtonGroup from "../Evaluation/EvaluationButtonGroup.vue";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRoute } from "vue-router";
