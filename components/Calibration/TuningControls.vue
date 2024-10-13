@@ -798,13 +798,48 @@ const AutoValChecked = () => {
 
 /**
  * Validate all Tuning tab data before saving
+ * Calibration and Validation times must either be fully set or empty (not partially set) to be valid
+ * @returns boolean
  */
 const isTuningTabDataValidated = () => {
-  return areCalibrationTimesValidated() || areValidationTimesValidated() || areParametersValidated() || isOutputVariableValidated();
+  return (areCalibrationTimesFullySetOrEmpty() && areValidationTimesFullySetOrEmpty()) && (areCalibrationTimesValidated() || areValidationTimesValidated() || areParametersValidated() || isOutputVariableValidated());
+};
+
+/**
+ * Check if all calibration times are set or empty
+ * @returns boolean
+ */
+const areCalibrationTimesFullySetOrEmpty = (): boolean => {
+  const areCalibrationTimesFullySet: boolean = isValidDateTime(simStartTime.value) && isValidDateTime(simEndTime.value) && isValidDateTime(calStartTime.value) && isValidDateTime(calEndTime.value);
+  const areCalibrationTimesEmpty: boolean = !isValidDateTime(simStartTime.value) && !isValidDateTime(simEndTime.value) && !isValidDateTime(calStartTime.value) && !isValidDateTime(calEndTime.value);
+  
+  if (areCalibrationTimesFullySet || areCalibrationTimesEmpty) {
+    return true;
+  } else {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration times must be fully set or left empty' });
+    return false;
+  }
+};
+
+/**
+ * Check if all validation times are set or empty
+ * @returns boolean
+ */
+const areValidationTimesFullySetOrEmpty = (): boolean => {
+  const areValidationTimesFullySet: boolean = isValidDateTime(avSimStartTime.value) && isValidDateTime(avSimEndTime.value) && isValidDateTime(avCalStartTime.value) && isValidDateTime(avCalEndTime.value);
+  const areValidationTimesEmpty: boolean = !isValidDateTime(avSimStartTime.value) && !isValidDateTime(avSimEndTime.value) && !isValidDateTime(avCalStartTime.value) && !isValidDateTime(avCalEndTime.value);
+  
+  if (areValidationTimesFullySet || areValidationTimesEmpty) {
+    return true;
+  } else {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Validation times must be fullly set or left empty' });
+    return false;
+  }
 };
 
 /**
  * Validate calibration_times
+ * @returns boolean
  */
 const areCalibrationTimesValidated = (): boolean => {
   // check if time_range is not set
@@ -815,12 +850,6 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if all calibration_times are not set
   if (!isValidDateTime(simStartTime.value) && !isValidDateTime(simEndTime.value) && !isValidDateTime(calStartTime.value) && !isValidDateTime(calEndTime.value)) {
-    return false;
-  } 
-
-  // check if calibration_times are incomplete
-  if (!isValidDateTime(simStartTime.value) || !isValidDateTime(simEndTime.value) || !isValidDateTime(calStartTime.value) || !isValidDateTime(calEndTime.value)) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration times cannot be saved if they are incomplete'});
     return false;
   }
 
@@ -873,6 +902,7 @@ const areCalibrationTimesValidated = (): boolean => {
 
 /**
  * Validate validation_times
+ * @returns boolean
  */
 const areValidationTimesValidated = (): boolean => {
   // check if automatic_validation is not enabled
@@ -882,12 +912,6 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if all validation_times are not set
   if (!isValidDateTime(avSimStartTime.value) && !isValidDateTime(avSimEndTime.value) && !isValidDateTime(avCalStartTime.value) && !isValidDateTime(avCalEndTime.value)) {
-    return false;
-  }
-
-  // check if validation_times are incomplete
-  if (!isValidDateTime(avSimStartTime.value) || !isValidDateTime(avSimEndTime.value) || !isValidDateTime(avCalStartTime.value) || !isValidDateTime(avCalEndTime.value)) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Validation times cannot be saved if they are incomplete'});
     return false;
   }
 
@@ -952,6 +976,7 @@ const areValidationTimesValidated = (): boolean => {
 
 /**
  * Validate parameters
+ * @returns boolean
  */
 const areParametersValidated = (): boolean => {
   // check if no Calibration Tuning Parameters have been added TODO: add more parameter validation checks here. e.g. check if min < max, etc.
@@ -965,6 +990,7 @@ const areParametersValidated = (): boolean => {
 
 /**
  * Validate output_variable_to_calibrate
+ * @returns boolean
  */
 const isOutputVariableValidated = (): boolean => {
   // check if Output Variable to Calibrate is set
