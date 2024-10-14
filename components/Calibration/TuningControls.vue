@@ -365,9 +365,6 @@ onMounted(async () => {
     rangeDateTo.value = timeRange?.end_time;
     console.log("rangeDateFrom:", rangeDateFrom.value);
     console.log("rangeDateTo:", rangeDateTo.value);
-  } else {
-    // time_range is not set. Cannot proceed
-    toast.add({ severity: 'warn', summary: 'Time Range not set', detail: 'Must set Forcing and Observational data before proceeding' });
   }
 
   calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
@@ -408,8 +405,6 @@ onMounted(async () => {
       }))) || [];
       console.log("outputVariables:", outputVariables.value);
     }
-  } else {
-    toast.add({ severity: 'warn', summary: 'Tuning Modules not loaded', detail: 'Must save Formulation data before proceeding', life: 5000 });
   }
 
   // set calibration times
@@ -987,7 +982,7 @@ const goNextTab = () => {
   if(!(userCalibrationRunData?.value?.output_variable_to_calibrate?.module)) {
     txt += "\nNo Output Varialbe to calibration"
   }
-  if(!(userCalibrationRunData?.value?.parameters_selected?.module)) {
+  if(!(userCalibrationRunData?.value?.parameters_selected)) {
     txt += "\nNo Paramters selected"
   }
 
