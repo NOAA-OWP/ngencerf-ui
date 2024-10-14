@@ -315,20 +315,20 @@ const saveOptMetData = () => {
 };
 
 const goNextTab = () => {
-   let err = false;
-   let txt = "Please correct the following:";
-   if (!uiOptimization.value) {
-      txt += "\nAll Calibration Times are required.";
-      err = true;
-   }
-   if (!uiObjectiveFunction.value) {
-      txt += "\nAll Automatic Validation Times are required."
-      err = true;
-   }
-   if (err) {
-      toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-      return;
-   }
+   // let err = false;
+   // let txt = "Please correct the following:";
+   // if (!uiOptimization.value) {
+   //    txt += "\nAll Calibration Times are required.";
+   //    err = true;
+   // }
+   // if (!uiObjectiveFunction.value) {
+   //    txt += "\nAll Automatic Validation Times are required."
+   //    err = true;
+   // }
+   // if (err) {
+   //    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
+   //    return;
+   // }
    gotoNext();
 };
 

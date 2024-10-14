@@ -961,37 +961,37 @@ const goPrevTab = () => {
 };
 
 const goNextTab = () => {
-  let err = false;
-  let txt = "Please correct the following:";
-  if (!(userCalibrationRunData.value?.calibration_times.calibration_end_time &&
-    userCalibrationRunData.value?.calibration_times.calibration_start_time &&
-    userCalibrationRunData.value?.calibration_times.simulation_end_time &&
-    userCalibrationRunData.value?.calibration_times.simulation_start_time)) {
-    txt += "\nAll Calibration Times are required.";
-    err = true;
-  }
-  if (!(userCalibrationRunData.value?.validation_times.simulation_end_time &&
-    userCalibrationRunData.value?.validation_times.simulation_start_time &&
-    userCalibrationRunData.value?.validation_times.validation_end_time &&
-    userCalibrationRunData.value?.validation_times.validation_start_time)) {
-    txt += "\nAll Automatic Validation Times are required."
-    err = true;
-  }
-  if (!userOutputVariableToCalibrate.value.name) {
-    txt += "\nNo Output Variable selected."
-    err = true;
-  }
-  if(!(userCalibrationRunData?.value?.output_variable_to_calibrate?.module)) {
-    txt += "\nNo Output Varialbe to calibration"
-  }
-  if(!(userCalibrationRunData?.value?.parameters_selected)) {
-    txt += "\nNo Paramters selected"
-  }
+  // let err = false;
+  // let txt = "Please correct the following:";
+  // if (!(userCalibrationRunData.value?.calibration_times.calibration_end_time &&
+  //   userCalibrationRunData.value?.calibration_times.calibration_start_time &&
+  //   userCalibrationRunData.value?.calibration_times.simulation_end_time &&
+  //   userCalibrationRunData.value?.calibration_times.simulation_start_time)) {
+  //   txt += "\nAll Calibration Times are required.";
+  //   err = true;
+  // }
+  // if (!(userCalibrationRunData.value?.validation_times.simulation_end_time &&
+  //   userCalibrationRunData.value?.validation_times.simulation_start_time &&
+  //   userCalibrationRunData.value?.validation_times.validation_end_time &&
+  //   userCalibrationRunData.value?.validation_times.validation_start_time)) {
+  //   txt += "\nAll Automatic Validation Times are required."
+  //   err = true;
+  // }
+  // if (!userOutputVariableToCalibrate.value.name) {
+  //   txt += "\nNo Output Variable selected."
+  //   err = true;
+  // }
+  // if(!(userCalibrationRunData?.value?.output_variable_to_calibrate?.module)) {
+  //   txt += "\nNo Output Varialbe to calibration"
+  // }
+  // if(!(userCalibrationRunData?.value?.parameters_selected?.module)) {
+  //   txt += "\nNo Paramters selected"
+  // }
 
-  if (err) {
-    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-    return;
-  }
+  // if (err) {
+  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
+  //   return;
+  // }
   gotoNext();
 };
 
