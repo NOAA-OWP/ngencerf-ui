@@ -312,32 +312,32 @@ const resetTabData = () => {
 };
 
 const goNextTab = () => {
-  let err = false;
-  let txt = "Please correct the following:";
-  if (!selectedDomainValue.value) {
-    txt += "\nA Domain is required.";
-    err = true;
-  }
-  if (!selectedGageValue.value) {
-    txt += "\nA Gage is required."
-    err = true;
-  }
-  if (!userCalibrationRunData?.value?.external_data_status?.forcing) {
-    txt += "\nForcing files missing"
-    err = true;
-  }
-  if (!userCalibrationRunData?.value?.external_data_status?.observational) {
-    txt += "\nGeopackage file is missing"
-    err = true;
-  }
-  if (!userCalibrationRunData?.value?.external_data_status?.geopackage) {
-    txt += "\nGeopackage file is missing"
-    err = true;
-  }
-  if(err) {
-    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life:5000 });
-    return;
-  }
+  // let err = false;
+  // let txt = "Please correct the following:";
+  // if (!selectedDomainValue.value) {
+  //   txt += "\nA Domain is required.";
+  //   err = true;
+  // }
+  // if (!selectedGageValue.value) {
+  //   txt += "\nA Gage is required."
+  //   err = true;
+  // }
+  // if (!userCalibrationRunData?.value?.external_data_status?.forcing) {
+  //   txt += "\nForcing files missing"
+  //   err = true;
+  // }
+  // if (!userCalibrationRunData?.value?.external_data_status?.observational) {
+  //   txt += "\nGeopackage file is missing"
+  //   err = true;
+  // }
+  // if (!userCalibrationRunData?.value?.external_data_status?.geopackage) {
+  //   txt += "\nGeopackage file is missing"
+  //   err = true;
+  // }
+  // if(err) {
+  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life:5000 });
+  //   return;
+  // }
   gotoNext();
 };
 

@@ -260,20 +260,33 @@ const resetFormulationData = () => {
 }
 
 const goNextTab = () => {
-  let err = false;
-  let txt = "Please correct the following:";
-  if (!userCalibrationRunData?.formulation_name ) {
-    txt += "\nA Formulation Name is required.";
-    err = true;
-  }
-  if (!userCalibrationRunData?.modules.length ) {
-    txt += "\nModule Selection is required."
-    err = true;
-  }
-  if (err) {
-    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-    return;
-  }
+  // let err = false;
+  // let txt = "Please correct the following:";
+  // if (!userCalibrationRunData?.formulation_name ) {
+  //   txt += "\nA Formulation Name is required.";
+  //   err = true;  // let err = false;
+  // let txt = "Please correct the following:";
+  // if (!userCalibrationRunData?.formulation_name ) {
+  //   txt += "\nA Formulation Name is required.";
+  //   err = true;
+  // }
+  // if (!userCalibrationRunData?.modules.length ) {
+  //   txt += "\nModule Selection is required."
+  //   err = true;
+  // }
+  // if (err) {
+  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
+  //   return;
+  // }
+  // }
+  // if (!userCalibrationRunData?.modules.length ) {
+  //   txt += "\nModule Selection is required."
+  //   err = true;
+  // }
+  // if (err) {
+  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
+  //   return;
+  // }
   gotoNext();
 }
 
