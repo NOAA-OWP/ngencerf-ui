@@ -644,8 +644,9 @@ const handleFileUpload = async (event: Event) => {
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
 const addCalibrationTuningParameter = () => {
-  const parameter = calibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
-  const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
+  console.log("selectedParameter:", selectedParameter.value);
+  const parameter = calibrationTuningParameters?.value?.find(param => param.output === selectedParameter.value);
+  const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.find(param => param.name === parameter.name);
 
   // add parameter to table if it is not already in the table
   if (!isParameterAlreadyInTable && parameter) {
