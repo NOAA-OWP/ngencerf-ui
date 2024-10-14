@@ -123,32 +123,30 @@
          </div>
          <div class="row-span-1 h-1rem hr">&nbsp;</div>
       </div>
-
-
-            <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6">
-               <span v-if="calibrationStatus !== 'Running'">
-               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                  <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()">
-                     Save
-                  </button>
-               </div>
-               </span>
-               <span v-else>
-                  <div class="col-span-1 mr-6 h-8">&nbsp;</div>                  
-               </span>
-               <div class="col-span-1 mr-3">
-               </div>
-               <div class="col-span-4">&nbsp;</div>
-               <div class="col-span-1">
-                  <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-                        aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
-               </div>
-               <div class="col-span-1 mr-4">
-                  <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button"
-                        aria-label="Next Tab Button" @click="goNextTab()">Next</button></div>
-               </div>
-
+      <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6">
+         <span v-if="calibrationStatus !== 'Running'">
+            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+               <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()">
+                  Save
+               </button>
             </div>
+         </span>
+         <span v-else>
+            <div class="col-span-1 mr-6 h-8">&nbsp;</div>
+         </span>
+         <div class="col-span-1 mr-3">
+         </div>
+         <div class="col-span-4">&nbsp;</div>
+         <div class="col-span-1">
+            <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+                  aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
+         </div>
+         <div class="col-span-1 mr-4">
+            <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+                  @click="goNextTab()">Next</button></div>
+         </div>
+
+      </div>
 
    </div>
 </template>
@@ -317,14 +315,19 @@ const saveOptMetData = () => {
 };
 
 const goNextTab = () => {
+   let err = false;
+   let txt = "Please correct the following:";
    if (!uiOptimization.value) {
-      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
+      txt += "\nAll Calibration Times are required.";
+      err = true;
    }
    if (!uiObjectiveFunction.value) {
-      toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
+      txt += "\nAll Automatic Validation Times are required."
+      err = true;
    }
-   if (!uiOptimization.value || !uiObjectiveFunction.value) {
-      setTimeout(() => gotoNext(), 3000);
+   if (err) {
+      toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
+      return;
    }
    gotoNext();
 };

@@ -123,9 +123,7 @@
             </Column>
           </DataTable>
         </div>
-
       </div>
-
 
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3">
         <span v-if="calibrationStatus !== 'Running'">
@@ -205,7 +203,7 @@ const {
 } = storeToRefs(useFormulationStore());
 
 const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
-const { fetchUserCalibrationRunData } = useUserDataStore()
+const { fetchUserCalibrationRunData, userCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore();
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 const runStatusStore = useRunStatusStore();
@@ -262,20 +260,28 @@ const resetFormulationData = () => {
 }
 
 const goNextTab = () => {
-  if (!formulationNameInput.value) {
-    toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Forumulation Name is required.", life: 3000 })
+  let err = false;
+  let txt = "Please correct the following:";
+  if (!userCalibrationRunData?.formulation_name ) {
+    txt += "\nA Formulation Name is required.";
+    err = true;
   }
-  if (!selectedModuleValues.value.length) {
-    toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "Module Selection is required.", life: 3000 })
+  if (!userCalibrationRunData?.modules.length ) {
+    txt += "\nModule Selection is required."
+    err = true;
   }
-  if (!formulationNameInput.value || !selectedModuleValues.value.length) {
+  if (err) {
+    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
     return;
   }
+  gotoNext();
+}
+
+const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
   e.click();
 }
-
 const goPrevTab = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
