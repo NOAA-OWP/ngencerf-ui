@@ -155,7 +155,7 @@
           <div class="text-left mt-2">
             <div class="font-bold">Calibratable Parameters:</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
-              :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters">
+              :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="name" optionValue="name" >
               <template #option="slotProps">
                 <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
               </template>
@@ -949,7 +949,7 @@ const saveTuningData = () => {
  * Reset Tuning Tab data
  */
   const resetTuningData = () => {
-  hardResetTuningStore();
+  // hardResetTuningStore(); // disable for now
 };
 
 const goPrevTab = () => {

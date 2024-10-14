@@ -143,8 +143,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
     avSimEndTime.value = "";
     avCalStartTime.value = "";
     avCalEndTime.value = "";
-    rangeDateFrom.value = null;
-    rangeDateTo.value = null;
     console.log("Tuning Store Reset")
   };
 
