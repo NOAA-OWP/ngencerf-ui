@@ -134,6 +134,7 @@
 </template>
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import type { UserCalibrationRunData } from "~/composables/NextGenModel";
 import { onMounted, onUnmounted } from "vue";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
@@ -145,6 +146,8 @@ import type { SelectChangeEvent } from "primevue/select";
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 const runStatusStore = useRunStatusStore();
 const { calibrationStatus } = storeToRefs(runStatusStore);
+const userDataStore = useUserDataStore();
+const { userCalibrationRunData } = storeToRefs(userDataStore);
 
 const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
@@ -309,18 +312,35 @@ const resetTabData = () => {
 };
 
 const goNextTab = () => {
+  let err = false;
+  let txt = "Please correct the following:";
   if (!selectedDomainValue.value) {
-    toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Domain is required.", life: 3000 });
+    txt += "\nA Domain is required.";
+    err = true;
   }
-  if (!!selectedGageValue.value) {
-    toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "A Gage is required.", life: 3000 });
+  if (!selectedGageValue.value) {
+    txt += "\nA Gage is required."
+    err = true;
   }
-  if (!selectedDomainValue.value || !selectedGageValue.value) {
-    toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: "Please select a Domain and Gage", life: 3000 });
+  if (!userCalibrationRunData?.value?.external_data_status?.forcing) {
+    txt += "\nForcing files missing"
+    err = true;
+  }
+  if (!userCalibrationRunData?.value?.external_data_status?.observational) {
+    txt += "\nGeopackage file is missing"
+    err = true;
+  }
+  if (!userCalibrationRunData?.value?.external_data_status?.geopackage) {
+    txt += "\nGeopackage file is missing"
+    err = true;
+  }
+  if(err) {
+    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life:5000 });
     return;
   }
   gotoNext();
 };
+
 
 </script>
 <style lang="scss" scoped>
