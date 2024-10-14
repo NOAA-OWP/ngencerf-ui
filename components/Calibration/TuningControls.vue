@@ -155,7 +155,7 @@
           <div class="text-left mt-2">
             <div class="font-bold">Calibratable Parameters:</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
-              :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="name" optionValue="name" >
+              :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="output" optionValue="output" >
               <template #option="slotProps">
                 <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
               </template>
@@ -380,6 +380,7 @@ onMounted(async () => {
         initial_value: param.initial_value,
         user_selected_for_tuning: param.user_selected_for_tuning,
         module: module.name,
+        output: `${param.name} (${module.name})`,
       }))) || [];
       console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
     }
