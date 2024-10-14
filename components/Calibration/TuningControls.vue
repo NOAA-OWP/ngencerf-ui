@@ -556,7 +556,7 @@ watch(selectedOutputVariable, () => {
   console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
 });
 
-// watch for changes to simStartTime. If simStartTime is set, set calStartTime to one year after simStartTime
+// watch for changes to simStartTime. If simStartTime is set, set calStartTime to one year after simStartTime if not already set
 watch(simStartTime, () => {
   if ((!calStartTime.value || !isValidDateTime(calStartTime.value)) && simStartTime.value && isValidDateTime(simStartTime.value)) {
     calStartTime.value = simStartTime.value.plus({ years: 1 }); // set calStartTime to one year after simStartTime
@@ -568,7 +568,18 @@ watch(simStartTime, () => {
   }
 });
 
-// watch for changes to avSimStartTime. If avSimStartTime is set, set avCalStartTime to one year after avSimStartTime
+// watch for changes to simEndTime. If simEndTime is set, set calEndTime to be the same as simEndTime if not already set
+watch(simEndTime, () => {
+  if ((!calEndTime.value || !isValidDateTime(calEndTime.value)) && simEndTime.value && isValidDateTime(simEndTime.value)) {
+    calEndTime.value = simEndTime.value;
+  }
+  else if ((!calEndTime.value || !isValidDateTime(calEndTime.value)) && simEndTime.value && typeof simEndTime.value === 'string') {
+    const simEndDateTime = DateTime.fromISO(simEndTime.value, { zone: 'utc' });
+    calEndTime.value = simEndDateTime.value;
+  }
+});
+
+// watch for changes to avSimStartTime. If avSimStartTime is set, set avCalStartTime to one year after avSimStartTime if not already set
 watch(avSimStartTime, () => {
   if ((!avCalStartTime.value || !isValidDateTime(avCalStartTime.value)) && avSimStartTime.value && isValidDateTime(avSimStartTime.value)) {
     avCalStartTime.value = avSimStartTime.value.plus({ years: 1 });
@@ -576,6 +587,17 @@ watch(avSimStartTime, () => {
   else if ((!avCalStartTime.value || !isValidDateTime(avCalStartTime.value)) && avSimStartTime.value && typeof avSimStartTime.value === 'string') {
     const avSimStartDateTime = DateTime.fromISO(avSimStartTime.value, { zone: 'utc' });
     avCalStartTime.value = avSimStartDateTime.value.plus({ years: 1 });
+  }
+});
+
+// watch for changes to avSimEndTime. If avSimEndTime is set, set avCalEndTime to be the same as avSimEndTime if not already set
+watch(avSimEndTime, () => {
+  if ((!avCalEndTime.value || !isValidDateTime(avCalEndTime.value)) && avSimEndTime.value && isValidDateTime(avSimEndTime.value)) {
+    avCalEndTime.value = avSimEndTime.value;
+  }
+  else if ((!avCalEndTime.value || !isValidDateTime(avCalEndTime.value)) && avSimEndTime.value && typeof avSimEndTime.value === 'string') {
+    const avSimEndDateTime = DateTime.fromISO(avSimEndTime.value, { zone: 'utc' });
+    avCalEndTime.value = avSimEndDateTime.value;
   }
 });
 
