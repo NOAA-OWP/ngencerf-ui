@@ -70,7 +70,7 @@
 
     <div class="grid grid-rows-1" id="HBCbuttons">
       <div class="row-span-1">
-          <span v-if="calibrationStatus === 'Done'">
+        <span v-if="calibrationStatus === 'Done'">
           <div id="ResultsArea" class="ngenButtonDiv row-span-1">
             <button class="font-normal">Go to Evaluation</button>
           </div>
