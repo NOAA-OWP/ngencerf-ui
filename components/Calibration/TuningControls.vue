@@ -151,7 +151,7 @@
               <div class="mb-2 font-bold">Output Variable To Calibrate</div>
               <div class="mt-2 text-sm">
                 <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable"
-                  :disabled="!isFormulationDataSaved()" :options="outputVariables" optionLabel="name">
+                  :disabled="!isFormulationDataSaved()" :options="outputVariables" optionLabel="name" optionValue="name" >
                 </Select>
                 <div v-if="!isFormulationDataSaved()" class="overlay"></div>
               </div>
@@ -439,10 +439,10 @@ onMounted(async () => {
     const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
 
     // set output variable to calibrate only if it is not already set
-    if (!selectedOutputVariable.value || (!selectedOutputVariable?.value.name && !selectedOutputVariable?.value.module)) {
+    if (!selectedOutputVariable.value || !selectedOutputVariable?.value.name) {
       userOutputVariableToCalibrate.value.name = name;
       userOutputVariableToCalibrate.value.module = module;
-      selectedOutputVariable.value = userOutputVariableToCalibrate.value;
+      selectedOutputVariable.value = userOutputVariableToCalibrate.value.name;
     }
   };
 
@@ -542,11 +542,11 @@ const handleAvCalEndUpdate = (value: any) => {
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
   // find module for newly-selected output variable
-  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === selectedOutputVariable?.value.name));
+  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === selectedOutputVariable?.value));
 
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
-    name: selectedOutputVariable?.value.name,
+    name: selectedOutputVariable?.value,
     module: module?.name,
   }
   console.log("selectedOutputVariable:", selectedOutputVariable.value);
