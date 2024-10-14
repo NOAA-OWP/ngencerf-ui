@@ -1,5 +1,28 @@
 <template>
-  <div id="BottomButtons" class="grid grid-cols-12 w-full">
+  <div id="BottomButtons" class="flex">
+    <div>
+      <div class="inline ngenButtonDiv bg-green mr-6" v-if="getEvaluationTabIndex() === 2">
+        <button class="font-normal">Evaluate</button>
+      </div>
+      <div class="inline mr-3 ngenButtonDiv mr-6" v-if="getEvaluationTabIndex() >= 5">
+        <button class="font-normal">Run</button>
+      </div>
+    </div>
+    <div class="inline mr-3" v-if="getEvaluationTabIndex() >= 5">
+      <button v-if="getEvaluationTabIndex() >= 5" class="c-blue font-normal underline">Cancel</button>
+    </div>
+    
+    <div class="ml-auto">
+    <!--
+	    <div class="inline ngenButtonDiv c-gray-md" v-if="getEvaluationTabIndex() === 4">
+	      <button v-if="getEvaluationTabIndex() === 4" class="prev actionBtnSmall font-normal">Prev</button>
+	    </div>
+	    <div class="inline ngenButtonDiv ml-6" v-if="getEvaluationTabIndex() === 3 || getEvaluationTabIndex() === 4">
+	    	<button v-if="getEvaluationTabIndex() === 3 || getEvaluationTabIndex() === 4"
+	        class="font-normal">Next</button>
+	    </div>
+	-->
+    </div>
 
     <div class="col-span-2">
       <span v-if="getEvaluationTabIndex() === 1">
@@ -63,55 +86,11 @@ const EvaluateSelectedCalibration = async ( e: Event ) => {
   font-weight: bold;
 }
 
-.actionBtn {
-  display: inline-block;
-  width: 95%;
-  height: 55px;
-  border: 5px solid #59b4c1;
-  border-radius: 10px;
-  margin-right: 20px;
-}
-
-.actionBtnSmall {
-  display: inline-block;
-  width: 105px;
-  height: 55px;
-  border-radius: 10px;
-  border: 3px solid #59b4c1;
-  margin-right: 3px;
-}
-
 .arrow {
   border: solid black;
   border-width: 0 3px 3px 0;
   display: inline-block;
   padding: 3px;
-}
-
-.start {
-  background-color: #155e29;
-}
-
-.stop {
-  background-color: #aa0000;
-}
-
-.save {
-  background-color: #333333;
-}
-
-.reset {
-  background-color: #000000;
-}
-
-.prev {
-  background-color: #000000;
-  display: inline-block;
-}
-
-.next {
-  background-color: #000000;
-  display: inline-block;
 }
 
 .disabled {

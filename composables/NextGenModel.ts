@@ -63,7 +63,7 @@ export interface UserCalibrationRunData {
   observational_user_filename: string;
   observational_file_path: string;
   geopackage_source: string;
-  external_data_errors: ExternalDataErrors[];
+  external_data_status: ExternalDataStatus;
   geopackage_hydrofabric_file_path: string;
   geopackage_image_url: string;
   modules: string[];
@@ -88,9 +88,10 @@ export interface UserCalibrationRunData {
   status: string;
 }
 
-export interface ExternalDataErrors {
-  name: string,
-  message: string
+export interface ExternalDataStatus {
+  observational: boolean;
+  forcing: boolean;
+  geopackage: boolean;
 }
 
 export interface UserCalibrationRunTimeRangeData {
@@ -405,9 +406,28 @@ export interface CalibrationValidationParameter {
   value: number;
 }
 
+export interface DynamicTableColumnHeader {
+  header: string;
+  colspan: number;
+  field?: string;
+}
+
 export interface DynamicTableColumn {
   field: any;
-  header: string;
+  header?: string;
+}
+
+export interface AlternativeIterationCalibrationRunData {
+  worker: string;
+  iteration: string|number;
+  objective_function_value: string;
+  [name: string]: string|number;
+}
+
+export interface AlternativeIterationTuningParameters {
+  worker: string;
+  iteration: string|number;
+  [name: string]: string|number;
 }
 
 /**

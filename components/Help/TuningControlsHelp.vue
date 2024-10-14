@@ -51,7 +51,7 @@
         </tr>
         <tr>
           <td class="td1">Calibration Tuning Parameters</td>
-          <td class="td2">Either upload from a file or select from the available calibratable parameters based on the
+          <td class="td2">Either upload from a file or select from the available calibration parameters based on the
             formulation chosen.</td>
         </tr>
         <tr>
@@ -60,11 +60,11 @@
         </tr>
         <tr>
           <td class="td1">Name:</td>
-          <td class="td2">Dropdown field of calibratable parameters.</td>
+          <td class="td2">Dropdown field of calibration parameters.</td>
         </tr>
         <tr>
           <td class="td1">Parameter Table:</td>
-          <td class="td2">Lists the calibratable parameters chosen. The source for these entries can be from the Name
+          <td class="td2">Lists the calibration parameters chosen. The source for these entries can be from the Name
             dropdown or uploaded from a file. User must supply the minimum, maximum and initial values.</td>
         </tr>
         <tr>

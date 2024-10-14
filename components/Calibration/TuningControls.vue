@@ -141,106 +141,108 @@
         </div>
       </div>
 
-      <div class="">
-        <div class="grid grid-rows-2">
 
-          <div class="row-span-1 text-left">
-            <div class="grid grid-cols-2">
+      <div class="grid grid-rows-2">
 
-              <div class="col-span-2">
-                <div class="">
-                  <div class="mt-6 mb-3 hr"></div>
-                  <div class="mb-2 font-bold">Output Variable To Calibrate</div>
-                  <div class="mt-2 text-sm" style="position: relative;">
-                    <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable"
-                      :disabled="!isFormulationDataSet()" :options="outputVariables" optionLabel="name"
-                      optionValue="name">
-                    </Select>
-                    <div v-if="!isFormulationDataSet()" class="overlay"></div>
-                  </div>
-                </div>
+        <div class="row-span-1 text-left">
+          <div class="grid grid-cols-2">
+
+            <div class="col-span-2">
+              <div class="mt-6 mb-3 hr"></div>
+              <div class="mb-2 font-bold">Output Variable To Calibrate</div>
+              <div class="mt-2 text-sm" style="position: relative;">
+                <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable"
+                  :disabled="!isFormulationDataSet()" :options="outputVariables" optionLabel="name">
+                  <!-- <template #optiongroup="slotProps">
+                        <div class="flex items-left">
+                          <div>{{ slotProps.option.name }} </div>
+                        </div>
+                      </template> -->
+                </Select>
+                <div v-if="!isFormulationDataSet()" class="overlay"></div>
               </div>
+            </div>
 
-              <div class="col-span-2">
-                <div class="mt-5 mb-3 hr"></div>
-                <div class="text-left">
-                  <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
-                  <div class="inline-block text-left text-sm"><label for="ParamFile">Parameters File (optional):</label>
-                  </div><br />
-                  <!-- <br />
+            <div class="col-span-2">
+              <div class="mt-5 mb-3 hr"></div>
+              <div class="text-left">
+                <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
+                <div class="inline-block text-left text-sm"><label for="ParamFile">Parameters File (optional):</label>
+                </div><br />
+                <!-- <br />
                   <Select id="ParamFile" class="varInputs inline-block mt-2 text-sm">
                     <option value="" selected disabled>...</option>                    
                   </Select> -->
-                  <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
-                    <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-                    <button @click="triggerFileInput" :disabled="!isFormulationDataSet()">Load</button>
-                    <div v-if="!isFormulationDataSet()" class="overlay"></div>
-                  </div>
-                </div>
-
-                <div class="text-left mt-3 text-sm" style="position: relative;">
-                  <div class="inline-block text-left"><label for="ParamName">Name:</label></div><br />
-                  <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter"
-                    :disabled="!isFormulationDataSet()" :options="calibrationTuningParameters" optionLabel="name"
-                    optionValue="name">
-                  </Select>
-                  <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
-                    <button @click="addParameterToTable" :disabled="!isFormulationDataSet()">Add</button>
-                  </div>
+                <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
+                  <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+                  <button @click="triggerFileInput" :disabled="!isFormulationDataSet()">Load</button>
                   <div v-if="!isFormulationDataSet()" class="overlay"></div>
                 </div>
               </div>
 
+              <div class="text-left mt-3 text-sm" style="position: relative;">
+                <div class="inline-block text-left"><label for="ParamName">Calibratable Parameters:</label></div>
+                <br />
+                <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter"
+                  :disabled="!isFormulationDataSet()" :options="calibrationTuningParameters" optionLabel="name"
+                  optionValue="name">
+                </Select>
+                <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
+                  <button @click="addParameterToTable" :disabled="!isFormulationDataSet()">Add</button>
+                </div>
+                <div v-if="!isFormulationDataSet()" class="overlay"></div>
+              </div>
             </div>
+
           </div>
+        </div>
 
-          <div id="TuningDataList" class="mt-5" style="position: relative;">
-            <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px">
-              <!-- parameter column, uneditable with light grey background -->
-              <Column field="parameter" header="Parameter" sortable>
-                <template #body="slotProps">
-                  <span style="background-color: lightgrey; padding: 4px; display: block;">
-                    {{ slotProps.data.name }}
-                  </span>
-                </template>
-              </Column>
+        <div id="TuningDataList" class="mt-5" style="position: relative;">
+          <DataTable :value="userCalibrationTuningParameters" scrollable scroll-height="200px">
+            <!-- parameter column, uneditable with light grey background -->
+            <Column field="parameter" header="Parameter" sortable>
+              <template #body="slotProps">
+                <span style="background-color: lightgrey; padding: 4px; display: block;">
+                  {{ slotProps.data.name }}
+                </span>
+              </template>
+            </Column>
 
-              <!-- min column, editable -->
-              <Column field="min" header="Min" sortable>
-                <template #body="slotProps">
-                  <input type="text" v-model="slotProps.data.minimum"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)"
-                    style="width: 100%;" />
-                </template>
-              </Column>
+            <!-- min column, editable -->
+            <Column field="min" header="Min" sortable>
+              <template #body="slotProps">
+                <input type="text" v-model="slotProps.data.minimum"
+                  @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;" />
+              </template>
+            </Column>
 
-              <!-- max column, editable -->
-              <Column field="max" header="Max" sortable>
-                <template #body="slotProps">
-                  <input type="text" v-model="slotProps.data.maximum"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)"
-                    style="width: 100%;" />
-                </template>
-              </Column>
+            <!-- max column, editable -->
+            <Column field="max" header="Max" sortable>
+              <template #body="slotProps">
+                <input type="text" v-model="slotProps.data.maximum"
+                  @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;" />
+              </template>
+            </Column>
 
-              <!-- initValue column, editable -->
-              <Column field="initValue" header="Initial Value" sortable>
-                <template #body="slotProps">
-                  <input type="text" v-model="slotProps.data.initial_value"
-                    @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)"
-                    style="width: 100%;" />
-                </template>
-              </Column>
-            </DataTable>
-            <div v-if="!isFormulationDataSet()" class="overlay"></div>
-          </div>
-
+            <!-- initValue column, editable -->
+            <Column field="initValue" header="Initial Value" sortable>
+              <template #body="slotProps">
+                <input type="text" v-model="slotProps.data.initial_value"
+                  @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)"
+                  style="width: 100%;" />
+              </template>
+            </Column>
+          </DataTable>
+          <div v-if="!isFormulationDataSet()" class="overlay"></div>
         </div>
 
       </div>
-    </div>
-    <div class="waitgif" v-if="isLoading">
-      <img src="@/assets/styles/img/wait.gif" />
+
+
+
+      <div class="waitgif" v-if="isLoading">
+        <img src="@/assets/styles/img/wait.gif" />
+      </div>
     </div>
   </div>
 
@@ -248,11 +250,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted , onUnmounted} from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { DateTime } from "luxon";
+import Select from "primevue/select";
 
 import { isValidDateTime } from "~/utils/CommonHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
@@ -300,6 +303,7 @@ const {
 } = storeToRefs(tuningStore);
 
 const toast = useToast();
+const calibrationTuningModules = ref<any>();
 const calibrationTuningParameters = ref<any[]>([]);
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
@@ -308,16 +312,51 @@ const isInitialSetupDone = ref(false);
 
 onMounted(async () => {
   toast.removeAllGroups();
-  // console.log('userCalibrationRunData:', userCalibrationRunData.value);
-  // console.log('loadTuningTabData:', loadTuningTabData.value);
 
-  if (!userCalibrationRunData.value || !loadTuningTabData.value) {
+  // fetch user calibration data
+  await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
+  
+  // if Tuning Tab static data is not loaded, fetch it
+  console.log("loadTuningTabData:", loadTuningTabData?.value);
+  if (loadTuningTabData?.value?._data.modules.length === 0) {
     // toast.add({ severity: 'info', summary: 'Fetching Tuning Tab Data...', detail: "Fetching Tuning Tab data...", life: 3000 });
-    await fetchTuningTabData(); // only fetch data if not already fetched
-    // console.log("automatic_validation:", automatic_validation.value);
-  } else {
-    // toast.add({ severity: 'info', summary: 'Tuning Tab Data already fetched', detail: 'Tuning Tab Data already fetched', life: 3000 });
+    await fetchTuningTabData();
   }
+  calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
+
+  if (calibrationTuningModules.value) {
+    // set calibration tuning parameters dropdown
+    calibrationTuningParameters.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
+      name: param.name,
+      minimum: param.minimum,
+      maximum: param.maximum,
+      initial_value: param.initial_value,
+      user_selected_for_tuning: param.user_selected_for_tuning,
+      module: module.name,
+    }))) || [];
+    // console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
+
+    // set calibration tuning parameters data table with user-selected parameters but without the user_selected_for_tuning flag
+    userCalibrationTuningParameters.value = calibrationTuningParameters.value?.filter((param: any) => param?.user_selected_for_tuning)?.map((param: any) => ({
+      name: param.name,
+      minimum: param.minimum,
+      maximum: param.maximum,
+      initial_value: param.initial_value,
+      module: param.module,
+    })) || [];
+    console.log("userCalibrationTuningParameters:", userCalibrationTuningParameters.value);
+
+    // set output variables
+    outputVariables.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
+      name: outputVar.name,
+      description: outputVar.description,
+      module: module.name,
+    }))) || [];
+  } else {
+    toast.add({ severity: 'warn', summary: 'Tuning Modules not loaded', detail: 'Must set Formulation data before proceeding' });
+  }
+
+  // console.log("outputVariables:", outputVariables.value);
 
   // console.log("loadTuningTabData:", loadTuningTabData?.value._data);
   // console.log("userCalibrationRunData:", userCalibrationRunData.value);
@@ -326,7 +365,7 @@ onMounted(async () => {
   // console.log("time_range:", userCalibrationRunData.value?.time_range);
 
   // set calibration times
-  if (userCalibrationRunData.value?.calibration_times) {
+  if (userCalibrationRunData?.value?.calibration_times) {
     const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
 
     simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
@@ -343,7 +382,7 @@ onMounted(async () => {
   };
 
   // set automatic validation times
-  if (userCalibrationRunData.value?.validation_times) {
+  if (userCalibrationRunData?.value?.validation_times) {
     const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
 
     avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
@@ -360,44 +399,23 @@ onMounted(async () => {
   };
 
   // set time range
-  const timeRange = userCalibrationRunData.value?.time_range;
-
+  const timeRange = userCalibrationRunData?.value?.time_range;
   // check if timeRange is provided and not empty
-  if (timeRange && timeRange.constructor === Object && Object.keys(timeRange).length > 0) {
+  if (timeRange?.start_time && timeRange?.end_time) {
     rangeDateFrom.value = timeRange?.start_time;
     rangeDateTo.value = timeRange?.end_time;
   } else {
     // time_range is not set. Cannot proceed
-    toast.add({ severity: 'warn', summary: 'time_range is not set', life: 10000 });
+    toast.add({ severity: 'warn', summary: 'Time Range not set', detail: 'Must set Forcing and Observational data before proceeding' });
   }
 
-  const calibrationTuningModules = loadTuningTabData.value?._data?.modules;
-
-  // set the calibration tuning parameters
-  calibrationTuningParameters.value = calibrationTuningModules?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
-    name: param.name,
-    minimum: param.minimum,
-    maximum: param.maximum,
-    initial_value: param.initial_value,
-    module: module.name,
-  }))) || [];
-  // console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
-
-  // set output variables
-  outputVariables.value = calibrationTuningModules?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
-    name: outputVar.name,
-    description: outputVar.description,
-    module: module.name,
-  }))) || [];
-  // console.log("outputVariables:", outputVariables.value);
-
-  // set ouput_variable_to_calibrate
+  // set ouput variable to calibrate
   if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
     console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
     const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
     userOutputVariableToCalibrate.value.name = name;
     userOutputVariableToCalibrate.value.module = module;
-    selectedOutputVariable.value = name;
+    selectedOutputVariable.value = userOutputVariableToCalibrate.value;
     // console.log('selectedOutputVariable:', selectedOutputVariable.value);
   };
 
@@ -428,8 +446,8 @@ onMounted(async () => {
   });
 
   /**
- * Save Tuning Tab data
- */
+   * Save Tuning Tab data
+   */
   useListen('calibrationButtonSaveStart', (actionButton) => {
     // handle saving Tuning Tab data
     const handleSaveTuningTab = async () => {
@@ -460,23 +478,16 @@ onMounted(async () => {
       // check if Tuning Tab data is validated before saving
       if (isTuningTabDataValidated()) {
         handleSaveTuningTab();
-      } else {
-        toast.add({
-          severity: 'warn',
-          summary: 'Tuning Tab data is not validated',
-        });
       }
     } else {
       toast.add({
         severity: 'error',
         summary: 'Calibration Tab not 3 or actionButton not SAVE',
-        detail: 'Calibration Tab not 3 or actionButton not SAVE',
       });
       console.error('getCalibrationTabIndex:', getCalibrationTabIndex());
       console.error('actionButton:', actionButton);
     }
   });
-
 });
 
 onUnmounted(() => {
@@ -505,9 +516,12 @@ const isTimeRangeSet = (): boolean => {
  * @returns boolean
  */
 const isFormulationDataSet = (): boolean => {
+  console.log("formulationNameInput:", formulationNameInput.value);
   if (formulationNameInput.value == "" && selectedModuleValues?.value.length === 0 && slothParameterInputs?.value.length === 0) {
+    console.log('formulation is not set');
     return false;
   } else {
+    console.log('formulation is set');
     return true;
   }
 };
@@ -515,14 +529,14 @@ const isFormulationDataSet = (): boolean => {
 const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
-    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because time_range is not set.', life: 10000 });
+    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.'});
   }
 };
 
 const handleFormulationNotSet = (event: Event) => {
   if (!isFormulationDataSet()) {
     event.preventDefault(); // Prevent any default action
-    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or paraemters because formulation data is not set.', life: 10000 });
+    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or paraemters because Formulation data is not set.' });
   }
 };
 
@@ -602,15 +616,15 @@ const handleAvCalEndUpdate = (value: any) => {
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
   // find module for newly-selected output variable
-  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === selectedOutputVariable?.value));
+  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === selectedOutputVariable?.value.name));
 
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
-    name: selectedOutputVariable?.value,
+    name: selectedOutputVariable?.value.name,
     module: module?.name,
   }
-  //console.log("selectedOutputVariable:", selectedOutputVariable.value);
-  //console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
+  console.log("selectedOutputVariable:", selectedOutputVariable.value);
+  console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
 });
 
 // watch for changes to simStartTime
@@ -717,7 +731,10 @@ const handleFileUpload = async (event: Event) => {
  */
 const addParameterToTable = () => {
   const parameter = calibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
-  if (parameter) {
+  const isParameterAlreadyInTable = userCalibrationTuningParameters?.value?.find(param => param.name === selectedParameter.value);
+
+  // add parameter to table if it is not already in the table
+  if (!isParameterAlreadyInTable && parameter) {
     userCalibrationTuningParameters?.value?.push({
       name: parameter.name,
       minimum: parameter.minimum,
@@ -943,6 +960,18 @@ const gotoNext = () => {
   const e = <HTMLElement>tabs[4];
   e.click();
 }
+
+// const getGroups = (groups: string[]) => {
+//   let txt = "";
+//   groups.forEach(element => {
+//     txt += element;
+//     if (groups[groups.length - 1] !== element) {
+//       txt += ", ";
+//     }
+//   });
+//   return txt;
+// }
+
 </script>
 
 <style lang="scss" scoped>
