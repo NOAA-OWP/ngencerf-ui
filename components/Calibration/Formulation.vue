@@ -56,7 +56,8 @@
         <div class="flex">
           <span class="text-left">
             <input type="checkbox" id="SlothCheck" class="ml-2" v-model="useSlothParameters" />
-            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for formulation</label>
+            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for
+              formulation</label>
           </span>
           <span v-show="useSlothParameters" class="ml-auto pr-2">
             <div class="inline-block  text-[16px] pl-10 pr-4" for="SlothName">SLoTH Name:</div>
@@ -127,15 +128,26 @@
 
 
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3">
-        <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
-          <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
-            Save
-          </button>
-        </div>
-        <div class="col-span-1 mr-3">
-          <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetFormulationData()"
-            aria-label="Reset Button">Reset</button>
-        </div>
+        <span v-if="calibrationStatus !== 'Running'">
+          <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+            <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
+              Save
+            </button>
+          </div>
+        </span>
+        <span v-else>
+          <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">&nbsp;</div>
+        </span>
+        <span v-if="calibrationStatus !== 'Running'">
+          <div class="col-span-1 mr-3">
+            <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
+              @click="resetFormulationData()" aria-label="Reset Button">Reset</button>
+          </div>
+        </span>
+        <span v-else>
+          <div class="col-span-1 mr-3"></div>
+        </span>
+
         <div class="col-span-4">&nbsp;</div>
         <div class="col-span-1">
           <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
@@ -194,9 +206,12 @@ const {
 
 const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
 const { fetchUserCalibrationRunData } = useUserDataStore()
-const { getCalibrationTabIndex } = generalStore()
-const toast = useToast();
+const { getCalibrationTabIndex } = generalStore();
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+const runStatusStore = useRunStatusStore();
+const { calibrationStatus } = storeToRefs(runStatusStore);
 
+const toast = useToast();
 
 onMounted(() => {
   toast.removeAllGroups();

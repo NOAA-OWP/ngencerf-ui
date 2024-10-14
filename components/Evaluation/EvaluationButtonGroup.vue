@@ -1,7 +1,7 @@
 <template>
   <div id="BottomButtons" class="flex">
     <div>
-      <div class="inline ngenButtonDiv bg-green mr-6" v-if="getEvaluationTabIndex() === 2">
+      <div class="inline ngenButtonDiv-green mr-6" v-if="getEvaluationTabIndex() === 2">
         <button class="font-normal">Evaluate</button>
       </div>
       <div class="inline mr-3 ngenButtonDiv" v-if="getEvaluationTabIndex() >= 5">

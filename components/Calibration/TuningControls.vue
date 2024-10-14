@@ -13,7 +13,8 @@
           <div class="col-span-2">
             <div id="BoxLeft" class="text-left">
               <div id="BoxTopLeft" class="pt-2">
-                <span class="tabTitles font-bold">Calibration Time Controls <span class="font-normal"><small>(* All times entered must be in GMT)</small></span></span>
+                <span class="tabTitles font-bold">Calibration Time Controls <span class="font-normal"><small>(* All
+                      times entered must be in GMT)</small></span></span>
               </div>
               <div id="BoxBottomLeft" class="pt-2">
                 <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
@@ -159,8 +160,10 @@
               <div class="text-left mt-2">
                 <div class="font-bold">Calibratable Parameters:</div>
                 <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
-                  :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="name"
-                  optionValue="name">
+                  :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters">
+                  <template #option="slotProps">
+                    <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
+                  </template>
                 </Select>
                 <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
                   <button @click="addCalibrationTuningParameter" :disabled="!isFormulationDataSaved()">Add</button>
@@ -233,15 +236,28 @@
 
       <div class="grid grid-rows-1 mt-8" id="Tuningbuttons">
         <div id="TuningBottomButtons" class="grid grid-cols-8">
-          <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
-            <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()">
-              Save
-            </button>
-          </div>
-          <div class="col-span-1 mr-3">
-            <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTuningData()"
-              aria-label="Reset Button">Reset</button>
-          </div>
+          <span v-if="userCalibrationRunData?.status !== 'Running'">
+            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+              <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()">
+                Save
+              </button>
+            </div>
+          </span>
+          <span v-else>
+            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">&nbsp;</div>
+          </span>
+
+          <span v-if="userCalibrationRunData?.status !== 'Running'">
+            <div class="col-span-1 mr-3">
+              <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTuningData()"
+                aria-label="Reset Button">Reset</button>
+            </div>
+          </span>
+
+          <span v-else>
+            <div class="col-span-1 mr-3">&nbsp;</div>
+          </span>
+
           <div class="col-span-4">&nbsp;</div>
           <div class="col-span-1">
             <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"

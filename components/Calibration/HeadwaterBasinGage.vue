@@ -93,15 +93,25 @@
 
         <div class="row-span-1 mt-4">
           <div class="grid grid-cols-8">
-            <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
-              <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
-                Save
-              </button>
-            </div>
-            <div class="col-span-1 mr-3">
-              <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
-                aria-label="Reset Button">Reset</button>
-            </div>
+            <span v-if="calibrationStatus !== 'Running'">
+              <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+                <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
+                  Save
+                </button>
+              </div>
+            </span>
+            <span v-else>
+              <div class="col-span-1 mr-3">&nbsp;</div>
+            </span>
+            <span v-if="calibrationStatus !== 'Running'">
+              <div class="col-span-1 mr-3">
+                <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
+                  aria-label="Reset Button">Reset</button>
+              </div>
+            </span>
+            <span v-else>
+              <div class="col-span-1 mr-3">&nbsp;</div>
+            </span>
             <div class="col-span-4">&nbsp;</div>
             <div class="col-span-1">&nbsp;</div>
             <div class="col-span-1 mr-4">
@@ -132,6 +142,9 @@ import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import type { SelectChangeEvent } from "primevue/select";
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+const runStatusStore = useRunStatusStore();
+const { calibrationStatus } = storeToRefs(runStatusStore);
 
 const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,

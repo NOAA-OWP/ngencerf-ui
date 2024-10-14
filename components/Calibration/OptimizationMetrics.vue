@@ -126,11 +126,16 @@
 
 
             <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6">
-               <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
+               <span v-if="calibrationStatus !== 'Running'">
+               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                   <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()">
                      Save
                   </button>
                </div>
+               </span>
+               <span v-else>
+                  <div class="col-span-1 mr-6 h-8">&nbsp;</div>                  
+               </span>
                <div class="col-span-1 mr-3">
                </div>
                <div class="col-span-4">&nbsp;</div>
@@ -156,6 +161,10 @@ import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore"
+
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+const runStatusStore = useRunStatusStore();
+const { calibrationStatus } = storeToRefs(runStatusStore);
 
 const optimizationStore = useOptimizationStore();
 const {

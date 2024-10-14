@@ -134,7 +134,20 @@ input::-webkit-input-placeholder {
   border: 0px;
 }
 
-
+.ngenButtonDiv-green {
+  cursor: pointer;
+  color: white;
+  padding: 6px 25px;
+  border-radius: 28px;
+  background-color: $ngwcp_secondary4;
+  text-align: center;
+  font-size: 18px;
+  border: 0px;
+  display: inline-block;
+}
+.ngenButtonDiv-green:hover {
+  background-color: $ngwcp_secondary4lt;
+}
 .btn-left {
   margin-right: auto;
   margin-left: 0px;
@@ -315,6 +328,7 @@ select option {
 
 // default color ovewrites
 .bg-green { background-color: $ngwcp_secondary4 !important; }
+.bg-lt-green { background-color: $ngwcp_secondary4lt !important}
 .bg-blue1 { background-color: $ngwcp_primary1 !important; }
 .bg-blue2 { background-color: $ngwcp_primary2 !important; }
 .bg-blue3 { background-color: $ngwcp_primary3 !important; }
@@ -326,6 +340,7 @@ select option {
 
 .c-gray-bg {background-color: $ngwcp_background !important }
 .bg-gray-md {background-color: $ngwcp_neutral_gray_md !important }
+
 
 #ProgressGroup {
   width: 100%;
