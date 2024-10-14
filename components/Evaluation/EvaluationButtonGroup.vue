@@ -4,7 +4,7 @@
       <div class="inline ngenButtonDiv bg-green mr-6" v-if="getEvaluationTabIndex() === 2">
         <button class="font-normal">Evaluate</button>
       </div>
-      <div class="inline mr-3 ngenButtonDiv mr-6" v-if="getEvaluationTabIndex() >= 5">
+      <div class="inline mr-3 ngenButtonDiv" v-if="getEvaluationTabIndex() >= 5">
         <button class="font-normal">Run</button>
       </div>
     </div>
@@ -13,15 +13,7 @@
     </div>
     
     <div class="ml-auto">
-    <!--
-	    <div class="inline ngenButtonDiv c-gray-md" v-if="getEvaluationTabIndex() === 4">
-	      <button v-if="getEvaluationTabIndex() === 4" class="prev actionBtnSmall font-normal">Prev</button>
-	    </div>
-	    <div class="inline ngenButtonDiv ml-6" v-if="getEvaluationTabIndex() === 3 || getEvaluationTabIndex() === 4">
-	    	<button v-if="getEvaluationTabIndex() === 3 || getEvaluationTabIndex() === 4"
-	        class="font-normal">Next</button>
-	    </div>
-	-->
+
     </div>
 
   </div>
