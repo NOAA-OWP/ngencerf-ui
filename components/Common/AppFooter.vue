@@ -1,25 +1,6 @@
 <template>
   <div id="Footer" class=" prevent-select cursor-default">
-    <div class="grid grid-rows-2 gap-1">
-      <div class="row-span-1">
-        <div class="grid grid-cols-3">
-          <div class="col-span-2">
-
-            <span v-if="location.name === 'Calibration' && getCalibrationTabIndex() > 1">
-              <div id="ActionButtons" class="footerColor" v-if="canDisplayBeforeRun">
-                <CalibrationButtonGroup />
-              </div>
-            </span>
-
-            <span v-else-if="location.name !== 'Calibration'">
-              <div id="ActionButtons" class="footerColor" v-if="canDisplayBeforeRun">
-                <EvaluationButtonGroup />
-              </div>
-            </span>
-          </div>
-        </div>
-      </div>
-
+    <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor">
         <div id="FooterData" class="version">
           Version {{ info.program_info.version }},&nbsp;&nbsp;{{
@@ -37,8 +18,6 @@
 
 <script lang="ts" setup>
 import json from "@/assets/versionInfo.json";
-import CalibrationButtonGroup from "../Calibration/CalibrationButtonGroup.vue";
-import EvaluationButtonGroup from "../Evaluation/EvaluationButtonGroup.vue";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRoute } from "vue-router";
@@ -57,23 +36,6 @@ const canDisplayBeforeRun = computed(() => {
 
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";
-
-#ActionButtons {
-  width: Calc(100% - 70px);
-  background: transparent;
-  /*border: 1px solid black;*/
-  margin-left: 20px;
-  margin-top: -20px;
-  background-color: white;
-  padding-top: 10px;
-  height: 54px;
-}
-
-.ActionButtons-bg-mask {
-  height: 54px;
-  display: block;
-  width: 100%;
-}
 
 #Footer {
   font: 18px NeueFrutigerWorld-Book, sans-serif;

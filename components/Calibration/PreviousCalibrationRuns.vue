@@ -2,10 +2,9 @@
 
   <div class="mx-auto px-8 text-center overflow-auto">
     <div class="width-full">
-        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs *</h1>
-        <span class="ngenButtonDiv-alt bg-blue4 ml-8"
-          @click="createNewCalibration"><button>New</button>
-        </span>
+      <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs *</h1>
+      <span class="ngenButtonDiv-alt bg-blue4 ml-8" @click="createNewCalibration"><button>New</button>
+      </span>
 
       <div id="CalTable" class="w-max mx-auto">
         <ConfirmDialog></ConfirmDialog>
@@ -60,7 +59,8 @@ const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
 const { loadOptimizationTabStaticData, optimizationStore_data_loading } = useOptimizationStore();
 const { loadTuningTabStaticData, tuningStore_data_loading } = useTuningStore();
-const { calibrationJobId } = storeToRefs(generalStore());
+const { calibrationJobId} = storeToRefs(generalStore());
+const { getCalibrationTabIndex } = generalStore();
 const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData,
   deleteCalibrationRun, cloneCalibrationRun } = useUserDataStore();
@@ -81,6 +81,19 @@ const onRowContextMenu = (event: any) => {
 
 onMounted(() => {
   isLoading.value = false;
+})
+
+/**
+ * This is a hack, for sure.
+ * When a run is selected, the Status/Run tab is not being underlined.
+ * This does it for now, but the actual cause needs to be found!
+ */
+onUnmounted(() => {
+ setTimeout(() => {
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[getCalibrationTabIndex() - 1];
+    e.click();
+  }, 250)
 })
 
 const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
@@ -113,7 +126,7 @@ const loadEntireRun = () => {
 }
 const gotoRunStatusTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
-  const e = allTabs[5] as HTMLElement;
+  const e = allTabs[CalibrationTabs.tab_statusRun] as HTMLElement;
   e.click();
 }
 
@@ -149,7 +162,7 @@ const gotoHeadwaterBasinGage = () => {
     loadTuningTabStaticData();
     loadOptimizationTabStaticData();
     const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[1];
+    const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
     e.click();
   })
 

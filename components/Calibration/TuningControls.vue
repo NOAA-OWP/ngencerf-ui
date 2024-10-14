@@ -1,6 +1,6 @@
 <template>
-  <div id="TuningControls pl-8" class="pl-4">
-    <div class="w-full mt-3 mb-2">
+  <div id="TuningControls" class="w-full">
+    <div class="mt-3 mb-2">
       <div v-if="rangeDateFrom && rangeDateTo" class="w-full text-left mt-1 text-xl c-blue-primary1 font-bold"
         id="RangeDates">
         RANGE: {{ format(rangeDateFrom) }} GMT to {{ format(rangeDateTo) }} GMT
@@ -13,8 +13,7 @@
           <div class="col-span-2">
             <div id="BoxLeft" class="text-left">
               <div id="BoxTopLeft" class="pt-2">
-                <small>* All times entered must be in GMT</small><br>
-                <span class="tabTitles font-bold">Calibration Time Controls</span>
+                <span class="tabTitles font-bold">Calibration Time Controls <span class="font-normal"><small>(* All times entered must be in GMT)</small></span></span>
               </div>
               <div id="BoxBottomLeft" class="pt-2">
                 <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
@@ -147,43 +146,19 @@
         <div class="row-span-1 text-left">
           <div class="grid grid-cols-2">
 
-            <div class="col-span-2">
+            <div class="col-span-1">
               <div class="mt-6 mb-3 hr"></div>
               <div class="mb-2 font-bold">Output Variable To Calibrate</div>
-              <div class="mt-2 text-sm" style="position: relative;">
+              <div class="mt-2 text-sm">
                 <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable"
                   :disabled="!isFormulationDataSaved()" :options="outputVariables" optionLabel="name">
-                  <!-- <template #optiongroup="slotProps">
-                        <div class="flex items-left">
-                          <div>{{ slotProps.option.name }} </div>
-                        </div>
-                      </template> -->
                 </Select>
                 <div v-if="!isFormulationDataSaved()" class="overlay"></div>
               </div>
-            </div>
 
-            <div class="col-span-2">
-              <div class="mt-5 mb-3 hr"></div>
-              <div class="text-left">
-                <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
-                <div class="inline-block text-left text-sm"><label for="ParamFile">Parameters File (optional):</label>
-                </div><br />
-                <!-- <br />
-                  <Select id="ParamFile" class="varInputs inline-block mt-2 text-sm">
-                    <option value="" selected disabled>...</option>                    
-                  </Select> -->
-                <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
-                  <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-                  <button @click="triggerFileInput" :disabled="!isFormulationDataSaved()">Load</button>
-                  <div v-if="!isFormulationDataSaved()" class="overlay"></div>
-                </div>
-              </div>
-
-              <div class="text-left mt-3 text-sm" style="position: relative;">
-                <div class="inline-block text-left"><label for="ParamName">Calibratable Parameters:</label></div>
-                <br />
-                <Select id="ParamName" class="varInputs inline-block mt-2" v-model="selectedParameter"
+              <div class="text-left mt-2">
+                <div class="font-bold">Calibratable Parameters:</div>
+                <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
                   :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="name"
                   optionValue="name">
                 </Select>
@@ -192,12 +167,27 @@
                 </div>
                 <div v-if="!isFormulationDataSaved()" class="overlay"></div>
               </div>
+
+            </div>
+
+            <div class="col-span-1">
+              <div class="mt-5 mb-3 hr"></div>
+
+              <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
+              <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
+                <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+                <button @click="triggerFileInput" :disabled="!isFormulationDataSaved()">Load Parameters File
+                  (optional)</button>
+                <div v-if="!isFormulationDataSaved()" class="overlay"></div>
+              </div>
+
+
             </div>
 
           </div>
         </div>
 
-        <div id="TuningDataList" class="mt-5" style="position: relative;">
+        <div id="TuningDataList" class="mt-2 mb-2" style="position: relative;">
           <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
             :model="cmTuningParameterData"></ContextMenu>
           <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
@@ -238,6 +228,30 @@
             </Column>
           </DataTable>
           <div v-if="!isFormulationDataSaved()" class="overlay"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-rows-1 mt-8" id="Tuningbuttons">
+        <div id="TuningBottomButtons" class="grid grid-cols-8">
+          <div class="col-span-1 ngenButtonDiv bg-green mr-6 h-8">
+            <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()">
+              Save
+            </button>
+          </div>
+          <div class="col-span-1 mr-3">
+            <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTuningData()"
+              aria-label="Reset Button">Reset</button>
+          </div>
+          <div class="col-span-4">&nbsp;</div>
+          <div class="col-span-1">
+            <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+                aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
+          </div>
+          <div class="col-span-1 mr-4">
+            <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+                @click="goNextTab()">Next</button></div>
+          </div>
+
         </div>
       </div>
 
@@ -284,7 +298,7 @@ const {
 
 const { fetchUserCalibrationRunData, getAccessToken } = userDataStore;
 const { userCalibrationRunData } = storeToRefs(userDataStore);
-const { loadTuningTabStaticData, saveTuningTabData } = tuningStore;
+const { loadTuningTabStaticData, saveTuningTabData, hardResetTuningStore } = tuningStore;
 const {
   loadTuningTabData,
   simStartTime,
@@ -326,9 +340,6 @@ onMounted(async () => {
 
   // fetch user calibration data
   await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
-  console.log("userCalibrationRunData:", userCalibrationRunData.value);
-  
-  console.log("loadTuningTabData before fetch from Tuning tab:", loadTuningTabData?.value);
 
   // if Tuning Tab static data is not loaded, fetch it
   if (loadTuningTabData?.value?._data?.modules.length === 0) {
@@ -436,88 +447,7 @@ onMounted(async () => {
   };
 
   isInitialSetupDone.value = true; // set to true after initial setup
-
-  useListen('calibrationButtonPrev', (actionButton) => {
-    if (getCalibrationTabIndex() == 4 && actionButton === "PREV") {
-      const tabs = document.getElementsByClassName("tabs");
-      const e = <HTMLElement>tabs[2];
-      e.click();
-    }
-  });
-
-  useListen('calibrationButtonNext', (actionButton) => {
-    if (getCalibrationTabIndex() == 4 && actionButton === "NEXT") {
-      if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
-        toast.add({ severity: 'warn', summary: `Data requirement warning`, detail: "All Calibration Times are required."})
-      }
-      if (!(avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value)) {
-        toast.add({ severity: 'warn', summary: `Data requirement warning`, detail: "All Automatic Validation Times are required."})
-      }
-      if (!userOutputVariableToCalibrate.value.name) {
-        toast.add({ severity: 'warn', summary: `Data requirement warning`, detail: "No Output Variable selected."})
-      }
-      toast.removeAllGroups();
-      gotoNext();
-    }
-  });
-
-  /**
-   * Save Tuning Tab data
-   */
-  useListen('calibrationButtonSaveStart', (actionButton) => {
-    // handle saving Tuning Tab data
-    const handleSaveTuningTab = async () => {
-      const saveTuningTabResponse = await saveTuningTabData();
-      console.log(
-        `saveTabContent Tuning, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `,
-        saveTuningTabResponse
-      );
-
-      if (saveTuningTabResponse?.ok) {
-        toast.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Saved Tuning Tab data',
-          life: 3000,
-        });
-      } else {
-        toast.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error saving Tuning Tab data'
-        });
-      }
-    };
-
-    // check if the current tab is the Tuning tab and the actionButton is 'SAVE'
-    if (getCalibrationTabIndex() === 4 && actionButton === 'SAVE') {
-      // check if Tuning Tab data is validated before saving
-      if (isTuningTabDataValidated()) {
-        handleSaveTuningTab();
-      } else {
-        toast.add({
-          severity: 'warn',
-          summary: 'Tuning Data Is Not Valid',
-          detail: 'You must provide valid calibration times, validation times, output variable to calibrate, or calibration tuning parameters before saving.',
-        });
-      }
-    } else {
-      toast.add({
-        severity: 'error',
-        summary: 'Calibration Tab not 3 or actionButton not SAVE',
-      });
-      console.error('getCalibrationTabIndex:', getCalibrationTabIndex());
-      console.error('actionButton:', actionButton);
-    }
-  });
 });
-
-onUnmounted(() => {
-  emitterOff('calibrationButtonSaveStart');
-  emitterOff('calibrationButtonNext');
-  emitterOff('calibrationButtonPrev');
-})
-
 
 /**
  * Check if time_range is set
@@ -538,10 +468,6 @@ const isTimeRangeSet = (): boolean => {
  * @returns boolean
  */
 const isFormulationDataSaved = (): boolean => {
-  // console.log("formulationNameInput:", formulationNameInput.value);
-  // console.log("selectedModuleValues:", selectedModuleValues?.value);
-  // console.log("slothParameterInputs:", slothParameterInputs?.value);
-
   if (formulationNameInput.value == "" && selectedModuleValues?.value.length === 0 && slothParameterInputs?.value.length === 0) {
     // console.log('formulation is not set');
     return false;
@@ -554,7 +480,7 @@ const isFormulationDataSaved = (): boolean => {
 const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
-    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.'});
+    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.' });
   }
 };
 
@@ -566,76 +492,51 @@ const handleOutputVariablesParametersClick = (event: Event) => {
 };
 
 const handleSimStartUpdate = (value: any) => {
-  // console.log('handleSimStartUpdate called');
   if (typeof value === 'string') {
     simStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  // console.log('typeof simStartTime:', typeof simStartTime.value);
-  // console.log('simStartTime:', simStartTime.value);
 };
 
 const handleSimEndUpdate = (value: any) => {
-  // console.log('handleSimEndUpdate called');
   if (typeof value === 'string') {
     simEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  // console.log('typeof simEndTime:', typeof simEndTime.value);
-  // console.log('simEndTime:', simEndTime.value);
 };
 
 const handleCalStartUpdate = (value: any) => {
-  // console.log('handleCalStartUpdate called');
   if (typeof value === 'string') {
     calStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  // console.log('typeof calStartTime:', typeof calStartTime.value);
-  // console.log('calStartTime:', calStartTime.value);
 };
 
 const handleCalEndUpdate = (value: any) => {
-  // console.log('handleCalEndUpdate called');
   if (typeof value === 'string') {
     calEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  // console.log('typeof calEndTime:', typeof calEndTime.value);
-  // console.log('calEndTime:', calEndTime.value);
 };
 
 const handleAvSimStartUpdate = (value: any) => {
-  // console.log('handleAvSimStartUpdate called');
   if (typeof value === 'string') {
     avSimStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  // console.log('typeof avSimStartTime:', typeof avSimStartTime.value);
-  // console.log('avSimStartTime:', avSimStartTime.value);
 };
 
 const handleAvSimEndUpdate = (value: any) => {
-  // console.log('handleAvSimEndUpdate called');
   if (typeof value === 'string') {
     avSimEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  //   console.log('typeof avSimEndTime:', typeof avSimEndTime.value);
-  //   console.log('avSimEndTime:', avSimEndTime.value);
 };
 
 const handleAvCalStartUpdate = (value: any) => {
-  // console.log('handleAvCalStartUpdate called');
   if (typeof value === 'string') {
     avCalStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  // console.log('typeof avCalStartTime:', typeof avCalStartTime.value);
-  // console.log('avCalStartTime:', avCalStartTime.value);
 };
 
 const handleAvCalEndUpdate = (value: any) => {
-  // console.log('handleAvCalEndUpdate called');
   if (typeof value === 'string') {
     avCalEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
   }
-  // console.log('typeof avCalEndTime:', typeof avCalEndTime.value);
-  // console.log('avCalEndTime:', avCalEndTime.value);
-  // console.log('avCalEndTimeString:', avCalEndTime.value.toISO());
 };
 
 // watch for changes to selected output variable
@@ -656,13 +557,11 @@ watch(selectedOutputVariable, () => {
 watch(simStartTime, () => {
   if ((!calStartTime.value || !isValidDateTime(calStartTime.value)) && simStartTime.value && isValidDateTime(simStartTime.value)) {
     calStartTime.value = simStartTime.value.plus({ years: 1 }); // set calStartTime to one year after simStartTime
-    // console.log('calStartTime:', calStartTime.value);
   }
   else if ((!calStartTime.value || !isValidDateTime(calStartTime.value)) && simStartTime.value && typeof simStartTime.value === 'string') {
     // console.log('simStartTime.value is a string. This should not happen'); // the simStartTime binding might call this watch function when it is a string. ooof.
     const simStartDateTime = DateTime.fromISO(simStartTime.value, { zone: 'utc' });
     calStartTime.value = simStartDateTime.value.plus({ years: 1 });
-    // console.log('calStartTime:', calStartTime.value);
   }
 });
 
@@ -670,13 +569,10 @@ watch(simStartTime, () => {
 watch(avSimStartTime, () => {
   if ((!avCalStartTime.value || !isValidDateTime(avCalStartTime.value)) && avSimStartTime.value && isValidDateTime(avSimStartTime.value)) {
     avCalStartTime.value = avSimStartTime.value.plus({ years: 1 });
-    // console.log('avCalStartTime:', avCalStartTime.value);
   }
   else if ((!avCalStartTime.value || !isValidDateTime(avCalStartTime.value)) && avSimStartTime.value && typeof avSimStartTime.value === 'string') {
-    // console.log('avSimStartTime.value is a string. This should not happen'); // the avSimStartTime binding might call this watch function when it is a string. ooof.
     const avSimStartDateTime = DateTime.fromISO(avSimStartTime.value, { zone: 'utc' });
     avCalStartTime.value = avSimStartDateTime.value.plus({ years: 1 });
-    // console.log('avCalStartTime:', avCalStartTime.value);
   }
 });
 
@@ -729,7 +625,7 @@ const handleFileUpload = async (event: Event) => {
           }
         });
       } else {
-        toast.add({ severity: 'warn', summary: 'No data in parameter file'});
+        toast.add({ severity: 'warn', summary: 'No data in parameter file' });
       }
     } catch (error) {
       toast.add({ severity: 'warn', summary: 'File upload failed' });
@@ -869,7 +765,7 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if time_range and calibration_times are null after converted to Date objects
   if (!rangeStartDate || !rangeEndDate || !simStartDate || !simEndDate || !calStartDate || !calEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects'});
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects' });
     return false;
   }
 
@@ -881,25 +777,25 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_times must be within time_range'});
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_times must be within time_range' });
     return false;
   }
 
   // check if simulation_end_time is not after simulation_start_time
   if (simStartDate >= simEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'simulation_end_time must be after simulation_start_time'});
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'simulation_end_time must be after simulation_start_time' });
     return false;
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
   if (calStartDate <= simStartDate || calStartDate > simEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time'});
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time' });
     return false;
   }
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time'});
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time' });
     return false;
   }
 
@@ -931,7 +827,7 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if Date objects are valid
   if (!avSimStartDate || !avSimEndDate || !avCalStartDate || !avCalEndDate || !rangeStartDate || !rangeEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects'});
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects' });
     return false;
   }
 
@@ -945,12 +841,6 @@ const areValidationTimesValidated = (): boolean => {
     const isAvSimEndAfterCalEnd = avSimEndDate > simEndDate;
     const isAvCalStartAfterCalEnd = avCalStartDate > simEndDate;
     const isAvCalEndAfterCalEnd = avCalEndDate > simEndDate;
-
-    // console.log('avSimStartDate:', avSimStartDate);
-    // console.log('avSimEndDate:', avSimEndDate);
-    // console.log('avCalStartDate:', avCalStartDate);
-    // console.log('avCalEndDate:', avCalEndDate);
-    // console.log('simEndDate:', simEndDate);
 
     // check if validation_times are not after calibration_times
     if (!isAvSimStartAfterCalEnd || !isAvSimEndAfterCalEnd || !isAvCalStartAfterCalEnd || !isAvCalEndAfterCalEnd) {
@@ -1009,20 +899,76 @@ const isOutputVariableValidated = (): boolean => {
 
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[4];
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_optimizationMetrics];
   e.click();
 }
 
-// const getGroups = (groups: string[]) => {
-//   let txt = "";
-//   groups.forEach(element => {
-//     txt += element;
-//     if (groups[groups.length - 1] !== element) {
-//       txt += ", ";
-//     }
-//   });
-//   return txt;
-// }
+/**
+  * Save Tuning Tab data
+  */
+const saveTuningData = () => {
+  // handle saving Tuning Tab data
+  const handleSaveTuningTab = async () => {
+    const saveTuningTabResponse = await saveTuningTabData();
+    console.log(
+      `saveTabContent Tuning, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `,
+      saveTuningTabResponse
+    );
+
+    if (saveTuningTabResponse?.ok) {
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Saved Tuning Tab data',
+        life: 3000,
+      });
+    } else {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error saving Tuning Tab data'
+      });
+    }
+  };
+
+  // check if Tuning Tab data is validated before saving
+  if (isTuningTabDataValidated()) {
+    handleSaveTuningTab();
+  } else {
+    toast.add({
+      severity: 'warn',
+      summary: 'Tuning Data Is Not Valid',
+      detail: 'You must provide valid calibration times, validation times, output variable to calibrate, or calibration tuning parameters before saving.',
+    });
+  }
+};
+
+/**
+ * Reset Tuning Tab data
+ */
+  const resetTuningData = () => {
+  hardResetTuningStore();
+};
+
+const goPrevTab = () => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_formulation];
+  e.click();
+};
+
+const goNextTab = () => {
+  if (!(calStartTime.value && calEndTime.value && simStartTime.value && simEndTime.value)) {
+    toast.add({ severity: 'warn', summary: `Data requirement warning`, detail: "All Calibration Times are required." })
+  }
+  if (!(avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value)) {
+    toast.add({ severity: 'warn', summary: `Data requirement warning`, detail: "All Automatic Validation Times are required." })
+  }
+  if (!userOutputVariableToCalibrate.value.name) {
+    toast.add({ severity: 'warn', summary: `Data requirement warning`, detail: "No Output Variable selected." })
+  }
+  toast.removeAllGroups();
+  gotoNext();
+};
 
 </script>
 
@@ -1064,5 +1010,9 @@ const gotoNext = () => {
   background-color: rgba(255, 255, 255, 0);
   cursor: not-allowed;
   z-index: 10;
+}
+
+.p-select-width {
+  width: 100%;
 }
 </style>
