@@ -494,6 +494,12 @@ onMounted(async () => {
       // check if Tuning Tab data is validated before saving
       if (isTuningTabDataValidated()) {
         handleSaveTuningTab();
+      } else {
+        toast.add({
+          severity: 'warn',
+          summary: 'Tuning Data Is Not Valid',
+          detail: 'You must provide valid calibration times, validation times, output variable to calibrate, or calibration tuning parameters before saving.',
+        });
       }
     } else {
       toast.add({
