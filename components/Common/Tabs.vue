@@ -156,12 +156,6 @@ const tabClicked = (event: Event) => {
     } else if (currentMenu.value === 4) {
       currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
       emit("tabNumber", currentVerificationTab.value);
-    } else if (currentMenu.value === 5) {
-      currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
-      emit("tabNumber", currentVerificationTab.value);
-    } else if (currentMenu.value === 6) {
-      currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
-      emit("tabNumber", currentVerificationTab.value);
     }
   })
 

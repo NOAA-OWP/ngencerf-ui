@@ -13,7 +13,6 @@
               <div class="grid row-span-12 white-tall-content-box">
                 <div class="overflow-auto">
                   <ForecastLeftBlock />
-                  <div class="ActionButtons-bg-mask"></div>
                 </div>
               </div>
             </div>

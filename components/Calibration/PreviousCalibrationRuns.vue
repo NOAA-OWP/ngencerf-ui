@@ -113,7 +113,7 @@ const loadEntireRun = () => {
 }
 const gotoRunStatusTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
-  const e = allTabs[5] as HTMLElement;
+  const e = allTabs[CalibrationTabs.tab_statusRun] as HTMLElement;
   e.click();
 }
 
@@ -149,7 +149,7 @@ const gotoHeadwaterBasinGage = () => {
     loadTuningTabStaticData();
     loadOptimizationTabStaticData();
     const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[1];
+    const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
     e.click();
   })
 

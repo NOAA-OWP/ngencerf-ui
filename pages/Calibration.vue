@@ -26,7 +26,7 @@ import NextgenLayout from "~/layouts/CalibrationLayout.vue";
 onMounted(() => {
   nextTick(() => {
     const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[0] as HTMLElement;
+    const e = allTabs[CalibrationTabs.tab_calibrationRuns] as HTMLElement;
     e.click();
   });
 });
