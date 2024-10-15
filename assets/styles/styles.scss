@@ -392,6 +392,9 @@ table.cols-bordered {
   }
 }
 
+.bg_green_lt { background-color: $ngwcp_green_lt; }
+.bg_blue_lt { background-color: $ngwcp_blue_lt; }
+
 //ATTENTION to DEVELOPERS: TEMORARY: REMOVE THIS AFTER geopackageImageUrl is working
 #GageCutout {
   background-image: url("~/assets/styles/img/temp-progress.png");
@@ -496,6 +499,23 @@ table.cols-bordered {
 }
 
 /* Listbox select (for Tuning Tab) */
+.p-listbox {
+  border-radius: 0px;
+}
+.p-listbox-list {
+  padding: 0px !important;
+}
+.p-listbox-list-container {
+  margin-top: 7px;
+}
 .p-listbox-option-selected {
-  background-color: #6dfcb9 !important;
+  background-color: $ngwcp_green_lt; 
+}
+
+/* Action Buttons repositioning */
+.ActionButtonsBox {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  padding:20px 30px 5px;
 }

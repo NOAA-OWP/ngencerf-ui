@@ -1,17 +1,17 @@
 <template>
-  <div id="Formulation" class="w-full">
+  <div id="Formulation" class="">
     <div class="grid grid-rows-7 pt-4 text-sm">
       <div class="row-span-5">
         <div class="grid grid-cols-8">
           <div class="col-span-8">
             <div id="FormulationName" class="block mt-1" aria-label="Forumulation Name" title="Formulation Name">
-              <span>Forumulation Name: </span>
+              <label for="formulationNameInput">Forumulation Name: </label>
               <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
                 aria-label="Input Forumulation Name" title="Input Formulation Name" required></InputText>
             </div>
           </div>
         </div>
-        <div class="mb-2 hr"></div>
+        <div class="mb-2 hr mt-3"></div>
         <div class="grid grid-cols-12">
           <div class="col-span-5">
             <div class="text-left text-lg mt-2"><strong>Formulation Modules</strong></div>
@@ -25,7 +25,7 @@
             </div>
             <div class="mb-1 font-bold">Select Modules:</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="w-full h-60">
+              optionLabel="name" optionValue="name" class="h-60">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'">
                   <div class="font-ui pl-2 leading-none">{{ slotProps.option.name }}</div>
@@ -39,7 +39,7 @@
               <div class="mt-5 mb-2 pl-4 text-lg" aria-label="List of groups covered by selection"
                 title="List of groups covered by selection"><strong>Groups Covered By Selections:</strong></div>
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
-                optionValue="name" scrollHeight="18rem" class="w-full border-0">
+                optionValue="name" scrollHeight="18rem" class="border-0">
                 <template #option="slotProps">
                   <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'"><span
                       class="font-ui pl-2">{{ slotProps.option.name }}</span></div>
@@ -69,7 +69,7 @@
           </span>
         </div>
 
-        <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="w-full items-center pl-2 pr-2 mt-2">
+        <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="items-center pl-2 pr-2 mt-2">
 
           <ContextMenu :pt="{ root: { id: 'loth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
             :model="cmSlothParameterData"></ContextMenu>
@@ -125,7 +125,7 @@
         </div>
       </div>
 
-      <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3">
+      <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3 ActionButtonsBox">
         <span v-if="calibrationStatus !== 'Running'">
           <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
             <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
@@ -381,9 +381,10 @@ h1 {
   text-align: right;
   width: 120px;
 }
-
+/*
 #FormulationBottomButtons {
   height: 54px;
   width: 100%;
 }
+*/
 </style>
