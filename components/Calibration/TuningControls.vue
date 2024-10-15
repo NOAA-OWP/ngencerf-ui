@@ -1,7 +1,7 @@
 <template>
-  <div id="TuningControls" class="w-full">
+  <div id="TuningControls" class="">
     <div class="mt-3 mb-2">
-      <div v-if="rangeDateFrom && rangeDateTo" class="w-full text-left mt-1 text-xl c-blue-primary1 font-bold"
+      <div v-if="rangeDateFrom && rangeDateTo" class="text-left mt-1 text-xl c-blue-primary1 font-bold"
         id="RangeDates">
         RANGE: {{ format(rangeDateFrom) }} GMT to {{ format(rangeDateTo) }} GMT
       </div>
@@ -140,9 +140,9 @@
   <div class="grid grid-rows-2">
 
     <div class="row-span-1 text-left">
-      <div class="grid grid-cols-2">
+      <div class="grid grid-cols-2 pb-3">
 
-        <div class="col-span-1">
+        <div class="col-span-2">
           <div class="mt-6 mb-3 hr"></div>
           <div class="mb-2 font-bold">Output Variable To Calibrate</div>
           <div class="mt-2 text-sm">
@@ -151,7 +151,23 @@
             </Select>
             <!-- <div v-if="!isFormulationDataSaved()" class="overlay"></div> -->
           </div>
+        </div>
 
+        <div class="col-span-2 mt-5 mb-3 hr"></div>
+
+        <div class="col-span-1">
+          
+
+          <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
+          <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
+            <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+            <button @click="triggerFileInput" :disabled="!isFormulationDataSaved()">Load Parameters File
+              (optional)</button>
+            <div v-if="!isFormulationDataSaved()" class="overlay"></div>
+          </div>
+        </div>
+
+        <div class="col-span-1">
           <div class="text-left mt-2">
             <div class="font-bold">Calibratable Parameters:</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
@@ -165,20 +181,6 @@
             </div>
             <!-- <div v-if="!isFormulationDataSaved()" class="overlay"></div> -->
           </div>
-
-        </div>
-
-        <div class="col-span-1">
-          <div class="mt-5 mb-3 hr"></div>
-
-          <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
-          <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
-            <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-            <button @click="triggerFileInput" :disabled="!isFormulationDataSaved()">Load Parameters File
-              (optional)</button>
-            <div v-if="!isFormulationDataSaved()" class="overlay"></div>
-          </div>
-
 
         </div>
 
@@ -229,7 +231,7 @@
     </div>
   </div>
 
-  <div class="grid grid-rows-1 mt-8" id="Tuningbuttons">
+  <div class="grid grid-rows-1 mt-8 ActionButtonsBox" id="Tuningbuttons">
     <div id="TuningBottomButtons" class="grid grid-cols-8">
       <span v-if="userCalibrationRunData?.status !== 'Running'">
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">

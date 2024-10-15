@@ -1,5 +1,5 @@
 <template>
-  <div id="HeadwaterBasinGage" class="w-full">
+  <div id="HeadwaterBasinGage" class="">
     <div id="GageSettings" class="mt-4">
       <div class="grid grid-rows-8 gap-6">
 
@@ -10,7 +10,7 @@
               <div class="col-span-1">
                 <label for="Domain">Domain:</label><br />
                 <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
-                  optionValue="name" placeholder=" ... " class="w-full"></Select>
+                  optionValue="name" placeholder=" ... " class=""></Select>
               </div>
             </div>
 
@@ -18,7 +18,7 @@
               <label for="Gage">Gage:</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
-                @change="onGageSelectionChange" class="w-full"></Select>
+                @change="onGageSelectionChange" class=""></Select>
             </div>
 
             <div class="col-span-1">&nbsp;</div>
@@ -29,20 +29,20 @@
             <div class="col-span-1">
               <label for="Forcing">Forcing:</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                optionValue="name" placeholder=" ... " class="w-full" @change="uploadForcingDlgOpen($event)"></Select>
+                optionValue="name" placeholder=" ... " class="" @change="uploadForcingDlgOpen($event)"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Observational">Observational:</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
-                optionLabel="name" optionValue="name" placeholder=" ... " class="w-full"
+                optionLabel="name" optionValue="name" placeholder=" ... " class=""
                 @change="uploadObservationalDlgOpen($event)"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Geopackage">Geopackage:</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
-                optionValue="name" placeholder=" ... " class="w-full"
+                optionValue="name" placeholder=" ... " class=""
                 @change="uploadGeopackageDlgOpen($event)"></Select>
 
             </div>
@@ -91,7 +91,7 @@
 
         </div>
 
-        <div class="row-span-1 mt-4">
+        <div class="row-span-1 mt-4 ActionButtonsBox">
           <div class="grid grid-cols-8">
             <span v-if="calibrationStatus !== 'Running'">
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">

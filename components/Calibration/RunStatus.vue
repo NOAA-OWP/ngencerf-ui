@@ -1,6 +1,6 @@
 <template>
   <div id="ResultPage">
-    <div class="grid grid-rows-10">
+    <div class="grid grid-rows-10 pr-3">
       <div class="row-span-2">
         <div id="ResultsDisplay">
           <div class="grid grid-cols-2">
@@ -55,8 +55,7 @@
           <img :src="selectedPlotFileUrl" alt="Image" />
         </div>
         <div id="GraphArea" class="p-2" v-else>
-          Data Display
-
+          <!--Data Display-->
         </div>
       </div>
 
@@ -68,7 +67,7 @@
     </div>
 
 
-    <div class="grid grid-rows-1" id="HBCbuttons">
+    <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
       <div class="row-span-1">
         <span v-if="calibrationStatus === 'Done'">
           <div id="ResultsArea" class="ngenButtonDiv row-span-1">
@@ -457,8 +456,8 @@ const cancelRun = async () => {
 }
 
 #GraphArea {
-  height: 500px;
-  width: 900px;
+  height: 40vh;
+  width: 100%;
   margin: 8px auto 0 auto;
   border: 1px solid $ngwcp_neutral_gray_md;
 }

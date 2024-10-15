@@ -3,8 +3,8 @@
   <div id="MainTabs" class="sticky top-0 bg-white mr-2">
 
     <span v-if="currentMenu === 1"> <!-- CALIBRATION TABS -->
-      <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
-        <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
+      <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
+        <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
           <div data-tab="1" data-menu-tab="11" class="tabs activeTab prevent-select" v-on:click="tabClicked"
             aria-label="Calibration Runs tab" title="Calibration Runs tab">
             Calibration Runs
@@ -42,7 +42,7 @@
     </span>
 
     <span v-else-if="currentMenu === 2"> <!-- EVALUATION TABS -->
-      <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
+      <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
         <div data-tab="1" data-menu-tab="21" class="tabs activeTab prevent-select" v-on:click="tabClicked"
           aria-label="Calibration Runs tab" title="Calibration Runs tab">
           Calibration Runs
@@ -62,7 +62,7 @@
     </span>
 
     <span v-else-if="currentMenu === 3"> <!-- FORECAST TABS -->
-      <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
+      <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
         <div data-tab="1" data-menu-tab="31" class="tabs activeTab prevent-select" v-on:click="tabClicked"
           aria-label="Previous Runs tab" title="Previous Runs tab">
           Previous Runs
@@ -88,7 +88,7 @@
 
 
     <span v-else-if="currentMenu === 4"> <!-- FORECAST TABS -->
-      <div class="@md:bg" style="margin-left: 10px; overflow: hidden">
+      <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
         <div data-tab="1" data-menu-tab="41" class="tabs activeTab prevent-select" v-on:click="tabClicked"
           aria-label="Calibration Runs tab" title="Calibration Runs tab">
           Calibration Runs

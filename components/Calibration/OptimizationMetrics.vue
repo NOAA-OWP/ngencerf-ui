@@ -1,5 +1,5 @@
 <template>
-   <div id="OptimizationMetrics" class="'w-full mt-4">
+   <div id="OptimizationMetrics" class="'mt-4">
       <div class="grid grid-rows-12 gap-5">
          <div class="row-span-3">
             <div class="grid grid-cols-2 pt-3 gap-10">
@@ -15,8 +15,8 @@
                </div>
                <div class="col-span-1">
                   <div class="mt-2">
-                     <div class="w-full">
-                        <div class="flex mt-2 w-full">
+                     <div class="">
+                        <div class="flex mt-2">
                            <div class="text-left font-bold">Algorithm Parameter(s)</div>
                            <div id="ClearTableBtn" class="ml-auto">
                               <button @click="resetOptimizationInputs" class="c-blue font-normal underline">Clear
@@ -24,7 +24,7 @@
                            </div>
                         </div>
 
-                        <div id="AlgParamtable" class="w-full mt-1">
+                        <div id="AlgParamtable" class="mt-1">
                            <DataTable :value="uiOptimizationInputs" scrollable editMode="cell" scroll-height="300px"
                               fixedHeader=true>
                               <Column field="name" header="Parameter" sortable></Column>
@@ -123,7 +123,7 @@
          </div>
          <div class="row-span-1 h-1rem hr">&nbsp;</div>
       </div>
-      <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6">
+      <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6 ActionButtonsBox">
          <span v-if="calibrationStatus !== 'Running'">
             <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()">
