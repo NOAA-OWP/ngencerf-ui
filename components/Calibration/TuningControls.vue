@@ -953,10 +953,11 @@ const saveTuningData = () => {
         life: 3000,
       });
     } else {
+      const errorMessage = saveTuningTabResponse?._data.message;
       toast.add({
         severity: 'error',
-        summary: 'Error',
-        detail: 'Error saving Tuning Tab data'
+        summary: 'Error saving Tuning tab data',
+        detail: errorMessage
       });
     }
   };
