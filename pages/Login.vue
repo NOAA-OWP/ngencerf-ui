@@ -18,11 +18,11 @@
                   <form onsubmit="return false">
                     <h1>Login in</h1>
                     <div class="inputBox">
-                      <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username"
+                      <input id="uname" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
                         autocomplete="username" v-on:keypress="autoSubmit" />
-                      <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
-                        Forgot Username
-                      </button>
+                      <!-- <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
+                        Forgot Email
+                      </button> -->
                     </div>
                     <div class="inputBox">
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
@@ -49,7 +49,7 @@
                     <div class="dialog-content">
                       <h1>Create an Account</h1>
                       <form @submit.prevent="submitForm">
-                        <div class="form-group inputBox">
+                        <div class="form-group inputBox" v-if="1==0">
                           <label for="username">Username</label>
                           <InputText v-model="newUsername" id="username" type="text" required />
                         </div>
@@ -140,7 +140,7 @@ const userName = ref<string>("");
 const userPassword = ref<string>("");
 const showDialog = ref(false);
 
-const newUsername = ref('');
+//const newUsername = ref('');
 const newEmail = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
@@ -195,12 +195,12 @@ const SubmitLoginForm = async (e: Event) => {
     await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
       body: {
-        username: userName.value,
+        username: userName.value.toLowerCase(),
         password: userPassword.value
       }
     }).then(response => {
       console.log("Response: ", response)
-      setUserName(userName.value);
+      setUserName(userName.value.toLowerCase());
       // store tokens in UserDataStore
       userDataStore.setAccessToken(response.access);
       userDataStore.setRefreshToken(response.refresh);
@@ -234,15 +234,23 @@ const submitForm = async () => {
   const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
     method: 'POST',
     body: {
-      username: newUsername.value,
-      email: newEmail.value,
+      username: newEmail.value.toLowerCase(),
+      email: newEmail.value.toLowerCase(),
       password: newPassword.value,
       re_password: confirmPassword.value
     }
   });
 
   if (error.value) {
-    if (error.value?.data.username) {
+    if (error.value?.data.email) {
+      let detail = error.value?.data.email[0];
+      if (detail.indexOf('already exists')) {
+        // customize error message since the one we get back from Djoser isn't ideal
+        detail = 'A user with this Email address has already registered.'
+      }
+      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
+      return;
+    } else if (error.value?.data.username) {
       let detail = error.value?.data.username[0];
       toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
       return;
