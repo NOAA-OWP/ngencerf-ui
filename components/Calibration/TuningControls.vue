@@ -956,7 +956,7 @@ const saveTuningData = () => {
       const errorMessage = saveTuningTabResponse?._data.message;
       toast.add({
         severity: 'error',
-        summary: 'Error saving Tuning tab data',
+        summary: 'Error Saving Tuning Tab Data',
         detail: errorMessage
       });
     }
