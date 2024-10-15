@@ -281,7 +281,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import { DateTime } from "luxon";
 import Select from "primevue/select";
 
-import { isValidDateTime } from "~/utils/CommonHelpers";
+import { isValidDateTime, isNotNullOrUndefined } from "~/utils/CommonHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
@@ -620,6 +620,7 @@ const handleFileUpload = async (event: Event) => {
   //console.log('Upload button clicked');
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0]; // get the first file we see
+  let errorMessage = '';
   if (file) {
     try {
       const formData = new FormData();
@@ -639,7 +640,7 @@ const handleFileUpload = async (event: Event) => {
       if (response?._data.user_parameter_file) {
         // Populate the Parameter table with the data from user-uploaded file
         response._data?.user_parameter_file?.forEach((param: any) => {
-          if (param.param && param.min && param.max && param.init && param.model) {
+          if (isNotNullOrUndefined(param.param) && isNotNullOrUndefined(param.min) && isNotNullOrUndefined(param.max) && isNotNullOrUndefined(param.init) && isNotNullOrUndefined(param.model)) {
             userSelectedCalibrationTuningParameters?.value?.push({
               name: param.param,
               minimum: param.min,
@@ -648,7 +649,8 @@ const handleFileUpload = async (event: Event) => {
               module: param.model, // module?
             });
           } else {
-            toast.add({ severity: 'warn', summary: 'Invalid data in parameter file' , life: 5000});
+            errorMessage = response._data?.message;
+            toast.add({ severity: 'warn', summary: 'Invalid data in parameter file' , detail: errorMessage });
           }
         });
       } else {
