@@ -58,6 +58,14 @@
                           <InputText v-model="newEmail" id="email" type="email" required />
                         </div>
                         <div class="form-group inputBox">
+                          <label for="first_name">First Name</label>
+                          <InputText v-model="newFirstName" id="first_name" type="text" required />
+                        </div>
+                        <div class="form-group inputBox">
+                          <label for="last_name">Last Name</label>
+                          <InputText v-model="newLastName" id="last_name" type="text" required />
+                        </div>
+                        <div class="form-group inputBox">
                           <label for="password">Password</label>
                           <Password v-model="newPassword" id="password" type="password" name="password"
                             autocomplete="current-password" required toggleMask class="block">
@@ -142,6 +150,8 @@ const showDialog = ref(false);
 
 //const newUsername = ref('');
 const newEmail = ref('');
+const newFirstName = ref('');
+const newLastName = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
 
@@ -196,6 +206,7 @@ const SubmitLoginForm = async (e: Event) => {
       method: 'POST',
       body: {
         username: userName.value.toLowerCase(),
+        email: userName.value.toLowerCase(),
         password: userPassword.value
       }
     }).then(response => {
@@ -236,6 +247,8 @@ const submitForm = async () => {
     body: {
       username: newEmail.value.toLowerCase(),
       email: newEmail.value.toLowerCase(),
+      first_name: newFirstName,
+      last_name: newLastName,
       password: newPassword.value,
       re_password: confirmPassword.value
     }
@@ -252,6 +265,14 @@ const submitForm = async () => {
       return;
     } else if (error.value?.data.username) {
       let detail = error.value?.data.username[0];
+      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
+      return;
+    } else if (error.value?.data.first_name) {
+      let detail = error.value?.data.first_name[0];
+      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
+      return;
+    } else if (error.value?.data.last_name) {
+      let detail = error.value?.data.last_name[0];
       toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
       return;
     } else if (error.value?.data.password) {
