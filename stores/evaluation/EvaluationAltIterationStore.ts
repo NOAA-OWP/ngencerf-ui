@@ -24,17 +24,13 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     })
     calibrationRunDetailDataList.value = data.value ?? [];
     if ( calibrationRunDetailDataList.value ) {
+      calibrationRunDetailTableColumn.value = [];
       let headerRow = <DynamicTableColumnHeader[]>[];
       const rowData = calibrationRunDetailDataList.value[0];
+      
       Object.keys( rowData ).forEach( key => {
-        headerRow.push({
-          header: key.charAt(0).toUpperCase() + key.slice(1),
-          colspan: 1,
-          field: key
-        });
-        calibrationRunDetailTableColumn.value.push({ field: key });
+        calibrationRunDetailTableColumn.value.push({ field: key, header: key.charAt(0).toUpperCase() + key.slice(1) });
       })
-      calibrationRunDetailDataListHeaders.value.push( headerRow );
       const subheader_spacer_colspan = headerRow.length - 2
       calibrationRunDetailDataList.value.forEach( rowData => {
         if ( isNumeric( rowData.iteration ) === false ) {
@@ -51,7 +47,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
             header: rowData.objective_function_value,
             colspan: subheader_spacer_colspan
           });
-          calibrationRunDetailDataListHeaders.value.push( headerRow );
+          calibrationRunDetailDataListHeaders.value.push( headerRow );      
         } else {
           computedCalibrationRunDetailDataList.value.push( rowData );
         }
@@ -63,17 +59,14 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     const { data } = await useFetch<AlternativeIterationTuningParameters[]>('/api/evaluation/corresponding_calibraiton_tuning_param_data', {
       'method': 'POST'
     })
+    tuningParametersTableColumn.value = [];
     tuningParametersDataList.value = data.value ?? [];
 
     if ( tuningParametersDataList.value ) {
       let headerRow = <DynamicTableColumnHeader[]>[];
       const rowData = tuningParametersDataList.value[0];
       Object.keys( rowData ).forEach( key => {
-        headerRow.push({
-          header: key.charAt(0).toUpperCase() + key.slice(1),
-          colspan: 1
-        });
-        tuningParametersTableColumn.value.push({ field: key });
+        tuningParametersTableColumn.value.push({ field: key, header: key.charAt(0).toUpperCase() + key.slice(1) });
       })
       tuningParametersDataListHeaders.value.push( headerRow );
       const subheader_spacer_colspan = headerRow.length - 1
@@ -94,16 +87,6 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
         }
       });
     }
-  }
-  
-  const sortCalibrationRunDetailDataList = ( field: string ) => {
-    console.log( field );
-    console.log( computedCalibrationRunDetailDataList.value );
-  }
-
-  const sortTuningParametersDataList = ( field: string ) => {
-    console.log( field );
-    console.log( computedtuningParametersDataList.value );
   }
 
   /**
@@ -132,10 +115,8 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     calibrationRunDetailTableColumn,
     tuningParametersTableColumn,
     resetEvaluationAltIterationStore,
-    sortCalibrationRunDetailDataList,
-    sortTuningParametersDataList,
     computedCalibrationRunDetailDataList,
-    computedtuningParametersDataList
+    computedtuningParametersDataList,
   }
 })
 
