@@ -28,6 +28,17 @@
       </DataTable>
     </div>
   </div>
+  <div class="row-span-1 mt-4 ActionButtonsBox">
+    <div class="grid grid-cols-8">
+      <span>
+        <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+          <button class="font-normal" title="Run" aria-label="Run Button" @click="">
+            Run
+          </button>
+        </div>
+      </span>
+    </div>
+  </div>
 </div>
 </template>
 
