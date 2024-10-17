@@ -1,127 +1,153 @@
 <template>
-   <div id="OptimizationMetrics" class="pl-5 pr-3">
-      <div class="grid grid-cols-2 pt-3 gap-10">
-         <div class="col-span-1">
+   <div id="OptimizationMetrics" class="'mt-4">
+      <div class="grid grid-rows-12 gap-5">
+         <div class="row-span-3">
+            <div class="grid grid-cols-2 pt-3 gap-10">
+               <div class="col-span-1">
 
-            <div id="OptAlg" class="mt-2">
-               <label for="OptimizationAlgorithm">Optimization Algorithm</label>
-               <Select id="OptimizationAlgorithm" class="mt-1" v-model="uiOptimization"
-                  :options="getOptimizationAlgorithmOptionsList" filter optionLabel="name" optionValue="name"
-                  placeholder="" @change="optimizationSelectChange"></Select>
+                  <div id="OptAlg" class="mt-2">
+                     <label for="OptimizationAlgorithm">Optimization Algorithm</label>
+                     <Select id="OptimizationAlgorithm" class="mt-1" v-model="uiOptimization"
+                        :options="getOptimizationAlgorithmOptionsList" filter optionLabel="name" optionValue="name"
+                        placeholder="" @change="optimizationSelectChange"></Select>
+                  </div>
+
+               </div>
+               <div class="col-span-1">
+                  <div class="mt-2">
+                     <div class="">
+                        <div class="flex mt-2">
+                           <div class="text-left font-bold">Algorithm Parameter(s)</div>
+                           <div id="ClearTableBtn" class="ml-auto">
+                              <button @click="resetOptimizationInputs" class="c-blue font-normal underline">Clear
+                                 <!-- <i class="pi pi-arrow-up"></i>--></button>
+                           </div>
+                        </div>
+
+                        <div id="AlgParamtable" class="mt-1">
+                           <DataTable :value="uiOptimizationInputs" scrollable editMode="cell" scroll-height="300px"
+                              fixedHeader=true>
+                              <Column field="name" header="Parameter" sortable></Column>
+                              <Column field="value" header="Initial Value" sortable>
+                                 <template #editor="{ index }">
+                                    <InputText v-model="uiOptimizationInputs[index].value" autofocus class="w-12 p-1">
+                                    </InputText>
+                                 </template>
+                              </Column>
+                           </DataTable>
+                        </div>
+                     </div>
+
+                  </div>
+               </div>
             </div>
-
          </div>
-         <div class="col-span-1">
 
-            <div class="mt-2">
-               <div class="w-full">
-                  <div class="flex mt-2 w-full">
-                     <div class="text-left font-bold">Algorithm Parameter(s)</div>
-                     <div id="ClearTableBtn" class="ml-auto">
-                        <button @click="resetOptimizationInputs" class="c-blue font-normal underline">Clear
-                           <!-- <i class="pi pi-arrow-up"></i>--></button>
+         <div class="row-span-1 h-1rem hr">&nbsp;</div>
+
+         <div class="row-span-4">
+            <div class="grid grid-cols-2 gap-10">
+               <div class="col-span-1">
+                  <div id="ObjFunct">
+                     <label for="ObjectiveFunction<">Objective Function</label>
+                     <Select id="ObjectiveFunction" class="rounded-md" filter v-model="uiObjectiveFunction"
+                        :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
+                        @change="updateMetricFlowFieldVisibility"></Select>
+                     <div v-if="showObjectiveFunctionStreamFlow">
+                        Flow Threshold: <InputNumber inputId="ofCategoricalFlowThreshold"
+                           v-model="uiStreamFlowThreshold" class="w-24">
+                        </InputNumber> m3/s
+                     </div>
+                     <div v-if="showObjectiveFunctionPeakFlow">
+                        Peak Flow Threshold: <InputNumber inputId="ofEventBasedFlowThreshold"
+                           v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
                      </div>
                   </div>
+               </div>
 
-                  <div id="AlgParamtable" class="w-full mt-1">
-                     <DataTable :value="uiOptimizationInputs" scrollable editMode="cell" scroll-height="300px"
-                        fixedHeader=true>
-                        <Column field="name" header="Parameter" sortable></Column>
-                        <Column field="value" header="Initial Value" sortable>
-                           <template #editor="{ index }">
-                              <InputText v-model="uiOptimizationInputs[index].value" autofocus class="w-12 p-1">
-                              </InputText>
-                           </template>
-                        </Column>
-                     </DataTable>
+               <div class="col-span-1">
+                  <div id="Metrics">
+                     <div class="font-bold">Metrics</div><br>
+
+                     <Checkbox id="CalcCatMetCB" inputId="CalcCatMetCB" class="h-5 w-5 mr-3"
+                        style="display:inline-block" :binary="true" v-model="cbIsCategorical"
+                        :disabled="cbCategoricalDisabled" @change="toggleMetricStreamFlowInput" />
+                     <label for="CalcCatMetCB" class="inline">Calculate Categorical Metrics</label>
+                     <div class="pl-8">
+                        <span class="text-sm ml-2">(POD, CSI, FAR)</span>
+                     </div>
+                     <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-1 pl-8">
+                        Flow Threshold: <InputNumber inputId="metricCategoricalFlowThreshold"
+                           v-model="uiStreamFlowThreshold" class="w-24"></InputNumber> m3/s
+                     </div><br />
+
+                     <Checkbox id="CalEventMetCB" inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline"
+                        style="display:inline-block" :binary="true" v-model="cbIsEvenBased"
+                        :disabled="cbEventBasedDisabled" @change="toggleMetricPeakFlowInput" />
+                     <label for="CalEventMetCB" class="inline">Calculate Event Based Metrics</label>
+                     <div class="pl-8">
+                        <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
+                     </div>
+                     <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-1 pl-8">
+                        Peak Flow Threshold: <InputNumber inputId="metricEventBasedFlowThreshold"
+                           v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
+                     </div>
                   </div>
                </div>
-
             </div>
          </div>
 
-         <div class="col-span-2">
-            <div class="hr"></div>
-         </div>
+         <div class="row-span-1 h-1rem hr">&nbsp;</div>
 
-         <div class="col-span-1">
-            <div id="ObjFunct">
-               <label for="ObjectiveFunction<">Objective Function</label>
-               <Select id="ObjectiveFunction" class="rounded-md" filter v-model="uiObjectiveFunction"
-                  :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
-                  @change="updateMetricFlowFieldVisibility"></Select>
-               <div v-if="showObjectiveFunctionStreamFlow">
-                  Flow Threshold: <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
-                     class="w-24">
-                  </InputNumber> m3/s
+         <div class="row-span-2 mb-4">
+            <div class="grid grid-cols-2 gap-10">
+               <div class="col-span-1">
+                  <!--REVIVING LOST CONTENT HERE-->
+                  <div id="CalibrationStopCriteria" class="bordered">
+                     <label for="StopCriteria">Calibration Stop Criteria:</label><br>
+                     <InputNumber id="StopCriteria" inputId="stopCriteria" v-model="uiStopCriteria" showButtons
+                        :min="0">
+                     </InputNumber>
+                     <div>Iterations per Worker</div>
+                  </div>
                </div>
-               <div v-if="showObjectiveFunctionPeakFlow">
-                  Peak Flow Threshold: <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
-                     class="w-24"></InputNumber> quartile
-               </div>
-            </div>
-         </div>
-
-         <div class="col-span-1">
-            <div id="Metrics">
-               <div class="font-bold">Metrics</div><br>
-
-               <Checkbox id="CalcCatMetCB" inputId="CalcCatMetCB" class="h-5 w-5 mr-3" style="display:inline-block"
-                  :binary="true" v-model="cbIsCategorical" :disabled="cbCategoricalDisabled"
-                  @change="toggleMetricStreamFlowInput" />
-               <label for="CalcCatMetCB" class="inline">Calculate Categorical Metrics</label>
-               <div class="pl-8">
-                  <span class="text-sm ml-2">(POD, CSI, FAR)</span>
-               </div>
-               <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-1 pl-8">
-                  Flow Threshold: <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
-                     class="w-24"></InputNumber> m3/s
-               </div><br />
-
-               <Checkbox id="CalEventMetCB" inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline"
-                  style="display:inline-block" :binary="true" v-model="cbIsEvenBased" :disabled="cbEventBasedDisabled"
-                  @change="toggleMetricPeakFlowInput" />
-               <label for="CalEventMetCB" class="inline">Calculate Event Based Metrics</label>
-               <div class="pl-8">
-                  <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
-               </div>
-               <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-1 pl-8">
-                  Peak Flow Threshold: <InputNumber inputId="metricEventBasedFlowThreshold"
-                     v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
+               <div class="col-span-1">
+                  <div id="PlotGenFreq" class="bordered">
+                     <label for="PlotFrequency">Plot Generation Frequency (0 = off)</label><br>
+                     Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency"
+                        v-model="uiPlotFrequency" showButtons :min="0"></InputNumber>&nbsp;&nbsp;Iterations
+                  </div>
                </div>
             </div>
+
          </div>
-
-         <div class="col-span-2">
-            <div class="hr"></div>
-         </div>
-
-         <div class="col-span-1">
-            <!--REVIVING LOST CONTENT HERE-->
-            <div id="CalibrationStopCriteria" class="bordered">
-               <label for="StopCriteria">Calibration Stop Criteria:</label><br>
-               <InputNumber id="StopCriteria" inputId="stopCriteria" v-model="uiStopCriteria" showButtons :min="0">
-               </InputNumber>
-               <div>Iterations per Worker</div>
-            </div>
-         </div>
-
-         <div class="col-span-1">
-            <div id="PlotGenFreq" class="bordered">
-               <label for="PlotFrequency">Plot Generation Frequency (0 = off)</label><br>
-               Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency"
-                  v-model="uiPlotFrequency" showButtons :min="0"></InputNumber>&nbsp;&nbsp;Iterations
-
-            </div>
-         </div>
-
-         <br clear="all">
-         <br clear="all">
-         <br clear="all">
+         <div class="row-span-1 h-1rem hr">&nbsp;</div>
       </div>
-      <div class="waitgif" v-if="optimizationStore_data_loading">
-         <img src="@/assets/styles/img/wait.gif" />
+      <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6 ActionButtonsBox">
+         <span v-if="calibrationStatus !== 'Running'">
+            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+               <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()">
+                  Save
+               </button>
+            </div>
+         </span>
+         <span v-else>
+            <div class="col-span-1 mr-6 h-8">&nbsp;</div>
+         </span>
+         <div class="col-span-1 mr-3">
+         </div>
+         <div class="col-span-4">&nbsp;</div>
+         <div class="col-span-1">
+            <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+                  aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
+         </div>
+         <div class="col-span-1 mr-4">
+            <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+                  @click="goNextTab()">Next</button></div>
+         </div>
+
       </div>
+
    </div>
 </template>
 
@@ -133,6 +159,10 @@ import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore"
+
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+const runStatusStore = useRunStatusStore();
+const { calibrationStatus } = storeToRefs(runStatusStore);
 
 const optimizationStore = useOptimizationStore();
 const {
@@ -167,62 +197,6 @@ const showMetricStreamFlow = ref<boolean>(false)
 
 onMounted(() => {
    toast.removeAllGroups();
-   /**
- * event bus for calibration button group click
- */
-   useListen('calibrationButtonSaveStart', (actionButton) => {
-      if (getCalibrationTabIndex() === 5 && actionButton == 'SAVE') {
-         toast.removeAllGroups()
-         const save_optimization_response = saveOptimizationTabData()
-         save_optimization_response.then((response) => {
-            if (response?.validation_errors) {
-               useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-                  toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: message })
-               })
-            } else {
-               toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message, life: 3000 })
-               fetchUserCalibrationRunData()
-            }
-         })
-      }
-   })
-
-   useListen('calibrationButtonResetCancel', (actionButton) => {
-      if (getCalibrationTabIndex() == 4 && actionButton == 'RESET') {
-         resetUserSelectionOptimization()
-      }
-   })
-
-   useListen('calibrationButtonNext', (actionButton) => {
-      if (getCalibrationTabIndex() == 5 && actionButton === "NEXT") {
-         if (!uiOptimization.value) {
-            toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Calibration Times are required.", life: 3000 })
-         }
-         if (!uiObjectiveFunction.value) {
-            toast.add({ severity: 'warn', summary: `Data requirement error`, detail: "All Automatic Validation Times are required.", life: 3000 })
-         }
-         if (!uiOptimization.value || !uiObjectiveFunction.value) {
-            setTimeout(() => gotoNext(), 3000);
-         }
-         gotoNext();
-      }
-   });
-
-   useListen('calibrationButtonPrev', (actionButton) => {
-      if (getCalibrationTabIndex() == 5 && actionButton === "PREV") {
-         const tabs = document.getElementsByClassName("tabs");
-         const e = <HTMLElement>tabs[3];
-         e.click();
-      }
-   });
-
-})
-
-onUnmounted(() => {
-  emitterOff('calibrationButtonSaveStart');
-  emitterOff('calibrationButtonResetCancel');
-  emitterOff('calibrationButtonPrev');
-  emitterOff('calibrationButtonNext');
 })
 
 /**
@@ -289,7 +263,7 @@ const optimizationSelectChange = () => {
 
 const gotoNext = () => {
    const tabs = document.getElementsByClassName("tabs");
-   const e = <HTMLElement>tabs[5];
+   const e = <HTMLElement>tabs[CalibrationTabs.tab_statusRun];
    e.click();
 }
 
@@ -320,6 +294,49 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
   }
 })
 
+
+/**
+* event bus for calibration button group click
+*/
+const saveOptMetData = () => {
+   toast.removeAllGroups()
+   const save_optimization_response = saveOptimizationTabData()
+   save_optimization_response.then((response) => {
+      if (response?.validation_errors) {
+         useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
+            toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: message })
+         })
+      } else {
+         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message, life: 3000 })
+         fetchUserCalibrationRunData()
+      }
+   })
+};
+
+const goNextTab = () => {
+   // let err = false;
+   // let txt = "Please correct the following:";
+   // if (!uiOptimization.value) {
+   //    txt += "\nAll Calibration Times are required.";
+   //    err = true;
+   // }
+   // if (!uiObjectiveFunction.value) {
+   //    txt += "\nAll Automatic Validation Times are required."
+   //    err = true;
+   // }
+   // if (err) {
+   //    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
+   //    return;
+   // }
+   gotoNext();
+};
+
+const goPrevTab = () => {
+   const tabs = document.getElementsByClassName("tabs");
+   const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
+   e.click();
+};
+
 </script>
 
 <style lang="scss" scoped>
@@ -330,5 +347,9 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
    position: relative;
    z-index: 2;
    max-height: 8rem !important;
+}
+
+#OptMetbuttons {
+   height: 40px;
 }
 </style>

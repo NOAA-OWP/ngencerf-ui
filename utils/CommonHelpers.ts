@@ -7,5 +7,5 @@ import { DateTime } from "luxon";
  * @returns {boolean}
  */
 export const isValidDateTime = (obj: any): boolean => {
-  return DateTime.isDateTime(obj) && obj.isValid;
+  return obj && DateTime.isDateTime(obj) && obj.isValid;
 };

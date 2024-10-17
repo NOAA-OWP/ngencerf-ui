@@ -19,7 +19,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const startTime = ref();
 
   const plotNames = ref();
-  const plotList = ref();
+  const plotList = ref([]);
   const selectedPlotName = ref();
   const selectedPlotFilename = ref();
   const selectedPlotFileUrl = ref();
@@ -131,7 +131,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     startTimeDate.value = "";
     startTime.value = "";
     plotNames.value = "";
-    plotList.value = "";
+    plotList.value = [];
     selectedPlotName.value = "";
     selectedPlotFilename.value = "";
     selectedPlotFileUrl.value = "";

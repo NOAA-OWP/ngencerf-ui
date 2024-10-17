@@ -95,13 +95,13 @@ const tuningParamsData = [
 <style lang="scss">
 @import "/assets/styles/styles.scss";
 #RunDetailsTbl .p-datatable-tbody > tr:nth-child(1) {
-    background-color: #D8FFD8; 
+    background-color: $ngwcp_green_lt; 
 }
 #RunDetailsTbl .p-datatable-tbody > tr:nth-child(2) {
-    background-color: #D8FFFF; 
+    background-color: $ngwcp_blue_lt; 
 }
 #CalTuningParamsTbl .p-datatable-tbody > tr:nth-child(1) {
-    background-color: #D8FFD8; 
+    background-color: $ngwcp_green_lt; 
 }
 
 table#cr-detail-list2 {

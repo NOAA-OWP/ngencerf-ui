@@ -14,7 +14,6 @@
               <div class="grid row-span-12 white-tall-content-box">
                 <div class="overflow-auto">
                   <VerificationLeftBlock />
-                  <div class="ActionButtons-bg-mask"></div>
                 </div>
               </div>
             </div>
