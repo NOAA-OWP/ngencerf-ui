@@ -5,7 +5,7 @@ services:
     extends:
       file: compose.yaml
       service: ngencerf-app
-    image: registry.sh.nextgenwaterprediction.com/ngwpc/nwm-ngen/nextgen_ui:prod
+    image: registry.sh.nextgenwaterprediction.com/ngwpc/nwm-ngen/ngencerf_ui:prod
     pull_policy: always
     build: 
       dockerfile: ./Dockerfile.production-pw
