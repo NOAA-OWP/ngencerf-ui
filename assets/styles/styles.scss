@@ -134,7 +134,20 @@ input::-webkit-input-placeholder {
   border: 0px;
 }
 
-
+.ngenButtonDiv-green {
+  cursor: pointer;
+  color: white;
+  padding: 6px 25px;
+  border-radius: 28px;
+  background-color: $ngwcp_secondary4;
+  text-align: center;
+  font-size: 18px;
+  border: 0px;
+  display: inline-block;
+}
+.ngenButtonDiv-green:hover {
+  background-color: $ngwcp_secondary4lt;
+}
 .btn-left {
   margin-right: auto;
   margin-left: 0px;
@@ -315,6 +328,7 @@ select option {
 
 // default color ovewrites
 .bg-green { background-color: $ngwcp_secondary4 !important; }
+.bg-lt-green { background-color: $ngwcp_secondary4lt !important}
 .bg-blue1 { background-color: $ngwcp_primary1 !important; }
 .bg-blue2 { background-color: $ngwcp_primary2 !important; }
 .bg-blue3 { background-color: $ngwcp_primary3 !important; }
@@ -326,6 +340,7 @@ select option {
 
 .c-gray-bg {background-color: $ngwcp_background !important }
 .bg-gray-md {background-color: $ngwcp_neutral_gray_md !important }
+
 
 #ProgressGroup {
   width: 100%;
@@ -376,6 +391,9 @@ table.cols-bordered {
     }
   }
 }
+
+.bg_green_lt { background-color: $ngwcp_green_lt; }
+.bg_blue_lt { background-color: $ngwcp_blue_lt; }
 
 //ATTENTION to DEVELOPERS: TEMORARY: REMOVE THIS AFTER geopackageImageUrl is working
 #GageCutout {
@@ -481,6 +499,23 @@ table.cols-bordered {
 }
 
 /* Listbox select (for Tuning Tab) */
+.p-listbox {
+  border-radius: 0px;
+}
+.p-listbox-list {
+  padding: 0px !important;
+}
+.p-listbox-list-container {
+  margin-top: 7px;
+}
 .p-listbox-option-selected {
-  background-color: #6dfcb9 !important;
+  background-color: $ngwcp_green_lt; 
+}
+
+/* Action Buttons repositioning */
+.ActionButtonsBox {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  padding:20px 30px 5px;
 }

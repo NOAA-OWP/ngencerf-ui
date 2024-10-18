@@ -38,7 +38,7 @@
                     aria-label="Update with new password">
                     Update
                   </button>
-                   <button class="ngenButtonDiv ml-20" id="closeBtn" name="cancel" value="Cancel" type="button" v-on:click="closeAccountBox"
+                   <button class="ngenButtonDiv ml-2" id="closeBtn" name="cancel" value="Cancel" type="button" v-on:click="closeAccountBox"
                     aria-label="Close Account Box">
                     Close
                   </button>

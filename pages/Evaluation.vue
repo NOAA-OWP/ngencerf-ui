@@ -10,7 +10,7 @@ import EvaluationLayout from "~/layouts/EvaluationLayout.vue";
 
 onMounted(() => {
   const allTabs = document.getElementsByClassName("tabs");
-  const e = allTabs[0] as HTMLElement;
+  const e = allTabs[CalibrationTabs.tab_calibrationRuns] as HTMLElement;
   e.click();
 });
 </script>

@@ -12,19 +12,19 @@
         <td><i v-if="userCalibrationRunData?.external_data_status?.forcing"
             :class="userCalibrationRunData?.external_data_status?.forcing ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td class="ptype" data-tab="3" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing</td>
+        <td class="ptype" data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.external_data_status?.observational"
             :class="userCalibrationRunData?.external_data_status?.observational ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td class="ptype" data-tab="3" title="Observational" aria-label="Observational" @click="tabClicked">Observational</td>
+        <td class="ptype" data-tab="2" title="Observational" aria-label="Observational" @click="tabClicked">Observational</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.external_data_status?.geopackage"
             :class="userCalibrationRunData?.external_data_status?.geopackage ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td class="ptype" data-tab="3" title="Geopackage" aria-label="Geopackage" @click="tabClicked">Geopackage</td>
+        <td class="ptype" data-tab="2" title="Geopackage" aria-label="Geopackage" @click="tabClicked">Geopackage</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length"
@@ -122,7 +122,7 @@ const {
   simEndTime,
   calStartTime,
   calEndTime,
-  userCalibrationTuningParameters,
+  userSelectedCalibrationTuningParameters,
   userOutputVariableToCalibrate,
   avSimStartTime,
   avSimEndTime,

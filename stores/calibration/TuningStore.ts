@@ -22,7 +22,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const calStartTime = ref<any>("");
   const calEndTime = ref<any>("");
 
-  const userCalibrationTuningParameters = ref<any[]>([]);
+  const calibrationTuningParameters = ref<any[]>([]);
+  const userSelectedCalibrationTuningParameters = ref<any[]>([]);
   const userOutputVariableToCalibrate = ref<{ name: string; module: string | null }>({
     name: '',
     module: null,
@@ -81,8 +82,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
     }
 
     // add user calibration tuning parameters if they are provided
-    if (userCalibrationTuningParameters.value && userCalibrationTuningParameters.value.length > 0) {
-      requestBody.parameters = userCalibrationTuningParameters.value;
+    if (userSelectedCalibrationTuningParameters.value && userSelectedCalibrationTuningParameters.value.length > 0) {
+      requestBody.parameters = userSelectedCalibrationTuningParameters.value;
     }
 
     // add user output variable to calibrate if it is provided
@@ -132,7 +133,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
     simEndTime.value = "";
     calStartTime.value = "";
     calEndTime.value = "";
-    userCalibrationTuningParameters.value = [];
+    calibrationTuningParameters.value = [];
+    userSelectedCalibrationTuningParameters.value = [];
     userOutputVariableToCalibrate.value.name = '';
     userOutputVariableToCalibrate.value.module = null;
     outputVariables.value = [];
@@ -141,8 +143,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
     avSimEndTime.value = "";
     avCalStartTime.value = "";
     avCalEndTime.value = "";
-    rangeDateFrom.value = null;
-    rangeDateTo.value = null;
     console.log("Tuning Store Reset")
   };
 
@@ -154,7 +154,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
     simEndTime,
     calStartTime,
     calEndTime,
-    userCalibrationTuningParameters,
+    calibrationTuningParameters,
+    userSelectedCalibrationTuningParameters,
     userOutputVariableToCalibrate,
     outputVariables,
     automatic_validation,

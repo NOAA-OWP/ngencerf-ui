@@ -1,37 +1,37 @@
 <template>
   <!-- LeftBlock.vue -->
   <div>
-    <Tabs @tabNumber="tabChanged" />
-    <div class="shrink-0">
-      <span v-if="activeTab == 1">
-        <CalibrationRunsTab />
-      </span> <span v-if="activeTab == 2">
-        <HeadwaterBasinGage />
-      </span>
-      <span v-else-if="activeTab == 3">
-        <Formulation />
-      </span>
-      <span v-else-if="activeTab == 4">
-        <TuningControls />
-      </span>
-      <span v-else-if="activeTab == 5">
-        <OptimizationMetrics />
-      </span>
-      <span v-else-if="activeTab == 6">
-        <RunStatus />
-      </span>
-    </div>
+    <CommonTabs @tabNumber="tabChanged" />
+
+    <span v-if="activeTab == 1">
+      <CalibrationCalibrationRunsTab />
+    </span> <span v-if="activeTab == 2">
+      <CalibrationHeadwaterBasinGage />
+    </span>
+    <span v-else-if="activeTab == 3">
+      <CalibrationFormulation />
+    </span>
+    <span v-else-if="activeTab == 4">
+      <CalibrationTuningControls />
+    </span>
+    <span v-else-if="activeTab == 5">
+      <CalibrationOptimizationMetrics />
+    </span>
+    <span v-else-if="activeTab == 6">
+      <CalibrationRunStatus />
+    </span>
   </div>
+
 </template>
 
 <script setup lang="ts">
-import HeadwaterBasinGage from '~/components/Calibration/HeadwaterBasinGage.vue';
-import Tabs from '~/components/Common/Tabs.vue'
-import Formulation from '~/components/Calibration/Formulation.vue'
-import TuningControls from '~/components/Calibration/TuningControls.vue'
-import OptimizationMetrics from '~/components/Calibration/OptimizationMetrics.vue'
-import RunStatus from '~/components/Calibration/RunStatus.vue'
-import CalibrationRunsTab from '~/components/Calibration/PreviousCalibrationRuns.vue'
+import CalibrationHeadwaterBasinGage from '~/components/Calibration/HeadwaterBasinGage.vue';
+import CommonTabs from '~/components/Common/Tabs.vue'
+import CalibrationFormulation from '~/components/Calibration/Formulation.vue'
+import CalibrationTuningControls from '~/components/Calibration/TuningControls.vue'
+import CalibrationOptimizationMetrics from '~/components/Calibration/OptimizationMetrics.vue'
+import CalibrationRunStatus from '~/components/Calibration/RunStatus.vue'
+import CalibrationCalibrationRunsTab from '~/components/Calibration/PreviousCalibrationRuns.vue'
 
 import { generalStore } from "@/stores/common/GeneralStore";
 
