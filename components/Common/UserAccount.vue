@@ -46,19 +46,14 @@
               </form>
             </div>
             <div class="col-span-7">
-              <div id="avatar" class="row">
-                <div><img src="@/assets/styles/img/herbie.png" /></div>
-              </div>
               <div id="passwordNotes" class="row">
                 <p>
                   <strong>Password format:</strong><br />
-                  At least 12 characters long but 14 or more is better.<br /><br />
-                  A combination of uppercase letters,<br />
-                  lowercase letters, numbers, an14 ord symbols.<br /><br />
-                  Not a word that can be found in a dictionary<br />
-                  or the name of a person, character,<br />
-                  product, or organization.<br /><br />
-                  Significantly different from your previous password
+                  <ul>
+                    <li>Cannot be a commonly used password</li>
+                    <li>Must be at least 8 characters long</li>
+                    <li>Must contain at least one non-numeric character</li>
+                  </ul>
                 </p>
               </div>
             </div>
