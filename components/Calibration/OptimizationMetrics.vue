@@ -203,64 +203,63 @@ onMounted(() => {
  * update objective function and metric peak flow/stream flow field visibility
  */
 const updateMetricFlowFieldVisibility = () => {
-   if (getSelectedMetricInfo.value) {
-      //reset toggleable field available property
-      cbCategoricalDisabled.value = false
-      cbEventBasedDisabled.value = false
-      showObjectiveFunctionStreamFlow.value = false
-      showObjectiveFunctionPeakFlow.value = false
-      uiStreamFlowThreshold.value = undefined
-      uiPeakFlowThreshold.value = undefined
-      showMetricStreamFlow.value = false
-      showMetricPeakFlow.value = false
+  if (getSelectedMetricInfo.value) {
+    //reset toggleable field available property
+    cbCategoricalDisabled.value = false
+    cbEventBasedDisabled.value = false
+    showObjectiveFunctionStreamFlow.value = false
+    showObjectiveFunctionPeakFlow.value = false
+    uiStreamFlowThreshold.value = undefined
+    uiPeakFlowThreshold.value = undefined
+    showMetricStreamFlow.value = false
+    showMetricPeakFlow.value = false
 
-      const metricInfo = getSelectedMetricInfo.value?.pop()
+    const metricInfo = getSelectedMetricInfo.value?.pop()
 
-      cbIsCategorical.value = metricInfo?.categorical ?? false
-      cbIsEvenBased.value = metricInfo?.event_based ?? false
+    cbIsCategorical.value = metricInfo?.categorical ?? false
+    cbIsEvenBased.value = metricInfo?.event_based ?? false
 
-      if (metricInfo?.categorical == true) {
-         showObjectiveFunctionStreamFlow.value = true
-         cbCategoricalDisabled.value = true
-      }
-      if (metricInfo?.event_based == true) {
-         showObjectiveFunctionPeakFlow.value = true
-         cbEventBasedDisabled.value = true
-      }
-   }
+    if (metricInfo?.categorical == true) {
+        showObjectiveFunctionStreamFlow.value = true
+        cbCategoricalDisabled.value = true
+    }
+    if (metricInfo?.event_based == true) {
+        showObjectiveFunctionPeakFlow.value = true
+        cbEventBasedDisabled.value = true
+    }
+  }
 }
 
 /**
  * metric stream flow field visibility toggle 
  */
 const toggleMetricStreamFlowInput = () => {
-   if (!cbCategoricalDisabled.value && cbIsCategorical.value) {
-      showMetricStreamFlow.value = true
-   } else if (!cbIsCategorical.value) {
-      showMetricStreamFlow.value = false
-      uiStreamFlowThreshold.value = undefined
-   }
+  if (!cbCategoricalDisabled.value && cbIsCategorical.value) {
+    showMetricStreamFlow.value = true
+  } else if (!cbIsCategorical.value) {
+    showMetricStreamFlow.value = false
+    uiStreamFlowThreshold.value = undefined
+  }
 }
 
 /**
  * metric peak flow field visibility toggle 
  */
 const toggleMetricPeakFlowInput = () => {
-   if (!cbEventBasedDisabled.value && cbIsEvenBased.value) {
-      showMetricPeakFlow.value = true
-   } else if (!cbIsEvenBased.value) {
-      showMetricPeakFlow.value = false
-      uiPeakFlowThreshold.value = undefined
-   }
+  if (!cbEventBasedDisabled.value && cbIsEvenBased.value) {
+    showMetricPeakFlow.value = true
+  } else if (!cbIsEvenBased.value) {
+    showMetricPeakFlow.value = false
+    uiPeakFlowThreshold.value = undefined
+  }
 }
 
 /**
  * explicitly reload optimization input table data
  */
 const optimizationSelectChange = () => {
-   uiOptimizationInputs.value = getOptimizationInputUserData.value
+  uiOptimizationInputs.value = getOptimizationInputUserData.value
 }
-
 
 const gotoNext = () => {
    const tabs = document.getElementsByClassName("tabs");
@@ -276,23 +275,23 @@ const gotoNext = () => {
 watch(() => optimizationStore_data_loading.value, (loading_status) => {
    const metricInfo = getSelectedMetricInfo.value?.pop()
 
-   if (metricInfo?.categorical == true) {
-      showObjectiveFunctionStreamFlow.value = true
-      cbCategoricalDisabled.value = true
-      cbIsCategorical.value = true
-   } else if (metricInfo?.categorical == false && uiStreamFlowThreshold.value) {
-      showMetricStreamFlow.value = true
-      cbIsCategorical.value = true
-   }
+  if (metricInfo?.categorical == true) {
+    showObjectiveFunctionStreamFlow.value = true
+    cbCategoricalDisabled.value = true
+    cbIsCategorical.value = true
+  } else if (metricInfo?.categorical == false && uiStreamFlowThreshold.value) {
+    showMetricStreamFlow.value = true
+    cbIsCategorical.value = true
+  }
 
-   if (metricInfo?.event_based == true) {
-      showObjectiveFunctionPeakFlow.value = true
-      cbEventBasedDisabled.value = true
-      cbIsEvenBased.value = true
-   } else if (metricInfo?.event_based == false && uiPeakFlowThreshold.value) {
-      showMetricPeakFlow.value = true
-      cbIsEvenBased.value = true
-   }
+  if (metricInfo?.event_based == true) {
+    showObjectiveFunctionPeakFlow.value = true
+    cbEventBasedDisabled.value = true
+    cbIsEvenBased.value = true
+  } else if (metricInfo?.event_based == false && uiPeakFlowThreshold.value) {
+    showMetricPeakFlow.value = true
+    cbIsEvenBased.value = true
+  }
 })
 
 
