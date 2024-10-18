@@ -244,10 +244,10 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
   * @returns {GeneralApiSaveResponse}
   */
   async function saveFormulationTabData() {
-    const slothParametersValidation = useCalibrationFormulationSlothTableValidation(slothParameterInputs.value);
-    console.log('saveFormulationTabData slothParametersValidation: ', slothParametersValidation.value)
-    if (Object.keys(slothParametersValidation.value).length == 0) {
-      const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>(`${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
+    const slothParametersValidation = useCalibrationFormulationSlothTableValidation( slothParameterInputs.value );
+    
+    if ( Object.keys( slothParametersValidation.value ).length == 0 ) {
+      const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${getAccessToken()}`,
