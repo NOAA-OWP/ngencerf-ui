@@ -37,6 +37,13 @@
           </button>
         </div>
       </span>
+      <span>
+        <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+          <button class="font-normal" title="Cancel" aria-label="Cancel Button" @click="">
+            Cancel
+          </button>
+        </div>
+      </span>
     </div>
   </div>
 </div>
@@ -44,7 +51,6 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import ColumnGroup from 'primevue/columngroup';
 import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAltIterationStore';
 
 const {     
