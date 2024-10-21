@@ -16,7 +16,7 @@
 
                 <div v-if="!showDialog" class="mx-auto px-8 text-left">
                   <form onsubmit="return false">
-                    <h1>Login in</h1>
+                    <h1>Login</h1>
                     <div class="inputBox">
                       <input id="uname" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
                         autocomplete="username" v-on:keypress="autoSubmit" />
