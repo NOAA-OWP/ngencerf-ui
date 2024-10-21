@@ -9,7 +9,7 @@
 
                     <div class="grid grid-cols-2 mb-5">
                         <div class="col-span-1">
-                            <div class="inline ">Headwater Basin Gage:
+                            <div class="inline ">Headwater Basin Gage
                                 <Select id="HeadwaterBasinGage" class="mr-2">
                                     <option value="">...</option>
                                 </Select>

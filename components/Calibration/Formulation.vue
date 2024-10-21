@@ -5,7 +5,7 @@
         <div class="grid grid-cols-8">
           <div class="col-span-8">
             <div id="FormulationName" class="block mt-1" aria-label="Forumulation Name" title="Formulation Name">
-              <label for="formulationNameInput">Forumulation Name: </label>
+              <label for="formulationNameInput" class="text-lg">Forumulation Name </label>
               <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
                 aria-label="Input Forumulation Name" title="Input Formulation Name" required></InputText>
             </div>
@@ -23,7 +23,7 @@
                   optionValue="name" placeholder="Select group..."></Select>
               </div>
             </div>
-            <div class="mb-1 font-bold">Select Modules:</div>
+            <div class="pt-4 mb-1 font-bold text-base">Select Modules</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
               optionLabel="name" optionValue="name" class="h-60">
               <template #option="slotProps">
@@ -37,7 +37,7 @@
           <div class="col-span-5">
             <div class="group-cover-selection-wrapper w-80 float-left">
               <div class="mt-5 mb-2 pl-4 text-lg" aria-label="List of groups covered by selection"
-                title="List of groups covered by selection"><strong>Groups Covered By Selections:</strong></div>
+                title="List of groups covered by selection"><strong>Groups Covered By Selections</strong></div>
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
                 optionValue="name" scrollHeight="18rem" class="border-0">
                 <template #option="slotProps">
@@ -54,13 +54,12 @@
       <div class="row-span-2 -mt-2">
 
         <div class="flex">
-          <span class="text-left">
+          <span class="text-left pt-1">
             <input type="checkbox" id="SlothCheck" class="ml-2" v-model="useSlothParameters" />
-            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for
-              formulation</label>
+            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for formulation</label>
           </span>
           <span v-show="useSlothParameters" class="ml-auto pr-2">
-            <div class="inline-block  text-[16px] pl-10 pr-4" for="SlothName">SLoTH Name:</div>
+            <label class="inline-block  text-[16px] pl-10 pr-4" for="SlothName">SLoTH Name</label>
             <input class="inline-block w-auto" id="SlothName" type="text" v-model="new_sloth_variable_name"
               @keypress="addSlothOnEnter($event)">
             <div class="ngenButtonDiv ml-3 inline-block">
@@ -305,7 +304,9 @@ const goPrevTab = () => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-
+#Groups, #formulationNameInput {
+  width: 256px;
+}
 #Formulation {
   width: auto;
 }
@@ -339,6 +340,11 @@ ul#ModulesList {
     background-color: $ngwcp_primary3;
     color: white;
   }
+}
+
+#ModuleList .p-listbox-option {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
 }
 
 #ModuleGroupSelect {

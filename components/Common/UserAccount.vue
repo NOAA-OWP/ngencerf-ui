@@ -1,14 +1,17 @@
 <template>
   <!-- User Page -->
 
-        <div id="UserBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md">
-          <div class="grid grid-cols-12 gap-3">
-            <div class="col-span-5">
+        <div id="UserBox" class="bg-white mx-auto px-16 pt-10 pb-16 rounded-[10px] max-w-screen-md">
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="col-span-2">
               <div class="ttl">Your Account</div>
               <div class="name">{{ accountName }}</div>
+              <div class="chgpwd mt-12 mb-6">Change Password</div>
+            </div>
+            <div class="col-span-1">
               <form @submit.prevent="changePassword" @cancel="closeAccountBox">
                 <div class="passwordBox grid row-auto">
-                  <div class="chgpwd">Change Password</div>
                   <div class="pwdspacer">Old password</div>
                   <div>
                     <Password id="OldPass" type="password" name="password" :inputProps="{ autocomplete: true }"
@@ -45,7 +48,7 @@
                 </div>
               </form>
             </div>
-            <div class="col-span-7">
+            <div class="col-span-1">
               <div id="passwordNotes" class="row">
                 <p>
                   <strong>Password format:</strong><br />
@@ -57,7 +60,9 @@
                 </p>
               </div>
             </div>
+
           </div>
+
         </div>
 
 </template>
@@ -178,12 +183,5 @@ const closeAccountBox = () => {
     font-size: 30px;
   }
 
-  .passwordBox {
-    margin: 120px 0 0 20px;
-  }
-
-  .pwdspacer {
-    margin-top: 40px;
-  }
 }
 </style>
