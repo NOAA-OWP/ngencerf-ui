@@ -53,25 +53,31 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
     useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false
     slothParameterInputs.value = userCalibrationRunData.value?.sloth_parameters ?? []
   }
-
+  userCalibrationRunData.value?.modules
   /**
   * return list of Module Options based on the filter selection
   * @returns {SelectOption[]}
   */
   const fetchFormulationModuleOptions = computed(() => {
-    let modules_list = <SelectOption[]>[]
+    let modules_list = <SelectOption[]>[];
+    let selected_mouldes_list = <SelectOption[]>[];
     formulationTabData.value?.modules.forEach((moduleData) => {
       if (!filterGroup.value || moduleData.groups.includes(filterGroup.value)) {
-        modules_list.push({
+        const selectOptionItem = {
           name: moduleData.name,
           description: moduleData.name,
           selected: false,
           groups: moduleData.groups
-        })
+        };
+        if ( userCalibrationRunData.value?.modules.includes( moduleData.name ) ) {
+          selected_mouldes_list.push( selectOptionItem );
+        } else {
+          modules_list.push( selectOptionItem );
+        }        
       }
     });
-    const sorted = computed(() => modules_list.slice().sort((a, b) => a.name.localeCompare(b.name)));
-    return sorted.value;
+    
+    return selected_mouldes_list.slice().sort((a, b) => a.name.localeCompare(b.name)).concat( modules_list.slice().sort((a, b) => a.name.localeCompare(b.name)) );
   })
 
 
