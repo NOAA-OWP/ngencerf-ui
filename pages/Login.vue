@@ -245,7 +245,6 @@ const submitForm = async () => {
   const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
     method: 'POST',
     body: {
-      username: newEmail.value.toLowerCase(),
       email: newEmail.value.toLowerCase(),
       first_name: newFirstName,
       last_name: newLastName,
