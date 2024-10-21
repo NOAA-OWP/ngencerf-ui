@@ -281,7 +281,7 @@ const submitForm = async () => {
     }
   }
 
-  if (data.value.email && data.value.username && data.value.id) {
+  if (data.value.email && data.value.id) {
     toast.add({ severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 3000 });
     closeDialog();
   };
