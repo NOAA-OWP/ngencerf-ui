@@ -21,7 +21,7 @@
                 <tbody>
                   <tr>
                     <td class="w-1/6">
-                      <label for="SimulationStart" class="whitespace-nowrap">Simulation Start:</label>
+                      <label for="SimulationStart" class="whitespace-nowrap">Simulation Start </label>
                     </td>
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
@@ -30,7 +30,7 @@
                       <!-- <div v-if="!isTimeRangeSet()" class="overlay"></div>  -->
                     </td>
                     <td class="pl-6 w-1/6">
-                      <label for="SimulationEnd" class="whitespace-nowrap">Simulation End:</label>
+                      <label for="SimulationEnd" class="whitespace-nowrap">Simulation End </label>
                     </td>
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
@@ -41,7 +41,7 @@
                   </tr>
                   <tr>
                     <td class="w-1/6">
-                      <label for="CalibrationStart" class="whitespace-nowrap">Calibration Start:</label>
+                      <label for="CalibrationStart" class="whitespace-nowrap">Calibration Start </label>
                     </td>
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
@@ -50,7 +50,7 @@
                      <!-- /<div v-if="!isTimeRangeSet()" class="overlay"></div> -->
                     </td>
                     <td class="pl-6 w-1/6">
-                      <label for="CalibrationEnd" class="whitespace-nowrap">Calibration End:</label>
+                      <label for="CalibrationEnd" class="whitespace-nowrap">Calibration End </label>
                     </td>
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
@@ -83,7 +83,7 @@
 
                       <td class="w-1/6">
                         <label for="ValSimulationStart" class="whitespace-nowrap">Simulation
-                          Start:</label>
+                          Start </label>
                       </td>
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
@@ -94,7 +94,7 @@
 
                       </td>
                       <td class="pl-6 w-1/6">
-                        <label for="ValSimulationEnd" class="whitespace-nowrap">Simulation End:</label>
+                        <label for="ValSimulationEnd" class="whitespace-nowrap">Simulation End </label>
                       </td>
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark" v-model="avSimEndTime"
@@ -107,7 +107,7 @@
                     <tr>
 
                       <td class="w-1/6">
-                        <label for="ValidationStart" class="whitespace-nowrap">Validation Start:</label>
+                        <label for="ValidationStart" class="whitespace-nowrap">Validation Start </label>
                       </td>
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark" v-model="avCalStartTime"
@@ -116,7 +116,7 @@
                         <!-- <div v-if="!isTimeRangeSet()" class="overlay"></div> -->
                       </td>
                       <td class="pl-6 w-1/6">
-                        <label for="ValidationEnd" class="whitespace-nowrap">Validation End:</label>
+                        <label for="ValidationEnd" class="whitespace-nowrap">Validation End </label>
                       </td>
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
@@ -158,7 +158,7 @@
         <div class="col-span-1">
           
 
-          <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
+          <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
           <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
             <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
             <button @click="triggerFileInput" :disabled="!isFormulationDataSaved()">Load Parameters File
@@ -169,7 +169,7 @@
 
         <div class="col-span-1">
           <div class="text-left mt-2">
-            <div class="font-bold">Calibratable Parameters:</div>
+            <div class="font-bold">Calibratable Parameters</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
               :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="output" optionValue="output" >
               <template #option="slotProps">
@@ -281,7 +281,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import { DateTime } from "luxon";
 import Select from "primevue/select";
 
-import { isValidDateTime } from "~/utils/CommonHelpers";
+import { isValidDateTime, isNotNullOrUndefined } from "~/utils/CommonHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
@@ -620,6 +620,7 @@ const handleFileUpload = async (event: Event) => {
   //console.log('Upload button clicked');
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0]; // get the first file we see
+  let errorMessage = '';
   if (file) {
     try {
       const formData = new FormData();
@@ -639,7 +640,7 @@ const handleFileUpload = async (event: Event) => {
       if (response?._data.user_parameter_file) {
         // Populate the Parameter table with the data from user-uploaded file
         response._data?.user_parameter_file?.forEach((param: any) => {
-          if (param.param && param.min && param.max && param.init && param.model) {
+          if (isNotNullOrUndefined(param.param) && isNotNullOrUndefined(param.min) && isNotNullOrUndefined(param.max) && isNotNullOrUndefined(param.init) && isNotNullOrUndefined(param.model)) {
             userSelectedCalibrationTuningParameters?.value?.push({
               name: param.param,
               minimum: param.min,
@@ -648,7 +649,8 @@ const handleFileUpload = async (event: Event) => {
               module: param.model, // module?
             });
           } else {
-            toast.add({ severity: 'warn', summary: 'Invalid data in parameter file' , life: 5000});
+            errorMessage = response._data?.message;
+            toast.add({ severity: 'warn', summary: 'Invalid data in parameter file' , detail: errorMessage });
           }
         });
       } else {
@@ -951,10 +953,11 @@ const saveTuningData = () => {
         life: 3000,
       });
     } else {
+      const errorMessage = saveTuningTabResponse?._data.message;
       toast.add({
         severity: 'error',
-        summary: 'Error',
-        detail: 'Error saving Tuning Tab data'
+        summary: 'Error Saving Tuning Tab Data',
+        detail: errorMessage
       });
     }
   };

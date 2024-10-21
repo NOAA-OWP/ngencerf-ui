@@ -16,13 +16,13 @@
 
                 <div v-if="!showDialog" class="mx-auto px-8 text-left">
                   <form onsubmit="return false">
-                    <h1>Login in</h1>
+                    <h1>Login</h1>
                     <div class="inputBox">
-                      <input id="uname" type="text" v-model="userName" placeholder=" Username" aria-label="Username"
+                      <input id="uname" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
                         autocomplete="username" v-on:keypress="autoSubmit" />
-                      <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
-                        Forgot Username
-                      </button>
+                      <!-- <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
+                        Forgot Email
+                      </button> -->
                     </div>
                     <div class="inputBox">
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
@@ -49,13 +49,21 @@
                     <div class="dialog-content">
                       <h1>Create an Account</h1>
                       <form @submit.prevent="submitForm">
-                        <div class="form-group inputBox">
+                        <div class="form-group inputBox" v-if="1==0">
                           <label for="username">Username</label>
                           <InputText v-model="newUsername" id="username" type="text" required />
                         </div>
                         <div class="form-group inputBox">
                           <label for="email">Email</label>
                           <InputText v-model="newEmail" id="email" type="email" required />
+                        </div>
+                        <div class="form-group inputBox">
+                          <label for="first_name">First Name</label>
+                          <InputText v-model="newFirstName" id="first_name" type="text" required />
+                        </div>
+                        <div class="form-group inputBox">
+                          <label for="last_name">Last Name</label>
+                          <InputText v-model="newLastName" id="last_name" type="text" required />
                         </div>
                         <div class="form-group inputBox">
                           <label for="password">Password</label>
@@ -140,8 +148,10 @@ const userName = ref<string>("");
 const userPassword = ref<string>("");
 const showDialog = ref(false);
 
-const newUsername = ref('');
+//const newUsername = ref('');
 const newEmail = ref('');
+const newFirstName = ref('');
+const newLastName = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
 
@@ -195,12 +205,13 @@ const SubmitLoginForm = async (e: Event) => {
     await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
       body: {
-        username: userName.value,
+        username: userName.value.toLowerCase(),
+        email: userName.value.toLowerCase(),
         password: userPassword.value
       }
     }).then(response => {
       console.log("Response: ", response)
-      setUserName(userName.value);
+      setUserName(userName.value.toLowerCase());
       // store tokens in UserDataStore
       userDataStore.setAccessToken(response.access);
       userDataStore.setRefreshToken(response.refresh);
@@ -234,16 +245,33 @@ const submitForm = async () => {
   const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
     method: 'POST',
     body: {
-      username: newUsername.value,
-      email: newEmail.value,
+      email: newEmail.value.toLowerCase(),
+      first_name: newFirstName,
+      last_name: newLastName,
       password: newPassword.value,
       re_password: confirmPassword.value
     }
   });
 
   if (error.value) {
-    if (error.value?.data.username) {
+    if (error.value?.data.email) {
+      let detail = error.value?.data.email[0];
+      if (detail.indexOf('already exists')) {
+        // customize error message since the one we get back from Djoser isn't ideal
+        detail = 'A user with this Email address has already registered.'
+      }
+      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
+      return;
+    } else if (error.value?.data.username) {
       let detail = error.value?.data.username[0];
+      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
+      return;
+    } else if (error.value?.data.first_name) {
+      let detail = error.value?.data.first_name[0];
+      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
+      return;
+    } else if (error.value?.data.last_name) {
+      let detail = error.value?.data.last_name[0];
       toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
       return;
     } else if (error.value?.data.password) {
@@ -252,7 +280,7 @@ const submitForm = async () => {
     }
   }
 
-  if (data.value.email && data.value.username && data.value.id) {
+  if (data.value.email && data.value.id) {
     toast.add({ severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 3000 });
     closeDialog();
   };
