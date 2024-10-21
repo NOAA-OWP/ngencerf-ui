@@ -43,17 +43,17 @@
 
     <span v-else-if="currentMenu === 2"> <!-- EVALUATION TABS -->
       <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
-        <div data-tab="1" data-menu-tab="21" class="tabs activeTab prevent-select" v-on:click="tabClicked"
+        <div data-tab="1" data-menu-tab="21" class="tabs activeTab prevent-select pl-25 mr-10" v-on:click="tabClicked"
           aria-label="Calibration Runs tab" title="Calibration Runs tab">
           Calibration Runs
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="2" data-menu-tab="22" class="tabs prevent-select" v-on:click="tabClicked"
+        <div data-tab="2" data-menu-tab="22" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
           aria-label="Evaluate Tab" title=" Evaluate tab" :disabled="true">
           Evaluate
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="3" data-menu-tab="23" class="tabs prevent-select" v-on:click="tabClicked"
+        <div data-tab="3" data-menu-tab="23" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
           aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
           Select Alternate Iteration
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>

@@ -2,7 +2,7 @@
   <div class="h-full min-h-screen ">
     <div class="grid grid-rows-12">
       <div class="row-span-2">
-        <div id="PgTitle">Previous Calibration Runs</div>
+        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs</h1>
       </div>
       <div class="waitgif" v-if="isLoadingCalibrationSummary">
         <img src="@/assets/styles/img/wait.gif" />
@@ -12,7 +12,7 @@
         <div id="CalTable">
           <div class="grid grid-cols-2 mb-5">
               <div class="col-span-1">
-                  <div class="inline ">Headwater Basin Gage:
+                  <div class="inline "><label for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
                   :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder=""></Select>
               </div>
@@ -152,4 +152,5 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+#HeadwaterBasinGage {width:300px;}
 </style>

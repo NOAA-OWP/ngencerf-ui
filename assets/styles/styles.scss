@@ -42,22 +42,28 @@ body {
   min-width: 1530px !important;
   min-height: 945px !important;
 }
-
 .font-ui {
   font-family: ui-sans-serif, system-ui, sans-serif, sans-serif, Arial, Helvetica;
 }
-
 .boxed {
   border: 1px solid #BBBBBF;
 }
-
+.h-full {height: 100vh;}
 label {font-weight: bold;}
-
 input, .p-select, .varInputs {
   width: 100%;
+  font-size: 16px;
+}
+.p-select .p-select-label, 
+.p-select-list .p-select-option {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+input, .varInputs {
   padding: 5px 10px !important;
   border-radius: 2px !important;
 }
+.p-iconfield .p-inputicon { top:38%;}
 .bg-white,
 .white-tall-content-box {
   input, .p-select, .p-inputtext, .p-password-input, .varInputs {
@@ -68,31 +74,25 @@ input, .p-select, .varInputs {
     color: #000000;
   }
 }
-
 input::-webkit-input-placeholder {
   opacity: 0.8;
 }
-
 .inputBox {
   margin-top: 20px;
 }
-
 .h-screen-inner {
   height: Calc(100vh - 180px);
 }
 .h-screen-inner-less {
   height: Calc(100vh - 240px);
 }
-
 .bg-white {
   background-color: #fff;
 }
-
 .underline,
 .underline button {
   text-decoration: underline;
 }
-
 .ngenButtonDiv {
   cursor: pointer;
   color: white;
@@ -104,12 +104,10 @@ input::-webkit-input-placeholder {
   border: 0px;
   display: inline-block;
 }
-
 .ngenButtonDiv:hover {
   background-color: $ngwcp_primary3;
   color: white;
 }
-
 .ngenButtonDiv-alt {
   cursor: pointer;
   color: white;

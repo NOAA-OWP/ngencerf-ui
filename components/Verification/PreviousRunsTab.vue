@@ -4,7 +4,7 @@
 
         <div id="CalTable">
 
-            <div class="inline">Headwater Basin Gage:
+            <div class="inline">Headwater Basin Gage
                 <Select id="HeadwaterBasinGage" class="mr-2">
                     <option value="">...</option>
                 </Select>

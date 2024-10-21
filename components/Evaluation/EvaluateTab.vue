@@ -12,13 +12,13 @@
         <div class="pl-6 pr-2 pt-2">
             <div class="flex mt-2">
                 <div class="w-2/3">     
-                    <label for="DisplayOptions" class="pr-2 pt-3">Display:</label>
+                    <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
                     <div class="inline-block w-2/3">
                         <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName"
                             :options="plotList" optionLabel="name" optionValue="name" >
                         </Select>
                     </div>
-                    <a href="#" class="p-2 text-blue-600 hover:underline" @click="toggleMessagesGroup">Show Calibration Details</a>
+                    <a href="#" class="p-2 c-blue font-normal underline" @click="toggleMessagesGroup">Show Calibration Details</a>
                 </div>
                 <div class="ml-auto mt-2">
                     <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn" @click="gotoSelectAlternateIteration">New Validation</button></span>
@@ -168,7 +168,7 @@ const selectedPlotData = [
 @import "/assets/styles/styles.scss";
 
 #DisplayOptions {
-  width: 250px;
+  width: 375px;
   margin-left: 0px;
 }
 
