@@ -22,7 +22,7 @@
           <DataTable id="cr-list" :value="filteredEvaluationCalibrationRunList" scrollable scroll-height="400px"
               table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
               :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
-              <Column field="calibration_run_id" header="Run ID" sortable></Column>
+              <Column field="calibration_run_id" header="Job ID" sortable></Column>
               <Column field="run_date" header="Run Date" sortable></Column>
               <Column field="formulation_name" header="formulation_name" sortable></Column>
               <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
