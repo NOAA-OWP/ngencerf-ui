@@ -81,6 +81,7 @@ const onRowContextMenu = (event: any) => {
 
 onMounted(() => {
   isLoading.value = false;
+  fetchUserCalibrationJobsListData();
 })
 
 /**
@@ -93,7 +94,7 @@ onUnmounted(() => {
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[getCalibrationTabIndex() - 1];
     e.click();
-  }, 250)
+  }, 250);
 })
 
 const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
