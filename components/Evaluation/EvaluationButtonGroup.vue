@@ -16,14 +16,56 @@
 
     </div>
 
+    <div class="col-span-2">
+      <span v-if="getEvaluationTabIndex() === 1">
+        <Button class="start actionBtn" @click.stop="EvaluateSelectedCalibration">Evaluate</Button>
+        
+        <Button v-if="loadUserSelectedCalibrationValidationRunList.length > 0" class="start actionBtn" @click.stop="EvalValidateCalibrateReset">Back</Button>
+      </span>
+      <!--
+      <span v-if="getEvaluationTabIndex() >= 5">
+        <button class="start actionBtn">Run</button>
+      </span>
+      -->
+      <span v-if="getEvaluationTabIndex() === 2">
+        <!-- <button class="start actionBtn">Evaluate</button> -->
+      </span>
+    </div>
+    <div class="col-span-2">
+      <!-- <button v-if="getEvaluationTabIndex() >= 5" class="stop actionBtn">Cancel</button> -->
+    </div>
+    <div class="col-span-1"></div>
+    <div class="col-span-1"></div>
+    <div class="col-span-1"></div>
+    <div class="col-span-1"></div>
+    <div class="col-span-2 text-right">
+      <!-- <button v-if="getEvaluationTabIndex() === 4" class="prev actionBtnSmall">&#8678; Prev</button> -->
+    </div>
+    <div class="col-span-2">
+      <!-- <button v-if="getEvaluationTabIndex() === 3 || getEvaluationTabIndex() === 4" class="next actionBtnSmall">Next
+        <span>&#8680;</span></button> -->
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
+import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
+import { useEvent } from "~/composables/UseEventBus";
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useUserDataStore } from "~/stores/common/UserDataStore";
 const { getEvaluationTabIndex } = generalStore();
+const { loadUserSelectedCalibrationValidationRunList } = storeToRefs( useEvaluationCalibrationRunStore() )
 
 const tabIndex = getEvaluationTabIndex();
+
+const EvalValidateCalibrateReset = async ( e: Event ) => {
+  useEvent( 'evaluateCalibrationRubTabAction', "ValidateListReset"  );
+}
+
+const EvaluateSelectedCalibration = async ( e: Event ) => {
+  useEvent( 'evaluateCalibrationRubTabAction', "EvaluateCalibrationRun"  );
+}
 
 </script>
 

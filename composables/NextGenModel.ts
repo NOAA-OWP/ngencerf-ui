@@ -264,7 +264,7 @@ export interface SelectOption {
   name: string;
   description: string;
   selected?: boolean;
-  groups: string[];
+  groups?: string[];
 }
 
 export interface module_data {
@@ -383,6 +383,35 @@ export interface CalibrationPlotListData extends SelectOption {
 }
 
 /**
+ * Evaluation models
+ */
+export interface ValidatedCalibrationRunListItem extends JobListItem {
+  objective_function: string;
+  optimization_algorithm: string;
+  validation_runs: number
+}
+
+export interface ValidatedCalibrationRunList {
+  jobs: ValidatedCalibrationRunListItem[];
+}
+
+export interface CalibrationValidationRunData {
+  validation_run_id: number;
+  run_date: Date;
+  parameters: CalibrationValidationParameter[];
+}
+
+export interface CalibrationValidationParameter {
+  name: string;
+  value: number;
+}
+
+export interface DynamicTableColumn {
+  field: any;
+  header: string;
+}
+
+/**
  * Event Bus Interface
  */
 export type CalibrationButtonGroupClickEvent = {
@@ -390,6 +419,10 @@ export type CalibrationButtonGroupClickEvent = {
   calibrationButtonResetCancel: string;
   calibrationButtonPrev: string;
   calibrationButtonNext: string;
+}
+
+export type EvaluationButtonGroupClickEvent = {
+  evaluateCalibrationRubTabAction: string;
 }
 
 export type LogoutEvent = {
