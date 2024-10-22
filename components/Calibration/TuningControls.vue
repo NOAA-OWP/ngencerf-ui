@@ -615,6 +615,10 @@ watch(avSimEndTime, () => {
  */
 const triggerFileInput = () => {
   if (fileInput.value) {
+    if (fileInput.value.value) {
+      console.log('fileInput.value.value is not empty. Resetting value');
+      fileInput.value.value = '';
+    }
     fileInput.value.click();
   }
 };
@@ -628,6 +632,7 @@ const handleFileUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0]; // get the first file we see
   let errorMessage = '';
+  let invalidParameters: any[] = [];
   if (file) {
     try {
       const formData = new FormData();
@@ -647,28 +652,54 @@ const handleFileUpload = async (event: Event) => {
       if (response?._data.user_parameter_file) {
         // Populate the Parameter table with the data from user-uploaded file
         response._data?.user_parameter_file?.forEach((param: any) => {
-          if (isNotNullOrUndefined(param.param) && isNotNullOrUndefined(param.min) && isNotNullOrUndefined(param.max) && isNotNullOrUndefined(param.init) && isNotNullOrUndefined(param.model)) {
-            userSelectedCalibrationTuningParameters?.value?.push({
-              name: param.param,
-              minimum: param.min,
-              maximum: param.max,
-              initial_value: param.init,
-              module: param.model, // module?
-            });
+          if (
+            isNotNullOrUndefined(param.param) && 
+            isNotNullOrUndefined(param.min) && 
+            isNotNullOrUndefined(param.max) && 
+            isNotNullOrUndefined(param.init) && 
+            isNotNullOrUndefined(param.model)) {
+              // check if parameter is in the calibrationTuningParameters list and not already in the userSelectedCalibrationTuningParameters list
+              const isParameterInCalibratableList = calibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
+              // add parameter to the userSelectedCalibrationTuningParameters list if it is in the calibrationTuningParameters list
+              if (!isParameterInCalibratableList) {
+                invalidParameters.push(param.param);
+              }
+
+              const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
+
+              if (isParameterAlreadyInTable) {
+                // delete the parameter from the table if parameter we're trying to add is already in the table so we override it
+                userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters?.value?.filter((paramData: any) => paramData.name !== param.param);
+              }
+
+              // add parameter to the table if is in the list of calibratable parameters
+              if (isParameterInCalibratableList) {
+                userSelectedCalibrationTuningParameters?.value?.push({
+                  name: param.param,
+                  minimum: param.min,
+                  maximum: param.max,
+                  initial_value: param.init,
+                  module: param.model, // module?
+                });
+              }
           } else {
             errorMessage = response._data?.message;
             toast.add({ severity: 'warn', summary: 'Invalid data in parameter file' , detail: errorMessage });
           }
         });
+
+        if (invalidParameters.length > 0) {
+          toast.add({ severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters are not in the list of calibratable parameters: ${invalidParameters.join(', ')}` });
+        }
       } else {
-        toast.add({ severity: 'warn', summary: 'No data in parameter file', life: 5000 });
+        toast.add({ severity: 'warn', summary: 'No data in parameter file'});
       }
     } catch (error) {
-      toast.add({ severity: 'warn', summary: 'File upload failed', life: 5000 });
+      toast.add({ severity: 'warn', summary: 'File upload failed' });
       console.error('File upload failed:', error);
     }
   } else {
-    toast.add({ severity: 'warn', summary: 'No file selected', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'No file selected' });
     console.error('No file selected');
   }
 };
@@ -677,7 +708,7 @@ const handleFileUpload = async (event: Event) => {
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
 const addCalibrationTuningParameter = () => {
-  console.log("selectedParameter:", selectedParameter.value);
+  // console.log("selectedParameter:", selectedParameter.value);
   const parameter = calibrationTuningParameters?.value?.find(param => param.output === selectedParameter.value);
   const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.find(param => param.name === parameter.name);
 
