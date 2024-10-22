@@ -196,7 +196,11 @@ const showMetricPeakFlow = ref<boolean>(false)
 const showMetricStreamFlow = ref<boolean>(false)
 
 onMounted(() => {
-   toast.removeAllGroups();
+  toast.removeAllGroups();
+
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+
 })
 
 /**
