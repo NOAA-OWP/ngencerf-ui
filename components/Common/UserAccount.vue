@@ -6,7 +6,9 @@
           <div class="grid grid-cols-2 gap-3">
             <div class="col-span-2">
               <div class="ttl">Your Account</div>
-              <div class="name">{{ accountName }}</div>
+              <div class="name">{{ getUserFullName() }} <br />
+              <span style="font-size:0.7em;">{{ getUserName() }} </span>
+              </div>
               <div class="chgpwd mt-12 mb-6">Change Password</div>
             </div>
             <div class="col-span-1">
@@ -73,11 +75,10 @@ import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useToast } from "primevue/usetoast";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
-const { getAccessToken, getUserInitials, getUserName } = useUserDataStore()
+const { getAccessToken, getUserInitials, getUserName, getUserFullName } = useUserDataStore()
 const toast = useToast();
 const { ngencerfBaseUrl } = useBackendConfig();
 
-const accountName = getUserName();
 const oldpass = ref("");
 const newpass = ref("");
 const confirmNewpass = ref("");

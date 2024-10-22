@@ -127,7 +127,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 
 const { calibrationJobId } = storeToRefs(generalStore());
 
-const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
+const { logUserIn, setUserName, setFirstName, setLastName, hardResetUserDataStore } = useUserDataStore();
 const { resetGeneralStore } = generalStore();
 const { resetGageStore, gageStore_data_loading } = useGageStore();
 const { resetFormulationStore, formulationStore_data_loading } = useFormulationStore();
@@ -210,6 +210,9 @@ const SubmitLoginForm = async (e: Event) => {
       // store tokens in UserDataStore
       userDataStore.setAccessToken(response.access);
       userDataStore.setRefreshToken(response.refresh);
+      // store user name in UserDataStore
+      userDataStore.setFirstName(response.first_name);
+      userDataStore.setLastName(response.last_name);
       logUserIn();
       GoToLanding();
     }
