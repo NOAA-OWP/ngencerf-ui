@@ -10,6 +10,8 @@ import type { JobsList, JobListItem, UserCalibrationRunData } from "~/composable
 export const useUserDataStore = defineStore("UserDataStore", () => {
   const isLoggedIn = ref<boolean>(false);
   const userName = ref("");
+  const firstName = ref("");
+  const lastName = ref("");
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -69,11 +71,51 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   }
 
   /**
+   * Gets users full name (first and last)
+   * @returns full name of user
+   */
+  function getUserFullName(): string {
+    return firstName.value + " " + lastName.value;
+  }
+
+  /**
+   * Gets users first name
+   * @returns first name of user
+   */
+  function getUserFirstName(): string {
+    return firstName.value;
+  }
+
+  /**
+   * Gets users last name
+   * @returns last name of user
+   */
+  function getUserLastName(): string {
+    return lastName.value;
+  }
+
+  /**
    * Sets username
    * @returns void
    */
   function setUserName(user: string) {
     userName.value = user;
+  }
+
+  /**
+   * Sets user first name
+   * @returns void
+   */
+  function setFirstName(name: string): void {
+    firstName.value = name;
+  }
+
+  /**
+   * Sets user last name
+   * @returns void
+   */
+  function setLastName(name: string): void {
+    lastName.value = name;
   }
 
   /**
@@ -215,10 +257,15 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     logUserIn,
     logUserOut,
     getUserName,
-    setUserName,
+    getUserFullName,
+    getUserFirstName,
+    getUserLastName,
     getUserInitials,
     setAccessToken,
     setRefreshToken,
+    setUserName,
+    setFirstName,
+    setLastName,
     getAccessToken,
     getRefreshToken,
     fetchUserCalibrationJobsListData,
