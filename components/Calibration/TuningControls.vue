@@ -612,6 +612,10 @@ watch(avSimEndTime, () => {
  */
 const triggerFileInput = () => {
   if (fileInput.value) {
+    if (fileInput.value.value) {
+      console.log('fileInput.value.value is not empty. Resetting value');
+      fileInput.value.value = '';
+    }
     fileInput.value.click();
   }
 };
@@ -685,14 +689,14 @@ const handleFileUpload = async (event: Event) => {
           toast.add({ severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters are not in the list of calibratable parameters: ${invalidParameters.join(', ')}` });
         }
       } else {
-        toast.add({ severity: 'warn', summary: 'No data in parameter file', life: 5000 });
+        toast.add({ severity: 'warn', summary: 'No data in parameter file'});
       }
     } catch (error) {
-      toast.add({ severity: 'warn', summary: 'File upload failed', life: 5000 });
+      toast.add({ severity: 'warn', summary: 'File upload failed' });
       console.error('File upload failed:', error);
     }
   } else {
-    toast.add({ severity: 'warn', summary: 'No file selected', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'No file selected' });
     console.error('No file selected');
   }
 };
@@ -701,7 +705,7 @@ const handleFileUpload = async (event: Event) => {
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
 const addCalibrationTuningParameter = () => {
-  console.log("selectedParameter:", selectedParameter.value);
+  // console.log("selectedParameter:", selectedParameter.value);
   const parameter = calibrationTuningParameters?.value?.find(param => param.output === selectedParameter.value);
   const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.find(param => param.name === parameter.name);
 
