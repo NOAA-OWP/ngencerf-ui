@@ -164,6 +164,10 @@ const isLoading = ref(true);
 onMounted(() => {
   toast.removeAllGroups();
   isLoading.value = false;
+
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+
 })
 
 const dialog = useDialog();
