@@ -81,6 +81,10 @@ const onRowContextMenu = (event: any) => {
 
 onMounted(() => {
   isLoading.value = false;
+
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+
   fetchUserCalibrationJobsListData();
 })
 

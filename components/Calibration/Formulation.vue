@@ -5,7 +5,7 @@
         <div class="grid grid-cols-8">
           <div class="col-span-8">
             <div id="FormulationName" class="block mt-1" aria-label="Forumulation Name" title="Formulation Name">
-              <label for="formulationNameInput" class="text-lg">Forumulation Name </label>
+              <label for="formulationNameInput" class="text-lg">Formulation Name </label>
               <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
                 aria-label="Input Forumulation Name" title="Input Formulation Name" required></InputText>
             </div>
@@ -79,8 +79,8 @@
             <Column field="param_name" header="SLoTH Output Var" sortable></Column>
             <Column field="param_count" header="Count" sortable>
               <template #editor="{ index }">
-                <InputText v-model="slothParameterInputs[index].param_count" autofocus class="w-12 p-1">
-                </InputText>
+                <InputNumber v-model="slothParameterInputs[index].param_count" autofocus class="w-12 p-1">
+                </InputNumber>
               </template>
             </Column>
             <Column field="param_type" header="Type" sortable>
@@ -212,6 +212,10 @@ const toast = useToast();
 
 onMounted(() => {
   toast.removeAllGroups();
+
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+
 })
 
 const addSlothOnEnter = (e: KeyboardEvent) => {
@@ -241,11 +245,11 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 */
 const saveFormulationData = () => {
   toast.removeAllGroups()
-  const save_formulation_response = saveFormulationTabData()
+  const save_formulation_response = saveFormulationTabData();
   save_formulation_response.then((response) => {
     if (response?.validation_errors) {
       useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-        toast.add({ severity: "error", summary: 'Error Saving Formulation Tab Data', detail: message })
+        toast.add({ severity: "error", summary: response?.message, detail: message })
       })
     } else {
       toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })

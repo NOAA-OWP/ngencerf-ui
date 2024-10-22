@@ -73,11 +73,11 @@ import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useToast } from "primevue/usetoast";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
-const { getAccessToken, getUserInitials } = useUserDataStore()
+const { getAccessToken, getUserInitials, getUserName } = useUserDataStore()
 const toast = useToast();
 const { ngencerfBaseUrl } = useBackendConfig();
 
-const accountName = getUserInitials();
+const accountName = getUserName();
 const oldpass = ref("");
 const newpass = ref("");
 const confirmNewpass = ref("");
