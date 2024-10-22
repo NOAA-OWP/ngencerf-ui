@@ -19,7 +19,7 @@
                     <h1>Login</h1>
                     <div class="inputBox">
                       <input id="uname" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
-                        autocomplete="username" v-on:keypress="autoSubmit" />
+                        autocomplete="email" v-on:keypress="autoSubmit" />
                       <!-- <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Email
                       </button> -->
@@ -48,11 +48,7 @@
                   <div class="dialog-overlay" @click.self="closeDialog">
                     <div class="dialog-content">
                       <h1>Create an Account</h1>
-                      <form @submit.prevent="submitForm">
-                        <div class="form-group inputBox" v-if="1==0">
-                          <label for="username">Username</label>
-                          <InputText v-model="newUsername" id="username" type="text" required />
-                        </div>
+                      <form @submit.prevent="SubmitNewAccountForm">
                         <div class="form-group inputBox">
                           <label for="email">Email</label>
                           <InputText v-model="newEmail" id="email" type="email" required />
@@ -205,7 +201,6 @@ const SubmitLoginForm = async (e: Event) => {
     await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
       body: {
-        username: userName.value.toLowerCase(),
         email: userName.value.toLowerCase(),
         password: userPassword.value
       }
@@ -235,7 +230,7 @@ const SubmitLoginForm = async (e: Event) => {
   }
 }
 
-const submitForm = async () => {
+const SubmitNewAccountForm = async () => {
   if (newPassword.value !== confirmPassword.value) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 3000 });
     return;
@@ -246,8 +241,8 @@ const submitForm = async () => {
     method: 'POST',
     body: {
       email: newEmail.value.toLowerCase(),
-      first_name: newFirstName,
-      last_name: newLastName,
+      first_name: newFirstName.value,
+      last_name: newLastName.value,
       password: newPassword.value,
       re_password: confirmPassword.value
     }
@@ -260,10 +255,6 @@ const submitForm = async () => {
         // customize error message since the one we get back from Djoser isn't ideal
         detail = 'A user with this Email address has already registered.'
       }
-      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
-      return;
-    } else if (error.value?.data.username) {
-      let detail = error.value?.data.username[0];
       toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
       return;
     } else if (error.value?.data.first_name) {
