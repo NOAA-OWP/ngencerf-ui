@@ -346,6 +346,9 @@ const onRowContextMenu = (event: any) => {
 
 onMounted(async () => {
   toast.removeAllGroups();
+  
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
 
   // fetch user calibration data
   await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?

@@ -79,8 +79,8 @@
             <Column field="param_name" header="SLoTH Output Var" sortable></Column>
             <Column field="param_count" header="Count" sortable>
               <template #editor="{ index }">
-                <InputText v-model="slothParameterInputs[index].param_count" autofocus class="w-12 p-1">
-                </InputText>
+                <InputNumber v-model="slothParameterInputs[index].param_count" autofocus class="w-12 p-1">
+                </InputNumber>
               </template>
             </Column>
             <Column field="param_type" header="Type" sortable>
@@ -212,6 +212,10 @@ const toast = useToast();
 
 onMounted(() => {
   toast.removeAllGroups();
+
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+
 })
 
 const addSlothOnEnter = (e: KeyboardEvent) => {

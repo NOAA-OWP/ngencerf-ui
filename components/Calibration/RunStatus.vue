@@ -160,6 +160,10 @@ let iterationIntervalId: NodeJS.Timeout | undefined = undefined;
 
 onMounted(async () => {
   toast.removeAllGroups();
+
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+
   nextTick(() => {
     if (userCalibrationRunData.value) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
