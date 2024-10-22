@@ -5,8 +5,8 @@ import { generalStore } from "../common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
-import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, GeneralErrorResponse } from "~/composables/NextGenModel";
-import { useCalibrationTabValidation, useCalibrationFormulationSlothTableValidation } from "~/composables/ValidationHandlers";
+import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, SaveFormulationTabPayload, GeneralErrorResponse } from "~/composables/NextGenModel";
+import { useCalibrationTabValidation, useCalibrationFormulationTabSaveValidate, useCalibrationFormulationSlothTableValidation } from "~/composables/ValidationHandlers";
 
 export const useFormulationStore = defineStore('FormulationStore', () => {
   /**
@@ -39,19 +39,19 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
       },
       body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     }).then((formulationTabDataResult) => {
-      formulationTabData.value = formulationTabDataResult?._data ?? undefined
-      setUserSelection()
+      formulationTabData.value = formulationTabDataResult?._data ?? undefined;
+      setUserSelection();
 
-      formulationStore_data_loading.value = false
+      formulationStore_data_loading.value = false;
     })
   }
 
   const setUserSelection = (): void => {
-    formulationNameInput.value = userCalibrationRunData.value?.formulation_name ?? ""
+    formulationNameInput.value = userCalibrationRunData.value?.formulation_name ?? "";
     //selectedModuleValues.value = getSavedModuleSelection.value ?? []
-    selectedModuleValues.value = userCalibrationRunData.value?.modules ?? []
-    useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false
-    slothParameterInputs.value = userCalibrationRunData.value?.sloth_parameters ?? []
+    selectedModuleValues.value = JSON.parse( JSON.stringify( userCalibrationRunData.value?.modules ) ) ?? [];
+    useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false;
+    slothParameterInputs.value = JSON.parse( JSON.stringify( userCalibrationRunData.value?.sloth_parameters ) ) ?? [];
   }
   userCalibrationRunData.value?.modules
   /**
@@ -78,26 +78,6 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
     });
     
     return selected_mouldes_list.slice().sort((a, b) => a.name.localeCompare(b.name)).concat( modules_list.slice().sort((a, b) => a.name.localeCompare(b.name)) );
-  })
-
-
-
-
-
-  /**
-  * return list of unique groups from the module list
-  * @returns {string[]}
-  */
-  function fetchModuleCoveredGroupList() {
-    let groupsList = <string[]>[]
-    formulationTabData.value?.modules.forEach((moduleData) => {
-      groupsList = [...new Set([...groupsList, ...moduleData.groups])]
-    })
-    return groupsList
-  }
-
-  const fetchFormulationModuleCoveredGroups = computed(() => {
-    return fetchModuleCoveredGroupList()
   })
 
   /**
@@ -135,15 +115,16 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
       name: "",
       description: "ALL"
     }]
-    let groups_list = fetchModuleCoveredGroupList();
-    groups_list.forEach((group) => {
+    //let groups_list = fetchModuleCoveredGroupList();
+    formulationTabData.value?.module_groups.forEach( ( group ) => {
       groupOptionsList.push({
         name: group,
         description: group,
         selected: false,
         groups:[]
       })
-    })
+    });
+    
     return groupOptionsList
   })
 
@@ -153,9 +134,8 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
   */
   const fetchFormulationModuleCoveredGroupOptions = computed(() => {
     let groupOptionsList = <SelectOption[]>[];
-    let groupsList = fetchModuleCoveredGroupList();
     const selectedGroups = selectedModuleCoveredGroups();
-    groupsList.forEach((group) => {
+    formulationTabData.value?.module_groups.forEach((group) => {      
       let option_data = {
         name: group,
         description: group,
@@ -250,32 +230,42 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
   * @returns {GeneralApiSaveResponse}
   */
   async function saveFormulationTabData() {
-    const slothParametersValidation = useCalibrationFormulationSlothTableValidation( slothParameterInputs.value );
-    
-    if ( Object.keys( slothParametersValidation.value ).length == 0 ) {
-      const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-        body: JSON.stringify({
-          calibration_run_id: calibrationJobId.value,
-          formulation_name: formulationNameInput.value,
-          modules: selectedModuleValues.value,
-          use_sloth: useSlothParameters.value,
-          sloth_parameters: slothParameterInputs.value
-        })
-      });
+    const savePayload = ref<SaveFormulationTabPayload>({});
 
-      return saveFormulationTabDataResponse?._data;
+    if ( formulationNameInput.value ) savePayload.value.formulation_name = formulationNameInput.value;
+    if ( selectedModuleValues.value.length > 0 ) savePayload.value.modules = selectedModuleValues.value;
+    if ( slothParameterInputs.value.length > 0 ) savePayload.value.sloth_parameters = slothParameterInputs.value;
+    
+    if ( Object.keys( savePayload.value ).length > 0 ) {
+      const saveValidation = useCalibrationFormulationTabSaveValidate( savePayload.value );
+      if ( Object.keys( saveValidation.value ).length > 0 ) {
+        return Promise.resolve({
+          message: "Unable to save formulation tab.",
+          validation_errors: saveValidation.value,
+          calibration_run_id: calibrationJobId.value,
+          status: "error"
+        });
+      } else {
+        savePayload.value['calibration_run_id'] = calibrationJobId.value;
+        savePayload.value['use_sloth'] = useSlothParameters.value;
+        const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${getAccessToken()}`,
+            "Content-Type": 'application/json'
+          },
+          body: JSON.stringify(savePayload.value)
+        });
+
+        return saveFormulationTabDataResponse?._data;
+      }
     } else {
       return Promise.resolve({
-        message: "Missing required field(s)",
-        validation_errors: slothParametersValidation.value,
+        message: "No formulation tab data to save.",
+        validation_errors: { "Tab Error": ['Please update at least 1 field before saving.'] },
         calibration_run_id: calibrationJobId.value,
         status: "error"
-      })
+      });
     }
   }
 
@@ -283,11 +273,7 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
   * @returns {void}
   */
   const resetUserSelectionFormulation = (): void => {
-    if (userCalibrationRunData.value?.gage) {
-      setUserSelection()
-    } else {
-      resetFormulationStore()
-    }
+    setUserSelection();
   }
 
   useLogoutListen('logoutEvent', () => {
@@ -313,7 +299,6 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
     formulationNameInput,
     slothParameterInputs,
     fetchFormulationModuleOptions,
-    fetchFormulationModuleCoveredGroups,
     fetchFormulationModuleCoveredGroupFilterOptions,
     fetchFormulationModuleCoveredGroupOptions,
     fetchFormulationSlothParameterTypeOptions,

@@ -1,5 +1,5 @@
 import { ref } from "vue"
-import type { SlothParameterData } from "./NextGenModel";
+import type { SlothParameterData, SaveFormulationTabPayload } from "./NextGenModel";
 import { ValidationFormFields } from "./NextGenModel";
 
 /**
@@ -46,6 +46,21 @@ export const useCalibrationFormulationSlothTableValidation = ( slothParameters: 
       errors.value[ error?.message as keyof typeof errors ] = [ 'All sloth parameter fields are required.' ];
    }
    
+   return errors;
+}
+
+export const useCalibrationFormulationTabSaveValidate = ( savePayload: SaveFormulationTabPayload ) => {
+   const errors = ref<any>({});
+   if ( savePayload.hasOwnProperty( "sloth_parameters" ) && !savePayload.hasOwnProperty( "modules" ) ) {
+      errors.value[ 'selectedModuleValues' ]= [ 'Selecting module is required for Sloth Parameter.' ];
+   }
+   if ( savePayload.hasOwnProperty( "sloth_parameters" ) && savePayload.hasOwnProperty( "modules" ) ) {
+      const slothParametersValidation = useCalibrationFormulationSlothTableValidation( savePayload['sloth_parameters'] ?? [] );
+      for (const [ key, messages ] of Object.entries( slothParametersValidation.value  )) {
+         errors.value[ `${key}` ] = messages;
+       }  
+   }
+
    return errors;
 }
 
