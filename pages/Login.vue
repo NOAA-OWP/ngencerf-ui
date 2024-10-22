@@ -48,11 +48,7 @@
                   <div class="dialog-overlay" @click.self="closeDialog">
                     <div class="dialog-content">
                       <h1>Create an Account</h1>
-                      <form @submit.prevent="submitForm">
-                        <div class="form-group inputBox" v-if="1==0">
-                          <label for="username">Username</label>
-                          <InputText v-model="newUsername" id="username" type="text" required />
-                        </div>
+                      <form @submit.prevent="SubmitNewAccountForm">
                         <div class="form-group inputBox">
                           <label for="email">Email</label>
                           <InputText v-model="newEmail" id="email" type="email" required />
@@ -74,11 +70,11 @@
                             </template>
                             <template #footer>
                               <Divider />
-                              <ul class="pl-2 ml-2 my-0 leading-normal">
+                              <ol class="pl-2 ml-2 my-0 leading-normal">
                                 <li>Cannot be a commonly used password</li>
                                 <li>Must be at least 8 characters long</li>
                                 <li>Must contain at least one non-numeric character</li>
-                              </ul>
+                              </ol>
                             </template>
                           </Password>
                         </div>
@@ -235,7 +231,7 @@ const SubmitLoginForm = async (e: Event) => {
   }
 }
 
-const submitForm = async () => {
+const SubmitNewAccountForm = async () => {
   if (newPassword.value !== confirmPassword.value) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 3000 });
     return;
