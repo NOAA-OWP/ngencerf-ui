@@ -19,7 +19,7 @@
                     <h1>Login</h1>
                     <div class="inputBox">
                       <input id="uname" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
-                        autocomplete="username" v-on:keypress="autoSubmit" />
+                        autocomplete="email" v-on:keypress="autoSubmit" />
                       <!-- <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Email
                       </button> -->
@@ -70,11 +70,11 @@
                             </template>
                             <template #footer>
                               <Divider />
-                              <ol class="pl-2 ml-2 my-0 leading-normal">
+                              <ul class="pl-2 ml-2 my-0 leading-normal">
                                 <li>Cannot be a commonly used password</li>
                                 <li>Must be at least 8 characters long</li>
                                 <li>Must contain at least one non-numeric character</li>
-                              </ol>
+                              </ul>
                             </template>
                           </Password>
                         </div>
@@ -201,7 +201,6 @@ const SubmitLoginForm = async (e: Event) => {
     await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
       body: {
-        username: userName.value.toLowerCase(),
         email: userName.value.toLowerCase(),
         password: userPassword.value
       }
@@ -242,8 +241,8 @@ const SubmitNewAccountForm = async () => {
     method: 'POST',
     body: {
       email: newEmail.value.toLowerCase(),
-      first_name: newFirstName,
-      last_name: newLastName,
+      first_name: newFirstName.value,
+      last_name: newLastName.value,
       password: newPassword.value,
       re_password: confirmPassword.value
     }
@@ -256,10 +255,6 @@ const SubmitNewAccountForm = async () => {
         // customize error message since the one we get back from Djoser isn't ideal
         detail = 'A user with this Email address has already registered.'
       }
-      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
-      return;
-    } else if (error.value?.data.username) {
-      let detail = error.value?.data.username[0];
       toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
       return;
     } else if (error.value?.data.first_name) {
