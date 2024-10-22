@@ -308,10 +308,12 @@ const saveOptMetData = () => {
    save_optimization_response.then((response) => {
       if (response?.validation_errors) {
          useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-            toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: message })
+            toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: message });
          })
+      } else if ( response?.response_type == 'error' ) {
+         toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: response?.message, life: 10000 });
       } else {
-         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message, life: 3000 })
+         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message, life: 3000 });
          fetchUserCalibrationRunData()
       }
    })
