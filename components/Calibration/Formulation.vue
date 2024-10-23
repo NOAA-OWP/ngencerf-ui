@@ -68,7 +68,7 @@
           </span>
         </div>
 
-        <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="items-center pl-2 pr-2 mt-2">
+        <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="items-center pl-2 pr-2 mt-2 overflow-auto max-h-[157px]">
 
           <ContextMenu :pt="{ root: { id: 'loth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
             :model="cmSlothParameterData"></ContextMenu>
@@ -207,14 +207,15 @@ const { getCalibrationTabIndex } = generalStore();
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 const runStatusStore = useRunStatusStore();
 const { calibrationStatus } = storeToRefs(runStatusStore);
+const mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+const dataTableDivElement = document.getElementById('SlothDataTable') as HTMLElement;
 
 const toast = useToast();
 
 onMounted(() => {
   toast.removeAllGroups();
 
-  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-  if (ele) { ele.scrollTo(0, 0); }
+  if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
 
 })
 
@@ -232,6 +233,20 @@ const addSlothVariable = () => {
   if (new_sloth_variable_name.value.trim() != '') {
     addNewSlothVariable(new_sloth_variable_name.value);
     new_sloth_variable_name.value = '';
+
+    if (mainLeftAreaElement) {
+      mainLeftAreaElement.scrollTo({
+        top: mainLeftAreaElement.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+
+    if (dataTableDivElement) {
+      dataTableDivElement.scrollTo({
+        top: dataTableDivElement.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
   }
 }
 
