@@ -137,7 +137,7 @@
   </div>
 
 
-  <div class="grid grid-rows-2">
+  <div class="grid grid-rows-2 pr-2">
 
     <div class="row-span-1 text-left">
       <div class="grid grid-cols-2 pb-3">
@@ -155,7 +155,7 @@
 
         <div class="col-span-2 mt-5 mb-3 hr"></div>
 
-        <div class="col-span-1">
+        <div class="col-span-2">
           
 
           <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
@@ -167,7 +167,7 @@
           </div>
         </div>
 
-        <div class="col-span-1">
+        <div class="col-span-2 mt-2">
           <div class="text-left mt-2">
             <div class="font-bold">Calibratable Parameters</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
@@ -186,8 +186,10 @@
 
       </div>
     </div>
-
+    
     <div id="TuningDataList" class="mt-2 mb-2 overflow-auto max-h-[200px]" style="position: relative;">
+      <div class="text-right mb-1 mr-2"><button class="c-blue font-normal  underline">Clear</button></div>
+
       <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
         :model="cmTuningParameterData"></ContextMenu>
       <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
@@ -246,8 +248,8 @@
 
       <span v-if="userCalibrationRunData?.status !== 'Running'">
         <div class="col-span-1 mr-3">
-          <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTuningData()"
-            aria-label="Reset Button">Reset</button>
+          <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTuningData()"
+            aria-label="Reset Button">Reset</button>-->
         </div>
       </span>
 

@@ -137,8 +137,8 @@
         </span>
         <span v-if="calibrationStatus !== 'Running'">
           <div class="col-span-1 mr-3">
-            <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
-              @click="resetFormulationData()" aria-label="Reset Button">Reset</button>
+            <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
+              @click="resetFormulationData()" aria-label="Reset Button">Reset</button>-->
           </div>
         </span>
         <span v-else>
