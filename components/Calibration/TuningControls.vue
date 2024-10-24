@@ -283,6 +283,7 @@ import Select from "primevue/select";
 
 import { isValidDateTime, isNotNullOrUndefined } from "~/utils/CommonHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
+import { ifHydrofabricErrorsExist } from "~/utils/TuningControlsHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
@@ -363,6 +364,11 @@ onMounted(async () => {
     console.log("loadTuningTabData after fetch from Tuning tab:", loadTuningTabData.value);
   } else {
     console.log("Tuning Tab data already loaded. No need to fetch");
+  }
+  // check if Hydrofabric errors exist
+  const hydrofabricErrorMessage = ifHydrofabricErrorsExist(loadTuningTabData.value._data);
+  if (hydrofabricErrorMessage) {
+    toast.add({ severity: 'error', summary: 'Hydrofabric Error', detail: hydrofabricErrorMessage });
   }
 
   // set time range
