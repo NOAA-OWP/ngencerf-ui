@@ -83,11 +83,11 @@
                           <Password v-model="confirmPassword" id="confirmPassword" type="password" :feedback="false"
                             required toggleMask class="block" />
                         </div>
-                        <div class="ngenButtonDiv bg-blue1 btn-left mt-4">
-                          <button type="submit">Create Account</button>
+                        <div :class="createAccountButtonClasses">
+                          <button type="submit" :disabled="disableCreateAccountBtn">Create Account</button>
                         </div>
                         <div class="signupButton underline text-base inline pl-6">
-                          <button type="button" @click="closeDialog" class="c-blue">Cancel</button>
+                          <button type="button" @click="closeDialog" :class="cancelCreateAccountLinkClasses" :disabled="disableCreateAccountBtn">Cancel</button>
                         </div>
                       </form>
                     </div>
@@ -150,6 +150,10 @@ const newFirstName = ref('');
 const newLastName = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
+
+const disableCreateAccountBtn = ref<boolean>(false);
+const createAccountButtonClasses = ref<string[]>(["ngenButtonDiv", "btn-left", "mt-4"]);
+const cancelCreateAccountLinkClasses = ref<string[]>(['c-blue'])
 
 onMounted(() => {
   nextTick(() => {
@@ -239,8 +243,12 @@ const SubmitNewAccountForm = async () => {
     return;
   }
 
-  // try to create a new account for user
-  const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
+  disableCreateAccountBtn.value = true;
+  if ( !createAccountButtonClasses.value.includes( 'disabledButton' ) ) createAccountButtonClasses.value.push( 'disabledButton' );
+  if ( !cancelCreateAccountLinkClasses.value.includes( 'disabledLink' ) ) cancelCreateAccountLinkClasses.value.push( 'disabledLink' );
+
+  //try to create a new account for user
+  const { data, error,  } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
     method: 'POST',
     body: {
       email: newEmail.value.toLowerCase(),
@@ -251,7 +259,10 @@ const SubmitNewAccountForm = async () => {
     }
   });
 
-  if (error.value) {
+  if (error.value) {    
+    disableCreateAccountBtn.value = false;
+    createAccountButtonClasses.value.splice( createAccountButtonClasses.value.indexOf( 'disabledButton' ), 1);
+    cancelCreateAccountLinkClasses.value.splice( cancelCreateAccountLinkClasses.value.indexOf( 'disabledLink' ), 1);
     if (error.value?.data.email) {
       let detail = error.value?.data.email[0];
       if (detail.indexOf('already exists')) {
@@ -275,6 +286,9 @@ const SubmitNewAccountForm = async () => {
   }
 
   if (data.value.email && data.value.id) {
+    disableCreateAccountBtn.value = false;
+    createAccountButtonClasses.value.splice( createAccountButtonClasses.value.indexOf( 'disabledButton' ), 1);
+    cancelCreateAccountLinkClasses.value.splice( cancelCreateAccountLinkClasses.value.indexOf( 'disabledLink' ), 1);
     toast.add({ severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 3000 });
     closeDialog();
   };
@@ -300,5 +314,13 @@ const GoToLanding = () => {
 .signupButton {
   border: 0px;
   margin: 20px auto 0 0;
+}
+
+.ngenButtonDiv.disabledButton {
+  background-color: darkgray;
+}
+
+.disabledLink {
+  color: darkgray;
 }
 </style>
