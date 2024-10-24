@@ -7,26 +7,30 @@
             <AppHeader />
           </div>
         </div>
-        <div class="h-full grid row-span-10">
+        <div class="grid row-span-10">
           <div class="grid grid-rows-12">
             <div class="row-span-12 flex items-center justify-center h-screen-inner">
 
-              <div id="LoginBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md"
+              <div id="LoginBox" class="bg-white mx-auto px-12 py-12 rounded-[10px] max-w-screen-md"
                 :class="!showDialog ? 'loginBox' : 'createAccountBox'">
 
                 <div v-if="!showDialog" class="mx-auto px-8 text-left">
                   <form onsubmit="return false">
+
                     <h1>Login</h1>
-                    <div class="inputBox">
-                      <input id="uname" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
-                        autocomplete="username" v-on:keypress="autoSubmit" />
+
+                    <div class="mt-10">
+                      <label for="uname" style="font-weight: normal;">Email</label><br>
+                      <input id="uname" class="w-[350px]" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
+                        autocomplete="email" v-on:keypress="autoSubmit" />
                       <!-- <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Email
                       </button> -->
                     </div>
-                    <div class="inputBox">
+                    <div class="mt-4">
+                      <label for="pword" style="font-weight: normal;">Password</label><br>
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
-                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block"
+                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block w-[350px]" 
                         v-on:keypress="autoSubmit" />
                       <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
                         Forgot Password
@@ -35,10 +39,9 @@
                     <div class="ngenButtonDiv bg-blue1 btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">
                       <button id="LoginButton">Sign In</button>
                     </div>
-                    <div>
-                      <div class="signupButton underline text-base" aria-label="sign up">
-                        <button @click="openDialog" class="c-blue">Create an Account</button>
-                      </div>
+
+                    <div class="signupButton underline text-base mt-2" aria-label="sign up">
+                      <button @click="openDialog" class="c-blue">Create an Account</button>
                     </div>
 
                   </form>
@@ -48,11 +51,7 @@
                   <div class="dialog-overlay" @click.self="closeDialog">
                     <div class="dialog-content">
                       <h1>Create an Account</h1>
-                      <form @submit.prevent="submitForm">
-                        <div class="form-group inputBox" v-if="1==0">
-                          <label for="username">Username</label>
-                          <InputText v-model="newUsername" id="username" type="text" required />
-                        </div>
+                      <form @submit.prevent="SubmitNewAccountForm">
                         <div class="form-group inputBox">
                           <label for="email">Email</label>
                           <InputText v-model="newEmail" id="email" type="email" required />
@@ -87,11 +86,11 @@
                           <Password v-model="confirmPassword" id="confirmPassword" type="password" :feedback="false"
                             required toggleMask class="block" />
                         </div>
-                        <div class="ngenButtonDiv bg-blue1 btn-left mt-4">
-                          <button type="submit">Create Account</button>
+                        <div :class="createAccountButtonClasses">
+                          <button type="submit" :disabled="disableCreateAccountBtn">Create Account</button>
                         </div>
                         <div class="signupButton underline text-base inline pl-6">
-                          <button type="button" @click="closeDialog" class="c-blue">Cancel</button>
+                          <button type="button" @click="closeDialog" :class="cancelCreateAccountLinkClasses" :disabled="disableCreateAccountBtn">Cancel</button>
                         </div>
                       </form>
                     </div>
@@ -131,7 +130,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 
 const { calibrationJobId } = storeToRefs(generalStore());
 
-const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
+const { logUserIn, setUserName, setFirstName, setLastName, hardResetUserDataStore } = useUserDataStore();
 const { resetGeneralStore } = generalStore();
 const { resetGageStore, gageStore_data_loading } = useGageStore();
 const { resetFormulationStore, formulationStore_data_loading } = useFormulationStore();
@@ -154,6 +153,10 @@ const newFirstName = ref('');
 const newLastName = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
+
+const disableCreateAccountBtn = ref<boolean>(false);
+const createAccountButtonClasses = ref<string[]>(["ngenButtonDiv", "btn-left", "mt-4"]);
+const cancelCreateAccountLinkClasses = ref<string[]>(['c-blue'])
 
 onMounted(() => {
   nextTick(() => {
@@ -205,7 +208,6 @@ const SubmitLoginForm = async (e: Event) => {
     await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
       method: 'POST',
       body: {
-        username: userName.value.toLowerCase(),
         email: userName.value.toLowerCase(),
         password: userPassword.value
       }
@@ -215,6 +217,9 @@ const SubmitLoginForm = async (e: Event) => {
       // store tokens in UserDataStore
       userDataStore.setAccessToken(response.access);
       userDataStore.setRefreshToken(response.refresh);
+      // store user name in UserDataStore
+      userDataStore.setFirstName(response.first_name);
+      userDataStore.setLastName(response.last_name);
       logUserIn();
       GoToLanding();
     }
@@ -235,35 +240,38 @@ const SubmitLoginForm = async (e: Event) => {
   }
 }
 
-const submitForm = async () => {
+const SubmitNewAccountForm = async () => {
   if (newPassword.value !== confirmPassword.value) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 3000 });
     return;
   }
 
-  // try to create a new account for user
-  const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
+  disableCreateAccountBtn.value = true;
+  if ( !createAccountButtonClasses.value.includes( 'disabledButton' ) ) createAccountButtonClasses.value.push( 'disabledButton' );
+  if ( !cancelCreateAccountLinkClasses.value.includes( 'disabledLink' ) ) cancelCreateAccountLinkClasses.value.push( 'disabledLink' );
+
+  //try to create a new account for user
+  const { data, error,  } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
     method: 'POST',
     body: {
       email: newEmail.value.toLowerCase(),
-      first_name: newFirstName,
-      last_name: newLastName,
+      first_name: newFirstName.value,
+      last_name: newLastName.value,
       password: newPassword.value,
       re_password: confirmPassword.value
     }
   });
 
-  if (error.value) {
+  if (error.value) {    
+    disableCreateAccountBtn.value = false;
+    createAccountButtonClasses.value.splice( createAccountButtonClasses.value.indexOf( 'disabledButton' ), 1);
+    cancelCreateAccountLinkClasses.value.splice( cancelCreateAccountLinkClasses.value.indexOf( 'disabledLink' ), 1);
     if (error.value?.data.email) {
       let detail = error.value?.data.email[0];
       if (detail.indexOf('already exists')) {
         // customize error message since the one we get back from Djoser isn't ideal
         detail = 'A user with this Email address has already registered.'
       }
-      toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
-      return;
-    } else if (error.value?.data.username) {
-      let detail = error.value?.data.username[0];
       toast.add({ severity: 'error', summary: 'Error', detail: detail, life: 3000 });
       return;
     } else if (error.value?.data.first_name) {
@@ -281,6 +289,9 @@ const submitForm = async () => {
   }
 
   if (data.value.email && data.value.id) {
+    disableCreateAccountBtn.value = false;
+    createAccountButtonClasses.value.splice( createAccountButtonClasses.value.indexOf( 'disabledButton' ), 1);
+    cancelCreateAccountLinkClasses.value.splice( cancelCreateAccountLinkClasses.value.indexOf( 'disabledLink' ), 1);
     toast.add({ severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 3000 });
     closeDialog();
   };
@@ -306,5 +317,13 @@ const GoToLanding = () => {
 .signupButton {
   border: 0px;
   margin: 20px auto 0 0;
+}
+
+.ngenButtonDiv.disabledButton {
+  background-color: darkgray;
+}
+
+.disabledLink {
+  color: darkgray;
 }
 </style>

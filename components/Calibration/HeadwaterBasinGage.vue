@@ -105,8 +105,8 @@
             </span>
             <span v-if="calibrationStatus !== 'Running'">
               <div class="col-span-1 mr-3">
-                <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
-                  aria-label="Reset Button">Reset</button>
+                <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
+                  aria-label="Reset Button">Reset</button>-->
               </div>
             </span>
             <span v-else>
@@ -164,6 +164,10 @@ const isLoading = ref(true);
 onMounted(() => {
   toast.removeAllGroups();
   isLoading.value = false;
+
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+
 })
 
 const dialog = useDialog();
