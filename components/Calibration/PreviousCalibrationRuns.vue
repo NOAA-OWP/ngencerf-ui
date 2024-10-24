@@ -59,7 +59,7 @@ import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "
 const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
 const { loadOptimizationTabStaticData, optimizationStore_data_loading } = useOptimizationStore();
-const { loadTuningTabStaticData, tuningStore_data_loading } = useTuningStore();
+const { loadTuningTabStaticData, tuningStore_data_loading, hardResetTuningStore } = useTuningStore();
 const { calibrationJobId} = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
 const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
@@ -85,6 +85,7 @@ onMounted(() => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
+  hardResetTuningStore();
   fetchUserCalibrationJobsListData();
 })
 

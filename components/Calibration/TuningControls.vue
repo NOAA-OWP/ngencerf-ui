@@ -188,7 +188,7 @@
     </div>
     
     <div id="TuningDataList" class="mt-2 mb-2 overflow-auto max-h-[200px]" style="position: relative;">
-      <div class="text-right mb-1 mr-2"><button class="c-blue font-normal  underline">Clear</button></div>
+      <!-- <div class="text-right mb-1 mr-2"><button class="c-blue font-normal  underline">Clear</button></div> -->
 
       <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
         :model="cmTuningParameterData"></ContextMenu>
