@@ -60,12 +60,42 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
   }
 
 
+  /**
+  * Delete a job
+  */
+  async function deleteCalibrationRun(runId: number) {
+    return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/delete_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: runId })
+    })
+  }
+
+  /**
+ * Clone a job
+ */
+  async function cloneCalibrationRun(runId: number) {
+    return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/clone_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: runId })
+    })
+  }
+
   return {
     fetchJobsListData,
     calibrationJobId,
     savedCalibrationJobs,
     runningCalibrationJobs,
-    fetchNewCalibrationRunId
+    fetchNewCalibrationRunId,
+    cloneCalibrationRun,
+    deleteCalibrationRun
   }
 })
 
