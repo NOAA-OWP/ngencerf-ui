@@ -46,7 +46,6 @@ export interface JobListItem {
   calibration_end_period: Date;
   formulation_name: string;
   run_date: Date;
-  owner: string;
 }
 
 /**
