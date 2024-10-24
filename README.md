@@ -12,8 +12,8 @@ Install docs from three different sites:
 
 Once you have installed NVM, you need to install the correct NodeJs version:
 
-nvm install 12.20.13.1
-nvm use 12.20.13.1
+nvm install 20.13.1
+nvm use 20.13.1
 
 Then you can proceed....
 
