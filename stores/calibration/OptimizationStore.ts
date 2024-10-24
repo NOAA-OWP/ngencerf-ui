@@ -109,7 +109,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
       data.inputs.forEach((data_input) => {
         let data_item = {
           name: data_input.name,
-          value: 0
+          value: data_input.default_value,
         }
         let user_optimization_input = userCalibrationRunData.value?.optimization_inputs.filter((optimization_input) => optimization_input.name == data_input.name)
         if (user_optimization_input && user_optimization_input.length) data_item.value = user_optimization_input[0].value

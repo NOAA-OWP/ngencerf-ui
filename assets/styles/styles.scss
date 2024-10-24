@@ -393,16 +393,7 @@ table.cols-bordered {
 .bg_green_lt { background-color: $ngwcp_green_lt; }
 .bg_blue_lt { background-color: $ngwcp_blue_lt; }
 
-//ATTENTION to DEVELOPERS: TEMORARY: REMOVE THIS AFTER geopackageImageUrl is working
-#GageCutout {
-  background-image: url("~/assets/styles/img/temp-progress.png");
-  background-repeat: no-repeat; 
-  background-size: cover;
-  background-position: center; 
-}
-
 // Help Pages
-
 ._help-page {
   padding: 10px;
 }
