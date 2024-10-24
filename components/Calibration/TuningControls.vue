@@ -697,6 +697,9 @@ const handleFileUpload = async (event: Event) => {
           }
         });
 
+        // scroll to the bottom of the page and table
+        scrollToBottom();
+
         if (invalidParameters.length > 0) {
           toast.add({ severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters are not in the list of calibratable parameters: ${invalidParameters.join(', ')}` });
         }
@@ -732,8 +735,16 @@ const addCalibrationTuningParameter = () => {
     });
   }
 
+  // scroll to the bottom of the page and table
+  scrollToBottom();
+};
+
+/**
+ * Scroll page and table to the bottom
+ */
+const scrollToBottom = () => {
   // grab main left area and data table elements and scroll to bottom
-  /// using nextTick to ensure elements are up to date before scrolling
+  // using nextTick to ensure elements are up to date before scrolling
   nextTick(() => {
     mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
     dataTableElement = document.querySelector(".p-datatable-table-container") as HTMLElement;
