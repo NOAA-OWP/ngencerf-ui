@@ -7,26 +7,30 @@
             <AppHeader />
           </div>
         </div>
-        <div class="h-full grid row-span-10">
+        <div class="grid row-span-10">
           <div class="grid grid-rows-12">
             <div class="row-span-12 flex items-center justify-center h-screen-inner">
 
-              <div id="LoginBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md"
+              <div id="LoginBox" class="bg-white mx-auto px-12 py-12 rounded-[10px] max-w-screen-md"
                 :class="!showDialog ? 'loginBox' : 'createAccountBox'">
 
                 <div v-if="!showDialog" class="mx-auto px-8 text-left">
                   <form onsubmit="return false">
+
                     <h1>Login</h1>
-                    <div class="inputBox">
-                      <input id="uname" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
+
+                    <div class="mt-10">
+                      <label for="uname" style="font-weight: normal;">Email</label><br>
+                      <input id="uname" class="w-[350px]" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
                         autocomplete="email" v-on:keypress="autoSubmit" />
                       <!-- <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Email
                       </button> -->
                     </div>
-                    <div class="inputBox">
+                    <div class="mt-4">
+                      <label for="pword" style="font-weight: normal;">Password</label><br>
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
-                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block"
+                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block w-[350px]" 
                         v-on:keypress="autoSubmit" />
                       <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
                         Forgot Password
@@ -35,10 +39,9 @@
                     <div class="ngenButtonDiv bg-blue1 btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">
                       <button id="LoginButton">Sign In</button>
                     </div>
-                    <div>
-                      <div class="signupButton underline text-base" aria-label="sign up">
-                        <button @click="openDialog" class="c-blue">Create an Account</button>
-                      </div>
+
+                    <div class="signupButton underline text-base mt-2" aria-label="sign up">
+                      <button @click="openDialog" class="c-blue">Create an Account</button>
                     </div>
 
                   </form>

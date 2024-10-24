@@ -1,6 +1,6 @@
 <template>
    <div id="OptimizationMetrics" class="'mt-4">
-      <div class="grid grid-rows-12 gap-5">
+      <div class="grid grid-rows-12 gap-1">
          <div class="row-span-3">
             <div class="grid grid-cols-2 pt-3 gap-10">
                <div class="col-span-1">
@@ -19,7 +19,7 @@
                         <div class="flex mt-2">
                            <div class="text-left font-bold">Algorithm Parameter(s)</div>
                            <div id="ClearTableBtn" class="ml-auto">
-                              <button @click="resetOptimizationInputs" class="c-blue font-normal underline">Clear
+                              <button @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2">Clear
                                  <!-- <i class="pi pi-arrow-up"></i>--></button>
                            </div>
                         </div>
@@ -43,7 +43,7 @@
             </div>
          </div>
 
-         <div class="row-span-1 h-1rem hr">&nbsp;</div>
+         <div class="row-span-1 hr">&nbsp;</div>
 
          <div class="row-span-4">
             <div class="grid grid-cols-2 gap-10">
@@ -53,12 +53,12 @@
                      <Select id="ObjectiveFunction" class="rounded-md" filter v-model="uiObjectiveFunction"
                         :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
                         @change="updateMetricFlowFieldVisibility"></Select>
-                     <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-1">
+                     <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-2">
                         Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold"
                            v-model="uiStreamFlowThreshold" class="w-24">
                         </InputNumber> m3/s
                      </div>
-                     <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-1">
+                     <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-2">
                         Peak Flow Threshold <InputNumber inputId="ofEventBasedFlowThreshold"
                            v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
                      </div>
@@ -76,7 +76,7 @@
                      <div class="pl-8">
                         <span class="text-sm ml-2">(POD, CSI, FAR)</span>
                      </div>
-                     <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-1 pl-8">
+                     <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-2 pl-8">
                         Flow Threshold <InputNumber inputId="metricCategoricalFlowThreshold"
                            v-model="uiStreamFlowThreshold" class="w-24"></InputNumber> m3/s
                      </div><br />
@@ -88,7 +88,7 @@
                      <div class="pl-8">
                         <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
                      </div>
-                     <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-1 pl-8">
+                     <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-2 pl-8">
                         Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold"
                            v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
                      </div>
@@ -97,7 +97,7 @@
             </div>
          </div>
 
-         <div class="row-span-1 h-1rem hr">&nbsp;</div>
+         <div class="row-span-1 hr">&nbsp;</div>
 
          <div class="row-span-2 mb-4">
             <div class="grid grid-cols-2 gap-10">
@@ -121,7 +121,7 @@
             </div>
 
          </div>
-         <div class="row-span-1 h-1rem hr">&nbsp;</div>
+         
       </div>
       <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6 ActionButtonsBox">
          <span v-if="calibrationStatus !== 'Running'">
