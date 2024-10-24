@@ -187,7 +187,7 @@
       </div>
     </div>
 
-    <div id="TuningDataList" class="mt-2 mb-2" style="position: relative;">
+    <div id="TuningDataList" class="mt-2 mb-2 overflow-auto max-h-[200px]" style="position: relative;">
       <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
         :model="cmTuningParameterData"></ContextMenu>
       <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
@@ -344,11 +344,14 @@ const onRowContextMenu = (event: any) => {
   tuningContextMenu.value.show(event.originalEvent);
 };
 
+let mainLeftAreaElement: HTMLElement | null = null;
+let dataTableElement: HTMLElement | null = null;
+
 onMounted(async () => {
   toast.removeAllGroups();
   
-  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-  if (ele) { ele.scrollTo(0, 0); }
+  mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
 
   // fetch user calibration data
   await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
@@ -722,6 +725,27 @@ const addCalibrationTuningParameter = () => {
       module: parameter.module,
     });
   }
+
+  // grab main left area and data table elements and scroll to bottom
+  /// using nextTick to ensure elements are up to date before scrolling
+  nextTick(() => {
+    mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+    dataTableElement = document.querySelector(".p-datatable-table-container") as HTMLElement;
+
+    if (mainLeftAreaElement) {
+      mainLeftAreaElement.scrollTo({
+        top: mainLeftAreaElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+
+    if (dataTableElement) {
+      dataTableElement.scrollTo({
+        top: dataTableElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  });
 };
 
 /**
