@@ -53,12 +53,12 @@
                      <Select id="ObjectiveFunction" class="rounded-md" filter v-model="uiObjectiveFunction"
                         :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
                         @change="updateMetricFlowFieldVisibility"></Select>
-                     <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-1">
+                     <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-2">
                         Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold"
                            v-model="uiStreamFlowThreshold" class="w-24">
                         </InputNumber> m3/s
                      </div>
-                     <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-1">
+                     <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-2">
                         Peak Flow Threshold <InputNumber inputId="ofEventBasedFlowThreshold"
                            v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
                      </div>
@@ -76,7 +76,7 @@
                      <div class="pl-8">
                         <span class="text-sm ml-2">(POD, CSI, FAR)</span>
                      </div>
-                     <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-1 pl-8">
+                     <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-2 pl-8">
                         Flow Threshold <InputNumber inputId="metricCategoricalFlowThreshold"
                            v-model="uiStreamFlowThreshold" class="w-24"></InputNumber> m3/s
                      </div><br />
@@ -88,7 +88,7 @@
                      <div class="pl-8">
                         <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
                      </div>
-                     <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-1 pl-8">
+                     <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-2 pl-8">
                         Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold"
                            v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
                      </div>
