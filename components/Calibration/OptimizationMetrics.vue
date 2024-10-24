@@ -1,6 +1,6 @@
 <template>
    <div id="OptimizationMetrics" class="'mt-4">
-      <div class="grid grid-rows-12 gap-5">
+      <div class="grid grid-rows-12 gap-1">
          <div class="row-span-3">
             <div class="grid grid-cols-2 pt-3 gap-10">
                <div class="col-span-1">
@@ -19,7 +19,7 @@
                         <div class="flex mt-2">
                            <div class="text-left font-bold">Algorithm Parameter(s)</div>
                            <div id="ClearTableBtn" class="ml-auto">
-                              <button @click="resetOptimizationInputs" class="c-blue font-normal underline">Clear
+                              <button @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2">Clear
                                  <!-- <i class="pi pi-arrow-up"></i>--></button>
                            </div>
                         </div>
@@ -30,8 +30,8 @@
                               <Column field="name" header="Parameter" sortable></Column>
                               <Column field="value" header="Initial Value" sortable>
                                  <template #editor="{ index }">
-                                    <InputText v-model="uiOptimizationInputs[index].value" autofocus class="w-12 p-1">
-                                    </InputText>
+                                    <InputNumber v-model="uiOptimizationInputs[index].value" autofocus class="w-12 p-1">
+                                    </InputNumber>
                                  </template>
                               </Column>
                            </DataTable>
@@ -43,7 +43,7 @@
             </div>
          </div>
 
-         <div class="row-span-1 h-1rem hr">&nbsp;</div>
+         <div class="row-span-1 hr">&nbsp;</div>
 
          <div class="row-span-4">
             <div class="grid grid-cols-2 gap-10">
@@ -97,7 +97,7 @@
             </div>
          </div>
 
-         <div class="row-span-1 h-1rem hr">&nbsp;</div>
+         <div class="row-span-1 hr">&nbsp;</div>
 
          <div class="row-span-2 mb-4">
             <div class="grid grid-cols-2 gap-10">
@@ -121,7 +121,7 @@
             </div>
 
          </div>
-         <div class="row-span-1 h-1rem hr">&nbsp;</div>
+         
       </div>
       <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6 ActionButtonsBox">
          <span v-if="calibrationStatus !== 'Running'">
@@ -188,17 +188,17 @@ const toast = useToast();
 
 //const isLoading = ref(true);
 
-const cbCategoricalDisabled = ref<boolean>(false)
-const cbEventBasedDisabled = ref<boolean>(false)
-const cbIsCategorical = ref<boolean>(false)
-const cbIsEvenBased = ref<boolean>(false)
-const showMetricPeakFlow = ref<boolean>(false)
-const showMetricStreamFlow = ref<boolean>(false)
+const cbCategoricalDisabled = ref<boolean>(false);
+const cbEventBasedDisabled = ref<boolean>(false);
+const cbIsCategorical = ref<boolean>(false);
+const cbIsEvenBased = ref<boolean>(false);
+const showMetricPeakFlow = ref<boolean>(false);
+const showMetricStreamFlow = ref<boolean>(false);
+const ele = document.getElementById("MainLeftDataArea") as HTMLElement;
 
 onMounted(() => {
   toast.removeAllGroups();
 
-  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
 })
@@ -209,27 +209,27 @@ onMounted(() => {
 const updateMetricFlowFieldVisibility = () => {
   if (getSelectedMetricInfo.value) {
     //reset toggleable field available property
-    cbCategoricalDisabled.value = false
-    cbEventBasedDisabled.value = false
-    showObjectiveFunctionStreamFlow.value = false
-    showObjectiveFunctionPeakFlow.value = false
-    uiStreamFlowThreshold.value = undefined
-    uiPeakFlowThreshold.value = undefined
-    showMetricStreamFlow.value = false
-    showMetricPeakFlow.value = false
+    cbCategoricalDisabled.value = false;
+    cbEventBasedDisabled.value = false;
+    showObjectiveFunctionStreamFlow.value = false;
+    showObjectiveFunctionPeakFlow.value = false;
+    uiStreamFlowThreshold.value = undefined;
+    uiPeakFlowThreshold.value = undefined;
+    showMetricStreamFlow.value = false;
+    showMetricPeakFlow.value = false;
 
-    const metricInfo = getSelectedMetricInfo.value?.pop()
+    const metricInfo = getSelectedMetricInfo.value?.pop();
 
-    cbIsCategorical.value = metricInfo?.categorical ?? false
-    cbIsEvenBased.value = metricInfo?.event_based ?? false
+    cbIsCategorical.value = metricInfo?.categorical ?? false;
+    cbIsEvenBased.value = metricInfo?.event_based ?? false;
 
     if (metricInfo?.categorical == true) {
-        showObjectiveFunctionStreamFlow.value = true
-        cbCategoricalDisabled.value = true
+        showObjectiveFunctionStreamFlow.value = true;
+        cbCategoricalDisabled.value = true;
     }
     if (metricInfo?.event_based == true) {
-        showObjectiveFunctionPeakFlow.value = true
-        cbEventBasedDisabled.value = true
+        showObjectiveFunctionPeakFlow.value = true;
+        cbEventBasedDisabled.value = true;
     }
   }
 }
@@ -239,10 +239,10 @@ const updateMetricFlowFieldVisibility = () => {
  */
 const toggleMetricStreamFlowInput = () => {
   if (!cbCategoricalDisabled.value && cbIsCategorical.value) {
-    showMetricStreamFlow.value = true
+    showMetricStreamFlow.value = true;
   } else if (!cbIsCategorical.value) {
-    showMetricStreamFlow.value = false
-    uiStreamFlowThreshold.value = undefined
+    showMetricStreamFlow.value = false;
+    uiStreamFlowThreshold.value = undefined;
   }
 }
 
@@ -251,10 +251,10 @@ const toggleMetricStreamFlowInput = () => {
  */
 const toggleMetricPeakFlowInput = () => {
   if (!cbEventBasedDisabled.value && cbIsEvenBased.value) {
-    showMetricPeakFlow.value = true
+    showMetricPeakFlow.value = true;
   } else if (!cbIsEvenBased.value) {
-    showMetricPeakFlow.value = false
-    uiPeakFlowThreshold.value = undefined
+    showMetricPeakFlow.value = false;
+    uiPeakFlowThreshold.value = undefined;
   }
 }
 
@@ -262,7 +262,7 @@ const toggleMetricPeakFlowInput = () => {
  * explicitly reload optimization input table data
  */
 const optimizationSelectChange = () => {
-  uiOptimizationInputs.value = getOptimizationInputUserData.value
+  uiOptimizationInputs.value = getOptimizationInputUserData.value;
 }
 
 const gotoNext = () => {
@@ -280,21 +280,21 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
    const metricInfo = getSelectedMetricInfo.value?.pop()
 
   if (metricInfo?.categorical == true) {
-    showObjectiveFunctionStreamFlow.value = true
-    cbCategoricalDisabled.value = true
-    cbIsCategorical.value = true
+    showObjectiveFunctionStreamFlow.value = true;
+    cbCategoricalDisabled.value = true;
+    cbIsCategorical.value = true;
   } else if (metricInfo?.categorical == false && uiStreamFlowThreshold.value) {
-    showMetricStreamFlow.value = true
-    cbIsCategorical.value = true
+    showMetricStreamFlow.value = true;
+    cbIsCategorical.value = true;
   }
 
   if (metricInfo?.event_based == true) {
-    showObjectiveFunctionPeakFlow.value = true
-    cbEventBasedDisabled.value = true
-    cbIsEvenBased.value = true
+    showObjectiveFunctionPeakFlow.value = true;
+    cbEventBasedDisabled.value = true;
+    cbIsEvenBased.value = true;
   } else if (metricInfo?.event_based == false && uiPeakFlowThreshold.value) {
-    showMetricPeakFlow.value = true
-    cbIsEvenBased.value = true
+    showMetricPeakFlow.value = true;
+    cbIsEvenBased.value = true;
   }
 })
 
@@ -311,9 +311,9 @@ const saveOptMetData = () => {
             toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: message });
          })
       } else if ( response?.response_type == 'error' ) {
-         toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: response?.message, life: 10000 });
+         toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: response?.message});
       } else {
-         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message, life: 3000 });
+         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message});
          fetchUserCalibrationRunData()
       }
    })
@@ -327,11 +327,11 @@ const goNextTab = () => {
    //    err = true;
    // }
    // if (!uiObjectiveFunction.value) {
-   //    txt += "\nAll Automatic Validation Times are required."
+   //    txt += "\nAll Automatic Validation Times are required.";
    //    err = true;
    // }
    // if (err) {
-   //    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
+   //    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt);
    //    return;
    // }
    gotoNext();

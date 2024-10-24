@@ -1,6 +1,6 @@
 <template>
 
-    <img v-if="geopackageImageUrl" id="GageCutoutImage" :src="geopackageImageUrl" />
+    <img style="height:100%; width:100%" v-if="geopackageImageUrl" id="GageCutoutImage" :src="geopackageImageUrl" />
 
 </template>
 

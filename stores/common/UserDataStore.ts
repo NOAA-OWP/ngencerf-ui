@@ -192,42 +192,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     userCalibrationRunData.value = userCalibrationRunDataResult?._data ?? undefined;
   }
 
-  /**
-  * Delete a job
-  */
-  async function deleteCalibrationRun(runId: number) {
-    await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/delete_job/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({ calibration_run_id: runId })
-    }).then(function(result) {
-      console.log("Result: ", result)
-      fetchUserCalibrationJobsListData();
-    });
-  }
-
-  /**
- * Clone a job
- */
-  async function cloneCalibrationRun(runId: number) {
-    await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/clone_job/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({ calibration_run_id: runId })
-    }).then(function(result) {
-      console.log("Result: ", result)
-       fetchUserCalibrationJobsListData();
-    });
-  }
-
-
-
   useLogoutListen('logoutEvent', () => {
     hardResetUserDataStore();
   })
@@ -272,8 +236,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     userCalibrationJobsListData,
     userCalibrationRunData,
     queryUserCalibrationRunData,
-    deleteCalibrationRun,
-    cloneCalibrationRun,
     fetchUserCalibrationRunData,
     hardResetUserDataStore,
     clearUserCalibrationRunData,   
