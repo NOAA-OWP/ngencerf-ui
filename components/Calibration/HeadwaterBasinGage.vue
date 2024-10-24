@@ -8,14 +8,14 @@
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
               <div class="col-span-1">
-                <label for="Domain">Domain:</label><br />
+                <label for="Domain">Domain</label><br />
                 <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
                   optionValue="name" placeholder=" ... " class=""></Select>
               </div>
             </div>
 
             <div class="col-span-1">
-              <label for="Gage">Gage:</label><br />
+              <label for="Gage">Gage</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
                 @change="onGageSelectionChange" class=""></Select>
@@ -27,20 +27,20 @@
         <div class="row-span-1">
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
-              <label for="Forcing">Forcing:</label><br />
+              <label for="Forcing">Forcing Data</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
                 optionValue="name" placeholder=" ... " class="" @change="uploadForcingDlgOpen($event)"></Select>
             </div>
 
             <div class="col-span-1">
-              <label for="Observational">Observational:</label><br />
+              <label for="Observational">Observational Data</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
                 optionLabel="name" optionValue="name" placeholder=" ... " class=""
                 @change="uploadObservationalDlgOpen($event)"></Select>
             </div>
 
             <div class="col-span-1">
-              <label for="Geopackage">Geopackage:</label><br />
+              <label for="Geopackage">Geo Package</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
                 optionValue="name" placeholder=" ... " class=""
                 @change="uploadGeopackageDlgOpen($event)"></Select>
@@ -164,6 +164,10 @@ const isLoading = ref(true);
 onMounted(() => {
   toast.removeAllGroups();
   isLoading.value = false;
+
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+
 })
 
 const dialog = useDialog();

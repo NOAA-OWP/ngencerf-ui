@@ -24,7 +24,7 @@ export interface GeneralApiSaveResponse {
 export interface GeneralErrorResponse {
   response_type: string;
   message: string;
-  validation_errors: ValidationErrorObject[];
+  validation_errors?: ValidationErrorObject[];
 }
 
 export interface ValidationErrorObject {
@@ -164,6 +164,14 @@ export interface GageOptionData {
   nwm_v3_calibrated: boolean;
 }
 
+export interface SaveGageTabPayload {
+  calibration_run_id?: number;
+  gage_id?: string;
+  forcing_source?: string;
+  observational_source?: string;
+  geopackage_source?: string;
+}
+
 export interface GageData {
   gage_id: string;
   agency: string;
@@ -207,6 +215,7 @@ export interface SaveGageTabResponse extends GeneralApiSaveResponse {
 export interface FormulationTabData {
   calibration_run_id: number;
   modules: FormulationModuleData[];
+  module_groups: string[];
   status: string;
 }
 
@@ -214,6 +223,14 @@ export interface FormulationModuleData {
   name: string;
   groups: string[];
   used_by_calibration_run: boolean;
+}
+
+export interface SaveFormulationTabPayload {
+  calibration_run_id?: number;
+  formulation_name?: string;
+  modules?: string[];
+  use_sloth?: boolean;
+  sloth_parameters?: SlothParameterData[];
 }
 
 export interface tuning_load {
@@ -339,6 +356,18 @@ export interface OptimizationDataInputData {
   description: string;
   data_type: string;
   is_active: boolean;
+}
+
+export interface SaveOptimizationPayload {
+  calibration_run_id?: number;
+  optimization_inputs?: UserCalibrationRunOptimizationInputData[];
+  optimization?: string;
+  objective_function?: string;
+  streamflow_threshold?: number;
+  peak_flow_threshold?: number;
+  stop_criteria?: number;
+  save_plot_iteration_frequency?: number;
+  save_output_iteration?: boolean;
 }
 
 export interface CalibrationRun {

@@ -2,7 +2,7 @@
 
   <div class="mx-auto px-8 text-center overflow-auto">
     <div class="width-full">
-      <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs *</h1>
+      <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs *</h1>
       <span class="ngenButtonDiv-alt bg-blue4 ml-8" @click="createNewCalibration"><button>New</button>
       </span>
 
@@ -15,7 +15,7 @@
           selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
           @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle"
           @rowDblselect="openSelectedCalibrationRun(selectedCalibrationRun)">
-          <Column field="calibration_run_id" header="Run ID" sortable></Column>
+          <Column field="calibration_run_id" header="Job ID" sortable></Column>
           <Column field="formulation_name" header="Formulation Name" sortable>
           </Column>
           <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
@@ -54,6 +54,7 @@ import { useGageStore } from "~/stores/calibration/GageStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
+import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "~/composables/ValidationHandlers";
 
 const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
@@ -62,9 +63,8 @@ const { loadTuningTabStaticData, tuningStore_data_loading } = useTuningStore();
 const { calibrationJobId} = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
 const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
-const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData,
-  deleteCalibrationRun, cloneCalibrationRun } = useUserDataStore();
-const { fetchNewCalibrationRunId } = useCalibrationJobStore();
+const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
+const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -81,6 +81,11 @@ const onRowContextMenu = (event: any) => {
 
 onMounted(() => {
   isLoading.value = false;
+
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+
+  fetchUserCalibrationJobsListData();
 })
 
 /**
@@ -93,7 +98,7 @@ onUnmounted(() => {
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[getCalibrationTabIndex() - 1];
     e.click();
-  }, 250)
+  }, 250);
 })
 
 const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
@@ -172,9 +177,16 @@ const gotoHeadwaterBasinGage = () => {
  * following section require backend api before them can be implemented
  */
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  //toast.add({ severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 })
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
-  cloneCalibrationRun(selectedRunId);
+  cloneCalibrationRun(selectedRunId).then( response => {
+    if ( response.status == 200 ) {
+      fetchUserCalibrationJobsListData();
+    } else {
+      useApiErrorResponsePreprocess( response ).forEach( message => {
+        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Clone Calibration Job Failed.', detail: message, life: 10000 });
+      });
+    }
+  });
 }
 
 const confirmDelte = useConfirm();
@@ -203,9 +215,16 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   })
 }
 const acceptDelete = (selectedRunId: number) => {
-  toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
-  deleteCalibrationRun(selectedRunId);
-  selectedCalibrationRun.value = undefined
+  deleteCalibrationRun(selectedRunId).then( response => {
+    if ( response.status == 200 ) {
+      fetchUserCalibrationJobsListData();
+    } else {
+      useApiErrorResponsePreprocess( response ).forEach( message => {
+        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
+      });
+    }
+  });
+  selectedCalibrationRun.value = undefined;
 }
 
 </script>

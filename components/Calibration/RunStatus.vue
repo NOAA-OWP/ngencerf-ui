@@ -8,11 +8,11 @@
               <table>
                 <tbody>
                   <tr height="45px">
-                    <td class="text-right font-bold">Start Time:</td>
+                    <td class="text-right font-bold">Start Time</td>
                     <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="45px">
-                    <td class="text-right font-bold">Running Time:</td>
+                    <td class="text-right font-bold">Running Time</td>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
                 </tbody>
@@ -23,7 +23,7 @@
               <table>
                 <tbody>
                   <tr>
-                    <td class="text-right"><label for="RunStatus">Status:</label></td>
+                    <td class="text-right"><label for="RunStatus">Status</label></td>
                     <td class="pl-5">
                       <span v-if="!progress">
                         <input id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;"
@@ -35,7 +35,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td class="text-right"><label for="DisplayOptions">Display:</label></td>
+                    <td class="text-right"><label for="DisplayOptions">Display</label></td>
                     <td class="pl-5">
                       <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
                         optionLabel="name" optionValue="name">
@@ -160,6 +160,10 @@ let iterationIntervalId: NodeJS.Timeout | undefined = undefined;
 
 onMounted(async () => {
   toast.removeAllGroups();
+
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+
   nextTick(() => {
     if (userCalibrationRunData.value) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;

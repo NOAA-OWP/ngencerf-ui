@@ -21,7 +21,7 @@
                 <tbody>
                   <tr>
                     <td class="w-1/6">
-                      <label for="SimulationStart" class="whitespace-nowrap">Simulation Start:</label>
+                      <label for="SimulationStart" class="whitespace-nowrap">Simulation Start </label>
                     </td>
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
@@ -30,7 +30,7 @@
                       <!-- <div v-if="!isTimeRangeSet()" class="overlay"></div>  -->
                     </td>
                     <td class="pl-6 w-1/6">
-                      <label for="SimulationEnd" class="whitespace-nowrap">Simulation End:</label>
+                      <label for="SimulationEnd" class="whitespace-nowrap">Simulation End </label>
                     </td>
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
@@ -41,7 +41,7 @@
                   </tr>
                   <tr>
                     <td class="w-1/6">
-                      <label for="CalibrationStart" class="whitespace-nowrap">Calibration Start:</label>
+                      <label for="CalibrationStart" class="whitespace-nowrap">Calibration Start </label>
                     </td>
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
@@ -50,7 +50,7 @@
                      <!-- /<div v-if="!isTimeRangeSet()" class="overlay"></div> -->
                     </td>
                     <td class="pl-6 w-1/6">
-                      <label for="CalibrationEnd" class="whitespace-nowrap">Calibration End:</label>
+                      <label for="CalibrationEnd" class="whitespace-nowrap">Calibration End </label>
                     </td>
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
@@ -83,7 +83,7 @@
 
                       <td class="w-1/6">
                         <label for="ValSimulationStart" class="whitespace-nowrap">Simulation
-                          Start:</label>
+                          Start </label>
                       </td>
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
@@ -94,7 +94,7 @@
 
                       </td>
                       <td class="pl-6 w-1/6">
-                        <label for="ValSimulationEnd" class="whitespace-nowrap">Simulation End:</label>
+                        <label for="ValSimulationEnd" class="whitespace-nowrap">Simulation End </label>
                       </td>
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark" v-model="avSimEndTime"
@@ -107,7 +107,7 @@
                     <tr>
 
                       <td class="w-1/6">
-                        <label for="ValidationStart" class="whitespace-nowrap">Validation Start:</label>
+                        <label for="ValidationStart" class="whitespace-nowrap">Validation Start </label>
                       </td>
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark" v-model="avCalStartTime"
@@ -116,7 +116,7 @@
                         <!-- <div v-if="!isTimeRangeSet()" class="overlay"></div> -->
                       </td>
                       <td class="pl-6 w-1/6">
-                        <label for="ValidationEnd" class="whitespace-nowrap">Validation End:</label>
+                        <label for="ValidationEnd" class="whitespace-nowrap">Validation End </label>
                       </td>
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
@@ -147,7 +147,7 @@
           <div class="mb-2 font-bold">Output Variable To Calibrate</div>
           <div class="mt-2 text-sm">
             <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable" :disabled="!isFormulationDataSaved()"
-              :options="outputVariables" optionLabel="name" optionValue="name" >
+              :options="outputVariables" optionLabel="output" optionValue="output" >
             </Select>
             <!-- <div v-if="!isFormulationDataSaved()" class="overlay"></div> -->
           </div>
@@ -158,7 +158,7 @@
         <div class="col-span-1">
           
 
-          <div class="mb-2 font-bold">Calibration Tuning Parameters</div>
+          <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
           <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
             <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
             <button @click="triggerFileInput" :disabled="!isFormulationDataSaved()">Load Parameters File
@@ -169,7 +169,7 @@
 
         <div class="col-span-1">
           <div class="text-left mt-2">
-            <div class="font-bold">Calibratable Parameters:</div>
+            <div class="font-bold">Calibratable Parameters</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
               :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="output" optionValue="output" >
               <template #option="slotProps">
@@ -346,6 +346,9 @@ const onRowContextMenu = (event: any) => {
 
 onMounted(async () => {
   toast.removeAllGroups();
+  
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
 
   // fetch user calibration data
   await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
@@ -405,6 +408,7 @@ onMounted(async () => {
         name: outputVar.name,
         description: outputVar.description,
         module: module.name,
+        output: `${outputVar.name} (${module.name})`,
       }))) || [];
       console.log("outputVariables:", outputVariables.value);
     }
@@ -447,7 +451,7 @@ onMounted(async () => {
     if (!selectedOutputVariable.value){
       userOutputVariableToCalibrate.value.name = name;
       userOutputVariableToCalibrate.value.module = module;
-      selectedOutputVariable.value = userOutputVariableToCalibrate.value.name;
+      selectedOutputVariable.value = `${name} (${module})`;
     }
   };
 
@@ -546,12 +550,15 @@ const handleAvCalEndUpdate = (value: any) => {
 
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
+  // get output variable object from newly-selected output variable
+  const outputVariable = outputVariables?.value?.find((outputVar: any) => outputVar?.output === selectedOutputVariable?.value);
+
   // find module for newly-selected output variable
-  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === selectedOutputVariable?.value));
+  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === outputVariable.name));
 
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
-    name: selectedOutputVariable?.value,
+    name: outputVariable?.name,
     module: module?.name,
   }
   console.log("selectedOutputVariable:", selectedOutputVariable.value);
@@ -608,6 +615,10 @@ watch(avSimEndTime, () => {
  */
 const triggerFileInput = () => {
   if (fileInput.value) {
+    if (fileInput.value.value) {
+      console.log('fileInput.value.value is not empty. Resetting value');
+      fileInput.value.value = '';
+    }
     fileInput.value.click();
   }
 };
@@ -621,6 +632,7 @@ const handleFileUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0]; // get the first file we see
   let errorMessage = '';
+  let invalidParameters: any[] = [];
   if (file) {
     try {
       const formData = new FormData();
@@ -640,28 +652,54 @@ const handleFileUpload = async (event: Event) => {
       if (response?._data.user_parameter_file) {
         // Populate the Parameter table with the data from user-uploaded file
         response._data?.user_parameter_file?.forEach((param: any) => {
-          if (isNotNullOrUndefined(param.param) && isNotNullOrUndefined(param.min) && isNotNullOrUndefined(param.max) && isNotNullOrUndefined(param.init) && isNotNullOrUndefined(param.model)) {
-            userSelectedCalibrationTuningParameters?.value?.push({
-              name: param.param,
-              minimum: param.min,
-              maximum: param.max,
-              initial_value: param.init,
-              module: param.model, // module?
-            });
+          if (
+            isNotNullOrUndefined(param.param) && 
+            isNotNullOrUndefined(param.min) && 
+            isNotNullOrUndefined(param.max) && 
+            isNotNullOrUndefined(param.init) && 
+            isNotNullOrUndefined(param.model)) {
+              // check if parameter is in the calibrationTuningParameters list and not already in the userSelectedCalibrationTuningParameters list
+              const isParameterInCalibratableList = calibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
+              // add parameter to the userSelectedCalibrationTuningParameters list if it is in the calibrationTuningParameters list
+              if (!isParameterInCalibratableList) {
+                invalidParameters.push(param.param);
+              }
+
+              const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
+
+              if (isParameterAlreadyInTable) {
+                // delete the parameter from the table if parameter we're trying to add is already in the table so we override it
+                userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters?.value?.filter((paramData: any) => paramData.name !== param.param);
+              }
+
+              // add parameter to the table if is in the list of calibratable parameters
+              if (isParameterInCalibratableList) {
+                userSelectedCalibrationTuningParameters?.value?.push({
+                  name: param.param,
+                  minimum: param.min,
+                  maximum: param.max,
+                  initial_value: param.init,
+                  module: param.model, // module?
+                });
+              }
           } else {
             errorMessage = response._data?.message;
             toast.add({ severity: 'warn', summary: 'Invalid data in parameter file' , detail: errorMessage });
           }
         });
+
+        if (invalidParameters.length > 0) {
+          toast.add({ severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters are not in the list of calibratable parameters: ${invalidParameters.join(', ')}` });
+        }
       } else {
-        toast.add({ severity: 'warn', summary: 'No data in parameter file', life: 5000 });
+        toast.add({ severity: 'warn', summary: 'No data in parameter file'});
       }
     } catch (error) {
-      toast.add({ severity: 'warn', summary: 'File upload failed', life: 5000 });
+      toast.add({ severity: 'warn', summary: 'File upload failed' });
       console.error('File upload failed:', error);
     }
   } else {
-    toast.add({ severity: 'warn', summary: 'No file selected', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'No file selected' });
     console.error('No file selected');
   }
 };
@@ -670,7 +708,7 @@ const handleFileUpload = async (event: Event) => {
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
 const addCalibrationTuningParameter = () => {
-  console.log("selectedParameter:", selectedParameter.value);
+  // console.log("selectedParameter:", selectedParameter.value);
   const parameter = calibrationTuningParameters?.value?.find(param => param.output === selectedParameter.value);
   const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.find(param => param.name === parameter.name);
 

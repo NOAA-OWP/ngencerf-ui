@@ -1,14 +1,19 @@
 <template>
   <!-- User Page -->
 
-        <div id="UserBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-md">
-          <div class="grid grid-cols-12 gap-3">
-            <div class="col-span-5">
+        <div id="UserBox" class="bg-white mx-auto px-16 pt-10 pb-16 rounded-[10px] max-w-screen-md">
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="col-span-2">
               <div class="ttl">Your Account</div>
-              <div class="name">{{ accountName }}</div>
+              <div class="name">{{ getUserFullName() }} <br />
+              <span style="font-size:0.7em;">{{ getUserName() }} </span>
+              </div>
+              <div class="chgpwd mt-12 mb-6">Change Password</div>
+            </div>
+            <div class="col-span-1">
               <form @submit.prevent="changePassword" @cancel="closeAccountBox">
                 <div class="passwordBox grid row-auto">
-                  <div class="chgpwd">Change Password</div>
                   <div class="pwdspacer">Old password</div>
                   <div>
                     <Password id="OldPass" type="password" name="password" :inputProps="{ autocomplete: true }"
@@ -45,24 +50,21 @@
                 </div>
               </form>
             </div>
-            <div class="col-span-7">
-              <div id="avatar" class="row">
-                <div><img src="@/assets/styles/img/herbie.png" /></div>
-              </div>
+            <div class="col-span-1">
               <div id="passwordNotes" class="row">
                 <p>
                   <strong>Password format:</strong><br />
-                  At least 12 characters long but 14 or more is better.<br /><br />
-                  A combination of uppercase letters,<br />
-                  lowercase letters, numbers, an14 ord symbols.<br /><br />
-                  Not a word that can be found in a dictionary<br />
-                  or the name of a person, character,<br />
-                  product, or organization.<br /><br />
-                  Significantly different from your previous password
+                  <ul>
+                    <li>Cannot be a commonly used password</li>
+                    <li>Must be at least 8 characters long</li>
+                    <li>Must contain at least one non-numeric character</li>
+                  </ul>
                 </p>
               </div>
             </div>
+
           </div>
+
         </div>
 
 </template>
@@ -73,11 +75,10 @@ import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useToast } from "primevue/usetoast";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
-const { getAccessToken, getUserInitials } = useUserDataStore()
+const { getAccessToken, getUserInitials, getUserName, getUserFullName } = useUserDataStore()
 const toast = useToast();
 const { ngencerfBaseUrl } = useBackendConfig();
 
-const accountName = getUserInitials();
 const oldpass = ref("");
 const newpass = ref("");
 const confirmNewpass = ref("");
@@ -183,12 +184,5 @@ const closeAccountBox = () => {
     font-size: 30px;
   }
 
-  .passwordBox {
-    margin: 120px 0 0 20px;
-  }
-
-  .pwdspacer {
-    margin-top: 40px;
-  }
 }
 </style>

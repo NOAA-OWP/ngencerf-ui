@@ -2,7 +2,7 @@
   <div class="h-full min-h-screen ">
     <div class="grid grid-rows-12">
       <div class="row-span-2">
-        <div id="PgTitle">Previous Calibration Runs</div>
+        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs</h1>
       </div>
       <div class="waitgif" v-if="isLoadingCalibrationSummary">
         <img src="@/assets/styles/img/wait.gif" />
@@ -12,7 +12,7 @@
         <div id="CalTable">
           <div class="grid grid-cols-2 mb-5">
               <div class="col-span-1">
-                  <div class="inline ">Headwater Basin Gage:
+                  <div class="inline "><label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
                   :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder=""></Select>
               </div>
@@ -22,7 +22,7 @@
           <DataTable id="cr-list" :value="filteredEvaluationCalibrationRunList" scrollable scroll-height="400px"
               table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
               :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
-              <Column field="calibration_run_id" header="Run ID" sortable></Column>
+              <Column field="calibration_run_id" header="Job ID" sortable></Column>
               <Column field="run_date" header="Run Date" sortable></Column>
               <Column field="formulation_name" header="formulation_name" sortable></Column>
               <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
@@ -152,4 +152,5 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+#HeadwaterBasinGage {width:300px;}
 </style>

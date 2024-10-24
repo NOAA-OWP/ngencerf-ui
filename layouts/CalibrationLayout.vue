@@ -6,12 +6,12 @@
           <AppHeader />
         </div>
       </div>
-      <div v-if="getMenuIndex() === 1 && getCalibrationTabIndex() === 1" class="grid row-span-10 gap-2">
+      <div v-if="getMenuIndex() === 1 && getCalibrationTabIndex() === 1" class="grid row-span-10 gap-2 mx-2">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
-            <div class="grid grid-rows-12 mx-auto px-4 py-2">
+            <div class="grid grid-rows-12 mx-auto px-2 py-2">
               <div class="grid row-span-12 white-tall-content-box">
-                <div class="overflow-auto">                 
+                <div id="MainLeftDataArea" class="overflow-auto"> 
                   <CalibrationLeftBlock />
                 </div>
               </div>
@@ -20,21 +20,21 @@
         </div>
       </div>
 
-      <div v-else class="grid row-span-10 gap-2">
+      <div v-else class="grid row-span-10 gap-2 mx-2">
         <div class="grid grid-cols-12">
           <div class="col-span-8">
-            <div class="grid grid-rows-12 mx-auto px-4 py-2">
+            <div class="grid grid-rows-12 mx-auto px-2 py-2">
               <div class="grid row-span-12 white-tall-content-box">
-                <div class="overflow-auto">
+                <div id="MainLeftDataArea" class="overflow-auto"> 
                   <CalibrationLeftBlock />
                 </div>
               </div>
             </div>
           </div>
           <div class="col-span-4">
-            <div class="grid grid-rows-12 mx-auto px-4 py-2">
+            <div class="grid grid-rows-12 mx-auto px-2 py-2">
               <div class="grid row-span-12 white-tall-content-box">
-                <div class="overflow-auto">
+                <div id="MainLeftDataArea" class="overflow-auto"> 
                   <CalibrationRightBlock />
                 </div>
               </div>
