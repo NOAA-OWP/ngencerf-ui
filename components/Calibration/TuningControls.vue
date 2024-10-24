@@ -188,7 +188,7 @@
     </div>
     
     <div id="TuningDataList" class="mt-2 mb-2 overflow-auto max-h-[200px]" style="position: relative;">
-      <div class="text-right mb-1 mr-2"><button class="c-blue font-normal  underline">Clear</button></div>
+      <!-- <div class="text-right mb-1 mr-2"><button class="c-blue font-normal  underline">Clear</button></div> -->
 
       <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
         :model="cmTuningParameterData"></ContextMenu>
@@ -699,6 +699,9 @@ const handleFileUpload = async (event: Event) => {
           }
         });
 
+        // scroll to the bottom of the page and table
+        scrollToBottom();
+
         if (invalidParameters.length > 0) {
           toast.add({ severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters are not in the list of calibratable parameters: ${invalidParameters.join(', ')}` });
         }
@@ -734,8 +737,16 @@ const addCalibrationTuningParameter = () => {
     });
   }
 
+  // scroll to the bottom of the page and table
+  scrollToBottom();
+};
+
+/**
+ * Scroll page and table to the bottom
+ */
+const scrollToBottom = () => {
   // grab main left area and data table elements and scroll to bottom
-  /// using nextTick to ensure elements are up to date before scrolling
+  // using nextTick to ensure elements are up to date before scrolling
   nextTick(() => {
     mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
     dataTableElement = document.querySelector(".p-datatable-table-container") as HTMLElement;
