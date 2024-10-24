@@ -191,8 +191,8 @@
       <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
         :model="cmTuningParameterData"></ContextMenu>
       <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
-        v-model:selection="selectedTuningParamaterData" selectionMode="single" contextMenu
-        v-model:contextMenuSelection="selectedTuningParamaterData" @rowContextmenu="onRowContextMenu">
+        v-model:selection="selectedTuningParameterData" selectionMode="single" contextMenu
+        v-model:contextMenuSelection="selectedTuningParameterData" @rowContextmenu="onRowContextMenu">
         <!-- parameter column, uneditable -->
         <Column field="parameter" header="Parameter" sortable>
           <template #body="slotProps">
@@ -334,11 +334,11 @@ const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isInitialSetupDone = ref(false);
-const selectedTuningParamaterData = ref();
+const selectedTuningParameterData = ref();
 const tuningContextMenu = ref();
 
 const cmTuningParameterData = ref([
-  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteCalibrationTuningParameter(selectedTuningParamaterData) }
+  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteCalibrationTuningParameter(selectedTuningParameterData) }
 ]);
 
 const onRowContextMenu = (event: any) => {
@@ -783,8 +783,8 @@ const updateCalibrationTuningParameter = (index: number, field: string, ev: Even
 /**
  * Delete Calibration Tuning Parameter from the table
  */
-const deleteCalibrationTuningParameter = (selectedTuningParamaterData: any) => {
-  userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters.value.filter((param: any) => param.name !== selectedTuningParamaterData.value.name);
+const deleteCalibrationTuningParameter = (selectedTuningParameterData: any) => {
+  userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters.value.filter((param: any) => param.name !== selectedTuningParameterData.value.name);
 };
 
 /**
