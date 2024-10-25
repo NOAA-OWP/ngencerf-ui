@@ -183,8 +183,9 @@ const closeDialog = () => {
 const ForgotUsername = () => {
   //
 };
+
 const ForgotPassword = () => {
-  //
+  toast.add({ severity: 'info', summary: 'Info', detail: 'Please contact the ngenCERF administrator to reset your password.'});
 };
 
 const autoSubmit = (e: KeyboardEvent) => {
