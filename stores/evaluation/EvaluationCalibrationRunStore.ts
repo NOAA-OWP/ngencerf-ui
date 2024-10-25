@@ -54,13 +54,13 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    */
   async function fetchUserValidatedCalibrationJobsListData() {
     userEvaluationCalibrationRunListData.value = [];
-    const runListDataResult = await makeProtectedApiCall<ValidatedCalibrationRunList>( `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`, {
+    const runListDataResult = await makeProtectedApiCall<ValidatedCalibrationRunList>( `${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
       method: "POST",
       headers: { 
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify( { include_validations: true } )
+      //body: JSON.stringify( { include_validations: true } )
     });
 
     if ( runListDataResult?._data?.jobs.length > 0 ) {
