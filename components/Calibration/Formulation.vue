@@ -245,17 +245,27 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 */
 const saveFormulationData = () => {
   toast.removeAllGroups()
-  const save_formulation_response = saveFormulationTabData();
-  save_formulation_response.then((response) => {
-    if (response?.validation_errors) {
-      useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-        toast.add({ severity: "error", summary: response?.message, detail: message })
-      })
+  saveFormulationTabData().then( response => {
+    if ( response.status == 200 ) {
+      toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
+      fetchUserCalibrationRunData()
     } else {
-      toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
-      fetchUserCalibrationRunData();
+      useApiErrorResponsePreprocess( response ).forEach( message => {
+        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Formulation Tab Data Failed.', detail: message, life: 10000 });
+      });
     }
-  })
+  });
+  // const save_formulation_response = saveFormulationTabData();
+  // save_formulation_response.then((response) => {
+  //   if (response?.validation_errors) {
+  //     useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
+  //       toast.add({ severity: "error", summary: response?.message, detail: message })
+  //     })
+  //   } else {
+  //     toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
+  //     fetchUserCalibrationRunData();
+  //   }
+  // })
 }
 
 const resetFormulationData = () => {

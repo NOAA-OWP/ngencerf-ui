@@ -88,8 +88,8 @@ export const useApiErrorResponseValidator = ( validationErrors: any ) => {
 
 export const useApiErrorResponsePreprocess = ( errorResponse: any ) => {
   let errors = <String[]>[];
-  if ( errorResponse?._data?.validation_error && Array.isArray( errorResponse?._data?.validation_error ) ) {
-    errors = useApiErrorResponseValidator( errorResponse?._data?.validation_error );
+  if ( errorResponse?._data?.validation_errors ) {
+    errors = useApiErrorResponseValidator( errorResponse?._data?.validation_errors );
   }
   if ( errorResponse?._data?.error && typeof errorResponse?._data?.error === 'string' &&  errorResponse?._data?.error.length > 0 ) {
     errors.push( errorResponse?._data?.error );
