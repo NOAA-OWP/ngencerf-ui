@@ -138,7 +138,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     if ( Object.keys( savePayload.value ).length > 0 ) {
       savePayload.value["calibration_run_id"] = calibrationJobId.value;
       savePayload.value["save_output_iteration"] = true;
-      const saveOptimizationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>(`${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
+      return await makeProtectedApiCall<GeneralApiSaveResponse>(`${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${getAccessToken()}`,
@@ -146,14 +146,16 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
         },
         body: JSON.stringify( savePayload.value )
       });
-
-      return saveOptimizationTabDataResponse?._data;
     } else {
       return Promise.resolve({
-        message: "Error saving Optimization Tab Data",
-        validation_errors: { "Tab Error": ["Please select at least 1 field before saving."] },
-        calibration_run_id: calibrationJobId.value,
-        status: "error"
+        _data: {
+          respone_type: "exception",
+          message: "Error saving Optimization Tab Data",
+          validation_errors: { "Tab Error": ["Please select at least 1 field before saving."] },
+          calibration_run_id: calibrationJobId.value,
+          status: "error"
+        },
+        status: 400
       });
     }
 
