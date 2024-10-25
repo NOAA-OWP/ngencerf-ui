@@ -147,18 +147,23 @@ const createNewCalibration = async () => {
   useGageStore().resetGageStore();
   clearUserCalibrationRunData();
 
-  const fetchedId = await fetchNewCalibrationRunId()
-  if (fetchedId != undefined) {
-    calibrationJobId.value = fetchedId
-    if (calibrationJobId.value > 0) {
-      queryUserCalibrationRunData().then(queryResponse => {
-        userCalibrationRunData.value = queryResponse?._data;
-        gotoHeadwaterBasinGage();
-      });
+  fetchNewCalibrationRunId().then( response => {
+    if ( response.status == 201 ) {
+      if ( response?._data && response?._data?.calibration_run_id && response?._data?.calibration_run_id > 0 ) {
+        calibrationJobId.value = response?._data?.calibration_run_id;
+        queryUserCalibrationRunData().then(queryResponse => {
+          userCalibrationRunData.value = queryResponse?._data;
+          gotoHeadwaterBasinGage();
+        });
+      } else {
+        toast.add({ severity: "error", summary: 'Create Calibration Job Failed.', detail: "Unable to Retrieve Valid Calibration Job Id", life: 10000 });
+      }      
     } else {
-      toast.add({ severity: 'error', summary: 'Open', detail: 'Error fetching new calibration run ID', life: 3000 });
+      useApiErrorResponsePreprocess( response ).forEach( message => {
+        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Create Calibration Job Failed.', detail: message, life: 10000 });
+      });
     }
-  }
+  });
 }
 
 const gotoHeadwaterBasinGage = () => {
