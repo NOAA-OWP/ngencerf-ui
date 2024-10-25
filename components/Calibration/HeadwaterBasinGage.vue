@@ -210,8 +210,16 @@ const showForcingFileUploadDialog = (headerText: string) => {
 }
 
 const handleDialogClose = (opt: any) => {
-  if (opt && opt.data) {
-    toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult.message, life: 3000 })
+  if ( opt && opt.data ) {
+    if ( opt.data.saveFileResponseResult.status == 200 ) {
+      toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 })
+    } else {
+      useApiErrorResponsePreprocess( opt.data.saveFileResponseResult ).forEach( message => {
+        toast.add({ severity: useApiResponseToastSeverityCode( opt.data.saveFileResponseResult?.status ), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
+      });
+    }    
+  } else {
+    toast.add({ severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: 10000 })
   }
   fileUploadDialogOpened.value = false
 }
