@@ -125,7 +125,7 @@
       </div>
 
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3 ActionButtonsBox">
-        <span v-if="calibrationStatus !== 'Running'">
+        <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
           <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
             <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
               Save
@@ -135,7 +135,7 @@
         <span v-else>
           <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">&nbsp;</div>
         </span>
-        <span v-if="calibrationStatus !== 'Running'">
+        <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
           <div class="col-span-1 mr-3">
             <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
               @click="resetFormulationData()" aria-label="Reset Button">Reset</button>-->
@@ -167,6 +167,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { onMounted, onUnmounted } from "vue";
+import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
