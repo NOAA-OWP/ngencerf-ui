@@ -1,5 +1,5 @@
 import { ref } from "vue"
-import type { SlothParameterData, SaveFormulationTabPayload } from "./NextGenModel";
+import type { SlothParameterData, SaveFormulationTabPayload, FormulationTabSaveWarning } from "./NextGenModel";
 import { ValidationFormFields } from "./NextGenModel";
 
 /**
@@ -51,6 +51,9 @@ export const useCalibrationFormulationSlothTableValidation = ( slothParameters: 
 
 export const useCalibrationFormulationTabSaveValidate = ( savePayload: SaveFormulationTabPayload ) => {
   const errors = ref<any>({});
+  if ( savePayload.hasOwnProperty( "formulation_name" ) && /^[a-z0-9_]+$/i.test( savePayload['formulation_name'] ?? "" ) == false ) {
+    errors.value[ 'formulation_name' ]= [ 'Formulation name can only include alpha numeric charaters and underscore.' ];
+  }
   if ( savePayload.hasOwnProperty( "sloth_parameters" ) && !savePayload.hasOwnProperty( "modules" ) ) {
     errors.value[ 'selectedModuleValues' ]= [ 'Selecting module is required for Sloth Parameter.' ];
   }
@@ -62,6 +65,16 @@ export const useCalibrationFormulationTabSaveValidate = ( savePayload: SaveFormu
   }
 
   return errors;
+}
+
+export const useCalibrationFormulationTabSaveWarning = ( formulation_warning: FormulationTabSaveWarning ) => {
+  let warnings = <string[]>[];
+  
+  if ( formulation_warning.hasOwnProperty( "messages") && Array.isArray( formulation_warning.messages ) && formulation_warning.messages.length > 0 ) {
+    warnings = formulation_warning.messages;
+  }
+
+  return warnings;
 }
 
 /**
