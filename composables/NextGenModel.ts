@@ -449,6 +449,10 @@ export interface DynamicTableColumn {
   header: string;
 }
 
+export interface DynamicObject {
+  [key: string]: any;
+}
+
 /**
  * Event Bus Interface
  */

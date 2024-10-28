@@ -30,18 +30,18 @@
                 <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
                     <img :src="selectedPlotFileUrl" alt="Image" />
                 </div>
-                <div id="GraphArea" class="p-2" v-else>
-                    Data Display
-                </div>
             </div>
-            <div class="text-center">
-                <div id="TableArea" class="p-2" v-if="selectedPlotName">
-                    <!-- <DataTable :value="selectedPlotData" scrollable scroll-height="500px"
-                        fixedHeader=true :multi-sort="true">
-                        <Column v-for="col of selectedPlotDataColumns" :key="col.value" :field="col.value" :header="col.text" sortable></Column>
-                    </DataTable> -->
-                </div>
-            </div>
+        </div>
+
+        <div id="TableArea" class="p-2" v-if="selectedIterationTable">
+            <DataTable :value="iterationMetricsData" scrollable scroll-height="500px"
+                fixedHeader=true :multi-sort="true" v-if="iterationMetricsData && selectedIterationTable == 1">
+                <Column v-for="col of iterationMetricsColumns" :key="col.value" :field="col.value" :header="col.text" sortable></Column>
+            </DataTable>
+            <DataTable :value="iterationParamsData" scrollable scroll-height="500px"
+                fixedHeader=true :multi-sort="true" v-if="iterationParamsData && selectedIterationTable == 2">
+                <Column v-for="col of iterationParamsColumns" :key="col.value" :field="col.value" :header="col.text" sortable></Column>
+            </DataTable>
         </div>
     </div>
 </template>
@@ -49,12 +49,15 @@
 <script setup lang="ts">
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
+import { useEvaluationIterationDataStore } from '~/stores/evaluation/EvaluationIterationDataStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useToast } from 'primevue/usetoast';
+import type { DynamicObject } from "~/composables/NextGenModel";
 
 import MessagesGroup from "../Common/MessagesGroup.vue";
 
 const runStatusStore = useRunStatusStore();
+const evaluationIterationDataStore = useEvaluationIterationDataStore();
 const userDataStore = useUserDataStore();
 const toast = useToast();
 
@@ -67,9 +70,14 @@ const {
     plotNames,
     selectedPlotName,
     selectedPlotFilename,
-    selectedPlotFileUrl,
-    tabChanged,
+    selectedPlotFileUrl
 } = storeToRefs(runStatusStore);
+const {
+    iterations,
+    iterationMetricsData,
+    iterationParamsData,
+    selectedIterationTable
+} = storeToRefs(evaluationIterationDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
@@ -78,23 +86,69 @@ const {
   queryGetPlotNames,
   queryGetPlot,
 } = runStatusStore;
+const {
+  queryGetIterations,
+} = evaluationIterationDataStore;
+
+const iterationMetricsColumns = [];
+const iterationParamsColumns = [];
+const iterationOptions = ['Custom - Iteration Metrics Table','Custom - Iteration Parameters Table'];
 
 onMounted(async () => {
     if (!userCalibrationRunData?.value || userCalibrationRunData?.value.error) {
         await fetchUserCalibrationRunData();
     }
-    console.log('plotNames:', plotNames.value?._data);
+
     // Get Plot Names
     if (!plotNames?.value?._data) {
         plotNames.value = await queryGetPlotNames();
-    } else {
-        console.log('plotNames:', plotNames.value?._data);
     }
-});
+    console.log('plotNames:', plotNames.value?._data);
 
-// setting plotList and selectedPlotName will populate the dropdown
-plotList.value = plotNames.value?._data?.plot_names;
-console.log('plotList:', plotList.value);
+    // setting plotList and selectedPlotName will populate the dropdown
+    plotList.value = plotNames.value?._data?.plot_names;
+
+    // Get Iteration Data
+    if (!iterations?.value?._data) {
+        iterations.value = await queryGetIterations();
+    }
+    console.log('iterations:', iterations.value?._data);
+
+    if (iterations.value?._data.iteration_data) {
+        for (let o = 0; o < iterationOptions.length; o++) {
+            plotList.value.push({'name': iterationOptions[o], 'description': ''});
+        }
+    }
+    console.log('plotList:', plotList.value);
+
+    // set up arrays for iterationMetricsData and iterationParamsData
+    iterationMetricsData.value = [];
+    iterationParamsData.value = [];
+    for (let i = 0; i < iterations.value?._data?.iteration_data.length; i++) {
+        const iterationMetricsRecord: DynamicObject = {};
+        for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
+            let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
+            iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
+            if (i == 0) {
+                iterationMetricsColumns.push({text: metric_name, value: metric_name});
+            }
+        }
+        iterationMetricsData.value.push(iterationMetricsRecord);
+        const iterationParamsRecord: DynamicObject = {};
+        for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
+            let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
+            iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
+            if (i == 0) {
+                iterationParamsColumns.push({text: param_name, value: param_name});
+            }
+        }
+        iterationParamsData.value.push(iterationParamsRecord);
+    }
+    console.log('iterationMetricsData:', iterationMetricsData.value);
+    console.log('iterationMetricsColumns:', iterationMetricsColumns);
+    console.log('iterationParamsData:', iterationParamsData.value);
+    console.log('iterationParamsColumns:', iterationParamsColumns);
+});
 
 // set selectedPlotName to the first plot name if it is not already set
 if (plotList.value && !selectedPlotName.value) {
@@ -104,15 +158,23 @@ if (plotList.value && !selectedPlotName.value) {
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  // get selected plot file name and url from server
-  const response: any = await queryGetPlot(selectedPlotName.value);
-
-  if (response?._data?.plot_file_name && response?._data?.plot_url) {
-    selectedPlotFilename.value = response?._data?.plot_file_name;
-    selectedPlotFileUrl.value = response?._data?.plot_url;
+  // is the selected option a plot or iteration table?
+  if(iterationOptions.includes(selectedPlotName.value)) {
+    selectedPlotFilename.value = null;
+    selectedPlotFileUrl.value = null;
+    selectedIterationTable.value = iterationOptions.indexOf(selectedPlotName.value)+1;
   } else {
-    toast.removeAllGroups();
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot', life: 5000 });
+    selectedIterationTable.value = null;
+    // get selected plot file name and url from server
+    const response: any = await queryGetPlot(selectedPlotName.value);
+
+    if (response?._data?.plot_file_name && response?._data?.plot_url) {
+        selectedPlotFilename.value = response?._data?.plot_file_name;
+        selectedPlotFileUrl.value = response?._data?.plot_url;
+    } else {
+        toast.removeAllGroups();
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot', life: 5000 });
+    }
   }
 });
 
@@ -136,32 +198,6 @@ const toggleMessagesGroup = () => {
         showMessagesGroup.value = true;
     }
 }
-
-// use dummy table data for now
-const selectedPlotDataColumns = [
-  { text: 'Iteration', value: 'iteration' },
-  { text: 'DDS', value: 'dds' },
-];
-const selectedPlotData = [
-  {'iteration': 0, 'dds': 1.4894664522},
-  {'iteration':1, 'dds': 1.4894664522},
-  {'iteration':2, 'dds': 1.4894664522},
-  {'iteration':3, 'dds': 1.4894664522},
-  {'iteration':4, 'dds': 1.5262780533},
-  {'iteration':5, 'dds': 1.5262780533},
-  {'iteration':6, 'dds': 1.5659216391},
-  {'iteration':7, 'dds': 1.5659216391},
-  {'iteration':8, 'dds': 1.6027335402},
-  {'iteration':9, 'dds': 1.642377123},
-  {'iteration':10, 'dds': 1.6820207118},
-  {'iteration':11, 'dds': 1.7244959823},
-  {'iteration':12, 'dds': 1.7244959823},
-  {'iteration':13, 'dds': 1.7244959823},
-  {'iteration':14, 'dds': 1.7244959823},
-  {'iteration':15, 'dds': 1.7244959823},
-  {'iteration':16, 'dds': 1.7669712528},
-  {'iteration':17, 'dds': 1.7244959823},
-];
 </script>
 
 <style lang="scss" scoped>
