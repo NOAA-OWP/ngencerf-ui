@@ -285,13 +285,13 @@ import Select from "primevue/select";
 
 import { isValidDateTime, isNotNullOrUndefined } from "~/utils/CommonHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
-import { ifHydrofabricErrorsExist } from "~/utils/TuningControlsHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { ifHydrofabricErrorsExist } from "~/utils/TuningControlsHelpers";
 
 const format = formatDateForDisplay;
 const isLoading = ref(false);
@@ -331,7 +331,6 @@ const {
 } = storeToRefs(tuningStore);
 
 const toast = useToast();
-const calibrationTuningModules = ref<any>();
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -367,63 +366,12 @@ onMounted(async () => {
   } else {
     console.log("Tuning Tab data already loaded. No need to fetch");
   }
+
   // check if Hydrofabric errors exist
   const hydrofabricErrorMessage = ifHydrofabricErrorsExist(loadTuningTabData.value._data);
   if (hydrofabricErrorMessage) {
     toast.add({ severity: 'error', summary: 'Hydrofabric Error', detail: hydrofabricErrorMessage });
-  }
-
-  // set time range
-  const timeRange = loadTuningTabData.value?._data?.time_range;
-  // check if timeRange is provided and not empty
-  if (timeRange?.start_time && timeRange?.end_time) {
-    rangeDateFrom.value = timeRange?.start_time;
-    rangeDateTo.value = timeRange?.end_time;
-    console.log("rangeDateFrom:", rangeDateFrom.value);
-    console.log("rangeDateTo:", rangeDateTo.value);
-  }
-
-  calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
-  console.log("calibrationTuningModules:", calibrationTuningModules.value);
-
-  if (calibrationTuningModules?.value.length > 0) {
-    // set calibration tuning parameters dropdown if not already set
-    if (!calibrationTuningParameters.value || calibrationTuningParameters.value.length === 0) {
-      calibrationTuningParameters.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
-        name: param.name,
-        minimum: param.minimum,
-        maximum: param.maximum,
-        initial_value: param.initial_value,
-        user_selected_for_tuning: param.user_selected_for_tuning,
-        module: module.name,
-        output: `${param.name} (${module.name})`,
-      }))) || [];
-      console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
-    }
-
-    // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
-    if (!userSelectedCalibrationTuningParameters.value || userSelectedCalibrationTuningParameters.value.length === 0) {
-      userSelectedCalibrationTuningParameters.value = calibrationTuningParameters.value?.filter((param: any) => param?.user_selected_for_tuning)?.map((param: any) => ({
-        name: param.name,
-        minimum: param.minimum,
-        maximum: param.maximum,
-        initial_value: param.initial_value,
-        module: param.module,
-      })) || [];
-      console.log("userSelectedCalibrationTuningParameters:", userSelectedCalibrationTuningParameters.value);
-    }
-
-    // set output variables if not already set
-    if (!outputVariables.value || outputVariables.value.length === 0) {
-      outputVariables.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
-        name: outputVar.name,
-        description: outputVar.description,
-        module: module.name,
-        output: `${outputVar.name} (${module.name})`,
-      }))) || [];
-      console.log("outputVariables:", outputVariables.value);
-    }
-  }
+  }  
 
   // set calibration times
   if (userCalibrationRunData?.value?.calibration_times) {
@@ -453,7 +401,7 @@ onMounted(async () => {
     }
   };
 
-  // set ouput variable to calibrate
+  // set output variable to calibrate
   if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
     console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
     const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
@@ -500,14 +448,14 @@ const isFormulationDataSaved = (): boolean => {
 const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
-    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.'});
   }
 };
 
 const handleOutputVariablesParametersClick = (event: Event) => {
   if (!isFormulationDataSaved()) {
     event.preventDefault(); // Prevent any default action
-    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or paraemters because Formulation data has not been saved.', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or parameters because Formulation data has not been saved.'});
   }
 };
 
