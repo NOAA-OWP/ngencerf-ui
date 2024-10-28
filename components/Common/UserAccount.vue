@@ -6,60 +6,61 @@
           <div class="grid grid-cols-2 gap-3">
             <div class="col-span-2">
               <div class="ttl">Your Account</div>
-              <div class="name">{{ getUserFullName() }} <br />
-              <span style="font-size:0.7em;">{{ getUserName() }} </span>
+              <div class="name">
+                {{ getUserFullName() }}
+                <div class="pt-1" style="font-size:0.7em;">{{ getUserName() }}</div>
               </div>
-              <div class="chgpwd mt-12 mb-6">Change Password</div>
+              <div class="mt-2 mb-2 hr"></div>
+              <div class="chgpwd mt-6 mb-6">Change Password</div>
             </div>
             <div class="col-span-1">
               <form @submit.prevent="changePassword" @cancel="closeAccountBox">
                 <div class="passwordBox grid row-auto">
-                  <div class="pwdspacer">Old password</div>
-                  <div>
+
+                  <label for="OldPass">Old password</label>
+                  <div class="mb-3">
                     <Password id="OldPass" type="password" name="password" :inputProps="{ autocomplete: true }"
                       autocomplete="current-password" v-model="oldpass" aria-label="Enter old password here" toggleMask
                       :feedback="false" />
-
                   </div>
-                  <p>&nbsp;</p>
-                  <div>New password</div>
-                  <div>
+                  
+                  <label for="NewPass">New password</label>
+                  <div class="mb-3">
                     <Password id="NewPass" type="password" name="password" :inputProps="{ autocomplete: true }"
                       autocomplete="new-password" v-model="newpass" aaria-label="Enter new password here" toggleMask
                       :feedback="true" />
-
                   </div>
-                  <p>&nbsp;</p>
-                  <div>Confirm New password</div>
-                  <div>
+                  
+                  <label for="ReNewPass">Confirm New password</label>
+                  <div class="mb-3">
                     <Password id="ReNewPass" type="password" name="password" :inputProps="{ autocomplete: true }"
                       autocomplete="new-password" v-model="confirmNewpass" aria-label="Password" toggleMask
                       :feedback="false" />
 
                   </div>
                 </div>
-                <div class="buttonArea mt-8">
-                  <button class="ngenButtonDiv" id="UpdateButton" type="submit"
+
+                <div class="buttonArea mt-4">
+                  <button class="ngenButtonDiv mr-6" id="UpdateButton" type="submit"
                     aria-label="Update with new password">
                     Update
                   </button>
-                   <button class="ngenButtonDiv ml-2" id="closeBtn" name="cancel" value="Cancel" type="button" v-on:click="closeAccountBox"
+                   <button class="c-blue font-normal underline" id="closeBtn" name="cancel" value="Cancel" type="button" v-on:click="closeAccountBox"
                     aria-label="Close Account Box">
                     Close
                   </button>
                 </div>
+
               </form>
             </div>
             <div class="col-span-1">
-              <div id="passwordNotes" class="row">
-                <p>
-                  <strong>Password format:</strong><br />
-                  <ul>
-                    <li>Cannot be a commonly used password</li>
-                    <li>Must be at least 8 characters long</li>
-                    <li>Must contain at least one non-numeric character</li>
-                  </ul>
-                </p>
+              <div id="passwordNotes">                
+                <strong>Password format:</strong><br>
+                <ul>
+                  <li>Cannot be a commonly used password</li>
+                  <li>Must be at least 8 characters long</li>
+                  <li>Must contain at least one non-numeric character</li>
+                </ul>
               </div>
             </div>
 
@@ -143,8 +144,8 @@ const closeAccountBox = () => {
 
 #UserBox {
   position: absolute;
-  left: 30%;
-  margin-top: 100px;
+  left: Calc(50vw - 365px);
+  top: Calc(50vh - 300px);
   border: 5px solid #ccc;
   z-index: 9999;
   #avatar {
@@ -158,30 +159,38 @@ const closeAccountBox = () => {
     vertical-align: top;
   }
 
-  #passwordNotes p {
+  #passwordNotes {
     text-align: left;
-    margin-left: 20px;
+    padding-left: 20px;
+    ul {
+      list-style: disc;
+      margin-top:10px;
+    }
+    li {
+      margin-top:5px;
+      margin-left:18px;
+    }
   }
 
   .buttonArea {
-    text-align: center;
+    text-align: left;
   }
 
   .ttl {
-    //margin: 30px 0 0 30px;
-    font-size: 40px;
-    margin-top: 20px;
+    font-size: 35px;
+    margin-top: 15px;
     text-align: center;
   }
 
   .name {
-    font-size: 30px;
+    font-size: 20px;
     text-align: center;
-    margin-top: 30px;
+    margin-top: 25px;
   }
 
   .chgpwd {
-    font-size: 30px;
+    font-size: 25px; 
+    text-align: center;
   }
 
 }

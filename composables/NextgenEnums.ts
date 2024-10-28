@@ -17,7 +17,7 @@ export const EvaluationTabs =  {
 export const NextgenPages = {
   page_calibration: 1,
   page_evaluation: 2,
-  page_forcast: 3,
+  page_forecast: 3,
   page_verification: 4
 }
 

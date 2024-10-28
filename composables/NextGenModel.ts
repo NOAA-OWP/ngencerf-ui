@@ -15,6 +15,12 @@ export interface CreatedCalibrationRun {
   calibration_run_id: number;
 }
 
+// properties interface / type
+export interface ComponentPropsTitle {
+  title: string;
+}
+
+// response interface
 export interface GeneralApiSaveResponse {
   message: string;
   calibration_run_id: number;
@@ -356,6 +362,9 @@ export interface OptimizationDataInputData {
   description: string;
   data_type: string;
   is_active: boolean;
+  default_value: number;
+  min: number;
+  max: number;
 }
 
 export interface SaveOptimizationPayload {

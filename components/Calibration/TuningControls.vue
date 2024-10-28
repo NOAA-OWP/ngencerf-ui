@@ -137,7 +137,7 @@
   </div>
 
 
-  <div class="grid grid-rows-2">
+  <div class="grid grid-rows-2 pr-2">
 
     <div class="row-span-1 text-left">
       <div class="grid grid-cols-2 pb-3">
@@ -155,7 +155,7 @@
 
         <div class="col-span-2 mt-5 mb-3 hr"></div>
 
-        <div class="col-span-1">
+        <div class="col-span-2">
           
 
           <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
@@ -167,7 +167,7 @@
           </div>
         </div>
 
-        <div class="col-span-1">
+        <div class="col-span-2 mt-2">
           <div class="text-left mt-2">
             <div class="font-bold">Calibratable Parameters</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
@@ -186,13 +186,15 @@
 
       </div>
     </div>
+    
+    <div id="TuningDataList" class="mt-2 mb-2 overflow-auto max-h-[200px]" style="position: relative;">
+      <!-- <div class="text-right mb-1 mr-2"><button class="c-blue font-normal  underline">Clear</button></div> -->
 
-    <div id="TuningDataList" class="mt-2 mb-2" style="position: relative;">
       <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
         :model="cmTuningParameterData"></ContextMenu>
       <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
-        v-model:selection="selectedTuningParamaterData" selectionMode="single" contextMenu
-        v-model:contextMenuSelection="selectedTuningParamaterData" @rowContextmenu="onRowContextMenu">
+        v-model:selection="selectedTuningParameterData" selectionMode="single" contextMenu
+        v-model:contextMenuSelection="selectedTuningParameterData" @rowContextmenu="onRowContextMenu">
         <!-- parameter column, uneditable -->
         <Column field="parameter" header="Parameter" sortable>
           <template #body="slotProps">
@@ -246,8 +248,8 @@
 
       <span v-if="userCalibrationRunData?.status !== 'Running'">
         <div class="col-span-1 mr-3">
-          <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTuningData()"
-            aria-label="Reset Button">Reset</button>
+          <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTuningData()"
+            aria-label="Reset Button">Reset</button>-->
         </div>
       </span>
 
@@ -289,6 +291,7 @@ import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { ifHydrofabricErrorsExist } from "~/utils/TuningControlsHelpers";
 
 const format = formatDateForDisplay;
 const isLoading = ref(false);
@@ -328,27 +331,29 @@ const {
 } = storeToRefs(tuningStore);
 
 const toast = useToast();
-const calibrationTuningModules = ref<any>();
 const selectedParameter = ref<any>(null);
 const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isInitialSetupDone = ref(false);
-const selectedTuningParamaterData = ref();
+const selectedTuningParameterData = ref();
 const tuningContextMenu = ref();
 
 const cmTuningParameterData = ref([
-  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteCalibrationTuningParameter(selectedTuningParamaterData) }
+  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteCalibrationTuningParameter(selectedTuningParameterData) }
 ]);
 
 const onRowContextMenu = (event: any) => {
   tuningContextMenu.value.show(event.originalEvent);
 };
 
+let mainLeftAreaElement: HTMLElement | null = null;
+let dataTableElement: HTMLElement | null = null;
+
 onMounted(async () => {
   toast.removeAllGroups();
   
-  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-  if (ele) { ele.scrollTo(0, 0); }
+  mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
 
   // fetch user calibration data
   await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
@@ -362,57 +367,11 @@ onMounted(async () => {
     console.log("Tuning Tab data already loaded. No need to fetch");
   }
 
-  // set time range
-  const timeRange = loadTuningTabData.value?._data?.time_range;
-  // check if timeRange is provided and not empty
-  if (timeRange?.start_time && timeRange?.end_time) {
-    rangeDateFrom.value = timeRange?.start_time;
-    rangeDateTo.value = timeRange?.end_time;
-    console.log("rangeDateFrom:", rangeDateFrom.value);
-    console.log("rangeDateTo:", rangeDateTo.value);
-  }
-
-  calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
-  console.log("calibrationTuningModules:", calibrationTuningModules.value);
-
-  if (calibrationTuningModules?.value.length > 0) {
-    // set calibration tuning parameters dropdown if not already set
-    if (!calibrationTuningParameters.value || calibrationTuningParameters.value.length === 0) {
-      calibrationTuningParameters.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.parameters?.map((param: any) => ({
-        name: param.name,
-        minimum: param.minimum,
-        maximum: param.maximum,
-        initial_value: param.initial_value,
-        user_selected_for_tuning: param.user_selected_for_tuning,
-        module: module.name,
-        output: `${param.name} (${module.name})`,
-      }))) || [];
-      console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
-    }
-
-    // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
-    if (!userSelectedCalibrationTuningParameters.value || userSelectedCalibrationTuningParameters.value.length === 0) {
-      userSelectedCalibrationTuningParameters.value = calibrationTuningParameters.value?.filter((param: any) => param?.user_selected_for_tuning)?.map((param: any) => ({
-        name: param.name,
-        minimum: param.minimum,
-        maximum: param.maximum,
-        initial_value: param.initial_value,
-        module: param.module,
-      })) || [];
-      console.log("userSelectedCalibrationTuningParameters:", userSelectedCalibrationTuningParameters.value);
-    }
-
-    // set output variables if not already set
-    if (!outputVariables.value || outputVariables.value.length === 0) {
-      outputVariables.value = calibrationTuningModules?.value?.flatMap((module: any) => module?.output_variables?.map((outputVar: any) => ({
-        name: outputVar.name,
-        description: outputVar.description,
-        module: module.name,
-        output: `${outputVar.name} (${module.name})`,
-      }))) || [];
-      console.log("outputVariables:", outputVariables.value);
-    }
-  }
+  // check if Hydrofabric errors exist
+  const hydrofabricErrorMessage = ifHydrofabricErrorsExist(loadTuningTabData.value._data);
+  if (hydrofabricErrorMessage) {
+    toast.add({ severity: 'error', summary: 'Hydrofabric Error', detail: hydrofabricErrorMessage });
+  }  
 
   // set calibration times
   if (userCalibrationRunData?.value?.calibration_times) {
@@ -442,7 +401,7 @@ onMounted(async () => {
     }
   };
 
-  // set ouput variable to calibrate
+  // set output variable to calibrate
   if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
     console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
     const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
@@ -489,14 +448,14 @@ const isFormulationDataSaved = (): boolean => {
 const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
-    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.'});
   }
 };
 
 const handleOutputVariablesParametersClick = (event: Event) => {
   if (!isFormulationDataSaved()) {
     event.preventDefault(); // Prevent any default action
-    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or paraemters because Formulation data has not been saved.', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or parameters because Formulation data has not been saved.'});
   }
 };
 
@@ -688,6 +647,9 @@ const handleFileUpload = async (event: Event) => {
           }
         });
 
+        // scroll to the bottom of the page and table
+        scrollToBottom();
+
         if (invalidParameters.length > 0) {
           toast.add({ severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters are not in the list of calibratable parameters: ${invalidParameters.join(', ')}` });
         }
@@ -722,6 +684,35 @@ const addCalibrationTuningParameter = () => {
       module: parameter.module,
     });
   }
+
+  // scroll to the bottom of the page and table
+  scrollToBottom();
+};
+
+/**
+ * Scroll page and table to the bottom
+ */
+const scrollToBottom = () => {
+  // grab main left area and data table elements and scroll to bottom
+  // using nextTick to ensure elements are up to date before scrolling
+  nextTick(() => {
+    mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+    dataTableElement = document.querySelector(".p-datatable-table-container") as HTMLElement;
+
+    if (mainLeftAreaElement) {
+      mainLeftAreaElement.scrollTo({
+        top: mainLeftAreaElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+
+    if (dataTableElement) {
+      dataTableElement.scrollTo({
+        top: dataTableElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  });
 };
 
 /**
@@ -753,8 +744,8 @@ const updateCalibrationTuningParameter = (index: number, field: string, ev: Even
 /**
  * Delete Calibration Tuning Parameter from the table
  */
-const deleteCalibrationTuningParameter = (selectedTuningParamaterData: any) => {
-  userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters.value.filter((param: any) => param.name !== selectedTuningParamaterData.value.name);
+const deleteCalibrationTuningParameter = (selectedTuningParameterData: any) => {
+  userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters.value.filter((param: any) => param.name !== selectedTuningParameterData.value.name);
 };
 
 /**

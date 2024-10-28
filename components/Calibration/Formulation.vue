@@ -68,7 +68,7 @@
           </span>
         </div>
 
-        <div id="SlothDataTable" v-show="useSlothParameters" editMode="cell" class="items-center pl-2 pr-2 mt-2">
+        <div id="SlothDataTable" v-show="useSlothParameters" class="items-center pl-2 pr-2 mt-2 overflow-auto max-h-[157px]">
 
           <ContextMenu :pt="{ root: { id: 'loth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
             :model="cmSlothParameterData"></ContextMenu>
@@ -137,8 +137,8 @@
         </span>
         <span v-if="calibrationStatus !== 'Running'">
           <div class="col-span-1 mr-3">
-            <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
-              @click="resetFormulationData()" aria-label="Reset Button">Reset</button>
+            <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
+              @click="resetFormulationData()" aria-label="Reset Button">Reset</button>-->
           </div>
         </span>
         <span v-else>
@@ -205,25 +205,27 @@ const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabDat
 const { fetchUserCalibrationRunData, userCalibrationRunData } = useUserDataStore()
 const { getCalibrationTabIndex } = generalStore();
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+import { data } from "autoprefixer";
 const runStatusStore = useRunStatusStore();
 const { calibrationStatus } = storeToRefs(runStatusStore);
+let mainLeftAreaElement: HTMLElement | null = null;
+let dataTableElement: HTMLElement | null = null;
 
 const toast = useToast();
 
 onMounted(() => {
   toast.removeAllGroups();
+  mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
 
-  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-  if (ele) { ele.scrollTo(0, 0); }
-
-})
+});
 
 const addSlothOnEnter = (e: KeyboardEvent) => {
   const ele = e.target as HTMLElement;
   if (e.key === "Enter" && new_sloth_variable_name.value.trim() != '') {
     addSlothVariable();
   }
-}
+};
 
 /**
  * add sloth variable entry to table and reset name field
@@ -233,6 +235,27 @@ const addSlothVariable = () => {
     addNewSlothVariable(new_sloth_variable_name.value);
     new_sloth_variable_name.value = '';
   }
+
+  // grab main left area and data table elements and scroll to bottom
+  /// using nextTick to ensure elements are up to date before scrolling
+  nextTick(() => {
+    mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+    dataTableElement = document.querySelector(".p-datatable-table-container") as HTMLElement;
+
+    if (mainLeftAreaElement) {
+      mainLeftAreaElement.scrollTo({
+        top: mainLeftAreaElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+
+    if (dataTableElement) {
+      dataTableElement.scrollTo({
+        top: dataTableElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  });
 }
 
 const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
@@ -255,17 +278,6 @@ const saveFormulationData = () => {
       });
     }
   });
-  // const save_formulation_response = saveFormulationTabData();
-  // save_formulation_response.then((response) => {
-  //   if (response?.validation_errors) {
-  //     useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-  //       toast.add({ severity: "error", summary: response?.message, detail: message })
-  //     })
-  //   } else {
-  //     toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
-  //     fetchUserCalibrationRunData();
-  //   }
-  // })
 }
 
 const resetFormulationData = () => {
