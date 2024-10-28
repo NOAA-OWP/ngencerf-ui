@@ -520,8 +520,8 @@ watch(selectedOutputVariable, () => {
     name: outputVariable?.name,
     module: module?.name,
   }
-  console.log("selectedOutputVariable:", selectedOutputVariable.value);
-  console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
+  // console.log("selectedOutputVariable:", selectedOutputVariable.value);
+  // console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
 });
 
 // watch for changes to simStartTime. If simStartTime is set, set calStartTime to one year after simStartTime if not already set
@@ -670,7 +670,6 @@ const handleFileUpload = async (event: Event) => {
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
 const addCalibrationTuningParameter = () => {
-  // console.log("selectedParameter:", selectedParameter.value);
   const parameter = calibrationTuningParameters?.value?.find(param => param.output === selectedParameter.value);
   const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.find(param => param.name === parameter.name);
 
