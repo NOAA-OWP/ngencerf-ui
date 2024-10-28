@@ -56,7 +56,8 @@
         <div class="flex">
           <span class="text-left pt-1">
             <input type="checkbox" id="SlothCheck" class="ml-2" v-model="useSlothParameters" />
-            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for formulation</label>
+            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for
+              formulation</label>
           </span>
           <span v-show="useSlothParameters" class="ml-auto pr-2">
             <label class="inline-block  text-[16px] pl-10 pr-4" for="SlothName">SLoTH Name</label>
@@ -68,7 +69,8 @@
           </span>
         </div>
 
-        <div id="SlothDataTable" v-show="useSlothParameters" class="items-center pl-2 pr-2 mt-2 overflow-auto max-h-[157px]">
+        <div id="SlothDataTable" v-show="useSlothParameters"
+          class="items-center pl-2 pr-2 mt-2 overflow-auto max-h-[157px]">
 
           <ContextMenu :pt="{ root: { id: 'loth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
             :model="cmSlothParameterData"></ContextMenu>
@@ -156,7 +158,7 @@
         </div>
 
       </div>
-
+      <DynamicDialog />
     </div>
     <div class="waitgif" v-if="formulationStore_data_loading">
       <img src="@/assets/styles/img/wait.gif" />
@@ -173,6 +175,12 @@ import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
 import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
+import { useDialog } from "primevue/usedialog";
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+
+
+const dialog = useDialog();
+const nextPrevDialogOpened = ref<boolean>(false);
 
 const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
@@ -285,35 +293,42 @@ const resetFormulationData = () => {
   resetUserSelectionFormulation()
 }
 
-const goNextTab = () => {
-  // let err = false;
-  // let txt = "Please correct the following:";
-  // if (!userCalibrationRunData?.formulation_name ) {
-  //   txt += "\nA Formulation Name is required.";
-  //   err = true;  // let err = false;
-  // let txt = "Please correct the following:";
-  // if (!userCalibrationRunData?.formulation_name ) {
-  //   txt += "\nA Formulation Name is required.";
-  //   err = true;
-  // }
-  // if (!userCalibrationRunData?.modules.length ) {
-  //   txt += "\nModule Selection is required."
-  //   err = true;
-  // }
-  // if (err) {
-  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-  //   return;
-  // }
-  // }
-  // if (!userCalibrationRunData?.modules.length ) {
-  //   txt += "\nModule Selection is required."
-  //   err = true;
-  // }
-  // if (err) {
-  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-  //   return;
-  // }
-  gotoNext();
+const validateTab = () => {
+  let error = false;
+  let text = [];
+  /* Check if formulation name changed */
+  let ucrd = userCalibrationRunData?.formulation_name === null ? '' : userCalibrationRunData?.formulation_name;
+  if (ucrd !== formulationNameInput.value) {
+    error = true;
+    text.push("Formulation Name has been changed");
+  }
+  /* check if list of modules changed */
+  let selModules = selectedModuleValues;
+  let savedModules = userCalibrationRunData?.modules;
+  if (selModules.value.length !== savedModules?.length) {
+    error = true;
+    text.push("Selected Modules have been changed");
+  } else {
+    selModules.value.every((module) => {
+      if (savedModules.indexOf(module) === -1) {
+        error = true;
+        text.push("Selected Modules have been changed");
+        return false;
+      }
+    })
+  }
+  /* Has user checked/unchecked Add SLoTH outpu8t variables? */
+  if (useSlothParameters.value !== userCalibrationRunData?.use_sloth) {
+    error = true;
+    text.push("Add SLoth output has changed");
+  }  
+  /* has the number of SLoTH vars changed? */
+  let x = slothParameterInputs.value;
+  if (useSlothParameters.value.length !== userCalibrationRunData?.sloth_parameters.length) {
+    error = true;
+    text.push("Add SLoth variable list has changed");
+  }
+  return { error: error, text: text }
 }
 
 const gotoNext = () => {
@@ -321,19 +336,69 @@ const gotoNext = () => {
   const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
   e.click();
 }
-const goPrevTab = () => {
+const gotoPrev = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
   e.click();
+}
+
+const goNextTab = () => {
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text);
+  } else {
+    gotoNext();
+  }
+};
+
+const goPrevTab = () => {
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text);
+  } else {
+    gotoPrev();
+  }
+};
+
+const showPrevNextDialog = (body: string[]) => {
+  if (!nextPrevDialogOpened.value) {
+    dialog.open(MoveNextPrevDialog, {
+      props: {
+        header: "Go to next tab?",
+        style: {
+          width: 'auto',
+        },
+        modal: true,
+      },
+      data: {
+        body: body
+      },
+      onClose: (opt) => {
+        nextPrevDialogOpened.value = false;
+        handleNextPrevDialogClose(opt);
+      },
+
+    })
+    nextPrevDialogOpened.value = true
+  }
+}
+
+const handleNextPrevDialogClose = (opt: any) => {
+  if (opt.data.moveToNextResponse) {
+    gotoNext();
+  }
 }
 
 </script>
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-#Groups, #formulationNameInput {
+
+#Groups,
+#formulationNameInput {
   width: 256px;
 }
+
 #Formulation {
   width: auto;
 }
@@ -414,6 +479,7 @@ h1 {
   text-align: right;
   width: 120px;
 }
+
 /*
 #FormulationBottomButtons {
   height: 54px;

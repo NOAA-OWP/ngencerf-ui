@@ -68,6 +68,7 @@ export interface UserCalibrationRunData {
   geopackage_image_url: string;
   modules: string[];
   formulation_name: string;
+  formulation_warning?: FormulationWarning;
   use_sloth: boolean;
   sloth_parameters: SlothParameterData[];
   automatic_validation: boolean;
@@ -88,6 +89,17 @@ export interface UserCalibrationRunData {
   status: string;
 }
 
+export interface FormulationWarning {
+  exclude_modules: string[],
+  group_requirements: GroupRequirements[],
+  messages: string[]
+}
+
+export interface GroupRequirements {
+  group_name: string,
+  required_count: number[],
+  has_count: number
+}
 export interface ExternalDataStatus {
   observational: boolean;
   forcing: boolean;

@@ -54,8 +54,8 @@
                         :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
                         @change="updateMetricFlowFieldVisibility"></Select>
                      <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-2">
-                        Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold"
-                           v-model="uiStreamFlowThreshold" class="w-24">
+                        Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
+                           class="w-24">
                         </InputNumber> m3/s
                      </div>
                      <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-2">
@@ -121,7 +121,7 @@
             </div>
 
          </div>
-         
+
       </div>
       <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6 ActionButtonsBox">
          <span v-if="calibrationStatus !== 'Running'">
@@ -147,7 +147,7 @@
          </div>
 
       </div>
-
+      <DynamicDialog />
    </div>
 </template>
 
@@ -159,6 +159,12 @@ import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore"
+
+import { useDialog } from "primevue/usedialog";
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+
+const dialog = useDialog();
+const nextPrevDialogOpened = ref<boolean>(false);
 
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 const runStatusStore = useRunStatusStore();
@@ -197,9 +203,9 @@ const showMetricStreamFlow = ref<boolean>(false);
 const ele = document.getElementById("MainLeftDataArea") as HTMLElement;
 
 onMounted(() => {
-  toast.removeAllGroups();
+   toast.removeAllGroups();
 
-  if (ele) { ele.scrollTo(0, 0); }
+   if (ele) { ele.scrollTo(0, 0); }
 
 })
 
@@ -207,70 +213,63 @@ onMounted(() => {
  * update objective function and metric peak flow/stream flow field visibility
  */
 const updateMetricFlowFieldVisibility = () => {
-  if (getSelectedMetricInfo.value) {
-    //reset toggleable field available property
-    cbCategoricalDisabled.value = false;
-    cbEventBasedDisabled.value = false;
-    showObjectiveFunctionStreamFlow.value = false;
-    showObjectiveFunctionPeakFlow.value = false;
-    uiStreamFlowThreshold.value = undefined;
-    uiPeakFlowThreshold.value = undefined;
-    showMetricStreamFlow.value = false;
-    showMetricPeakFlow.value = false;
+   if (getSelectedMetricInfo.value) {
+      //reset toggleable field available property
+      cbCategoricalDisabled.value = false;
+      cbEventBasedDisabled.value = false;
+      showObjectiveFunctionStreamFlow.value = false;
+      showObjectiveFunctionPeakFlow.value = false;
+      uiStreamFlowThreshold.value = undefined;
+      uiPeakFlowThreshold.value = undefined;
+      showMetricStreamFlow.value = false;
+      showMetricPeakFlow.value = false;
 
-    const metricInfo = getSelectedMetricInfo.value?.pop();
+      const metricInfo = getSelectedMetricInfo.value?.pop();
 
-    cbIsCategorical.value = metricInfo?.categorical ?? false;
-    cbIsEvenBased.value = metricInfo?.event_based ?? false;
+      cbIsCategorical.value = metricInfo?.categorical ?? false;
+      cbIsEvenBased.value = metricInfo?.event_based ?? false;
 
-    if (metricInfo?.categorical == true) {
-        showObjectiveFunctionStreamFlow.value = true;
-        cbCategoricalDisabled.value = true;
-    }
-    if (metricInfo?.event_based == true) {
-        showObjectiveFunctionPeakFlow.value = true;
-        cbEventBasedDisabled.value = true;
-    }
-  }
+      if (metricInfo?.categorical == true) {
+         showObjectiveFunctionStreamFlow.value = true;
+         cbCategoricalDisabled.value = true;
+      }
+      if (metricInfo?.event_based == true) {
+         showObjectiveFunctionPeakFlow.value = true;
+         cbEventBasedDisabled.value = true;
+      }
+   }
 }
 
 /**
  * metric stream flow field visibility toggle 
  */
 const toggleMetricStreamFlowInput = () => {
-  if (!cbCategoricalDisabled.value && cbIsCategorical.value) {
-    showMetricStreamFlow.value = true;
-  } else if (!cbIsCategorical.value) {
-    showMetricStreamFlow.value = false;
-    uiStreamFlowThreshold.value = undefined;
-  }
+   if (!cbCategoricalDisabled.value && cbIsCategorical.value) {
+      showMetricStreamFlow.value = true;
+   } else if (!cbIsCategorical.value) {
+      showMetricStreamFlow.value = false;
+      uiStreamFlowThreshold.value = undefined;
+   }
 }
 
 /**
  * metric peak flow field visibility toggle 
  */
 const toggleMetricPeakFlowInput = () => {
-  if (!cbEventBasedDisabled.value && cbIsEvenBased.value) {
-    showMetricPeakFlow.value = true;
-  } else if (!cbIsEvenBased.value) {
-    showMetricPeakFlow.value = false;
-    uiPeakFlowThreshold.value = undefined;
-  }
+   if (!cbEventBasedDisabled.value && cbIsEvenBased.value) {
+      showMetricPeakFlow.value = true;
+   } else if (!cbIsEvenBased.value) {
+      showMetricPeakFlow.value = false;
+      uiPeakFlowThreshold.value = undefined;
+   }
 }
 
 /**
  * explicitly reload optimization input table data
  */
 const optimizationSelectChange = () => {
-  uiOptimizationInputs.value = getOptimizationInputUserData.value;
+   uiOptimizationInputs.value = getOptimizationInputUserData.value;
 }
-
-const gotoNext = () => {
-   const tabs = document.getElementsByClassName("tabs");
-   const e = <HTMLElement>tabs[CalibrationTabs.tab_statusRun];
-   e.click();
-}
-
 
 /**
  * explicitly watching loading status, as onmount happen prior to store loading. 
@@ -279,23 +278,23 @@ const gotoNext = () => {
 watch(() => optimizationStore_data_loading.value, (loading_status) => {
    const metricInfo = getSelectedMetricInfo.value?.pop()
 
-  if (metricInfo?.categorical == true) {
-    showObjectiveFunctionStreamFlow.value = true;
-    cbCategoricalDisabled.value = true;
-    cbIsCategorical.value = true;
-  } else if (metricInfo?.categorical == false && uiStreamFlowThreshold.value) {
-    showMetricStreamFlow.value = true;
-    cbIsCategorical.value = true;
-  }
+   if (metricInfo?.categorical == true) {
+      showObjectiveFunctionStreamFlow.value = true;
+      cbCategoricalDisabled.value = true;
+      cbIsCategorical.value = true;
+   } else if (metricInfo?.categorical == false && uiStreamFlowThreshold.value) {
+      showMetricStreamFlow.value = true;
+      cbIsCategorical.value = true;
+   }
 
-  if (metricInfo?.event_based == true) {
-    showObjectiveFunctionPeakFlow.value = true;
-    cbEventBasedDisabled.value = true;
-    cbIsEvenBased.value = true;
-  } else if (metricInfo?.event_based == false && uiPeakFlowThreshold.value) {
-    showMetricPeakFlow.value = true;
-    cbIsEvenBased.value = true;
-  }
+   if (metricInfo?.event_based == true) {
+      showObjectiveFunctionPeakFlow.value = true;
+      cbEventBasedDisabled.value = true;
+      cbIsEvenBased.value = true;
+   } else if (metricInfo?.event_based == false && uiPeakFlowThreshold.value) {
+      showMetricPeakFlow.value = true;
+      cbIsEvenBased.value = true;
+   }
 })
 
 
@@ -310,39 +309,75 @@ const saveOptMetData = () => {
          useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
             toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: message });
          })
-      } else if ( response?.response_type == 'error' ) {
-         toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: response?.message});
+      } else if (response?.response_type == 'error') {
+         toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: response?.message });
       } else {
-         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message});
+         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message });
          fetchUserCalibrationRunData()
       }
    })
 };
 
-const goNextTab = () => {
-   // let err = false;
-   // let txt = "Please correct the following:";
-   // if (!uiOptimization.value) {
-   //    txt += "\nAll Calibration Times are required.";
-   //    err = true;
-   // }
-   // if (!uiObjectiveFunction.value) {
-   //    txt += "\nAll Automatic Validation Times are required.";
-   //    err = true;
-   // }
-   // if (err) {
-   //    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt);
-   //    return;
-   // }
-   gotoNext();
-};
 
-const goPrevTab = () => {
+const gotoNext = () => {
+   const tabs = document.getElementsByClassName("tabs");
+   const e = <HTMLElement>tabs[CalibrationTabs.tab_statusRun];
+   e.click();
+}
+
+const gotoPrev = () => {
    const tabs = document.getElementsByClassName("tabs");
    const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
    e.click();
 };
 
+
+const goNextTab = () => {
+   const errors = validateOptimizationMetricssTab();
+   if (errors.error) {
+      showPrevNextDialog(errors.text);
+   } else {
+      gotoNext();
+   }
+};
+
+const goPrevTab = () => {
+   const errors = validateOptimizationMetricssTab();
+   if (errors.error) {
+      showPrevNextDialog(errors.text);
+   } else {
+      gotoPrev();
+   }
+};
+
+const showPrevNextDialog = (body: string[]) => {
+   if (!nextPrevDialogOpened.value) {
+      dialog.open(MoveNextPrevDialog, {
+         props: {
+            header: "Go to next tab?",
+            style: {
+               width: 'auto',
+            },
+            modal: true,
+         },
+         data: {
+            body: body
+         },
+         onClose: (opt) => {
+            nextPrevDialogOpened.value = false;
+            handleNextPrevDialogClose(opt);
+         },
+
+      })
+      nextPrevDialogOpened.value = true
+   }
+}
+
+const handleNextPrevDialogClose = (opt: any) => {
+   if (opt.data.moveToNextResponse) {
+      gotoNext();
+   }
+}
 </script>
 
 <style lang="scss" scoped>

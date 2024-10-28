@@ -1,8 +1,7 @@
 <template>
   <div id="TuningControls" class="">
     <div class="mt-3 mb-2">
-      <div v-if="rangeDateFrom && rangeDateTo" class="text-left mt-1 text-xl c-blue-primary1 font-bold"
-        id="RangeDates">
+      <div v-if="rangeDateFrom && rangeDateTo" class="text-left mt-1 text-xl c-blue-primary1 font-bold" id="RangeDates">
         RANGE: {{ format(rangeDateFrom) }} GMT to {{ format(rangeDateTo) }} GMT
       </div>
     </div>
@@ -47,7 +46,7 @@
                       <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                         @update:model-value="handleCalStartUpdate" :disabled="!isTimeRangeSet()" />
-                     <!-- /<div v-if="!isTimeRangeSet()" class="overlay"></div> -->
+                      <!-- /<div v-if="!isTimeRangeSet()" class="overlay"></div> -->
                     </td>
                     <td class="pl-6 w-1/6">
                       <label for="CalibrationEnd" class="whitespace-nowrap">Calibration End </label>
@@ -147,7 +146,7 @@
           <div class="mb-2 font-bold">Output Variable To Calibrate</div>
           <div class="mt-2 text-sm">
             <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable" :disabled="!isFormulationDataSaved()"
-              :options="outputVariables" optionLabel="output" optionValue="output" >
+              :options="outputVariables" optionLabel="output" optionValue="output">
             </Select>
             <!-- <div v-if="!isFormulationDataSaved()" class="overlay"></div> -->
           </div>
@@ -156,7 +155,7 @@
         <div class="col-span-2 mt-5 mb-3 hr"></div>
 
         <div class="col-span-2">
-          
+
 
           <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
           <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
@@ -171,7 +170,8 @@
           <div class="text-left mt-2">
             <div class="font-bold">Calibratable Parameters</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
-              :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="output" optionValue="output" >
+              :disabled="!isFormulationDataSaved()" :options="calibrationTuningParameters" optionLabel="output"
+              optionValue="output">
               <template #option="slotProps">
                 <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
               </template>
@@ -186,7 +186,7 @@
 
       </div>
     </div>
-    
+
     <div id="TuningDataList" class="mt-2 mb-2 overflow-auto max-h-[200px]" style="position: relative;">
       <!-- <div class="text-right mb-1 mr-2"><button class="c-blue font-normal  underline">Clear</button></div> -->
 
@@ -269,7 +269,7 @@
 
     </div>
   </div>
-
+  <DynamicDialog />
   <div class="waitgif" v-if="isLoading">
     <img src="@/assets/styles/img/wait.gif" />
   </div>
@@ -292,6 +292,12 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { ifHydrofabricErrorsExist } from "~/utils/TuningControlsHelpers";
+
+import { useDialog } from "primevue/usedialog";
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+
+const dialog = useDialog();
+const nextPrevDialogOpened = ref<boolean>(false);
 
 const format = formatDateForDisplay;
 const isLoading = ref(false);
@@ -351,7 +357,7 @@ let dataTableElement: HTMLElement | null = null;
 
 onMounted(async () => {
   toast.removeAllGroups();
-  
+
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
 
@@ -371,7 +377,7 @@ onMounted(async () => {
   const hydrofabricErrorMessage = ifHydrofabricErrorsExist(loadTuningTabData.value._data);
   if (hydrofabricErrorMessage) {
     toast.add({ severity: 'error', summary: 'Hydrofabric Error', detail: hydrofabricErrorMessage });
-  }  
+  }
 
   // set calibration times
   if (userCalibrationRunData?.value?.calibration_times) {
@@ -407,7 +413,7 @@ onMounted(async () => {
     const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
 
     // set output variable to calibrate only if it is not already set
-    if (!selectedOutputVariable.value){
+    if (!selectedOutputVariable.value) {
       userOutputVariableToCalibrate.value.name = name;
       userOutputVariableToCalibrate.value.module = module;
       selectedOutputVariable.value = `${name} (${module})`;
@@ -448,14 +454,14 @@ const isFormulationDataSaved = (): boolean => {
 const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
-    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.'});
+    toast.add({ severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.' });
   }
 };
 
 const handleOutputVariablesParametersClick = (event: Event) => {
   if (!isFormulationDataSaved()) {
     event.preventDefault(); // Prevent any default action
-    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or parameters because Formulation data has not been saved.'});
+    toast.add({ severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or parameters because Formulation data has not been saved.' });
   }
 };
 
@@ -612,38 +618,38 @@ const handleFileUpload = async (event: Event) => {
         // Populate the Parameter table with the data from user-uploaded file
         response._data?.user_parameter_file?.forEach((param: any) => {
           if (
-            isNotNullOrUndefined(param.param) && 
-            isNotNullOrUndefined(param.min) && 
-            isNotNullOrUndefined(param.max) && 
-            isNotNullOrUndefined(param.init) && 
+            isNotNullOrUndefined(param.param) &&
+            isNotNullOrUndefined(param.min) &&
+            isNotNullOrUndefined(param.max) &&
+            isNotNullOrUndefined(param.init) &&
             isNotNullOrUndefined(param.model)) {
-              // check if parameter is in the calibrationTuningParameters list and not already in the userSelectedCalibrationTuningParameters list
-              const isParameterInCalibratableList = calibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
-              // add parameter to the userSelectedCalibrationTuningParameters list if it is in the calibrationTuningParameters list
-              if (!isParameterInCalibratableList) {
-                invalidParameters.push(param.param);
-              }
+            // check if parameter is in the calibrationTuningParameters list and not already in the userSelectedCalibrationTuningParameters list
+            const isParameterInCalibratableList = calibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
+            // add parameter to the userSelectedCalibrationTuningParameters list if it is in the calibrationTuningParameters list
+            if (!isParameterInCalibratableList) {
+              invalidParameters.push(param.param);
+            }
 
-              const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
+            const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
 
-              if (isParameterAlreadyInTable) {
-                // delete the parameter from the table if parameter we're trying to add is already in the table so we override it
-                userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters?.value?.filter((paramData: any) => paramData.name !== param.param);
-              }
+            if (isParameterAlreadyInTable) {
+              // delete the parameter from the table if parameter we're trying to add is already in the table so we override it
+              userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters?.value?.filter((paramData: any) => paramData.name !== param.param);
+            }
 
-              // add parameter to the table if is in the list of calibratable parameters
-              if (isParameterInCalibratableList) {
-                userSelectedCalibrationTuningParameters?.value?.push({
-                  name: param.param,
-                  minimum: param.min,
-                  maximum: param.max,
-                  initial_value: param.init,
-                  module: param.model, // module?
-                });
-              }
+            // add parameter to the table if is in the list of calibratable parameters
+            if (isParameterInCalibratableList) {
+              userSelectedCalibrationTuningParameters?.value?.push({
+                name: param.param,
+                minimum: param.min,
+                maximum: param.max,
+                initial_value: param.init,
+                module: param.model, // module?
+              });
+            }
           } else {
             errorMessage = response._data?.message;
-            toast.add({ severity: 'warn', summary: 'Invalid data in parameter file' , detail: errorMessage });
+            toast.add({ severity: 'warn', summary: 'Invalid data in parameter file', detail: errorMessage });
           }
         });
 
@@ -654,7 +660,7 @@ const handleFileUpload = async (event: Event) => {
           toast.add({ severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters are not in the list of calibratable parameters: ${invalidParameters.join(', ')}` });
         }
       } else {
-        toast.add({ severity: 'warn', summary: 'No data in parameter file'});
+        toast.add({ severity: 'warn', summary: 'No data in parameter file' });
       }
     } catch (error) {
       toast.add({ severity: 'warn', summary: 'File upload failed' });
@@ -773,7 +779,7 @@ const isTuningTabDataValidated = () => {
 const areCalibrationTimesFullySetOrEmpty = (): boolean => {
   const areCalibrationTimesFullySet: boolean = isValidDateTime(simStartTime.value) && isValidDateTime(simEndTime.value) && isValidDateTime(calStartTime.value) && isValidDateTime(calEndTime.value);
   const areCalibrationTimesEmpty: boolean = !isValidDateTime(simStartTime.value) && !isValidDateTime(simEndTime.value) && !isValidDateTime(calStartTime.value) && !isValidDateTime(calEndTime.value);
-  
+
   if (areCalibrationTimesFullySet || areCalibrationTimesEmpty) {
     return true;
   } else {
@@ -789,7 +795,7 @@ const areCalibrationTimesFullySetOrEmpty = (): boolean => {
 const areValidationTimesFullySetOrEmpty = (): boolean => {
   const areValidationTimesFullySet: boolean = isValidDateTime(avSimStartTime.value) && isValidDateTime(avSimEndTime.value) && isValidDateTime(avCalStartTime.value) && isValidDateTime(avCalEndTime.value);
   const areValidationTimesEmpty: boolean = !isValidDateTime(avSimStartTime.value) && !isValidDateTime(avSimEndTime.value) && !isValidDateTime(avCalStartTime.value) && !isValidDateTime(avCalEndTime.value);
-  
+
   if (areValidationTimesFullySet || areValidationTimesEmpty) {
     return true;
   } else {
@@ -854,7 +860,7 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time' , life: 5000});
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time', life: 5000 });
     return false;
   }
 
@@ -956,12 +962,6 @@ const isOutputVariableValidated = (): boolean => {
   return true;
 };
 
-const gotoNext = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_optimizationMetrics];
-  e.click();
-}
-
 /**
   * Save Tuning Tab data
   */
@@ -1006,51 +1006,122 @@ const saveTuningData = () => {
 /**
  * Reset Tuning Tab data
  */
-  const resetTuningData = () => {
+const resetTuningData = () => {
   // hardResetTuningStore(); // disable for now
 };
 
-const goPrevTab = () => {
+const validateTab = () => {
+  /* Check the DateTimes */
+  let error = false;
+  let text = [];
+  if (calStartTime.value !== userCalibrationRunData?.value?.calibration_times.calibration_start_time) {
+    error = true;
+    text.push("Calibration Start has been changed");
+  }
+  if (calEndTime.value !== userCalibrationRunData?.value?.calibration_times.calibration_end_time) {
+    error = true;
+    text.push("Calibration End has been changed");
+  }
+  if (simStartTime.value !== userCalibrationRunData?.value?.calibration_times.simulation_start_time) {
+    error = true;
+    text.push("Simulation Start has been changed");
+  }
+  if (simEndTime.value !== userCalibrationRunData?.value?.calibration_times.simulation_end_time) {
+    error = true;
+    text.push("Simulation End has been changed");
+  }
+
+  if (avCalStartTime.value !== userCalibrationRunData?.value?.validation_times.validation_start_time) {
+    error = true;
+    text.push("Validation Start has been changed");
+  }
+  if (avCalEndTime.value !== userCalibrationRunData?.value?.validation_times.validation_end_time) {
+    error = true;
+    text.push("Validation End has been changed");
+  }
+  if (avSimStartTime.value !== userCalibrationRunData?.value?.validation_times.simulation_start_time) {
+    error = true;
+    text.push("Simulation Start has been changed");
+  }
+  if (avSimEndTime.value !== userCalibrationRunData?.value?.validation_times.simulation_end_time) {
+    error = true;
+    text.push("Simulation End has been changed");
+  }
+
+  if (avSimEndTime.value !== userCalibrationRunData?.value?.validation_times.simulation_end_time) {
+    error = true;
+    text.push("Simulation End has been changed");
+  }
+
+  if( selectedOutputVariable.value.name !== userCalibrationRunData?.value?.output_variable_to_calibrate.name) {
+    error = true;
+    text.push("Output Variable To Calibrate has changed")
+  }
+
+  let x = userSelectedCalibrationTuningParameters.value;
+  console.log(userSelectedCalibrationTuningParameters.value)
+  debugger;
+  return { error: error, text: text }
+}
+
+const gotoNext = () => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_optimizationMetrics];
+  e.click();
+}
+
+const gotoPrev = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_formulation];
   e.click();
 };
 
 const goNextTab = () => {
-  // let err = false;
-  // let txt = "Please correct the following:";
-  // if (!(userCalibrationRunData.value?.calibration_times.calibration_end_time &&
-  //   userCalibrationRunData.value?.calibration_times.calibration_start_time &&
-  //   userCalibrationRunData.value?.calibration_times.simulation_end_time &&
-  //   userCalibrationRunData.value?.calibration_times.simulation_start_time)) {
-  //   txt += "\nAll Calibration Times are required.";
-  //   err = true;
-  // }
-  // if (!(userCalibrationRunData.value?.validation_times.simulation_end_time &&
-  //   userCalibrationRunData.value?.validation_times.simulation_start_time &&
-  //   userCalibrationRunData.value?.validation_times.validation_end_time &&
-  //   userCalibrationRunData.value?.validation_times.validation_start_time)) {
-  //   txt += "\nAll Automatic Validation Times are required."
-  //   err = true;
-  // }
-  // if (!userOutputVariableToCalibrate.value.name) {
-  //   txt += "\nNo Output Variable selected."
-  //   err = true;
-  // }
-  // if(!(userCalibrationRunData?.value?.output_variable_to_calibrate?.module)) {
-  //   txt += "\nNo Output Varialbe to calibration"
-  // }
-  // if(!(userCalibrationRunData?.value?.parameters_selected?.module)) {
-  //   txt += "\nNo Paramters selected"
-  // }
-
-  // if (err) {
-  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-  //   return;
-  // }
-  gotoNext();
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text);
+  } else {
+    gotoNext();
+  }
 };
 
+const goPrevTab = () => {
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text);
+  } else {
+    gotoPrev();
+  }
+};
+
+const showPrevNextDialog = (body: string[]) => {
+  if (!nextPrevDialogOpened.value) {
+    dialog.open(MoveNextPrevDialog, {
+      props: {
+        header: "Go to next tab?",
+        style: {
+          width: 'auto',
+        },
+        modal: true,
+      },
+      data: {
+        body: body
+      },
+      onClose: (opt) => {
+        nextPrevDialogOpened.value = false;
+        handleNextPrevDialogClose(opt);
+      },
+
+    })
+    nextPrevDialogOpened.value = true
+  }
+}
+
+const handleNextPrevDialogClose = (opt: any) => {
+  if (opt.data.moveToNextResponse) {
+    gotoNext();
+  }
+}
 </script>
 
 <style lang="scss" scoped>
