@@ -1,7 +1,7 @@
 <template>
   <div id="Messages">
     <div class="">
-      <h2 class="mt-5">Calibration Run Setup</h2>
+      <h2 class="mt-5">{{ componentProps.title }}</h2>
 
       <div class="grid grid-cols-2 gap=1 text-sm mt-4">
         <div class="col-span-1">
@@ -74,9 +74,11 @@
             {{ formatDate(calData?.validation_times?.validation_end_time) }}</div>
           </p>
           <p>&nbsp;</p>
-          <p v-if="calData?.objective_function"><span class="font-medium">Tuning Parameters:</span> {{ null }}</p>
-          <p v-if="calData?.objective_function"><span class="font-medium">Objective Function:</span> {{
-            calData?.objective_function }}</p>
+          <p v-if="userSelectedCalibrationTuningParameters">
+            <span class="font-medium">Tuning Parameters:</span> 
+            {{ userSelectedCalibrationTuningParameters.length }}</p>
+          <p v-if="calData?.objective_function"><span class="font-medium">Objective Function:</span> 
+            {{ calData?.objective_function }}</p>
           <p v-if="calData?.save_plot_iteration_frequency"><span class="font-medium">Plot Generation Frequency:</span>
             {{ calData?.save_plot_iteration_frequency }}</p>
         </div>
@@ -89,11 +91,23 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
+import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
+import { defineProps, withDefaults } from 'vue';
+import type { ComponentPropsTitle } from '~/composables/NextGenModel'; //why doesn't this work?
 
 const calRunStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(calRunStore);
 const calData = ref(userCalibrationRunData);
+const tuningStore = useTuningStore();
+const { userSelectedCalibrationTuningParameters } = storeToRefs(tuningStore);
+
+const componentProps = withDefaults(defineProps<{
+    title: string
+  }>(), {
+    title: 'Calibration Run Setup'
+  }
+);
 
 const getModuleList = () => {
   let modules = "";
@@ -104,7 +118,7 @@ const getModuleList = () => {
     }
   });
   return modules;
-}
+};
 
 const formatDate = (d: any) => {
   if ((d instanceof Date)) {
@@ -112,7 +126,7 @@ const formatDate = (d: any) => {
   } else {
     return formatDateForDisplay(d);
   }
-}
+};
 
 </script>
 
