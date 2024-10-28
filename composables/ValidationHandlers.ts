@@ -51,7 +51,7 @@ export const useCalibrationFormulationSlothTableValidation = ( slothParameters: 
 
 export const useCalibrationFormulationTabSaveValidate = ( savePayload: SaveFormulationTabPayload ) => {
   const errors = ref<any>({});
-  if ( savePayload.hasOwnProperty( "formulation_name" ) && /^[a-z0-9_]+$/i.test( savePayload['formulation_name'] ?? "" ) == false ) {
+  if ( savePayload.hasOwnProperty( "formulation_name" ) && /^[a-z0-9-_]+$/i.test( savePayload['formulation_name'] ?? "" ) == false ) {
     errors.value[ 'formulation_name' ]= [ 'Formulation name can only include alpha numeric charaters and underscore.' ];
   }
   if ( savePayload.hasOwnProperty( "sloth_parameters" ) && !savePayload.hasOwnProperty( "modules" ) ) {
