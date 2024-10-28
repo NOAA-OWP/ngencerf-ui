@@ -8,7 +8,10 @@ import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { SelectOption, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn } from "~/composables/NextGenModel";
 import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
-export const useEvaluationAltIterationStore = defineStore('EvaluationAltIterationStore', () => {  
+export const useEvaluationAltIterationStore = defineStore('EvaluationAltIterationStore', () => { 
+  const { ngencerfBaseUrl } = useBackendConfig();
+  const { getAccessToken } = useUserDataStore();
+  const { userCalibrationRunData } = storeToRefs( useUserDataStore() );
   const calibrationRunDetailDataList = ref<AlternativeIterationCalibrationRunData[]>([]);
   const tuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
   const calibrationRunDetailDataListHeaders = ref<any[]>([]);
@@ -19,6 +22,15 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
   const computedtuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
 
   const fetchCalibrationRunDetailDataList = async () => {
+    const runListDataResult = await makeProtectedApiCall<AlternativeIterationCalibrationRunData>( `${ngencerfBaseUrl}/calibration/get_calibration_data_by_iteration/`, {
+      method: "POST",
+      headers: { 
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: userCalibrationRunData?.value?.calibration_run_id })
+    });
+
     const { data } = await useFetch<AlternativeIterationCalibrationRunData[]>('/api/evaluation/run_detail_data', {
       'method': 'POST'
     })

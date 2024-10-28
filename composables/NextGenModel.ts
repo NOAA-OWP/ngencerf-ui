@@ -355,6 +355,9 @@ export interface OptimizationDataInputData {
   description: string;
   data_type: string;
   is_active: boolean;
+  default_value: number;
+  min: number;
+  max: number;
 }
 
 export interface SaveOptimizationPayload {
@@ -443,6 +446,32 @@ export interface DynamicTableColumnHeader {
 export interface DynamicTableColumn {
   field: any;
   header?: string;
+}
+
+export interface CalibrationRunByIteration {
+  message: string;
+  iteration_data: CalibrationRunIterationData[];
+  nwm_retrospective_data: CalibrationRunIterationMetricData[];
+}
+
+export interface CalibrationRunIterationData {
+  iteration_num: number;
+  iteration_id: number;
+  worker_name: string;
+  best_params: boolean;
+  calibration_output_variable_value: number;
+  parameters: CalibrationRunIterationParameterData[];
+  metrics: CalibrationRunIterationMetricData[];
+}
+
+export interface CalibrationRunIterationParameterData {
+  parameter_name: string;
+  parameter_value: number;
+}
+
+export interface CalibrationRunIterationMetricData {
+  metric_name: string;
+  metric_value: number;
 }
 
 export interface AlternativeIterationCalibrationRunData {
