@@ -125,15 +125,13 @@
       </div>
 
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3 ActionButtonsBox">
-        <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
+        <span>
           <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-            <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
+            <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()"
+            :disabled="!isCalibrationJobStatusSavedOrReady(calibrationStatus)">
               Save
             </button>
           </div>
-        </span>
-        <span v-else>
-          <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">&nbsp;</div>
         </span>
         <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
           <div class="col-span-1 mr-3">

@@ -93,15 +93,13 @@
 
         <div class="row-span-1 mt-4 ActionButtonsBox">
           <div class="grid grid-cols-8">
-            <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
+            <span>
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
+                <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()"
+                :disabled="!isCalibrationJobStatusSavedOrReady(calibrationStatus)">
                   Save
                 </button>
               </div>
-            </span>
-            <span v-else>
-              <div class="col-span-1 mr-3">&nbsp;</div>
             </span>
             <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
               <div class="col-span-1 mr-3">

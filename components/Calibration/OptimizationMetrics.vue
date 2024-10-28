@@ -124,15 +124,13 @@
          
       </div>
       <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6 ActionButtonsBox">
-         <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
+         <span>
             <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-               <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()">
+               <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()"
+               :disabled="!isCalibrationJobStatusSavedOrReady(calibrationStatus)">
                   Save
                </button>
             </div>
-         </span>
-         <span v-else>
-            <div class="col-span-1 mr-6 h-8">&nbsp;</div>
          </span>
          <div class="col-span-1 mr-3">
          </div>

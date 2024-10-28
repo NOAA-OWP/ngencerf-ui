@@ -235,18 +235,16 @@
 
   <div class="grid grid-rows-1 mt-8 ActionButtonsBox" id="Tuningbuttons">
     <div id="TuningBottomButtons" class="grid grid-cols-8">
-      <span v-if="userCalibrationRunData?.status !== 'Running'">
+      <span>
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-          <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()">
+          <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()"
+          :disabled="!isCalibrationJobStatusSavedOrReady(calibrationStatus)">
             Save
           </button>
         </div>
       </span>
-      <span v-else>
-        <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">&nbsp;</div>
-      </span>
 
-      <span v-if="userCalibrationRunData?.status !== 'Running'">
+      <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
         <div class="col-span-1 mr-3">
           <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTuningData()"
             aria-label="Reset Button">Reset</button>-->
@@ -287,12 +285,12 @@ import { isValidDateTime, isNotNullOrUndefined } from "~/utils/CommonHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { ifHydrofabricErrorsExist } from "~/utils/TuningControlsHelpers";
-
 const format = formatDateForDisplay;
 const isLoading = ref(false);
 
@@ -301,6 +299,8 @@ const { getCalibrationTabIndex } = generalStore();
 const { ngencerfBaseUrl } = useBackendConfig();
 const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
+const runStatusStore = useRunStatusStore();
+const { calibrationStatus } = storeToRefs(runStatusStore);
 
 const {
   formulationNameInput,
