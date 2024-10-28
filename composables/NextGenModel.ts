@@ -15,6 +15,12 @@ export interface CreatedCalibrationRun {
   calibration_run_id: number;
 }
 
+// properties interface / type
+export interface ComponentPropsTitle {
+  title: string;
+}
+
+// response interface
 export interface GeneralApiSaveResponse {
   message: string;
   calibration_run_id: number;

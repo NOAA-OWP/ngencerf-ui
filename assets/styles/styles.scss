@@ -480,11 +480,12 @@ table.cols-bordered {
 .p-toast {
   width: min(25rem, 100vw) !important;
 }
-.p-toast-top-center {
-}
+
+// .p-toast-top-center {
+// }
 
 .p-toast-message {
-  border: 2px solid red;
+  border: 2px solid;
 }
 
 /* Listbox select (for Tuning Tab) */
