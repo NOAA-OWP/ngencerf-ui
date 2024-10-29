@@ -452,6 +452,7 @@ export interface DynamicTableColumnHeader {
 export interface DynamicTableColumn {
   field: any;
   header?: string;
+  hidden?: boolean;
 }
 
 export interface CalibrationRunByIteration {

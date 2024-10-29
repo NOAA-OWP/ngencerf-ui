@@ -5,7 +5,7 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
-import type { SelectOption, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn } from "~/composables/NextGenModel";
+import type { CalibrationRunIterationParameterData, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn, CalibrationRunIterationMetricData } from "~/composables/NextGenModel";
 import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
 export const useEvaluationAltIterationStore = defineStore('EvaluationAltIterationStore', () => { 
@@ -21,7 +21,10 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
   const computedCalibrationRunDetailDataList = ref<AlternativeIterationCalibrationRunData[]>([]);
   const computedtuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
 
-  const fetchCalibrationRunDetailDataList = async () => {
+  const fetchCalibrationDataByIterationDataList = async () => {
+    let headerRow = <DynamicTableColumnHeader[]>[];
+    let rowData = <any>{};
+
     const runListDataResult = await makeProtectedApiCall<AlternativeIterationCalibrationRunData>( `${ngencerfBaseUrl}/calibration/get_calibration_data_by_iteration/`, {
       method: "POST",
       headers: { 
@@ -30,7 +33,116 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
       },
       body: JSON.stringify({ calibration_run_id: userCalibrationRunData?.value?.calibration_run_id })
     });
+    
+    if ( runListDataResult._data.nwm_retrospective_data	) {
+      headerRow = [];
+      headerRow.push({
+        header: "NWM 3.0",
+        colspan: 3
+      });
+      runListDataResult._data.nwm_retrospective_data.forEach( ( nwm_retro_data : CalibrationRunIterationMetricData ) => {
+        headerRow.push({
+          header: `${nwm_retro_data.metric_value}`,
+          colspan: 1
+        });
+      });
+      calibrationRunDetailDataListHeaders.value.push( headerRow );
+    }
 
+    // building run detail table data based on the response data
+    // also building table column data array, since we will always have a best run, we build the table column data array during the best run
+    // the best run also needs to be excluded from the actual table data array and add to the header data array
+    if ( runListDataResult._data.iteration_data ) {
+      runListDataResult._data.iteration_data.forEach( ( iteration_data : CalibrationRunIterationData ) => {
+        if ( iteration_data.best_params	=== true ) {
+          // detail run section
+          headerRow = [];
+          calibrationRunDetailTableColumn.value.push({ field: 'iteration_id', hidden: true });  
+          calibrationRunDetailTableColumn.value.push({ field: 'worker_name', header: "Worker" });
+          calibrationRunDetailTableColumn.value.push({ field: 'iteration_num', header: "Iteration" });
+          calibrationRunDetailTableColumn.value.push({ field: 'calibration_output_variable_value', header: "Objective Function" });
+
+          headerRow.push({ 
+            header: iteration_data.worker_name,
+            colspan: 1
+          });
+
+          headerRow.push({ 
+            header: `Best ${iteration_data.iteration_num}`,
+            colspan: 1
+          });
+
+          headerRow.push({ 
+            header: `${iteration_data.calibration_output_variable_value}`,
+            colspan: 1
+          });
+
+          iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {
+            calibrationRunDetailTableColumn.value.push({ field: metric.metric_name, header: metric.metric_name });
+
+            headerRow.push({ 
+              header: `${metric.metric_value}`,
+              colspan: 1
+            });
+          });
+
+          calibrationRunDetailDataListHeaders.value.push( headerRow );
+
+          // tuning parameters section
+          headerRow = [];
+          headerRow.push({ 
+            header: iteration_data.worker_name,
+            colspan: 1
+          });
+
+          headerRow.push({ 
+            header: `Best ${iteration_data.iteration_num}`,
+            colspan: 1
+          });
+          
+          tuningParametersTableColumn.value.push({ field: 'iteration_id', hidden: true });  
+          tuningParametersTableColumn.value.push({ field: 'worker_name', header: "Worker" });
+          tuningParametersTableColumn.value.push({ field: 'iteration_num', header: "Iteration" });
+          iteration_data.parameters.forEach( ( parameter: CalibrationRunIterationParameterData ) => {
+            tuningParametersTableColumn.value.push({ field: parameter.parameter_name, header: parameter.parameter_name });
+
+            headerRow.push({ 
+              header: `${parameter.parameter_value}`,
+              colspan: 1
+            });
+          });
+
+          tuningParametersDataListHeaders.value.push( headerRow );
+
+        } else {
+          // detail run section
+          rowData = {};
+          rowData['iteration_id'] = iteration_data.iteration_id;        
+          rowData['worker_name'] = iteration_data.worker_name;        
+          rowData['iteration_num'] = iteration_data.iteration_num;        
+          rowData['calibration_output_variable_value'] = iteration_data.calibration_output_variable_value;
+          
+          iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {
+            rowData[ metric.metric_name ] = metric.metric_value;
+          });
+          computedCalibrationRunDetailDataList.value.push( rowData );
+
+          //tuning parameter section
+          rowData = {};
+          rowData['iteration_id'] = iteration_data.iteration_id;        
+          rowData['worker_name'] = iteration_data.worker_name;        
+          rowData['iteration_num'] = iteration_data.iteration_num;
+          
+          iteration_data.parameters.forEach( ( parameters: CalibrationRunIterationParameterData ) => {
+            rowData[ parameters.parameter_name ] = parameters.parameter_value;
+          });
+          computedtuningParametersDataList.value.push( rowData );
+
+        };
+      });
+    }
+
+    /*
     const { data } = await useFetch<AlternativeIterationCalibrationRunData[]>('/api/evaluation/run_detail_data', {
       'method': 'POST'
     })
@@ -65,40 +177,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
         }
       });
     }
-  }
-  
-  const fetchTuningParametersDataList = async () => {
-    const { data } = await useFetch<AlternativeIterationTuningParameters[]>('/api/evaluation/corresponding_calibraiton_tuning_param_data', {
-      'method': 'POST'
-    })
-    tuningParametersTableColumn.value = [];
-    tuningParametersDataList.value = data.value ?? [];
-
-    if ( tuningParametersDataList.value ) {
-      let headerRow = <DynamicTableColumnHeader[]>[];
-      const rowData = tuningParametersDataList.value[0];
-      Object.keys( rowData ).forEach( key => {
-        tuningParametersTableColumn.value.push({ field: key, header: key.charAt(0).toUpperCase() + key.slice(1) });
-      })
-      tuningParametersDataListHeaders.value.push( headerRow );
-      const subheader_spacer_colspan = headerRow.length - 1
-      tuningParametersDataList.value.forEach( rowData => {
-        if ( isNumeric( rowData.iteration ) === false ) {
-          headerRow = [];
-          headerRow.push({
-            header: rowData.worker,
-            colspan: 1
-          });
-          headerRow.push({
-            header: String( rowData.iteration ),
-            colspan: subheader_spacer_colspan
-          });
-          tuningParametersDataListHeaders.value.push( headerRow );
-        } else {
-          computedtuningParametersDataList.value.push( rowData );
-        }
-      });
-    }
+      */
   }
 
   /**
@@ -122,8 +201,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     calibrationRunDetailDataListHeaders,
     tuningParametersDataList,
     tuningParametersDataListHeaders,
-    fetchCalibrationRunDetailDataList,
-    fetchTuningParametersDataList,
+    fetchCalibrationDataByIterationDataList,
     calibrationRunDetailTableColumn,
     tuningParametersTableColumn,
     resetEvaluationAltIterationStore,

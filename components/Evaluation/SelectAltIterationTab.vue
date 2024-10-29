@@ -6,11 +6,13 @@
       <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px"
         table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable">
         <template #header>
+        <table>
         <tr v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index">
           <th v-for="( col, colIndex ) in row" :key="colIndex" :colspan="col.colspan">{{ col.header }}</th>
         </tr>
+        </table>
         </template>
-        <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header" :field="col.field" sortable></Column>      
+        <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" sortable></Column>      
       </DataTable>      
     </div>
   </div>
@@ -20,11 +22,13 @@
       <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"
         selectionMode="single" ref="tuningParametersTable"> 
         <template #header>
+          <table>
           <tr v-for="(row, index) in tuningParametersDataListHeaders" :key="index">
             <th v-for="( col, colIndex ) in row" :key="colIndex" :colspan="col.colspan">{{ col.header }}</th>
           </tr>
+          </table>
         </template>
-        <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header" :field="col.field" sortable></Column> 
+        <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" sortable></Column> 
       </DataTable>
     </div>
   </div>
@@ -54,8 +58,7 @@ import { storeToRefs } from 'pinia';
 import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAltIterationStore';
 
 const {     
-    fetchCalibrationRunDetailDataList,
-    fetchTuningParametersDataList,
+  fetchCalibrationDataByIterationDataList,
     resetEvaluationAltIterationStore,
 } = useEvaluationAltIterationStore()
 
@@ -74,8 +77,8 @@ const tuningParametersTable = ref<HTMLTableElement>();
 onMounted( () => {
   nextTick( () => {
     resetEvaluationAltIterationStore();
-    fetchCalibrationRunDetailDataList();
-    fetchTuningParametersDataList();
+    fetchCalibrationDataByIterationDataList();
+    //fetchTuningParametersDataList();
 
     const syncScroll = (source:any, target:any) => {
       source.addEventListener( "scroll", ( event: Event ) => {
