@@ -378,7 +378,7 @@ const goNextTab = () => {
 const goPrevTab = () => {
    const errors = validateTab();
    if (errors.error) {
-      showPrevNextDialog(errors.tex, falset);
+      showPrevNextDialog(errors.text, false);
    } else {
       gotoPrev();
    }
