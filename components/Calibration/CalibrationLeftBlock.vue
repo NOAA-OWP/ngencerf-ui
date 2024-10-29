@@ -1,25 +1,26 @@
 <template>
   <!-- LeftBlock.vue -->
-  <div>
+  <div class="grid grid-rows-1">
     <CommonTabs @tabNumber="tabChanged" />
 
-    <span v-if="activeTab == 1">
+    <div class="row-span-1" v-if="activeTab == 1">
       <CalibrationCalibrationRunsTab />
-    </span> <span v-if="activeTab == 2">
+    </div> 
+    <div class="row-span-1" v-if="activeTab == 2">
       <CalibrationHeadwaterBasinGage />
-    </span>
-    <span v-else-if="activeTab == 3">
+    </div>
+    <div class="row-span-1" v-else-if="activeTab == 3">
       <CalibrationFormulation />
-    </span>
-    <span v-else-if="activeTab == 4">
+    </div>
+    <div class="row-span-1" v-else-if="activeTab == 4">
       <CalibrationTuningControls />
-    </span>
-    <span v-else-if="activeTab == 5">
+    </div>
+    <div class="row-span-1" v-else-if="activeTab == 5">
       <CalibrationOptimizationMetrics />
-    </span>
-    <span v-else-if="activeTab == 6">
+    </div>
+    <div class="row-span-1" v-else-if="activeTab == 6">
       <CalibrationRunStatus />
-    </span>
+    </div>
   </div>
 
 </template>

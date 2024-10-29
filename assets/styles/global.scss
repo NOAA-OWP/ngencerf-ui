@@ -61,6 +61,12 @@ $dark: $ngwcp_secondary1;
     .hr {
         @apply w-full h-[1px] bg-gray-md;
     }
+    .progressTable td:nth-child(2) { 
+        @apply ptype whitespace-nowrap c-blue underline; 
+    }
+    .progressTable td:nth-child(2):hover { 
+        @apply c-blue-primary1 cursor-pointer; 
+    }
 }
 
 // Typography & Icons
