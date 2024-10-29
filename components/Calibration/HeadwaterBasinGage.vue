@@ -213,8 +213,16 @@ const showForcingFileUploadDialog = (headerText: string) => {
 }
 
 const handleDialogClose = (opt: any) => {
-  if (opt && opt.data) {
-    toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult.message, life: 3000 })
+  if ( opt && opt.data ) {
+    if ( opt.data.saveFileResponseResult.status == 200 ) {
+      toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 })
+    } else {
+      useApiErrorResponsePreprocess( opt.data.saveFileResponseResult ).forEach( message => {
+        toast.add({ severity: useApiResponseToastSeverityCode( opt.data.saveFileResponseResult?.status ), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
+      });
+    }    
+  } else {
+    toast.add({ severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: 10000 })
   }
   fileUploadDialogOpened.value = false
 }
@@ -300,18 +308,16 @@ const toggle_isNWMv3 = () => {
 
 const saveTabData = () => {
   toast.removeAllGroups();
-  const save_tab_response = saveGageTabData();
-  save_tab_response.then((response) => {
-    if (response?.validation_errors) {
-      useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-        toast.add({ severity: "error", summary: 'Error Saving Gage Tab Data', detail: message });
-      })
-    } else {
-      toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 });
+  saveGageTabData().then( response => {
+    if ( response.status == 200 ) {
+      toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?._data?.message, life: 3000 });
       fetchUserCalibrationRunData()
+    } else {
+      useApiErrorResponsePreprocess( response ).forEach( message => {
+        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
+      });
     }
-  })
-
+  });
 };
 
 const resetTabData = () => {
