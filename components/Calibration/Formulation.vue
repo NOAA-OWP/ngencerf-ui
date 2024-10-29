@@ -273,7 +273,7 @@ const saveFormulationData = () => {
       toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
       if ( response?._data?.nwm_warning == true ) {
         useCalibrationFormulationTabSaveWarning( response?._data?.formulation_warning ?? {} ).forEach( warning => {
-          toast.add({ severity: 'warn', summary: 'Formulation Tab Data Saved With Warning.', detail: warning, life: 10000 });
+          toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning, life: 10000 });
         });
       }   
       fetchUserCalibrationRunData();   
