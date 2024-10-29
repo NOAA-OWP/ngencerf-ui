@@ -37,6 +37,23 @@ export interface ValidationErrorObject {
   [key: string]: string
 }
 
+export interface FormulationTabSaveWarning {
+  excluded_modules?: FormulationTabSaveWarningExcludedModule[];
+  group_requirements?: FormulationTabSaveWarningGroupRequirement[];
+  messages?: string[];
+}
+
+export interface FormulationTabSaveWarningExcludedModule {
+  module_name?: string;
+  must_have?: string[];
+}
+
+export interface FormulationTabSaveWarningGroupRequirement {
+  group_name?: string;
+  required_count?: number[];
+  has_count?: number;
+}
+
 /**
  * model for calibration job list
  */

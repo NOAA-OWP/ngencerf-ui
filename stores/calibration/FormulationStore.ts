@@ -240,15 +240,18 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
       const saveValidation = useCalibrationFormulationTabSaveValidate( savePayload.value );
       if ( Object.keys( saveValidation.value ).length > 0 ) {
         return Promise.resolve({
-          message: "Unable to save formulation tab.",
-          validation_errors: saveValidation.value,
-          calibration_run_id: calibrationJobId.value,
-          status: "error"
+          _data: {
+            message: "Unable to save formulation tab.",
+            validation_errors: saveValidation.value,
+            calibration_run_id: calibrationJobId.value,
+            status: "error"
+          },
+          status: 400
         });
       } else {
         savePayload.value['calibration_run_id'] = calibrationJobId.value;
         savePayload.value['use_sloth'] = useSlothParameters.value;
-        const saveFormulationTabDataResponse = await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
+        return await makeProtectedApiCall<GeneralApiSaveResponse>( `${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${getAccessToken()}`,
@@ -256,15 +259,16 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
           },
           body: JSON.stringify(savePayload.value)
         });
-
-        return saveFormulationTabDataResponse?._data;
       }
     } else {
       return Promise.resolve({
-        message: "No formulation tab data to save.",
-        validation_errors: { "Tab Error": ['Please update at least 1 field before saving.'] },
-        calibration_run_id: calibrationJobId.value,
-        status: "error"
+        _data: {
+          message: "No formulation tab data to save.",
+          validation_errors: { "Tab Error": ['Please update at least 1 field before saving.'] },
+          calibration_run_id: calibrationJobId.value,
+          status: "error"
+        },
+        status: 400
       });
     }
   }
