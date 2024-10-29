@@ -30,7 +30,7 @@
                               <Column field="name" header="Parameter" sortable></Column>
                               <Column field="value" header="Initial Value" sortable>
                                  <template #editor="{ index }">
-                                    <InputNumber v-model="uiOptimizationInputs[index].value" autofocus class="w-12 p-1">
+                                    <InputNumber v-model="uiOptimizationInputs[index].value" inputId="locale-us" locale="en-US" :minFractionDigits="2" fluid autofocus class="w-12 p-1">
                                     </InputNumber>
                                  </template>
                               </Column>
