@@ -226,11 +226,12 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       // Create an interval to update calibrationStatus every 10 seconds until status is not Running
       if (!statusIntervalId) {
         statusIntervalId = setInterval(async () => {
-          await fetchUserCalibrationRunData();
+          let getCalibrationStatusResponse = await queryGetCalibrationStatus();
+          console.log('getCalibrationStatusResponse:', getCalibrationStatusResponse);
 
-          if (userCalibrationRunData.value && userCalibrationRunData.value.status) {
+          if (getCalibrationStatusResponse && getCalibrationStatusResponse.status) {
             // if Calibration status changes, clear intervals, and set progress to null
-            if (userCalibrationRunData.value?.status !== 'Running') {
+            if (getCalibrationStatusResponse.status !== 'Running') {
               clearInterval(runningTimeIntervalId);
               clearInterval(statusIntervalId);
             }
