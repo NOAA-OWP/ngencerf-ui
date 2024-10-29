@@ -4,7 +4,7 @@
       <tr>
         <td><i v-if="userCalibrationRunData?.gage?.gage_id"
             :class="(userCalibrationRunData?.gage?.gage_id) ? 'checkMark' : ''" class="pi pi-check font-bold"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="2" title="Headwater Basin Gage" aria-label="Headwater Basin Gage"
+        <td data-tab="2" title="Headwater Basin Gage" aria-label="Headwater Basin Gage"
           @click="tabClicked">
           Headwater Basin Gage</td>
       </tr>
@@ -12,29 +12,29 @@
         <td><i v-if="userCalibrationRunData?.external_data_status?.forcing"
             :class="userCalibrationRunData?.external_data_status?.forcing ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td class="ptype" data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing</td>
+        <td data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.external_data_status?.observational"
             :class="userCalibrationRunData?.external_data_status?.observational ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td class="ptype" data-tab="2" title="Observational" aria-label="Observational" @click="tabClicked">Observational</td>
+        <td data-tab="2" title="Observational" aria-label="Observational" @click="tabClicked">Observational</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.external_data_status?.geopackage"
             :class="userCalibrationRunData?.external_data_status?.geopackage ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td class="ptype" data-tab="2" title="Geopackage" aria-label="Geopackage" @click="tabClicked">Geopackage</td>
+        <td data-tab="2" title="Geopackage" aria-label="Geopackage" @click="tabClicked">Geopackage</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length"
             :class="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td class="ptype" data-tab="3" title="Formulation" aria-label="Formulation" @click="tabClicked">Formulation</td>
+        <td data-tab="3" title="Formulation" aria-label="Formulation" @click="tabClicked">Formulation</td>
       </tr>
       <tr>
         <td><i v-if="checkStartEndTimeValues()" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="4" title="Start and End Times" aria-label="Start and End Times"
+        <td data-tab="4" title="Start and End Times" aria-label="Start and End Times"
           @click="tabClicked">
           Start and End Times</td>
       </tr>
@@ -42,34 +42,34 @@
         <td><i v-if="userCalibrationRunData?.output_variable_to_calibrate.name &&
           userCalibrationRunData?.output_variable_to_calibrate.module" class="pi pi-check font-bold checkMark"></i>
         </td>
-        <td class="ptype whitespace-nowrap" data-tab="4" title="Calibration Output Variable"
+        <td data-tab="4" title="Calibration Output Variable"
           aria-label="Calibration Output Variable" @click="tabClicked">Calibration Output Variable</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.parameters_selected" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters"
+        <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters"
           @click="tabClicked">Tuning Parameters</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.optimization" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="5" title="Optimization Algorithm"
+        <td data-tab="5" title="Optimization Algorithm"
           aria-label="Optimization Algorithm" @click="tabClicked">Optimization Algorithm</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.objective_function" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="5" title="Objective Function" aria-label="Objective Function"
+        <td data-tab="5" title="Objective Function" aria-label="Objective Function"
           @click="tabClicked">
           Objective Function</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.stop_criteria" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="5" title="Calibration Stop Criteria"
+        <td data-tab="5" title="Calibration Stop Criteria"
           aria-label="Calibration Stop Criteria" @click="tabClicked">Calibration Stop Criteria</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.save_plot_iteration_frequency" class="pi pi-check font-bold checkMark"></i>
         </td>
-        <td class="ptype whitespace-nowrap" data-tab="5" title="Metrics and Plot Inteval"
+        <td data-tab="5" title="Metrics and Plot Inteval"
           aria-label="Metrics and Plot Inteval" @click="tabClicked">Metrics / Plot Inteval</td>
       </tr>
     </tbody>
