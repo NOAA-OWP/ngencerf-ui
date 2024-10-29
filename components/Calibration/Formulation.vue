@@ -266,7 +266,7 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 */
 const saveFormulationData = () => {
   if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
-    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Calibration Job Status is not in "Saved" or "Ready" status' });
+    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
     const save_formulation_response = saveFormulationTabData();
