@@ -270,14 +270,13 @@ const saveFormulationData = () => {
   toast.removeAllGroups()
   saveFormulationTabData().then( response => {
     if ( response.status == 200 ) {
-      if ( response?._data?.nwm_warning == false ) {
-        toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
-        fetchUserCalibrationRunData();
-      } else {
+      toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
+      if ( response?._data?.nwm_warning == true ) {
         useCalibrationFormulationTabSaveWarning( response?._data?.formulation_warning ?? {} ).forEach( warning => {
           toast.add({ severity: 'warn', summary: 'Formulation Tab Data Saved With Warning.', detail: warning, life: 10000 });
         });
-      }      
+      }   
+      fetchUserCalibrationRunData();   
     } else {
       useApiErrorResponsePreprocess( response ).forEach( message => {
         toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Formulation Tab Data Failed.', detail: message, life: 10000 });
