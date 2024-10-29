@@ -145,7 +145,7 @@ export const useGageStore = defineStore('GageStore', () => {
     if ( selectedObservationalValue.value ) savePayload['observational_source'] = selectedObservationalValue.value;
     if ( selectedGeopackageValue.value ) savePayload['geopackage_source'] = selectedGeopackageValue.value;
     
-    if ( Object.keys( savePayload ).length > 0 ) {
+    if ( Object.keys( savePayload ).length > 0 && savePayload.hasOwnProperty( "gage_id" ) ) {
       savePayload['calibration_run_id'] = calibrationJobId.value;
 
       const saveGageTabDataResponse = await makeProtectedApiCall<SaveGageTabResponse>(`${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
@@ -159,13 +159,15 @@ export const useGageStore = defineStore('GageStore', () => {
 
       geopackageImageUrl.value = saveGageTabDataResponse?._data?.geopackage_image_url ?? ""
 
-      return saveGageTabDataResponse?._data
+      return saveGageTabDataResponse
     } else {
       return Promise.resolve({
-        message: "Error saving Gage Tab Data",
-        validation_errors: { "Tab Error": ["Please select at least 1 field before saving."] },
-        calibration_run_id: calibrationJobId.value,
-        status: "error"
+        _data: {
+          message: "Please select a Gage ID before saving.",
+          calibration_run_id: calibrationJobId.value,
+          status: "error"
+        },
+        status: 400
       });
     }
   }
