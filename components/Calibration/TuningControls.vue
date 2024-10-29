@@ -137,7 +137,7 @@
 
 
   <div class="pr-2">
-    
+
     <div class="text-left">
       <div class="grid grid-cols-2 pb-3">
 
@@ -190,7 +190,7 @@
 
       </div>
     </div>
-    
+
     <div id="TuningDataList" class="mt-2 mb-10 overflow-auto max-h-[200px]" style="position: relative;">
 
       <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
@@ -234,7 +234,7 @@
       </DataTable>
       <!-- <div v-if="!isFormulationDataSaved()" class="overlay"></div> -->
     </div>
-    
+
   </div>
 
   <div class="grid grid-rows-1 mt-8 ActionButtonsBox" id="Tuningbuttons">
@@ -1077,7 +1077,31 @@ const validateTab = () => {
 }
 
 const compareTimeEntries = (txtDT: string, dT: Date) => {
-  return new Date(dT) === new Date(txtDT);
+  return new Date(dT).getTime() !== new Date(txtDT).getTime();
+}
+
+const restorePage = async () => {
+  // set calibration times
+  if (userCalibrationRunData?.value?.calibration_times) {
+    const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
+    simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+    simEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+    calStartTime.value = DateTime.fromISO(calibration_start_time, { zone: 'utc' });
+    calEndTime.value = DateTime.fromISO(calibration_end_time, { zone: 'utc' });
+  };
+
+  // set automatic validation times
+  if (userCalibrationRunData?.value?.validation_times) {
+    const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
+    avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+    avSimEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+    avCalStartTime.value = DateTime.fromISO(validation_start_time, { zone: 'utc' });
+    avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
+  };
+
+  if (selectedOutputVariable.value !== null &&
+    selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
+  }
 }
 
 const gotoNext = () => {
@@ -1114,7 +1138,7 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
   if (!nextPrevDialogOpened.value) {
     dialog.open(MoveNextPrevDialog, {
       props: {
-        header: next ? "Go to next tab?" : "Go to previous tab?",
+        header: "Unsaved changes!",
         style: {
           width: 'auto',
         },
@@ -1136,6 +1160,7 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
   if (opt.data.moveToNextResponse) {
+    restorePage();
     if (opt.data.goNext) {
       gotoNext();
     } else {

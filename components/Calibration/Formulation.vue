@@ -174,17 +174,13 @@ import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
-<<<<<<< HEAD
-import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
-=======
 import { useCalibrationFormulationTabSaveWarning, useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
->>>>>>> development
 
 const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
@@ -301,6 +297,7 @@ const resetFormulationData = () => {
   resetUserSelectionFormulation()
 }
 
+
 const validateTab = () => {
   let error = false;
   let text = [];
@@ -338,6 +335,19 @@ const validateTab = () => {
   return { error: error, text: text }
 }
 
+const restorePage = () => {
+  if(userCalibrationRunData?.modules){
+    selectedModuleValues.value = userCalibrationRunData?.modules;
+  }  
+  if(userCalibrationRunData?.formulation_name) {
+    formulationNameInput.value = userCalibrationRunData?.formulation_name
+  }
+  if(userCalibrationRunData) {
+    useSlothParameters.value = userCalibrationRunData?.use_sloth;
+    slothParameterInputs.value = userCalibrationRunData?.sloth_parameters;
+  }  
+}
+
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
@@ -371,7 +381,7 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
   if (!nextPrevDialogOpened.value) {
     dialog.open(MoveNextPrevDialog, {
       props: {
-        header: next ? "Go to next tab?" : "Go to previous tab?",
+        header: "Unsaved changes!",
         style: {
           width: 'auto',
         },
@@ -393,6 +403,7 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
   if (opt.data.moveToNextResponse) {
+    restorePage();
     if (opt.data.goNext) {
       gotoNext();
     } else {

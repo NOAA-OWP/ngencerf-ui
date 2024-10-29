@@ -10,7 +10,7 @@
       Stay on tab
     </button> &nbsp;
     <button class="ngenButtonDiv" @click="stayOnTab(true)">
-      Go to {{ goNext ? 'next' : 'previous'  }} tab
+      Discard changes
     </button>
   </div>
 </template>

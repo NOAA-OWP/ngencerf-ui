@@ -30,7 +30,8 @@
                               <Column field="name" header="Parameter" sortable></Column>
                               <Column field="value" header="Initial Value" sortable>
                                  <template #editor="{ index }">
-                                    <InputNumber v-model="uiOptimizationInputs[index].value" inputId="locale-us" locale="en-US" :minFractionDigits="2" fluid autofocus class="w-12 p-1">
+                                    <InputNumber v-model="uiOptimizationInputs[index].value" inputId="locale-us"
+                                       locale="en-US" :minFractionDigits="2" fluid autofocus class="w-12 p-1">
                                     </InputNumber>
                                  </template>
                               </Column>
@@ -303,16 +304,16 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
 */
 const saveOptMetData = () => {
    toast.removeAllGroups()
-   saveOptimizationTabData().then( response => {
-    if ( response.status == 200 ) {
-      toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?._data?.message, life: 5000 });
-      fetchUserCalibrationRunData()
-    } else {
-      useApiErrorResponsePreprocess( response ).forEach( message => {
-        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message, life: 10000 });
-      });
-    }
-  });
+   saveOptimizationTabData().then(response => {
+      if (response.status == 200) {
+         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?._data?.message, life: 5000 });
+         fetchUserCalibrationRunData()
+      } else {
+         useApiErrorResponsePreprocess(response).forEach(message => {
+            toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message, life: 10000 });
+         });
+      }
+   });
 };
 
 const validateTab = () => {
@@ -321,33 +322,52 @@ const validateTab = () => {
    if (userCalibrationRunData?.optimization !== uiOptimization.value) {
       error = true;
       text.push("Optimization Algorithm has been changed");
-   }   
+   }
    if (userCalibrationRunData?.objective_function !== uiObjectiveFunction.value) {
       error = true;
       text.push("Objective Function has been changed");
    }
-
    if (userCalibrationRunData?.stop_criteria !== uiStopCriteria.value) {
       error = true;
       text.push("Calibration Stop Criteria has been changed");
    }
-
    if (userCalibrationRunData?.save_plot_iteration_frequency !== uiPlotFrequency.value) {
       error = true;
       text.push("Plot Generation Frequency has been changed");
    }
-
-   if (userCalibrationRunData?.objective_function !== uiObjectiveFunction.value) {
-      error = true;
-      text.push("Algorithm Parameters have been changed");
-   }
-
    if (userCalibrationRunData?.optimization_inputs.length !== uiOptimizationInputs.value.length) {
       error = true;
       text.push("Algorithm Parameters have been changed");
    }
 
+   if ((userCalibrationRunData?.streamflow_threshold || null) !== (uiStreamFlowThreshold.value || null)) {
+      error = true;
+      text.push("Calculate Categorical Metrics (Flow Threshold) has been changed");
+   }
+
+   if ((userCalibrationRunData?.peak_flow_threshold || null) !== (uiPeakFlowThreshold.value || null)) {
+      error = true;
+      text.push("Calculate Event Based Metrics (Peak Flow Threshold) has been changed");
+   }
+
+   uiOptimizationInputs.value.every((module, index) => {
+      if (userCalibrationRunData?.optimization_inputs[index].name !== module.name ||
+         userCalibrationRunData?.optimization_inputs[index].value !== module.value) {
+         error = true;
+         text.push("Selected Modules or their values have been changed");
+      }
+   })
    return { error: error, text: text }
+}
+
+const restorePage = async () => {
+   if (userCalibrationRunData) {
+      uiOptimization.value = userCalibrationRunData?.optimization;
+      uiObjectiveFunction.value = userCalibrationRunData?.objective_function;
+      uiStopCriteria.value = userCalibrationRunData?.stop_criteria;
+      uiPlotFrequency.value = userCalibrationRunData?.save_plot_iteration_frequency;
+      uiOptimizationInputs.value = userCalibrationRunData?.optimization_inputs;
+   }
 }
 
 const gotoNext = () => {
@@ -381,11 +401,11 @@ const goPrevTab = () => {
    }
 };
 
-const showPrevNextDialog = (body: string[], next: boolean ) => {
+const showPrevNextDialog = (body: string[], next: boolean) => {
    if (!nextPrevDialogOpened.value) {
       dialog.open(MoveNextPrevDialog, {
          props: {
-            header: next ? "Go to next tab?" : "Go to previous tab?",
+            header: "Unsaved changes!",
             style: {
                width: 'auto',
             },
@@ -407,11 +427,12 @@ const showPrevNextDialog = (body: string[], next: boolean ) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
    if (opt.data.moveToNextResponse) {
+      restorePage();
       if (opt.data.goNext) {
-      gotoNext();
-    } else {
-      gotoPrev();
-    }
+         gotoNext();
+      } else {
+         gotoPrev();
+      }
    }
 }
 </script>

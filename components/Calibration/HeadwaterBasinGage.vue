@@ -213,14 +213,14 @@ const showForcingFileUploadDialog = (headerText: string) => {
 }
 
 const handleDialogClose = (opt: any) => {
-  if ( opt && opt.data ) {
-    if ( opt.data.saveFileResponseResult.status == 200 ) {
+  if (opt && opt.data) {
+    if (opt.data.saveFileResponseResult.status == 200) {
       toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 })
     } else {
-      useApiErrorResponsePreprocess( opt.data.saveFileResponseResult ).forEach( message => {
-        toast.add({ severity: useApiResponseToastSeverityCode( opt.data.saveFileResponseResult?.status ), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
+      useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
+        toast.add({ severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
       });
-    }    
+    }
   } else {
     toast.add({ severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: 10000 })
   }
@@ -308,13 +308,13 @@ const toggle_isNWMv3 = () => {
 
 const saveTabData = () => {
   toast.removeAllGroups();
-  saveGageTabData().then( response => {
-    if ( response.status == 200 ) {
+  saveGageTabData().then(response => {
+    if (response.status == 200) {
       toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?._data?.message, life: 3000 });
       fetchUserCalibrationRunData()
     } else {
-      useApiErrorResponsePreprocess( response ).forEach( message => {
-        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
       });
     }
   });
@@ -327,28 +327,28 @@ const resetTabData = () => {
 const validateTab = () => {
   let error = false;
   let text = [];
-  if( userCalibrationRunData?.value?.gage.gage_id && (userCalibrationRunData?.value?.gage.gage_id !== selectedGageValue.value) ) {
+  if (userCalibrationRunData?.value?.gage.gage_id && (userCalibrationRunData?.value?.gage.gage_id !== selectedGageValue.value)) {
     error = true;
     text.push("Gage value has been changed");
   }
-  return {error: error, text: text}
+  return { error: error, text: text }
 }
 
 const goNextTab = () => {
   const errors = validateTab();
-  if(errors.error) {
+  if (errors.error) {
     showPrevNextDialog(errors.text, true);
   } else {
     gotoNext();
   }
-  
+
 };
 
 const showPrevNextDialog = (body: string[], next: boolean) => {
   if (!nextPrevDialogOpened.value) {
     dialog.open(MoveNextPrevDialog, {
       props: {
-        header: "Go to next tab?",
+        header: "Unsaved changes!",
         style: {
           width: 'auto',
         },
@@ -368,7 +368,11 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 }
 
 const handleNextPrevDialogClose = (opt: any) => {
-  if( opt.data.moveToNextResponse ) {
+  if (opt.data.moveToNextResponse) {
+    if (userCalibrationRunData?.value?.gage.gage_id) {
+      selectedGageValue.value = userCalibrationRunData?.value?.gage.gage_id;
+    }
+
     gotoNext();
   }
 }
