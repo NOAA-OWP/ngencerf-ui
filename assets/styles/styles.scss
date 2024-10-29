@@ -81,7 +81,8 @@ input::-webkit-input-placeholder {
   margin-top: 20px;
 }
 .h-screen-inner {
-  height: Calc(100vh - 180px);
+  /*height: Calc(100vh - 180px);*/
+  height: Calc(100vh - 270px);
 }
 .h-screen-inner-less {
   height: Calc(100vh - 240px);
