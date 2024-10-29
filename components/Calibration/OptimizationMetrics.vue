@@ -154,6 +154,7 @@ import { onMounted, onUnmounted } from "vue";
 
 import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
+import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore"
 
@@ -304,17 +305,14 @@ const saveOptMetData = () => {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
-    const save_optimization_response = saveOptimizationTabData()
-    save_optimization_response.then((response) => {
-      if (response?.validation_errors) {
-        useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-          toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: message });
-        })
-      } else if (response?.response_type == 'error') {
-        toast.add({ severity: "error", summary: 'Error Saving Optimization Metrics Tab Data', detail: response?.message });
+    saveOptimizationTabData().then( response => {
+      if ( response.status == 200 ) {
+        toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?._data?.message});
+        fetchUserCalibrationRunData();
       } else {
-        toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?.message });
-        fetchUserCalibrationRunData()
+        useApiErrorResponsePreprocess( response ).forEach( message => {
+          toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message});
+        });
       }
     });
   }

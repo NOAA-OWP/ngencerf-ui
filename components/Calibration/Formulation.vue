@@ -170,7 +170,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
-import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
+import { useCalibrationFormulationTabSaveWarning, useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
 const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
@@ -269,15 +269,19 @@ const saveFormulationData = () => {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
-    const save_formulation_response = saveFormulationTabData();
-    save_formulation_response.then((response) => {
-      if (response?.validation_errors) {
-        useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-          toast.add({ severity: "error", summary: response?.message, detail: message })
-        })
+    saveFormulationTabData().then( response => {
+      if ( response.status == 200 ) {
+        toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
+        if ( response?._data?.nwm_warning == true ) {
+          useCalibrationFormulationTabSaveWarning( response?._data?.formulation_warning ?? {} ).forEach( warning => {
+            toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning });
+          });
+        }   
+        fetchUserCalibrationRunData();   
       } else {
-        toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
-        fetchUserCalibrationRunData();
+        useApiErrorResponsePreprocess( response ).forEach( message => {
+          toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Formulation Tab Data Failed.', detail: message});
+        });
       }
     });
   }
