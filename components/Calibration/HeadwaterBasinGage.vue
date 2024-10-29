@@ -95,8 +95,7 @@
           <div class="grid grid-cols-8">
             <span>
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()"
-                :disabled="!isCalibrationJobStatusSavedOrReady(calibrationStatus)">
+                <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
                   Save
                 </button>
               </div>
@@ -275,7 +274,7 @@ const showGeopackageFileUploadDialog = (headerText: string) => {
         handleDialogClose(opt)
       },
     })
-    fileUploadDialogOpened.value = true
+    fileUploadDialogOpened.value = true;
   }
 }
 
@@ -288,26 +287,29 @@ const gotoNext = () => {
 /**
  * follow section waiting further detail to be implemented
  */
-const selected_rfc = ref<string>("")
+const selected_rfc = ref<string>("");
 
 const toggle_isNWMv3 = () => {
 
-}
+};
 
 const saveTabData = () => {
-  toast.removeAllGroups();
-  const save_tab_response = saveGageTabData();
-  save_tab_response.then((response) => {
-    if (response?.validation_errors) {
-      useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-        toast.add({ severity: "error", summary: 'Error Saving Gage Tab Data', detail: message });
-      })
-    } else {
-      toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 });
-      fetchUserCalibrationRunData()
-    }
-  })
-
+  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Calibration Job Status is not in "Saved" or "Ready" status' });
+  } else {
+    toast.removeAllGroups();
+    const save_tab_response = saveGageTabData();
+    save_tab_response.then((response) => {
+      if (response?.validation_errors) {
+        useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
+          toast.add({ severity: "error", summary: 'Error Saving Gage Tab Data', detail: message });
+        })
+      } else {
+        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?.message, life: 3000 });
+        fetchUserCalibrationRunData()
+      }
+    });
+  }
 };
 
 const resetTabData = () => {

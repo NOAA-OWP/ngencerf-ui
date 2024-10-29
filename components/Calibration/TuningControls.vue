@@ -237,8 +237,7 @@
     <div id="TuningBottomButtons" class="grid grid-cols-8">
       <span>
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-          <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()"
-          :disabled="!isCalibrationJobStatusSavedOrReady(calibrationStatus)">
+          <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()">
             Save
           </button>
         </div>
@@ -959,7 +958,7 @@ const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_optimizationMetrics];
   e.click();
-}
+};
 
 /**
   * Save Tuning Tab data
@@ -990,15 +989,19 @@ const saveTuningData = () => {
     }
   };
 
-  // check if Tuning Tab data is validated before saving
-  if (isTuningTabDataValidated()) {
-    handleSaveTuningTab();
+  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Calibration Job Status is not in "Saved" or "Ready" status' });
   } else {
-    toast.add({
-      severity: 'warn',
-      summary: 'Tuning Data Is Not Valid',
-      detail: 'You must provide valid calibration times, validation times, output variable to calibrate, or calibration tuning parameters before saving.',
-    });
+    // check if Tuning Tab data is validated before saving
+    if (isTuningTabDataValidated()) {
+      handleSaveTuningTab();
+    } else {
+      toast.add({
+        severity: 'warn',
+        summary: 'Tuning Data Is Not Valid',
+        detail: 'You must provide valid calibration times, validation times, output variable to calibrate, or calibration tuning parameters before saving.',
+      });
+    }
   }
 };
 

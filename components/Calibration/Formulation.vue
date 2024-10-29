@@ -127,8 +127,7 @@
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3 ActionButtonsBox">
         <span>
           <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-            <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()"
-            :disabled="!isCalibrationJobStatusSavedOrReady(calibrationStatus)">
+            <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
               Save
             </button>
           </div>
@@ -266,22 +265,26 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 * event bus for calibration button group click
 */
 const saveFormulationData = () => {
-  toast.removeAllGroups()
-  const save_formulation_response = saveFormulationTabData();
-  save_formulation_response.then((response) => {
-    if (response?.validation_errors) {
-      useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-        toast.add({ severity: "error", summary: response?.message, detail: message })
-      })
-    } else {
-      toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
-      fetchUserCalibrationRunData();
-    }
-  })
+  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Calibration Job Status is not in "Saved" or "Ready" status' });
+  } else {
+    toast.removeAllGroups();
+    const save_formulation_response = saveFormulationTabData();
+    save_formulation_response.then((response) => {
+      if (response?.validation_errors) {
+        useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
+          toast.add({ severity: "error", summary: response?.message, detail: message })
+        })
+      } else {
+        toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
+        fetchUserCalibrationRunData();
+      }
+    });
+  }
 }
 
 const resetFormulationData = () => {
-  resetUserSelectionFormulation()
+  resetUserSelectionFormulation();
 }
 
 const goNextTab = () => {
