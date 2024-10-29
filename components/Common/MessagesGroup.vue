@@ -74,7 +74,7 @@
             {{ formatDate(calData?.validation_times?.validation_end_time) }}</div>
           </p>
           <p>&nbsp;</p>
-          <p v-if="userSelectedCalibrationTuningParameters">
+          <p v-if="userSelectedCalibrationTuningParameters && userSelectedCalibrationTuningParameters.length > 0">
             <span class="font-medium">Tuning Parameters:</span> 
             {{ userSelectedCalibrationTuningParameters.length }}</p>
           <p v-if="calData?.objective_function"><span class="font-medium">Objective Function:</span> 

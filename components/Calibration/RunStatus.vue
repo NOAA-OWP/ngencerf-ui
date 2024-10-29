@@ -79,15 +79,15 @@
         <span v-else>
           <div id="StausRunBottomButtons" class="grid grid-cols-8">
             <span v-if="userCalibrationRunData?.status !== 'Running'">
-            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-              <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
-                Run
-              </button>
-            </div>
-          </span>
-          <span v-else>
-            <div class="col-span-1 mr-6 h-8">&nbsp;</div>
-          </span>
+              <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+                <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
+                  Run
+                </button>
+              </div>
+            </span>
+            <span v-else>
+              <div class="col-span-1 mr-6 h-8">&nbsp;</div>
+            </span>
             <div class="col-span-1 mr-3">
               <button class="c-blue font-normal text-xl underline pt-1" title="Cancel Button" @click="cancelRun()"
                 aria-label="Cancel Button">Cancel</button>
@@ -226,11 +226,12 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       // Create an interval to update calibrationStatus every 10 seconds until status is not Running
       if (!statusIntervalId) {
         statusIntervalId = setInterval(async () => {
-          await fetchUserCalibrationRunData();
+          let getCalibrationStatusResponse = await queryGetCalibrationStatus();
+          console.log('getCalibrationStatusResponse:', getCalibrationStatusResponse);
 
-          if (userCalibrationRunData.value && userCalibrationRunData.value.status) {
+          if (getCalibrationStatusResponse && getCalibrationStatusResponse.status) {
             // if Calibration status changes, clear intervals, and set progress to null
-            if (userCalibrationRunData.value?.status !== 'Running') {
+            if (getCalibrationStatusResponse.status !== 'Running') {
               clearInterval(runningTimeIntervalId);
               clearInterval(statusIntervalId);
             }

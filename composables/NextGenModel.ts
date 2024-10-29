@@ -426,6 +426,13 @@ export interface CalibrationStatus {
   calibration_run_id: number;
   status: string;
   errors: string[];
+  validations: Validations;
+}
+
+export interface Validations {
+  validation_run_id: number;
+  status: string;
+  validation_type: string;
 }
 
 export interface CalibrationPlotListNamesData {
