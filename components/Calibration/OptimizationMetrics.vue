@@ -188,7 +188,7 @@ const {
    getOptimizationInputUserData,
 } = storeToRefs(optimizationStore);
 const { loadOptimizationTabStaticData, saveOptimizationTabData, resetOptimizationInputs, resetUserSelectionOptimization } = optimizationStore;
-const { fetchUserCalibrationRunData } = useUserDataStore();
+const { fetchUserCalibrationRunData, userCalibrationRunData } = useUserDataStore();
 const { getCalibrationTabIndex } = generalStore();
 const toast = useToast();
 
@@ -318,6 +318,40 @@ const saveOptMetData = () => {
    })
 };
 
+const validateTab = () => {
+   let error = false;
+   let text = [];
+   if (userCalibrationRunData?.optimization !== uiOptimization.value) {
+      error = true;
+      text.push("Optimization Algorithm has been changed");
+   }   
+   if (userCalibrationRunData?.objective_function !== uiObjectiveFunction.value) {
+      error = true;
+      text.push("Objective Function has been changed");
+   }
+
+   if (userCalibrationRunData?.stop_criteria !== uiStopCriteria.value) {
+      error = true;
+      text.push("Calibration Stop Criteria has been changed");
+   }
+
+   if (userCalibrationRunData?.save_plot_iteration_frequency !== uiPlotFrequency.value) {
+      error = true;
+      text.push("Plot Generation Frequency has been changed");
+   }
+
+   if (userCalibrationRunData?.objective_function !== uiObjectiveFunction.value) {
+      error = true;
+      text.push("Algorithm Parameters have been changed");
+   }
+
+   if (userCalibrationRunData?.optimization_inputs.length !== uiOptimizationInputs.value.length) {
+      error = true;
+      text.push("Algorithm Parameters have been changed");
+   }
+
+   return { error: error, text: text }
+}
 
 const gotoNext = () => {
    const tabs = document.getElementsByClassName("tabs");
@@ -333,24 +367,24 @@ const gotoPrev = () => {
 
 
 const goNextTab = () => {
-   const errors = validateOptimizationMetricssTab();
+   const errors = validateTab();
    if (errors.error) {
-      showPrevNextDialog(errors.text);
+      showPrevNextDialog(errors.text, true);
    } else {
       gotoNext();
    }
 };
 
 const goPrevTab = () => {
-   const errors = validateOptimizationMetricssTab();
+   const errors = validateTab();
    if (errors.error) {
-      showPrevNextDialog(errors.text);
+      showPrevNextDialog(errors.tex, falset);
    } else {
       gotoPrev();
    }
 };
 
-const showPrevNextDialog = (body: string[]) => {
+const showPrevNextDialog = (body: string[], next: boolean ) => {
    if (!nextPrevDialogOpened.value) {
       dialog.open(MoveNextPrevDialog, {
          props: {
@@ -361,7 +395,8 @@ const showPrevNextDialog = (body: string[]) => {
             modal: true,
          },
          data: {
-            body: body
+            body: body,
+            direction: next
          },
          onClose: (opt) => {
             nextPrevDialogOpened.value = false;
@@ -375,7 +410,11 @@ const showPrevNextDialog = (body: string[]) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
    if (opt.data.moveToNextResponse) {
+      if (opt.data.goNext) {
       gotoNext();
+    } else {
+      gotoPrev();
+    }
    }
 }
 </script>

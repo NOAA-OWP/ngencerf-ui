@@ -1014,54 +1014,66 @@ const validateTab = () => {
   /* Check the DateTimes */
   let error = false;
   let text = [];
-  if (calStartTime.value !== userCalibrationRunData?.value?.calibration_times.calibration_start_time) {
+  if (userCalibrationRunData?.value?.calibration_times.simulation_start_time &&
+    compareTimeEntries(userCalibrationRunData?.value?.calibration_times.simulation_start_time, simStartTime.value)) {
+    error = true;
+    text.push("Simulation Start has been changed");
+  }
+  if (userCalibrationRunData?.value?.calibration_times.simulation_end_time &&
+    compareTimeEntries(userCalibrationRunData?.value?.calibration_times.simulation_end_time, simEndTime.value)) {
+    error = true;
+    text.push("Simulation End has been changed");
+  }
+  if (userCalibrationRunData?.value?.calibration_times.calibration_start_time &&
+    compareTimeEntries(userCalibrationRunData?.value?.calibration_times.calibration_start_time, calStartTime.value)) {
     error = true;
     text.push("Calibration Start has been changed");
   }
-  if (calEndTime.value !== userCalibrationRunData?.value?.calibration_times.calibration_end_time) {
+  if (userCalibrationRunData?.value?.calibration_times.calibration_end_time &&
+    compareTimeEntries(userCalibrationRunData?.value?.calibration_times.calibration_end_time, calEndTime.value)) {
     error = true;
     text.push("Calibration End has been changed");
   }
-  if (simStartTime.value !== userCalibrationRunData?.value?.calibration_times.simulation_start_time) {
+
+  if (userCalibrationRunData?.value?.validation_times.simulation_start_time &&
+    compareTimeEntries(userCalibrationRunData?.value?.validation_times.simulation_start_time, avSimStartTime.value)) {
     error = true;
     text.push("Simulation Start has been changed");
   }
-  if (simEndTime.value !== userCalibrationRunData?.value?.calibration_times.simulation_end_time) {
+  if (userCalibrationRunData?.value?.validation_times.simulation_end_time &&
+    compareTimeEntries(userCalibrationRunData?.value?.validation_times.simulation_end_time, avSimEndTime.value)) {
     error = true;
     text.push("Simulation End has been changed");
   }
-
-  if (avCalStartTime.value !== userCalibrationRunData?.value?.validation_times.validation_start_time) {
+  if (userCalibrationRunData?.value?.validation_times.validation_start_time &&
+    compareTimeEntries(userCalibrationRunData?.value?.validation_times.validation_start_time, avCalStartTime.value)) {
     error = true;
     text.push("Validation Start has been changed");
   }
-  if (avCalEndTime.value !== userCalibrationRunData?.value?.validation_times.validation_end_time) {
+  if (userCalibrationRunData?.value?.validation_times.validation_end_time &&
+    compareTimeEntries(userCalibrationRunData?.value?.validation_times.validation_end_time, avCalEndTime.value)) {
     error = true;
     text.push("Validation End has been changed");
   }
-  if (avSimStartTime.value !== userCalibrationRunData?.value?.validation_times.simulation_start_time) {
-    error = true;
-    text.push("Simulation Start has been changed");
-  }
-  if (avSimEndTime.value !== userCalibrationRunData?.value?.validation_times.simulation_end_time) {
+
+  if (userCalibrationRunData?.value?.validation_times.simulation_end_time &&
+    compareTimeEntries(userCalibrationRunData?.value?.validation_times.simulation_end_time, avSimEndTime.value)) {
     error = true;
     text.push("Simulation End has been changed");
   }
 
-  if (avSimEndTime.value !== userCalibrationRunData?.value?.validation_times.simulation_end_time) {
+  /* selectedOutputVariable */
+  if (selectedOutputVariable.value !== null &&
+    selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
     error = true;
-    text.push("Simulation End has been changed");
+    text.push("Output Variable to Calibrate has changed");
   }
 
-  if( selectedOutputVariable.value.name !== userCalibrationRunData?.value?.output_variable_to_calibrate.name) {
-    error = true;
-    text.push("Output Variable To Calibrate has changed")
-  }
-
-  let x = userSelectedCalibrationTuningParameters.value;
-  console.log(userSelectedCalibrationTuningParameters.value)
-  debugger;
   return { error: error, text: text }
+}
+
+const compareTimeEntries = (txtDT: string, dT: Date) => {
+  return new Date(dT) === new Date(txtDT);
 }
 
 const gotoNext = () => {
@@ -1079,7 +1091,7 @@ const gotoPrev = () => {
 const goNextTab = () => {
   const errors = validateTab();
   if (errors.error) {
-    showPrevNextDialog(errors.text);
+    showPrevNextDialog(errors.text, true);
   } else {
     gotoNext();
   }
@@ -1088,13 +1100,13 @@ const goNextTab = () => {
 const goPrevTab = () => {
   const errors = validateTab();
   if (errors.error) {
-    showPrevNextDialog(errors.text);
+    showPrevNextDialog(errors.text, false);
   } else {
     gotoPrev();
   }
 };
 
-const showPrevNextDialog = (body: string[]) => {
+const showPrevNextDialog = (body: string[], next: boolean) => {
   if (!nextPrevDialogOpened.value) {
     dialog.open(MoveNextPrevDialog, {
       props: {
@@ -1105,7 +1117,8 @@ const showPrevNextDialog = (body: string[]) => {
         modal: true,
       },
       data: {
-        body: body
+        body: body,
+        direction: next
       },
       onClose: (opt) => {
         nextPrevDialogOpened.value = false;
@@ -1119,7 +1132,11 @@ const showPrevNextDialog = (body: string[]) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
   if (opt.data.moveToNextResponse) {
-    gotoNext();
+    if (opt.data.goNext) {
+      gotoNext();
+    } else {
+      gotoPrev();
+    }
   }
 }
 </script>

@@ -321,10 +321,9 @@ const validateTab = () => {
   if (useSlothParameters.value !== userCalibrationRunData?.use_sloth) {
     error = true;
     text.push("Add SLoth output has changed");
-  }  
+  }
   /* has the number of SLoTH vars changed? */
-  let x = slothParameterInputs.value;
-  if (useSlothParameters.value.length !== userCalibrationRunData?.sloth_parameters.length) {
+  if (slothParameterInputs.value.length !== userCalibrationRunData?.sloth_parameters.length) {
     error = true;
     text.push("Add SLoth variable list has changed");
   }
@@ -345,7 +344,7 @@ const gotoPrev = () => {
 const goNextTab = () => {
   const errors = validateTab();
   if (errors.error) {
-    showPrevNextDialog(errors.text);
+    showPrevNextDialog(errors.text, true);
   } else {
     gotoNext();
   }
@@ -354,13 +353,13 @@ const goNextTab = () => {
 const goPrevTab = () => {
   const errors = validateTab();
   if (errors.error) {
-    showPrevNextDialog(errors.text);
+    showPrevNextDialog(errors.text, false);
   } else {
     gotoPrev();
   }
 };
 
-const showPrevNextDialog = (body: string[]) => {
+const showPrevNextDialog = (body: string[], next: boolean) => {
   if (!nextPrevDialogOpened.value) {
     dialog.open(MoveNextPrevDialog, {
       props: {
@@ -371,7 +370,8 @@ const showPrevNextDialog = (body: string[]) => {
         modal: true,
       },
       data: {
-        body: body
+        body: body,
+        direction: next
       },
       onClose: (opt) => {
         nextPrevDialogOpened.value = false;
@@ -385,7 +385,11 @@ const showPrevNextDialog = (body: string[]) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
   if (opt.data.moveToNextResponse) {
-    gotoNext();
+    if (opt.data.goNext) {
+      gotoNext();
+    } else {
+      gotoPrev();
+    }
   }
 }
 

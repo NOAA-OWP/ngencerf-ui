@@ -10,7 +10,7 @@
       Stay on tab
     </button> &nbsp;
     <button class="ngenButtonDiv" @click="stayOnTab(true)">
-      Go to next tab
+      Go to {{ goNext ? 'next' : 'previous'  }} tab
     </button>
   </div>
 </template>
@@ -18,11 +18,12 @@
 <script lang="ts" setup>
 import { inject, onMounted } from 'vue';
 const dialogRef = inject<any>('dialogRef')
-const params = ref<string>("")
+const params = ref<string>("");
+const goNext = ref<boolean>();
 
 onMounted(() => {
-  console.log("Mounted: MoveNextPrevDialog")
   params.value = dialogRef.value.data.body; // {user: 'primetime'}
+  goNext.value = dialogRef.value.data.direction;
   console.log(params);
 })
 
@@ -30,7 +31,8 @@ const stayOnTab = (w: boolean) => {
   const moveToNextResponse = dialogRef.value.data;
   dialogRef.value.data = true;
     dialogRef.value.close({
-      moveToNextResponse: w
+      moveToNextResponse: w,
+      goNext: goNext.value
     });
 }
 

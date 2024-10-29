@@ -331,14 +331,14 @@ const validateTab = () => {
 const goNextTab = () => {
   const errors = validateTab();
   if(errors.error) {
-    showPrevNextDialog(errors.text);
+    showPrevNextDialog(errors.text, true);
   } else {
     gotoNext();
   }
   
 };
 
-const showPrevNextDialog = (body: string[]) => {
+const showPrevNextDialog = (body: string[], next: boolean) => {
   if (!nextPrevDialogOpened.value) {
     dialog.open(MoveNextPrevDialog, {
       props: {
@@ -349,7 +349,8 @@ const showPrevNextDialog = (body: string[]) => {
         modal: true,
       },
       data: {
-        body: body
+        body: body,
+        direction: next
       },
       onClose: (opt) => {
         nextPrevDialogOpened.value = false;
