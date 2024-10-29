@@ -116,7 +116,10 @@ onMounted(async () => {
 
     if (iterations.value?._data.iteration_data) {
         for (let o = 0; o < iterationOptions.length; o++) {
-            plotList.value.push({'name': iterationOptions[o], 'description': ''});
+            let plotListItem = {'name': iterationOptions[o], 'description': ''};
+            if (!plotList.value.includes(plotListItem)) {
+                plotList.value.push(plotListItem);
+            }
         }
     }
     console.log('plotList:', plotList.value);
@@ -129,6 +132,11 @@ onMounted(async () => {
         for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
             let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
             iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
+            if (iterationMetricsRecord[metric_name] === null) {
+                iterationMetricsRecord[metric_name] = 'N/A';
+            } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
+                iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
+            }
             if (i == 0) {
                 iterationMetricsColumns.push({text: metric_name, value: metric_name});
             }
@@ -138,6 +146,11 @@ onMounted(async () => {
         for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
             let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
             iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
+            if (iterationParamsRecord[param_name] === null) {
+                iterationParamsRecord[param_name] = 'N/A';
+            } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
+                iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
+            }
             if (i == 0) {
                 iterationParamsColumns.push({text: param_name, value: param_name});
             }
