@@ -1,7 +1,7 @@
 <template>
   <div id="Messages">
     <div class="">
-      <h2 class="mt-5">Calibration Run Setup</h2>
+      <h2 class="mt-5">{{ componentProps.title }}</h2>
 
       <div class="grid grid-cols-2 gap=1 text-sm mt-4">
         <div class="col-span-1">
@@ -93,12 +93,21 @@ import { storeToRefs } from 'pinia';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
+import { defineProps, withDefaults } from 'vue';
+import type { ComponentPropsTitle } from '~/composables/NextGenModel'; //why doesn't this work?
 
 const calRunStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(calRunStore);
 const calData = ref(userCalibrationRunData);
 const tuningStore = useTuningStore();
 const { userSelectedCalibrationTuningParameters } = storeToRefs(tuningStore);
+
+const componentProps = withDefaults(defineProps<{
+    title: string
+  }>(), {
+    title: 'Calibration Run Setup'
+  }
+);
 
 const getModuleList = () => {
   let modules = "";

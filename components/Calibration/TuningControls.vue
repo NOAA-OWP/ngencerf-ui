@@ -136,9 +136,9 @@
   </div>
 
 
-  <div class="grid grid-rows-2 pr-2">
-
-    <div class="row-span-1 text-left">
+  <div class="pr-2">
+    
+    <div class="text-left">
       <div class="grid grid-cols-2 pb-3">
 
         <div class="col-span-2">
@@ -166,7 +166,7 @@
           </div>
         </div>
 
-        <div class="col-span-2 mt-2">
+        <div class="col-span-1 mt-2">
           <div class="text-left mt-2">
             <div class="font-bold">Calibratable Parameters</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
@@ -184,11 +184,14 @@
 
         </div>
 
+        <div class="col-span-1 mt-2 relative">
+          <button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg">Clear</button>
+        </div>
+
       </div>
     </div>
-
-    <div id="TuningDataList" class="mt-2 mb-2 overflow-auto max-h-[200px]" style="position: relative;">
-      <!-- <div class="text-right mb-1 mr-2"><button class="c-blue font-normal  underline">Clear</button></div> -->
+    
+    <div id="TuningDataList" class="mt-2 mb-10 overflow-auto max-h-[200px]" style="position: relative;">
 
       <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
         :model="cmTuningParameterData"></ContextMenu>
@@ -231,6 +234,7 @@
       </DataTable>
       <!-- <div v-if="!isFormulationDataSaved()" class="overlay"></div> -->
     </div>
+    
   </div>
 
   <div class="grid grid-rows-1 mt-8 ActionButtonsBox" id="Tuningbuttons">
