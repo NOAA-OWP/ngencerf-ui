@@ -388,7 +388,7 @@ const showPrevNextDialog = (body: string[], next: boolean ) => {
    if (!nextPrevDialogOpened.value) {
       dialog.open(MoveNextPrevDialog, {
          props: {
-            header: "Go to next tab?",
+            header: next ? "Go to next tab?" : "Go to previous tab?",
             style: {
                width: 'auto',
             },
