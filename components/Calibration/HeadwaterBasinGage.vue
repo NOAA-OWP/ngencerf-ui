@@ -178,7 +178,7 @@ const onGageSelectionChange = () => {
 }
 
 const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
-  if (e && e.value === 'Upload') {
+  if (e && e.value === 'User Upload') {
     showForcingFileUploadDialog('Forcing Files')
   }
 }
@@ -217,7 +217,7 @@ const handleDialogClose = (opt: any) => {
 }
 
 const uploadObservationalDlgOpen = (e: SelectChangeEvent) => {
-  if (e && e.value === 'Upload') {
+  if (e && e.value === 'User Upload') {
     showObservationalFileUploadDialog('Observational File')
   }
 }
@@ -249,7 +249,7 @@ const showObservationalFileUploadDialog = (headerText: string) => {
 }
 
 const uploadGeopackageDlgOpen = (e: SelectChangeEvent) => {
-  if (e && e.value === 'Upload') {
+  if (e && e.value === 'User Upload') {
     showGeopackageFileUploadDialog('Geopackage File')
   }
 }
