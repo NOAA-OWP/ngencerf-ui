@@ -308,11 +308,11 @@ const saveTabData = () => {
     toast.removeAllGroups();
     saveGageTabData().then( response => {
       if ( response.status == 200 ) {
-        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?._data?.message, life: 3000 });
-        fetchUserCalibrationRunData()
+        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?._data?.message});
+        fetchUserCalibrationRunData();
       } else {
         useApiErrorResponsePreprocess( response ).forEach( message => {
-          toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
+          toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Gage Tab Data Failed.', detail: message });
         });
       }
     });
