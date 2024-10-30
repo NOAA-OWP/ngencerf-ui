@@ -90,7 +90,7 @@
 <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
   <div class="row-span-1">
           <div id="StausRunBottomButtons" class="grid grid-cols-8">
-            <span v-if="userCalibrationRunData?.status !== 'Running'">
+            <span v-if="calibrationStatus !== 'Running'">
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                 <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
                   Run
@@ -100,10 +100,16 @@
             <span v-else>
               <div class="col-span-1 mr-6 h-8">&nbsp;</div>
             </span>
-            <div class="col-span-1 mr-3"><!--c-blue font-normal text-xl underline pt-1-->
-              <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelRun()"
-                aria-label="Cancel Button">Cancel</button>
-            </div>
+            <span v-if="calibrationStatus === 'Running'">
+              <div class="col-span-1 mr-3"><!--c-blue font-normal text-xl underline pt-1-->
+                <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelRun()" aria-label="Cancel Button">
+                  Cancel
+                </button>
+              </div>
+            </span>
+            <span v-else>
+              <div class="col-span-1 mr-3">&nbsp;</div>
+            </span>
             <div class="col-span-4">&nbsp;</div>
             <div class="col-span-1">&nbsp;</div>
             <div class="col-span-1 mr-4">
@@ -243,7 +249,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             } else {
               toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
             }
-          }, 10000);
+          }, 1000);
         }
       } else {
         toast.removeAllGroups();
@@ -274,7 +280,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       console.log('plotList:', plotList.value);
     } else {
       toast.removeAllGroups();
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names' });
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
     }
   }
 
@@ -313,7 +319,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       console.log('plotList:', plotList.value);
     } else {
       toast.removeAllGroups();
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names' });
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
     }
 
     // clear intervals and set stopCriteriaMet to true
@@ -391,7 +397,7 @@ watch(selectedPlotName, async () => {
       selectedPlotFileUrl.value = response?._data?.plot_url;
     } else {
       toast.removeAllGroups();
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot' });
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
     }
   } else {
     toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
