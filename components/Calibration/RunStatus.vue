@@ -90,7 +90,7 @@
 <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
   <div class="row-span-1">
           <div id="StatusRunBottomButtons" class="grid grid-cols-8">
-            <span v-if="calibrationStatus !== 'Submitted' && calibrationStatus !== 'Running'">
+            <span v-if="calibrationStatus === 'Ready">
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                 <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
                   Run
