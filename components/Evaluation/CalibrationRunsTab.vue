@@ -7,7 +7,8 @@
       <div class="waitgif" v-if="isLoadingCalibrationSummary">
         <img src="@/assets/styles/img/wait.gif" />
       </div>
-      <Button id="btn-new-validation" class="start actionBtn" v-if="userSelectedEvalCalibrationRunId > 0" @click.stop="navigateToNewValidation">New Validation</Button>
+      <Button id="btn-new-validation" class="start actionBtn" 
+        @click.stop="navigateToNewValidation">New Validation</Button>
       <div class="row-span-10" v-if="loadUserSelectedCalibrationValidationRunList.length <= 1">
         <div id="CalTable">
           <div class="grid grid-cols-2 mb-5">
@@ -110,9 +111,13 @@ const onEvalCalibrationRowUnSelect = ( event: any ) => {
 }
 
 const navigateToNewValidation = ( event : any ) => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[2];
-  e.click();
+  if ( userSelectedEvalCalibrationRunId.value > 0 ) {
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[2];
+    e.click();
+  } else {
+    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 3000 })
+  }
 }
 
 const rowStyle = (data: any) => {

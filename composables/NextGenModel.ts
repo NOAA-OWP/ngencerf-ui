@@ -482,15 +482,17 @@ export interface CalibrationRunIterationMetricData {
 }
 
 export interface AlternativeIterationCalibrationRunData {
-  worker: string;
-  iteration: string|number;
-  objective_function_value: string;
+  iteration_id: number;
+  worker_name: string;
+  iteration_num: number;
+  calibration_output_variable_value: number;
   [name: string]: string|number;
 }
 
 export interface AlternativeIterationTuningParameters {
-  worker: string;
-  iteration: string|number;
+  iteration_id: number;
+  worker_name: string;
+  iteration_num: number;
   [name: string]: string|number;
 }
 

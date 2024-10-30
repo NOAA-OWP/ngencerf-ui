@@ -34,15 +34,15 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
       body: JSON.stringify({ calibration_run_id: userCalibrationRunData?.value?.calibration_run_id })
     });
     
-    if ( runListDataResult._data.nwm_retrospective_data	) {
+    if ( runListDataResult._data['nwm_3.0_retrospective_data']	) {
       headerRow = [];
       headerRow.push({
         header: "NWM 3.0",
         colspan: 3
       });
-      runListDataResult._data.nwm_retrospective_data.forEach( ( nwm_retro_data : CalibrationRunIterationMetricData ) => {
+      runListDataResult._data['nwm_3.0_retrospective_data'].forEach( ( nwm_retro_data : CalibrationRunIterationMetricData ) => {
         headerRow.push({
-          header: `${nwm_retro_data.metric_value}`,
+          header: `${Number( nwm_retro_data.metric_value ).toFixed( 4 )}`,
           colspan: 1
         });
       });
@@ -73,7 +73,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           });
 
           headerRow.push({ 
-            header: `${iteration_data.calibration_output_variable_value}`,
+            header: `${Number( iteration_data.calibration_output_variable_value ).toFixed( 4 )}`,
             colspan: 1
           });
 
@@ -81,7 +81,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
             calibrationRunDetailTableColumn.value.push({ field: metric.metric_name, header: metric.metric_name });
 
             headerRow.push({ 
-              header: `${metric.metric_value}`,
+              header: `${Number( metric.metric_value ).toFixed( 4 )}`,
               colspan: 1
             });
           });
@@ -107,7 +107,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
             tuningParametersTableColumn.value.push({ field: parameter.parameter_name, header: parameter.parameter_name });
 
             headerRow.push({ 
-              header: `${parameter.parameter_value}`,
+              header: `${Number(parameter.parameter_value).toFixed(4)}`,
               colspan: 1
             });
           });
@@ -120,12 +120,12 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           rowData['iteration_id'] = iteration_data.iteration_id;        
           rowData['worker_name'] = iteration_data.worker_name;        
           rowData['iteration_num'] = iteration_data.iteration_num;        
-          rowData['calibration_output_variable_value'] = iteration_data.calibration_output_variable_value;
+          rowData['calibration_output_variable_value'] = Number( iteration_data.calibration_output_variable_value ).toFixed( 4 );
           
           iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {
-            rowData[ metric.metric_name ] = metric.metric_value;
+            rowData[ metric.metric_name ] = Number( metric.metric_value ).toFixed( 4 );
           });
-          computedCalibrationRunDetailDataList.value.push( rowData );
+          computedCalibrationRunDetailDataList.value.push( rowData );          
 
           //tuning parameter section
           rowData = {};
@@ -134,50 +134,12 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           rowData['iteration_num'] = iteration_data.iteration_num;
           
           iteration_data.parameters.forEach( ( parameters: CalibrationRunIterationParameterData ) => {
-            rowData[ parameters.parameter_name ] = parameters.parameter_value;
+            rowData[ parameters.parameter_name ] = Number( parameters.parameter_value ).toFixed( 4) ;
           });
           computedtuningParametersDataList.value.push( rowData );
-
         };
       });
     }
-
-    /*
-    const { data } = await useFetch<AlternativeIterationCalibrationRunData[]>('/api/evaluation/run_detail_data', {
-      'method': 'POST'
-    })
-    calibrationRunDetailDataList.value = data.value ?? [];
-    if ( calibrationRunDetailDataList.value ) {
-      calibrationRunDetailTableColumn.value = [];
-      let headerRow = <DynamicTableColumnHeader[]>[];
-      const rowData = calibrationRunDetailDataList.value[0];
-      
-      Object.keys( rowData ).forEach( key => {
-        calibrationRunDetailTableColumn.value.push({ field: key, header: key.charAt(0).toUpperCase() + key.slice(1) });
-      })
-      const subheader_spacer_colspan = headerRow.length - 2
-      calibrationRunDetailDataList.value.forEach( rowData => {
-        if ( isNumeric( rowData.iteration ) === false ) {
-          headerRow = [];
-          headerRow.push({
-            header: rowData.worker,
-            colspan: 1
-          });
-          headerRow.push({
-            header: String( rowData.iteration ),
-            colspan: 1
-          });
-          headerRow.push({
-            header: rowData.objective_function_value,
-            colspan: subheader_spacer_colspan
-          });
-          calibrationRunDetailDataListHeaders.value.push( headerRow );      
-        } else {
-          computedCalibrationRunDetailDataList.value.push( rowData );
-        }
-      });
-    }
-      */
   }
 
   /**

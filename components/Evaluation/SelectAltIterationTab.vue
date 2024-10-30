@@ -3,32 +3,34 @@
   <div class="row-span-1">           
     <div id="RunDetailsTbl" class="text-left mt-3 p-3">
       <div class="tableTitle">Run Details</div>
-      <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px"
-        table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable">
-        <template #header>
-        <table>
-        <tr v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index">
-          <th v-for="( col, colIndex ) in row" :key="colIndex" :colspan="col.colspan">{{ col.header }}</th>
-        </tr>
-        </table>
-        </template>
-        <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" sortable></Column>      
+      <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
+        table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow">
+        <ColumnGroup type="header">
+          <Row>
+            <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" sortable></Column>
+          </Row>
+          <Row v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index" :pt="{ id: index }">
+            <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan"></Column>
+          </Row>
+        </ColumnGroup>
+        <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :field="col.field" :hidden="col.hidden ?? false"></Column>
       </DataTable>      
     </div>
   </div>
   <div class="row-span-1 mt-3">           
     <div id="CalTuningParamsTbl" class="text-left mt-3 p-3">
       <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
-      <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"
-        selectionMode="single" ref="tuningParametersTable"> 
-        <template #header>
-          <table>
-          <tr v-for="(row, index) in tuningParametersDataListHeaders" :key="index">
-            <th v-for="( col, colIndex ) in row" :key="colIndex" :colspan="col.colspan">{{ col.header }}</th>
-          </tr>
-          </table>
-        </template>
-        <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" sortable></Column> 
+      <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"  @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect"
+        selectionMode="single" ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"> 
+        <ColumnGroup type="header">
+          <Row>
+            <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" sortable></Column> 
+          </Row>
+          <Row v-for="(row, index) in tuningParametersDataListHeaders" :key="index">
+            <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan"></Column>
+          </Row>
+        </ColumnGroup>
+        <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false"></Column> 
       </DataTable>
     </div>
   </div>
@@ -55,12 +57,13 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAltIterationStore';
 
 const {     
   fetchCalibrationDataByIterationDataList,
     resetEvaluationAltIterationStore,
-} = useEvaluationAltIterationStore()
+} = useEvaluationAltIterationStore();
 
 const {
   calibrationRunDetailDataListHeaders,
@@ -69,7 +72,10 @@ const {
   tuningParametersTableColumn,
   computedCalibrationRunDetailDataList,
   computedtuningParametersDataList,
-} = storeToRefs( useEvaluationAltIterationStore() )
+} = storeToRefs( useEvaluationAltIterationStore() );
+
+const selectedCalibrationByIterationDetailRow = ref<any>();
+const selectedCalibrationByIterationParameterRow = ref<any>();
 
 const calibrationRunDetailTable = ref<HTMLTableElement>();
 const tuningParametersTable = ref<HTMLTableElement>();
@@ -86,42 +92,46 @@ onMounted( () => {
         target.scrollTop = scrollTop;
       });
     };    
-
-    syncScroll( calibrationRunDetailTable.value?.children[0], tuningParametersTable.value?.children[0] );
-    syncScroll( tuningParametersTable.value?.children[0], calibrationRunDetailTable.value?.children[0] );
+    
+    syncScroll( calibrationRunDetailTable.value?.$el.children[0], tuningParametersTable.value?.$el.children[0] );
+    syncScroll( tuningParametersTable.value?.$el.children[0], calibrationRunDetailTable.value?.$el.children[0] );
   })
 })
 
-/*
-const runDetailData = [
-    { iteration: "NWM 3.0", objective_function_value: "", metric_1: "", metric_2: "", metric_3: "", metric_4: "", metric_5: "", metric_6: "" },
-    { iteration: "Best: 123", objective_function_value: "", metric_1: "", metric_2: "", metric_3: "", metric_4: "", metric_5: "", metric_6: "" },
-    { iteration: "0", objective_function_value: "", metric_1: "", metric_2: "", metric_3: "", metric_4: "", metric_5: "", metric_6: "" },
-    { iteration: "1", objective_function_value: "", metric_1: "", metric_2: "", metric_3: "", metric_4: "", metric_5: "", metric_6: "" },
-    { iteration: "2", objective_function_value: "", metric_1: "", metric_2: "", metric_3: "", metric_4: "", metric_5: "", metric_6: "" },
-    { iteration: "3", objective_function_value: "", metric_1: "", metric_2: "", metric_3: "", metric_4: "", metric_5: "", metric_6: "" },
-]
+const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
+  const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
+  selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];
+}
 
-const tuningParamsData = [
-    { iteration: "Best: 123", param_1: "", param_2: "", param_3: "", param_4: "", param_5: "", param_6: "", },
-    { iteration: "0", param_1: "", param_2: "", param_3: "", param_4: "", param_5: "", param_6: "", },
-    { iteration: "1", param_1: "", param_2: "", param_3: "", param_4: "", param_5: "", param_6: "", },
-    { iteration: "2", param_1: "", param_2: "", param_3: "", param_4: "", param_5: "", param_6: "", },
-    { iteration: "3", param_1: "", param_2: "", param_3: "", param_4: "", param_5: "", param_6: "", }
-]
-*/
+const onParameterTableRowSelect = ( event: DataTableRowClickEvent ) => {
+  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
+  selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];
+}
+
+const onTableRowUnselect = ( event: DataTableRowClickEvent ) => {
+  selectedCalibrationByIterationParameterRow.value = null;
+  selectedCalibrationByIterationDetailRow.value = null;
+}
+
 </script>
 
 <style lang="scss">
 @import "/assets/styles/styles.scss";
-#RunDetailsTbl .p-datatable-tbody > tr:nth-child(1) {
+
+#RunDetailsTbl .p-datatable-thead > tr:nth-child(2) th {
     background-color: $ngwcp_green_lt; 
+    border: $ngwcp_green_lt; 
+    color: var(--p-datatable-row-color);
 }
-#RunDetailsTbl .p-datatable-tbody > tr:nth-child(2) {
+#RunDetailsTbl .p-datatable-thead > tr:nth-child(3) th {
     background-color: $ngwcp_blue_lt; 
+    border: $ngwcp_blue_lt; 
+    color: var(--p-datatable-row-color);
 }
-#CalTuningParamsTbl .p-datatable-tbody > tr:nth-child(1) {
+#CalTuningParamsTbl .p-datatable-thead > tr:nth-child(2) th {
     background-color: $ngwcp_green_lt; 
+    border: $ngwcp_green_lt; 
+    color: var(--p-datatable-row-color);
 }
 
 table#cr-detail-list2 {
