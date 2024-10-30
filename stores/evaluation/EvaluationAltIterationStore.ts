@@ -5,7 +5,7 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
-import type { CalibrationRunIterationParameterData, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn, CalibrationRunIterationMetricData } from "~/composables/NextGenModel";
+import type { CalibrationRunIterationParameterData, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn, CalibrationRunIterationMetricData, CalibrationRunByIterationRetrospectiveData } from "~/composables/NextGenModel";
 import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
 export const useEvaluationAltIterationStore = defineStore('EvaluationAltIterationStore', () => { 
@@ -25,7 +25,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     let headerRow = <DynamicTableColumnHeader[]>[];
     let rowData = <any>{};
 
-    const runListDataResult = await makeProtectedApiCall<AlternativeIterationCalibrationRunData>( `${ngencerfBaseUrl}/calibration/get_calibration_data_by_iteration/`, {
+    const runListDataResult = await makeProtectedApiCall<CalibrationRunByIteration>( `${ngencerfBaseUrl}/calibration/get_calibration_data_by_iteration/`, {
       method: "POST",
       headers: { 
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -34,19 +34,21 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
       body: JSON.stringify({ calibration_run_id: userCalibrationRunData?.value?.calibration_run_id })
     });
     
-    if ( runListDataResult._data['nwm_3.0_retrospective_data']	) {
-      headerRow = [];
-      headerRow.push({
-        header: "NWM 3.0",
-        colspan: 3
-      });
-      runListDataResult._data['nwm_3.0_retrospective_data'].forEach( ( nwm_retro_data : CalibrationRunIterationMetricData ) => {
+    if ( runListDataResult._data.retrospective_data	) {
+      runListDataResult._data.retrospective_data.forEach( ( retro_data : CalibrationRunByIterationRetrospectiveData ) => {
+        headerRow = [];
         headerRow.push({
-          header: `${Number( nwm_retro_data.metric_value ).toFixed( 4 )}`,
-          colspan: 1
+          header: retro_data.name,
+          colspan: 3
         });
+        retro_data.data.forEach( ( data : CalibrationRunIterationMetricData ) => {
+          headerRow.push({
+            header: `${Number( data.metric_value ).toFixed( 4 )}`,
+            colspan: 1
+          });
+        });
+        calibrationRunDetailDataListHeaders.value.push( headerRow );
       });
-      calibrationRunDetailDataListHeaders.value.push( headerRow );
     }
 
     // building run detail table data based on the response data
@@ -142,6 +144,21 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     }
   }
 
+
+  const createNewValidationJob = async () => {
+    return await makeProtectedApiCall( `${ngencerfBaseUrl}/calibration/create_validation_run/`, {
+      method: "POST",
+      headers: { 
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ 
+        calibration_run_id: userCalibrationRunData?.value?.calibration_run_id,
+        iteration_id: userSelectedCalibrationIterationId.value
+      })
+    });
+  }
+
   /**
    * 
    * @param value 
@@ -174,7 +191,8 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     resetEvaluationAltIterationStore,
     computedCalibrationRunDetailDataList,
     computedtuningParametersDataList,
-    userSelectedCalibrationIterationId
+    userSelectedCalibrationIterationId,
+    createNewValidationJob
   }
 })
 

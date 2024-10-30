@@ -9,7 +9,7 @@ import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRu
 import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {  
-  const { calibrationJobId, validatedCalibrationRunId } = storeToRefs( generalStore() );
+  const { calibrationJobId } = storeToRefs( generalStore() );
   const { fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
   const calibrationRunList = ref<any[]>([]);
   const userSelectedEvalCalibrationRunId = ref<number>( 0 );
@@ -172,7 +172,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   })
 
   return {
-    validatedCalibrationRunId,
     uiGageId,
     calibrationRunList,
     filteredEvaluationCalibrationRunList,

@@ -458,7 +458,7 @@ export interface DynamicTableColumn {
 export interface CalibrationRunByIteration {
   message: string;
   iteration_data: CalibrationRunIterationData[];
-  nwm_retrospective_data: CalibrationRunIterationMetricData[];
+  retrospective_data: CalibrationRunByIterationRetrospectiveData[];
 }
 
 export interface CalibrationRunIterationData {
@@ -474,6 +474,11 @@ export interface CalibrationRunIterationData {
 export interface CalibrationRunIterationParameterData {
   parameter_name: string;
   parameter_value: number;
+}
+
+export interface CalibrationRunByIterationRetrospectiveData	{
+  name: string;
+  data: CalibrationRunIterationMetricData[];
 }
 
 export interface CalibrationRunIterationMetricData {
