@@ -2,7 +2,7 @@
   <!-- LeftBlock.vue -->
   <div class="grid grid-rows-1">
     <CommonTabs @tabNumber="tabChanged" />
-
+    
     <div class="row-span-1" v-if="activeTab == 1">
       <CalibrationCalibrationRunsTab />
     </div> 
@@ -21,6 +21,7 @@
     <div class="row-span-1" v-else-if="activeTab == 6">
       <CalibrationRunStatus />
     </div>
+    
   </div>
 
 </template>
