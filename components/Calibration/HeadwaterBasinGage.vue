@@ -100,7 +100,7 @@
                 </button>
               </div>
             </span>
-            <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
+            <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 mr-3">
                 <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
                   aria-label="Reset Button">Reset</button>-->
@@ -162,6 +162,9 @@ const isLoading = ref(true);
 onMounted(() => {
   toast.removeAllGroups();
   isLoading.value = false;
+
+  console.log('userCalibrationRunData.value', userCalibrationRunData.value);
+  console.log('calibrationStatus.value', calibrationStatus.value);
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }

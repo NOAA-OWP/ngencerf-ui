@@ -180,6 +180,7 @@ const progress = ref();
 
 
 onMounted(async () => {
+  
   toast.removeAllGroups();
 
   console.log('runningTime:', runningTime.value);
@@ -192,6 +193,9 @@ onMounted(async () => {
     if (userCalibrationRunData.value) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
       console.log('stopCriteria:', stopCriteria.value);
+
+      startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
+      console.log('startTimeDate:', startTimeDate.value);
 
       calibrationStatus.value = userCalibrationRunData.value?.status;
       console.log('calibrationStatus:', calibrationStatus.value);
