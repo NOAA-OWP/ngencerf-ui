@@ -132,7 +132,7 @@
             </button>
           </div>
         </span>
-        <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
+        <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
           <div class="col-span-1 mr-3">
             <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
               @click="resetFormulationData()" aria-label="Reset Button">Reset</button>-->
@@ -200,12 +200,13 @@ const {
 } = storeToRefs(useFormulationStore());
 
 const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
-const { fetchUserCalibrationRunData, userCalibrationRunData } = useUserDataStore()
+const { fetchUserCalibrationRunData } = useUserDataStore();
+const userDataStore = useUserDataStore();
+const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { getCalibrationTabIndex } = generalStore();
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { data } from "autoprefixer";
 const runStatusStore = useRunStatusStore();
-const { calibrationStatus } = storeToRefs(runStatusStore);
 let mainLeftAreaElement: HTMLElement | null = null;
 let dataTableElement: HTMLElement | null = null;
 
@@ -215,7 +216,6 @@ onMounted(() => {
   toast.removeAllGroups();
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
-
 });
 
 const addSlothOnEnter = (e: KeyboardEvent) => {
@@ -265,7 +265,7 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 * event bus for calibration button group click
 */
 const saveFormulationData = () => {
-  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+  if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();

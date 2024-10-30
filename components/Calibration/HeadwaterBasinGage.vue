@@ -142,8 +142,6 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import type { SelectChangeEvent } from "primevue/select";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
-const runStatusStore = useRunStatusStore();
-const { calibrationStatus } = storeToRefs(runStatusStore);
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 
@@ -162,9 +160,6 @@ const isLoading = ref(true);
 onMounted(() => {
   toast.removeAllGroups();
   isLoading.value = false;
-
-  console.log('userCalibrationRunData.value', userCalibrationRunData.value);
-  console.log('calibrationStatus.value', calibrationStatus.value);
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
@@ -305,7 +300,7 @@ const toggle_isNWMv3 = () => {
 };
 
 const saveTabData = () => {
-  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+  if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
