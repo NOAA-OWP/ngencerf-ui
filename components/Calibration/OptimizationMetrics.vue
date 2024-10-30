@@ -308,12 +308,12 @@ const saveOptMetData = () => {
     saveOptimizationTabData().then( response => {
       if ( response.status == 200 ) {
         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?._data?.message});
-        fetchUserCalibrationRunData();
       } else {
         useApiErrorResponsePreprocess( response ).forEach( message => {
           toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message});
         });
       }
+      fetchUserCalibrationRunData();
     });
   }
 };

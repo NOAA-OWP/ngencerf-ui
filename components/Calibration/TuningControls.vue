@@ -277,7 +277,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from "vue";
+import { onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -297,6 +297,7 @@ import { ifHydrofabricErrorsExist } from "~/utils/TuningControlsHelpers";
 
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+import type { DatePickerProps } from "primevue/datepicker";
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -523,7 +524,7 @@ watch(selectedOutputVariable, () => {
   const outputVariable = outputVariables?.value?.find((outputVar: any) => outputVar?.output === selectedOutputVariable?.value);
 
   // find module for newly-selected output variable
-  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === outputVariable.name));
+  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === outputVariables.name));
 
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
@@ -992,6 +993,7 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
+    fetchUserCalibrationRunData();
   };
 
   if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
@@ -1021,52 +1023,37 @@ const validateTab = () => {
   /* Check the DateTimes */
   let error = false;
   let text = [];
-  if (userCalibrationRunData?.value?.calibration_times.simulation_start_time &&
-    compareTimeEntries(userCalibrationRunData?.value?.calibration_times.simulation_start_time, simStartTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times.simulation_start_time || '', simStartTime.value)) {
     error = true;
-    text.push("Simulation Start has been changed");
+    text.push("Simulation Start has changed");
   }
-  if (userCalibrationRunData?.value?.calibration_times.simulation_end_time &&
-    compareTimeEntries(userCalibrationRunData?.value?.calibration_times.simulation_end_time, simEndTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times.simulation_end_time || '', simEndTime.value)) {
     error = true;
-    text.push("Simulation End has been changed");
+    text.push("Simulation End has changed");
   }
-  if (userCalibrationRunData?.value?.calibration_times.calibration_start_time &&
-    compareTimeEntries(userCalibrationRunData?.value?.calibration_times.calibration_start_time, calStartTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times.calibration_start_time || '', calStartTime.value)) {
     error = true;
-    text.push("Calibration Start has been changed");
+    text.push("Calibration Start has changed");
   }
-  if (userCalibrationRunData?.value?.calibration_times.calibration_end_time &&
-    compareTimeEntries(userCalibrationRunData?.value?.calibration_times.calibration_end_time, calEndTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times.calibration_end_time || '', calEndTime.value)) {
     error = true;
-    text.push("Calibration End has been changed");
+    text.push("Calibration End has changed");
   }
-
-  if (userCalibrationRunData?.value?.validation_times.simulation_start_time &&
-    compareTimeEntries(userCalibrationRunData?.value?.validation_times.simulation_start_time, avSimStartTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times.simulation_start_time || '', avSimStartTime.value)) {
     error = true;
-    text.push("Simulation Start has been changed");
+    text.push("Simulation Start has changed");
   }
-  if (userCalibrationRunData?.value?.validation_times.simulation_end_time &&
-    compareTimeEntries(userCalibrationRunData?.value?.validation_times.simulation_end_time, avSimEndTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times.simulation_end_time || '', avSimEndTime.value)) {
     error = true;
-    text.push("Simulation End has been changed");
+    text.push("Simulation End has changed");
   }
-  if (userCalibrationRunData?.value?.validation_times.validation_start_time &&
-    compareTimeEntries(userCalibrationRunData?.value?.validation_times.validation_start_time, avCalStartTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times.validation_start_time || '', avCalStartTime.value)) {
     error = true;
-    text.push("Validation Start has been changed");
+    text.push("Validation Start has changed");
   }
-  if (userCalibrationRunData?.value?.validation_times.validation_end_time &&
-    compareTimeEntries(userCalibrationRunData?.value?.validation_times.validation_end_time, avCalEndTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times.validation_end_time || '', avCalEndTime.value)) {
     error = true;
-    text.push("Validation End has been changed");
-  }
-
-  if (userCalibrationRunData?.value?.validation_times.simulation_end_time &&
-    compareTimeEntries(userCalibrationRunData?.value?.validation_times.simulation_end_time, avSimEndTime.value)) {
-    error = true;
-    text.push("Simulation End has been changed");
+    text.push("Validation End has changed");
   }
 
   /* selectedOutputVariable */
@@ -1080,6 +1067,13 @@ const validateTab = () => {
 }
 
 const compareTimeEntries = (txtDT: string, dT: Date) => {
+  const dateProps = dT as DatePickerProps;
+  if( !txtDT && dateProps.invalid ) {
+    return false;
+  }
+  if( txtDT && dateProps.invalid ) {
+    return true;
+  }
   return new Date(dT).getTime() !== new Date(txtDT).getTime();
 }
 
