@@ -27,3 +27,12 @@ export const isNotNullOrUndefined = (variable: any): boolean => {
 export const isCalibrationJobStatusSavedOrReady = (status?: string): boolean => {
   return status === 'Saved' || status === 'Ready';
 };
+
+/**
+ * Check if Calibration job status is 'Done', 'Cancelled', 'Failed', or 'Server Error'
+ * @param status
+ * @returns {boolean}
+ */
+export const isCalibrationJobFinished = (status?: string): boolean => {
+  return status === 'Done' || status === 'Cancelled' || status === 'Failed' || status === 'Server Error';
+};

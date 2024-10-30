@@ -131,6 +131,7 @@ import { onMounted, onUnmounted } from "vue";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
+import { isCalibrationJobFinished } from '~/utils/CommonHelpers';
 import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
 
@@ -242,7 +243,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             } else {
               toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
             }
-          }, 1000);
+          }, 10000);
         }
       } else {
         toast.removeAllGroups();
@@ -291,8 +292,18 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data' });
     }
 
-    // Update Plot Names. Is this necessary?
-    plotNames.value = await queryGetPlotNames();
+    // Update Plot Names
+    const getIterationResponse = await queryIteration();
+    if (getIterationResponse?._data?.iteration) {
+      iteration.value = getIterationResponse?._data?.iteration;
+      console.log('iteration:', iteration.value);
+    } else {
+      console.error('Error getting Iteration');
+    }
+
+    if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
+      plotNames.value = await queryGetPlotNames();
+    }
 
     if (plotNames.value?._data.plot_names) {
       console.log('plotNames:', plotNames.value?._data);
@@ -371,7 +382,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  if (iteration.value >= 1) {
+  if (iteration.value >= 1 || isCalibrationJobFinished(calibrationStatus.value)) {
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
 
@@ -383,7 +394,7 @@ watch(selectedPlotName, async () => {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot' });
     }
   } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'No plots available until iteration 1' });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
   }
 });
 
