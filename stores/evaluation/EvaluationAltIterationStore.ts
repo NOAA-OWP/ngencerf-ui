@@ -11,7 +11,7 @@ import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 export const useEvaluationAltIterationStore = defineStore('EvaluationAltIterationStore', () => { 
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
-  const { userCalibrationRunData } = storeToRefs( useUserDataStore() );
+  const { userCalibrationRunData, userSelectedCalibrationIterationId } = storeToRefs( useUserDataStore() );
   const calibrationRunDetailDataList = ref<AlternativeIterationCalibrationRunData[]>([]);
   const tuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
   const calibrationRunDetailDataListHeaders = ref<any[]>([]);
@@ -156,7 +156,12 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     tuningParametersDataList.value = [];
     calibrationRunDetailDataListHeaders.value = [];
     tuningParametersDataListHeaders.value = [];
+    userSelectedCalibrationIterationId.value = null;
   }
+
+  useLogoutListen('logoutEvent', () => {
+    resetEvaluationAltIterationStore();
+  })
 
   return {
     calibrationRunDetailDataList,
@@ -169,6 +174,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     resetEvaluationAltIterationStore,
     computedCalibrationRunDetailDataList,
     computedtuningParametersDataList,
+    userSelectedCalibrationIterationId
   }
 })
 

@@ -38,15 +38,8 @@
     <div class="grid grid-cols-8">
       <span>
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-          <button class="font-normal" title="Run" aria-label="Run Button" @click="">
+          <button class="font-normal" title="Run" aria-label="Run Button" @click="navigateToEvaluateStatus">
             Run
-          </button>
-        </div>
-      </span>
-      <span>
-        <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-          <button class="font-normal" title="Cancel" aria-label="Cancel Button" @click="">
-            Cancel
           </button>
         </div>
       </span>
@@ -59,6 +52,9 @@
 import { storeToRefs } from 'pinia';
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAltIterationStore';
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
 
 const {     
   fetchCalibrationDataByIterationDataList,
@@ -72,6 +68,7 @@ const {
   tuningParametersTableColumn,
   computedCalibrationRunDetailDataList,
   computedtuningParametersDataList,
+  userSelectedCalibrationIterationId,
 } = storeToRefs( useEvaluationAltIterationStore() );
 
 const selectedCalibrationByIterationDetailRow = ref<any>();
@@ -99,11 +96,13 @@ onMounted( () => {
 })
 
 const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
+  userSelectedCalibrationIterationId.value = event.data.iteration_id;
   const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
   selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];
 }
 
 const onParameterTableRowSelect = ( event: DataTableRowClickEvent ) => {
+  userSelectedCalibrationIterationId.value = event.data.iteration_id;
   const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
   selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];
 }
@@ -111,8 +110,18 @@ const onParameterTableRowSelect = ( event: DataTableRowClickEvent ) => {
 const onTableRowUnselect = ( event: DataTableRowClickEvent ) => {
   selectedCalibrationByIterationParameterRow.value = null;
   selectedCalibrationByIterationDetailRow.value = null;
+  userSelectedCalibrationIterationId.value = null;
 }
 
+const navigateToEvaluateStatus = ( event : any ) => {
+  if ( userSelectedCalibrationIterationId.value && userSelectedCalibrationIterationId.value > 0 ) {
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[3];
+    e.click();
+  } else {
+    toast.add({ severity: 'warn', summary: 'Missing Iteration ID', detail: 'Pleasea select a iteration job first.', life: 6000 })
+  }
+}
 </script>
 
 <style lang="scss">
