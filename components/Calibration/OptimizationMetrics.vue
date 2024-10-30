@@ -1,5 +1,5 @@
 <template>
-  <div id="OptimizationMetrics" class="'mt-4">
+  <div id="OptimizationMetrics" class="mt-4">
     <div class="grid grid-rows-12 gap-1">
       <div class="row-span-3">
         <div class="grid grid-cols-2 pt-3 gap-10">
@@ -123,7 +123,7 @@
       </div>
 
     </div>
-    <div id="OptMetBottomButtons" class="grid grid-cols-8 mt-6 ActionButtonsBox">
+    <div id="OptMetBottomButtons" class="absolute b-0 grid grid-cols-8 mt-6 ActionButtonsBox">
       <span>
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
           <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()">
