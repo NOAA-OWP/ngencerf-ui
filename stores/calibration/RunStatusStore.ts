@@ -23,6 +23,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const selectedPlotName = ref();
   const selectedPlotFilename = ref();
   const selectedPlotFileUrl = ref();
+  const iteration = ref();
 
   const stopCriteria = ref();
   const stopCriteriaMet = ref(false);
@@ -157,6 +158,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     selectedPlotName,
     selectedPlotFilename,
     selectedPlotFileUrl,
+    iteration,
     stopCriteria,
     stopCriteriaMet,
     runningTimeIntervalId,
