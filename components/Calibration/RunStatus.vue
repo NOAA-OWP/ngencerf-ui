@@ -157,6 +157,7 @@ const {
   selectedPlotName,
   selectedPlotFilename,
   selectedPlotFileUrl,
+  iteration,
   stopCriteria,
   stopCriteriaMet,
   runningTimeIntervalId,
@@ -175,7 +176,6 @@ const {
 } = runStatusStore;
 
 const isLoading = ref(false);
-const iteration = ref();
 const progress = ref();
 
 
