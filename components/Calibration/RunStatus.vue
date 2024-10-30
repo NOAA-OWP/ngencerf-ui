@@ -206,20 +206,25 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         // Create an interval to update runningTime every second while status is Running
         if (!runningTimeIntervalId) {
           runningTimeIntervalId = setInterval(async () => {
-            await fetchUserCalibrationRunData();
+            let getCalibrationStatusResponse = await queryGetCalibrationStatus();
+            console.log('getCalibrationStatusResponse:', getCalibrationStatusResponse._data);
 
-            if (userCalibrationRunData?.value?.status && userCalibrationRunData?.value?.status !== 'Running') {
-              // Calculate Running Time every second
-              runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+            if (getCalibrationStatusResponse._data && getCalibrationStatusResponse._data.status) {
+              if (getCalibrationStatusResponse._data.status === 'Running') {
+                // Calculate Running Time every second
+                runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+              } else {
+                clearInterval(runningTimeIntervalId);
+                clearInterval(statusIntervalId);
+                calibrationStatus.value = getCalibrationStatusResponse._data.status;
+              }
             } else {
-              clearInterval(runningTimeIntervalId);
-              clearInterval(statusIntervalId);
+              toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
             }
           }, 1000);
         }
       } else {
         toast.removeAllGroups();
-
         toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
       }
 
@@ -227,15 +232,15 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       if (!statusIntervalId) {
         statusIntervalId = setInterval(async () => {
           let getCalibrationStatusResponse = await queryGetCalibrationStatus();
-          console.log('getCalibrationStatusResponse:', getCalibrationStatusResponse);
+          console.log('getCalibrationStatusResponse:', getCalibrationStatusResponse._data);
 
-          if (getCalibrationStatusResponse && getCalibrationStatusResponse.status) {
+          if (getCalibrationStatusResponse._data && getCalibrationStatusResponse._data.status) {
             // if Calibration status changes, clear intervals, and set progress to null
-            if (getCalibrationStatusResponse.status !== 'Running') {
+            if (getCalibrationStatusResponse._data.status !== 'Running') {
               clearInterval(runningTimeIntervalId);
               clearInterval(statusIntervalId);
             }
-            calibrationStatus.value = userCalibrationRunData.value?.status; // set this last so that the watch function gets triggered after handling Done, Cancelled, or Failed status
+            calibrationStatus.value = getCalibrationStatusResponse._data.status; // set this last so that the watch function gets triggered after handling Done, Cancelled, or Failed status
           } else {
             toast.removeAllGroups();
             toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data' });
