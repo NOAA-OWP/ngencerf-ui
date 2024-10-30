@@ -168,7 +168,8 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { onMounted, onUnmounted } from "vue";
+import { onMounted } from "vue";
+import type { UserCalibrationRunData } from "~/composables/NextGenModel";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
@@ -210,7 +211,9 @@ const {
 } = storeToRefs(useFormulationStore());
 
 const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
-const { fetchUserCalibrationRunData, userCalibrationRunData } = useUserDataStore()
+const { fetchUserCalibrationRunData } = useUserDataStore();
+const userDataStore = useUserDataStore();
+const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { getCalibrationTabIndex } = generalStore();
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { data } from "autoprefixer";
@@ -276,18 +279,18 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 */
 const saveFormulationData = () => {
   toast.removeAllGroups()
-  saveFormulationTabData().then( response => {
-    if ( response.status == 200 ) {
+  saveFormulationTabData().then(response => {
+    if (response.status == 200) {
       toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
-      if ( response?._data?.nwm_warning == true ) {
-        useCalibrationFormulationTabSaveWarning( response?._data?.formulation_warning ?? {} ).forEach( warning => {
+      if (response?._data?.nwm_warning == true) {
+        useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
           toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning, life: 10000 });
         });
-      }   
-      fetchUserCalibrationRunData();   
+      }
+      fetchUserCalibrationRunData();
     } else {
-      useApiErrorResponsePreprocess( response ).forEach( message => {
-        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Formulation Tab Data Failed.', detail: message, life: 10000 });
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message, life: 10000 });
       });
     }
   });
@@ -299,22 +302,24 @@ const resetFormulationData = () => {
 
 
 const validateTab = () => {
+  fetchUserCalibrationRunData();
   let error = false;
   let text = [];
   /* Check if formulation name changed */
-  let ucrd = userCalibrationRunData?.formulation_name === null ? '' : userCalibrationRunData?.formulation_name;
-  if (ucrd !== formulationNameInput.value) {
+  let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : ''  ;
+  let newName = formulationNameInput.value ? formulationNameInput.value : '';
+  if (savedName !== newName) {
     error = true;
     text.push("Formulation Name has been changed");
   }
   /* check if list of modules changed */
-  let selModules = selectedModuleValues;
-  let savedModules = userCalibrationRunData?.modules;
-  if (selModules.value.length !== savedModules?.length) {
+  let selModules = selectedModuleValues.value;
+  let savedModules = userCalibrationRunData?.value?.modules;
+  if (selModules.length !== savedModules?.length) {
     error = true;
     text.push("Selected Modules have been changed");
   } else {
-    selModules.value.every((module) => {
+    selModules.every((module) => {
       if (savedModules.indexOf(module) === -1) {
         error = true;
         text.push("Selected Modules have been changed");
@@ -323,12 +328,12 @@ const validateTab = () => {
     })
   }
   /* Has user checked/unchecked Add SLoTH outpu8t variables? */
-  if (useSlothParameters.value !== userCalibrationRunData?.use_sloth) {
+  if (useSlothParameters.value !== userCalibrationRunData?.value?.use_sloth) {
     error = true;
     text.push("Add SLoth output has changed");
   }
   /* has the number of SLoTH vars changed? */
-  if (slothParameterInputs.value.length !== userCalibrationRunData?.sloth_parameters.length) {
+  if (slothParameterInputs.value.length !== userCalibrationRunData?.value?.sloth_parameters.length) {
     error = true;
     text.push("Add SLoth variable list has changed");
   }
@@ -336,16 +341,12 @@ const validateTab = () => {
 }
 
 const restorePage = () => {
-  if(userCalibrationRunData?.modules){
-    selectedModuleValues.value = userCalibrationRunData?.modules;
-  }  
-  if(userCalibrationRunData?.formulation_name) {
-    formulationNameInput.value = userCalibrationRunData?.formulation_name
+  selectedModuleValues.value  = userCalibrationRunData?.value?.modules ? userCalibrationRunData?.value?.modules : [];
+  formulationNameInput.value  = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";  
+  if (userCalibrationRunData.value) {
+    useSlothParameters.value = userCalibrationRunData?.value?.use_sloth;
+    slothParameterInputs.value = userCalibrationRunData?.value?.sloth_parameters;
   }
-  if(userCalibrationRunData) {
-    useSlothParameters.value = userCalibrationRunData?.use_sloth;
-    slothParameterInputs.value = userCalibrationRunData?.sloth_parameters;
-  }  
 }
 
 const gotoNext = () => {

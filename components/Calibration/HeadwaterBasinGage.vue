@@ -327,7 +327,8 @@ const resetTabData = () => {
 const validateTab = () => {
   let error = false;
   let text = [];
-  if (userCalibrationRunData?.value?.gage.gage_id && (userCalibrationRunData?.value?.gage.gage_id !== selectedGageValue.value)) {
+  if (userCalibrationRunData?.value?.gage === null && selectedGageValue.value ||
+    userCalibrationRunData?.value?.gage?.gage_id && (userCalibrationRunData?.value?.gage?.gage_id !== selectedGageValue.value)) {
     error = true;
     text.push("Gage value has been changed");
   }
@@ -369,10 +370,7 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
   if (opt.data.moveToNextResponse) {
-    if (userCalibrationRunData?.value?.gage.gage_id) {
-      selectedGageValue.value = userCalibrationRunData?.value?.gage.gage_id;
-    }
-
+      selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
     gotoNext();
   }
 }
