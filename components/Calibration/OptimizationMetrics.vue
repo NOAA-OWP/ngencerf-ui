@@ -353,11 +353,12 @@ const validateTab = () => {
       text.push("Calculate Event Based Metrics (Peak Flow Threshold) has been changed");
    }
 
+   if( userCalibrationRunData?.optimization_inputs && userCalibrationRunData?.optimization_inputs.length > 0)
    uiOptimizationInputs.value.every((module, index) => {
       if (userCalibrationRunData?.optimization_inputs[index].name !== module.name ||
          userCalibrationRunData?.optimization_inputs[index].value !== module.value) {
          error = true;
-         text.push("Selected Modules or their values have been changed");
+         text.push("Algorithm Parameter(s) have been added or changed");
       }
    })
    return { error: error, text: text }
