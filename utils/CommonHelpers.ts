@@ -10,7 +10,6 @@ export const isValidDateTime = (obj: any): boolean => {
   return obj && DateTime.isDateTime(obj) && obj.isValid;
 };
 
-
 /**
  * Checks if a variable is not null and not undefined
  * @param var
@@ -18,4 +17,13 @@ export const isValidDateTime = (obj: any): boolean => {
  */
 export const isNotNullOrUndefined = (variable: any): boolean => {
   return variable !== null && variable !== undefined;
+};
+
+/**
+ * Checks if Calibration job status is 'Saved' or 'Ready'
+ * @param status
+ * @returns {boolean}
+ */
+export const isCalibrationJobStatusSavedOrReady = (status?: string): boolean => {
+  return status === 'Saved' || status === 'Ready';
 };
