@@ -54,6 +54,7 @@ import { useGageStore } from "~/stores/calibration/GageStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "~/composables/ValidationHandlers";
 
 const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
@@ -65,6 +66,7 @@ const { getCalibrationTabIndex } = generalStore();
 const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
+const { hardResetRunStatusStore } = useRunStatusStore();
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -86,6 +88,7 @@ onMounted(() => {
   if (ele) { ele.scrollTo(0, 0); }
 
   hardResetTuningStore();
+  hardResetRunStatusStore();
   fetchUserCalibrationJobsListData();
 })
 
