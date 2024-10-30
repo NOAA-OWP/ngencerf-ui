@@ -127,17 +127,14 @@
       </div>
 
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3 ActionButtonsBox">
-        <span v-if="calibrationStatus !== 'Running'">
+        <span>
           <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
             <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
               Save
             </button>
           </div>
         </span>
-        <span v-else>
-          <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">&nbsp;</div>
-        </span>
-        <span v-if="calibrationStatus !== 'Running'">
+        <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
           <div class="col-span-1 mr-3">
             <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
               @click="resetFormulationData()" aria-label="Reset Button">Reset</button>-->
@@ -170,6 +167,7 @@
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
 import type { UserCalibrationRunData } from "~/composables/NextGenModel";
+import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
@@ -278,26 +276,30 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 * event bus for calibration button group click
 */
 const saveFormulationData = () => {
-  toast.removeAllGroups()
-  saveFormulationTabData().then(response => {
-    if (response.status == 200) {
-      toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
-      if (response?._data?.nwm_warning == true) {
-        useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
-          toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning, life: 10000 });
+  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
+  } else {
+    toast.removeAllGroups();
+    saveFormulationTabData().then( response => {
+      if ( response.status == 200 ) {
+        toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
+        if ( response?._data?.nwm_warning == true ) {
+          useCalibrationFormulationTabSaveWarning( response?._data?.formulation_warning ?? {} ).forEach( warning => {
+            toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning });
+          });
+        }   
+        fetchUserCalibrationRunData();   
+      } else {
+        useApiErrorResponsePreprocess( response ).forEach( message => {
+          toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Formulation Tab Data Failed.', detail: message});
         });
       }
-      fetchUserCalibrationRunData();
-    } else {
-      useApiErrorResponsePreprocess(response).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message, life: 10000 });
-      });
-    }
-  });
+    });
+  }
 }
 
 const resetFormulationData = () => {
-  resetUserSelectionFormulation()
+  resetUserSelectionFormulation();
 }
 
 

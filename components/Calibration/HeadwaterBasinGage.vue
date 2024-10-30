@@ -92,17 +92,14 @@
 
         <div class="row-span-1 mt-4 ActionButtonsBox">
           <div class="grid grid-cols-8">
-            <span v-if="calibrationStatus !== 'Running'">
+            <span>
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                 <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
                   Save
                 </button>
               </div>
             </span>
-            <span v-else>
-              <div class="col-span-1 mr-3">&nbsp;</div>
-            </span>
-            <span v-if="calibrationStatus !== 'Running'">
+            <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
               <div class="col-span-1 mr-3">
                 <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
                   aria-label="Reset Button">Reset</button>-->
@@ -142,6 +139,7 @@ import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import type { SelectChangeEvent } from "primevue/select";
+import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 
 const runStatusStore = useRunStatusStore();
@@ -287,7 +285,7 @@ const showGeopackageFileUploadDialog = (headerText: string) => {
         handleDialogClose(opt)
       },
     })
-    fileUploadDialogOpened.value = true
+    fileUploadDialogOpened.value = true;
   }
 }
 
@@ -300,24 +298,28 @@ const gotoNext = () => {
 /**
  * follow section waiting further detail to be implemented
  */
-const selected_rfc = ref<string>("")
+const selected_rfc = ref<string>("");
 
 const toggle_isNWMv3 = () => {
 
-}
+};
 
 const saveTabData = () => {
-  toast.removeAllGroups();
-  saveGageTabData().then(response => {
-    if (response.status == 200) {
-      toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?._data?.message, life: 3000 });
-      fetchUserCalibrationRunData()
-    } else {
-      useApiErrorResponsePreprocess(response).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
-      });
-    }
-  });
+  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
+  } else {
+    toast.removeAllGroups();
+    saveGageTabData().then( response => {
+      if ( response.status == 200 ) {
+        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?._data?.message});
+        fetchUserCalibrationRunData();
+      } else {
+        useApiErrorResponsePreprocess( response ).forEach( message => {
+          toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Gage Tab Data Failed.', detail: message });
+        });
+      }
+    });
+  }
 };
 
 const resetTabData = () => {

@@ -239,18 +239,15 @@
 
   <div class="grid grid-rows-1 mt-8 ActionButtonsBox" id="Tuningbuttons">
     <div id="TuningBottomButtons" class="grid grid-cols-8">
-      <span v-if="userCalibrationRunData?.status !== 'Running'">
+      <span>
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
           <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()">
             Save
           </button>
         </div>
       </span>
-      <span v-else>
-        <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">&nbsp;</div>
-      </span>
 
-      <span v-if="userCalibrationRunData?.status !== 'Running'">
+      <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
         <div class="col-span-1 mr-3">
           <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTuningData()"
             aria-label="Reset Button">Reset</button>-->
@@ -291,6 +288,7 @@ import { isValidDateTime, isNotNullOrUndefined } from "~/utils/CommonHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
@@ -311,6 +309,8 @@ const { getCalibrationTabIndex } = generalStore();
 const { ngencerfBaseUrl } = useBackendConfig();
 const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
+const runStatusStore = useRunStatusStore();
+const { calibrationStatus } = storeToRefs(runStatusStore);
 
 const {
   formulationNameInput,
@@ -523,15 +523,15 @@ watch(selectedOutputVariable, () => {
   const outputVariable = outputVariables?.value?.find((outputVar: any) => outputVar?.output === selectedOutputVariable?.value);
 
   // find module for newly-selected output variable
-  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === outputVariables.name));
+  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === outputVariable.name));
 
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
     name: outputVariable?.name,
     module: module?.name,
   }
-  console.log("selectedOutputVariable:", selectedOutputVariable.value);
-  console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
+  // console.log("selectedOutputVariable:", selectedOutputVariable.value);
+  // console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
 });
 
 // watch for changes to simStartTime. If simStartTime is set, set calStartTime to one year after simStartTime if not already set
@@ -680,7 +680,6 @@ const handleFileUpload = async (event: Event) => {
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
 const addCalibrationTuningParameter = () => {
-  // console.log("selectedParameter:", selectedParameter.value);
   const parameter = calibrationTuningParameters?.value?.find(param => param.output === selectedParameter.value);
   const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.find(param => param.name === parameter.name);
 
@@ -995,15 +994,19 @@ const saveTuningData = () => {
     }
   };
 
-  // check if Tuning Tab data is validated before saving
-  if (isTuningTabDataValidated()) {
-    handleSaveTuningTab();
+  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
-    toast.add({
-      severity: 'warn',
-      summary: 'Tuning Data Is Not Valid',
-      detail: 'You must provide valid calibration times, validation times, output variable to calibrate, or calibration tuning parameters before saving.',
-    });
+    // check if Tuning Tab data is validated before saving
+    if (isTuningTabDataValidated()) {
+      handleSaveTuningTab();
+    } else {
+      toast.add({
+        severity: 'warn',
+        summary: 'Tuning Data Is Not Valid',
+        detail: 'You must provide valid calibration times, validation times, output variable to calibrate, or calibration tuning parameters before saving.',
+      });
+    }
   }
 };
 

@@ -1,17 +1,17 @@
 <template>
   <div id="ResultPage">
     <div class="grid grid-rows-10 pr-3">
-      <div class="row-span-2">
+      <div class="row-span-1">
         <div id="ResultsDisplay">
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
                 <tbody>
-                  <tr height="45px">
+                  <tr height="40px">
                     <td class="text-right font-bold">Start Time</td>
                     <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="45px">
+                  <tr height="32px">
                     <td class="text-right font-bold">Running Time</td>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <div class="row-span-8">
+      <div class="row-span-9">
         <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
           <img :src="selectedPlotFileUrl" alt="Image" />
         </div>
@@ -66,30 +66,42 @@
       </div> -->
     </div>
 
-
+<!--
     <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
       <div class="row-span-1">
+-->
         <span v-if="calibrationStatus === 'Done'">
+<!-- NOTE TO DEVELOPERS: temporary commenting out block below until the functionality for this button is ready-->
+<!-- 
+
+<div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
+  <div class="row-span-1">
           <div id="ResultsArea" class="ngenButtonDiv row-span-1">
             <button class="font-normal">Go to Evaluation</button>
           </div>
           <div class="col-span-7">&nbsp;</div>
+  </div>
+</div>
+-->
         </span>
 
         <span v-else>
+
+<div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
+  <div class="row-span-1">
           <div id="StausRunBottomButtons" class="grid grid-cols-8">
             <span v-if="userCalibrationRunData?.status !== 'Running'">
-            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-              <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
-                Run
-              </button>
-            </div>
-          </span>
-          <span v-else>
-            <div class="col-span-1 mr-6 h-8">&nbsp;</div>
-          </span>
-            <div class="col-span-1 mr-3">
-              <button class="c-blue font-normal text-xl underline pt-1" title="Cancel Button" @click="cancelRun()"
+              <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+                <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
+                  Run
+                </button>
+              </div>
+            </span>
+            <span v-else>
+              <div class="col-span-1 mr-6 h-8">&nbsp;</div>
+            </span>
+            <div class="col-span-1 mr-3"><!--c-blue font-normal text-xl underline pt-1-->
+              <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelRun()"
                 aria-label="Cancel Button">Cancel</button>
             </div>
             <div class="col-span-4">&nbsp;</div>
@@ -97,10 +109,15 @@
             <div class="col-span-1 mr-4">
             </div>
           </div>
+
+  </div>
+</div>
+
         </span>
+<!--
       </div>
     </div>
-
+-->
 
     <div class="waitgif" v-if="isLoading">
       <img src="@/assets/styles/img/wait.gif" />
@@ -226,11 +243,12 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       // Create an interval to update calibrationStatus every 10 seconds until status is not Running
       if (!statusIntervalId) {
         statusIntervalId = setInterval(async () => {
-          await fetchUserCalibrationRunData();
+          let getCalibrationStatusResponse = await queryGetCalibrationStatus();
+          console.log('getCalibrationStatusResponse:', getCalibrationStatusResponse);
 
-          if (userCalibrationRunData.value && userCalibrationRunData.value.status) {
+          if (getCalibrationStatusResponse && getCalibrationStatusResponse.status) {
             // if Calibration status changes, clear intervals, and set progress to null
-            if (userCalibrationRunData.value?.status !== 'Running') {
+            if (getCalibrationStatusResponse.status !== 'Running') {
               clearInterval(runningTimeIntervalId);
               clearInterval(statusIntervalId);
             }
@@ -449,21 +467,21 @@ const cancelRun = async () => {
 @import "@/assets/styles/styles.scss";
 
 #ResultsDisplay {
-  width: 50vw;
-  margin: 20px auto;
-  padding: 10px 10px 10px 20px;
+  width: 40vw;
+  min-width:720px;
+  margin: 5px auto;
+  padding: 6px 10px 6px 20px;
   border-radius: 10px;
   height: 100px;
   border: 0px solid $ngwcp_neutral_gray_md;
-  min-width: 750px;
 
 }
 
 #GraphArea {
-  height: 40vh;
-  width: 100%;
-  margin: 8px auto 0 auto;
-  border: 1px solid $ngwcp_neutral_gray_md;
+  min-height: 40vh;
+  width: 70%;
+  margin: 0px auto 0 auto;
+  /*border: 1px solid $ngwcp_neutral_gray_md;*/
 }
 
 #RunStatus,

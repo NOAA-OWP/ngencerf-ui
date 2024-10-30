@@ -1,7 +1,7 @@
 <template>
   <div id="Messages">
     <div class="">
-      <h2 class="mt-5">{{ componentProps.title }}</h2>
+      <h2 class="mt-5">{{ componentProps.title }} {{ userCalibrationRunData?.calibration_run_id ? "- Job #" + userCalibrationRunData.calibration_run_id : '' }}</h2>
 
       <div class="grid grid-cols-2 gap=1 text-sm mt-4">
         <div class="col-span-1">
@@ -74,7 +74,7 @@
             {{ formatDate(calData?.validation_times?.validation_end_time) }}</div>
           </p>
           <p>&nbsp;</p>
-          <p v-if="userSelectedCalibrationTuningParameters">
+          <p v-if="userSelectedCalibrationTuningParameters && userSelectedCalibrationTuningParameters.length > 0">
             <span class="font-medium">Tuning Parameters:</span> 
             {{ userSelectedCalibrationTuningParameters.length }}</p>
           <p v-if="calData?.objective_function"><span class="font-medium">Objective Function:</span> 
