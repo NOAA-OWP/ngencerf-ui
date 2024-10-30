@@ -23,9 +23,12 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const selectedPlotName = ref();
   const selectedPlotFilename = ref();
   const selectedPlotFileUrl = ref();
+  const iteration = ref();
 
   const stopCriteria = ref();
   const stopCriteriaMet = ref(false);
+  const runningTimeIntervalId = ref();
+
 
   /**
    * Get Calibration Status
@@ -137,7 +140,13 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     selectedPlotFileUrl.value = "";
     stopCriteria.value = "";
     stopCriteriaMet.value = false;
-  }
+    console.log("RunStatusStore has been hard reset");
+
+    if (runningTimeIntervalId.value) {
+      clearInterval(runningTimeIntervalId.value);
+      runningTimeIntervalId.value = '';
+    }
+  };
 
   return {
     calibrationStatus,
@@ -149,8 +158,10 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     selectedPlotName,
     selectedPlotFilename,
     selectedPlotFileUrl,
+    iteration,
     stopCriteria,
     stopCriteriaMet,
+    runningTimeIntervalId,
     queryGetCalibrationStatus,
     queryGetPlotNames,
     queryGetPlot,
