@@ -187,6 +187,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     simEndTime.value = "";
     calStartTime.value = "";
     calEndTime.value = "";
+    calibrationTuningModules.value = null;
     calibrationTuningParameters.value = [];
     userSelectedCalibrationTuningParameters.value = [];
     userOutputVariableToCalibrate.value.name = '';
@@ -197,7 +198,30 @@ export const useTuningStore = defineStore('TuningStore', () => {
     avSimEndTime.value = "";
     avCalStartTime.value = "";
     avCalEndTime.value = "";
-    console.log("Tuning Store Reset")
+    rangeDateFrom.value = null;
+    rangeDateTo.value = null;
+    tuningStore_data_loading.value = true;
+    console.log("Tuning Store Hard Reset")
+  };
+
+  /**
+   * Reset User Data in Tuning Store
+   */
+  const resetUserDataInTuningStore = (): void => {
+    simStartTime.value = "";
+    simEndTime.value = "";
+    calStartTime.value = "";
+    calEndTime.value = "";
+    userSelectedCalibrationTuningParameters.value = [];
+    userOutputVariableToCalibrate.value.name = '';
+    userOutputVariableToCalibrate.value.module = null;
+    automatic_validation.value = true;
+    avSimStartTime.value = "";
+    avSimEndTime.value = "";
+    avCalStartTime.value = "";
+    avCalEndTime.value = "";
+    tuningStore_data_loading.value = true;
+    console.log("Tuning Store User Data Reset")
   };
 
   return {

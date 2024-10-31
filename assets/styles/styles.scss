@@ -80,8 +80,16 @@ input::-webkit-input-placeholder {
 .inputBox {
   margin-top: 20px;
 }
-.h-screen-inner {
+.h-screen-outer {
   height: Calc(100vh - 180px);
+}
+.h-screen-inner {
+  height: Calc(100vh - 150px);
+  /*height: Calc(100vh - 180px);
+  height: Calc(100vh - 270px);*/
+}
+.min-h-screen-inner {
+  height: Calc(100vh - 150px);
 }
 .h-screen-inner-less {
   height: Calc(100vh - 240px);
@@ -145,6 +153,20 @@ input::-webkit-input-placeholder {
 }
 .ngenButtonDiv-green:hover {
   background-color: $ngwcp_secondary4lt;
+}
+.ngenButtonDiv-red {
+  cursor: pointer;
+  color: white;
+  padding: 6px 25px;
+  border-radius: 28px;
+  background-color: $ngwcp_red_dark1;
+  text-align: center;
+  font-size: 18px;
+  border: 0px;
+  display: inline-block;
+}
+.ngenButtonDiv-red:hover {
+  background-color: $ngwcp_red_dark2;
 }
 .btn-left {
   margin-right: auto;

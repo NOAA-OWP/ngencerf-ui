@@ -1,18 +1,18 @@
 <template>
   <div id="ResultPage">
     <div class="grid grid-rows-10 pr-3">
-      <div class="row-span-2">
+      <div class="row-span-1">
         <div id="ResultsDisplay">
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
                 <tbody>
-                  <tr height="45px">
+                  <tr height="40px">
                     <td class="text-right font-bold">Start Time</td>
                     <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="45px">
-                    <td class="text-right font-bold">Running Time</td>
+                  <tr height="32px">
+                    <td class="text-right font-bold">Elapsed Time</td>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
                 </tbody>
@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <div class="row-span-8">
+      <div class="row-span-9">
         <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
           <img :src="selectedPlotFileUrl" alt="Image" />
         </div>
@@ -66,41 +66,64 @@
       </div> -->
     </div>
 
-
+<!--
     <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
       <div class="row-span-1">
+-->
         <span v-if="calibrationStatus === 'Done'">
+<!-- NOTE TO DEVELOPERS: temporary commenting out block below until the functionality for this button is ready-->
+<!-- 
+
+<div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
+  <div class="row-span-1">
           <div id="ResultsArea" class="ngenButtonDiv row-span-1">
             <button class="font-normal">Go to Evaluation</button>
           </div>
           <div class="col-span-7">&nbsp;</div>
+  </div>
+</div>
+-->
         </span>
 
         <span v-else>
-          <div id="StausRunBottomButtons" class="grid grid-cols-8">
-            <span v-if="userCalibrationRunData?.status !== 'Running'">
-            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-              <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
-                Run
-              </button>
-            </div>
-          </span>
-          <span v-else>
-            <div class="col-span-1 mr-6 h-8">&nbsp;</div>
-          </span>
-            <div class="col-span-1 mr-3">
-              <button class="c-blue font-normal text-xl underline pt-1" title="Cancel Button" @click="cancelRun()"
-                aria-label="Cancel Button">Cancel</button>
-            </div>
+
+<div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
+  <div class="row-span-1">
+          <div id="StatusRunBottomButtons" class="grid grid-cols-8">
+            <span v-if="calibrationStatus !== 'Submitted' && calibrationStatus !== 'Running'">
+              <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+                <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
+                  Run
+                </button>
+              </div>
+            </span>
+            <span v-else>
+              <div class="col-span-1 mr-6 h-8">&nbsp;</div>
+            </span>
+            <span v-if="calibrationStatus === 'Running'">
+              <div class="col-span-1 mr-3"><!--c-blue font-normal text-xl underline pt-1-->
+                <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelRun()" aria-label="Cancel Button">
+                  Cancel
+                </button>
+              </div>
+            </span>
+            <span v-else>
+              <div class="col-span-1 mr-3">&nbsp;</div>
+            </span>
             <div class="col-span-4">&nbsp;</div>
             <div class="col-span-1">&nbsp;</div>
             <div class="col-span-1 mr-4">
             </div>
           </div>
+
+  </div>
+</div>
+
         </span>
+<!--
       </div>
     </div>
-
+-->
 
     <div class="waitgif" v-if="isLoading">
       <img src="@/assets/styles/img/wait.gif" />
@@ -114,6 +137,7 @@ import { onMounted, onUnmounted } from "vue";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
+import { isCalibrationJobFinished } from '~/utils/CommonHelpers';
 import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
 
@@ -133,8 +157,10 @@ const {
   selectedPlotName,
   selectedPlotFilename,
   selectedPlotFileUrl,
+  iteration,
   stopCriteria,
   stopCriteriaMet,
+  runningTimeIntervalId,
 } = storeToRefs(runStatusStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -150,16 +176,14 @@ const {
 } = runStatusStore;
 
 const isLoading = ref(false);
-const iterations = ref();
-const iterationData = ref();
 const progress = ref();
 
-let statusIntervalId: NodeJS.Timeout | undefined = undefined;
-let runningTimeIntervalId: NodeJS.Timeout | undefined = undefined;
-let iterationIntervalId: NodeJS.Timeout | undefined = undefined;
 
 onMounted(async () => {
   toast.removeAllGroups();
+
+  console.log('runningTime:', runningTime.value);
+  console.log('typeof runningTime:', typeof runningTime.value);
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
@@ -180,7 +204,11 @@ onMounted(async () => {
 watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
   console.log('inside calibrationStatus watch');
   console.log('calibrationStatus:', calibrationStatus.value);
-  if (calibrationStatus.value === 'Saved') {
+  if (calibrationStatus.value === 'Submitted') {
+
+  }
+
+  else if (calibrationStatus.value === 'Saved') {
 
   }
 
@@ -189,81 +217,59 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
   }
 
   else if (calibrationStatus.value === 'Running') {
-    // fetch Calibration Run Data to get run_date
-    await fetchUserCalibrationRunData();
-    // Get run_date from load_calibration_run endpoint
-    if (userCalibrationRunData.value) {
-      console.log('userCalibrationRunData:', userCalibrationRunData.value);
-      startTimeDate.value = new Date(userCalibrationRunData.value?.run_date); // do we need to keep setting this after the first time? will value change after status is Running?
-      console.log('startTimeDate:', startTimeDate.value);
+    // Calculate Running Time
+    if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
+      startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
+      runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
-      // Calculate Running Time
-      if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
-        startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
-        runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+      console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
+      console.log('typeof runningTimeIntervalId:', typeof runningTimeIntervalId.value);
+      // Create an interval to update calibrationStatus and runningTime every second while status is Running
+      if (!runningTimeIntervalId.value) {
+        runningTimeIntervalId.value = setInterval(async () => {
+          const getCalibrationStatusResponse = await queryGetCalibrationStatus();
+          console.log('getCalibrationStatusResponse:', getCalibrationStatusResponse._data);
 
-
-        // Create an interval to update runningTime every second while status is Running
-        if (!runningTimeIntervalId) {
-          runningTimeIntervalId = setInterval(async () => {
-            await fetchUserCalibrationRunData();
-
-            if (userCalibrationRunData?.value?.status && userCalibrationRunData?.value?.status !== 'Running') {
+          if (getCalibrationStatusResponse._data && getCalibrationStatusResponse._data.status) {
+            if (getCalibrationStatusResponse._data.status === 'Running') {
               // Calculate Running Time every second
               runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
             } else {
-              clearInterval(runningTimeIntervalId);
-              clearInterval(statusIntervalId);
+              clearInterval(runningTimeIntervalId.value);
             }
-          }, 1000);
-        }
-      } else {
-        toast.removeAllGroups();
-
-        toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
-      }
-
-      // Create an interval to update calibrationStatus every 10 seconds until status is not Running
-      if (!statusIntervalId) {
-        statusIntervalId = setInterval(async () => {
-          await fetchUserCalibrationRunData();
-
-          if (userCalibrationRunData.value && userCalibrationRunData.value.status) {
-            // if Calibration status changes, clear intervals, and set progress to null
-            if (userCalibrationRunData.value?.status !== 'Running') {
-              clearInterval(runningTimeIntervalId);
-              clearInterval(statusIntervalId);
-            }
-            calibrationStatus.value = userCalibrationRunData.value?.status; // set this last so that the watch function gets triggered after handling Done, Cancelled, or Failed status
+            calibrationStatus.value = getCalibrationStatusResponse._data.status;
           } else {
-            toast.removeAllGroups();
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data' });
-
+            toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
           }
-        }, 10000);
-      }
-
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data' });
-    }
-
-    // Get Plot Names
-    plotNames.value = await queryGetPlotNames();
-    if (plotNames.value?._data.plot_names) {
-      console.log('plotNames._data:', plotNames.value?._data);
-
-      // setting plotList and selectedPlotName will populate the dropdown
-      plotList.value = plotNames.value?._data?.plot_names;
-      console.log('plotList:', plotList.value);
-
-      // set selectedPlotName to the first plot name if it is not already set
-      if (plotList.value && !selectedPlotName.value) {
-        selectedPlotName.value = plotList?.value[0]?.name;
-        console.log('selectedPlotName:', selectedPlotName.value);
+        }, 1000);
       }
     } else {
       toast.removeAllGroups();
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names' });
+      toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
+    }
+
+    // Get Plot Names
+    const getIterationResponse = await queryIteration();
+    if (getIterationResponse?._data?.iteration) {
+      iteration.value = getIterationResponse?._data?.iteration;
+      console.log('iteration:', iteration.value);
+    } else {
+      console.error('Error getting Iteration');
+    }
+
+    if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
+      plotNames.value = await queryGetPlotNames();
+    }
+
+    if (plotNames.value?._data.plot_names) {
+      console.log('plotNames._data:', plotNames.value?._data);
+
+      // setting plotList will populate the dropdown
+      plotList.value = plotNames?.value?._data?.plot_names;
+      console.log('plotList:', plotList.value);
+    } else {
+      toast.removeAllGroups();
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
     }
   }
 
@@ -281,42 +287,47 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data' });
     }
 
-    // Update Plot Names. Is this necessary?
-    plotNames.value = await queryGetPlotNames();
+    // Update Plot Names
+    const getIterationResponse = await queryIteration();
+    if (getIterationResponse?._data?.iteration) {
+      iteration.value = getIterationResponse?._data?.iteration;
+      console.log('iteration:', iteration.value);
+    } else {
+      console.error('Error getting Iteration');
+    }
+
+    if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
+      plotNames.value = await queryGetPlotNames();
+    }
 
     if (plotNames.value?._data.plot_names) {
-
       console.log('plotNames:', plotNames.value?._data);
 
-      // setting plotList and selectedPlotName will populate the dropdown
+      // setting plotList will populate the dropdown
       plotList.value = plotNames.value?._data?.plot_names;
       console.log('plotList:', plotList.value);
-
-      if (plotList.value && !selectedPlotName.value) {
-        selectedPlotName.value = plotList.value[0]?.name;
-        console.log('selectedPlotName:', selectedPlotName.value);
-      }
     } else {
       toast.removeAllGroups();
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Plot Names' });
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
     }
 
     // clear intervals and set stopCriteriaMet to true
     stopCriteriaMet.value = true;
-    clearInterval(runningTimeIntervalId);
-    clearInterval(statusIntervalId);
+    clearInterval(runningTimeIntervalId.value);
   }
 
   else if (calibrationStatus.value === 'Cancelled') {
     stopCriteriaMet.value = false; // this should already be false, but just in case
-    clearInterval(runningTimeIntervalId);
-    clearInterval(statusIntervalId);
+    clearInterval(runningTimeIntervalId.value);
   }
 
   else if (calibrationStatus.value === 'Failed') {
     stopCriteriaMet.value = false; // this should already be false, but just in case
-    clearInterval(runningTimeIntervalId);
-    clearInterval(statusIntervalId);
+    clearInterval(runningTimeIntervalId.value);
+  }
+
+  else if (calibrationStatus.value === 'Server error') {
+
   }
 
   else {
@@ -329,8 +340,6 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     // if Calibration status changes to anything but Running or Done while still executing this watch function, clear intervals (stop pinging server)
     if (calibrationStatus.value !== 'Running' && calibrationStatus.value !== 'Done') {
       stopCriteriaMet.value = false;
-      clearInterval(runningTimeIntervalId);
-      clearInterval(statusIntervalId);
     }
   });
 });
@@ -368,15 +377,19 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  // get selected plot file name and url from server
-  const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
+  if (iteration.value >= 1 || isCalibrationJobFinished(calibrationStatus.value)) {
+    // get selected plot file name and url from server
+    const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
 
-  if (response?._data?.plot_file_name && response?._data?.plot_url) {
-    selectedPlotFilename.value = response?._data?.plot_file_name;
-    selectedPlotFileUrl.value = response?._data?.plot_url;
+    if (response?._data?.plot_file_name && response?._data?.plot_url) {
+      selectedPlotFilename.value = response?._data?.plot_file_name;
+      selectedPlotFileUrl.value = response?._data?.plot_url;
+    } else {
+      toast.removeAllGroups();
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
+    }
   } else {
-    toast.removeAllGroups();
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot' });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
   }
 });
 
@@ -396,6 +409,7 @@ watch(selectedPlotName, async () => {
 // Run Calibration Job
 const startRun = async () => {
   if (calibrationStatus.value === 'Ready') {
+    calibrationStatus.value = 'Submitted';
     toast.removeAllGroups();
     try {
       console.log('hitting run_calibration endpoint');
@@ -403,6 +417,8 @@ const startRun = async () => {
 
       if (runCalibrationResponse?._data.status) {
         calibrationStatus.value = runCalibrationResponse?._data.status;
+        startTimeDate.value = new Date(runCalibrationResponse?._data?.run_date);
+        console.log('startTimeDate:', startTimeDate.value);
         if (calibrationStatus.value != 'Running') {
           toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
         }
@@ -449,21 +465,21 @@ const cancelRun = async () => {
 @import "@/assets/styles/styles.scss";
 
 #ResultsDisplay {
-  width: 50vw;
-  margin: 20px auto;
-  padding: 10px 10px 10px 20px;
+  width: 40vw;
+  min-width:720px;
+  margin: 5px auto;
+  padding: 6px 10px 6px 20px;
   border-radius: 10px;
   height: 100px;
   border: 0px solid $ngwcp_neutral_gray_md;
-  min-width: 750px;
 
 }
 
 #GraphArea {
-  height: 40vh;
-  width: 100%;
-  margin: 8px auto 0 auto;
-  border: 1px solid $ngwcp_neutral_gray_md;
+  min-height: 40vh;
+  width: 70%;
+  margin: 0px auto 0 auto;
+  /*border: 1px solid $ngwcp_neutral_gray_md;*/
 }
 
 #RunStatus,

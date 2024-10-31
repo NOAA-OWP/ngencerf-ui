@@ -1,16 +1,16 @@
 <template>
   <div id="Messages">
     <div class="">
-      <h2 class="mt-5">{{ componentProps.title }}</h2>
+      <h2 class="mt-5">{{ componentProps.title }} {{ userCalibrationRunData?.calibration_run_id ? "- Job " +
+        userCalibrationRunData.calibration_run_id : '' }}</h2>
 
       <div class="grid grid-cols-2 gap=1 text-sm mt-4">
         <div class="col-span-1">
           <p v-if="calData?.gage?.gage_id"><span class="font-medium">Gage:</span> {{ calData?.gage?.gage_id }}</p>
-          <p v-if="calData?.forcing_source"><span class="font-medium">Forcing Data:</span> {{ calData?.forcing_source
-            }}</p>
+          <p v-if="calData?.forcing_source"><span class="font-medium">Forcing Data:</span> {{ calData?.forcing_source }}
+          </p>
           <p v-if="calData?.formulation_name"><span class="font-medium">Formulation Name:</span> {{
-            calData?.formulation_name
-            }}</p>
+            calData?.formulation_name }}</p>
         </div>
         <div class="col-span-1">
           <p v-if="calData?.gage?.station_name"><span class="font-medium">{{ calData?.gage?.station_name }}</span></p>
@@ -74,10 +74,11 @@
             {{ formatDate(calData?.validation_times?.validation_end_time) }}</div>
           </p>
           <p>&nbsp;</p>
-          <p v-if="userSelectedCalibrationTuningParameters">
-            <span class="font-medium">Tuning Parameters:</span> 
-            {{ userSelectedCalibrationTuningParameters.length }}</p>
-          <p v-if="calData?.objective_function"><span class="font-medium">Objective Function:</span> 
+          <p v-if="userSelectedCalibrationTuningParameters && userSelectedCalibrationTuningParameters.length > 0">
+            <span class="font-medium">Tuning Parameters:</span>
+            {{ userSelectedCalibrationTuningParameters.length }}
+          </p>
+          <p v-if="calData?.objective_function"><span class="font-medium">Objective Function:</span>
             {{ calData?.objective_function }}</p>
           <p v-if="calData?.save_plot_iteration_frequency"><span class="font-medium">Plot Generation Frequency:</span>
             {{ calData?.save_plot_iteration_frequency }}</p>
@@ -93,7 +94,6 @@ import { storeToRefs } from 'pinia';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { defineProps, withDefaults } from 'vue';
 import type { ComponentPropsTitle } from '~/composables/NextGenModel'; //why doesn't this work?
 
 const calRunStore = useUserDataStore();
@@ -103,10 +103,10 @@ const tuningStore = useTuningStore();
 const { userSelectedCalibrationTuningParameters } = storeToRefs(tuningStore);
 
 const componentProps = withDefaults(defineProps<{
-    title: string
-  }>(), {
-    title: 'Calibration Run Setup'
-  }
+  title?: string
+}>(), {
+  title: () => 'Calibration Run Setup'
+}
 );
 
 const getModuleList = () => {

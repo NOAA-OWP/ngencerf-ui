@@ -29,6 +29,9 @@ $ngwcp_background: #eff4f7;
 $ngwcp_green_lt: #D8FFD8;
 $ngwcp_blue_lt: #D8FFFF;
 
+$ngwcp_red_dark1: #922222;
+$ngwcp_red_dark2: #811d1d;
+
 $color-transparent: rgba(0, 0, 0, 0);
 $color-blue: #0077ff;
 
@@ -60,6 +63,12 @@ $dark: $ngwcp_secondary1;
     }
     .hr {
         @apply w-full h-[1px] bg-gray-md;
+    }
+    .progressTable td:nth-child(2) { 
+        @apply ptype whitespace-nowrap c-blue underline; 
+    }
+    .progressTable td:nth-child(2):hover { 
+        @apply c-blue-primary1 cursor-pointer; 
     }
 }
 

@@ -48,7 +48,8 @@ const canDisplayBeforeRun = computed(() => {
 }
 
 #FooterData {
-  height: 50px;
+  /*height: 50px;*/
+  height: 40px;
   z-index: 9;
 }
 
@@ -66,7 +67,7 @@ const canDisplayBeforeRun = computed(() => {
 .version,
 .copyright {
   display: block;
-  margin-top: 10px;
+  margin-top: 16px;
 }
 
 .version {
