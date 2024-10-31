@@ -303,7 +303,6 @@ const { ngencerfBaseUrl } = useBackendConfig();
 const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
 const runStatusStore = useRunStatusStore();
-const { calibrationStatus } = storeToRefs(runStatusStore);
 
 const {
   formulationNameInput,

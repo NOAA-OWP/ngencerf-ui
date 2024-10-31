@@ -13,7 +13,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { getAccessToken } = useUserDataStore();
   
   // refs
-  const calibrationStatus = ref<string>();
   const runningTime = ref();
   const startTimeDate = ref();
   const startTime = ref();
@@ -129,7 +128,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Hard Reset Run/Status Store
    */
   const hardResetRunStatusStore = (): void => {
-    calibrationStatus.value = "";
     runningTime.value = "";
     startTimeDate.value = "";
     startTime.value = "";
@@ -149,7 +147,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   return {
-    calibrationStatus,
     startTimeDate,
     startTime,
     runningTime,

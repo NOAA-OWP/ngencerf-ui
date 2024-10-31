@@ -158,9 +158,6 @@ import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore"
 
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
-const runStatusStore = useRunStatusStore();
-
 const optimizationStore = useOptimizationStore();
 const {
   uiObjectiveFunction,
