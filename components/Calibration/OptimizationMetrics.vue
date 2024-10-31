@@ -187,7 +187,9 @@ const {
    getOptimizationInputUserData,
 } = storeToRefs(optimizationStore);
 const { loadOptimizationTabStaticData, saveOptimizationTabData, resetOptimizationInputs, resetUserSelectionOptimization } = optimizationStore;
-const { fetchUserCalibrationRunData, userCalibrationRunData } = useUserDataStore();
+const { fetchUserCalibrationRunData } = useUserDataStore();
+const userDataStore = useUserDataStore();
+const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { getCalibrationTabIndex } = generalStore();
 const toast = useToast();
 
@@ -302,7 +304,7 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
 * event bus for calibration button group click
 */
 const saveOptMetData = () => {
-   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
+   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)) {
       toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
    } else {
       toast.removeAllGroups();
