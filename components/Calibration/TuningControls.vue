@@ -1023,35 +1023,35 @@ const validateTab = () => {
   /* Check the DateTimes */
   let error = false;
   let text = [];
-  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times.simulation_start_time || '', simStartTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times?.simulation_start_time || '', simStartTime.value)) {
     error = true;
     text.push("Simulation Start has changed");
   }
-  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times.simulation_end_time || '', simEndTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times?.simulation_end_time || '', simEndTime.value)) {
     error = true;
     text.push("Simulation End has changed");
   }
-  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times.calibration_start_time || '', calStartTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times?.calibration_start_time || '', calStartTime.value)) {
     error = true;
     text.push("Calibration Start has changed");
   }
-  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times.calibration_end_time || '', calEndTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times?.calibration_end_time || '', calEndTime.value)) {
     error = true;
     text.push("Calibration End has changed");
   }
-  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times.simulation_start_time || '', avSimStartTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times?.simulation_start_time || '', avSimStartTime.value)) {
     error = true;
     text.push("Simulation Start has changed");
   }
-  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times.simulation_end_time || '', avSimEndTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times?.simulation_end_time || '', avSimEndTime.value)) {
     error = true;
     text.push("Simulation End has changed");
   }
-  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times.validation_start_time || '', avCalStartTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times?.validation_start_time || '', avCalStartTime.value)) {
     error = true;
     text.push("Validation Start has changed");
   }
-  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times.validation_end_time || '', avCalEndTime.value)) {
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times?.validation_end_time || '', avCalEndTime.value)) {
     error = true;
     text.push("Validation End has changed");
   }

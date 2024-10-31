@@ -208,6 +208,20 @@ onMounted(() => {
 
    if (ele) { ele.scrollTo(0, 0); }
 
+   if (userCalibrationRunData.value?.streamflow_threshold) {
+      cbIsCategorical.value = true;
+      showMetricStreamFlow.value = true;
+      uiStreamFlowThreshold.value = userCalibrationRunData.value?.streamflow_threshold
+   }
+
+   if (userCalibrationRunData.value?.peak_flow_threshold) {
+      cbIsEvenBased.value = true;
+      showMetricPeakFlow.value = true;
+      uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold
+   }
+
+   // uiStreamFlowThreshold
+   // uiPeakFlowThreshold
 })
 
 /**
@@ -337,11 +351,11 @@ const validateTab = () => {
       error = true;
       text.push("Objective Function has been changed");
    }
-   if (userCalibrationRunData?.value?.stop_criteria !== uiStopCriteria.value) {
+   if (userCalibrationRunData?.value?.stop_criteria || 0 !== uiStopCriteria.value) {
       error = true;
       text.push("Calibration Stop Criteria has been changed");
    }
-   if (userCalibrationRunData?.value?.save_plot_iteration_frequency !== uiPlotFrequency.value) {
+   if (userCalibrationRunData?.value?.save_plot_iteration_frequency || 0 !== uiPlotFrequency.value) {
       error = true;
       text.push("Plot Generation Frequency has been changed");
    }
@@ -350,12 +364,12 @@ const validateTab = () => {
       text.push("Algorithm Parameters have been changed");
    }
 
-   if ((userCalibrationRunData?.value?.streamflow_threshold || null) !== (uiStreamFlowThreshold.value || null)) {
+   if ((userCalibrationRunData?.value?.streamflow_threshold || 0) !== (uiStreamFlowThreshold.value || 0)) {
       error = true;
       text.push("Calculate Categorical Metrics (Flow Threshold) has been changed");
    }
 
-   if ((userCalibrationRunData?.value?.peak_flow_threshold || null) !== (uiPeakFlowThreshold.value || null)) {
+   if ((userCalibrationRunData?.value?.peak_flow_threshold || 0) !== (uiPeakFlowThreshold.value || 0)) {
       error = true;
       text.push("Calculate Event Based Metrics (Peak Flow Threshold) has been changed");
    }
@@ -375,8 +389,8 @@ const restorePage = async () => {
    if (userCalibrationRunData.value) {
       uiOptimization.value = userCalibrationRunData?.value?.optimization;
       uiObjectiveFunction.value = userCalibrationRunData?.value?.objective_function;
-      uiStopCriteria.value = userCalibrationRunData?.value?.stop_criteria;
-      uiPlotFrequency.value = userCalibrationRunData?.value?.save_plot_iteration_frequency;
+      uiStopCriteria.value = userCalibrationRunData?.value?.stop_criteria || 0;
+      uiPlotFrequency.value = userCalibrationRunData?.value?.save_plot_iteration_frequency || 0;
       uiOptimizationInputs.value = userCalibrationRunData?.value?.optimization_inputs;
    }
 }
