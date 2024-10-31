@@ -61,7 +61,7 @@
                      </div>
                      <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-2">
                         Peak Flow Threshold <InputNumber inputId="ofEventBasedFlowThreshold"
-                           v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
+                           v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quantile
                      </div>
                   </div>
                </div>
@@ -91,7 +91,7 @@
                      </div>
                      <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-2 pl-8">
                         Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold"
-                           v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quartile
+                           v-model="uiPeakFlowThreshold" class="w-24"></InputNumber> quantile
                      </div>
                   </div>
                </div>
