@@ -61,7 +61,7 @@
               </div>
               <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-2">
                 Peak Flow Threshold <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
-                  class="w-24"></InputNumber> quartile
+                  class="w-24"></InputNumber> quantile
               </div>
             </div>
           </div>
@@ -91,7 +91,7 @@
               </div>
               <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-2 pl-8">
                 Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
-                  class="w-24"></InputNumber> quartile
+                  class="w-24"></InputNumber> quantile
               </div>
             </div>
           </div>
@@ -119,7 +119,7 @@
             </div>
           </div>
         </div>
-
+        <DynamicDialog />
       </div>
 
     </div>
@@ -157,6 +157,11 @@ import { useToast } from "primevue/usetoast";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore"
+import { useDialog } from "primevue/usedialog";
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+
+const dialog = useDialog();
+const nextPrevDialogOpened = ref<boolean>(false);
 
 const optimizationStore = useOptimizationStore();
 const {
@@ -197,6 +202,20 @@ onMounted(() => {
 
   if (ele) { ele.scrollTo(0, 0); }
 
+  if (userCalibrationRunData.value?.streamflow_threshold) {
+    cbIsCategorical.value = true;
+    showMetricStreamFlow.value = true;
+    uiStreamFlowThreshold.value = userCalibrationRunData.value?.streamflow_threshold
+  }
+
+  if (userCalibrationRunData.value?.peak_flow_threshold) {
+    cbIsEvenBased.value = true;
+    showMetricPeakFlow.value = true;
+    uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold
+  }
+
+  // uiStreamFlowThreshold
+  // uiPeakFlowThreshold
 })
 
 /**
@@ -261,13 +280,6 @@ const optimizationSelectChange = () => {
   uiOptimizationInputs.value = getOptimizationInputUserData.value;
 };
 
-const gotoNext = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_statusRun];
-  e.click();
-};
-
-
 /**
  * explicitly watching loading status, as onmount happen prior to store loading. 
  * make sure we manage the display base on user input AFTER data loading has completed 
@@ -295,6 +307,7 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
 })
 
 
+
 /**
 * event bus for calibration button group click
 */
@@ -303,43 +316,143 @@ const saveOptMetData = () => {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
-    saveOptimizationTabData().then( response => {
-      if ( response.status == 200 ) {
-        toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?._data?.message});
-        fetchUserCalibrationRunData();
+    saveOptimizationTabData().then(response => {
+      if (response.status == 200) {
+        toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?._data?.message });
       } else {
-        useApiErrorResponsePreprocess( response ).forEach( message => {
-          toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message});
+        useApiErrorResponsePreprocess(response).forEach(message => {
+          toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message });
         });
       }
+      fetchUserCalibrationRunData();
     });
   }
 };
 
+
+const validateTab = () => {
+  let error = false;
+  let text = [];
+  let savedName = userCalibrationRunData?.value?.optimization ? userCalibrationRunData?.value?.optimization : '';
+  let newName = uiOptimization.value ? uiOptimization.value : '';
+  if (savedName !== newName) {
+    error = true;
+    text.push("Optimization Algorithm has been changed");
+  }
+  savedName = userCalibrationRunData?.value?.objective_function ? userCalibrationRunData?.value?.objective_function : '';
+  newName = uiObjectiveFunction.value ? uiObjectiveFunction.value : '';
+  if (savedName !== newName) {
+    error = true;
+    text.push("Objective Function has been changed");
+  }
+  if (userCalibrationRunData?.value?.stop_criteria || 0 !== uiStopCriteria.value) {
+    error = true;
+    text.push("Calibration Stop Criteria has been changed");
+  }
+  if (userCalibrationRunData?.value?.save_plot_iteration_frequency || 0 !== uiPlotFrequency.value) {
+    error = true;
+    text.push("Plot Generation Frequency has been changed");
+  }
+  if (userCalibrationRunData?.value?.optimization_inputs.length !== uiOptimizationInputs.value.length) {
+    error = true;
+    text.push("Algorithm Parameters have been changed");
+  }
+
+  if ((userCalibrationRunData?.value?.streamflow_threshold || 0) !== (uiStreamFlowThreshold.value || 0)) {
+    error = true;
+    text.push("Calculate Categorical Metrics (Flow Threshold) has been changed");
+  }
+
+  if ((userCalibrationRunData?.value?.peak_flow_threshold || 0) !== (uiPeakFlowThreshold.value || 0)) {
+    error = true;
+    text.push("Calculate Event Based Metrics (Peak Flow Threshold) has been changed");
+  }
+
+  if (userCalibrationRunData?.value?.optimization_inputs && userCalibrationRunData?.value?.optimization_inputs.length > 0)
+    uiOptimizationInputs.value.every((module, index) => {
+      if (userCalibrationRunData?.value?.optimization_inputs[index].name !== module.name ||
+        userCalibrationRunData?.value?.optimization_inputs[index].value !== module.value) {
+        error = true;
+        text.push("Algorithm Parameter(s) have been added or changed");
+      }
+    })
+  return { error: error, text: text }
+}
+
+const restorePage = async () => {
+  if (userCalibrationRunData.value) {
+    uiOptimization.value = userCalibrationRunData?.value?.optimization;
+    uiObjectiveFunction.value = userCalibrationRunData?.value?.objective_function;
+    uiStopCriteria.value = userCalibrationRunData?.value?.stop_criteria || 0;
+    uiPlotFrequency.value = userCalibrationRunData?.value?.save_plot_iteration_frequency || 0;
+    uiOptimizationInputs.value = userCalibrationRunData?.value?.optimization_inputs;
+  }
+}
+
 const goNextTab = () => {
-  // let err = false;
-  // let txt = "Please correct the following:";
-  // if (!uiOptimization.value) {
-  //    txt += "\nAll Calibration Times are required.";
-  //    err = true;
-  // }
-  // if (!uiObjectiveFunction.value) {
-  //    txt += "\nAll Automatic Validation Times are required.";
-  //    err = true;
-  // }
-  // if (err) {
-  //    toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt);
-  //    return;
-  // }
-  gotoNext();
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text, true);
+  } else {
+    gotoNext();
+  }
 };
 
 const goPrevTab = () => {
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text, false);
+  } else {
+    gotoPrev();
+  }
+};
+
+const gotoNext = () => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_statusRun];
+  e.click();
+}
+
+const gotoPrev = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
   e.click();
-};
+}
 
+const showPrevNextDialog = (body: string[], next: boolean) => {
+  if (!nextPrevDialogOpened.value) {
+    dialog.open(MoveNextPrevDialog, {
+      props: {
+        header: "Unsaved changes!",
+        style: {
+          width: 'auto',
+        },
+        modal: true,
+      },
+      data: {
+        body: body,
+        direction: next
+      },
+      onClose: (opt) => {
+        nextPrevDialogOpened.value = false;
+        handleNextPrevDialogClose(opt);
+      },
+
+    })
+    nextPrevDialogOpened.value = true
+  }
+}
+
+const handleNextPrevDialogClose = (opt: any) => {
+  if (opt.data.moveToNextResponse) {
+    restorePage();
+    if (opt.data.goNext) {
+      gotoNext();
+    } else {
+      gotoPrev();
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

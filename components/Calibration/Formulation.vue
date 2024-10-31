@@ -7,7 +7,7 @@
             <div id="FormulationName" class="block mt-1" aria-label="Forumulation Name" title="Formulation Name">
               <label for="formulationNameInput" class="text-lg">Formulation Name </label>
               <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
-                aria-label="Input Forumulation Name" title="Input Formulation Name" required></InputText>
+                aria-label="Input Forumulation Name" title="Input Formulation Name" required @keypress="checkValidCharacters($event)"></InputText>
             </div>
           </div>
         </div>
@@ -56,7 +56,8 @@
         <div class="flex">
           <span class="text-left pt-1">
             <input type="checkbox" id="SlothCheck" class="ml-2" v-model="useSlothParameters" />
-            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for formulation</label>
+            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for
+              formulation</label>
           </span>
           <span v-show="useSlothParameters" class="ml-auto pr-2">
             <label class="inline-block  text-[16px] pl-10 pr-4" for="SlothName">SLoTH Name</label>
@@ -68,7 +69,8 @@
           </span>
         </div>
 
-        <div id="SlothDataTable" v-show="useSlothParameters" class="items-center pl-2 pr-2 mt-2 overflow-auto max-h-[157px]">
+        <div id="SlothDataTable" v-show="useSlothParameters"
+          class="items-center pl-2 pr-2 mt-2 overflow-auto max-h-[157px]">
 
           <ContextMenu :pt="{ root: { id: 'loth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
             :model="cmSlothParameterData"></ContextMenu>
@@ -153,7 +155,7 @@
         </div>
 
       </div>
-
+      <DynamicDialog />
     </div>
     <div class="waitgif" v-if="formulationStore_data_loading">
       <img src="@/assets/styles/img/wait.gif" />
@@ -163,13 +165,20 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { onMounted, onUnmounted } from "vue";
+import { onMounted } from "vue";
+import type { UserCalibrationRunData } from "~/composables/NextGenModel";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
+import { useDialog } from "primevue/usedialog";
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+
+
+const dialog = useDialog();
+const nextPrevDialogOpened = ref<boolean>(false);
 import { useCalibrationFormulationTabSaveWarning, useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
 
 const isLoading = ref(false);
@@ -260,6 +269,16 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
   deleteSlothVariable(selectedSlothParameterData.value.param_name);
 }
 
+/**
+ * Prevent unwanted characters
+ */
+const checkValidCharacters = (e: KeyboardEvent) => {
+  if(/^[a-zA-Z0-9_-]+$/.test(e.key) === false) {
+    e.preventDefault();
+    return true;
+  }
+  return false;
+}
 
 /**
 * event bus for calibration button group click
@@ -291,35 +310,54 @@ const resetFormulationData = () => {
   resetUserSelectionFormulation();
 }
 
-const goNextTab = () => {
-  // let err = false;
-  // let txt = "Please correct the following:";
-  // if (!userCalibrationRunData?.formulation_name ) {
-  //   txt += "\nA Formulation Name is required.";
-  //   err = true;  // let err = false;
-  // let txt = "Please correct the following:";
-  // if (!userCalibrationRunData?.formulation_name ) {
-  //   txt += "\nA Formulation Name is required.";
-  //   err = true;
-  // }
-  // if (!userCalibrationRunData?.modules.length ) {
-  //   txt += "\nModule Selection is required."
-  //   err = true;
-  // }
-  // if (err) {
-  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-  //   return;
-  // }
-  // }
-  // if (!userCalibrationRunData?.modules.length ) {
-  //   txt += "\nModule Selection is required."
-  //   err = true;
-  // }
-  // if (err) {
-  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-  //   return;
-  // }
-  gotoNext();
+
+const validateTab = () => {
+  fetchUserCalibrationRunData();
+  let error = false;
+  let text = [];
+  /* Check if formulation name changed */
+  let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : ''  ;
+  let newName = formulationNameInput.value ? formulationNameInput.value : '';
+  if (savedName !== newName) {
+    error = true;
+    text.push("Formulation Name has been changed");
+  }
+  /* check if list of modules changed */
+  let selModules = selectedModuleValues.value;
+  let savedModules = userCalibrationRunData?.value?.modules;
+  if (selModules.length !== savedModules?.length) {
+    error = true;
+    text.push("Selected Modules have been changed");
+  } else {
+    selModules.every((module) => {
+      if (savedModules.indexOf(module) === -1) {
+        error = true;
+        text.push("Selected Modules have been changed");
+        return false;
+      }
+    })
+  }
+  /* Has user checked/unchecked Add SLoTH outpu8t variables? */
+  if (useSlothParameters.value !== userCalibrationRunData?.value?.use_sloth) {
+    error = true;
+    text.push("Add SLoth output has changed");
+  }
+  /* has the number of SLoTH vars changed? */
+  if (slothParameterInputs.value.length !== userCalibrationRunData?.value?.sloth_parameters.length) {
+    error = true;
+    text.push("Add SLoth variable list has changed");
+  }
+  return { error: error, text: text }
+}
+
+const restorePage = () => {
+  console.log("Run Data: ", userCalibrationRunData.value);
+  selectedModuleValues.value  = userCalibrationRunData?.value?.modules ? userCalibrationRunData?.value?.modules : [];
+  formulationNameInput.value  = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";  
+  if (userCalibrationRunData.value) {
+    useSlothParameters.value = userCalibrationRunData?.value?.use_sloth;
+    slothParameterInputs.value = userCalibrationRunData?.value?.sloth_parameters;
+  }
 }
 
 const gotoNext = () => {
@@ -327,19 +365,75 @@ const gotoNext = () => {
   const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
   e.click();
 }
-const goPrevTab = () => {
+const gotoPrev = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
   e.click();
+}
+
+const goNextTab = () => {
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text, true);
+  } else {
+    gotoNext();
+  }
+};
+
+const goPrevTab = () => {
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text, false);
+  } else {
+    gotoPrev();
+  }
+};
+
+const showPrevNextDialog = (body: string[], next: boolean) => {
+  if (!nextPrevDialogOpened.value) {
+    dialog.open(MoveNextPrevDialog, {
+      props: {
+        header: "Unsaved changes!",
+        style: {
+          width: 'auto',
+        },
+        modal: true,
+      },
+      data: {
+        body: body,
+        direction: next
+      },
+      onClose: (opt) => {
+        nextPrevDialogOpened.value = false;
+        handleNextPrevDialogClose(opt);
+      },
+
+    })
+    nextPrevDialogOpened.value = true
+  }
+}
+
+const handleNextPrevDialogClose = (opt: any) => {
+  if (opt.data.moveToNextResponse) {
+    restorePage();
+    if (opt.data.goNext) {
+      gotoNext();
+    } else {
+      gotoPrev();
+    }
+  }
 }
 
 </script>
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-#Groups, #formulationNameInput {
+
+#Groups,
+#formulationNameInput {
   width: 256px;
 }
+
 #Formulation {
   width: auto;
 }
@@ -420,6 +514,7 @@ h1 {
   text-align: right;
   width: 120px;
 }
+
 /*
 #FormulationBottomButtons {
   height: 54px;
