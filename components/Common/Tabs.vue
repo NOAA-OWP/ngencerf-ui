@@ -58,6 +58,11 @@
           Select Alternate Iteration
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
+        <div data-tab="4" data-menu-tab="24" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
+          aria-label="Run Validation tab" title="Run Validation tab">
+          Status
+          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+        </div>
       </div>
     </span>
 

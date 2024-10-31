@@ -12,6 +12,9 @@
       <span v-else-if="activeTab == 3">
         <SelectAltIterationTab />
       </span>
+      <span v-else-if="activeTab == 4">
+        <RunStatus />
+      </span>
     </div>
   </div>
 </template>
@@ -22,6 +25,7 @@ import Tabs from '~/components/Common/Tabs.vue'
 import EvaluateTab from './EvaluateTab.vue'
 import SelectAltIterationTab from './SelectAltIterationTab.vue'
 import CalibrationRunsTab from './CalibrationRunsTab.vue'
+import RunStatus from './RunStatus.vue'
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
