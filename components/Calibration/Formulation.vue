@@ -7,7 +7,7 @@
             <div id="FormulationName" class="block mt-1" aria-label="Forumulation Name" title="Formulation Name">
               <label for="formulationNameInput" class="text-lg">Formulation Name </label>
               <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
-                aria-label="Input Forumulation Name" title="Input Formulation Name" required></InputText>
+                aria-label="Input Forumulation Name" title="Input Formulation Name" required @keypress="checkValidCharacters($event)"></InputText>
             </div>
           </div>
         </div>
@@ -271,12 +271,22 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
   deleteSlothVariable(selectedSlothParameterData.value.param_name);
 }
 
+/**
+ * Prevent unwanted characters
+ */
+const checkValidCharacters = (e: KeyboardEvent) => {
+  if(/^[a-zA-Z0-9_-]+$/.test(e.key) === false) {
+    e.preventDefault();
+    return true;
+  }
+  return false;
+}
 
 /**
 * event bus for calibration button group click
 */
 const saveFormulationData = () => {
-  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+  if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();

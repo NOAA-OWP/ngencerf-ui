@@ -305,7 +305,7 @@ const toggle_isNWMv3 = () => {
 };
 
 const saveTabData = () => {
-  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+  if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
