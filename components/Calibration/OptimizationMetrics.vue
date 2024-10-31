@@ -304,7 +304,7 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
 * event bus for calibration button group click
 */
 const saveOptMetData = () => {
-   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)) {
+   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
       toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
    } else {
       toast.removeAllGroups();
@@ -325,45 +325,45 @@ const saveOptMetData = () => {
 const validateTab = () => {
    let error = false;
    let text = [];
-   let savedName = userCalibrationRunData?.optimization ? userCalibrationRunData?.optimization : '';
+   let savedName = userCalibrationRunData?.value?.optimization ? userCalibrationRunData?.value?.optimization : '';
    let newName = uiOptimization.value ? uiOptimization.value : '';
    if (savedName !== newName) {
       error = true;
       text.push("Optimization Algorithm has been changed");
    }
-   savedName = userCalibrationRunData?.objective_function ? userCalibrationRunData?.objective_function : '';
+   savedName = userCalibrationRunData?.value?.objective_function ? userCalibrationRunData?.value?.objective_function : '';
    newName = uiObjectiveFunction.value ? uiObjectiveFunction.value : '';
    if (savedName !== newName) {
       error = true;
       text.push("Objective Function has been changed");
    }
-   if (userCalibrationRunData?.stop_criteria !== uiStopCriteria.value) {
+   if (userCalibrationRunData?.value?.stop_criteria !== uiStopCriteria.value) {
       error = true;
       text.push("Calibration Stop Criteria has been changed");
    }
-   if (userCalibrationRunData?.save_plot_iteration_frequency !== uiPlotFrequency.value) {
+   if (userCalibrationRunData?.value?.save_plot_iteration_frequency !== uiPlotFrequency.value) {
       error = true;
       text.push("Plot Generation Frequency has been changed");
    }
-   if (userCalibrationRunData?.optimization_inputs.length !== uiOptimizationInputs.value.length) {
+   if (userCalibrationRunData?.value?.optimization_inputs.length !== uiOptimizationInputs.value.length) {
       error = true;
       text.push("Algorithm Parameters have been changed");
    }
 
-   if ((userCalibrationRunData?.streamflow_threshold || null) !== (uiStreamFlowThreshold.value || null)) {
+   if ((userCalibrationRunData?.value?.streamflow_threshold || null) !== (uiStreamFlowThreshold.value || null)) {
       error = true;
       text.push("Calculate Categorical Metrics (Flow Threshold) has been changed");
    }
 
-   if ((userCalibrationRunData?.peak_flow_threshold || null) !== (uiPeakFlowThreshold.value || null)) {
+   if ((userCalibrationRunData?.value?.peak_flow_threshold || null) !== (uiPeakFlowThreshold.value || null)) {
       error = true;
       text.push("Calculate Event Based Metrics (Peak Flow Threshold) has been changed");
    }
 
-   if (userCalibrationRunData?.optimization_inputs && userCalibrationRunData?.optimization_inputs.length > 0)
+   if (userCalibrationRunData?.value?.optimization_inputs && userCalibrationRunData?.value?.optimization_inputs.length > 0)
       uiOptimizationInputs.value.every((module, index) => {
-         if (userCalibrationRunData?.optimization_inputs[index].name !== module.name ||
-            userCalibrationRunData?.optimization_inputs[index].value !== module.value) {
+         if (userCalibrationRunData?.value?.optimization_inputs[index].name !== module.name ||
+            userCalibrationRunData?.value?.optimization_inputs[index].value !== module.value) {
             error = true;
             text.push("Algorithm Parameter(s) have been added or changed");
          }
@@ -372,12 +372,12 @@ const validateTab = () => {
 }
 
 const restorePage = async () => {
-   if (userCalibrationRunData) {
-      uiOptimization.value = userCalibrationRunData?.optimization;
-      uiObjectiveFunction.value = userCalibrationRunData?.objective_function;
-      uiStopCriteria.value = userCalibrationRunData?.stop_criteria;
-      uiPlotFrequency.value = userCalibrationRunData?.save_plot_iteration_frequency;
-      uiOptimizationInputs.value = userCalibrationRunData?.optimization_inputs;
+   if (userCalibrationRunData.value) {
+      uiOptimization.value = userCalibrationRunData?.value?.optimization;
+      uiObjectiveFunction.value = userCalibrationRunData?.value?.objective_function;
+      uiStopCriteria.value = userCalibrationRunData?.value?.stop_criteria;
+      uiPlotFrequency.value = userCalibrationRunData?.value?.save_plot_iteration_frequency;
+      uiOptimizationInputs.value = userCalibrationRunData?.value?.optimization_inputs;
    }
 }
 
