@@ -29,5 +29,4 @@ export const CalibrationHelpPages = {
   optimizationMetrics: 5,
   runStatus: 6,
   results: 7,
-
 }
