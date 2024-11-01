@@ -270,14 +270,14 @@
 
     </div>
   </div>
-
+  <DynamicDialog />
   <div class="waitgif" v-if="isLoading">
     <img src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from "vue";
+import { onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -294,6 +294,14 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { ifHydrofabricErrorsExist } from "~/utils/TuningControlsHelpers";
+
+import { useDialog } from "primevue/usedialog";
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+import type { DatePickerProps } from "primevue/datepicker";
+
+const dialog = useDialog();
+const nextPrevDialogOpened = ref<boolean>(false);
+
 const format = formatDateForDisplay;
 const isLoading = ref(false);
 
@@ -421,6 +429,55 @@ onMounted(async () => {
 
     isInitialSetupDone.value = true; // set to true after initial setup
   }
+
+  // check if Hydrofabric errors exist
+  const hydrofabricErrorMessage = ifHydrofabricErrorsExist(loadTuningTabData.value._data);
+  if (hydrofabricErrorMessage) {
+    toast.add({ severity: 'error', summary: 'Hydrofabric Error', detail: hydrofabricErrorMessage });
+  }
+
+  // set calibration times
+  if (userCalibrationRunData?.value?.calibration_times) {
+    const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
+
+    // set calibration times only if they are not already set
+    // if a user purposely removes all times, they will be reset to the default values. Is that what we want?
+    if (!isValidDateTime(simStartTime.value) && !isValidDateTime(simEndTime.value) && !isValidDateTime(calStartTime.value) && !isValidDateTime(calEndTime.value)) {
+      simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+      simEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+      calStartTime.value = DateTime.fromISO(calibration_start_time, { zone: 'utc' });
+      calEndTime.value = DateTime.fromISO(calibration_end_time, { zone: 'utc' });
+    }
+  };
+
+  // set automatic validation times
+  if (userCalibrationRunData?.value?.validation_times) {
+    const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
+
+    // set automatic validation times only if they are not already set
+    // if a user purposely removes all times, they will be reset to the default values. Is that what we want?
+    if (!isValidDateTime(avSimStartTime.value) && !isValidDateTime(avSimEndTime.value) && !isValidDateTime(avCalStartTime.value) && !isValidDateTime(avCalEndTime.value)) {
+      avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+      avSimEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+      avCalStartTime.value = DateTime.fromISO(validation_start_time, { zone: 'utc' });
+      avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
+    }
+  };
+
+  // set output variable to calibrate
+  if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
+    console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
+    const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
+
+    // set output variable to calibrate only if it is not already set
+    if (!selectedOutputVariable.value) {
+      userOutputVariableToCalibrate.value.name = name;
+      userOutputVariableToCalibrate.value.module = module;
+      selectedOutputVariable.value = `${name} (${module})`;
+    }
+  };
+
+  isInitialSetupDone.value = true; // set to true after initial setup
 });
 
 /**
@@ -519,7 +576,7 @@ watch(selectedOutputVariable, () => {
   const outputVariable = outputVariables?.value?.find((outputVar: any) => outputVar?.output === selectedOutputVariable?.value);
 
   // find module for newly-selected output variable
-  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === outputVariable.name));
+  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === outputVariables.name));
 
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
@@ -961,12 +1018,6 @@ const isOutputVariableValidated = (): boolean => {
   return true;
 };
 
-const gotoNext = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_optimizationMetrics];
-  e.click();
-};
-
 /**
   * Save Tuning Tab data
   */
@@ -994,9 +1045,10 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
+    fetchUserCalibrationRunData();
   };
 
-  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+  if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     // check if Tuning Tab data is validated before saving
@@ -1019,47 +1071,152 @@ const resetTuningData = () => {
   // hardResetTuningStore(); // disable for now
 };
 
-const goPrevTab = () => {
+const validateTab = () => {
+  /* Check the DateTimes */
+  let error = false;
+  let text = [];
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times?.simulation_start_time || '', simStartTime.value)) {
+    error = true;
+    text.push("Simulation Start has changed");
+  }
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times?.simulation_end_time || '', simEndTime.value)) {
+    error = true;
+    text.push("Simulation End has changed");
+  }
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times?.calibration_start_time || '', calStartTime.value)) {
+    error = true;
+    text.push("Calibration Start has changed");
+  }
+  if (compareTimeEntries(userCalibrationRunData?.value?.calibration_times?.calibration_end_time || '', calEndTime.value)) {
+    error = true;
+    text.push("Calibration End has changed");
+  }
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times?.simulation_start_time || '', avSimStartTime.value)) {
+    error = true;
+    text.push("Simulation Start has changed");
+  }
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times?.simulation_end_time || '', avSimEndTime.value)) {
+    error = true;
+    text.push("Simulation End has changed");
+  }
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times?.validation_start_time || '', avCalStartTime.value)) {
+    error = true;
+    text.push("Validation Start has changed");
+  }
+  if (compareTimeEntries(userCalibrationRunData?.value?.validation_times?.validation_end_time || '', avCalEndTime.value)) {
+    error = true;
+    text.push("Validation End has changed");
+  }
+
+  /* selectedOutputVariable */
+  if (selectedOutputVariable.value !== null &&
+    selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
+    error = true;
+    text.push("Output Variable to Calibrate has changed");
+  }
+
+  return { error: error, text: text }
+}
+
+const compareTimeEntries = (txtDT: string, dT: Date) => {
+  const dateProps = dT as DatePickerProps;
+  if( !txtDT && dateProps.invalid ) {
+    return false;
+  }
+  if( txtDT && dateProps.invalid ) {
+    return true;
+  }
+  return new Date(dT).getTime() !== new Date(txtDT).getTime();
+}
+
+const restorePage = async () => {
+  // set calibration times
+  if (userCalibrationRunData?.value?.calibration_times) {
+    const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
+    simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+    simEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+    calStartTime.value = DateTime.fromISO(calibration_start_time, { zone: 'utc' });
+    calEndTime.value = DateTime.fromISO(calibration_end_time, { zone: 'utc' });
+  };
+
+  // set automatic validation times
+  if (userCalibrationRunData?.value?.validation_times) {
+    const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
+    avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+    avSimEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+    avCalStartTime.value = DateTime.fromISO(validation_start_time, { zone: 'utc' });
+    avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
+  };
+
+  if (selectedOutputVariable.value !== null &&
+    selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
+  }
+}
+
+const gotoNext = () => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_optimizationMetrics];
+  e.click();
+}
+
+const gotoPrev = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_formulation];
   e.click();
 };
 
 const goNextTab = () => {
-  // let err = false;
-  // let txt = "Please correct the following:";
-  // if (!(userCalibrationRunData.value?.calibration_times.calibration_end_time &&
-  //   userCalibrationRunData.value?.calibration_times.calibration_start_time &&
-  //   userCalibrationRunData.value?.calibration_times.simulation_end_time &&
-  //   userCalibrationRunData.value?.calibration_times.simulation_start_time)) {
-  //   txt += "\nAll Calibration Times are required.";
-  //   err = true;
-  // }
-  // if (!(userCalibrationRunData.value?.validation_times.simulation_end_time &&
-  //   userCalibrationRunData.value?.validation_times.simulation_start_time &&
-  //   userCalibrationRunData.value?.validation_times.validation_end_time &&
-  //   userCalibrationRunData.value?.validation_times.validation_start_time)) {
-  //   txt += "\nAll Automatic Validation Times are required."
-  //   err = true;
-  // }
-  // if (!userOutputVariableToCalibrate.value.name) {
-  //   txt += "\nNo Output Variable selected."
-  //   err = true;
-  // }
-  // if(!(userCalibrationRunData?.value?.output_variable_to_calibrate?.module)) {
-  //   txt += "\nNo Output Varialbe to calibration"
-  // }
-  // if(!(userCalibrationRunData?.value?.parameters_selected?.module)) {
-  //   txt += "\nNo Paramters selected"
-  // }
-
-  // if (err) {
-  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-  //   return;
-  // }
-  gotoNext();
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text, true);
+  } else {
+    gotoNext();
+  }
 };
 
+const goPrevTab = () => {
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text, false);
+  } else {
+    gotoPrev();
+  }
+};
+
+const showPrevNextDialog = (body: string[], next: boolean) => {
+  if (!nextPrevDialogOpened.value) {
+    dialog.open(MoveNextPrevDialog, {
+      props: {
+        header: "Unsaved changes!",
+        style: {
+          width: 'auto',
+        },
+        modal: true,
+      },
+      data: {
+        body: body,
+        direction: next
+      },
+      onClose: (opt) => {
+        nextPrevDialogOpened.value = false;
+        handleNextPrevDialogClose(opt);
+      },
+
+    })
+    nextPrevDialogOpened.value = true
+  }
+}
+
+const handleNextPrevDialogClose = (opt: any) => {
+  if (opt.data.moveToNextResponse) {
+    restorePage();
+    if (opt.data.goNext) {
+      gotoNext();
+    } else {
+      gotoPrev();
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
