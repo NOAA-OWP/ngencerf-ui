@@ -70,7 +70,7 @@
     <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
       <div class="row-span-1">
 -->
-        <span v-if="calibrationStatus === 'Done'">
+        <span v-if="calibrationStatus ===  'Done'">
 <!-- NOTE TO DEVELOPERS: temporary commenting out block below until the functionality for this button is ready-->
 <!-- 
 
@@ -148,7 +148,6 @@ const toast = useToast();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
 const {
-  calibrationStatus,
   startTimeDate,
   startTime,
   runningTime,
@@ -178,6 +177,8 @@ const {
 const isLoading = ref(false);
 const progress = ref();
 
+const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
+
 
 onMounted(async () => {
   
@@ -196,9 +197,6 @@ onMounted(async () => {
 
       startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
       console.log('startTimeDate:', startTimeDate.value);
-
-      calibrationStatus.value = userCalibrationRunData.value?.status;
-      console.log('calibrationStatus:', calibrationStatus.value);
     }
   });
 });
@@ -241,7 +239,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             } else {
               clearInterval(runningTimeIntervalId.value);
             }
-            calibrationStatus.value = getCalibrationStatusResponse._data.status;
+            if (userCalibrationRunData.value) {
+              userCalibrationRunData.value.status = getCalibrationStatusResponse._data.status;
+            }
           } else {
             toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
           }
@@ -348,37 +348,6 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
   });
 });
 
-// // WE WILL USE THIS LATER. Handle iterations changes
-// watch(iterations, async (newIterations, oldIterations, onCleanup) => {
-//   if (calibrationStatus.value !== 'Running') {
-//     if (iterationIntervalId) {
-//       calculateProgress();
-
-//       // if progress reaches 100, verify Calibration status is Done. calibrationStatus watch function will set stopCriteriaMet to true, clear intervals, and set progress to null
-//       if (progress.value >= 100) {
-//         calibrationStatus.value = await queryGetCalibrationStatus();
-//         if (calibrationStatus.value?._data?.status === 'Done') {
-//           await fetchUserCalibrationRunData(); // update Calibration data
-//           calibrationStatus.value = 'Done';
-//           } else {
-//             toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Status is not Done after progress reached 100' });
-//           }
-//       }
-//     } else {
-//       toast.add({ severity: 'error', summary: 'Error', detail: 'iterationIntervalId was not set when status was initially set to Running' });
-//     }
-//   } else {
-//     toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration Status is not Running but iterations was changed somehow' });
-//   }
-
-//   onCleanup(() => {
-//     // if stop criteria met before interval is cleared, clear interval
-//     if (iterationIntervalId && stopCriteriaMet.value) {
-//       clearInterval(iterationIntervalId);
-//     }
-//   });
-// });
-
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   if (iteration.value >= 1 || isCalibrationJobFinished(calibrationStatus.value)) {
@@ -413,17 +382,22 @@ watch(selectedPlotName, async () => {
 // Run Calibration Job
 const startRun = async () => {
   if (calibrationStatus.value === 'Ready') {
-    calibrationStatus.value = 'Submitted';
+    if (userCalibrationRunData.value) {
+      userCalibrationRunData.value.status = 'Submitted';
+    }
     toast.removeAllGroups();
     try {
       console.log('hitting run_calibration endpoint');
       const runCalibrationResponse = await executeRunCalibration();
 
       if (runCalibrationResponse?._data.status) {
-        calibrationStatus.value = runCalibrationResponse?._data.status;
+        if (userCalibrationRunData.value) {
+          userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
+        }
+
         startTimeDate.value = new Date(runCalibrationResponse?._data?.run_date);
         console.log('startTimeDate:', startTimeDate.value);
-        if (calibrationStatus.value != 'Running') {
+        if (userCalibrationRunData?.value?.status !== 'Running') {
           toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
         }
       } else {
@@ -446,9 +420,11 @@ const cancelRun = async () => {
       const cancelCalibrationResponse = await cancelCalibrationJob();
 
       if (cancelCalibrationResponse?._data.status) {
-        calibrationStatus.value = cancelCalibrationResponse?._data.status;
-        console.log('calibrationStatus:', calibrationStatus.value);
-        if (calibrationStatus.value != 'Cancelled') {
+        if (userCalibrationRunData.value) {
+          userCalibrationRunData.value.status = cancelCalibrationResponse?._data.status;
+        }
+        console.log('calibrationStatus:', calibrationStatus);
+        if (userCalibrationRunData?.value?.status !== 'Cancelled') {
 
           toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' });
         }
