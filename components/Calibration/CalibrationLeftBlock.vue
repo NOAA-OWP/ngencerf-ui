@@ -6,7 +6,7 @@
     <div class="row-span-1" v-if="activeTab == 1">
       <LazyCalibrationCalibrationRunsTab />
     </div> 
-    <div class="row-span-1" v-if="activeTab == 2">
+    <div class="row-span-1" v-else-if="activeTab == 2">
       <LazyCalibrationHeadwaterBasinGage />
     </div>
     <div class="row-span-1" v-else-if="activeTab == 3">
