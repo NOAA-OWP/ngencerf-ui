@@ -10,7 +10,7 @@
             Calibration Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <span v-show="calibrationJobId">
+          <span v-show="calibrationJobId && currentCalibrationTab > 1">
             <div data-tab="2" data-menu-tab="12" class="tabs prevent-select" v-on:click="tabClicked"
               aria-label="Headwater Basin Gage tab" title="Headwater Basin Gage tab">
               Headwater Basin Gage
