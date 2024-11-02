@@ -284,7 +284,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import { DateTime } from "luxon";
 import Select from "primevue/select";
 
-import { isValidDateTime, isNotNullOrUndefined } from "~/utils/CommonHelpers";
+import { isValidDate, isValidDateTime, isNotNullOrUndefined } from "~/utils/CommonHelpers";
 import { formatDateForDisplay, calculateTimeRange } from "~/utils/TimeHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
@@ -366,7 +366,7 @@ onMounted(async () => {
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
 
-  /* Check to see if there is a job. If not, don't initialize this tab! */
+  // Check to see if there is a job. If not, don't initialize this tab!
   if (calibrationJobId.value) {
     // fetch user calibration data
     await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
@@ -943,48 +943,63 @@ const areValidationTimesValidated = (): boolean => {
   const avSimEndDate = avSimEndTime.value.toJSDate();
   const avCalStartDate = avCalStartTime.value.toJSDate();
   const avCalEndDate = avCalEndTime.value.toJSDate();
-  const rangeStartDate = new Date(rangeDateFrom.value)
+  const rangeStartDate = new Date(rangeDateFrom.value);
   const rangeEndDate = new Date(rangeDateTo.value);
 
   // check if Date objects are valid
   if (!avSimStartDate || !avSimEndDate || !avCalStartDate || !avCalEndDate || !rangeStartDate || !rangeEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects', life: 5000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects for validation' });
     return false;
   }
 
-  // if calibration_times are set, check if validation_times are not after calibration_times
+  // if calibration_times are set, check if:
+  // - validation simulation times do not encompass both calibration and validation times
+  // - calibration times and validation times  do not overlap
   if ((isValidDateTime(simStartTime.value) && isValidDateTime(simEndTime.value) && isValidDateTime(calStartTime.value) && isValidDateTime(calEndTime.value))) {
-    // convert simeEndTime to Date object. simEndTime is the lastest time within calibration_times
+    // convert times to Date objects. simEndTime is the latest time within calibration_times
+    const simStartDate = simStartTime.value.toJSDate();
     const simEndDate = simEndTime.value.toJSDate();
+    const calStartDate = calStartTime.value.toJSDate();
+    const calEndDate = calEndTime.value.toJSDate();
 
-    // set conditions to check if validation_times are not after calibration_times
-    const isAvSimStartAfterCalEnd = avSimStartDate > simEndDate;
-    const isAvSimEndAfterCalEnd = avSimEndDate > simEndDate;
-    const isAvCalStartAfterCalEnd = avCalStartDate > simEndDate;
-    const isAvCalEndAfterCalEnd = avCalEndDate > simEndDate;
+    // set conditions to check if validation simulation times do not encompass both calibration and validation times
+    const isAvSimStartAfterCalStart = avSimStartDate > calStartDate;
+    const isAvSimEndBeforeCalEnd = avSimEndDate < calEndDate;
+    const isAvSimStartAfterAvCalStart = avSimStartDate > avCalStartDate;
+    const isAvSimEndBeforeAvCalEnd = avSimEndDate < avCalEndDate;
 
-    // check if validation_times are not after calibration_times
-    if (!isAvSimStartAfterCalEnd || !isAvSimEndAfterCalEnd || !isAvCalStartAfterCalEnd || !isAvCalEndAfterCalEnd) {
-      toast.add({ severity: 'warn', summary: 'Warn', detail: 'All validation_times must be after calibration_times', life: 5000 });
+    // check if validation simulation times do not encompass both calibration and validation times
+    if (isAvSimStartAfterCalStart || isAvSimEndBeforeCalEnd || isAvSimStartAfterAvCalStart || isAvSimEndBeforeAvCalEnd) {
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Validation Simulation times must encompass both Calibration and Validation times'});
+      return false;
+    }
+
+    // set conditions to check if calibration times and validation times overlap
+    const isAvCalStartBeforeOrEqualToCalEnd = avCalStartDate <= calEndDate;
+    const isAvCalEndAfterOrEqualToCalStart = avCalEndDate >= calStartDate;
+
+    // check if calibration times and validation times overlap
+    if (isAvCalStartBeforeOrEqualToCalEnd && isAvCalEndAfterOrEqualToCalStart) {
+      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration and Validation times must not overlap'});
       return false;
     }
   }
 
   // check if avSimEndDate is not after avSimStartDate
   if (avSimStartDate >= avSimEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Automatic Validation Simulation End must be after Simulation Start', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Automatic Validation Simulation End must be after Simulation Start'});
     return false;
   }
 
   // check if avCalStartDate is not within avSimStartDate and avSimEndDate
   if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Automatic Validation Calibration Start must be within Simulation Start and End', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Automatic Validation Calibration Start must be within Simulation Start and End'});
     return false;
   }
 
   // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
   if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Automatic Validation Calibration End must be after Calibration Start and less than or equal to Automatic Validation Simulation End', life: 5000 });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Automatic Validation Calibration End must be after Calibration Start and less than or equal to Automatic Validation Simulation End'});
     return false;
   }
 
