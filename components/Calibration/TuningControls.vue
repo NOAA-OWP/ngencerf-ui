@@ -339,6 +339,7 @@ const {
   avCalEndTime,
   rangeDateFrom,
   rangeDateTo,
+  saveTuningTabRequestBody
 } = storeToRefs(tuningStore);
 
 const toast = useToast();
@@ -820,44 +821,64 @@ const AutoValChecked = () => {
 };
 
 /**
- * Validate all Tuning tab data before saving
- * Calibration and Validation times must either be fully set or empty (not partially set) to be valid
+ * Validate and build request body. Return false if validation fails
  * @returns boolean
  */
-const isTuningTabDataValidated = () => {
-  return (areCalibrationTimesFullySetOrEmpty() && areValidationTimesFullySetOrEmpty()) && (areCalibrationTimesValidated() || areValidationTimesValidated() || areParametersValidated() || isOutputVariableValidated());
+const validateAndBuildRequestBody = (): boolean => {
+  saveTuningTabRequestBody.value.calibration_run_id = calibrationJobId.value;
+
+  if (areCalibrationTimesSet()) {
+    if (areCalibrationTimesValidated()) {
+      saveTuningTabRequestBody.value.calibration_times = {
+        simulation_start_time: simStartTime.value,
+        simulation_end_time: simEndTime.value,
+        calibration_start_time: calStartTime.value,
+        calibration_end_time: calEndTime.value
+      };
+    } else {
+      return false;
+    }
+  }
+  if (areValidationTimesSet()) {
+    if (areValidationTimesValidated()) {
+      saveTuningTabRequestBody.value.validation_times = {
+        simulation_start_time: avSimStartTime.value,
+        simulation_end_time: avSimEndTime.value,
+        validation_start_time: avCalStartTime.value,
+        validation_end_time: avCalEndTime.value
+      };
+    } else {
+      return false;
+    }
+  }
+
+  saveTuningTabRequestBody.value.automatic_validation = automatic_validation.value;
+
+  if (areTuningParametersSet()) {
+    saveTuningTabRequestBody.value.parameters = userSelectedCalibrationTuningParameters.value;
+  }
+
+  if (isOutputVariableSet()) {
+    saveTuningTabRequestBody.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
+  }
+
+  return true;
 };
 
 /**
- * Check if all calibration times are set or empty
+ * Check if all calibration times are set
  * @returns boolean
  */
-const areCalibrationTimesFullySetOrEmpty = (): boolean => {
-  const areCalibrationTimesFullySet: boolean = isValidDateTime(simStartTime.value) && isValidDateTime(simEndTime.value) && isValidDateTime(calStartTime.value) && isValidDateTime(calEndTime.value);
-  const areCalibrationTimesEmpty: boolean = !isValidDateTime(simStartTime.value) && !isValidDateTime(simEndTime.value) && !isValidDateTime(calStartTime.value) && !isValidDateTime(calEndTime.value);
-
-  if (areCalibrationTimesFullySet || areCalibrationTimesEmpty) {
-    return true;
-  } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration times must be fully set or left empty' });
-    return false;
-  }
+const areCalibrationTimesSet = (): boolean => {
+  return simStartTime.value && simEndTime.value && calStartTime.value && calEndTime.value;
 };
 
 /**
- * Check if all validation times are set or empty
+ * Check if all validation times are set
  * @returns boolean
  */
-const areValidationTimesFullySetOrEmpty = (): boolean => {
-  const areValidationTimesFullySet: boolean = isValidDateTime(avSimStartTime.value) && isValidDateTime(avSimEndTime.value) && isValidDateTime(avCalStartTime.value) && isValidDateTime(avCalEndTime.value);
-  const areValidationTimesEmpty: boolean = !isValidDateTime(avSimStartTime.value) && !isValidDateTime(avSimEndTime.value) && !isValidDateTime(avCalStartTime.value) && !isValidDateTime(avCalEndTime.value);
-
-  if (areValidationTimesFullySet || areValidationTimesEmpty) {
-    return true;
-  } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Validation times must be fullly set or left empty' });
-    return false;
-  }
+const areValidationTimesSet = (): boolean => {
+  return avSimStartTime.value && avSimEndTime.value && avCalStartTime.value && avCalEndTime.value;
 };
 
 /**
@@ -871,7 +892,7 @@ const areCalibrationTimesValidated = (): boolean => {
     return false;
   }
 
-  // check if all calibration_times are not set
+  // check if all calibration_times are not valid
   if (!isValidDateTime(simStartTime.value) && !isValidDateTime(simEndTime.value) && !isValidDateTime(calStartTime.value) && !isValidDateTime(calEndTime.value)) {
     return false;
   }
@@ -886,7 +907,7 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if time_range and calibration_times are null after converted to Date objects
   if (!rangeStartDate || !rangeEndDate || !simStartDate || !simEndDate || !calStartDate || !calEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects', life: 5000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects'});
     return false;
   }
 
@@ -933,7 +954,7 @@ const areValidationTimesValidated = (): boolean => {
     return true;
   }
 
-  // check if all validation_times are not set
+  // check if all validation_times are not valid
   if (!isValidDateTime(avSimStartTime.value) && !isValidDateTime(avSimEndTime.value) && !isValidDateTime(avCalStartTime.value) && !isValidDateTime(avCalEndTime.value)) {
     return false;
   }
@@ -1007,30 +1028,32 @@ const areValidationTimesValidated = (): boolean => {
 };
 
 /**
- * Validate parameters
+ * Check if tuning parameters are set
  * @returns boolean
  */
-const areParametersValidated = (): boolean => {
-  // check if no Calibration Tuning Parameters have been added TODO: add more parameter validation checks here. e.g. check if min < max, etc.
-  if (userSelectedCalibrationTuningParameters.value.length === 0) {
-    // toast.add({ severity: 'warn', summary: 'Warning', detail: 'At least one Calibration Tuning Parameter must be added' });
-    return false;
+const areTuningParametersSet = (): boolean => {
+  // check if no Calibration Tuning Parameters have been added 
+  // TODO: add more parameter validation checks here. e.g. check if min < max, etc.
+  if (
+    userSelectedCalibrationTuningParameters.value &&
+    userSelectedCalibrationTuningParameters.value.length > 0
+  ) {
+    return true;
   }
 
-  return true;
+  return false;
 };
 
 /**
- * Validate output_variable_to_calibrate
+ * Check if Output Variable to Calibrate is set
  * @returns boolean
  */
-const isOutputVariableValidated = (): boolean => {
+const isOutputVariableSet = (): boolean => {
   // check if Output Variable to Calibrate is set
-  if (!userOutputVariableToCalibrate.value.name || !userOutputVariableToCalibrate.value.module) {
-    // toast.add({ severity: 'warn', summary: 'Warning', detail: 'Output Variable to Calibrate must be selected' });
-    return false;
+  if (userOutputVariableToCalibrate.value.name && userOutputVariableToCalibrate.value.module) {
+    return true;
   }
-  return true;
+  return false;
 };
 
 /**
@@ -1067,7 +1090,7 @@ const saveTuningData = () => {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     // check if Tuning Tab data is validated before saving
-    if (isTuningTabDataValidated()) {
+    if (validateAndBuildRequestBody()) {
       handleSaveTuningTab();
     } else {
       toast.add({
