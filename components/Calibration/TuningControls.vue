@@ -365,16 +365,68 @@ onMounted(async () => {
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
 
-  // fetch user calibration data
-  await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
+  /* Check to see if there is a job. If not, don't initialize this tab! */
+  if (calibrationJobId.value) {
+    // fetch user calibration data
+    await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
 
-  // if Tuning Tab static data is not loaded, fetch it
-  if (loadTuningTabData?.value?._data?.modules.length === 0) {
-    console.log("fetching Tuning Tab data");
-    await loadTuningTabStaticData();
-    console.log("loadTuningTabData after fetch from Tuning tab:", loadTuningTabData.value);
-  } else {
-    console.log("Tuning Tab data already loaded. No need to fetch");
+    // if Tuning Tab static data is not loaded, fetch it
+    if (loadTuningTabData?.value?._data?.modules.length === 0) {
+      console.log("fetching Tuning Tab data");
+      await loadTuningTabStaticData();
+      console.log("loadTuningTabData after fetch from Tuning tab:", loadTuningTabData.value);
+    } else {
+      console.log("Tuning Tab data already loaded. No need to fetch");
+    }
+
+    // check if Hydrofabric errors exist
+    const hydrofabricErrorMessage = loadTuningTabData.value ? ifHydrofabricErrorsExist(loadTuningTabData.value._data) : '';
+    if (hydrofabricErrorMessage) {
+      toast.add({ severity: 'error', summary: 'Hydrofabric Error', detail: hydrofabricErrorMessage });
+    }
+
+    // set calibration times
+    if (userCalibrationRunData?.value?.calibration_times) {
+      const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
+
+      // set calibration times only if they are not already set
+      // if a user purposely removes all times, they will be reset to the default values. Is that what we want?
+      if (!isValidDateTime(simStartTime.value) && !isValidDateTime(simEndTime.value) && !isValidDateTime(calStartTime.value) && !isValidDateTime(calEndTime.value)) {
+        simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+        simEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+        calStartTime.value = DateTime.fromISO(calibration_start_time, { zone: 'utc' });
+        calEndTime.value = DateTime.fromISO(calibration_end_time, { zone: 'utc' });
+      }
+    };
+
+    // set automatic validation times
+    if (userCalibrationRunData?.value?.validation_times) {
+      const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
+
+      // set automatic validation times only if they are not already set
+      // if a user purposely removes all times, they will be reset to the default values. Is that what we want?
+      if (!isValidDateTime(avSimStartTime.value) && !isValidDateTime(avSimEndTime.value) && !isValidDateTime(avCalStartTime.value) && !isValidDateTime(avCalEndTime.value)) {
+        avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
+        avSimEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
+        avCalStartTime.value = DateTime.fromISO(validation_start_time, { zone: 'utc' });
+        avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
+      }
+    };
+
+    // set output variable to calibrate
+    if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
+      console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
+      const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
+
+      // set output variable to calibrate only if it is not already set
+      if (!selectedOutputVariable.value) {
+        userOutputVariableToCalibrate.value.name = name;
+        userOutputVariableToCalibrate.value.module = module;
+        selectedOutputVariable.value = `${name} (${module})`;
+      }
+    };
+
+    isInitialSetupDone.value = true; // set to true after initial setup
   }
 
   // check if Hydrofabric errors exist
