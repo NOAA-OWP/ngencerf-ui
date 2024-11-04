@@ -848,7 +848,7 @@ const areValidationTimesSet = (): boolean => {
 const areCalibrationTimesValidated = (): boolean => {
   // check if time_range is not set
   if (!rangeDateFrom.value || !rangeDateTo.value) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range must be set' });
+    toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'time_range must be set' });
     return false;
   }
 
@@ -867,7 +867,7 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if time_range and calibration_times are null after converted to Date objects
   if (!rangeStartDate || !rangeEndDate || !simStartDate || !simEndDate || !calStartDate || !calEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or calibration_times cannot be converted to Date objects'});
+    toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'time_range and/or calibration_times cannot be converted to Date objects'});
     return false;
   }
 
@@ -879,25 +879,25 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be within time_range'});
+    toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'calibration_times must be within time_range'});
     return false;
   }
 
   // check if simulation_end_time is not after simulation_start_time
   if (simStartDate >= simEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'simulation_end_time must be after simulation_start_time'});
+    toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'simulation_end_time must be after simulation_start_time'});
     return false;
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
   if (calStartDate <= simStartDate || calStartDate > simEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time'});
+    toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time'});
     return false;
   }
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time'});
+    toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time'});
     return false;
   }
 
@@ -929,7 +929,7 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if Date objects are valid
   if (!avSimStartDate || !avSimEndDate || !avCalStartDate || !avCalEndDate || !rangeStartDate || !rangeEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range and/or validation_times cannot be converted to Date objects for validation' });
+    toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'time_range and/or validation_times cannot be converted to Date objects for validation' });
     return false;
   }
 
@@ -951,7 +951,7 @@ const areValidationTimesValidated = (): boolean => {
 
     // check if validation simulation times do not encompass both calibration and validation times
     if (isAvSimStartAfterCalStart || isAvSimEndBeforeCalEnd || isAvSimStartAfterAvCalStart || isAvSimEndBeforeAvCalEnd) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Validation Simulation times must encompass both Calibration and Validation times'});
+      toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'Validation Simulation times must encompass both Calibration and Validation times'});
       return false;
     }
 
@@ -961,26 +961,26 @@ const areValidationTimesValidated = (): boolean => {
 
     // check if calibration times and validation times overlap
     if (isAvCalStartBeforeOrEqualToCalEnd && isAvCalEndAfterOrEqualToCalStart) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration and Validation times must not overlap'});
+      toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'Calibration and Validation times must not overlap'});
       return false;
     }
   }
 
   // check if avSimEndDate is not after avSimStartDate
   if (avSimStartDate >= avSimEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Validation Simulation End must be after Simulation Start'});
+    toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'Validation Simulation End must be after Simulation Start'});
     return false;
   }
 
   // check if avCalStartDate is not within avSimStartDate and avSimEndDate
   if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Validation Calibration Start must be within Simulation Start and End'});
+    toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'Validation Calibration Start must be within Simulation Start and End'});
     return false;
   }
 
   // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
   if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Validation Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End'});
+    toast.add({ severity: 'error', summary: 'Unable to Save', detail: 'Validation Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End'});
     return false;
   }
 
@@ -1052,12 +1052,6 @@ const saveTuningData = () => {
     // check if Tuning Tab data is validated before saving
     if (validateAndBuildRequestBody()) {
       handleSaveTuningTab();
-    } else {
-      toast.add({
-        severity: 'error',
-        summary: 'Tuning Data Is Not Valid',
-        detail: 'You must provide valid calibration times, validation times, output variable to calibrate, or calibration tuning parameters before saving.',
-      });
     }
   }
 };
