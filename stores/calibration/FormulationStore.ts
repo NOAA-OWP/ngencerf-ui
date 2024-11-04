@@ -232,9 +232,9 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
   async function saveFormulationTabData() {
     const savePayload = ref<SaveFormulationTabPayload>({});
 
-    if ( formulationNameInput.value ) savePayload.value.formulation_name = formulationNameInput.value;
-    if ( selectedModuleValues.value.length > 0 ) savePayload.value.modules = selectedModuleValues.value;
-    if ( slothParameterInputs.value.length > 0 ) savePayload.value.sloth_parameters = slothParameterInputs.value;
+    savePayload.value.formulation_name = formulationNameInput.value ? formulationNameInput.value : "";
+    savePayload.value.modules = selectedModuleValues.value.length > 0 ? selectedModuleValues.value : [];
+    savePayload.value.sloth_parameters = slothParameterInputs.value.length > 0 ? slothParameterInputs.value : [];
     
     if ( Object.keys( savePayload.value ).length > 0 ) {
       const saveValidation = useCalibrationFormulationTabSaveValidate( savePayload.value );

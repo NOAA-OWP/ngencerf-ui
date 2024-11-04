@@ -42,8 +42,7 @@
             <div class="col-span-1">
               <label for="Geopackage">Geo Package</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
-                optionValue="name" placeholder=" ... " class=""
-                @change="uploadGeopackageDlgOpen($event)"></Select>
+                optionValue="name" placeholder=" ... " class="" @change="uploadGeopackageDlgOpen($event)"></Select>
 
             </div>
           </div>
@@ -122,7 +121,6 @@
 
     </div>
 
-
     <div class="waitgif" v-if="isLoading">
       <img src="@/assets/styles/img/wait.gif" />
     </div>
@@ -138,14 +136,17 @@ import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import type { SelectChangeEvent } from "primevue/select";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+
 const runStatusStore = useRunStatusStore();
 const { calibrationStatus } = storeToRefs(runStatusStore);
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
+
 
 const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
@@ -159,6 +160,7 @@ const toast = useToast();
 
 const isLoading = ref(true);
 
+
 onMounted(() => {
   toast.removeAllGroups();
   isLoading.value = false;
@@ -170,6 +172,7 @@ onMounted(() => {
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
+const nextPrevDialogOpened = ref<boolean>(false);
 
 const onGageSelectionChange = () => {
   fetchSelectedGageData()
@@ -208,14 +211,14 @@ const showForcingFileUploadDialog = (headerText: string) => {
 }
 
 const handleDialogClose = (opt: any) => {
-  if ( opt && opt.data ) {
-    if ( opt.data.saveFileResponseResult.status == 200 ) {
+  if (opt && opt.data) {
+    if (opt.data.saveFileResponseResult.status == 200) {
       toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 })
     } else {
-      useApiErrorResponsePreprocess( opt.data.saveFileResponseResult ).forEach( message => {
-        toast.add({ severity: useApiResponseToastSeverityCode( opt.data.saveFileResponseResult?.status ), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
+      useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
+        toast.add({ severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
       });
-    }    
+    }
   } else {
     toast.add({ severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: 10000 })
   }
@@ -302,7 +305,7 @@ const toggle_isNWMv3 = () => {
 };
 
 const saveTabData = () => {
-  if (!isCalibrationJobStatusSavedOrReady(calibrationStatus.value)) {
+  if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
@@ -323,36 +326,56 @@ const resetTabData = () => {
   resetUserSelectionGage();
 };
 
+const validateTab = () => {
+  let error = false;
+  let text = [];
+  if (userCalibrationRunData?.value?.gage === null && selectedGageValue.value ||
+    userCalibrationRunData?.value?.gage?.gage_id && (userCalibrationRunData?.value?.gage?.gage_id !== selectedGageValue.value)) {
+    error = true;
+    text.push("Gage value has been changed");
+  }
+  return { error: error, text: text }
+}
+
 const goNextTab = () => {
-  // let err = false;
-  // let txt = "Please correct the following:";
-  // if (!selectedDomainValue.value) {
-  //   txt += "\nA Domain is required.";
-  //   err = true;
-  // }
-  // if (!selectedGageValue.value) {
-  //   txt += "\nA Gage is required."
-  //   err = true;
-  // }
-  // if (!userCalibrationRunData?.value?.external_data_status?.forcing) {
-  //   txt += "\nForcing files missing"
-  //   err = true;
-  // }
-  // if (!userCalibrationRunData?.value?.external_data_status?.observational) {
-  //   txt += "\nGeopackage file is missing"
-  //   err = true;
-  // }
-  // if (!userCalibrationRunData?.value?.external_data_status?.geopackage) {
-  //   txt += "\nGeopackage file is missing"
-  //   err = true;
-  // }
-  // if(err) {
-  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life:5000 });
-  //   return;
-  // }
-  gotoNext();
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text, true);
+  } else {
+    gotoNext();
+  }
+
 };
 
+const showPrevNextDialog = (body: string[], next: boolean) => {
+  if (!nextPrevDialogOpened.value) {
+    dialog.open(MoveNextPrevDialog, {
+      props: {
+        header: "Unsaved changes!",
+        style: {
+          width: 'auto',
+        },
+        modal: true,
+      },
+      data: {
+        body: body,
+        direction: next
+      },
+      onClose: (opt) => {
+        nextPrevDialogOpened.value = false;
+        handleNextPrevDialogClose(opt);
+      },
+    })
+    nextPrevDialogOpened.value = true
+  }
+}
+
+const handleNextPrevDialogClose = (opt: any) => {
+  if (opt.data.moveToNextResponse) {
+      selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
+    gotoNext();
+  }
+}
 
 </script>
 <style lang="scss" scoped>

@@ -13,7 +13,7 @@
         <DataTable id="cr-list" :value="userCalibrationJobsListData" sortField="calibration_run_id" :sortOrder="-1"
           scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
           selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-          @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle"
+          @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)"
           @rowDblselect="openSelectedCalibrationRun(selectedCalibrationRun)">
           <Column field="calibration_run_id" header="Job ID" sortable></Column>
           <Column field="formulation_name" header="Formulation Name" sortable>
@@ -30,9 +30,7 @@
         </DataTable>
       </div>
       <div class="mt-4 mx-auto">
-        * Right click on a row for Open, Clone or Delete options, or click on then New
-        button.
-      </div>
+        * Double click on a row to open, or right click on a row for Open, Clone or Delete options, or click on New button.      </div>
     </div>
   </div>
 
@@ -104,6 +102,12 @@ onUnmounted(() => {
     e.click();
   }, 250);
 })
+
+const onRowDblClick = (e: any)  => {
+  const data = ref<any>();
+  data.value = e.data;
+  openSelectedCalibrationRun(data)
+}
 
 const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   isLoading.value = true;
