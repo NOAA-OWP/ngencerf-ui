@@ -2,6 +2,15 @@ import { DateTime } from "luxon";
 
 
 /**
+ * Checks if an object is a valid Date object
+ * @param obj
+ * @returns {boolean}
+ */
+export const isValidDate = (obj: any): boolean => {
+  return obj && obj instanceof Date && !isNaN(obj.getTime());
+};
+
+/**
  * Checks if an object is a valid DateTime object
  * @param obj
  * @returns {boolean}
@@ -12,7 +21,7 @@ export const isValidDateTime = (obj: any): boolean => {
 
 /**
  * Checks if a variable is not null and not undefined
- * @param var
+ * @param variable
  * @returns {boolean}
  */
 export const isNotNullOrUndefined = (variable: any): boolean => {
