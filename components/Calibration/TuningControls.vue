@@ -429,56 +429,9 @@ onMounted(async () => {
     };
 
     isInitialSetupDone.value = true; // set to true after initial setup
+  } else {
+    toast.add({ severity: 'warn', summary: 'No Calibration Job ID', detail: 'No calibration job ID found. Please go back to the Calibration Runs tab and select a job.' });
   }
-
-  // check if Hydrofabric errors exist
-  const hydrofabricErrorMessage = ifHydrofabricErrorsExist(loadTuningTabData.value._data);
-  if (hydrofabricErrorMessage) {
-    toast.add({ severity: 'error', summary: 'Hydrofabric Error', detail: hydrofabricErrorMessage });
-  }
-
-  // set calibration times
-  if (userCalibrationRunData?.value?.calibration_times) {
-    const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
-
-    // set calibration times only if they are not already set
-    // if a user purposely removes all times, they will be reset to the default values. Is that what we want?
-    if (!isValidDateTime(simStartTime.value) && !isValidDateTime(simEndTime.value) && !isValidDateTime(calStartTime.value) && !isValidDateTime(calEndTime.value)) {
-      simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
-      simEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
-      calStartTime.value = DateTime.fromISO(calibration_start_time, { zone: 'utc' });
-      calEndTime.value = DateTime.fromISO(calibration_end_time, { zone: 'utc' });
-    }
-  };
-
-  // set automatic validation times
-  if (userCalibrationRunData?.value?.validation_times) {
-    const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
-
-    // set automatic validation times only if they are not already set
-    // if a user purposely removes all times, they will be reset to the default values. Is that what we want?
-    if (!isValidDateTime(avSimStartTime.value) && !isValidDateTime(avSimEndTime.value) && !isValidDateTime(avCalStartTime.value) && !isValidDateTime(avCalEndTime.value)) {
-      avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
-      avSimEndTime.value = DateTime.fromISO(simulation_end_time, { zone: 'utc' });
-      avCalStartTime.value = DateTime.fromISO(validation_start_time, { zone: 'utc' });
-      avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
-    }
-  };
-
-  // set output variable to calibrate
-  if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
-    console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
-    const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
-
-    // set output variable to calibrate only if it is not already set
-    if (!selectedOutputVariable.value) {
-      userOutputVariableToCalibrate.value.name = name;
-      userOutputVariableToCalibrate.value.module = module;
-      selectedOutputVariable.value = `${name} (${module})`;
-    }
-  };
-
-  isInitialSetupDone.value = true; // set to true after initial setup
 });
 
 /**
@@ -709,7 +662,7 @@ const handleFileUpload = async (event: Event) => {
             }
           } else {
             errorMessage = response._data?.message;
-            toast.add({ severity: 'warn', summary: 'Invalid data in parameter file', detail: errorMessage });
+            toast.add({ severity: 'error', summary: 'Invalid data in parameter file', detail: errorMessage });
           }
         });
 
@@ -723,7 +676,7 @@ const handleFileUpload = async (event: Event) => {
         toast.add({ severity: 'warn', summary: 'No data in parameter file' });
       }
     } catch (error) {
-      toast.add({ severity: 'warn', summary: 'File upload failed' });
+      toast.add({ severity: 'error', summary: 'File upload failed' });
       console.error('File upload failed:', error);
     }
   } else {
@@ -865,7 +818,7 @@ const validateAndBuildRequestBody = (): boolean => {
   }
 
   if (Object.keys(saveTuningTabRequestBody.value).length === 0) {
-    toast.add({ severity: 'warn', summary: 'No data to save', detail: 'No valid data has been entered to save' });
+    toast.add({ severity: 'error', summary: 'No data to save', detail: 'No valid data has been entered to save'});
     return false;
   }
 
@@ -895,7 +848,7 @@ const areValidationTimesSet = (): boolean => {
 const areCalibrationTimesValidated = (): boolean => {
   // check if time_range is not set
   if (!rangeDateFrom.value || !rangeDateTo.value) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'time_range must be set' });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'time_range must be set' });
     return false;
   }
 
@@ -926,25 +879,25 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_times must be within time_range', life: 5000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_times must be within time_range'});
     return false;
   }
 
   // check if simulation_end_time is not after simulation_start_time
   if (simStartDate >= simEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'simulation_end_time must be after simulation_start_time', life: 5000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'simulation_end_time must be after simulation_start_time'});
     return false;
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
   if (calStartDate <= simStartDate || calStartDate > simEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time', life: 5000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time'});
     return false;
   }
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time', life: 5000 });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time'});
     return false;
   }
 
@@ -998,7 +951,7 @@ const areValidationTimesValidated = (): boolean => {
 
     // check if validation simulation times do not encompass both calibration and validation times
     if (isAvSimStartAfterCalStart || isAvSimEndBeforeCalEnd || isAvSimStartAfterAvCalStart || isAvSimEndBeforeAvCalEnd) {
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Validation Simulation times must encompass both Calibration and Validation times'});
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Validation Simulation times must encompass both Calibration and Validation times'});
       return false;
     }
 
@@ -1008,26 +961,26 @@ const areValidationTimesValidated = (): boolean => {
 
     // check if calibration times and validation times overlap
     if (isAvCalStartBeforeOrEqualToCalEnd && isAvCalEndAfterOrEqualToCalStart) {
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration and Validation times must not overlap'});
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration and Validation times must not overlap'});
       return false;
     }
   }
 
   // check if avSimEndDate is not after avSimStartDate
   if (avSimStartDate >= avSimEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Automatic Validation Simulation End must be after Simulation Start'});
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Validation Simulation End must be after Simulation Start'});
     return false;
   }
 
   // check if avCalStartDate is not within avSimStartDate and avSimEndDate
   if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Automatic Validation Calibration Start must be within Simulation Start and End'});
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Validation Calibration Start must be within Simulation Start and End'});
     return false;
   }
 
   // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
   if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Automatic Validation Calibration End must be after Calibration Start and less than or equal to Automatic Validation Simulation End'});
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Validation Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End'});
     return false;
   }
 
@@ -1101,7 +1054,7 @@ const saveTuningData = () => {
       handleSaveTuningTab();
     } else {
       toast.add({
-        severity: 'warn',
+        severity: 'error',
         summary: 'Tuning Data Is Not Valid',
         detail: 'You must provide valid calibration times, validation times, output variable to calibrate, or calibration tuning parameters before saving.',
       });
