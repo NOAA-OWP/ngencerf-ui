@@ -132,7 +132,9 @@
         </div>
       </span>
       <span v-else>
-        <div>Run on 10-29 2024 at 22:03:12 UTC</div>
+        <div class="col-span-1 mr-6 h-8">
+          Run on {{ formatDateForRunOnString(startTimeDate) }}
+        </div>
       </span>
       <div class="col-span-1 mr-3">
       </div>
@@ -160,8 +162,10 @@ import { useToast } from "primevue/usetoast";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore"
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+import { formatDateForRunOnString } from "~/utils/TimeHelpers";
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -188,6 +192,7 @@ const { fetchUserCalibrationRunData } = useUserDataStore();
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { getCalibrationTabIndex } = generalStore();
+const { startTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
 //const isLoading = ref(true);

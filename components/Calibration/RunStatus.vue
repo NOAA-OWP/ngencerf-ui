@@ -137,7 +137,7 @@ import { onMounted, onUnmounted } from "vue";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
-import { isCalibrationJobFinished } from '~/utils/CommonHelpers';
+import { isValidDate, isCalibrationJobFinished } from '~/utils/CommonHelpers';
 import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
 
@@ -193,10 +193,12 @@ onMounted(async () => {
   nextTick(() => {
     if (userCalibrationRunData.value) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
-      console.log('stopCriteria:', stopCriteria.value);
+      // console.log('stopCriteria:', stopCriteria.value);
 
-      startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
-      console.log('startTimeDate:', startTimeDate.value);
+      if (userCalibrationRunData.value.run_date) {
+        startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
+        // console.log('startTimeDate:', startTimeDate.value);
+      }
     }
   });
 });
@@ -204,8 +206,8 @@ onMounted(async () => {
 
 // Handle calibrationStatus changes
 watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
-  console.log('inside calibrationStatus watch');
-  console.log('calibrationStatus:', calibrationStatus.value);
+  // console.log('inside calibrationStatus watch');
+  // console.log('calibrationStatus:', calibrationStatus.value);
   if (calibrationStatus.value === 'Submitted') {
 
   }
@@ -224,8 +226,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
       runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
-      console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
-      console.log('typeof runningTimeIntervalId:', typeof runningTimeIntervalId.value);
+      // console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
+      // console.log('typeof runningTimeIntervalId:', typeof runningTimeIntervalId.value);
       // Create an interval to update calibrationStatus and runningTime every second while status is Running
       if (!runningTimeIntervalId.value) {
         runningTimeIntervalId.value = setInterval(async () => {
@@ -256,7 +258,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     const getIterationResponse = await queryIteration();
     if (getIterationResponse?._data?.iteration) {
       iteration.value = getIterationResponse?._data?.iteration;
-      console.log('iteration:', iteration.value);
+      // console.log('iteration:', iteration.value);
     } else {
       console.error('Error getting Iteration');
     }
@@ -266,11 +268,11 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     }
 
     if (plotNames.value?._data.plot_names) {
-      console.log('plotNames._data:', plotNames.value?._data);
+      // console.log('plotNames._data:', plotNames.value?._data);
 
       // setting plotList will populate the dropdown
       plotList.value = plotNames?.value?._data?.plot_names;
-      console.log('plotList:', plotList.value);
+      // console.log('plotList:', plotList.value);
     } else {
       toast.removeAllGroups();
       toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
@@ -279,11 +281,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
   else if (calibrationStatus.value === 'Done') {
     if (userCalibrationRunData.value) {
-      startTimeDate.value = new Date(userCalibrationRunData.value?.run_date); // do we need to keep setting this after the first time? will value change after status is Running?
-      console.log('startTimeDate:', startTimeDate.value);
-
-      if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
-        startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
+      if (userCalibrationRunData.value.run_date) {
+        startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
+        // console.log('startTimeDate:', startTimeDate.value);
       } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
       }
@@ -295,7 +295,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     const getIterationResponse = await queryIteration();
     if (getIterationResponse?._data?.iteration) {
       iteration.value = getIterationResponse?._data?.iteration;
-      console.log('iteration:', iteration.value);
+      // console.log('iteration:', iteration.value);
     } else {
       console.error('Error getting Iteration');
     }
@@ -305,11 +305,11 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     }
 
     if (plotNames.value?._data.plot_names) {
-      console.log('plotNames:', plotNames.value?._data);
+      // console.log('plotNames:', plotNames.value?._data);
 
       // setting plotList will populate the dropdown
       plotList.value = plotNames.value?._data?.plot_names;
-      console.log('plotList:', plotList.value);
+      // console.log('plotList:', plotList.value);
     } else {
       toast.removeAllGroups();
       toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
@@ -340,7 +340,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
   }
 
   onCleanup(() => {
-    console.log('Cleaning up calibrationStatus watch');
+    // console.log('Cleaning up calibrationStatus watch');
     // if Calibration status changes to anything but Running or Done while still executing this watch function, clear intervals (stop pinging server)
     if (calibrationStatus.value !== 'Running' && calibrationStatus.value !== 'Done') {
       stopCriteriaMet.value = false;
@@ -366,18 +366,14 @@ watch(selectedPlotName, async () => {
   }
 });
 
-
-// /**
-//  * Calculate Progress. WE WILL USE THIS LATER.
-//  */
-// const calculateProgress = (): void => {
-//   if (stopCriteria.value && !stopCriteriaMet.value) {
-//     progress.value = (iterations.value / stopCriteria.value) * 100;
-//   } else {
-//     toast.add({ severity: 'error', summary: 'Error', detail: 'No Stop Criteria value set or Stop Criteria already met' });
-//   }
-// };
-
+// Handle startTimeDate changes
+watch(startTimeDate, () => {
+  if (isValidDate(startTimeDate.value)) {
+    startTime.value = convertTimeZone(startTimeDate.value);
+  } else {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object'});
+  }
+});
 
 // Run Calibration Job
 const startRun = async () => {
@@ -387,21 +383,31 @@ const startRun = async () => {
     }
     toast.removeAllGroups();
     try {
-      console.log('hitting run_calibration endpoint');
+      // console.log('hitting run_calibration endpoint');
       const runCalibrationResponse = await executeRunCalibration();
 
-      if (runCalibrationResponse?._data.status) {
-        if (userCalibrationRunData.value) {
-          userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
+      if (runCalibrationResponse._data) {
+        if (runCalibrationResponse._data.status) { 
+          if (userCalibrationRunData.value) {
+            userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
+          } else {
+            toast.add({severity: 'error', summary: 'Error', detail: 'load_calibration_run_data from server failed'});
+          }
+        } else {
+          toast.add({severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server'});
         }
 
-        startTimeDate.value = new Date(runCalibrationResponse?._data?.run_date);
-        console.log('startTimeDate:', startTimeDate.value);
+        if (runCalibrationResponse._data.run_date) {
+          startTimeDate.value = new Date(runCalibrationResponse?._data?.run_date);
+        } else {
+          toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
+        }
+
         if (userCalibrationRunData?.value?.status !== 'Running') {
           toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
         }
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration' });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'run_calibration from server failed' });
       }
     } catch (error) {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration' });
@@ -416,14 +422,14 @@ const cancelRun = async () => {
   if (calibrationStatus.value === 'Running') {
     toast.removeAllGroups();
     try {
-      console.log('hitting cancel_job endpoint');
+      // console.log('hitting cancel_job endpoint');
       const cancelCalibrationResponse = await cancelCalibrationJob();
 
       if (cancelCalibrationResponse?._data.status) {
         if (userCalibrationRunData.value) {
           userCalibrationRunData.value.status = cancelCalibrationResponse?._data.status;
         }
-        console.log('calibrationStatus:', calibrationStatus);
+        // console.log('calibrationStatus:', calibrationStatus);
         if (userCalibrationRunData?.value?.status !== 'Cancelled') {
 
           toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' });

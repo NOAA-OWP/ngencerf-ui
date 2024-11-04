@@ -247,7 +247,9 @@
         </div>
       </span>
       <span v-else>
-        <div>Run on 10-29 2024 at 22:03:12 UTC</div>
+        <div class="col-span-1 mr-6 h-8">
+          Run on {{ formatDateForRunOnString(startTimeDate) }}
+        </div>
       </span>
 
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
@@ -297,7 +299,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { ifHydrofabricErrorsExist } from "~/utils/TuningControlsHelpers";
-
+import { formatDateForRunOnString } from "~/utils/TimeHelpers";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import type { DatePickerProps } from "primevue/datepicker";
@@ -314,6 +316,7 @@ const { ngencerfBaseUrl } = useBackendConfig();
 const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
 const runStatusStore = useRunStatusStore();
+const { startTimeDate } = storeToRefs(useRunStatusStore());
 
 const {
   formulationNameInput,

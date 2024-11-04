@@ -100,7 +100,9 @@
               </div>
             </span>
             <span v-else>
-              <div>Run on 10-29 2024 at 22:03:12 UTC</div>
+              <div class="col-span-1 mr-6 h-8">
+                Run on {{ formatDateForRunOnString(startTimeDate) }}
+              </div>
             </span>
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 mr-3">
@@ -137,12 +139,14 @@ import { onMounted, onUnmounted } from "vue";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import type { SelectChangeEvent } from "primevue/select";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
+import { formatDateForRunOnString } from "~/utils/TimeHelpers";
 
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -156,6 +160,7 @@ const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUser
 const { getCalibrationTabIndex } = generalStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
+const { startTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
 const isLoading = ref(true);
