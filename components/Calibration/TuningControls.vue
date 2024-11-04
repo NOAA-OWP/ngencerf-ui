@@ -681,21 +681,23 @@ const handleFileUpload = async (event: Event) => {
             isNotNullOrUndefined(param.max) &&
             isNotNullOrUndefined(param.init) &&
             isNotNullOrUndefined(param.model)) {
-            // check if parameter is in the calibrationTuningParameters list and not already in the userSelectedCalibrationTuningParameters list
+            // check if parameter is in the calibrationTuningParameters list, which is the list of calibratable parameters
             const isParameterInCalibratableList = calibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
-            // add parameter to the userSelectedCalibrationTuningParameters list if it is in the calibrationTuningParameters list
+
+            // if parameter is not in the list of calibratable parameters, add it to the list of invalid parameters
             if (!isParameterInCalibratableList) {
               invalidParameters.push(param.param);
             }
 
+            // check if parameter is already in the table
             const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
 
+            // if parameter we are adding is already in the table, delete the parameter from the table so we can override it
             if (isParameterAlreadyInTable) {
-              // delete the parameter from the table if parameter we're trying to add is already in the table so we override it
               userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters?.value?.filter((paramData: any) => paramData.name !== param.param);
             }
 
-            // add parameter to the table if is in the list of calibratable parameters
+            // add parameter to the table if it is in the list of calibratable parameters
             if (isParameterInCalibratableList) {
               userSelectedCalibrationTuningParameters?.value?.push({
                 name: param.param,
@@ -821,7 +823,7 @@ const AutoValChecked = () => {
 };
 
 /**
- * Validate and build request body. Return false if validation fails
+ * Validate and build save_tuning_tab request body. Return false if validation fails
  * @returns boolean
  */
 const validateAndBuildRequestBody = (): boolean => {
@@ -860,6 +862,11 @@ const validateAndBuildRequestBody = (): boolean => {
 
   if (isOutputVariableSet()) {
     saveTuningTabRequestBody.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
+  }
+
+  if (Object.keys(saveTuningTabRequestBody.value).length === 0) {
+    toast.add({ severity: 'warn', summary: 'No data to save', detail: 'No valid data has been entered to save' });
+    return false;
   }
 
   return true;
