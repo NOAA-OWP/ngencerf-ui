@@ -124,12 +124,15 @@
 
     </div>
     <div id="OptMetBottomButtons" class="absolute b-0 grid grid-cols-8 mt-6 ActionButtonsBox">
-      <span>
+      <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
           <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()">
             Save
           </button>
         </div>
+      </span>
+      <span v-else>
+        <div>Run on 10-29 2024 at 22:03:12 UTC</div>
       </span>
       <div class="col-span-1 mr-3">
       </div>

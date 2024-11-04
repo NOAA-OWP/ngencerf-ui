@@ -92,12 +92,15 @@
 
         <div class="row-span-1 mt-4 ActionButtonsBox">
           <div class="grid grid-cols-8">
-            <span>
+            <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                 <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
                   Save
                 </button>
               </div>
+            </span>
+            <span v-else>
+              <div>Run on 10-29 2024 at 22:03:12 UTC</div>
             </span>
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 mr-3">
