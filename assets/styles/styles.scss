@@ -39,8 +39,10 @@ body {
   -ms-flex-direction: column;
   flex-direction: column;
   overflow: hidden;
-  min-width: 1530px !important;
-  min-height: 945px !important;
+  /*min-width: 1530px !important;*/
+  min-width: 1280px !important;
+  /*min-height: 945px !important;*/
+  min-height: 670px !important;
 }
 .font-ui {
   font-family: ui-sans-serif, system-ui, sans-serif, sans-serif, Arial, Helvetica;
@@ -531,4 +533,29 @@ table.cols-bordered {
   background-color: white;
   padding:20px 30px 5px;
   z-index: 1;
+}
+
+#EvaluatePage #TableArea {
+  .p-datatable-table {
+    width:auto; 
+    min-width:450px;
+    max-width: 100%;
+
+    td {
+      font-size: 13px;
+      padding:4px !important;
+    }
+    th {
+      padding-left: 4px !important;
+      padding-right: 4px !important;
+
+      .p-datatable-column-header-content {
+        gap: 0.3rem;
+      }
+    }
+
+    .p-datatable-sort-icon {
+      zoom: 0.8;
+    }
+  }
 }
