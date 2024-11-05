@@ -160,6 +160,7 @@ const {
   stopCriteria,
   stopCriteriaMet,
   runningTimeIntervalId,
+  calibrationStatusIntervalId
 } = storeToRefs(runStatusStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -181,11 +182,9 @@ const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 
 
 onMounted(async () => {
-  
   toast.removeAllGroups();
 
-  console.log('runningTime:', runningTime.value);
-  console.log('typeof runningTime:', typeof runningTime.value);
+  // console.log('runningTime:', runningTime.value);
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
@@ -206,21 +205,7 @@ onMounted(async () => {
 
 // Handle calibrationStatus changes
 watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
-  // console.log('inside calibrationStatus watch');
-  // console.log('calibrationStatus:', calibrationStatus.value);
-  if (calibrationStatus.value === 'Submitted') {
-
-  }
-
-  else if (calibrationStatus.value === 'Saved') {
-
-  }
-
-  else if (calibrationStatus.value === 'Ready') {
-
-  }
-
-  else if (calibrationStatus.value === 'Running') {
+  if (calibrationStatus.value === 'Running') {
     // Calculate Running Time
     if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
       startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
@@ -228,27 +213,36 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
       // console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
       // console.log('typeof runningTimeIntervalId:', typeof runningTimeIntervalId.value);
-      // Create an interval to update calibrationStatus and runningTime every second while status is Running
+      // Create an interval to update runningTime every second while status is Running
       if (!runningTimeIntervalId.value) {
         runningTimeIntervalId.value = setInterval(async () => {
+          if (userCalibrationRunData.value?.status === 'Running') {
+            // Calculate Running Time every second
+            runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+          } else {
+            clearInterval(runningTimeIntervalId.value);
+          }
+        }, 1000);
+      }
+
+      // Create an interval to update calibrationStatus every 10 seconds while status is Running
+      if (!calibrationStatusIntervalId.value) {
+        calibrationStatusIntervalId.value = setInterval(async () => {
           const getCalibrationStatusResponse = await queryGetCalibrationStatus();
-          console.log('getCalibrationStatusResponse:', getCalibrationStatusResponse._data);
 
           if (getCalibrationStatusResponse._data && getCalibrationStatusResponse._data.status) {
-            if (getCalibrationStatusResponse._data.status === 'Running') {
-              // Calculate Running Time every second
-              runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
-            } else {
-              clearInterval(runningTimeIntervalId.value);
-            }
-            if (userCalibrationRunData.value) {
-              userCalibrationRunData.value.status = getCalibrationStatusResponse._data.status;
+            if (getCalibrationStatusResponse._data.status !== 'Running') {
+              if (userCalibrationRunData.value) {
+                clearInterval(calibrationStatusIntervalId.value);
+                userCalibrationRunData.value.status = getCalibrationStatusResponse._data.status;
+              }
             }
           } else {
             toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
           }
-        }, 1000);
+        }, 10000);
       }
+
     } else {
       toast.removeAllGroups();
       toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
@@ -318,30 +312,18 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     // clear intervals and set stopCriteriaMet to true
     stopCriteriaMet.value = true;
     clearInterval(runningTimeIntervalId.value);
+    clearInterval(calibrationStatusIntervalId.value);
   }
 
-  else if (calibrationStatus.value === 'Cancelled') {
-    stopCriteriaMet.value = false; // this should already be false, but just in case
+  else if (['Cancelled', 'Failed', 'Server error'].includes(calibrationStatus.value ?? '')) {
+    stopCriteriaMet.value = false;
     clearInterval(runningTimeIntervalId.value);
-  }
-
-  else if (calibrationStatus.value === 'Failed') {
-    stopCriteriaMet.value = false; // this should already be false, but just in case
-    clearInterval(runningTimeIntervalId.value);
-  }
-
-  else if (calibrationStatus.value === 'Server error') {
-
-  }
-
-  else {
-    toast.removeAllGroups();
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Unknown Calibration Status' });
+    clearInterval(calibrationStatusIntervalId.value);
   }
 
   onCleanup(() => {
     // console.log('Cleaning up calibrationStatus watch');
-    // if Calibration status changes to anything but Running or Done while still executing this watch function, clear intervals (stop pinging server)
+    // if Calibration status changes to anything but Running or Done while still executing this watch function, set stopCriteriaMet to false
     if (calibrationStatus.value !== 'Running' && calibrationStatus.value !== 'Done') {
       stopCriteriaMet.value = false;
     }
