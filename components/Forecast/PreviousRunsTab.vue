@@ -119,7 +119,8 @@ const acceptDelete = (selectedRunId: number) => {
 
 const rowStyle = (data: any) => {
     if (!['Saved', 'Ready'].includes(data.status)) {
-        return { backgroundColor: 'gainsboro' }
+        //return { backgroundColor: 'gainsboro' }
+        return { backgroundColor: 'white' }
     }
 }
 

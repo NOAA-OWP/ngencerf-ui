@@ -1,22 +1,33 @@
 <template>
-  <div class="h-full min-h-screen ">
+  <div class="h-full min-h-screen pr-2">
     <div class="grid grid-rows-12">
+      
       <div class="row-span-2">
-        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs</h1>
+
+        <div class="flex mt-2">
+          <div class="w-2/3">
+            <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs</h1>
+          </div>
+          <div class="ml-auto mt-2">
+            <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4" v-if="userSelectedEvalCalibrationRunId > 0" @click.stop="navigateToNewValidation">New Validation</Button></div>
+          </div>
+        </div>
+
       </div>
       <div class="waitgif" v-if="isLoadingCalibrationSummary">
         <img src="@/assets/styles/img/wait.gif" />
       </div>
-      <Button id="btn-new-validation" class="start actionBtn" v-if="userSelectedEvalCalibrationRunId > 0" @click.stop="navigateToNewValidation">New Validation</Button>
+
       <div class="row-span-10" v-if="loadUserSelectedCalibrationValidationRunList.length <= 1">
         <div id="CalTable">
           <div class="grid grid-cols-2 mb-5">
               <div class="col-span-1">
-                  <div class="inline "><label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-                  <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
-                  :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder=""></Select>
+                  <div class="inline ">
+                      <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
+                      <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
+                      :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder=""></Select>
+                  </div>
               </div>
-          </div>
           </div>
           
           <DataTable id="cr-list" :value="filteredEvaluationCalibrationRunList" scrollable scroll-height="400px"
@@ -117,7 +128,8 @@ const navigateToNewValidation = ( event : any ) => {
 
 const rowStyle = (data: any) => {
     if (!['Saved', 'Ready'].includes(data.status)) {
-        return { backgroundColor: 'gainsboro' }
+        //return { backgroundColor: 'gainsboro' }
+        return { backgroundColor: 'white' }
     }
 }
 
