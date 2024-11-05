@@ -379,11 +379,11 @@ onMounted(async () => {
 
     // if Tuning Tab static data is not loaded, fetch it
     if (loadTuningTabData?.value?._data?.modules.length === 0) {
-      console.log("fetching Tuning Tab data");
+      // console.log("fetching Tuning Tab data");
       await loadTuningTabStaticData();
-      console.log("loadTuningTabData after fetch from Tuning tab:", loadTuningTabData.value);
+      // console.log("loadTuningTabData after fetch from Tuning tab:", loadTuningTabData.value);
     } else {
-      console.log("Tuning Tab data already loaded. No need to fetch");
+      // console.log("Tuning Tab data already loaded. No need to fetch");
     }
 
     // check if Hydrofabric errors exist
@@ -422,7 +422,7 @@ onMounted(async () => {
 
     // set output variable to calibrate
     if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
-      console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
+      // console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
       const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
 
       // set output variable to calibrate only if it is not already set
@@ -597,7 +597,7 @@ watch(avSimEndTime, () => {
 const triggerFileInput = () => {
   if (fileInput.value) {
     if (fileInput.value.value) {
-      console.log('fileInput.value.value is not empty. Resetting value');
+      // console.log('fileInput.value.value is not empty. Resetting value');
       fileInput.value.value = '';
     }
     fileInput.value.click();
