@@ -30,7 +30,7 @@
         </DataTable>
       </div>
       <div class="mt-4 mx-auto">
-        * Double click on a row to open, or right click on a row for Open, Clone or Delete options, or click on New button.      </div>
+        * Double click on a row to open, or right click for other options. Click "New" for a fresh setup.</div>
     </div>
   </div>
 
@@ -145,7 +145,8 @@ const gotoRunStatusTab = () => {
 
 const rowStyle = (data: any) => {
   if (!['Saved', 'Ready'].includes(data.status)) {
-    return { backgroundColor: 'gainsboro' };
+    //return { backgroundColor: 'gainsboro' };
+    return { backgroundColor: 'white' };
   }
 }
 
