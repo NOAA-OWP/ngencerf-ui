@@ -17,7 +17,7 @@ export const generalStore = defineStore(
     const menuIndex = ref("1");
 
     const calibrationJobId = ref<number>( 0 );
-    const validatedCalibrationRunId = ref<number>( 0 );
+    const evaluateValidationRunId = ref<number>( 0 );
     
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
@@ -89,7 +89,7 @@ export const generalStore = defineStore(
       getEvalRunSelected,
       setEvalRunSelected,
       calibrationJobId,
-      validatedCalibrationRunId,
+      evaluateValidationRunId,
       calibrationTabIndex,
       evaluationTabIndex,
       forecastTabIndex,

@@ -116,7 +116,7 @@ export const useApiErrorResponsePreprocess = ( errorResponse: any ) => {
 export const useApiResponseToastSeverityCode = ( status: number ) => {
   switch ( status ) {
     case 200:
-      return "info";
+      return "success";
     case 400:
     case 500:
       return "error";
