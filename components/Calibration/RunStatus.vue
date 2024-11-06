@@ -183,9 +183,6 @@ const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 
 onMounted(async () => {
   toast.removeAllGroups();
-
-  // console.log('runningTime:', runningTime.value);
-
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
@@ -196,7 +193,7 @@ onMounted(async () => {
 
       if (userCalibrationRunData.value.run_date) {
         startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
-        // console.log('startTimeDate:', startTimeDate.value);
+        console.log('startTimeDate from within nextTicket and onMounted:', startTimeDate.value);
       }
     }
   });
@@ -205,130 +202,132 @@ onMounted(async () => {
 
 // Handle calibrationStatus changes
 watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
-  if (calibrationStatus.value === 'Running') {
-    // Calculate Running Time
-    if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
-      startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
-      runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+  if (userCalibrationRunData.value) {
+    if (userCalibrationRunData.value.stop_criteria) {
+      stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
+    }
+    
+    if (userCalibrationRunData.value.run_date) {
+      startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
+    }
 
-      // console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
-      // console.log('typeof runningTimeIntervalId:', typeof runningTimeIntervalId.value);
-      // Create an interval to update runningTime every second while status is Running
-      if (!runningTimeIntervalId.value) {
-        runningTimeIntervalId.value = setInterval(async () => {
-          if (userCalibrationRunData.value?.status === 'Running') {
-            // Calculate Running Time every second
-            runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
-          } else {
-            clearInterval(runningTimeIntervalId.value);
-          }
-        }, 1000);
-      }
+    if (calibrationStatus.value === 'Running') {
+      // Calculate Running Time
+      if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
+        startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
+        runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
-      // Create an interval to update calibrationStatus every 10 seconds while status is Running
-      if (!calibrationStatusIntervalId.value) {
-        calibrationStatusIntervalId.value = setInterval(async () => {
-          const getCalibrationStatusResponse = await queryGetCalibrationStatus();
-
-          if (getCalibrationStatusResponse._data && getCalibrationStatusResponse._data.status) {
-            if (getCalibrationStatusResponse._data.status !== 'Running') {
-              if (userCalibrationRunData.value) {
-                clearInterval(calibrationStatusIntervalId.value);
-                userCalibrationRunData.value.status = getCalibrationStatusResponse._data.status;
-              }
+        // console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
+        // console.log('typeof runningTimeIntervalId:', typeof runningTimeIntervalId.value);
+        // Create an interval to update runningTime every second while status is Running
+        if (!runningTimeIntervalId.value) {
+          // console.log('creating runningTimeIntervalId');
+          runningTimeIntervalId.value = setInterval(async () => {
+            if (userCalibrationRunData.value?.status === 'Running') {
+              // Calculate Running Time every second
+              runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+            } else {
+              clearInterval(runningTimeIntervalId.value);
             }
-          } else {
-            toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
-          }
-        }, 10000);
-      }
+          }, 1000);
+        }
 
-    } else {
-      toast.removeAllGroups();
-      toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
-    }
+        console.log('calibrationStatusIntervalId:', calibrationStatusIntervalId.value);
+        // Create an interval to update calibrationStatus every 10 seconds while status is Running
+        if (!calibrationStatusIntervalId.value) {
+          // console.log('creating calibrationStatusIntervalId');
+          calibrationStatusIntervalId.value = setInterval(async () => {
+            const getCalibrationStatusResponse = await queryGetCalibrationStatus();
 
-    // Get Plot Names
-    const getIterationResponse = await queryIteration();
-    if (getIterationResponse?._data?.iteration) {
-      iteration.value = getIterationResponse?._data?.iteration;
-      // console.log('iteration:', iteration.value);
-    } else {
-      console.error('Error getting Iteration');
-    }
+            if (getCalibrationStatusResponse._data && getCalibrationStatusResponse._data.status) {
+              if (getCalibrationStatusResponse._data.status !== 'Running') {
+                if (userCalibrationRunData.value) {
+                  clearInterval(calibrationStatusIntervalId.value);
+                  userCalibrationRunData.value.status = getCalibrationStatusResponse._data.status;
+                }
+              }
+            } else {
+              toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
+            }
+          }, 10000);
+        }
 
-    if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
-      plotNames.value = await queryGetPlotNames();
-    }
-
-    if (plotNames.value?._data.plot_names) {
-      // console.log('plotNames._data:', plotNames.value?._data);
-
-      // setting plotList will populate the dropdown
-      plotList.value = plotNames?.value?._data?.plot_names;
-      // console.log('plotList:', plotList.value);
-    } else {
-      toast.removeAllGroups();
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
-    }
-  }
-
-  else if (calibrationStatus.value === 'Done') {
-    if (userCalibrationRunData.value) {
-      if (userCalibrationRunData.value.run_date) {
-        startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
-        // console.log('startTimeDate:', startTimeDate.value);
       } else {
+        toast.removeAllGroups();
         toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
       }
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting Calibration Run Data' });
+
+      // Get Plot Names
+      const getIterationResponse = await queryIteration();
+      if (getIterationResponse?._data?.iteration) {
+        iteration.value = getIterationResponse?._data?.iteration;
+        // console.log('iteration:', iteration.value);
+      } else {
+        console.error('Error getting Iteration');
+      }
+
+      if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
+        plotNames.value = await queryGetPlotNames();
+      }
+
+      if (plotNames.value?._data.plot_names) {
+        // console.log('plotNames._data:', plotNames.value?._data);
+
+        // setting plotList will populate the dropdown
+        plotList.value = plotNames?.value?._data?.plot_names;
+        // console.log('plotList:', plotList.value);
+      } else {
+        toast.removeAllGroups();
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
+      }
     }
 
-    // Update Plot Names
-    const getIterationResponse = await queryIteration();
-    if (getIterationResponse?._data?.iteration) {
-      iteration.value = getIterationResponse?._data?.iteration;
-      // console.log('iteration:', iteration.value);
-    } else {
-      console.error('Error getting Iteration');
+    else if (calibrationStatus.value === 'Done') {
+      // Update Plot Names
+      const getIterationResponse = await queryIteration();
+      if (getIterationResponse?._data?.iteration) {
+        iteration.value = getIterationResponse?._data?.iteration;
+        // console.log('iteration:', iteration.value);
+      } else {
+        console.error('Error getting Iteration');
+      }
+
+      if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
+        plotNames.value = await queryGetPlotNames();
+      }
+
+      if (plotNames.value?._data.plot_names) {
+        // console.log('plotNames:', plotNames.value?._data);
+
+        // setting plotList will populate the dropdown
+        plotList.value = plotNames.value?._data?.plot_names;
+        // console.log('plotList:', plotList.value);
+      } else {
+        toast.removeAllGroups();
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
+      }
+
+      // clear intervals and set stopCriteriaMet to true
+      stopCriteriaMet.value = true;
+      clearInterval(runningTimeIntervalId.value);
+      clearInterval(calibrationStatusIntervalId.value);
     }
 
-    if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
-      plotNames.value = await queryGetPlotNames();
+    else if (['Cancelled', 'Failed', 'Server error'].includes(calibrationStatus.value ?? '')) {
+      stopCriteriaMet.value = false;
+      clearInterval(runningTimeIntervalId.value);
+      clearInterval(calibrationStatusIntervalId.value);
     }
-
-    if (plotNames.value?._data.plot_names) {
-      // console.log('plotNames:', plotNames.value?._data);
-
-      // setting plotList will populate the dropdown
-      plotList.value = plotNames.value?._data?.plot_names;
-      // console.log('plotList:', plotList.value);
-    } else {
-      toast.removeAllGroups();
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
-    }
-
-    // clear intervals and set stopCriteriaMet to true
-    stopCriteriaMet.value = true;
-    clearInterval(runningTimeIntervalId.value);
-    clearInterval(calibrationStatusIntervalId.value);
-  }
-
-  else if (['Cancelled', 'Failed', 'Server error'].includes(calibrationStatus.value ?? '')) {
-    stopCriteriaMet.value = false;
-    clearInterval(runningTimeIntervalId.value);
-    clearInterval(calibrationStatusIntervalId.value);
   }
 
   onCleanup(() => {
-    // console.log('Cleaning up calibrationStatus watch');
+    console.log('Cleaning up calibrationStatus watch');
     // if Calibration status changes to anything but Running or Done while still executing this watch function, set stopCriteriaMet to false
     if (calibrationStatus.value !== 'Running' && calibrationStatus.value !== 'Done') {
       stopCriteriaMet.value = false;
     }
   });
-});
+}, { immediate: true });
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
@@ -388,6 +387,7 @@ const startRun = async () => {
         if (userCalibrationRunData?.value?.status !== 'Running') {
           toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
         }
+        fetchUserCalibrationRunData();
       } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'run_calibration from server failed' });
       }
@@ -413,9 +413,9 @@ const cancelRun = async () => {
         }
         // console.log('calibrationStatus:', calibrationStatus);
         if (userCalibrationRunData?.value?.status !== 'Cancelled') {
-
           toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' });
         }
+        fetchUserCalibrationRunData();
       } else {
         toast.add({ severity: 'error', summary: 'Error cancelling Calibration', detail: 'Cannot get Calibration status' });
       }

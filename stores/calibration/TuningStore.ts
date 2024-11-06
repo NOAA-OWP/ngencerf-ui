@@ -72,7 +72,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     }
 
     calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
-    console.log("calibrationTuningModules:", calibrationTuningModules.value);
+    // console.log("calibrationTuningModules:", calibrationTuningModules.value);
 
     if (calibrationTuningModules?.value.length > 0) {
       // set calibration tuning parameters dropdown if not already set
