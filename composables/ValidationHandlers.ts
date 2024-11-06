@@ -1,6 +1,7 @@
 import { ref } from "vue"
-import type { SlothParameterData, SaveFormulationTabPayload, FormulationTabSaveWarning } from "./NextGenModel";
+import type { SlothParameterData, SaveFormulationTabPayload, FormulationTabSaveWarning, GageBasinApiSavedResponse, HydrofabricError } from "./NextGenModel";
 import { ValidationFormFields } from "./NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
 
 /**
  * @param requiredFields 
@@ -24,6 +25,34 @@ export const useCalibrationTabValidation = ( requiredFields: any ) => {
   return {
     errors
   }
+}
+
+/**
+ * 
+ * @param savedResponse 
+ * @returns {ToastMessageOptions[]}
+ */
+export const useProcessCalibrationGageSavedResponse = ( savedResponse: GageBasinApiSavedResponse ) => {
+  const messages = ref<ToastMessageOptions[]>([]);
+  messages.value.push({
+    severity: 'success',
+    summary: `Gage Tab Data Saved`, 
+    detail: savedResponse.message, 
+    life: 5000 
+  });
+
+  if ( savedResponse.hasOwnProperty( 'hydrofabric_errors' ) && savedResponse.hydrofabric_errors.length > 0 ) {
+    savedResponse.hydrofabric_errors.forEach( ( hydrofabric_error : HydrofabricError ) => {
+      messages.value.push({
+        severity: 'warn',
+        summary: 'Hydrofabric Error',
+        detail: hydrofabric_error.message,
+        life: 10000
+      });
+    })
+  }
+
+  return messages.value;
 }
 
 /**
