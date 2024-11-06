@@ -46,8 +46,6 @@
             {{ formatDate(calData?.calibration_times?.calibration_end_time) }}</div>
           </p>
           <p>&nbsp;</p>
-          <p v-if="calData?.output_variable_to_calibrate?.name"><span class="font-medium">Cal Output Variable:</span>
-            {{ calData?.output_variable_to_calibrate?.name }}</p>
           <p v-if="calData?.optimization"><span class="font-medium">Optimization Algorithm:</span>
             {{ calData?.optimization }}</p>
           <p v-if="calData?.stop_criteria"><span class="font-medium">Calibration Stop Criteria:</span>
@@ -82,6 +80,10 @@
             {{ calData?.objective_function }}</p>
           <p v-if="calData?.save_plot_iteration_frequency"><span class="font-medium">Plot Generation Frequency:</span>
             {{ calData?.save_plot_iteration_frequency }}</p>
+        </div>
+        <div class="col-span-2">
+          <p v-if="calData?.output_variable_to_calibrate?.name"><span class="font-medium">Cal Output Variable:</span>
+            {{ calData?.output_variable_to_calibrate?.name }}</p>
         </div>
       </div>
     </div>
