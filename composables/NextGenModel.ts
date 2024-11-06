@@ -69,7 +69,6 @@ export interface JobListItem {
   calibration_end_period: Date;
   formulation_name: string;
   run_date: Date;
-  owner: string;
 }
 
 /**
@@ -475,14 +474,83 @@ export interface CalibrationValidationRunData {
   parameters: CalibrationValidationParameter[];
 }
 
+export interface CalibrationValidationJobList {
+  validation_jobs: CalibrationValidationJobData[];
+}
+
+export interface CalibrationValidationJobData extends CalibrationValidationRunData {
+  best?: boolean;
+}
+
 export interface CalibrationValidationParameter {
   name: string;
   value: number;
 }
 
+export interface DynamicTableColumnHeader {
+  header: string;
+  colspan: number;
+  field?: string;
+  styles?: string[];
+}
+
 export interface DynamicTableColumn {
   field: any;
-  header: string;
+  header?: string;
+  hidden?: boolean;
+  styles?: string[];  
+}
+
+export interface CalibrationRunByIteration {
+  message: string;
+  objective_function_metric: string;
+  iteration_data: CalibrationRunIterationData[];
+  retrospective_data: CalibrationRunByIterationRetrospectiveData[];
+}
+
+export interface CalibrationRunIterationData {
+  iteration_num: number;
+  iteration_id: number;
+  worker_name: string;
+  best_params: boolean;
+  calibration_output_variable_value: number;
+  parameters: CalibrationRunIterationParameterData[];
+  metrics: CalibrationRunIterationMetricData[];
+}
+
+export interface CalibrationRunIterationParameterData {
+  parameter_name: string;
+  parameter_value: number;
+}
+
+export interface CalibrationRunValidationParameterData {
+  name: string;
+  value: number;
+}
+
+export interface CalibrationRunByIterationRetrospectiveData	{
+  name: string;
+  data: CalibrationRunIterationMetricData[];
+}
+
+export interface CalibrationRunIterationMetricData {
+  metric_name: string;
+  metric_value: number;
+}
+
+export interface AlternativeIterationCalibrationRunData {
+  iteration_id: number;
+  worker_name: string;
+  iteration_num: number;
+  calibration_output_variable_value: number;
+  [name: string]: string|number;
+}
+
+export interface AlternativeIterationTuningParameters {
+  iteration_id: number;
+  worker_name: string;
+  iteration_num: number;
+  [name: string]: string|number;
 }
 
 export interface DynamicObject {

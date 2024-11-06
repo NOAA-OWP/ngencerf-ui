@@ -18,6 +18,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   const { calibrationJobId } = storeToRefs(generalStore());
   const userCalibrationJobsListData = ref<JobListItem[]>([]);
   const userCalibrationRunData = ref<UserCalibrationRunData>();
+  
+  const userSelectedCalibrationIterationId = ref<number | null>(null);
 
   /**
    * Checks if user is logged in
@@ -241,7 +243,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     queryUserCalibrationRunData,
     fetchUserCalibrationRunData,
     hardResetUserDataStore,
-    clearUserCalibrationRunData,   
+    clearUserCalibrationRunData,
+    userSelectedCalibrationIterationId
   };
 },
   {
