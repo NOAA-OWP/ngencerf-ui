@@ -129,7 +129,7 @@
 </template>
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import type { UserCalibrationRunData } from "~/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
 import { onMounted, onUnmounted } from "vue";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
@@ -141,6 +141,8 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import type { SelectChangeEvent } from "primevue/select";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+
+import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "~/composables/ValidationHandlers";
 
 const runStatusStore = useRunStatusStore();
 const { calibrationStatus } = storeToRefs(runStatusStore);
@@ -311,7 +313,9 @@ const saveTabData = () => {
     toast.removeAllGroups();
     saveGageTabData().then( response => {
       if ( response.status == 200 ) {
-        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?._data?.message});
+        useProcessCalibrationGageSavedResponse( response?._data ).forEach( ( toastMessage : ToastMessageOptions ) => {
+          toast.add( toastMessage );
+        })        
         fetchUserCalibrationRunData();
       } else {
         useApiErrorResponsePreprocess( response ).forEach( message => {

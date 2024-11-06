@@ -37,6 +37,17 @@ export interface ValidationErrorObject {
   [key: string]: string
 }
 
+export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
+  geopackage_image_url?: string | null;
+  hydrofabric_errors: HydrofabricError[];
+}
+
+export interface HydrofabricError {
+  name: string;
+  message: string;
+  status_code: string;
+}
+
 export interface FormulationTabSaveWarning {
   excluded_modules?: FormulationTabSaveWarningExcludedModule[];
   group_requirements?: FormulationTabSaveWarningGroupRequirement[];
