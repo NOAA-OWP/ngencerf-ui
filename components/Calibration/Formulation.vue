@@ -127,14 +127,19 @@
       </div>
 
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3 ActionButtonsBox">
-        <span>
+        <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
           <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
             <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
               Save
             </button>
           </div>
         </span>
-        <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
+        <span v-else>
+          <div class="col-span-1 mr-6 h-8">
+            Run on {{ formatDateForRunOnString(startTimeDate) }}
+          </div>
+        </span>
+        <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
           <div class="col-span-1 mr-3">
             <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
               @click="resetFormulationData()" aria-label="Reset Button">Reset</button>-->
@@ -168,8 +173,10 @@ import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
 import type { UserCalibrationRunData } from "~/composables/NextGenModel";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
+import { formatDateForRunOnString } from "~/utils/TimeHelpers";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
@@ -213,10 +220,8 @@ const { fetchUserCalibrationRunData } = useUserDataStore();
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { getCalibrationTabIndex } = generalStore();
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
-import { data } from "autoprefixer";
 const runStatusStore = useRunStatusStore();
-const { calibrationStatus } = storeToRefs(runStatusStore);
+const { startTimeDate } = storeToRefs(useRunStatusStore());
 let mainLeftAreaElement: HTMLElement | null = null;
 let dataTableElement: HTMLElement | null = null;
 
@@ -226,7 +231,6 @@ onMounted(() => {
   toast.removeAllGroups();
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
-
 });
 
 const addSlothOnEnter = (e: KeyboardEvent) => {
