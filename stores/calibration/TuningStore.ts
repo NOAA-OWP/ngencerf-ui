@@ -67,12 +67,12 @@ export const useTuningStore = defineStore('TuningStore', () => {
     if (timeRange?.start_time && timeRange?.end_time) {
       rangeDateFrom.value = timeRange?.start_time;
       rangeDateTo.value = timeRange?.end_time;
-      console.log("rangeDateFrom:", rangeDateFrom.value);
-      console.log("rangeDateTo:", rangeDateTo.value);
+      // console.log("rangeDateFrom:", rangeDateFrom.value);
+      // console.log("rangeDateTo:", rangeDateTo.value);
     }
 
     calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
-    console.log("calibrationTuningModules:", calibrationTuningModules.value);
+    // console.log("calibrationTuningModules:", calibrationTuningModules.value);
 
     if (calibrationTuningModules?.value.length > 0) {
       // set calibration tuning parameters dropdown if not already set
@@ -86,7 +86,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
           module: module.name,
           output: `${param.name} (${module.name})`,
         }))) || [];
-        console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
+        // console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
       }
 
       // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
@@ -98,7 +98,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
           initial_value: param.initial_value,
           module: param.module,
         })) || [];
-        console.log("userSelectedCalibrationTuningParameters:", userSelectedCalibrationTuningParameters.value);
+        // console.log("userSelectedCalibrationTuningParameters:", userSelectedCalibrationTuningParameters.value);
       }
 
       // set output variables if not already set
@@ -109,7 +109,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
           module: module.name,
           output: `${outputVar.name} (${module.name})`,
         }))) || [];
-        console.log("outputVariables:", outputVariables.value);
+        // console.log("outputVariables:", outputVariables.value);
       }
     }
 
@@ -121,7 +121,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
    * @returns {Promise<any>} SaveTuningTab data
    */
   async function saveTuningTabData(): Promise<any> {
-    console.log("saveTuningTabRequestBody:", JSON.stringify(saveTuningTabRequestBody.value));
+    // console.log("saveTuningTabRequestBody:", JSON.stringify(saveTuningTabRequestBody.value));
 
     const saveTuningTabResponse: any = await makeProtectedApiCall(
       `${ngencerfBaseUrl}/calibration/save_tuning_tab/`,

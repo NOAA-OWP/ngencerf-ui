@@ -92,14 +92,19 @@
 
         <div class="row-span-1 mt-4 ActionButtonsBox">
           <div class="grid grid-cols-8">
-            <span>
+            <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                 <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
                   Save
                 </button>
               </div>
             </span>
-            <span v-if="isCalibrationJobStatusSavedOrReady(calibrationStatus)">
+            <span v-else>
+              <div class="col-span-1 mr-6 h-8">
+                Run on {{ formatDateForRunOnString(startTimeDate) }}
+              </div>
+            </span>
+            <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 mr-3">
                 <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
                   aria-label="Reset Button">Reset</button>-->
@@ -134,16 +139,15 @@ import { onMounted, onUnmounted } from "vue";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import type { SelectChangeEvent } from "primevue/select";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+import { formatDateForRunOnString } from "~/utils/TimeHelpers";
 
-const runStatusStore = useRunStatusStore();
-const { calibrationStatus } = storeToRefs(runStatusStore);
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 
@@ -156,6 +160,7 @@ const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUser
 const { getCalibrationTabIndex } = generalStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
+const { startTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
 const isLoading = ref(true);

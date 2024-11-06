@@ -13,7 +13,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { getAccessToken } = useUserDataStore();
   
   // refs
-  const calibrationStatus = ref<string>();
   const runningTime = ref();
   const startTimeDate = ref();
   const startTime = ref();
@@ -28,6 +27,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const stopCriteria = ref();
   const stopCriteriaMet = ref(false);
   const runningTimeIntervalId = ref();
+  const calibrationStatusIntervalId = ref();
 
 
   /**
@@ -129,7 +129,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Hard Reset Run/Status Store
    */
   const hardResetRunStatusStore = (): void => {
-    calibrationStatus.value = "";
     runningTime.value = "";
     startTimeDate.value = "";
     startTime.value = "";
@@ -146,10 +145,14 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       clearInterval(runningTimeIntervalId.value);
       runningTimeIntervalId.value = '';
     }
+
+    if (calibrationStatusIntervalId.value) {
+      clearInterval(calibrationStatusIntervalId.value);
+      calibrationStatusIntervalId.value = '';
+    }
   };
 
   return {
-    calibrationStatus,
     startTimeDate,
     startTime,
     runningTime,
@@ -162,6 +165,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     stopCriteria,
     stopCriteriaMet,
     runningTimeIntervalId,
+    calibrationStatusIntervalId,
     queryGetCalibrationStatus,
     queryGetPlotNames,
     queryGetPlot,
