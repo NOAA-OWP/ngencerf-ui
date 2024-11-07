@@ -100,7 +100,7 @@
               </div>
             </span>
             <span v-else>
-              <div class="col-span-1 mr-6 h-8">
+              <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
                 Run on {{ formatDateForRunOnString(startTimeDate) }}
               </div>
             </span>
@@ -134,7 +134,7 @@
 </template>
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import type { UserCalibrationRunData } from "~/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
 import { onMounted, onUnmounted } from "vue";
 import { useGageStore } from "~/stores/calibration/GageStore";
 import { generalStore } from "~/stores/common/GeneralStore";
@@ -147,6 +147,8 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import type { SelectChangeEvent } from "primevue/select";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { formatDateForRunOnString } from "~/utils/TimeHelpers";
+
+import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "~/composables/ValidationHandlers";
 
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -220,7 +222,7 @@ const handleDialogClose = (opt: any) => {
     if (opt.data.saveFileResponseResult.status == 200) {
       toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 })
     } else {
-      useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
+      useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach( message => {
         toast.add({ severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
       });
     }
@@ -316,7 +318,9 @@ const saveTabData = () => {
     toast.removeAllGroups();
     saveGageTabData().then( response => {
       if ( response.status == 200 ) {
-        toast.add({ severity: 'info', summary: 'Gage Tab Data Saved', detail: response?._data?.message});
+        useProcessCalibrationGageSavedResponse( response?._data ).forEach( ( toastMessage : ToastMessageOptions ) => {
+          toast.add( toastMessage );
+        })        
         fetchUserCalibrationRunData();
       } else {
         useApiErrorResponsePreprocess( response ).forEach( message => {

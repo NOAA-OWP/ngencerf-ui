@@ -135,7 +135,7 @@
           </div>
         </span>
         <span v-else>
-          <div class="col-span-1 mr-6 h-8">
+          <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
             Run on {{ formatDateForRunOnString(startTimeDate) }}
           </div>
         </span>
@@ -186,7 +186,7 @@ import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
-import { useCalibrationFormulationTabSaveWarning, useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
+import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "~/composables/ValidationHandlers";
 
 const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
