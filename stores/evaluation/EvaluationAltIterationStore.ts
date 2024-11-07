@@ -39,7 +39,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
         headerRow = [];
         headerRow.push({
           header: retro_data.name,
-          colspan: 3
+          colspan: 2
         });
         retro_data.data.forEach( ( data : CalibrationRunIterationMetricData ) => {
           headerRow.push({
@@ -62,7 +62,6 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           calibrationRunDetailTableColumn.value.push({ field: 'iteration_id', hidden: true });  
           calibrationRunDetailTableColumn.value.push({ field: 'worker_name', header: "Worker" });
           calibrationRunDetailTableColumn.value.push({ field: 'iteration_num', header: "Iteration" });
-          calibrationRunDetailTableColumn.value.push({ field: 'calibration_output_variable_value', header: "Objective Function" });
 
           headerRow.push({ 
             header: iteration_data.worker_name,
@@ -74,13 +73,14 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
             colspan: 1
           });
 
-          headerRow.push({ 
-            header: `${Number( iteration_data.calibration_output_variable_value ).toFixed( 4 )}`,
-            colspan: 1
-          });
-
-          iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {
-            calibrationRunDetailTableColumn.value.push({ field: metric.metric_name, header: metric.metric_name });
+          iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {            
+            let metric_header_label = <string>metric.metric_name;
+            let headerColumn = <DynamicTableColumn>{ field: metric.metric_name, header: metric_header_label } 
+            if ( metric.metric_name == runListDataResult._data.objective_function_metric ) {
+              headerColumn[ 'header' ] += " *";
+              headerColumn[ 'styles' ] = [ 'bg-objective-function-col' ];
+            }
+            calibrationRunDetailTableColumn.value.push( headerColumn );
 
             headerRow.push({ 
               header: `${Number( metric.metric_value ).toFixed( 4 )}`,
@@ -122,7 +122,6 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           rowData['iteration_id'] = iteration_data.iteration_id;        
           rowData['worker_name'] = iteration_data.worker_name;        
           rowData['iteration_num'] = iteration_data.iteration_num;        
-          rowData['calibration_output_variable_value'] = Number( iteration_data.calibration_output_variable_value ).toFixed( 4 );
           
           iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {
             rowData[ metric.metric_name ] = Number( metric.metric_value ).toFixed( 4 );
@@ -174,6 +173,11 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     calibrationRunDetailDataListHeaders.value = [];
     tuningParametersDataListHeaders.value = [];
     userSelectedCalibrationIterationId.value = null;
+
+    calibrationRunDetailTableColumn.value = [];
+    tuningParametersTableColumn.value = [];
+    computedCalibrationRunDetailDataList.value = [];
+    computedtuningParametersDataList.value = [];
   }
 
   useLogoutListen('logoutEvent', () => {

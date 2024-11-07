@@ -13,7 +13,7 @@
         <DataTable id="cr-list" :value="userCalibrationJobsListData" sortField="calibration_run_id" :sortOrder="-1"
           scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
           selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-          @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle"
+          @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)"
           @rowDblselect="openSelectedCalibrationRun(selectedCalibrationRun)">
           <Column field="calibration_run_id" header="Job ID" sortable></Column>
           <Column field="formulation_name" header="Formulation Name" sortable>
@@ -30,9 +30,7 @@
         </DataTable>
       </div>
       <div class="mt-4 mx-auto">
-        * Right click on a row for Open, Clone or Delete options, or click on then New
-        button.
-      </div>
+        * Double click on a row to open, or right click for other options. Click "New" for a fresh setup.</div>
     </div>
   </div>
 
@@ -54,6 +52,7 @@ import { useGageStore } from "~/stores/calibration/GageStore";
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
+import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "~/composables/ValidationHandlers";
 
 const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
@@ -65,6 +64,7 @@ const { getCalibrationTabIndex } = generalStore();
 const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
+const { hardResetRunStatusStore } = useRunStatusStore();
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -86,6 +86,7 @@ onMounted(() => {
   if (ele) { ele.scrollTo(0, 0); }
 
   hardResetTuningStore();
+  hardResetRunStatusStore();
   fetchUserCalibrationJobsListData();
 })
 
@@ -101,6 +102,12 @@ onUnmounted(() => {
     e.click();
   }, 250);
 })
+
+const onRowDblClick = (e: any)  => {
+  const data = ref<any>();
+  data.value = e.data;
+  openSelectedCalibrationRun(data)
+}
 
 const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   isLoading.value = true;
@@ -138,7 +145,8 @@ const gotoRunStatusTab = () => {
 
 const rowStyle = (data: any) => {
   if (!['Saved', 'Ready'].includes(data.status)) {
-    return { backgroundColor: 'gainsboro' };
+    //return { backgroundColor: 'gainsboro' };
+    return { backgroundColor: 'white' };
   }
 }
 

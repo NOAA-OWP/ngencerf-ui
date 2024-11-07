@@ -1,29 +1,28 @@
 <template>
-<div class="grid grid-rows-2">
-  <div class="row-span-1">           
-    <div id="RunDetailsTbl" class="text-left mt-3 p-3">
-      <div class="tableTitle">Run Details</div>
-      <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
-        table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow">
-        <ColumnGroup type="header">
-          <Row>
-            <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" sortable></Column>
-          </Row>
-          <Row v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index" :pt="{ id: index }">
-            <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan"></Column>
-          </Row>
-        </ColumnGroup>
-        <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :field="col.field" :hidden="col.hidden ?? false"></Column>
-      </DataTable>      
-    </div>
+          
+  <div id="RunDetailsTbl" class="text-left mt-3 p-3">
+    <div class="tableTitle">Run Details</div>
+    <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
+      table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow">
+      <ColumnGroup type="header">
+        <Row>
+          <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" :class="col.styles ?? []" sortable></Column>
+        </Row>
+        <Row v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index" :pt="{ id: index }">
+          <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan"></Column>
+        </Row>
+      </ColumnGroup>
+      <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :field="col.field" :hidden="col.hidden ?? false"></Column>
+    </DataTable>      
   </div>
-  <div class="row-span-1 mt-3">           
+ 
+  <div class="mt-3">           
     <div id="CalTuningParamsTbl" class="text-left mt-3 p-3">
       <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
       <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"  @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect"
         selectionMode="single" ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"> 
         <ColumnGroup type="header">
-          <Row>
+          <Row :class="['table-header']">
             <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" sortable></Column> 
           </Row>
           <Row v-for="(row, index) in tuningParametersDataListHeaders" :key="index">
@@ -34,7 +33,8 @@
       </DataTable>
     </div>
   </div>
-  <div class="row-span-1 mt-4 ActionButtonsBox">
+
+  <div class="mt-4 ActionButtonsBox">
     <div class="grid grid-cols-8">
       <span>
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
@@ -45,7 +45,6 @@
       </span>
     </div>
   </div>
-</div>
 </template>
 
 <script setup lang="ts">
@@ -159,6 +158,10 @@ const navigateToEvaluateStatus = ( event : any ) => {
     color: var(--p-datatable-row-color);
 }
 
+.p-datatable-tbody .p-datatable-selectable-row td {
+    font-size: 0.8em;
+}
+
 table#cr-detail-list2 {
   text-align: left;
   position: relative;
@@ -182,6 +185,11 @@ table#cr-detail-list2 th {
   position: sticky;
   top: 0; /* Don't forget this, required for the stickiness */
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+}
+
+th.p-datatable-header-cell.bg-objective-function-col,
+th.p-datatable-header-cell.bg-objective-function-col:hover {
+    background-color: rgb(251 146 60);
 }
 /*
 #RunDetailsTbl, #CalTuningParamsTbl {

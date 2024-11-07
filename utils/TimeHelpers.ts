@@ -1,14 +1,11 @@
 import { DateTime } from "luxon";
-import Toast from "primevue/toast";
 
 
-//https://moment.github.io/luxon/api-docs/index.html
-
-export const formatTime = (time: string) => {
-  return DateTime.fromISO(time).toUTC().toFormat("yyyy/MM/dd  HH:mm:ss");
-};
-
-// 2017-12-31T00:00:00Z => 2017-12-31 00:00
+/**
+ * Converts a string in ISO format or a Date object to a string in the format "yyyy-MM-dd HH:mm"
+ * @param d 
+ * @returns {string} string in the format "yyyy-MM-dd HH:mm"
+ */
 export const formatDateForDisplay = ( d: string | Date ): string => {
   let dateTime;
 
@@ -29,7 +26,17 @@ export const formatDateForDisplay = ( d: string | Date ): string => {
 
   // Return the formatted date in 'yyyy-MM-dd HH:mm' format
   return dateTime.toFormat('yyyy-MM-dd HH:mm');
-}
+};
+
+/**
+ * Converts a Date object to a string in the format "MM-dd yyyy 'at' HH:mm:ss 'UTC'"
+ * @param d
+ * @returns {string} string in the format "MM-dd yyyy 'at' HH:mm:ss 'UTC'"
+ */
+export const formatDateForRunOnString = (d: Date): string => {
+  const dateTime = DateTime.fromJSDate(d, { zone: 'utc' });
+  return dateTime.toFormat("MM-dd yyyy 'at' HH:mm:ss 'UTC'");
+};
 
 /**
  * Takes a date object and converts it to a string in the specified timezone format
@@ -47,8 +54,7 @@ export const convertTimeZone = (date: Date, locale: string = 'en-US'): string =>
     second: '2-digit',
     hour12: false,
   });  
-}
-
+};
 
 /**
  * This function is for creating a time range that encompasses the calibration and simulation times for testing
@@ -104,7 +110,7 @@ export function calculateTimeRange(
   const rangeEnd = formatDate(paddedEnd);
 
   return { rangeStart, rangeEnd };
-}
+};
 
 /**
  * Calculates the elapsed time between two Date objects
@@ -118,4 +124,4 @@ export function calculateElapsedTime(start_time: Date, end_time: Date): string {
   const diff = end.diff(start, ["days", "hours", "minutes", "seconds"]);
   
   return diff.toFormat("d 'Days,' hh:mm:ss");
-}
+};

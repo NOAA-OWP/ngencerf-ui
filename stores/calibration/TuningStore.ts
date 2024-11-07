@@ -41,6 +41,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const rangeDateTo = ref<any>();
 
   const tuningStore_data_loading = ref(true);
+  const saveTuningTabRequestBody = ref<any>({});
 
   /**
    * Load Tuning Tab data
@@ -66,12 +67,12 @@ export const useTuningStore = defineStore('TuningStore', () => {
     if (timeRange?.start_time && timeRange?.end_time) {
       rangeDateFrom.value = timeRange?.start_time;
       rangeDateTo.value = timeRange?.end_time;
-      console.log("rangeDateFrom:", rangeDateFrom.value);
-      console.log("rangeDateTo:", rangeDateTo.value);
+      // console.log("rangeDateFrom:", rangeDateFrom.value);
+      // console.log("rangeDateTo:", rangeDateTo.value);
     }
 
     calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
-    console.log("calibrationTuningModules:", calibrationTuningModules.value);
+    // console.log("calibrationTuningModules:", calibrationTuningModules.value);
 
     if (calibrationTuningModules?.value.length > 0) {
       // set calibration tuning parameters dropdown if not already set
@@ -85,7 +86,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
           module: module.name,
           output: `${param.name} (${module.name})`,
         }))) || [];
-        console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
+        // console.log("calibrationTuningParameters:", calibrationTuningParameters.value);
       }
 
       // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
@@ -97,7 +98,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
           initial_value: param.initial_value,
           module: param.module,
         })) || [];
-        console.log("userSelectedCalibrationTuningParameters:", userSelectedCalibrationTuningParameters.value);
+        // console.log("userSelectedCalibrationTuningParameters:", userSelectedCalibrationTuningParameters.value);
       }
 
       // set output variables if not already set
@@ -108,7 +109,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
           module: module.name,
           output: `${outputVar.name} (${module.name})`,
         }))) || [];
-        console.log("outputVariables:", outputVariables.value);
+        // console.log("outputVariables:", outputVariables.value);
       }
     }
 
@@ -120,46 +121,9 @@ export const useTuningStore = defineStore('TuningStore', () => {
    * @returns {Promise<any>} SaveTuningTab data
    */
   async function saveTuningTabData(): Promise<any> {
-    const requestBody: any = {}; // store all the data to be sent to the server
+    // console.log("saveTuningTabRequestBody:", JSON.stringify(saveTuningTabRequestBody.value));
 
-    // add Tuning Tab data to request body
-    requestBody.calibration_run_id = calibrationJobId.value;
-
-    // add calibration times if they are provided
-    if (isValidDateTime(simStartTime.value) && isValidDateTime(simEndTime.value) && isValidDateTime(calStartTime.value) && isValidDateTime(calEndTime.value)) {
-      requestBody.calibration_times = {
-        simulation_start_time: simStartTime.value,
-        simulation_end_time: simEndTime.value,
-        calibration_start_time: calStartTime.value,
-        calibration_end_time: calEndTime.value
-      };
-    }
-
-    // add user calibration tuning parameters if they are provided
-    if (userSelectedCalibrationTuningParameters.value && userSelectedCalibrationTuningParameters.value.length > 0) {
-      requestBody.parameters = userSelectedCalibrationTuningParameters.value;
-    }
-
-    // add user output variable to calibrate if it is provided
-    if (userOutputVariableToCalibrate.value.name && userOutputVariableToCalibrate.value.module) {
-      requestBody.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
-    }
-
-    requestBody.automatic_validation = automatic_validation.value;
-
-    // add validation times if automatic validation is enabled and the times are provided
-    if (automatic_validation.value && isValidDateTime(avSimStartTime.value) && isValidDateTime(avSimEndTime.value) && isValidDateTime(avCalStartTime.value) && isValidDateTime(avCalEndTime.value)) {
-      requestBody.validation_times = {
-        simulation_start_time: avSimStartTime.value,
-        simulation_end_time: avSimEndTime.value,
-        validation_start_time: avCalStartTime.value,
-        validation_end_time: avCalEndTime.value
-      };
-    }
-
-    console.log("saveTuningTabData:", JSON.stringify(requestBody));
-
-    const saveTuningTabOutput: any = await makeProtectedApiCall(
+    const saveTuningTabResponse: any = await makeProtectedApiCall(
       `${ngencerfBaseUrl}/calibration/save_tuning_tab/`,
       {
         method: 'POST',
@@ -167,10 +131,10 @@ export const useTuningStore = defineStore('TuningStore', () => {
           Authorization: `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(saveTuningTabRequestBody.value)
       });
 
-    return saveTuningTabOutput;
+    return saveTuningTabResponse;
   };
 
 
@@ -187,6 +151,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     simEndTime.value = "";
     calStartTime.value = "";
     calEndTime.value = "";
+    calibrationTuningModules.value = null;
     calibrationTuningParameters.value = [];
     userSelectedCalibrationTuningParameters.value = [];
     userOutputVariableToCalibrate.value.name = '';
@@ -197,7 +162,30 @@ export const useTuningStore = defineStore('TuningStore', () => {
     avSimEndTime.value = "";
     avCalStartTime.value = "";
     avCalEndTime.value = "";
-    console.log("Tuning Store Reset")
+    rangeDateFrom.value = null;
+    rangeDateTo.value = null;
+    tuningStore_data_loading.value = true;
+    console.log("Tuning Store Hard Reset")
+  };
+
+  /**
+   * Reset User Data in Tuning Store
+   */
+  const resetUserDataInTuningStore = (): void => {
+    simStartTime.value = "";
+    simEndTime.value = "";
+    calStartTime.value = "";
+    calEndTime.value = "";
+    userSelectedCalibrationTuningParameters.value = [];
+    userOutputVariableToCalibrate.value.name = '';
+    userOutputVariableToCalibrate.value.module = null;
+    automatic_validation.value = true;
+    avSimStartTime.value = "";
+    avSimEndTime.value = "";
+    avCalStartTime.value = "";
+    avCalEndTime.value = "";
+    tuningStore_data_loading.value = true;
+    console.log("Tuning Store User Data Reset")
   };
 
   return {
@@ -219,6 +207,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     avCalEndTime,
     rangeDateFrom,
     rangeDateTo,
+    saveTuningTabRequestBody,
     saveTuningTabData,
     hardResetTuningStore
   };

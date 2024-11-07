@@ -1,37 +1,39 @@
 <template>
   <!-- LeftBlock.vue -->
-  <div>
+  <div class="grid grid-rows-1">
     <CommonTabs @tabNumber="tabChanged" />
-
-    <span v-if="activeTab == 1">
-      <CalibrationCalibrationRunsTab />
-    </span> <span v-if="activeTab == 2">
-      <CalibrationHeadwaterBasinGage />
-    </span>
-    <span v-else-if="activeTab == 3">
-      <CalibrationFormulation />
-    </span>
-    <span v-else-if="activeTab == 4">
-      <CalibrationTuningControls />
-    </span>
-    <span v-else-if="activeTab == 5">
-      <CalibrationOptimizationMetrics />
-    </span>
-    <span v-else-if="activeTab == 6">
-      <CalibrationRunStatus />
-    </span>
+    
+    <div class="row-span-1" v-if="activeTab == 1">
+      <LazyCalibrationCalibrationRunsTab />
+    </div> 
+    <div class="row-span-1" v-else-if="activeTab == 2">
+      <LazyCalibrationHeadwaterBasinGage />
+    </div>
+    <div class="row-span-1" v-else-if="activeTab == 3">
+      <LazyCalibrationFormulation />
+    </div>
+    <div class="row-span-1" v-else-if="activeTab == 4">
+      <LazyCalibrationTuningControls />
+    </div>
+    <div class="row-span-1" v-else-if="activeTab == 5">
+      <LazyCalibrationOptimizationMetrics />
+    </div>
+    <div class="row-span-1" v-else-if="activeTab == 6">
+      <LazyCalibrationRunStatus />
+    </div>
+    
   </div>
 
 </template>
 
 <script setup lang="ts">
-import CalibrationHeadwaterBasinGage from '~/components/Calibration/HeadwaterBasinGage.vue';
+import LazyCalibrationHeadwaterBasinGage from '~/components/Calibration/HeadwaterBasinGage.vue';
 import CommonTabs from '~/components/Common/Tabs.vue'
-import CalibrationFormulation from '~/components/Calibration/Formulation.vue'
-import CalibrationTuningControls from '~/components/Calibration/TuningControls.vue'
-import CalibrationOptimizationMetrics from '~/components/Calibration/OptimizationMetrics.vue'
-import CalibrationRunStatus from '~/components/Calibration/RunStatus.vue'
-import CalibrationCalibrationRunsTab from '~/components/Calibration/PreviousCalibrationRuns.vue'
+import LazyCalibrationFormulation from '~/components/Calibration/Formulation.vue'
+import LazyCalibrationTuningControls from '~/components/Calibration/TuningControls.vue'
+import LazyCalibrationOptimizationMetrics from '~/components/Calibration/OptimizationMetrics.vue'
+import LazyCalibrationRunStatus from '~/components/Calibration/RunStatus.vue'
+import LazyCalibrationCalibrationRunsTab from '~/components/Calibration/PreviousCalibrationRuns.vue'
 
 import { generalStore } from "@/stores/common/GeneralStore";
 

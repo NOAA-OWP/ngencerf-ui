@@ -13,7 +13,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { getAccessToken } = useUserDataStore();
   
   // refs
-  const calibrationStatus = ref<string>();
   const runningTime = ref();
   const startTimeDate = ref();
   const startTime = ref();
@@ -23,9 +22,13 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const selectedPlotName = ref();
   const selectedPlotFilename = ref();
   const selectedPlotFileUrl = ref();
+  const iteration = ref();
 
   const stopCriteria = ref();
   const stopCriteriaMet = ref(false);
+  const runningTimeIntervalId = ref();
+  const calibrationStatusIntervalId = ref();
+
 
   /**
    * Get Calibration Status
@@ -61,7 +64,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Get Calibration Plot
    * @return {any}
    */
-  const queryGetPlot = async (plotName: string): Promise<any> => {
+  const queryGetPlot = async (plotName: string, include_data=false): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
       method: "POST",
       headers: {
@@ -71,7 +74,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       body: JSON.stringify(
         { 
           calibration_run_id: calibrationJobId.value,
-          plot_name: plotName
+          plot_name: plotName,
+          include_data: include_data
         }
       )
     });
@@ -126,7 +130,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Hard Reset Run/Status Store
    */
   const hardResetRunStatusStore = (): void => {
-    calibrationStatus.value = "";
     runningTime.value = "";
     startTimeDate.value = "";
     startTime.value = "";
@@ -137,10 +140,20 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     selectedPlotFileUrl.value = "";
     stopCriteria.value = "";
     stopCriteriaMet.value = false;
-  }
+    console.log("RunStatusStore has been hard reset");
+
+    if (runningTimeIntervalId.value) {
+      clearInterval(runningTimeIntervalId.value);
+      runningTimeIntervalId.value = '';
+    }
+
+    if (calibrationStatusIntervalId.value) {
+      clearInterval(calibrationStatusIntervalId.value);
+      calibrationStatusIntervalId.value = '';
+    }
+  };
 
   return {
-    calibrationStatus,
     startTimeDate,
     startTime,
     runningTime,
@@ -149,8 +162,11 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     selectedPlotName,
     selectedPlotFilename,
     selectedPlotFileUrl,
+    iteration,
     stopCriteria,
     stopCriteriaMet,
+    runningTimeIntervalId,
+    calibrationStatusIntervalId,
     queryGetCalibrationStatus,
     queryGetPlotNames,
     queryGetPlot,

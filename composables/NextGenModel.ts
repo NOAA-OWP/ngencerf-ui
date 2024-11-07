@@ -37,6 +37,34 @@ export interface ValidationErrorObject {
   [key: string]: string
 }
 
+export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
+  geopackage_image_url?: string | null;
+  hydrofabric_errors: HydrofabricError[];
+}
+
+export interface HydrofabricError {
+  name: string;
+  message: string;
+  status_code: string;
+}
+
+export interface FormulationTabSaveWarning {
+  excluded_modules?: FormulationTabSaveWarningExcludedModule[];
+  group_requirements?: FormulationTabSaveWarningGroupRequirement[];
+  messages?: string[];
+}
+
+export interface FormulationTabSaveWarningExcludedModule {
+  module_name?: string;
+  must_have?: string[];
+}
+
+export interface FormulationTabSaveWarningGroupRequirement {
+  group_name?: string;
+  required_count?: number[];
+  has_count?: number;
+}
+
 /**
  * model for calibration job list
  */
@@ -73,6 +101,7 @@ export interface UserCalibrationRunData {
   geopackage_image_url: string;
   modules: string[];
   formulation_name: string;
+  formulation_warning?: FormulationWarning;
   use_sloth: boolean;
   sloth_parameters: SlothParameterData[];
   automatic_validation: boolean;
@@ -93,6 +122,17 @@ export interface UserCalibrationRunData {
   status: string;
 }
 
+export interface FormulationWarning {
+  exclude_modules: string[],
+  group_requirements: GroupRequirements[],
+  messages: string[]
+}
+
+export interface GroupRequirements {
+  group_name: string,
+  required_count: number[],
+  has_count: number
+}
 export interface ExternalDataStatus {
   observational: boolean;
   forcing: boolean;
@@ -408,6 +448,13 @@ export interface CalibrationStatus {
   calibration_run_id: number;
   status: string;
   errors: string[];
+  validations: Validations;
+}
+
+export interface Validations {
+  validation_run_id: number;
+  status: string;
+  validation_type: string;
 }
 
 export interface CalibrationPlotListNamesData {
@@ -438,6 +485,14 @@ export interface CalibrationValidationRunData {
   parameters: CalibrationValidationParameter[];
 }
 
+export interface CalibrationValidationJobList {
+  validation_jobs: CalibrationValidationJobData[];
+}
+
+export interface CalibrationValidationJobData extends CalibrationValidationRunData {
+  best?: boolean;
+}
+
 export interface CalibrationValidationParameter {
   name: string;
   value: number;
@@ -447,16 +502,19 @@ export interface DynamicTableColumnHeader {
   header: string;
   colspan: number;
   field?: string;
+  styles?: string[];
 }
 
 export interface DynamicTableColumn {
   field: any;
   header?: string;
   hidden?: boolean;
+  styles?: string[];  
 }
 
 export interface CalibrationRunByIteration {
   message: string;
+  objective_function_metric: string;
   iteration_data: CalibrationRunIterationData[];
   retrospective_data: CalibrationRunByIterationRetrospectiveData[];
 }
@@ -474,6 +532,11 @@ export interface CalibrationRunIterationData {
 export interface CalibrationRunIterationParameterData {
   parameter_name: string;
   parameter_value: number;
+}
+
+export interface CalibrationRunValidationParameterData {
+  name: string;
+  value: number;
 }
 
 export interface CalibrationRunByIterationRetrospectiveData	{
@@ -499,6 +562,10 @@ export interface AlternativeIterationTuningParameters {
   worker_name: string;
   iteration_num: number;
   [name: string]: string|number;
+}
+
+export interface DynamicObject {
+  [key: string]: any;
 }
 
 /**

@@ -172,6 +172,9 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * @returns {Promise<any>}
    */
   async function queryUserCalibrationRunData() {
+    if( !calibrationJobId.value ) {
+      return null;
+    }
     const userCalibrationRunDataResult = await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/load_calibration_run/`, {
       method: "POST",
       headers: {

@@ -86,7 +86,9 @@ export const makeProtectedApiCall = async <T>(
 ): Promise<any> => {
   const userDataStore = useUserDataStore();
   const parsedUrl = new URL(url);
-  const ngencerfBaseUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
+  //const ngencerfBaseUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
+  const { ngencerfBaseUrl } =  useBackendConfig();
+  
   let responseData: FetchResponse<any> | null = null;
 
   // verify access token before making the API call

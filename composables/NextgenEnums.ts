@@ -12,6 +12,7 @@ export const EvaluationTabs =  {
   tab_calibrationRuns: 0,
   tab_evaluate: 1,
   tab_selectAltIteration: 2,
+  tab_runStatus: 3
 }
 
 export const NextgenPages = {
@@ -29,5 +30,6 @@ export const CalibrationHelpPages = {
   optimizationMetrics: 5,
   runStatus: 6,
   results: 7,
-
 }
+
+export const TokenExpired = 498;

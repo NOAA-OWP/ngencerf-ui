@@ -3,29 +3,29 @@
     <tbody>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold  checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="1" title="Calibration Run" aria-label="Calibration Run"
+        <td data-tab="1" title="Calibration Run" aria-label="Calibration Run"
           @click="tabClicked">
           Calibration Run</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype" data-tab="2" title="Parameter Set" aria-label="Parameter Set" @click="tabClicked">
+        <td data-tab="2" title="Parameter Set" aria-label="Parameter Set" @click="tabClicked">
           Parameter Set</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="3" title="Run Type" aria-label="Run Type"
+        <td data-tab="3" title="Run Type" aria-label="Run Type"
           @click="tabClicked">
           Run Type</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="3" title="Forcing Source"
+        <td data-tab="3" title="Forcing Source"
           aria-label="Forcing Source" @click="tabClicked">Forcing Source</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td class="ptype whitespace-nowrap" data-tab="3" title="Time Period" aria-label="Time Period"
+        <td data-tab="3" title="Time Period" aria-label="Time Period"
           @click="tabClicked">Time Period</td>
       </tr>
     </tbody>
