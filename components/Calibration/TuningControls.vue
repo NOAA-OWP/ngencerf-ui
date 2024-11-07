@@ -277,7 +277,7 @@
   </div>
   <DynamicDialog />
   <div class="waitgif" v-if="isLoading">
-    <img src="@/assets/styles/img/wait.gif" />
+    <img alt="Please wait" src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
 
@@ -531,16 +531,16 @@ const handleAvCalEndUpdate = (value: any) => {
 
 // watch for changes to selected output variable
 watch(selectedOutputVariable, () => {
-  // Parse out the name and module from the Select value
-  let paren = selectedOutputVariable?.value.indexOf('(');
-  const outputVariable = selectedOutputVariable?.value.substring(0, paren - 1 );
-  const module = selectedOutputVariable?.value.substring(paren + 1, selectedOutputVariable?.value.length - 1 );
-  
+  // get output variable object from newly-selected output variable
+  const outputVariable = outputVariables?.value?.find((outputVar: any) => outputVar?.output === selectedOutputVariable?.value);
+
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
-    name: outputVariable,
-    module: module,
+    name: outputVariable?.name,
+    module: outputVariable?.module,
   }
+  // console.log("selectedOutputVariable:", selectedOutputVariable.value);
+  // console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
 });
 
 // watch for changes to simStartTime. If simStartTime is set, set calStartTime to one year after simStartTime if not already set
@@ -626,9 +626,9 @@ const handleFileUpload = async (event: Event) => {
           },
           body: formData,
         });
-
-      if( response.error && response.error === TokenExpired) {
-        alert("Your session had timed out")
+        if( response.error && response.error === TokenExpired) {
+        alert("Your session had timed out");
+        navigateTo('login');
       } else if (response?._data.user_parameter_file) {
         // Populate the Parameter table with the data from user-uploaded file
         response._data?.user_parameter_file?.forEach((param: any) => {
@@ -794,8 +794,6 @@ const validateAndBuildRequestBody = (): boolean => {
         calibration_start_time: calStartTime.value,
         calibration_end_time: calEndTime.value
       };
-    } else {
-      return false;
     }
   }
   if (areValidationTimesSet()) {
@@ -806,8 +804,6 @@ const validateAndBuildRequestBody = (): boolean => {
         validation_start_time: avCalStartTime.value,
         validation_end_time: avCalEndTime.value
       };
-    } else {
-      return false;
     }
   }
 
