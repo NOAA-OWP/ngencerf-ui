@@ -98,7 +98,7 @@
               </div>
             </span>
             <span v-else>
-              <div class="col-span-1 mr-6 h-8">&nbsp;</div>
+              <div class="col-span-1 mr-6 h-8 whitespace-nowrap">&nbsp;</div>
             </span>
             <span v-if="calibrationStatus === 'Running'">
               <div class="col-span-1 mr-3"><!--c-blue font-normal text-xl underline pt-1-->
