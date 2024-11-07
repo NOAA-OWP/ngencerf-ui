@@ -31,4 +31,4 @@ export const CalibrationHelpPages = {
   results: 7,
 }
 
-const TokenExpired = 498;
+export const TokenExpired = 498;
