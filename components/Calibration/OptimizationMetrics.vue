@@ -132,7 +132,7 @@
         </div>
       </span>
       <span v-else>
-        <div class="col-span-1 mr-6 h-8">
+        <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
           Run on {{ formatDateForRunOnString(startTimeDate) }}
         </div>
       </span>
@@ -353,11 +353,11 @@ const validateTab = () => {
     error = true;
     text.push("Objective Function has been changed");
   }
-  if (userCalibrationRunData?.value?.stop_criteria || 0 !== uiStopCriteria.value) {
+  if ((userCalibrationRunData?.value?.stop_criteria || 0 )!== uiStopCriteria.value) {
     error = true;
     text.push("Calibration Stop Criteria has been changed");
   }
-  if (userCalibrationRunData?.value?.save_plot_iteration_frequency || 0 !== uiPlotFrequency.value) {
+  if ((userCalibrationRunData?.value?.save_plot_iteration_frequency || 0) !== uiPlotFrequency.value) {
     error = true;
     text.push("Plot Generation Frequency has been changed");
   }
