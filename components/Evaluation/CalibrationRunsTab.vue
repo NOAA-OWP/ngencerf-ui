@@ -6,7 +6,7 @@
             <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs</h1>
           </div>
           <div class="ml-auto mt-2">
-            <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4" v-if="userSelectedEvalCalibrationRunId > 0" @click.stop="navigateToAlternateIteration">New Validation</Button></div>
+            <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4" v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true" @click.stop="navigateToAlternateIteration">New Validation</Button></div>
           </div>
         </div>
 
@@ -27,7 +27,11 @@
                   table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
                   :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
                   <Column field="calibration_run_id" header="Job ID" sortable></Column>
-                  <Column field="run_date" header="Run Date" sortable></Column>
+                  <Column field="run_date" header="Run Date" sortable>
+                    <template #body="slotProps">
+                      {{ formatDateForDisplay( slotProps.data.run_date ) }}
+                    </template>
+                  </Column>
                   <Column field="formulation_name" header="formulation_name" sortable></Column>
                   <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
                   <Column field="objective_function" header="Objective Function" sortable></Column>                        
@@ -50,7 +54,7 @@
         <div class="flex mt-2">
           <div class="ml-auto mt-4">
             <div id="NewButton" class="">
-              <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" v-if="computedCalibrationValidationRunList.length > 0" @click.stop="navigateToEvaluation">Evaluate</Button>
+              <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true" @click.stop="navigateToEvaluation">Evaluate</Button>
             </div>
           </div>
         </div>
@@ -66,17 +70,19 @@
 import { useToast } from "primevue/usetoast";
 
 import type { CalibrationRun, CalibrationValidationJobData } from "~/composables/NextGenModel";
+import { EvaluationTabs } from  "~/composables/NextgenEnums";
 import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { generalStore } from "@/stores/common/GeneralStore";
+import { formatDateForDisplay } from '~/utils/TimeHelpers';
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
 const { 
-  uiGageId, evaluationCalibrationRunGageList,
-  getReferenceDataSetOptions,
+  uiGageId, 
+  evaluationCalibrationRunGageList,
+  loadCalibrationDataComplete,
   userSelectedEvalCalibrationRunId,
   calibrationValidationRunListHeaders,
   computedCalibrationValidationRunList,
@@ -108,8 +114,13 @@ const onEvalCalibrationRowSelect = async ( event: DataTableRowClickEvent ) => {
 }
 
 watch( () => userCalibrationRunData.value, ( updatedRunData, initialRunData ) => {
+  console.log( 'initialRunData', initialRunData )
+  console.log( 'updatedRunData', updatedRunData )
   if ( updatedRunData != undefined && Object.keys( updatedRunData ).length > 0 ) {
-    isLoadingCalibrationSummary.value = false;
+    nextTick(() => {
+      isLoadingCalibrationSummary.value = false;
+      loadCalibrationDataComplete.value = true;
+    });
   }
 });
 
@@ -128,7 +139,7 @@ const onEvalValidationRowUnSelect = async ( event: DataTableRowClickEvent ) => {
 const navigateToAlternateIteration = ( event : any ) => {
   if ( userSelectedEvalCalibrationRunId.value > 0 ) {
     const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[2];
+    const e = <HTMLElement>tabs[ EvaluationTabs.tab_selectAltIteration ];
     e.click();
   } else {
     toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 })
@@ -138,7 +149,7 @@ const navigateToAlternateIteration = ( event : any ) => {
 const navigateToEvaluation = ( event: any ) => {
   if ( evaluateValidationRunId.value > 0 ) {
     const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[1];
+    const e = <HTMLElement>tabs[ EvaluationTabs.tab_evaluate ];
     e.click();
   } else {
     toast.add({ severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 })
@@ -157,25 +168,6 @@ onMounted( () => {
   resetUserSelectedEvalCalibrationRun();
 
   fetchUserValidatedCalibrationJobsListData();
-
-  useListen('evaluateCalibrationRubTabAction', ( action ) => {
-    if ( action == "ValidateListReset" ) {
-      selectedCalibrationRun.value = undefined;
-      resetUserSelectedEvalCalibrationRun();
-    }
-  });
-
-  useListen('evaluateCalibrationRubTabAction', ( action ) => {
-    if ( action == "EvaluateCalibrationRun" ) {
-      const tabs = document.getElementsByClassName("tabs");
-      const e = <HTMLElement>tabs[1];
-      e.click();
-    }
-  });  
-});
-
-onUnmounted(() => {
-  emitterOff('evaluateCalibrationRubTabAction');
 });
 
 </script>

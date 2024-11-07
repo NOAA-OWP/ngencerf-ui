@@ -7,6 +7,7 @@ import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, DynamicTableColumn, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "~/composables/NextGenModel";
 import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
+import { formatDateForDisplay } from '~/utils/TimeHelpers';
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {  
   const { calibrationJobId, evaluateValidationRunId } = storeToRefs( generalStore() );
@@ -17,6 +18,9 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const { getAccessToken } = useUserDataStore();
   const uiGageId = ref<string>( "" );   
   const userSelectedEvalCalibrationRun = ref<any>();
+  const loadCalibrationDataComplete = ref<boolean>( false );
+  
+
   /**
    * list of calibration jobs with validation data
    */
@@ -99,7 +103,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         }
         let rowData = <any>{};
         rowData['validation_run_id'] = validation_job.validation_run_id;
-        rowData['run_date'] = validation_job.run_date;
+        rowData['run_date'] = formatDateForDisplay( validation_job.run_date );
         validation_job.parameters.forEach( ( parameter: CalibrationRunValidationParameterData ) => {
           rowData[ parameter.name ] = parameter.value;
         });
@@ -111,7 +115,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const loadSelectedCalibrationRun = async ( calibration_run_id: number ) => {
     calibrationJobId.value = calibration_run_id;
     userSelectedEvalCalibrationRunId.value = calibration_run_id;
-    fetchUserCalibrationRunData();
+    await fetchUserCalibrationRunData();
   }
 
   const resetUserSelectedCalibrationValidationRunList = () => {
@@ -137,6 +141,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    */
   const resetUserSelectedEvalCalibrationRun = (): void => {
     userSelectedEvalCalibrationRun.value = undefined;
+    loadCalibrationDataComplete.value = false;
     userSelectedCalibrationValidationRunList.value = [];
     resetUserSelectedEvalValidationRun();
     clearUserCalibrationRunData();
@@ -162,6 +167,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     calibrationRunList,
     evaluationCalibrationRunGageList,
     userSelectedEvalCalibrationRunId,
+    loadCalibrationDataComplete,
 
     loadSelectedCalibrationRun,
     fetchUserValidatedCalibrationJobsListData,

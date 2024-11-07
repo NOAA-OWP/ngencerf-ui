@@ -48,16 +48,18 @@
           Calibration Runs
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="2" data-menu-tab="22" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
-          aria-label="Evaluate Tab" title=" Evaluate tab" :disabled="true">
-          Evaluate
-          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
-        <div data-tab="3" data-menu-tab="23" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
-          aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
-          Select Alternate Iteration
-          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
+        <span v-show="calibrationJobId > 0 && loadCalibrationDataComplete == true">
+          <div data-tab="2" data-menu-tab="22" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
+            aria-label="Evaluate Tab" title=" Evaluate tab" :disabled="true">
+            Evaluate
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div data-tab="3" data-menu-tab="23" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
+            aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
+            Select Alternate Iteration
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+        </span>
       </div>
     </span>
 
@@ -115,7 +117,10 @@
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
+
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
@@ -124,6 +129,9 @@ const currentEvaluationTab = ref(getEvaluationTabIndex());
 const currentForecastTab = ref(getForecastTabIndex());
 const currentVerificationTab = ref(getVerificationTabIndex());
 const currentMenu = ref(getMenuIndex());
+
+//store specific import
+const { loadCalibrationDataComplete } = storeToRefs( useEvaluationCalibrationRunStore() )
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
@@ -136,12 +144,13 @@ const tabClicked = (event: Event) => {
   Object.keys(allTabs).forEach(function (key) {
     allTabs[key as any].classList.remove("activeTab");
   });
-
+  
   // Note that the compiler sends errors when you don't check for null
   if (ele) {
-    const cl = ele.classList;
+    //const cl = ele.classList;
     ele.classList.add("activeTab");
   }
+
   nextTick(() => {
     // Send the selected tab info to the active tab set with emit
     if (currentMenu.value === 1) {
