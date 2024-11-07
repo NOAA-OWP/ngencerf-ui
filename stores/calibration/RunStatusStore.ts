@@ -137,6 +137,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     selectedPlotName.value = "";
     selectedPlotFilename.value = "";
     selectedPlotFileUrl.value = "";
+    iteration.value = undefined;
     stopCriteria.value = "";
     stopCriteriaMet.value = false;
     console.log("RunStatusStore has been hard reset");

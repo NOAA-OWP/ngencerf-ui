@@ -15,6 +15,10 @@
                     <td class="text-right font-bold">Elapsed Time</td>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
+                  <tr v-if="iteration && iteration >= 1" height="32px">
+                    <td class="text-right font-bold">Iteration</td>
+                    <td class="pl-5">{{ iteration }}</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -177,9 +181,7 @@ const {
 
 const isLoading = ref(false);
 const progress = ref();
-
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
-
 
 onMounted(async () => {
   toast.removeAllGroups();
@@ -219,12 +221,13 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
         // console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
         // console.log('typeof runningTimeIntervalId:', typeof runningTimeIntervalId.value);
+
         // Create an interval to update runningTime every second while status is Running
         if (!runningTimeIntervalId.value) {
           // console.log('creating runningTimeIntervalId');
           runningTimeIntervalId.value = setInterval(async () => {
             if (userCalibrationRunData.value?.status === 'Running') {
-              // Calculate Running Time every second
+              // Calculate Running Time every second while status is Running
               runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
             } else {
               clearInterval(runningTimeIntervalId.value);
@@ -232,22 +235,31 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           }, 1000);
         }
 
-        console.log('calibrationStatusIntervalId:', calibrationStatusIntervalId.value);
+        // console.log('calibrationStatusIntervalId:', calibrationStatusIntervalId.value);
+
         // Create an interval to update calibrationStatus every 10 seconds while status is Running
         if (!calibrationStatusIntervalId.value) {
           // console.log('creating calibrationStatusIntervalId');
           calibrationStatusIntervalId.value = setInterval(async () => {
-            const getCalibrationStatusResponse = await queryGetCalibrationStatus();
+            const getIterationResponse = await queryIteration();
 
-            if (getCalibrationStatusResponse._data && getCalibrationStatusResponse._data.status) {
-              if (getCalibrationStatusResponse._data.status !== 'Running') {
+            // check if status changes from Running
+            if (getIterationResponse._data && getIterationResponse._data.status) {
+              if (getIterationResponse._data.status !== 'Running') {
                 if (userCalibrationRunData.value) {
                   clearInterval(calibrationStatusIntervalId.value);
-                  userCalibrationRunData.value.status = getCalibrationStatusResponse._data.status;
+                  userCalibrationRunData.value.status = getIterationResponse._data.status;
                 }
               }
             } else {
               toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
+            }
+
+            // check if iteration changes
+            if (getIterationResponse._data && getIterationResponse._data.iteration) {
+              iteration.value = getIterationResponse._data.iteration;
+            } else {
+              toast.add({ severity: 'warn', summary: 'Unable to get Iteration' });
             }
           }, 10000);
         }
@@ -258,14 +270,6 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       }
 
       // Get Plot Names
-      const getIterationResponse = await queryIteration();
-      if (getIterationResponse?._data?.iteration) {
-        iteration.value = getIterationResponse?._data?.iteration;
-        // console.log('iteration:', iteration.value);
-      } else {
-        console.error('Error getting Iteration');
-      }
-
       if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
         plotNames.value = await queryGetPlotNames();
       }
@@ -283,15 +287,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     }
 
     else if (calibrationStatus.value === 'Done') {
-      // Update Plot Names
-      const getIterationResponse = await queryIteration();
-      if (getIterationResponse?._data?.iteration) {
-        iteration.value = getIterationResponse?._data?.iteration;
-        // console.log('iteration:', iteration.value);
-      } else {
-        console.error('Error getting Iteration');
-      }
-
+      // Get Plot Names
       if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
         plotNames.value = await queryGetPlotNames();
       }
