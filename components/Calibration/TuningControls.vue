@@ -1214,6 +1214,9 @@ const handleNextPrevDialogClose = (opt: any) => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
+#OutVar {
+  width: 600px;
+}
 #AddUpdateBtn {
   height: 40px;
 }
