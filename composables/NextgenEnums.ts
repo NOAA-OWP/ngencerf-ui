@@ -30,3 +30,5 @@ export const CalibrationHelpPages = {
   runStatus: 6,
   results: 7,
 }
+
+const TokenExpired = 498;
