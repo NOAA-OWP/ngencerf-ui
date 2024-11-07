@@ -347,6 +347,10 @@ select option {
 .p-datatable-column-title {
   font-size: 0.8em;
 }
+#MainLeftDataArea .p-datatable-tbody > tr.p-datatable-row-selected {
+  background-color: #D8FFD8 !important;    
+  color: black;
+}
 
 // default color ovewrites
 .bg-green { background-color: $ngwcp_secondary4 !important; }
@@ -524,6 +528,10 @@ table.cols-bordered {
 }
 .p-listbox-option-selected {
   background-color: $ngwcp_green_lt; 
+}
+#MainLeftDataArea .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected {
+  color: var(--p-listbox-option-color); 
+  font-weight: 500;
 }
 
 /* Action Buttons repositioning */
