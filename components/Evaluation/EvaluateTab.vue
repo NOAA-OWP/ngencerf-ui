@@ -35,7 +35,7 @@
             <div>
                 <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
                     <div v-if="plotTableList && plotTableList.length > 1">
-                        <label for="PlotTableOptions" class="pr-2 pt-3">Show Table </label>
+                        <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
                         <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable"
                             :options="plotTableList" optionLabel="name" optionValue="name">
                         </Select>
@@ -181,12 +181,9 @@ onMounted(async () => {
     console.log('iterationMetricsColumns:', iterationMetricsColumns);
     console.log('iterationParamsData:', iterationParamsData.value);
     console.log('iterationParamsColumns:', iterationParamsColumns);
-
-    // set selectedPlotName to the first plot name when the page is loaded
-    if (plotList.value) {
-        selectedPlotName.value = plotList?.value[0]?.name;
-        console.log('selectedPlotName:', selectedPlotName.value);
-    }
+    
+    // make sure page loads with no plot selected
+    selectedPlotName.value = null;
 });
 
 // Handle selectedPlotName changes
@@ -198,7 +195,7 @@ watch(selectedPlotName, async () => {
     selectedIterationTable.value = iterationOptions.indexOf(selectedPlotName.value)+1;
     plotTableData.value = [];
     plotTableColumns.value = [];
-  } else {
+  } else if (selectedPlotName.value) {
     selectedIterationTable.value = null;
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value, true);
@@ -232,7 +229,7 @@ watch(selectedPlotName, async () => {
                     }
                     // now go through and add rows to our table
                     for (let d = 0; d < iteration_data_row.length; d++) {
-                        let data_row = {iteration: d, ...iteration_data_row[d]};
+                        let data_row = iteration_data_row[d];
                         delete data_row.run;
                         plotTables.value[table_name].push(data_row);
                     }
@@ -308,6 +305,20 @@ watch(plotTableData, async () => {
             let column_header = column_header_words.join(" ");
             plotTableColumns.value.push({header: column_header, value: key});
         });
+        for (let d = 0; d < plotTableData.value.length; d++) {
+            Object.keys(plotTableData.value[d]).forEach(key => {
+                if (plotTableData.value[d][key] != 0 && (plotTableData.value[d][key] === null || plotTableData.value[d][key] == '')) {
+                    plotTableData.value[d][key] = 'N/A';
+                } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
+                    // attempt to round to 5 digits - just display as is if there are any problems doing this
+                    try {
+                        plotTableData.value[d][key] = Number(plotTableData.value[d][key]).toFixed(5);
+                    } catch (e) {
+                        console.log('Error rounding value ' + plotTableData.value[d][key] + ': ' + e.message);
+                    }
+                }
+            });
+        }
         console.log('plotTableData: ', plotTableData.value);
         console.log('plotTableColumns: ', plotTableColumns.value);
     }
