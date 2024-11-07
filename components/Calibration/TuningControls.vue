@@ -247,7 +247,7 @@
         </div>
       </span>
       <span v-else>
-        <div class="col-span-1 mr-6 h-8">
+        <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
           Run on {{ formatDateForRunOnString(startTimeDate) }}
         </div>
       </span>
@@ -277,7 +277,7 @@
   </div>
   <DynamicDialog />
   <div class="waitgif" v-if="isLoading">
-    <img src="@/assets/styles/img/wait.gif" />
+    <img alt="Please wait" src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
 
@@ -534,13 +534,10 @@ watch(selectedOutputVariable, () => {
   // get output variable object from newly-selected output variable
   const outputVariable = outputVariables?.value?.find((outputVar: any) => outputVar?.output === selectedOutputVariable?.value);
 
-  // find module for newly-selected output variable
-  const module = loadTuningTabData?.value?._data?.modules?.find((module: any) => module?.output_variables?.find((outputVar: any) => outputVar?.name === outputVariables.name));
-
   // set userOutputVariableToCalibrate with newly-selected output variable
   userOutputVariableToCalibrate.value = {
     name: outputVariable?.name,
-    module: module?.name,
+    module: outputVariable?.module,
   }
   // console.log("selectedOutputVariable:", selectedOutputVariable.value);
   // console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
@@ -629,8 +626,10 @@ const handleFileUpload = async (event: Event) => {
           },
           body: formData,
         });
-
-      if (response?._data.user_parameter_file) {
+        if( response.error && response.error === TokenExpired) {
+        alert("Your session had timed out");
+        navigateTo('login');
+      } else if (response?._data.user_parameter_file) {
         // Populate the Parameter table with the data from user-uploaded file
         response._data?.user_parameter_file?.forEach((param: any) => {
           if (
@@ -795,8 +794,6 @@ const validateAndBuildRequestBody = (): boolean => {
         calibration_start_time: calStartTime.value,
         calibration_end_time: calEndTime.value
       };
-    } else {
-      return false;
     }
   }
   if (areValidationTimesSet()) {
@@ -807,8 +804,6 @@ const validateAndBuildRequestBody = (): boolean => {
         validation_start_time: avCalStartTime.value,
         validation_end_time: avCalEndTime.value
       };
-    } else {
-      return false;
     }
   }
 
@@ -1219,6 +1214,9 @@ const handleNextPrevDialogClose = (opt: any) => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
+#OutVar {
+  width: 600px;
+}
 #AddUpdateBtn {
   height: 40px;
 }
