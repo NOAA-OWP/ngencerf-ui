@@ -15,7 +15,7 @@
                     <td class="text-right font-bold">Elapsed Time</td>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr v-if="iteration && iteration >= 1" height="32px">
+                  <tr v-if="isNotNullOrUndefined(iteration)" height="32px">
                     <td class="text-right font-bold">Iteration</td>
                     <td class="pl-5">{{ iteration }}</td>
                   </tr>
@@ -29,12 +29,19 @@
                   <tr>
                     <td class="text-right"><label for="RunStatus">Status</label></td>
                     <td class="pl-5">
-                      <span v-if="!progress">
+                      <span v-if="calibrationStatus !== 'Done'">
                         <input id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;"
                           v-model="calibrationStatus" disabled />
                       </span>
-                      <span v-else>
-                        <ProgressBar :value="progress"></ProgressBar>
+                      <span v-else-if="calibrationStatus === 'Done' && !allValidationsDone">
+                        <span id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;">
+                          Calibration Done, Validation Running
+                        </span>
+                      </span>
+                      <span v-else-if="calibrationStatus === 'Done' && allValidationsDone">
+                        <span id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;">
+                          Done
+                        </span>
                       </span>
                     </td>
                   </tr>
@@ -141,7 +148,7 @@ import { onMounted, onUnmounted } from "vue";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
-import { isValidDate, isCalibrationJobFinished } from '~/utils/CommonHelpers';
+import { isValidDate, isNotNullOrUndefined } from '~/utils/CommonHelpers';
 import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
 
@@ -164,7 +171,9 @@ const {
   stopCriteria,
   stopCriteriaMet,
   runningTimeIntervalId,
-  calibrationStatusIntervalId
+  calibrationStatusIntervalId,
+  validationsStatusIntervalId,
+  allValidationsDone
 } = storeToRefs(runStatusStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -183,12 +192,12 @@ const isLoading = ref(false);
 const progress = ref();
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 
-onMounted(async () => {
+onMounted(() => {
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
-  nextTick(() => {
+  nextTick(async () => {
     if (userCalibrationRunData.value) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
       // console.log('stopCriteria:', stopCriteria.value);
@@ -197,6 +206,13 @@ onMounted(async () => {
         startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
         console.log('startTimeDate from within nextTicket and onMounted:', startTimeDate.value);
       }
+    }
+    
+    // if calibration is Done, check if all validation statuses are Done
+    if (userCalibrationRunData?.value?.status === 'Done') {
+      const getStatusResponse = await queryGetCalibrationStatus();
+      const validations = getStatusResponse?._data?.validations;
+      allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
     }
   });
 });
@@ -256,10 +272,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             }
 
             // check if iteration changes
-            if (getIterationResponse._data && getIterationResponse._data.iteration) {
+            if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
               iteration.value = getIterationResponse._data.iteration;
-            } else {
-              toast.add({ severity: 'warn', summary: 'Unable to get Iteration' });
             }
           }, 10000);
         }
@@ -287,6 +301,14 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     }
 
     else if (calibrationStatus.value === 'Done') {
+      if (!iteration.value) {
+        const getIterationResponse = await queryIteration();
+
+        if (getIterationResponse._data && getIterationResponse._data.iteration) {
+          iteration.value = getIterationResponse._data.iteration;
+        }
+      }
+
       // Get Plot Names
       if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
         plotNames.value = await queryGetPlotNames();
@@ -303,7 +325,27 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
       }
 
-      // clear intervals and set stopCriteriaMet to true
+      // when calibration is Done, check if all validation statuses are Done
+      const getStatusResponse = await queryGetCalibrationStatus();
+      const validations = getStatusResponse?._data?.validations;
+      allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
+
+      // create an interval to keep checking validation statuses every 10 seconds while all validations are not Done
+      if (!validationsStatusIntervalId.value) {
+        validationsStatusIntervalId.value = setInterval(async () => {
+          const getStatusResponse = await queryGetCalibrationStatus();
+          const validations = getStatusResponse?._data?.validations;
+          if (validations && validations.length > 0) {
+            allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
+            if (allValidationsDone.value) {
+              clearInterval(validationsStatusIntervalId.value);
+            }
+          }
+        }, 10000);
+      }
+
+      // clear intervals that increments the calibration running time and checks calibration status,
+      // and set stopCriteriaMet to true
       stopCriteriaMet.value = true;
       clearInterval(runningTimeIntervalId.value);
       clearInterval(calibrationStatusIntervalId.value);
@@ -327,7 +369,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  if (iteration.value >= 1 || isCalibrationJobFinished(calibrationStatus.value)) {
+  if (iteration.value >= 1) {
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
 
@@ -349,6 +391,19 @@ watch(startTimeDate, () => {
     startTime.value = convertTimeZone(startTimeDate.value);
   } else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object'});
+  }
+});
+
+// Handle iteration changes
+watch(iteration, async () => {
+  if (iteration.value >= 1 && selectedPlotName.value) {
+    // get selected plot file name and url from server
+    const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
+
+    if (response?._data?.plot_file_name && response?._data?.plot_url) {
+      selectedPlotFilename.value = response?._data?.plot_file_name;
+      selectedPlotFileUrl.value = response?._data?.plot_url;
+    }
   }
 });
 
