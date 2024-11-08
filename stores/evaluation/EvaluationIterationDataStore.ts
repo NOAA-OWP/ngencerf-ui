@@ -12,9 +12,12 @@ export const useEvaluationIterationDataStore = defineStore('EvaluationIterationD
 
   // refs
   const iterations = ref();
-  const iterationMetricsData = ref();
-  const iterationParamsData = ref();
-  const selectedIterationTable = ref();
+  const iterationMetricsData = ref<any[]>([]);
+  const iterationParamsData = ref<any[]>([]);
+  const iterationMetricsColumns = ref<any[]>([]);
+  const iterationParamsColumns = ref<any[]>([]);
+  const iterationOptions = ['Iteration Metrics Table','Iteration Parameters Table'];
+  const selectedIterationTable = ref<number>( 0 );
 
   /**
    * Get Calibration Iteration Data
@@ -39,6 +42,9 @@ export const useEvaluationIterationDataStore = defineStore('EvaluationIterationD
     iterations,
     iterationMetricsData,
     iterationParamsData,
+    iterationMetricsColumns,
+    iterationParamsColumns,
+    iterationOptions,
     selectedIterationTable,
     queryGetIterations,
   };

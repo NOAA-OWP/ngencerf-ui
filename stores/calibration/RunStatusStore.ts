@@ -65,7 +65,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Get Calibration Plot
    * @return {any}
    */
-  const queryGetPlot = async (plotName: string): Promise<any> => {
+  const queryGetPlot = async (plotName: string, include_data=false): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
       method: "POST",
       headers: {
@@ -75,7 +75,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       body: JSON.stringify(
         { 
           calibration_run_id: calibrationJobId.value,
-          plot_name: plotName
+          plot_name: plotName,
+          include_data: include_data
         }
       )
     });
