@@ -325,18 +325,16 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
       }
 
-      // when calibration is Done, check if all validation statuses are Done
-      const getStatusResponse = await queryGetCalibrationStatus();
-      const validations = getStatusResponse?._data?.validations;
-      allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
-
       // create an interval to keep checking validation statuses every 10 seconds while all validations are not Done
       if (!validationsStatusIntervalId.value) {
         validationsStatusIntervalId.value = setInterval(async () => {
           const getStatusResponse = await queryGetCalibrationStatus();
           const validations = getStatusResponse?._data?.validations;
-          if (validations && validations.length > 0) {
+          if (validations && validations.length === 2) {
+            // check if all validations are Done
             allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
+
+            // if valid_control and valid_best are Done, clear the interval
             if (allValidationsDone.value) {
               clearInterval(validationsStatusIntervalId.value);
             }
