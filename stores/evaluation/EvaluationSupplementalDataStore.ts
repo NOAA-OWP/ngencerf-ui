@@ -44,7 +44,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * @return {any}
    */
    const queryGetPerformanceMetrics = async (): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_performance_metrics/`, {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_status/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -52,7 +52,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
       },
       body: JSON.stringify(
         { 
-          calibration_run_id: calibrationJobId.value
+          calibration_run_id: calibrationJobId.value,
+          include_performance_metrics: true
         }
       )
     });
