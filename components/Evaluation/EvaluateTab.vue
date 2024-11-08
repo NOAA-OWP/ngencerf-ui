@@ -48,14 +48,18 @@
             </div>
         </div>
 
-        <div id="TableArea" class="p-2" v-if="selectedIterationTable">
+        <div id="SupplementalTableArea" class="p-2" v-if="selectedSupplementalTable">
             <DataTable :value="iterationMetricsData" scrollable scroll-height="500px"
-                fixedHeader=true :multi-sort="true" v-if="iterationMetricsData && selectedIterationTable == 1">
+                fixedHeader=true :multi-sort="true" v-if="iterationMetricsData && selectedSupplementalTable == 1">
                 <Column v-for="( col, colIndex ) in iterationMetricsColumns" :key="colIndex" :header="col.header" :field="col.field" sortable></Column>
             </DataTable>
             <DataTable :value="iterationParamsData" scrollable scroll-height="500px"
-                fixedHeader=true :multi-sort="true" v-if="iterationParamsData && selectedIterationTable == 2">
+                fixedHeader=true :multi-sort="true" v-if="iterationParamsData && selectedSupplementalTable == 2">
                 <Column v-for="( col, colIndex ) in iterationParamsColumns" :key="colIndex" :header="col.header" :field="col.field" sortable></Column>
+            </DataTable>
+            <DataTable :value="performanceMetricsData" fixedHeader=true
+                v-if="performanceMetricsData && selectedSupplementalTable == 3">
+                <Column v-for="( col, colIndex ) in performanceMetricsColumns" :key="colIndex" :header="col.header" :field="col.field"></Column>
             </DataTable>
         </div>
     </div>
@@ -64,7 +68,7 @@
 <script setup lang="ts">
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
-import { useEvaluationIterationDataStore } from '~/stores/evaluation/EvaluationIterationDataStore';
+import { useEvaluationSupplementalDataStore } from '~/stores/evaluation/EvaluationSupplementalDataStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useToast } from 'primevue/usetoast';
 import type { DynamicObject } from "~/composables/NextGenModel";
@@ -72,7 +76,7 @@ import type { DynamicObject } from "~/composables/NextGenModel";
 import MessagesGroup from "../Common/MessagesGroup.vue";
 
 const runStatusStore = useRunStatusStore();
-const evaluationIterationDataStore = useEvaluationIterationDataStore();
+const EvaluationSupplementalDataStore = useEvaluationSupplementalDataStore();
 const userDataStore = useUserDataStore();
 const toast = useToast();
 
@@ -93,8 +97,10 @@ const {
     iterationParamsData,
     iterationMetricsColumns,
     iterationParamsColumns,
-    selectedIterationTable
-} = storeToRefs(evaluationIterationDataStore);
+    selectedSupplementalTable,
+    performanceMetrics,
+    performanceMetricsData,
+} = storeToRefs(EvaluationSupplementalDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
@@ -105,14 +111,16 @@ const {
 } = runStatusStore;
 const {
     queryGetIterations,
-    iterationOptions,
-} = evaluationIterationDataStore;
+    queryGetPerformanceMetrics,
+} = EvaluationSupplementalDataStore;
 
 const plotTables = ref({});
 const plotTableList = ref<any[]>([]);
 const selectedPlotTable = ref<string | null>(null);
 const plotTableData = ref<any[]>([]);
 const plotTableColumns = ref<any[]>([]);
+const performanceMetricsColumns = [{header: 'Metric', field: 'metric'},{header: 'Value', field: 'value'}];
+const supplementalTableOptions = ['Iteration Metrics Table','Iteration Parameters Table','Performance Metrics Table']
 
 onMounted(async () => {
     if (!userCalibrationRunData?.value || userCalibrationRunData?.value?.error) {
@@ -132,13 +140,10 @@ onMounted(async () => {
     iterations.value = await queryGetIterations();
     console.log('iterations:', iterations.value?._data);
 
+    // Add Iteration Metrics/Parameters Tables to the dropdown
     if (iterations.value?._data.iteration_data) {
-        for (let o = 0; o < iterationOptions.length; o++) {
-            let plotListItem = {'name': iterationOptions[o], 'description': ''};
-            if (!plotList.value.includes(plotListItem)) {
-                plotList.value.push(plotListItem);
-            }
-        }
+        plotList.value.push({name: supplementalTableOptions[0], description: ''});
+        plotList.value.push({name: supplementalTableOptions[1], description: ''});
     }
     console.log('plotList:', plotList.value);
 
@@ -181,22 +186,39 @@ onMounted(async () => {
     console.log('iterationMetricsColumns:', iterationMetricsColumns);
     console.log('iterationParamsData:', iterationParamsData.value);
     console.log('iterationParamsColumns:', iterationParamsColumns);
+
+    // Get Performance Metrics - put each one into the table as its own row
+    performanceMetrics.value = await queryGetPerformanceMetrics();
+    performanceMetricsData.value = [];
+    if (performanceMetrics.value?._data) {
+        console.log('performanceMetrics:', performanceMetrics.value?._data);
+        Object.keys(performanceMetrics.value?._data).forEach(key => {
+            performanceMetricsData.value.push({'metric': key, 'value': performanceMetrics.value?._data[key]});
+        });
+        console.log('performanceMetricsData:', performanceMetricsData.value);
+        console.log('performanceMetricsColumns:', performanceMetricsColumns);
+        
+        // Add Performance Metrics Table to the dropdown
+        plotList.value.push({name: supplementalTableOptions[2], description: ''});
+    }
     
     // make sure page loads with no plot selected
     selectedPlotName.value = null;
+    selectedPlotFilename.value = null;
+    selectedPlotFileUrl.value = null;
 });
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   // is the selected option a plot or iteration table?
-  if(iterationOptions.includes(selectedPlotName.value)) {
+  if(supplementalTableOptions.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
-    selectedIterationTable.value = iterationOptions.indexOf(selectedPlotName.value)+1;
+    selectedSupplementalTable.value = supplementalTableOptions.indexOf(selectedPlotName.value)+1;
     plotTableData.value = [];
     plotTableColumns.value = [];
   } else if (selectedPlotName.value) {
-    selectedIterationTable.value = null;
+    selectedSupplementalTable.value = null;
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value, true);
 
