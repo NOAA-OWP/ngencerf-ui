@@ -261,7 +261,7 @@ watch(selectedPlotName, async () => {
     if (selectedSupplementalTable.value == 1 && iterationMetricsData.value.length == 0) {
         toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: 5000 });
     }
-    if (selectedSupplementalTable.value == 2 && iterationParametersData.value.length == 0) {
+    if (selectedSupplementalTable.value == 2 && iterationParamsData.value.length == 0) {
         toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: 5000 });
     }
     if (selectedSupplementalTable.value == 3 && performanceMetricsData.value.length == 0) {
