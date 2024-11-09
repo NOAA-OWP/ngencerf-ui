@@ -48,14 +48,18 @@
             </div>
         </div>
 
-        <div id="TableArea" class="p-2" v-if="selectedIterationTable">
+        <div id="SupplementalTableArea" class="p-2" v-if="selectedSupplementalTable">
             <DataTable :value="iterationMetricsData" scrollable scroll-height="500px"
-                fixedHeader=true :multi-sort="true" v-if="iterationMetricsData && selectedIterationTable == 1">
+                fixedHeader=true :multi-sort="true" v-if="iterationMetricsData && selectedSupplementalTable == 1">
                 <Column v-for="( col, colIndex ) in iterationMetricsColumns" :key="colIndex" :header="col.header" :field="col.field" sortable></Column>
             </DataTable>
             <DataTable :value="iterationParamsData" scrollable scroll-height="500px"
-                fixedHeader=true :multi-sort="true" v-if="iterationParamsData && selectedIterationTable == 2">
+                fixedHeader=true :multi-sort="true" v-if="iterationParamsData && selectedSupplementalTable == 2">
                 <Column v-for="( col, colIndex ) in iterationParamsColumns" :key="colIndex" :header="col.header" :field="col.field" sortable></Column>
+            </DataTable>
+            <DataTable :value="performanceMetricsData" fixedHeader=true
+                v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable == 3">
+                <Column v-for="( col, colIndex ) in performanceMetricsColumns" :key="colIndex" :header="col.header" :field="col.field"></Column>
             </DataTable>
         </div>
     </div>
@@ -64,7 +68,7 @@
 <script setup lang="ts">
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
-import { useEvaluationIterationDataStore } from '~/stores/evaluation/EvaluationIterationDataStore';
+import { useEvaluationSupplementalDataStore } from '~/stores/evaluation/EvaluationSupplementalDataStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useToast } from 'primevue/usetoast';
 import type { DynamicObject } from "~/composables/NextGenModel";
@@ -72,7 +76,7 @@ import type { DynamicObject } from "~/composables/NextGenModel";
 import MessagesGroup from "../Common/MessagesGroup.vue";
 
 const runStatusStore = useRunStatusStore();
-const evaluationIterationDataStore = useEvaluationIterationDataStore();
+const EvaluationSupplementalDataStore = useEvaluationSupplementalDataStore();
 const userDataStore = useUserDataStore();
 const toast = useToast();
 
@@ -93,8 +97,10 @@ const {
     iterationParamsData,
     iterationMetricsColumns,
     iterationParamsColumns,
-    selectedIterationTable
-} = storeToRefs(evaluationIterationDataStore);
+    selectedSupplementalTable,
+    performanceMetrics,
+    performanceMetricsData,
+} = storeToRefs(EvaluationSupplementalDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
@@ -105,14 +111,16 @@ const {
 } = runStatusStore;
 const {
     queryGetIterations,
-    iterationOptions,
-} = evaluationIterationDataStore;
+    queryGetPerformanceMetrics,
+} = EvaluationSupplementalDataStore;
 
 const plotTables = ref({});
 const plotTableList = ref<any[]>([]);
 const selectedPlotTable = ref<string | null>(null);
 const plotTableData = ref<any[]>([]);
 const plotTableColumns = ref<any[]>([]);
+const performanceMetricsColumns = [{header: 'Metric', field: 'metric'}];
+const supplementalTableOptions = ['Iteration Metrics Table','Iteration Parameters Table','Performance Metrics Table']
 
 onMounted(async () => {
     if (!userCalibrationRunData?.value || userCalibrationRunData?.value?.error) {
@@ -132,27 +140,24 @@ onMounted(async () => {
     iterations.value = await queryGetIterations();
     console.log('iterations:', iterations.value?._data);
 
+    // Add Iteration Metrics/Parameters Tables to the dropdown
     if (iterations.value?._data.iteration_data) {
-        for (let o = 0; o < iterationOptions.length; o++) {
-            let plotListItem = {'name': iterationOptions[o], 'description': ''};
-            if (!plotList.value.includes(plotListItem)) {
-                plotList.value.push(plotListItem);
-            }
-        }
+        plotList.value.push({name: supplementalTableOptions[0], description: ''});
+        plotList.value.push({name: supplementalTableOptions[1], description: ''});
     }
-    console.log('plotList:', plotList.value);
 
     // set up arrays for iterationMetricsData and iterationParamsData
     iterationMetricsData.value = [];
     iterationParamsData.value = [];
-    iterationMetricsColumns.value = [];
-    iterationParamsColumns.value = [];
+    iterationMetricsColumns.value = [{header: 'Iteration', field: 'iteration'}];
+    iterationParamsColumns.value = [{header: 'Iteration', field: 'iteration'}];
     for (let i = 0; i < iterations.value?._data?.iteration_data.length; i++) {
         const iterationMetricsRecord: DynamicObject = {};
+        iterationMetricsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_id;
         for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
             let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
             iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
-            if (iterationMetricsRecord[metric_name] === null) {
+            if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] == '') && iterationMetricsRecord[metric_name] != 0) {
                 iterationMetricsRecord[metric_name] = 'N/A';
             } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
                 iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
@@ -163,10 +168,11 @@ onMounted(async () => {
         }
         iterationMetricsData.value.push(iterationMetricsRecord);
         const iterationParamsRecord: DynamicObject = {};
+        iterationParamsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_id;
         for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
             let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
             iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
-            if (iterationParamsRecord[param_name] === null) {
+            if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] == '') && iterationParamsRecord[param_name] != 0) {
                 iterationParamsRecord[param_name] = 'N/A';
             } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
                 iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
@@ -181,22 +187,90 @@ onMounted(async () => {
     console.log('iterationMetricsColumns:', iterationMetricsColumns);
     console.log('iterationParamsData:', iterationParamsData.value);
     console.log('iterationParamsColumns:', iterationParamsColumns);
+
+    // Get Performance Metrics - put each one into the table as its own row
+    performanceMetrics.value = await queryGetPerformanceMetrics();
+    performanceMetricsData.value = [];
+    if (performanceMetrics.value?._data) {
+        console.log('performanceMetrics:', performanceMetrics.value?._data);
+        if (performanceMetrics.value?._data?.performance_metrics) {
+            // First add the metric names and the values from our Calibration run
+            performanceMetricsColumns.push({header: 'Calibration Job ID ' + calibrationJobId.value, field: 'calibration_job_id_' + calibrationJobId.value});
+            Object.keys(performanceMetrics.value?._data.performance_metrics).forEach(key => {
+                performanceMetricsData.value.push({'metric': key});
+                performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = performanceMetrics.value?._data.performance_metrics[key];
+            });
+            // Now go through the values from our Validations and add each metric value to the appropriate row
+            if (performanceMetrics.value?._data?.validations) {
+                for (let v = 0; v < performanceMetrics.value?._data?.validations.length; v++) {
+                    let validation_run_id = performanceMetrics.value?._data?.validations[v].validation_run_id;
+                    performanceMetricsColumns.push({header: 'Validation Job ID ' + validation_run_id, field: 'validation_job_id_' + validation_run_id});
+                    if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
+                        Object.keys(performanceMetrics.value?._data?.validations[v].performance_metrics).forEach(key => {
+                            // Loop through our existing rows and see if we have this metric already
+                            let metricRow = -1;
+                            for (let m = 0; m < performanceMetricsData.value.length; m++) {
+                                if (performanceMetricsData.value[m].metric == key) {
+                                    metricRow = m;
+                                    performanceMetricsData.value[m]['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
+                                    break;
+                                }
+                            }
+                            if (metricRow == -1) {
+                                // We didn't find this metric, so create a new row for it
+                                performanceMetricsData.value.push({'metric': key});
+                                performanceMetricsData.value.at(-1)['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
+                            }
+                        });
+                    }
+                }
+                // Now clean up our metric names so that they display nicely
+                for (let m = 0; m < performanceMetricsData.value.length; m++) {
+                    let column_header_words = performanceMetricsData.value[m].metric.split("_");
+                    for (let w = 0; w < column_header_words.length; w++) {
+                        let word = column_header_words[w]
+                        column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+                    }
+                    let column_header = column_header_words.join(" ");
+                    performanceMetricsData.value[m].metric = column_header;
+                }
+            }
+        }
+        console.log('performanceMetricsData:', performanceMetricsData.value);
+        console.log('performanceMetricsColumns:', performanceMetricsColumns);
+    }
     
+    // Add Performance Metrics Table to the dropdown
+    plotList.value.push({name: supplementalTableOptions[2], description: ''});
+    console.log('plotList:', plotList.value);
+
     // make sure page loads with no plot selected
     selectedPlotName.value = null;
+    selectedPlotFilename.value = null;
+    selectedPlotFileUrl.value = null;
+    selectedSupplementalTable.value = null;
 });
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   // is the selected option a plot or iteration table?
-  if(iterationOptions.includes(selectedPlotName.value)) {
+  if(supplementalTableOptions.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
-    selectedIterationTable.value = iterationOptions.indexOf(selectedPlotName.value)+1;
+    selectedSupplementalTable.value = supplementalTableOptions.indexOf(selectedPlotName.value)+1;
+    if (selectedSupplementalTable.value == 1 && iterationMetricsData.value.length == 0) {
+        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: 5000 });
+    }
+    if (selectedSupplementalTable.value == 2 && iterationParamsData.value.length == 0) {
+        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: 5000 });
+    }
+    if (selectedSupplementalTable.value == 3 && performanceMetricsData.value.length == 0) {
+        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: 5000 });
+    }
     plotTableData.value = [];
     plotTableColumns.value = [];
   } else if (selectedPlotName.value) {
-    selectedIterationTable.value = null;
+    selectedSupplementalTable.value = null;
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value, true);
 
@@ -208,7 +282,7 @@ watch(selectedPlotName, async () => {
             selectedPlotFilename.value = null;
             selectedPlotFileUrl.value = null;
             toast.removeAllGroups();
-            toast.add({ severity: 'warn', summary: 'Plot graph is currently unavailable', life: 5000 });
+            toast.add({ severity: 'info', summary: 'Plot graph is currently unavailable', life: 5000 });
         }
 
         if (response?._data?.plot_data && response?._data?.plot_data.length > 0){
