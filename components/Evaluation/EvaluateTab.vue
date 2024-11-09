@@ -153,7 +153,7 @@ onMounted(async () => {
     iterationParamsColumns.value = [{header: 'Iteration', field: 'iteration'}];
     for (let i = 0; i < iterations.value?._data?.iteration_data.length; i++) {
         const iterationMetricsRecord: DynamicObject = {};
-        iterationMetricsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_id;
+        iterationMetricsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
         for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
             let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
             iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
@@ -168,7 +168,7 @@ onMounted(async () => {
         }
         iterationMetricsData.value.push(iterationMetricsRecord);
         const iterationParamsRecord: DynamicObject = {};
-        iterationParamsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_id;
+        iterationParamsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
         for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
             let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
             iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
