@@ -114,8 +114,6 @@ const onEvalCalibrationRowSelect = async ( event: DataTableRowClickEvent ) => {
 }
 
 watch( () => userCalibrationRunData.value, ( updatedRunData, initialRunData ) => {
-  console.log( 'initialRunData', initialRunData )
-  console.log( 'updatedRunData', updatedRunData )
   if ( updatedRunData != undefined && Object.keys( updatedRunData ).length > 0 ) {
     nextTick(() => {
       isLoadingCalibrationSummary.value = false;

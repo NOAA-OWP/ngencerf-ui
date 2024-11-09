@@ -42,6 +42,11 @@ export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
   hydrofabric_errors: HydrofabricError[];
 }
 
+export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
+  run_date: Date;
+  validation_run_id: number;
+}
+
 export interface HydrofabricError {
   name: string;
   message: string;
@@ -566,6 +571,36 @@ export interface AlternativeIterationTuningParameters {
 
 export interface DynamicObject {
   [key: string]: any;
+}
+
+export interface CalibrationGetStatusResponse {
+  message: string;
+  calibration_run_id: number;
+  status: string;
+  errors?: string[];
+  validations: CalibrationGetStatusValidationItem[];
+  run_date: Date;
+  elapsed_time: string | null;
+  performance_metrics: CalibrationGetStatusPerformanceMetricItem[] | null;
+}
+
+export interface CalibrationGetStatusValidationItem {
+  validation_run_id: number;
+  status: string;
+  validation_type: string;
+  run_date: Date;
+  elapsed_time?: string | null;
+  performance_metrics?: CalibrationGetStatusPerformanceMetricItem[] | null;
+}
+
+export interface CalibrationGetStatusPerformanceMetricItem {
+  elapsed_time: string;
+  num_cpus: number;
+  cpu_time: string;
+  max_rss: string;
+  max_disk_read: string;
+  max_disk_write: string;
+  reserved_time: string;
 }
 
 /**

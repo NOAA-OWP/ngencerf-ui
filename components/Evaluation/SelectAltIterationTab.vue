@@ -38,8 +38,8 @@
     <div class="grid grid-cols-8">
       <span>
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-          <button class="font-normal" title="Run" aria-label="Run Button" @click="navigateToEvaluateStatus">
-            Run
+          <button class="font-normal" title="Validate Selected Iteration" aria-label="Run Button" @click="navigateToEvaluateStatus">
+            Validate Selected Iteration
           </button>
         </div>
       </span>
@@ -53,6 +53,7 @@ import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAltIterationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from '~/stores/common/GeneralStore';
+import { useValidationRunStatusStore } from '~/stores/evaluation/ValidationRunStatusStore';
 
 const toast = useToast();
 const {     
@@ -71,7 +72,9 @@ const {
   userSelectedCalibrationIterationId,
 } = storeToRefs( useEvaluationAltIterationStore() );
 
-const { evaluateValidationRunId } = storeToRefs( generalStore() );
+const { clearRunningStatusInfo } = useValidationRunStatusStore();
+
+const { evaluateIterationRunId } = storeToRefs( generalStore() );
 
 const selectedCalibrationByIterationDetailRow = ref<any>();
 const selectedCalibrationByIterationParameterRow = ref<any>();
@@ -98,13 +101,15 @@ onMounted( () => {
 })
 
 const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
-  userSelectedCalibrationIterationId.value = event.data.iteration_id;
+  //userSelectedCalibrationIterationId.value = event.data.iteration_id;
+  evaluateIterationRunId.value = event.data.iteration_id;
   const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
   selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];
 }
 
 const onParameterTableRowSelect = ( event: DataTableRowClickEvent ) => {
-  userSelectedCalibrationIterationId.value = event.data.iteration_id;
+  //userSelectedCalibrationIterationId.value = event.data.iteration_id;
+  evaluateIterationRunId.value = event.data.iteration_id;
   const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
   selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];
 }
@@ -112,27 +117,32 @@ const onParameterTableRowSelect = ( event: DataTableRowClickEvent ) => {
 const onTableRowUnselect = ( event: DataTableRowClickEvent ) => {
   selectedCalibrationByIterationParameterRow.value = null;
   selectedCalibrationByIterationDetailRow.value = null;
-  userSelectedCalibrationIterationId.value = null;
+  //userSelectedCalibrationIterationId.value = null;
+  evaluateIterationRunId.value = 0;
 }
 
 const navigateToEvaluateStatus = ( event : any ) => {
-  if ( userSelectedCalibrationIterationId.value && userSelectedCalibrationIterationId.value > 0 ) {
-    createNewValidationJob().then( response => {
-      if ( response.status == 201 ) {
-        if ( response?._data && response?._data?.validation_run_id && response?._data?.validation_run_id > 0 ) {
-          evaluateValidationRunId.value = response._data.validation_run_id;
-          const tabs = document.getElementsByClassName("tabs");
-          const e = <HTMLElement>tabs[3];
-          e.click();
-        } else {
-          toast.add({ severity: "error", summary: 'Create Validation Job Failed.', detail: "Unable to Retrieve Valid Validation Job Id", life: 10000 });
-        }      
-      } else {
-        useApiErrorResponsePreprocess( response ).forEach( message => {
-          toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Create Validation Job Failed.', detail: message, life: 10000 });
-        });
-      }
-    })
+  if ( evaluateIterationRunId.value && evaluateIterationRunId.value > 0 ) {
+    clearRunningStatusInfo();
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[ EvaluationTabs.tab_runStatus ];
+    e.click();
+    // createNewValidationJob().then( response => {
+    //   if ( response.status == 201 ) {
+    //     if ( response?._data && response?._data?.validation_run_id && response?._data?.validation_run_id > 0 ) {
+    //       evaluateValidationRunId.value = response._data.validation_run_id;
+    //       const tabs = document.getElementsByClassName("tabs");
+    //       const e = <HTMLElement>tabs[3];
+    //       e.click();
+    //     } else {
+    //       toast.add({ severity: "error", summary: 'Create Validation Job Failed.', detail: "Unable to Retrieve Valid Validation Job Id", life: 10000 });
+    //     }      
+    //   } else {
+    //     useApiErrorResponsePreprocess( response ).forEach( message => {
+    //       toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Create Validation Job Failed.', detail: message, life: 10000 });
+    //     });
+    //   }
+    // })
   } else {
     toast.add({ severity: 'warn', summary: 'Missing Iteration ID', detail: 'Pleasea select a iteration job first.', life: 6000 })
   }
