@@ -242,11 +242,12 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         if (!runningTimeIntervalId.value) {
           // console.log('creating runningTimeIntervalId');
           runningTimeIntervalId.value = setInterval(async () => {
-            if (userCalibrationRunData.value?.status === 'Running') {
+            if (userCalibrationRunData.value?.status === 'Running' || (!allValidationsDone.value)) {
               // Calculate Running Time every second while status is Running
               runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
             } else {
               clearInterval(runningTimeIntervalId.value);
+              runningTimeIntervalId.value = undefined;
             }
           }, 1000);
         }
@@ -264,6 +265,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
               if (getIterationResponse._data.status !== 'Running') {
                 if (userCalibrationRunData.value) {
                   clearInterval(calibrationStatusIntervalId.value);
+                  calibrationStatusIntervalId.value = undefined;
                   userCalibrationRunData.value.status = getIterationResponse._data.status;
                 }
               }
@@ -337,6 +339,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             // if valid_control and valid_best are Done, clear the interval
             if (allValidationsDone.value) {
               clearInterval(validationsStatusIntervalId.value);
+              validationsStatusIntervalId.value = undefined;
             }
           }
         }, 10000);
@@ -345,14 +348,18 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       // clear intervals that increments the calibration running time and checks calibration status,
       // and set stopCriteriaMet to true
       stopCriteriaMet.value = true;
-      clearInterval(runningTimeIntervalId.value);
       clearInterval(calibrationStatusIntervalId.value);
+      calibrationStatusIntervalId.value = undefined;
     }
 
     else if (['Cancelled', 'Failed', 'Server error'].includes(calibrationStatus.value ?? '')) {
       stopCriteriaMet.value = false;
       clearInterval(runningTimeIntervalId.value);
+      runningTimeIntervalId.value = undefined;
       clearInterval(calibrationStatusIntervalId.value);
+      calibrationStatusIntervalId.value = undefined;
+      clearInterval(validationsStatusIntervalId.value);
+      validationsStatusIntervalId.value = undefined;
     }
   }
 
