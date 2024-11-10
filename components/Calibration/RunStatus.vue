@@ -15,9 +15,9 @@
                     <td class="text-right font-bold">Elapsed Time</td>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr v-if="isNotNullOrUndefined(iteration)" height="32px">
+                  <tr height="32px">
                     <td class="text-right font-bold">Iteration</td>
-                    <td class="pl-5">{{ iteration }}</td>
+                    <td class="pl-5">{{ iteration ?? '-'.repeat(30) }}</td>
                   </tr>
                 </tbody>
               </table>
