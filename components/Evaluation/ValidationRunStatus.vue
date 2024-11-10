@@ -150,9 +150,8 @@ watch( validationStatus, async ( newStatus, initialStatus ) => {
     validationStatusCheckingInterval.value = setInterval( async () => {
       queryIterationValidationRunStatus().then( response => {
         const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
-          return validation.validation_run_id == evaluateValidationRunId.value
+          return validation.validation_run_id == iterationValidationRunId.value
         });
-        console.log( 'validation_run', find_validation_run)
         if ( !find_validation_run ) {
           validationStatus.value = 'Fail';
         } else {
@@ -162,11 +161,12 @@ watch( validationStatus, async ( newStatus, initialStatus ) => {
             validationStatus.value = 'Fail';
           } else {
             validationStatus.value = validation_run.status;
-          }          
-        }        
+          }
+        }
       })
     }, 3000 );
   } else {
+    evaluateValidationRunId.value = iterationValidationRunId.value;
     clearInterval( validationStatusCheckingInterval.value );
     clearInterval( validationRunningTimeInterval.value );
   }

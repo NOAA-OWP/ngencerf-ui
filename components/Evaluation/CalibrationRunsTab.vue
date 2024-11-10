@@ -162,6 +162,7 @@ const navigateToEvaluation = ( event: any ) => {
 }
 
 const returnCalibrationJobList = ( event: any ) => {
+  selectedCalibrationRun.value = selectedCalibrationValidationRun.value = undefined;
   resetUserSelectedEvalValidationRun();
 }
 
