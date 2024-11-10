@@ -48,7 +48,14 @@
               @rowSelect="onEvalValdiationRowSelect" @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
               <Column v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex" :header="col.header" :field="col.field"></Column> 
             </DataTable>
-          </div>        
+          </div>
+          <div class="flex mt-2">
+            <div class="ml-auto mt-4">
+              <div id="NewButton" class="">
+                <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return to Calibration Jobs</Button>
+              </div>
+            </div>
+          </div>
         </div>   
         
         <div class="flex mt-2">
@@ -152,6 +159,10 @@ const navigateToEvaluation = ( event: any ) => {
   } else {
     toast.add({ severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 })
   }
+}
+
+const returnCalibrationJobList = ( event: any ) => {
+  resetUserSelectedEvalValidationRun();
 }
 
 const rowStyle = (data: any) => {

@@ -146,27 +146,36 @@ const startRun = async () => {
 }
 
 watch( validationStatus, async ( newStatus, initialStatus ) => {
-  console.log( 'newStatus', newStatus )
   if ( newStatus != null && !isValidationRunStopped( newStatus )) {
     validationStatusCheckingInterval.value = setInterval( async () => {
       queryIterationValidationRunStatus().then( response => {
-        const validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
+        const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
           return validation.validation_run_id == evaluateValidationRunId.value
         });
-        console.log( 'validation_run', validation_run)
-        if ( !validation_run ) {
+        console.log( 'validation_run', find_validation_run)
+        if ( !find_validation_run ) {
           validationStatus.value = 'Fail';
         } else {
-          validationStatus.value = validation_run[0].status;
+          // make sure we actually has validation run
+          const validation_run = find_validation_run.shift();
+          if ( !validation_run ) {
+            validationStatus.value = 'Fail';
+          } else {
+            validationStatus.value = validation_run.status;
+          }          
         }        
       })
     }, 3000 );
   } else {
-    console.log( 'clearInterval')
     clearInterval( validationStatusCheckingInterval.value );
     clearInterval( validationRunningTimeInterval.value );
   }
 });
+
+onUnmounted( () => {
+  clearInterval( validationStatusCheckingInterval.value );
+  clearInterval( validationRunningTimeInterval.value );
+})
 
 const cancelRun = async () => {
   clearInterval( validationStatusCheckingInterval.value );
