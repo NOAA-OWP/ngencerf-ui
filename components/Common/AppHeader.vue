@@ -93,15 +93,6 @@
               <span v-else-if="getEvaluationTabIndex() === 3">
                 <LazySelectAltIterationHelp />
               </span>
-              <span v-else-if="getEvaluationTabIndex() === 4">
-                <LazySelParamSetHelp />
-              </span>
-              <span v-else-if="getEvaluationTabIndex() === 5">
-                <LazySelectAltIterationHelp />
-              </span>
-              <span v-else-if="getEvaluationTabIndex() === 6">
-                <LazyEvalStatusHelp />
-              </span>
             </div>
           </div>
 
@@ -137,8 +128,6 @@ const LazyHelpResultsHelp = defineAsyncComponent(() => import("../Help/Calibrati
 const LazyCalibrationRunsHelp = defineAsyncComponent(() => import("../Help/Evaluation/CalibrationRunsHelp.vue"))
 const LazyEvaluateHelp = defineAsyncComponent(() => import("../Help/Evaluation/EvaluateHelp.vue"))
 const LazySelectAltIterationHelp = defineAsyncComponent(() => import("../Help/Evaluation/SelectAltIterationHelp.vue"))
-const LazyEvalStatusHelp = defineAsyncComponent(() => import("../Help/Evaluation/EvalStatusHelp.vue"))
-const LazySelParamSetHelp = defineAsyncComponent(() => import("../Help/Evaluation/SelParamSetHelp.vue"))
 
 const emit = defineEmits(["logoutEvent"]);
 

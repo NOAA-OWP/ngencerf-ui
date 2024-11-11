@@ -59,21 +59,6 @@
             Select Alternate Iteration
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div data-tab="4" data-menu-tab="24" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
-            aria-label="Select Parameter Set tab" title="Select Parameter Set tab">
-            Select Parameter Set
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div data-tab="5" data-menu-tab="25" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
-            aria-label="Setup Validation Run tab" title="Setup Validation Run tab">
-            Setup Validation Run
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div data-tab="6" data-menu-tab="26" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
-            aria-label="Evaluation Status tab" title="Evaluation Status tab">
-            Status
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
         </span>
       </div>
     </span>
