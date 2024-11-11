@@ -5,13 +5,14 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
-import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, DynamicTableColumn, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "~/composables/NextGenModel";
-import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
+import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "~/composables/NextGenModel";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
+import { useValidationRunStatusStore } from "./ValidationRunStatusStore";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {  
-  const { calibrationJobId, evaluateValidationRunId } = storeToRefs( generalStore() );
+  const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId } = storeToRefs( generalStore() );
   const { fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
+  const { clearRunningStatusInfo } = useValidationRunStatusStore()
   const calibrationRunList = ref<any[]>([]);
   const userSelectedEvalCalibrationRunId = ref<number>( 0 );
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -145,13 +146,14 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     userSelectedCalibrationValidationRunList.value = [];
     resetUserSelectedEvalValidationRun();
     clearUserCalibrationRunData();
+    clearRunningStatusInfo();
   }
 
   /**
    * @return {void}
    */
   const resetUserSelectedEvalValidationRun = ():void => {
-    calibrationJobId.value = userSelectedEvalCalibrationRunId.value = 0;
+    calibrationJobId.value = userSelectedEvalCalibrationRunId.value = evaluateIterationRunId.value = 0;
     evaluateValidationRunId.value = 0;
     calibrationValidationRunListHeaders.value = [];
     computedCalibrationValidationRunList.value = [];
@@ -180,7 +182,8 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     userEvaluationCalibrationRunListData,
     calibrationValidationRunListHeaders,
     computedCalibrationValidationRunList,
-    evaluateValidationRunId
+    evaluateValidationRunId,
+    evaluateIterationRunId
   }
 })
 
