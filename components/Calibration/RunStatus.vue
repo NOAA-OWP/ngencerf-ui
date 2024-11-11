@@ -185,6 +185,7 @@ const {
   queryGetPlot,
   executeRunCalibration,
   queryIteration,
+  queryGetJobDataDirectory,
   cancelCalibrationJob,
 } = runStatusStore;
 
@@ -383,9 +384,13 @@ watch(selectedPlotName, async () => {
       selectedPlotFileUrl.value = response?._data?.plot_url;
     } else {
       toast.removeAllGroups();
+      selectedPlotFilename.value = "";
+      selectedPlotFileUrl.value = "";
       toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
     }
   } else {
+    selectedPlotFilename.value = "";
+    selectedPlotFileUrl.value = "";
     toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
   }
 });

@@ -128,6 +128,21 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   /**
+   * Get Job Data Directory
+   * @returns {any}
+   */
+  const queryGetJobDataDirectory = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_job_data_dir/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+    });
+  };
+
+  /**
    * Hard Reset Run/Status Store
    */
   const hardResetRunStatusStore = (): void => {
@@ -183,6 +198,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     queryGetPlot,
     executeRunCalibration,
     queryIteration,
+    queryGetJobDataDirectory,
     cancelCalibrationJob,
     hardResetRunStatusStore
   };
