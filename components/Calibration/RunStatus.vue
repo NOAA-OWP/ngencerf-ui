@@ -218,9 +218,98 @@ onMounted(() => {
   });
 });
 
+/**
+ * Create runningTimeIntervalId to update runningTime every second while Calibration is Running or Validation is not Done
+ */
+ const createRunningTimeInterval = () => {
+  console.log('creating runningTimeIntervalId');
+  console.log('userCalibrationRunData:', userCalibrationRunData.value);
+  console.log('allValidationsDone:', allValidationsDone.value);
+  runningTimeIntervalId.value = setInterval(async () => {
+    if (userCalibrationRunData.value?.status === 'Running' || (!allValidationsDone.value)) {
+      // Calculate Running Time every second while status is Running
+      runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+    } else {
+      clearInterval(runningTimeIntervalId.value);
+      runningTimeIntervalId.value = undefined;
+    }
+  }, 1000);
+}
+
+// Run Calibration Job
+const startRun = async () => {
+  if (calibrationStatus.value === 'Ready') {
+    if (userCalibrationRunData.value) {
+      userCalibrationRunData.value.status = 'Submitted';
+    }
+    toast.removeAllGroups();
+    try {
+      // console.log('hitting run_calibration endpoint');
+      const runCalibrationResponse = await executeRunCalibration();
+
+      if (runCalibrationResponse._data) {
+        if (runCalibrationResponse._data.status) { 
+          if (userCalibrationRunData.value) {
+            userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
+          } else {
+            toast.add({severity: 'error', summary: 'Error', detail: 'load_calibration_run_data from server failed'});
+          }
+        } else {
+          toast.add({severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server'});
+        }
+
+        if (runCalibrationResponse._data.run_date) {
+          startTimeDate.value = new Date(runCalibrationResponse?._data?.run_date);
+        } else {
+          toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
+        }
+
+        if (userCalibrationRunData?.value?.status !== 'Running') {
+          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
+        }
+        fetchUserCalibrationRunData();
+      } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'run_calibration from server failed' });
+      }
+    } catch (error) {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration' });
+    }
+  } else {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Ready. Cannot run Calibration' });
+  }
+};
+
+// Cancel Calibration Job
+const cancelRun = async () => {
+  if (calibrationStatus.value === 'Running') {
+    toast.removeAllGroups();
+    try {
+      // console.log('hitting cancel_job endpoint');
+      const cancelCalibrationResponse = await cancelCalibrationJob();
+
+      if (cancelCalibrationResponse?._data.status) {
+        if (userCalibrationRunData.value) {
+          userCalibrationRunData.value.status = cancelCalibrationResponse?._data.status;
+        }
+        // console.log('calibrationStatus:', calibrationStatus);
+        if (userCalibrationRunData?.value?.status !== 'Cancelled') {
+          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' });
+        }
+        fetchUserCalibrationRunData();
+      } else {
+        toast.add({ severity: 'error', summary: 'Error cancelling Calibration', detail: 'Cannot get Calibration status' });
+      }
+    } catch (error) {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run' });
+    }
+  } else {
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration' });
+  }
+};
 
 // Handle calibrationStatus changes
 watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
+  console.log('calibrationStatus watch:', newCalibrationStatus, oldCalibrationStatus);
   if (userCalibrationRunData.value) {
     if (userCalibrationRunData.value.stop_criteria) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
@@ -236,10 +325,12 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
         runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
-        // console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
+        console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
 
         // Create an interval to update runningTime every second while Calibration is Running or Validation is not Done
-        createRunningTimeInterval();
+        if (!runningTimeIntervalId.value) {
+          createRunningTimeInterval();
+        }
 
         // console.log('calibrationStatusIntervalId:', calibrationStatusIntervalId.value);
 
@@ -300,7 +391,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         // console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
 
         // Create an interval to update runningTime every second while Calibration is Running or Validation is not Done
-        createRunningTimeInterval();
+        if (!runningTimeIntervalId.value) {
+          createRunningTimeInterval();
+        }
       }
 
       if (!iteration.value) {
@@ -414,96 +507,6 @@ watch(iteration, async () => {
     }
   }
 });
-
-/**
- * Create runningTimeIntervalId to update runningTime every second while Calibration is Running or Validation is not Done
- */
-const createRunningTimeInterval = () => {
-  // Create an interval to update runningTime every second while status is Running
-  if (!runningTimeIntervalId.value) {
-    // console.log('creating runningTimeIntervalId');
-    runningTimeIntervalId.value = setInterval(async () => {
-      if (userCalibrationRunData.value?.status === 'Running' || (!allValidationsDone.value)) {
-        // Calculate Running Time every second while status is Running
-        runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
-      } else {
-        clearInterval(runningTimeIntervalId.value);
-        runningTimeIntervalId.value = undefined;
-      }
-    }, 1000);
-  }
-}
-
-// Run Calibration Job
-const startRun = async () => {
-  if (calibrationStatus.value === 'Ready') {
-    if (userCalibrationRunData.value) {
-      userCalibrationRunData.value.status = 'Submitted';
-    }
-    toast.removeAllGroups();
-    try {
-      // console.log('hitting run_calibration endpoint');
-      const runCalibrationResponse = await executeRunCalibration();
-
-      if (runCalibrationResponse._data) {
-        if (runCalibrationResponse._data.status) { 
-          if (userCalibrationRunData.value) {
-            userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
-          } else {
-            toast.add({severity: 'error', summary: 'Error', detail: 'load_calibration_run_data from server failed'});
-          }
-        } else {
-          toast.add({severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server'});
-        }
-
-        if (runCalibrationResponse._data.run_date) {
-          startTimeDate.value = new Date(runCalibrationResponse?._data?.run_date);
-        } else {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
-        }
-
-        if (userCalibrationRunData?.value?.status !== 'Running') {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
-        }
-        fetchUserCalibrationRunData();
-      } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'run_calibration from server failed' });
-      }
-    } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration' });
-    }
-  } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Ready. Cannot run Calibration' });
-  }
-};
-
-// Cancel Calibration Job
-const cancelRun = async () => {
-  if (calibrationStatus.value === 'Running') {
-    toast.removeAllGroups();
-    try {
-      // console.log('hitting cancel_job endpoint');
-      const cancelCalibrationResponse = await cancelCalibrationJob();
-
-      if (cancelCalibrationResponse?._data.status) {
-        if (userCalibrationRunData.value) {
-          userCalibrationRunData.value.status = cancelCalibrationResponse?._data.status;
-        }
-        // console.log('calibrationStatus:', calibrationStatus);
-        if (userCalibrationRunData?.value?.status !== 'Cancelled') {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' });
-        }
-        fetchUserCalibrationRunData();
-      } else {
-        toast.add({ severity: 'error', summary: 'Error cancelling Calibration', detail: 'Cannot get Calibration status' });
-      }
-    } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run' });
-    }
-  } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration' });
-  }
-};
 
 </script>
 
