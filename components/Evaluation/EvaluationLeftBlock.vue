@@ -12,13 +12,13 @@
       <span v-else-if="activeTab == 3">
         <LazySelectAltIterationTab />
       </span>
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Tabs from '~/components/Common/Tabs.vue'
-
+import Tabs from '../Common/Tabs.vue';
 import LazyEvaluateTab from './EvaluateTab.vue'
 import LazySelectAltIterationTab from './SelectAltIterationTab.vue'
 import LazyCalibrationRunsTab from './CalibrationRunsTab.vue'

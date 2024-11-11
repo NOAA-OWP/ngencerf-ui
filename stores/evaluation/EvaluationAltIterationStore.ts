@@ -6,7 +6,6 @@ import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { CalibrationRunIterationParameterData, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn, CalibrationRunIterationMetricData, CalibrationRunByIterationRetrospectiveData } from "~/composables/NextGenModel";
-import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
 export const useEvaluationAltIterationStore = defineStore('EvaluationAltIterationStore', () => { 
   const { ngencerfBaseUrl } = useBackendConfig();
