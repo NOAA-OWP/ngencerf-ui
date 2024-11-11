@@ -18,7 +18,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const startTime = ref();
 
   const plotNames = ref();
-  const plotList = ref([]);
+  const plotList = ref<any[]>([]);
   const selectedPlotName = ref();
   const selectedPlotFilename = ref();
   const selectedPlotFileUrl = ref();
