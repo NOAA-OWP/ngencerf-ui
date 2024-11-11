@@ -5,7 +5,7 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { generalStore } from "../common/GeneralStore";
 
-export const useEvaluationIterationDataStore = defineStore('EvaluationIterationDataStore', () => {
+export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplementalDataStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
@@ -16,8 +16,9 @@ export const useEvaluationIterationDataStore = defineStore('EvaluationIterationD
   const iterationParamsData = ref<any[]>([]);
   const iterationMetricsColumns = ref<any[]>([]);
   const iterationParamsColumns = ref<any[]>([]);
-  const iterationOptions = ['Iteration Metrics Table','Iteration Parameters Table'];
-  const selectedIterationTable = ref<number>( 0 );
+  const selectedSupplementalTable = ref<number>( 0 );
+  const performanceMetrics = ref();
+  const performanceMetricsData = ref<any[]>([]);
 
   /**
    * Get Calibration Iteration Data
@@ -38,15 +39,37 @@ export const useEvaluationIterationDataStore = defineStore('EvaluationIterationD
     });
   };
 
+   /**
+   * Get Performance Metrics
+   * @return {any}
+   */
+   const queryGetPerformanceMetrics = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_status/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(
+        { 
+          calibration_run_id: calibrationJobId.value,
+          include_performance_metrics: true
+        }
+      )
+    });
+  };
+
   return {
     iterations,
     iterationMetricsData,
     iterationParamsData,
     iterationMetricsColumns,
     iterationParamsColumns,
-    iterationOptions,
-    selectedIterationTable,
+    selectedSupplementalTable,
+    performanceMetrics,
+    performanceMetricsData,
     queryGetIterations,
+    queryGetPerformanceMetrics,
   };
 },
 {
@@ -61,5 +84,5 @@ export const useEvaluationIterationDataStore = defineStore('EvaluationIterationD
    actions, and getters.
 */
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useEvaluationIterationDataStore, import.meta.hot));
+  import.meta.hot.accept(acceptHMRUpdate(useEvaluationSupplementalDataStore, import.meta.hot));
 }
