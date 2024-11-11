@@ -14,8 +14,9 @@
                     </td>
                   </tr>
                   <tr>
-                    <td class="text-right"><label for="DisplayOptions">Display</label></td>
+                    <td class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></td>
                     <td class="pl-5">
+                      {{ iterationValidationRunId }}
                     </td>
                   </tr>
                 </tbody>
@@ -164,7 +165,7 @@ watch( validationStatus, async ( newStatus, initialStatus ) => {
           }
         }
       })
-    }, 3000 );
+    }, 10000 );
   } else {
     evaluateValidationRunId.value = iterationValidationRunId.value;
     clearInterval( validationStatusCheckingInterval.value );
@@ -218,7 +219,7 @@ const navigateToEvaluation = ( event: any ) => {
 }
 
 #RunStatus,
-#DisplayOptions {
+#ValidatioinJobId {
   width: 250px;
   margin-left: 0px;
 }

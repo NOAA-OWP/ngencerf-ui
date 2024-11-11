@@ -39,7 +39,7 @@
       <span>
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
           <button class="font-normal" title="Validate Selected Iteration" aria-label="Run Button" @click="navigateToEvaluateStatus">
-            Validate Selected Iteration
+            Next
           </button>
         </div>
       </span>
