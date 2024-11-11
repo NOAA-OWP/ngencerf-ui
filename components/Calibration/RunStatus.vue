@@ -237,21 +237,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
         // console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
-        // console.log('typeof runningTimeIntervalId:', typeof runningTimeIntervalId.value);
 
-        // Create an interval to update runningTime every second while status is Running
-        if (!runningTimeIntervalId.value) {
-          // console.log('creating runningTimeIntervalId');
-          runningTimeIntervalId.value = setInterval(async () => {
-            if (userCalibrationRunData.value?.status === 'Running' || (!allValidationsDone.value)) {
-              // Calculate Running Time every second while status is Running
-              runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
-            } else {
-              clearInterval(runningTimeIntervalId.value);
-              runningTimeIntervalId.value = undefined;
-            }
-          }, 1000);
-        }
+        // Create an interval to update runningTime every second while Calibration is Running or Validation is not Done
+        createRunningTimeInterval();
 
         // console.log('calibrationStatusIntervalId:', calibrationStatusIntervalId.value);
 
@@ -304,6 +292,17 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     }
 
     else if (calibrationStatus.value === 'Done') {
+      // Calculate Running Time
+      if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
+        startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
+        runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+
+        // console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
+
+        // Create an interval to update runningTime every second while Calibration is Running or Validation is not Done
+        createRunningTimeInterval();
+      }
+
       if (!iteration.value) {
         const getIterationResponse = await queryIteration();
 
@@ -346,8 +345,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         }, 10000);
       }
 
-      // clear intervals that increments the calibration running time and checks calibration status,
-      // and set stopCriteriaMet to true
+      // clear intervals that checks calibration status and set stopCriteriaMet to true
       stopCriteriaMet.value = true;
       clearInterval(calibrationStatusIntervalId.value);
       calibrationStatusIntervalId.value = undefined;
@@ -416,6 +414,25 @@ watch(iteration, async () => {
     }
   }
 });
+
+/**
+ * Create runningTimeIntervalId to update runningTime every second while Calibration is Running or Validation is not Done
+ */
+const createRunningTimeInterval = () => {
+  // Create an interval to update runningTime every second while status is Running
+  if (!runningTimeIntervalId.value) {
+    // console.log('creating runningTimeIntervalId');
+    runningTimeIntervalId.value = setInterval(async () => {
+      if (userCalibrationRunData.value?.status === 'Running' || (!allValidationsDone.value)) {
+        // Calculate Running Time every second while status is Running
+        runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+      } else {
+        clearInterval(runningTimeIntervalId.value);
+        runningTimeIntervalId.value = undefined;
+      }
+    }, 1000);
+  }
+}
 
 // Run Calibration Job
 const startRun = async () => {
