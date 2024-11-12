@@ -327,15 +327,13 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
         startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
         
-        // Calculate Running Time every second while calibration or validation is Running
-        if (calibrationStatus.value !== 'Failed') {
-          if (!allValidationsDone.value) {
-            elapsedTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+        // Calculate Running Time every second while calibration and validation is Running
+        if (calibrationStatus.value !== 'Failed' && !allValidationsDone.value) {
+          elapsedTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
-            // Create an interval to update elapsedTime every second while Calibration is Running or Validation is not Done
-            if (!elapsedTimeIntervalId.value) {
-              createElapsedTimeInterval();
-            }
+          // Create an interval to update elapsedTime every second while Calibration is Running or Validation is not Done
+          if (!elapsedTimeIntervalId.value) {
+            createElapsedTimeInterval();
           }
         }
       } else {
@@ -422,22 +420,41 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
       }
 
-      // create an interval to keep checking validation statuses every 10 seconds while all validations are not Done
-      if (!validationsStatusIntervalId.value) {
-        validationsStatusIntervalId.value = setInterval(async () => {
-          const getStatusResponse = await queryGetCalibrationStatus();
-          const validations = getStatusResponse?._data?.validations;
-          if (validations && validations.length === 2) {
-            // check if all validations are Done
-            allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
+      if (!allValidationsDone.value) {
+        // create an interval to keep checking validation statuses every 10 seconds while all validations are not Done
+        if (!validationsStatusIntervalId.value) {
+          validationsStatusIntervalId.value = setInterval(async () => {
+            const getStatusResponse = await queryGetCalibrationStatus();
+            const validations = getStatusResponse?._data?.validations;
+            if (validations && validations.length === 2) {
+              // check if all validations are Done
+              allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
 
-            // if valid_control and valid_best are Done, clear the interval
-            if (allValidationsDone.value) {
-              clearInterval(validationsStatusIntervalId.value);
-              validationsStatusIntervalId.value = undefined;
+              // if valid_control and valid_best are Done, clear the interval
+              if (allValidationsDone.value) {
+                clearInterval(validationsStatusIntervalId.value);
+                validationsStatusIntervalId.value = undefined;
+              }
             }
+          }, 10000);
+        }
+      } else {
+        // Validations should be done. Get the latest elapsed time amongst the validations
+        const getStatusResponse = await queryGetCalibrationStatus();
+        const validations = getStatusResponse?._data?.validations;
+        // valid_control and valid_best are the only validations
+        if (validations && validations.length === 2) {
+          // get elapsed times from validations
+          const elapsedTimes = validations
+            .map((validation: any) => validation.elapsed_time)
+            .filter((eTime: any) => eTime !== null && eTime !== undefined);
+
+          // if there are elapsed times, get the max elapsed time
+          // we will only have elapsed times if server is running on Parallel Works
+          if (elapsedTimes.length > 0) {
+            elapsedTime.value = Math.max(...elapsedTimes);
           }
-        }, 10000);
+        }
       }
 
       // clear intervals that checks calibration status and set stopCriteriaMet to true
