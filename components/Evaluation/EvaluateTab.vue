@@ -40,10 +40,12 @@
                             :options="plotTableList" optionLabel="name" optionValue="name">
                         </Select>
                     </div>
-                    <DataTable :value="plotTableData" scrollable scroll-height="500px"
-                        fixedHeader=true :multi-sort="true">
-                        <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable></Column>
-                    </DataTable>
+                    <div class="pt-6 pb-2">
+                        <DataTable :value="plotTableData" scrollable scroll-height="500px"
+                            fixedHeader=true :multi-sort="true">
+                            <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable></Column>
+                        </DataTable>
+                    </div>
                 </div>
             </div>
         </div>
