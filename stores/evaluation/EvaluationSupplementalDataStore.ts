@@ -32,18 +32,18 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
         "Content-Type": 'application/json'
       },
       body: JSON.stringify(
-        { 
+        {
           calibration_run_id: calibrationJobId.value
         }
       )
     });
   };
 
-   /**
-   * Get Performance Metrics
-   * @return {any}
-   */
-   const queryGetPerformanceMetrics = async (): Promise<any> => {
+  /**
+  * Get Performance Metrics
+  * @return {any}
+  */
+  const queryGetPerformanceMetrics = async (): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_status/`, {
       method: "POST",
       headers: {
@@ -51,7 +51,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
         "Content-Type": 'application/json'
       },
       body: JSON.stringify(
-        { 
+        {
           calibration_run_id: calibrationJobId.value,
           include_performance_metrics: true
         }
