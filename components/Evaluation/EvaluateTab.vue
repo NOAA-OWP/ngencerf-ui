@@ -26,12 +26,28 @@
           <a href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">Show
             Calibration Details</a>
         </div>
-      </div>
-    </div>
-    <div class="grid grid-cols-2">
-      <div class="text-center">
-        <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
-          <img :src="selectedPlotFileUrl" alt="Image" />
+        <div class="grid grid-cols-2">
+            <div class="text-center">
+                <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
+                    <img :src="selectedPlotFileUrl" alt="Image" />
+                </div>
+            </div>
+            <div>
+                <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
+                    <div v-if="plotTableList && plotTableList.length > 1">
+                        <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
+                        <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable"
+                            :options="plotTableList" optionLabel="name" optionValue="name">
+                        </Select>
+                    </div>
+                    <div class="pt-6 pb-2">
+                        <DataTable :value="plotTableData" scrollable scroll-height="500px"
+                            fixedHeader=true :multi-sort="true">
+                            <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable></Column>
+                        </DataTable>
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
       <div>

@@ -39,11 +39,13 @@ body {
   -ms-flex-direction: column;
   flex-direction: column;
   overflow: hidden;
+  /*min-width: 1530px !important;*/
   min-width: 1280px !important;
+  /*min-height: 945px !important;*/
   min-height: 670px !important;
 }
 .font-ui {
-  font-family: ui-sans-serif, system-ui, sans-serif, Arial, Helvetica;
+  font-family: ui-sans-serif, system-ui, sans-serif, sans-serif, Arial, Helvetica;
 }
 .boxed {
   border: 1px solid #BBBBBF;
@@ -85,12 +87,17 @@ input::-webkit-input-placeholder {
 }
 .h-screen-inner {
   height: Calc(100vh - 150px);
+  /*height: Calc(100vh - 180px);
+  height: Calc(100vh - 270px);*/
 }
 .min-h-screen-inner {
   height: Calc(100vh - 150px);
 }
 .h-screen-inner-less {
   height: Calc(100vh - 240px);
+}
+.bg-white {
+  background-color: #fff;
 }
 .underline,
 .underline button {
@@ -413,6 +420,7 @@ table.cols-bordered {
 
 .bg_green_lt { background-color: $ngwcp_green_lt; }
 .bg_blue_lt { background-color: $ngwcp_blue_lt; }
+.bg_blue_md { background-color: $ngwcp_blue_md; }
 
 // Help Pages
 ._help-page {
@@ -439,10 +447,6 @@ table.cols-bordered {
   margin-left: 20px;
 }
 
-._help-table td {
-  padding-bottom: .25em;
-}
-
 ._help-table .td1 {
   text-align: right;
   padding-right: 30px;
@@ -457,8 +461,7 @@ table.cols-bordered {
 
 
 ._help-page p {
-  line-height: 1.5em;
-  margin-bottom: 1em;
+  line-height: 2em;
 }
 
 /* Right Side Blocks */
@@ -477,11 +480,38 @@ table.cols-bordered {
 
 }
 
+/* Progress Tables */
+/* .progressTable {
+  width: 100%;
+  margin-left: 15px;
+
+  table {
+    tr {
+      line-height: calc(1.3vw + 0.41vh); // font-size: 14px;
+    }
+  }
+}
+.checkMark {
+  text-align: right;
+}
+
+.ptype {
+  width: 90%;
+  cursor: pointer;
+}
+
+.ptype:hover {
+  color: $ngwcp_primary1;
+} */
+
+
 /* Toast */
 .p-toast {
   width: min(25rem, 100vw) !important;
 }
 
+// .p-toast-top-center {
+// }
 
 .p-toast-message {
   border: 2px solid;
@@ -498,7 +528,8 @@ table.cols-bordered {
   margin-top: 7px;
 }
 .p-listbox-option-selected {
-  background-color: $ngwcp_green_lt; 
+  /*background-color: $ngwcp_green_lt; */
+  background-color: $ngwcp_green_lt !important; 
 }
 #MainLeftDataArea .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected {
   color: var(--p-listbox-option-color); 
