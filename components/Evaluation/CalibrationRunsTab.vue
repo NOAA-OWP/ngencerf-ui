@@ -1,6 +1,6 @@
 <template>
+  <!-- Evaluation Calibration Runs Tab -->
   <div class="h-screen-inner pr-2">
-
         <div class="flex mt-2">
           <div class="w-2/3">
             <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs</h1>
@@ -49,13 +49,7 @@
               <Column v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex" :header="col.header" :field="col.field"></Column> 
             </DataTable>
           </div>
-          <div class="flex mt-2">
-            <div class="ml-auto mt-4">
-              <div id="NewButton" class="">
-                <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return to Calibration Jobs</Button>
-              </div>
-            </div>
-          </div>
+
         </div>   
         
         <div class="flex mt-2">
@@ -69,7 +63,7 @@
   </div>
 
   <div class="waitgif" v-if="isLoadingCalibrationSummary">
-    <img src="@/assets/styles/img/wait.gif" />
+    <img alt="Please Wait..." src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
 

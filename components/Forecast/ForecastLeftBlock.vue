@@ -1,19 +1,22 @@
-<template> 
+<template>
   <!-- ForecastLeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
       <span v-if="activeTab == 1">
-        <PreviousRunsTab />
+        <LazyCalibrationsRunsTab />
       </span>
       <span v-else-if="activeTab == 2">
-       <SetupForecastRunTab />
+        <LazyForecastRunsTab />
       </span>
       <span v-else-if="activeTab == 3">
-        <StatusTab />
+        <LazySetupForecastRunTab />
       </span>
       <span v-else-if="activeTab == 4">
-        <ResultsTab />
+        <LazyStatusTab />
+      </span>
+      <span v-else-if="activeTab == 5">
+        <LazyResultsTab />
       </span>
     </div>
   </div>
@@ -21,14 +24,12 @@
 
 <script setup lang="ts">
 import Tabs from '~/components/Common/Tabs.vue'
-
-
-// Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
-import PreviousRunsTab from '~/components/Forecast/PreviousRunsTab.vue'
-import SetupForecastRunTab from './SetupForecastRunTab.vue'
-import StatusTab from './StatusTab.vue'
-import ResultsTab from './ResultsTab.vue'
+import LazyForecastRunsTab from './ForecastRunsTab.vue'
+import LazyCalibrationsRunsTab from './CalibrationsRunsTab.vue';
+import LazySetupForecastRunTab from './SetupForecastRunTab.vue'
+import LazyStatusTab from './StatusTab.vue'
+import LazyResultsTab from './ResultsTab.vue'
 
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 
