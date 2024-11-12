@@ -30,12 +30,28 @@
           <a href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">Show
             Calibration Details</a>
         </div>
-      </div>
-    </div>
-    <div class="grid grid-cols-2">
-      <div class="text-center">
-        <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
-          <img :src="selectedPlotFileUrl" alt="Image" />
+        <div class="grid grid-cols-2">
+            <div class="text-center">
+                <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
+                    <img :src="selectedPlotFileUrl" alt="Image" />
+                </div>
+            </div>
+            <div>
+                <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
+                    <div v-if="plotTableList && plotTableList.length > 1">
+                        <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
+                        <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable"
+                            :options="plotTableList" optionLabel="name" optionValue="name">
+                        </Select>
+                    </div>
+                    <div class="pt-6 pb-2">
+                        <DataTable :value="plotTableData" scrollable scroll-height="500px"
+                            fixedHeader=true :multi-sort="true">
+                            <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable></Column>
+                        </DataTable>
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
       <div>
@@ -46,12 +62,10 @@
               optionLabel="name" optionValue="name">
             </Select>
           </div>
-          <div class="pt-6 pb-2">
-            <DataTable :value="plotTableData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
-              <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable>
-              </Column>
-            </DataTable>
-          </div>
+          <DataTable :value="plotTableData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
+            <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable>
+            </Column>
+          </DataTable>
         </div>
       </div>
     </div>
@@ -126,16 +140,16 @@ const {
   queryGetPerformanceMetrics,
 } = EvaluationSupplementalDataStore;
 
-const plotTables = ref({});
+const plotTables = ref<DynamicObject>({});
 const plotTableList = ref<any[]>([]);
-const selectedPlotTable = ref<string | null>(null);
+const selectedPlotTable = ref<string>('');
 const plotTableData = ref<any[]>([]);
 const plotTableColumns = ref<any[]>([]);
 const performanceMetricsColumns = [{ header: 'Metric', field: 'metric' }];
 const supplementalTableOptions = ['Iteration Metrics Table', 'Iteration Parameters Table', 'Performance Metrics Table']
 
 onMounted(async () => {
-  if (!userCalibrationRunData?.value || userCalibrationRunData?.value?.error) {
+  if (!userCalibrationRunData?.value) {
     await fetchUserCalibrationRunData();
   }
 
@@ -260,7 +274,7 @@ onMounted(async () => {
   selectedPlotName.value = null;
   selectedPlotFilename.value = null;
   selectedPlotFileUrl.value = null;
-  selectedSupplementalTable.value = null;
+  selectedSupplementalTable.value = 0;
 });
 
 // Handle selectedPlotName changes
@@ -282,7 +296,7 @@ watch(selectedPlotName, async () => {
     plotTableData.value = [];
     plotTableColumns.value = [];
   } else if (selectedPlotName.value) {
-    selectedSupplementalTable.value = null;
+    selectedSupplementalTable.value = 0;
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value, true);
 
@@ -300,7 +314,7 @@ watch(selectedPlotName, async () => {
       if (response?._data?.plot_data && response?._data?.plot_data.length > 0) {
         plotTables.value = {};
         plotTableList.value = [];
-        selectedPlotTable.value = null;
+        selectedPlotTable.value = '';
         plotTableData.value = [];
         if (Array.isArray(response?._data?.plot_data[0])) {
           // special case - we are dealing with an array of multiple tables, instead of a single table
@@ -325,7 +339,11 @@ watch(selectedPlotName, async () => {
             plotTableList.value.push({ name: key });
           });
           selectedPlotTable.value = plotTableList.value[0].name;
-          plotTableData.value = plotTables.value[selectedPlotTable.value];
+          if (selectedPlotTable.value != '') {
+            plotTableData.value = plotTables.value[selectedPlotTable.value];
+          } else {
+            plotTableData.value = [];
+          }
         } else {
           let max_rows = response?._data?.plot_data.length;
           plotTables.value = { default_table: [] };
@@ -373,7 +391,7 @@ watch(selectedPlotName, async () => {
 
 // Handle selectedPlotTable changes
 watch(selectedPlotTable, async () => {
-  if (selectedPlotTable.value) {
+  if (selectedPlotTable.value != '') {
     plotTableData.value = plotTables.value[selectedPlotTable.value];
   }
 });
@@ -399,8 +417,8 @@ watch(plotTableData, async () => {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
           try {
             plotTableData.value[d][key] = Number(plotTableData.value[d][key]).toFixed(5);
-          } catch (e) {
-            console.log('Error rounding value ' + plotTableData.value[d][key] + ': ' + e.message);
+          } catch (error) {
+            console.error('Error rounding value ' + plotTableData.value[d][key] + ': ', error);
           }
         }
       });
