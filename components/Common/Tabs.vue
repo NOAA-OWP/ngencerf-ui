@@ -59,6 +59,13 @@
             Select Alternate Iteration
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
+          <span v-show="evaluateIterationRunId && evaluateIterationRunId > 0">
+            <div data-tab="4" data-menu-tab="24" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
+              aria-label="Run Validation tab" title="Run Validation tab">
+              Status
+              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+            </div>
+          </span>
         </span>
       </div>
     </span>
@@ -121,7 +128,7 @@ import { storeToRefs } from "pinia";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
 
-const { calibrationJobId } = storeToRefs(generalStore());
+const { calibrationJobId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
@@ -131,7 +138,7 @@ const currentVerificationTab = ref(getVerificationTabIndex());
 const currentMenu = ref(getMenuIndex());
 
 //store specific import
-const { loadCalibrationDataComplete } = storeToRefs( useEvaluationCalibrationRunStore() )
+const { loadCalibrationDataComplete } = storeToRefs(useEvaluationCalibrationRunStore())
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
@@ -144,7 +151,7 @@ const tabClicked = (event: Event) => {
   Object.keys(allTabs).forEach(function (key) {
     allTabs[key as any].classList.remove("activeTab");
   });
-  
+
   // Note that the compiler sends errors when you don't check for null
   if (ele) {
     //const cl = ele.classList;
