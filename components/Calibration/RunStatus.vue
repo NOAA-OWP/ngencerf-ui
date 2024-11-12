@@ -13,7 +13,7 @@
                   </tr>
                   <tr height="32px">
                     <td class="text-right font-bold">Elapsed Time</td>
-                    <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ elapsedTime ? elapsedTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="32px">
                     <td class="text-right font-bold">Iteration</td>
@@ -56,11 +56,10 @@
                 </tbody>
               </table>
             </div>
-
-            <div>
-              
-            </div>
-
+          </div>
+          <div>
+              <label for="resultsPathname">Results Pathname</label>
+              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
           </div>
         </div>
       </div>
@@ -147,8 +146,7 @@
 </template>
 
 <script lang="ts" setup>
-import ProgressBar from "primevue/progressbar";
-import { onMounted, onUnmounted } from "vue";
+import { onMounted  } from "vue";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
@@ -165,7 +163,7 @@ const { getCalibrationTabIndex } = generalStore();
 const {
   startTimeDate,
   startTime,
-  runningTime,
+  elapsedTime,
   plotNames,
   plotList,
   selectedPlotName,
@@ -174,7 +172,7 @@ const {
   iteration,
   stopCriteria,
   stopCriteriaMet,
-  runningTimeIntervalId,
+  elapsedTimeIntervalId,
   calibrationStatusIntervalId,
   validationsStatusIntervalId,
   allValidationsDone,
@@ -224,19 +222,19 @@ onMounted(() => {
 });
 
 /**
- * Create runningTimeIntervalId to update runningTime every second while Calibration is Running or Validation is not Done
+ * Create elapsedTimeIntervalId to update elapsedTime every second while Calibration is Running or Validation is not Done
  */
- const createRunningTimeInterval = () => {
-  // console.log('creating runningTimeIntervalId');
+ const createElapsedTimeInterval = () => {
+  // console.log('creating elapsedTimeIntervalId');
   // console.log('userCalibrationRunData:', userCalibrationRunData.value);
   // console.log('allValidationsDone:', allValidationsDone.value);
-  runningTimeIntervalId.value = setInterval(async () => {
+  elapsedTimeIntervalId.value = setInterval(async () => {
     if (userCalibrationRunData.value?.status === 'Running' || (!allValidationsDone.value)) {
       // Calculate Running Time every second while status is Running
-      runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+      elapsedTime.value = calculateElapsedTime(startTimeDate.value, new Date());
     } else {
-      clearInterval(runningTimeIntervalId.value);
-      runningTimeIntervalId.value = undefined;
+      clearInterval(elapsedTimeIntervalId.value);
+      elapsedTimeIntervalId.value = undefined;
     }
   }, 1000);
 }
@@ -329,12 +327,15 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
         startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
         
+        // Calculate Running Time every second while calibration or validation is Running
         if (calibrationStatus.value !== 'Failed') {
-          runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+          if (!allValidationsDone.value) {
+            elapsedTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
-          // Create an interval to update runningTime every second while Calibration is Running or Validation is not Done
-          if (!runningTimeIntervalId.value) {
-            createRunningTimeInterval();
+            // Create an interval to update elapsedTime every second while Calibration is Running or Validation is not Done
+            if (!elapsedTimeIntervalId.value) {
+              createElapsedTimeInterval();
+            }
           }
         }
       } else {
@@ -447,8 +448,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
     else if (['Cancelled', 'Failed', 'Server error'].includes(calibrationStatus.value ?? '')) {
       stopCriteriaMet.value = false;
-      clearInterval(runningTimeIntervalId.value);
-      runningTimeIntervalId.value = undefined;
+      clearInterval(elapsedTimeIntervalId.value);
+      elapsedTimeIntervalId.value = undefined;
       clearInterval(calibrationStatusIntervalId.value);
       calibrationStatusIntervalId.value = undefined;
       clearInterval(validationsStatusIntervalId.value);

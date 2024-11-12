@@ -13,7 +13,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { getAccessToken } = useUserDataStore();
   
   // refs
-  const runningTime = ref();
+  const elapsedTime = ref();
   const startTimeDate = ref();
   const startTime = ref();
 
@@ -26,7 +26,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
   const stopCriteria = ref();
   const stopCriteriaMet = ref(false);
-  const runningTimeIntervalId = ref();
+  const elapsedTimeIntervalId = ref();
   const calibrationStatusIntervalId = ref();
   const validationsStatusIntervalId = ref();
   const allValidationsDone = ref(false);
@@ -147,7 +147,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Hard Reset Run/Status Store
    */
   const hardResetRunStatusStore = (): void => {
-    runningTime.value = "";
+    elapsedTime.value = "";
     startTimeDate.value = "";
     startTime.value = "";
     plotNames.value = "";
@@ -161,9 +161,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     allValidationsDone.value = false;
     resultsPathname.value = undefined;
 
-    if (runningTimeIntervalId.value) {
-      clearInterval(runningTimeIntervalId.value);
-      runningTimeIntervalId.value = undefined;
+    if (elapsedTimeIntervalId.value) {
+      clearInterval(elapsedTimeIntervalId.value);
+      elapsedTimeIntervalId.value = undefined;
     }
 
     if (calibrationStatusIntervalId.value) {
@@ -182,7 +182,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   return {
     startTimeDate,
     startTime,
-    runningTime,
+    elapsedTime,
     plotNames,
     plotList,
     selectedPlotName,
@@ -191,7 +191,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     iteration,
     stopCriteria,
     stopCriteriaMet,
-    runningTimeIntervalId,
+    elapsedTimeIntervalId,
     calibrationStatusIntervalId,
     validationsStatusIntervalId,
     allValidationsDone,
