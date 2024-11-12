@@ -157,6 +157,7 @@ const navigateToAlternateIteration = (event: any) => {
 const navigateToEvaluation = (event: any) => {
   if (evaluateValidationRunId.value > 0) {
     const tabs = document.getElementsByClassName("tabs");
+
     const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
     e.click();
   } else {
