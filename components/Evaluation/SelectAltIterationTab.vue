@@ -14,6 +14,7 @@
       </ColumnGroup>
       <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :field="col.field" :hidden="col.hidden ?? false"></Column>
     </DataTable>      
+    <div class="text-sm">* Metric used as Objective Function</div>
   </div>
  
   <div class="mt-3">           
@@ -34,17 +35,17 @@
     </div>
   </div>
 
-  <div class="mt-4 ActionButtonsBox">
-    <div class="grid grid-cols-8">
-      <span>
-        <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-          <button class="font-normal" title="Validate Selected Iteration" aria-label="Run Button" @click="navigateToEvaluateStatus">
-            Next
-          </button>
-        </div>
-      </span>
-    </div>
+  <div class="b-0 grid grid-cols-8 mt-6 ActionButtonsBox">   
+    <div class="col-span-7"></div>
+    <div class="col-span-1 mr-4">
+      <div>
+        <button class="ngenButtonDiv ml-6 font-normal h-8" title="Validate Selected Iteration" aria-label="Run Button" @click="navigateToEvaluateStatus">
+          Next
+        </button>
+      </div>
+    </div>    
   </div>
+
 </template>
 
 <script setup lang="ts">
@@ -152,20 +153,23 @@ const navigateToEvaluateStatus = ( event : any ) => {
 <style lang="scss">
 @import "/assets/styles/styles.scss";
 
-#RunDetailsTbl .p-datatable-thead > tr:nth-child(2) th {
-    background-color: $ngwcp_green_lt; 
-    border: $ngwcp_green_lt; 
-    color: var(--p-datatable-row-color);
+#RunDetailsTbl .p-datatable-thead > tr:nth-child(2) th,
+#RunDetailsTbl .p-datatable-thead > tr:nth-child(2) th:hover {
+    background-color: $ngwcp_blue_md !important; 
+    border: $ngwcp_blue_md; 
+    color: var(--p-datatable-row-color) !important;
 }
-#RunDetailsTbl .p-datatable-thead > tr:nth-child(3) th {
-    background-color: $ngwcp_blue_lt; 
+#RunDetailsTbl .p-datatable-thead > tr:nth-child(3) th,
+#RunDetailsTbl .p-datatable-thead > tr:nth-child(3) th:hover {
+    background-color: $ngwcp_blue_lt !important; 
     border: $ngwcp_blue_lt; 
-    color: var(--p-datatable-row-color);
+    color: var(--p-datatable-row-color) !important;
 }
-#CalTuningParamsTbl .p-datatable-thead > tr:nth-child(2) th {
-    background-color: $ngwcp_green_lt; 
-    border: $ngwcp_green_lt; 
-    color: var(--p-datatable-row-color);
+#CalTuningParamsTbl .p-datatable-thead > tr:nth-child(2) th,
+#CalTuningParamsTbl .p-datatable-thead > tr:nth-child(2) th:hover {
+    background-color: $ngwcp_blue_lt !important; 
+    border: $ngwcp_blue_lt; 
+    color: var(--p-datatable-row-color) !important;
 }
 
 .p-datatable-tbody .p-datatable-selectable-row td {
@@ -199,7 +203,7 @@ table#cr-detail-list2 th {
 
 th.p-datatable-header-cell.bg-objective-function-col,
 th.p-datatable-header-cell.bg-objective-function-col:hover {
-    background-color: rgb(251 146 60);
+    background-color: rgb(204, 85, 0);
 }
 /*
 #RunDetailsTbl, #CalTuningParamsTbl {

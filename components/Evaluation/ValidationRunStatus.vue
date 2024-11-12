@@ -4,25 +4,6 @@
       <div class="row-span-2">
         <div id="ResultsDisplay">
           <div class="grid grid-cols-2">
-            <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
-              <table>
-                <tbody>
-                  <tr>
-                    <td class="text-right"><label for="RunStatus">Status</label></td>
-                    <td class="pl-5">
-                      {{ validationStatus }}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></td>
-                    <td class="pl-5">
-                      {{ iterationValidationRunId }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
             <div class="col-span-1">
               <table>
                 <tbody>
@@ -36,8 +17,26 @@
                   </tr>
                 </tbody>
               </table>
+            </div>            
+
+            <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
+              <table>
+                <tbody>
+                  <tr height="45px">
+                    <td class="text-right"><label for="RunStatus">Status</label></td>
+                    <td class="pl-5">
+                      {{ validationStatus }}
+                    </td>
+                  </tr>
+                  <tr height="45px">
+                    <td class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></td>
+                    <td class="pl-5">
+                      {{ iterationValidationRunId }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            
 
           </div>
         </div>
@@ -56,25 +55,23 @@
 
 
         <span v-else>
-          <div id="StausRunBottomButtons" class="grid grid-cols-8">
-            <span v-if="userCalibrationRunData?.status !== 'Running'">
-            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-              <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()" :disabled="isStartDisabled()">
-                Run
-              </button>
-            </div>
-          </span>
-          <span v-else>
-            <div class="col-span-1 mr-6 h-8">&nbsp;</div>
-          </span>
-            <div class="col-span-1 mr-3">
-              <button class="c-blue font-normal text-xl underline pt-1" title="Cancel Button" @click="cancelRun()" :disabled="isCancelDisabled()"
-                aria-label="Cancel Button">Cancel</button>
-            </div>
-            <div class="col-span-4">&nbsp;</div>
-            <div class="col-span-1">&nbsp;</div>
-            <div class="col-span-1 mr-4">
-            </div>
+          <div id="StausRunBottomButtons" class="grid grid-cols-6">
+          
+              <div v-if="userCalibrationRunData?.status !== 'Running'" class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+                <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()" :disabled="isStartDisabled()">
+                  Run
+                </button>
+              </div>
+            
+              <div v-else class="col-span-1 mr-6 h-8">&nbsp;</div>
+           
+              <div class="col-span-1 ngenButtonDiv-red mr-6 h-8">
+                <button class="font-normal" title="Cancel Button" @click="cancelRun()" :disabled="isCancelDisabled()"
+                  aria-label="Cancel Button">Cancel</button>
+              </div>
+              <div class="col-span-2">&nbsp;</div>
+              <div class="col-span-1 mr-4">
+              </div>
           </div>
         </span>
       </div>
