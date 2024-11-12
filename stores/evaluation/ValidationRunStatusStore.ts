@@ -21,7 +21,7 @@ export const useValidationRunStatusStore = defineStore('ValidationRunStatusStore
 
    // Restore state from sessionStorage if available
    if (typeof window !== 'undefined') {
-    validationStatus.value = JSON.parse(sessionStorage.getItem('validationStatus') ?? "");
+    validationStatus.value = sessionStorage.getItem('validationStatus') ?? "";
     runningTime.value = sessionStorage.getItem('runningTime');
     startTimeDate.value = sessionStorage.getItem('startTimeDate');
     startTime.value = sessionStorage.getItem('startTime');

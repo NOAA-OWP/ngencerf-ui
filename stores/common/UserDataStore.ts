@@ -10,7 +10,7 @@ import type { JobsList, JobListItem, UserCalibrationRunData } from "~/composable
 export const useUserDataStore = defineStore("UserDataStore", () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { calibrationJobId } = storeToRefs(generalStore());
-  
+
   const isLoggedIn = ref<boolean>(false);
   const userName = ref("");
   const firstName = ref("");
@@ -20,11 +20,11 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
 
   const userCalibrationJobsListData = ref<JobListItem[]>([]);
   const userCalibrationRunData = ref<UserCalibrationRunData>();
-  
+
   const userSelectedCalibrationIterationId = ref<number | null>(null);
 
-   // Restore state from sessionStorage if available
-   if (typeof window !== 'undefined') {
+  // Restore state from sessionStorage if available
+  if (typeof window !== 'undefined') {
     let ls;
     ls = sessionStorage.getItem('userCalibrationJobsListData');
     if (ls !== "undefined") { userCalibrationJobsListData.value = ls ? JSON.parse(ls) : [] }
@@ -87,17 +87,20 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    */
   function getUserInitials(): string {
     let n = userName.value;
-    let atSignPos = n.indexOf("@");
-    if (atSignPos !== -1) {
-      let name = n.substring(0, atSignPos);
-      let dotPos = name.lastIndexOf('.');
-      if (dotPos !== -1) {
-        return (name[0] + name.substring(dotPos + 1)[0]).toUpperCase();
+    if (n) {
+      let atSignPos = n.indexOf("@");
+      if (atSignPos !== -1) {
+        let name = n.substring(0, atSignPos);
+        let dotPos = name.lastIndexOf('.');
+        if (dotPos !== -1) {
+          return (name[0] + name.substring(dotPos + 1)[0]).toUpperCase();
+        }
+        return userName.value.toUpperCase()[0];
+      } else {
+        return userName.value.toUpperCase()[0];
       }
-      return userName.value.toUpperCase()[0];
-    } else {
-      return userName.value.toUpperCase()[0];
     }
+    return "";
   }
 
   /**
@@ -200,7 +203,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * @returns {Promise<any>}
    */
   async function queryUserCalibrationRunData() {
-    if( !calibrationJobId.value ) {
+    if (!calibrationJobId.value) {
       return null;
     }
     const userCalibrationRunDataResult = await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/load_calibration_run/`, {

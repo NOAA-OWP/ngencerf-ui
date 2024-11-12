@@ -1,7 +1,9 @@
 <template>
-  <EvaluationLayout>
+ 
+    <EvaluationLayout>
+      <slot />
+    </EvaluationLayout>
 
-  </EvaluationLayout>
 </template>
 
 <script lang="ts" setup>
