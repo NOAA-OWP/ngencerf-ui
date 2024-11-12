@@ -57,6 +57,10 @@
               </table>
             </div>
 
+            <div>
+              
+            </div>
+
           </div>
         </div>
       </div>
@@ -173,7 +177,8 @@ const {
   runningTimeIntervalId,
   calibrationStatusIntervalId,
   validationsStatusIntervalId,
-  allValidationsDone
+  allValidationsDone,
+  resultsPathname
 } = storeToRefs(runStatusStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -183,8 +188,8 @@ const {
   queryGetCalibrationStatus,
   queryGetPlotNames,
   queryGetPlot,
-  executeRunCalibration,
-  queryIteration,
+  runCalibrationJob,
+  queryGetIteration,
   queryGetJobDataDirectory,
   cancelCalibrationJob,
 } = runStatusStore;
@@ -205,7 +210,7 @@ onMounted(() => {
 
       if (userCalibrationRunData.value.run_date) {
         startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
-        console.log('startTimeDate from within nextTicket and onMounted:', startTimeDate.value);
+        // console.log('startTimeDate from within nextTicket and onMounted:', startTimeDate.value);
       }
     }
     
@@ -222,9 +227,9 @@ onMounted(() => {
  * Create runningTimeIntervalId to update runningTime every second while Calibration is Running or Validation is not Done
  */
  const createRunningTimeInterval = () => {
-  console.log('creating runningTimeIntervalId');
-  console.log('userCalibrationRunData:', userCalibrationRunData.value);
-  console.log('allValidationsDone:', allValidationsDone.value);
+  // console.log('creating runningTimeIntervalId');
+  // console.log('userCalibrationRunData:', userCalibrationRunData.value);
+  // console.log('allValidationsDone:', allValidationsDone.value);
   runningTimeIntervalId.value = setInterval(async () => {
     if (userCalibrationRunData.value?.status === 'Running' || (!allValidationsDone.value)) {
       // Calculate Running Time every second while status is Running
@@ -245,7 +250,7 @@ const startRun = async () => {
     toast.removeAllGroups();
     try {
       // console.log('hitting run_calibration endpoint');
-      const runCalibrationResponse = await executeRunCalibration();
+      const runCalibrationResponse = await runCalibrationJob();
 
       if (runCalibrationResponse._data) {
         if (runCalibrationResponse._data.status) { 
@@ -309,7 +314,7 @@ const cancelRun = async () => {
 
 // Handle calibrationStatus changes
 watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
-  console.log('calibrationStatus watch:', newCalibrationStatus, oldCalibrationStatus);
+  // console.log('calibrationStatus watch:', newCalibrationStatus, oldCalibrationStatus);
   if (userCalibrationRunData.value) {
     if (userCalibrationRunData.value.stop_criteria) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
@@ -319,50 +324,59 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
     }
 
-    if (calibrationStatus.value === 'Running') {
+    if (['Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
       // Calculate Running Time
       if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
         startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
-        runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
+        
+        if (calibrationStatus.value !== 'Failed') {
+          runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
-        console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
-
-        // Create an interval to update runningTime every second while Calibration is Running or Validation is not Done
-        if (!runningTimeIntervalId.value) {
-          createRunningTimeInterval();
+          // Create an interval to update runningTime every second while Calibration is Running or Validation is not Done
+          if (!runningTimeIntervalId.value) {
+            createRunningTimeInterval();
+          }
         }
-
-        // console.log('calibrationStatusIntervalId:', calibrationStatusIntervalId.value);
-
-        // Create an interval to update calibrationStatus every 10 seconds while status is Running
-        if (!calibrationStatusIntervalId.value) {
-          // console.log('creating calibrationStatusIntervalId');
-          calibrationStatusIntervalId.value = setInterval(async () => {
-            const getIterationResponse = await queryIteration();
-
-            // check if status changes from Running
-            if (getIterationResponse._data && getIterationResponse._data.status) {
-              if (getIterationResponse._data.status !== 'Running') {
-                if (userCalibrationRunData.value) {
-                  clearInterval(calibrationStatusIntervalId.value);
-                  calibrationStatusIntervalId.value = undefined;
-                  userCalibrationRunData.value.status = getIterationResponse._data.status;
-                }
-              }
-            } else {
-              toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
-            }
-
-            // check if iteration changes
-            if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
-              iteration.value = getIterationResponse._data.iteration;
-            }
-          }, 10000);
-        }
-
       } else {
-        toast.removeAllGroups();
         toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
+      }
+
+      // get job data directory
+      if (!resultsPathname.value) {
+        const getJobDataDirectoryResponse = await queryGetJobDataDirectory();
+
+        if (getJobDataDirectoryResponse?._data.data_dir) {
+          resultsPathname.value = getJobDataDirectoryResponse._data.data_dir;
+        } else {
+          toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Job Data Directory' });
+        }
+      }
+    }
+
+    if (calibrationStatus.value === 'Running') {
+      if (!calibrationStatusIntervalId.value) {
+        // console.log('creating calibrationStatusIntervalId');
+        calibrationStatusIntervalId.value = setInterval(async () => {
+          const getIterationResponse = await queryGetIteration();
+
+          // check if status changes from Running
+          if (getIterationResponse._data && getIterationResponse._data.status) {
+            if (getIterationResponse._data.status !== 'Running') {
+              if (userCalibrationRunData.value) {
+                clearInterval(calibrationStatusIntervalId.value);
+                calibrationStatusIntervalId.value = undefined;
+                userCalibrationRunData.value.status = getIterationResponse._data.status;
+              }
+            }
+          } else {
+            toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
+          }
+
+          // check if iteration changes
+          if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
+            iteration.value = getIterationResponse._data.iteration;
+          }
+        }, 10000);
       }
 
       // Get Plot Names
@@ -383,21 +397,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     }
 
     else if (calibrationStatus.value === 'Done') {
-      // Calculate Running Time
-      if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
-        startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
-        runningTime.value = calculateElapsedTime(startTimeDate.value, new Date());
-
-        // console.log('runningTimeIntervalId:', runningTimeIntervalId.value);
-
-        // Create an interval to update runningTime every second while Calibration is Running or Validation is not Done
-        if (!runningTimeIntervalId.value) {
-          createRunningTimeInterval();
-        }
-      }
-
       if (!iteration.value) {
-        const getIterationResponse = await queryIteration();
+        const getIterationResponse = await queryGetIteration();
 
         if (getIterationResponse._data && getIterationResponse._data.iteration) {
           iteration.value = getIterationResponse._data.iteration;

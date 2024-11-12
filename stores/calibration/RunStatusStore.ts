@@ -30,6 +30,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const calibrationStatusIntervalId = ref();
   const validationsStatusIntervalId = ref();
   const allValidationsDone = ref(false);
+  const resultsPathname = ref();
 
   /**
    * Get Calibration Status
@@ -86,7 +87,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Run Calibration
    * @return {any}
    */
-  const executeRunCalibration = async (): Promise<any> => {
+  const runCalibrationJob = async (): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/run_calibration/`, {
       method: "POST",
       headers: {
@@ -101,7 +102,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Get Calibration Iteration
    * @returns {any}
    */
-  const queryIteration = async (): Promise<any> => {
+  const queryGetIteration = async (): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_iteration/`, {
       method: "POST",
       headers: {
@@ -158,6 +159,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     stopCriteria.value = "";
     stopCriteriaMet.value = false;
     allValidationsDone.value = false;
+    resultsPathname.value = undefined;
 
     if (runningTimeIntervalId.value) {
       clearInterval(runningTimeIntervalId.value);
@@ -193,11 +195,12 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     calibrationStatusIntervalId,
     validationsStatusIntervalId,
     allValidationsDone,
+    resultsPathname,
     queryGetCalibrationStatus,
     queryGetPlotNames,
     queryGetPlot,
-    executeRunCalibration,
-    queryIteration,
+    runCalibrationJob,
+    queryGetIteration,
     queryGetJobDataDirectory,
     cancelCalibrationJob,
     hardResetRunStatusStore
