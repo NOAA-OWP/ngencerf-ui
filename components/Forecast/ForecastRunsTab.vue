@@ -7,7 +7,7 @@
       </div>
       <div class="ml-auto mt-2">
         <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
-            v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
+            v-if="userSelectedEvalCalibrationRunId > 0"
             @click.stop="navigateToAlternateIteration">New Forecast</Button></div>
       </div>
     </div>
@@ -58,17 +58,6 @@
       </div>
 
     </div>
-
-    <div class="flex mt-2">
-      <div class="ml-auto mt-4">
-        <div id="NewButton" class="">
-          <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
-            v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true"
-            @click.stop="navigateToEvaluation">Evaluate</Button>
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <div class="waitgif" v-if="isLoadingCalibrationSummary">
