@@ -1,5 +1,5 @@
 <template>
-  <!-- Forecast Runs Tab -->
+  <!-- Forecast Calibration Runs Tab -->
   <div class="h-screen-inner pr-2">
     <div class="flex mt-2">
       <div class="w-2/3">

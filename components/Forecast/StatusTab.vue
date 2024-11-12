@@ -26,26 +26,9 @@
               </table>
             </div>
 
-            <!-- <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
-              <table>
-                <tbody>
-                  <tr>
-                    <td class="text-right"><label for="RunStatus">Status</label></td>
-                    <td class="pl-5">
-                      <span v-if="calibrationStatus !== 'Done'">
-                        <input id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;"
-                          v-model="calibrationStatus" disabled />
-                      </span>
-                      <span v-else-if="calibrationStatus === 'Done' && !allValidationsDone">
-                        <span id="RunCycle" class="dummyProgress ml-2 text-lg" style="background-color: white;">
-                          Cycle:
-                        </span>
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div> -->
+            <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
+
+            </div>
 
           </div>
         </div>
@@ -66,8 +49,6 @@ import { onMounted } from "vue";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
-import { isValidDate, isNotNullOrUndefined } from '~/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
 
 const runStatusStore = useRunStatusStore();

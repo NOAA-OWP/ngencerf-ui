@@ -25,8 +25,8 @@
 <script setup lang="ts">
 import Tabs from '~/components/Common/Tabs.vue'
 import { generalStore } from "@/stores/common/GeneralStore";
-import LazyForecastRunsTab from './ForecastRunsTab.vue'
 import LazyCalibrationsRunsTab from './CalibrationsRunsTab.vue';
+import LazyForecastRunsTab from './ForecastRunsTab.vue'
 import LazySetupForecastRunTab from './SetupForecastRunTab.vue'
 import LazyStatusTab from './StatusTab.vue'
 import LazyResultsTab from './ResultsTab.vue'
