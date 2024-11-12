@@ -31,6 +31,41 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validationsStatusIntervalId = ref();
   const allValidationsDone = ref(false);
 
+   // Restore state from sessionStorage if available
+   if (typeof window !== 'undefined') {
+    let ls;
+    ls = sessionStorage.getItem('plotList');
+    if (ls !== "undefined") { plotList.value = ls ? JSON.parse(ls) : [] }
+    runningTime.value = sessionStorage.getItem('runningTime') as string;
+    startTimeDate.value = sessionStorage.getItem('startTimeDate') as string;
+    startTime.value = sessionStorage.getItem('startTime') as string;
+    plotNames.value = sessionStorage.getItem('plotNames') as string;
+    selectedPlotName.value = sessionStorage.getItem('selectedPlotName') as string;
+    selectedPlotFilename.value = sessionStorage.getItem('selectedPlotFilename') as string;
+    selectedPlotFileUrl.value = sessionStorage.getItem('selectedPlotFileUrl') as string;
+    iteration.value = sessionStorage.getItem('iteration') as string;
+    stopCriteria.value = sessionStorage.getItem('stopCriteria') as string;
+    runningTimeIntervalId.value = sessionStorage.getItem('runningTimeIntervalId') as string;
+    runningTimeIntervalId.value = sessionStorage.getItem('calibrationStatusIntervalId') as string;
+
+    stopCriteriaMet.value = JSON.parse(sessionStorage.getItem('stopCriteriaMet') as string) === "true";
+    console.log("RunStatusStore has been refreshed from sessionStorage");
+  }
+
+  watch(plotList, (plotList) => { sessionStorage.setItem('plotList', JSON.stringify(plotList)); })
+  watch(runningTime, (runningTime) => { sessionStorage.setItem('runningTime', runningTime); })
+  watch(startTimeDate, (startTimeDate) => { sessionStorage.setItem('startTimeDate', startTimeDate); })
+  watch(startTime, (startTime) => { sessionStorage.setItem('startTime', startTime); })
+  watch(plotNames, (plotNames) => { sessionStorage.setItem('plotNames', plotNames); })
+  watch(selectedPlotName, (selectedPlotName) => { sessionStorage.setItem('selectedPlotName', selectedPlotName); })
+  watch(selectedPlotFilename, (selectedPlotFilename) => { sessionStorage.setItem('selectedPlotFilename', selectedPlotFilename); })
+  watch(selectedPlotFileUrl, (selectedPlotFileUrl) => { sessionStorage.setItem('selectedPlotFileUrl', selectedPlotFileUrl); })
+  watch(iteration, (iteration) => { sessionStorage.setItem('iteration', iteration); })
+  watch(stopCriteria, (stopCriteria) => { sessionStorage.setItem('stopCriteria', stopCriteria); })
+  watch(runningTimeIntervalId, (runningTimeIntervalId) => { sessionStorage.setItem('runningTimeIntervalId', runningTimeIntervalId); })
+  watch(runningTimeIntervalId, (runningTimeIntervalId) => { sessionStorage.setItem('runningTimeIntervalId', runningTimeIntervalId); })
+  watch(stopCriteriaMet, (stopCriteriaMet) => { sessionStorage.setItem('uiStopCritstopCriteriaMeteria', JSON.stringify(stopCriteriaMet)); })
+  
   /**
    * Get Calibration Status
    * @return {any}

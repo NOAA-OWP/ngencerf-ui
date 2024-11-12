@@ -6,20 +6,21 @@ import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { SelectOption, GageTabData, GeneralApiSaveResponse, GeneralErrorResponse, SaveGageTabResponse, SaveGageTabPayload } from "~/composables/NextGenModel";
-import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
 export const useGageStore = defineStore('GageStore', () => {
   /**
   * ref section
   */
   const { calibrationJobId } = storeToRefs(generalStore());
-  const domainOptionsList = ref<SelectOption[]>([]);
-  const gageOptionsList = ref<SelectOption[]>([]);
-  const isNWMv3 = ref<boolean>(false);
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
   const userDataStore = useUserDataStore();
   const { userCalibrationRunData } = storeToRefs(userDataStore);
+
+  const domainOptionsList = ref<SelectOption[]>([]);
+  const gageOptionsList = ref<SelectOption[]>([]);
+  const isNWMv3 = ref<boolean>(false);
+
   const gageTabData = ref<GageTabData>();
   const geopackageImageUrl = ref<string>("");
   const selectedDomainValue = ref<string>("");
@@ -31,25 +32,48 @@ export const useGageStore = defineStore('GageStore', () => {
 
   const gageStore_data_loading = ref<boolean>(true);
 
+  // Restore state from sessionStorage if available
+  if (typeof window !== 'undefined') {
+    let ls;
+    ls = sessionStorage.getItem('domainOptionsList');
+    if (ls !== "undefined") { domainOptionsList.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('gageOptionsList');
+    if (ls !== "undefined") { gageOptionsList.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('gageTabData');
+    if (ls !== "undefined") { gageTabData.value = JSON.parse(ls as string) }
+    ls = sessionStorage.getItem('gageData');
+    if (ls !== "undefined") { gageData.value = JSON.parse(ls as string) }
 
-  const loadGageTabStaticData = () => { 
+    geopackageImageUrl.value = sessionStorage.getItem('geopackageImageUrl') as string;
+    selectedDomainValue.value = sessionStorage.getItem('formulatselectedDomainValueionNameInput') as string;
+    selectedGageValue.value = sessionStorage.getItem('selectedGageValue') as string;
+    selectedForcingValue.value = sessionStorage.getItem('formuselectedForcingValuelationNameInput') as string;
+    selectedObservationalValue.value = sessionStorage.getItem('selectedObservationalValue') as string;
+    selectedGeopackageValue.value = sessionStorage.getItem('selectedGeopackageValue') as string;
+
+    isNWMv3.value = sessionStorage.getItem('isNWMv3') as string === "true";
+    gageStore_data_loading.value = sessionStorage.getItem('gageStore_data_loading') as string === "true";
+    console.log("GageStore restored");
+  }
+
+  const loadGageTabStaticData = () => {
     gageStore_data_loading.value = true
     makeProtectedApiCall<GageTabData>(`${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${getAccessToken()}`,
-      "Content-Type": 'application/json'
-    },
-    body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
-  })
-    .then((gageTabDataResult) => {
-      gageTabData.value = gageTabDataResult?._data ?? undefined
-      gageStore_data_loading.value = false
-      console.log( 'gageTabData', gageTabData.value )
-      //init ui model value
-      geopackageImageUrl.value = userCalibrationRunData.value?.geopackage_image_url ?? ""
-      setUserSelection()
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     })
+      .then((gageTabDataResult) => {
+        gageTabData.value = gageTabDataResult?._data ?? undefined
+        gageStore_data_loading.value = false
+        console.log('gageTabData', gageTabData.value)
+        //init ui model value
+        geopackageImageUrl.value = userCalibrationRunData.value?.geopackage_image_url ?? ""
+        setUserSelection()
+      })
   }
   /**
   * get iser se;ected domain name based on the selected gage
@@ -90,7 +114,7 @@ export const useGageStore = defineStore('GageStore', () => {
     gageOptionsList.value = []
     gageTabData.value?.gages.forEach((gage_value) => {
       if (selectedDomainValue.value == "" || gage_value.domain == selectedDomainValue.value) {
-        if ((isNWMv3.value == true && gage_value.nwm_v3_calibrated == true) || isNWMv3.value == false) {
+        if ((isNWMv3.value && gage_value.nwm_v3_calibrated) || isNWMv3.value) {
           gageOptionsList.value.push({
             name: gage_value.gage_id,
             description: gage_value.gage_id,
@@ -140,12 +164,12 @@ export const useGageStore = defineStore('GageStore', () => {
   */
   async function saveGageTabData() {
     let savePayload = <SaveGageTabPayload>({});
-    if ( selectedGageValue.value ) savePayload['gage_id'] = selectedGageValue.value;
-    if ( selectedForcingValue.value ) savePayload['forcing_source'] = selectedForcingValue.value;
-    if ( selectedObservationalValue.value ) savePayload['observational_source'] = selectedObservationalValue.value;
-    if ( selectedGeopackageValue.value ) savePayload['geopackage_source'] = selectedGeopackageValue.value;
-    
-    if ( Object.keys( savePayload ).length > 0 && savePayload.hasOwnProperty( "gage_id" ) ) {
+    if (selectedGageValue.value) savePayload['gage_id'] = selectedGageValue.value;
+    if (selectedForcingValue.value) savePayload['forcing_source'] = selectedForcingValue.value;
+    if (selectedObservationalValue.value) savePayload['observational_source'] = selectedObservationalValue.value;
+    if (selectedGeopackageValue.value) savePayload['geopackage_source'] = selectedGeopackageValue.value;
+
+    if (Object.keys(savePayload).length > 0 && savePayload.hasOwnProperty("gage_id")) {
       savePayload['calibration_run_id'] = calibrationJobId.value;
 
       const saveGageTabDataResponse = await makeProtectedApiCall<SaveGageTabResponse>(`${ngencerfBaseUrl}/calibration/save_gage_tab/`, {
@@ -154,7 +178,7 @@ export const useGageStore = defineStore('GageStore', () => {
           "Authorization": `Bearer ${getAccessToken()}`,
           "Content-Type": 'application/json'
         },
-        body: JSON.stringify( savePayload )
+        body: JSON.stringify(savePayload)
       })
 
       geopackageImageUrl.value = saveGageTabDataResponse?._data?.geopackage_image_url ?? ""
@@ -207,7 +231,7 @@ export const useGageStore = defineStore('GageStore', () => {
   }
 
   async function saveUserGeopackageFile(formData: FormData) {
-    formData.append('return_geopackage_url', String( true ) )
+    formData.append('return_geopackage_url', String(true))
     const saveUserGeopackageFilesResponse = await makeProtectedApiCall<GeneralApiSaveResponse | GeneralErrorResponse>(`${ngencerfBaseUrl}/calibration/upload_geopackage_data/`, {
       method: "POST",
       headers: {
@@ -288,12 +312,12 @@ export const useGageStore = defineStore('GageStore', () => {
     resetGageStore,
     loadGageTabStaticData
   }
-}, 
-{
-  persist: {
-    storage: persistedState.localStorage
-  },
-})
+},
+  {
+    persist: {
+      storage: persistedState.localStorage
+    },
+  })
 
 /* Pinia supports Hot Module replacement so you can edit your stores
   and interact with them directly in your app without reloading the page,

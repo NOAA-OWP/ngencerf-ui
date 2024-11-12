@@ -4,7 +4,6 @@
  *  Data will include the current menu status and the current tab status for each of the 4 menu items
  */
 import { defineStore } from "pinia";
-import piniaPluginPersistedState from "pinia-plugin-persistedstate"
 
 export const generalStore = defineStore(
   "generalStore",
@@ -16,13 +15,40 @@ export const generalStore = defineStore(
 
     const menuIndex = ref("1");
 
-    const calibrationJobId = ref<number>( 0 );
-    const evaluateValidationRunId = ref<number>( 0 );
-    const evaluateIterationRunId = ref<number>( 0 );
-    const iterationValidationRunId = ref<number>( 0 );
-    
+    const calibrationJobId = ref<number>(0);
+    const evaluateValidationRunId = ref<number>(0);
+    const evaluateIterationRunId = ref<number>(0);
+    const iterationValidationRunId = ref<number>(0);
+
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
+
+    // Restore state from sessionStorage if available
+    if (typeof window !== 'undefined') {
+      calibrationTabIndex.value = sessionStorage.getItem('calibrationTabIndex') as string;
+      evaluationTabIndex.value = sessionStorage.getItem('evaluationTabIndex') as string;
+      forecastTabIndex.value = sessionStorage.getItem('forecastTabIndex') as string;
+      verificationTabIndex.value = sessionStorage.getItem('verificationTabIndex') as string;
+      menuIndex.value = sessionStorage.getItem('menuIndex') as string;
+      calibrationJobId.value = parseInt(JSON.parse(sessionStorage.getItem('calibrationJobId') as string), 10);
+      evaluateValidationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('evaluateValidationRunId') as string), 10);
+      evaluateIterationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('evaluateIterationRunId') as string), 10);
+      iterationValidationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('iterationValidationRunId') as string), 10);
+      evaluationRunSelected.value = JSON.parse(sessionStorage.getItem('evaluationRunSelected') as string);
+      console.log("GeneralStore has been refreshed from sessionStorage");
+    }
+
+    watch(calibrationTabIndex, (calibrationTabIndex) => { sessionStorage.setItem('calibrationTabIndex', calibrationTabIndex); })
+    watch(evaluationTabIndex, (evaluationTabIndex) => { sessionStorage.setItem('evaluationTabIndex', evaluationTabIndex); })
+    watch(forecastTabIndex, (forecastTabIndex) => { sessionStorage.setItem('forecastTabIndex', forecastTabIndex); })
+    watch(verificationTabIndex, (verificationTabIndex) => { sessionStorage.setItem('verificationTabIndex', verificationTabIndex); })
+    watch(menuIndex, (menuIndex) => { sessionStorage.setItem('menuIndex', menuIndex); })
+    watch(calibrationJobId, (calibrationJobId) => { sessionStorage.setItem('calibrationJobId', JSON.stringify(calibrationJobId)); })
+    watch(iterationValidationRunId, (iterationValidationRunId) => { sessionStorage.setItem('iterationValidationRunId', JSON.stringify(iterationValidationRunId)); })
+    watch(evaluateValidationRunId, (evaluateValidationRunId) => { sessionStorage.setItem('evaluateValidationRunId', JSON.stringify(evaluateValidationRunId)); })
+    watch(evaluateIterationRunId, (evaluateIterationRunId) => { sessionStorage.setItem('evaluateIterationRunId', JSON.stringify(evaluateIterationRunId)); })
+    watch(evaluationRunSelected, (evaluationRunSelected) => { sessionStorage.setItem('evaluationRunSelected', JSON.stringify(evaluationRunSelected)); })
+
 
     // Top Menu index
     function getMenuIndex() {
@@ -76,7 +102,7 @@ export const generalStore = defineStore(
     function resetGeneralStore() {
       calibrationJobId.value = 0;
     }
-    
+
     return {
       getMenuIndex,
       setMenuIndex,

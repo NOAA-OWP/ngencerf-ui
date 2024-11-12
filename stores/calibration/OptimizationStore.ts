@@ -6,7 +6,6 @@ import { generalStore } from "../common/GeneralStore";
 import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralApiSaveResponse, SaveOptimizationPayload } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { useCalibrationTabValidation } from "~/composables/ValidationHandlers";
 
 export const useOptimizationStore = defineStore('OptimizationStore', () => {
   /**
@@ -16,12 +15,13 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore()
   const userDataStore = useUserDataStore()
+  const { userCalibrationRunData } = storeToRefs(userDataStore)
   /**
   * ref ui user input
   */
   const optimizationStore_data_loading = ref<boolean>(true)
+
   const optimizationTabData = ref<OptimizationTabData>()
-  const { userCalibrationRunData } = storeToRefs(userDataStore)
   const uiStreamFlowThreshold = ref<number>()
   const uiPeakFlowThreshold = ref<number>()
   const uiOptimizationInputs = ref<UserCalibrationRunOptimizationInputData[]>([])
@@ -34,10 +34,36 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   const showObjectiveFunctionPeakFlow = ref<boolean>(false)
   const showObjectiveFunctionStreamFlow = ref<boolean>(false)
 
+  // Restore state from sessionStorage if available
+  if (typeof window !== 'undefined') {
+    let ls;
+    ls = sessionStorage.getItem('uiOptimizationInputs');
+    if (ls !== "undefined") { uiOptimizationInputs.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('optimizationAlgorithmOptionsList');
+    if (ls !== "undefined") { optimizationAlgorithmOptionsList.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('objectiveFunctionOptionsList');
+    if (ls !== "undefined") { objectiveFunctionOptionsList.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('optimizationTabData');
+    if (ls !== "undefined") { optimizationTabData.value = JSON.parse(ls as string) }
+
+    uiOptimization.value = sessionStorage.getItem('uiOptimization') as string;
+    uiObjectiveFunction.value = sessionStorage.getItem('uiObjectiveFunction') as string;
+
+    uiStreamFlowThreshold.value = parseInt(sessionStorage.getItem('uiStreamFlowThreshold') as string, 10);
+    uiPeakFlowThreshold.value = parseInt(sessionStorage.getItem('uiPeakFlowThreshold') as string, 10);
+    uiPlotFrequency.value = parseInt(sessionStorage.getItem('uiPlotFrequency') as string, 10);
+    uiStopCriteria.value = parseInt(sessionStorage.getItem('uiStopCriteria') as string, 10);
+
+    optimizationStore_data_loading.value = JSON.parse(sessionStorage.getItem('optimizationStore_data_loading') as string) === "true";
+    showObjectiveFunctionPeakFlow.value = JSON.parse(sessionStorage.getItem('showObjectiveFunctionPeakFlow') as string) === "true";
+    showObjectiveFunctionStreamFlow.value = JSON.parse(sessionStorage.getItem('showObjectiveFunctionStreamFlow') as string) === "true";
+
+    console.log("OptimizationStore has been refreshed from sessionStorage");
+  }
   /**
-   * load static optimization tab data with provided calibration job id and initialize ui field data 
-   * @return {void}
-   */
+ * load static optimization tab data with provided calibration job id and initialize ui field data 
+ * @return {void}
+ */
   const loadOptimizationTabStaticData = () => {
     optimizationStore_data_loading.value = true
     makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {
@@ -111,8 +137,11 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
           name: data_input.name,
           value: data_input.default_value,
         }
-        let user_optimization_input = userCalibrationRunData.value?.optimization_inputs.filter((optimization_input) => optimization_input.name == data_input.name)
-        if (user_optimization_input && user_optimization_input.length) data_item.value = user_optimization_input[0].value
+        let user_optimization_input =
+          userCalibrationRunData.value?.optimization_inputs.filter((optimization_input) => optimization_input.name == data_input.name)
+        if (user_optimization_input && user_optimization_input.length) {
+          data_item.value = user_optimization_input[0].value
+        }
 
         data_items.push(data_item)
       })
@@ -127,15 +156,15 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   */
   async function saveOptimizationTabData() {
     const savePayload = ref<SaveOptimizationPayload>({});
-    if ( uiOptimizationInputs.value.length > 0 ) savePayload.value["optimization_inputs"] = uiOptimizationInputs.value;
-    if ( uiOptimization.value ) savePayload.value["optimization"] = uiOptimization.value;
-    if ( uiObjectiveFunction.value ) savePayload.value["objective_function"] = uiObjectiveFunction.value;
-    if ( uiStreamFlowThreshold.value != undefined && uiStreamFlowThreshold.value > 0  ) savePayload.value["streamflow_threshold"] = uiStreamFlowThreshold.value;
-    if ( uiPeakFlowThreshold.value != undefined && uiPeakFlowThreshold.value > 0) savePayload.value["peak_flow_threshold"] = uiPeakFlowThreshold.value;
-    if ( uiStopCriteria.value != undefined && uiStopCriteria.value > 0 ) savePayload.value["stop_criteria"] = uiStopCriteria.value;
-    if ( uiPlotFrequency.value != undefined && uiPlotFrequency.value > 0 ) savePayload.value["save_plot_iteration_frequency"] = uiPlotFrequency.value;
-    
-    if ( Object.keys( savePayload.value ).length > 0 ) {
+    if (uiOptimizationInputs.value.length > 0) savePayload.value["optimization_inputs"] = uiOptimizationInputs.value;
+    if (uiOptimization.value) savePayload.value["optimization"] = uiOptimization.value;
+    if (uiObjectiveFunction.value) savePayload.value["objective_function"] = uiObjectiveFunction.value;
+    if (uiStreamFlowThreshold.value != undefined && uiStreamFlowThreshold.value > 0) savePayload.value["streamflow_threshold"] = uiStreamFlowThreshold.value;
+    if (uiPeakFlowThreshold.value != undefined && uiPeakFlowThreshold.value > 0) savePayload.value["peak_flow_threshold"] = uiPeakFlowThreshold.value;
+    if (uiStopCriteria.value != undefined && uiStopCriteria.value > 0) savePayload.value["stop_criteria"] = uiStopCriteria.value;
+    if (uiPlotFrequency.value != undefined && uiPlotFrequency.value > 0) savePayload.value["save_plot_iteration_frequency"] = uiPlotFrequency.value;
+
+    if (Object.keys(savePayload.value).length > 0) {
       savePayload.value["calibration_run_id"] = calibrationJobId.value;
       savePayload.value["save_output_iteration"] = true;
       return await makeProtectedApiCall<GeneralApiSaveResponse>(`${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
@@ -144,7 +173,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
           "Authorization": `Bearer ${getAccessToken()}`,
           "Content-Type": 'application/json'
         },
-        body: JSON.stringify( savePayload.value )
+        body: JSON.stringify(savePayload.value)
       });
     } else {
       return Promise.resolve({
@@ -224,12 +253,12 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     resetOptimizationStore,
     loadOptimizationTabStaticData
   }
-}, 
-{
-  persist: {
-    storage: persistedState.localStorage
-  },
-})
+},
+  {
+    persist: {
+      storage: persistedState.localStorage
+    },
+  })
 
 /* Pinia supports Hot Module replacement so you can edit your stores
   and interact with them directly in your app without reloading the page,

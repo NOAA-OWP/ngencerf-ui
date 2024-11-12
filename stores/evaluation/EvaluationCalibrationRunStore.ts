@@ -9,47 +9,67 @@ import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRu
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
 import { useValidationRunStatusStore } from "./ValidationRunStatusStore";
 
-export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {  
-  const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId } = storeToRefs( generalStore() );
+export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {
+  const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
   const { fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
   const { clearRunningStatusInfo } = useValidationRunStatusStore()
-  const calibrationRunList = ref<any[]>([]);
-  const userSelectedEvalCalibrationRunId = ref<number>( 0 );
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
-  const uiGageId = ref<string>( "" );   
-  const userSelectedEvalCalibrationRun = ref<any>();
-  const loadCalibrationDataComplete = ref<boolean>( false );
-  
 
+  const calibrationRunList = ref<any[]>([]);
+  const userSelectedEvalCalibrationRunId = ref<number>(0);
+
+  const uiGageId = ref<string>("");
+  const userSelectedEvalCalibrationRun = ref<any>();
+  const loadCalibrationDataComplete = ref<boolean>(false);
+
+
+  // Restore state from sessionStorage if available
+  if (typeof window !== 'undefined') {
+    let ls;
+    ls = sessionStorage.getItem('calibrationRunList');
+    if (ls !== "undefined") { calibrationRunList.value = ls ? JSON.parse(ls) : [] }
+    userSelectedEvalCalibrationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('userSelectedEvalCalibrationRunId') as string), 10);
+    uiGageId.value = sessionStorage.getItem('uiGageId') as string;
+    userSelectedEvalCalibrationRun.value = sessionStorage.getItem('userSelectedEvalCalibrationRun') as string;
+    loadCalibrationDataComplete.value = JSON.parse(sessionStorage.getItem('loadCalibrationDataComplete') as string) === "true";
+    console.log("EvaluationCalibrationRunStore Store restored");
+  }
+
+  watch(calibrationRunList, (calibrationRunList) => { sessionStorage.setItem('calibrationRunList', JSON.stringify(calibrationRunList)); })
+  watch(userSelectedEvalCalibrationRunId, (userSelectedEvalCalibrationRunId) => { sessionStorage.setItem('userSelectedEvalCalibrationRunId', JSON.stringify(userSelectedEvalCalibrationRunId)); })
+  watch(uiGageId, (uiGageId) => { sessionStorage.setItem('uiGageId', uiGageId); })
+  watch(userSelectedEvalCalibrationRun, (userSelectedEvalCalibrationRun) => { sessionStorage.setItem('userSelectedEvalCalibrationRun', JSON.stringify(userSelectedEvalCalibrationRun)); })
+  watch(loadCalibrationDataComplete, (loadCalibrationDataComplete) => { sessionStorage.setItem('loadCalibrationDataComplete', JSON.stringify(loadCalibrationDataComplete)); })
+  
   /**
-   * list of calibration jobs with validation data
-   */
-  const userEvaluationCalibrationRunListData = ref<ValidatedCalibrationRunListItem[]>( [] );
+     * list of calibration jobs with validation data
+     */
+  const userEvaluationCalibrationRunListData = ref<ValidatedCalibrationRunListItem[]>([]);
   /**
    * list of validation jobs of a selected calibration job id
    */
-  const userSelectedCalibrationValidationRunList = ref<CalibrationValidationRunData[]>( [] );
+  const userSelectedCalibrationValidationRunList = ref<CalibrationValidationRunData[]>([]);
 
   const calibrationValidationRunListHeaders = ref<any[]>([]);
-  const computedCalibrationValidationRunList = ref<CalibrationValidationJobData[]>( [] );
+  const computedCalibrationValidationRunList = ref<CalibrationValidationJobData[]>([]);
 
   /**
   * @returns {SelectOption[]}
   */
-  const evaluationCalibrationRunGageList = computed( () => {
+  const evaluationCalibrationRunGageList = computed(() => {
     let gageOptionList = <SelectOption[]>[];
-    userEvaluationCalibrationRunListData.value.forEach( runItem => {
-        const checkGageIndex = gageOptionList.findIndex( gageOption => {
-          gageOption.name === runItem.gage_id 
+    userEvaluationCalibrationRunListData.value.forEach(runItem => {
+      const checkGageIndex = gageOptionList.findIndex(gageOption => {
+        gageOption.name === runItem.gage_id
+      });
+
+      if (checkGageIndex == -1) {
+        gageOptionList.push({
+          'name': runItem.gage_id,
+          'description': runItem.gage_id
         });
-        
-        if ( checkGageIndex == -1 ) {
-          gageOptionList.push({
-              'name': runItem.gage_id,
-              'description': runItem.gage_id
-          });
-        }
+      }
     });
     return gageOptionList;
   });
@@ -60,60 +80,60 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    */
   async function fetchUserValidatedCalibrationJobsListData() {
     userEvaluationCalibrationRunListData.value = [];
-    const runListDataResult = await makeProtectedApiCall<ValidatedCalibrationRunList>( `${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
+    const runListDataResult = await makeProtectedApiCall<ValidatedCalibrationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
       method: "POST",
-      headers: { 
+      headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       }
     });
 
-    if ( runListDataResult?._data?.jobs.length > 0 ) {
-      runListDataResult?._data?.jobs.forEach( ( runItem: ValidatedCalibrationRunListItem ) => {
-        if ( runItem.status.toLowerCase() == "done" && runItem.run_date != null ) {
-          userEvaluationCalibrationRunListData.value.push( runItem );
+    if (runListDataResult?._data?.jobs.length > 0) {
+      runListDataResult?._data?.jobs.forEach((runItem: ValidatedCalibrationRunListItem) => {
+        if (runItem.status.toLowerCase() == "done" && runItem.run_date != null) {
+          userEvaluationCalibrationRunListData.value.push(runItem);
         }
       });
     }
   }
 
   const fetchUserSelectedCalibrationValidationRunList = async () => {
-    const runListDataResult = await makeProtectedApiCall<CalibrationValidationJobList>( `${ngencerfBaseUrl}/calibration/get_validation_jobs/`, {
+    const runListDataResult = await makeProtectedApiCall<CalibrationValidationJobList>(`${ngencerfBaseUrl}/calibration/get_validation_jobs/`, {
       method: "POST",
-      headers: { 
+      headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify( { calibration_run_id: userSelectedEvalCalibrationRunId.value } )
+      body: JSON.stringify({ calibration_run_id: userSelectedEvalCalibrationRunId.value })
     });
 
-    if( runListDataResult._data?.validation_jobs ) {     
+    if (runListDataResult._data?.validation_jobs) {
       //if there is only 1 validation job, we automatically set the selected validation id to that validation job     
-      if ( runListDataResult._data?.validation_jobs.length == 1) {
+      if (runListDataResult._data?.validation_jobs.length == 1) {
         evaluateValidationRunId.value = runListDataResult._data?.validation_jobs[0].validation_run_id;
       }
-      
-      runListDataResult._data?.validation_jobs.forEach( ( validation_job: CalibrationValidationJobData ) => {
-        if ( validation_job.best	=== true ) {
-          calibrationValidationRunListHeaders.value.push({ field: 'validation_run_id', header: "Validation Run ID"});          
-          calibrationValidationRunListHeaders.value.push({ field: 'run_date', header: "Run Date"});
 
-          validation_job.parameters.forEach( ( parameter: CalibrationRunValidationParameterData ) => {
-            calibrationValidationRunListHeaders.value.push({ field: parameter.name, header: parameter.name });            
+      runListDataResult._data?.validation_jobs.forEach((validation_job: CalibrationValidationJobData) => {
+        if (validation_job.best === true) {
+          calibrationValidationRunListHeaders.value.push({ field: 'validation_run_id', header: "Validation Run ID" });
+          calibrationValidationRunListHeaders.value.push({ field: 'run_date', header: "Run Date" });
+
+          validation_job.parameters.forEach((parameter: CalibrationRunValidationParameterData) => {
+            calibrationValidationRunListHeaders.value.push({ field: parameter.name, header: parameter.name });
           });
         }
         let rowData = <any>{};
         rowData['validation_run_id'] = validation_job.validation_run_id;
-        rowData['run_date'] = formatDateForDisplay( validation_job.run_date );
-        validation_job.parameters.forEach( ( parameter: CalibrationRunValidationParameterData ) => {
-          rowData[ parameter.name ] = parameter.value;
+        rowData['run_date'] = formatDateForDisplay(validation_job.run_date);
+        validation_job.parameters.forEach((parameter: CalibrationRunValidationParameterData) => {
+          rowData[parameter.name] = parameter.value;
         });
-        computedCalibrationValidationRunList.value.push( rowData );
+        computedCalibrationValidationRunList.value.push(rowData);
       });
     }
   }
 
-  const loadSelectedCalibrationRun = async ( calibration_run_id: number ) => {
+  const loadSelectedCalibrationRun = async (calibration_run_id: number) => {
     calibrationJobId.value = calibration_run_id;
     userSelectedEvalCalibrationRunId.value = calibration_run_id;
     await fetchUserCalibrationRunData();
@@ -126,9 +146,9 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   /**
    * @returns {SelectOption[]}
    */
-  const getReferenceDataSetOptions = computed( () => {
+  const getReferenceDataSetOptions = computed(() => {
     let options = <SelectOption[]>[];
-    if ( userSelectedEvalCalibrationRunId.value > 0 ) {
+    if (userSelectedEvalCalibrationRunId.value > 0) {
       options.push({
         'name': 'nwm',
         'description': 'NWM v2.0 retrospective'
@@ -152,12 +172,12 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   /**
    * @return {void}
    */
-  const resetUserSelectedEvalValidationRun = ():void => {
+  const resetUserSelectedEvalValidationRun = (): void => {
     calibrationJobId.value = userSelectedEvalCalibrationRunId.value = evaluateIterationRunId.value = 0;
     evaluateValidationRunId.value = 0;
     calibrationValidationRunListHeaders.value = [];
     computedCalibrationValidationRunList.value = [];
-  
+
   }
 
   useLogoutListen('logoutEvent', () => {

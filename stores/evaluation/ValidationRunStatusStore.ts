@@ -11,14 +11,29 @@ export const useValidationRunStatusStore = defineStore('ValidationRunStatusStore
   const { userCalibrationRunData } = storeToRefs( useUserDataStore() );
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
+  const validationStopStatus = ref<string[]>([ 'DONE', 'SERVER ERROR', 'FAIL' ])
 
   const validationStatus = ref<string | null>( null );
   const runningTime = ref();
   const startTimeDate = ref();
   const startTime = ref();
-  const validationStopStatus = ref<string[]>([ 'DONE', 'SERVER ERROR', 'FAIL' ])
 
-  /**
+
+   // Restore state from sessionStorage if available
+   if (typeof window !== 'undefined') {
+    validationStatus.value = JSON.parse(sessionStorage.getItem('validationStatus') ?? "");
+    runningTime.value = sessionStorage.getItem('runningTime');
+    startTimeDate.value = sessionStorage.getItem('startTimeDate');
+    startTime.value = sessionStorage.getItem('startTime');
+    console.log("ValidationRunStatusStore Store restored");
+  }
+
+  watch(validationStatus, (validationStatus) => { sessionStorage.setItem('validationStatus', JSON.stringify(validationStatus)); })
+  watch(runningTime, (runningTime) => { sessionStorage.setItem('runningTime',  JSON.stringify(runningTime)); })
+  watch(startTimeDate, (startTimeDate) => { sessionStorage.setItem('startTimeDate',  JSON.stringify(startTimeDate)); })
+  watch(startTime, (startTime) => { sessionStorage.setItem('startTime',  JSON.stringify(startTime)); })
+
+ /**
    * @returns {Promise<any>}
    */
   const executeIterationValidationRun = async () => {
