@@ -138,7 +138,7 @@ const currentVerificationTab = ref(getVerificationTabIndex());
 const currentMenu = ref(getMenuIndex());
 
 //store specific import
-const { loadCalibrationDataComplete } = storeToRefs(useEvaluationCalibrationRunStore())
+const { loadCalibrationDataComplete } = storeToRefs( useEvaluationCalibrationRunStore() )
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
@@ -151,7 +151,7 @@ const tabClicked = (event: Event) => {
   Object.keys(allTabs).forEach(function (key) {
     allTabs[key as any].classList.remove("activeTab");
   });
-
+  
   // Note that the compiler sends errors when you don't check for null
   if (ele) {
     //const cl = ele.classList;

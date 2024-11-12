@@ -257,6 +257,8 @@ const closeAccountBox = () => {
     height: 150px;
     float: right;
     margin: 20px 20px 40px 0;
+
+    /*border: 1px solid #105d84;*/
     text-align: right;
     vertical-align: top;
   }
