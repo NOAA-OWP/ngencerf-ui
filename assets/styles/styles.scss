@@ -420,6 +420,7 @@ table.cols-bordered {
 
 .bg_green_lt { background-color: $ngwcp_green_lt; }
 .bg_blue_lt { background-color: $ngwcp_blue_lt; }
+.bg_blue_md { background-color: $ngwcp_blue_md; }
 
 // Help Pages
 ._help-page {
@@ -527,7 +528,8 @@ table.cols-bordered {
   margin-top: 7px;
 }
 .p-listbox-option-selected {
-  background-color: $ngwcp_green_lt; 
+  /*background-color: $ngwcp_green_lt; */
+  background-color: $ngwcp_green_lt !important; 
 }
 #MainLeftDataArea .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected {
   color: var(--p-listbox-option-color); 
