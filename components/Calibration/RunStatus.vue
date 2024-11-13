@@ -327,8 +327,11 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
         startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
         
-        // Calculate Running Time every second while calibration and validation is Running
-        if (calibrationStatus.value !== 'Failed' && !validControlAndValidBestDone.value) {
+        const getStatusResponse = await queryGetCalibrationStatus();
+        validControlAndValidBestDone.value = areValidControlAndValidBestDone(getStatusResponse);
+
+        // Calculate Running Time every second while calibration is Running or calibration is Done and valid_control and valid_best are not Done
+        if (calibrationStatus.value === 'Running' || (calibrationStatus.value === 'Done' && !validControlAndValidBestDone.value)) {
           elapsedTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
           // Create an interval to update elapsedTime every second while Calibration is Running or Validation is not Done
