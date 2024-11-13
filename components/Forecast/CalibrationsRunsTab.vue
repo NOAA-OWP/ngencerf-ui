@@ -27,10 +27,21 @@
             </div>
           </div>
 
+          <ConfirmDialog></ConfirmDialog>
+          <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+            :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
           <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
-            table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
-            :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
-            class="boxed">
+            :rowStyle="rowStyle"
+            table-style="min-width: 50rem" 
+            v-model:selection="selectedCalibrationRun" 
+            selectionMode="single" 
+            contextMenu
+            v-model:contextMenuSelection="selectedCalibrationRun"
+
+            @rowContextmenu="onRowContextMenu($event)"             
+            @rowSelect="(onEvalCalibrationRowSelect($event))"
+            @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
+
             <Column field="calibration_run_id" header="Job ID" sortable></Column>
             <Column field="status" header="status" sortable></Column>
             <Column field="run_date" header="Run Date" sortable>
@@ -73,12 +84,24 @@ import { useToast } from "primevue/usetoast";
 import type { CalibrationRun, CalibrationValidationJobData } from "~/composables/NextGenModel";
 import { EvaluationTabs } from "~/composables/NextgenEnums";
 import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
+import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
 
+const { deleteCalibrationRun } = useCalibrationJobStore();
+
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
+
+const crContextMenu = ref(); //calibration run context menu
+const cmCalibrationRun = ref([
+  { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
+  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun) }
+]);
+const onRowContextMenu = (event: any) => {
+  crContextMenu.value.show(event.originalEvent);
+};
 
 const {
   uiGageId,
@@ -112,6 +135,52 @@ const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   loadSelectedCalibrationRun(event.data.calibration_run_id);
   isLoadingCalibrationSummary.value = true;
   fetchUserSelectedCalibrationValidationRunList();
+}
+
+const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
+  resetUserSelectedEvalValidationRun();
+  loadSelectedCalibrationRun(selectedCalibrationRun.value.calibration_run_id);
+  isLoadingCalibrationSummary.value = true;
+  fetchUserSelectedCalibrationValidationRunList();
+}
+
+const confirmDelte = useConfirm();
+const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
+  const confirm_delete = ref(false)
+  const selectedRunId = selectedCalibrationRun.value.calibration_run_id
+  let confirmMessage = "Are you sure you want to delete this run?"
+  if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
+
+  confirmDelte.require({
+    message: confirmMessage,
+    header: 'Confirm Delete',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'DELETE RUN',
+    },
+    accept: () => acceptDelete(selectedRunId),
+    reject: () => {
+      //do nothing
+    }
+  })
+}
+const acceptDelete = (selectedRunId: number) => {
+  deleteCalibrationRun(selectedRunId).then( response => {
+    if ( response.status == 200 ) {
+      fetchUserSelectedCalibrationValidationRunList();
+    } else {
+      useApiErrorResponsePreprocess( response ).forEach( message => {
+        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
+      });
+    }
+  }).then(  () => {
+    selectedCalibrationRun.value = undefined;
+  });
 }
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
