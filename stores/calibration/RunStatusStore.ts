@@ -32,7 +32,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const elapsedTimeIntervalId = ref();
   const calibrationStatusIntervalId = ref();
   const validationsStatusIntervalId = ref();
-  const allValidationsDone = ref(false);
+  const validControlAndValidBestDone = ref(false);
   const resultsPathname = ref();
 
   /** 
@@ -49,24 +49,21 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       }
     }
 
-    // load elapsedTime, allValidationsDone from get_status. 
+    // load elapsedTime, validControlAndValidBestDone from get_status. 
     // Calibration must be Done to get validations
     // Calibration and Validations must be Done to get completed elapsedTime
     const getStatusResponse = await queryGetCalibrationStatus();
     const validations = getStatusResponse?._data?.validations;
-    // valid_control and valid_best are the only validations right?
-    if (validations && validations.length === 2) {
-      allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
-      // get elapsed times from validations
-      const elapsedTimes = validations
-        .map((validation: any) => validation.elapsed_time)
-        .filter((eTime: any) => eTime !== null && eTime !== undefined);
+    validControlAndValidBestDone.value = areValidControlAndValidBestDone(getStatusResponse);
+    // get elapsed times from validations
+    const elapsedTimes = validations
+      .map((validation: any) => validation.elapsed_time)
+      .filter((eTime: any) => eTime !== null && eTime !== undefined);
 
-      // if there are elapsed times, get the max elapsed time
-      // we will only have elapsed times if server is running on Parallel Works
-      if (elapsedTimes.length > 0) {
-        elapsedTime.value = Math.max(...elapsedTimes);
-      }
+    // if there are elapsed times, get the max elapsed time
+    // we will only have elapsed times if server is running on Parallel Works
+    if (elapsedTimes.length > 0) {
+      elapsedTime.value = Math.max(...elapsedTimes);
     }
 
     // load plotNames and plotList from get_plot_names
@@ -81,6 +78,25 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     const getJobDataDirectoryResponse = await queryGetJobDataDirectory();
     resultsPathname.value = getJobDataDirectoryResponse?._data?.data_dir;
   };
+
+  /**
+   * Returns true if valid_control and valid_best are Done
+   * @returns
+   */
+  const areValidControlAndValidBestDone = (getStatusResponse: any): boolean => {
+    const validations = getStatusResponse?._data?.validations;
+    const calibrationValidationsDone = validations.filter(
+      (item: any) =>
+        (item.validation_type === 'valid_best' || item.validation_type === 'valid_control') &&
+        item.status === 'Done'
+    );
+  
+    // Check if both 'valid_best' and 'valid_control' are present in the calibrationValidations array
+    const hasValidBestDone = calibrationValidationsDone.some((item: any) => item.validation_type === 'valid_best');
+    const hasValidControlDone = calibrationValidationsDone.some((item: any) => item.validation_type === 'valid_control');
+  
+    return hasValidBestDone && hasValidControlDone;
+  }
 
   /**
    * Get Calibration Status
@@ -214,7 +230,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     iteration.value = undefined;
     stopCriteria.value = "";
     stopCriteriaMet.value = false;
-    allValidationsDone.value = false;
+    validControlAndValidBestDone.value = false;
     resultsPathname.value = undefined;
 
     if (elapsedTimeIntervalId.value) {
@@ -250,9 +266,10 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     elapsedTimeIntervalId,
     calibrationStatusIntervalId,
     validationsStatusIntervalId,
-    allValidationsDone,
+    validControlAndValidBestDone,
     resultsPathname,
     loadRunStatusStore,
+    areValidControlAndValidBestDone,
     queryGetCalibrationStatus,
     queryGetPlotNames,
     queryGetPlot,

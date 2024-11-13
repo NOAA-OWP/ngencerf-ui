@@ -33,12 +33,12 @@
                         <input id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;"
                           v-model="calibrationStatus" disabled />
                       </span>
-                      <span v-else-if="calibrationStatus === 'Done' && !allValidationsDone">
+                      <span v-else-if="calibrationStatus === 'Done' && !validControlAndValidBestDone">
                         <span id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;">
                           Calibration Done, Validation Running
                         </span>
                       </span>
-                      <span v-else-if="calibrationStatus === 'Done' && allValidationsDone">
+                      <span v-else-if="calibrationStatus === 'Done' && validControlAndValidBestDone">
                         <span id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;">
                           Done
                         </span>
@@ -175,7 +175,7 @@ const {
   elapsedTimeIntervalId,
   calibrationStatusIntervalId,
   validationsStatusIntervalId,
-  allValidationsDone,
+  validControlAndValidBestDone,
   resultsPathname
 } = storeToRefs(runStatusStore);
 
@@ -183,6 +183,7 @@ const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
 
 const {
+  areValidControlAndValidBestDone,
   queryGetCalibrationStatus,
   queryGetPlotNames,
   queryGetPlot,
@@ -215,11 +216,7 @@ onMounted(() => {
     // if calibration is Done, check if all validation statuses are Done
     if (userCalibrationRunData?.value?.status === 'Done') {
       const getStatusResponse = await queryGetCalibrationStatus();
-      const validations = getStatusResponse?._data?.validations;
-      if (validations && validations.length === 2) {
-        // check if all validations are Done
-        allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
-      }
+      validControlAndValidBestDone.value = areValidControlAndValidBestDone(getStatusResponse);
     }
   });
 });
@@ -230,9 +227,9 @@ onMounted(() => {
  const createElapsedTimeInterval = () => {
   // console.log('creating elapsedTimeIntervalId');
   // console.log('userCalibrationRunData:', userCalibrationRunData.value);
-  // console.log('allValidationsDone:', allValidationsDone.value);
+  // console.log('validControlAndValidBestDone:', validControlAndValidBestDone.value);
   elapsedTimeIntervalId.value = setInterval(async () => {
-    if (userCalibrationRunData.value?.status === 'Running' || (!allValidationsDone.value)) {
+    if (userCalibrationRunData.value?.status === 'Running' || (!validControlAndValidBestDone.value)) {
       // Calculate Running Time every second while status is Running
       elapsedTime.value = calculateElapsedTime(startTimeDate.value, new Date());
     } else {
@@ -331,7 +328,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
         
         // Calculate Running Time every second while calibration and validation is Running
-        if (calibrationStatus.value !== 'Failed' && !allValidationsDone.value) {
+        if (calibrationStatus.value !== 'Failed' && !validControlAndValidBestDone.value) {
           elapsedTime.value = calculateElapsedTime(startTimeDate.value, new Date());
 
           // Create an interval to update elapsedTime every second while Calibration is Running or Validation is not Done
@@ -420,21 +417,17 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
       }
 
-      if (!allValidationsDone.value) {
+      if (!validControlAndValidBestDone.value) {
         // create an interval to keep checking validation statuses every 10 seconds while all validations are not Done
         if (!validationsStatusIntervalId.value) {
           validationsStatusIntervalId.value = setInterval(async () => {
             const getStatusResponse = await queryGetCalibrationStatus();
-            const validations = getStatusResponse?._data?.validations;
-            if (validations && validations.length === 2) {
-              // check if all validations are Done
-              allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
+            validControlAndValidBestDone.value = areValidControlAndValidBestDone(getStatusResponse);
 
-              // if valid_control and valid_best are Done, clear the interval
-              if (allValidationsDone.value) {
-                clearInterval(validationsStatusIntervalId.value);
-                validationsStatusIntervalId.value = undefined;
-              }
+            // if valid_control and valid_best are Done, clear the interval
+            if (validControlAndValidBestDone.value) {
+              clearInterval(validationsStatusIntervalId.value);
+              validationsStatusIntervalId.value = undefined;
             }
           }, 10000);
         }
