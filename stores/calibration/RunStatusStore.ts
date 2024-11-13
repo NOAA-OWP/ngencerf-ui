@@ -6,11 +6,14 @@ import { generalStore } from "../common/GeneralStore";
 import type { CalibrationStatus, CalibrationPlotListNamesData } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { isValidDate, isNotNullOrUndefined, isCalibrationJobFinished } from '~/utils/CommonHelpers';
+import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken } = useUserDataStore();
+  const { fetchUserCalibrationRunData, getAccessToken } = useUserDataStore();
+  const { userCalibrationRunData } = storeToRefs(useUserDataStore());
   
   // refs
   const elapsedTime = ref();
@@ -31,6 +34,53 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validationsStatusIntervalId = ref();
   const allValidationsDone = ref(false);
   const resultsPathname = ref();
+
+  /** 
+   * Load RunStatusStore
+   */
+  const loadRunStatusStore = async (): Promise<void> => {
+    // load stopCriteria, startTimeDate, and startTime from load_calibration_run
+    stopCriteria.value = userCalibrationRunData?.value?.stop_criteria;
+
+    if (isCalibrationJobFinished(userCalibrationRunData?.value?.status)) {
+      startTimeDate.value = new Date(userCalibrationRunData.value?.run_date as string);
+      if (isValidDate(startTimeDate.value)) {
+        startTime.value = convertTimeZone(startTimeDate.value);
+      }
+    }
+
+    // load elapsedTime, allValidationsDone from get_status. 
+    // Calibration must be Done to get validations
+    // Calibration and Validations must be Done to get completed elapsedTime
+    const getStatusResponse = await queryGetCalibrationStatus();
+    const validations = getStatusResponse?._data?.validations;
+    // valid_control and valid_best are the only validations right?
+    if (validations && validations.length === 2) {
+      allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
+      // get elapsed times from validations
+      const elapsedTimes = validations
+        .map((validation: any) => validation.elapsed_time)
+        .filter((eTime: any) => eTime !== null && eTime !== undefined);
+
+      // if there are elapsed times, get the max elapsed time
+      // we will only have elapsed times if server is running on Parallel Works
+      if (elapsedTimes.length > 0) {
+        elapsedTime.value = Math.max(...elapsedTimes);
+      }
+    }
+
+    // load plotNames and plotList from get_plot_names
+    plotNames.value = await queryGetPlotNames();
+    plotList.value = plotNames?.value?._data?.plot_names;
+
+    // load iteration from get_iteration.
+    const getIterationResponse = await queryGetIteration();
+    iteration.value = getIterationResponse?._data?.iteration;
+
+    // load resultsPathname from get_job_data_dir. Calibration must be Done, Running, or Failed to get resultsPathname
+    const getJobDataDirectoryResponse = await queryGetJobDataDirectory();
+    resultsPathname.value = getJobDataDirectoryResponse?._data?.data_dir;
+  };
 
   /**
    * Get Calibration Status
@@ -196,6 +246,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     validationsStatusIntervalId,
     allValidationsDone,
     resultsPathname,
+    loadRunStatusStore,
     queryGetCalibrationStatus,
     queryGetPlotNames,
     queryGetPlot,

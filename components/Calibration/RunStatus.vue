@@ -216,7 +216,10 @@ onMounted(() => {
     if (userCalibrationRunData?.value?.status === 'Done') {
       const getStatusResponse = await queryGetCalibrationStatus();
       const validations = getStatusResponse?._data?.validations;
-      allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
+      if (validations && validations.length === 2) {
+        // check if all validations are Done
+        allValidationsDone.value = validations?.every((validation: any) => validation.status === 'Done');
+      }
     }
   });
 });
@@ -398,10 +401,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     else if (calibrationStatus.value === 'Done') {
       if (!iteration.value) {
         const getIterationResponse = await queryGetIteration();
-
-        if (getIterationResponse._data && getIterationResponse._data.iteration) {
-          iteration.value = getIterationResponse._data.iteration;
-        }
+        iteration.value = getIterationResponse?._data?.iteration;
       }
 
       // Get Plot Names
