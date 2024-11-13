@@ -81,6 +81,7 @@ export interface JobListItem {
   calibration_run_id: number;
   gage_id: string;
   status: string;
+  job_genesis: string;
   calibration_start_period: Date;
   calibration_end_period: Date;
   formulation_name: string;
@@ -477,7 +478,8 @@ export interface CalibrationPlotListData extends SelectOption {
 export interface ValidatedCalibrationRunListItem extends JobListItem {
   objective_function: string;
   optimization_algorithm: string;
-  validation_runs: number
+  validation_runs: number;
+  validation_run_ids: number[];
 }
 
 export interface ValidatedCalibrationRunList {

@@ -95,7 +95,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       
       runListDataResult._data?.validation_jobs.forEach( ( validation_job: CalibrationValidationJobData ) => {
         if ( validation_job.best	=== true ) {
-          calibrationValidationRunListHeaders.value.push({ field: 'validation_run_id', header: "Validation Run ID"});          
+          calibrationValidationRunListHeaders.value.push({ field: 'validation_run_id', header: "Validation Run ID"});
           calibrationValidationRunListHeaders.value.push({ field: 'run_date', header: "Run Date"});
 
           validation_job.parameters.forEach( ( parameter: CalibrationRunValidationParameterData ) => {

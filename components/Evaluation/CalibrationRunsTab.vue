@@ -23,10 +23,11 @@
                   </div>
               </div>
               
-              <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
+              <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px" sortField="calibration_run_id" :sortOrder="-1"
                   table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
                   :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
                   <Column field="calibration_run_id" header="Job ID" sortable></Column>
+                  <Column field="job_genesis" header="Job Genesis" sortable></Column>
                   <Column field="run_date" header="Run Date" sortable>
                     <template #body="slotProps">
                       {{ formatDateForDisplay( slotProps.data.run_date ) }}
@@ -35,7 +36,7 @@
                   <Column field="formulation_name" header="formulation_name" sortable></Column>
                   <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
                   <Column field="objective_function" header="Objective Function" sortable></Column>                        
-                  <Column field="Optimization" header="Optimization Algorithm" sortable></Column>
+                  <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
                   <Column field="validation_runs" header="Validation Runs" sortable></Column>
               </DataTable>                    
             </div>
@@ -43,7 +44,7 @@
         </div>
         <div v-if="computedCalibrationValidationRunList.length > 1">
           <div id="evaluationCalibrationList">
-            <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px"
+            <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px" sortField="validation_run_id" :sortOrder="-1"
               table-style="min-width: 50rem" selectionMode="single" v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle" 
               @rowSelect="onEvalValdiationRowSelect" @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
               <Column v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex" :header="col.header" :field="col.field"></Column> 
