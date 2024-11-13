@@ -9,7 +9,7 @@ import { useBackendConfig } from "~/composables/UseBackendConfig";
 import type { i } from "vitest/dist/reporters-yx5ZTtEV.js";
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
-  const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
+  const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
   
@@ -66,20 +66,19 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Get Calibration Plot
    * @return {any}
    */
-  const queryGetPlot = async (plotName: string, include_data=false): Promise<any> => {
-    let apiCallBody: DynamicObject = {plot_name: plotName, include_data: include_data};
-    if (evaluateValidationRunId.value) {
-      apiCallBody['validation_run_id'] = evaluateValidationRunId.value;
-    } else {
-      apiCallBody['calibration_run_id'] = calibrationJobId.value;
-    }
+  const queryGetPlot = async (plotName: string, include_data: boolean=false, calibration_run_id: number=calibrationJobId.value, validation_run_id: number=0): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify(apiCallBody)
+      body: JSON.stringify({
+        plot_name: plotName, 
+        include_data: include_data,
+        calibration_run_id: (calibration_run_id > 0) ? calibration_run_id : null,
+        validation_run_id: (validation_run_id > 0) ? validation_run_id : null
+      })
     });
   };
 

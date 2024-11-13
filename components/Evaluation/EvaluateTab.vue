@@ -109,9 +109,7 @@ const {
   plotNames,
   selectedPlotName,
   selectedPlotFilename,
-  selectedPlotFileUrl
-} = storeToRefs(runStatusStore);
-const {
+  selectedPlotFileUrl,
   iterations,
   iterationMetricsData,
   iterationParamsData,
@@ -184,37 +182,39 @@ onMounted(async () => {
   iterationParamsData.value = [];
   iterationMetricsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
   iterationParamsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
-  for (let i = 0; i < iterations.value?._data?.iteration_data.length; i++) {
-    const iterationMetricsRecord: DynamicObject = {};
-    iterationMetricsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
-    for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
-      let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
-      iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
-      if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] == '') && iterationMetricsRecord[metric_name] != 0) {
-        iterationMetricsRecord[metric_name] = 'N/A';
-      } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
-        iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
+  if (iterations.value?._data?.iteration_data) {
+    for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
+      const iterationMetricsRecord: DynamicObject = {};
+      iterationMetricsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
+      for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
+        let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
+        iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
+        if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] == '') && iterationMetricsRecord[metric_name] != 0) {
+          iterationMetricsRecord[metric_name] = 'N/A';
+        } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
+          iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
+        }
+        if (i == 0) {
+          iterationMetricsColumns.value.push({ header: metric_name, field: metric_name });
+        }
       }
-      if (i == 0) {
-        iterationMetricsColumns.value.push({ header: metric_name, field: metric_name });
+      iterationMetricsData.value.push(iterationMetricsRecord);
+      const iterationParamsRecord: DynamicObject = {};
+      iterationParamsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
+      for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
+        let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
+        iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
+        if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] == '') && iterationParamsRecord[param_name] != 0) {
+          iterationParamsRecord[param_name] = 'N/A';
+        } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
+          iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
+        }
+        if (i == 0) {
+          iterationParamsColumns.value.push({ header: param_name, field: param_name });
+        }
       }
+      iterationParamsData.value.push(iterationParamsRecord);
     }
-    iterationMetricsData.value.push(iterationMetricsRecord);
-    const iterationParamsRecord: DynamicObject = {};
-    iterationParamsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
-    for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
-      let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
-      iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
-      if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] == '') && iterationParamsRecord[param_name] != 0) {
-        iterationParamsRecord[param_name] = 'N/A';
-      } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
-        iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
-      }
-      if (i == 0) {
-        iterationParamsColumns.value.push({ header: param_name, field: param_name });
-      }
-    }
-    iterationParamsData.value.push(iterationParamsRecord);
   }
   console.log('iterationMetricsData:', iterationMetricsData.value);
   console.log('iterationMetricsColumns:', iterationMetricsColumns);
@@ -278,7 +278,10 @@ onMounted(async () => {
   console.log('plotList:', plotList.value);
 
   // Get Calibration/Validation Logs
-  logs.value = await queryGetLogs();
+  logs.value = await queryGetLogs(
+    (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
+    (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
+  );
   calibrationLogData.value = {};
   calibrationLogList.value = [];
   validationLogData.value = '';
@@ -358,7 +361,12 @@ watch(selectedPlotName, async () => {
   } else if (selectedPlotName.value) {
     selectedSupplementalTable.value = 0;
     // get selected plot file name and url from server
-    const response: any = await queryGetPlot(selectedPlotName.value, true);
+    const response: any = await queryGetPlot(
+      selectedPlotName.value, // plotName
+      true, // include_data
+      (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
+      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
+    );
 
     if (response?._data) {
       if (response?._data?.plot_file_name && response?._data?.plot_url) {
