@@ -18,6 +18,10 @@
               optionLabel="name" optionValue="name">
             </Select>
           </div>
+          <div>
+            <label for="resultsPathname">Results Pathname</label>
+            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+          </div>
         </div>
         <div class="ml-auto">
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
@@ -127,6 +131,7 @@ const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
 
 const {
+  loadRunStatusStore,
   queryGetPlotNames,
   queryGetPlot,
 } = runStatusStore;
@@ -158,14 +163,10 @@ onMounted(async () => {
     await fetchUserCalibrationRunData();
   }
 
+  // Load Run Status Store to load plotNames, plotList, and resultsPathname
+  await loadRunStatusStore();
+
   console.log('userCalibrationRunData: ', userCalibrationRunData.value);
-
-  // Get Plot Names
-  plotNames.value = await queryGetPlotNames();
-  console.log('plotNames:', plotNames.value?._data);
-
-  // setting plotList and selectedPlotName will populate the dropdown
-  plotList.value = plotNames.value?._data?.plot_names;
 
   // Get Iteration Data
   iterations.value = await queryGetIterations();
