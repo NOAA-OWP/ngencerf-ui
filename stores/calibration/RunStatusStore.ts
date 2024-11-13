@@ -103,19 +103,13 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @return {any}
    */
   const queryGetCalibrationStatus = async (): Promise<any> => {
-    let apiCallBody: DynamicObject = {};
-    if (evaluateValidationRunId.value) {
-      apiCallBody['validation_run_id'] = evaluateValidationRunId.value;
-    } else {
-      apiCallBody['calibration_run_id'] = calibrationJobId.value;
-    }
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify(apiCallBody)
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     });
   };
 
