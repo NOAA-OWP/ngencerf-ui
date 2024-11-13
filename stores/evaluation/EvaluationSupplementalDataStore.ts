@@ -63,25 +63,20 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * @return {any}
    */
   const queryGetLogs = async (): Promise<any> => {
+    let apiCallBody: DynamicObject = {};
     if (evaluateValidationRunId.value) {
-      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-        body: JSON.stringify({'validation_run_id': evaluateValidationRunId.value})
-      });
+      apiCallBody['validation_run_id'] = evaluateValidationRunId.value;
     } else {
-      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-        body: JSON.stringify({'calibration_run_id': calibrationJobId.value})
-      });
+      apiCallBody['calibration_run_id'] = calibrationJobId.value;
     }
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(apiCallBody)
+    });
   };
 
   return {

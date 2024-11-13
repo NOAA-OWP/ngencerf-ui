@@ -37,25 +37,20 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @return {any}
    */
   const queryGetCalibrationStatus = async (): Promise<any> => {
+    let apiCallBody: DynamicObject = {};
     if (evaluateValidationRunId.value) {
-      return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-        body: JSON.stringify({'validation_run_id': evaluateValidationRunId.value})
-      });
+      apiCallBody['validation_run_id'] = evaluateValidationRunId.value;
     } else {
-      return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-        body: JSON.stringify({'calibration_run_id': calibrationJobId.value})
-      });
+      apiCallBody['calibration_run_id'] = calibrationJobId.value;
     }
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(apiCallBody)
+    });
   };
 
   /**
@@ -78,37 +73,20 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @return {any}
    */
   const queryGetPlot = async (plotName: string, include_data=false): Promise<any> => {
+    let apiCallBody: DynamicObject = {plot_name: plotName, include_data: include_data};
     if (evaluateValidationRunId.value) {
-      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-        body: JSON.stringify(
-          { 
-            validation_run_id: evaluateValidationRunId.value,
-            plot_name: plotName,
-            include_data: include_data
-          }
-        )
-      });
+      apiCallBody['validation_run_id'] = evaluateValidationRunId.value;
     } else {
-      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-        body: JSON.stringify(
-          { 
-            calibration_run_id: calibrationJobId.value,
-            plot_name: plotName,
-            include_data: include_data
-          }
-        )
-      });
+      apiCallBody['calibration_run_id'] = calibrationJobId.value;
     }
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(apiCallBody)
+    });
   };
 
   /**
@@ -122,7 +100,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({'calibration_run_id': calibrationJobId.value})
+      body: JSON.stringify({calibration_run_id: calibrationJobId.value})
     });
   }
 
@@ -137,7 +115,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({'calibration_run_id': calibrationJobId.value})
+      body: JSON.stringify({calibration_run_id: calibrationJobId.value})
     });
   };
 
@@ -152,7 +130,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({'calibration_run_id': calibrationJobId.value})
+      body: JSON.stringify({calibration_run_id: calibrationJobId.value})
     });
   };
 
