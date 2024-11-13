@@ -69,7 +69,7 @@
   </div>
 
   <div class="waitgif" v-if="isLoadingCalibrationSummary">
-    <img src="@/assets/styles/img/wait.gif" />
+    <img alt="Pleae wait..." src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
 

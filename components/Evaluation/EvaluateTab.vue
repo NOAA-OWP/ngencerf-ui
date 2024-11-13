@@ -2,7 +2,7 @@
     <Transition name="slide-fade">
         <div id="MessagesGroupWindow" v-if="showMessagesGroup">
             <div class="text-right sticky top-0">
-            <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+            <img alt="Close" title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
                 class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" />
             </div>
             <MessagesGroup/>
@@ -21,7 +21,7 @@
                 </div>
                 <div class="ml-auto">
                     <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn" @click="gotoSelectAlternateIteration">New Validation</button></span>
-                    <br clear="all">
+                    <br />
                     <a href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">Show Calibration Details</a>
                 </div>
             </div>
@@ -29,7 +29,7 @@
         <div class="grid grid-cols-2">
             <div class="text-center">
                 <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
-                    <img :src="selectedPlotFileUrl" alt="Image" />
+                    <img :src="selectedPlotFileUrl" alt="Plot" />
                 </div>
             </div>
             <div>

@@ -4,16 +4,16 @@
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
       <span v-if="activeTab == 1">
-        <CalibrationRunsTab />
+        <LazyCalibrationRunsTab />
       </span>
       <span v-else-if="activeTab == 2">
-        <EvaluateTab />
+        <LazyEvaluateTab />
       </span>
       <span v-else-if="activeTab == 3">
-        <SelectAltIterationTab />
+        <LazySelectAltIterationTab />
       </span>
       <span v-else-if="activeTab == 4">
-        <RunStatus />
+        <LazyRunStatus />
       </span>
     </div>
   </div>
@@ -22,10 +22,10 @@
 <script setup lang="ts">
 import Tabs from '~/components/Common/Tabs.vue'
 
-import EvaluateTab from './EvaluateTab.vue'
-import SelectAltIterationTab from './SelectAltIterationTab.vue'
-import CalibrationRunsTab from './CalibrationRunsTab.vue'
-import RunStatus from './ValidationRunStatus.vue'
+import LazyEvaluateTab from './EvaluateTab.vue'
+import LazySelectAltIterationTab from './SelectAltIterationTab.vue'
+import LazyCalibrationRunsTab from './CalibrationRunsTab.vue'
+import LazyRunStatus from './ValidationRunStatus.vue'
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
