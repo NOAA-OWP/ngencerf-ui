@@ -6,7 +6,7 @@ import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { generalStore } from "../common/GeneralStore";
 
 export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplementalDataStore', () => {
-  const { calibrationJobId } = storeToRefs(generalStore());
+  const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
 
@@ -19,6 +19,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const selectedSupplementalTable = ref<number>( 0 );
   const performanceMetrics = ref();
   const performanceMetricsData = ref<any[]>([]);
+  const logs = ref();
+  const calibrationLogData = ref<DynamicObject>({});
+  const validationLogData = ref<string>("")
 
   /**
    * Get Calibration Iteration Data
@@ -31,11 +34,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify(
-        {
-          calibration_run_id: calibrationJobId.value
-        }
-      )
+      body: JSON.stringify({calibration_run_id: calibrationJobId.value})
     });
   };
 
@@ -59,6 +58,32 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     });
   };
 
+  /**
+   * Get Calibration/Validation Logs
+   * @return {any}
+   */
+  const queryGetLogs = async (): Promise<any> => {
+    if (evaluateValidationRunId.value) {
+      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+        },
+        body: JSON.stringify({'validation_run_id': evaluateValidationRunId.value})
+      });
+    } else {
+      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+        },
+        body: JSON.stringify({'calibration_run_id': calibrationJobId.value})
+      });
+    }
+  };
+
   return {
     iterations,
     iterationMetricsData,
@@ -68,8 +93,12 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedSupplementalTable,
     performanceMetrics,
     performanceMetricsData,
+    logs,
+    calibrationLogData,
+    validationLogData,
     queryGetIterations,
     queryGetPerformanceMetrics,
+    queryGetLogs,
   };
 },
 {

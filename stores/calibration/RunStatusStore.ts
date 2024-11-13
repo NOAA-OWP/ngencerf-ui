@@ -6,9 +6,10 @@ import { generalStore } from "../common/GeneralStore";
 import type { CalibrationStatus, CalibrationPlotListNamesData } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import type { i } from "vitest/dist/reporters-yx5ZTtEV.js";
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
-  const { calibrationJobId } = storeToRefs(generalStore());
+  const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
   
@@ -36,14 +37,25 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @return {any}
    */
   const queryGetCalibrationStatus = async (): Promise<any> => {
-    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
-    });
+    if (evaluateValidationRunId.value) {
+      return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+        },
+        body: JSON.stringify({'validation_run_id': evaluateValidationRunId.value})
+      });
+    } else {
+      return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+        },
+        body: JSON.stringify({'calibration_run_id': calibrationJobId.value})
+      });
+    }
   };
 
   /**
@@ -66,20 +78,37 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @return {any}
    */
   const queryGetPlot = async (plotName: string, include_data=false): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify(
-        { 
-          calibration_run_id: calibrationJobId.value,
-          plot_name: plotName,
-          include_data: include_data
-        }
-      )
-    });
+    if (evaluateValidationRunId.value) {
+      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+        },
+        body: JSON.stringify(
+          { 
+            validation_run_id: evaluateValidationRunId.value,
+            plot_name: plotName,
+            include_data: include_data
+          }
+        )
+      });
+    } else {
+      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+        },
+        body: JSON.stringify(
+          { 
+            calibration_run_id: calibrationJobId.value,
+            plot_name: plotName,
+            include_data: include_data
+          }
+        )
+      });
+    }
   };
 
   /**
@@ -93,7 +122,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({'calibration_run_id': calibrationJobId.value})
     });
   }
 
@@ -108,7 +137,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({'calibration_run_id': calibrationJobId.value})
     });
   };
 
@@ -123,7 +152,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({'calibration_run_id': calibrationJobId.value})
     });
   };
 
