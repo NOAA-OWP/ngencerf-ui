@@ -50,8 +50,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   watch(performanceMetrics, (performanceMetrics) => { sessionStorage.setItem('performanceMetrics', JSON.stringify(performanceMetrics)); })
   watch(selectedSupplementalTable, (selectedSupplementalTable) => { sessionStorage.setItem('selectedSupplementalTable', JSON.stringify(selectedSupplementalTable)); })
   watch(iterations, (iterations) => { sessionStorage.setItem('iterations',  JSON.stringify(iterations)); })
-  watch(performanceMetrics, (performanceMetrics) => { sessionStorage.setItem('performanceMetrics', performanceMetrics); }) 
-
 
   /**
  * Get Calibration Iteration Data
