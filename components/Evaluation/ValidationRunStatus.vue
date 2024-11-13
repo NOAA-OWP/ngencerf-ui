@@ -34,6 +34,12 @@
                       {{ iterationValidationRunId }}
                     </td>
                   </tr>
+                  <tr height="45px">
+                    <td class="text-right"><label for="iterationNum">Iteration</label></td>
+                    <td class="pl-5">
+                      {{ evaluateIterationRunId }}
+                    </td>
+                  </tr>                  
                 </tbody>
               </table>
             </div>
@@ -93,7 +99,7 @@ const userDataStore = useUserDataStore();
 const validationRunStatusStore = useValidationRunStatusStore();
 const toast = useToast();
 
-const { evaluateValidationRunId } = storeToRefs(generalStore());
+const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 
 const { startTime, startTimeDate, runningTime, validationStatus, iterationValidationRunId } = storeToRefs( validationRunStatusStore );

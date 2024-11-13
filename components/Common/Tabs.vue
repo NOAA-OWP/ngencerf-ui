@@ -62,7 +62,7 @@
           <span v-show="evaluateIterationRunId && evaluateIterationRunId > 0">
             <div data-tab="4" data-menu-tab="24" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
               aria-label="Run Validation tab" title="Run Validation tab">
-              Status
+              Run / Status
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
           </span>
