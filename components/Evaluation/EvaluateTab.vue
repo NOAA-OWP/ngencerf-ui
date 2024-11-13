@@ -3,7 +3,7 @@
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
         <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
-          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" />
+          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close"/>
       </div>
       <MessagesGroup />
     </div>
@@ -30,46 +30,30 @@
           <a href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">Show
             Calibration Details</a>
         </div>
-        <div class="grid grid-cols-2">
-            <div class="text-center">
-                <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
-                    <img :src="selectedPlotFileUrl" alt="Image" />
-                </div>
-            </div>
-            <div>
-                <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
-                    <div v-if="plotTableList && plotTableList.length > 1">
-                        <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
-                        <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable"
-                            :options="plotTableList" optionLabel="name" optionValue="name">
-                        </Select>
-                    </div>
-                    <div class="pt-6 pb-2">
-                        <DataTable :value="plotTableData" scrollable scroll-height="500px"
-                            fixedHeader=true :multi-sort="true">
-                            <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable></Column>
-                        </DataTable>
-                    </div>
-                </div>
-            </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2">
+      <div class="text-center">
+        <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
+          <img :src="selectedPlotFileUrl" :alt="selectedPlotName" />
         </div>
       </div>
       <div>
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
           <div v-if="plotTableList && plotTableList.length > 1">
             <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
-            <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable" :options="plotTableList"
-              optionLabel="name" optionValue="name">
+            <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable"
+              :options="plotTableList" optionLabel="name" optionValue="name">
             </Select>
           </div>
-          <DataTable :value="plotTableData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
-            <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable>
-            </Column>
-          </DataTable>
+          <div class="pt-6 pb-2">
+            <DataTable :value="plotTableData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
+              <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable></Column>
+            </DataTable>
+          </div>
         </div>
       </div>
     </div>
-
     <div id="SupplementalTableArea" class="p-2" v-if="selectedSupplementalTable">
       <DataTable :value="iterationMetricsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true"
         v-if="iterationMetricsData && selectedSupplementalTable == 1">
@@ -86,6 +70,21 @@
         <Column v-for="( col, colIndex ) in performanceMetricsColumns" :key="colIndex" :header="col.header"
           :field="col.field"></Column>
       </DataTable>
+      <div v-if="calibrationLogList && calibrationLogList.length > 0 && selectedSupplementalTable == 4">
+        <label for="CalibrationLogOptions" class="pr-2 pt-3">Select Calibration Log</label>
+        <Select v-if="calibrationLogList.length > 1" id="CalibrationLogOptions" class="p-select" 
+          v-model="selectedCalibrationLog" :options="calibrationLogList" optionLabel="name" optionValue="name">
+        </Select>
+        <div id="CalibrationLogDisplay" class="h-500 overflow-scroll">
+          <div v-html="calibrationLogDisplay"></div>
+        </div>
+      </div>
+      <div v-if="validationLogData && validationLogData != '' && selectedSupplementalTable == 5">
+        <label for="ValidationLogDisplay" class="pr-2 pt-3">Validation Log</label>
+        <div id="ValidationLogDisplay" class="h-500 overflow-scroll">
+          <div v-html="validationLogData"></div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -107,7 +106,7 @@ const toast = useToast();
 
 const showMessagesGroup = ref(false);
 
-const { calibrationJobId } = storeToRefs(generalStore());
+const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
 const {
   plotList,
@@ -126,6 +125,9 @@ const {
   selectedSupplementalTable,
   performanceMetrics,
   performanceMetricsData,
+  logs,
+  calibrationLogData,
+  validationLogData,
 } = storeToRefs(EvaluationSupplementalDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -139,6 +141,7 @@ const {
 const {
   queryGetIterations,
   queryGetPerformanceMetrics,
+  queryGetLogs,
 } = EvaluationSupplementalDataStore;
 
 const plotTables = ref<DynamicObject>({});
@@ -147,7 +150,16 @@ const selectedPlotTable = ref<string>('');
 const plotTableData = ref<any[]>([]);
 const plotTableColumns = ref<any[]>([]);
 const performanceMetricsColumns = [{ header: 'Metric', field: 'metric' }];
-const supplementalTableOptions = ['Iteration Metrics Table', 'Iteration Parameters Table', 'Performance Metrics Table']
+const calibrationLogList = ref<any[]>([]);
+const calibrationLogDisplay = ref<string>('');
+const selectedCalibrationLog = ref<string>('');
+const supplementalTableOptions = [
+  'Iteration Metrics Table',
+  'Iteration Parameters Table',
+  'Performance Metrics Table',
+  'Calibration Logs',
+  'Validation Log'
+]
 
 onMounted(async () => {
   if (!userCalibrationRunData?.value) {
@@ -267,6 +279,53 @@ onMounted(async () => {
   plotList.value.push({ name: supplementalTableOptions[2], description: '' });
   console.log('plotList:', plotList.value);
 
+  // Get Calibration/Validation Logs
+  logs.value = await queryGetLogs();
+  calibrationLogData.value = {};
+  calibrationLogList.value = [];
+  validationLogData.value = '';
+  if (logs.value?._data?.logs) {
+    console.log('logs: ', logs.value?._data?.logs);
+    for (let l = 0; l < logs.value?._data?.logs.length; l++) {
+      Object.keys(logs.value?._data?.logs[l]).forEach(key => {
+        let logText = "";
+        for (let t = 0; t < logs.value?._data?.logs[l][key].length; t++) {
+          logText += logs.value?._data?.logs[l][key][t] + '<br/>\n';
+        }
+        calibrationLogData.value[key] = logText;
+        calibrationLogList.value.push({ name: key });
+      });
+    }
+    if (calibrationLogList.value.length > 0) {
+      selectedCalibrationLog.value = calibrationLogList.value[0]['name'];
+    }
+    console.log('calibrationLogData: ', calibrationLogData.value);
+    console.log('calibrationLogList: ', calibrationLogList.value);
+    if (logs.value?._data?.validations) {
+      for (let v = 0; v < logs.value?._data?.validations.length; v++) {
+        if (logs.value?._data?.validations[v].validation_job_id == evaluateValidationRunId.value) {
+          let logText = "";
+          if (logs.value?._data?.validations[v].log) {
+            for (let t = 0; t < logs.value?._data?.validations[v].log.length; t++) {
+              logText += logs.value?._data?.validations[v].log[t] + '<br/>\n';
+            }
+          }
+          validationLogData.value = logText;
+          break;
+        }
+      }
+      console.log('validationLogData: ', validationLogData.value);
+    }
+  }
+
+  // Add Calibration/Validation Logs to the dropdown
+  if (logs.value?._data?.logs) {
+    plotList.value.push({ name: supplementalTableOptions[3], description: '' });
+    if (logs.value?._data?.validations) {
+      plotList.value.push({ name: supplementalTableOptions[4], description: '' });
+    }
+  }
+
   // make sure page loads with no plot selected
   selectedPlotName.value = null;
   selectedPlotFilename.value = null;
@@ -289,6 +348,12 @@ watch(selectedPlotName, async () => {
     }
     if (selectedSupplementalTable.value == 3 && performanceMetricsData.value.length == 0) {
       toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: 5000 });
+    }
+    if (selectedSupplementalTable.value == 4 && calibrationLogList.value.length == 0) {
+      toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no logs', life: 5000 });
+    }
+    if (selectedSupplementalTable.value == 5 && validationLogData.value == '') {
+      toast.add({ severity: 'info', summary: 'Validation Run ' + evaluateValidationRunId.value + ' has no logs', life: 5000 });
     }
     plotTableData.value = [];
     plotTableColumns.value = [];
@@ -425,6 +490,13 @@ watch(plotTableData, async () => {
   }
 });
 
+// Handle selectedCalibrationLog changes
+watch(selectedCalibrationLog, async () => {
+  if (selectedCalibrationLog.value != '') {
+    calibrationLogDisplay.value = calibrationLogData.value[selectedCalibrationLog.value];
+  }
+});
+
 const gotoSelectAlternateIteration = () => {
   nextTick(() => {
     const tabs = document.getElementsByClassName("tabs");
@@ -468,5 +540,9 @@ const toggleMessagesGroup = () => {
   width: 48%;
   background-color: white;
   overflow: auto;
+}
+
+#CalibrationLogDisplay, #ValidationLogDisplay {
+  max-height: 400px;
 }
 </style>

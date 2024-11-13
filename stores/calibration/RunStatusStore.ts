@@ -6,13 +6,13 @@ import { generalStore } from "../common/GeneralStore";
 import type { CalibrationStatus, CalibrationPlotListNamesData } from "~/composables/NextGenModel";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { isValidDate, isNotNullOrUndefined, isCalibrationJobFinished } from '~/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
+import { isValidDate, isCalibrationJobFinished } from '~/utils/CommonHelpers';
+import { convertTimeZone } from '~/utils/TimeHelpers';
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
-  const { calibrationJobId } = storeToRefs(generalStore());
+  const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { fetchUserCalibrationRunData, getAccessToken } = useUserDataStore();
+  const { getAccessToken } = useUserDataStore();
   const { userCalibrationRunData } = storeToRefs(useUserDataStore());
   
   // refs
@@ -87,13 +87,19 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @return {any}
    */
   const queryGetCalibrationStatus = async (): Promise<any> => {
+    let apiCallBody: DynamicObject = {};
+    if (evaluateValidationRunId.value) {
+      apiCallBody['validation_run_id'] = evaluateValidationRunId.value;
+    } else {
+      apiCallBody['calibration_run_id'] = calibrationJobId.value;
+    }
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify(apiCallBody)
     });
   };
 
@@ -117,19 +123,19 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @return {any}
    */
   const queryGetPlot = async (plotName: string, include_data=false): Promise<any> => {
+    let apiCallBody: DynamicObject = {plot_name: plotName, include_data: include_data};
+    if (evaluateValidationRunId.value) {
+      apiCallBody['validation_run_id'] = evaluateValidationRunId.value;
+    } else {
+      apiCallBody['calibration_run_id'] = calibrationJobId.value;
+    }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify(
-        { 
-          calibration_run_id: calibrationJobId.value,
-          plot_name: plotName,
-          include_data: include_data
-        }
-      )
+      body: JSON.stringify(apiCallBody)
     });
   };
 
@@ -144,7 +150,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({calibration_run_id: calibrationJobId.value})
     });
   }
 
@@ -159,7 +165,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({calibration_run_id: calibrationJobId.value})
     });
   };
 
@@ -174,7 +180,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({calibration_run_id: calibrationJobId.value})
     });
   };
 
