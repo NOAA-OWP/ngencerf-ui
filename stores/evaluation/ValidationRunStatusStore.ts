@@ -13,10 +13,10 @@ export const useValidationRunStatusStore = defineStore('ValidationRunStatusStore
   const { getAccessToken } = useUserDataStore();
 
   const validationStatus = ref<string | null>( null );
-  const runningTime = ref();
-  const startTimeDate = ref();
-  const startTime = ref();
-  const validationStopStatus = ref<string[]>([ 'DONE', 'SERVER ERROR', 'FAIL' ])
+  const runningTime = ref<string>("");
+  const startTime = ref<string>("");
+  const validationStopStatus = ref<string[]>([ 'DONE', 'SERVER ERROR', 'FAIL', 'CANCELLED' ]);
+  const validationFailedStatus = ref<string[]>([ 'SERVER ERROR', 'FAIL' ]);
 
   /**
    * @returns {Promise<any>}
@@ -59,6 +59,22 @@ export const useValidationRunStatusStore = defineStore('ValidationRunStatusStore
 
   /**
    * @param status 
+   * @returns {boolean}
+   */
+  const isValidationRunDone = ( status: string ) => {
+    return status.toUpperCase() == 'DONE';
+  }
+
+  /**
+   * @param status 
+   * @returns {boolean}
+   */
+  const isValidationRerunable = ( status: string ) => {
+    return validationFailedStatus.value.includes( status.toUpperCase() );
+  }
+
+  /**
+   * @param status 
    * @return {boolean}
    */
   const isValidationRunStopped = ( status: string ) => {
@@ -67,13 +83,12 @@ export const useValidationRunStatusStore = defineStore('ValidationRunStatusStore
 
   const clearRunningStatusInfo = () => {
     validationStatus.value = null;
-    startTime.value = null;
-    runningTime.value = null;
+    startTime.value = "";
+    runningTime.value = "";
   }
 
   return {
     runningTime,
-    startTimeDate,
     startTime,
     validationStatus,
     iterationValidationRunId,
@@ -83,6 +98,8 @@ export const useValidationRunStatusStore = defineStore('ValidationRunStatusStore
     executeCancelIterationValidationRun,
     isValidationRunStopped, 
     clearRunningStatusInfo,
+    isValidationRunDone,
+    isValidationRerunable
   }
 })
 
