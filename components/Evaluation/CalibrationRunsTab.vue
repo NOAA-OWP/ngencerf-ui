@@ -113,6 +113,14 @@ const toast = useToast();
 const selectedCalibrationRun = ref<CalibrationRun>();
 const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
+
+onMounted( () => {
+  //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
+  resetUserSelectedEvalCalibrationRun();
+  fetchUserValidatedCalibrationJobsListData();
+  console.log("CalibrationRunsTab for Evaluation mounted")
+});
+
 const onEvalCalibrationRowSelect = async ( event: DataTableRowClickEvent ) => {
   resetUserSelectedEvalValidationRun();
   loadSelectedCalibrationRun( event.data.calibration_run_id );
@@ -172,14 +180,6 @@ const rowStyle = (data: any) => {
         return { backgroundColor: 'white' }
     }
 }
-
-onMounted( () => {
-  //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
-  resetUserSelectedEvalCalibrationRun();
-
-  fetchUserValidatedCalibrationJobsListData();
-});
-
 </script>
 
 <style lang="scss" scoped>
