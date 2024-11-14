@@ -49,7 +49,7 @@
         </span>
         <span v-show="calibrationJobId > 0 && loadCalibrationDataComplete == true">
           <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Evaluate Tab"
-            title=" Evaluate tab" :disabled="true">
+            title=" Evaluate tab">
             Evaluate
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
@@ -140,7 +140,38 @@ const { loadCalibrationDataComplete } = storeToRefs(useEvaluationCalibrationRunS
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
 
+// onMounted(() => {
+//   const observerCallback = (mutationsList) => {
+//     for (const mutation of mutationsList) {
+//       if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+//         const targetElement = mutation.target;
+//         if (targetElement.classList.contains('activeTab')) {
+//           console.log('activeTab class added to', targetElement);
+//         } else {
+//           console.log('activeTab class removed from', targetElement);
+//         }
+//       }
+//     }
+//   };
+
+//   const observer = new MutationObserver(observerCallback);
+
+//   // Observe all elements with the class 'tabs' for attribute changes
+//   const tabsElements = document.querySelectorAll('.tabs');
+//   console.log("tabElements length: ", tabsElements.length)
+//   tabsElements.forEach((el) => {
+//     observer.observe(el, { attributes: true, attributeFilter: ['class'] });
+//   });
+
+//   // Cleanup observer on component unmount
+//   onBeforeUnmount(() => {
+//     observer.disconnect();
+//   });
+// });
+
+
 const tabClicked = (event: Event) => {
+  console.log("Tab Clicked Event ", event.target)
   event.preventDefault();
   const ele = event.currentTarget as HTMLElement;
   const allTabs = document.getElementsByClassName("tabs");
