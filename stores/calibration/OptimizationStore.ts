@@ -48,7 +48,6 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
 
     uiOptimization.value = sessionStorage.getItem('uiOptimization') as string;
     uiObjectiveFunction.value = sessionStorage.getItem('uiObjectiveFunction') as string;
-
     uiStreamFlowThreshold.value = parseInt(sessionStorage.getItem('uiStreamFlowThreshold') as string, 10);
     uiPeakFlowThreshold.value = parseInt(sessionStorage.getItem('uiPeakFlowThreshold') as string, 10);
     uiPlotFrequency.value = parseInt(sessionStorage.getItem('uiPlotFrequency') as string, 10);
@@ -57,13 +56,28 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     optimizationStore_data_loading.value = JSON.parse(sessionStorage.getItem('optimizationStore_data_loading') as string) === "true";
     showObjectiveFunctionPeakFlow.value = JSON.parse(sessionStorage.getItem('showObjectiveFunctionPeakFlow') as string) === "true";
     showObjectiveFunctionStreamFlow.value = JSON.parse(sessionStorage.getItem('showObjectiveFunctionStreamFlow') as string) === "true";
-
     console.log("OptimizationStore has been refreshed from sessionStorage");
   }
+
+
+  watch(uiOptimizationInputs, (uiOptimizationInputs) => { sessionStorage.setItem('uiOptimizationInputs', JSON.stringify(uiOptimizationInputs)); });
+  watch(optimizationAlgorithmOptionsList, (optimizationAlgorithmOptionsList) => { sessionStorage.setItem('optimizationAlgorithmOptionsList', JSON.stringify(optimizationAlgorithmOptionsList)); });
+  watch(objectiveFunctionOptionsList, (objectiveFunctionOptionsList) => { sessionStorage.setItem('objectiveFunctionOptionsList', JSON.stringify(objectiveFunctionOptionsList)); });
+  watch(optimizationTabData, (optimizationTabData) => { sessionStorage.setItem('optimizationTabData', JSON.stringify(optimizationTabData)); });
+  watch(uiOptimization, (uiOptimization) => { sessionStorage.setItem('uiOptimization', uiOptimization); });
+  watch(uiObjectiveFunction, (uiObjectiveFunction) => { sessionStorage.setItem('uiObjectiveFunction', uiObjectiveFunction); });
+  watch(uiStreamFlowThreshold, (uiStreamFlowThreshold) => { sessionStorage.setItem('uiStreamFlowThreshold', JSON.stringify(uiStreamFlowThreshold)); });
+  watch(uiPeakFlowThreshold, (uiPeakFlowThreshold) => { sessionStorage.setItem('uiPeakFlowThreshold', JSON.stringify(uiPeakFlowThreshold)); });
+  watch(uiPlotFrequency, (uiPlotFrequency) => { sessionStorage.setItem('uiPlotFrequency', JSON.stringify(uiPlotFrequency)); });
+  watch(uiStopCriteria, (uiStopCriteria) => { sessionStorage.setItem('uiStopCriteria', JSON.stringify(uiStopCriteria)); });
+  watch(optimizationStore_data_loading, (optimizationStore_data_loading) => { sessionStorage.setItem('', JSON.stringify(optimizationStore_data_loading)); });
+  watch(showObjectiveFunctionPeakFlow, (showObjectiveFunctionPeakFlow) => { sessionStorage.setItem('showObjectiveFunctionPeakFlow', JSON.stringify(showObjectiveFunctionPeakFlow)); });
+  watch(showObjectiveFunctionStreamFlow, (showObjectiveFunctionStreamFlow) => { sessionStorage.setItem('showObjectiveFunctionStreamFlow', JSON.stringify(showObjectiveFunctionStreamFlow)); });
+
   /**
- * load static optimization tab data with provided calibration job id and initialize ui field data 
- * @return {void}
- */
+  * load static optimization tab data with provided calibration job id and initialize ui field data 
+  * @return {void}
+  */
   const loadOptimizationTabStaticData = () => {
     optimizationStore_data_loading.value = true
     makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_optimization_tab/`, {

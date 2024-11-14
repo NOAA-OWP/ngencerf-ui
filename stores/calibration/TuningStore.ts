@@ -76,7 +76,26 @@ export const useTuningStore = defineStore('TuningStore', () => {
       if (ls !== "undefined") { saveTuningTabRequestBody.value = ls ? JSON.parse(ls) : {} }
       console.log("TuningStore has been refreshed from sessionStorage");
     }
-    
+
+    watch(loadTuningTabData, (loadTuningTabData) => { sessionStorage.setItem('loadTuningTabData', JSON.stringify(loadTuningTabData)); });
+    watch(calibrationTuningModules, (calibrationTuningModules) => { sessionStorage.setItem('calibrationTuningModules', JSON.stringify(calibrationTuningModules)); });
+    watch(calibrationTuningParameters, (calibrationTuningParameters) => { sessionStorage.setItem('calibrationTuningParameters', JSON.stringify(calibrationTuningParameters)); });
+    watch(userSelectedCalibrationTuningParameters, (userSelectedCalibrationTuningParameters) => { sessionStorage.setItem('userSelectedCalibrationTuningParameters', JSON.stringify(userSelectedCalibrationTuningParameters)); });
+    watch(userOutputVariableToCalibrate, (userOutputVariableToCalibrate) => { sessionStorage.setItem('userOutputVariableToCalibrate', JSON.stringify(userOutputVariableToCalibrate)); });
+    watch(outputVariables, (outputVariables) => { sessionStorage.setItem('outputVariables', JSON.stringify(outputVariables)); });
+    watch(saveTuningTabRequestBody, (saveTuningTabRequestBody) => { sessionStorage.setItem('saveTuningTabRequestBody', JSON.stringify(saveTuningTabRequestBody)); });
+    watch(simEndTime, (simEndTime) => { sessionStorage.setItem('simEndTime', simEndTime ?? ""); });
+    watch(calStartTime, (calStartTime) => { sessionStorage.setItem('calStartTime', calStartTime ?? ""); });
+    watch(calEndTime, (calEndTime) => { sessionStorage.setItem('calEndTime', calEndTime ?? ""); });
+    watch(automatic_validation, (automatic_validation) => { sessionStorage.setItem('automatic_validation', JSON.stringify(automatic_validation) ); });
+    watch(avSimStartTime, (avSimStartTime) => { sessionStorage.setItem('avSimStartTime', avSimStartTime ?? ""); });
+    watch(avSimEndTime, (avSimEndTime) => { sessionStorage.setItem('avSimEndTime', avSimEndTime ?? ""); });
+    watch(avCalStartTime, (avCalStartTime) => { sessionStorage.setItem('avCalStartTime', avCalStartTime ?? ""); });
+    watch(avCalEndTime, (avCalEndTime) => { sessionStorage.setItem('avCalEndTime', avCalEndTime ?? ""); });
+    watch(rangeDateFrom, (rangeDateFrom) => { sessionStorage.setItem('rangeDateFrom', rangeDateFrom ?? ""); });
+    watch(tuningStore_data_loading, (tuningStore_data_loading) => { sessionStorage.setItem('tuningStore_data_loading', JSON.stringify(tuningStore_data_loading) ); });
+
+   
   /**
    * Load Tuning Tab data
    * @returns {Promise<any>}

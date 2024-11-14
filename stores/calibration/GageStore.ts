@@ -56,6 +56,20 @@ export const useGageStore = defineStore('GageStore', () => {
     console.log("GageStore restored");
   }
 
+  watch(domainOptionsList, (domainOptionsList) => { sessionStorage.setItem('domainOptionsList', JSON.stringify(domainOptionsList)); })
+  watch(gageOptionsList, (gageOptionsList) => { sessionStorage.setItem('gageOptionsList', JSON.stringify(gageOptionsList)); })
+  watch(gageTabData, (gageTabData) => { sessionStorage.setItem('gageTabData', JSON.stringify(gageTabData)); })
+  watch(gageData, (gageData) => { sessionStorage.setItem('gageData', JSON.stringify(gageData)); })
+  watch(geopackageImageUrl, (geopackageImageUrl) => { sessionStorage.setItem('geopackageImageUrl', geopackageImageUrl); })
+  watch(selectedDomainValue, (selectedDomainValue) => { sessionStorage.setItem('selectedDomainValue', selectedDomainValue); })
+  watch(selectedGageValue, (selectedGageValue) => { sessionStorage.setItem('selectedGageValue',selectedGageValue ); })
+  watch(selectedForcingValue, (selectedForcingValue) => { sessionStorage.setItem('selectedForcingValue', selectedForcingValue); })
+  watch(selectedObservationalValue, (selectedObservationalValue) => { sessionStorage.setItem('selectedObservationalValue',selectedObservationalValue ); })
+  watch(isNWMv3, (isNWMv3) => { sessionStorage.setItem('isNWMv3', JSON.stringify(isNWMv3)); })
+  watch(gageStore_data_loading, (gageStore_data_loading) => { sessionStorage.setItem('gageStore_data_loading', JSON.stringify(gageStore_data_loading)); })
+  
+
+
   const loadGageTabStaticData = () => {
     gageStore_data_loading.value = true
     makeProtectedApiCall<GageTabData>(`${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
