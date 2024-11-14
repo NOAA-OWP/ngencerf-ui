@@ -78,7 +78,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { UserCalibrationRunData } from "~/composables/NextGenModel";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { useGageStore } from '~/stores/calibration/GageStore';
 import { useFormulationStore } from '~/stores/calibration/FormulationStore';

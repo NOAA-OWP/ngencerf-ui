@@ -1,8 +1,10 @@
 <!-- Calibration.vue -->
 <template>
-  <NextgenLayout>
-    <slot />
-  </NextgenLayout>
+  <client-only>
+    <NextgenLayout>
+      <slot />
+    </NextgenLayout>
+  </client-only>
 </template>
 
 <script lang="ts" setup>

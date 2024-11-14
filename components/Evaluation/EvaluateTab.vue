@@ -26,7 +26,7 @@
         <div class="ml-auto">
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
               @click="gotoSelectAlternateIteration">New Validation</button></span>
-          <br clear="all">
+          <br />
           <a href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">Show
             Calibration Details</a>
         </div>
@@ -162,6 +162,7 @@ const supplementalTableOptions = [
 ]
 
 onMounted(async () => {
+
   if (!userCalibrationRunData?.value) {
     await fetchUserCalibrationRunData();
   }
@@ -323,7 +324,7 @@ onMounted(async () => {
     console.log('calibrationLogData: ', calibrationLogData.value);
     console.log('calibrationLogList: ', calibrationLogList.value);
     if (logs.value?._data?.validations) {
-      for (let v = 0; v < logs.value?._data?.validations.length; v++) {
+      for (let v = 0; v < logs.value?._dacalibrationJobIdta?.validations.length; v++) {
         if (logs.value?._data?.validations[v].validation_job_id == evaluateValidationRunId.value) {
           let logText = "";
           if (logs.value?._data?.validations[v].log) {

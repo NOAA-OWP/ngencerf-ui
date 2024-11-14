@@ -22,6 +22,24 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const loadCalibrationDataComplete = ref<boolean>( false );
   
 
+  // Restore state from sessionStorage if available
+  if (typeof window !== 'undefined') {
+    let ls;
+    ls = sessionStorage.getItem('calibrationRunList');
+    if (ls !== "undefined") { calibrationRunList.value = ls ? JSON.parse(ls) : [] }
+    userSelectedEvalCalibrationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('userSelectedEvalCalibrationRunId') as string), 10);
+    uiGageId.value = sessionStorage.getItem('uiGageId') as string;
+    userSelectedEvalCalibrationRun.value = sessionStorage.getItem('userSelectedEvalCalibrationRun') as string;
+    loadCalibrationDataComplete.value = JSON.parse(sessionStorage.getItem('loadCalibrationDataComplete') as string) === "true";
+    console.log("EvaluationCalibrationRunStore Store restored");
+  }
+
+  watch(calibrationRunList, (calibrationRunList) => { sessionStorage.setItem('calibrationRunList', JSON.stringify(calibrationRunList)); })
+  watch(userSelectedEvalCalibrationRunId, (userSelectedEvalCalibrationRunId) => { sessionStorage.setItem('userSelectedEvalCalibrationRunId', JSON.stringify(userSelectedEvalCalibrationRunId)); })
+  watch(uiGageId, (uiGageId) => { sessionStorage.setItem('uiGageId', uiGageId); })
+  watch(userSelectedEvalCalibrationRun, (userSelectedEvalCalibrationRun) => { sessionStorage.setItem('userSelectedEvalCalibrationRun', JSON.stringify(userSelectedEvalCalibrationRun)); })
+  watch(loadCalibrationDataComplete, (loadCalibrationDataComplete) => { sessionStorage.setItem('loadCalibrationDataComplete', JSON.stringify(loadCalibrationDataComplete)); })
+  
   /**
    * list of calibration jobs with validation data
    */

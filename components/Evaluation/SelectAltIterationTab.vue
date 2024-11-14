@@ -98,6 +98,7 @@ onMounted( () => {
     
     syncScroll( calibrationRunDetailTable.value?.$el.children[0], tuningParametersTable.value?.$el.children[0] );
     syncScroll( tuningParametersTable.value?.$el.children[0], calibrationRunDetailTable.value?.$el.children[0] );
+    console.log("SelectAltIterationTab for Evaluation mounted")
   })
 })
 
