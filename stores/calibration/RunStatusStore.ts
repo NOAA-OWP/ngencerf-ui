@@ -35,44 +35,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validControlAndValidBestDone = ref(false);
   const resultsPathname = ref();
 
-    // Restore state from sessionStorage if available
-    if (typeof window !== 'undefined') {
-      let ls;
-      ls = sessionStorage.getItem('plotList');
-      if (ls !== "undefined") { plotList.value = ls ? JSON.parse(ls) : [] }
-      elapsedTime.value = sessionStorage.getItem('elapsedTime') as string;
-      startTimeDate.value = sessionStorage.getItem('startTimeDate') as string;
-      startTime.value = sessionStorage.getItem('startTime') as string;
-      plotNames.value = sessionStorage.getItem('plotNames') as string;
-      selectedPlotName.value = sessionStorage.getItem('selectedPlotName') as string;
-      selectedPlotFilename.value = sessionStorage.getItem('selectedPlotFilename') as string;
-      selectedPlotFileUrl.value = sessionStorage.getItem('selectedPlotFileUrl') as string;
-      iteration.value = sessionStorage.getItem('iteration') as string;
-      stopCriteria.value = sessionStorage.getItem('stopCriteria') as string;
-      elapsedTimeIntervalId.value = sessionStorage.getItem('elapsedTimeIntervalId') as string;
-      calibrationStatusIntervalId.value = sessionStorage.getItem('calibrationStatusIntervalId') as string;
-      validationsStatusIntervalId.value = sessionStorage.getItem('validationsStatusIntervalId') as string;
-      resultsPathname.value = sessionStorage.getItem('resultsPathname') as string;
-      
-  
-      stopCriteriaMet.value = JSON.parse(sessionStorage.getItem('stopCriteriaMet') as string) === "true";
-      console.log("RunStatusStore has been refreshed from sessionStorage");
-    }
-  
-    watch(plotList, (plotList) => { sessionStorage.setItem('plotList', JSON.stringify(plotList)); })
-    watch(elapsedTime, (elapsedTime) => { sessionStorage.setItem('elapsedTime', elapsedTime); })
-    watch(startTimeDate, (startTimeDate) => { sessionStorage.setItem('startTimeDate', startTimeDate); })
-    watch(startTime, (startTime) => { sessionStorage.setItem('startTime', startTime); })
-    watch(plotNames, (plotNames) => { sessionStorage.setItem('plotNames', plotNames); })
-    watch(selectedPlotName, (selectedPlotName) => { sessionStorage.setItem('selectedPlotName', selectedPlotName); })
-    watch(selectedPlotFilename, (selectedPlotFilename) => { sessionStorage.setItem('selectedPlotFilename', selectedPlotFilename); })
-    watch(selectedPlotFileUrl, (selectedPlotFileUrl) => { sessionStorage.setItem('selectedPlotFileUrl', selectedPlotFileUrl); })
-    watch(iteration, (iteration) => { sessionStorage.setItem('iteration', iteration); })
-    watch(stopCriteria, (stopCriteria) => { sessionStorage.setItem('stopCriteria', stopCriteria); })
-    watch(calibrationStatusIntervalId, (calibrationStatusIntervalId) => { sessionStorage.setItem('calibrationStatusIntervalId', calibrationStatusIntervalId); })
-    watch(validationsStatusIntervalId, (validationsStatusIntervalId) => { sessionStorage.setItem('validationsStatusIntervalId', validationsStatusIntervalId); })
-    watch(stopCriteriaMet, (stopCriteriaMet) => { sessionStorage.setItem('uiStopCritstopCriteriaMeteria', JSON.stringify(stopCriteriaMet)); })
-    /** 
+  /** 
    * Load RunStatusStore
    */
   const loadRunStatusStore = async (): Promise<void> => {
@@ -169,20 +132,19 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Get Calibration Plot
    * @return {any}
    */
-  const queryGetPlot = async (plotName: string, include_data=false): Promise<any> => {
-    let apiCallBody: DynamicObject = {plot_name: plotName, include_data: include_data};
-    if (evaluateValidationRunId.value) {
-      apiCallBody['validation_run_id'] = evaluateValidationRunId.value;
-    } else {
-      apiCallBody['calibration_run_id'] = calibrationJobId.value;
-    }
+  const queryGetPlot = async (plotName: string, include_data: boolean=false, calibration_run_id: number=calibrationJobId.value, validation_run_id: number=0): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify(apiCallBody)
+      body: JSON.stringify({
+        plot_name: plotName, 
+        include_data: include_data,
+        calibration_run_id: (calibration_run_id > 0) ? calibration_run_id : null,
+        validation_run_id: (validation_run_id > 0) ? validation_run_id : null
+      })
     });
   };
 

@@ -6,11 +6,16 @@ import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { generalStore } from "../common/GeneralStore";
 
 export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplementalDataStore', () => {
-  const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
+  const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
 
   // refs
+  const plotNames = ref();
+  const plotList = ref<any[]>([]);
+  const selectedPlotName = ref();
+  const selectedPlotFilename = ref();
+  const selectedPlotFileUrl = ref();
   const iterations = ref();
   const iterationMetricsData = ref<any[]>([]);
   const iterationParamsData = ref<any[]>([]);
@@ -70,7 +75,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({calibration_run_id: calibrationJobId.value})
     });
   };
 
@@ -98,24 +103,26 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * Get Calibration/Validation Logs
    * @return {any}
    */
-  const queryGetLogs = async (): Promise<any> => {
-    let apiCallBody: DynamicObject = {};
-    if (evaluateValidationRunId.value) {
-      apiCallBody['validation_run_id'] = evaluateValidationRunId.value;
-    } else {
-      apiCallBody['calibration_run_id'] = calibrationJobId.value;
-    }
+  const queryGetLogs = async (calibration_run_id: number=calibrationJobId.value, validation_run_id: number=0): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify(apiCallBody)
+      body: JSON.stringify({
+        calibration_run_id: (calibration_run_id > 0) ? calibration_run_id : null,
+        validation_run_id: (validation_run_id > 0) ? validation_run_id : null
+      })
     });
   };
 
   return {
+    plotNames,
+    plotList,
+    selectedPlotName,
+    selectedPlotFilename,
+    selectedPlotFileUrl,
     iterations,
     iterationMetricsData,
     iterationParamsData,
