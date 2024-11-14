@@ -109,6 +109,9 @@ const showMessagesGroup = ref(false);
 const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
 const {
+  resultsPathname
+} = storeToRefs(runStatusStore);
+const {
   plotList,
   plotNames,
   selectedPlotName,
@@ -163,8 +166,24 @@ onMounted(async () => {
     await fetchUserCalibrationRunData();
   }
 
-  // Load Run Status Store to load plotNames, plotList, and resultsPathname
+  // Load Run Status Store to load resultsPathname
   await loadRunStatusStore();
+
+  // Get Plot Names
+  if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
+    plotNames.value = await queryGetPlotNames();
+  }
+
+  if (plotNames.value?._data.plot_names) {
+    // console.log('plotNames._data:', plotNames.value?._data);
+
+    // setting plotList will populate the dropdown
+    plotList.value = plotNames?.value?._data?.plot_names;
+    // console.log('plotList:', plotList.value);
+  } else {
+    toast.removeAllGroups();
+    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
+  }
 
   console.log('userCalibrationRunData: ', userCalibrationRunData.value);
 
