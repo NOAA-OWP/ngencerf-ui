@@ -107,6 +107,7 @@ onMounted(async () => {
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
+  console.log("Evaluation Run Status for Evaluation mounted")
 });
 
 const updateRunningTime = () => {
