@@ -162,6 +162,11 @@ const supplementalTableOptions = [
 ]
 
 onMounted(async () => {
+  // Don't do onMounted if we are in a refresh and there is no calibrationJob loaded
+  if( !calibrationJobId ) {
+    return;
+  }
+
   if (!userCalibrationRunData?.value) {
     await fetchUserCalibrationRunData();
   }
@@ -323,7 +328,7 @@ onMounted(async () => {
     console.log('calibrationLogData: ', calibrationLogData.value);
     console.log('calibrationLogList: ', calibrationLogList.value);
     if (logs.value?._data?.validations) {
-      for (let v = 0; v < logs.value?._data?.validations.length; v++) {
+      for (let v = 0; v < logs.value?._dacalibrationJobIdta?.validations.length; v++) {
         if (logs.value?._data?.validations[v].validation_job_id == evaluateValidationRunId.value) {
           let logText = "";
           if (logs.value?._data?.validations[v].log) {
