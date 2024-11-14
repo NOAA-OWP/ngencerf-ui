@@ -6,20 +6,22 @@ import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { generalStore } from "../common/GeneralStore";
 
 export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplementalDataStore', () => {
-  const { calibrationJobId } = storeToRefs(generalStore());
+  const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
 
   // refs
+  const iterations = ref();
   const iterationMetricsData = ref<any[]>([]);
   const iterationParamsData = ref<any[]>([]);
   const iterationMetricsColumns = ref<any[]>([]);
   const iterationParamsColumns = ref<any[]>([]);
-  const performanceMetricsData = ref<any[]>([]);
-
   const selectedSupplementalTable = ref<number>(0);
-  const iterations = ref<number>(0);
   const performanceMetrics = ref();
+  const performanceMetricsData = ref<any[]>([]);
+  const logs = ref();
+  const calibrationLogData = ref<DynamicObject>({});
+  const validationLogData = ref<string>("")
 
 
   // Restore state from sessionStorage if available
@@ -33,28 +35,34 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     if (ls !== "undefined") { iterationMetricsColumns.value = ls ? JSON.parse(ls) : [] }
     ls = sessionStorage.getItem('iterationParamsColumns');
     if (ls !== "undefined") { iterationParamsColumns.value = ls ? JSON.parse(ls) : [] }
-    ls = sessionStorage.getItem('performanceMetrics');
-    //if (ls !== "undefined") { performanceMetrics.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('performanceMetricsData');
+    if (ls !== "undefined") { performanceMetricsData.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('calibrationLogData');
+    if (ls !== "undefined") { calibrationLogData.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('iterations');
+    if (ls !== "undefined") { iterations.value = ls ? JSON.parse(ls) : [] }
 
+    validationLogData.value = sessionStorage.getItem('validationLogData') as string;
     selectedSupplementalTable.value = parseInt(JSON.parse(sessionStorage.getItem('selectedSupplementalTable') as string), 10);
-    iterations.value = parseInt(JSON.parse(sessionStorage.getItem('iterations') as string), 10);
-    //performanceMetrics.value = JSON.parse(sessionStorage.getItem('performanceMetrics') as string);
-
     console.log("EvaluationSupplementalDataStore Store restored");
   }
 
+
+  watch(iterations, (iterations) => { sessionStorage.setItem('iterations', JSON.stringify(iterations)); })
   watch(iterationMetricsData, (iterationMetricsData) => { sessionStorage.setItem('iterationMetricsData', JSON.stringify(iterationMetricsData)); })
+  watch(calibrationLogData, (calibrationLogData) => { sessionStorage.setItem('calibrationLogData', JSON.stringify(calibrationLogData)); })
+  watch(performanceMetricsData, (performanceMetricsData) => { sessionStorage.setItem('performanceMetricsData', JSON.stringify(performanceMetricsData)); })
   watch(iterationParamsData, (iterationParamsData) => { sessionStorage.setItem('iterationParamsData', JSON.stringify(iterationParamsData)); })
   watch(iterationMetricsColumns, (iterationMetricsColumns) => { sessionStorage.setItem('iterationMetricsColumns', JSON.stringify(iterationMetricsColumns)); })
   watch(iterationParamsColumns, (iterationParamsColumns) => { sessionStorage.setItem('iterationParamsColumns', JSON.stringify(iterationParamsColumns)); })
-  //watch(performanceMetrics, (performanceMetrics) => { sessionStorage.setItem('performanceMetrics', JSON.stringify(performanceMetrics)); })
+  watch(performanceMetrics, (performanceMetrics) => { sessionStorage.setItem('performanceMetrics', JSON.stringify(performanceMetrics)); })
   watch(selectedSupplementalTable, (selectedSupplementalTable) => { sessionStorage.setItem('selectedSupplementalTable', JSON.stringify(selectedSupplementalTable)); })
-  watch(iterations, (iterations) => { sessionStorage.setItem('iterations',  JSON.stringify(iterations)); })
+  watch(validationLogData, (validationLogData) => { sessionStorage.setItem('validationLogData', validationLogData); })
 
   /**
- * Get Calibration Iteration Data
- * @return {any}
- */
+   * Get Calibration Iteration Data
+   * @return {any}
+   */
   const queryGetIterations = async (): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_calibration_data_by_iteration/`, {
       method: "POST",
@@ -62,11 +70,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify(
-        {
-          calibration_run_id: calibrationJobId.value
-        }
-      )
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     });
   };
 
@@ -90,6 +94,27 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     });
   };
 
+  /**
+   * Get Calibration/Validation Logs
+   * @return {any}
+   */
+  const queryGetLogs = async (): Promise<any> => {
+    let apiCallBody: DynamicObject = {};
+    if (evaluateValidationRunId.value) {
+      apiCallBody['validation_run_id'] = evaluateValidationRunId.value;
+    } else {
+      apiCallBody['calibration_run_id'] = calibrationJobId.value;
+    }
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(apiCallBody)
+    });
+  };
+
   return {
     iterations,
     iterationMetricsData,
@@ -99,8 +124,12 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedSupplementalTable,
     performanceMetrics,
     performanceMetricsData,
+    logs,
+    calibrationLogData,
+    validationLogData,
     queryGetIterations,
     queryGetPerformanceMetrics,
+    queryGetLogs,
   };
 },
   {
