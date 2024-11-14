@@ -11,6 +11,11 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const { getAccessToken } = useUserDataStore();
 
   // refs
+  const plotNames = ref();
+  const plotList = ref<any[]>([]);
+  const selectedPlotName = ref();
+  const selectedPlotFilename = ref();
+  const selectedPlotFileUrl = ref();
   const iterations = ref();
   const iterationMetricsData = ref<any[]>([]);
   const iterationParamsData = ref<any[]>([]);
@@ -19,6 +24,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const selectedSupplementalTable = ref<number>( 0 );
   const performanceMetrics = ref();
   const performanceMetricsData = ref<any[]>([]);
+  const logs = ref();
+  const calibrationLogData = ref<DynamicObject>({});
+  const validationLogData = ref<string>("")
 
   /**
    * Get Calibration Iteration Data
@@ -31,11 +39,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify(
-        {
-          calibration_run_id: calibrationJobId.value
-        }
-      )
+      body: JSON.stringify({calibration_run_id: calibrationJobId.value})
     });
   };
 
@@ -59,7 +63,30 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     });
   };
 
+  /**
+   * Get Calibration/Validation Logs
+   * @return {any}
+   */
+  const queryGetLogs = async (calibration_run_id: number=calibrationJobId.value, validation_run_id: number=0): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        calibration_run_id: (calibration_run_id > 0) ? calibration_run_id : null,
+        validation_run_id: (validation_run_id > 0) ? validation_run_id : null
+      })
+    });
+  };
+
   return {
+    plotNames,
+    plotList,
+    selectedPlotName,
+    selectedPlotFilename,
+    selectedPlotFileUrl,
     iterations,
     iterationMetricsData,
     iterationParamsData,
@@ -68,8 +95,12 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedSupplementalTable,
     performanceMetrics,
     performanceMetricsData,
+    logs,
+    calibrationLogData,
+    validationLogData,
     queryGetIterations,
     queryGetPerformanceMetrics,
+    queryGetLogs,
   };
 },
 {
