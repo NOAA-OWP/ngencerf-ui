@@ -5,25 +5,53 @@ import { generalStore } from "../common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
-import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, SaveFormulationTabPayload, GeneralErrorResponse } from "~/composables/NextGenModel";
-import { useCalibrationTabValidation, useCalibrationFormulationTabSaveValidate, useCalibrationFormulationSlothTableValidation } from "~/composables/ValidationHandlers";
+import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, SaveFormulationTabPayload } from "~/composables/NextGenModel";
+import { useCalibrationFormulationTabSaveValidate } from "~/composables/ValidationHandlers";
 
 export const useFormulationStore = defineStore('FormulationStore', () => {
   /**
   * define ref
   */
   const { calibrationJobId } = storeToRefs(generalStore())
+  const { ngencerfBaseUrl } = useBackendConfig();
+  const { getAccessToken } = useUserDataStore()
+  const userDataStore = useUserDataStore()
+  const { userCalibrationRunData } = storeToRefs(userDataStore)
+  
   const filterGroup = ref<string>("")
   const selectedModuleValues = ref<string[]>([])
   const formulationNameInput = ref<string>("")
   const slothParameterInputs = ref<SlothParameterData[]>([])
   const useSlothParameters = ref<boolean>(false)
-  const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken } = useUserDataStore()
-  const userDataStore = useUserDataStore()
-  const { userCalibrationRunData } = storeToRefs(userDataStore)
+
   const formulationTabData = ref<FormulationTabData>()
   const formulationStore_data_loading = ref<boolean>(true)
+
+   // Restore state from sessionStorage if available
+   if (typeof window !== 'undefined') {
+    let ls;
+    ls = sessionStorage.getItem('slothParameterInputs');
+    if (ls !== "undefined") { slothParameterInputs.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('selectedModuleValues');
+    if (ls !== "undefined") { selectedModuleValues.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('formulationTabData');
+    if (ls !== "undefined") { formulationTabData.value = JSON.parse(ls as string) }
+
+    filterGroup.value = sessionStorage.getItem('filterGroup') as string;
+    formulationNameInput.value = sessionStorage.getItem('formulationNameInput') as string;
+    useSlothParameters.value = sessionStorage.getItem('useSlothParameters') as string === "true";
+    formulationStore_data_loading.value = sessionStorage.getItem('formulationStore_data_loading') as string === "true";
+    console.log("FormulationStore restored");
+  }
+
+  watch(slothParameterInputs, (slothParameterInputs) => { sessionStorage.setItem('slothParameterInputs', JSON.stringify(slothParameterInputs)); })
+  watch(selectedModuleValues, (selectedModuleValues) => { sessionStorage.setItem('selectedModuleValues', JSON.stringify(selectedModuleValues)); })
+  watch(formulationTabData, (formulationTabData) => { sessionStorage.setItem('formulationTabData', JSON.stringify(formulationTabData)); })
+  watch(filterGroup, (filterGroup) => { sessionStorage.setItem('filterGroup', filterGroup); })
+  watch(formulationNameInput, (formulationNameInput) => { sessionStorage.setItem('formulationNameInput', formulationNameInput); })
+  watch(useSlothParameters, (useSlothParameters) => { sessionStorage.setItem('useSlothParameters', JSON.stringify(useSlothParameters)); })
+  watch(formulationStore_data_loading, (formulationStore_data_loading) => { sessionStorage.setItem('formulationStore_data_loading', JSON.stringify(formulationStore_data_loading)); })
+
 
   /**
   * load forumlation tab data and init ref data
@@ -53,7 +81,7 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
     useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false;
     slothParameterInputs.value = JSON.parse( JSON.stringify( userCalibrationRunData.value?.sloth_parameters ) ) ?? [];
   }
-  userCalibrationRunData.value?.modules
+
   /**
   * return list of Module Options based on the filter selection
   * @returns {SelectOption[]}
@@ -98,13 +126,13 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
   * return list of selected module name
   * @returns {string[]}
   */
-  const getSavedModuleSelection = computed(() => {
-    let selectedModules = <string[]>[]
-    formulationTabData.value?.modules.forEach((moduleData) => {
-      if (moduleData.used_by_calibration_run) selectedModules.push(moduleData.name)
-    })
-    return selectedModules
-  })
+  // const getSavedModuleSelection = computed(() => {
+  //   let selectedModules = <string[]>[]
+  //   formulationTabData.value?.modules.forEach((moduleData) => {
+  //     if (moduleData.used_by_calibration_run) selectedModules.push(moduleData.name)
+  //   })
+  //   return selectedModules
+  // })
 
   /**
   * return list of group options for the group filter field
@@ -319,7 +347,7 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
 },
   {
     persist: {
-      storage: persistedState.localStorage
+      storage: persistedState.sessionStorage
     },
   })
 

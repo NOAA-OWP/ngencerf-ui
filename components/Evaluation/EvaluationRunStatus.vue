@@ -34,6 +34,12 @@
                       {{ iterationValidationRunId }}
                     </td>
                   </tr>
+                  <tr height="45px">
+                    <td class="text-right"><label for="iterationNum">Iteration</label></td>
+                    <td class="pl-5">
+                      {{ evaluateIterationRunId }}
+                    </td>
+                  </tr>                  
                 </tbody>
               </table>
             </div>
@@ -57,16 +63,16 @@
         <span v-else>
           <div id="StausRunBottomButtons" class="grid grid-cols-6">
           
-              <div v-if="userCalibrationRunData?.status !== 'Running'" class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()" :disabled="isStartDisabled()">
+              <div v-if="!isStartHidden()" class="col-span-1 ngenButtonDiv-green mr-6 h-8">
+                <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
                   Run
                 </button>
               </div>
             
               <div v-else class="col-span-1 mr-6 h-8">&nbsp;</div>
            
-              <div class="col-span-1 ngenButtonDiv-red mr-6 h-8">
-                <button class="font-normal" title="Cancel Button" @click="cancelRun()" :disabled="isCancelDisabled()"
+              <div class="col-span-1 ngenButtonDiv-red mr-6 h-8 hidden" v-if="!isCancelHidden()">
+                <button class="font-normal" title="Cancel Button" @click="cancelRun()" 
                   aria-label="Cancel Button">Cancel</button>
               </div>
               <div class="col-span-2">&nbsp;</div>
@@ -93,11 +99,10 @@ const userDataStore = useUserDataStore();
 const validationRunStatusStore = useValidationRunStatusStore();
 const toast = useToast();
 
-const { evaluateValidationRunId } = storeToRefs(generalStore());
-const { userCalibrationRunData } = storeToRefs(userDataStore);
+const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 
-const { startTime, startTimeDate, runningTime, validationStatus, iterationValidationRunId } = storeToRefs( validationRunStatusStore );
-const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun } = validationRunStatusStore;
+const { startTime, runningTime, validationStatus, iterationValidationRunId } = storeToRefs( validationRunStatusStore );
+const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, isValidationRunDone, isValidationRerunable } = validationRunStatusStore;
 
 const validationStatusCheckingInterval = ref<any>();
 const validationRunningTimeInterval = ref<any>();
@@ -107,6 +112,7 @@ onMounted(async () => {
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
+  console.log("Evaluation Run Status for Evaluation mounted")
 });
 
 const updateRunningTime = () => {
@@ -114,18 +120,20 @@ const updateRunningTime = () => {
   runningTime.value = calculateElapsedTime( convertedStartTime, new Date() );
 }
 
-const isStartDisabled = () => {
-  let disabled = false;
-  if ( validationStatus.value != null ) disabled = true;
-  return disabled;
+const isStartHidden = (): boolean => {
+  let hidden = false;
+  if ( validationStatus.value != null ) {
+    hidden = true;
+  }
+  return hidden;
 }
 
-const isCancelDisabled = () => {
-  let disabled = true;
-  if ( validationStatus.value != null && !isValidationRunStopped( validationStatus.value ) ) {
-    disabled = false;
+const isCancelHidden = ():boolean => {
+  let hidden = false;
+  if ( validationStatus.value == null || ( validationStatus.value != null && isValidationRunStopped( validationStatus.value ) ) ) {
+    hidden = true;
   }
-  return disabled;
+  return hidden;
 }
 
 const startRun = async () => {
@@ -176,8 +184,6 @@ onUnmounted( () => {
 })
 
 const cancelRun = async () => {
-  clearInterval( validationStatusCheckingInterval.value );
-  clearInterval( validationRunningTimeInterval.value );
   executeCancelIterationValidationRun().then( response => {
     validationStatus.value = response?._data.status;
   })

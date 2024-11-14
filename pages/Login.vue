@@ -159,8 +159,9 @@ const createAccountButtonClasses = ref<string[]>(["ngenButtonDiv", "btn-left", "
 const cancelCreateAccountLinkClasses = ref<string[]>(['c-blue'])
 
 onMounted(() => {
+
   nextTick(() => {
-    localStorage.clear();
+    sessionStorage.clear();
     calibrationJobId.value = 0;
     hardResetUserDataStore();
     resetGeneralStore();
@@ -169,6 +170,7 @@ onMounted(() => {
     resetOptimizationStore();
     hardResetRunStatusStore();
     hardResetTuningStore();
+    //getFooterInformation();
   })
 });
 
@@ -189,8 +191,6 @@ const ForgotPassword = () => {
 };
 
 const autoSubmit = (e: KeyboardEvent) => {
-  const u = document.getElementById("uname");
-  const p = document.getElementById('pword');
   if (e.key === "Enter" && (userName.value.trim() !== "" && userPassword.value.trim() !== "")) {
     SubmitLoginForm(e);
   }
@@ -304,6 +304,20 @@ const SubmitNewAccountForm = async () => {
 const GoToLanding = () => {
   navigateTo("LandingPage");
 };
+
+// Get footer info
+const getFooterInformation = () => {
+    makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: ""
+    }).then((result) => {
+      console.log(result);
+    })
+  }
 
 </script>
 <style lang="scss" scoped>

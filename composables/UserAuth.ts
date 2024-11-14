@@ -85,8 +85,7 @@ export const makeProtectedApiCall = async <T>(
   userOptions: any = {},
 ): Promise<any> => {
   const userDataStore = useUserDataStore();
-  const parsedUrl = new URL(url);
-  //const ngencerfBaseUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
+
   const { ngencerfBaseUrl } =  useBackendConfig();
   
   let responseData: FetchResponse<any> | null = null;

@@ -2,7 +2,6 @@
 
 import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { CalibrationRunIterationParameterData, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn, CalibrationRunIterationMetricData, CalibrationRunByIterationRetrospectiveData } from "~/composables/NextGenModel";
@@ -11,6 +10,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
   const { userCalibrationRunData, userSelectedCalibrationIterationId } = storeToRefs( useUserDataStore() );
+
   const calibrationRunDetailDataList = ref<AlternativeIterationCalibrationRunData[]>([]);
   const tuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
   const calibrationRunDetailDataListHeaders = ref<any[]>([]);
@@ -19,6 +19,40 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
   const tuningParametersTableColumn = ref<DynamicTableColumn[]>([]);
   const computedCalibrationRunDetailDataList = ref<AlternativeIterationCalibrationRunData[]>([]);
   const computedtuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
+
+
+   // Restore state from sessionStorage if available
+   if (typeof window !== 'undefined') {
+    let ls;
+    ls = sessionStorage.getItem('calibrationRunDetailDataList');
+    if (ls !== "undefined") { calibrationRunDetailDataList.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('tuningParametersDataList');
+    if (ls !== "undefined") { tuningParametersDataList.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('calibrationRunDetailDataListHeaders');
+    if (ls !== "undefined") { calibrationRunDetailDataListHeaders.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('tuningParametersDataListHeaders'); 
+       if (ls !== "undefined") { tuningParametersDataListHeaders.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('calibrationRunDetailTableColumn');
+    if (ls !== "undefined") {calibrationRunDetailTableColumn .value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('tuningParametersTableColumn');
+    if (ls !== "undefined") { tuningParametersTableColumn.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('computedCalibrationRunDetailDataList');
+    if (ls !== "undefined") { computedCalibrationRunDetailDataList.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('computedtuningParametersDataList');
+    if (ls !== "undefined") { computedtuningParametersDataList.value = ls ? JSON.parse(ls) : [] }
+
+    console.log("EvaluationAltIteration Store restored");
+  }
+
+  watch(calibrationRunDetailDataList, (calibrationRunDetailDataList) => { sessionStorage.setItem('calibrationRunDetailDataList', JSON.stringify(calibrationRunDetailDataList)); });
+  watch(tuningParametersDataList, (tuningParametersDataList) => { sessionStorage.setItem('tuningParametersDataList', JSON.stringify(tuningParametersDataList)); });
+  watch(calibrationRunDetailDataListHeaders, (calibrationRunDetailDataListHeaders) => { sessionStorage.setItem('calibrationRunDetailDataListHeaders', JSON.stringify(calibrationRunDetailDataListHeaders)); });
+  watch(tuningParametersDataListHeaders, (tuningParametersDataListHeaders) => { sessionStorage.setItem('tuningParametersDataListHeaders', JSON.stringify(tuningParametersDataListHeaders)); });
+  watch(calibrationRunDetailTableColumn, (calibrationRunDetailTableColumn) => { sessionStorage.setItem('calibrationRunDetailTableColumn', JSON.stringify(calibrationRunDetailTableColumn)); });
+  watch(tuningParametersTableColumn, (tuningParametersTableColumn) => { sessionStorage.setItem('tuningParametersTableColumn', JSON.stringify(tuningParametersTableColumn)); });
+  watch(computedCalibrationRunDetailDataList, (computedCalibrationRunDetailDataList) => { sessionStorage.setItem('computedCalibrationRunDetailDataList', JSON.stringify(computedCalibrationRunDetailDataList)); });
+  watch(computedtuningParametersDataList, (computedtuningParametersDataList) => { sessionStorage.setItem('computedtuningParametersDataList', JSON.stringify(computedtuningParametersDataList)); });
+
 
   const fetchCalibrationDataByIterationDataList = async () => {
     let headerRow = <DynamicTableColumnHeader[]>[];

@@ -47,7 +47,7 @@
 
       <div class="row-span-1">
         <AppFooter />
-      </div>currentEvaluationTab
+      </div>
     </div>
   </div>
 </template>
