@@ -69,6 +69,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * @return {any}
    */
   const queryGetIterations = async (): Promise<any> => {
+    if(!calibrationJobId.value) {
+      return null;
+    }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_calibration_data_by_iteration/`, {
       method: "POST",
       headers: {
@@ -84,6 +87,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   * @return {any}
   */
   const queryGetPerformanceMetrics = async (): Promise<any> => {
+    if(!calibrationJobId.value) {
+      return null;
+    }   
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_status/`, {
       method: "POST",
       headers: {
@@ -104,6 +110,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * @return {any}
    */
   const queryGetLogs = async (calibration_run_id: number=calibrationJobId.value, validation_run_id: number=0): Promise<any> => {
+    if(!calibrationJobId.value) {
+      return null;
+    }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
       method: "POST",
       headers: {

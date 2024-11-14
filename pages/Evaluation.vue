@@ -1,5 +1,5 @@
 <template>
- <client-only>
+  <client-only>
     <EvaluationLayout>
       <slot />
     </EvaluationLayout>
@@ -14,7 +14,9 @@ onMounted(() => {
   nextTick(() => {
     const allTabs = document.getElementsByClassName("tabs");
     const e = allTabs[CalibrationTabs.tab_calibrationRuns] as HTMLElement;
-    e.click();
+    if (e) {
+      e.click();
+    }
   });
 });
 </script>

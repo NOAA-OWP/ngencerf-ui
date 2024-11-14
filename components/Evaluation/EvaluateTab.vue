@@ -162,10 +162,6 @@ const supplementalTableOptions = [
 ]
 
 onMounted(async () => {
-  // Don't do onMounted if we are in a refresh and there is no calibrationJob loaded
-  if( !calibrationJobId ) {
-    return;
-  }
 
   if (!userCalibrationRunData?.value) {
     await fetchUserCalibrationRunData();
