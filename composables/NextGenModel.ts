@@ -81,6 +81,7 @@ export interface JobListItem {
   calibration_run_id: number;
   gage_id: string;
   status: string;
+  created_at: Date;
   job_genesis: string;
   calibration_start_period: Date;
   calibration_end_period: Date;

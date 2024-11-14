@@ -28,6 +28,11 @@
                   :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
                   <Column field="calibration_run_id" header="Job ID" sortable></Column>
                   <Column field="job_genesis" header="Job Genesis" sortable></Column>
+                  <Column field="created_at" header="Create Day" sortable>
+                    <template #body="slotProps">
+                      {{ formatDateForDisplay( slotProps.data.created_at ) }}
+                    </template>
+                  </Column>
                   <Column field="run_date" header="Run Date" sortable>
                     <template #body="slotProps">
                       {{ formatDateForDisplay( slotProps.data.run_date ) }}
