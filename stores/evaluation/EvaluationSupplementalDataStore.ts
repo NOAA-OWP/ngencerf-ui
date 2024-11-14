@@ -34,11 +34,11 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     ls = sessionStorage.getItem('iterationParamsColumns');
     if (ls !== "undefined") { iterationParamsColumns.value = ls ? JSON.parse(ls) : [] }
     ls = sessionStorage.getItem('performanceMetrics');
-    if (ls !== "undefined") { performanceMetrics.value = ls ? JSON.parse(ls) : [] }
+    //if (ls !== "undefined") { performanceMetrics.value = ls ? JSON.parse(ls) : [] }
 
     selectedSupplementalTable.value = parseInt(JSON.parse(sessionStorage.getItem('selectedSupplementalTable') as string), 10);
     iterations.value = parseInt(JSON.parse(sessionStorage.getItem('iterations') as string), 10);
-    performanceMetrics.value = JSON.parse(sessionStorage.getItem('performanceMetrics') as string);
+    //performanceMetrics.value = JSON.parse(sessionStorage.getItem('performanceMetrics') as string);
 
     console.log("EvaluationSupplementalDataStore Store restored");
   }
@@ -47,7 +47,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   watch(iterationParamsData, (iterationParamsData) => { sessionStorage.setItem('iterationParamsData', JSON.stringify(iterationParamsData)); })
   watch(iterationMetricsColumns, (iterationMetricsColumns) => { sessionStorage.setItem('iterationMetricsColumns', JSON.stringify(iterationMetricsColumns)); })
   watch(iterationParamsColumns, (iterationParamsColumns) => { sessionStorage.setItem('iterationParamsColumns', JSON.stringify(iterationParamsColumns)); })
-  watch(performanceMetrics, (performanceMetrics) => { sessionStorage.setItem('performanceMetrics', JSON.stringify(performanceMetrics)); })
+  //watch(performanceMetrics, (performanceMetrics) => { sessionStorage.setItem('performanceMetrics', JSON.stringify(performanceMetrics)); })
   watch(selectedSupplementalTable, (selectedSupplementalTable) => { sessionStorage.setItem('selectedSupplementalTable', JSON.stringify(selectedSupplementalTable)); })
   watch(iterations, (iterations) => { sessionStorage.setItem('iterations',  JSON.stringify(iterations)); })
 
