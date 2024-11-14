@@ -275,7 +275,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 },
 {
   persist: {
-    storage: persistedState.localStorage
+    storage: persistedState.sessionStorage
   },
 });
 

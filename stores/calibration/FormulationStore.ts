@@ -347,7 +347,7 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
 },
   {
     persist: {
-      storage: persistedState.localStorage
+      storage: persistedState.sessionStorage
     },
   })
 

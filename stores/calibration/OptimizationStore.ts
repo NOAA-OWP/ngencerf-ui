@@ -256,7 +256,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
 },
   {
     persist: {
-      storage: persistedState.localStorage
+      storage: persistedState.sessionStorage
     },
   })
 

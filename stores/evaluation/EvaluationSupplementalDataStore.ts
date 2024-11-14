@@ -141,7 +141,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
 },
   {
     persist: {
-      storage: persistedState.localStorage
+      storage: persistedState.sessionStorage
     },
   });
 

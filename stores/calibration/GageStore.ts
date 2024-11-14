@@ -315,7 +315,7 @@ export const useGageStore = defineStore('GageStore', () => {
 },
   {
     persist: {
-      storage: persistedState.localStorage
+      storage: persistedState.sessionStorage
     },
   })
 

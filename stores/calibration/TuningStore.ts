@@ -228,7 +228,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
 },
   {
     persist: {
-      storage: persistedState.localStorage
+      storage: persistedState.sessionStorage
     },
   });
 

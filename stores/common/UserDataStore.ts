@@ -280,7 +280,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
 },
   {
     persist: {
-      storage: persistedState.localStorage
+      storage: persistedState.sessionStorage
     },
   });
 
