@@ -127,7 +127,7 @@
     </div>
 
     <div class="waitgif" v-if="isLoading">
-      <img src="@/assets/styles/img/wait.gif" />
+      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
 
