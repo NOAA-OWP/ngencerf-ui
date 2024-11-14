@@ -19,7 +19,7 @@
           <Column field="job_genesis" header="Job Genesis" sortable></Column>
           <Column field="formulation_name" header="Formulation Name" sortable></Column>
           <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-          <Column field="created_at" header="Created Date" sortable>
+          <Column field="created_at" header="Creation Date" sortable>
             <template #body="slotProps">
               {{ formatDateForDisplay( slotProps.data.created_at ) }}
             </template>
