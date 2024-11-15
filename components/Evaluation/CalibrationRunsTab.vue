@@ -105,6 +105,7 @@ import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
+import { hilightTab } from '~/composables/TabHilight';
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
@@ -136,6 +137,7 @@ const selectedCalibrationRun = ref<CalibrationRun>();
 const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
 onMounted(() => {
+  hilightTab(EvaluationTabs.tab_calibrationRuns);
   //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
   resetUserSelectedEvalCalibrationRun();
   fetchUserValidatedCalibrationJobsListData();

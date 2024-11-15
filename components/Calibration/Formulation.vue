@@ -182,7 +182,7 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import type { SlothParameterData } from '~/composables/NextGenModel';
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
-
+import { hilightTab } from '~/composables/TabHilight';
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -228,6 +228,8 @@ let dataTableElement: HTMLElement | null = null;
 const toast = useToast();
 
 onMounted(() => {
+  hilightTab(CalibrationTabs.tab_formulation);
+  
   toast.removeAllGroups();
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }

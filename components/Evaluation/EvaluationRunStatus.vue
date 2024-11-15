@@ -94,6 +94,7 @@ import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { calculateElapsedTime, formatDateForDisplay } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
 import type { CalibrationGetStatusValidationItem } from "~/composables/NextGenModel";
+import { hilightTab } from '~/composables/TabHilight';
 
 const userDataStore = useUserDataStore();
 const toast = useToast();
@@ -107,6 +108,8 @@ const validationStatusCheckingInterval = ref<any>();
 const validationRunningTimeInterval = ref<any>();
 
 onMounted(async () => {
+  hilightTab(EvaluationTabs.tab_runStatus);
+  
   toast.removeAllGroups();
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;

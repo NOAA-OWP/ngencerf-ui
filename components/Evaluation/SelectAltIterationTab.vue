@@ -54,6 +54,7 @@ import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAltIterationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from '~/stores/common/GeneralStore';
+import { hilightTab } from '~/composables/TabHilight';
 import { useEvaluationRunStatusStore } from '~/stores/evaluation/EvaluationRunStatusStore';
 
 const toast = useToast();
@@ -84,6 +85,8 @@ const calibrationRunDetailTable = ref<HTMLTableElement>();
 const tuningParametersTable = ref<HTMLTableElement>();
 
 onMounted( () => {
+  hilightTab(EvaluationTabs.tab_selectAltIteration);
+  
   nextTick( () => {
     resetEvaluationAltIterationStore();
     fetchCalibrationDataByIterationDataList();
@@ -191,16 +194,5 @@ th.p-datatable-header-cell.bg-objective-function-col,
 th.p-datatable-header-cell.bg-objective-function-col:hover {
     background-color: rgb(204, 85, 0);
 }
-/*
-#RunDetailsTbl, #CalTuningParamsTbl {
-    width: 900px;
-    margin: 0 auto;
-}
 
-.tableTitle {
-    margin: 15px 0 10px 0;
-    font-size: 1.5em;
-
-}
-*/
 </style>
