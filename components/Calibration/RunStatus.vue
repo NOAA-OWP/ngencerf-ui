@@ -1,22 +1,25 @@
 <template>
   <div id="ResultPage">
-    <div class="grid grid-rows-10 pr-3">
-      <div class="row-span-1">
+   <!-- <div class="grid grid-rows-7 pr-3">
+      <div class="row-span-2">-->
+    <div class="pr-3">
+      <div>
         <div id="ResultsDisplay">
           <div class="grid grid-cols-2">
+
             <div class="col-span-1">
               <table>
                 <tbody>
                   <tr height="40px">
-                    <td class="text-right font-bold">Start Time</td>
+                    <td class="text-right font-bold"><div style="width: 140px;">Start Time</div></td>
                     <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="32px">
-                    <td class="text-right font-bold">Elapsed Time</td>
+                    <td class="text-right font-bold"><div style="width: 140px;">Elapsed Time</div></td>
                     <td class="pl-5">{{ elapsedTime ? elapsedTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="32px">
-                    <td class="text-right font-bold">Iteration</td>
+                    <td class="text-right font-bold"><div style="width: 140px;">Iteration</div></td>
                     <td class="pl-5">{{ iteration ?? '-'.repeat(30) }}</td>
                   </tr>
                 </tbody>
@@ -26,26 +29,26 @@
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
                 <tbody>
-                  <tr>
+                  <tr height="40px">
                     <td class="text-right"><label for="RunStatus">Status</label></td>
                     <td class="pl-5">
                       <span v-if="calibrationStatus !== 'Done'">
-                        <input id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;"
+                        <input id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md" style="background-color: white;"
                           v-model="calibrationStatus" disabled />
                       </span>
                       <span v-else-if="calibrationStatus === 'Done' && !validControlAndValidBestDone">
-                        <span id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;">
+                        <span id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md" style="background-color: white;">
                           Calibration Done, Validation Running
                         </span>
                       </span>
                       <span v-else-if="calibrationStatus === 'Done' && validControlAndValidBestDone">
-                        <span id="RunStatus" class="dummyProgress ml-2 text-lg" style="background-color: white;">
+                        <span id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md" style="background-color: white;">
                           Done
                         </span>
                       </span>
                     </td>
                   </tr>
-                  <tr>
+                  <tr height="32px">
                     <td class="text-right"><label for="DisplayOptions">Display</label></td>
                     <td class="pl-5">
                       <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
@@ -56,15 +59,27 @@
                 </tbody>
               </table>
             </div>
-          </div>
-          <div>
-              <label for="resultsPathname">Results Pathname</label>
-              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+
+            <div class="col-span-2">
+              <table style="width:100%">
+                <tbody>
+                  <tr height="40px">
+                    <td class="text-right font-bold" style="width: 140px;">
+                      <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
+                    </td>
+                    <td class="pl-5"><InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled /></td>
+                  </tr>
+                </tbody>
+              </table>
+                
+                
+            </div>
+
           </div>
         </div>
       </div>
-
-      <div class="row-span-9">
+      <!-- <div class="row-span-8">-->
+      <div>
         <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
           <img :src="selectedPlotFileUrl" alt="Image" />
         </div>
@@ -529,12 +544,12 @@ watch(iteration, async () => {
 @import "@/assets/styles/styles.scss";
 
 #ResultsDisplay {
-  width: 40vw;
+  width: 50vw;
   min-width:720px;
   margin: 5px auto;
   padding: 6px 10px 6px 20px;
   border-radius: 10px;
-  height: 100px;
+  /*height: 100px;*/
   border: 0px solid $ngwcp_neutral_gray_md;
 
 }
@@ -562,6 +577,12 @@ watch(iteration, async () => {
   width: 135px;
   text-align: right;
   padding-right: 20px;
+}
+#resultsPathname {
+  background-color: #fff;
+  border: 0px solid #fff;
+  border-left: 0; border-right: 0;
+  color: black; box-shadow: none;
 }
 </style>
 

@@ -1,6 +1,6 @@
 <template>
   <div id="ResultPage">
-    <div class="grid grid-rows-10 pr-3">
+    <div class="grid grid-rows-7 pr-3">
       <div class="row-span-2">
         <div id="ResultsDisplay">
           <div class="grid grid-cols-2">

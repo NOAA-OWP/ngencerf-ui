@@ -18,10 +18,18 @@
               optionLabel="name" optionValue="name">
             </Select>
           </div>
-          <div>
-            <label for="resultsPathname">Results Pathname</label>
-            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
-          </div>
+
+          <table class="mt-2" style="width:100%">
+            <tbody>
+                <tr height="40px">
+                <td class="text-left font-bold" style="width: 140px;">
+                    <label for="resultsPathname">Results Pathname</label>
+                </td>
+                <td class="pl-3"><InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled /></td>
+                </tr>
+            </tbody>
+          </table>
+
         </div>
         <div class="ml-auto">
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
@@ -70,19 +78,19 @@
         <Column v-for="( col, colIndex ) in performanceMetricsColumns" :key="colIndex" :header="col.header"
           :field="col.field"></Column>
       </DataTable>
-      <div v-if="calibrationLogList && calibrationLogList.length > 0 && selectedSupplementalTable == 4">
+      <div class="pl-4" v-if="calibrationLogList && calibrationLogList.length > 0 && selectedSupplementalTable == 4">
         <label for="CalibrationLogOptions" class="pr-2 pt-3">Select Calibration Log</label>
         <Select v-if="calibrationLogList.length > 1" id="CalibrationLogOptions" class="p-select" 
           v-model="selectedCalibrationLog" :options="calibrationLogList" optionLabel="name" optionValue="name">
         </Select>
-        <div id="CalibrationLogDisplay" class="h-500 overflow-scroll">
-          <div v-html="calibrationLogDisplay"></div>
+        <div id="CalibrationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
+          <div v-html="calibrationLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
-      <div v-if="validationLogData && validationLogData != '' && selectedSupplementalTable == 5">
+      <div class="pl-4" v-if="validationLogData && validationLogData != '' && selectedSupplementalTable == 5">
         <label for="ValidationLogDisplay" class="pr-2 pt-3">Validation Log</label>
-        <div id="ValidationLogDisplay" class="h-500 overflow-scroll">
-          <div v-html="validationLogData"></div>
+        <div id="ValidationLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
+          <div v-html="validationLogData" class="whitespace-nowrap"></div>
         </div>
       </div>
     </div>
@@ -571,5 +579,15 @@ const toggleMessagesGroup = () => {
 
 #CalibrationLogDisplay, #ValidationLogDisplay {
   max-height: 400px;
+}
+
+#resultsPathname {
+  background-color: #fff;
+  border: 0px solid #fff;
+  border-left: 0; border-right: 0;
+  color: black; box-shadow: none;
+}
+.gray-border {
+    border: 2px solid #d9d9d9;
 }
 </style>

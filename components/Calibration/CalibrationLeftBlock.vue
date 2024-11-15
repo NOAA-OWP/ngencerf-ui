@@ -1,24 +1,24 @@
 <template>
   <!-- LeftBlock.vue -->
-  <div class="grid grid-rows-1">
+  <div>
     <CommonTabs @tabNumber="tabChanged" />
     
-    <div class="row-span-1" v-if="activeTab == 1">
+    <div v-if="activeTab == 1">
       <LazyCalibrationCalibrationRunsTab />
     </div> 
-    <div class="row-span-1" v-else-if="activeTab == 2">
+    <div v-else-if="activeTab == 2">
       <LazyCalibrationHeadwaterBasinGage />
     </div>
-    <div class="row-span-1" v-else-if="activeTab == 3">
+    <div v-else-if="activeTab == 3">
       <LazyCalibrationFormulation />
     </div>
-    <div class="row-span-1" v-else-if="activeTab == 4">
+    <div v-else-if="activeTab == 4">
       <LazyCalibrationTuningControls />
     </div>
-    <div class="row-span-1" v-else-if="activeTab == 5">
+    <div v-else-if="activeTab == 5">
       <LazyCalibrationOptimizationMetrics />
     </div>
-    <div class="row-span-1" v-else-if="activeTab == 6">
+    <div v-else-if="activeTab == 6">
       <LazyCalibrationRunStatus />
     </div>
     
