@@ -490,6 +490,7 @@ export interface ValidatedCalibrationRunList {
 export interface CalibrationValidationRunData {
   validation_run_id: number;
   run_date: Date;
+  status: string;
   parameters: CalibrationValidationParameter[];
 }
 

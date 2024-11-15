@@ -54,8 +54,8 @@ import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAltIterationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from '~/stores/common/GeneralStore';
-import { useValidationRunStatusStore } from '~/stores/evaluation/ValidationRunStatusStore';
 import { hilightTab } from '~/composables/TabHilight';
+import { useEvaluationRunStatusStore } from '~/stores/evaluation/EvaluationRunStatusStore';
 
 const toast = useToast();
 const {     
@@ -74,8 +74,8 @@ const {
   userSelectedCalibrationIterationId,
 } = storeToRefs( useEvaluationAltIterationStore() );
 
-const { clearRunningStatusInfo } = useValidationRunStatusStore();
-const { iterationValidationRunId } = storeToRefs( useValidationRunStatusStore() );
+const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
+const { iterationValidationRunId } = storeToRefs( useEvaluationRunStatusStore() );
 const { evaluateIterationRunId } = storeToRefs( generalStore() );
 
 const selectedCalibrationByIterationDetailRow = ref<any>();
@@ -194,16 +194,5 @@ th.p-datatable-header-cell.bg-objective-function-col,
 th.p-datatable-header-cell.bg-objective-function-col:hover {
     background-color: rgb(204, 85, 0);
 }
-/*
-#RunDetailsTbl, #CalTuningParamsTbl {
-    width: 900px;
-    margin: 0 auto;
-}
 
-.tableTitle {
-    margin: 15px 0 10px 0;
-    font-size: 1.5em;
-
-}
-*/
 </style>

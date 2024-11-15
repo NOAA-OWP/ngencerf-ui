@@ -89,7 +89,7 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted } from "vue";
 import { generalStore } from '~/stores/common/GeneralStore';
-import { useValidationRunStatusStore } from '~/stores/evaluation/ValidationRunStatusStore';
+import { useEvaluationRunStatusStore } from '~/stores/evaluation/EvaluationRunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { calculateElapsedTime, formatDateForDisplay } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
@@ -97,13 +97,12 @@ import type { CalibrationGetStatusValidationItem } from "~/composables/NextGenMo
 import { hilightTab } from '~/composables/TabHilight';
 
 const userDataStore = useUserDataStore();
-const validationRunStatusStore = useValidationRunStatusStore();
 const toast = useToast();
 
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 
-const { startTime, runningTime, validationStatus, iterationValidationRunId } = storeToRefs( validationRunStatusStore );
-const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, isValidationRunDone, isValidationRerunable } = validationRunStatusStore;
+const { startTime, runningTime, validationStatus, iterationValidationRunId } = storeToRefs( useEvaluationRunStatusStore() );
+const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, isValidationRunDone, isValidationRerunable } = useEvaluationRunStatusStore();
 
 const validationStatusCheckingInterval = ref<any>();
 const validationRunningTimeInterval = ref<any>();

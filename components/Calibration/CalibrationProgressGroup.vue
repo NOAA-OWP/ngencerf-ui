@@ -79,10 +79,7 @@
 
 <script lang="ts" setup>
 import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { useGageStore } from '~/stores/calibration/GageStore';
-import { useFormulationStore } from '~/stores/calibration/FormulationStore';
 import { useTuningStore } from "~/stores/calibration/TuningStore";
-import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 

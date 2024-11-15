@@ -4,7 +4,10 @@
 
       <div class="flex mt-2">
         <div class="w-2/3">
-          <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">Previous Calibration Runs</h1>
+          <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
+            <span v-if="computedCalibrationValidationRunList.length <= 1">Previous Calibration Runs</span>
+            <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{ userSelectedEvalCalibrationRunId }}</span>
+          </h1>
         </div>
         <div class="ml-auto mt-2">
           <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
@@ -78,7 +81,7 @@
         <div class="ml-auto mt-4">
           <div id="NewButton" class="">
             <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
-              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true"
+              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0"
               @click.stop="navigateToEvaluation">Evaluate</Button>
           </div>
         </div>
@@ -132,7 +135,6 @@ const toast = useToast();
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRun>();
 const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
-
 
 onMounted(() => {
   hilightTab(EvaluationTabs.tab_calibrationRuns);
