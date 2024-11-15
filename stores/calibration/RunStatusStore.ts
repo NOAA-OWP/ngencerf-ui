@@ -196,21 +196,32 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Get Calibration Plot
    * @return {any}
    */
-  const queryGetPlot = async (plotName: string, include_data: boolean = false, calibration_run_id: number = calibrationJobId.value, validation_run_id: number = 0): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/`, {
-      method: "POST",
+  const queryGetPlot = async (
+    plotName: string,
+    include_data: boolean = false,
+    calibration_run_id: number = calibrationJobId.value,
+    validation_run_id: number = 0,
+    page?: number,
+    page_size?: number
+  ): Promise<any> => {
+    const params = new URLSearchParams({
+      plot_name: plotName,
+      include_data: include_data.toString(),
+      calibration_run_id: (calibration_run_id > 0) ? calibration_run_id.toString() : '',
+      validation_run_id: (validation_run_id > 0) ? validation_run_id.toString() : '',
+      page: page !== undefined ? page.toString() : '',
+      page_size: page_size !== undefined ? page_size.toString() : ''
+    });
+
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/?${params.toString()}`, {
+      method: "GET",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({
-        plot_name: plotName,
-        include_data: include_data,
-        calibration_run_id: (calibration_run_id > 0) ? calibration_run_id : null,
-        validation_run_id: (validation_run_id > 0) ? validation_run_id : null
-      })
+        "Content-Type": "application/json"
+      }
     });
   };
+
 
   /**
    * Run Calibration

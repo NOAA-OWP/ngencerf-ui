@@ -501,9 +501,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  if (iteration.value >= 1) {
+  if (iteration.value && iteration.value >= 1) {
     // get selected plot file name and url from server
-    const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
+    const response: any = await queryGetPlot(selectedPlotName.value as string); // store this in RunStatusStore
 
     if (response?._data?.plot_file_name && response?._data?.plot_url) {
       selectedPlotFilename.value = response?._data?.plot_file_name;
@@ -524,7 +524,7 @@ watch(selectedPlotName, async () => {
 // Handle startTimeDate changes
 watch(startTimeDate, () => {
   if (isValidDate(startTimeDate.value)) {
-    startTime.value = convertTimeZone(startTimeDate.value);
+    startTime.value = convertTimeZone(startTimeDate.value as Date);
   } else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object'});
   }
@@ -532,7 +532,7 @@ watch(startTimeDate, () => {
 
 // Handle iteration changes
 watch(iteration, async () => {
-  if (iteration.value >= 1 && selectedPlotName.value) {
+  if (iteration.value && iteration.value >= 1 && selectedPlotName.value) {
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
 
