@@ -36,12 +36,12 @@
                         <input id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md" style="background-color: white;"
                           v-model="calibrationStatus" disabled />
                       </span>
-                      <span v-else-if="calibrationStatus === 'Done' && !validControlAndValidBestDone">
+                      <span v-else-if="calibrationStatus === 'Done' && !validControlAndValidBestStatus">
                         <span id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md" style="background-color: white;">
                           Calibration Done, Validation Running
                         </span>
                       </span>
-                      <span v-else-if="calibrationStatus === 'Done' && validControlAndValidBestDone">
+                      <span v-else-if="calibrationStatus === 'Done' && validControlAndValidBestStatus === 'Done'">
                         <span id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md" style="background-color: white;">
                           Done
                         </span>
@@ -190,7 +190,7 @@ const {
   elapsedTimeIntervalId,
   calibrationStatusIntervalId,
   validationsStatusIntervalId,
-  validControlAndValidBestDone,
+  validControlAndValidBestStatus,
   resultsPathname
 } = storeToRefs(runStatusStore);
 
@@ -198,7 +198,7 @@ const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
 
 const {
-  areValidControlAndValidBestDone,
+  getValidControlAndValidBestStatus,
   queryGetCalibrationStatus,
   queryGetPlotNames,
   queryGetPlot,
@@ -232,6 +232,8 @@ onMounted(() => {
     if (userCalibrationRunData?.value?.status === 'Done') {
       const getStatusResponse = await queryGetCalibrationStatus();
       validControlAndValidBestDone.value = areValidControlAndValidBestDone(getStatusResponse);
+
+
     }
   });
 });

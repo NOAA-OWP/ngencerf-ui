@@ -32,7 +32,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const elapsedTimeIntervalId = ref<number>();
   const calibrationStatusIntervalId = ref<number>();
   const validationsStatusIntervalId = ref<number>();
-  const validControlAndValidBestDone = ref<boolean>(false);
+  const validControlAndValidBestStatus = ref<string>();
   const resultsPathname = ref<string>();
 
   // // Restore state from sessionStorage if available
@@ -94,21 +94,20 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       }
     }
 
-    // load elapsedTime, validControlAndValidBestDone from get_status. 
+    // load validControlAndValidBestStatus and elapsedTime from queryGetCalibrationStatus
     // Calibration must be Done to get validations
-    // Calibration and Validations must be Done to get completed elapsedTime
+    // Calibration and Validations must be Done and run on Parallel Works to get completed elapsedTime
     const getStatusResponse = await queryGetCalibrationStatus();
     const validations = getStatusResponse?._data?.validations;
-    validControlAndValidBestDone.value = areValidControlAndValidBestDone(getStatusResponse);
-    // get elapsed times from validations
-    const elapsedTimes = validations
-      .map((validation: any) => validation.elapsed_time)
-      .filter((eTime: any) => eTime !== null && eTime !== undefined);
+    const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
+    const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
+    if (validControl && validBest) {
+      validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validControl, validBest);
 
-    // if there are elapsed times, get the max elapsed time
-    // we will only have elapsed times if server is running on Parallel Works
-    if (elapsedTimes.length > 0) {
-      elapsedTime.value = Math.max(...elapsedTimes).toString();
+      // get elapsed time from valid_best
+      if (validBest.elapsed_time) {
+        elapsedTime.value = validBest.elapsed_time;
+      }
     }
 
     // load plotNames and plotList from get_plot_names
@@ -125,23 +124,40 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   /**
-   * Returns true if valid_control and valid_best are Done
-   * @returns
+   * Get the status of valid_control and valid_best to determine the overall status
+   * @param validControl
+   * @param validBest
+   * @returns {string}
    */
-  const areValidControlAndValidBestDone = (getStatusResponse: any): boolean => {
-    const validations = getStatusResponse?._data?.validations;
-    const calibrationValidationsDone = validations.filter(
-      (item: any) =>
-        (item.validation_type === 'valid_best' || item.validation_type === 'valid_control') &&
-        item.status === 'Done'
-    );
+  const getValidControlAndValidBestStatus = (validControl: any, validBest: any): string => {
+    const validControlStatus: string = validControl.status;
+    const validBestStatus: string = validBest.status;
 
-    // Check if both 'valid_best' and 'valid_control' are present in the calibrationValidations array
-    const hasValidBestDone = calibrationValidationsDone.some((item: any) => item.validation_type === 'valid_best');
-    const hasValidControlDone = calibrationValidationsDone.some((item: any) => item.validation_type === 'valid_control');
-
-    return hasValidBestDone && hasValidControlDone;
-  }
+    if (validControlStatus === 'Saved' || validBestStatus === 'Saved') {
+      return 'Saved';
+    }
+    else if (validControlStatus === 'Ready' || validBestStatus === 'Ready') {
+      return 'Ready';
+    }
+    else if (validControlStatus === 'Running' || validBestStatus === 'Running') {
+      return 'Running';
+    }
+    else if (validControlStatus === 'Cancelled' || validBestStatus === 'Cancelled') {
+      return 'Cancelled';
+    }
+    else if (validControlStatus === 'Failed' || validBestStatus === 'Failed') {
+      return 'Failed';
+    }
+    else if (validControlStatus === 'Server Error' || validBestStatus === 'Server Error') {
+      return 'Server Error';
+    }
+    else if (validControlStatus === 'Done' && validBestStatus === 'Done') {
+      return 'Done';
+    }
+    else {
+      return 'Unknown';
+    }
+  };
 
   /**
    * Get Calibration Status
@@ -267,17 +283,17 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    */
   const hardResetRunStatusStore = (): void => {
     elapsedTime.value = "";
-    startTimeDate.value = "";
+    startTimeDate.value = undefined;
     startTime.value = "";
-    plotNames.value = "";
+    plotNames.value = {};
     plotList.value = [];
     selectedPlotName.value = "";
     selectedPlotFilename.value = "";
     selectedPlotFileUrl.value = "";
     iteration.value = undefined;
-    stopCriteria.value = "";
+    stopCriteria.value = undefined;
     stopCriteriaMet.value = false;
-    validControlAndValidBestDone.value = false;
+    validControlAndValidBestStatus.value = undefined;
     resultsPathname.value = undefined;
 
     if (elapsedTimeIntervalId.value) {
@@ -313,10 +329,10 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     elapsedTimeIntervalId,
     calibrationStatusIntervalId,
     validationsStatusIntervalId,
-    validControlAndValidBestDone,
+    validControlAndValidBestStatus,
     resultsPathname,
     loadRunStatusStore,
-    areValidControlAndValidBestDone,
+    getValidControlAndValidBestStatus,
     queryGetCalibrationStatus,
     queryGetPlotNames,
     queryGetPlot,
