@@ -48,7 +48,7 @@
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </span>
         <span v-show="calibrationJobId > 0 && loadCalibrationDataComplete == true">
-          <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Evaluate Tab"
+          <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Evaluate Tab" v-show="evaluateValidationRunId > 0"
             title=" Evaluate tab">
             Evaluate
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
@@ -125,7 +125,7 @@ import { storeToRefs } from "pinia";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
 
-const { calibrationJobId, evaluateIterationRunId } = storeToRefs(generalStore());
+const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
