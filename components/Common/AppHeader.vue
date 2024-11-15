@@ -115,7 +115,6 @@ import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 import ContextMenu from 'primevue/contextmenu';
-import ConfirmPopup from 'primevue/confirmpopup';
 
 import { useLogout } from "~/composables/UseEventBus";
 
@@ -205,7 +204,7 @@ useAccountEventListen('accountEvent', () => {
 })
 
 const logoutUser = async () => {
-  if (confirm("Are you sure you want to logout?") == true) {
+  if (confirm("Are you sure you want to logout?")) {
     console.log("Logging out...");
     useLogout("logoutEvent", "");
     await navigateTo('login');
@@ -232,12 +231,20 @@ const displayHelp = () => {
 }
 
 const MenuChanged = (e: MouseEvent) => {
+  const currentMenu = getMenuIndex();
   const ele = e.currentTarget as HTMLElement;
   const m = ele.getAttribute('data-menu');
-  if (m) {
-    setMenuIndex(parseInt(m, 10));
+  const tabs = document.getElementsByClassName("tabs");
+  const tab = <HTMLElement>tabs[0];
+  if (m && e) {
+    if (currentMenu && currentMenu.toString() === m) {
+      tab.click();
+    } else {
+      setMenuIndex(parseInt(m, 10));
+    }
   }
 }
+
 </script>
 
 <style lang="scss" scoped>
