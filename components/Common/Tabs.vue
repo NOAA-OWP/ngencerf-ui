@@ -173,7 +173,6 @@ const tabNotCompleted = ref(false);
 
 
 const tabClicked = (event: Event) => {
-  console.log("Tab Clicked Event ", event.target)
   event.preventDefault();
   const ele = event.currentTarget as HTMLElement;
   nextTick(() => {
