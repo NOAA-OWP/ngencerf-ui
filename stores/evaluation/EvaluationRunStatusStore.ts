@@ -6,7 +6,7 @@ import { generalStore } from "../common/GeneralStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
 
-export const useValidationRunStatusStore = defineStore('ValidationRunStatusStore', () => {
+export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore', () => {
   const { evaluateIterationRunId, iterationValidationRunId } = storeToRefs(generalStore());
   const { userCalibrationRunData } = storeToRefs(useUserDataStore());
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -121,5 +121,5 @@ export const useValidationRunStatusStore = defineStore('ValidationRunStatusStore
   actions, and getters.
 */
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useValidationRunStatusStore, import.meta.hot));
+  import.meta.hot.accept(acceptHMRUpdate(useEvaluationRunStatusStore, import.meta.hot));
 }

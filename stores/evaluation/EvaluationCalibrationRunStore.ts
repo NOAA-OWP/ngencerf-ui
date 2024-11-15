@@ -7,12 +7,12 @@ import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "~/composables/NextGenModel";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { useValidationRunStatusStore } from "./ValidationRunStatusStore";
+import { useEvaluationRunStatusStore } from "./EvaluationRunStatusStore";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {  
   const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId } = storeToRefs( generalStore() );
   const { fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
-  const { clearRunningStatusInfo } = useValidationRunStatusStore()
+  const { clearRunningStatusInfo } = useEvaluationRunStatusStore()
   const calibrationRunList = ref<any[]>([]);
   const userSelectedEvalCalibrationRunId = ref<number>( 0 );
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -113,12 +113,14 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       
       runListDataResult._data?.validation_jobs.forEach( ( validation_job: CalibrationValidationJobData ) => {
         if ( validation_job.best	=== true ) {
-          calibrationValidationRunListHeaders.value.push({ field: 'validation_run_id', header: "Validation Run ID"});
+          calibrationValidationRunListHeaders.value.push({ field: 'validation_run_id', header: "Validation Job ID"});
           calibrationValidationRunListHeaders.value.push({ field: 'run_date', header: "Run Date"});
 
           validation_job.parameters.forEach( ( parameter: CalibrationRunValidationParameterData ) => {
             calibrationValidationRunListHeaders.value.push({ field: parameter.name, header: parameter.name });            
           });
+
+          calibrationValidationRunListHeaders.value.push({ field: 'status', header: "Status"});
         }
         let rowData = <any>{};
         rowData['validation_run_id'] = validation_job.validation_run_id;
@@ -126,6 +128,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         validation_job.parameters.forEach( ( parameter: CalibrationRunValidationParameterData ) => {
           rowData[ parameter.name ] = parameter.value;
         });
+        rowData['status'] = validation_job.status;
         computedCalibrationValidationRunList.value.push( rowData );
       });
     }

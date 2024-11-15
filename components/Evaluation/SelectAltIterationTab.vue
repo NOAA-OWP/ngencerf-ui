@@ -54,7 +54,7 @@ import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAltIterationStore';
 import { useToast } from "primevue/usetoast";
 import { generalStore } from '~/stores/common/GeneralStore';
-import { useValidationRunStatusStore } from '~/stores/evaluation/ValidationRunStatusStore';
+import { useEvaluationRunStatusStore } from '~/stores/evaluation/EvaluationRunStatusStore';
 
 const toast = useToast();
 const {     
@@ -73,8 +73,8 @@ const {
   userSelectedCalibrationIterationId,
 } = storeToRefs( useEvaluationAltIterationStore() );
 
-const { clearRunningStatusInfo } = useValidationRunStatusStore();
-const { iterationValidationRunId } = storeToRefs( useValidationRunStatusStore() );
+const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
+const { iterationValidationRunId } = storeToRefs( useEvaluationRunStatusStore() );
 const { evaluateIterationRunId } = storeToRefs( generalStore() );
 
 const selectedCalibrationByIterationDetailRow = ref<any>();
