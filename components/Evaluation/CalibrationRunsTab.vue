@@ -42,7 +42,7 @@
                   {{ formatDateForDisplay(slotProps.data.created_at) }}
                 </template>
               </Column>
-              <Column field="submit_date" header="Run Date" sortable>
+              <Column field="submit_date" header="Submit Date" sortable>
                 <template #body="slotProps">
                   {{ formatDateForDisplay(slotProps.data.submit_date) }}
                 </template>

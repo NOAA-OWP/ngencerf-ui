@@ -11,7 +11,7 @@
               <table>
                 <tbody>
                   <tr height="40px">
-                    <td class="text-right font-bold"><div style="width: 140px;">Start Time</div></td>
+                    <td class="text-right font-bold"><div style="width: 140px;">Submit Time</div></td>
                     <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="32px">
