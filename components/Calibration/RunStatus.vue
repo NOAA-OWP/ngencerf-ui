@@ -11,7 +11,7 @@
               <table>
                 <tbody>
                   <tr height="40px">
-                    <td class="text-right font-bold"><div style="width: 140px;">Start Time</div></td>
+                    <td class="text-right font-bold"><div style="width: 140px;">Submit Time</div></td>
                     <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="32px">
@@ -225,8 +225,8 @@ onMounted(() => {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
       // console.log('stopCriteria:', stopCriteria.value);
 
-      if (userCalibrationRunData.value.run_date) {
-        startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
+      if (userCalibrationRunData.value.submit_date) {
+        startTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
         // console.log('startTimeDate from within nextTicket and onMounted:', startTimeDate.value);
       }
     }
@@ -279,10 +279,10 @@ const startRun = async () => {
           toast.add({severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server'});
         }
 
-        if (runCalibrationResponse._data.run_date) {
-          startTimeDate.value = new Date(runCalibrationResponse?._data?.run_date);
+        if (runCalibrationResponse._data.submit_date) {
+          startTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
         } else {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
+          toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
         }
 
         if (userCalibrationRunData?.value?.status !== 'Running') {
@@ -336,14 +336,14 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
     }
     
-    if (userCalibrationRunData.value.run_date) {
-      startTimeDate.value = new Date(userCalibrationRunData.value?.run_date);
+    if (userCalibrationRunData.value.submit_date) {
+      startTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
     }
 
     if (['Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
       // Calculate Running Time
       if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
-        startTime.value = convertTimeZone(startTimeDate.value); // create a string from run_date and convert it to local time format
+        startTime.value = convertTimeZone(startTimeDate.value); // create a string from submit_date and convert it to local time format
         
         const getStatusResponse = await queryGetCalibrationStatus();
         validControlAndValidBestDone.value = areValidControlAndValidBestDone(getStatusResponse);
@@ -358,7 +358,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           }
         }
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object' });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
       }
 
       // get job data directory
@@ -524,7 +524,7 @@ watch(startTimeDate, () => {
   if (isValidDate(startTimeDate.value)) {
     startTime.value = convertTimeZone(startTimeDate.value as Date);
   } else {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'run_date from server could not be converted to a Date object'});
+    toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object'});
   }
 });
 

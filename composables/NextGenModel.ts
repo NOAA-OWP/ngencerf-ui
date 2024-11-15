@@ -43,7 +43,7 @@ export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
 }
 
 export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
-  run_date: Date;
+  submit_date: Date;
   validation_run_id: number;
 }
 
@@ -86,7 +86,7 @@ export interface JobListItem {
   calibration_start_period: Date;
   calibration_end_period: Date;
   formulation_name: string;
-  run_date: Date;
+  submit_date: Date;
 }
 
 /**
@@ -94,7 +94,7 @@ export interface JobListItem {
  */
 export interface UserCalibrationRunData {
   calibration_run_id: number;
-  run_date: string; // e.g. "2024-09-13T05:50:22.334Z"
+  submit_date: string; // e.g. "2024-09-13T05:50:22.334Z"
   gage: GageData;
   forcing_source: string;
   forcing_user_dir: string;
@@ -489,7 +489,7 @@ export interface ValidatedCalibrationRunList {
 
 export interface CalibrationValidationRunData {
   validation_run_id: number;
-  run_date: Date;
+  submit_date: Date;
   status: string;
   parameters: CalibrationValidationParameter[];
 }
@@ -583,7 +583,7 @@ export interface CalibrationGetStatusResponse {
   status: string;
   errors?: string[];
   validations: CalibrationGetStatusValidationItem[];
-  run_date: Date;
+  submit_date: Date;
   elapsed_time: string | null;
   performance_metrics: CalibrationGetStatusPerformanceMetricItem[] | null;
 }
@@ -592,7 +592,7 @@ export interface CalibrationGetStatusValidationItem {
   validation_run_id: number;
   status: string;
   validation_type: string;
-  run_date: Date;
+  submit_date: Date;
   elapsed_time?: string | null;
   performance_metrics?: CalibrationGetStatusPerformanceMetricItem[] | null;
 }
