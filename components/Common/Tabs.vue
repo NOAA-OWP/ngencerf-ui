@@ -140,38 +140,6 @@ const { loadCalibrationDataComplete } = storeToRefs(useEvaluationCalibrationRunS
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
 
-// onMounted(() => {
-//   const observerCallback = (mutationsList: any) => {
-//     for (const mutation of mutationsList) {
-//       if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-//         const targetElement = mutation.target;
-//         if (targetElement.classList.contains('activeTab')) {
-//           console.log('activeTab class added to', targetElement);
-//           console.trace('Trace for activeTab class addition');
-//         } else {
-//           console.log('activeTab class removed from', targetElement);
-//           console.trace('Trace for activeTab class removal');
-//         }
-//       }
-//     }
-//   };
-
-//   const observer = new MutationObserver(observerCallback);
-
-//   // Observe all elements with the class 'tabs' for attribute changes
-//   const tabsElements = document.querySelectorAll('.tabs');
-//   console.log("tabElements length: ", tabsElements.length)
-//   tabsElements.forEach((el) => {
-//     observer.observe(el, { attributes: true, attributeFilter: ['class'] });
-//   });
-
-//   // Cleanup observer on component unmount
-//   onBeforeUnmount(() => {
-//     observer.disconnect();
-//   });
-// });
-
-
 const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele = event.currentTarget as HTMLElement;
@@ -191,7 +159,6 @@ const tabClicked = (event: Event) => {
       emit("tabNumber", currentVerificationTab.value);
     }
   })
-
 }
 </script>
 <style lang="scss" scoped>
