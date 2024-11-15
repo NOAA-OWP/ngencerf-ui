@@ -59,6 +59,13 @@ const calibrationJobStore = useCalibrationJobStore()
 const { fetchJobsListData } = storeToRefs(calibrationJobStore)
 const { fetchNewCalibrationRunId } = calibrationJobStore
 
+import { hilightTab } from '~/composables/TabHilight';
+onMounted(() => {
+  hilightTab(VerificationTabs.tab_calibrationRuns);
+  
+})
+
+
 // async function initCalibrationRunList() {
 //     await calibrationRunStore.retrieveCalibrationRuns()
 // }

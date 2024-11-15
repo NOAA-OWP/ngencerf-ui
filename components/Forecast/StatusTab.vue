@@ -35,6 +35,13 @@
 </template>
 
 <script setup lang="ts">
+import { hilightTab } from '~/composables/TabHilight';
+onMounted(() => {
+  hilightTab(ForecastTabs.tab_runStatus);
+  
+})
+
+
 
 </script>
 

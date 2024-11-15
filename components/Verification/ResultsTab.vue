@@ -4,7 +4,12 @@
 </template>
 
 <script setup lang="ts">
-//
+import { hilightTab } from '~/composables/TabHilight';
+onMounted(() => {
+  hilightTab(VerificationTabs.tab_results);
+  
+})
+
 </script>
 
 <style lang="scss" scoped>

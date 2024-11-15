@@ -147,6 +147,7 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import type { SelectChangeEvent } from "primevue/select";
 import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
 import { formatDateForRunOnString } from "~/utils/TimeHelpers";
+import { hilightTab } from '~/composables/TabHilight';
 
 import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "~/composables/ValidationHandlers";
 
@@ -169,6 +170,8 @@ const isLoading = ref(true);
 
 
 onMounted(() => {
+  hilightTab(CalibrationTabs.tab_headwaterBasinGage);
+  
   toast.removeAllGroups();
   isLoading.value = false;
 

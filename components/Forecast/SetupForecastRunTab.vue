@@ -44,6 +44,12 @@
 </template>
 
 <script setup lang="ts">
+import { hilightTab } from '~/composables/TabHilight';
+onMounted(() => {
+  hilightTab(ForecastTabs.tab_selectAltIteration);
+  
+})
+
 
 const observedForcing = ref();
 const forcingSource = ref();

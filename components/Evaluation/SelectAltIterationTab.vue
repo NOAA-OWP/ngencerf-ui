@@ -55,6 +55,7 @@ import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAl
 import { useToast } from "primevue/usetoast";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useValidationRunStatusStore } from '~/stores/evaluation/ValidationRunStatusStore';
+import { hilightTab } from '~/composables/TabHilight';
 
 const toast = useToast();
 const {     
@@ -84,6 +85,8 @@ const calibrationRunDetailTable = ref<HTMLTableElement>();
 const tuningParametersTable = ref<HTMLTableElement>();
 
 onMounted( () => {
+  hilightTab(EvaluationTabs.tab_selectAltIteration);
+  
   nextTick( () => {
     resetEvaluationAltIterationStore();
     fetchCalibrationDataByIterationDataList();
