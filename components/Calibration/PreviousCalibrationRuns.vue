@@ -24,10 +24,10 @@
               {{ formatDateForDisplay( slotProps.data.created_at ) }}
             </template>
           </Column>
-          <Column field="run_date" header="Run Date" sortable>
+          <Column field="submit_date" header="Run Date" sortable>
             <template #body="slotProps">
-              <span v-if="slotProps.data.run_date">
-              {{ formatDateForDisplay( slotProps.data.run_date ) }}
+              <span v-if="slotProps.data.submit_date">
+              {{ formatDateForDisplay( slotProps.data.submit_date ) }}
               </span>
             </template>
           </Column>

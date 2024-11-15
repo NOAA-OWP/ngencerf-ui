@@ -88,7 +88,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     stopCriteria.value = userCalibrationRunData?.value?.stop_criteria;
 
     if (isCalibrationJobFinished(userCalibrationRunData?.value?.status)) {
-      startTimeDate.value = new Date(userCalibrationRunData.value?.run_date as string);
+      startTimeDate.value = new Date(userCalibrationRunData.value?.submit_date as string);
       if (isValidDate(startTimeDate.value)) {
         startTime.value = convertTimeZone(startTimeDate.value);
       }

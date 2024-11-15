@@ -145,7 +145,7 @@ const startRun = async () => {
     if ( response.status == 201 ) {
       validationStatus.value = response?._data?.status;
       iterationValidationRunId.value = response?._data.validation_run_id;
-      startTime.value = response?._data?.run_date;
+      startTime.value = response?._data?.submit_date;
       validationRunningTimeInterval.value = setInterval( updateRunningTime, 1000 );
     } else {
       toast.add({ severity: 'warn', summary: 'Unable to Create Validation' });

@@ -28,7 +28,7 @@
             <Column field="calibration_run_id" header="Run ID" sortable></Column>
             <Column field="formulation_name" header="Formulation Name" sortable></Column>
             <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-            <Column field="run_date" header="Run Date" sortable></Column>
+            <Column field="submit_date" header="Run Date" sortable></Column>
             <Column field="calibration_start_period" header="Calibration Period" sortable></Column>
             <Column field="status" header="Status" sortable></Column>
           </DataTable>
