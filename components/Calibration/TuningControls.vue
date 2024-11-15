@@ -303,6 +303,7 @@ import { formatDateForRunOnString } from "~/utils/TimeHelpers";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import type { DatePickerProps } from "primevue/datepicker";
+import { hilightTab } from '~/composables/TabHilight';
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -367,6 +368,8 @@ let mainLeftAreaElement: HTMLElement | null = null;
 let dataTableElement: HTMLElement | null = null;
 
 onMounted(async () => {
+  hilightTab(CalibrationTabs.tab_tuningControls);
+  
   toast.removeAllGroups();
 
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;

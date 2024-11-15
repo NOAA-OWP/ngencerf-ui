@@ -168,6 +168,7 @@ import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { isValidDate, isNotNullOrUndefined } from '~/utils/CommonHelpers';
 import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
+import { hilightTab } from '~/composables/TabHilight';
 
 const runStatusStore = useRunStatusStore();
 const userDataStore = useUserDataStore();
@@ -213,6 +214,8 @@ const progress = ref();
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 
 onMounted(() => {
+  hilightTab(CalibrationTabs.tab_statusRun);
+  
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }

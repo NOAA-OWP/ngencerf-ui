@@ -79,6 +79,7 @@ const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useU
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
+import { hilightTab } from '~/composables/TabHilight';
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -94,6 +95,8 @@ const onRowContextMenu = (event: any) => {
 };
 
 onMounted(() => {
+  hilightTab(CalibrationTabs.tab_calibrationRuns);
+  
   isLoading.value = false;
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;

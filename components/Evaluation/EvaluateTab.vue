@@ -104,6 +104,7 @@ import { useEvaluationSupplementalDataStore } from '~/stores/evaluation/Evaluati
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useToast } from 'primevue/usetoast';
 import type { DynamicObject } from "~/composables/NextGenModel";
+import { hilightTab } from '~/composables/TabHilight';
 
 import MessagesGroup from "../Common/MessagesGroup.vue";
 
@@ -115,7 +116,7 @@ const toast = useToast();
 const showMessagesGroup = ref(false);
 
 const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
-const { getCalibrationTabIndex } = generalStore();
+
 const {
   resultsPathname
 } = storeToRefs(runStatusStore);
@@ -170,7 +171,8 @@ const supplementalTableOptions = [
 ]
 
 onMounted(async () => {
-
+  hilightTab(EvaluationTabs.tab_evaluate);
+  
   if (!userCalibrationRunData?.value) {
     await fetchUserCalibrationRunData();
   }

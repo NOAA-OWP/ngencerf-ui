@@ -15,6 +15,19 @@ export const EvaluationTabs =  {
   tab_runStatus: 3
 }
 
+export const ForecastTabs =  {
+  tab_calibrationRuns: 0,
+  tab_evaluate: 1,
+  tab_selectAltIteration: 2,
+  tab_runStatus: 3,
+  tab_results: 4
+}
+
+export const VerificationTabs =  {
+  tab_calibrationRuns: 0,
+  tab_results: 1
+}
+
 export const NextgenPages = {
   page_calibration: 1,
   page_evaluation: 2,

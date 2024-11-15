@@ -59,6 +59,13 @@ const calibrationJobStore = useCalibrationJobStore()
 const { fetchJobsListData } = storeToRefs(calibrationJobStore)
 const { fetchNewCalibrationRunId } = calibrationJobStore
 
+import { hilightTab } from '~/composables/TabHilight';
+onMounted(() => {
+  hilightTab(VerificationTabs.tab_calibrationRuns);
+  
+})
+
+
 // async function initCalibrationRunList() {
 //     await calibrationRunStore.retrieveCalibrationRuns()
 // }
@@ -79,7 +86,6 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 const confirmDelte = useConfirm();
 
 const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-    const confirm_delete = ref(false)
     const selectedRunId = selectedCalibrationRun.value.runId
     let confirmMessage = "Are you sure you want to delete?"
     if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
@@ -143,8 +149,6 @@ const NewCalibration = async () => {
 #CalTable {
     width: 1000px;
     margin: 0 auto;
-    //border: 1px solid $ngwcp_primary1;
-
     .table {
         thead tr th {
             background-color: #F5A4A4;
