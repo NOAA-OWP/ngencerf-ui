@@ -88,7 +88,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
     if ( runListDataResult?._data?.jobs.length > 0 ) {
       runListDataResult?._data?.jobs.forEach( ( runItem: ValidatedCalibrationRunListItem ) => {
-        if ( runItem.status.toLowerCase() == "done" && runItem.run_date != null ) {
+        if ( runItem.status.toLowerCase() == "done" && runItem.submit_date != null ) {
           userEvaluationCalibrationRunListData.value.push( runItem );
         }
       });
@@ -114,7 +114,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       runListDataResult._data?.validation_jobs.forEach( ( validation_job: CalibrationValidationJobData ) => {
         if ( validation_job.best	=== true ) {
           calibrationValidationRunListHeaders.value.push({ field: 'validation_run_id', header: "Validation Job ID"});
-          calibrationValidationRunListHeaders.value.push({ field: 'run_date', header: "Run Date"});
+          calibrationValidationRunListHeaders.value.push({ field: 'submit_date', header: "Submit Date"});
 
           validation_job.parameters.forEach( ( parameter: CalibrationRunValidationParameterData ) => {
             calibrationValidationRunListHeaders.value.push({ field: parameter.name, header: parameter.name });            
@@ -124,7 +124,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         }
         let rowData = <any>{};
         rowData['validation_run_id'] = validation_job.validation_run_id;
-        rowData['run_date'] = formatDateForDisplay( validation_job.run_date );
+        rowData['submit_date'] = formatDateForDisplay( validation_job.submit_date );
         validation_job.parameters.forEach( ( parameter: CalibrationRunValidationParameterData ) => {
           rowData[ parameter.name ] = parameter.value;
         });
