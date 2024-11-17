@@ -18,6 +18,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
 
+  const tokenExpired = ref<boolean>(false);
+
   const userCalibrationJobsListData = ref<JobListItem[]>([]);
   const userCalibrationRunData = ref<UserCalibrationRunData>();
 
@@ -183,6 +185,14 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     return refreshToken.value;
   }
 
+  function setIsTokenExpired() {
+    tokenExpired.value = true;
+  }
+
+  function getIsTokenExpired() {
+    return tokenExpired.value;
+  }
+
   /**
    * fetch user created calibration job list data
    * @return {void}
@@ -228,8 +238,10 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     userCalibrationRunData.value = userCalibrationRunDataResult?._data ?? undefined;
   }
 
-  useLogoutListen('logoutEvent', () => {
-    hardResetUserDataStore();
+  useLogoutListen('logoutEvent', (evStr: string) => {
+    if (evStr === "logout") {
+      hardResetUserDataStore();
+    }
   })
 
   /**
@@ -263,6 +275,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     getUserInitials,
     setAccessToken,
     setRefreshToken,
+    setIsTokenExpired,
+    getIsTokenExpired,
     setUserName,
     setFirstName,
     setLastName,
@@ -275,7 +289,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     fetchUserCalibrationRunData,
     hardResetUserDataStore,
     clearUserCalibrationRunData,
-    userSelectedCalibrationIterationId
+    userSelectedCalibrationIterationId,
   };
 },
   {

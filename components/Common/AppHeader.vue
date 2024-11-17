@@ -116,7 +116,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 import ContextMenu from 'primevue/contextmenu';
 
-import { useLogout } from "~/composables/UseEventBus";
+import { useLogout, useLogoutListen } from "~/composables/UseEventBus";
 
 import UserAccount from "~/components/Common/UserAccount.vue";
 
@@ -135,7 +135,7 @@ const accountOverlay = ref();
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
-const { isUserLoggedIn, getUserInitials, hardResetUserDataStore } = useUserDataStore();
+const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
 const location = useRoute();
 
@@ -203,10 +203,19 @@ useAccountEventListen('accountEvent', () => {
   ele.style.display = "none";
 })
 
+useLogoutListen('logoutEvent', (evStr: string) => {
+  if (evStr === "token" && !getIsTokenExpired()) {
+    setIsTokenExpired();
+    alert("Your session has expired. Please log in again.");
+    useLogout("logoutEvent", "logout");
+    navigateTo('login');
+  }
+})
+
 const logoutUser = async () => {
   if (confirm("Are you sure you want to logout?")) {
     console.log("Logging out...");
-    useLogout("logoutEvent", "");
+    useLogout("logoutEvent", "logout");
     await navigateTo('login');
   }
 }
@@ -378,7 +387,7 @@ const MenuChanged = (e: MouseEvent) => {
   width: 60px;
   display: inline-block;
 
-#HelpCircle {
+  #HelpCircle {
     text-align: center;
     margin-top: 15px;
   }
