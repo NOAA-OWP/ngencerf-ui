@@ -282,7 +282,7 @@ const startRun = async () => {
     if (userCalibrationRunData.value) {
       userCalibrationRunData.value.status = 'Submitted';
     }
-    toast.removeAllGroups();
+    // toast.removeAllGroups();
     try {
       // console.log('hitting run_calibration endpoint');
       const runCalibrationResponse = await runCalibrationJob();
@@ -322,7 +322,7 @@ const startRun = async () => {
 // Cancel Calibration Job
 const cancelRun = async () => {
   if (calibrationStatus.value === 'Running') {
-    toast.removeAllGroups();
+    // toast.removeAllGroups();
     try {
       // console.log('hitting cancel_job endpoint');
       const cancelCalibrationResponse = await cancelCalibrationJob();
@@ -411,7 +411,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         );
         // console.log('plotList:', plotList.value);
       } else {
-        toast.removeAllGroups();
+        // toast.removeAllGroups();
         toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
       }
     }
