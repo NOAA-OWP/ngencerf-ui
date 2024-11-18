@@ -47,7 +47,7 @@
 import { hilightTab } from '~/composables/TabHilight';
 onMounted(() => {
   hilightTab(ForecastTabs.tab_selectAltIteration);
-  
+
 })
 
 

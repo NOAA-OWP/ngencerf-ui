@@ -1,35 +1,35 @@
 <template>
   <div class="grid grid-rows-10">
-      <div class="row-span-1">
-          <div id="CalibrationRunId" class="mt-5">
-              Calibration Run ID {{ 265 }}
-          </div>
+    <div class="row-span-1">
+      <div id="CalibrationRunId" class="mt-5">
+        Calibration Run ID {{ 265 }}
       </div>
+    </div>
 
-      <div class="row-span-1 summaryRow">
-          <div class="grid grid-cols-7">
-              <div class="col-span-1 text-center">
-                  Iteration: {{ 87 }}
-              </div>
-              <div class="col-span-2 line-left">
-                  Output Var to Export: 
-              </div>
-              <div class="col-span-2 line-left">
-                  Sim Start:<br />
-                  Sim End:
-              </div>
-              <div class="col-span-2 line-left">
-                  Validation Start:<br />
-                  Validation End:
-              </div>
-          </div>
+    <div class="row-span-1 summaryRow">
+      <div class="grid grid-cols-7">
+        <div class="col-span-1 text-center">
+          Iteration: {{ 87 }}
+        </div>
+        <div class="col-span-2 line-left">
+          Output Var to Export:
+        </div>
+        <div class="col-span-2 line-left">
+          Sim Start:<br />
+          Sim End:
+        </div>
+        <div class="col-span-2 line-left">
+          Validation Start:<br />
+          Validation End:
+        </div>
       </div>
+    </div>
 
-      <div class="row-span-8">
-          <div id="LoggingArea" class="boxed p-4">
-              <p v-for="l in 20">Log Line...</p>
-          </div>
+    <div class="row-span-8">
+      <div id="LoggingArea" class="boxed p-4">
+        <p v-for="l in 20">Log Line...</p>
       </div>
+    </div>
 
   </div>
 </template>
@@ -38,7 +38,7 @@
 import { hilightTab } from '~/composables/TabHilight';
 onMounted(() => {
   hilightTab(ForecastTabs.tab_runStatus);
-  
+
 })
 
 
@@ -54,14 +54,16 @@ onMounted(() => {
 }
 
 #LoggingArea {
- // width: 1100px;
- width: 90%;
+  // width: 1100px;
+  width: 90%;
   margin: 10px auto;
 }
+
 .summaryRow {
-      width: 1100px;
+  width: 1100px;
   margin: 10px auto;
 }
+
 .line-left {
   border-left: 1px solid black;
   padding-left: 5px;
