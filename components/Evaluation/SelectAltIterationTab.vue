@@ -108,8 +108,9 @@ onMounted( () => {
 })
 
 const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
+  console.log( 'onDetailTableRowSelect event.data.validation_run_id', event.data.validation_run_id );
   //userSelectedCalibrationIterationId.value = event.data.iteration_id;
-  if ( event.data.validation_run_id && event.data.validation_run_idf > 0 ) {
+  if ( event.data.validation_run_id === "" ) {
     evaluateIterationRunId.value = event.data.iteration_id; 
   }
   const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
@@ -117,8 +118,9 @@ const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
 }
 
 const onParameterTableRowSelect = ( event: DataTableRowClickEvent ) => {
+  console.log( 'onParameterTableRowSelect event.data.validation_run_id', event.data.validation_run_id );
   //userSelectedCalibrationIterationId.value = event.data.iteration_id;
-  if ( event.data.validation_run_id && event.data.validation_run_idf > 0 ) {
+  if ( event.data.validation_run_id === "" ) {
     evaluateIterationRunId.value = event.data.iteration_id;    
   }
   const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
