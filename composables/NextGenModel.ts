@@ -198,15 +198,15 @@ export interface SlothParameterData {
  * Model for Calibration's Headwater Basin Gage tab
  */
 export interface GageTabData {
-   status: string;
-   calibration_run_id: number;
-   forcing_source_values: ForcingSourceValueData[];
-   observational_source_values: ObservationalSourceValueData[];
-   geopackage_source_values: GeopackageSourceValueData[];
-   gages: GageOptionData[];
-   gage: GageData;
-   geopackage_image_url: string;
-   domain_values: DomainValueData[];
+  status: string;
+  calibration_run_id: number;
+  forcing_source_values: ForcingSourceValueData[];
+  observational_source_values: ObservationalSourceValueData[];
+  geopackage_source_values: GeopackageSourceValueData[];
+  gages: GageOptionData[];
+  gage: GageData;
+  geopackage_image_url: string;
+  domain_values: DomainValueData[];
 }
 
 export interface GageOptionData {
@@ -518,7 +518,7 @@ export interface DynamicTableColumn {
   field: any;
   header?: string;
   hidden?: boolean;
-  styles?: string[];  
+  styles?: string[];
 }
 
 export interface CalibrationRunByIteration {
@@ -548,7 +548,7 @@ export interface CalibrationRunValidationParameterData {
   value: number;
 }
 
-export interface CalibrationRunByIterationRetrospectiveData	{
+export interface CalibrationRunByIterationRetrospectiveData {
   name: string;
   data: CalibrationRunIterationMetricData[];
 }
@@ -563,14 +563,14 @@ export interface AlternativeIterationCalibrationRunData {
   worker_name: string;
   iteration_num: number;
   calibration_output_variable_value: number;
-  [name: string]: string|number;
+  [name: string]: string | number;
 }
 
 export interface AlternativeIterationTuningParameters {
   iteration_id: number;
   worker_name: string;
   iteration_num: number;
-  [name: string]: string|number;
+  [name: string]: string | number;
 }
 
 export interface DynamicObject {
@@ -627,6 +627,11 @@ export type LogoutEvent = {
 
 export type AccountEvent = {
   accountEvent: string;
+}
+
+export type ServerInfo = {
+  version: string;
+  email: string;
 }
 
 export const ValidationFormFields = {
