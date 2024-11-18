@@ -99,8 +99,7 @@ export const makeProtectedApiCall = async <T>(
     const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
     
     // if refresh fails, log the user out and redirect to login page
-    // TODO: navigateTo needs to be moved. It cannot be called by Pinia store files. Have components call this function instead.
-    if (!refreshAccessTokenSuccess) {
+      if (!refreshAccessTokenSuccess) {
       userDataStore.logUserOut();
       useLogout("logoutEvent", "token");
       return null;
