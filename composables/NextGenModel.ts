@@ -573,6 +573,10 @@ export interface AlternativeIterationTuningParameters {
   [name: string]: string|number;
 }
 
+export interface APIResponse {
+  _data?: {[key: string]: any;};
+}
+
 export interface DynamicObject {
   [key: string]: any;
 }
