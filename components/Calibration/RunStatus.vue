@@ -212,6 +212,11 @@ const {
 const isLoading = ref(false);
 const progress = ref();
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
+const plotNamesToExclude = [
+  "Iteration Metrics Table",
+  "Iteration Parameters Table",
+  "Performance Metrics Table",
+];
 
 onMounted(() => {
   hilightTab(CalibrationTabs.tab_statusRun);
@@ -408,7 +413,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         // console.log('plotNames._data:', plotNames.value?._data);
 
         // setting plotList will populate the dropdown
-        plotList.value = plotNames?.value?._data?.plot_names;
+        plotList.value = plotNames.value?._data?.plot_names?.filter(
+          (plot: any) => !plotNamesToExclude.includes(plot.name)
+        );
         // console.log('plotList:', plotList.value);
       } else {
         toast.removeAllGroups();
@@ -431,7 +438,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         // console.log('plotNames:', plotNames.value?._data);
 
         // setting plotList will populate the dropdown
-        plotList.value = plotNames.value?._data?.plot_names;
+        plotList.value = plotNames.value?._data?.plot_names?.filter(
+          (plot: any) => !plotNamesToExclude.includes(plot.name)
+        );
         // console.log('plotList:', plotList.value);
       } else {
         toast.removeAllGroups();
