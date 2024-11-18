@@ -248,7 +248,7 @@
       </span>
       <span v-else>
         <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-          Run on {{ formatDateForRunOnString(startTimeDate) }}
+          Run on {{ formatDateForRunOnString(submitTimeDate) }}
         </div>
       </span>
 
@@ -317,7 +317,7 @@ const { ngencerfBaseUrl } = useBackendConfig();
 const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
 const runStatusStore = useRunStatusStore();
-const { startTimeDate } = storeToRefs(useRunStatusStore());
+const { submitTimeDate } = storeToRefs(useRunStatusStore());
 
 const {
   formulationNameInput,

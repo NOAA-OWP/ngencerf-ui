@@ -12,7 +12,7 @@
                     <td class="text-right font-bold">
                       <div style="width: 140px;">Submit Time</div>
                     </td>
-                    <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ submitTime ? submitTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="32px">
                     <td class="text-right font-bold">
@@ -187,8 +187,8 @@ const toast = useToast();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
 const {
-  startTimeDate,
-  startTime,
+  submitTimeDate,
+  submitTime,
   elapsedTime,
   plotNames,
   plotList,
@@ -236,8 +236,8 @@ onMounted(() => {
       // console.log('stopCriteria:', stopCriteria.value);
 
       if (userCalibrationRunData.value.submit_date) {
-        startTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
-        // console.log('startTimeDate from within nextTicket and onMounted:', startTimeDate.value);
+        submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
+        // console.log('submitTimeDate from within nextTicket and onMounted:', submitTimeDate.value);
       }
     }
 
@@ -265,7 +265,7 @@ const createElapsedTimeInterval = () => {
     if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' && 
       (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate elapsedTime every second while Calibration is Running or Validation is not Done
-      elapsedTime.value = calculateElapsedTime(startTimeDate.value as Date, new Date());
+      elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
     } else {
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
@@ -296,7 +296,7 @@ const startRun = async () => {
         }
 
         if (runCalibrationResponse._data.submit_date) {
-          startTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
+          submitTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
         } else {
           toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
         }
@@ -353,13 +353,13 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     }
 
     if (userCalibrationRunData.value.submit_date) {
-      startTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
+      submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
     }
 
     if (['Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
       // Calculate Running Time
-      if (startTimeDate.value && startTimeDate.value instanceof Date && !isNaN(startTimeDate?.value.getTime())) {
-        startTime.value = convertTimeZone(startTimeDate.value); // create a string from submit_date and convert it to local time format
+      if (submitTimeDate.value && submitTimeDate.value instanceof Date && !isNaN(submitTimeDate?.value.getTime())) {
+        submitTime.value = convertTimeZone(submitTimeDate.value); // create a string from submit_date and convert it to local time format
 
         const getStatusResponse = await queryGetCalibrationStatus();
         const validations = getStatusResponse?._data?.validations;
@@ -369,10 +369,10 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validControl, validBest);
         }
 
-        // Calculate Running Time every second while calibration is Running or calibration is Done and valid_control and valid_best are Ready or Running
+        // Calculate Running Time every second while calibration is Running or calibration is Done and valid_control and valid_best have not started or are Ready or Running
         if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' && 
         (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
-          elapsedTime.value = calculateElapsedTime(startTimeDate.value as Date, new Date());
+          elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
 
           // Create an interval to update elapsedTime every second while Calibration is Running or Validation is not Done
           if (!elapsedTimeIntervalId.value) {
@@ -525,10 +525,10 @@ watch(selectedPlotName, async () => {
   }
 });
 
-// Handle startTimeDate changes
-watch(startTimeDate, () => {
-  if (isValidDate(startTimeDate.value)) {
-    startTime.value = convertTimeZone(startTimeDate.value as Date);
+// Handle submitTimeDate changes
+watch(submitTimeDate, () => {
+  if (isValidDate(submitTimeDate.value)) {
+    submitTime.value = convertTimeZone(submitTimeDate.value as Date);
   } else {
     toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
   }

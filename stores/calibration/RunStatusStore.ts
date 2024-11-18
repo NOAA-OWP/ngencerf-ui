@@ -17,8 +17,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
   // refs
   const elapsedTime = ref<string>();
-  const startTimeDate = ref<Date>();
-  const startTime = ref<string>();
+  const submitTimeDate = ref<Date>();
+  const submitTime = ref<string>();
 
   const plotNames = ref({});
   const plotList = ref<any[]>([]);
@@ -44,8 +44,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   //   if (ls !== "undefined") { plotNames.value = JSON.parse(ls as string) }
 
   //   elapsedTime.value = sessionStorage.getItem('elapsedTime') as string;
-  //   startTimeDate.value = sessionStorage.getItem('startTimeDate') as any as Date;
-  //   startTime.value = sessionStorage.getItem('startTime') as string;
+  //   submitTimeDate.value = sessionStorage.getItem('submitTimeDate') as any as Date;
+  //   submitTime.value = sessionStorage.getItem('submitTime') as string;
   //   selectedPlotName.value = sessionStorage.getItem('selectedPlotName') as string;
   //   selectedPlotFilename.value = sessionStorage.getItem('selectedPlotFilename') as string;
   //   selectedPlotFileUrl.value = sessionStorage.getItem('selectedPlotFileUrl') as string;
@@ -65,8 +65,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   // watch(plotList, (plotList) => { sessionStorage.setItem('plotList', JSON.stringify(plotList)); });
   // watch(plotNames, (plotNames) => { sessionStorage.setItem('', JSON.stringify(plotNames)); });
   // watch(elapsedTime, (elapsedTime) => { sessionStorage.setItem('elapsedTime', elapsedTime ?? ""); });
-  // watch(startTimeDate, (startTimeDate) => { sessionStorage.setItem('startTimeDate', JSON.stringify(startTimeDate)); });
-  // watch(startTime, (startTime) => { sessionStorage.setItem('startTime', startTime ?? ""); });
+  // watch(submitTimeDate, (submitTimeDate) => { sessionStorage.setItem('submitTimeDate', JSON.stringify(submitTimeDate)); });
+  // watch(submitTime, (submitTime) => { sessionStorage.setItem('submitTime', submitTime ?? ""); });
   // watch(selectedPlotName, (selectedPlotName) => { sessionStorage.setItem('selectedPlotName', selectedPlotName ?? ""); });
   // watch(selectedPlotFilename, (selectedPlotFilename) => { sessionStorage.setItem('selectedPlotFilename', selectedPlotFilename ?? ""); });
   // watch(selectedPlotFileUrl, (selectedPlotFileUrl) => { sessionStorage.setItem('selectedPlotFileUrl', selectedPlotFileUrl ?? ""); });
@@ -84,13 +84,13 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Load RunStatusStore
    */
   const loadRunStatusStore = async (): Promise<void> => {
-    // load stopCriteria, startTimeDate, and startTime from load_calibration_run
+    // load stopCriteria, submitTimeDate, and submitTime from load_calibration_run
     stopCriteria.value = userCalibrationRunData?.value?.stop_criteria;
 
     if (isCalibrationJobFinished(userCalibrationRunData?.value?.status)) {
-      startTimeDate.value = new Date(userCalibrationRunData.value?.submit_date as string);
-      if (isValidDate(startTimeDate.value)) {
-        startTime.value = convertTimeZone(startTimeDate.value);
+      submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date as string);
+      if (isValidDate(submitTimeDate.value)) {
+        submitTime.value = convertTimeZone(submitTimeDate.value);
       }
     }
 
@@ -293,8 +293,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    */
   const hardResetRunStatusStore = (): void => {
     elapsedTime.value = "";
-    startTimeDate.value = undefined;
-    startTime.value = "";
+    submitTimeDate.value = undefined;
+    submitTime.value = "";
     plotNames.value = {};
     plotList.value = [];
     selectedPlotName.value = "";
@@ -325,8 +325,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   return {
-    startTimeDate,
-    startTime,
+    submitTimeDate,
+    submitTime,
     elapsedTime,
     plotNames,
     plotList,
