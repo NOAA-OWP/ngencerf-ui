@@ -183,18 +183,20 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const queryGetPlot = async (
     plotName: string,
     include_data: boolean = false,
+    force_include_plot: boolean = false,
     calibration_run_id: number = calibrationJobId.value,
     validation_run_id: number = 0,
-    page?: number,
-    page_size?: number
+    start?: number,
+    limit?: number
   ): Promise<any> => {
     const params = new URLSearchParams({
       plot_name: plotName,
       include_data: include_data.toString(),
+      force_include_plot: force_include_plot.toString(),
       calibration_run_id: (calibration_run_id > 0) ? calibration_run_id.toString() : '',
       validation_run_id: (validation_run_id > 0) ? validation_run_id.toString() : '',
-      page: page !== undefined ? page.toString() : '',
-      page_size: page_size !== undefined ? page_size.toString() : ''
+      start: start !== undefined ? start.toString() : '',
+      limit: limit !== undefined ? limit.toString() : ''
     });
 
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/?${params.toString()}`, {
