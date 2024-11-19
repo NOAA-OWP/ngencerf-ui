@@ -12,6 +12,9 @@
       <Column field="time_range_ngencerf" header="Time Range ngenCERF"></Column>
     </DataTable>
   </div>
+  <div class="text-xs mt-2">
+    Cycles in <span class="text-gray-500">grey</span> are currently unavailable from the GUI. Use the CLI to run these cycles.
+  </div>
   <div>
     <span v-if="selectedCycle">
       <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
