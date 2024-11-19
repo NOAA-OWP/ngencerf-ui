@@ -298,7 +298,7 @@ import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { makeProtectedApiCall } from '~/composables/UserAuth';
 import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { ifHydrofabricErrorsExist } from "~/utils/TuningControlsHelpers";
+import { ifEDSErrorsExist } from "~/utils/TuningControlsHelpers";
 import { formatDateForRunOnString } from "~/utils/TimeHelpers";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
@@ -389,10 +389,10 @@ onMounted(async () => {
       // console.log("Tuning Tab data already loaded. No need to fetch");
     }
 
-    // check if Hydrofabric errors exist
-    const hydrofabricErrorMessage = loadTuningTabData.value ? ifHydrofabricErrorsExist(loadTuningTabData.value._data) : '';
-    if (hydrofabricErrorMessage) {
-      toast.add({ severity: 'error', summary: 'Hydrofabric Error', detail: hydrofabricErrorMessage });
+    // check if EDS errors exist
+    const edsErrorMessage = loadTuningTabData.value ? ifEDSErrorsExist(loadTuningTabData.value._data) : '';
+    if (edsErrorMessage) {
+      toast.add({ severity: 'error', summary: 'EDS Error', detail: edsErrorMessage });
     }
 
     // set calibration times

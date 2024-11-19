@@ -3,7 +3,8 @@
   <div id="RunDetailsTbl" class="text-left mt-3 p-3">
     <div class="tableTitle">Run Details</div>
     <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
-      table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow">
+      table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow"
+      :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : null">
       <ColumnGroup type="header">
         <Row>
           <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" :class="col.styles ?? []" sortable></Column>
@@ -21,7 +22,8 @@
     <div id="CalTuningParamsTbl" class="text-left mt-3 p-3">
       <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
       <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"  @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect"
-        selectionMode="single" ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"> 
+        selectionMode="single" ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"
+        :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : null"> 
         <ColumnGroup type="header">
           <Row :class="['table-header']">
             <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header" :field="col.field" :hidden="col.hidden ?? false" sortable></Column> 
@@ -35,7 +37,7 @@
     </div>
   </div>
 
-  <div class="b-0 grid grid-cols-8 mt-6 ActionButtonsBox">   
+  <div class="b-0 grid grid-cols-8 mt-6 ActionButtonsBox" v-show="evaluateIterationRunId && evaluateIterationRunId > 0">   
     <div class="col-span-7"></div>
     <div class="col-span-1 mr-4">
       <div>
@@ -106,15 +108,21 @@ onMounted( () => {
 })
 
 const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
+  console.log( 'onDetailTableRowSelect event.data.validation_run_id', event.data.validation_run_id );
   //userSelectedCalibrationIterationId.value = event.data.iteration_id;
-  evaluateIterationRunId.value = event.data.iteration_id;
+  if ( event.data.validation_run_id === "" ) {
+    evaluateIterationRunId.value = event.data.iteration_id; 
+  }
   const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
-  selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];
+  selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];   
 }
 
 const onParameterTableRowSelect = ( event: DataTableRowClickEvent ) => {
+  console.log( 'onParameterTableRowSelect event.data.validation_run_id', event.data.validation_run_id );
   //userSelectedCalibrationIterationId.value = event.data.iteration_id;
-  evaluateIterationRunId.value = event.data.iteration_id;
+  if ( event.data.validation_run_id === "" ) {
+    evaluateIterationRunId.value = event.data.iteration_id;    
+  }
   const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
   selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];
 }
@@ -162,7 +170,12 @@ const navigateToEvaluateStatus = ( event : any ) => {
 }
 
 .p-datatable-tbody .p-datatable-selectable-row td {
-    font-size: 0.8em;
+  font-size: 0.8em;
+}
+
+.p-datatable-tbody .p-datatable-selectable-row.disabled-row td {
+  font-weight: 500;
+  color: darkgray;
 }
 
 table#cr-detail-list2 {
@@ -192,7 +205,6 @@ table#cr-detail-list2 th {
 
 th.p-datatable-header-cell.bg-objective-function-col,
 th.p-datatable-header-cell.bg-objective-function-col:hover {
-    background-color: rgb(204, 85, 0);
+  background-color: rgb(204, 85, 0);
 }
-
 </style>
