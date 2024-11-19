@@ -11,20 +11,20 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const { getAccessToken } = useUserDataStore();
 
   // refs
-  const plotNames = ref();
+  const plotNames = ref<APIResponse>({});
   const plotList = ref<any[]>([]);
-  const selectedPlotName = ref();
-  const selectedPlotFilename = ref();
-  const selectedPlotFileUrl = ref();
-  const iterations = ref();
+  const selectedPlotName = ref<string | null>(null);
+  const selectedPlotFilename = ref<string | null>(null);
+  const selectedPlotFileUrl = ref<string | null>(null);
+  const iterations = ref<APIResponse>({});
   const iterationMetricsData = ref<any[]>([]);
   const iterationParamsData = ref<any[]>([]);
   const iterationMetricsColumns = ref<any[]>([]);
   const iterationParamsColumns = ref<any[]>([]);
-  const selectedSupplementalTable = ref<number>(0);
-  const performanceMetrics = ref();
+  const selectedSupplementalTable = ref<number>( 0 );
+  const performanceMetrics = ref<APIResponse>({});
   const performanceMetricsData = ref<any[]>([]);
-  const logs = ref();
+  const logs = ref<APIResponse>({});
   const calibrationLogData = ref<DynamicObject>({});
   const validationLogData = ref<string>("")
 

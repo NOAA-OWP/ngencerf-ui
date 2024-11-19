@@ -39,7 +39,7 @@ export interface ValidationErrorObject {
 
 export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
   geopackage_image_url?: string | null;
-  hydrofabric_errors: HydrofabricError[];
+  eds_errors: edsError[];
 }
 
 export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
@@ -47,7 +47,7 @@ export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
   validation_run_id: number;
 }
 
-export interface HydrofabricError {
+export interface edsError {
   name: string;
   message: string;
   status_code: string;
@@ -531,9 +531,10 @@ export interface CalibrationRunByIteration {
 export interface CalibrationRunIterationData {
   iteration_num: number;
   iteration_id: number;
+  validation_run_id?: number;
   worker_name: string;
   best_params: boolean;
-  calibration_output_variable_value: number;
+  objective_function_value: number;
   parameters: CalibrationRunIterationParameterData[];
   metrics: CalibrationRunIterationMetricData[];
 }
@@ -560,17 +561,28 @@ export interface CalibrationRunIterationMetricData {
 
 export interface AlternativeIterationCalibrationRunData {
   iteration_id: number;
+  validation_run_id: number|string;
   worker_name: string;
   iteration_num: number;
-  calibration_output_variable_value: number;
-  [name: string]: string | number;
+  objective_function_value: number;
+  [name: string]: string|number;
 }
 
 export interface AlternativeIterationTuningParameters {
   iteration_id: number;
+  validation_run_id: number|string;
   worker_name: string;
   iteration_num: number;
+  
   [name: string]: string | number;
+}
+
+export interface APIResponse {
+  _data?: {[key: string]: any;};
+}
+
+export interface APIResponse {
+  _data?: {[key: string]: any;};
 }
 
 export interface DynamicObject {

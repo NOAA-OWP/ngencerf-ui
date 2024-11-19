@@ -17,8 +17,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
   // refs
   const elapsedTime = ref<string>();
-  const startTimeDate = ref<Date>();
-  const startTime = ref<string>();
+  const submitTimeDate = ref<Date>();
+  const submitTime = ref<string>();
 
   const plotNames = ref({});
   const plotList = ref<any[]>([]);
@@ -32,7 +32,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const elapsedTimeIntervalId = ref<number>();
   const calibrationStatusIntervalId = ref<number>();
   const validationsStatusIntervalId = ref<number>();
-  const validControlAndValidBestDone = ref<boolean>(false);
+  const validControlAndValidBestStatus = ref<string>();
   const resultsPathname = ref<string>();
 
   // // Restore state from sessionStorage if available
@@ -44,8 +44,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   //   if (ls !== "undefined") { plotNames.value = JSON.parse(ls as string) }
 
   //   elapsedTime.value = sessionStorage.getItem('elapsedTime') as string;
-  //   startTimeDate.value = sessionStorage.getItem('startTimeDate') as any as Date;
-  //   startTime.value = sessionStorage.getItem('startTime') as string;
+  //   submitTimeDate.value = sessionStorage.getItem('submitTimeDate') as any as Date;
+  //   submitTime.value = sessionStorage.getItem('submitTime') as string;
   //   selectedPlotName.value = sessionStorage.getItem('selectedPlotName') as string;
   //   selectedPlotFilename.value = sessionStorage.getItem('selectedPlotFilename') as string;
   //   selectedPlotFileUrl.value = sessionStorage.getItem('selectedPlotFileUrl') as string;
@@ -65,8 +65,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   // watch(plotList, (plotList) => { sessionStorage.setItem('plotList', JSON.stringify(plotList)); });
   // watch(plotNames, (plotNames) => { sessionStorage.setItem('', JSON.stringify(plotNames)); });
   // watch(elapsedTime, (elapsedTime) => { sessionStorage.setItem('elapsedTime', elapsedTime ?? ""); });
-  // watch(startTimeDate, (startTimeDate) => { sessionStorage.setItem('startTimeDate', JSON.stringify(startTimeDate)); });
-  // watch(startTime, (startTime) => { sessionStorage.setItem('startTime', startTime ?? ""); });
+  // watch(submitTimeDate, (submitTimeDate) => { sessionStorage.setItem('submitTimeDate', JSON.stringify(submitTimeDate)); });
+  // watch(submitTime, (submitTime) => { sessionStorage.setItem('submitTime', submitTime ?? ""); });
   // watch(selectedPlotName, (selectedPlotName) => { sessionStorage.setItem('selectedPlotName', selectedPlotName ?? ""); });
   // watch(selectedPlotFilename, (selectedPlotFilename) => { sessionStorage.setItem('selectedPlotFilename', selectedPlotFilename ?? ""); });
   // watch(selectedPlotFileUrl, (selectedPlotFileUrl) => { sessionStorage.setItem('selectedPlotFileUrl', selectedPlotFileUrl ?? ""); });
@@ -84,31 +84,30 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Load RunStatusStore
    */
   const loadRunStatusStore = async (): Promise<void> => {
-    // load stopCriteria, startTimeDate, and startTime from load_calibration_run
+    // load stopCriteria, submitTimeDate, and submitTime from load_calibration_run
     stopCriteria.value = userCalibrationRunData?.value?.stop_criteria;
 
     if (isCalibrationJobFinished(userCalibrationRunData?.value?.status)) {
-      startTimeDate.value = new Date(userCalibrationRunData.value?.submit_date as string);
-      if (isValidDate(startTimeDate.value)) {
-        startTime.value = convertTimeZone(startTimeDate.value);
+      submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date as string);
+      if (isValidDate(submitTimeDate.value)) {
+        submitTime.value = convertTimeZone(submitTimeDate.value);
       }
     }
 
-    // load elapsedTime, validControlAndValidBestDone from get_status. 
+    // load validControlAndValidBestStatus and elapsedTime from queryGetCalibrationStatus
     // Calibration must be Done to get validations
-    // Calibration and Validations must be Done to get completed elapsedTime
+    // Calibration and Validations must be Done and run on Parallel Works to get completed elapsedTime
     const getStatusResponse = await queryGetCalibrationStatus();
     const validations = getStatusResponse?._data?.validations;
-    validControlAndValidBestDone.value = areValidControlAndValidBestDone(getStatusResponse);
-    // get elapsed times from validations
-    const elapsedTimes = validations
-      .map((validation: any) => validation.elapsed_time)
-      .filter((eTime: any) => eTime !== null && eTime !== undefined);
+    const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
+    const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
+    if (validControl && validBest) {
+      validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validControl, validBest);
 
-    // if there are elapsed times, get the max elapsed time
-    // we will only have elapsed times if server is running on Parallel Works
-    if (elapsedTimes.length > 0) {
-      elapsedTime.value = Math.max(...elapsedTimes).toString();
+      // get elapsed time from valid_best
+      if (validBest.elapsed_time) {
+        elapsedTime.value = validBest.elapsed_time;
+      }
     }
 
     // load plotNames and plotList from get_plot_names
@@ -125,23 +124,40 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   /**
-   * Returns true if valid_control and valid_best are Done
-   * @returns
+   * Get the status of valid_control and valid_best to determine the overall status
+   * @param validControl
+   * @param validBest
+   * @returns {string}
    */
-  const areValidControlAndValidBestDone = (getStatusResponse: any): boolean => {
-    const validations = getStatusResponse?._data?.validations;
-    const calibrationValidationsDone = validations.filter(
-      (item: any) =>
-        (item.validation_type === 'valid_best' || item.validation_type === 'valid_control') &&
-        item.status === 'Done'
-    );
+  const getValidControlAndValidBestStatus = (validControl: any, validBest: any): string => {
+    const validControlStatus: string = validControl.status;
+    const validBestStatus: string = validBest.status;
 
-    // Check if both 'valid_best' and 'valid_control' are present in the calibrationValidations array
-    const hasValidBestDone = calibrationValidationsDone.some((item: any) => item.validation_type === 'valid_best');
-    const hasValidControlDone = calibrationValidationsDone.some((item: any) => item.validation_type === 'valid_control');
-
-    return hasValidBestDone && hasValidControlDone;
-  }
+    if (validControlStatus === 'Saved' || validBestStatus === 'Saved') {
+      return 'Saved';
+    }
+    else if (validControlStatus === 'Ready' || validBestStatus === 'Ready') {
+      return 'Ready';
+    }
+    else if (validControlStatus === 'Running' || validBestStatus === 'Running') {
+      return 'Running';
+    }
+    else if (validControlStatus === 'Cancelled' || validBestStatus === 'Cancelled') {
+      return 'Cancelled';
+    }
+    else if (validControlStatus === 'Failed' || validBestStatus === 'Failed') {
+      return 'Failed';
+    }
+    else if (validControlStatus === 'Server Error' || validBestStatus === 'Server Error') {
+      return 'Server Error';
+    }
+    else if (validControlStatus === 'Done' && validBestStatus === 'Done') {
+      return 'Done';
+    }
+    else {
+      return 'Unknown';
+    }
+  };
 
   /**
    * Get Calibration Status
@@ -183,18 +199,20 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const queryGetPlot = async (
     plotName: string,
     include_data: boolean = false,
+    force_include_plot: boolean = true,
     calibration_run_id: number = calibrationJobId.value,
     validation_run_id: number = 0,
-    page?: number,
-    page_size?: number
+    start?: number,
+    limit?: number
   ): Promise<any> => {
     const params = new URLSearchParams({
       plot_name: plotName,
       include_data: include_data.toString(),
+      force_include_plot: force_include_plot.toString(),
       calibration_run_id: (calibration_run_id > 0) ? calibration_run_id.toString() : '',
       validation_run_id: (validation_run_id > 0) ? validation_run_id.toString() : '',
-      page: page !== undefined ? page.toString() : '',
-      page_size: page_size !== undefined ? page_size.toString() : ''
+      start: start !== undefined ? start.toString() : '',
+      limit: limit !== undefined ? limit.toString() : ''
     });
 
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/?${params.toString()}`, {
@@ -205,7 +223,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       }
     });
   };
-
 
   /**
    * Run Calibration
@@ -278,17 +295,17 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    */
   const hardResetRunStatusStore = (): void => {
     elapsedTime.value = "";
-    startTimeDate.value = "";
-    startTime.value = "";
-    plotNames.value = "";
+    submitTimeDate.value = undefined;
+    submitTime.value = "";
+    plotNames.value = {};
     plotList.value = [];
     selectedPlotName.value = "";
     selectedPlotFilename.value = "";
     selectedPlotFileUrl.value = "";
     iteration.value = undefined;
-    stopCriteria.value = "";
+    stopCriteria.value = undefined;
     stopCriteriaMet.value = false;
-    validControlAndValidBestDone.value = false;
+    validControlAndValidBestStatus.value = undefined;
     resultsPathname.value = undefined;
 
     if (elapsedTimeIntervalId.value) {
@@ -310,8 +327,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   return {
-    startTimeDate,
-    startTime,
+    submitTimeDate,
+    submitTime,
     elapsedTime,
     plotNames,
     plotList,
@@ -324,10 +341,10 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     elapsedTimeIntervalId,
     calibrationStatusIntervalId,
     validationsStatusIntervalId,
-    validControlAndValidBestDone,
+    validControlAndValidBestStatus,
     resultsPathname,
     loadRunStatusStore,
-    areValidControlAndValidBestDone,
+    getValidControlAndValidBestStatus,
     queryGetCalibrationStatus,
     queryGetPlotNames,
     queryGetPlot,
