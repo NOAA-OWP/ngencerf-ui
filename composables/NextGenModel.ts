@@ -531,9 +531,10 @@ export interface CalibrationRunByIteration {
 export interface CalibrationRunIterationData {
   iteration_num: number;
   iteration_id: number;
+  validation_run_id?: number;
   worker_name: string;
   best_params: boolean;
-  calibration_output_variable_value: number;
+  objective_function_value: number;
   parameters: CalibrationRunIterationParameterData[];
   metrics: CalibrationRunIterationMetricData[];
 }
@@ -560,14 +561,16 @@ export interface CalibrationRunIterationMetricData {
 
 export interface AlternativeIterationCalibrationRunData {
   iteration_id: number;
+  validation_run_id: number|string;
   worker_name: string;
   iteration_num: number;
-  calibration_output_variable_value: number;
+  objective_function_value: number;
   [name: string]: string|number;
 }
 
 export interface AlternativeIterationTuningParameters {
   iteration_id: number;
+  validation_run_id: number|string;
   worker_name: string;
   iteration_num: number;
   [name: string]: string|number;
