@@ -72,7 +72,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
         headerRow = [];
         headerRow.push({
           header: retro_data.name,
-          colspan: 2
+          colspan: 3
         });
         retro_data.data.forEach((data: CalibrationRunIterationMetricData) => {
           headerRow.push({
@@ -92,9 +92,10 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
         if (iteration_data.best_params === true) {
           // detail run section
           headerRow = [];
-          calibrationRunDetailTableColumn.value.push({ field: 'iteration_id', hidden: true });
+          calibrationRunDetailTableColumn.value.push({ field: 'iteration_id', hidden: true });            
           calibrationRunDetailTableColumn.value.push({ field: 'worker_name', header: "Worker" });
           calibrationRunDetailTableColumn.value.push({ field: 'iteration_num', header: "Iteration" });
+          calibrationRunDetailTableColumn.value.push({ field: 'validation_run_id', header: "Validation ID" });  
 
           headerRow.push({
             header: iteration_data.worker_name,
@@ -106,11 +107,16 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
             colspan: 1
           });
 
-          iteration_data.metrics.forEach((metric: CalibrationRunIterationMetricData) => {
+          let calibrationRunDetailValidationRunId : string = '';
+          headerRow.push({ 
+            header: `${calibrationRunDetailValidationRunId}`,
+            colspan: 1
+          });
+
+          iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {            
             let metric_header_label = <string>metric.metric_name;
             let headerColumn = <DynamicTableColumn>{ field: metric.metric_name, header: metric_header_label }
             if (metric.metric_name == runListDataResult._data.objective_function_metric) {
-              headerColumn['header'] += " *";
               headerColumn['styles'] = ['bg-objective-function-col'];
             }
             calibrationRunDetailTableColumn.value.push(headerColumn);
@@ -135,10 +141,20 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
             colspan: 1
           });
 
-          tuningParametersTableColumn.value.push({ field: 'iteration_id', hidden: true });
+          let tuningParametersValidationRunId : string = '';
+          if ( iteration_data.validation_run_id && iteration_data.validation_run_id > 0 ) {
+            tuningParametersValidationRunId = `${iteration_data.validation_run_id}`;
+          }
+          headerRow.push({ 
+            header: `${tuningParametersValidationRunId}`,
+            colspan: 1
+          });
+
+          tuningParametersTableColumn.value.push({ field: 'iteration_id', hidden: true });            
           tuningParametersTableColumn.value.push({ field: 'worker_name', header: "Worker" });
           tuningParametersTableColumn.value.push({ field: 'iteration_num', header: "Iteration" });
-          iteration_data.parameters.forEach((parameter: CalibrationRunIterationParameterData) => {
+          tuningParametersTableColumn.value.push({ field: 'validation_run_id', header: "Validation ID" });  
+          iteration_data.parameters.forEach( ( parameter: CalibrationRunIterationParameterData ) => {
             tuningParametersTableColumn.value.push({ field: parameter.parameter_name, header: parameter.parameter_name });
 
             headerRow.push({
@@ -152,19 +168,21 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
         } else {
           // detail run section
           rowData = {};
-          rowData['iteration_id'] = iteration_data.iteration_id;
-          rowData['worker_name'] = iteration_data.worker_name;
-          rowData['iteration_num'] = iteration_data.iteration_num;
-
-          iteration_data.metrics.forEach((metric: CalibrationRunIterationMetricData) => {
-            rowData[metric.metric_name] = Number(metric.metric_value).toFixed(4);
+          rowData['iteration_id'] = iteration_data.iteration_id;       
+          rowData['validation_run_id'] = iteration_data.validation_run_id && iteration_data.validation_run_id > 0 ? iteration_data.validation_run_id : ''; 
+          rowData['worker_name'] = iteration_data.worker_name;        
+          rowData['iteration_num'] = iteration_data.iteration_num;        
+          
+          iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {
+            rowData[ metric.metric_name ] = Number( metric.metric_value ).toFixed( 4 );
           });
           computedCalibrationRunDetailDataList.value.push(rowData);
 
           //tuning parameter section
           rowData = {};
           rowData['iteration_id'] = iteration_data.iteration_id;
-          rowData['worker_name'] = iteration_data.worker_name;
+          rowData['validation_run_id'] = iteration_data.validation_run_id && iteration_data.validation_run_id > 0 ? iteration_data.validation_run_id : ''; 
+          rowData['worker_name'] = iteration_data.worker_name;        
           rowData['iteration_num'] = iteration_data.iteration_num;
 
           iteration_data.parameters.forEach((parameters: CalibrationRunIterationParameterData) => {

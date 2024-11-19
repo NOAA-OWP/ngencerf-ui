@@ -42,7 +42,7 @@
     </div>
     <div class="grid grid-cols-2">
       <div class="text-center">
-        <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
+        <div id="GraphArea" class="p-2" v-if="selectedPlotName && selectedPlotFileUrl">
           <img :src="selectedPlotFileUrl" :alt="selectedPlotName" />
         </div>
       </div>
@@ -55,7 +55,10 @@
             </Select>
           </div>
           <div class="pt-6 pb-2">
-            <DataTable :value="plotTableData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
+            <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0">
+              <b>Rows 1 to {{ plotTableData.length }} of {{ plotTableTotalSize }}</b>
+            </div>
+            <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true  scrollable scroll-height="500px" :multi-sort="true">
               <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable></Column>
             </DataTable>
           </div>
@@ -107,13 +110,14 @@ import type { DynamicObject } from "~/composables/NextGenModel";
 import { hilightTab } from '~/composables/TabHilight';
 
 import MessagesGroup from "../Common/MessagesGroup.vue";
+import { nextTick } from 'vue';
 
 const runStatusStore = useRunStatusStore();
 const EvaluationSupplementalDataStore = useEvaluationSupplementalDataStore();
 const userDataStore = useUserDataStore();
 const toast = useToast();
 
-const showMessagesGroup = ref(false);
+const showMessagesGroup = ref<Boolean>(false);
 
 const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
 
@@ -157,7 +161,13 @@ const plotTables = ref<DynamicObject>({});
 const plotTableList = ref<any[]>([]);
 const selectedPlotTable = ref<string>('');
 const plotTableData = ref<any[]>([]);
+const plotTableBatchData = ref<any[]>([]);
 const plotTableColumns = ref<any[]>([]);
+const plotTableTotalSize = ref<number>(0);
+const plotTableBatchSize = ref<number>(1000);
+const plotTablePageSize = ref<number>(100);
+const plotTableCurrentPage = ref<number>(1);
+const plotTableLazyLoad = ref<Boolean>(false);
 const performanceMetricsColumns = [{ header: 'Metric', field: 'metric' }];
 const calibrationLogList = ref<any[]>([]);
 const calibrationLogDisplay = ref<string>('');
@@ -185,7 +195,7 @@ onMounted(async () => {
     plotNames.value = await queryGetPlotNames();
   }
 
-  if (plotNames.value?._data.plot_names) {
+  if (plotNames.value?._data?.plot_names) {
     // console.log('plotNames._data:', plotNames.value?._data);
 
     // setting plotList will populate the dropdown
@@ -203,9 +213,13 @@ onMounted(async () => {
   console.log('iterations:', iterations.value?._data);
 
   // Add Iteration Metrics/Parameters Tables to the dropdown
-  if (iterations.value?._data.iteration_data) {
-    plotList.value.push({ name: supplementalTableOptions[0], description: '' });
-    plotList.value.push({ name: supplementalTableOptions[1], description: '' });
+  if (iterations.value?._data?.iteration_data) {
+    if (!plotList.value.some(item => item.name == supplementalTableOptions[0])) {
+      plotList.value.push({ name: supplementalTableOptions[0], description: '' });
+    }
+    if (!plotList.value.some(item => item.name == supplementalTableOptions[1])) {
+      plotList.value.push({ name: supplementalTableOptions[1], description: '' });
+    }
   }
 
   // set up arrays for iterationMetricsData and iterationParamsData
@@ -262,7 +276,7 @@ onMounted(async () => {
       performanceMetricsColumns.push({ header: 'Calibration Job ID ' + calibrationJobId.value, field: 'calibration_job_id_' + calibrationJobId.value });
       Object.keys(performanceMetrics.value?._data.performance_metrics).forEach(key => {
         performanceMetricsData.value.push({ 'metric': key });
-        performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = performanceMetrics.value?._data.performance_metrics[key];
+        performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = performanceMetrics.value?._data?.performance_metrics[key];
       });
       // Now go through the values from our Validations and add each metric value to the appropriate row
       if (performanceMetrics.value?._data?.validations) {
@@ -305,7 +319,9 @@ onMounted(async () => {
   }
 
   // Add Performance Metrics Table to the dropdown
-  plotList.value.push({ name: supplementalTableOptions[2], description: '' });
+  if (!plotList.value.some(item => item.name == supplementalTableOptions[2])) {
+    plotList.value.push({ name: supplementalTableOptions[2], description: '' });
+  }
   console.log('plotList:', plotList.value);
 
   // Get Calibration/Validation Logs
@@ -352,9 +368,13 @@ onMounted(async () => {
 
   // Add Calibration/Validation Logs to the dropdown
   if (logs.value?._data?.logs) {
-    plotList.value.push({ name: supplementalTableOptions[3], description: '' });
+    if (!plotList.value.some(item => item.name == supplementalTableOptions[3])) {
+      plotList.value.push({ name: supplementalTableOptions[3], description: '' });
+    }
     if (logs.value?._data?.validations) {
-      plotList.value.push({ name: supplementalTableOptions[4], description: '' });
+      if (!plotList.value.some(item => item.name == supplementalTableOptions[4])) {
+        plotList.value.push({ name: supplementalTableOptions[4], description: '' });
+      }
     }
   }
 
@@ -368,7 +388,7 @@ onMounted(async () => {
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   // is the selected option a plot or iteration table?
-  if (supplementalTableOptions.includes(selectedPlotName.value)) {
+  if (selectedPlotName.value && supplementalTableOptions.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
     selectedSupplementalTable.value = supplementalTableOptions.indexOf(selectedPlotName.value) + 1;
@@ -387,6 +407,7 @@ watch(selectedPlotName, async () => {
     if (selectedSupplementalTable.value == 5 && validationLogData.value == '') {
       toast.add({ severity: 'info', summary: 'Validation Run ' + evaluateValidationRunId.value + ' has no logs', life: 5000 });
     }
+    plotTableBatchData.value = [];
     plotTableData.value = [];
     plotTableColumns.value = [];
   } else if (selectedPlotName.value) {
@@ -395,8 +416,11 @@ watch(selectedPlotName, async () => {
     const response: any = await queryGetPlot(
       selectedPlotName.value, // plotName
       true, // include_data
+      true, // force_include_plot
       (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
+      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+      0, // start
+      plotTableBatchSize.value // limit
     );
 
     if (response?._data) {
@@ -414,6 +438,12 @@ watch(selectedPlotName, async () => {
         plotTables.value = {};
         plotTableList.value = [];
         selectedPlotTable.value = '';
+        if (response?._data?.pagination_metadata?.count) {
+          plotTableTotalSize.value = response?._data?.pagination_metadata?.count;
+        } else {
+          plotTableTotalSize.value = response?._data?.plot_data.length;
+        }
+        plotTableBatchData.value = [];
         plotTableData.value = [];
         if (Array.isArray(response?._data?.plot_data[0])) {
           // special case - we are dealing with an array of multiple tables, instead of a single table
@@ -439,18 +469,15 @@ watch(selectedPlotName, async () => {
           });
           selectedPlotTable.value = plotTableList.value[0].name;
           if (selectedPlotTable.value != '') {
-            plotTableData.value = plotTables.value[selectedPlotTable.value];
+            plotTableBatchData.value = plotTables.value[selectedPlotTable.value];
           } else {
-            plotTableData.value = [];
+            plotTableBatchData.value = [];
           }
+          plotTableData.value = plotTableBatchData.value;
+          adjustPlotTableColumns();
         } else {
-          let max_rows = response?._data?.plot_data.length;
           plotTables.value = { default_table: [] };
-          if (response?._data?.plot_data.length > 100) {
-            // limit to first 100 rows for now - eventually need to find a way to let the user change the date range dynamically
-            max_rows = 100;
-          }
-          for (let d = 0; d < max_rows; d++) {
+          for (let d = 0; d < response?._data?.plot_data.length; d++) {
             let data_row = response?._data?.plot_data[d];
             if ("metrics" in data_row) {
               for (let d = 0; d < data_row.metrics.length; d++) {
@@ -466,14 +493,17 @@ watch(selectedPlotName, async () => {
             }
             plotTables.value.default_table.push(data_row);
           }
-          plotTableData.value = plotTables.value.default_table;
+          plotTableBatchData.value = plotTables.value.default_table;
+          plotTableData.value = plotTableBatchData.value.slice(0, plotTablePageSize.value <= plotTableTotalSize.value ? plotTablePageSize.value : plotTableTotalSize.value);
+          adjustPlotTableColumns();
           if (plotTableData.value.length < response?._data?.plot_data.length) {
-            toast.add({ severity: 'info', summary: 'Displaying ' + plotTableData.value.length + ' of ' + response?._data?.plot_data.length + ' records', life: 5000 });
+            plotTableLazyLoad.value = true;
           }
         }
       } else {
         plotTableData.value = [];
         plotTableColumns.value = [];
+        plotTableLazyLoad.value = false;
         toast.removeAllGroups();
         toast.add({ severity: 'info', summary: 'Plot data is currently unavailable', life: 5000 });
       }
@@ -482,6 +512,7 @@ watch(selectedPlotName, async () => {
       selectedPlotFileUrl.value = null;
       plotTableData.value = [];
       plotTableColumns.value = [];
+      plotTableLazyLoad.value = false;
       toast.removeAllGroups();
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot', life: 5000 });
     }
@@ -490,13 +521,16 @@ watch(selectedPlotName, async () => {
 
 // Handle selectedPlotTable changes
 watch(selectedPlotTable, async () => {
+  console.log('selectedPlotName changed');
   if (selectedPlotTable.value != '') {
     plotTableData.value = plotTables.value[selectedPlotTable.value];
+    adjustPlotTableColumns();
   }
 });
 
 // set plotTableColumns whenever plotTableData is changed
-watch(plotTableData, async () => {
+function adjustPlotTableColumns() {
+  console.log('adjusting plotTableColumns');
   plotTableColumns.value = [];
   if (plotTableData.value.length > 0) {
     Object.keys(plotTableData.value[0]).forEach(key => {
@@ -522,10 +556,49 @@ watch(plotTableData, async () => {
         }
       });
     }
-    console.log('plotTableData: ', plotTableData.value);
-    console.log('plotTableColumns: ', plotTableColumns.value);
+    //console.log('plotTableData: ', plotTableData.value);
+    //console.log('plotTableColumns: ', plotTableColumns.value);
+    nextTick(() => {
+      const tableContainer = document.getElementById('plotTableHTML')?.querySelector('.p-datatable-table-container');
+      tableContainer?.addEventListener('scroll', async(event) => {
+        if (plotTableLazyLoad.value && (tableContainer.scrollTop > (tableContainer.scrollHeight - (2*tableContainer.clientHeight)))) {
+          plotTableLazyLoad.value = false; // disable scroll event until we're done
+          if (plotTableBatchData.value.length < plotTableTotalSize.value ) {
+            let start_row = plotTableData.value.length;
+            let end_row = plotTableData.value.length + plotTablePageSize.value;
+            if (plotTableData.value.length < plotTableBatchData.value.length) {
+              console.log('Loading next ' + plotTablePageSize.value + ' rows from our saved batch of ' + plotTableBatchData.value.length);
+            } else {
+              console.log('Loading next ' + plotTableBatchSize.value + ' rows from the ' + plotTableTotalSize.value + ' total stored in the backend');
+              plotTableCurrentPage.value++;
+              const response: any = await queryGetPlot(
+                selectedPlotName.value, // plotName
+                true, // include_data
+                false, // force_include_plot
+                (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
+                (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+                plotTableBatchData.value.length, // start
+                plotTableBatchSize.value // limit
+              );
+              if (response?._data) {
+                for (let d = 0; d < response?._data?.plot_data.length; d++) {
+                  let data_row = response?._data?.plot_data[d];
+                  plotTableBatchData.value.push(data_row);
+                }
+              }
+            }
+            let new_rows = plotTableBatchData.value.slice(start_row, end_row <= plotTableTotalSize.value ? end_row : plotTableTotalSize.value);
+            plotTableData.value = plotTableData.value.concat(new_rows);
+            plotTableLazyLoad.value = true; // turn scroll event back on
+          } else {
+            console.log('No more data to load - disabling scroll event');
+            plotTableLazyLoad.value = false;
+          }
+        }
+      });
+    });
   }
-});
+}
 
 // Handle selectedCalibrationLog changes
 watch(selectedCalibrationLog, async () => {

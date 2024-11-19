@@ -39,7 +39,7 @@ export interface ValidationErrorObject {
 
 export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
   geopackage_image_url?: string | null;
-  hydrofabric_errors: HydrofabricError[];
+  eds_errors: edsError[];
 }
 
 export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
@@ -47,7 +47,7 @@ export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
   validation_run_id: number;
 }
 
-export interface HydrofabricError {
+export interface edsError {
   name: string;
   message: string;
   status_code: string;
@@ -198,15 +198,15 @@ export interface SlothParameterData {
  * Model for Calibration's Headwater Basin Gage tab
  */
 export interface GageTabData {
-   status: string;
-   calibration_run_id: number;
-   forcing_source_values: ForcingSourceValueData[];
-   observational_source_values: ObservationalSourceValueData[];
-   geopackage_source_values: GeopackageSourceValueData[];
-   gages: GageOptionData[];
-   gage: GageData;
-   geopackage_image_url: string;
-   domain_values: DomainValueData[];
+  status: string;
+  calibration_run_id: number;
+  forcing_source_values: ForcingSourceValueData[];
+  observational_source_values: ObservationalSourceValueData[];
+  geopackage_source_values: GeopackageSourceValueData[];
+  gages: GageOptionData[];
+  gage: GageData;
+  geopackage_image_url: string;
+  domain_values: DomainValueData[];
 }
 
 export interface GageOptionData {
@@ -518,7 +518,7 @@ export interface DynamicTableColumn {
   field: any;
   header?: string;
   hidden?: boolean;
-  styles?: string[];  
+  styles?: string[];
 }
 
 export interface CalibrationRunByIteration {
@@ -531,9 +531,10 @@ export interface CalibrationRunByIteration {
 export interface CalibrationRunIterationData {
   iteration_num: number;
   iteration_id: number;
+  validation_run_id?: number;
   worker_name: string;
   best_params: boolean;
-  calibration_output_variable_value: number;
+  objective_function_value: number;
   parameters: CalibrationRunIterationParameterData[];
   metrics: CalibrationRunIterationMetricData[];
 }
@@ -548,7 +549,7 @@ export interface CalibrationRunValidationParameterData {
   value: number;
 }
 
-export interface CalibrationRunByIterationRetrospectiveData	{
+export interface CalibrationRunByIterationRetrospectiveData {
   name: string;
   data: CalibrationRunIterationMetricData[];
 }
@@ -560,17 +561,24 @@ export interface CalibrationRunIterationMetricData {
 
 export interface AlternativeIterationCalibrationRunData {
   iteration_id: number;
+  validation_run_id: number|string;
   worker_name: string;
   iteration_num: number;
-  calibration_output_variable_value: number;
+  objective_function_value: number;
   [name: string]: string|number;
 }
 
 export interface AlternativeIterationTuningParameters {
   iteration_id: number;
+  validation_run_id: number|string;
   worker_name: string;
   iteration_num: number;
-  [name: string]: string|number;
+  
+  [name: string]: string | number;
+}
+
+export interface APIResponse {
+  _data?: {[key: string]: any;};
 }
 
 export interface DynamicObject {
@@ -616,6 +624,11 @@ export type LogoutEvent = {
 
 export type AccountEvent = {
   accountEvent: string;
+}
+
+export type ServerInfo = {
+  version: string;
+  email: string;
 }
 
 export const ValidationFormFields = {

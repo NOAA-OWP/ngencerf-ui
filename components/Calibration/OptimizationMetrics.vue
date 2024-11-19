@@ -133,7 +133,7 @@
       </span>
       <span v-else>
         <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-          Run on {{ formatDateForRunOnString(startTimeDate) }}
+          Run on {{ formatDateForRunOnString(submitTimeDate) }}
         </div>
       </span>
       <div class="col-span-1 mr-3">
@@ -193,7 +193,7 @@ const { fetchUserCalibrationRunData } = useUserDataStore();
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { getCalibrationTabIndex } = generalStore();
-const { startTimeDate } = storeToRefs(useRunStatusStore());
+const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
 //const isLoading = ref(true);

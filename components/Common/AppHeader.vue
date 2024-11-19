@@ -418,8 +418,7 @@ const MenuChanged = (e: MouseEvent) => {
 }
 
 .slide-fade-leave-active {
-  //transition: all 1s cubic-bezier(0.075, 0.82, 0.165, 1)
-  transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1)
+  transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .slide-fade-enter-from,
