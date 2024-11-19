@@ -395,6 +395,7 @@ watch(selectedPlotName, async () => {
     const response: any = await queryGetPlot(
       selectedPlotName.value, // plotName
       true, // include_data
+      true, // force_include_plot
       (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
     );

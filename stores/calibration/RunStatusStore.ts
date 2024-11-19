@@ -183,7 +183,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const queryGetPlot = async (
     plotName: string,
     include_data: boolean = false,
-    force_include_plot: boolean = false,
+    force_include_plot: boolean = true,
     calibration_run_id: number = calibrationJobId.value,
     validation_run_id: number = 0,
     start?: number,
