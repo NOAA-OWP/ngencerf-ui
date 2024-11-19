@@ -55,6 +55,9 @@
             </Select>
           </div>
           <div class="pt-6 pb-2">
+            <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0">
+              <b>Rows 1 to {{ plotTableData.length }} of {{ plotTableTotalSize }}</b>
+            </div>
             <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true  scrollable scroll-height="500px" :multi-sort="true">
               <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable></Column>
             </DataTable>
@@ -211,8 +214,12 @@ onMounted(async () => {
 
   // Add Iteration Metrics/Parameters Tables to the dropdown
   if (iterations.value?._data?.iteration_data) {
-    plotList.value.push({ name: supplementalTableOptions[0], description: '' });
-    plotList.value.push({ name: supplementalTableOptions[1], description: '' });
+    if (!plotList.value.some(item => item.name == supplementalTableOptions[0])) {
+      plotList.value.push({ name: supplementalTableOptions[0], description: '' });
+    }
+    if (!plotList.value.some(item => item.name == supplementalTableOptions[1])) {
+      plotList.value.push({ name: supplementalTableOptions[1], description: '' });
+    }
   }
 
   // set up arrays for iterationMetricsData and iterationParamsData
@@ -312,7 +319,9 @@ onMounted(async () => {
   }
 
   // Add Performance Metrics Table to the dropdown
-  plotList.value.push({ name: supplementalTableOptions[2], description: '' });
+  if (!plotList.value.some(item => item.name == supplementalTableOptions[2])) {
+    plotList.value.push({ name: supplementalTableOptions[2], description: '' });
+  }
   console.log('plotList:', plotList.value);
 
   // Get Calibration/Validation Logs
@@ -359,9 +368,13 @@ onMounted(async () => {
 
   // Add Calibration/Validation Logs to the dropdown
   if (logs.value?._data?.logs) {
-    plotList.value.push({ name: supplementalTableOptions[3], description: '' });
+    if (!plotList.value.some(item => item.name == supplementalTableOptions[3])) {
+      plotList.value.push({ name: supplementalTableOptions[3], description: '' });
+    }
     if (logs.value?._data?.validations) {
-      plotList.value.push({ name: supplementalTableOptions[4], description: '' });
+      if (!plotList.value.some(item => item.name == supplementalTableOptions[4])) {
+        plotList.value.push({ name: supplementalTableOptions[4], description: '' });
+      }
     }
   }
 
@@ -485,7 +498,6 @@ watch(selectedPlotName, async () => {
           adjustPlotTableColumns();
           if (plotTableData.value.length < response?._data?.plot_data.length) {
             plotTableLazyLoad.value = true;
-            toast.add({ severity: 'info', summary: 'Displaying ' + plotTableData.value.length + ' of ' + plotTableTotalSize.value + ' records', life: 5000 });
           }
         }
       } else {
@@ -544,14 +556,14 @@ function adjustPlotTableColumns() {
         }
       });
     }
-    console.log('plotTableData: ', plotTableData.value);
-    console.log('plotTableColumns: ', plotTableColumns.value);
+    //console.log('plotTableData: ', plotTableData.value);
+    //console.log('plotTableColumns: ', plotTableColumns.value);
     nextTick(() => {
       const tableContainer = document.getElementById('plotTableHTML')?.querySelector('.p-datatable-table-container');
       tableContainer?.addEventListener('scroll', async(event) => {
-        if (plotTableLazyLoad && (tableContainer.scrollTop > (tableContainer.scrollHeight - (2*tableContainer.clientHeight)))) {
+        if (plotTableLazyLoad.value && (tableContainer.scrollTop > (tableContainer.scrollHeight - (2*tableContainer.clientHeight)))) {
+          plotTableLazyLoad.value = false; // disable scroll event until we're done
           if (plotTableBatchData.value.length < plotTableTotalSize.value ) {
-            //toast.add({ severity: 'info', summary: 'Loading more plot data...', life: 5000 });
             let start_row = plotTableData.value.length;
             let end_row = plotTableData.value.length + plotTablePageSize.value;
             if (plotTableData.value.length < plotTableBatchData.value.length) {
@@ -577,12 +589,11 @@ function adjustPlotTableColumns() {
             }
             let new_rows = plotTableBatchData.value.slice(start_row, end_row <= plotTableTotalSize.value ? end_row : plotTableTotalSize.value);
             plotTableData.value = plotTableData.value.concat(new_rows);
-            toast.removeAllGroups();
-            toast.add({ severity: 'info', summary: 'Displaying ' + plotTableData.value.length + ' of ' + plotTableTotalSize.value + ' records', life: 5000 });
+            plotTableLazyLoad.value = true; // turn scroll event back on
+          } else {
+            console.log('No more data to load - disabling scroll event');
+            plotTableLazyLoad.value = false;
           }
-        } else {
-          console.log('No more data to load - disabling scroll event');
-          plotTableLazyLoad.value = false;
         }
       });
     });
