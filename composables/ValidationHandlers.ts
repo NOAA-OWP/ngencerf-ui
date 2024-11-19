@@ -1,5 +1,5 @@
 import { ref } from "vue"
-import type { SlothParameterData, SaveFormulationTabPayload, FormulationTabSaveWarning, GageBasinApiSavedResponse, HydrofabricError } from "./NextGenModel";
+import type { SlothParameterData, SaveFormulationTabPayload, FormulationTabSaveWarning, GageBasinApiSavedResponse, edsError } from "./NextGenModel";
 import { ValidationFormFields } from "./NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 
@@ -41,12 +41,12 @@ export const useProcessCalibrationGageSavedResponse = ( savedResponse: GageBasin
     life: 5000 
   });
 
-  if ( savedResponse.hasOwnProperty( 'hydrofabric_errors' ) && savedResponse.hydrofabric_errors.length > 0 ) {
-    savedResponse.hydrofabric_errors.forEach( ( hydrofabric_error : HydrofabricError ) => {
+  if ( savedResponse.hasOwnProperty( 'eds_errors' ) && savedResponse.eds_errors.length > 0 ) {
+    savedResponse.eds_errors.forEach( ( eds_error : edsError ) => {
       messages.value.push({
         severity: 'warn',
-        summary: 'Hydrofabric Error',
-        detail: hydrofabric_error.message,
+        summary: 'EDS Error',
+        detail: eds_error.message,
         life: 10000
       });
     })

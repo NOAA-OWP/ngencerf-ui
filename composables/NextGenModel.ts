@@ -39,7 +39,7 @@ export interface ValidationErrorObject {
 
 export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
   geopackage_image_url?: string | null;
-  hydrofabric_errors: HydrofabricError[];
+  eds_errors: edsError[];
 }
 
 export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
@@ -47,7 +47,7 @@ export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
   validation_run_id: number;
 }
 
-export interface HydrofabricError {
+export interface edsError {
   name: string;
   message: string;
   status_code: string;
@@ -574,6 +574,10 @@ export interface AlternativeIterationTuningParameters {
   worker_name: string;
   iteration_num: number;
   [name: string]: string|number;
+}
+
+export interface APIResponse {
+  _data?: {[key: string]: any;};
 }
 
 export interface DynamicObject {
