@@ -60,6 +60,20 @@
         </table>
       </div>
     </div>
+    <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
+      <div class="row-span-1">
+        <div class="grid grid-cols-8">
+          <span>
+            <div class="col-span-1 mr-3"><!--c-blue font-normal text-xl underline pt-1-->
+              <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelForecastRun()"
+                aria-label="Cancel Button">
+                Cancel
+              </button>
+            </div>
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -69,6 +83,10 @@ import { hilightTab } from '~/composables/TabHilight';
 onMounted(() => {
   hilightTab(ForecastTabs.tab_status);
 });
+
+const cancelForecastRun = () => {
+  console.log('cancelForecastRun');
+};
 </script>
 
 <style lang="scss" scoped>
