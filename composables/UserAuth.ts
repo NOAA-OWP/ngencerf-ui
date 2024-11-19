@@ -4,37 +4,7 @@
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 import type { FetchResponse } from 'ofetch';
-
-/**
- * Verfies access token
- * @param ngencerfBaseUrl
- * @returns {boolean} true if access token is valid, false otherwise
- */
-export const verifyAccessToken = async (ngencerfBaseUrl: string): Promise<boolean> => {
-  const userDataStore = useUserDataStore();
-  const accessToken = userDataStore.getAccessToken();
-
-  // If no access token is present to verify, return false
-  if (!accessToken) {
-    return false;
-  }
-
-  // Make a request to the server to verify the access token
-  // Response will be empty if token is valid or a string[] if token is invalid
-  try {
-    const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/verify/`, {
-      method: 'POST',
-      body: { 
-        token: accessToken
-      },
-    });
-    // console.log('Token verification response:', data);
-    return true;
-  } catch (error) {
-    console.error('Error verifying token:', error);
-    return false;
-  }
-};
+import { useLogout } from "~/composables/UseEventBus";
 
 /**
  * Refreshes access token
@@ -84,52 +54,66 @@ export const makeProtectedApiCall = async <T>(
   url: string,
   userOptions: any = {},
 ): Promise<any> => {
-  const userDataStore = useUserDataStore();
-
-  const { ngencerfBaseUrl } =  useBackendConfig();
-  
   let responseData: FetchResponse<any> | null = null;
-
-  // verify access token before making the API call
-  const isValid = await verifyAccessToken(ngencerfBaseUrl);
-
-  // if access token is invalid, attempt to refresh it
-  if (!isValid) {
-    const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
-    
-    // if refresh fails, log the user out and redirect to login page
-    // TODO: navigateTo needs to be moved. It cannot be called by Pinia store files. Have components call this function instead.
-    if (!refreshAccessTokenSuccess) {
-      userDataStore.logUserOut();
-      await navigateTo('login');
-      return null;
-    }
-  }
-
   // make API call
-  try {
-    const response = await $fetch.raw(url, {
-      ...userOptions,
-      async onRequest({ request, options }: { request: any, options: any } ) {
-        // stringify body if it is an object
-        if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
-          options.body = JSON.stringify(options.body);
-        }
-        console.log('Request:', request, options);
-      },
-      async onRequestError({ error }: { error: any }) {
-        console.error('Request error:', error);
-      },
-      async onResponseError({ response }: { response: any }) {
-        responseData = await response;
-      }
-    });
 
-    responseData = await response;
-    console.log('Response:', responseData);
-    return responseData;
-  } catch (error) {
-    console.error('API call failed:', responseData, error);
-    return responseData;
-  }
+  
+  const response = await $fetch.raw(url, {
+    ...userOptions,
+    async onRequest({ request, options }: { request: any, options: any }) {
+      // stringify body if it is an object
+      if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
+        options.body = JSON.stringify(options.body);
+      }
+      console.log('Request:', request, options);
+    },
+    async onRequestError({ error }: { error: any }) {
+      console.error('Request error:', error);
+    },
+    async onResponseError({ response }: { response: any }) {
+      const userDataStore = useUserDataStore();
+      responseData = await response;
+      if (responseData?.status === 401) {
+        const { ngencerfBaseUrl } = useBackendConfig();
+        const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
+        if (!refreshAccessTokenSuccess) {
+          sendUserToLogin();
+        }
+        userOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
+        await $fetch.raw(url, {
+          ...userOptions,
+          async onRequest({ request, options }: { request: any, options: any }) {
+            // stringify body if it is an object
+            if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
+              options.body = JSON.stringify(options.body);
+            }
+            console.log('Request:', request, options);
+          },
+          async onRequestError({ error }: { error: any }) {
+            console.error('Request error:', error);
+            sendUserToLogin();
+          },
+          async onResponseError({ response }: { response: any }) {
+            responseData = await response;
+            console.error("ResponseError", response)
+            sendUserToLogin();
+          }
+        });
+        responseData = await response;
+        console.log('Response:', responseData);
+        return responseData;
+      }
+    }
+  });
+  responseData = await response;
+  console.log('Response:', responseData);
+  return responseData;
+
 };
+
+const sendUserToLogin = () => {
+  const userDataStore = useUserDataStore();
+  userDataStore.logUserOut();
+  useLogout("logoutEvent", "token");
+  return null;
+}

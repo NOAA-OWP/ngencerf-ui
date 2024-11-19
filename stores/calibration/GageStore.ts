@@ -62,12 +62,12 @@ export const useGageStore = defineStore('GageStore', () => {
   watch(gageData, (gageData) => { sessionStorage.setItem('gageData', JSON.stringify(gageData)); })
   watch(geopackageImageUrl, (geopackageImageUrl) => { sessionStorage.setItem('geopackageImageUrl', geopackageImageUrl); })
   watch(selectedDomainValue, (selectedDomainValue) => { sessionStorage.setItem('selectedDomainValue', selectedDomainValue); })
-  watch(selectedGageValue, (selectedGageValue) => { sessionStorage.setItem('selectedGageValue',selectedGageValue ); })
+  watch(selectedGageValue, (selectedGageValue) => { sessionStorage.setItem('selectedGageValue', selectedGageValue); })
   watch(selectedForcingValue, (selectedForcingValue) => { sessionStorage.setItem('selectedForcingValue', selectedForcingValue); })
-  watch(selectedObservationalValue, (selectedObservationalValue) => { sessionStorage.setItem('selectedObservationalValue',selectedObservationalValue ); })
+  watch(selectedObservationalValue, (selectedObservationalValue) => { sessionStorage.setItem('selectedObservationalValue', selectedObservationalValue); })
   watch(isNWMv3, (isNWMv3) => { sessionStorage.setItem('isNWMv3', JSON.stringify(isNWMv3)); })
   watch(gageStore_data_loading, (gageStore_data_loading) => { sessionStorage.setItem('gageStore_data_loading', JSON.stringify(gageStore_data_loading)); })
-  
+
 
 
   const loadGageTabStaticData = () => {
@@ -281,8 +281,10 @@ export const useGageStore = defineStore('GageStore', () => {
     }
   }
 
-  useLogoutListen('logoutEvent', () => {
-    resetGageStore();
+  useLogoutListen('logoutEvent', (evStr: string) => {
+    if (evStr === "logout") {
+      resetGageStore();
+    }
   })
 
   /**

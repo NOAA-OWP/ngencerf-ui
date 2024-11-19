@@ -618,17 +618,6 @@ export interface CalibrationGetStatusPerformanceMetricItem {
 /**
  * Event Bus Interface
  */
-export type CalibrationButtonGroupClickEvent = {
-  calibrationButtonSaveStart: string;
-  calibrationButtonResetCancel: string;
-  calibrationButtonPrev: string;
-  calibrationButtonNext: string;
-}
-
-export type EvaluationButtonGroupClickEvent = {
-  evaluateCalibrationRubTabAction: string;
-}
-
 export type LogoutEvent = {
   logoutEvent: string;
 }

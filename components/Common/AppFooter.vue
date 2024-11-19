@@ -28,27 +28,6 @@ const info = json;
 
 const serverInfo = ref<ServerInfo>();
 
-onMounted(() => {
-  footerData();
-})
-
-const canDisplayBeforeRun = computed(() => {
-  return isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'Login';
-});
-
-const footerData = () => {
-  makeProtectedApiCall<ServerInfo>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${getAccessToken()}`,
-      "Content-Type": 'application/json'
-    },
-    body: {}
-  }).then((result) => {
-    serverInfo.value = result._data;
-  })
-}
-
 </script>
 
 <style lang="scss" scoped>
