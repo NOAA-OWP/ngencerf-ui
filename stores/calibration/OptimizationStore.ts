@@ -226,8 +226,10 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     }
   }
 
-  useLogoutListen('logoutEvent', () => {
-    resetOptimizationStore();
+  useLogoutListen('logoutEvent', (evStr: string) => {
+    if (evStr === "logout") {
+      resetOptimizationStore();
+    }
   })
 
   /**
