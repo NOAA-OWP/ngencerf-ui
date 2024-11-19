@@ -101,7 +101,7 @@
             </span>
             <span v-else>
               <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-                Run on {{ formatDateForRunOnString(startTimeDate) }}
+                Run on {{ formatDateForRunOnString(submitTimeDate) }}
               </div>
             </span>
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
@@ -163,7 +163,7 @@ const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUser
 const { getCalibrationTabIndex } = generalStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
-const { startTimeDate } = storeToRefs(useRunStatusStore());
+const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
 const isLoading = ref(true);
