@@ -5,38 +5,6 @@
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 import type { FetchResponse } from 'ofetch';
 import { useLogout } from "~/composables/UseEventBus";
-import Error from '~/error.vue';
-
-/**
- * Verfies access token
- * @param ngencerfBaseUrl
- * @returns {boolean} true if access token is valid, false otherwise
- */
-export const verifyAccessToken = async (ngencerfBaseUrl: string): Promise<boolean> => {
-  const userDataStore = useUserDataStore();
-  const accessToken = userDataStore.getAccessToken();
-
-  // If no access token is present to verify, return false
-  if (!accessToken) {
-    return false;
-  }
-
-  // Make a request to the server to verify the access token
-  // Response will be empty if token is valid or a string[] if token is invalid
-  try {
-    const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/verify/`, {
-      method: 'POST',
-      body: {
-        token: accessToken
-      },
-    });
-    // console.log('Token verification response:', data);
-    return true;
-  } catch (error) {
-    console.error('Error verifying token:', error);
-    return false;
-  }
-};
 
 /**
  * Refreshes access token
