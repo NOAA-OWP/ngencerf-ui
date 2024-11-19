@@ -81,7 +81,7 @@
 import { hilightTab } from '~/composables/TabHilight';
 
 onMounted(() => {
-  hilightTab(ForecastTabs.tab_status);
+  hilightTab(ForecastTabs.tab_statusRun);
 });
 
 const cancelForecastRun = () => {

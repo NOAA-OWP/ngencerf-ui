@@ -18,8 +18,8 @@ export const EvaluationTabs =  {
 export const ForecastTabs =  {
   tab_calibrationRuns: 0,
   tab_forecastRuns: 1,
-  tab_setupForecastRuns: 2,
-  tab_status: 3,
+  tab_setupForecast: 2,
+  tab_statusRun: 3,
   tab_results: 4
 }
 

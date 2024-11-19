@@ -71,21 +71,27 @@
 
     <span v-else-if="currentMenu === 3"> <!-- FORECAST TABS -->
       <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
-        <span data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked" aria-label="Previous Runs tab"
-          title="Previous Runs tab">
-          Previous Runs
-          <div :class="tabNotCompleted ? 'erorDot' : 'noErrorDot'"></div>
+        <span data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked" aria-label="Calibration Runs tab"
+          title="Calibration Runs tab">
+          Calibration Runs
+          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </span>
-        <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast and Run Tab"
-          title="Setup Forecast / Run tab">
-          Setup Forecast / Run
+        <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Forecast Runs Tab"
+          title="Forecast Runs Tab">
+          Forecast Runs
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status tab" title="Status">
-          Status
+        <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast Tab"
+          title="Setup Forecast tab">
+          Setup Forecast
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
+        <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status/Run tab" 
+          title="Status/Run Tab">
+          Status/Run
+          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+        </div>
+        <div data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
           title="Results tab">
           Results
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
@@ -94,7 +100,7 @@
     </span>
 
 
-    <span v-else-if="currentMenu === 4"> <!-- FORECAST TABS -->
+    <span v-else-if="currentMenu === 4"> <!-- VERIFICATION TABS -->
       <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
         <span data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked"
           aria-label="Calibration Runs tab" title="Calibration Runs tab">

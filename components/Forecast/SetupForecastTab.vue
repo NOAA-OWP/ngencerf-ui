@@ -42,14 +42,14 @@ const cycles = ref([
 ]);
 
 onMounted(() => {
-  hilightTab(ForecastTabs.tab_setupForecastRuns);
+  hilightTab(ForecastTabs.tab_setupForecast);
 
 });
 
 const startForecastRun = () => {
   console.log('startForecastRun');
   const allTabs = document.getElementsByClassName("tabs");
-  const e = allTabs[ForecastTabs.tab_status] as HTMLElement;
+  const e = allTabs[ForecastTabs.tab_statusRun] as HTMLElement;
   e.click();
 };
 </script>

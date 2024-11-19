@@ -10,10 +10,10 @@
         <LazyForecastRunsTab />
       </span>
       <span v-else-if="activeTab == 3">
-       <LazySetupForecastRunTab />
+       <LazySetupForecastTab />
       </span>
       <span v-else-if="activeTab == 4">
-        <LazyStatusTab />
+        <LazyStatusRunTab />
       </span>
       <span v-else-if="activeTab == 5">
         <LazyResultsTab />
@@ -28,11 +28,11 @@ import Tabs from '~/components/Common/Tabs.vue'
 
 
 import { generalStore } from "@/stores/common/GeneralStore";
-import LazyPreviousRunsTab from './PreviousRunsTab.vue'
-import LazyForecastRunsTab from './ForecastRunsTab.vue'
-import LazySetupForecastRunTab from './SetupForecastRunTab.vue'
-import LazyStatusTab from './StatusTab.vue'
-import LazyResultsTab from './ResultsTab.vue'
+import LazyPreviousRunsTab from './PreviousRunsTab.vue';
+import LazyForecastRunsTab from './ForecastRunsTab.vue';
+import LazySetupForecastTab from './SetupForecastTab.vue';
+import LazyStatusRunTab from './StatusRunTab.vue';
+import LazyResultsTab from './ResultsTab.vue';
 
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 
