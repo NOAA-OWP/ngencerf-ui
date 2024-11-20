@@ -336,6 +336,7 @@ onMounted(async () => {
   }
   console.log('plotList:', plotList.value);
 
+  /* FIXME: Temp Workaround made by Carolyn for memory issue on 100 iteration run. 
   // Get Calibration/Validation Logs
   logs.value = await queryGetLogs(
     (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
@@ -397,7 +398,7 @@ onMounted(async () => {
     console.log('validationLogList: ', validationLogList.value);
     console.log('selectedValidationLog: ', selectedValidationLog.value);
   }
-
+*/
   // Add Calibration/Validation Logs to the dropdown
   if (logs.value?._data?.logs) {
     if (!plotList.value.some(item => item.name == supplementalTableOptions[3])) {
