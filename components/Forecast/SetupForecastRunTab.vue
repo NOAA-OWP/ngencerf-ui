@@ -1,42 +1,20 @@
 <template>
+  <!-- Setup Forecast Runs Tab -->
   <div class="h-full min-h-screen ">
     <div class="grid grid-rows-4">
-      <div class="row-span-2">
-        <div class="grid grid-cols-2  mb-5 mt-10">
-          <div class="col-span-1 ml-10">
-            Select Run Typ:e<br />
-            <div class="mt-5">
-              <RadioButton v-model="observedForcing" inputId="observedForcing" name="observedForcing" />
-              <label for="observedForcing" class="ml-4">Use Observed Forcing</label><br />
-            </div>
-            <div class="mt-5">
-              <RadioButton v-model="forcingSource" inputId="forcingSource" name="forcingSource"></RadioButton>
-              <label for="observedForcing" class="ml-4">Use Forecast Forcing</label>
-            </div>
-          </div>
-
-          <div class="col-span-1">
-            Select Forcing Type:<br />
-            <Dropdown class="mt-5" id="Groups" v-model="forcingType" :options="forcingOptions"></Dropdown>
-          </div>
+      <div class="row-span-1">
+        <div class="col-span-1 mt-8">
+          <h2>Cycle</h2><br />
+          <Dropdown class="mt-2" id="ShortRangeForecast" v-model="cycle" :options="cycleOptions"
+            placeholder="Short Range Forecast"></Dropdown>
         </div>
       </div>
 
-      <div class="row-span-2 mt-10">
-        <div class="grid grid-cols-2">
-          <div class="col-span-1 ml-10">
-            <div class="mt-5">
-              <label for="observedForcing" class="ml-4">Use Forecast Forcing</label>
-              <Dropdown class="mt-5" id="Groups" v-model="forcingType" :options="forcingOptions"></Dropdown>
-            </div>
-          </div>
-          <div class="col-span-1">
-            <div class="mt-5">
-              <label for="observedForcing" class="ml-4">Use Forecast Forcing</label>
-              <Dropdown class="mt-5" id="Groups" v-model="forcingType" :options="forcingOptions"></Dropdown>
-            </div>
-          </div>
-        </div>
+      <div class="row-span-2">&nbsp;</div>
+
+      <div class="row-span-1">
+        <h2>Status: {{ Status }}</h2><br />
+        <Button class="ngenButtonDiv-green w-40">Run</Button>
       </div>
     </div>
   </div>
@@ -45,17 +23,17 @@
 
 <script setup lang="ts">
 import { hilightTab } from '~/composables/TabHilight';
-onMounted(() => {
-  hilightTab(ForecastTabs.tab_selectAltIteration);
-  
-})
+onMounted( () => {
+  hilightTab(ForecastTabs.tab_setupForecastRun);  
+  //isLoading.value = false;
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+});
 
+const cycle = ref();
+const cycleOptions = ref();
 
-const observedForcing = ref();
-const forcingSource = ref();
-
-const forcingType = ref();
-const forcingOptions = ref([]);
+const Status = ref("Ready");
 </script>
 
 <style lang="scss" scoped>
