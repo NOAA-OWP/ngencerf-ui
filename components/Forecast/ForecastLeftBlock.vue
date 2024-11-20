@@ -4,7 +4,7 @@
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
       <span v-if="activeTab == 1">
-        <LazyCalibrationsRunsTab />
+        <LazyPreviousRunsTab />
       </span>
       <span v-else-if="activeTab == 2">
         <LazyForecastRunsTab />
@@ -25,11 +25,11 @@
 <script setup lang="ts">
 import Tabs from '~/components/Common/Tabs.vue'
 import { generalStore } from "@/stores/common/GeneralStore";
-import LazyCalibrationsRunsTab from './CalibrationsRunsTab.vue';
 import LazyForecastRunsTab from './ForecastRunsTab.vue'
 import LazySetupForecastRunTab from './SetupForecastRunTab.vue'
 import LazyStatusTab from './StatusTab.vue'
 import LazyResultsTab from './ResultsTab.vue'
+import LazyPreviousRunsTab from '../Verification/PreviousRunsTab.vue';
 
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 

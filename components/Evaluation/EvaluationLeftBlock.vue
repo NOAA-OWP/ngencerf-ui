@@ -25,7 +25,7 @@ import Tabs from '~/components/Common/Tabs.vue'
 import LazyEvaluateTab from './EvaluateTab.vue'
 import LazySelectAltIterationTab from './SelectAltIterationTab.vue'
 import LazyCalibrationRunsTab from './CalibrationRunsTab.vue'
-import LazyRunStatus from './ValidationRunStatus.vue'
+import LazyRunStatus from './EvaluationRunStatus.vue'
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";

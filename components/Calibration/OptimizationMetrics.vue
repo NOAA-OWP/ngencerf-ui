@@ -166,6 +166,7 @@ import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import { formatDateForRunOnString } from "~/utils/TimeHelpers";
+import { hilightTab } from '~/composables/TabHilight';
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -206,6 +207,8 @@ const showMetricStreamFlow = ref<boolean>(false);
 const ele = document.getElementById("MainLeftDataArea") as HTMLElement;
 
 onMounted(() => {
+  hilightTab(CalibrationTabs.tab_optimizationMetrics);
+  
   toast.removeAllGroups();
 
   if (ele) { ele.scrollTo(0, 0); }

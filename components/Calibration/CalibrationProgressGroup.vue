@@ -79,10 +79,7 @@
 
 <script lang="ts" setup>
 import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { useGageStore } from '~/stores/calibration/GageStore';
-import { useFormulationStore } from '~/stores/calibration/FormulationStore';
 import { useTuningStore } from "~/stores/calibration/TuningStore";
-import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 
@@ -94,41 +91,6 @@ const currentCalibrationTab = ref(getCalibrationTabIndex());
 const emit = defineEmits(["tabNumber"]);
 
 const tuningStore = useTuningStore();
-const forumlationStore = useFormulationStore();
-const { formulationNameInput, selectedModuleValues } = storeToRefs(forumlationStore);
-const optimizationStore = useOptimizationStore()
-const {
-  uiObjectiveFunction,
-  uiOptimization,
-  uiOptimizationInputs,
-  uiPeakFlowThreshold,
-  uiPlotFrequency,
-  uiStopCriteria,
-  uiStreamFlowThreshold,
-  getOptimizationAlgorithmOptionsList,
-  getObjectiveFunctionOptionsList,
-  showObjectiveFunctionPeakFlow,
-  showObjectiveFunctionStreamFlow,
-  getSelectedMetricInfo,
-  getOptimizationInputUserData
-} = storeToRefs(optimizationStore)
-
-const gageStore = useGageStore();
-const { gageData, gageTabData, selectedDomainValue, gageStore_data_loading, selectedForcingValue, selectedGageValue, getGageOptionsList, selectedObservationalValue, getDomainOptionsList, getForcingOptionsList, getObservationalOptionsList } = storeToRefs(gageStore)
-
-const {
-  simStartTime,
-  simEndTime,
-  calStartTime,
-  calEndTime,
-  userSelectedCalibrationTuningParameters,
-  userOutputVariableToCalibrate,
-  avSimStartTime,
-  avSimEndTime,
-  avCalStartTime,
-  avCalEndTime,
-} = storeToRefs(tuningStore);
-
 
 const checkStartEndTimeValues = () => {
   return (
@@ -148,13 +110,7 @@ const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele = event.currentTarget as HTMLElement;
   const allTabs = document.getElementsByClassName("tabs");
-  // Remove highlighting from all tabs
-  Object.keys(allTabs).forEach(function (key) {
-    allTabs[key as any].classList.remove("activeTab");
-  });
-
   const tabNum = Number(ele.getAttribute("data-tab")) - 1;
-  allTabs[tabNum].classList.add("activeTab");
   const e = allTabs[tabNum] as HTMLElement;
   e.click();
 

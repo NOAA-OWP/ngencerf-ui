@@ -16,14 +16,27 @@
           @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)"
           @rowDblselect="openSelectedCalibrationRun(selectedCalibrationRun)">
           <Column field="calibration_run_id" header="Job ID" sortable></Column>
-          <Column field="formulation_name" header="Formulation Name" sortable>
-          </Column>
+          <Column field="job_genesis" header="Job Genesis" sortable></Column>
+          <Column field="formulation_name" header="Formulation Name" sortable></Column>
           <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-          <Column field="run_date" header="Run Date" sortable></Column>
+          <Column field="created_at" header="Creation Date" sortable>
+            <template #body="slotProps">
+              {{ formatDateForDisplay( slotProps.data.created_at ) }}
+            </template>
+          </Column>
+          <Column field="submit_date" header="Submit Date" sortable>
+            <template #body="slotProps">
+              <span v-if="slotProps.data.submit_date">
+              {{ formatDateForDisplay( slotProps.data.submit_date ) }}
+              </span>
+            </template>
+          </Column>
           <Column header="Calibration Period" sortable>
             <template #body="slotProps">
-              {{ slotProps.data.calibration_start_period }} <span v-if="slotProps.data.calibration_end_period">to</span>
-              {{ slotProps.data.calibration_end_period }}
+              <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period">
+              {{ formatDateForDisplay( slotProps.data.calibration_start_period ) }} <span v-if="slotProps.data.calibration_end_period">to</span>
+              {{ formatDateForDisplay( slotProps.data.calibration_end_period ) }}
+              </span>
             </template>
           </Column>
           <Column field="status" header="Status" sortable></Column>
@@ -54,6 +67,7 @@ import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "~/composables/ValidationHandlers";
+import { formatDateForDisplay } from '~/utils/TimeHelpers';
 
 const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
@@ -65,6 +79,7 @@ const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useU
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
+import { hilightTab } from '~/composables/TabHilight';
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -80,6 +95,8 @@ const onRowContextMenu = (event: any) => {
 };
 
 onMounted(() => {
+  hilightTab(CalibrationTabs.tab_calibrationRuns);
+  
   isLoading.value = false;
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;

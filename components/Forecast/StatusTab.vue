@@ -44,52 +44,14 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { onMounted } from "vue";
-import { generalStore } from '~/stores/common/GeneralStore';
-import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
-import { useUserDataStore } from '~/stores/common/UserDataStore';
-import { useToast } from 'primevue/usetoast';
+<script setup lang="ts">
+import { hilightTab } from '~/composables/TabHilight';
+onMounted(() => {
+  hilightTab(ForecastTabs.tab_runStatus);
+  
+})
 
-const runStatusStore = useRunStatusStore();
-const userDataStore = useUserDataStore();
-const toast = useToast();
 
-const { calibrationJobId } = storeToRefs(generalStore());
-const { getCalibrationTabIndex } = generalStore();
-const {
-  startTimeDate,
-  startTime,
-  runningTime,
-  plotNames,
-  plotList,
-  selectedPlotName,
-  selectedPlotFilename,
-  selectedPlotFileUrl,
-  iteration,
-  stopCriteria,
-  stopCriteriaMet,
-  runningTimeIntervalId,
-  calibrationStatusIntervalId,
-  validationsStatusIntervalId,
-  allValidationsDone
-} = storeToRefs(runStatusStore);
-
-const { userCalibrationRunData } = storeToRefs(userDataStore);
-const { fetchUserCalibrationRunData } = userDataStore;
-
-const {
-  queryGetCalibrationStatus,
-  queryGetPlotNames,
-  queryGetPlot,
-  executeRunCalibration,
-  queryIteration,
-  cancelCalibrationJob,
-} = runStatusStore;
-
-const isLoading = ref(false);
-
-const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 
 </script>
 
@@ -132,26 +94,3 @@ const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 }
 </style>
 
-<style>
-:root {
-  .p-progressbar {
-    background-color: yellow;
-    vertical-align: text-bottom;
-    margin-left: 10px;
-    width: 80%;
-  }
-
-  .p-progressbar-value {
-    color: green;
-    background-color: green;
-  }
-
-  .p-progressbar-value {
-    color: black;
-  }
-
-  .p-progressbar-label {
-    color: white;
-  }
-}
-</style>

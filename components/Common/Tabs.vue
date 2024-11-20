@@ -4,53 +4,52 @@
 
     <span v-if="currentMenu === 1"> <!-- CALIBRATION TABS -->
       <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
-        <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
-          <div data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked"
-            aria-label="Calibration Runs tab" title="Calibration Runs tab">
-            Calibration Runs
+        <span data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked"
+          aria-label="Calibration Runs tab" title="Calibration Runs tab">
+          Calibration Runs
+          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+        </span>
+        <span v-show="calibrationJobId && currentCalibrationTab > 1">
+          <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Headwater Basin Gage tab"
+            title="Headwater Basin Gage tab">
+            Headwater Basin Gage
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <span v-show="calibrationJobId && currentCalibrationTab > 1">
-            <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked"
-              aria-label="Headwater Basin Gage tab" title="Headwater Basin Gage tab">
-              Headwater Basin Gage
-              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-            </div>
-            <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked"
-              aria-label=" Formulation tab" title=" Formulation tab">
-              Formulation
-              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-            </div>
-            <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked"
-              aria-label="Tuning Controls tab" title="Tuning Controls tab">
-              Tuning Controls
-              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-            </div>
-            <div data-tab="5" class="tabs prevent-select" v-on:click="tabClicked"
-              aria-label=" Optimization / Metrics tab" title=" Optimization / Metrics tab">
-              Optimization / Metrics
-              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-            </div>
-            <div data-tab="6" class="tabs prevent-select" v-on:click="tabClicked"
-              aria-label="Status Run tab" title="Status Run tab">
-              Status / Run
-              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-            </div>
-          </span>
-        </div>
+          <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label=" Formulation tab"
+            title=" Formulation tab">
+            Formulation
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Tuning Controls tab"
+            title="Tuning Controls tab">
+            Tuning Controls
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label=" Optimization / Metrics tab"
+            title=" Optimization / Metrics tab">
+            Optimization / Metrics
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div data-tab="6" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status Run tab"
+            title="Status Run tab">
+            Status / Run
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+        </span>
       </div>
+
     </span>
 
     <span v-else-if="currentMenu === 2"> <!-- EVALUATION TABS -->
       <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
-        <div data-tab="1" class="tabs activeTab prevent-select pl-25 mr-10" v-on:click="tabClicked"
+        <span data-tab="1" class="tabs activeTab prevent-select pl-25 mr-10" v-on:click="tabClicked"
           aria-label="Calibration Runs tab" title="Calibration Runs tab">
           Calibration Runs
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
+        </span>
         <span v-show="calibrationJobId > 0 && loadCalibrationDataComplete == true">
-          <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
-            aria-label="Evaluate Tab" title=" Evaluate tab" :disabled="true">
+          <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Evaluate Tab" v-show="evaluateValidationRunId > 0"
+            title=" Evaluate tab">
             Evaluate
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
@@ -62,7 +61,7 @@
           <span v-show="evaluateIterationRunId && evaluateIterationRunId > 0">
             <div data-tab="4" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
               aria-label="Run Validation tab" title="Run Validation tab">
-              Status
+              Run / Status
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
           </span>
@@ -72,28 +71,22 @@
 
     <span v-else-if="currentMenu === 3"> <!-- FORECAST TABS -->
       <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
-        <div data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked"
-          aria-label="Calibrations Runs tab" title="Calibrations Runs tab">
-          Calibrations Runs
+        <span data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked" aria-label="Previous Runs tab"
+          title="Previous Runs tab">
+          Previous Runs
           <div :class="tabNotCompleted ? 'erorDot' : 'noErrorDot'"></div>
-        </div>
-        <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Forecast Runs Tab" title="Setup Forecast Runs tab">
-          Forecast Runs
+        </span>
+        <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast and Run Tab"
+          title="Setup Forecast / Run tab">
+          Setup Forecast / Run
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecaset and Run tab"
-          title="Setup Forecaset and Run">
-          Setup Forecaset/Run
-          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-        </div>
-        <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status tab"
-          title="Status">
+        <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status tab" title="Status">
           Status
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="5" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Results tab" title="Results tab">
+        <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
+          title="Results tab">
           Results
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
@@ -103,23 +96,22 @@
 
     <span v-else-if="currentMenu === 4"> <!-- FORECAST TABS -->
       <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
-        <div data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked"
+        <span data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked"
           aria-label="Calibration Runs tab" title="Calibration Runs tab">
           Calibration Runs
           <div :class="tabNotCompleted ? 'erorDot' : 'noErrorDot'"></div>
-        </div>
-        <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Setup Forecast and Run Tab" title="Setup Forecast / Run tab">
+        </span>
+        <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast and Run Tab"
+          title="Setup Forecast / Run tab">
           Setup Forecast / Run
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status tab"
-          title="Status">
+        <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status tab" title="Status">
           Status
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked"
-          aria-label="Results tab" title="Results tab">
+        <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
+          title="Results tab">
           Results
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
@@ -133,7 +125,7 @@ import { storeToRefs } from "pinia";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
 
-const { calibrationJobId, evaluateIterationRunId } = storeToRefs(generalStore());
+const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
@@ -151,18 +143,6 @@ const tabNotCompleted = ref(false);
 const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele = event.currentTarget as HTMLElement;
-  const allTabs = document.getElementsByClassName("tabs");
-  // Remove highlighting from all tabs
-  Object.keys(allTabs).forEach(function (key) {
-    allTabs[key as any].classList.remove("activeTab");
-  });
-
-  // Note that the compiler sends errors when you don't check for null
-  if (ele) {
-    //const cl = ele.classList;
-    ele.classList.add("activeTab");
-  }
-
   nextTick(() => {
     // Send the selected tab info to the active tab set with emit
     if (currentMenu.value === 1) {
@@ -179,7 +159,6 @@ const tabClicked = (event: Event) => {
       emit("tabNumber", currentVerificationTab.value);
     }
   })
-
 }
 </script>
 <style lang="scss" scoped>

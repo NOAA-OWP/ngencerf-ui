@@ -7,12 +7,12 @@ import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "~/composables/NextGenModel";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { useValidationRunStatusStore } from "./ValidationRunStatusStore";
+import { useEvaluationRunStatusStore } from "./EvaluationRunStatusStore";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {  
   const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId } = storeToRefs( generalStore() );
   const { fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
-  const { clearRunningStatusInfo } = useValidationRunStatusStore()
+  const { clearRunningStatusInfo } = useEvaluationRunStatusStore()
   const calibrationRunList = ref<any[]>([]);
   const userSelectedEvalCalibrationRunId = ref<number>( 0 );
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -22,6 +22,24 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const loadCalibrationDataComplete = ref<boolean>( false );
   
 
+  // Restore state from sessionStorage if available
+  if (typeof window !== 'undefined') {
+    let ls;
+    ls = sessionStorage.getItem('calibrationRunList');
+    if (ls !== "undefined") { calibrationRunList.value = ls ? JSON.parse(ls) : [] }
+    userSelectedEvalCalibrationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('userSelectedEvalCalibrationRunId') as string), 10);
+    uiGageId.value = sessionStorage.getItem('uiGageId') as string;
+    userSelectedEvalCalibrationRun.value = sessionStorage.getItem('userSelectedEvalCalibrationRun') as string;
+    loadCalibrationDataComplete.value = JSON.parse(sessionStorage.getItem('loadCalibrationDataComplete') as string) === "true";
+    console.log("EvaluationCalibrationRunStore Store restored");
+  }
+
+  watch(calibrationRunList, (calibrationRunList) => { sessionStorage.setItem('calibrationRunList', JSON.stringify(calibrationRunList)); })
+  watch(userSelectedEvalCalibrationRunId, (userSelectedEvalCalibrationRunId) => { sessionStorage.setItem('userSelectedEvalCalibrationRunId', JSON.stringify(userSelectedEvalCalibrationRunId)); })
+  watch(uiGageId, (uiGageId) => { sessionStorage.setItem('uiGageId', uiGageId); })
+  watch(userSelectedEvalCalibrationRun, (userSelectedEvalCalibrationRun) => { sessionStorage.setItem('userSelectedEvalCalibrationRun', JSON.stringify(userSelectedEvalCalibrationRun)); })
+  watch(loadCalibrationDataComplete, (loadCalibrationDataComplete) => { sessionStorage.setItem('loadCalibrationDataComplete', JSON.stringify(loadCalibrationDataComplete)); })
+  
   /**
    * list of calibration jobs with validation data
    */
@@ -70,7 +88,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
     if ( runListDataResult?._data?.jobs.length > 0 ) {
       runListDataResult?._data?.jobs.forEach( ( runItem: ValidatedCalibrationRunListItem ) => {
-        if ( runItem.status.toLowerCase() == "done" && runItem.run_date != null ) {
+        if ( runItem.status.toLowerCase() == "done" && runItem.submit_date != null ) {
           userEvaluationCalibrationRunListData.value.push( runItem );
         }
       });
@@ -95,19 +113,22 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       
       runListDataResult._data?.validation_jobs.forEach( ( validation_job: CalibrationValidationJobData ) => {
         if ( validation_job.best	=== true ) {
-          calibrationValidationRunListHeaders.value.push({ field: 'validation_run_id', header: "Validation Run ID"});          
-          calibrationValidationRunListHeaders.value.push({ field: 'run_date', header: "Run Date"});
+          calibrationValidationRunListHeaders.value.push({ field: 'validation_run_id', header: "Validation Job ID"});
+          calibrationValidationRunListHeaders.value.push({ field: 'submit_date', header: "Submit Date"});
 
           validation_job.parameters.forEach( ( parameter: CalibrationRunValidationParameterData ) => {
             calibrationValidationRunListHeaders.value.push({ field: parameter.name, header: parameter.name });            
           });
+
+          calibrationValidationRunListHeaders.value.push({ field: 'status', header: "Status"});
         }
         let rowData = <any>{};
         rowData['validation_run_id'] = validation_job.validation_run_id;
-        rowData['run_date'] = formatDateForDisplay( validation_job.run_date );
+        rowData['submit_date'] = formatDateForDisplay( validation_job.submit_date );
         validation_job.parameters.forEach( ( parameter: CalibrationRunValidationParameterData ) => {
           rowData[ parameter.name ] = parameter.value;
         });
+        rowData['status'] = validation_job.status;
         computedCalibrationValidationRunList.value.push( rowData );
       });
     }
