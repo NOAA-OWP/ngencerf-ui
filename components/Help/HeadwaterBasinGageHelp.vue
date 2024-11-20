@@ -24,8 +24,8 @@
         </tr>
         <tr>
           <td class="td1">Forcing:</td>
-          <td class="td2">Pull down to select Forcing data source for the selected gage. Either EHS for Enterprise 
-            Hydrofabric Services or Upload to upload from local computer. <br /> <br />
+          <td class="td2">Pull down to select Forcing data source for the selected gage. Either Data Services for Enterprise
+            Data Services or Upload to upload from local computer. <br /> <br />
             A gage must have already been selected to upload a file. Upload allows the user to specify their own csv 
             tfile containing hourly time-series details of forcing data. The files (one per catchment in the headwater 
             basin for the selected gage)
@@ -39,8 +39,8 @@
         </tr>
         <tr>
           <td class="td1">Observational:</td>
-          <td class="td2">Pull down to select Observational Data source for the selected gage. Either EHS for Enterprise 
-            Hydrofabric Services or Upload to upload from local computer. <br /> <br />
+          <td class="td2">Pull down to select Observational Data source for the selected gage. Either Data Services for Enterprise
+            Data Services or Upload to upload from local computer. <br /> <br />
             Upload allows the user to specify their own csv file hourly time-series details of observed gage streamflow data.
             A gage must have already been selected
             to upload a file. This file must be in the following format, with the the 1st line being the header
@@ -52,8 +52,8 @@
         </tr>
         <tr>
           <td class="td1">GeoPackage:</td>
-          <td class="td2">Pull down to select the source for the selected gage GeoPackage file. Either EHS for Enterprise 
-            Hydrofabric Services or Upload to upload from local computer. <br /> <br />
+          <td class="td2">Pull down to select the source for the selected gage GeoPackage file. Either Data Services for Enterprise
+            Data Services or Upload to upload from local computer. <br /> <br />
             Upload allows the user to specify their own .gpkg file. A gage must have already been selected to upload a file.</td>
         </tr>
         <tr>

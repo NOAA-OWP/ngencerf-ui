@@ -52,7 +52,7 @@
       <Transition name="slide-fade">
         <div v-if="showHelp" id="HelpWindow">
           <div class="text-right sticky top-0">
-            <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+            <img alt="Close" title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
               class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
           </div>
           <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
@@ -117,7 +117,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 import ContextMenu from 'primevue/contextmenu';
 
-import { useLogout } from "~/composables/UseEventBus";
+import { useLogout, useLogoutListen } from "~/composables/UseEventBus";
 
 import UserAccount from "~/components/Common/UserAccount.vue";
 
@@ -136,7 +136,7 @@ const accountOverlay = ref();
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
 
-const { isUserLoggedIn, getUserInitials, hardResetUserDataStore } = useUserDataStore();
+const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
 const location = useRoute();
 
@@ -204,10 +204,19 @@ useAccountEventListen('accountEvent', () => {
   ele.style.display = "none";
 })
 
+useLogoutListen('logoutEvent', (evStr: string) => {
+  if (evStr === "token" && !getIsTokenExpired()) {
+    setIsTokenExpired();
+    alert("Your session has expired. Please log in again.");
+    useLogout("logoutEvent", "logout");
+    navigateTo('login');
+  }
+})
+
 const logoutUser = async () => {
   if (confirm("Are you sure you want to logout?")) {
     console.log("Logging out...");
-    useLogout("logoutEvent", "");
+    useLogout("logoutEvent", "logout");
     await navigateTo('login');
   }
 }
@@ -280,7 +289,7 @@ const MenuChanged = (e: MouseEvent) => {
 #TopMenu {
   display: inline;
   font-size: 20px;
-  font: 20px Arial, sans-serif;
+  font-family: Arial, sans-serif;
 }
 
 #MainMenu {
@@ -340,6 +349,7 @@ const MenuChanged = (e: MouseEvent) => {
   border-radius: 50%;
   font-size: 30px;
   padding-top: 20px;
+  margin-right: 10px;
 }
 
 #HelpCircle {
@@ -353,10 +363,6 @@ const MenuChanged = (e: MouseEvent) => {
   font-size: 38px;
   padding-top: 12px;
   border: 1px solid #000;
-}
-
-#UserCircle {
-  margin-right: 10px;
 }
 
 #UserCircle:hover {
@@ -382,7 +388,7 @@ const MenuChanged = (e: MouseEvent) => {
   width: 60px;
   display: inline-block;
 
-  HelpWindow #HelpCircle {
+  #HelpCircle {
     text-align: center;
     margin-top: 15px;
   }
@@ -413,8 +419,7 @@ const MenuChanged = (e: MouseEvent) => {
 }
 
 .slide-fade-leave-active {
-  //transition: all 1s cubic-bezier(0.075, 0.82, 0.165, 1)
-  transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1)
+  transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .slide-fade-enter-from,
