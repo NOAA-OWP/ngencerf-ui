@@ -1,77 +1,68 @@
 <template>
-  <client-only>
-      <div class="flex mt-2">
-        <div class="w-2/3">
-          <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
-            Previous Calibration Runs
-          </h1>
-        </div>
+  <!-- Forecast Runs Tab -->
+  <div class="h-screen-inner pr-2">
+    <div class="flex mt-2">
+      <div class="w-2/3">
+        <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">Previous Forecast Runs</h1>
       </div>
+      <div class="ml-auto mt-2">
+        <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
+            v-if="userSelectedEvalCalibrationRunId > 0"
+            @click.stop="navigateToAlternateIteration">New Forecast</Button></div>
+      </div>
+    </div>
 
-      <div id="calibrationRunList"
-        v-if="userEvaluationCalibrationRunListData.length > 0 && computedCalibrationValidationRunList.length <= 1">
-        <div>
-          <div id="CalTable">
-            <div class="grid grid-cols-2 mb-5">
-              <div class="col-span-1">
-                <div class="inline ">
-                  <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-                  <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
-                    :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
-                    placeholder=""></Select>
-                </div>
+    <div id="calibrationRunList"
+      v-if="userEvaluationCalibrationRunListData.length > 0 && computedCalibrationValidationRunList.length <= 1">
+      <div>
+        <div id="CalTable">
+          <div class="grid grid-cols-2 mb-5">
+            <div class="col-span-1">
+              <div class="inline ">
+                <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
+                <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
+                  :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
+                  placeholder=""></Select>
               </div>
             </div>
-
-            <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
-              sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
-              v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
-              @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
-              <Column field="calibration_run_id" header="Run ID" sortable></Column>
-              <Column field="status" header="Status" sortable></Column>
-               <Column field="created_at" header="Creation Date" sortable>
-                <template #body="slotProps">
-                  {{ formatDateForDisplay(slotProps.data.created_at) }}
-                </template>
-              </Column>
-              <Column field="submit_date" header="Submit Date" sortable>
-                <template #body="slotProps">
-                  {{ formatDateForDisplay(slotProps.data.submit_date) }}
-                </template>
-              </Column>
-              <Column field="formulation_name" header="formulation_name" sortable></Column>
-              <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-              <Column field="objective_function" header="Objective Function" sortable></Column>
-              <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
-              </DataTable>
           </div>
-        </div>
-      </div>
-      <div v-if="computedCalibrationValidationRunList.length > 1">
-        <div id="evaluationCalibrationList">
-          <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px"
-            sortField="validation_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="single"
-            v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle"
-            @rowSelect="onEvalValdiationRowSelect" @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
-            <Column v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex"
-              :header="col.header" :field="col.field"></Column>
+
+          <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
+            table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun" selectionMode="single"
+            :rowStyle="rowStyle" @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
+            class="boxed">
+            <Column field="forecast_run_id" header="Forecast Run ID" sortable></Column>
+            <Column field="calibration_run_id" header="Calibration Run ID" sortable></Column>
+            <Column field="status" header="status" sortable></Column>
+            <Column field="run_date" header="Run Date" sortable>
+              <template #body="slotProps">
+                {{ formatDateForDisplay(slotProps.data.run_date) }}
+              </template>
+            </Column>
+             <Column field="run_cycle" header="run_cycle" sortable></Column>
+            <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
           </DataTable>
-        </div>
-        <div class="flex mt-2">
-          <div class="ml-auto mt-4">
-            <div id="NewButton" class="">
-              <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return
-                to
-                Calibration Jobs</Button>
-            </div>
-          </div>
+          <div class="mt-4">* Right-click for Open, Delete and Clone options</div>
         </div>
       </div>
-
-    <div class="waitgif" v-if="isLoadingCalibrationSummary">
-      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
-  </client-only>
+    <div v-if="computedCalibrationValidationRunList.length > 1">
+      <div id="evaluationCalibrationList">
+        <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px"
+          table-style="min-width: 50rem" selectionMode="single" v-model:selection="selectedCalibrationValidationRun"
+          :rowStyle="rowStyle" @rowSelect="onEvalValdiationRowSelect" @rowUnselect="onEvalValidationRowUnSelect"
+          class="boxed">
+          <Column v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex" :header="col.header"
+            :field="col.field"></Column>
+        </DataTable>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="waitgif" v-if="isLoadingCalibrationSummary">
+    <img alt="Please Wait..." src="@/assets/styles/img/wait.gif" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -84,7 +75,6 @@ import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { hilightTab } from '~/composables/TabHilight';
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
@@ -115,15 +105,13 @@ const toast = useToast();
 const selectedCalibrationRun = ref<CalibrationRun>();
 const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
-onMounted(() => {
-  hilightTab(ForecastTabs.tab_calibrationRuns);
+onMounted( () => {
+  hilightTab(ForecastTabs.tab_forecastRuns);  
   //isLoading.value = false;
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
-  //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
-  resetUserSelectedEvalCalibrationRun();
-  fetchUserValidatedCalibrationJobsListData();
 });
+
 
 const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   resetUserSelectedEvalValidationRun();
@@ -157,7 +145,7 @@ const navigateToAlternateIteration = (event: any) => {
   if (userSelectedEvalCalibrationRunId.value > 0) {
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
-    e.click();
+    e.click();forecast
   } else {
     toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 })
   }
@@ -166,6 +154,7 @@ const navigateToAlternateIteration = (event: any) => {
 const navigateToEvaluation = (event: any) => {
   if (evaluateValidationRunId.value > 0) {
     const tabs = document.getElementsByClassName("tabs");
+
     const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
     e.click();
   } else {
@@ -184,6 +173,14 @@ const rowStyle = (data: any) => {
     return { backgroundColor: 'white' }
   }
 }
+
+onMounted(() => {
+  //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
+  resetUserSelectedEvalCalibrationRun();
+
+  fetchUserValidatedCalibrationJobsListData();
+});
+
 </script>
 
 <style lang="scss" scoped>

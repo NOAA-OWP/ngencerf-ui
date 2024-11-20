@@ -73,19 +73,24 @@
       <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
         <span data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked" aria-label="Previous Runs tab"
           title="Previous Runs tab">
-          Previous Runs
+          Calibration Runs
           <div :class="tabNotCompleted ? 'erorDot' : 'noErrorDot'"></div>
         </span>
-        <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast and Run Tab"
+        <span data-tab="2" class="tabs activeTab prevent-select" v-on:click="tabClicked" aria-label="Forecast Runs tab"
+          title="Forecast Runs tab">
+          Forecast Runs
+          <div :class="tabNotCompleted ? 'erorDot' : 'noErrorDot'"></div>
+        </span>
+        <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast and Run Tab"
           title="Setup Forecast / Run tab">
           Setup Forecast / Run
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status tab" title="Status">
+        <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status tab" title="Status">
           Status
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </div>
-        <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
+        <div data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
           title="Results tab">
           Results
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
