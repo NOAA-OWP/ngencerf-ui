@@ -23,11 +23,12 @@
 
 <script setup lang="ts">
 import { hilightTab } from '~/composables/TabHilight';
-onMounted(() => {
-  hilightTab(ForecastTabs.tab_selectAltIteration);
-  
-})
-
+onMounted( () => {
+  hilightTab(ForecastTabs.tab_setupForecastRun);  
+  //isLoading.value = false;
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+});
 
 const cycle = ref();
 const cycleOptions = ref();

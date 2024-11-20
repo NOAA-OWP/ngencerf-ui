@@ -9,11 +9,11 @@
                 <tbody>
                   <tr height="40px">
                     <td class="text-right font-bold">Start Time</td>
-                    <td class="pl-5">{{ startTime ? startTime : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="32px">
                     <td class="text-right font-bold">Elapsed Time</td>
-                    <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ '-'.repeat(30) }}</td>
                   </tr>
                   <tr>
                     <td>&nbsp;</td>
@@ -46,11 +46,13 @@
 
 <script setup lang="ts">
 import { hilightTab } from '~/composables/TabHilight';
-onMounted(() => {
-  hilightTab(ForecastTabs.tab_runStatus);
-  
-})
-
+const isLoading = ref<boolean>(false);
+onMounted( () => {
+  hilightTab(ForecastTabs.tab_runStatus);  
+  isLoading.value = false;
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+});
 
 
 </script>

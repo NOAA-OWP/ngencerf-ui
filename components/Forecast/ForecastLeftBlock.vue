@@ -25,17 +25,16 @@
 <script setup lang="ts">
 import Tabs from '~/components/Common/Tabs.vue'
 import { generalStore } from "@/stores/common/GeneralStore";
-import LazyForecastRunsTab from './ForecastRunsTab.vue'
-import LazySetupForecastRunTab from './SetupForecastRunTab.vue'
-import LazyStatusTab from './StatusTab.vue'
-import LazyResultsTab from './ResultsTab.vue'
-import LazyPreviousRunsTab from '../Verification/PreviousRunsTab.vue';
-
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 
-// Default to Tab 1, HeadwaterBasinGage
-const activeTab = ref(getForecastTabIndex());
+import LazyPreviousRunsTab from '~/components/Forecast/PreviousRunsTab.vue';
+import LazyForecastRunsTab from '~/components/Forecast/ForecastRunsTab.vue'
+import LazySetupForecastRunTab from '~/components/Forecast/SetupForecastRunTab.vue'
+import LazyStatusTab from '~/components/Forecast/StatusTab.vue'
+import LazyResultsTab from '~/components/Forecast/ResultsTab.vue'
 
+// Default to Tab 1
+const activeTab = ref(getForecastTabIndex());
 // Activate new tab
 const tabChanged = (tabNum: number) => {
   activeTab.value = tabNum;

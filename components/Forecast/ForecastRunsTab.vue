@@ -105,6 +105,14 @@ const toast = useToast();
 const selectedCalibrationRun = ref<CalibrationRun>();
 const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
+onMounted( () => {
+  hilightTab(ForecastTabs.tab_forecastRuns);  
+  //isLoading.value = false;
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
+});
+
+
 const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   resetUserSelectedEvalValidationRun();
   loadSelectedCalibrationRun(event.data.calibration_run_id);
@@ -137,7 +145,7 @@ const navigateToAlternateIteration = (event: any) => {
   if (userSelectedEvalCalibrationRunId.value > 0) {
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
-    e.click();
+    e.click();forecast
   } else {
     toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 })
   }
