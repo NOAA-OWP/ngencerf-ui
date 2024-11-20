@@ -2,8 +2,8 @@
   <div class="_help-page">
     <div class="_help-title">ngenCERF Calibration Landing Page</div>
     <div class="_help-subtitle">Displays table of previous calibration run with some basic details.</div>
-    <p class="text-center" style="color:orange;font-size:0.8em;">
-      WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+    <p class="text-center" style="color:#cc5500;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
 
     <table class="_help-table">

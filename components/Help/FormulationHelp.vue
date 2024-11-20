@@ -2,8 +2,8 @@
   <div class="_help-page">
     <div class="_help-title">ngenCERF Calibration Workflow - Formulation Tab</div>
     <div class="_help-subtitle">&nbsp;</div>
-    <p class="text-center" style="color:orange;font-size:0.8em;">
-      WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+    <p class="text-center" style="color:#cc5500;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
 
     <table class="_help-table">

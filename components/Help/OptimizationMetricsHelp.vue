@@ -6,8 +6,8 @@
       function, the calibration stop criteria, the plot generation frequency and metrics. By default, the ngen-cal
       program does not calculate the Categorical Metrics, POD, CSI, and FAR or the Event Based Metrics, PKBIAS, PKTE,
       and EVBIAS.</div>
-    <p class="text-center" style="color:orange;font-size:0.8em;">
-      WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+    <p class="text-center" style="color:#cc5500;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
 
 

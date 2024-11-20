@@ -4,8 +4,8 @@
     <div class="_help-subtitle">
         This tab provides the user the ability to select the time periods to run the calibration, 
         the time periods for an automatic validation after calibration is complete based on the best set of parameters
-        determined during the calibration process, and which module parameters for the selected formulation to tune during
-        calibration.
+        determined during the calibration process, the output variable to calibrate and which module parameters for 
+        the selected formulation to tune during calibration.
     </div>
     <p class="text-center" style="color:#cc5500;font-size:0.8em;">
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
