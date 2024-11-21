@@ -26,7 +26,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const performanceMetricsData = ref<any[]>([]);
   const logs = ref<APIResponse>({});
   const calibrationLogData = ref<DynamicObject>({});
-  const validationLogData = ref<DynamicObject>({});
+  const validationLogData = ref<string>("")
 
 
   // Restore state from sessionStorage if available
@@ -44,11 +44,10 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     if (ls !== "undefined") { performanceMetricsData.value = ls ? JSON.parse(ls) : [] }
     ls = sessionStorage.getItem('calibrationLogData');
     if (ls !== "undefined") { calibrationLogData.value = ls ? JSON.parse(ls) : [] }
-    ls = sessionStorage.getItem('validationLogData');
-    if (ls !== "undefined") { validationLogData.value = ls ? JSON.parse(ls) : [] }
     ls = sessionStorage.getItem('iterations');
     if (ls !== "undefined") { iterations.value = ls ? JSON.parse(ls) : [] }
 
+    validationLogData.value = sessionStorage.getItem('validationLogData') as string;
     selectedSupplementalTable.value = parseInt(JSON.parse(sessionStorage.getItem('selectedSupplementalTable') as string), 10);
     console.log("EvaluationSupplementalDataStore Store restored");
   }
@@ -56,14 +55,14 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
 
   watch(iterations, (iterations) => { sessionStorage.setItem('iterations', JSON.stringify(iterations)); })
   watch(iterationMetricsData, (iterationMetricsData) => { sessionStorage.setItem('iterationMetricsData', JSON.stringify(iterationMetricsData)); })
+  watch(calibrationLogData, (calibrationLogData) => { sessionStorage.setItem('calibrationLogData', JSON.stringify(calibrationLogData)); })
   watch(performanceMetricsData, (performanceMetricsData) => { sessionStorage.setItem('performanceMetricsData', JSON.stringify(performanceMetricsData)); })
   watch(iterationParamsData, (iterationParamsData) => { sessionStorage.setItem('iterationParamsData', JSON.stringify(iterationParamsData)); })
   watch(iterationMetricsColumns, (iterationMetricsColumns) => { sessionStorage.setItem('iterationMetricsColumns', JSON.stringify(iterationMetricsColumns)); })
   watch(iterationParamsColumns, (iterationParamsColumns) => { sessionStorage.setItem('iterationParamsColumns', JSON.stringify(iterationParamsColumns)); })
   watch(performanceMetrics, (performanceMetrics) => { sessionStorage.setItem('performanceMetrics', JSON.stringify(performanceMetrics)); })
   watch(selectedSupplementalTable, (selectedSupplementalTable) => { sessionStorage.setItem('selectedSupplementalTable', JSON.stringify(selectedSupplementalTable)); })
-  watch(calibrationLogData, (calibrationLogData) => { sessionStorage.setItem('calibrationLogData', JSON.stringify(calibrationLogData)); })
-  watch(validationLogData, (validationLogData) => { sessionStorage.setItem('validationLogData', JSON.stringify(validationLogData)); })
+  watch(validationLogData, (validationLogData) => { sessionStorage.setItem('validationLogData', validationLogData); })
 
   /**
    * Get Calibration Iteration Data
