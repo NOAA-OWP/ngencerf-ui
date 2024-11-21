@@ -19,7 +19,7 @@
           </li>
           <li aria-label="Forecast" title="Forecast">
             <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
-              @click=""  class="disabled">
+              @click="MenuChanged">
               Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
