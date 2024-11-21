@@ -43,59 +43,59 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const tuningStore_data_loading = ref(true);
   const saveTuningTabRequestBody = ref<any>({});
 
-    // Restore state from sessionStorage if available
-    if (typeof window !== 'undefined') {
-      let ls;
-      ls = sessionStorage.getItem('loadTuningTabData');
-      if (ls !== "undefined") { loadTuningTabData.value = JSON.parse(ls as string) }
-  
-      simStartTime.value = sessionStorage.getItem('simStartTime') as string;
-      simEndTime.value = sessionStorage.getItem('simEndTime') as string;
-      calStartTime.value = sessionStorage.getItem('calStartTime') as string;
-      calEndTime.value = sessionStorage.getItem('calEndTime') as string;
-  
-      ls = sessionStorage.getItem('calibrationTuningModules');
-      if (ls !== "undefined") { calibrationTuningModules.value = JSON.parse(ls as string) }
-      ls = sessionStorage.getItem('calibrationTuningParameters');
-      if (ls !== "undefined") { calibrationTuningParameters.value = ls ? JSON.parse(ls) : [] }
-      ls = sessionStorage.getItem('userSelectedCalibrationTuningParameters');
-      if (ls !== "undefined") { userSelectedCalibrationTuningParameters.value = ls ? JSON.parse(ls) : [] }
-      ls = sessionStorage.getItem('userOutputVariableToCalibrate');
-      if (ls !== "undefined") { userOutputVariableToCalibrate.value = ls ? JSON.parse(ls) : [] }
-      ls = sessionStorage.getItem('outputVariables');
-      if (ls !== "undefined") { outputVariables.value = ls ? JSON.parse(ls) : [] }
-      automatic_validation.value = JSON.parse(sessionStorage.getItem('automatic_validation') as string) === "true";
-      avSimStartTime.value = sessionStorage.getItem('avSimStartTime') as string;
-      avSimEndTime.value = sessionStorage.getItem('avSimEndTime') as string;
-      avCalStartTime.value = sessionStorage.getItem('avCalStartTime') as string;
-      avCalEndTime.value = sessionStorage.getItem('avCalEndTime') as string;
-      rangeDateFrom.value = sessionStorage.getItem('rangeDateFrom') as string;
-      rangeDateTo.value = sessionStorage.getItem('rangeDateTo') as string;
-      tuningStore_data_loading.value = JSON.parse(sessionStorage.getItem('tuningStore_data_loading') as string) === "true";
-      ls = sessionStorage.getItem('saveTuningTabRequestBody');
-      if (ls !== "undefined") { saveTuningTabRequestBody.value = ls ? JSON.parse(ls) : {} }
-      console.log("TuningStore has been refreshed from sessionStorage");
-    }
+  // Restore state from sessionStorage if available
+  if (typeof window !== 'undefined') {
+    let ls;
+    ls = sessionStorage.getItem('loadTuningTabData');
+    if (ls !== "undefined") { loadTuningTabData.value = JSON.parse(ls as string) }
 
-    watch(loadTuningTabData, (loadTuningTabData) => { sessionStorage.setItem('loadTuningTabData', JSON.stringify(loadTuningTabData)); });
-    watch(calibrationTuningModules, (calibrationTuningModules) => { sessionStorage.setItem('calibrationTuningModules', JSON.stringify(calibrationTuningModules)); });
-    watch(calibrationTuningParameters, (calibrationTuningParameters) => { sessionStorage.setItem('calibrationTuningParameters', JSON.stringify(calibrationTuningParameters)); });
-    watch(userSelectedCalibrationTuningParameters, (userSelectedCalibrationTuningParameters) => { sessionStorage.setItem('userSelectedCalibrationTuningParameters', JSON.stringify(userSelectedCalibrationTuningParameters)); });
-    watch(userOutputVariableToCalibrate, (userOutputVariableToCalibrate) => { sessionStorage.setItem('userOutputVariableToCalibrate', JSON.stringify(userOutputVariableToCalibrate)); });
-    watch(outputVariables, (outputVariables) => { sessionStorage.setItem('outputVariables', JSON.stringify(outputVariables)); });
-    watch(saveTuningTabRequestBody, (saveTuningTabRequestBody) => { sessionStorage.setItem('saveTuningTabRequestBody', JSON.stringify(saveTuningTabRequestBody)); });
-    watch(simEndTime, (simEndTime) => { sessionStorage.setItem('simEndTime', simEndTime ?? ""); });
-    watch(calStartTime, (calStartTime) => { sessionStorage.setItem('calStartTime', calStartTime ?? ""); });
-    watch(calEndTime, (calEndTime) => { sessionStorage.setItem('calEndTime', calEndTime ?? ""); });
-    watch(automatic_validation, (automatic_validation) => { sessionStorage.setItem('automatic_validation', JSON.stringify(automatic_validation) ); });
-    watch(avSimStartTime, (avSimStartTime) => { sessionStorage.setItem('avSimStartTime', avSimStartTime ?? ""); });
-    watch(avSimEndTime, (avSimEndTime) => { sessionStorage.setItem('avSimEndTime', avSimEndTime ?? ""); });
-    watch(avCalStartTime, (avCalStartTime) => { sessionStorage.setItem('avCalStartTime', avCalStartTime ?? ""); });
-    watch(avCalEndTime, (avCalEndTime) => { sessionStorage.setItem('avCalEndTime', avCalEndTime ?? ""); });
-    watch(rangeDateFrom, (rangeDateFrom) => { sessionStorage.setItem('rangeDateFrom', rangeDateFrom ?? ""); });
-    watch(tuningStore_data_loading, (tuningStore_data_loading) => { sessionStorage.setItem('tuningStore_data_loading', JSON.stringify(tuningStore_data_loading) ); });
+    simStartTime.value = sessionStorage.getItem('simStartTime') as string;
+    simEndTime.value = sessionStorage.getItem('simEndTime') as string;
+    calStartTime.value = sessionStorage.getItem('calStartTime') as string;
+    calEndTime.value = sessionStorage.getItem('calEndTime') as string;
 
-   
+    ls = sessionStorage.getItem('calibrationTuningModules');
+    if (ls !== "undefined") { calibrationTuningModules.value = JSON.parse(ls as string) }
+    ls = sessionStorage.getItem('calibrationTuningParameters');
+    if (ls !== "undefined") { calibrationTuningParameters.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('userSelectedCalibrationTuningParameters');
+    if (ls !== "undefined") { userSelectedCalibrationTuningParameters.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('userOutputVariableToCalibrate');
+    if (ls !== "undefined") { userOutputVariableToCalibrate.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('outputVariables');
+    if (ls !== "undefined") { outputVariables.value = ls ? JSON.parse(ls) : [] }
+    automatic_validation.value = JSON.parse(sessionStorage.getItem('automatic_validation') as string) === "true";
+    avSimStartTime.value = sessionStorage.getItem('avSimStartTime') as string;
+    avSimEndTime.value = sessionStorage.getItem('avSimEndTime') as string;
+    avCalStartTime.value = sessionStorage.getItem('avCalStartTime') as string;
+    avCalEndTime.value = sessionStorage.getItem('avCalEndTime') as string;
+    rangeDateFrom.value = sessionStorage.getItem('rangeDateFrom') as string;
+    rangeDateTo.value = sessionStorage.getItem('rangeDateTo') as string;
+    tuningStore_data_loading.value = JSON.parse(sessionStorage.getItem('tuningStore_data_loading') as string) === "true";
+    ls = sessionStorage.getItem('saveTuningTabRequestBody');
+    if (ls !== "undefined") { saveTuningTabRequestBody.value = ls ? JSON.parse(ls) : {} }
+    console.log("TuningStore has been refreshed from sessionStorage");
+  }
+
+  watch(loadTuningTabData, (loadTuningTabData) => { sessionStorage.setItem('loadTuningTabData', JSON.stringify(loadTuningTabData)); });
+  watch(calibrationTuningModules, (calibrationTuningModules) => { sessionStorage.setItem('calibrationTuningModules', JSON.stringify(calibrationTuningModules)); });
+  watch(calibrationTuningParameters, (calibrationTuningParameters) => { sessionStorage.setItem('calibrationTuningParameters', JSON.stringify(calibrationTuningParameters)); });
+  watch(userSelectedCalibrationTuningParameters, (userSelectedCalibrationTuningParameters) => { sessionStorage.setItem('userSelectedCalibrationTuningParameters', JSON.stringify(userSelectedCalibrationTuningParameters)); });
+  watch(userOutputVariableToCalibrate, (userOutputVariableToCalibrate) => { sessionStorage.setItem('userOutputVariableToCalibrate', JSON.stringify(userOutputVariableToCalibrate)); });
+  watch(outputVariables, (outputVariables) => { sessionStorage.setItem('outputVariables', JSON.stringify(outputVariables)); });
+  watch(saveTuningTabRequestBody, (saveTuningTabRequestBody) => { sessionStorage.setItem('saveTuningTabRequestBody', JSON.stringify(saveTuningTabRequestBody)); });
+  watch(simEndTime, (simEndTime) => { sessionStorage.setItem('simEndTime', simEndTime ?? ""); });
+  watch(calStartTime, (calStartTime) => { sessionStorage.setItem('calStartTime', calStartTime ?? ""); });
+  watch(calEndTime, (calEndTime) => { sessionStorage.setItem('calEndTime', calEndTime ?? ""); });
+  watch(automatic_validation, (automatic_validation) => { sessionStorage.setItem('automatic_validation', JSON.stringify(automatic_validation)); });
+  watch(avSimStartTime, (avSimStartTime) => { sessionStorage.setItem('avSimStartTime', avSimStartTime ?? ""); });
+  watch(avSimEndTime, (avSimEndTime) => { sessionStorage.setItem('avSimEndTime', avSimEndTime ?? ""); });
+  watch(avCalStartTime, (avCalStartTime) => { sessionStorage.setItem('avCalStartTime', avCalStartTime ?? ""); });
+  watch(avCalEndTime, (avCalEndTime) => { sessionStorage.setItem('avCalEndTime', avCalEndTime ?? ""); });
+  watch(rangeDateFrom, (rangeDateFrom) => { sessionStorage.setItem('rangeDateFrom', rangeDateFrom ?? ""); });
+  watch(tuningStore_data_loading, (tuningStore_data_loading) => { sessionStorage.setItem('tuningStore_data_loading', JSON.stringify(tuningStore_data_loading)); });
+
+
   /**
    * Load Tuning Tab data
    * @returns {Promise<any>}
@@ -103,7 +103,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
   async function loadTuningTabStaticData(): Promise<any> {
     tuningStore_data_loading.value = true;
 
-    loadTuningTabData.value =  await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_tuning_tab/`, {
+    loadTuningTabData.value = await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_tuning_tab/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -191,8 +191,10 @@ export const useTuningStore = defineStore('TuningStore', () => {
   };
 
 
-  useLogoutListen('logoutEvent', () => {
-    hardResetTuningStore();
+  useLogoutListen('logoutEvent', (evStr: string) => {
+    if (evStr === "logout") {
+      hardResetTuningStore();
+    }
   })
 
   /**
