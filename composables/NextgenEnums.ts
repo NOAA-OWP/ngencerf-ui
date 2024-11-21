@@ -1,5 +1,5 @@
 
-export const CalibrationTabs = {
+export const CalibrationTabs =  {
   tab_calibrationRuns: 0,
   tab_headwaterBasinGage: 1,
   tab_formulation: 2,
@@ -8,7 +8,7 @@ export const CalibrationTabs = {
   tab_statusRun: 5
 }
 
-export const EvaluationTabs = {
+export const EvaluationTabs =  {
   tab_calibrationRuns: 0,
   tab_evaluate: 1,
   tab_selectAltIteration: 2,
@@ -17,8 +17,8 @@ export const EvaluationTabs = {
 
 export const ForecastTabs =  {
   tab_calibrationRuns: 0,
-  tab_forecastRuns: 1,
-  tab_setupForecastRun: 2,
+  tab_evaluate: 1,
+  tab_selectAltIteration: 2,
   tab_runStatus: 3,
   tab_results: 4
 }
