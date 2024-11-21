@@ -55,6 +55,9 @@
             </Select>
           </div>
           <div class="pt-6 pb-2">
+            <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0">
+              <b>Rows 1 to {{ plotTableData.length }} of {{ plotTableTotalSize }}</b>
+            </div>
             <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true  scrollable scroll-height="500px" :multi-sort="true">
               <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable></Column>
             </DataTable>
@@ -79,18 +82,27 @@
           :field="col.field"></Column>
       </DataTable>
       <div class="pl-4" v-if="calibrationLogList && calibrationLogList.length > 0 && selectedSupplementalTable == 4">
-        <label for="CalibrationLogOptions" class="pr-2 pt-3">Select Calibration Log</label>
-        <Select v-if="calibrationLogList.length > 1" id="CalibrationLogOptions" class="p-select" 
-          v-model="selectedCalibrationLog" :options="calibrationLogList" optionLabel="name" optionValue="name">
-        </Select>
+        <div v-if="calibrationLogList.length > 1">
+          <label for="CalibrationLogOptions" class="pr-2 pt-3">Select Calibration Log</label>
+          <Select id="CalibrationLogOptions" class="p-select" 
+            v-model="selectedCalibrationLog" :options="calibrationLogList" optionLabel="name" optionValue="name">
+          </Select>
+        </div>
+        <div v-if="calibrationLogList.length == 1"><b>{{ selectedCalibrationLog }}</b></div>
         <div id="CalibrationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
           <div v-html="calibrationLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
-      <div class="pl-4" v-if="validationLogData && validationLogData != '' && selectedSupplementalTable == 5">
-        <label for="ValidationLogDisplay" class="pr-2 pt-3">Validation Log</label>
-        <div id="ValidationLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
-          <div v-html="validationLogData" class="whitespace-nowrap"></div>
+      <div class="pl-4" v-if="validationLogList && validationLogList.length > 0 && selectedSupplementalTable == 5">
+        <div v-if="validationLogList.length > 1">
+          <label for="validationLogOptions" class="pr-2 pt-3">Select Validation Log</label>
+          <Select id="validationLogOptions" class="p-select" 
+            v-model="selectedValidationLog" :options="validationLogList" optionLabel="name" optionValue="name">
+          </Select>
+        </div>
+        <div v-if="validationLogList.length == 1"><b>{{ selectedValidationLog }}</b></div>
+        <div id="ValidationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
+          <div v-html="validationLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
     </div>
@@ -169,12 +181,15 @@ const performanceMetricsColumns = [{ header: 'Metric', field: 'metric' }];
 const calibrationLogList = ref<any[]>([]);
 const calibrationLogDisplay = ref<string>('');
 const selectedCalibrationLog = ref<string>('');
+const validationLogList = ref<any[]>([]);
+const validationLogDisplay = ref<string>('');
+const selectedValidationLog = ref<string>('');
 const supplementalTableOptions = [
   'Iteration Metrics Table',
   'Iteration Parameters Table',
   'Performance Metrics Table',
   'Calibration Logs',
-  'Validation Log'
+  'Validation Logs'
 ]
 
 onMounted(async () => {
@@ -211,8 +226,12 @@ onMounted(async () => {
 
   // Add Iteration Metrics/Parameters Tables to the dropdown
   if (iterations.value?._data?.iteration_data) {
-    plotList.value.push({ name: supplementalTableOptions[0], description: '' });
-    plotList.value.push({ name: supplementalTableOptions[1], description: '' });
+    if (!plotList.value.some(item => item.name == supplementalTableOptions[0])) {
+      plotList.value.push({ name: supplementalTableOptions[0], description: '' });
+    }
+    if (!plotList.value.some(item => item.name == supplementalTableOptions[1])) {
+      plotList.value.push({ name: supplementalTableOptions[1], description: '' });
+    }
   }
 
   // set up arrays for iterationMetricsData and iterationParamsData
@@ -312,7 +331,9 @@ onMounted(async () => {
   }
 
   // Add Performance Metrics Table to the dropdown
-  plotList.value.push({ name: supplementalTableOptions[2], description: '' });
+  if (!plotList.value.some(item => item.name == supplementalTableOptions[2])) {
+    plotList.value.push({ name: supplementalTableOptions[2], description: '' });
+  }
   console.log('plotList:', plotList.value);
 
   // Get Calibration/Validation Logs
@@ -322,8 +343,17 @@ onMounted(async () => {
   );
   calibrationLogData.value = {};
   calibrationLogList.value = [];
-  validationLogData.value = '';
+  validationLogData.value = {};
+  validationLogList.value = [];
+  /* Bringing back comments from Carolyn's hotfix
   if (logs.value?._data?.logs) {
+    if (logs.value?._data?.logs.length == 0) {
+      // try to get calibration logs separately
+      let calibration_logs = await queryGetLogs(calibrationJobId.value, 0);
+      if (calibration_logs._data?.logs) {
+        logs.value._data.logs = calibration_logs._data?.logs;
+      }
+    }
     console.log('logs: ', logs.value?._data?.logs);
     for (let l = 0; l < logs.value?._data?.logs.length; l++) {
       Object.keys(logs.value?._data?.logs[l]).forEach(key => {
@@ -340,28 +370,45 @@ onMounted(async () => {
     }
     console.log('calibrationLogData: ', calibrationLogData.value);
     console.log('calibrationLogList: ', calibrationLogList.value);
-    if (logs.value?._data?.validations) {
-      for (let v = 0; v < logs.value?._data?.validations.length; v++) {
-        if (logs.value?._data?.validations[v].validation_job_id == evaluateValidationRunId.value) {
-          let logText = "";
-          if (logs.value?._data?.validations[v].log) {
-            for (let t = 0; t < logs.value?._data?.validations[v].log.length; t++) {
-              logText += logs.value?._data?.validations[v].log[t] + '<br/>\n';
-            }
-          }
-          validationLogData.value = logText;
-          break;
-        }
-      }
-      console.log('validationLogData: ', validationLogData.value);
-    }
+    console.log('selectedCalibrationLog: ', selectedCalibrationLog.value);
   }
+  if (logs.value?._data?.validations) {
+    for (let v = 0; v < logs.value?._data?.validations.length; v++) {
+      console.log('validation_run_id: ', logs.value?._data?.validations[v].validation_run_id);
+      if (logs.value?._data?.validations[v].validation_run_id == evaluateValidationRunId.value) {
+        if (logs.value?._data?.validations[v].logs) {
+          for (let l = 0; l < logs.value?._data?.validations[v].logs?.length; l++) {
+            Object.keys(logs.value?._data?.validations[v].logs[l]).forEach(key => {
+              let logText = "";
+              for (let t = 0; t < logs.value?._data?.validations[v].logs[l][key].length; t++) {
+                logText += logs.value?._data?.validations[v].logs[l][key][t] + '<br/>\n';
+              }
+              validationLogData.value[key] = logText;
+              validationLogList.value.push({ name: key });
+            });
+          }
+        }
+        break;
+      }
+    }
+    if (validationLogList.value.length > 0) {
+      selectedValidationLog.value = validationLogList.value[0]['name'];
+    }
+    console.log('validationLogData: ', validationLogData.value);
+    console.log('validationLogList: ', validationLogList.value);
+    console.log('selectedValidationLog: ', selectedValidationLog.value);
+  }
+  End of hotfix */ 
 
   // Add Calibration/Validation Logs to the dropdown
   if (logs.value?._data?.logs) {
-    plotList.value.push({ name: supplementalTableOptions[3], description: '' });
+    if (!plotList.value.some(item => item.name == supplementalTableOptions[3])) {
+      plotList.value.push({ name: supplementalTableOptions[3], description: '' });
+    }
     if (logs.value?._data?.validations) {
-      plotList.value.push({ name: supplementalTableOptions[4], description: '' });
+      if (!plotList.value.some(item => item.name == supplementalTableOptions[4])) {
+        plotList.value.push({ name: supplementalTableOptions[4], description: '' });
+      }
     }
   }
 
@@ -391,7 +438,7 @@ watch(selectedPlotName, async () => {
     if (selectedSupplementalTable.value == 4 && calibrationLogList.value.length == 0) {
       toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no logs', life: 5000 });
     }
-    if (selectedSupplementalTable.value == 5 && validationLogData.value == '') {
+    if (selectedSupplementalTable.value == 5 && validationLogList.value.length == 0) {
       toast.add({ severity: 'info', summary: 'Validation Run ' + evaluateValidationRunId.value + ' has no logs', life: 5000 });
     }
     plotTableBatchData.value = [];
@@ -485,7 +532,6 @@ watch(selectedPlotName, async () => {
           adjustPlotTableColumns();
           if (plotTableData.value.length < response?._data?.plot_data.length) {
             plotTableLazyLoad.value = true;
-            toast.add({ severity: 'info', summary: 'Displaying ' + plotTableData.value.length + ' of ' + plotTableTotalSize.value + ' records', life: 5000 });
           }
         }
       } else {
@@ -544,14 +590,14 @@ function adjustPlotTableColumns() {
         }
       });
     }
-    console.log('plotTableData: ', plotTableData.value);
-    console.log('plotTableColumns: ', plotTableColumns.value);
+    //console.log('plotTableData: ', plotTableData.value);
+    //console.log('plotTableColumns: ', plotTableColumns.value);
     nextTick(() => {
       const tableContainer = document.getElementById('plotTableHTML')?.querySelector('.p-datatable-table-container');
       tableContainer?.addEventListener('scroll', async(event) => {
-        if (plotTableLazyLoad && (tableContainer.scrollTop > (tableContainer.scrollHeight - (2*tableContainer.clientHeight)))) {
+        if (plotTableLazyLoad.value && (tableContainer.scrollTop > (tableContainer.scrollHeight - (2*tableContainer.clientHeight)))) {
+          plotTableLazyLoad.value = false; // disable scroll event until we're done
           if (plotTableBatchData.value.length < plotTableTotalSize.value ) {
-            //toast.add({ severity: 'info', summary: 'Loading more plot data...', life: 5000 });
             let start_row = plotTableData.value.length;
             let end_row = plotTableData.value.length + plotTablePageSize.value;
             if (plotTableData.value.length < plotTableBatchData.value.length) {
@@ -577,22 +623,26 @@ function adjustPlotTableColumns() {
             }
             let new_rows = plotTableBatchData.value.slice(start_row, end_row <= plotTableTotalSize.value ? end_row : plotTableTotalSize.value);
             plotTableData.value = plotTableData.value.concat(new_rows);
-            toast.removeAllGroups();
-            toast.add({ severity: 'info', summary: 'Displaying ' + plotTableData.value.length + ' of ' + plotTableTotalSize.value + ' records', life: 5000 });
+            plotTableLazyLoad.value = true; // turn scroll event back on
+          } else {
+            console.log('No more data to load - disabling scroll event');
+            plotTableLazyLoad.value = false;
           }
-        } else {
-          console.log('No more data to load - disabling scroll event');
-          plotTableLazyLoad.value = false;
         }
       });
     });
   }
 }
 
-// Handle selectedCalibrationLog changes
+// Handle selectedCalibrationLog/selectedValidationLog changes
 watch(selectedCalibrationLog, async () => {
   if (selectedCalibrationLog.value != '') {
     calibrationLogDisplay.value = calibrationLogData.value[selectedCalibrationLog.value];
+  }
+});
+watch(selectedValidationLog, async () => {
+  if (selectedValidationLog.value != '') {
+    validationLogDisplay.value = validationLogData.value[selectedValidationLog.value];
   }
 });
 
