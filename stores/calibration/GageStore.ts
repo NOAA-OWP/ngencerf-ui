@@ -128,7 +128,7 @@ export const useGageStore = defineStore('GageStore', () => {
     gageOptionsList.value = []
     gageTabData.value?.gages.forEach((gage_value) => {
       if (selectedDomainValue.value == "" || gage_value.domain == selectedDomainValue.value) {
-        if (gage_value.nwm_v3_calibrated) {
+        if ((isNWMv3.value && gage_value.nwm_v3_calibrated) || isNWMv3.value) {
           gageOptionsList.value.push({
             name: gage_value.gage_id,
             description: gage_value.gage_id,
@@ -141,6 +141,7 @@ export const useGageStore = defineStore('GageStore', () => {
 
     return gageOptionsList.value
   })
+
   const getForcingOptionsList = computed(() => {
     return gageTabData.value?.forcing_source_values
   })
