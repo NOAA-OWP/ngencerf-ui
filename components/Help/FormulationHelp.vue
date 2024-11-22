@@ -1,9 +1,14 @@
 <template>
   <div class="_help-page">
-    <div class="_help-title">ngenCERF Calibration Workflow - Formulation Tab</div>
-    <div class="_help-subtitle">&nbsp;</div>
-    <p class="text-center" style="color:orange;font-size:0.8em;">
-      WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+    <div class="_help-title">Calibration - Formulation Tab</div>
+    <div class="_help-subtitle">Select the forumlation for the calibration.</div>
+    <p class="text-center" style="color:#cc5500;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
+    </p>
+
+    <p style="margin-left: 40px; margin-top:20px;font-size:0.9em; line-height: 20px;">
+      <strong>NOTE:</strong> <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup,
+        starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress area to go to that specific setup tab.</em>
     </p>
 
     <table class="_help-table">
@@ -70,15 +75,15 @@
           </td>
         </tr>
         <tr>
-          <td class="td1">SAVE Button:</td>
+          <td class="td1">Save Button:</td>
           <td class="td2">Save data from the tab. Partial saves are allowed.</td>
         </tr>
         <tr>
-          <td class="td1">RESET Button:</td>
-          <td class="td2">Reset data to default information for the Forumlation Tab only.</td>
+          <td class="td1">Prev Button:</td>
+          <td class="td2">Move to the Headwater Basin Gage tab.</td>
         </tr>
         <tr>
-          <td class="td1">NEXT Button:</td>
+          <td class="td1">Next Button:</td>
           <td class="td2">Move to the Tuning Controls Tab. If there is any unsaved data, the user will first be prompted
             to save.</td>
         </tr>

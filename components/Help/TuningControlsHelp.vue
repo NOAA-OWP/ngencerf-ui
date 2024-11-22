@@ -4,31 +4,42 @@
     <div class="_help-subtitle">
         This tab provides the user the ability to select the time periods to run the calibration, 
         the time periods for an automatic validation after calibration is complete based on the best set of parameters
-        determined during the calibration process, and which module parameters for the selected formulation to tune during
-        calibration.
+        determined during the calibration process, the output variable to calibrate and which module parameters for 
+        the selected formulation to tune during calibration.
     </div>
     <p class="text-center" style="color:orange;font-size:0.8em;">
       WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
     </p>
-    <p class="text-center" style="color:red;">
-      NOTE: Times are hourly and must be specified to the top of the hour (hh:00).
+    <p style="margin-left: 40px; margin-top:20px;font-size:0.9em; line-height: 20px;">
+      <strong>NOTE:</strong> <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup,
+        starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress area to go to that specific setup tab.</em>
     </p>
+    <br />
     <hr>
     <div style="margin-left: 75px; margin-top:20px;">
+      <p><strong>General Rules:</strong></p>
+    <div style="margin-left: 10px;">
+      <ul style="list-style-type: disc;margin-left: 20px;">
+        <li>The observational and forcing data must have been loaded to select Time Controls.</li>
+        <li>The formulation must have been chosen to select Tuning Parameters.</li>
+      </ul>
+    </div>
+    <br />
     <p><strong>Time Control Rules:</strong></p>
     <div style="margin-left: 10px;">
-      <ul>
+      <ul style="list-style-type: disc;margin-left: 20px;">
         <li>Calibration Start and End times must be within the Calibration Simulation Start and End times.</li>
         <li>Validation Start and End times must be within the Validation Simulation Start and End times.</li>
         <li>Calibration Start and End Times cannot overlap Validation Start and End times.</li>
         <li>Validation Simulation times must encompass both the Calibration and the Validation times.</li>
+        <li>Times are hourly and must be specified to the top of the hour (hh:00).</li>
       </ul>
     </div>
     <br />
     <p><strong>Example:</strong></p>
     <span><strong>Calibration Times:</strong></span>
     <div style="margin-left: 10px;">
-      <ul>
+      <ul style="list-style-type: disc;margin-left: 20px;">
         <li>Simulation Start: 2015-10-01 00:00</li>
         <li>Calibration Start: 2016-10-01 00:00</li>
         <li>Simulation End: 2017-09-30 23:00</li>
@@ -38,7 +49,7 @@
     <br />
     <span><strong>Validation Times:</strong></span>
     <div style="margin-left: 10px;">
-      <ul>
+      <ul style="list-style-type: disc;margin-left: 20px;">
       <li>Simulation Start: 2016-10-01 00:00</li>
       <li>Validation Start: 2019-10-30 00:00</li>
       <li>Simulation End: 2020-09-30 23:00</li>
