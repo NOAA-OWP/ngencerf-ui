@@ -1,20 +1,37 @@
 <template>
   <div class="_help-page">
-    <div class="_help-title">ngenCERF Calibration Landing Page</div>
-    <div class="_help-subtitle">Displays table of previous calibration run with some basic details.</div>
-    <p class="text-center" style="color:orange;font-size:0.8em;">
-      WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+    <div class="_help-title">Calibration - Calibration Runs Tab</div>
+    <div class="_help-subtitle">Display Users Previous Calibration jobs.</div>
+    <p class="text-center" style="color:#cc5500;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
+    </p>
+
+    <p style="margin-left: 40px; margin-top:20px;font-size:0.9em; line-height: 20px;">
+      <strong>NOTE:</strong> <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup,
+        starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress area to go to that specific setup tab.</em>
     </p>
 
     <table class="_help-table">
       <tbody>
         <tr>
-          <td class="td1"></td>
-          <td class="td2"><strong>New Button starts a new calibration setup.</strong></td>
+          <td class="td1">New Button</td>
+          <td class="td2">Starts a new calibration setup.</td>
         </tr>
         <tr>
-          <td class="td1"></td>
-          <td class="td2"><strong>Statuses:</strong></td>
+          <td class="td1">&nbsp;</td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="td1">Double Click</td>
+          <td class="td2">Loads the selected calibration job. User will be taken to the Run/Status tab. (Same as right click/OSpen)</td>
+        </tr>
+        <tr>
+          <td class="td1">&nbsp;</td>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="td1">Statuses</td>
+          <td class="td2"><strong>Description</strong></td>
         </tr>
         <tr>
           <td class="td1">Saved:</td>
@@ -46,22 +63,20 @@
     <table class="_help-table">
       <tbody>
         <tr>
-          <td class="td1">&nbsp;</td>
-          <td class="td2"><strong>User can right click on an entry in the table to:</strong></td>
+          <td class="td1">Right Click</td>
+          <td class="td2"><strong>Provides a context menu with the following options</strong></td>
         </tr>
         <tr>
           <td class="td1">Open:<br /></td>
-          <td class="td2">If job is Ready, Running, Complete, Failed or Cancelled user will be taken to the Results tab,
-            otherwise user will be taken to a setup tab..</td>
+          <td class="td2">Loads the selected calibration job. User will be taken to the Run/Status tab.</td>
         </tr>
         <tr>
           <td class="td1">Clone:</td>
-          <td class="td2">Use the data from the selected calibration job as a baseline for to setup a new calibration.
-            User will be taken to the Headwater Basin Gage tab..</td>
+          <td class="td2">Use the data from the selected calibration job as a baseline for a new calibration that will be added to the table.</td>
         </tr>
         <tr>
           <td class="td1">Delete:</td>
-          <td class="td2">Delete the selected job. User will remain on this page.</td>
+          <td class="td2">Delete the selected calibration job and all it's associated validation jobs. User will remain on this page.</td>
         </tr>
       </tbody>
     </table>

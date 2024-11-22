@@ -12,7 +12,7 @@
                     <td class="pl-5">{{ startTime ? formatDateForDisplay( startTime ) : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="45px">
-                    <td class="text-right font-bold">Running Time</td>
+                    <td class="text-right font-bold">Elapsed Time</td>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
                 </tbody>
