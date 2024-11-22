@@ -30,24 +30,13 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     // load forecast cycles
     const loadForecastTabResponse: any = await loadForecastTab();
     forecastCycles.value = loadForecastTabResponse?._data?.forecast_cycle_values;
+    console.log('forecastCycles', forecastCycles.value);
   };
 
   /**
    * Load Forecast Status/Run tab data
    */
   const loadForecastStatusRunTabData = async (): Promise<void> => {
-    /**
-    // response for create_and_run_forecast endpoint.
-    // we will need another endpoint to get the status of the forecast job
-    {
-      "message": "string",
-      "calibration_run_id": 0,
-      "forecast_run_id": 0,
-      "status": "string",
-      "submit_date": "2024-11-21T20:27:01.066Z",
-    }
-     */
-
     // load forecast status
     const loadForecastTabResponse: any = await loadForecastTab();
     forecastJobStatus.value = loadForecastTabResponse?._data?.status;

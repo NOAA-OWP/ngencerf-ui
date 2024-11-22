@@ -7,9 +7,9 @@
   <div>
     <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
       selectionMode="single">
-      <Column field="name" header="Cycle"></Column>
-      <Column field="data_sources" header="Data Sources"></Column>
-      <Column field="time_range" header="Time Range ngenCERF"></Column>
+      <Column field="Cycle" header="Cycle"></Column>
+      <Column field="Data Sources" header="Data Sources"></Column>
+      <Column field="Time Range (NgenCERF)" header="Time Range (NgenCERF)"></Column>
     </DataTable>
   </div>
   <div class="text-xs mt-2 mx-auto text-center">
@@ -65,10 +65,14 @@ onMounted(async () => {
   // highlight the tab when selected
   hilightTab(ForecastTabs.tab_setupForecast);
 
-  // load tab data if forecastCycles is empty
-  if (!forecastCycles.value || forecastCycles.value.length === 0) {
-    await loadSetupForecastTabData();
-  }
+  nextTick(async () => {
+    // load tab data if forecastCycles is empty
+    if (!forecastCycles.value || forecastCycles.value.length === 0) {
+      await loadSetupForecastTabData();
+    }
+    console.log('forecastCycles', forecastCycles.value);
+    console.log('forecastCycle[0]["Data Sources"]:', forecastCycles?.value[0]["Data Sources"]);
+  });
 });
 
 /**
