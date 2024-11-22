@@ -7,53 +7,48 @@
         determined during the calibration process, the output variable to calibrate and which module parameters for 
         the selected formulation to tune during calibration.
     </div>
-    <p class="text-center" style="color:#cc5500;font-size:0.8em;">
-      WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
+    <p class="text-center" style="color:orange;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+    </p>
+    <p class="text-center" style="color:red;">
+      NOTE: Times are hourly and must be specified to the top of the hour (hh:00).
     </p>
     <hr>
     <div style="margin-left: 75px; margin-top:20px;">
-      <p><strong>General Rules:</strong></p>
-      <div style="margin-left: 10px;">
-        <ul style="list-style-type: disc; margin-left:20px;">
-          <li>Observational and Forcing data must have been loaded to enter times.</li>
-          <li>Formulation must have been selected to select Output Variable to Calibrate or Parameters.</li>
-        </ul>
-      </div>
-      <br />
-      <p><strong>Time Control Rules:</strong></p>
-      <div style="margin-left: 10px;">
-        <ul style="list-style-type: disc; margin-left:20px;">
-          <li>Times are hourly and must be specified to the top of the hour (hh:00).</li>
-          <li>Calibration Start and End times must be within the Calibration Simulation Start and End times.</li>
-          <li>Validation Start and End times must be within the Validation Simulation Start and End times.</li>
-          <li>Calibration Start and End Times cannot overlap Validation Start and End times.</li>
-          <li>Validation Simulation times must encompass both the Calibration and the Validation times.</li>
-        </ul>
-        <p><strong>Example:</strong></p>
-        <span><strong>Calibration Times:</strong></span>
-        <div style="margin-left: 10px;">
-          <ul style="list-style-type: disc; margin-left:20px;">
-            <li>Simulation Start: 2015-10-01 00:00</li>
-            <li>Calibration Start: 2016-10-01 00:00</li>
-            <li>Simulation End: 2017-09-30 23:00</li>
-            <li>Calibration End: 2017-09-30 23:00:00</li>
-          </ul>
-        </div>
-        <br />
-        <span><strong>Validation Times:</strong></span>
-        <div style="margin-left: 10px;">
-          <ul style="list-style-type: disc; margin-left:20px;">
-          <li>Simulation Start: 2016-10-01 00:00</li>
-          <li>Validation Start: 2019-10-30 00:00</li>
-          <li>Simulation End: 2020-09-30 23:00</li>
-          <li>Validation End: 2020-09-30 23:00</li>
-          </ul>
-        </div>
-      </div>
-      <br />
+    <p><strong>Time Control Rules:</strong></p>
+    <div style="margin-left: 10px;">
+      <ul>
+        <li>Calibration Start and End times must be within the Calibration Simulation Start and End times.</li>
+        <li>Validation Start and End times must be within the Validation Simulation Start and End times.</li>
+        <li>Calibration Start and End Times cannot overlap Validation Start and End times.</li>
+        <li>Validation Simulation times must encompass both the Calibration and the Validation times.</li>
+      </ul>
     </div>
-    <hr>
-    <table class="_help-table">
+    <br />
+    <p><strong>Example:</strong></p>
+    <span><strong>Calibration Times:</strong></span>
+    <div style="margin-left: 10px;">
+      <ul>
+        <li>Simulation Start: 2015-10-01 00:00</li>
+        <li>Calibration Start: 2016-10-01 00:00</li>
+        <li>Simulation End: 2017-09-30 23:00</li>
+        <li>Calibration End: 2017-09-30 23:00:00</li>
+      </ul>
+    </div>
+    <br />
+    <span><strong>Validation Times:</strong></span>
+    <div style="margin-left: 10px;">
+      <ul>
+      <li>Simulation Start: 2016-10-01 00:00</li>
+      <li>Validation Start: 2019-10-30 00:00</li>
+      <li>Simulation End: 2020-09-30 23:00</li>
+      <li>Validation End: 2020-09-30 23:00</li>
+      </ul>
+    </div>
+  </div>
+  <br />
+  <hr>
+  <table class="_help-table">
       <tbody>
         <tr>
           <td class="td1">Entering Times:</td>

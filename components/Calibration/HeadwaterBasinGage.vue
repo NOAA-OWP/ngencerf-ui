@@ -15,12 +15,11 @@
             </div>
 
             <div class="col-span-1">
-              <label for="Gage">Calibration Gage</label><br />
+              <label for="Gage">Gage</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
                 @change="onGageSelectionChange" class=""></Select>
             </div>
-
 
             <div class="col-span-1">&nbsp;</div>
           </div>
@@ -178,7 +177,7 @@ onMounted(() => {
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
-  console.log(getGageOptionsList)
+
 })
 
 const dialog = useDialog();

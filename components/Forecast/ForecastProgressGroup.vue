@@ -2,28 +2,48 @@
   <table id="ForecastProgressTable" class="progressTable prevent-select">
     <tbody>
       <tr>
-        <td><i v-if="userCalibrationRunData?.gage?.gage_id" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="1" title="Calibration Run" aria-label="Calibration Run"
+        <td><i v-if="false" class="pi pi-check font-bold  checkMark"></i></td>
+        <td data-tab="1" title="Headwater Basin Gage" aria-label="Headwater Basin Gage"
           @click="tabClicked">
-          Calibration Run</td>
+          Headwater Basin Gage</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="2" title="Cycle" aria-label="Cycle"
-          @click="tabClicked">
-          Cycle</td>
+        <td data-tab="2" title="Formulation" aria-label="Formulation" @click="tabClicked">Formulation</td>
       </tr>
-     </tbody>
+      <tr>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
+        <td data-tab="3" title="Parameters Set" aria-label="Parameters Set"
+          @click="tabClicked">
+          Parameters Set</td>
+      </tr>
+      <tr>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
+        <td data-tab="3" title="Time Period" aria-label="Time Period"
+          @click="tabClicked">Time Period</td>
+      </tr>
+      <tr>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
+        <td data-tab="3" title="Scaler and Gridded Vars"
+          aria-label="Scaler and Gridded Vars" @click="tabClicked">Scaler/Gridded Varss</td>
+      </tr>
+      <tr>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
+        <td data-tab="4" title="Output Variable" aria-label="Output Variable"
+          @click="tabClicked">Output Variable</td>
+      </tr>
+      <tr>
+        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
+        <td data-tab="4" title="Parameters Set" aria-label="Parameters Set"
+          @click="tabClicked">
+          Parameters Set</td>
+      </tr>
+    </tbody>
   </table>
 </template>
 
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-
-const userDataStore = useUserDataStore();
-const { userCalibrationRunData } = storeToRefs(userDataStore);
-
 const { getForecastTabIndex, getMenuIndex } = generalStore();
 const currentForecastTab = ref(getForecastTabIndex());
 const emit = defineEmits(["tabNumber"]);

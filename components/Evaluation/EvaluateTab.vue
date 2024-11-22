@@ -346,6 +346,7 @@ onMounted(async () => {
   calibrationLogList.value = [];
   validationLogData.value = {};
   validationLogList.value = [];
+  /* Bringing back comments from Carolyn's hotfix
   if (logs.value?._data?.logs) {
     if (logs.value?._data?.logs.length == 0) {
       // try to get calibration logs separately
@@ -398,7 +399,8 @@ onMounted(async () => {
     console.log('validationLogList: ', validationLogList.value);
     console.log('selectedValidationLog: ', selectedValidationLog.value);
   }
-*/
+  End of hotfix */ 
+
   // Add Calibration/Validation Logs to the dropdown
   if (logs.value?._data?.logs) {
     if (!plotList.value.some(item => item.name == supplementalTableOptions[3])) {

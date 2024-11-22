@@ -18,9 +18,8 @@
               @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
-              @click=""  class="disabled">
-              Forecast</NuxtLink>
+            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3' @click=""
+              class="disabled">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
             <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
