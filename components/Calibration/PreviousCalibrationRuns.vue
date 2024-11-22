@@ -13,8 +13,7 @@
         <DataTable id="cr-list" :value="userCalibrationJobsListData" sortField="calibration_run_id" :sortOrder="-1"
           scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
           selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-          @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)"
-          @rowDblselect="openSelectedCalibrationRun(selectedCalibrationRun)">
+          @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
           <Column field="calibration_run_id" header="Job ID" sortable></Column>
           <Column field="job_genesis" header="Job Genesis" sortable></Column>
           <Column field="formulation_name" header="Formulation Name" sortable></Column>

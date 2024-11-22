@@ -38,7 +38,7 @@
             <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
-              @rowSelect="onForecastRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
+              @row-dblclick="onRowDblClick($event)"
               @rowContextmenu="onRowContextMenu" class="boxed">
               <Column field="calibration_run_id" header="Run ID" sortable></Column>
               <Column field="status" header="Status" sortable></Column>
@@ -182,6 +182,12 @@ const onEvalValdiationRowSelect = async (event: DataTableRowClickEvent) => {
 
 const onEvalValidationRowUnSelect = async (event: DataTableRowClickEvent) => {
   evaluateValidationRunId.value = 0;
+}
+
+const onRowDblClick = (event: any) => {
+  const rowData = event.data;
+  contextMenuJob.value = rowData.calibration_run_id;
+  openSelectedCalibrationRun();
 }
 
 const openSelectedCalibrationRun = () => {
