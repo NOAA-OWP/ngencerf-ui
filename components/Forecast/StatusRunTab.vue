@@ -8,7 +8,7 @@
               <td class="text-right font-bold">
                 <div style="width: 140px;">Job ID</div>
               </td>
-              <td class="pl-5">{{ jobId ?? '-'.repeat(30) }}</td>
+              <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
             </tr>
             <tr height="32px">
               <td class="text-right font-bold">
@@ -106,16 +106,18 @@ const {
   submitTime,
   elapsedTimeIntervalId,
   forecastJobStatusIntervalId,
+  resultsPathname,
 } = storeToRefs(useForecastStore()); 
 
 const {
   loadSetupForecastTabData,
+  loadForecastStatusRunTabData,
   loadForecastTab,
   createAndRunForecastJob,
   getStatus,
 } = useForecastStore();
 
-onMounted(() => {
+onMounted(async () => {
   toast.removeAllGroups(); // clear all toast messages
   isLoading.value = false; // set isLoading to false
 
@@ -125,6 +127,9 @@ onMounted(() => {
 
   // highlight the tab when selected
   hilightTab(ForecastTabs.tab_statusRun);
+
+  // load Status/Run tab data
+  await loadForecastStatusRunTabData();
 });
 
 /**
@@ -218,11 +223,20 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
   if (forecastJobStatus.value === 'Running') {
     createElapsedTimeInterval();
     createForecastJobStatusInterval();
+
+    const loadForecastTabResponse: any = await loadForecastTab();
+    resultsPathname.value = loadForecastTabResponse?._data?.data_dir;
   }
 
   // when forecastJobStatus changes to Done, look for elapsedTime from server
   if (forecastJobStatus.value === 'Done') {
     const getStatusResponse = await getStatus();
+
+    if (!resultsPathname.value) {
+      const loadForecastTabResponse: any = await loadForecastTab();
+      resultsPathname.value = loadForecastTabResponse?._data?.data_dir;
+    }
+
     const forecasts: any[] = getStatusResponse?._data.forecasts;
     const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 

@@ -21,6 +21,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const submitTime = ref<string>();
   const elapsedTimeIntervalId = ref<number>();
   const forecastJobStatusIntervalId = ref<number>();
+  const resultsPathname = ref<string>();
 
   /**
    * Load Setup Forecast tab data
@@ -34,7 +35,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   /**
    * Load Forecast Status/Run tab data
    */
-  const loadForecastStatusTabData = async (): Promise<void> => {
+  const loadForecastStatusRunTabData = async (): Promise<void> => {
     /**
     // response for create_and_run_forecast endpoint.
     // we will need another endpoint to get the status of the forecast job
@@ -55,6 +56,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     if (isValidDate(submitTimeDate.value)) {
       submitTime.value = convertTimeZone(submitTimeDate.value);
     }
+    resultsPathname.value = loadForecastTabResponse?._data?.data_dir;
+
   };
 
   /**
@@ -116,8 +119,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     submitTime,
     elapsedTimeIntervalId,
     forecastJobStatusIntervalId,
+    resultsPathname,
     loadSetupForecastTabData,
-    loadForecastStatusTabData,
+    loadForecastStatusRunTabData,
     loadForecastTab,
     createAndRunForecastJob,
     getStatus,
