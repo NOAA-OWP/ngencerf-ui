@@ -39,7 +39,7 @@
               <td class="text-right font-bold">
                 <div style="width: 140px;">Cycle</div>
               </td>
-              <td class="pl-5">{{ forecastCycle ?? '-'.repeat(30) }}</td>
+              <td class="pl-5">{{ forecastCycle.Cycle ?? '-'.repeat(30) }}</td>
             </tr>
           </tbody>
         </table>
