@@ -11,9 +11,9 @@
           </h1>
         </div>
         <div class="ml-auto mt-2">
-          <!-- <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
+          <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
               v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
-              @click.stop="navigateToAlternateIteration">New Validation</Button></div> -->
+              @click="navigateToAlternateIteration">New Forecast</Button></div>
         </div>
       </div>
 
@@ -51,8 +51,9 @@
               <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
               <Column field="objective_function" header="Objective Function" sortable></Column>
               <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
-
             </DataTable>
+            <div class="mt-4 mx-auto">
+              * Double click on a row to open, or right click for other options. Click "New" for a fresh setup.</div>
           </div>
         </div>
       </div>
@@ -152,13 +153,14 @@ onMounted(() => {
 });
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
-  isLoading.value = true;
-  resetUserSelectedEvalValidationRun();
-  nextTick( async () => {
-    await loadSelectedCalibrationRun(event.data.calibration_run_id);
-    await fetchUserSelectedCalibrationValidationRunList();
-    isLoading.value = false;
-  })  
+  return; // Locking out single clicks
+  //isLoading.value = true;
+  // resetUserSelectedEvalValidationRun();
+  // nextTick( async () => {
+  //   await loadSelectedCalibrationRun(event.data.calibration_run_id);
+  //   await fetchUserSelectedCalibrationValidationRunList();
+  //   isLoading.value = false;
+  // })  
 }
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
@@ -185,12 +187,12 @@ const onEvalValidationRowUnSelect = async (event: DataTableRowClickEvent) => {
 const openSelectedCalibrationRun = () => {
   isLoading.value = true;
   resetUserSelectedEvalValidationRun();
-   nextTick( async () => {
-    await loadSelectedCalibrationRun(contextMenuJob.value as number);  
+  nextTick(async () => {
+    await loadSelectedCalibrationRun(contextMenuJob.value as number);
     await fetchUserSelectedCalibrationValidationRunList();
     isLoading.value = false;
   })
-  
+
 }
 
 // const navigateToAlternateIteration = (event: any) => {
@@ -237,12 +239,12 @@ const deleteSelectedCalibrationRun = () => {
   })
 }
 const acceptDelete = (selectedRunId: number) => {
-  deleteCalibrationRun(selectedRunId).then( response => {
-    if ( response.status == 200 ) {
+  deleteCalibrationRun(selectedRunId).then(response => {
+    if (response.status == 200) {
       fetchUserValidatedCalibrationJobsListData();
     } else {
-      useApiErrorResponsePreprocess( response ).forEach( message => {
-        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
       });
     }
   });
