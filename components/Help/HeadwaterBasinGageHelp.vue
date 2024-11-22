@@ -6,6 +6,11 @@
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
 
+    <p style="margin-left: 40px; margin-top:20px;font-size:0.9em; line-height: 20px;">
+      <strong>NOTE:</strong> <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup,
+        starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress area to go to that specific setup tab.</em>
+    </p>
+
     <table class="_help-table">
       <tbody>
         <tr>
