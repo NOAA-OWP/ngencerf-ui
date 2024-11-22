@@ -1,6 +1,6 @@
 <template>
   <div class="_help-page">
-    <div class="_help-title">ngenCERF Calibration Runs Tab</div>
+    <div class="_help-title">Calibration - Calibration Runs Tab</div>
     <div class="_help-subtitle">Display Users Previous Calibration jobs.</div>
     <p class="text-center" style="color:#cc5500;font-size:0.8em;">
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
@@ -18,7 +18,7 @@
         </tr>
         <tr>
           <td class="td1">Double Click</td>
-          <td class="td2">Loads the selected calibration job. User will be taken to the Run/Status tab. (Same as right click/open)</td>
+          <td class="td2">Loads the selected calibration job. User will be taken to the Run/Status tab. (Same as right click/OSpen)</td>
         </tr>
         <tr>
           <td class="td1">&nbsp;</td>
