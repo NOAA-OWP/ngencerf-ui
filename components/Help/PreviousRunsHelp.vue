@@ -6,11 +6,6 @@
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
 
-    <p style="margin-left: 40px; margin-top:20px;font-size:0.9em; line-height: 20px;">
-      <strong>NOTE:</strong> <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup,
-        starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress area to go to that specific setup tab.</em>
-    </p>
-
     <table class="_help-table">
       <tbody>
         <tr>
@@ -23,7 +18,7 @@
         </tr>
         <tr>
           <td class="td1">Double Click</td>
-          <td class="td2">Loads the selected calibration job. User will be taken to the Run/Status tab. (Same as right click/OSpen)</td>
+          <td class="td2">Loads the selected calibration job. User will be taken to the Run/Status tab. (Same as right click/Open)</td>
         </tr>
         <tr>
           <td class="td1">&nbsp;</td>
@@ -46,7 +41,7 @@
           <td class="td2">Calibration is currently running.</td>
         </tr>
         <tr>
-          <td class="td1">Complete:</td>
+          <td class="td1">Done:</td>
           <td class="td2">Calibration job completed without any errors.</td>
         </tr>
         <tr>
@@ -56,6 +51,10 @@
         <tr>
           <td class="td1">Cancelled:</td>
           <td class="td2">Calibration job cancelled by users.</td>
+        </tr>
+        <tr>
+          <td class="td1">Server Error:</td>
+          <td class="td2">The server had an error before the job finished.</td>
         </tr>
       </tbody>
     </table>
@@ -72,7 +71,7 @@
         </tr>
         <tr>
           <td class="td1">Clone:</td>
-          <td class="td2">Use the data from the selected calibration job as a baseline for a new calibration that will be added to the table.</td>
+          <td class="td2">Use the data from the selected calibration job as a baseline for a new calibration that will be added to the table. User will remain on this page.</td>
         </tr>
         <tr>
           <td class="td1">Delete:</td>

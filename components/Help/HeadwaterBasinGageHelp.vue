@@ -20,8 +20,8 @@
             Virgin Islands.</td>
         </tr>
         <tr>
-          <td class="td1">Gage:</td>
-          <td class="td2">Pull down to select a gage from the chosen domain. Typing in this field shows predictive
+          <td class="td1">Calibration Gage:</td>
+          <td class="td2">Pull down to select a calibration gage from the chosen domain. Typing in this field shows predictive
             choices.
             A choice must be made from the pull down list. Required to upload Forcing, Observational or GeoPackage
             files.

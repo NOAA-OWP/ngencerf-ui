@@ -15,9 +15,9 @@
         <li>The right side of each tab in the Calibration workflow shows the Progress towards completing a calibration setup
             and a summary of the choices made for the setup.</li>
         <li>Once all the required data has been entered, all checkmarks will be set 
-            and the status will be Ready. Otherwise the status will be Saved or one of the finished status.</li>
+            and the status will be Ready. Otherwise the status will be Saved or one of the finished statuses.</li>
         <li>Once the calibration job has started, after the 1st iteratoin, the user can view plots. These plots will be automatically updated
-            based on the plot interval specified by the user.</li>
+            while the job is running based on the plot interval specified by the user.</li>
         <li>The user can stop a running job by clicking the Cancel button.</li>
         <li>For any status other than Saved and Ready, the user can view plots generated during the calibration and validation runs.</li>
       </ul>
