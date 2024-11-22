@@ -23,7 +23,7 @@
             checked in the Groups Covered by Selections area.</td>
         </tr>
         <tr>
-          <td class="td1">Group:</td>
+          <td class="td1">Groups Filter:</td>
           <td class="td2">Pulldown filter to show only modules for the selected group type.
           </td>
         </tr>
@@ -39,7 +39,7 @@
           <td class="td2">&nbsp;</td>
         </tr>
         <tr>
-          <td class="td1"><span class="text-2xl">SLoTH Variables</span></td>
+          <td class="td1"><span class="text-1xl" style="font-size:1.15em;">SLoTH Variables</span></td>
           <td class="td2">Simple Logical Tautology Handler (SLoTH) variables enable testing a module without having all
             necessary upstream
             modules in the formulation. The user defines a SLoTH variable to hold expected output and maps it to
@@ -49,10 +49,15 @@
           </td>
         </tr>
         <tr>
-          <td class="td1">Add SLoTH output Variables Checkbox:</td>
+          <td class="td1">Add SLoTH output variable for formulation:</td>
           <td class="td2">Selecting this checkbox will present the user with a field to create the name SLoTH variable
             and a
             button to add it to the formulation.</td>
+        </tr>
+        <tr>
+          <td class="td1">SLoTH Name:</td>
+          <td class="td2">SLoTH variable name to add to SLoTH table.
+          </td>
         </tr>
         <tr>
           <td class="td1">Add Button:</td>
@@ -62,16 +67,16 @@
         </tr>
         <tr>
           <td class="td1">SLoTH Variable Table:</td>
-          <td class="td2">Columns:<br>
-            &nbsp;&nbsp; <b>SLoTH Output Var</b>: User defined name.<br />
-            &nbsp;&nbsp; <b>Count</b>: Number of variables<br />
-            &nbsp;&nbsp; <b>Type</b>: Data type of elements<br />
-            &nbsp;&nbsp; <b>Units</b>: Dimensions<br />
-            &nbsp;&nbsp; <b>Location</b>: node (always node)<br />
-            &nbsp;&nbsp; <b>For Module</b>: Name of module to received SLoTH variable<br />
-            &nbsp;&nbsp; <b>Module Param</b>: Module Parameter name to receive the SLoTH variable value<br />
-            &nbsp;&nbsp; <b>Value</b>: Value of variable<br />
-            <br />
+          <td class="td2">Columns: (All columns must be entered.)<br>
+             <b>SLoTH Output Var</b>: User defined name.<br />
+            <b>Count</b>: Number of variables<br />
+            <b>Type</b>: Data type of elements<br />
+            <b>Units</b>: Dimensions<br />
+            <b>Location</b>: node (always node)<br />
+            <b>For Module</b>: Name of module to received SLoTH variable<br />
+            <b>Module Param</b>: Module Parameter name to receive the SLoTH variable value<br />
+            <b>Value</b>: Value of variable<br />
+            <b>HINT: </b>To change the variable name, right-click and delete it then Add a new variable.<br />
           </td>
         </tr>
         <tr>

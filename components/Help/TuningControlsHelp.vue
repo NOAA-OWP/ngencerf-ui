@@ -131,14 +131,9 @@
             to save.</td>
         </tr>
         <tr>
-          <td class="td1">Previous Button:</td>
+          <td class="td1">Prev Button:</td>
           <td class="td2">Move to the Formulation Tab. If there is any unsaved data, the user will first be prompted to
             save.</td>
-        </tr>
-        <tr>
-          <td class="td1">Mext Button:</td>
-          <td class="td2">Move to the Tuning Controls Tab. If there is any unsaved data, the user will first be prompted
-            to save.</td>
         </tr>
         <tr>
           <td class="td1">&nbsp;</td>
@@ -152,6 +147,11 @@
           <td class="td1"><strong>Calibration Tuning Controls disabled</strong></td>
           <td class="td2">This means that either the observation data, the forcing data or both have not yet been
             selected. Go to the Headwater Basin Gage tab and make sure to this data is selected.
+          </td>
+        </tr>
+        <tr>
+          <td class="td1"><strong>Parameters disabled</strong></td>
+          <td class="td2">This means that either the Formulation has not been chosen. Go to the Formulation tab and select the formulation.
           </td>
         </tr>
       </tbody>
