@@ -198,7 +198,6 @@ const openSelectedCalibrationRun = () => {
     await fetchUserSelectedCalibrationValidationRunList();
     isLoading.value = false;
   })
-
 }
 
 const navigateToSetupForecastRun = (event: any) => {

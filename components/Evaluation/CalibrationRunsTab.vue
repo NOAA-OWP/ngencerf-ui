@@ -31,10 +31,14 @@
               </div>
             </div>
 
-            <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
+            <ConfirmDialog></ConfirmDialog>
+            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+              :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+                         <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
-              @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" class="boxed">
+              @row-dblclick="onRowDblClick($event)"
+              @rowContextmenu="onRowContextMenu" class="boxed">
               <Column field="calibration_run_id" header="Job ID" sortable></Column>
               <Column field="job_genesis" header="Job Genesis" sortable></Column>
               <Column field="created_at" header="Creation Date" sortable>
@@ -53,6 +57,8 @@
               <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
               <Column field="validation_runs" header="Validation Runs" sortable></Column>
             </DataTable>
+            <div class="mt-4 mx-auto">
+              * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.</div>
           </div>
         </div>
       </div>
@@ -89,7 +95,7 @@
 
     </div>
 
-    <div class="waitgif" v-if="isLoadingCalibrationSummary">
+    <div class="waitgif" v-if="isLoading">
       <img alt="Pleae wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
@@ -106,6 +112,20 @@ import { storeToRefs } from "pinia";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
 import { hilightTab } from '~/composables/TabHilight';
+import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
+
+const { deleteCalibrationRun } = useCalibrationJobStore();
+
+const crContextMenu = ref(); //calibration run context menu
+const contextMenuJob = ref<number>()
+const cmCalibrationRun = ref([
+  { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
+  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
+]);
+const onRowContextMenu = (event: any) => {
+  crContextMenu.value.show(event.originalEvent);
+  contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
+};
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
@@ -129,7 +149,7 @@ const {
 } = evaluationCalibrationRunStore;
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-const isLoadingCalibrationSummary = ref<boolean>(false);
+const isLoading = ref<boolean>(true);
 
 const toast = useToast();
 //this model is for highlighting purpose
@@ -141,20 +161,20 @@ onMounted(() => {
   //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
   resetUserSelectedEvalCalibrationRun();
   fetchUserValidatedCalibrationJobsListData();
-  console.log("CalibrationRunsTab for Evaluation mounted")
+  isLoading.value = false;
 });
 
 const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   resetUserSelectedEvalValidationRun();
   loadSelectedCalibrationRun(event.data.calibration_run_id);
-  isLoadingCalibrationSummary.value = true;
+  isLoading.value = true;
   fetchUserSelectedCalibrationValidationRunList();
 }
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
   if (updatedRunData != undefined && Object.keys(updatedRunData).length > 0) {
     nextTick(() => {
-      isLoadingCalibrationSummary.value = false;
+      isLoading.value = false;
       loadCalibrationDataComplete.value = true;
     });
   }
@@ -171,6 +191,24 @@ const onEvalValdiationRowSelect = async (event: DataTableRowClickEvent) => {
 const onEvalValidationRowUnSelect = async (event: DataTableRowClickEvent) => {
   evaluateValidationRunId.value = 0;
 }
+
+const onRowDblClick = (event: any) => {
+  isLoading.value = true;
+  const rowData = event.data;
+  contextMenuJob.value = rowData.calibration_run_id;
+  openSelectedCalibrationRun();
+}
+
+const openSelectedCalibrationRun = () => {
+  isLoading.value = true;
+  resetUserSelectedEvalValidationRun();
+  nextTick(async () => {
+    await loadSelectedCalibrationRun(contextMenuJob.value as number);
+    await fetchUserSelectedCalibrationValidationRunList();
+    isLoading.value = false;
+  })
+}
+
 
 const navigateToAlternateIteration = (event: any) => {
   if (userSelectedEvalCalibrationRunId.value > 0) {
@@ -195,6 +233,41 @@ const navigateToEvaluation = (event: any) => {
 const returnCalibrationJobList = (event: any) => {
   selectedCalibrationRun.value = selectedCalibrationValidationRun.value = undefined;
   resetUserSelectedEvalValidationRun();
+}
+
+const confirmDelte = useConfirm();
+const deleteSelectedCalibrationRun = () => {
+  const selectedRunId = contextMenuJob.value as number;
+  let confirmMessage = "Are you sure you want to delete this run?"
+  confirmDelte.require({
+    message: confirmMessage,
+    header: 'Confirm Delete',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'DELETE RUN',
+    },
+    accept: () => acceptDelete(selectedRunId),
+    reject: () => {
+      //do nothing
+    }
+  })
+}
+const acceptDelete = (selectedRunId: number) => {
+  deleteCalibrationRun(selectedRunId).then(response => {
+    if (response.status == 200) {
+      fetchUserValidatedCalibrationJobsListData();
+    } else {
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
+      });
+    }
+  });
+  selectedCalibrationRun.value = undefined;
 }
 
 const rowStyle = (data: any) => {
