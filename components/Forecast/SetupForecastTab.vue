@@ -7,9 +7,9 @@
   <div>
     <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
       selectionMode="single">
-      <Column field="cycle" header="Cycle"></Column>
+      <Column field="name" header="Cycle"></Column>
       <Column field="data_sources" header="Data Sources"></Column>
-      <Column field="time_range_ngencerf" header="Time Range ngenCERF"></Column>
+      <Column field="time_range" header="Time Range ngenCERF"></Column>
     </DataTable>
   </div>
   <div class="text-xs mt-2 mx-auto text-center">
@@ -33,26 +33,28 @@
 
 <script setup lang="ts">
 import { hilightTab } from '~/composables/TabHilight';
+import { useForecastStore } from '~/stores/forecast/ForecastStore';
 import { useToast } from 'primevue/usetoast';
 
 const isLoading = ref<boolean>(false); // loading indicator
 const toast = useToast();
-const forecastCycle = ref<object>(); // selected forecast cycle
-// fake forecast cycles
-const forecastCycles = ref<any[]>([
-  { cycle: 1, data_sources: 'Data Sources 1', time_range_ngencerf: 'Time Range ngenCERF 1' },
-  { cycle: 2, data_sources: 'Data Sources 2', time_range_ngencerf: 'Time Range ngenCERF 2' },
-  { cycle: 3, data_sources: 'Data Sources 3', time_range_ngencerf: 'Time Range ngenCERF 3' },
-  { cycle: 4, data_sources: 'Data Sources 4', time_range_ngencerf: 'Time Range ngenCERF 4' },
-  { cycle: 5, data_sources: 'Data Sources 5', time_range_ngencerf: 'Time Range ngenCERF 5' },
-  { cycle: 6, data_sources: 'Data Sources 6', time_range_ngencerf: 'Time Range ngenCERF 6' },
-  { cycle: 7, data_sources: 'Data Sources 7', time_range_ngencerf: 'Time Range ngenCERF 7' },
-  { cycle: 8, data_sources: 'Data Sources 8', time_range_ngencerf: 'Time Range ngenCERF 8' },
-  { cycle: 9, data_sources: 'Data Sources 9', time_range_ngencerf: 'Time Range ngenCERF 9' },
-  { cycle: 10, data_sources: 'Data Sources 10', time_range_ngencerf: 'Time Range ngenCERF 10' },
-]);
 
-onMounted(() => {
+const {
+  forecastJobId,
+  forecastCycles,
+  forecastCycle,
+  forecastJobStatus,
+  elapsedTime,
+  submitTimeDate,
+  submitTime
+} = storeToRefs(useForecastStore()); 
+
+const {
+  loadSetupForecastTabData,
+  hardResetForecastStore
+} = useForecastStore();
+
+onMounted(async () => {
   toast.removeAllGroups(); // clear all toast messages
   isLoading.value = false; // set isLoading to false
 
@@ -63,6 +65,10 @@ onMounted(() => {
   // highlight the tab when selected
   hilightTab(ForecastTabs.tab_setupForecast);
 
+  // load tab data if forecastCycles is empty
+  if (!forecastCycles.value || forecastCycles.value.length === 0) {
+    await loadSetupForecastTabData();
+  }
 });
 
 /**

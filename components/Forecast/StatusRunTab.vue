@@ -89,11 +89,31 @@
 
 <script setup lang="ts">
 import { hilightTab } from '~/composables/TabHilight';
+import { useForecastStore } from '~/stores/forecast/ForecastStore';
 import { useToast } from 'primevue/usetoast';
+import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
 
-const isLoading = ref<boolean>(false);
+const isLoading = ref<boolean>(false); // loading indicator
 const toast = useToast();
-const forecastJobStatus = ref<string>();
+
+const {
+  forecastJobId,
+  forecastCycles,
+  forecastCycle,
+  forecastJobStatus,
+  elapsedTime,
+  submitTimeDate,
+  submitTime,
+  elapsedTimeIntervalId,
+  forecastJobStatusIntervalId,
+} = storeToRefs(useForecastStore()); 
+
+const {
+  loadSetupForecastTabData,
+  loadForecastTab,
+  createAndRunForecastJob,
+  getStatus,
+} = useForecastStore();
 
 onMounted(() => {
   toast.removeAllGroups(); // clear all toast messages
@@ -108,10 +128,69 @@ onMounted(() => {
 });
 
 /**
+ * Create elapsedTimeIntervalId to update elapsedTime every second while Forecast job is Running
+ */
+const createElapsedTimeInterval = () => {
+  elapsedTimeIntervalId.value = setInterval(async () => {
+    if (forecastJobStatus.value === 'Running') {
+      // Calculate elapsedTime every second while Forecast job is Running
+      elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
+    } else {
+      clearInterval(elapsedTimeIntervalId.value);
+      elapsedTimeIntervalId.value = undefined;
+    }
+  }, 1000) as unknown as number;
+};
+
+/**
+ * Create forecastJobStatusIntervalId to update forecastJobStatus every 10 seconds
+ */
+const createForecastJobStatusInterval = () => {
+  forecastJobStatusIntervalId.value = setInterval(async () => {
+    const getStatusResponse = await getStatus();
+    const forecasts: any[] = getStatusResponse?._data.forecasts;
+    const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
+
+    if (forecast) {
+      if (forecast.status !== 'Running') {
+        clearInterval(forecastJobStatusIntervalId.value);
+        forecastJobStatusIntervalId.value = undefined;
+        forecastJobStatus.value = forecast.status;
+      } 
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`});
+    }
+  }, 10000) as unknown as number;
+};
+
+/**
  * Start the forecast run
  */
-const startForecastRun = () => {
-  console.log('startForecastRun');
+const startForecastRun = async () => {
+  forecastJobStatus.value = 'Submitted';
+
+  try {
+    const createAndRunForecastJobResponse = await createAndRunForecastJob(forecastCycle?.value?.name as string);
+
+    if (createAndRunForecastJobResponse?._data?.status) {
+      forecastJobStatus.value = createAndRunForecastJobResponse._data.status;
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get Forecast status from server' });
+    }
+
+    if (createAndRunForecastJobResponse?._data?.submit_date) {
+      submitTimeDate.value = new Date(createAndRunForecastJobResponse?._data?.submit_date);
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
+    }
+
+    if (forecastJobStatus.value !== 'Running') {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Forecast status not set to Running after clicking START' });
+    }
+    await loadForecastTab();
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Forecast job' });
+  }
 };
 
 /**
@@ -121,13 +200,48 @@ const cancelForecastRun = () => {
   console.log('cancelForecastRun');
 };
 
+/**
+ * Go to the Status Run tab
+ */
+ const goToResultsTab = () => {
+  const allTabs = document.getElementsByClassName("tabs");
+  const e = allTabs[ForecastTabs.tab_results] as HTMLElement;
+  e.click();
+};
+
+/**
+ * Watch the forecast job status for changes
+ */
 watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCleanup) => {
-  
+  // when forecastJobStatus changes to Running, start incrementing elapsedTime every second
+  // and start checking forecastJobStatus every 10 seconds until forecastJobStatus changes from Running
+  if (forecastJobStatus.value === 'Running') {
+    createElapsedTimeInterval();
+    createForecastJobStatusInterval();
+  }
+
+  // when forecastJobStatus changes to Done, look for elapsedTime from server
+  if (forecastJobStatus.value === 'Done') {
+    const getStatusResponse = await getStatus();
+    const forecasts: any[] = getStatusResponse?._data.forecasts;
+    const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
+
+    if (forecast) {
+      if (forecast.elapsed_time) {
+        elapsedTime.value = forecast.elapsed_time;
+      } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response`});
+      }
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`});
+    }
+    goToResultsTab();
+  }
 
   onCleanup(() => {
     console.log('cleanup');
   });
-});
+}, { immediate: true });
 </script>
 
 <style lang="scss" scoped>
