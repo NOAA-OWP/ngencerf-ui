@@ -1,15 +1,16 @@
 <template>
   <div class="_help-page">
-    <div class="_help-title">ngenCERF Calibration Workflow - Optimization / Metrics Tab</div>
+    <div class="_help-title">Calibration - Optimization/Metrics Tab</div>
     <div class="_help-subtitle">This tab provides the user the ability to select the optimization algorithm, the
-      objective
-      function, the calibration stop criteria, the plot generation frequency and metrics. By default, the ngen-cal
-      program does not calculate the Categorical Metrics, POD, CSI, and FAR or the Event Based Metrics, PKBIAS, PKTE,
-      and EVBIAS.</div>
-    <p class="text-center" style="color:orange;font-size:0.8em;">
-      WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+      objective function, the calibration stop criteria, the plot generation frequency and additional metrics to calculate. By default, the ngen-cal
+      program does not calculate the Categorical Metrics, POD, CSI, and FAR or the Event Based Metrics, PKBIAS, PKTE, and EVBIAS but the user can opt to calculate these.</div>
+    <p class="text-center" style="color:#cc5500;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
-
+    <p style="margin-left: 40px; margin-top:20px;font-size:0.9em; line-height: 20px;">
+      <strong>NOTE:</strong> <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup,
+        starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress area to go to that specific setup tab.</em>
+    </p>
 
     <table class="_help-table">
       <tbody>
@@ -30,23 +31,26 @@
         </tr>
         <tr>
           <td class="td1">Objective Function:</td>
-          <td class="td2">If a Categorical metric is not selected as the objective function, the user can select to have
+          <td class="td2">
+            Select a metric to use as the objective function during calibration.<br />
+            If a Categorical metric (POD, CSI, FAR) is selected, the user must provide the Flow Threshold.<br />
+            If an Event based metric (PKBIAS, PKTE, EVBIAS) is selected, the user must provide the Peak Flow Threshold.
+          </td>
+        </tr>
+        <tr>
+          <td class="td1">Categorical Metrics:</td>
+          <td class="td2">If a Categorical metric (POD, CSI, FAR) is not selected as the objective function, the user can select this checkbox to have
             the program also calculate the Categorical Metrics.
           </td>
         </tr>
         <tr>
           <td class="td1">Calculate Categorical Metrics</td>
-          <td class="td2">If an Event Based metric is not selected as the objective function, the user can select to
-            have
-            the program also calculate the Event Based Metrics.</td>
+          <td class="td2">If an Event Based metric is not selected as the objective function, the user can select select this checkbox to
+            have the program also calculate the Event Based Metrics.</td>
         </tr>
         <tr>
-          <td class="td1">SAVE Button:</td>
-          <td class="td2">Save data from the tab. NEXTPartial saves are allowed.</td>
-        </tr>
-        <tr>
-          <td class="td1">RESET Button:</td>&nbsp;
-          <td class="td2">Reset data to default information for the Optimization and Metrics Tab only.</td>
+          <td class="td1">Save Button:</td>
+          <td class="td2">Save data from the tab. Partial saves are allowed.</td>
         </tr>
         <tr>
           <td class="td1">Prev Button:</td>
@@ -55,7 +59,7 @@
         </tr>
         <tr>
           <td class="td1">Next Button:</td>
-          <td class="td2">Move to the Run/Status Tab. If there is any unsaved data, the user will first be prompted
+          <td class="td2">Move to the Status/Run Tab. If there is any unsaved data, the user will first be prompted
             to save.</td>
         </tr>
       </tbody>
