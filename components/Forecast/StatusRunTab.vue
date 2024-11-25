@@ -40,7 +40,7 @@
                 <div style="width: 140px;">Cycle</div>
               </td>
               <td class="pl-5">{{ (forecastCycle as ForecastTabData).name ?? '-'.repeat(30) }}</td>
-            </tr>convertTimeZone
+            </tr>
           </tbody>
         </table>
       </div>
@@ -55,7 +55,7 @@
               <td class="pl-5">
                 <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
               </td>
-            </tr>convertTimeZone
+            </tr>
           </tbody>
         </table>
       </div>
