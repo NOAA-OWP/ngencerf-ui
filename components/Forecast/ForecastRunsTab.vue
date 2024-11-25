@@ -1,7 +1,7 @@
 <template>
   <client-only>
     <div>
-      <h2>Forecaset Runs</h2>
+      <h2>Forecast Runs</h2>
 
       <div class="waitgif" v-if="isLoading">
         <img alt="Pleae wait..." src="@/assets/styles/img/wait.gif" />
