@@ -17,8 +17,7 @@
         </div>
       </div>
 
-      <div id="calibrationRunList"
-        v-if="userEvaluationCalibrationRunListData.length > 0 && computedCalibrationValidationRunList.length <= 1">
+      <div id="calibrationRunList">
         <div>
           <div id="CalTable">
             <div class="grid grid-cols-2 mb-5">
@@ -54,26 +53,6 @@
             </DataTable>
             <div class="mt-4 mx-auto">
               * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.</div>
-          </div>
-        </div>
-      </div>
-      <div v-if="computedCalibrationValidationRunList.length > 1">
-        <div id="evaluationCalibrationList">
-          <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px"
-            sortField="validation_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="single"
-            v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle"
-            @rowSelect="onEvalValdiationRowSelect" @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
-            <Column v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex"
-              :header="col.header" :field="col.field"></Column>
-          </DataTable>
-        </div>
-        <div class="flex mt-2">
-          <div class="ml-auto mt-4">
-            <div id="NewButton" class="">
-              <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return
-                to
-                Calibration Jobs</Button>
-            </div>
           </div>
         </div>
       </div>
@@ -196,11 +175,12 @@ const openSelectedCalibrationRun = () => {
   nextTick(async () => {
     await loadSelectedCalibrationRun(contextMenuJob.value as number);
     await fetchUserSelectedCalibrationValidationRunList();
+    navigateToSetupForecast();
     isLoading.value = false;
   })
 }
 
-const navigateToSetupForecast = (event: any) => {
+const navigateToSetupForecast = () => {
   if (userSelectedEvalCalibrationRunId.value > 0) {
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
@@ -208,11 +188,6 @@ const navigateToSetupForecast = (event: any) => {
   } else {
     toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: 6000 })
   }
-}
-
-const returnCalibrationJobList = (event: any) => {
-  selectedCalibrationRun.value = selectedCalibrationValidationRun.value = undefined;
-  resetUserSelectedEvalValidationRun();
 }
 
 const rowStyle = (data: any) => {
