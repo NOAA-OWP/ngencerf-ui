@@ -12,8 +12,8 @@
       <Column field="time_range" header="Time Range (NgenCERF)"></Column>
     </DataTable>
   </div>
-  <div class="text-xs mt-2 mx-auto text-center">
-    Cycles in <span class="text-gray-500">grey</span> are currently unavailable from the GUI. Use the CLI to run these
+  <div class="text-normal mt-2 mx-auto text-center">
+    * Cycles in <span class="text-gray-500">grey</span> are currently unavailable from the GUI. Use the CLI to run these
     cycles.
   </div>
   <div>
@@ -71,7 +71,7 @@ onMounted(async () => {
       await loadSetupForecastTabData();
     }
     console.log('forecastCycles', forecastCycles.value);
-    console.log('forecastCycle[0]["Data Sources"]:', forecastCycles?.value[0]["Data Sources"]);
+    //console.log('forecastCycle[0]["Data Sources"]:', forecastCycles?.value[0]["Data Sources"]);
   });
 });
 
