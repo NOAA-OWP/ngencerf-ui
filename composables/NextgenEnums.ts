@@ -17,10 +17,10 @@ export const EvaluationTabs =  {
 
 export const ForecastTabs =  {
   tab_calibrationRuns: 0,
-  tab_forecastRuns: 1,
-  tab_setupForecast: 2,
-  tab_statusRun: 3,
-  tab_results: 4
+  tab_setupForecast: 1,
+  tab_statusRun: 2,
+  tab_results: 3,
+  tab_forecastRuns: 4
 }
 
 export const VerificationTabs =  {

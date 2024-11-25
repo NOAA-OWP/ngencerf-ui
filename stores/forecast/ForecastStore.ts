@@ -127,7 +127,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     loadForecastStatusRunTabData,
     loadForecastTab,
     createAndRunForecastJob,
-    loadForecastRuns,
     getStatus,
     hardResetForecastStore
   };

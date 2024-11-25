@@ -77,11 +77,6 @@
             Calibration Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
-          <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Forecast Runs Tab"
-            title="Forecast Runs Tab">
-            Forecast Runs
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
           <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast Tab"
             title="Setup Forecast tab">
             Setup Forecast
@@ -95,6 +90,11 @@
           <div data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
             title="Results tab">
             Results
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Forecast Runs Tab"
+            title="Forecast Runs Tab">
+            Forecast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
         </div>
