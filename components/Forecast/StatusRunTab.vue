@@ -39,8 +39,8 @@
               <td class="text-right font-bold">
                 <div style="width: 140px;">Cycle</div>
               </td>
-              <td class="pl-5">{{ forecastCycle.Cycle ?? '-'.repeat(30) }}</td>
-            </tr>
+              <td class="pl-5">{{ (forecastCycle as ForecastTabData).name ?? '-'.repeat(30) }}</td>
+            </tr>convertTimeZone
           </tbody>
         </table>
       </div>
@@ -55,7 +55,7 @@
               <td class="pl-5">
                 <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
               </td>
-            </tr>
+            </tr>convertTimeZone
           </tbody>
         </table>
       </div>
@@ -82,7 +82,7 @@
       </div>
     </div>
     <div class="waitgif" v-if="isLoading">
-      <img src="@/assets/styles/img/wait.gif" />
+      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
 </template>
@@ -91,7 +91,7 @@
 import { hilightTab } from '~/composables/TabHilight';
 import { useForecastStore } from '~/stores/forecast/ForecastStore';
 import { useToast } from 'primevue/usetoast';
-import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
+import { calculateElapsedTime } from '~/utils/TimeHelpers';
 
 const isLoading = ref<boolean>(false); // loading indicator
 const toast = useToast();
