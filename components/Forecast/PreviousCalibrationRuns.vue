@@ -13,7 +13,7 @@
         <div class="ml-auto mt-2">
           <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
               v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
-              @click="navigateToSetupForecastRun">New Forecast</Button></div>
+              @click="navigateToSetupForecast">New Forecast</Button></div>
         </div>
       </div>
 
@@ -200,13 +200,13 @@ const openSelectedCalibrationRun = () => {
   })
 }
 
-const navigateToSetupForecastRun = (event: any) => {
+const navigateToSetupForecast = (event: any) => {
   if (userSelectedEvalCalibrationRunId.value > 0) {
     const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecastRun];
+    const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 })
+    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: 6000 })
   }
 }
 

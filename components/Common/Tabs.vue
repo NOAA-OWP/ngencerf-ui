@@ -105,7 +105,7 @@
         <span data-tab="1" class="tabs activeTab prevent-select" v-on:click="tabClicked"
           aria-label="Calibration Runs tab" title="Calibration Runs tab">
           Calibration Runs
-          <div :class="tabNotCompleted ? 'erorDot' : 'noErrorDot'"></div>
+          <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </span>
         <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast and Run Tab"
           title="Setup Forecast / Run tab">
