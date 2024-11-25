@@ -77,6 +77,20 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   /**
+   * Query load_forecast_tab endpoint
+   */
+  const loadForecastRuns = async (forecastCycleName: string): Promise<any> => {
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/load_forecast_runs/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibrationJobId, cycle_name: forecastCycleName })
+    });
+  };
+
+  /**
    * Call get_status endpoint
    * @return {any}
    */
@@ -113,6 +127,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     loadForecastStatusRunTabData,
     loadForecastTab,
     createAndRunForecastJob,
+    loadForecastRuns,
     getStatus,
     hardResetForecastStore
   };
