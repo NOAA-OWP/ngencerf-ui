@@ -13,8 +13,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
 
   // refs
   const forecastJobId = ref<number>();
-  const forecastCycles = ref<any[]>();
-  const forecastCycle = ref<object>();
+  const forecastCycles = ref<ForecastTabData[]>();
+  const forecastCycle = ref<ForecastTabData>();
   const forecastJobStatus = ref<string>();
   const elapsedTime = ref<string>();
   const submitTimeDate = ref<Date>();

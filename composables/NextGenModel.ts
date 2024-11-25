@@ -631,6 +631,12 @@ export type ServerInfo = {
   email: string;
 }
 
+export type ForecastTabData = {
+  name: string;
+  data_sources: string;
+  time_range: string;
+}
+
 export const ValidationFormFields = {
   formulation_name: "Formulation Name",
   modules: "Formulation Modules",

@@ -7,9 +7,9 @@
   <div>
     <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
       selectionMode="single">
-      <Column field="Cycle" header="Cycle"></Column>
-      <Column field="Data Sources" header="Data Sources"></Column>
-      <Column field="Time Range (NgenCERF)" header="Time Range (NgenCERF)"></Column>
+      <Column field="name" header="Cycle"></Column>
+      <Column field="data_sources" header="Data Sources"></Column>
+      <Column field="time_range" header="Time Range (NgenCERF)"></Column>
     </DataTable>
   </div>
   <div class="text-xs mt-2 mx-auto text-center">
