@@ -48,8 +48,8 @@
           <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
         </span>
         <span v-show="calibrationJobId > 0 && loadCalibrationDataComplete == true">
-          <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Evaluate Tab" v-show="evaluateValidationRunId > 0"
-            title=" Evaluate tab">
+          <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Evaluate Tab"
+            v-show="evaluateValidationRunId > 0" title=" Evaluate tab">
             Evaluate
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>

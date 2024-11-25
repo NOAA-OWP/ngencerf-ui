@@ -1,10 +1,10 @@
-<template> 
+<template>
   <!-- ForecastLeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
       <span v-if="activeTab == 1">
-        <LazyPreviousRunsTab />
+        <LazyPreviousCalibrationRuns />
       </span>
       <span v-else-if="activeTab == 2">
         <LazyForecastRunsTab />
@@ -25,10 +25,8 @@
 <script setup lang="ts">
 import Tabs from '~/components/Common/Tabs.vue'
 
-
-
 import { generalStore } from "@/stores/common/GeneralStore";
-import LazyPreviousRunsTab from './PreviousRunsTab.vue';
+import LazyPreviousCalibrationRuns from '~/components/Forecast/PreviousCalibrationRuns.vue';
 import LazyForecastRunsTab from './ForecastRunsTab.vue';
 import LazySetupForecastTab from './SetupForecastTab.vue';
 import LazyStatusRunTab from './StatusRunTab.vue';

@@ -6,13 +6,14 @@
         <div class="w-2/3">
           <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
             <span v-if="computedCalibrationValidationRunList.length <= 1">Previous Calibration Runs</span>
-            <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{ userSelectedEvalCalibrationRunId }}</span>
+            <span v-if="computedCalibrationValidationRunList.length > 1">Forecast Runs for Calibration Job {{
+              userSelectedEvalCalibrationRunId }}</span>
           </h1>
         </div>
         <div class="ml-auto mt-2">
           <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
               v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
-              @click.stop="navigateToAlternateIteration">New Validation</Button></div>
+              @click="navigateToSetupForecastRun">New Forecast</Button></div>
         </div>
       </div>
 
@@ -34,28 +35,22 @@
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-                         <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
+            <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
               @row-dblclick="onRowDblClick($event)"
               @rowContextmenu="onRowContextMenu" class="boxed">
-              <Column field="calibration_run_id" header="Job ID" sortable></Column>
-              <Column field="job_genesis" header="Job Genesis" sortable></Column>
-              <Column field="created_at" header="Creation Date" sortable>
+              <Column field="calibration_run_id" header="Run ID" sortable></Column>
+              <Column field="status" header="Status" sortable></Column>
+              <Column field="submit_date" header="Run Date" sortable>
                 <template #body="slotProps">
                   {{ formatDateForDisplay(slotProps.data.created_at) }}
                 </template>
               </Column>
-              <Column field="submit_date" header="Submit Date" sortable>
-                <template #body="slotProps">
-                  {{ formatDateForDisplay(slotProps.data.submit_date) }}
-                </template>
-              </Column>
-              <Column field="formulation_name" header="formulation_name" sortable></Column>
+              <Column field="formulation_name" header="Formulation Name" sortable></Column>
               <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
               <Column field="objective_function" header="Objective Function" sortable></Column>
               <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
-              <Column field="validation_runs" header="Validation Runs" sortable></Column>
             </DataTable>
             <div class="mt-4 mx-auto">
               * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.</div>
@@ -83,16 +78,6 @@
         </div>
       </div>
 
-      <div class="flex mt-2">
-        <div class="ml-auto mt-4">
-          <div id="NewButton" class="">
-            <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
-              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0"
-              @click.stop="navigateToEvaluation">Evaluate</Button>
-          </div>
-        </div>
-      </div>
-
     </div>
 
     <div class="waitgif" v-if="isLoading">
@@ -108,16 +93,19 @@ import type { CalibrationRun, CalibrationValidationJobData } from "~/composables
 import { EvaluationTabs } from "~/composables/NextgenEnums";
 import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
-import { storeToRefs } from "pinia";
+import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
 import { hilightTab } from '~/composables/TabHilight';
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
-
+import { storeToRefs } from "pinia";
 const { deleteCalibrationRun } = useCalibrationJobStore();
 
+const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
+
+const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 const contextMenuJob = ref<number>()
+const isLoading = ref(true);
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
@@ -126,8 +114,6 @@ const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent);
   contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
 };
-
-const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
 const {
   uiGageId,
@@ -149,26 +135,32 @@ const {
 } = evaluationCalibrationRunStore;
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-const isLoading = ref<boolean>(true);
 
-const toast = useToast();
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRun>();
 const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
 onMounted(() => {
+  isLoading.value = true;
   hilightTab(EvaluationTabs.tab_calibrationRuns);
+  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+  if (ele) { ele.scrollTo(0, 0); }
   //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
   resetUserSelectedEvalCalibrationRun();
   fetchUserValidatedCalibrationJobsListData();
   isLoading.value = false;
+  console.log("CalibrationRunsTab for Evaluation mounted")
 });
 
-const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
-  resetUserSelectedEvalValidationRun();
-  loadSelectedCalibrationRun(event.data.calibration_run_id);
-  isLoading.value = true;
-  fetchUserSelectedCalibrationValidationRunList();
+const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
+  return; // Locking out single clicks
+  //isLoading.value = true;
+  // resetUserSelectedEvalValidationRun();
+  // nextTick( async () => {
+  //   await loadSelectedCalibrationRun(event.data.calibration_run_id);
+  //   await fetchUserSelectedCalibrationValidationRunList();
+  //   isLoading.value = false;
+  // })  
 }
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
@@ -193,7 +185,6 @@ const onEvalValidationRowUnSelect = async (event: DataTableRowClickEvent) => {
 }
 
 const onRowDblClick = (event: any) => {
-  isLoading.value = true;
   const rowData = event.data;
   contextMenuJob.value = rowData.calibration_run_id;
   openSelectedCalibrationRun();
@@ -209,30 +200,25 @@ const openSelectedCalibrationRun = () => {
   })
 }
 
-
-const navigateToAlternateIteration = (event: any) => {
+const navigateToSetupForecastRun = (event: any) => {
   if (userSelectedEvalCalibrationRunId.value > 0) {
     const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
+    const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecastRun];
     e.click();
   } else {
     toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 })
   }
 }
 
-const navigateToEvaluation = (event: any) => {
-  if (evaluateValidationRunId.value > 0) {
-    const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
-    e.click();
-  } else {
-    toast.add({ severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 })
-  }
-}
-
 const returnCalibrationJobList = (event: any) => {
   selectedCalibrationRun.value = selectedCalibrationValidationRun.value = undefined;
   resetUserSelectedEvalValidationRun();
+}
+
+const rowStyle = (data: any) => {
+  if (!['Saved', 'Ready'].includes(data.status)) {
+    return { backgroundColor: 'white' }
+  }
 }
 
 const confirmDelte = useConfirm();
@@ -270,12 +256,6 @@ const acceptDelete = (selectedRunId: number) => {
   selectedCalibrationRun.value = undefined;
 }
 
-const rowStyle = (data: any) => {
-  if (!['Saved', 'Ready'].includes(data.status)) {
-    //return { backgroundColor: 'gainsboro' }
-    return { backgroundColor: 'white' }
-  }
-}
 </script>
 
 <style lang="scss" scoped>
