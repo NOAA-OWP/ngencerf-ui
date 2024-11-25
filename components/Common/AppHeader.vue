@@ -1,112 +1,114 @@
 <template>
-  <!-- AppHeader.vue -->
-  <div id="Header" class="header  prevent-select">
-    <div id="TopBar">&nbsp;</div>
-    <div class="grid grid-cols-12 gap-1" style="height: 80px">
-      <div id="PgmName" class="col-span-2 mt-6">
-        <NuxtLink to="LandingPage">NgenCERF</NuxtLink>
-      </div>
-      <div id="Col2" class="col-span-8">
+  <client-only>
+    <!-- AppHeader.vue -->
+    <div id="Header" class="header  prevent-select">
+      <div id="TopBar">&nbsp;</div>
+      <div class="grid grid-cols-12 gap-1" style="height: 80px">
+        <div id="PgmName" class="col-span-2 mt-6">
+          <NuxtLink to="LandingPage">NgenCERF</NuxtLink>
+        </div>
+        <div id="Col2" class="col-span-8">
 
-        <ul v-show="isUserLoggedIn() && location.name !== 'Login'" id="MainMenu">
-          <li aria-label="Calibration" title="Calibration">
-            <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
-              @click="MenuChanged">Calibration</NuxtLink>
-          </li>
-          <li aria-label="Evaluation" title="Evaluation">
-            <NuxtLink :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2'
-              @click="MenuChanged">Evaluation</NuxtLink>
-          </li>
-          <li aria-label="Forecast" title="Forecast">
-            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
-              @click="MenuChanged">Forecast</NuxtLink>
-          </li>
-          <li aria-label="Verification" title="Verification">
-            <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
-              @click="" class="disabled">Verification</NuxtLink>
-          </li>
-        </ul>
+          <ul v-show="isUserLoggedIn() && location.name !== 'Login'" id="MainMenu">
+            <li aria-label="Calibration" title="Calibration">
+              <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
+                @click="MenuChanged">Calibration</NuxtLink>
+            </li>
+            <li aria-label="Evaluation" title="Evaluation">
+              <NuxtLink :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2'
+                @click="MenuChanged">Evaluation</NuxtLink>
+            </li>
+            <li aria-label="Forecast" title="Forecast">
+              <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
+                @click="MenuChanged">Forecast</NuxtLink>
+            </li>
+            <li aria-label="Verification" title="Verification">
+              <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
+                @click="" class="disabled">Verification</NuxtLink>
+            </li>
+          </ul>
 
-      </div>
+        </div>
 
-      <div id="Circles" class="col-span-2">
-        <div id="UserGroup" class="grid grid-cols-2">
+        <div id="Circles" class="col-span-2">
+          <div id="UserGroup" class="grid grid-cols-2">
 
-          <div class="col-span-1">
-            <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle"
-              class="float-right userInitials" @contextmenu="onImageRightClick" @click="onImageRightClick">
-              {{ getUserInitials() }}<i class="pi pi-angle-down"></i>
-              <ContextMenu ref="userContextMenu" :model="userItems" :autoZIndex="true" />
+            <div class="col-span-1">
+              <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle"
+                class="float-right userInitials" @contextmenu="onImageRightClick" @click="onImageRightClick">
+                {{ getUserInitials() }}<i class="pi pi-angle-down"></i>
+                <ContextMenu ref="userContextMenu" :model="userItems" :autoZIndex="true" />
+              </div>
+
+            </div>
+            <div class="col-span-1">
+              <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px"
+                id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</button>
             </div>
 
           </div>
-          <div class="col-span-1">
-            <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px"
-              id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</button>
-          </div>
-
         </div>
-      </div>
 
-      <Transition name="slide-fade">
-        <div v-if="showHelp" id="HelpWindow">
-          <div class="text-right sticky top-0">
-            <img alt="Close" title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
-              class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
-          </div>
-          <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
-            <HelpLandingPageHelp />
-          </div>
+        <Transition name="slide-fade">
+          <div v-if="showHelp" id="HelpWindow">
+            <div class="text-right sticky top-0">
+              <img alt="Close" title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+                class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
+            </div>
+            <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
+              <HelpLandingPageHelp />
+            </div>
 
-          <div v-if="location.name === 'Calibration'" class="py-10 px-1">
-            <div v-if="getMenuIndex() === 1">
-              <span v-if="getCalibrationTabIndex() === 1">
-                <HelpPreviousRunsHelp />
-              </span>
-              <span v-else-if="getCalibrationTabIndex() === 2">
-                <HelpHeadwaterBasinGageHelp />
-              </span>
-              <span v-else-if="getCalibrationTabIndex() === 3">
-                <HelpFormulationHelp />
-              </span>
-              <span v-else-if="getCalibrationTabIndex() === 4">
-                <HelpTuningControlsHelp />
-              </span>
-              <span v-else-if="getCalibrationTabIndex() === 5">
-                <HelpOptimizationMetricsHelp />
-              </span>
-              <span v-else-if="getCalibrationTabIndex() === 6">
-                <HelpRunStatusHelp />
-              </span>
-              <span v-else-if="getCalibrationTabIndex() === 7">
-                <HelpResultsHelp />
-              </span>
+            <div v-if="location.name === 'Calibration'" class="py-10 px-1">
+              <div v-if="getMenuIndex() === 1">
+                <span v-if="getCalibrationTabIndex() === 1">
+                  <HelpPreviousRunsHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 2">
+                  <HelpHeadwaterBasinGageHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 3">
+                  <HelpFormulationHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 4">
+                  <HelpTuningControlsHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 5">
+                  <HelpOptimizationMetricsHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 6">
+                  <HelpRunStatusHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 7">
+                  <HelpResultsHelp />
+                </span>
+              </div>
+            </div>
+
+            <div v-else-if="getMenuIndex() === 2">
+
+            </div>
+            <div v-else-if="getMenuIndex() === 3">
+
+            </div>
+            <div v-else-if="getMenuIndex() === 4">
+
+            </div>
+            <div v-else-if="getMenuIndex() === 5">
+
+            </div>
+            <div v-else-if="getMenuIndex() === 6">
+
             </div>
           </div>
+        </Transition>
 
-          <div v-else-if="getMenuIndex() === 2">
-
-          </div>
-          <div v-else-if="getMenuIndex() === 3">
-
-          </div>
-          <div v-else-if="getMenuIndex() === 4">
-
-          </div>
-          <div v-else-if="getMenuIndex() === 5">
-
-          </div>
-          <div v-else-if="getMenuIndex() === 6">
-
-          </div>
-        </div>
-      </Transition>
-
+      </div>
     </div>
-  </div>
-  <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
-    <UserAccount />
-  </div>
+    <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
+      <UserAccount />
+    </div>
+  </client-only>
 </template>
 
 <script lang="ts" setup>
@@ -240,18 +242,15 @@ const displayHelp = () => {
 }
 
 const MenuChanged = (e: MouseEvent) => {
-  const currentMenu = getMenuIndex();
-  const ele = e.currentTarget as HTMLElement;
-  const m = ele.getAttribute('data-menu');
-  const tabs = document.getElementsByClassName("tabs");
-  const tab = <HTMLElement>tabs[0];
-  if (tabs && m && e) {
-    if (currentMenu && currentMenu.toString() === m) {
+  nextTick(() => {
+    const currentMenu = parseInt((e?.target as HTMLElement).getAttribute('data-menu') as string, 10);
+    setMenuIndex(currentMenu);
+    const tabs = document.getElementsByClassName("tabs");
+    const tab = <HTMLElement>tabs[0];
+    if (tab) {
       tab.click();
-    } else {
-      setMenuIndex(parseInt(m, 10));
     }
-  }
+  })
 }
 
 </script>
