@@ -63,7 +63,8 @@
             v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle"
             @rowSelect="onEvalValdiationRowSelect" @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
             <Column v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex"
-              :header="col.header" :field="col.field"></Column>
+              :header="col.header" :field="col.field">
+            </Column>
           </DataTable>
         </div>
         <div class="flex mt-2">
