@@ -637,9 +637,7 @@ export type ForecastCycle = {
   time_range: string;
 }
 
-export type ForecastRuns = {
-  jobs: ForecastRun[];
-}
+export type ForecastRuns = ForecastRun[];
 
 export type ForecastRun = {
   calibration_run_id: number;
@@ -653,11 +651,7 @@ export type ForecastRun = {
   submit_date: string;
   objective_function: string;
   optimization_algorithm: string;
-  //validation_runs: number;
-  //validation_run_ids: number[];
 }
-
-
 
 export const ValidationFormFields = {
   formulation_name: "Formulation Name",

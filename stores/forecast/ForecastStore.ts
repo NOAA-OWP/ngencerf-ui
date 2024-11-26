@@ -1,4 +1,5 @@
 import { defineStore, storeToRefs } from "pinia";
+import type { SelectOption, ForecastRun, ForecastRuns, ForecastCycle } from "@/composables/NextGenModel";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
@@ -9,12 +10,12 @@ import { convertTimeZone } from '~/utils/TimeHelpers';
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken } = useUserDataStore();
+  const { getAccessToken, clearUserCalibrationRunData } = useUserDataStore();
 
   // refs
   const forecastJobId = ref<number>();
-  const forecastCycles = ref<ForecastTabData[]>();
-  const forecastCycle = ref<ForecastTabData>();
+  const forecastCycles = ref<ForecastCycle[]>();
+  const forecastCycle = ref<ForecastCycle>();
   const forecastJobStatus = ref<string>();
   const elapsedTime = ref<string>();
   const submitTimeDate = ref<Date>();
@@ -22,6 +23,28 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const elapsedTimeIntervalId = ref<number>();
   const forecastJobStatusIntervalId = ref<number>();
   const resultsPathname = ref<string>();
+
+  const forecastRuns = ref<ForecastRuns[]>([]);
+
+  /**
+  * @returns {SelectOption[]}
+  */
+  const evaluationForecastRunGageList = computed(() => {
+    let gageOptionList = <SelectOption[]>[];
+    forecastRuns.value.forEach(runItem => {
+      const checkGageIndex = gageOptionList.findIndex(
+        (gageOption) =>
+          gageOption.name === (runItem as any as ForecastRun).gage_id
+      ) !== -1;
+      if (!checkGageIndex) {
+        gageOptionList.push({
+          'name':  (runItem as any as ForecastRun).gage_id,
+          'description':  (runItem as any as ForecastRun).gage_id
+        });
+      }
+    });
+    return gageOptionList;
+  });
 
   /**
    * Load Setup Forecast tab data
@@ -79,14 +102,16 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   /**
    * Query load_forecast_tab endpoint
    */
-  const loadForecastRuns = async (forecastCycleName: string): Promise<any> => {
-    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/load_forecast_runs/`, {
+  const loadForecastRuns = async (): Promise<any> => {
+    return makeProtectedApiCall<ForecastRuns>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_forecast/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId, cycle_name: forecastCycleName })
+      body: {}
+    }).then((result) => {
+      forecastRuns.value = result._data.jobs
     });
   };
 
@@ -111,6 +136,22 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const hardResetForecastStore = (): void => {
       
   };
+
+  const resetUserSelectedForecastCalibrationRun = (): void => {
+    forecastJobId.value =  0
+    forecastCycles.value =  [];
+    forecastCycle.value =  undefined;
+    forecastJobStatus.value =  "";
+    elapsedTime.value =  "";
+    submitTimeDate.value = undefined;
+    submitTime.value =  "";
+    elapsedTimeIntervalId.value =  0;
+    forecastJobStatusIntervalId.value =  0;
+    resultsPathname.value =  "";  
+    forecastRuns.value = [];
+    clearUserCalibrationRunData();
+  }
+
  
   return {
     forecastJobId,
@@ -127,6 +168,11 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     loadForecastStatusRunTabData,
     loadForecastTab,
     createAndRunForecastJob,
+    loadForecastRuns,
+    resetUserSelectedForecastCalibrationRun,
+
+    evaluationForecastRunGageList,
+    forecastRuns,
     getStatus,
     hardResetForecastStore
   };

@@ -88,6 +88,8 @@ const onRowContextMenu = (event: any) => {
   contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
 };
 
+const {clearUserCalibrationRunData } = useUserDataStore();
+
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
 //this model is for highlighting purpose

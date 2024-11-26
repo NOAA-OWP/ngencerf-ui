@@ -5,9 +5,7 @@
       <div class="flex mt-2">
         <div class="w-2/3">
           <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
-            <span v-if="computedCalibrationValidationRunList.length <= 1">Previous Calibration Runs</span>
-            <span v-if="computedCalibrationValidationRunList.length > 1">Forecast Runs for Calibration Job {{
-              userSelectedEvalCalibrationRunId }}</span>
+            Previous Calibration Runs
           </h1>
         </div>
         <div class="ml-auto mt-2">
@@ -25,7 +23,7 @@
                 <div class="inline ">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
-                    :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
+                    :options="evaluationForecastRunGageList" filter optionLabel="name" optionValue="name"
                     placeholder=""></Select>
                 </div>
               </div>
@@ -34,12 +32,11 @@
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-            <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
+            <DataTable id="cr-list" :value="forecastRuns" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
-              @row-dblclick="onRowDblClick($event)"
-              @rowContextmenu="onRowContextMenu" class="boxed">
-              <Column field="calibration_run_id" header="Run ID" sortable></Column>
+              @row-dblclick="onRowDblClick($event)" @rowContextmenu="onRowContextMenu" class="boxed">
+              <Column field="calibration_run_id" header="Job ID" sortable></Column>
               <Column field="status" header="Status" sortable></Column>
               <Column field="submit_date" header="Run Date" sortable>
                 <template #body="slotProps">
@@ -52,7 +49,8 @@
               <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
             </DataTable>
             <div class="mt-4 mx-auto">
-              * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.</div>
+              * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.
+            </div>
           </div>
         </div>
       </div>
@@ -69,7 +67,9 @@
 import { useToast } from "primevue/usetoast";
 
 import type { CalibrationRun, CalibrationValidationJobData } from "~/composables/NextGenModel";
+
 import { EvaluationTabs } from "~/composables/NextgenEnums";
+import { useForecastStore } from "~/stores/forecast/ForecastStore";
 import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
@@ -81,13 +81,18 @@ const { deleteCalibrationRun } = useCalibrationJobStore();
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
+
+const forecastStore = useForecastStore();
+const { loadForecastRuns } = forecastStore;
+
+
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 const contextMenuJob = ref<number>()
 const isLoading = ref(true);
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
-  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
+  // { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
 ]);
 const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent);
@@ -96,7 +101,6 @@ const onRowContextMenu = (event: any) => {
 
 const {
   uiGageId,
-  evaluationCalibrationRunGageList,
   loadCalibrationDataComplete,
   userSelectedEvalCalibrationRunId,
   calibrationValidationRunListHeaders,
@@ -115,20 +119,22 @@ const {
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
+const { forecastRuns, evaluationForecastRunGageList } = storeToRefs(useForecastStore());
+
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRun>();
 const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
-onMounted(() => {
+onMounted(async () => {
   isLoading.value = true;
   hilightTab(EvaluationTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
   //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
   resetUserSelectedEvalCalibrationRun();
-  fetchUserValidatedCalibrationJobsListData();
+  await loadForecastRuns();
   isLoading.value = false;
-  console.log("CalibrationRunsTab for Evaluation mounted")
+
 });
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
@@ -151,18 +157,9 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
   }
 });
 
-const onEvalCalibrationRowUnSelect = (event: any) => {
-  resetUserSelectedEvalCalibrationRun();
-}
+const onRowMenuOpen = () => {
 
-const onEvalValdiationRowSelect = async (event: DataTableRowClickEvent) => {
-  evaluateValidationRunId.value = event.data.validation_run_id;
 }
-
-const onEvalValidationRowUnSelect = async (event: DataTableRowClickEvent) => {
-  evaluateValidationRunId.value = 0;
-}
-
 const onRowDblClick = (event: any) => {
   const rowData = event.data;
   contextMenuJob.value = rowData.calibration_run_id;
