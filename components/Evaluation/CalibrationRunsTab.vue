@@ -1,12 +1,13 @@
 <template>
   <client-only>
-    <div class="h-screen-inner pr-2">
+    <div class="h-screen-inner pr-2 text-center">
 
       <div class="flex mt-2">
         <div class="w-2/3">
           <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
             <span v-if="computedCalibrationValidationRunList.length <= 1">Previous Calibration Runs</span>
-            <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{ userSelectedEvalCalibrationRunId }}</span>
+            <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
+              userSelectedEvalCalibrationRunId }}</span>
           </h1>
         </div>
         <div class="ml-auto mt-2">
@@ -18,7 +19,7 @@
 
       <div id="calibrationRunList"
         v-if="userEvaluationCalibrationRunListData.length > 0 && computedCalibrationValidationRunList.length <= 1">
-        <div>
+
           <div id="CalTable">
             <div class="grid grid-cols-2 mb-5">
               <div class="col-span-1">
@@ -34,11 +35,10 @@
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-                         <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
+            <DataTable id="EvalRunTable" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
-              @row-dblclick="onRowDblClick($event)"
-              @rowContextmenu="onRowContextMenu" class="boxed">
+              @row-dblclick="onRowDblClick($event)" @rowContextmenu="onRowContextMenu" class="boxed">
               <Column field="calibration_run_id" header="Job ID" sortable></Column>
               <Column field="job_genesis" header="Job Genesis" sortable></Column>
               <Column field="created_at" header="Creation Date" sortable>
@@ -58,9 +58,10 @@
               <Column field="validation_runs" header="Validation Runs" sortable></Column>
             </DataTable>
             <div class="mt-4 mx-auto">
-              * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.</div>
+              * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.
+            </div>
           </div>
-        </div>
+
       </div>
       <div v-if="computedCalibrationValidationRunList.length > 1">
         <div id="evaluationCalibrationList">
@@ -281,7 +282,15 @@ const rowStyle = (data: any) => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
+#calibrationRunList {
+  height: 80%;
+}
 #HeadwaterBasinGage {
   width: 300px;
+}
+
+#EvalRunTable {
+  width: 1270px;
+  margin: 0 auto;
 }
 </style>

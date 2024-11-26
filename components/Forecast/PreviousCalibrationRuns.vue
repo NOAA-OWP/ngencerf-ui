@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div class="h-screen-inner pr-2">
+    <div class="h-screen-inner pr-2  text-center">
 
       <div class="flex mt-2">
         <div class="w-2/3">
@@ -32,7 +32,7 @@
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-            <DataTable id="cr-list" :value="forecastRuns" scrollable scroll-height="400px"
+            <DataTable id="ForecastRunTable" :value="forecastRuns" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
@@ -249,7 +249,15 @@ const acceptDelete = (selectedRunId: number) => {
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
 
+#calibrationRunList {
+  height: 80%;
+}
 #HeadwaterBasinGage {
   width: 300px;
+}
+
+#ForecastRunTable {
+  width: 1270px;
+  margin: 0 auto;
 }
 </style>
