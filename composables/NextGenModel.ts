@@ -631,11 +631,33 @@ export type ServerInfo = {
   email: string;
 }
 
-export type ForecastTabData = {
+export type ForecastCycle = {
   name: string;
   data_sources: string;
   time_range: string;
 }
+
+export type ForecastRuns = {
+  jobs: ForecastRun[];
+}
+
+export type ForecastRun = {
+  calibration_run_id: number;
+  gage_id: string;
+  job_genesis: string;
+  created_at: string;
+  status: string;
+  calibration_start_period: string;
+  calibration_end_period: string;
+  formulation_name: string;
+  submit_date: string;
+  objective_function: string;
+  optimization_algorithm: string;
+  //validation_runs: number;
+  //validation_run_ids: number[];
+}
+
+
 
 export const ValidationFormFields = {
   formulation_name: "Formulation Name",
