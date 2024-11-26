@@ -95,15 +95,26 @@
               <LazyEvaluationCalibrationSelectAltInterationssHelp />
             </span>
           </div>
-          <!-- <div v-else-if="getMenuIndex() === 4">
 
+
+          <div v-else-if="getMenuIndex() === 3">
+            <span v-if="getForecastTabIndex() === 1">
+              <h2 class="mt-8 text-center">Help for Calibration Runs</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 2">
+              <h2 class="mt-8 text-center">Help for Setup Forecast</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 3">
+              <h2 class="mt-8 text-center">Help for Status/Run</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 4">
+              <h2 class="mt-8 text-center">Help for Results</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 5">
+              <h2 class="mt-8 text-center">Help for Forecast Runs</h2>
+            </span>
           </div>
-          <div v-else-if="getMenuIndex() === 5">
 
-          </div>
-          <div v-else-if="getMenuIndex() === 6">
-
-          </div> -->
         </div>
       </Transition>
 
@@ -142,7 +153,7 @@ const emit = defineEmits(["logoutEvent"]);
 
 const accountOverlay = ref();
 
-const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex } = generalStore();
+const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex } = generalStore();
 
 const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
