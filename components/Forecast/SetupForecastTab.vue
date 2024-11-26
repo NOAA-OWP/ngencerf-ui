@@ -26,9 +26,7 @@
       </div>
     </span>
   </div>
-  <div class="waitgif" v-if="isLoading">
-    <img src="@/assets/styles/img/wait.gif" />
-  </div>
+  <div class="waitgif" v-if="isLoading"> <img alt="Please wait..." src="@/assets/styles/img/wait.gif" /> </div>
 </template>
 
 <script setup lang="ts">
@@ -47,7 +45,7 @@ const {
   elapsedTime,
   submitTimeDate,
   submitTime
-} = storeToRefs(useForecastStore()); 
+} = storeToRefs(useForecastStore());
 
 const {
   loadSetupForecastTabData,

@@ -10,7 +10,7 @@
         </div>
         <div class="ml-auto mt-2">
           <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
-              v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
+              v-if="forecastJobId"
               @click="navigateToSetupForecast">New Forecast</Button></div>
         </div>
       </div>
@@ -34,6 +34,7 @@
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
             <DataTable id="cr-list" :value="forecastRuns" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
+              @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
               @row-dblclick="onRowDblClick($event)" @rowContextmenu="onRowContextMenu" class="boxed">
               <Column field="calibration_run_id" header="Job ID" sortable></Column>
@@ -88,7 +89,7 @@ const { loadForecastRuns } = forecastStore;
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
-const contextMenuJob = ref<number>()
+
 const isLoading = ref(true);
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
@@ -96,7 +97,7 @@ const cmCalibrationRun = ref([
 ]);
 const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent);
-  contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
+  forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
 };
 
 const {
@@ -119,7 +120,7 @@ const {
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
-const { forecastRuns, evaluationForecastRunGageList } = storeToRefs(useForecastStore());
+const { forecastRuns, evaluationForecastRunGageList, forecastJobId } = storeToRefs(useForecastStore());
 
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRun>();
@@ -130,6 +131,7 @@ onMounted(async () => {
   hilightTab(EvaluationTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
+  forecastJobId.value = 0;
   //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
   resetUserSelectedEvalCalibrationRun();
   await loadForecastRuns();
@@ -137,16 +139,30 @@ onMounted(async () => {
 
 });
 
+// const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
+//   return; // Locking out single clicks
+//   //isLoading.value = true;
+//   // resetUserSelectedEvalValidationRun();
+//   // nextTick( async () => {
+//   //   await loadSelectedCalibrationRun(event.data.calibration_run_id);
+//   //   await fetchUserSelectedCalibrationValidationRunList();
+//   //   isLoading.value = false;
+//   // })  
+// }
+
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
-  return; // Locking out single clicks
-  //isLoading.value = true;
-  // resetUserSelectedEvalValidationRun();
-  // nextTick( async () => {
-  //   await loadSelectedCalibrationRun(event.data.calibration_run_id);
-  //   await fetchUserSelectedCalibrationValidationRunList();
-  //   isLoading.value = false;
-  // })  
+  isLoading.value = true;
+  forecastJobId.value = event.data.calibration_run_id;
+  await loadSelectedCalibrationRun(forecastJobId.value as number);
+  await fetchUserSelectedCalibrationValidationRunList();
+  isLoading.value = false;
 }
+
+const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
+  forecastJobId.value = 0;
+
+}
+
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
   if (updatedRunData != undefined && Object.keys(updatedRunData).length > 0) {
@@ -162,7 +178,7 @@ const onRowMenuOpen = () => {
 }
 const onRowDblClick = (event: any) => {
   const rowData = event.data;
-  contextMenuJob.value = rowData.calibration_run_id;
+  forecastJobId.value = rowData.calibration_run_id;
   openSelectedCalibrationRun();
 }
 
@@ -170,7 +186,7 @@ const openSelectedCalibrationRun = () => {
   isLoading.value = true;
   resetUserSelectedEvalValidationRun();
   nextTick(async () => {
-    await loadSelectedCalibrationRun(contextMenuJob.value as number);
+    await loadSelectedCalibrationRun(forecastJobId.value as number);
     await fetchUserSelectedCalibrationValidationRunList();
     navigateToSetupForecast();
     isLoading.value = false;
@@ -195,7 +211,7 @@ const rowStyle = (data: any) => {
 
 const confirmDelte = useConfirm();
 const deleteSelectedCalibrationRun = () => {
-  const selectedRunId = contextMenuJob.value as number;
+  const selectedRunId = forecastJobId.value as number;
   let confirmMessage = "Are you sure you want to delete this run?"
   confirmDelte.require({
     message: confirmMessage,
