@@ -514,8 +514,8 @@ watch(selectedPlotName, async () => {
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value as string); // store this in RunStatusStore
 
-    if (response?._data?.plot_file_name && response?._data?.plot_url) {
-      selectedPlotFilename.value = response?._data?.plot_file_name;
+    if (response?._data?.plot_file_path && response?._data?.plot_url) {
+      selectedPlotFilename.value = response?._data?.plot_file_path;
       selectedPlotFileUrl.value = response?._data?.plot_url;
     } else {
       toast.removeAllGroups();
@@ -545,8 +545,8 @@ watch(iteration, async () => {
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
 
-    if (response?._data?.plot_file_name && response?._data?.plot_url) {
-      selectedPlotFilename.value = response?._data?.plot_file_name;
+    if (response?._data?.plot_file_path && response?._data?.plot_url) {
+      selectedPlotFilename.value = response?._data?.plot_file_path;
       selectedPlotFileUrl.value = response?._data?.plot_url;
     } else {
       selectedPlotFilename.value = "";
