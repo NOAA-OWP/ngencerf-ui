@@ -124,7 +124,12 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         }
         let rowData = <any>{};
         rowData['validation_run_id'] = validation_job.validation_run_id;
-        rowData['iteration_num'] = validation_job.iteration_num;
+        if (validation_job.best === true) {
+          rowData['iteration_num'] = validation_job.iteration_num.toString() + "*";
+        }
+        else {
+          rowData['iteration_num'] = validation_job.iteration_num;
+        }
         rowData['status'] = validation_job.status;
         rowData['submit_date'] = formatDateForDisplay(validation_job.submit_date);
         validation_job.parameters.forEach((parameter: CalibrationRunValidationParameterData) => {

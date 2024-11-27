@@ -66,6 +66,9 @@
               :header="col.header" :field="col.field">
             </Column>
           </DataTable>
+          <div class="mt-3 mx-auto">
+            * Iteration containing best parameter set determined during calibration.
+          </div>
         </div>
         <div class="flex mt-2">
           <div class="ml-auto mt-4">
