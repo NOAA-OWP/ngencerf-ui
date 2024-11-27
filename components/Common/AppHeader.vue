@@ -204,7 +204,7 @@ const sizeHelpWindow = () => {
   let headerHeight = document.getElementById('Header')?.clientHeight;
   let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
   if (footerTop && headerHeight) {
-    let h = (footerTop - headerHeight) + 54;
+    let h = (footerTop - headerHeight) - 20;
     let hpx = h + 'px'
     let ele = document.getElementById("HelpWindow");
     if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
