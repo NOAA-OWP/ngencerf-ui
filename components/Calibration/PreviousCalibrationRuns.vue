@@ -84,7 +84,7 @@ const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormu
 const { loadOptimizationTabStaticData, optimizationStore_data_loading } = useOptimizationStore();
 const { loadTuningTabStaticData, tuningStore_data_loading, hardResetTuningStore } = useTuningStore();
 const { calibrationJobId } = storeToRefs(generalStore());
-const { getCalibrationTabIndex } = generalStore();
+const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
@@ -106,16 +106,15 @@ const onRowContextMenu = (event: any) => {
 };
 
 onMounted(() => {
-  hilightTab(CalibrationTabs.tab_calibrationRuns);
-
-  isLoading.value = false;
-
-  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-  if (ele) { ele.scrollTo(0, 0); }
-
-  hardResetTuningStore();
-  hardResetRunStatusStore();
-  fetchUserCalibrationJobsListData();
+  if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
+    hilightTab(CalibrationTabs.tab_calibrationRuns);
+    isLoading.value = false;
+    let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+    if (ele) { ele.scrollTo(0, 0); }
+    hardResetTuningStore();
+    hardResetRunStatusStore();
+    fetchUserCalibrationJobsListData();
+  }
 })
 
 /**
