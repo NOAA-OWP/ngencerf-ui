@@ -1,54 +1,63 @@
 <template>
+  <client-only>
+    <div class="mx-auto px-8 text-center overflow-auto">
+      <div class="width-full">
+        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs *</h1>
+        <span class="ngenButtonDiv-alt bg-blue4 ml-8" @click="createNewCalibration"><button>New</button>
+        </span>
 
-  <div class="mx-auto px-8 text-center overflow-auto">
-    <div class="width-full">
-      <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs *</h1>
-      <span class="ngenButtonDiv-alt bg-blue4 ml-8" @click="createNewCalibration"><button>New</button>
-      </span>
-
-      <div id="CalTable" class="w-max mx-auto">
-        <ConfirmDialog></ConfirmDialog>
-        <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-          :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-        <DataTable id="cr-list" :value="userCalibrationJobsListData" sortField="calibration_run_id" :sortOrder="-1"
-          scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
-          selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-          @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
-          <Column field="calibration_run_id" header="Job ID" sortable></Column>
-          <Column field="job_genesis" header="Job Genesis" sortable></Column>
-          <Column field="formulation_name" header="Formulation Name" sortable></Column>
-          <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-          <Column field="created_at" header="Creation Date" sortable>
-            <template #body="slotProps">
-              {{ formatDateForDisplay( slotProps.data.created_at ) }}
-            </template>
-          </Column>
-          <Column field="submit_date" header="Submit Date" sortable>
-            <template #body="slotProps">
-              <span v-if="slotProps.data.submit_date">
-              {{ formatDateForDisplay( slotProps.data.submit_date ) }}
-              </span>
-            </template>
-          </Column>
-          <Column header="Calibration Period" sortable>
-            <template #body="slotProps">
-              <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period">
-              {{ formatDateForDisplay( slotProps.data.calibration_start_period ) }} <span v-if="slotProps.data.calibration_end_period">to</span>
-              {{ formatDateForDisplay( slotProps.data.calibration_end_period ) }}
-              </span>
-            </template>
-          </Column>
-          <Column field="status" header="Status" sortable></Column>
-        </DataTable>
+        <div id="CalTable" class="w-max mx-auto">
+          <div class="grid grid-cols-2 mb-5">
+            <div class="col-span-1">
+              <div class="text-left" for="HeadwaterBasinGage">Headwater Basin Gage Filter</div>
+              <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId" :options="calibrationRunGageList" filter
+                optionLabel="name" optionValue="name" placeholder=""></Select>
+            </div>
+          </div>
+          <ConfirmDialog></ConfirmDialog>
+          <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+            :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+          <DataTable id="cr-list" :value="userCalibrationJobsListData" sortField="calibration_run_id" :sortOrder="-1"
+            scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
+            selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
+            @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
+            <Column field="calibration_run_id" header="Job ID" sortable></Column>
+            <Column field="job_genesis" header="Job Genesis" sortable></Column>
+            <Column field="formulation_name" header="Formulation Name" sortable></Column>
+            <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
+            <Column field="created_at" header="Creation Date" sortable>
+              <template #body="slotProps">
+                {{ formatDateForDisplay(slotProps.data.created_at) }}
+              </template>
+            </Column>
+            <Column field="submit_date" header="Submit Date" sortable>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.submit_date">
+                  {{ formatDateForDisplay(slotProps.data.submit_date) }}
+                </span>
+              </template>
+            </Column>
+            <Column header="Calibration Period" sortable>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period">
+                  {{ formatDateForDisplay(slotProps.data.calibration_start_period) }} <span
+                    v-if="slotProps.data.calibration_end_period">to</span>
+                  {{ formatDateForDisplay(slotProps.data.calibration_end_period) }}
+                </span>
+              </template>
+            </Column>
+            <Column field="status" header="Status" sortable></Column>
+          </DataTable>
+        </div>
+        <div class="mt-4 mx-auto">
+          * Double click on a row to open, or right click for other options. Click "New" for a fresh setup.</div>
       </div>
-      <div class="mt-4 mx-auto">
-        * Double click on a row to open, or right click for other options. Click "New" for a fresh setup.</div>
     </div>
-  </div>
 
-  <div class="waitgif" v-if="isLoading">
-    <img src="@/assets/styles/img/wait.gif" />
-  </div>
+    <div class="waitgif" v-if="isLoading">
+      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
+    </div>
+  </client-only>
 </template>
 
 <script setup lang="ts">
@@ -72,9 +81,10 @@ const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
 const { loadOptimizationTabStaticData, optimizationStore_data_loading } = useOptimizationStore();
 const { loadTuningTabStaticData, tuningStore_data_loading, hardResetTuningStore } = useTuningStore();
-const { calibrationJobId} = storeToRefs(generalStore());
+const { calibrationJobId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex } = generalStore();
-const { userCalibrationJobsListData, userCalibrationRunData } = storeToRefs(useUserDataStore());
+
+const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -95,7 +105,7 @@ const onRowContextMenu = (event: any) => {
 
 onMounted(() => {
   hilightTab(CalibrationTabs.tab_calibrationRuns);
-  
+
   isLoading.value = false;
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -112,14 +122,14 @@ onMounted(() => {
  * This does it for now, but the actual cause needs to be found!
  */
 onUnmounted(() => {
- setTimeout(() => {
+  setTimeout(() => {
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[getCalibrationTabIndex() - 1];
     e.click();
   }, 250);
 })
 
-const onRowDblClick = (e: any)  => {
+const onRowDblClick = (e: any) => {
   const data = ref<any>();
   data.value = e.data;
   openSelectedCalibrationRun(data)
@@ -171,9 +181,9 @@ const createNewCalibration = async () => {
   useGageStore().resetGageStore();
   clearUserCalibrationRunData();
 
-  fetchNewCalibrationRunId().then( response => {
-    if ( response.status == 201 ) {
-      if ( response?._data && response?._data?.calibration_run_id && response?._data?.calibration_run_id > 0 ) {
+  fetchNewCalibrationRunId().then(response => {
+    if (response.status == 201) {
+      if (response?._data && response?._data?.calibration_run_id && response?._data?.calibration_run_id > 0) {
         calibrationJobId.value = response?._data?.calibration_run_id;
         queryUserCalibrationRunData().then(queryResponse => {
           userCalibrationRunData.value = queryResponse?._data;
@@ -181,10 +191,10 @@ const createNewCalibration = async () => {
         });
       } else {
         toast.add({ severity: "error", summary: 'Create Calibration Job Failed.', detail: "Unable to Retrieve Valid Calibration Job Id", life: 10000 });
-      }      
+      }
     } else {
-      useApiErrorResponsePreprocess( response ).forEach( message => {
-        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Create Calibration Job Failed.', detail: message, life: 10000 });
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Create Calibration Job Failed.', detail: message, life: 10000 });
       });
     }
   });
@@ -208,12 +218,12 @@ const gotoHeadwaterBasinGage = () => {
  */
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
-  cloneCalibrationRun(selectedRunId).then( response => {
-    if ( response.status == 200 ) {
+  cloneCalibrationRun(selectedRunId).then(response => {
+    if (response.status == 200) {
       fetchUserCalibrationJobsListData();
     } else {
-      useApiErrorResponsePreprocess( response ).forEach( message => {
-        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Clone Calibration Job Failed.', detail: message, life: 10000 });
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Clone Calibration Job Failed.', detail: message, life: 10000 });
       });
     }
   });
@@ -245,12 +255,12 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   })
 }
 const acceptDelete = (selectedRunId: number) => {
-  deleteCalibrationRun(selectedRunId).then( response => {
-    if ( response.status == 200 ) {
+  deleteCalibrationRun(selectedRunId).then(response => {
+    if (response.status == 200) {
       fetchUserCalibrationJobsListData();
     } else {
-      useApiErrorResponsePreprocess( response ).forEach( message => {
-        toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
       });
     }
   });
@@ -261,8 +271,4 @@ const acceptDelete = (selectedRunId: number) => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-
-#CalTable {
-  border: 1px solid $ngwcp_primary1;
-}
 </style>

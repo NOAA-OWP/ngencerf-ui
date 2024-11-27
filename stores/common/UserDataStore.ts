@@ -24,6 +24,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   const userCalibrationRunData = ref<UserCalibrationRunData>();
 
   const userSelectedCalibrationIterationId = ref<number | null>(null);
+  const uiGageId = ref<string>("");
 
   // Restore state from sessionStorage if available
   if (typeof window !== 'undefined') {
@@ -192,6 +193,25 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   function getIsTokenExpired() {
     return tokenExpired.value;
   }
+  /**
+* @returns {SelectOption[]}
+*/
+  const calibrationRunGageList = computed(() => {
+    let gageOptionList = <SelectOption[]>[];
+    userCalibrationJobsListData.value.forEach(runItem => {
+      const checkGageIndex = gageOptionList.findIndex(
+        (gageOption) =>
+          gageOption.name === runItem.gage_id
+      ) !== -1;
+      if (!checkGageIndex) {
+        gageOptionList.push({
+          'name': runItem.gage_id,
+          'description': runItem.gage_id
+        });
+      }
+    });
+    return gageOptionList;
+  });
 
   /**
    * fetch user created calibration job list data
@@ -290,6 +310,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     hardResetUserDataStore,
     clearUserCalibrationRunData,
     userSelectedCalibrationIterationId,
+    calibrationRunGageList,
+    uiGageId
   };
 },
   {
