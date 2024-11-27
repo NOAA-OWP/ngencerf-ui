@@ -26,11 +26,11 @@
 import Tabs from '~/components/Common/Tabs.vue'
 
 import { generalStore } from "@/stores/common/GeneralStore";
-import LazyPreviousCalibrationRuns from '~/components/Forecast/PreviousCalibrationRuns.vue';
-import LazyForecastRunsTab from './ForecastRunsTab.vue';
-import LazySetupForecastTab from './SetupForecastTab.vue';
-import LazyStatusRunTab from './StatusRunTab.vue';
-import LazyResultsTab from './ResultsTab.vue';
+const LazyPreviousCalibrationRuns = defineAsyncComponent(() => import('~/components/Forecast/PreviousCalibrationRuns.vue'));
+const LazyForecastRunsTab = defineAsyncComponent(() => import('./ForecastRunsTab.vue'));
+const LazySetupForecastTab = defineAsyncComponent(() => import('./SetupForecastTab.vue'));
+const LazyStatusRunTab = defineAsyncComponent(() => import('./StatusRunTab.vue'));
+const LazyResultsTab = defineAsyncComponent(() => import('./ResultsTab.vue'));
 
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 
