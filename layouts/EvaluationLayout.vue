@@ -6,7 +6,7 @@
           <AppHeader />
         </div>
       </div>
-      <div v-if="getMenuIndex() === 2 && getEvaluationTabIndex() === 1" class="grid row-span-10 gap-2">
+      <div v-if="getMenuIndex() === 2 && getEvaluationTabIndex() === 2" class="grid row-span-10 gap-2">
         <div class="grid grid-cols-12">
           <div class="col-span-12">
             <div class="grid grid-rows-12 mx-auto px-4 py-2">
