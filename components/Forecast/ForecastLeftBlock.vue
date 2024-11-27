@@ -1,19 +1,22 @@
-<template> 
+<template>
   <!-- ForecastLeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
       <span v-if="activeTab == 1">
-        <PreviousRunsTab />
+        <LazyPreviousCalibrationRuns />
       </span>
       <span v-else-if="activeTab == 2">
-       <SetupForecastRunTab />
+        <LazyForecastRunsTab />
       </span>
       <span v-else-if="activeTab == 3">
-        <StatusTab />
+       <LazySetupForecastTab />
       </span>
       <span v-else-if="activeTab == 4">
-        <ResultsTab />
+        <LazyStatusRunTab />
+      </span>
+      <span v-else-if="activeTab == 5">
+        <LazyResultsTab />
       </span>
     </div>
   </div>
@@ -22,17 +25,15 @@
 <script setup lang="ts">
 import Tabs from '~/components/Common/Tabs.vue'
 
-
-// Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
-import PreviousRunsTab from '~/components/Forecast/PreviousRunsTab.vue'
-import SetupForecastRunTab from './SetupForecastRunTab.vue'
-import StatusTab from './StatusTab.vue'
-import ResultsTab from './ResultsTab.vue'
+const LazyPreviousCalibrationRuns = defineAsyncComponent(() => import('~/components/Forecast/PreviousCalibrationRuns.vue'));
+const LazyForecastRunsTab = defineAsyncComponent(() => import('./ForecastRunsTab.vue'));
+const LazySetupForecastTab = defineAsyncComponent(() => import('./SetupForecastTab.vue'));
+const LazyStatusRunTab = defineAsyncComponent(() => import('./StatusRunTab.vue'));
+const LazyResultsTab = defineAsyncComponent(() => import('./ResultsTab.vue'));
 
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 
-// Default to Tab 1, HeadwaterBasinGage
 const activeTab = ref(getForecastTabIndex());
 
 // Activate new tab

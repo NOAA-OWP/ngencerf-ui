@@ -10,12 +10,11 @@ export default {
     "./error.vue",
   ],
   theme: {
-    colors: {
-      "buttonBackground": "$ngwcp_primary1",
+    extend: {
+      colors: {
+        buttonBackground: "$ngwcp_primary1", 
+      },
     },
   },
   plugins: [require('tailwindcss-primeui')],
 };
-
-
-

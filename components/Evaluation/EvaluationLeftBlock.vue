@@ -22,10 +22,10 @@
 <script setup lang="ts">
 import Tabs from '~/components/Common/Tabs.vue'
 
-import LazyEvaluateTab from './EvaluateTab.vue'
-import LazySelectAltIterationTab from './SelectAltIterationTab.vue'
-import LazyCalibrationRunsTab from './CalibrationRunsTab.vue'
-import LazyRunStatus from './EvaluationRunStatus.vue'
+const LazyEvaluateTab = defineAsyncComponent(() => import('./EvaluateTab.vue'));
+const LazySelectAltIterationTab = defineAsyncComponent(() => import('./SelectAltIterationTab.vue'));
+const LazyCalibrationRunsTab = defineAsyncComponent(() => import('./CalibrationRunsTab.vue'));
+const LazyRunStatus = defineAsyncComponent(() => import('./EvaluationRunStatus.vue'));
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";

@@ -114,7 +114,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           });
 
           iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {            
-            let metric_header_label = <string>metric.metric_name;
+            let metric_header_label = metric.metric_name;
             let headerColumn = <DynamicTableColumn>{ field: metric.metric_name, header: metric_header_label }
             if (metric.metric_name == runListDataResult._data.objective_function_metric) {
               headerColumn['styles'] = ['bg-objective-function-col'];
@@ -207,15 +207,6 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
         iteration_id: userSelectedCalibrationIterationId.value
       })
     });
-  }
-
-  /**
-   * 
-   * @param value 
-   * @returns {boolean}
-   */
-  const isNumeric = (value: any) => {
-    return /^-?\d+$/.test(value);
   }
 
   const resetEvaluationAltIterationStore = () => {

@@ -169,9 +169,9 @@ const navigateToEvaluateStatus = ( event : any ) => {
     color: var(--p-datatable-row-color) !important;
 }
 
-.p-datatable-tbody .p-datatable-selectable-row td {
-  font-size: 0.8em;
-}
+// .p-datatable-tbody .p-datatable-selectable-row td {
+//   font-size: 0.8em;
+// }
 
 .p-datatable-tbody .p-datatable-selectable-row.disabled-row td {
   font-weight: 500;

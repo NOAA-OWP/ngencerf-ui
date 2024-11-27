@@ -18,8 +18,8 @@
               @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3' @click=""
-              class="disabled">Forecast</NuxtLink>
+            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
+              @click="MenuChanged">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
             <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
@@ -55,50 +55,66 @@
               class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
           </div>
           <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
-            <HelpLandingPageHelp />
+            <LazyHelpLandingPageHelp />
           </div>
 
           <div v-if="location.name === 'Calibration'" class="py-10 px-1">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
-                <HelpPreviousRunsHelp />
+                <LazyCalibrationHelpPreviousRunsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 2">
-                <HelpHeadwaterBasinGageHelp />
+                <LazyCalibrationHelpHeadwaterBasinGageHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 3">
-                <HelpFormulationHelp />
+                <LazyCalibrationHelpFormulationHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 4">
-                <HelpTuningControlsHelp />
+                <LazyCalibrationHelpTuningControlsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 5">
-                <HelpOptimizationMetricsHelp />
+                <LazyCalibrationHelpOptimizationMetricsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 6">
-                <HelpRunStatusHelp />
+                <LazyCalibrationHelpRunStatusHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 7">
-                <HelpResultsHelp />
+                <LazyCalibrationHelpResultsHelp />
               </span>
             </div>
           </div>
 
           <div v-else-if="getMenuIndex() === 2">
-
+            <span v-if="getEvaluationTabIndex() === 1">
+              <LazyEvaluationCalibrationRunsHelp />
+            </span>
+            <span v-if="getEvaluationTabIndex() === 2">
+              <LazyEvaluationEvaluatesHelp />
+            </span>
+            <span v-if="getEvaluationTabIndex() === 3">
+              <LazyEvaluationCalibrationSelectAltInterationssHelp />
+            </span>
           </div>
+
+
           <div v-else-if="getMenuIndex() === 3">
-
+            <span v-if="getForecastTabIndex() === 1">
+              <h2 class="mt-8 text-center">Help for Calibration Runs</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 2">
+              <h2 class="mt-8 text-center">Help for Setup Forecast</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 3">
+              <h2 class="mt-8 text-center">Help for Status/Run</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 4">
+              <h2 class="mt-8 text-center">Help for Results</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 5">
+              <h2 class="mt-8 text-center">Help for Forecast Runs</h2>
+            </span>
           </div>
-          <div v-else-if="getMenuIndex() === 4">
 
-          </div>
-          <div v-else-if="getMenuIndex() === 5">
-
-          </div>
-          <div v-else-if="getMenuIndex() === 6">
-
-          </div>
         </div>
       </Transition>
 
@@ -120,20 +136,24 @@ import { useLogout, useLogoutListen } from "~/composables/UseEventBus";
 
 import UserAccount from "~/components/Common/UserAccount.vue";
 
-const HelpLandingPageHelp = defineAsyncComponent(() => import("../Help/LandingPageHelp.vue"))
-const HelpPreviousRunsHelp = defineAsyncComponent(() => import("../Help/PreviousRunsHelp.vue"))
-const HelpHeadwaterBasinGageHelp = defineAsyncComponent(() => import("../Help/HeadwaterBasinGageHelp.vue"))
-const HelpTuningControlsHelp = defineAsyncComponent(() => import("../Help/TuningControlsHelp.vue"))
-const HelpFormulationHelp = defineAsyncComponent(() => import("../Help/FormulationHelp.vue"))
-const HelpOptimizationMetricsHelp = defineAsyncComponent(() => import("../Help/OptimizationMetricsHelp.vue"))
-const HelpRunStatusHelp = defineAsyncComponent(() => import("../Help/RunStatusHelp.vue"))
-const HelpResultsHelp = defineAsyncComponent(() => import("../Help/ResultsHelp.vue"))
+const LazyHelpLandingPageHelp = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
+const LazyCalibrationHelpPreviousRunsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/PreviousRunsHelp.vue"))
+const LazyCalibrationHelpHeadwaterBasinGageHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/HeadwaterBasinGageHelp.vue"))
+const LazyCalibrationHelpTuningControlsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/TuningControlsHelp.vue"))
+const LazyCalibrationHelpFormulationHelp = defineAsyncComponent(() => import("../Help/Calibration/FormulationHelp.vue"))
+const LazyCalibrationHelpOptimizationMetricsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/OptimizationMetricsHelp.vue"))
+const LazyCalibrationHelpRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/RunStatusHelp.vue"))
+const LazyCalibrationHelpResultsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/ResultsHelp.vue"))
+
+const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/CalibrationRunsHelp.vue"))
+const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
+const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
 
 const emit = defineEmits(["logoutEvent"]);
 
 const accountOverlay = ref();
 
-const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
+const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex } = generalStore();
 
 const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
@@ -184,7 +204,7 @@ const sizeHelpWindow = () => {
   let headerHeight = document.getElementById('Header')?.clientHeight;
   let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
   if (footerTop && headerHeight) {
-    let h = (footerTop - headerHeight) + 54;
+    let h = (footerTop - headerHeight) - 20;
     let hpx = h + 'px'
     let ele = document.getElementById("HelpWindow");
     if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
@@ -240,18 +260,20 @@ const displayHelp = () => {
 }
 
 const MenuChanged = (e: MouseEvent) => {
-  const currentMenu = getMenuIndex();
-  const ele = e.currentTarget as HTMLElement;
-  const m = ele.getAttribute('data-menu');
-  const tabs = document.getElementsByClassName("tabs");
-  const tab = <HTMLElement>tabs[0];
-  if (m && e) {
-    if (currentMenu && currentMenu.toString() === m) {
-      tab.click();
-    } else {
-      setMenuIndex(parseInt(m, 10));
+  nextTick(() => {
+    const currentMenu = getMenuIndex();
+    const ele = e.currentTarget as HTMLElement;
+    const m = ele.getAttribute('data-menu');
+    const tabs = document.getElementsByClassName("tabs");
+    const tab = <HTMLElement>tabs[0];
+    if (m && e) {
+      if (currentMenu && currentMenu.toString() === m) {
+        tab.click();
+      } else {
+        setMenuIndex(parseInt(m, 10));
+      }
     }
-  }
+  });
 }
 
 </script>
