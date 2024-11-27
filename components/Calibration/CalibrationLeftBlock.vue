@@ -27,13 +27,15 @@
 </template>
 
 <script setup lang="ts">
-import LazyCalibrationHeadwaterBasinGage from '~/components/Calibration/HeadwaterBasinGage.vue';
+
 import CommonTabs from '~/components/Common/Tabs.vue'
-import LazyCalibrationFormulation from '~/components/Calibration/Formulation.vue'
-import LazyCalibrationTuningControls from '~/components/Calibration/TuningControls.vue'
-import LazyCalibrationOptimizationMetrics from '~/components/Calibration/OptimizationMetrics.vue'
-import LazyCalibrationRunStatus from '~/components/Calibration/RunStatus.vue'
-import LazyCalibrationCalibrationRunsTab from '~/components/Calibration/PreviousCalibrationRuns.vue'
+
+const LazyCalibrationHeadwaterBasinGage = defineAsyncComponent(() => import('~/components/Calibration/HeadwaterBasinGage.vue'));
+const LazyCalibrationFormulation= defineAsyncComponent(() => import('~/components/Calibration/Formulation.vue'));
+const LazyCalibrationTuningControls= defineAsyncComponent(() => import('~/components/Calibration/TuningControls.vue'));
+const LazyCalibrationOptimizationMetrics= defineAsyncComponent(() => import('~/components/Calibration/OptimizationMetrics.vue'));
+const LazyCalibrationRunStatus= defineAsyncComponent(() => import('~/components/Calibration/RunStatus.vue'));
+const LazyCalibrationCalibrationRunsTab= defineAsyncComponent(() => import('~/components/Calibration/PreviousCalibrationRuns.vue'));
 
 import { generalStore } from "@/stores/common/GeneralStore";
 
