@@ -29,7 +29,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   /**
   * @returns {SelectOption[]}
   */
-  const evaluationForecastRunGageList = computed(() => {
+  const forecastRunGageList = computed(() => {
     let gageOptionList = <SelectOption[]>[];
     forecastRuns.value.forEach(runItem => {
       const checkGageIndex = gageOptionList.findIndex(
@@ -171,7 +171,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     loadForecastRuns,
     resetUserSelectedForecastCalibrationRun,
 
-    evaluationForecastRunGageList,
+    forecastRunGageList,
     forecastRuns,
     getStatus,
     hardResetForecastStore,

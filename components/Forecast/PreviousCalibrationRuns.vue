@@ -23,7 +23,7 @@
                 <div class="ml-10">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
-                    :options="evaluationForecastRunGageList" filter optionLabel="name" optionValue="name"
+                    :options="forecastRunGageList" filter optionLabel="name" optionValue="name"
                     placeholder=""></Select>
                 </div>
               </div>
@@ -119,7 +119,7 @@ const {
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
-const { forecastRuns, evaluationForecastRunGageList, forecastJobId } = storeToRefs(useForecastStore());
+const { forecastRuns, forecastRunGageList, forecastJobId } = storeToRefs(useForecastStore());
 
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRun>();

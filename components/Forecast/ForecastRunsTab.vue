@@ -23,7 +23,7 @@
                 <div class="inline ">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
-                    :options="evaluationForecastRunGageList" filter optionLabel="name" optionValue="name"
+                    :options="forecastRunGageList" filter optionLabel="name" optionValue="name"
                     placeholder=""></Select>
                 </div>
               </div>
@@ -74,7 +74,7 @@ import { storeToRefs } from "pinia";
 import { useForecastStore } from "~/stores/forecast/ForecastStore";
 
 const forecastStore = useForecastStore();
-const { evaluationForecastRunGageList, forecastJobId, uiGageId } = forecastStore;
+const { forecastRunGageList, forecastJobId, uiGageId } = forecastStore;
 const {forecastRuns, } = useForecastStore();
 
 const toast = useToast();
