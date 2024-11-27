@@ -1,14 +1,12 @@
-import { defineStore, storeToRefs } from "pinia";
+import { defineStore } from "pinia";
 import type { SelectOption, ForecastRun, ForecastRuns, ForecastCycle } from "@/composables/NextGenModel";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { generalStore } from "../common/GeneralStore";
 import { makeProtectedApiCall } from "~/composables/UserAuth";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { isValidDate } from '~/utils/CommonHelpers';
 import { convertTimeZone } from '~/utils/TimeHelpers';
 
 export const useForecastStore = defineStore('ForecastStore', () => {
-  //const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken, clearUserCalibrationRunData } = useUserDataStore();
 
@@ -25,6 +23,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const resultsPathname = ref<string>();
 
   const forecastRuns = ref<ForecastRuns[]>([]);
+
+  const uiGageId = ref<string>("");
 
   /**
   * @returns {SelectOption[]}
@@ -174,7 +174,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     evaluationForecastRunGageList,
     forecastRuns,
     getStatus,
-    hardResetForecastStore
+    hardResetForecastStore,
+    uiGageId
   };
 }, {
   persist: {

@@ -5,7 +5,7 @@
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
-            Previous Calibration Runs
+            Previous Calibration Runs *
           </h1>
         </div>
         <div class="ml-auto mt-2">

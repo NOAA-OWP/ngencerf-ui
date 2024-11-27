@@ -5,7 +5,7 @@
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
-            <span v-if="computedCalibrationValidationRunList.length <= 1">Previous Calibration Runs</span>
+            <span v-if="computedCalibrationValidationRunList.length <= 1">Previous Calibration Runs *</span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
               userSelectedEvalCalibrationRunId }}</span>
           </h1>

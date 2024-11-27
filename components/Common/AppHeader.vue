@@ -265,7 +265,7 @@ const MenuChanged = (e: MouseEvent) => {
   const m = ele.getAttribute('data-menu');
   const tabs = document.getElementsByClassName("tabs");
   const tab = <HTMLElement>tabs[0];
-  if (tab && m && e) {
+  if (m && e) {
     if (currentMenu && currentMenu.toString() === m) {
       tab.click();
     } else {

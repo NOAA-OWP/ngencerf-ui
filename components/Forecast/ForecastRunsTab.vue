@@ -5,7 +5,7 @@
       <div class="flex mt-2">
         <div class="w-2/3">
           <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
-            <span>Previous Forecast Runs</span>
+            <span>Previous Forecast Runs *</span>
           </h1>
         </div>
         <div class="ml-auto mt-2">
@@ -74,7 +74,7 @@ import { storeToRefs } from "pinia";
 import { useForecastStore } from "~/stores/forecast/ForecastStore";
 
 const forecastStore = useForecastStore();
-const { evaluationForecastRunGageList, forecastJobId } = forecastStore;
+const { evaluationForecastRunGageList, forecastJobId, uiGageId } = forecastStore;
 const {forecastRuns, } = useForecastStore();
 
 const toast = useToast();
