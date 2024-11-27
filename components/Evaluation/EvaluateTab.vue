@@ -431,8 +431,8 @@ watch(selectedPlotName, async () => {
     );
 
     if (response?._data) {
-      if (response?._data?.plot_file_name && response?._data?.plot_url) {
-        selectedPlotFilename.value = response?._data?.plot_file_name;
+      if (response?._data?.plot_file_path && response?._data?.plot_url) {
+        selectedPlotFilename.value = response?._data?.plot_file_path;
         selectedPlotFileUrl.value = response?._data?.plot_url;
       } else {
         selectedPlotFilename.value = null;
