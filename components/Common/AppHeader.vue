@@ -260,18 +260,20 @@ const displayHelp = () => {
 }
 
 const MenuChanged = (e: MouseEvent) => {
-  const currentMenu = getMenuIndex();
-  const ele = e.currentTarget as HTMLElement;
-  const m = ele.getAttribute('data-menu');
-  const tabs = document.getElementsByClassName("tabs");
-  const tab = <HTMLElement>tabs[0];
-  if (m && e) {
-    if (currentMenu && currentMenu.toString() === m) {
-      tab.click();
-    } else {
-      setMenuIndex(parseInt(m, 10));
+  nextTick(() => {
+    const currentMenu = getMenuIndex();
+    const ele = e.currentTarget as HTMLElement;
+    const m = ele.getAttribute('data-menu');
+    const tabs = document.getElementsByClassName("tabs");
+    const tab = <HTMLElement>tabs[0];
+    if (m && e) {
+      if (currentMenu && currentMenu.toString() === m) {
+        tab.click();
+      } else {
+        setMenuIndex(parseInt(m, 10));
+      }
     }
-  }
+  });
 }
 
 </script>

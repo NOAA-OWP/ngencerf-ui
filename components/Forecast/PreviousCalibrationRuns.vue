@@ -28,13 +28,13 @@
                 </div>
               </div>
             </div>
-
+            <!-- @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" -->
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
             <DataTable id="ForecastRunTable" :value="forecastRuns" scrollable scroll-height="400px"
-              sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
-              @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect"
+              sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"              
+              
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
               @row-dblclick="onRowDblClick($event)" @rowContextmenu="onRowContextMenu" class="boxed">
               <Column field="calibration_run_id" header="Job ID" sortable></Column>
@@ -92,7 +92,10 @@ const crContextMenu = ref(); //calibration run context menu
 
 const isLoading = ref(true);
 const cmCalibrationRun = ref([
-  { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
+{ label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
+{ label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onForecastRowSelect() },
+
+
   // { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
 ]);
 const onRowContextMenu = (event: any) => {
@@ -104,10 +107,6 @@ const {
   uiGageId,
   loadCalibrationDataComplete,
   userSelectedEvalCalibrationRunId,
-  calibrationValidationRunListHeaders,
-  computedCalibrationValidationRunList,
-  userEvaluationCalibrationRunListData,
-  evaluateValidationRunId
 } = storeToRefs(evaluationCalibrationRunStore);
 
 const {
@@ -139,20 +138,8 @@ onMounted(async () => {
 
 });
 
-// const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
-//   return; // Locking out single clicks
-//   //isLoading.value = true;
-//   // resetUserSelectedEvalValidationRun();
-//   // nextTick( async () => {
-//   //   await loadSelectedCalibrationRun(event.data.calibration_run_id);
-//   //   await fetchUserSelectedCalibrationValidationRunList();
-//   //   isLoading.value = false;
-//   // })  
-// }
-
-const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
+const onForecastRowSelect = async () => {
   isLoading.value = true;
-  forecastJobId.value = event.data.calibration_run_id;
   await loadSelectedCalibrationRun(forecastJobId.value as number);
   await fetchUserSelectedCalibrationValidationRunList();
   isLoading.value = false;
@@ -160,7 +147,6 @@ const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
 
 const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
   forecastJobId.value = 0;
-
 }
 
 
@@ -173,9 +159,6 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
   }
 });
 
-const onRowMenuOpen = () => {
-
-}
 const onRowDblClick = (event: any) => {
   const rowData = event.data;
   forecastJobId.value = rowData.calibration_run_id;
