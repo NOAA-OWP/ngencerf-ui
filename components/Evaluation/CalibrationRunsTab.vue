@@ -1,10 +1,10 @@
 <template>
   <client-only>
-    <div class="h-screen-inner pr-2 text-center">
+    <div class="h-screen-inner pr-2">
 
       <div class="flex mt-2">
-        <div class="w-2/3">
-          <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
+        <div class="w-full">
+          <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
             <span v-if="computedCalibrationValidationRunList.length <= 1">Previous Calibration Runs</span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
               userSelectedEvalCalibrationRunId }}</span>
@@ -23,7 +23,7 @@
           <div id="CalTable">
             <div class="grid grid-cols-2 mb-5">
               <div class="col-span-1">
-                <div class="inline ">
+                <div class="ml-10">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
                     :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
@@ -57,7 +57,7 @@
               <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
               <Column field="validation_runs" header="Validation Runs" sortable></Column>
             </DataTable>
-            <div class="mt-4 mx-auto">
+            <div class="mt-4 ml-10">
               * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.
             </div>
           </div>
