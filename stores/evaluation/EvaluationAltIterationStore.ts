@@ -95,7 +95,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           calibrationRunDetailTableColumn.value.push({ field: 'iteration_id', hidden: true });            
           calibrationRunDetailTableColumn.value.push({ field: 'worker_name', header: "Worker" });
           calibrationRunDetailTableColumn.value.push({ field: 'iteration_num', header: "Iteration" });
-          calibrationRunDetailTableColumn.value.push({ field: 'validation_run_id', header: "Validation ID" });  
+          calibrationRunDetailTableColumn.value.push({ field: 'validation_run_id', header: "Validation Job ID" });  
 
           headerRow.push({
             header: iteration_data.worker_name,
@@ -103,11 +103,11 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           });
 
           headerRow.push({
-            header: `Best ${iteration_data.iteration_num}`,
+            header: `${iteration_data.iteration_num} (Best)`,
             colspan: 1
           });
 
-          let calibrationRunDetailValidationRunId : string = '';
+          let calibrationRunDetailValidationRunId : string = iteration_data.validation_run_id && iteration_data.validation_run_id > 0 ? iteration_data.validation_run_id.toString() : '';
           headerRow.push({ 
             header: `${calibrationRunDetailValidationRunId}`,
             colspan: 1
@@ -137,7 +137,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           });
 
           headerRow.push({
-            header: `Best ${iteration_data.iteration_num}`,
+            header: `${iteration_data.iteration_num}  (Best)`,
             colspan: 1
           });
 
@@ -153,7 +153,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           tuningParametersTableColumn.value.push({ field: 'iteration_id', hidden: true });            
           tuningParametersTableColumn.value.push({ field: 'worker_name', header: "Worker" });
           tuningParametersTableColumn.value.push({ field: 'iteration_num', header: "Iteration" });
-          tuningParametersTableColumn.value.push({ field: 'validation_run_id', header: "Validation ID" });  
+          tuningParametersTableColumn.value.push({ field: 'validation_run_id', header: "Validation Job ID" });  
           iteration_data.parameters.forEach( ( parameter: CalibrationRunIterationParameterData ) => {
             tuningParametersTableColumn.value.push({ field: parameter.parameter_name, header: parameter.parameter_name });
 

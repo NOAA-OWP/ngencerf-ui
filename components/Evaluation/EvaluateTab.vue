@@ -21,12 +21,18 @@
 
           <table class="mt-2" style="width:100%">
             <tbody>
-                <tr height="40px">
-                <td class="text-left font-bold" style="width: 140px;">
+              <tr>
+                <td class="text-left font-bold" style="width: 40px;font-size:0.9em;">
+                    <label for="validationJobId">Validation Job ID </label>
+                </td>
+                <td class="pl-3"><InputText id="validationJobId" v-model="evaluateValidationRunId" disabled /></td>
+              </tr>
+              <tr>
+                <td class="text-left font-bold" style="width: 140px;font-size:0.9em;">
                     <label for="resultsPathname">Results Pathname</label>
                 </td>
                 <td class="pl-3"><InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled /></td>
-                </tr>
+              </tr>
             </tbody>
           </table>
 
@@ -82,27 +88,18 @@
           :field="col.field"></Column>
       </DataTable>
       <div class="pl-4" v-if="calibrationLogList && calibrationLogList.length > 0 && selectedSupplementalTable == 4">
-        <div v-if="calibrationLogList.length > 1">
-          <label for="CalibrationLogOptions" class="pr-2 pt-3">Select Calibration Log</label>
-          <Select id="CalibrationLogOptions" class="p-select" 
-            v-model="selectedCalibrationLog" :options="calibrationLogList" optionLabel="name" optionValue="name">
-          </Select>
-        </div>
-        <div v-if="calibrationLogList.length == 1"><b>{{ selectedCalibrationLog }}</b></div>
+        <label for="CalibrationLogOptions" class="pr-2 pt-3">Select Calibration Log</label>
+        <Select v-if="calibrationLogList.length > 1" id="CalibrationLogOptions" class="p-select" 
+          v-model="selectedCalibrationLog" :options="calibrationLogList" optionLabel="name" optionValue="name">
+        </Select>
         <div id="CalibrationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
           <div v-html="calibrationLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
-      <div class="pl-4" v-if="validationLogList && validationLogList.length > 0 && selectedSupplementalTable == 5">
-        <div v-if="validationLogList.length > 1">
-          <label for="validationLogOptions" class="pr-2 pt-3">Select Validation Log</label>
-          <Select id="validationLogOptions" class="p-select" 
-            v-model="selectedValidationLog" :options="validationLogList" optionLabel="name" optionValue="name">
-          </Select>
-        </div>
-        <div v-if="validationLogList.length == 1"><b>{{ selectedValidationLog }}</b></div>
-        <div id="ValidationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
-          <div v-html="validationLogDisplay" class="whitespace-nowrap"></div>
+      <div class="pl-4" v-if="validationLogData && validationLogData != '' && selectedSupplementalTable == 5">
+        <label for="ValidationLogDisplay" class="pr-2 pt-3">Validation Log</label>
+        <div id="ValidationLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
+          <div v-html="validationLogData" class="whitespace-nowrap"></div>
         </div>
       </div>
     </div>
@@ -181,15 +178,12 @@ const performanceMetricsColumns = [{ header: 'Metric', field: 'metric' }];
 const calibrationLogList = ref<any[]>([]);
 const calibrationLogDisplay = ref<string>('');
 const selectedCalibrationLog = ref<string>('');
-const validationLogList = ref<any[]>([]);
-const validationLogDisplay = ref<string>('');
-const selectedValidationLog = ref<string>('');
 const supplementalTableOptions = [
   'Iteration Metrics Table',
   'Iteration Parameters Table',
   'Performance Metrics Table',
   'Calibration Logs',
-  'Validation Logs'
+  'Validation Log'
 ]
 
 onMounted(async () => {
@@ -344,17 +338,8 @@ onMounted(async () => {
   );
   calibrationLogData.value = {};
   calibrationLogList.value = [];
-  validationLogData.value = {};
-  validationLogList.value = [];
-  /* Bringing back comments from Carolyn's hotfix
+  validationLogData.value = '';
   if (logs.value?._data?.logs) {
-    if (logs.value?._data?.logs.length == 0) {
-      // try to get calibration logs separately
-      let calibration_logs = await queryGetLogs(calibrationJobId.value, 0);
-      if (calibration_logs._data?.logs) {
-        logs.value._data.logs = calibration_logs._data?.logs;
-      }
-    }
     console.log('logs: ', logs.value?._data?.logs);
     for (let l = 0; l < logs.value?._data?.logs.length; l++) {
       Object.keys(logs.value?._data?.logs[l]).forEach(key => {
@@ -371,36 +356,23 @@ onMounted(async () => {
     }
     console.log('calibrationLogData: ', calibrationLogData.value);
     console.log('calibrationLogList: ', calibrationLogList.value);
-    console.log('selectedCalibrationLog: ', selectedCalibrationLog.value);
-  }
-  if (logs.value?._data?.validations) {
-    for (let v = 0; v < logs.value?._data?.validations.length; v++) {
-      console.log('validation_run_id: ', logs.value?._data?.validations[v].validation_run_id);
-      if (logs.value?._data?.validations[v].validation_run_id == evaluateValidationRunId.value) {
-        if (logs.value?._data?.validations[v].logs) {
-          for (let l = 0; l < logs.value?._data?.validations[v].logs?.length; l++) {
-            Object.keys(logs.value?._data?.validations[v].logs[l]).forEach(key => {
-              let logText = "";
-              for (let t = 0; t < logs.value?._data?.validations[v].logs[l][key].length; t++) {
-                logText += logs.value?._data?.validations[v].logs[l][key][t] + '<br/>\n';
-              }
-              validationLogData.value[key] = logText;
-              validationLogList.value.push({ name: key });
-            });
+    if (logs.value?._data?.validations) {
+      for (let v = 0; v < logs.value?._data?.validations.length; v++) {
+        if (logs.value?._data?.validations[v].validation_job_id == evaluateValidationRunId.value) {
+          let logText = "";
+          if (logs.value?._data?.validations[v].log) {
+            for (let t = 0; t < logs.value?._data?.validations[v].log.length; t++) {
+              logText += logs.value?._data?.validations[v].log[t] + '<br/>\n';
+            }
           }
+          validationLogData.value = logText;
+          break;
         }
-        break;
       }
+      console.log('validationLogData: ', validationLogData.value);
     }
-    if (validationLogList.value.length > 0) {
-      selectedValidationLog.value = validationLogList.value[0]['name'];
-    }
-    console.log('validationLogData: ', validationLogData.value);
-    console.log('validationLogList: ', validationLogList.value);
-    console.log('selectedValidationLog: ', selectedValidationLog.value);
   }
-  End of hotfix */ 
-
+*/
   // Add Calibration/Validation Logs to the dropdown
   if (logs.value?._data?.logs) {
     if (!plotList.value.some(item => item.name == supplementalTableOptions[3])) {
@@ -439,7 +411,7 @@ watch(selectedPlotName, async () => {
     if (selectedSupplementalTable.value == 4 && calibrationLogList.value.length == 0) {
       toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no logs', life: 5000 });
     }
-    if (selectedSupplementalTable.value == 5 && validationLogList.value.length == 0) {
+    if (selectedSupplementalTable.value == 5 && validationLogData.value == '') {
       toast.add({ severity: 'info', summary: 'Validation Run ' + evaluateValidationRunId.value + ' has no logs', life: 5000 });
     }
     plotTableBatchData.value = [];
@@ -635,15 +607,10 @@ function adjustPlotTableColumns() {
   }
 }
 
-// Handle selectedCalibrationLog/selectedValidationLog changes
+// Handle selectedCalibrationLog changes
 watch(selectedCalibrationLog, async () => {
   if (selectedCalibrationLog.value != '') {
     calibrationLogDisplay.value = calibrationLogData.value[selectedCalibrationLog.value];
-  }
-});
-watch(selectedValidationLog, async () => {
-  if (selectedValidationLog.value != '') {
-    validationLogDisplay.value = validationLogData.value[selectedValidationLog.value];
   }
 });
 
@@ -696,7 +663,15 @@ const toggleMessagesGroup = () => {
   max-height: 400px;
 }
 
+#validationJobId {
+  font-size:0.9em;
+  background-color: #fff;
+  border: 0px solid #fff;
+  border-left: 0; border-right: 0;
+  color: black; box-shadow: none;
+}
 #resultsPathname {
+  font-size:0.9em;
   background-color: #fff;
   border: 0px solid #fff;
   border-left: 0; border-right: 0;

@@ -114,21 +114,22 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       runListDataResult._data?.validation_jobs.forEach((validation_job: CalibrationValidationJobData) => {
         if (validation_job.best === true) {
           calibrationValidationRunListHeaders.value.push({ field: 'validation_run_id', header: "Validation Job ID" });
+          calibrationValidationRunListHeaders.value.push({ field: 'iteration_num', header: "Iteration" });
+          calibrationValidationRunListHeaders.value.push({ field: 'status', header: "Status" });
           calibrationValidationRunListHeaders.value.push({ field: 'submit_date', header: "Submit Date" });
 
           validation_job.parameters.forEach((parameter: CalibrationRunValidationParameterData) => {
             calibrationValidationRunListHeaders.value.push({ field: parameter.name, header: parameter.name });
           });
-
-          calibrationValidationRunListHeaders.value.push({ field: 'status', header: "Status" });
         }
         let rowData = <any>{};
         rowData['validation_run_id'] = validation_job.validation_run_id;
+        rowData['iteration_num'] = (validation_job.best === true) ? validation_job.iteration_num.toString() + "*" : validation_job.iteration_num;
+        rowData['status'] = validation_job.status;
         rowData['submit_date'] = formatDateForDisplay(validation_job.submit_date);
         validation_job.parameters.forEach((parameter: CalibrationRunValidationParameterData) => {
           rowData[parameter.name] = parameter.value;
         });
-        rowData['status'] = validation_job.status;
         computedCalibrationValidationRunList.value.push(rowData);
       });
     }
