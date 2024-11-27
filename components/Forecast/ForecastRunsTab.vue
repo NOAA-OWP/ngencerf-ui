@@ -10,7 +10,7 @@
         </div>
         <div class="ml-auto mt-2">
           <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
-              v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
+              v-if="forecastJobId && forecastJobId > 0"
               @click="navigateToSetupForecast">New Forecast</Button></div>
         </div>
       </div>
@@ -23,7 +23,7 @@
                 <div class="inline ">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
-                    :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
+                    :options="evaluationForecastRunGageList" filter optionLabel="name" optionValue="name"
                     placeholder=""></Select>
                 </div>
               </div>
@@ -32,7 +32,7 @@
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-            <DataTable id="cr-list" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
+            <DataTable id="cr-list" :value="forecastRuns" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
               @row-dblclick="onRowDblClick($event)"
@@ -67,13 +67,15 @@
 import { useToast } from "primevue/usetoast";
 
 import type { CalibrationRun } from "~/composables/NextGenModel";
-import { EvaluationTabs } from "~/composables/NextgenEnums";
-import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
 import { hilightTab } from '~/composables/TabHilight';
 import { storeToRefs } from "pinia";
+import { useForecastStore } from "~/stores/forecast/ForecastStore";
 
+const forecastStore = useForecastStore();
+const { evaluationForecastRunGageList, forecastJobId } = forecastStore;
+const {forecastRuns, } = useForecastStore();
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu

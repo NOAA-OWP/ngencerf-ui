@@ -8,7 +8,7 @@ import { isValidDate } from '~/utils/CommonHelpers';
 import { convertTimeZone } from '~/utils/TimeHelpers';
 
 export const useForecastStore = defineStore('ForecastStore', () => {
-  const { calibrationJobId } = storeToRefs(generalStore());
+  //const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken, clearUserCalibrationRunData } = useUserDataStore();
 
@@ -95,7 +95,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId, cycle_name: forecastCycleName })
+      body: JSON.stringify({ calibration_run_id: forecastJobId.value, cycle_name: forecastCycleName })
     });
   };
 
@@ -126,7 +126,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({ calibration_run_id: forecastJobId.value })
     });
   };
 
