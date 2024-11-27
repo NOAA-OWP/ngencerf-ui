@@ -48,9 +48,11 @@
             </Column>
             <Column field="status" header="Status" sortable></Column>
           </DataTable>
+          <div class="mt-4 text-left">
+            * Double click on a row to open, or right click for other options. Click "New" for a fresh setup.
+          </div>
         </div>
-        <div class="mt-4 mx-auto">
-          * Double click on a row to open, or right click for other options. Click "New" for a fresh setup.</div>
+
       </div>
     </div>
 
