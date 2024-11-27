@@ -117,19 +117,6 @@ onMounted(() => {
   }
 })
 
-/**
- * This is a hack, for sure.
- * When a run is selected, the Status/Run tab is not being underlined.
- * This does it for now, but the actual cause needs to be found!
- */
-onUnmounted(() => {
-  setTimeout(() => {
-    const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[getCalibrationTabIndex() - 1];
-    e.click();
-  }, 250);
-})
-
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
   data.value = e.data;

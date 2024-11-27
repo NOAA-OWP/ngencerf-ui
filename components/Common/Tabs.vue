@@ -48,7 +48,7 @@
             Calibration Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
-          <span v-show="calibrationJobId > 0 && loadCalibrationDataComplete == true">
+          <span v-show="calibrationJobId > 0">
             <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Evaluate Tab"
               v-show="evaluateValidationRunId > 0" title=" Evaluate tab">
               Evaluate
@@ -130,7 +130,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { generalStore } from "@/stores/common/GeneralStore";
-import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
+//import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
 
 const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
@@ -142,7 +142,7 @@ const currentVerificationTab = ref(getVerificationTabIndex());
 const currentMenu = ref(getMenuIndex());
 
 //store specific import
-const { loadCalibrationDataComplete } = storeToRefs(useEvaluationCalibrationRunStore())
+//const { loadCalibrationDataComplete } = storeToRefs(useEvaluationCalibrationRunStore())
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
