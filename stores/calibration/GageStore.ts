@@ -128,12 +128,14 @@ export const useGageStore = defineStore('GageStore', () => {
     gageOptionsList.value = []
     gageTabData.value?.gages.forEach((gage_value) => {
       if (selectedDomainValue.value == "" || gage_value.domain == selectedDomainValue.value) {
-        gageOptionsList.value.push({
-          name: gage_value.gage_id,
-          description: gage_value.gage_id,
-          selected: false,
-          groups: []
-        })
+        if ((gage_value.nwm_v3_calibrated)) {
+          gageOptionsList.value.push({
+            name: gage_value.gage_id,
+            description: gage_value.gage_id,
+            selected: false,
+            groups: []
+          })
+        }
       }
     })
 
