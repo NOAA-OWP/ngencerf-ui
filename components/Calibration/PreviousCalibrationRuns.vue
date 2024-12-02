@@ -7,10 +7,10 @@
         </span>
 
         <div id="CalTable" class="w-max mx-auto">
-          <div class="grid grid-cols-2 mb-5">
+          <div class="grid grid-cols-1 mb-5">
             <div class="col-span-1">
-              <div class="text-left" for="HeadwaterBasinGage">Headwater Basin Gage Filter</div>
-              <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId" :options="calibrationRunGageList" filter
+              <div class="text-left">Headwater Basin Gage Filter</div>
+              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter float-left" v-model="uiGageId" :options="calibrationRunGageList" filter
                 optionLabel="name" optionValue="name" placeholder=""></Select>
             </div>
           </div>
