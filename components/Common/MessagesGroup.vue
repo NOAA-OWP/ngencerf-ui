@@ -1,7 +1,7 @@
 <template>
   <div id="Messages">
     <div class="">
-      <h2 class="mt-5">{{ componentProps.title }} {{ userCalibrationRunData?.calibration_run_id ? "- Job " +
+      <h2 class="mt-5">{{ componentProps.title }} {{ userCalibrationRunData?.calibration_run_id ? 
         userCalibrationRunData.calibration_run_id : '' }}</h2>
 
       <div class="grid grid-cols-2 gap=1 text-sm mt-4">
@@ -96,7 +96,6 @@ import { storeToRefs } from 'pinia';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useTuningStore } from "~/stores/calibration/TuningStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import type { ComponentPropsTitle } from '~/composables/NextGenModel'; //why doesn't this work?
 
 const calRunStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(calRunStore);
@@ -107,7 +106,7 @@ const { userSelectedCalibrationTuningParameters } = storeToRefs(tuningStore);
 const componentProps = withDefaults(defineProps<{
   title?: string
 }>(), {
-  title: () => 'Calibration Run Setup'
+  title: () => 'Setup - Calibration Job ID '
 }
 );
 

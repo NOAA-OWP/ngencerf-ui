@@ -39,8 +39,14 @@ body {
 .boxed {
   border: 1px solid #BBBBBF;
 }
-.h-full {height: 100vh;}
-label {font-weight: bold;}
+.h-full {
+  height: 100vh;
+}
+
+label {
+  font-weight: bold; 
+  cursor: pointer
+}
 input, .p-select, .varInputs {
   width: 100%;
   font-size: 16px;
@@ -82,9 +88,6 @@ input::-webkit-input-placeholder {
 }
 .h-screen-inner-less {
   height: Calc(100vh - 240px);
-}
-.bg-white {
-  background-color: #fff;
 }
 .underline,
 .underline button {
@@ -213,10 +216,6 @@ fieldset {
   line-height: 1.5em;
 }
 
-label {
-  cursor: pointer;
-}
-
 select {
   border: 1px solid #666666;
   padding: 2px;
@@ -295,9 +294,7 @@ select option {
 .dp__input_icons {
   padding: 10px 12px !important;
 }
-.dp--clear-btn,
-.dp__input_icon {
-  /*top: 40% !important;*/
+.dp--clear-btn, .dp__input_icon {
   top: 16px !important;
 }
 .p-listbox-option {
@@ -320,7 +317,6 @@ select option {
 }
 
 .p-datatable-thead tr th {
-  /*background-color: $ngwcp_primary1;*/
   background-color: #003D64;
   color: white;
   border-left: 1px solid white;
@@ -340,6 +336,7 @@ select option {
 
 .p-datatable-column-title {
   font-size: 0.8em;
+  white-space: nowrap;
 }
 #MainLeftDataArea .p-datatable-tbody > tr.p-datatable-row-selected {
   background-color: #D8FFD8 !important;    
@@ -474,31 +471,6 @@ table.cols-bordered {
 
 }
 
-/* Progress Tables */
-/* .progressTable {
-  width: 100%;
-  margin-left: 15px;
-
-  table {
-    tr {
-      line-height: calc(1.3vw + 0.41vh); // font-size: 14px;
-    }
-  }
-}
-.checkMark {
-  text-align: right;
-}
-
-.ptype {
-  width: 90%;
-  cursor: pointer;
-}
-
-.ptype:hover {
-  color: $ngwcp_primary1;
-} */
-
-
 /* Toast */
 .p-toast {
   width: min(25rem, 100vw) !important;
@@ -522,7 +494,6 @@ table.cols-bordered {
   margin-top: 7px;
 }
 .p-listbox-option-selected {
-  /*background-color: $ngwcp_green_lt; */
   background-color: $ngwcp_green_lt !important; 
 }
 #MainLeftDataArea .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected {
@@ -564,6 +535,7 @@ table.cols-bordered {
   }
 }
 
-.p-datatable-column-title {
-  white-space: nowrap;
+.basin-gage-filter, .p-inputtext {
+  width: 220px !important;
+
 }
