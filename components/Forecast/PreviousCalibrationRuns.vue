@@ -22,7 +22,7 @@
               <div class="col-span-1">
                 <div class="ml-10">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-                  <Select id="HeadwaterBasinGage" class="mr-2" v-model="uiGageId"
+                  <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
                     :options="forecastRunGageList" filter optionLabel="name" optionValue="name"
                     placeholder=""></Select>
                 </div>
