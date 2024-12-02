@@ -25,7 +25,9 @@ RUN set -eux; \
 
 COPY . .
 
-ENV NGENCERF_BASE_URL="https://cloud.nextgenwaterprediction.com/me/50505/api/"
+# override NGENCERF URL to facilitate ParallelWorks sessions sharing
+ARG NGENCERF_BASE_URL
+ENV NGENCERF_BASE_URL=${NGENCERF_BASE_URL}
 
 RUN set -eux; \
     npm run build
