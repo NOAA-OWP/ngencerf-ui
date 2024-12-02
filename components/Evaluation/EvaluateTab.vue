@@ -354,7 +354,7 @@ onMounted(async () => {
   if (logs.value?._data?.logs) {
     if (logs.value?._data?.logs.length == 0) {
       // try to get calibration logs separately
-      let calibration_logs = await queryGetLogs(calibrationJobId.value, 0);
+      let calibration_logs = await queryGetLogs(evaluateValidationRunId.value);
       if (calibration_logs._data?.logs) {
         logs.value._data.logs = calibration_logs._data?.logs;
       }
@@ -430,19 +430,19 @@ watch(selectedPlotName, async () => {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
     selectedSupplementalTable.value = supplementalTableOptions.indexOf(selectedPlotName.value) + 1;
-    if (selectedSupplementalTable.value == 1 && iterationMetricsData.value.length == 0) {
+    if (selectedSupplementalTable.value === 1 && !iterationMetricsData.value.length) {
       toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: 5000 });
     }
-    if (selectedSupplementalTable.value == 2 && iterationParamsData.value.length == 0) {
+    if (selectedSupplementalTable.value === 2 && !iterationParamsData.value.length) {
       toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: 5000 });
     }
-    if (selectedSupplementalTable.value == 3 && performanceMetricsData.value.length == 0) {
+    if (selectedSupplementalTable.value === 3 && !performanceMetricsData.value.length) {
       toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: 5000 });
     }
-    if (selectedSupplementalTable.value == 4 && calibrationLogList.value.length == 0) {
+    if (selectedSupplementalTable.value === 4 && !calibrationLogList.value.length) {
       toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no logs', life: 5000 });
     }
-    if (selectedSupplementalTable.value == 5 && validationLogList.value.length == 0) {
+    if (selectedSupplementalTable.value === 5 && !validationLogList.value.length) {
       toast.add({ severity: 'info', summary: 'Validation Run ' + evaluateValidationRunId.value + ' has no logs', life: 5000 });
     }
     plotTableBatchData.value = [];
@@ -610,7 +610,7 @@ function adjustPlotTableColumns() {
               console.log('Loading next ' + plotTableBatchSize.value + ' rows from the ' + plotTableTotalSize.value + ' total stored in the backend');
               plotTableCurrentPage.value++;
               const response: any = await queryGetPlot(
-                selectedPlotName.value, // plotName
+                selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
                 true, // include_data
                 false, // force_include_plot
                 (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
