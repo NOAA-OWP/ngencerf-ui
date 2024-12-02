@@ -44,7 +44,7 @@ body {
 }
 
 label {
-  font-weight: bold; 
+  font-weight: bold;
   cursor: pointer
 }
 input, .p-select, .varInputs {
@@ -536,7 +536,6 @@ table.cols-bordered {
   }
 }
 
-.basin-gage-filter, .p-inputtext {
+.basin-gage-filter { 
   width: 220px !important;
-
 }
