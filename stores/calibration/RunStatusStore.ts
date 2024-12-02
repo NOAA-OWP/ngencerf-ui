@@ -322,8 +322,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       clearInterval(validationsStatusIntervalId.value);
       validationsStatusIntervalId.value = undefined;
     }
-
-    console.log("RunStatusStore has been hard reset");
   };
 
   return {

@@ -53,7 +53,6 @@ export const useGageStore = defineStore('GageStore', () => {
 
     isNWMv3.value = sessionStorage.getItem('isNWMv3') as string === "true";
     gageStore_data_loading.value = sessionStorage.getItem('gageStore_data_loading') as string === "true";
-    console.log("GageStore restored");
   }
 
   watch(domainOptionsList, (domainOptionsList) => { sessionStorage.setItem('domainOptionsList', JSON.stringify(domainOptionsList)); })
@@ -83,7 +82,6 @@ export const useGageStore = defineStore('GageStore', () => {
       .then((gageTabDataResult) => {
         gageTabData.value = gageTabDataResult?._data ?? undefined
         gageStore_data_loading.value = false
-        console.log('gageTabData', gageTabData.value)
         //init ui model value
         geopackageImageUrl.value = userCalibrationRunData.value?.geopackage_image_url ?? ""
         setUserSelection()
@@ -298,7 +296,6 @@ export const useGageStore = defineStore('GageStore', () => {
     selectedGeopackageValue.value = ""
     gageData.value = undefined;
     geopackageImageUrl.value = "";
-    console.log("Gage Store Reset");
   }
 
   return {

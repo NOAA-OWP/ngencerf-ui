@@ -213,7 +213,6 @@ const SubmitLoginForm = async (e: Event) => {
         password: userPassword.value
       }
     }).then(response => {
-      console.log("Response: ", response)
       setUserName(userName.value.toLowerCase());
       // store tokens in UserDataStore
       userDataStore.setAccessToken(response.access);
@@ -225,12 +224,10 @@ const SubmitLoginForm = async (e: Event) => {
       GoToLanding();
     }
     ).catch(error => {
-      console.log(error);
       if (error) {
         let err = error.data?.detail;
         if (!err) {
           err = "Cannot reach server. Error code: " + error.statusCode;
-          console.log("StatusCode: ", e);
         }
         toast.add({ severity: 'error', summary: 'Error', detail: err, life: 3000 });
         console.error("Error during user creation:", error.message, error.data.detail);

@@ -359,7 +359,6 @@ const validateTab = () => {
 }
 
 const restorePage = () => {
-  console.log("Run Data: ", userCalibrationRunData.value);
   selectedModuleValues.value  = userCalibrationRunData?.value?.modules ? userCalibrationRunData?.value?.modules : [];
   formulationNameInput.value  = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";  
   if (userCalibrationRunData.value) {

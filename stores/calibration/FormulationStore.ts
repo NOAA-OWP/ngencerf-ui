@@ -41,7 +41,6 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
     formulationNameInput.value = sessionStorage.getItem('formulationNameInput') as string;
     useSlothParameters.value = sessionStorage.getItem('useSlothParameters') as string === "true";
     formulationStore_data_loading.value = sessionStorage.getItem('formulationStore_data_loading') as string === "true";
-    console.log("FormulationStore restored");
   }
 
   watch(slothParameterInputs, (slothParameterInputs) => { sessionStorage.setItem('slothParameterInputs', JSON.stringify(slothParameterInputs)); })
@@ -322,7 +321,6 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
     selectedModuleValues.value = [];
     useSlothParameters.value = false;
     slothParameterInputs.value = [];
-    console.log("Formulation Store Reset")
   }
 
   return {

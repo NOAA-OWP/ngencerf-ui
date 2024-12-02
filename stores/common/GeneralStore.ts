@@ -35,7 +35,6 @@ export const generalStore = defineStore(
       evaluateIterationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('evaluateIterationRunId') as string), 10);
       iterationValidationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('iterationValidationRunId') as string), 10);
       evaluationRunSelected.value = JSON.parse(sessionStorage.getItem('evaluationRunSelected') as string);
-      console.log("GeneralStore has been refreshed from sessionStorage");
     }
 
     watch(calibrationTabIndex, (calibrationTabIndex) => { sessionStorage.setItem('calibrationTabIndex', calibrationTabIndex); })
