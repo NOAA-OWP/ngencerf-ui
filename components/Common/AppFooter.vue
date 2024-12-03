@@ -3,9 +3,9 @@
     <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor">
         <div id="FooterData" class="version">
-          App {{ info.program_info.version }},&nbsp;&nbsp;{{
-            info.program_info.release_date
-          }}, Server {{ serverInfo?.version }}
+          App Version: {{ info.release_info.version }},&nbsp; ({{
+            info.release_info.date
+          }}), Server Version: {{ serverInfo?.version }}
         </div>
         <div class="copyright">Copyright &COPY;2024, RTX</div>
       </div>
@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-import json from "@/assets/versionInfo.json";
+import json from "@/assets/version.json";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRoute } from "vue-router";
 import type { ServerInfo } from "~/composables/NextGenModel";
