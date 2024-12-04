@@ -3,7 +3,7 @@
     <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor">
         <div id="FooterData" class="version">
-          App Version: {{ info.release_info.version }},&nbsp; ({{
+          App Version: {{ info.release_info.version }}&nbsp; ({{
             info.release_info.date
           }}), Server Version: {{ serverInfo?.version }}
         </div>
