@@ -1,7 +1,7 @@
 <template>
-  <div id="Footer" class=" prevent-select cursor-default">
+  <div id="Footer" class="prevent-select cursor-default">
     <div class="grid grid-rows-1 gap-1">
-      <div class="row-span-1 footerColor">
+      <div class="row-span-1 footerColor text-sm">
         <div id="FooterData" class="version">
           App Version: {{ info.release_info.version }}&nbsp; ({{
             info.release_info.date
