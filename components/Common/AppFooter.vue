@@ -15,18 +15,34 @@
 
 <script lang="ts" setup>
 import json from "@/assets/version.json";
-import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRoute } from "vue-router";
 import type { ServerInfo } from "~/composables/NextGenModel";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 
-const { isUserLoggedIn, userCalibrationRunData, getAccessToken } = useUserDataStore();
 const { ngencerfBaseUrl } = useBackendConfig();
 
 const location = useRoute();
 const info = json;
 
 const serverInfo = ref<ServerInfo>();
+
+onMounted( () => {
+  getFooterInformation();
+})
+
+// Get footer info
+const getFooterInformation = () => {
+    makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": 'application/json'
+      },
+      body: ""
+    }).then((result) => {
+      serverInfo.value = result._data;
+    })
+  }
+
 
 </script>
 

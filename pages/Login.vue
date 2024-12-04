@@ -147,7 +147,6 @@ const userName = ref<string>("");
 const userPassword = ref<string>("");
 const showDialog = ref(false);
 
-//const newUsername = ref('');
 const newEmail = ref('');
 const newFirstName = ref('');
 const newLastName = ref('');
@@ -170,7 +169,6 @@ onMounted(() => {
     resetOptimizationStore();
     hardResetRunStatusStore();
     hardResetTuningStore();
-    //getFooterInformation();
   })
 });
 
@@ -304,20 +302,6 @@ const SubmitNewAccountForm = async () => {
 const GoToLanding = () => {
   navigateTo("LandingPage");
 };
-
-// Get footer info
-const getFooterInformation = () => {
-    makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: ""
-    }).then((result) => {
-      console.log(result);
-    })
-  }
 
 </script>
 <style lang="scss" scoped>
