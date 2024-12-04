@@ -62,10 +62,51 @@
           </div>
           <div class="pt-6 pb-2">
             <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0">
-              <b>Rows 1 to {{ plotTableData.length }} of {{ plotTableTotalSize }}</b>
+              <div>Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{ plotTableTotalSize }}</div>
+              <div>
+                <label for="PlotTablePageNumber" class="pr-2 pt-3">Go to Page:</label> 
+                <input type="number" min="1" :max="plotTableTotalPages" v-model="plotTableCurrentPage">
+              </div>
+              <div class="text-center" v-if="plotTableTotalPages > 1">
+                <!-- Previous page -->
+                <span v-if="plotTableCurrentPage > 1" class="pagingLink">
+                  <a @click="gotoPlotTablePage(plotTableCurrentPage-1)">
+                    &lt;
+                  </a>
+                </span>
+                <span v-for="page of plotTablePageOptions">
+                  <!-- Current page -->
+                  <span v-if="page.number == plotTableCurrentPage"
+                    class="pagingLink active">
+                    {{ page.number }}
+                  </span>
+                  
+                  <!--- Other page numbers to show-->
+                  <span v-else-if="(page.number >= 1 && page.number <= 2) ||
+                      (page.number >= (plotTableCurrentPage-1) && page.number <= (plotTableCurrentPage+1)) ||
+                      (page.number >= (plotTableTotalPages-1) && page.number <= plotTableTotalPages)"
+                      class="pagingLink">
+                    <a @click="gotoPlotTablePage(page.number)">
+                      {{ page.number }}
+                    </a>
+                  </span>
+                  
+                  <!-- Show "..." in gaps where page numbers are not sequential - this should only happen if current page +/-2 doesn't fit the above criteria -->
+                  <span v-else-if="page.number == (plotTableCurrentPage-2) ||
+                      page.number == (plotTableCurrentPage+2)" class="pagingLink">
+                    ...
+                  </span>
+                </span>
+                <!-- Next page -->
+                <span v-if="plotTableCurrentPage < plotTableTotalPages" class="pagingLink">
+                  <a @click="gotoPlotTablePage(plotTableCurrentPage+1)">
+                    &gt;
+                  </a>
+                </span>
+              </div>
             </div>
             <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true  scrollable scroll-height="500px" :multi-sort="true">
-              <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" sortable></Column>
+              <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" :sortable="plotTableTotalPages == 1"></Column>
             </DataTable>
           </div>
         </div>
@@ -176,13 +217,14 @@ const plotTables = ref<DynamicObject>({});
 const plotTableList = ref<any[]>([]);
 const selectedPlotTable = ref<string>('');
 const plotTableData = ref<any[]>([]);
-const plotTableBatchData = ref<any[]>([]);
 const plotTableColumns = ref<any[]>([]);
 const plotTableTotalSize = ref<number>(0);
-const plotTableBatchSize = ref<number>(1000);
 const plotTablePageSize = ref<number>(100);
 const plotTableCurrentPage = ref<number>(1);
-const plotTableLazyLoad = ref<Boolean>(false);
+const plotTableTotalPages = ref<number>(1);
+const plotTablePageOptions = ref<any[]>([]);
+const plotTableStartRow = ref<number>(1);
+const plotTableEndRow = ref<number>(plotTablePageSize.value);
 const performanceMetricsColumns = [{ header: 'Metric', field: 'metric' }];
 const calibrationLogList = ref<any[]>([]);
 const calibrationLogDisplay = ref<string>('');
@@ -445,20 +487,21 @@ watch(selectedPlotName, async () => {
     if (selectedSupplementalTable.value === 5 && !validationLogList.value.length) {
       toast.add({ severity: 'info', summary: 'Validation Run ' + evaluateValidationRunId.value + ' has no logs', life: 5000 });
     }
-    plotTableBatchData.value = [];
     plotTableData.value = [];
     plotTableColumns.value = [];
   } else if (selectedPlotName.value) {
     selectedSupplementalTable.value = 0;
+    plotTableCurrentPage.value = 1;
+    
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(
-      selectedPlotName.value, // plotName
+      selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
       true, // include_data
       true, // force_include_plot
       (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
       0, // start
-      plotTableBatchSize.value // limit
+      plotTablePageSize.value // limit
     );
 
     if (response?._data) {
@@ -481,7 +524,6 @@ watch(selectedPlotName, async () => {
         } else {
           plotTableTotalSize.value = response?._data?.plot_data.length;
         }
-        plotTableBatchData.value = [];
         plotTableData.value = [];
         if (Array.isArray(response?._data?.plot_data[0])) {
           // special case - we are dealing with an array of multiple tables, instead of a single table
@@ -507,11 +549,10 @@ watch(selectedPlotName, async () => {
           });
           selectedPlotTable.value = plotTableList.value[0].name;
           if (selectedPlotTable.value != '') {
-            plotTableBatchData.value = plotTables.value[selectedPlotTable.value];
+            plotTableData.value = plotTables.value[selectedPlotTable.value];
           } else {
-            plotTableBatchData.value = [];
+            plotTableData.value = [];
           }
-          plotTableData.value = plotTableBatchData.value;
           adjustPlotTableColumns();
         } else {
           plotTables.value = { default_table: [] };
@@ -531,17 +572,15 @@ watch(selectedPlotName, async () => {
             }
             plotTables.value.default_table.push(data_row);
           }
-          plotTableBatchData.value = plotTables.value.default_table;
-          plotTableData.value = plotTableBatchData.value.slice(0, plotTablePageSize.value <= plotTableTotalSize.value ? plotTablePageSize.value : plotTableTotalSize.value);
+          plotTableData.value = plotTables.value.default_table;
           adjustPlotTableColumns();
-          if (plotTableData.value.length < response?._data?.plot_data.length) {
-            plotTableLazyLoad.value = true;
-          }
         }
+        plotTableStartRow.value = 1;
+        plotTableEndRow.value = plotTableData.value.length;
+        plotTableTotalPages.value = Math.ceil(plotTableTotalSize.value/plotTablePageSize.value);
       } else {
         plotTableData.value = [];
         plotTableColumns.value = [];
-        plotTableLazyLoad.value = false;
         toast.removeAllGroups();
         toast.add({ severity: 'info', summary: 'Plot data is currently unavailable', life: 5000 });
       }
@@ -550,7 +589,6 @@ watch(selectedPlotName, async () => {
       selectedPlotFileUrl.value = null;
       plotTableData.value = [];
       plotTableColumns.value = [];
-      plotTableLazyLoad.value = false;
       toast.removeAllGroups();
       toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot', life: 5000 });
     }
@@ -596,47 +634,43 @@ function adjustPlotTableColumns() {
     }
     //console.log('plotTableData: ', plotTableData.value);
     //console.log('plotTableColumns: ', plotTableColumns.value);
-    nextTick(() => {
-      const tableContainer = document.getElementById('plotTableHTML')?.querySelector('.p-datatable-table-container');
-      tableContainer?.addEventListener('scroll', async(event) => {
-        if (plotTableLazyLoad.value && (tableContainer.scrollTop > (tableContainer.scrollHeight - (2*tableContainer.clientHeight)))) {
-          plotTableLazyLoad.value = false; // disable scroll event until we're done
-          if (plotTableBatchData.value.length < plotTableTotalSize.value ) {
-            let start_row = plotTableData.value.length;
-            let end_row = plotTableData.value.length + plotTablePageSize.value;
-            if (plotTableData.value.length < plotTableBatchData.value.length) {
-              console.log('Loading next ' + plotTablePageSize.value + ' rows from our saved batch of ' + plotTableBatchData.value.length);
-            } else {
-              console.log('Loading next ' + plotTableBatchSize.value + ' rows from the ' + plotTableTotalSize.value + ' total stored in the backend');
-              plotTableCurrentPage.value++;
-              const response: any = await queryGetPlot(
-                selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
-                true, // include_data
-                false, // force_include_plot
-                (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
-                (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-                plotTableBatchData.value.length, // start
-                plotTableBatchSize.value // limit
-              );
-              if (response?._data) {
-                for (let d = 0; d < response?._data?.plot_data.length; d++) {
-                  let data_row = response?._data?.plot_data[d];
-                  plotTableBatchData.value.push(data_row);
-                }
-              }
-            }
-            let new_rows = plotTableBatchData.value.slice(start_row, end_row <= plotTableTotalSize.value ? end_row : plotTableTotalSize.value);
-            plotTableData.value = plotTableData.value.concat(new_rows);
-            plotTableLazyLoad.value = true; // turn scroll event back on
-          } else {
-            console.log('No more data to load - disabling scroll event');
-            plotTableLazyLoad.value = false;
-          }
-        }
-      });
-    });
   }
 }
+
+// Set up paging options
+watch(plotTableTotalPages, async () => {
+  plotTablePageOptions.value = [];
+  for (let p = 1; p <= plotTableTotalPages.value; p++) {
+    plotTablePageOptions.value.push({'number': p});
+  }
+});
+
+function gotoPlotTablePage(page: number) {
+  plotTableCurrentPage.value = page;
+}
+
+// Watch for page number changes in plot table
+watch(plotTableCurrentPage, async () => {
+  if (plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value/plotTablePageSize.value)) {
+    console.log('ERROR: Page number + ' + plotTableCurrentPage.value + ' out of bounds');
+  } else {
+    plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value-1)) + 1;
+    plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value-1),plotTableTotalSize.value);
+    console.log('Loading rows ' + plotTableStartRow.value + '-' + plotTableEndRow.value + ' from the ' + plotTableTotalSize.value + ' total stored in the backend');
+    const response: any = await queryGetPlot(
+      selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
+      true, // include_data
+      false, // force_include_plot
+      (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
+      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+      plotTableStartRow.value-1, // start
+      plotTablePageSize.value // limit
+    );
+    if (response?._data?.plot_data) {
+      plotTableData.value = response?._data?.plot_data;
+    }
+  }
+});
 
 // Handle selectedCalibrationLog/selectedValidationLog changes
 watch(selectedCalibrationLog, async () => {
@@ -715,5 +749,18 @@ const toggleMessagesGroup = () => {
 }
 .gray-border {
     border: 2px solid #d9d9d9;
+}
+
+.pagingLink {
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 8px;
+}
+.pagingLink a:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.pagingLink.active {
+  font-weight: bold;
 }
 </style>
