@@ -7,7 +7,7 @@
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
             Calibration Runs*<br />
             <span style="font-size: 12px;font-weight: normal;">
-              * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.
+              * Double click on a row to open, or right click for other options.
             </span>
           </h1>
         </div>
@@ -55,9 +55,6 @@
               <Column field="objective_function" header="Objective Function" sortable></Column>
               <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
             </DataTable>
-            <div class="mt-4 ml-10">
-              * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.
-            </div>
           </div>
         </div>
       </div>
