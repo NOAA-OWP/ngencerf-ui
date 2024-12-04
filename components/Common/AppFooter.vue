@@ -5,7 +5,7 @@
         <div id="FooterData" class="version">
           App Version: {{ info.release_info.version }}&nbsp; ({{
             info.release_info.date
-          }}), Server Version: {{ serverInfo?.version }}, {{ serverInfo?.date }}
+          }}), Server Version: {{ serverInfo?.version }} ({{ serverInfo?.date }})
         </div>
         <div class="copyright">Copyright &COPY;2024, RTX</div>
       </div>
