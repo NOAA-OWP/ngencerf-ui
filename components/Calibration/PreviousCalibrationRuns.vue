@@ -2,7 +2,7 @@
   <client-only>
     <div class="mx-auto px-8 text-center overflow-auto">
       <div class="width-full">
-        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs *</h1>
+        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Runs*</h1>
         <span class="ngenButtonDiv-alt bg-blue4 ml-8" @click="createNewCalibration"><button>New</button>
         </span>
         <br />

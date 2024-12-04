@@ -4,22 +4,22 @@
     <CommonTabs @tabNumber="tabChanged" />
     
     <div v-if="activeTab == 1">
-      <LazyCalibrationCalibrationRunsTab />
+      <CalibrationCalibrationRunsTab />
     </div> 
     <div v-else-if="activeTab == 2">
-      <LazyCalibrationHeadwaterBasinGage />
+      <CalibrationHeadwaterBasinGage />
     </div>
     <div v-else-if="activeTab == 3">
-      <LazyCalibrationFormulation />
+      <CalibrationFormulation />
     </div>
     <div v-else-if="activeTab == 4">
-      <LazyCalibrationTuningControls />
+      <CalibrationTuningControls />
     </div>
     <div v-else-if="activeTab == 5">
-      <LazyCalibrationOptimizationMetrics />
+      <CalibrationOptimizationMetrics />
     </div>
     <div v-else-if="activeTab == 6">
-      <LazyCalibrationRunStatus />
+      <CalibrationRunStatus />
     </div>
     
   </div>
@@ -28,14 +28,16 @@
 
 <script setup lang="ts">
 
-import CommonTabs from '~/components/Common/Tabs.vue'
+import CommonTabs from '@/components/Common/Tabs.vue'
 
-const LazyCalibrationHeadwaterBasinGage = defineAsyncComponent(() => import('~/components/Calibration/HeadwaterBasinGage.vue'));
-const LazyCalibrationFormulation= defineAsyncComponent(() => import('~/components/Calibration/Formulation.vue'));
-const LazyCalibrationTuningControls= defineAsyncComponent(() => import('~/components/Calibration/TuningControls.vue'));
-const LazyCalibrationOptimizationMetrics= defineAsyncComponent(() => import('~/components/Calibration/OptimizationMetrics.vue'));
-const LazyCalibrationRunStatus= defineAsyncComponent(() => import('~/components/Calibration/RunStatus.vue'));
-const LazyCalibrationCalibrationRunsTab= defineAsyncComponent(() => import('~/components/Calibration/PreviousCalibrationRuns.vue'));
+import CalibrationHeadwaterBasinGage from '@/components/Calibration/HeadwaterBasinGage.vue';
+import CalibrationFormulation from'@/components/Calibration/Formulation.vue';
+import CalibrationTuningControls from'@/components/Calibration/TuningControls.vue';
+import CalibrationOptimizationMetrics from'@/components/Calibration/OptimizationMetrics.vue';
+import CalibrationRunStatus from'@/components/Calibration/RunStatus.vue';
+import CalibrationCalibrationRunsTab from'@/components/Calibration/PreviousCalibrationRuns.vue';
+
+
 
 import { generalStore } from "@/stores/common/GeneralStore";
 
