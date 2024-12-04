@@ -6,7 +6,7 @@
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
             <span v-if="computedCalibrationValidationRunList.length <= 1">
-              Calibration Runs *<br />
+              Calibration Runs*<br />
               <span style="font-size: 12px;font-weight: normal;">
                 * Double click on a row to open, or right click for other options.
               </span>
