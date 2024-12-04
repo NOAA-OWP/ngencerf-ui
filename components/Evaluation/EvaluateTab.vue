@@ -62,50 +62,48 @@
           </div>
           <div class="pt-6 pb-2">
             <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0">
-              <b>Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{ plotTableTotalSize }}</b><br/>
-              <span v-if="plotTableTotalPages > 1">
+              <div>Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{ plotTableTotalSize }}</div>
+              <div>
+                <label for="PlotTablePageNumber" class="pr-2 pt-3">Go to Page:</label> 
+                <input type="number" min="1" :max="plotTableTotalPages" v-model="plotTableCurrentPage">
+              </div>
+              <div class="text-center" v-if="plotTableTotalPages > 1">
                 <!-- Previous page -->
-                <span v-if="plotTableCurrentPage > 1" 
-                  @click="gotoPlotTablePage(plotTableCurrentPage-1)"
-                  style="font-weight: bold; padding: 4px;">
-                  &lt;
+                <span v-if="plotTableCurrentPage > 1" class="pagingLink">
+                  <a @click="gotoPlotTablePage(plotTableCurrentPage-1)">
+                    &lt;
+                  </a>
                 </span>
                 <span v-for="page of plotTablePageOptions">
-                  
                   <!-- Current page -->
-                  <span v-if="page.number == plotTableCurrentPage" 
-                    style="font-weight: bold; padding: 4px;">
+                  <span v-if="page.number == plotTableCurrentPage"
+                    class="pagingLink active">
                     {{ page.number }}
                   </span>
                   
                   <!--- Other page numbers to show-->
-                  <span v-else-if="
-                      (page.number >= 1 && page.number <= 2) ||
+                  <span v-else-if="(page.number >= 1 && page.number <= 2) ||
                       (page.number >= (plotTableCurrentPage-1) && page.number <= (plotTableCurrentPage+1)) ||
-                      (page.number >= (plotTableTotalPages-1) && page.number <= plotTableTotalPages)
-                    " @click="gotoPlotTablePage(page.number)"
-                    style="padding: 4px;" >
-                    {{ page.number }}
+                      (page.number >= (plotTableTotalPages-1) && page.number <= plotTableTotalPages)"
+                      class="pagingLink">
+                    <a @click="gotoPlotTablePage(page.number)">
+                      {{ page.number }}
+                    </a>
                   </span>
                   
                   <!-- Show "..." in gaps where page numbers are not sequential - this should only happen if current page +/-2 doesn't fit the above criteria -->
-                  <span v-else-if="
-                      page.number == (plotTableCurrentPage-2) ||
-                      page.number == (plotTableCurrentPage+2)
-                    ">
+                  <span v-else-if="page.number == (plotTableCurrentPage-2) ||
+                      page.number == (plotTableCurrentPage+2)" class="pagingLink">
                     ...
                   </span>
                 </span>
                 <!-- Next page -->
-                <span v-if="plotTableCurrentPage < plotTableTotalPages" 
-                  @click="gotoPlotTablePage(plotTableCurrentPage+1)"
-                  style="font-weight: bold; padding: 4px;">
-                  &gt;
+                <span v-if="plotTableCurrentPage < plotTableTotalPages" class="pagingLink">
+                  <a @click="gotoPlotTablePage(plotTableCurrentPage+1)">
+                    &gt;
+                  </a>
                 </span>
-                <br/>
-                <label for="PlotTablePageNumber" class="pr-2 pt-3">Go to Page:</label> 
-                <input type="number" min="1" :max="plotTableTotalPages" v-model="plotTableCurrentPage">
-              </span>
+              </div>
             </div>
             <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true  scrollable scroll-height="500px" :multi-sort="true">
               <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header" :sortable="plotTableTotalPages == 1"></Column>
@@ -751,5 +749,18 @@ const toggleMessagesGroup = () => {
 }
 .gray-border {
     border: 2px solid #d9d9d9;
+}
+
+.pagingLink {
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 8px;
+}
+.pagingLink a:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.pagingLink.active {
+  font-weight: bold;
 }
 </style>
