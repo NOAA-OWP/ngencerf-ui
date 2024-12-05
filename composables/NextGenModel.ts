@@ -628,6 +628,7 @@ export type AccountEvent = {
 
 export type ServerInfo = {
   version: string;
+  date: string;
   email: string;
 }
 

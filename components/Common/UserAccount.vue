@@ -128,7 +128,6 @@ const changePasswordClasses = ref("chgpwd sel");
 const updateNameClasses = ref("updtnm");
 
 watch(showForm, async () => {
-  console.log('showForm:', showForm.value);
   if (showForm.value == 'updateName') {
     changePasswordClasses.value = "chgpwd";
     updateNameClasses.value = "updtnm sel";
@@ -184,7 +183,6 @@ const changePassword = async () => {
       let e = error.value?.data?.detail;
       if (!e) {
         e = "Cannot reach server. Error code: " + error.value.statusCode;
-        console.log("StatusCode: ", e);
       }
       toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 });
       console.error("Error during user creation:", error.value?.message, error.value?.data);
@@ -222,13 +220,11 @@ const updateName = async () => {
       let e = error.value?.data?.detail;
       if (!e) {
         e = "Cannot reach server. Error code: " + error.value.statusCode;
-        console.log("StatusCode: ", e);
       }
       toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 });
       console.error("Error during user update:", error.value?.message, error.value?.data);
       return;
     }
-    console.log("data: ", data);
     // Clear out the inputs and report success
     setFirstName(updateNameData.first_name);
     setLastName(updateNameData.last_name);

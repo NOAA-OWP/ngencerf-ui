@@ -5,7 +5,12 @@
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
-            <span v-if="computedCalibrationValidationRunList.length <= 1">Previous Calibration Runs *</span>
+            <span v-if="computedCalibrationValidationRunList.length <= 1">
+              Calibration Runs*<br />
+              <span style="font-size: 12px;font-weight: normal;">
+                * Double click on a row to open, or right click for other options.
+              </span>
+            </span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
               userSelectedEvalCalibrationRunId }}</span>
           </h1>
@@ -13,7 +18,8 @@
         <div class="ml-auto mt-2">
           <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
               v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
-              @click.stop="navigateToAlternateIteration">New Validation</Button></div>
+              @click.stop="navigateToAlternateIteration">New Validation</Button>
+          </div>
         </div>
       </div>
 
@@ -57,9 +63,6 @@
               <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
               <Column field="validation_runs" header="Validation Runs" sortable></Column>
             </DataTable>
-            <div class="mt-4 ml-10">
-              * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.
-            </div>
           </div>
 
       </div>

@@ -40,8 +40,6 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
     if (ls !== "undefined") { computedCalibrationRunDetailDataList.value = ls ? JSON.parse(ls) : [] }
     ls = sessionStorage.getItem('computedtuningParametersDataList');
     if (ls !== "undefined") { computedtuningParametersDataList.value = ls ? JSON.parse(ls) : [] }
-
-    console.log("EvaluationAltIteration Store restored");
   }
 
   watch(calibrationRunDetailDataList, (calibrationRunDetailDataList) => { sessionStorage.setItem('calibrationRunDetailDataList', JSON.stringify(calibrationRunDetailDataList)); });

@@ -31,7 +31,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     uiGageId.value = sessionStorage.getItem('uiGageId') as string;
     userSelectedEvalCalibrationRun.value = sessionStorage.getItem('userSelectedEvalCalibrationRun') as string;
     loadCalibrationDataComplete.value = JSON.parse(sessionStorage.getItem('loadCalibrationDataComplete') as string) === "true";
-    console.log("EvaluationCalibrationRunStore Store restored");
   }
 
   watch(calibrationRunList, (calibrationRunList) => { sessionStorage.setItem('calibrationRunList', JSON.stringify(calibrationRunList)); })
@@ -163,6 +162,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    * @return {void}
    */
   const resetUserSelectedEvalCalibrationRun = (): void => {
+    userSelectedEvalCalibrationRunId.value = 0;
     userSelectedEvalCalibrationRun.value = undefined;
     loadCalibrationDataComplete.value = false;
     userSelectedCalibrationValidationRunList.value = [];

@@ -71,11 +71,6 @@ export function calculateTimeRange(
   simulation_start_time: string,
   simulation_end_time: string
 ): { rangeStart: string; rangeEnd: string } {
-  // console.log("calibration_start_time", calibration_start_time);
-  // console.log("calibration_end_time", calibration_end_time);
-  // console.log("simulation_start_time", simulation_start_time);
-  // console.log("simulation_end_time", simulation_end_time);
-
   const startDates = [
     DateTime.fromISO(calibration_start_time),
     DateTime.fromISO(simulation_start_time),
@@ -86,16 +81,6 @@ export function calculateTimeRange(
     DateTime.fromISO(simulation_end_time),
   ];
 
-  const zStartDates = [
-    new DateTime(calibration_start_time).toFormat("yyyy/MM/dd  HH:mm:ss"),
-    new DateTime(simulation_start_time).toFormat("yyyy/MM/dd  HH:mm:ss")
-  ];
-
-  const zEendDates = [
-    new DateTime(calibration_end_time).toFormat("yyyy/MM/dd  HH:mm:ss"),
-    new DateTime(simulation_end_time).toFormat("yyyy/MM/dd  HH:mm:ss")
-  ];
-
   const minDate = DateTime.min(...startDates);
   const maxDate = DateTime.max(...endDates);
 
@@ -104,7 +89,7 @@ export function calculateTimeRange(
   const paddedEnd = maxDate.plus({ months: 1 });
 
   // convert a DateTime object to a string in ISO format
-  const formatDate = (date: DateTime): string => date.toISO();
+  const formatDate = (date: any): string => date.toISO();
 
   const rangeStart = formatDate(paddedStart);
   const rangeEnd = formatDate(paddedEnd);

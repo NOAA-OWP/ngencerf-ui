@@ -2,10 +2,13 @@
   <client-only>
     <div class="mx-auto px-8 text-center overflow-auto">
       <div class="width-full">
-        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs *</h1>
+        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Runs*</h1>
         <span class="ngenButtonDiv-alt bg-blue4 ml-8" @click="createNewCalibration"><button>New</button>
         </span>
-
+        <br />
+        <span style="font-size: 12px;font-weight: normal;">
+              * Double click on a row to open, or right click for other options. Click "New" for a fresh setup.
+            </span>
         <div id="CalTable" class="w-max mx-auto">
           <div class="grid grid-cols-1 mb-5">
             <div class="col-span-1">
@@ -48,9 +51,6 @@
             </Column>
             <Column field="status" header="Status" sortable></Column>
           </DataTable>
-          <div class="mt-4 text-left">
-            * Double click on a row to open, or right click for other options. Click "New" for a fresh setup.
-          </div>
         </div>
 
       </div>

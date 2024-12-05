@@ -23,7 +23,6 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     validationStatus.value = sessionStorage.getItem('validationStatus') ?? "";
     runningTime.value = sessionStorage.getItem('runningTime') ?? "";
     startTime.value = sessionStorage.getItem('startTime') ?? "";
-    console.log("ValidationRunStatusStore Store restored");
   }
 
   watch(validationStatus, (validationStatus) => { sessionStorage.setItem('validationStatus', JSON.stringify(validationStatus)); })

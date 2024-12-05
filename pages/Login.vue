@@ -147,7 +147,6 @@ const userName = ref<string>("");
 const userPassword = ref<string>("");
 const showDialog = ref(false);
 
-//const newUsername = ref('');
 const newEmail = ref('');
 const newFirstName = ref('');
 const newLastName = ref('');
@@ -170,7 +169,6 @@ onMounted(() => {
     resetOptimizationStore();
     hardResetRunStatusStore();
     hardResetTuningStore();
-    //getFooterInformation();
   })
 });
 
@@ -213,7 +211,6 @@ const SubmitLoginForm = async (e: Event) => {
         password: userPassword.value
       }
     }).then(response => {
-      console.log("Response: ", response)
       setUserName(userName.value.toLowerCase());
       // store tokens in UserDataStore
       userDataStore.setAccessToken(response.access);
@@ -225,12 +222,10 @@ const SubmitLoginForm = async (e: Event) => {
       GoToLanding();
     }
     ).catch(error => {
-      console.log(error);
       if (error) {
         let err = error.data?.detail;
         if (!err) {
           err = "Cannot reach server. Error code: " + error.statusCode;
-          console.log("StatusCode: ", e);
         }
         toast.add({ severity: 'error', summary: 'Error', detail: err, life: 3000 });
         console.error("Error during user creation:", error.message, error.data.detail);
@@ -304,20 +299,6 @@ const SubmitNewAccountForm = async () => {
 const GoToLanding = () => {
   navigateTo("LandingPage");
 };
-
-// Get footer info
-const getFooterInformation = () => {
-    makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: ""
-    }).then((result) => {
-      console.log(result);
-    })
-  }
 
 </script>
 <style lang="scss" scoped>

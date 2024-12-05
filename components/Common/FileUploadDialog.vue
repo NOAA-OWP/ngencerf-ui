@@ -31,7 +31,6 @@ const onUpload = (event: any) => {
 };
 
 onMounted(() => {
-  console.log('MOUNTED: FileUploadDialog');
   inputName.value = dialogRef.value.data?.inputName ?? ""
   selectMultiple.value = dialogRef.value.data?.selectMultiple ?? false
   fileExtension.value = dialogRef.value.data?.fileExtension ?? ".csv"

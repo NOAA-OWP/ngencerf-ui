@@ -174,12 +174,10 @@ let observer = null;
 const isOnDiv = ref(false);
 
 const onImageRightClick = (event: any) => {
-  console.log("Activating user manu")
   userContextMenu.value.show(event)
 }
 
 onMounted(() => {
-  console.log('MOUNTED: AppHeader');
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
     let headerHeight = document.getElementById('Header')?.clientHeight;
@@ -234,7 +232,6 @@ useLogoutListen('logoutEvent', (evStr: string) => {
 
 const logoutUser = async () => {
   if (confirm("Are you sure you want to logout?")) {
-    console.log("Logging out...");
     useLogout("logoutEvent", "logout");
     await navigateTo('login');
   }

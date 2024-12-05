@@ -5,13 +5,19 @@
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
-            Previous Calibration Runs *
+            Calibration Runs*<br />
+            <span style="font-size: 12px;font-weight: normal;">
+              * Double click on a row to open, or right click for other options.
+            </span>
           </h1>
         </div>
+
         <div class="ml-auto mt-2">
-          <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
+          <div id="NewButton" class="">
+            <Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
               v-if="forecastJobId"
-              @click="navigateToSetupForecast">New Forecast</Button></div>
+              @click="navigateToSetupForecast">New Forecast</Button>
+          </div>
         </div>
       </div>
 
@@ -49,9 +55,6 @@
               <Column field="objective_function" header="Objective Function" sortable></Column>
               <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
             </DataTable>
-            <div class="mt-4 ml-10">
-              * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.
-            </div>
           </div>
         </div>
       </div>
