@@ -497,6 +497,11 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
+  let toastMessage: string = 'Plots are not yet available';
+  if (selectedPlotName.value in validationPlotNames) {
+        toastMessage = 'Plots are not available until after validation is complete';
+  }
+
   if (iteration.value && iteration.value >= 1) {
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value as string); // store this in RunStatusStore
@@ -508,12 +513,12 @@ watch(selectedPlotName, async () => {
       toast.removeAllGroups();
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
+      toast.add({ severity: 'warn', summary: 'Warning', detail: toastMessage });
     }
   } else {
     selectedPlotFilename.value = "";
     selectedPlotFileUrl.value = "";
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: toastMessage });
   }
 });
 

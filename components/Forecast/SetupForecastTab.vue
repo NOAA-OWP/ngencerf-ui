@@ -5,8 +5,14 @@
     </h1>
   </div>
   <div>
-    <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
-      selectionMode="single">
+    <DataTable
+      :value="forecastCycles"
+      sortField="cycle"
+      scrollable
+      v-model:selection="forecastCycle"
+      selectionMode="single"
+      :rowClass="getRowClass"
+    >
       <Column field="name" header="Cycle"></Column>
       <Column field="data_sources" header="Data Sources"></Column>
       <Column field="time_range" header="Time Range (NgenCERF)"></Column>
@@ -73,6 +79,24 @@ onMounted(async () => {
 });
 
 /**
+ * Get the row class
+ * @param rowData
+ * @returns {string}
+ */
+const getRowClass = (rowData: any) => {
+  return rowData.is_active === "False" ? "disabled-row" : "";
+};
+
+/**
+ * Check if the row is selectable
+ * @param rowData
+ * @returns {boolean}
+ */
+const isRowSelectable = (rowData: any) => {
+  return rowData.is_active === "True";
+};
+
+/**
  * Go to the Status Run tab
  */
 const goToStatusRunTab = () => {
@@ -85,4 +109,9 @@ const goToStatusRunTab = () => {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
+
+.disabled-row {
+  pointer-events: none;
+  opacity: 0.5;
+}
 </style>
