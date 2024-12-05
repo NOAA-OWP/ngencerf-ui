@@ -63,7 +63,7 @@
           <div class="pt-6 pb-2">
             <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0">
               <div>Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{ plotTableTotalSize }}</div>
-              <div>
+              <div v-if="plotTableTotalPages > 1">
                 <label for="PlotTablePageNumber" class="pr-2 pt-3">Go to Page:</label> 
                 <input type="number" min="1" :max="plotTableTotalPages" v-model="plotTableCurrentPage">
               </div>
