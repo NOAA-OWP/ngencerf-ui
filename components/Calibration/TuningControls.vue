@@ -382,11 +382,8 @@ onMounted(async () => {
 
     // if Tuning Tab static data is not loaded, fetch it
     if (loadTuningTabData?.value?._data?.modules.length === 0) {
-      // console.log("fetching Tuning Tab data");
       await loadTuningTabStaticData();
-      // console.log("loadTuningTabData after fetch from Tuning tab:", loadTuningTabData.value);
     } else {
-      // console.log("Tuning Tab data already loaded. No need to fetch");
     }
 
     // check if EDS errors exist
@@ -425,7 +422,6 @@ onMounted(async () => {
 
     // set output variable to calibrate
     if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
-      // console.log("userCalibrationRunData.value.output_variable_to_calibrate:", userCalibrationRunData.value.output_variable_to_calibrate);
       const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
 
       // set output variable to calibrate only if it is not already set
@@ -462,10 +458,8 @@ const isTimeRangeSet = (): boolean => {
  */
 const isFormulationDataSaved = (): boolean => {
   if (formulationNameInput.value == "" && selectedModuleValues?.value.length === 0 && slothParameterInputs?.value.length === 0) {
-    // console.log('formulation is not set');
     return false;
   } else {
-    // console.log('formulation is set');
     return true;
   }
 };
@@ -542,8 +536,6 @@ watch(selectedOutputVariable, () => {
     name: outputVariable?.name,
     module: outputVariable?.module,
   }
-  // console.log("selectedOutputVariable:", selectedOutputVariable.value);
-  // console.log("userOutputVariableToCalibrate:", userOutputVariableToCalibrate.value);
 });
 
 // watch for changes to simStartTime. If simStartTime is set, set calStartTime to one year after simStartTime if not already set
@@ -552,7 +544,7 @@ watch(simStartTime, () => {
     calStartTime.value = simStartTime.value.plus({ years: 1 }); // set calStartTime to one year after simStartTime
   }
   else if ((!calStartTime.value || !isValidDateTime(calStartTime.value)) && simStartTime.value && typeof simStartTime.value === 'string') {
-    // console.log('simStartTime.value is a string. This should not happen'); // the simStartTime binding might call this watch function when it is a string. ooof.
+    // the simStartTime binding might call this watch function when it is a string. ooof.
     const simStartDateTime = DateTime.fromISO(simStartTime.value, { zone: 'utc' });
     calStartTime.value = simStartDateTime.value.plus({ years: 1 });
   }
@@ -597,7 +589,6 @@ watch(avSimEndTime, () => {
 const triggerFileInput = () => {
   if (fileInput.value) {
     if (fileInput.value.value) {
-      // console.log('fileInput.value.value is not empty. Resetting value');
       fileInput.value.value = '';
     }
     fileInput.value.click();
@@ -609,7 +600,6 @@ const triggerFileInput = () => {
  * @param event
  */
 const handleFileUpload = async (event: Event) => {
-  //console.log('Upload button clicked');
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0]; // get the first file we see
   let errorMessage = '';
@@ -763,8 +753,7 @@ const updateCalibrationTuningParameter = (index: number, field: string, ev: Even
       parameter.initial_value = value;
     }
   }
-  //console.log("updated calibrationTuningParameters:", calibrationTuningParameters.value);
-};
+ };
 
 /**
  * Delete Calibration Tuning Parameter from the table
@@ -779,7 +768,6 @@ const deleteCalibrationTuningParameter = (selectedTuningParameterData: any) => {
 const AutoValChecked = () => {
   const ele = <HTMLInputElement>document.getElementById("CheckTheBox");
   automatic_validation.value = ele.checked as boolean;
-  // //console.log("automatic_validation:", automatic_validation.value);
 };
 
 /**
@@ -1026,11 +1014,6 @@ const saveTuningData = () => {
   // handle saving Tuning Tab data
   const handleSaveTuningTab = async () => {
     const saveTuningTabResponse = await saveTuningTabData();
-    console.log(
-      `saveTabContent Tuning, should be tabIndex 4, on tabIndex ${getCalibrationTabIndex()}, save response: `,
-      saveTuningTabResponse
-    );
-
     if (saveTuningTabResponse?.ok) {
       toast.add({
         severity: 'success',

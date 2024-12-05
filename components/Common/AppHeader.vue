@@ -122,6 +122,9 @@
   </div>
   <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
     <UserAccount />
+  </div>  
+  <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
+    <LazyAboutBox />
   </div>
 </template>
 
@@ -148,10 +151,12 @@ const LazyCalibrationHelpResultsHelp = defineAsyncComponent(() => import("@/comp
 const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/CalibrationRunsHelp.vue"))
 const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
+const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 
 const emit = defineEmits(["logoutEvent"]);
 
 const accountOverlay = ref();
+const aboutOverlay = ref();
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex } = generalStore();
 
@@ -161,7 +166,8 @@ const location = useRoute();
 
 const userItems = ref([
   { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
-  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
+  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() },
+  { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() }
 ])
 
 const userContextMenu = ref();
@@ -174,12 +180,10 @@ let observer = null;
 const isOnDiv = ref(false);
 
 const onImageRightClick = (event: any) => {
-  console.log("Activating user manu")
   userContextMenu.value.show(event)
 }
 
 onMounted(() => {
-  console.log('MOUNTED: AppHeader');
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
     let headerHeight = document.getElementById('Header')?.clientHeight;
@@ -214,12 +218,21 @@ const sizeHelpWindow = () => {
 /**
  * 
  */
-const gotoAccount = async () => {
+ const gotoAccount = async () => {
   accountOverlay.value.style.display = "block";
+}
+
+const aboutBox = async () => {
+  aboutOverlay.value.style.display = "block";
 }
 
 useAccountEventListen('accountEvent', () => {
   const ele = document.getElementById('UserAccountOverlay') as HTMLElement;
+  ele.style.display = "none";
+})
+
+useAccountEventListen('aboutBoxEvent', () => {
+  const ele = document.getElementById('AboutBoxOverlay') as HTMLElement;
   ele.style.display = "none";
 })
 
@@ -234,7 +247,6 @@ useLogoutListen('logoutEvent', (evStr: string) => {
 
 const logoutUser = async () => {
   if (confirm("Are you sure you want to logout?")) {
-    console.log("Logging out...");
     useLogout("logoutEvent", "logout");
     await navigateTo('login');
   }
