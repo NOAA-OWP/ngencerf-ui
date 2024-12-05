@@ -3,19 +3,19 @@
   <div id="AboutBox">
     <div class="text-right sticky top-0">
       <img alt="Close" title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
-        class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeAboutBox"/>
+        class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeAboutBox" />
     </div>
 
     <div id="BoxContent">
       <div id="PgmName">
-        NgenCERF
+        About
       </div>
       <hr class="mt-2" />
       <div id="FooterData">
         <table>
           <tbody>
             <tr>
-              <td class="td1">App Version: </td>
+              <td class="td1">UI Version: </td>
               <td class="td2">{{ info.release_info.version }}</td>
             </tr>
             <tr>
@@ -33,6 +33,10 @@
             <tr>
               <td class="td1">Released: </td>
               <td class="td2">{{ serverInfo?.date }}</td>
+            </tr>
+            <tr>
+              <td class="td1">&nbsp;</td>
+              <td class="td2">&nbsp;</td>
             </tr>
             <tr>
               <td class="td1">Support Email: </td>
@@ -91,8 +95,8 @@ const closeAboutBox = () => {
   top: 90px;
   border: 5px solid #ccc;
   z-index: 9999;
-  width: 450px;
-  height: 300px;
+  width: 339px;
+  height: 280px;
   background-color: white;
 
 
@@ -106,18 +110,18 @@ const closeAboutBox = () => {
     background-color: black;
   }
 
-.td1 {
-  text-align: right;
-  padding-right: 10px;
-}
+  .td1 {
+    text-align: right;
+    padding-right: 10px;
+  }
 
-.td2 {
-  margin-left: 10px;
-}
+  .td2 {
+    margin-left: 10px;
+  }
 
   #PgmName {
     display: inline-block;
-    font: 40px "NeueFrutigerWorld-Bold", sans-serif;
+    font: 20px "NeueFrutigerWorld-Bold", sans-serif;
     font-weight: bold;
     margin-left: 20px;
     margin-top: 15px;
