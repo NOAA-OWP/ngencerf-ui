@@ -6,7 +6,7 @@
           <tbody>
             <tr height="40px">
               <td class="text-right font-bold">
-                <div style="width: 140px;">Job ID</div>
+                <div style="width: 140px;">Forecast Job ID</div>
               </td>
               <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
             </tr>
