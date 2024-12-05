@@ -53,6 +53,9 @@
         </div>
       </div>
       <div>
+        <div class="text-center" v-if="plotTableErrorMessage != '' && selectedSupplementalTable == 0">
+          {{ plotTableErrorMessage }}
+        </div>
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
           <div v-if="plotTableList && plotTableList.length > 1">
             <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
@@ -225,6 +228,7 @@ const plotTableTotalPages = ref<number>(1);
 const plotTablePageOptions = ref<any[]>([]);
 const plotTableStartRow = ref<number>(1);
 const plotTableEndRow = ref<number>(plotTablePageSize.value);
+const plotTableErrorMessage = ref<string>('');
 const performanceMetricsColumns = [{ header: 'Metric', field: 'metric' }];
 const calibrationLogList = ref<any[]>([]);
 const calibrationLogDisplay = ref<string>('');
@@ -578,8 +582,7 @@ watch(selectedPlotName, async () => {
       } else {
         plotTableData.value = [];
         plotTableColumns.value = [];
-        toast.removeAllGroups();
-        toast.add({ severity: 'info', summary: 'Plot data is currently unavailable', life: 5000 });
+        plotTableErrorMessage.value = 'Data internally calculated by program and unavailable for table display.';
       }
     } else {
       selectedPlotFilename.value = null;
@@ -604,6 +607,7 @@ watch(selectedPlotTable, async () => {
 // set plotTableColumns whenever plotTableData is changed
 function adjustPlotTableColumns() {
   console.log('adjusting plotTableColumns');
+  plotTableErrorMessage.value = '';
   plotTableColumns.value = [];
   if (plotTableData.value.length > 0) {
     Object.keys(plotTableData.value[0]).forEach(key => {
