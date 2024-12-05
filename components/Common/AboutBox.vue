@@ -40,7 +40,9 @@
             </tr>
             <tr>
               <td class="td1">Support Email: </td>
-              <td class="td2">{{ serverInfo?.contact_email }}</td>
+              <td class="td2">
+                <a class="hlink" :href="'mailto:' + serverInfo?.contact_email">{{ serverInfo?.contact_email }}</a>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -58,14 +60,11 @@ import json from "@/assets/version.json";
 const info = json;
 const { ngencerfBaseUrl } = useBackendConfig();
 const serverInfo = ref<ServerInfo>();
-const mailTo = ref<string>();
 
 onMounted(async () => {
   console.log("Calling get footer info from User Account on mounted")
   await getFooterInformation();
-  mailTo.value = "mailto:" + serverInfo?.value?.contact_email;
 })
-
 
 // Get footer info
 const getFooterInformation = () => {
@@ -117,6 +116,11 @@ const closeAboutBox = () => {
 
   .td2 {
     margin-left: 10px;
+  }
+
+  .hlink {
+    text-decoration: underline;
+    color: blue;
   }
 
   #PgmName {

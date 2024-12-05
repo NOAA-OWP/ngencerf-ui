@@ -82,8 +82,6 @@ const getFooterInformation = () => {
   z-index: 9999;
 }
 
-
-
 #AppDate, #ServerDate {
   border: 2px solid black;
   padding: 10px;
