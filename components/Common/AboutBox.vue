@@ -1,6 +1,5 @@
 <template>
   <!-- About Box -->
-
   <div id="AboutBox">
     <div class="text-right sticky top-0">
       <img alt="Close" title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
@@ -88,8 +87,8 @@ const closeAboutBox = () => {
 
 #AboutBox {
   position: absolute;
-  left: Calc(50vw - 300px);
-  top: Calc(50vh - 300px);
+  right: 5px;
+  top: 90px;
   border: 5px solid #ccc;
   z-index: 9999;
   width: 450px;
@@ -100,7 +99,6 @@ const closeAboutBox = () => {
   #FooterData {
     padding: 15px;
     line-height: 1.5em;
-    font-size: 1.1em;
   }
 
   hr {
