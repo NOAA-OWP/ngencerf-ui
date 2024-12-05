@@ -1,17 +1,26 @@
 <template>
+
+
+
   <div id="Footer" class="prevent-select cursor-default">
+    <div id="FloatingInfo">
+      <div id="AppDate" class="hidden text-left">Application Release Date: {{ info.release_info.date }}<br /></div>
+      <div id="ServerDate" class="hidden text-left">Server Release Date: {{ serverInfo?.date }}</div>
+    </div>
     <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor text-sm">
-        <div id="FooterData" class="version" @mouseenter="showFooterInfo" @mouseleave="hideFooterInfo">App Version: {{
-          info.release_info.version }}&nbsp; <span class="rollover">({{ info.release_info.date }}), </span>
-          Server Version: {{ serverInfo?.version }}&nbsp; <span class="rollover">({{ serverInfo?.date }})</span>
+        <div id="FooterData" class="version">
+          <span @mouseenter="showAppInfo" @mouseleave="hideAppInfo">App Version:
+            {{ info.release_info.version }}</span>&nbsp;&nbsp;&nbsp;
+          <span @mouseenter="showServerInfo" @mouseleave="hideServerInfo">Server Version:
+            {{ serverInfo?.version }}</span>
         </div>
         <div class="copyright">Copyright &COPY;2024, RTX</div>
       </div>
     </div>
   </div>
 </template>
-
+line-
 <script lang="ts" setup>
 import json from "@/assets/version.json";
 import type { ServerInfo } from "~/composables/NextGenModel";
@@ -21,23 +30,31 @@ const info = json;
 const serverInfo = ref<ServerInfo>();
 
 onMounted(() => {
-  hideFooterInfo();
+  console.log("Calling get footer info from User Account on mounted")
   getFooterInformation();
 })
 
-const showFooterInfo = () => {
-  const elements = document.getElementsByClassName('rollover');
-  for (const item of elements) {
-    (item as HTMLElement).style.display = "inline-block"
-  }
+const showAppInfo = () => {
+  const e = document.getElementById('AppDate');
+  (e as HTMLElement).style.display = "inline-block"
 }
 
-const hideFooterInfo = () => {
-  const elements = document.getElementsByClassName('rollover');
-  for (const item of elements) {
-    (item as HTMLElement).style.display = "none"
-  }
+const hideAppInfo = () => {
+  const e = document.getElementById('AppDate');
+  (e as HTMLElement).style.display = "none"
 }
+
+const showServerInfo = () => {
+  const e = document.getElementById('ServerDate');
+  (e as HTMLElement).style.display = "inline-block"
+}
+
+const hideServerInfo = () => {
+  const e = document.getElementById('ServerDate');
+  (e as HTMLElement).style.display = "none"
+}
+
+
 // Get footer info
 const getFooterInformation = () => {
   makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
@@ -56,6 +73,14 @@ const getFooterInformation = () => {
 
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";
+
+#FloatingInfo {
+  position:sticky;
+  margin-left: 20px;
+  height: 2em;
+  font-size: 0.8em;
+  z-index: 9999;
+}
 
 #Footer {
   font-size: 18px;

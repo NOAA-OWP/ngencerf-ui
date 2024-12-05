@@ -58,6 +58,7 @@ const serverInfo = ref<ServerInfo>();
 const mailTo = ref<string>();
 
 onMounted(async () => {
+  console.log("Calling get footer info from User Account on mounted")
   await getFooterInformation();
   mailTo.value = "mailto:" + serverInfo?.value?.contact_email;
 })
