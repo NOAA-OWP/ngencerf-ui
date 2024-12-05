@@ -29,7 +29,6 @@
 <script lang="ts" setup>
 import CalibrationProgressGroup from "./CalibrationProgressGroup.vue";
 import MessagesGroup from "../Common/MessagesGroup.vue";
-//import CalibrationMessagesGroup from "./CalibrationMessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 </script>
 

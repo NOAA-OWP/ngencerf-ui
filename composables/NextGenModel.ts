@@ -213,7 +213,7 @@ export interface GageOptionData {
   gage_id: string;
   nsw_id: string;
   domain: string;
-  nwm_v3_calibrated: boolean;
+  nwm_v3_calibration: boolean;
 }
 
 export interface SaveGageTabPayload {
@@ -628,6 +628,7 @@ export type AccountEvent = {
 
 export type ServerInfo = {
   version: string;
+  date: string;
   email: string;
 }
 

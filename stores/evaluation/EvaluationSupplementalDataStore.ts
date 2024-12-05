@@ -109,10 +109,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * Get Calibration/Validation Logs
    * @return {any}
    */
-  const queryGetLogs = async (calibration_run_id: number=calibrationJobId.value, validation_run_id: number=0): Promise<any> => {
-    if(!calibrationJobId.value) {
-      return null;
-    }
+  const queryGetLogs = async (validation_run_id: number=0): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
       method: "POST",
       headers: {
@@ -120,8 +117,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        calibration_run_id: (calibration_run_id > 0) ? calibration_run_id : null,
-        validation_run_id: (validation_run_id > 0) ? validation_run_id : null
+        validation_run_id: validation_run_id
       })
     });
   };
