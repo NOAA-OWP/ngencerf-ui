@@ -624,12 +624,13 @@ export type LogoutEvent = {
 
 export type AccountEvent = {
   accountEvent: string;
+  aboutBoxEvent: string;
 }
 
 export type ServerInfo = {
   version: string;
   date: string;
-  email: string;
+  contact_email: string;
 }
 
 export type ForecastCycle = {

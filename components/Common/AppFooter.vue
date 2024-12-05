@@ -2,10 +2,9 @@
   <div id="Footer" class="prevent-select cursor-default">
     <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor text-sm">
-        <div id="FooterData" class="version">
-          App Version: {{ info.release_info.version }}&nbsp; ({{
-            info.release_info.date
-          }}), Server Version: {{ serverInfo?.version }} ({{ serverInfo?.date }})
+        <div id="FooterData" class="version" @mouseenter="showFooterInfo" @mouseleave="hideFooterInfo">App Version: {{
+          info.release_info.version }}&nbsp; <span class="rollover">({{ info.release_info.date }}), </span>
+          Server Version: {{ serverInfo?.version }}&nbsp; <span class="rollover">({{ serverInfo?.date }})</span>
         </div>
         <div class="copyright">Copyright &COPY;2024, RTX</div>
       </div>
@@ -15,33 +14,42 @@
 
 <script lang="ts" setup>
 import json from "@/assets/version.json";
-import { useRoute } from "vue-router";
 import type { ServerInfo } from "~/composables/NextGenModel";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
-
 const { ngencerfBaseUrl } = useBackendConfig();
-
-const location = useRoute();
 const info = json;
-
 const serverInfo = ref<ServerInfo>();
 
-onMounted( () => {
+onMounted(() => {
+  hideFooterInfo();
   getFooterInformation();
 })
 
+const showFooterInfo = () => {
+  const elements = document.getElementsByClassName('rollover');
+  for (const item of elements) {
+    (item as HTMLElement).style.display = "inline-block"
+  }
+}
+
+const hideFooterInfo = () => {
+  const elements = document.getElementsByClassName('rollover');
+  for (const item of elements) {
+    (item as HTMLElement).style.display = "none"
+  }
+}
 // Get footer info
 const getFooterInformation = () => {
-    makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": 'application/json'
-      },
-      body: ""
-    }).then((result) => {
-      serverInfo.value = result._data;
-    })
-  }
+  makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": 'application/json'
+    },
+    body: ""
+  }).then((result) => {
+    serverInfo.value = result._data;
+  })
+}
 
 
 </script>
