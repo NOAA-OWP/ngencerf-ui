@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-const title = ref('NgenCERF')
+const title = ref('ngenCERF')
 const description = ref('')
 
 // This will be reactive when you change title/description above
