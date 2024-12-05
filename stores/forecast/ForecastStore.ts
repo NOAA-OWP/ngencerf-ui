@@ -53,7 +53,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     // load forecast cycles
     const loadForecastTabResponse: any = await loadForecastTab();
     forecastCycles.value = loadForecastTabResponse?._data?.forecast_cycle_values;
-    console.log('forecastCycles', forecastCycles.value);
   };
 
   /**

@@ -256,11 +256,8 @@ onMounted(async () => {
   }
 
   if (plotNames.value?._data?.plot_names) {
-    // console.log('plotNames._data:', plotNames.value?._data);
-
     // setting plotList will populate the dropdown
     plotList.value = plotNames?.value?._data?.plot_names;
-    // console.log('plotList:', plotList.value);
   } else {
     toast.removeAllGroups();
     toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });

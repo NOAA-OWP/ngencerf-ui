@@ -236,11 +236,9 @@ onMounted(() => {
   nextTick(async () => {
     if (userCalibrationRunData.value) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
-      // console.log('stopCriteria:', stopCriteria.value);
 
       if (userCalibrationRunData.value.submit_date) {
         submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
-        // console.log('submitTimeDate from within nextTicket and onMounted:', submitTimeDate.value);
       }
     }
 
@@ -261,9 +259,7 @@ onMounted(() => {
  * Create elapsedTimeIntervalId to update elapsedTime every second while Calibration is Running or Validation is not Done
  */
 const createElapsedTimeInterval = () => {
-  // console.log('creating elapsedTimeIntervalId');
-  // console.log('userCalibrationRunData:', userCalibrationRunData.value);
-  // console.log('validControlAndValidBestDone:', validControlAndValidBestDone.value);
+
   elapsedTimeIntervalId.value = setInterval(async () => {
     if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' && 
       (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
@@ -284,7 +280,6 @@ const startRun = async () => {
     }
     // toast.removeAllGroups();
     try {
-      // console.log('hitting run_calibration endpoint');
       const runCalibrationResponse = await runCalibrationJob();
 
       if (runCalibrationResponse._data) {
@@ -324,14 +319,12 @@ const cancelRun = async () => {
   if (calibrationStatus.value === 'Running') {
     // toast.removeAllGroups();
     try {
-      // console.log('hitting cancel_job endpoint');
       const cancelCalibrationResponse = await cancelCalibrationJob();
 
       if (cancelCalibrationResponse?._data.status) {
         if (userCalibrationRunData.value) {
           userCalibrationRunData.value.status = cancelCalibrationResponse?._data.status;
         }
-        // console.log('calibrationStatus:', calibrationStatus);
         if (userCalibrationRunData?.value?.status !== 'Cancelled') {
           toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' });
         }
@@ -349,7 +342,6 @@ const cancelRun = async () => {
 
 // Handle calibrationStatus changes
 watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
-  // console.log('calibrationStatus watch:', newCalibrationStatus, oldCalibrationStatus);
   if (userCalibrationRunData.value) {
     if (userCalibrationRunData.value.stop_criteria) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
@@ -403,22 +395,18 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       }
 
       if (plotNames.value?._data.plot_names) {
-        // console.log('plotNames._data:', plotNames.value?._data);
 
         // setting plotList will populate the dropdown
         plotList.value = plotNames.value?._data?.plot_names?.filter(
           (plot: any) => !plotNamesToExclude.includes(plot.name)
         );
-        // console.log('plotList:', plotList.value);
       } else {
-        // toast.removeAllGroups();
         toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
       }
     }
 
     if (calibrationStatus.value === 'Running') {
       if (!calibrationStatusIntervalId.value) {
-        // console.log('creating calibrationStatusIntervalId');
         calibrationStatusIntervalId.value = setInterval(async () => {
           const getIterationResponse = await queryGetIteration();
 
@@ -500,7 +488,6 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
   }
 
   onCleanup(() => {
-    console.log('Cleaning up calibrationStatus watch');
     // if Calibration status changes to anything but Running or Done while still executing this watch function, set stopCriteriaMet to false
     if (calibrationStatus.value !== 'Running' && calibrationStatus.value !== 'Done') {
       stopCriteriaMet.value = false;

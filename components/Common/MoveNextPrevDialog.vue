@@ -24,11 +24,9 @@ const goNext = ref<boolean>();
 onMounted(() => {
   params.value = dialogRef.value.data.body; // {user: 'primetime'}
   goNext.value = dialogRef.value.data.direction;
-  console.log(params);
 })
 
 const stayOnTab = (w: boolean) => {
-  const moveToNextResponse = dialogRef.value.data;
   dialogRef.value.data = true;
     dialogRef.value.close({
       moveToNextResponse: w,

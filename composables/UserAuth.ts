@@ -30,8 +30,6 @@ export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boole
 
     // If new access token is returned, update user data store with new access token
     if (access) {
-      // console.log('Refreshed access token:', access);
-      // console.log('Token refresh successful');
       userDataStore.setAccessToken(access);
       return true;
     } else {
@@ -65,7 +63,6 @@ export const makeProtectedApiCall = async <T>(
       if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
         options.body = JSON.stringify(options.body);
       }
-      console.log('Request:', request, options);
     },
     async onRequestError({ error }: { error: any }) {
       console.error('Request error:', error);
@@ -87,7 +84,6 @@ export const makeProtectedApiCall = async <T>(
             if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
               options.body = JSON.stringify(options.body);
             }
-            console.log('Request:', request, options);
           },
           async onRequestError({ error }: { error: any }) {
             console.error('Request error:', error);
@@ -100,13 +96,11 @@ export const makeProtectedApiCall = async <T>(
           }
         });
         responseData = await response;
-        console.log('Response:', responseData);
         return responseData;
       }
     }
   });
   responseData = await response;
-  console.log('Response:', responseData);
   return responseData;
 
 };
@@ -117,3 +111,5 @@ const sendUserToLogin = () => {
   useLogout("logoutEvent", "token");
   return null;
 }
+
+

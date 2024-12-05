@@ -39,7 +39,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     lastName.value = sessionStorage.getItem('lastName') as string;
     accessToken.value = sessionStorage.getItem('accessToken') as string;
     refreshToken.value = sessionStorage.getItem('refreshToken') as string;
-    console.log("UserDataStore has been refreshed from sessionStorage");
   }
 
   watch(userCalibrationJobsListData, (userCalibrationJobsListData) => { sessionStorage.setItem('userCalibrationJobsListData', JSON.stringify(userCalibrationJobsListData)); });
@@ -274,7 +273,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     refreshToken.value = null;
     userCalibrationJobsListData.value = [];
     userCalibrationRunData.value = undefined;
-    console.log("User Data Store Reset");
   }
 
   /**

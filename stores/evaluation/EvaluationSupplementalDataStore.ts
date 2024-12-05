@@ -50,7 +50,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     if (ls !== "undefined") { iterations.value = ls ? JSON.parse(ls) : [] }
 
     selectedSupplementalTable.value = parseInt(JSON.parse(sessionStorage.getItem('selectedSupplementalTable') as string), 10);
-    console.log("EvaluationSupplementalDataStore Store restored");
   }
 
 

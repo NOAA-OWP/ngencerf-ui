@@ -56,7 +56,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     optimizationStore_data_loading.value = JSON.parse(sessionStorage.getItem('optimizationStore_data_loading') as string) === "true";
     showObjectiveFunctionPeakFlow.value = JSON.parse(sessionStorage.getItem('showObjectiveFunctionPeakFlow') as string) === "true";
     showObjectiveFunctionStreamFlow.value = JSON.parse(sessionStorage.getItem('showObjectiveFunctionStreamFlow') as string) === "true";
-    console.log("OptimizationStore has been refreshed from sessionStorage");
+   
   }
 
 
@@ -243,7 +243,6 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     uiPlotFrequency.value = 0;
     uiStopCriteria.value = 0;
     uiOptimizationInputs.value = [];
-    console.log("Optimization Store Reset");
   }
 
   return {
