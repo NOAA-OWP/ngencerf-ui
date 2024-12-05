@@ -16,9 +16,16 @@
           </h1>
         </div>
         <div class="ml-auto mt-2">
-          <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
+          <div id="NewButton" class="">
+            <Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
               v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
               @click.stop="navigateToAlternateIteration">New Validation</Button>
+          </div>
+          <br/>
+          <div id="NewButton" class="">
+            <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
+              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0"
+              @click.stop="navigateToEvaluation">Evaluate</Button>
           </div>
         </div>
       </div>
@@ -44,7 +51,7 @@
             <DataTable id="EvalRunTable" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
-              @row-dblclick="onRowDblClick($event)" @rowContextmenu="onRowContextMenu" class="boxed">
+              @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" @rowContextmenu="onRowContextMenu" class="boxed">
               <Column field="calibration_run_id" header="Job ID" sortable></Column>
               <Column field="job_genesis" header="Job Genesis" sortable></Column>
               <Column field="created_at" header="Creation Date" sortable>
@@ -90,17 +97,6 @@
           </div>
         </div>
       </div>
-
-      <div class="flex mt-2">
-        <div class="ml-auto mt-4">
-          <div id="NewButton" class="">
-            <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
-              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0"
-              @click.stop="navigateToEvaluation">Evaluate</Button>
-          </div>
-        </div>
-      </div>
-
     </div>
 
     <div class="waitgif" v-if="isLoading">
@@ -112,7 +108,7 @@
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun, CalibrationValidationJobData } from "~/composables/NextGenModel";
+import type { CalibrationRun, CalibrationValidationJobData, DataTableContextMenuOption } from "~/composables/NextGenModel";
 import { EvaluationTabs } from "~/composables/NextgenEnums";
 import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
@@ -126,12 +122,19 @@ const { deleteCalibrationRun } = useCalibrationJobStore();
 
 const crContextMenu = ref(); //calibration run context menu
 const contextMenuJob = ref<number>()
-const cmCalibrationRun = ref([
-  { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
-  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
-]);
+// const cmCalibrationRun = ref([
+//   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
+//   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
+// ]);
+const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
+
 const onRowContextMenu = (event: any) => {
+  cmCalibrationRun.value = [];
   crContextMenu.value.show(event.originalEvent);
+  if ( event.data.validation_runs > 1 ) {
+    cmCalibrationRun.value.push( { label: 'View Validations', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns() } )
+  }
+  cmCalibrationRun.value.push( { label: 'Delete', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } )
   contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
 };
 
@@ -176,7 +179,9 @@ const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   resetUserSelectedEvalValidationRun();
   loadSelectedCalibrationRun(event.data.calibration_run_id);
   isLoading.value = true;
-  fetchUserSelectedCalibrationValidationRunList();
+  if ( event.data.validation_runs == 1 ) {
+    fetchUserSelectedCalibrationValidationRunList();
+  }
 }
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
@@ -217,6 +222,9 @@ const openSelectedCalibrationRun = () => {
   })
 }
 
+const viewSelectedCalibrationValidationRuns = () => {
+  fetchUserSelectedCalibrationValidationRunList();
+}
 
 const navigateToAlternateIteration = (event: any) => {
   if (userSelectedEvalCalibrationRunId.value > 0) {

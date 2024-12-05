@@ -616,6 +616,15 @@ export interface CalibrationGetStatusPerformanceMetricItem {
 }
 
 /**
+ * context menu option types
+ */
+export interface DataTableContextMenuOption {
+  label: string;
+  icon: string;
+  command: any;
+}
+
+/**
  * Event Bus Interface
  */
 export type LogoutEvent = {
