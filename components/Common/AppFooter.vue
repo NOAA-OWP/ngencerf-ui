@@ -5,15 +5,15 @@
   <div id="Footer" class="prevent-select cursor-default">
     <div id="FloatingInfo">
       <div id="AppDate" class="hidden text-left">UI Release Date: {{ info.release_info.date }}<br /></div>
-      <div id="ServerDate" class="hidden text-left">Server Release Date: {{ serverInfo?.date }}</div>
+      <div id="ServerDate" class="hidden text-left">ngenCERF Release Date: {{ serverInfo?.ngenCerf_date }}</div>
     </div>
     <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor text-sm">
         <div id="FooterData" class="version">
           <span @mouseenter="showAppInfo" @mouseleave="hideAppInfo">UI Version:
             {{ info.release_info.version }}</span>&nbsp;&nbsp;&nbsp;
-          <span @mouseenter="showServerInfo" @mouseleave="hideServerInfo">Server Version:
-            {{ serverInfo?.version }}</span>
+          <span @mouseenter="showServerInfo" @mouseleave="hideServerInfo">ngenCERF Version:
+            {{ serverInfo?.ngenCerf_version }}</span>
         </div>
         <div class="copyright">Copyright &COPY;2024, RTX</div>
       </div>

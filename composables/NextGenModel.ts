@@ -632,6 +632,8 @@ export type ServerInfo = {
   date: string;
   contact_email: string;
   commit_hash: string;
+  ngenCerf_version: string;
+  ngenCerf_date: string;
 }
 
 export type ForecastCycle = {
