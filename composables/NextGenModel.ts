@@ -631,6 +631,7 @@ export type ServerInfo = {
   version: string;
   date: string;
   contact_email: string;
+  commit_hash: string;
 }
 
 export type ForecastCycle = {

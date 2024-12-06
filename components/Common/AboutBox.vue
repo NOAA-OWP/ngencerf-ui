@@ -33,11 +33,15 @@
             <tr>
               <td class="td1">Released: </td>
               <td class="td2">{{ serverInfo?.date }}</td>
+            </tr>            <tr>
+              <td class="td1">Commit hash:</td>
+              <td class="td2"></td>
             </tr>
-            <tr>
-              <td class="td1">&nbsp;</td>
-              <td class="td2">&nbsp;</td>
-            </tr>
+          </tbody>
+        </table>
+        <span class="commit-hash">{{ serverInfo?.commit_hash }}</span>
+        <table class="mt-4">
+          <tbody>
             <tr>
               <td class="td1">Support Email: </td>
               <td class="td2">
@@ -82,8 +86,8 @@ const closeAboutBox = () => {
   top: 90px;
   border: 5px solid #ccc;
   z-index: 9999;
-  width: 339px;
-  height: 280px;
+  width: 400px;
+  height: 300px;
   background-color: white;
 
 
@@ -104,6 +108,10 @@ const closeAboutBox = () => {
 
   .td2 {
     margin-left: 10px;
+  }
+
+  .commit-hash {
+    padding: 3px !important;
   }
 
   .hlink {
