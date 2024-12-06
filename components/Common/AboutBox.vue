@@ -33,15 +33,15 @@
             <tr>
               <td class="td1">Released: </td>
               <td class="td2">{{ serverInfo?.date }}</td>
-            </tr>            <tr>
-              <td class="td1">Commit hash:</td>
-              <td class="td2"></td>
             </tr>
-          </tbody>
-        </table>
-        <span class="commit-hash">{{ serverInfo?.commit_hash }}</span>
-        <table class="mt-4">
-          <tbody>
+            <tr>
+              <td class="td1">Commit hash:</td>
+              <td class="td2">{{ serverInfo?.commit_hash }}</td>
+            </tr>
+            <tr>
+              <td class="td1">&nbsp;</td>
+              <td class="td2">&nbsp;</td>
+            </tr>
             <tr>
               <td class="td1">Support Email: </td>
               <td class="td2">
@@ -51,7 +51,6 @@
           </tbody>
         </table>
       </div>
-
     </div>
   </div>
 
@@ -86,7 +85,7 @@ const closeAboutBox = () => {
   top: 90px;
   border: 5px solid #ccc;
   z-index: 9999;
-  width: 400px;
+  width: 518px;
   height: 300px;
   background-color: white;
 
