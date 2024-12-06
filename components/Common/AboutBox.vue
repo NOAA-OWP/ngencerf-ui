@@ -36,7 +36,7 @@
             </tr>
             <tr>
               <td class="td1">UI Commit: </td>
-              <td class="td2"></td>
+              <td class="td2">{{ info.release_info.commit }}</td>
             </tr>
             <tr>
               <td class="td1">&nbsp;</td>
