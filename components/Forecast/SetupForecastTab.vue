@@ -9,7 +9,7 @@
       selectionMode="single">
       <Column field="name" header="Cycle"></Column>
       <Column field="data_sources" header="Data Sources"></Column>
-      <Column field="time_range" header="Time Range (NgenCERF)"></Column>
+      <Column field="time_range" header="Time Range (ngenCERF)"></Column>
     </DataTable>
   </div>
   <div class="text-normal mt-2 mx-auto text-center">
