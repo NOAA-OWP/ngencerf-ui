@@ -1,9 +1,11 @@
+import { GageOptionData } from './../../composables/NextGenModel';
 // @ts-check
 /**
  *  The General Store will be responsible for handling information OUTSIDE of the data needed for the back end.
  *  Data will include the current menu status and the current tab status for each of the 4 menu items
  */
-import { defineStore } from "pinia";
+import { defineStore } from "pinia";import type { ServerInfo } from "~/composables/NextGenModel";
+import type { ServerInfo } from "~/composables/NextGenModel";
 
 export const generalStore = defineStore(
   "generalStore",
@@ -22,6 +24,8 @@ export const generalStore = defineStore(
 
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
+
+    const serverInfo = ref<ServerInfo>();
 
     // Restore state from sessionStorage if available
     if (typeof window !== 'undefined') {
@@ -48,6 +52,14 @@ export const generalStore = defineStore(
     watch(evaluateIterationRunId, (evaluateIterationRunId) => { sessionStorage.setItem('evaluateIterationRunId', JSON.stringify(evaluateIterationRunId)); })
     watch(evaluationRunSelected, (evaluationRunSelected) => { sessionStorage.setItem('evaluationRunSelected', JSON.stringify(evaluationRunSelected)); })
 
+
+    function getServerInfo() {
+      return serverInfo.value;
+    }
+
+    function setServerInfo(si: ServerInfo) {
+      serverInfo.value = si;
+    }
 
     // Top Menu index
     function getMenuIndex() {
@@ -122,7 +134,9 @@ export const generalStore = defineStore(
       calibrationTabIndex,
       evaluationTabIndex,
       forecastTabIndex,
-      resetGeneralStore
+      resetGeneralStore,
+      setServerInfo,
+      getServerInfo
     };
   },
   {

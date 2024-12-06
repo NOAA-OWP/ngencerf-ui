@@ -25,13 +25,23 @@ line-
 import json from "@/assets/version.json";
 import type { ServerInfo } from "~/composables/NextGenModel";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { generalStore } from "~/stores/common/GeneralStore";
+
+const genStore = generalStore();
+
+const { getServerInfo, setServerInfo } = generalStore();
+
+
 const { ngencerfBaseUrl } = useBackendConfig();
 const info = json;
 const serverInfo = ref<ServerInfo>();
 
-onMounted(() => {
+onMounted( async () => {
   console.log("Calling get footer info from User Account on mounted")
-  getFooterInformation();
+  serverInfo.value = getServerInfo();
+  if( !serverInfo.value || !serverInfo.value.version )  {
+    await getFooterInformation();
+  }
 })
 
 const showAppInfo = () => {
@@ -65,6 +75,9 @@ const getFooterInformation = () => {
     body: ""
   }).then((result) => {
     serverInfo.value = result._data;
+    if(serverInfo.value) {
+      setServerInfo(serverInfo.value);
+    }    
   })
 }
 
