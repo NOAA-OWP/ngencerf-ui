@@ -8,7 +8,7 @@
             <span v-if="computedCalibrationValidationRunList.length <= 1">
               Calibration Runs*<br />
               <span style="font-size: 12px;font-weight: normal;">
-                * Double click on a row to open, or right click for other options.
+                * Right click for other options.
               </span>
             </span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
@@ -17,7 +17,7 @@
         </div>
         <div class="ml-auto mt-2">
           <div id="NewButton" class="">
-            <Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
+            <Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4 w-40"
               v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
               @click.stop="navigateToAlternateIteration">New Validation</Button>
           </div>
@@ -34,7 +34,7 @@
         v-if="userEvaluationCalibrationRunListData.length > 0 && computedCalibrationValidationRunList.length <= 1">
 
           <div id="CalTable">
-            <div class="grid grid-cols-2 mb-5">
+            <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
               <div class="col-span-1">
                 <div class="ml-10">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
@@ -132,7 +132,7 @@ const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
   crContextMenu.value.show(event.originalEvent);
   if ( event.data.validation_runs > 1 ) {
-    cmCalibrationRun.value.push( { label: 'View Validations', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns() } )
+    cmCalibrationRun.value.push( { label: 'Select a Validation Job', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns() } )
   }
   cmCalibrationRun.value.push( { label: 'Delete', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } )
   contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
@@ -254,7 +254,7 @@ const returnCalibrationJobList = (event: any) => {
 const confirmDelte = useConfirm();
 const deleteSelectedCalibrationRun = () => {
   const selectedRunId = contextMenuJob.value as number;
-  let confirmMessage = "Are you sure you want to delete this run?"
+  let confirmMessage = "Are you sure you want to delete this calibration run? All associated validation job will also be deleted."
   confirmDelte.require({
     message: confirmMessage,
     header: 'Confirm Delete',
@@ -277,13 +277,15 @@ const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
     if (response.status == 200) {
       fetchUserValidatedCalibrationJobsListData();
+      resetUserSelectedEvalValidationRun();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
       });
     }
   });
-  selectedCalibrationRun.value = undefined;
+  //selectedCalibrationRun.value = undefined;
+  
 }
 
 const rowStyle = (data: any) => {
@@ -304,8 +306,14 @@ const rowStyle = (data: any) => {
   width: 300px;
 }
 
-#EvalRunTable {
+#EvalRunTable,
+.gage-filter-wrapper {
   width: 1270px;
   margin: 0 auto;
 }
+
+.gage-filter-wrapper {
+  margin-bottom: 1rem;
+}
+
 </style>
