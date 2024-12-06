@@ -4,7 +4,7 @@
     <div id="TopBar">&nbsp;</div>
     <div class="grid grid-cols-12 gap-1" style="height: 80px">
       <div id="PgmName" class="col-span-2 mt-6">
-        <NuxtLink to="LandingPage">NgenCERF</NuxtLink>
+        <NuxtLink to="LandingPage">ngenCERF</NuxtLink>
       </div>
       <div id="Col2" class="col-span-8">
 
