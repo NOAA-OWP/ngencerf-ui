@@ -15,12 +15,28 @@
         <table>
           <tbody>
             <tr>
+              <td class="td1">ngenCERF Version: </td>
+              <td class="td2">{{ serverInfo?.ngenCerf_version }}</td>
+            </tr>
+            <tr>
+              <td class="td1">ngenCERF Date: </td>
+              <td class="td2"> {{ serverInfo?.ngenCerf_date }}</td>
+            </tr>
+            <tr>
+              <td class="td1">&nbsp;</td>
+              <td class="td2">&nbsp;</td>
+            </tr>
+            <tr>
               <td class="td1">UI Version: </td>
               <td class="td2">{{ info.release_info.version }}</td>
             </tr>
             <tr>
-              <td class="td1">Released: </td>
+              <td class="td1">UI Date: </td>
               <td class="td2"> {{ info.release_info.date }}</td>
+            </tr>
+            <tr>
+              <td class="td1">UI Commit: </td>
+              <td class="td2"></td>
             </tr>
             <tr>
               <td class="td1">&nbsp;</td>
@@ -31,11 +47,11 @@
               <td class="td2">{{ serverInfo?.version }}</td>
             </tr>
             <tr>
-              <td class="td1">Released: </td>
+              <td class="td1">Server Date: </td>
               <td class="td2">{{ serverInfo?.date }}</td>
             </tr>
             <tr>
-              <td class="td1">Commit hash:</td>
+              <td class="td1">Server Commit:</td>
               <td class="td2">{{ serverInfo?.commit_hash }}</td>
             </tr>
             <tr>
@@ -85,8 +101,8 @@ const closeAboutBox = () => {
   top: 90px;
   border: 5px solid #ccc;
   z-index: 9999;
-  width: 518px;
-  height: 300px;
+  width: 544px;
+  height: 400px;
   background-color: white;
 
 
