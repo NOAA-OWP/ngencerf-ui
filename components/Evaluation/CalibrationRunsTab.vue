@@ -8,7 +8,7 @@
             <span v-if="computedCalibrationValidationRunList.length <= 1">
               Calibration Runs*<br />
               <span style="font-size: 12px;font-weight: normal;">
-                * Right click for other options.
+                * Select the job then right click for action items.
               </span>
             </span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
