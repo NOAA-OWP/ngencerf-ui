@@ -54,34 +54,22 @@
 </template>
 
 <script setup lang="ts">
-import { useBackendConfig } from "~/composables/UseBackendConfig";
 import type { ServerInfo } from "~/composables/NextGenModel";
 import json from "@/assets/version.json";
+import { generalStore } from "~/stores/common/GeneralStore";
+
+const genStore = generalStore();
+const { getServerInfo } = generalStore();
+
 const info = json;
-const { ngencerfBaseUrl } = useBackendConfig();
 const serverInfo = ref<ServerInfo>();
 
 onMounted(async () => {
-  console.log("Calling get footer info from User Account on mounted")
-  await getFooterInformation();
+  serverInfo.value = getServerInfo();
 })
-
-// Get footer info
-const getFooterInformation = () => {
-  makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": 'application/json'
-    },
-    body: ""
-  }).then((result) => {
-    serverInfo.value = result._data;
-  })
-}
 
 const closeAboutBox = () => {
   useAccountEvent("aboutBoxEvent", "");
-
 }
 
 </script>
