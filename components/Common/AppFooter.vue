@@ -1,18 +1,12 @@
 <template>
-
-
-
   <div id="Footer" class="prevent-select cursor-default">
     <div id="FloatingInfo">
-      <div id="AppDate" class="hidden text-left">UI Release Date: {{ info.release_info.date }}<br /></div>
-      <div id="ServerDate" class="hidden text-left">ngenCERF Release Date: {{ serverInfo?.ngenCerf_date }}</div>
+      <div id="ServerDate" class="hidden text-left">Release Date: {{ serverInfo?.ngenCerf_date }}</div>
     </div>
     <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor text-sm">
         <div id="FooterData" class="version">
-          <span @mouseenter="showAppInfo" @mouseleave="hideAppInfo">UI Version:
-            {{ info.release_info.version }}</span>&nbsp;&nbsp;&nbsp;
-          <span @mouseenter="showServerInfo" @mouseleave="hideServerInfo">ngenCERF Version:
+          <span @mouseenter="showServerInfo" @mouseleave="hideServerInfo">Version:
             {{ serverInfo?.ngenCerf_version }}</span>
         </div>
         <div class="copyright">Copyright &COPY;2024, RTX</div>
@@ -20,7 +14,7 @@
     </div>
   </div>
 </template>
-line-
+
 <script lang="ts" setup>
 import json from "@/assets/version.json";
 import type { ServerInfo } from "~/composables/NextGenModel";
@@ -30,7 +24,6 @@ import { generalStore } from "~/stores/common/GeneralStore";
 const genStore = generalStore();
 
 const { getServerInfo, setServerInfo } = generalStore();
-
 
 const { ngencerfBaseUrl } = useBackendConfig();
 const info = json;
@@ -44,16 +37,6 @@ onMounted( async () => {
   }
 })
 
-const showAppInfo = () => {
-  const e = document.getElementById('AppDate');
-  (e as HTMLElement).style.display = "inline-block"
-}
-
-const hideAppInfo = () => {
-  const e = document.getElementById('AppDate');
-  (e as HTMLElement).style.display = "none"
-}
-
 const showServerInfo = () => {
   const e = document.getElementById('ServerDate');
   (e as HTMLElement).style.display = "inline-block"
@@ -64,8 +47,7 @@ const hideServerInfo = () => {
   (e as HTMLElement).style.display = "none"
 }
 
-
-// Get footer info
+// Get footer infongenCERF
 const getFooterInformation = () => {
   makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
     method: "POST",
@@ -80,7 +62,6 @@ const getFooterInformation = () => {
     }    
   })
 }
-
 
 </script>
 
