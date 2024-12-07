@@ -168,7 +168,7 @@
         </div>
 
         <div class="col-span-1 mt-2 relative">
-          <button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg">Clear</button>
+          <button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg" @click="clearUserSelectedCalibrationTuningParameters()">Clear</button>
         </div>
 
       </div>
@@ -739,6 +739,14 @@ const updateCalibrationTuningParameter = (index: number, field: string, ev: Even
  */
 const deleteCalibrationTuningParameter = (selectedTuningParameterData: any) => {
   userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters.value.filter((param: any) => param.name !== selectedTuningParameterData.value.name);
+};
+
+/**
+ * Clear userSelectedCalibrationTuningParameters
+ */
+const clearUserSelectedCalibrationTuningParameters = () => {
+  userSelectedCalibrationTuningParameters.value = [];
+  selectedTuningParameterData.value = null;
 };
 
 /**
