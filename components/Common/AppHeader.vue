@@ -165,9 +165,9 @@ const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } 
 const location = useRoute();
 
 const userItems = ref([
+  { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
   { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
-  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() },
-  { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() }
+  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
 ])
 
 const userContextMenu = ref();
