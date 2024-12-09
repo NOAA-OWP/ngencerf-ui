@@ -1,7 +1,7 @@
 <template>
   <div id="Footer" class="prevent-select cursor-default">
-    <div id="FloatingInfo">
-      <div id="ServerDate" class="hidden text-left">Release Date: {{ serverInfo?.ngenCerf_date }}</div>
+    <div id="FloatingInfo" class="hidden">
+      <div id="ServerDate" class="text-left">Release Date: {{ serverInfo?.ngenCerf_date }}</div>
     </div>
     <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor text-sm">
@@ -21,8 +21,6 @@ import type { ServerInfo } from "~/composables/NextGenModel";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { generalStore } from "~/stores/common/GeneralStore";
 
-const genStore = generalStore();
-
 const { getServerInfo, setServerInfo } = generalStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -38,12 +36,12 @@ onMounted( async () => {
 })
 
 const showServerInfo = () => {
-  const e = document.getElementById('ServerDate');
+  const e = document.getElementById('FloatingInfo');
   (e as HTMLElement).style.display = "inline-block"
 }
 
 const hideServerInfo = () => {
-  const e = document.getElementById('ServerDate');
+  const e = document.getElementById('FloatingInfo');
   (e as HTMLElement).style.display = "none"
 }
 
@@ -78,8 +76,9 @@ const getFooterInformation = () => {
 
 #AppDate, #ServerDate {
   border: 2px solid black;
-  padding: 10px;
+  padding: 5px;
   border-radius: 10px;
+  background-color: white;
 }
 #Footer {
   font-size: 18px;
