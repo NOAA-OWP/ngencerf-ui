@@ -7,7 +7,7 @@
         </span>
         <br />
         <p style="font-size: 12px;font-weight: normal; margin-top:-10px;">
-              Double click on a row to open, or right click for more options. Click "New" for a fresh setup.
+              Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
         </p>
         <div id="CalTable" class="w-max mx-auto">
           <div class="grid grid-cols-1 mb-5">
