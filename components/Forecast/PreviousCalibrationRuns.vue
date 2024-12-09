@@ -5,9 +5,9 @@
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
-            Calibration Runs*<br />
+            Calibration Runs<br />
             <span style="font-size: 12px;font-weight: normal;">
-              * Double click on a row to open, or right click for other options.
+              Double click on a row to setup a forecast, or select row and right click for more options.
             </span>
           </h1>
         </div>
@@ -95,7 +95,7 @@ const crContextMenu = ref(); //calibration run context menu
 
 const isLoading = ref(true);
 const cmCalibrationRun = ref([
-{ label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
+{ label: 'Setup Forecast', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
 { label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onForecastRowSelect() },
 
 
