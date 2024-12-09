@@ -6,13 +6,17 @@
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
             <span v-if="computedCalibrationValidationRunList.length <= 1">
-              Calibration Runs*<br />
+              Calibration Runs<br />
               <span style="font-size: 12px;font-weight: normal;">
-                * Select the job then right click for action items.
+                Select the job then right click for options.
               </span>
             </span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
-              userSelectedEvalCalibrationRunId }}</span>
+              userSelectedEvalCalibrationRunId }}<br />
+              <span style="font-size: 12px;font-weight: normal;">
+                Select the job to view/evaluate then click the Evaluate button.
+              </span>
+            </span>
           </h1>
         </div>
         <div class="ml-auto mt-2">
