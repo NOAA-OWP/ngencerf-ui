@@ -254,6 +254,12 @@ onMounted(async () => {
   // Load Run Status Store to load resultsPathname
   await loadRunStatusStore();
 
+  // make sure page loads with no plot selected
+  selectedPlotName.value = null;
+  selectedPlotFilename.value = null;
+  selectedPlotFileUrl.value = null;
+  selectedSupplementalTable.value = 0;
+
   // Get Plot Names
   if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
     plotNames.value = await queryGetPlotNames();
@@ -458,12 +464,6 @@ onMounted(async () => {
       }
     }
   }
-
-  // make sure page loads with no plot selected
-  selectedPlotName.value = null;
-  selectedPlotFilename.value = null;
-  selectedPlotFileUrl.value = null;
-  selectedSupplementalTable.value = 0;
 });
 
 // Handle selectedPlotName changes
