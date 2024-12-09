@@ -631,8 +631,8 @@ const handleFileUpload = async (event: Event) => {
             isNotNullOrUndefined(param.max) &&
             isNotNullOrUndefined(param.init) &&
             isNotNullOrUndefined(param.model)) {
-            // check if parameter is in the calibrationTuningParameters list, which is the list of calibratable parameters
-            const isParameterInCalibratableList = calibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param);
+            // check if parameter is in the calibrationTuningParameters list and that the module name matches, which is the list of calibratable parameters
+            const isParameterInCalibratableList = calibrationTuningParameters?.value?.some((paramData: any) => paramData.name === param.param && paramData.module === param.model);
 
             // if parameter is not in the list of calibratable parameters, add it to the list of invalid parameters
             if (!isParameterInCalibratableList) {

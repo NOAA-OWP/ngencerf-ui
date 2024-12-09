@@ -103,7 +103,6 @@ onMounted( () => {
     
     syncScroll( calibrationRunDetailTable.value?.$el.children[0], tuningParametersTable.value?.$el.children[0] );
     syncScroll( tuningParametersTable.value?.$el.children[0], calibrationRunDetailTable.value?.$el.children[0] );
-    console.log("SelectAltIterationTab for Evaluation mounted")
   })
 })
 
@@ -112,16 +111,19 @@ const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
   //userSelectedCalibrationIterationId.value = event.data.iteration_id;
   if ( event.data.validation_run_id === "" ) {
     evaluateIterationRunId.value = event.data.iteration_id; 
+  } else {
+    evaluateIterationRunId.value = 0;
   }
   const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
   selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];   
 }
 
 const onParameterTableRowSelect = ( event: DataTableRowClickEvent ) => {
-  console.log( 'onParameterTableRowSelect event.data.validation_run_id', event.data.validation_run_id );
   //userSelectedCalibrationIterationId.value = event.data.iteration_id;
   if ( event.data.validation_run_id === "" ) {
     evaluateIterationRunId.value = event.data.iteration_id;    
+  } else {
+    evaluateIterationRunId.value = 0;
   }
   const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
   selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];

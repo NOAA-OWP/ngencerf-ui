@@ -3,6 +3,10 @@
     <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">
       Forecast Cycle Selection
     </h1>
+    <p style="font-size: 12px;font-weight: normal;margin-top:-20px;">
+      Select a cycle then click Next.
+    </p>
+    <br />
   </div>
   <div>
     <DataTable
@@ -15,11 +19,11 @@
     >
       <Column field="name" header="Cycle"></Column>
       <Column field="data_sources" header="Data Sources"></Column>
-      <Column field="time_range" header="Time Range (NgenCERF)"></Column>
+      <Column field="time_range" header="Time Range (ngenCERF)"></Column>
     </DataTable>
   </div>
   <div class="text-normal mt-2 mx-auto text-center">
-    * Cycles in <span class="text-gray-500">grey</span> are currently unavailable from the GUI. Use the CLI to run these
+    Cycles in <span class="text-gray-500">grey</span> are currently unavailable from the GUI. Use the CLI to run these
     cycles.
   </div>
   <div>

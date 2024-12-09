@@ -6,19 +6,30 @@
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
             <span v-if="computedCalibrationValidationRunList.length <= 1">
-              Calibration Runs*<br />
+              Calibration Runs<br />
               <span style="font-size: 12px;font-weight: normal;">
-                * Double click on a row to open, or right click for other options.
+                Select the job then right click for options.
               </span>
             </span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
-              userSelectedEvalCalibrationRunId }}</span>
+              userSelectedEvalCalibrationRunId }}<br />
+              <span style="font-size: 12px;font-weight: normal;">
+                Select the job to view/evaluate then click the Evaluate button.
+              </span>
+            </span>
           </h1>
         </div>
         <div class="ml-auto mt-2">
-          <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
+          <div id="NewButton" class="">
+            <Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4 w-40"
               v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
               @click.stop="navigateToAlternateIteration">New Validation</Button>
+          </div>
+          <br/>
+          <div id="NewButton" class="">
+            <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
+              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0"
+              @click.stop="navigateToEvaluation">Evaluate</Button>
           </div>
         </div>
       </div>
@@ -27,7 +38,7 @@
         v-if="userEvaluationCalibrationRunListData.length > 0 && computedCalibrationValidationRunList.length <= 1">
 
           <div id="CalTable">
-            <div class="grid grid-cols-2 mb-5">
+            <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
               <div class="col-span-1">
                 <div class="ml-10">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
@@ -44,7 +55,7 @@
             <DataTable id="EvalRunTable" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
-              @row-dblclick="onRowDblClick($event)" @rowContextmenu="onRowContextMenu" class="boxed">
+              @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" @rowContextmenu="onRowContextMenu" class="boxed">
               <Column field="calibration_run_id" header="Job ID" sortable></Column>
               <Column field="job_genesis" header="Job Genesis" sortable></Column>
               <Column field="created_at" header="Creation Date" sortable>
@@ -90,17 +101,6 @@
           </div>
         </div>
       </div>
-
-      <div class="flex mt-2">
-        <div class="ml-auto mt-4">
-          <div id="NewButton" class="">
-            <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
-              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0"
-              @click.stop="navigateToEvaluation">Evaluate</Button>
-          </div>
-        </div>
-      </div>
-
     </div>
 
     <div class="waitgif" v-if="isLoading">
@@ -112,7 +112,7 @@
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun, CalibrationValidationJobData } from "~/composables/NextGenModel";
+import type { CalibrationRun, CalibrationValidationJobData, DataTableContextMenuOption } from "~/composables/NextGenModel";
 import { EvaluationTabs } from "~/composables/NextgenEnums";
 import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
@@ -126,12 +126,19 @@ const { deleteCalibrationRun } = useCalibrationJobStore();
 
 const crContextMenu = ref(); //calibration run context menu
 const contextMenuJob = ref<number>()
-const cmCalibrationRun = ref([
-  { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
-  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
-]);
+// const cmCalibrationRun = ref([
+//   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
+//   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
+// ]);
+const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
+
 const onRowContextMenu = (event: any) => {
+  cmCalibrationRun.value = [];
   crContextMenu.value.show(event.originalEvent);
+  if ( event.data.validation_runs > 1 ) {
+    cmCalibrationRun.value.push( { label: 'Select a Validation Job', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns() } )
+  }
+  cmCalibrationRun.value.push( { label: 'Delete', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } )
   contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
 };
 
@@ -176,7 +183,9 @@ const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   resetUserSelectedEvalValidationRun();
   loadSelectedCalibrationRun(event.data.calibration_run_id);
   isLoading.value = true;
-  fetchUserSelectedCalibrationValidationRunList();
+  if ( event.data.validation_runs == 1 ) {
+    fetchUserSelectedCalibrationValidationRunList();
+  }
 }
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
@@ -217,6 +226,9 @@ const openSelectedCalibrationRun = () => {
   })
 }
 
+const viewSelectedCalibrationValidationRuns = () => {
+  fetchUserSelectedCalibrationValidationRunList();
+}
 
 const navigateToAlternateIteration = (event: any) => {
   if (userSelectedEvalCalibrationRunId.value > 0) {
@@ -246,7 +258,7 @@ const returnCalibrationJobList = (event: any) => {
 const confirmDelte = useConfirm();
 const deleteSelectedCalibrationRun = () => {
   const selectedRunId = contextMenuJob.value as number;
-  let confirmMessage = "Are you sure you want to delete this run?"
+  let confirmMessage = "Are you sure you want to delete this calibration run? All associated validation job will also be deleted."
   confirmDelte.require({
     message: confirmMessage,
     header: 'Confirm Delete',
@@ -269,13 +281,15 @@ const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
     if (response.status == 200) {
       fetchUserValidatedCalibrationJobsListData();
+      resetUserSelectedEvalValidationRun();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
       });
     }
   });
-  selectedCalibrationRun.value = undefined;
+  //selectedCalibrationRun.value = undefined;
+  
 }
 
 const rowStyle = (data: any) => {
@@ -296,8 +310,14 @@ const rowStyle = (data: any) => {
   width: 300px;
 }
 
-#EvalRunTable {
+#EvalRunTable,
+.gage-filter-wrapper {
   width: 1270px;
   margin: 0 auto;
 }
+
+.gage-filter-wrapper {
+  margin-bottom: 1rem;
+}
+
 </style>

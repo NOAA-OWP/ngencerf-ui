@@ -616,6 +616,15 @@ export interface CalibrationGetStatusPerformanceMetricItem {
 }
 
 /**
+ * context menu option types
+ */
+export interface DataTableContextMenuOption {
+  label: string;
+  icon: string;
+  command: any;
+}
+
+/**
  * Event Bus Interface
  */
 export type LogoutEvent = {
@@ -624,12 +633,16 @@ export type LogoutEvent = {
 
 export type AccountEvent = {
   accountEvent: string;
+  aboutBoxEvent: string;
 }
 
 export type ServerInfo = {
   version: string;
   date: string;
-  email: string;
+  contact_email: string;
+  commit_hash: string;
+  ngenCerf_version: string;
+  ngenCerf_date: string;
 }
 
 export type ForecastCycle = {

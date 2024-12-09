@@ -1,4 +1,13 @@
 <template>
+  <div class="w-full">
+    <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
+      Forecast
+    </h1>
+    <p class="text-center" style="font-size: 12px;font-weight: normal;margin-top:-20px;">
+      If status is Ready click Run to submit and run the forecast.
+    </p>
+    <br />
+  </div>
   <div>
     <div class="grid grid-cols-2">
       <div class="col-span-1">

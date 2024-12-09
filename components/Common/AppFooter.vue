@@ -1,11 +1,13 @@
 <template>
   <div id="Footer" class="prevent-select cursor-default">
+    <div id="FloatingInfo" class="hidden">
+      <div id="ServerDate" class="text-left">Release Date: {{ serverInfo?.ngenCerf_date }}</div>
+    </div>
     <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor text-sm">
         <div id="FooterData" class="version">
-          App Version: {{ info.release_info.version }}&nbsp; ({{
-            info.release_info.date
-          }}), Server Version: {{ serverInfo?.version }} ({{ serverInfo?.date }})
+          <span @mouseenter="showServerInfo" @mouseleave="hideServerInfo">Version:
+            {{ serverInfo?.ngenCerf_version }}</span>
         </div>
         <div class="copyright">Copyright &COPY;2024, RTX</div>
       </div>
@@ -15,40 +17,69 @@
 
 <script lang="ts" setup>
 import json from "@/assets/version.json";
-import { useRoute } from "vue-router";
 import type { ServerInfo } from "~/composables/NextGenModel";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { generalStore } from "~/stores/common/GeneralStore";
+
+const { getServerInfo, setServerInfo } = generalStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
-
-const location = useRoute();
 const info = json;
-
 const serverInfo = ref<ServerInfo>();
 
-onMounted( () => {
-  getFooterInformation();
+onMounted( async () => {
+  console.log("Calling get footer info from User Account on mounted")
+  serverInfo.value = getServerInfo();
+  if( !serverInfo.value || !serverInfo.value.version )  {
+    await getFooterInformation();
+  }
 })
 
-// Get footer info
-const getFooterInformation = () => {
-    makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": 'application/json'
-      },
-      body: ""
-    }).then((result) => {
-      serverInfo.value = result._data;
-    })
-  }
+const showServerInfo = () => {
+  const e = document.getElementById('FloatingInfo');
+  (e as HTMLElement).style.display = "inline-block"
+}
 
+const hideServerInfo = () => {
+  const e = document.getElementById('FloatingInfo');
+  (e as HTMLElement).style.display = "none"
+}
+
+// Get footer infongenCERF
+const getFooterInformation = () => {
+  makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": 'application/json'
+    },
+    body: ""
+  }).then((result) => {
+    serverInfo.value = result._data;
+    if(serverInfo.value) {
+      setServerInfo(serverInfo.value);
+    }    
+  })
+}
 
 </script>
 
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";
 
+#FloatingInfo {
+  position:sticky;
+  margin-left: 20px;
+  height: 2em;
+  font-size: 0.8em;
+  z-index: 9999;
+}
+
+#AppDate, #ServerDate {
+  border: 2px solid black;
+  padding: 5px;
+  border-radius: 10px;
+  background-color: white;
+}
 #Footer {
   font-size: 18px;
   font-family: NeueFrutigerWorld-Book, sans-serif;

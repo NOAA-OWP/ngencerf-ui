@@ -4,7 +4,7 @@
     <div id="TopBar">&nbsp;</div>
     <div class="grid grid-cols-12 gap-1" style="height: 80px">
       <div id="PgmName" class="col-span-2 mt-6">
-        <NuxtLink to="LandingPage">NgenCERF</NuxtLink>
+        <NuxtLink to="LandingPage">ngenCERF</NuxtLink>
       </div>
       <div id="Col2" class="col-span-8">
 
@@ -122,6 +122,9 @@
   </div>
   <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
     <UserAccount />
+  </div>  
+  <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
+    <LazyAboutBox />
   </div>
 </template>
 
@@ -148,10 +151,12 @@ const LazyCalibrationHelpResultsHelp = defineAsyncComponent(() => import("@/comp
 const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/CalibrationRunsHelp.vue"))
 const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
+const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 
 const emit = defineEmits(["logoutEvent"]);
 
 const accountOverlay = ref();
+const aboutOverlay = ref();
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex } = generalStore();
 
@@ -160,6 +165,7 @@ const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } 
 const location = useRoute();
 
 const userItems = ref([
+  { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
   { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
   { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
 ])
@@ -212,12 +218,21 @@ const sizeHelpWindow = () => {
 /**
  * 
  */
-const gotoAccount = async () => {
+ const gotoAccount = async () => {
   accountOverlay.value.style.display = "block";
+}
+
+const aboutBox = async () => {
+  aboutOverlay.value.style.display = "block";
 }
 
 useAccountEventListen('accountEvent', () => {
   const ele = document.getElementById('UserAccountOverlay') as HTMLElement;
+  ele.style.display = "none";
+})
+
+useAccountEventListen('aboutBoxEvent', () => {
+  const ele = document.getElementById('AboutBoxOverlay') as HTMLElement;
   ele.style.display = "none";
 })
 
