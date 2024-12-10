@@ -482,7 +482,7 @@ watch(selectedPlotName, async () => {
 
   // provide custom message if missing selected plot is a validation plot
   if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
-    plotNotAvailableMessage = 'Plots are not available until after validation is complete';
+    plotNotAvailableMessage = selectedPlotName.value?.toString() + ' is not available until after validation is complete';
   }
 
   if (iteration.value && iteration.value >= 1) {
@@ -521,7 +521,7 @@ watch(iteration, async () => {
 
     // provide custom message if missing selected plot is a validation plot
     if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
-      plotNotAvailableMessage = 'Plots are not available until after validation is complete';
+      plotNotAvailableMessage = selectedPlotName.value?.toString() + ' is not available until after validation is complete';
     }
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
