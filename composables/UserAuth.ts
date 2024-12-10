@@ -88,7 +88,7 @@ export const makeProtectedApiCall = async <T>(
       rqstUserOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
       return makeProtectedApiCall( rqstUrl, rqstUserOptions);
     } else {
-      responseData = {_data: await response.json(), status: response.status };
+      responseData = {_data: await response.json(), status: response.status, ok: response.ok };
        console.log(responseData);
        return responseData;
     }
