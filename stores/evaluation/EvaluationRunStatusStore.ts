@@ -13,7 +13,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
 
-  const validationStatus = ref<string | null>(null);
+  const validationStatus = ref<string>( "" );
   const runningTime = ref<string>("");
   const startTime = ref<string>("");
   const validationStopStatus = ref<string[]>(['DONE', 'SERVER ERROR', 'FAIL', 'CANCELLED']);
@@ -121,7 +121,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   }
 
   const clearRunningStatusInfo = () => {
-    validationStatus.value = null;
+    validationStatus.value = "";
     startTime.value = "";
     runningTime.value = "";
   }

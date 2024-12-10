@@ -114,16 +114,20 @@ onMounted(async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
   
+  // assume having evaluateValidationRunId but not evaluateIterationRunId means user is intend to view the status of a done/stopped job
   if ( evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0 ) {
     loadValidationStatusInformation( evaluateValidationRunId.value );
   } else {
-    evaluateValidationRunId.value = 0;
+    // this condition assume we have evaluateIterationRunId value which also assume user want to run a new validation
+    // this condition is specifically use to handle user click on status/run tab which can not reset certain value until user land on the tab
+    evaluateValidationRunId.value = displayValidationId.value = 0;
+    runningTime.value = startTime.value = "";
   }
 });
 
 const isStartHidden = (): boolean => {
   let hidden = false;
-  if ( validationStatus.value != null ) {
+  if ( validationStatus.value !== "" ) {
     hidden = true;
   }
   return hidden;
@@ -131,7 +135,7 @@ const isStartHidden = (): boolean => {
 
 const isCancelHidden = ():boolean => {
   let hidden = false;
-  if ( validationStatus.value == null || ( validationStatus.value != null && isValidationRunStopped( validationStatus.value ) ) ) {
+  if ( validationStatus.value === "" || ( validationStatus.value !== "" && isValidationRunStopped( validationStatus.value ) ) ) {
     hidden = true;
   }
   return hidden;
@@ -173,7 +177,8 @@ watch( validationStatus, async ( newStatus, initialStatus ) => {
       })
     }, 10000 );
   } else {
-    evaluateValidationRunId.value = iterationValidationRunId.value;
+    // this is for value assignment is only for running job that is now done/stopped
+    if ( iterationValidationRunId.value > 0 ) evaluateValidationRunId.value = iterationValidationRunId.value;
     clearInterval( validationStatusCheckingInterval.value );
     clearInterval( validationRunningTimeInterval.value );
   }

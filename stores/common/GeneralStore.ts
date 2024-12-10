@@ -17,10 +17,15 @@ export const generalStore = defineStore(
     const menuIndex = ref("1");
 
     const calibrationJobId = ref<number>(0);
+    // user selected valiation run id from evaluate tab
     const evaluateValidationRunId = ref<number>(0);
+    // user selected iteration run id from evaluate-select alternative tab
     const evaluateIterationRunId = ref<number>(0);
+    // running validation run id from selected iteration
     const iterationValidationRunId = ref<number>(0);
+    // user selected validation run status
     const evaluateValidationRunStatus = ref<string>('');
+    // user seleted iteration run number for display only
     const evaluateDisplayIterationNumber = ref<number>( 0 );
 
     // Has the user selected a previous calibration run for Evaluation?
@@ -40,6 +45,8 @@ export const generalStore = defineStore(
       evaluateIterationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('evaluateIterationRunId') as string), 10);
       iterationValidationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('iterationValidationRunId') as string), 10);
       evaluationRunSelected.value = JSON.parse(sessionStorage.getItem('evaluationRunSelected') as string);
+      evaluateValidationRunStatus.value = JSON.parse(sessionStorage.getItem('evaluateValidationRunStatus') as string);
+      evaluateDisplayIterationNumber.value = parseInt(JSON.parse(sessionStorage.getItem('evaluateDisplayIterationNumber') as string), 10);
     }
 
     watch(calibrationTabIndex, (calibrationTabIndex) => { sessionStorage.setItem('calibrationTabIndex', calibrationTabIndex); })
@@ -52,7 +59,8 @@ export const generalStore = defineStore(
     watch(evaluateValidationRunId, (evaluateValidationRunId) => { sessionStorage.setItem('evaluateValidationRunId', JSON.stringify(evaluateValidationRunId)); })
     watch(evaluateIterationRunId, (evaluateIterationRunId) => { sessionStorage.setItem('evaluateIterationRunId', JSON.stringify(evaluateIterationRunId)); })
     watch(evaluationRunSelected, (evaluationRunSelected) => { sessionStorage.setItem('evaluationRunSelected', JSON.stringify(evaluationRunSelected)); })
-
+    watch(evaluateValidationRunStatus, (evaluateValidationRunStatus) => { sessionStorage.setItem('evaluateValidationRunStatus', JSON.stringify(evaluateValidationRunStatus)); })
+    watch(evaluateDisplayIterationNumber, (evaluateDisplayIterationNumber) => { sessionStorage.setItem('evaluateDisplayIterationNumber', JSON.stringify(evaluateDisplayIterationNumber)); })
 
     function getServerInfo() {
       return serverInfo.value;
