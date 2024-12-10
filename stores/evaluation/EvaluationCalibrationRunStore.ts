@@ -201,6 +201,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     resetUserSelectedCalibrationValidationRunList,
     fetchUserSelectedCalibrationValidationRunList,
     resetUserSelectedEvalValidationRun,
+    clearUserCalibrationRunData,
 
     userEvaluationCalibrationRunListData,
     calibrationValidationRunListHeaders,

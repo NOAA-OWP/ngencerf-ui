@@ -79,9 +79,11 @@
       </div>
       <div v-if="computedCalibrationValidationRunList.length > 1">
         <div id="evaluationCalibrationList">
+          <ContextMenu :pt="{ root: { id: 'vr-context-menu' } }" class="bg-white" ref="vrContextMenu"
+          :model="cmValidationRun" @hide="selectedCalibrationValidationRun = undefined"></ContextMenu>          
           <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px"
             sortField="validation_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="single"
-            v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle"
+            v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle" @rowContextmenu="onRowVrContextMenu" 
             @rowSelect="onEvalValdiationRowSelect" @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
             <Column v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field">
@@ -94,9 +96,7 @@
         <div class="flex mt-2">
           <div class="ml-auto mt-4">
             <div id="NewButton" class="">
-              <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return
-                to
-                Calibration Jobs</Button>
+              <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return to Calibration Jobs</Button>
             </div>
           </div>
         </div>
@@ -125,22 +125,34 @@ import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
 const { deleteCalibrationRun } = useCalibrationJobStore();
 
 const crContextMenu = ref(); //calibration run context menu
-const contextMenuJob = ref<number>()
-// const cmCalibrationRun = ref([
-//   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
-//   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
-// ]);
+const vrContextMenu = ref(); //validation run context menu
+
+const contextMenuJob = ref<number>();
+const cmValidationJob = ref<number>();
+
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
+const cmValidationRun = ref<DataTableContextMenuOption[]>([]);
 
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
   crContextMenu.value.show(event.originalEvent);
-  if ( event.data.validation_runs > 1 ) {
-    cmCalibrationRun.value.push( { label: 'Select a Validation Job', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns() } )
+  const crRowData = event.data as ValidatedCalibrationRunListItem;
+  if ( crRowData.validation_runs > 1 ) {
+    cmCalibrationRun.value.push( { label: 'Select a Validation Job', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns( crRowData.calibration_run_id ) } )
   }
   cmCalibrationRun.value.push( { label: 'Delete', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } )
   contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
 };
+
+const onRowVrContextMenu = ( event: any ) => {
+  cmValidationRun.value = [];
+  vrContextMenu.value.show( event.originalEvent );
+  cmValidationRun.value.push( { label: 'View Status', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun( vrRowData.validation_run_id, vrRowData.status ) } );
+  const vrRowData = event.data as CalibrationValidationJobData;
+  if ( vrRowData.status.toLocaleUpperCase() === "RUNNING" ) {
+    cmValidationRun.value.push( { label: 'Cancel', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun( vrRowData.validation_run_id, vrRowData.status ) } );
+  }
+}
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
@@ -162,6 +174,7 @@ const {
   resetUserSelectedEvalCalibrationRun,
   resetUserSelectedEvalValidationRun,
   fetchUserValidatedCalibrationJobsListData,
+  clearUserCalibrationRunData,
 } = evaluationCalibrationRunStore;
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
@@ -229,8 +242,19 @@ const openSelectedCalibrationRun = () => {
   })
 }
 
-const viewSelectedCalibrationValidationRuns = () => {
+const viewSelectedCalibrationValidationRuns = ( calibration_run_id: number ) => {
+  resetUserSelectedEvalValidationRun();
+  loadSelectedCalibrationRun( calibration_run_id );
+  isLoading.value = true;  
   fetchUserSelectedCalibrationValidationRunList();
+}
+
+const navigationToStatusRun = ( validation_run_id: number, validation_status: string ) => {
+  evaluateValidationRunId.value = validation_run_id;
+  evaluateValidationRunStatus.value = validation_status;
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
+  e.click();
 }
 
 const navigateToAlternateIteration = (event: any) => {
@@ -256,6 +280,7 @@ const navigateToEvaluation = (event: any) => {
 const returnCalibrationJobList = (event: any) => {
   selectedCalibrationRun.value = selectedCalibrationValidationRun.value = undefined;
   resetUserSelectedEvalValidationRun();
+  clearUserCalibrationRunData();
 }
 
 const confirmDelte = useConfirm();

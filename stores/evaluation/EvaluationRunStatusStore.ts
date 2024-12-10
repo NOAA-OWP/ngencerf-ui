@@ -67,7 +67,11 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ validation_run_id: iterationValidationRunId.value })
+      body: JSON.stringify({
+        calibration_run_id: userCalibrationRunData.value?.calibration_run_id,
+        validation_run_id: iterationValidationRunId.value,
+        forecast_run_id: 0
+      })
     });
   }
 
