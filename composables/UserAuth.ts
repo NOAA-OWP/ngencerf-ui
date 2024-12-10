@@ -73,7 +73,7 @@ export const makeProtectedApiCall = async <T>(
       }
     });
     if (response.ok) {
-      responseData = {_data: await response.json(), status: response.status };
+      responseData = {_data: await response.json(), status: response.status, ok: response.ok };
        console.log(responseData);
        return responseData;
     } 
