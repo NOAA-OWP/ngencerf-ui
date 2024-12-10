@@ -7,12 +7,10 @@ import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
 import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "~/composables/NextGenModel";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { useEvaluationRunStatusStore } from "./EvaluationRunStatusStore";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {
-  const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
+  const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
   const { fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
-  const { clearRunningStatusInfo } = useEvaluationRunStatusStore()
   const calibrationRunList = ref<any[]>([]);
   const userSelectedEvalCalibrationRunId = ref<number>(0);
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -107,7 +105,9 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     if (runListDataResult._data?.validation_jobs) {
       //if there is only 1 validation job, we automatically set the selected validation id to that validation job     
       if (runListDataResult._data?.validation_jobs.length == 1) {
-        evaluateValidationRunId.value = runListDataResult._data?.validation_jobs[0].validation_run_id;
+        const defaultValidationJob = runListDataResult._data?.validation_jobs[0] as CalibrationValidationJobData;
+        evaluateValidationRunId.value = defaultValidationJob.validation_run_id;
+        evaluateValidationRunStatus.value = defaultValidationJob.status;
       }
 
       runListDataResult._data?.validation_jobs.forEach((validation_job: CalibrationValidationJobData) => {
@@ -168,7 +168,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     userSelectedCalibrationValidationRunList.value = [];
     resetUserSelectedEvalValidationRun();
     clearUserCalibrationRunData();
-    clearRunningStatusInfo();
   }
 
   /**
@@ -178,8 +177,8 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     calibrationJobId.value = userSelectedEvalCalibrationRunId.value = evaluateIterationRunId.value = 0;
     evaluateValidationRunId.value = 0;
     calibrationValidationRunListHeaders.value = [];
-    computedCalibrationValidationRunList.value = [];
-
+    computedCalibrationValidationRunList.value = [];    
+    evaluateValidationRunStatus.value = '';
   }
 
   useLogoutListen('logoutEvent', (evStr: string) => {
@@ -207,7 +206,8 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     calibrationValidationRunListHeaders,
     computedCalibrationValidationRunList,
     evaluateValidationRunId,
-    evaluateIterationRunId
+    evaluateIterationRunId,
+    evaluateValidationRunStatus
   }
 })
 

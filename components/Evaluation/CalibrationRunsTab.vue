@@ -28,7 +28,7 @@
           <br/>
           <div id="NewButton" class="">
             <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
-              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0"
+              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0 && evaluateValidationRunStatus !== 'Running'"
               @click.stop="navigateToEvaluation">Evaluate</Button>
           </div>
         </div>
@@ -152,7 +152,8 @@ const {
   calibrationValidationRunListHeaders,
   computedCalibrationValidationRunList,
   userEvaluationCalibrationRunListData,
-  evaluateValidationRunId
+  evaluateValidationRunId,
+  evaluateValidationRunStatus
 } = storeToRefs(evaluationCalibrationRunStore);
 
 const {
@@ -183,7 +184,7 @@ const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   resetUserSelectedEvalValidationRun();
   loadSelectedCalibrationRun(event.data.calibration_run_id);
   isLoading.value = true;
-  if ( event.data.validation_runs == 1 ) {
+  if ( event.data.validation_runs === 1 ) {
     fetchUserSelectedCalibrationValidationRunList();
   }
 }
@@ -203,10 +204,12 @@ const onEvalCalibrationRowUnSelect = (event: any) => {
 
 const onEvalValdiationRowSelect = async (event: DataTableRowClickEvent) => {
   evaluateValidationRunId.value = event.data.validation_run_id;
+  evaluateValidationRunStatus.value = event.data.status;
 }
 
 const onEvalValidationRowUnSelect = async (event: DataTableRowClickEvent) => {
   evaluateValidationRunId.value = 0;
+  evaluateValidationRunStatus.value = '';
 }
 
 const onRowDblClick = (event: any) => {

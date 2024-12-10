@@ -1,10 +1,9 @@
-import { GageOptionData } from './../../composables/NextGenModel';
 // @ts-check
 /**
  *  The General Store will be responsible for handling information OUTSIDE of the data needed for the back end.
  *  Data will include the current menu status and the current tab status for each of the 4 menu items
  */
-import { defineStore } from "pinia";import type { ServerInfo } from "~/composables/NextGenModel";
+import { defineStore } from "pinia";
 import type { ServerInfo } from "~/composables/NextGenModel";
 
 export const generalStore = defineStore(
@@ -21,6 +20,8 @@ export const generalStore = defineStore(
     const evaluateValidationRunId = ref<number>(0);
     const evaluateIterationRunId = ref<number>(0);
     const iterationValidationRunId = ref<number>(0);
+    const evaluateValidationRunStatus = ref<string>('');
+    const evaluateDisplayIterationNumber = ref<number>( 0 );
 
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
@@ -131,6 +132,8 @@ export const generalStore = defineStore(
       evaluateValidationRunId,
       evaluateIterationRunId,
       iterationValidationRunId,
+      evaluateValidationRunStatus,
+      evaluateDisplayIterationNumber,
       calibrationTabIndex,
       evaluationTabIndex,
       forecastTabIndex,

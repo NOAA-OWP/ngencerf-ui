@@ -31,13 +31,13 @@
                   <tr height="45px">
                     <td class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></td>
                     <td class="pl-5">
-                      {{ iterationValidationRunId }}
+                      {{ displayValidationId }}
                     </td>
                   </tr>
                   <tr height="45px">
                     <td class="text-right"><label for="iterationNum">Iteration</label></td>
                     <td class="pl-5">
-                      {{ evaluateIterationRunId }}
+                      {{ evaluateDisplayIterationNumber }}
                     </td>
                   </tr>                  
                 </tbody>
@@ -91,7 +91,7 @@ import { onMounted, onUnmounted } from "vue";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '~/stores/evaluation/EvaluationRunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
-import { calculateElapsedTime, formatDateForDisplay } from '~/utils/TimeHelpers';
+import { formatDateForDisplay } from '~/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
 import type { CalibrationGetStatusValidationItem } from "~/composables/NextGenModel";
 import { hilightTab } from '~/composables/TabHilight';
@@ -101,11 +101,10 @@ const toast = useToast();
 
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 
-const { startTime, runningTime, validationStatus, iterationValidationRunId } = storeToRefs( useEvaluationRunStatusStore() );
-const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, isValidationRunDone, isValidationRerunable } = useEvaluationRunStatusStore();
+const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, evaluateDisplayIterationNumber } = storeToRefs( useEvaluationRunStatusStore() );
+const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime } = useEvaluationRunStatusStore();
 
 const validationStatusCheckingInterval = ref<any>();
-const validationRunningTimeInterval = ref<any>();
 
 onMounted(async () => {
   hilightTab(EvaluationTabs.tab_runStatus);
@@ -114,13 +113,13 @@ onMounted(async () => {
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
-  console.log("Evaluation Run Status for Evaluation mounted")
+  
+  if ( evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0 ) {
+    loadValidationStatusInformation( evaluateValidationRunId.value );
+  } else {
+    evaluateValidationRunId.value = 0;
+  }
 });
-
-const updateRunningTime = () => {
-  const convertedStartTime = new Date( startTime.value );
-  runningTime.value = calculateElapsedTime( convertedStartTime, new Date() );
-}
 
 const isStartHidden = (): boolean => {
   let hidden = false;
@@ -142,9 +141,9 @@ const startRun = async () => {
   toast.removeAllGroups();
 
   executeIterationValidationRun().then( ( response ) => {
-    if ( response.status == 201 ) {
+    if ( response.status === 201 ) {
       validationStatus.value = response?._data?.status;
-      iterationValidationRunId.value = response?._data.validation_run_id;
+      iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
       validationRunningTimeInterval.value = setInterval( updateRunningTime, 1000 );
     } else {
@@ -154,7 +153,7 @@ const startRun = async () => {
 }
 
 watch( validationStatus, async ( newStatus, initialStatus ) => {
-  if ( newStatus != null && !isValidationRunStopped( newStatus )) {
+  if ( newStatus !== null && !isValidationRunStopped( newStatus )) {
     validationStatusCheckingInterval.value = setInterval( async () => {
       queryIterationValidationRunStatus().then( response => {
         const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
@@ -254,10 +253,6 @@ const navigateToEvaluation = ( event: any ) => {
   .p-progressbar-value {
     color: green;
     background-color: green;
-  }
-
-  .p-progressbar-value {
-    color: black;
   }
 
   .p-progressbar-label {
