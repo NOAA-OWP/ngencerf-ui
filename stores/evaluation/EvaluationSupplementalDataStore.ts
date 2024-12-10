@@ -16,53 +16,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const selectedPlotName = ref<string | null>(null);
   const selectedPlotFilename = ref<string | null>(null);
   const selectedPlotFileUrl = ref<string | null>(null);
-  const iterations = ref<APIResponse>({});
-  const iterationMetricsData = ref<any[]>([]);
-  const iterationParamsData = ref<any[]>([]);
-  const iterationMetricsColumns = ref<any[]>([]);
-  const iterationParamsColumns = ref<any[]>([]);
-  const selectedSupplementalTable = ref<number>( 0 );
-  const performanceMetrics = ref<APIResponse>({});
-  const performanceMetricsData = ref<any[]>([]);
-  const logs = ref<APIResponse>({});
-  const calibrationLogData = ref<DynamicObject>({});
-  const validationLogData = ref<DynamicObject>({});
-
-
-  // Restore state from sessionStorage if available
-  if (typeof window !== 'undefined') {
-    let ls;
-    ls = sessionStorage.getItem('iterationMetricsData');
-    if (ls !== "undefined") { iterationMetricsData.value = ls ? JSON.parse(ls) : [] }
-    ls = sessionStorage.getItem('iterationParamsData');
-    if (ls !== "undefined") { iterationParamsData.value = ls ? JSON.parse(ls) : [] }
-    ls = sessionStorage.getItem('iterationMetricsColumns');
-    if (ls !== "undefined") { iterationMetricsColumns.value = ls ? JSON.parse(ls) : [] }
-    ls = sessionStorage.getItem('iterationParamsColumns');
-    if (ls !== "undefined") { iterationParamsColumns.value = ls ? JSON.parse(ls) : [] }
-    ls = sessionStorage.getItem('performanceMetricsData');
-    if (ls !== "undefined") { performanceMetricsData.value = ls ? JSON.parse(ls) : [] }
-    ls = sessionStorage.getItem('calibrationLogData');
-    if (ls !== "undefined") { calibrationLogData.value = ls ? JSON.parse(ls) : [] }
-    ls = sessionStorage.getItem('validationLogData');
-    if (ls !== "undefined") { validationLogData.value = ls ? JSON.parse(ls) : [] }
-    ls = sessionStorage.getItem('iterations');
-    if (ls !== "undefined") { iterations.value = ls ? JSON.parse(ls) : [] }
-
-    selectedSupplementalTable.value = parseInt(JSON.parse(sessionStorage.getItem('selectedSupplementalTable') as string), 10);
-  }
-
-
-  watch(iterations, (iterations) => { sessionStorage.setItem('iterations', JSON.stringify(iterations)); })
-  watch(iterationMetricsData, (iterationMetricsData) => { sessionStorage.setItem('iterationMetricsData', JSON.stringify(iterationMetricsData)); })
-  watch(performanceMetricsData, (performanceMetricsData) => { sessionStorage.setItem('performanceMetricsData', JSON.stringify(performanceMetricsData)); })
-  watch(iterationParamsData, (iterationParamsData) => { sessionStorage.setItem('iterationParamsData', JSON.stringify(iterationParamsData)); })
-  watch(iterationMetricsColumns, (iterationMetricsColumns) => { sessionStorage.setItem('iterationMetricsColumns', JSON.stringify(iterationMetricsColumns)); })
-  watch(iterationParamsColumns, (iterationParamsColumns) => { sessionStorage.setItem('iterationParamsColumns', JSON.stringify(iterationParamsColumns)); })
-  watch(performanceMetrics, (performanceMetrics) => { sessionStorage.setItem('performanceMetrics', JSON.stringify(performanceMetrics)); })
-  watch(selectedSupplementalTable, (selectedSupplementalTable) => { sessionStorage.setItem('selectedSupplementalTable', JSON.stringify(selectedSupplementalTable)); })
-  watch(calibrationLogData, (calibrationLogData) => { sessionStorage.setItem('calibrationLogData', JSON.stringify(calibrationLogData)); })
-  watch(validationLogData, (validationLogData) => { sessionStorage.setItem('validationLogData', JSON.stringify(validationLogData)); })
 
   /**
    * Get Calibration Iteration Data
@@ -128,27 +81,16 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedPlotName,
     selectedPlotFilename,
     selectedPlotFileUrl,
-    iterations,
-    iterationMetricsData,
-    iterationParamsData,
-    iterationMetricsColumns,
-    iterationParamsColumns,
-    selectedSupplementalTable,
-    performanceMetrics,
-    performanceMetricsData,
-    logs,
-    calibrationLogData,
-    validationLogData,
     queryGetIterations,
     queryGetPerformanceMetrics,
     queryGetLogs,
   };
 },
-  {
-    persist: {
-      storage: persistedState.sessionStorage
-    },
-  });
+{
+  persist: {
+    storage: persistedState.sessionStorage
+  },
+});
 
 /* Pinia supports Hot Module replacement so you can edit your stores
    and interact with them directly in your app without reloading the page,

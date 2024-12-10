@@ -9,21 +9,21 @@
               <table>
                 <tbody>
                   <tr height="40px">
-                    <td class="text-right font-bold">
+                    <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Submit Time</div>
-                    </td>
+                    </th>
                     <td class="pl-5">{{ submitTime ? submitTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="32px">
-                    <td class="text-right font-bold">
+                    <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Elapsed Time</div>
-                    </td>
+                    </th>
                     <td class="pl-5">{{ elapsedTime ? elapsedTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="32px">
-                    <td class="text-right font-bold">
+                    <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Iteration</div>
-                    </td>
+                    </th>
                     <td class="pl-5">{{ iteration ?? '-'.repeat(30) }}</td>
                   </tr>
                 </tbody>
@@ -34,7 +34,7 @@
               <table>
                 <tbody>
                   <tr height="40px">
-                    <td class="text-right"><label for="RunStatus">Status</label></td>
+                    <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
                     <td class="pl-5">
                       <span v-if="calibrationStatus !== 'Done'">
                         <input id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md"
@@ -56,7 +56,7 @@
                     </td>
                   </tr>
                   <tr height="32px">
-                    <td class="text-right"><label for="DisplayOptions">Display</label></td>
+                    <th scope="row" class="text-right"><label for="DisplayOptions">Display</label></th>
                     <td class="pl-5">
                       <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
                         optionLabel="name" optionValue="name">
@@ -71,9 +71,9 @@
               <table style="width:100%">
                 <tbody>
                   <tr height="40px">
-                    <td class="text-right font-bold" style="width: 140px;">
+                    <th scope="row" class="text-right font-bold" style="width: 140px;">
                       <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
-                    </td>
+                    </th>
                     <td class="pl-5">
                       <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory"
                         disabled />
@@ -90,37 +90,25 @@
       </div>
       <div>
         <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
-          <img :src="selectedPlotFileUrl" alt="Image" />
+          <img :src="selectedPlotFileUrl" alt="Selected Plot" />
         </div>
         <div id="GraphArea" class="p-2" v-else>
           <!--Data Display-->
         </div>
       </div>
-
-      <!-- <div class="row-span-1">
-        <div id="ResultsArea" class="row-span-1" v-if="calibrationStatus === 'Done'">
-          <button class="ngenButtonDiv">Go to Evaluation</button>
-        </div>
-      </div> -->
     </div>
-
-    <!--
-    <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
-      <div class="row-span-1">
--->
     <span v-if="calibrationStatus === 'Done'">
       <!-- NOTE TO DEVELOPERS: temporary commenting out block below until the functionality for this button is ready-->
       <!-- 
-
-<div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
-  <div class="row-span-1">
+      <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
+        <div class="row-span-1">
           <div id="ResultsArea" class="ngenButtonDiv row-span-1">
             <button class="font-normal">Go to Evaluation</button>
           </div>
           <div class="col-span-7">&nbsp;</div>
-  </div>
-</div>
--->
+        </div>
+      </div>
+      -->
     </span>
 
     <span v-else>
@@ -159,20 +147,16 @@
       </div>
 
     </span>
-    <!--
-      </div>
-    </div>
--->
 
     <div class="waitgif" v-if="isLoading">
-      <img src="@/assets/styles/img/wait.gif" />
+      <img src="@/assets/styles/img/wait.gif" alt="Wait gif" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-import { generalStore } from '~/stores/common/GeneralStore';
+import { ValidationPlotNames } from "~/composables/NextgenEnums";
 import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { isValidDate, isNotNullOrUndefined } from '~/utils/CommonHelpers';
@@ -218,7 +202,6 @@ const {
 } = runStatusStore;
 
 const isLoading = ref(false);
-const progress = ref();
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 const plotNamesToExclude = [
   "Iteration Metrics Table",
@@ -278,7 +261,6 @@ const startRun = async () => {
     if (userCalibrationRunData.value) {
       userCalibrationRunData.value.status = 'Submitted';
     }
-    // toast.removeAllGroups();
     try {
       const runCalibrationResponse = await runCalibrationJob();
 
@@ -317,7 +299,6 @@ const startRun = async () => {
 // Cancel Calibration Job
 const cancelRun = async () => {
   if (calibrationStatus.value === 'Running') {
-    // toast.removeAllGroups();
     try {
       const cancelCalibrationResponse = await cancelCalibrationJob();
 
@@ -497,6 +478,13 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
+  let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available.';
+
+  // provide custom message if missing selected plot is a validation plot
+  if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
+    plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
+  }
+
   if (iteration.value && iteration.value >= 1) {
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value as string); // store this in RunStatusStore
@@ -508,12 +496,12 @@ watch(selectedPlotName, async () => {
       toast.removeAllGroups();
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
+      toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage });
     }
   } else {
     selectedPlotFilename.value = "";
     selectedPlotFileUrl.value = "";
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
+    toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage });
   }
 });
 
@@ -529,6 +517,12 @@ watch(submitTimeDate, () => {
 // Handle iteration changes
 watch(iteration, async () => {
   if (iteration.value && iteration.value >= 1 && selectedPlotName.value) {
+    let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available';
+
+    // provide custom message if missing selected plot is a validation plot
+    if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
+      plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
+    }
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
 
@@ -538,7 +532,7 @@ watch(iteration, async () => {
     } else {
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Plots are not yet available' });
+      toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage});
     }
   }
 });
@@ -554,7 +548,6 @@ watch(iteration, async () => {
   margin: 5px auto;
   padding: 6px 10px 6px 20px;
   border-radius: 10px;
-  /*height: 100px;*/
   border: 0px solid $ngwcp_neutral_gray_md;
 
 }
@@ -563,7 +556,6 @@ watch(iteration, async () => {
   min-height: 40vh;
   width: 70%;
   margin: 0px auto 0 auto;
-  /*border: 1px solid $ngwcp_neutral_gray_md;*/
 }
 
 #RunStatus,

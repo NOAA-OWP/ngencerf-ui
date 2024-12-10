@@ -46,3 +46,10 @@ export const CalibrationHelpPages = {
 }
 
 export const TokenExpired = 498;
+
+export const ValidationPlotNames = [
+  'Bar Chart Metrics',
+  'Flow Duration Curves Validation',
+  'Hydrograph Validation',
+  'Streamflow Validation Precipitation'
+]
