@@ -646,7 +646,7 @@ const handleFileUpload = async (event: Event) => {
         scrollToBottom();
 
         if (invalidParameters.length > 0) {
-          toast.add({ severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters are not in the list of calibratable parameters: ${invalidParameters.join(', ')}` });
+          toast.add({ severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters in the uploaded file were not imported because they are not calibratable:\n ${invalidParameters.join(', ')}` });
         }
       } else {
         toast.add({ severity: 'warn', summary: 'No data in parameter file' });
