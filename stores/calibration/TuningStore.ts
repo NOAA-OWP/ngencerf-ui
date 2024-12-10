@@ -10,7 +10,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 export const useTuningStore = defineStore('TuningStore', () => {
   // server-data properties
   const userDataStore = useUserDataStore();
-  const loadTuningTabData = ref<any>(); // TODO: update to use LoadTuningTabResponse type
+  const loadTuningTabData = ref<any>();
   // const saveTuningTabData = ref<SaveTuningTabRequestBody>()
   const { calibrationJobId } = storeToRefs(generalStore())
   const { getAccessToken } = userDataStore;
