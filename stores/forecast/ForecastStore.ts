@@ -108,7 +108,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: {}
+      body: ""
     }).then((result) => {
       forecastRuns.value = result._data.jobs
     });
