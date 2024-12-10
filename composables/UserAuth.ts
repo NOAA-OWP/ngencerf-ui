@@ -48,60 +48,53 @@ export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boole
  * @param userOptions 
  * @returns response from the API call
  */
+
+let rqstUrl: string;
+let rqstUserOptions: any;
+
 export const makeProtectedApiCall = async <T>(
   url: string,
   userOptions: any = {},
 ): Promise<any> => {
-  let responseData: FetchResponse<any> | null = null;
-  // make API call
+  // Save the call data in case we need to refresh.
+   rqstUrl = url;
+   rqstUserOptions = userOptions; 
 
-  
-  const response = await $fetch.raw(url, {
-    ...userOptions,
-    async onRequest({ request, options }: { request: any, options: any }) {
-      // stringify body if it is an object
-      if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
-        options.body = JSON.stringify(options.body);
-      }
-    },
-    async onRequestError({ error }: { error: any }) {
-      console.error('Request error:', error);
-    },
-    async onResponseError({ response }: { response: any }) {
-      const userDataStore = useUserDataStore();
-      responseData = await response;
-      if (responseData?.status === 401) {
-        const { ngencerfBaseUrl } = useBackendConfig();
-        const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
-        if (!refreshAccessTokenSuccess) {
-          sendUserToLogin();
+  let responseData: any; 
+
+  try {
+    const response = await fetch(url, {
+      ...userOptions,
+      async onRequest({ request, options }: { request: any, options: any }) {
+        // stringify body if it is an object
+        if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
+          options.body = JSON.stringify(options.body);
         }
-        userOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
-        await $fetch.raw(url, {
-          ...userOptions,
-          async onRequest({ request, options }: { request: any, options: any }) {
-            // stringify body if it is an object
-            if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
-              options.body = JSON.stringify(options.body);
-            }
-          },
-          async onRequestError({ error }: { error: any }) {
-            console.error('Request error:', error);
-            sendUserToLogin();
-          },
-          async onResponseError({ response }: { response: any }) {
-            responseData = await response;
-            console.error("ResponseError", response)
-            sendUserToLogin();
-          }
-        });
-        responseData = await response;
-        return responseData;
       }
+    });
+    if (response.ok) {
+      responseData = {_data: await response.json(), status: response.status, ok: response.ok };
+       console.log(responseData);
+       return responseData;
+    } 
+    if( response.status === 401) {
+      const userDataStore = useUserDataStore();
+      const { ngencerfBaseUrl } = useBackendConfig();
+      const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
+      if (!refreshAccessTokenSuccess) {
+        sendUserToLogin();
+        return;
+      }
+      rqstUserOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
+      return makeProtectedApiCall( rqstUrl, rqstUserOptions);
+    } else {
+      responseData = {_data: await response.json(), status: response.status, ok: response.ok };
+       console.log(responseData);
+       return responseData;
     }
-  });
-  responseData = await response;
-  return responseData;
+  } catch {
+    sendUserToLogin();
+  }
 
 };
 
