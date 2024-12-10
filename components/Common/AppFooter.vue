@@ -28,7 +28,6 @@ const info = json;
 const serverInfo = ref<ServerInfo>();
 
 onMounted( async () => {
-  console.log("Calling get footer info from User Account on mounted")
   serverInfo.value = getServerInfo();
   if( !serverInfo.value || !serverInfo.value.version )  {
     await getFooterInformation();
