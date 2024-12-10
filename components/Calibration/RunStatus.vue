@@ -478,11 +478,11 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  let plotNotAvailableMessage: string = 'Plots are not yet available';
+  let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available.';
 
   // provide custom message if missing selected plot is a validation plot
   if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
-    plotNotAvailableMessage = selectedPlotName.value?.toString() + ' is not available until after validation is complete';
+    plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
   }
 
   if (iteration.value && iteration.value >= 1) {
@@ -517,11 +517,11 @@ watch(submitTimeDate, () => {
 // Handle iteration changes
 watch(iteration, async () => {
   if (iteration.value && iteration.value >= 1 && selectedPlotName.value) {
-    let plotNotAvailableMessage: string = 'Plots are not yet available';
+    let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available';
 
     // provide custom message if missing selected plot is a validation plot
     if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
-      plotNotAvailableMessage = selectedPlotName.value?.toString() + ' is not available until after validation is complete';
+      plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
     }
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
