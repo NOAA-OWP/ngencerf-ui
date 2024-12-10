@@ -63,7 +63,7 @@ export const makeProtectedApiCall = async <T>(
   let responseData: any; 
 
   try {
-    const response = await $fetch.raw(url, {
+    const response = await fetch(url, {
       ...userOptions,
       async onRequest({ request, options }: { request: any, options: any }) {
         // stringify body if it is an object
@@ -73,11 +73,11 @@ export const makeProtectedApiCall = async <T>(
       }
     });
     if (response.ok) {
-      responseData = response;
-      console.log(responseData);
-      return responseData;
+      responseData = {_data: await response.json(), status: response.status };
+       console.log(responseData);
+       return responseData;
     } 
-    if (response.status === 401) {
+    if( response.status === 401) {
       const userDataStore = useUserDataStore();
       const { ngencerfBaseUrl } = useBackendConfig();
       const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
@@ -88,7 +88,9 @@ export const makeProtectedApiCall = async <T>(
       rqstUserOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
       return makeProtectedApiCall( rqstUrl, rqstUserOptions);
     } else {
-      return response;
+      responseData = {_data: await response.json(), status: response.status };
+       console.log(responseData);
+       return responseData;
     }
   } catch {
     sendUserToLogin();
