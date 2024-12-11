@@ -16,29 +16,16 @@
             <span v-if="computedCalibrationValidationRunList.length <= 1">
               Calibration Runs<br />
               <span style="font-size: 14px;font-weight: normal;">
-                Right click on row for available options.
+                Select row then right click for available options.
               </span>
             </span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
               userSelectedEvalCalibrationRunId }}<br />
               <span style="font-size: 14px;font-weight: normal;">
-                Right click on row for available options.
+                Select row then right click for available options.
               </span>
             </span>
           </h1>
-        </div>
-        <div class="ml-auto mt-2">
-          <div id="NewButton" class="">
-            <Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4 w-40"
-              v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
-              @click.stop="navigateToAlternateIteration">New Validation</Button>
-          </div>
-          <br/>
-          <div id="NewButton" class="">
-            <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
-              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0 && evaluateValidationRunStatus !== 'Running'"
-              @click.stop="navigateToEvaluation">Evaluate</Button>
-          </div>
         </div>
       </div>
 
@@ -59,7 +46,7 @@
 
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+              :model="cmCalibrationRun"></ContextMenu>
             <DataTable id="EvalRunTable" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
@@ -88,7 +75,7 @@
       <div v-if="computedCalibrationValidationRunList.length > 1">
         <div id="evaluationCalibrationList">
           <ContextMenu :pt="{ root: { id: 'vr-context-menu' } }" class="bg-white" ref="vrContextMenu"
-          :model="cmValidationRun" @hide="selectedCalibrationValidationRun = undefined"></ContextMenu>          
+          :model="cmValidationRun"></ContextMenu>          
           <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px"
             sortField="validation_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="single"
             v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle" @rowContextmenu="onRowVrContextMenu" 
@@ -185,34 +172,38 @@ onMounted(() => {
 
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
-  contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
-  crContextMenu.value.show(event.originalEvent);
-  const crRowData = event.data as ValidatedCalibrationRunListItem;
-  if ( crRowData.validation_runs > 1 ) {
-    cmCalibrationRun.value.push( { label: 'Select Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns( crRowData.calibration_run_id ) } )
-  } if ( crRowData.validation_runs === 1 ) {
-    cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJobFromCalibration( crRowData.calibration_run_id ) } )
+  const crRowData = event.data as ValidatedCalibrationRunListItem;  
+  if ( selectedCalibrationRun && selectedCalibrationRun.value?.calibration_run_id == crRowData.calibration_run_id ) {
+    crContextMenu.value.show(event.originalEvent);
+    contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
+    if ( crRowData.validation_runs > 1 ) {
+      cmCalibrationRun.value.push( { label: 'Select Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns( crRowData.calibration_run_id ) } )
+    } if ( crRowData.validation_runs === 1 ) {
+      cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJobFromCalibration( crRowData.calibration_run_id ) } )
+    }
+    cmCalibrationRun.value.push( { label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) } );
+    cmCalibrationRun.value.push( { label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails( crRowData.calibration_run_id ) } )
+    if ( crRowData.validation_runs === 1 ) {
+      cmCalibrationRun.value.push( { label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => viewValidationRunStatus( crRowData.calibration_run_id ) } )
+    }
+    cmCalibrationRun.value.push( { label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } );
   }
-  cmCalibrationRun.value.push( { label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) } );
-  cmCalibrationRun.value.push( { label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails( crRowData.calibration_run_id ) } )
-  if ( crRowData.validation_runs === 1 ) {
-    cmCalibrationRun.value.push( { label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => viewValidationRunStatus( crRowData.calibration_run_id ) } )
-  }
-  cmCalibrationRun.value.push( { label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } );
 };
 
 const onRowVrContextMenu = ( event: any ) => {
   cmValidationRun.value = [];
-  vrContextMenu.value.show( event.originalEvent );
   const vrRowData = event.data as CalibrationValidationJobData;
-  if ( vrRowData.status.toLocaleUpperCase() !== 'RUNNING' ) {
-    cmValidationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJob( vrRowData.validation_run_id, vrRowData.status ) } );
-  }
-  cmValidationRun.value.push( { label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) } );
-  cmValidationRun.value.push( { label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails( userSelectedEvalCalibrationRunId.value ) } );
-  cmValidationRun.value.push( { label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun( vrRowData.validation_run_id, vrRowData.status ) } );  
-  if ( vrRowData.status.toLocaleUpperCase() === 'RUNNING' ) {
-    cmValidationRun.value.push( { label: 'Cancel', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun( vrRowData.validation_run_id, vrRowData.status ) } );
+  if ( selectedCalibrationValidationRun && selectedCalibrationValidationRun.value?.validation_run_id === vrRowData.validation_run_id ) {
+    vrContextMenu.value.show( event.originalEvent );
+    if ( vrRowData.status.toLocaleUpperCase() !== 'RUNNING' ) {
+      cmValidationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJob( vrRowData.validation_run_id, vrRowData.status ) } );
+    }
+    cmValidationRun.value.push( { label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) } );
+    cmValidationRun.value.push( { label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails( userSelectedEvalCalibrationRunId.value ) } );
+    cmValidationRun.value.push( { label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun( vrRowData.validation_run_id, vrRowData.status ) } );  
+    if ( vrRowData.status.toLocaleUpperCase() === 'RUNNING' ) {
+      cmValidationRun.value.push( { label: 'Cancel', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun( vrRowData.validation_run_id, vrRowData.status ) } );
+    }
   }
 }
 
@@ -268,6 +259,7 @@ const openSelectedCalibrationRun = () => {
 
 const viewCalibrationDetails = async ( calibration_run_id: number ) => {
   //resetUserSelectedEvalValidationRun();
+  console.log( 'viewCalibrationDetails selectedCalibrationRun ', selectedCalibrationRun );
   isLoading.value = true;  
   nextTick(async () => {  
     await loadSelectedCalibrationRun( calibration_run_id );
