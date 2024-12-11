@@ -197,7 +197,7 @@ const onRowContextMenu = (event: any) => {
   if ( crRowData.validation_runs === 1 ) {
     cmCalibrationRun.value.push( { label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => viewValidationRunStatus( crRowData.calibration_run_id ) } )
   }
-  cmCalibrationRun.value.push( { label: 'Delete', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } );
+  cmCalibrationRun.value.push( { label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } );
 };
 
 const onRowVrContextMenu = ( event: any ) => {
