@@ -499,6 +499,7 @@ export interface CalibrationValidationJobList {
 }
 
 export interface CalibrationValidationJobData extends CalibrationValidationRunData {
+  iteration_num: number;
   best?: boolean;
 }
 
@@ -598,9 +599,12 @@ export interface CalibrationGetStatusResponse {
 
 export interface CalibrationGetStatusValidationItem {
   validation_run_id: number;
+  iteration_num: number;
   status: string;
   validation_type: string;
   submit_date: Date;
+  run_end: Date;
+  run_start: Date;
   elapsed_time?: string | null;
   performance_metrics?: CalibrationGetStatusPerformanceMetricItem[] | null;
 }

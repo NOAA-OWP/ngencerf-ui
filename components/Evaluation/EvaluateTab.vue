@@ -26,7 +26,7 @@
                   <label for="validationJobId">Validation Job ID </label>
                 </td>
                 <td class="pl-3">
-                  <InputText id="validationJobId" v-model="evaluateValidationRunId" disabled />
+                  <div id="validationJobId">{{ evaluateValidationRunId }}</div>
                 </td>
               </tr>
               <tr>
@@ -249,9 +249,15 @@ const supplementalTableOptions = [
   'Validation Logs'
 ]
 
-onMounted( () => {
-  nextTick( async () => {
+onMounted(() => {
+  nextTick(async () => {
     hilightTab(EvaluationTabs.tab_evaluate);
+
+    // make sure page loads with no plot selected
+    selectedPlotName.value = null;
+    selectedPlotFilename.value = null;
+    selectedPlotFileUrl.value = null;
+    selectedSupplementalTable.value = 0;
 
     if (!userCalibrationRunData?.value) {
       await fetchUserCalibrationRunData();
@@ -466,10 +472,11 @@ onMounted( () => {
     }
 
     // make sure page loads with no plot selected
-    selectedPlotName.value = null;
-    selectedPlotFilename.value = null;
-    selectedPlotFileUrl.value = null;
-    selectedSupplementalTable.value = 0;
+    /* Relocated to top of onMounted to prevent errors. */
+    // selectedPlotName.value = null;
+    // selectedPlotFilename.value = null;
+    // selectedPlotFileUrl.value = null;
+    // selectedSupplementalTable.value = 0;
   })
 });
 
