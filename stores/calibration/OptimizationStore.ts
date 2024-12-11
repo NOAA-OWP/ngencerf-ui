@@ -151,18 +151,21 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
           name: data_input.name,
           value: data_input.default_value,
         }
-        let user_optimization_input =
-          userCalibrationRunData.value?.optimization_inputs.filter((optimization_input) => optimization_input.name === data_input.name)
-        if (user_optimization_input && user_optimization_input.length) {
+        let user_optimization_input = filterCalRunData(data_input.name);
+
+        if (user_optimization_input && user_optimization_input.length !== 0) {
           data_item.value = user_optimization_input[0].value
         }
 
         data_items.push(data_item)
       })
     })
-
     return data_items
   })
+
+  const filterCalRunData = (dinput: string) => {
+    return userCalibrationRunData.value?.optimization_inputs.filter((optimization_input) => optimization_input.name === dinput)
+  }
 
   /**
   * return save formulation tab response from the server

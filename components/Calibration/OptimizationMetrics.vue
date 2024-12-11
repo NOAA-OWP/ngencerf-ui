@@ -133,7 +133,7 @@
       </span>
       <span v-else>
         <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-          Run on {{ formatDateForRunOnString(submitTimeDate) }}
+          Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
         </div>
       </span>
       <div class="col-span-1 mr-3">

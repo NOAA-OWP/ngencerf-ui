@@ -111,7 +111,7 @@ export const useCalibrationFormulationTabSaveWarning = ( formulation_warning: Fo
  * @returns [<string>messages]
  */
 export const useApiErrorResponseValidator = ( validationErrors: any ) => {
-  let errors = <String[]>[];
+  let errors = <string[]>[];
   Object.keys( validationErrors ).forEach( key => {
     let field_label = key;
     if ( key in ValidationFormFields ) field_label = ValidationFormFields[ key as keyof typeof ValidationFormFields ];
@@ -129,7 +129,7 @@ export const useApiErrorResponseValidator = ( validationErrors: any ) => {
 }
 
 export const useApiErrorResponsePreprocess = ( errorResponse: any ) => {
-  let errors = <String[]>[];
+  let errors = <string[]>[];
   if ( errorResponse?._data?.validation_errors ) {
     errors = useApiErrorResponseValidator( errorResponse?._data?.validation_errors );
   }

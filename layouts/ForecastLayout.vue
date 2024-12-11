@@ -42,4 +42,4 @@ import ForecastRightBlock from "@/components/Forecast/ForecastRightBlock.vue";
 import ForecastLeftBlock from "@/components/Forecast/ForecastLeftBlock.vue";
 
 </script>
-<style lang="scss" scoped></style>
+

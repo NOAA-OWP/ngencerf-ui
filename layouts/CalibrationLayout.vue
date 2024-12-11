@@ -58,4 +58,4 @@ import { generalStore } from "@/stores/common/GeneralStore";
 
 const { getMenuIndex, getCalibrationTabIndex } = generalStore();
 </script>
-<style lang="scss" scoped></style>
+

@@ -98,7 +98,6 @@ onMounted(() => {
   nextTick(() => {
     resetEvaluationAltIterationStore();
     fetchCalibrationDataByIterationDataList();
-    //fetchTuningParametersDataList();
 
     const syncScroll = (source: any, target: any) => {
       source.addEventListener("scroll", (event: Event) => {
@@ -107,8 +106,8 @@ onMounted(() => {
       });
     };
 
-    syncScroll(calibrationRunDetailTable.value?.$el.children[0], tuningParametersTable.value?.$el.children[0]);
-    syncScroll(tuningParametersTable.value?.$el.children[0], calibrationRunDetailTable.value?.$el.children[0]);
+    syncScroll(((calibrationRunDetailTable.value as any)?.$el as HTMLTableElement).children[0], ((tuningParametersTable.value as any)?.$el as HTMLTableElement)?.children[0]);
+    syncScroll(((tuningParametersTable.value as any)?.$el as HTMLTableElement)?.children[0], ((calibrationRunDetailTable.value as any)?.$el as HTMLTableElement)?.children[0]);
   })
 })
 
