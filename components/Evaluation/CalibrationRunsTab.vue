@@ -15,14 +15,14 @@
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
             <span v-if="computedCalibrationValidationRunList.length <= 1">
               Calibration Runs<br />
-              <span style="font-size: 12px;font-weight: normal;">
-                Select the job then right click for options.
+              <span style="font-size: 14px;font-weight: normal;">
+                Right click on row for available options.
               </span>
             </span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
               userSelectedEvalCalibrationRunId }}<br />
-              <span style="font-size: 12px;font-weight: normal;">
-                Select the job to view/evaluate then click the Evaluate button.
+              <span style="font-size: 14px;font-weight: normal;">
+                Right click on row for available options.
               </span>
             </span>
           </h1>
