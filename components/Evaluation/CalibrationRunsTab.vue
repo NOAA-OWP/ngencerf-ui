@@ -16,30 +16,17 @@
             <span v-if="computedCalibrationValidationRunList.length <= 1">
               Calibration Runs<br />
               <span style="font-size: 14px;font-weight: normal;">
-                Right click on row for available options.
+                Select row then right click for available options.
               </span>
             </span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
               userSelectedEvalCalibrationRunId }}<br />
               <span style="font-size: 14px;font-weight: normal;">
-                Right click on row for available options.
+                Select row then right click for available options.
               </span>
             </span>
           </h1>
         </div>
-        <!-- <div class="ml-auto mt-2">
-          <div id="NewButton" class="">
-            <Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4 w-40"
-              v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
-              @click.stop="navigateToAlternateIteration">New Validation</Button>
-          </div>
-          <br/>
-          <div id="NewButton" class="">
-            <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
-              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0 && evaluateValidationRunStatus !== 'Running'"
-              @click.stop="navigateToEvaluation">Evaluate</Button>
-          </div>
-        </div> -->
       </div>
 
       <div id="calibrationRunList"
