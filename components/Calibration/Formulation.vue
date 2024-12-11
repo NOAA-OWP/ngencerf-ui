@@ -171,22 +171,22 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
-import type { UserCalibrationRunData } from "~/composables/NextGenModel";
-import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
-import { formatDateForRunOnString } from "~/utils/TimeHelpers";
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { generalStore } from "~/stores/common/GeneralStore";
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+import type { UserCalibrationRunData } from "@/composables/NextGenModel";
+import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
+import { formatDateForRunOnString } from "@/utils/TimeHelpers";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useToast } from "primevue/usetoast";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import type { SlothParameterData } from '~/composables/NextGenModel';
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import type { SlothParameterData } from '@/composables/NextGenModel';
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
-import { hilightTab } from '~/composables/TabHilight';
+import { hilightTab } from '@/composables/TabHilight';
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
-import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "~/composables/ValidationHandlers";
+import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
 
 const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")

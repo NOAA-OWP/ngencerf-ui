@@ -35,9 +35,9 @@
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun } from "~/composables/NextGenModel";
-//import { useCalibrationRunStore } from "~/stores/CalibrationRunStore";
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
+import type { CalibrationRun } from "@/composables/NextGenModel";
+//import { useCalibrationRunStore } from "@/stores/CalibrationRunStore";
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -59,7 +59,7 @@ const calibrationJobStore = useCalibrationJobStore()
 const { fetchJobsListData } = storeToRefs(calibrationJobStore)
 const { fetchNewCalibrationRunId } = calibrationJobStore
 
-import { hilightTab } from '~/composables/TabHilight';
+import { hilightTab } from '@/composables/TabHilight';
 onMounted(() => {
   hilightTab(VerificationTabs.tab_calibrationRuns);
   

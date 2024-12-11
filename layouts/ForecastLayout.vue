@@ -36,10 +36,10 @@
 </template>
 
 <script setup lang="ts">
-import AppFooter from "~/components/Common/AppFooter.vue";
-import AppHeader from "~/components/Common/AppHeader.vue";
-import ForecastRightBlock from "~/components/Forecast/ForecastRightBlock.vue";
-import ForecastLeftBlock from "~/components/Forecast/ForecastLeftBlock.vue";
+import AppFooter from "@/components/Common/AppFooter.vue";
+import AppHeader from "@/components/Common/AppHeader.vue";
+import ForecastRightBlock from "@/components/Forecast/ForecastRightBlock.vue";
+import ForecastLeftBlock from "@/components/Forecast/ForecastLeftBlock.vue";
 
 </script>
 <style lang="scss" scoped></style>

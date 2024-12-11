@@ -1,11 +1,11 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralApiSaveResponse, SaveOptimizationPayload } from "~/composables/NextGenModel";
-import { makeProtectedApiCall } from "~/composables/UserAuth";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralApiSaveResponse, SaveOptimizationPayload } from "@/composables/NextGenModel";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 
 export const useOptimizationStore = defineStore('OptimizationStore', () => {
   /**

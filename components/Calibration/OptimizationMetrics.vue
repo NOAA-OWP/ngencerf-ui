@@ -157,16 +157,16 @@
 import { storeToRefs } from "pinia";
 import { onMounted, onUnmounted } from "vue";
 
-import { useOptimizationStore } from '~/stores/calibration/OptimizationStore';
+import { useOptimizationStore } from '@/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
-import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
-import { generalStore } from "~/stores/common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore"
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
+import { generalStore } from "@/stores/common/GeneralStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore"
+import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
-import { formatDateForRunOnString } from "~/utils/TimeHelpers";
-import { hilightTab } from '~/composables/TabHilight';
+import { formatDateForRunOnString } from "@/utils/TimeHelpers";
+import { hilightTab } from '@/composables/TabHilight';
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);

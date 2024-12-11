@@ -1,7 +1,7 @@
 import { VueWrapper, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, test } from "vitest";
 import { createTestingPinia } from "@pinia/testing";
-import AppHeader from "~/components/Common/AppHeader.vue";
+import AppHeader from "@/components/Common/AppHeader.vue";
 
 describe("Test Header component", () => {
   let wrapper: VueWrapper;

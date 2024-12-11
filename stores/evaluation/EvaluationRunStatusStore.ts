@@ -1,11 +1,11 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { makeProtectedApiCall } from "~/composables/UserAuth"
-import { calculateElapsedTime } from '~/utils/TimeHelpers';
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { makeProtectedApiCall } from "@/composables/UserAuth"
+import { calculateElapsedTime } from '@/utils/TimeHelpers';
 
 export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore', () => {
   const { calibrationJobId, evaluateIterationRunId, iterationValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());

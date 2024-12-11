@@ -1,13 +1,13 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import type { CalibrationStatus, CalibrationPlotListNamesData } from "~/composables/NextGenModel";
-import { makeProtectedApiCall } from "~/composables/UserAuth";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { isValidDate, isCalibrationJobFinished } from '~/utils/CommonHelpers';
-import { convertTimeZone } from '~/utils/TimeHelpers';
+import type { CalibrationStatus, CalibrationPlotListNamesData } from "@/composables/NextGenModel";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { isValidDate, isCalibrationJobFinished } from '@/utils/CommonHelpers';
+import { convertTimeZone } from '@/utils/TimeHelpers';
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());

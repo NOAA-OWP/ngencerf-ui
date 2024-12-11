@@ -70,16 +70,16 @@
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun, CalibrationValidationJobData } from "~/composables/NextGenModel";
+import type { CalibrationRun, CalibrationValidationJobData } from "@/composables/NextGenModel";
 
-import { EvaluationTabs } from "~/composables/NextgenEnums";
-import { useForecastStore } from "~/stores/forecast/ForecastStore";
-import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
+import { EvaluationTabs } from "@/composables/NextgenEnums";
+import { useForecastStore } from "@/stores/forecast/ForecastStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { hilightTab } from '~/composables/TabHilight';
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { hilightTab } from '@/composables/TabHilight';
 import { storeToRefs } from "pinia";
 const { deleteCalibrationRun } = useCalibrationJobStore();
 

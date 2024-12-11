@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-import ForecastLayout from "~/layouts/ForecastLayout.vue";
+import ForecastLayout from "@/layouts/ForecastLayout.vue";
 
 onMounted(() => {
   nextTick(() => {

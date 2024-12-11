@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import Tabs from '~/components/Common/Tabs.vue'
+import Tabs from '@/components/Common/Tabs.vue'
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";

@@ -8,7 +8,7 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-import EvaluationLayout from "~/layouts/EvaluationLayout.vue";
+import EvaluationLayout from "@/layouts/EvaluationLayout.vue";
 
 onMounted(() => {
   nextTick(() => {

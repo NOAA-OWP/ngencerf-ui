@@ -88,13 +88,13 @@
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted } from "vue";
-import { generalStore } from '~/stores/common/GeneralStore';
-import { useEvaluationRunStatusStore } from '~/stores/evaluation/EvaluationRunStatusStore';
-import { useUserDataStore } from '~/stores/common/UserDataStore';
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
+import { generalStore } from '@/stores/common/GeneralStore';
+import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
-import type { CalibrationGetStatusValidationItem } from "~/composables/NextGenModel";
-import { hilightTab } from '~/composables/TabHilight';
+import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+import { hilightTab } from '@/composables/TabHilight';
 
 const userDataStore = useUserDataStore();
 const toast = useToast();

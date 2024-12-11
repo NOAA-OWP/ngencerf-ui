@@ -156,13 +156,13 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-import { ValidationPlotNames } from "~/composables/NextgenEnums";
-import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
-import { useUserDataStore } from '~/stores/common/UserDataStore';
-import { isValidDate, isNotNullOrUndefined } from '~/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
+import { ValidationPlotNames } from "@/composables/NextgenEnums";
+import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
+import { convertTimeZone, calculateElapsedTime } from '@/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
-import { hilightTab } from '~/composables/TabHilight';
+import { hilightTab } from '@/composables/TabHilight';
 
 const runStatusStore = useRunStatusStore();
 const userDataStore = useUserDataStore();

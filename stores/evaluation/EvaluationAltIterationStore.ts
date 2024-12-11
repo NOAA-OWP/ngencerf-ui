@@ -2,10 +2,10 @@
 
 import { defineStore, storeToRefs } from "pinia";
 import { generalStore } from "../common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { makeProtectedApiCall } from "~/composables/UserAuth"
-import type { CalibrationRunIterationParameterData, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn, CalibrationRunIterationMetricData, CalibrationRunByIterationRetrospectiveData } from "~/composables/NextGenModel";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { makeProtectedApiCall } from "@/composables/UserAuth"
+import type { CalibrationRunIterationParameterData, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn, CalibrationRunIterationMetricData, CalibrationRunByIterationRetrospectiveData } from "@/composables/NextGenModel";
 
 export const useEvaluationAltIterationStore = defineStore('EvaluationAltIterationStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();

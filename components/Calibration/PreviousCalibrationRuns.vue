@@ -66,18 +66,18 @@
 import { onMounted } from "vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import type { JobListItem } from "~/composables/NextGenModel";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { generalStore } from "~/stores/common/GeneralStore";
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
+import type { JobListItem } from "@/composables/NextGenModel";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
-import { useGageStore } from "~/stores/calibration/GageStore";
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { useTuningStore } from "~/stores/calibration/TuningStore";
-import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
-import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "~/composables/ValidationHandlers";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
+import { useGageStore } from "@/stores/calibration/GageStore";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
+import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
+import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
@@ -90,7 +90,7 @@ const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrati
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
-import { hilightTab } from '~/composables/TabHilight';
+import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu

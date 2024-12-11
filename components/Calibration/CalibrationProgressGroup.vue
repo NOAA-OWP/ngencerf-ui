@@ -78,8 +78,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { useTuningStore } from "~/stores/calibration/TuningStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 

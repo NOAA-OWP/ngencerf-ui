@@ -16,7 +16,7 @@
 
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { getForecastTabIndex, getMenuIndex } = generalStore();

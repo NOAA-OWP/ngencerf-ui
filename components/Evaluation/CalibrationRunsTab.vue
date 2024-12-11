@@ -2,7 +2,7 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
           class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
@@ -122,13 +122,13 @@ import { useToast } from "primevue/usetoast";
 
 import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NextGenModel";
 import { EvaluationTabs } from "@/composables/NextgenEnums";
-import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { hilightTab } from '~/composables/TabHilight';
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { hilightTab } from '@/composables/TabHilight';
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const { deleteCalibrationRun } = useCalibrationJobStore();

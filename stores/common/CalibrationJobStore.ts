@@ -2,10 +2,10 @@
 
 import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "../common/UserDataStore";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "../common/GeneralStore";
 import { makeProtectedApiCall } from "#imports";
-import type { JobListItem } from "~/composables/NextGenModel";
+import type { JobListItem } from "@/composables/NextGenModel";
 
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();

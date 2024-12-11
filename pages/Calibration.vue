@@ -9,7 +9,7 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-import NextgenLayout from "~/layouts/CalibrationLayout.vue";
+import NextgenLayout from "@/layouts/CalibrationLayout.vue";
 
 // onBeforeMount( () => {
 //     window.addEventListener("beforeunload", event => {

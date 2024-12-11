@@ -2,11 +2,11 @@
 
 import { defineStore, storeToRefs } from "pinia";
 import { generalStore } from "../common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { makeProtectedApiCall } from "~/composables/UserAuth";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, SaveFormulationTabPayload } from "~/composables/NextGenModel";
-import { useCalibrationFormulationTabSaveValidate } from "~/composables/ValidationHandlers";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, SaveFormulationTabPayload } from "@/composables/NextGenModel";
+import { useCalibrationFormulationTabSaveValidate } from "@/composables/ValidationHandlers";
 
 export const useFormulationStore = defineStore('FormulationStore', () => {
   /**
