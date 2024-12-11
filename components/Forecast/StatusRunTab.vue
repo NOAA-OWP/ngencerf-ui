@@ -42,13 +42,13 @@
               <td class="text-right font-bold">
                 <div style="width: 140px;">Status</div>
               </td>
-              <td class="pl-5">{{ forecastJobStatus ?? '-'.repeat(30) }}</td>
+              <td class="pl-5">{{ forecastJobStatus ?? 'Ready' }}</td>
             </tr>
             <tr height="32px">
               <td class="text-right font-bold">
                 <div style="width: 140px;">Cycle</div>
               </td>
-              <td class="pl-5">{{ (forecastCycle as ForecastTabData).name ?? '-'.repeat(30) }}</td>
+              <td class="pl-5">{{ (forecastCycle as ForecastCycle).name ?? '-'.repeat(30) }}</td>
             </tr>
           </tbody>
         </table>
@@ -72,7 +72,7 @@
     <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
       <div class="row-span-1">
         <div class="grid grid-cols-8">
-          <span v-if="forecastJobStatus === 'Ready'">
+          <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
             <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
               <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startForecastRun()">
                 Run
@@ -116,6 +116,7 @@ const {
   elapsedTimeIntervalId,
   forecastJobStatusIntervalId,
   resultsPathname,
+  calibrationRunForForecast,
 } = storeToRefs(useForecastStore()); 
 
 const {
@@ -184,7 +185,7 @@ const startForecastRun = async () => {
   forecastJobStatus.value = 'Submitted';
 
   try {
-    const createAndRunForecastJobResponse = await createAndRunForecastJob(forecastCycle?.value?.name as string);
+    const createAndRunForecastJobResponse = await createAndRunForecastJob(calibrationRunForForecast?.value?.calibration_run_id as number, forecastCycle?.value?.name as string);
 
     if (createAndRunForecastJobResponse?._data?.status) {
       forecastJobStatus.value = createAndRunForecastJobResponse._data.status;

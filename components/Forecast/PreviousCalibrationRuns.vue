@@ -87,7 +87,7 @@ const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
 
 const forecastStore = useForecastStore();
-const { getCalibrationJobsForForecast } = forecastStore;
+const { getCalibrationJobsForForecast, resetUserSelectedForecastCalibrationRun } = forecastStore;
 
 
 const toast = useToast();
@@ -134,6 +134,7 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
   //clear calibration data if user were on calibration tab and clear evaluation previous run data user may have selected
   resetUserSelectedEvalCalibrationRun();
+  resetUserSelectedForecastCalibrationRun();
   await getCalibrationJobsForForecast();
   isLoading.value = false;
 

@@ -88,14 +88,14 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   /**
    * Create and Run Forecast Job by querying create_and_run_forecast endpoint
    */
-  const createAndRunForecastJob = async (forecastCycleName: string): Promise<any> => {
+  const createAndRunForecastJob = async (calibrationRunId: number, forecastCycleName: string): Promise<any> => {
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/create_and_run_forecast/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: forecastJobId.value, cycle_name: forecastCycleName })
+      body: JSON.stringify({ calibration_run_id: calibrationRunId, cycle_name: forecastCycleName })
     });
   };
 

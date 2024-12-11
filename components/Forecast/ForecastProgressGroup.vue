@@ -2,12 +2,16 @@
   <table id="ForecastProgressTable" class="progressTable prevent-select">
     <tbody>
       <tr>
-        <td><i v-if="userCalibrationRunData?.calibration_run_id" class="pi pi-check font-bold  checkMark"></i></td>
+        <td><i v-if="calibrationRunForForecast?.calibration_run_id"
+            :class="(calibrationRunForForecast?.calibration_run_id) ? 'checkMark': ''"
+            class="pi pi-check font-bold"></i></td>
         <td data-tab="1" title="Calibration Run" aria-label="Calibration Run"
           @click="tabClicked">Calibration Run</td>
       </tr>
       <tr>
-        <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="forecastCycle?.is_active"
+            :class="(forecastCycle?.is_active) ? 'checkMark': ''"
+            class="pi pi-check font-bold"></i></td>
         <td data-tab="2" title="Cycle" aria-label="Cycle" @click="tabClicked">Cycle</td>
       </tr>
     </tbody>
@@ -16,9 +20,9 @@
 
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-const userDataStore = useUserDataStore();
-const { userCalibrationRunData } = storeToRefs(userDataStore);
+import { useForecastStore } from "@/stores/forecast/ForecastStore";
+
+const { forecastCycle, calibrationRunForForecast } = useForecastStore();
 const { getForecastTabIndex, getMenuIndex } = generalStore();
 const currentForecastTab = ref(getForecastTabIndex());
 const emit = defineEmits(["tabNumber"]);
