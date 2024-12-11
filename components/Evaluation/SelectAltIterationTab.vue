@@ -120,7 +120,7 @@ const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
     evaluateIterationRunId.value = 0;
   }
   evaluateDisplayIterationNumber.value = event.data.iteration_num;
-  const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
+  const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id === event.data.iteration_id );
   selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];   
 }
 
@@ -132,7 +132,7 @@ const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
     evaluateIterationRunId.value = 0;
   }
   evaluateDisplayIterationNumber.value = event.data.iteration_num;
-  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
+  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id === event.data.iteration_id );
   selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];
 }
 

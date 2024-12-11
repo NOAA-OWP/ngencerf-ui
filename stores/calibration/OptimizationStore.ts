@@ -143,7 +143,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   */
   const getOptimizationInputUserData = computed(() => {
     let data_items: UserCalibrationRunOptimizationInputData[] = []
-    let optimization_data = optimizationTabData.value?.optimizations.filter((optimization_option) => optimization_option.name == uiOptimization.value)
+    let optimization_data = optimizationTabData.value?.optimizations.filter((optimization_option) => optimization_option.name === uiOptimization.value)
 
     optimization_data?.forEach((data) => {
       data.inputs.forEach((data_input) => {
@@ -152,7 +152,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
           value: data_input.default_value,
         }
         let user_optimization_input =
-          userCalibrationRunData.value?.optimization_inputs.filter((optimization_input) => optimization_input.name == data_input.name)
+          userCalibrationRunData.value?.optimization_inputs.filter((optimization_input) => optimization_input.name === data_input.name)
         if (user_optimization_input && user_optimization_input.length) {
           data_item.value = user_optimization_input[0].value
         }
@@ -205,7 +205,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   }
 
   const getSelectedMetricInfo = computed(() => {
-    const selectedMetric = optimizationTabData.value?.metrics.filter((metric_data) => metric_data.name == uiObjectiveFunction.value)
+    const selectedMetric = optimizationTabData.value?.metrics.filter((metric_data) => metric_data.name === uiObjectiveFunction.value)
     return selectedMetric
   })
 

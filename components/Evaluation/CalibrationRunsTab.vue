@@ -318,7 +318,7 @@ const navigateToAlternateIteration = (event: any) => {
 const evaluateValidationJobFromCalibration = async ( calibration_run_id: number ): Promise<void> => {
   loadSelectedCalibrationRun( calibration_run_id );
   await fetchValidationRunListByCalibrationRun().then( validationRunList => {
-    if ( validationRunList.length == 1 ) {
+    if ( validationRunList.length === 1 ) {
       evaluateValidationRunId.value = validationRunList[0].validation_run_id;
       evaluateValidationRunStatus.value = validationRunList[0].status;
       
@@ -342,7 +342,7 @@ const viewValidationRunStatus = async ( calibration_run_id : number ): Promise<v
   nextTick(async () => {
     setSelectedCalibrationRunId( calibration_run_id );
     await fetchValidationRunListByCalibrationRun().then( validationRunList => {
-      if ( validationRunList.length == 1 ) {
+      if ( validationRunList.length === 1 ) {
         navigationToStatusRun( validationRunList[0].validation_run_id, validationRunList[0].status);
       }
     });
@@ -389,7 +389,7 @@ const deleteSelectedCalibrationRun = () => {
 }
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       fetchUserValidatedCalibrationJobsListData();
       resetUserSelectedEvalValidationRun();
     } else {

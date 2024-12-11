@@ -222,7 +222,7 @@ const showForcingFileUploadDialog = (headerText: string) => {
 
 const handleDialogClose = (opt: any) => {
   if (opt && opt.data) {
-    if (opt.data.saveFileResponseResult.status == 200) {
+    if (opt.data.saveFileResponseResult.status === 200) {
       toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 })
     } else {
       useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach( message => {
@@ -320,7 +320,7 @@ const saveTabData = () => {
   } else {
     toast.removeAllGroups();
     saveGageTabData().then( response => {
-      if ( response.status == 200 ) {
+      if ( response.status === 200 ) {
         useProcessCalibrationGageSavedResponse( response?._data ).forEach( ( toastMessage : ToastMessageOptions ) => {
           toast.add( toastMessage );
         })        

@@ -116,7 +116,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {            
             let metric_header_label = metric.metric_name;
             let headerColumn = <DynamicTableColumn>{ field: metric.metric_name, header: metric_header_label }
-            if (metric.metric_name == runListDataResult._data.objective_function_metric) {
+            if (metric.metric_name === runListDataResult._data.objective_function_metric) {
               headerColumn['styles'] = ['bg-objective-function-col'];
             }
             calibrationRunDetailTableColumn.value.push(headerColumn);

@@ -85,7 +85,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
     if (runListDataResult?._data?.jobs.length > 0) {
       runListDataResult?._data?.jobs.forEach((runItem: ValidatedCalibrationRunListItem) => {
-        if (runItem.status.toLowerCase() == "done" && runItem.submit_date != null) {
+        if (runItem.status.toLowerCase() === "done" && runItem.submit_date != null) {
           userEvaluationCalibrationRunListData.value.push(runItem);
         }
       });
@@ -117,7 +117,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
     if (runListDataResult._data?.validation_jobs) {
       //if there is only 1 validation job, we automatically set the selected validation id to that validation job     
-      if (runListDataResult._data?.validation_jobs.length == 1) {
+      if (runListDataResult._data?.validation_jobs.length === 1) {
         const defaultValidationJob = runListDataResult._data?.validation_jobs[0] as CalibrationValidationJobData;
         evaluateValidationRunId.value = defaultValidationJob.validation_run_id;
         evaluateValidationRunStatus.value = defaultValidationJob.status;

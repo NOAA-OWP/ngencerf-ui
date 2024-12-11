@@ -57,7 +57,7 @@
         </div>
       </div>
       <div>
-        <div class="text-center" v-if="plotTableErrorMessage != '' && selectedSupplementalTable == 0">
+        <div class="text-center" v-if="plotTableErrorMessage != '' && selectedSupplementalTable === 0">
           {{ plotTableErrorMessage }}
         </div>
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
@@ -83,7 +83,7 @@
                 </span>
                 <span v-for="page of plotTablePageOptions">
                   <!-- Current page -->
-                  <span v-if="page.number == plotTableCurrentPage" class="pagingLink active">
+                  <span v-if="page.number === plotTableCurrentPage" class="pagingLink active">
                     {{ page.number }}
                   </span>
 
@@ -98,8 +98,8 @@
                   </span>
 
                   <!-- Show "..." in gaps where page numbers are not sequential - this should only happen if current page +/-2 doesn't fit the above criteria -->
-                  <span v-else-if="page.number == (plotTableCurrentPage - 2) ||
-                    page.number == (plotTableCurrentPage + 2)" class="pagingLink">
+                  <span v-else-if="page.number === (plotTableCurrentPage - 2) ||
+                    page.number === (plotTableCurrentPage + 2)" class="pagingLink">
                     ...
                   </span>
                 </span>
@@ -114,7 +114,7 @@
             <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true scrollable scroll-height="500px"
               :multi-sort="true">
               <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header"
-                :sortable="plotTableTotalPages == 1"></Column>
+                :sortable="plotTableTotalPages === 1"></Column>
             </DataTable>
           </div>
         </div>
@@ -122,40 +122,40 @@
     </div>
     <div id="SupplementalTableArea" class="p-2" v-if="selectedSupplementalTable">
       <DataTable :value="iterationMetricsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true"
-        v-if="iterationMetricsData && selectedSupplementalTable == 1">
+        v-if="iterationMetricsData && selectedSupplementalTable === 1">
         <Column v-for="( col, colIndex ) in iterationMetricsColumns" :key="colIndex" :header="col.header"
           :field="col.field" sortable></Column>
       </DataTable>
       <DataTable :value="iterationParamsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true"
-        v-if="iterationParamsData && selectedSupplementalTable == 2">
+        v-if="iterationParamsData && selectedSupplementalTable === 2">
         <Column v-for="( col, colIndex ) in iterationParamsColumns" :key="colIndex" :header="col.header"
           :field="col.field" sortable></Column>
       </DataTable>
       <DataTable :value="performanceMetricsData" fixedHeader=true
-        v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable == 3">
+        v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable === 3">
         <Column v-for="( col, colIndex ) in performanceMetricsColumns" :key="colIndex" :header="col.header"
           :field="col.field"></Column>
       </DataTable>
-      <div class="pl-4" v-if="calibrationLogList && calibrationLogList.length > 0 && selectedSupplementalTable == 4">
+      <div class="pl-4" v-if="calibrationLogList && calibrationLogList.length > 0 && selectedSupplementalTable === 4">
         <div v-if="calibrationLogList.length > 1">
           <label for="CalibrationLogOptions" class="pr-2 pt-3">Select Calibration Log</label>
           <Select id="CalibrationLogOptions" class="p-select" v-model="selectedCalibrationLog"
             :options="calibrationLogList" optionLabel="name" optionValue="name">
           </Select>
         </div>
-        <div v-if="calibrationLogList.length == 1"><b>{{ selectedCalibrationLog }}</b></div>
+        <div v-if="calibrationLogList.length === 1"><b>{{ selectedCalibrationLog }}</b></div>
         <div id="CalibrationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
           <div v-html="calibrationLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
-      <div class="pl-4" v-if="validationLogList && validationLogList.length > 0 && selectedSupplementalTable == 5">
+      <div class="pl-4" v-if="validationLogList && validationLogList.length > 0 && selectedSupplementalTable === 5">
         <div v-if="validationLogList.length > 1">
           <label for="validationLogOptions" class="pr-2 pt-3">Select Validation Log</label>
           <Select id="validationLogOptions" class="p-select" v-model="selectedValidationLog"
             :options="validationLogList" optionLabel="name" optionValue="name">
           </Select>
         </div>
-        <div v-if="validationLogList.length == 1"><b>{{ selectedValidationLog }}</b></div>
+        <div v-if="validationLogList.length === 1"><b>{{ selectedValidationLog }}</b></div>
         <div id="ValidationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
           <div v-html="validationLogDisplay" class="whitespace-nowrap"></div>
         </div>
@@ -287,10 +287,10 @@ onMounted(() => {
 
     // Add Iteration Metrics/Parameters Tables to the dropdown
     if (iterations.value?._data?.iteration_data) {
-      if (!plotList.value.some(item => item.name == supplementalTableOptions[0])) {
+      if (!plotList.value.some(item => item.name === supplementalTableOptions[0])) {
         plotList.value.push({ name: supplementalTableOptions[0], description: '' });
       }
-      if (!plotList.value.some(item => item.name == supplementalTableOptions[1])) {
+      if (!plotList.value.some(item => item.name === supplementalTableOptions[1])) {
         plotList.value.push({ name: supplementalTableOptions[1], description: '' });
       }
     }
@@ -307,12 +307,12 @@ onMounted(() => {
         for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
           let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
           iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
-          if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] == '') && iterationMetricsRecord[metric_name] != 0) {
+          if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] === '') && iterationMetricsRecord[metric_name] != 0) {
             iterationMetricsRecord[metric_name] = 'N/A';
           } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
             iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
           }
-          if (i == 0) {
+          if (i === 0) {
             iterationMetricsColumns.value.push({ header: metric_name, field: metric_name });
           }
         }
@@ -322,12 +322,12 @@ onMounted(() => {
         for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
           let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
           iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
-          if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] == '') && iterationParamsRecord[param_name] != 0) {
+          if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] === '') && iterationParamsRecord[param_name] != 0) {
             iterationParamsRecord[param_name] = 'N/A';
           } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
             iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
           }
-          if (i == 0) {
+          if (i === 0) {
             iterationParamsColumns.value.push({ header: param_name, field: param_name });
           }
         }
@@ -361,13 +361,13 @@ onMounted(() => {
                 // Loop through our existing rows and see if we have this metric already
                 let metricRow = -1;
                 for (let m = 0; m < performanceMetricsData.value.length; m++) {
-                  if (performanceMetricsData.value[m].metric == key) {
+                  if (performanceMetricsData.value[m].metric === key) {
                     metricRow = m;
                     performanceMetricsData.value[m]['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
                     break;
                   }
                 }
-                if (metricRow == -1) {
+                if (metricRow === -1) {
                   // We didn't find this metric, so create a new row for it
                   performanceMetricsData.value.push({ 'metric': key });
                   performanceMetricsData.value.at(-1)['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
@@ -392,7 +392,7 @@ onMounted(() => {
     }
 
     // Add Performance Metrics Table to the dropdown
-    if (!plotList.value.some(item => item.name == supplementalTableOptions[2])) {
+    if (!plotList.value.some(item => item.name === supplementalTableOptions[2])) {
       plotList.value.push({ name: supplementalTableOptions[2], description: '' });
     }
     console.log('plotList:', plotList.value);
@@ -407,7 +407,7 @@ onMounted(() => {
     validationLogData.value = {};
     validationLogList.value = [];
     if (logs.value?._data?.logs) {
-      if (logs.value?._data?.logs.length == 0) {
+      if (logs.value?._data?.logs.length === 0) {
         // try to get calibration logs separately
         let calibration_logs = await queryGetLogs(evaluateValidationRunId.value);
         if (calibration_logs._data?.logs) {
@@ -435,7 +435,7 @@ onMounted(() => {
     if (logs.value?._data?.validations) {
       for (let v = 0; v < logs.value?._data?.validations.length; v++) {
         console.log('validation_run_id: ', logs.value?._data?.validations[v].validation_run_id);
-        if (logs.value?._data?.validations[v].validation_run_id == evaluateValidationRunId.value) {
+        if (logs.value?._data?.validations[v].validation_run_id === evaluateValidationRunId.value) {
           if (logs.value?._data?.validations[v].logs) {
             for (let l = 0; l < logs.value?._data?.validations[v].logs?.length; l++) {
               Object.keys(logs.value?._data?.validations[v].logs[l]).forEach(key => {
@@ -461,11 +461,11 @@ onMounted(() => {
 
     // Add Calibration/Validation Logs to the dropdown
     if (logs.value?._data?.logs) {
-      if (!plotList.value.some(item => item.name == supplementalTableOptions[3])) {
+      if (!plotList.value.some(item => item.name === supplementalTableOptions[3])) {
         plotList.value.push({ name: supplementalTableOptions[3], description: '' });
       }
       if (logs.value?._data?.validations) {
-        if (!plotList.value.some(item => item.name == supplementalTableOptions[4])) {
+        if (!plotList.value.some(item => item.name === supplementalTableOptions[4])) {
           plotList.value.push({ name: supplementalTableOptions[4], description: '' });
         }
       }
@@ -635,7 +635,7 @@ function adjustPlotTableColumns() {
     });
     for (let d = 0; d < plotTableData.value.length; d++) {
       Object.keys(plotTableData.value[d]).forEach(key => {
-        if (plotTableData.value[d][key] != 0 && (plotTableData.value[d][key] === null || plotTableData.value[d][key] == '')) {
+        if (plotTableData.value[d][key] != 0 && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
           plotTableData.value[d][key] = 'N/A';
         } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this

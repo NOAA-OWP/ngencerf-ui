@@ -161,7 +161,7 @@ watch( validationStatus, async ( newStatus, initialStatus ) => {
     validationStatusCheckingInterval.value = setInterval( async () => {
       queryIterationValidationRunStatus().then( response => {
         const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
-          return validation.validation_run_id == iterationValidationRunId.value
+          return validation.validation_run_id === iterationValidationRunId.value
         });
         if ( !find_validation_run ) {
           validationStatus.value = 'Fail';

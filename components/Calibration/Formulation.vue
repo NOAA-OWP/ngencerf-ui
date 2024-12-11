@@ -27,7 +27,7 @@
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
               optionLabel="name" optionValue="name" class="h-60">
               <template #option="slotProps">
-                <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'">
+                <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
                   <div class="font-ui pl-2 leading-none">{{ slotProps.option.name }}</div>
                 </div>
               </template>
@@ -41,7 +41,7 @@
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
                 optionValue="name" scrollHeight="18rem" class="border-0">
                 <template #option="slotProps">
-                  <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'"><span
+                  <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'"><span
                       class="font-ui pl-2">{{ slotProps.option.name }}</span></div>
                 </template>
               </Listbox>
@@ -297,9 +297,9 @@ const saveFormulationData = () => {
   } else {
     toast.removeAllGroups();
     saveFormulationTabData().then( response => {
-      if ( response.status == 200 ) {
+      if ( response.status === 200 ) {
         toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
-        if ( response?._data?.nwm_warning == true ) {
+        if ( response?._data?.nwm_warning === true ) {
           useCalibrationFormulationTabSaveWarning( response?._data?.formulation_warning ?? {} ).forEach( warning => {
             toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning });
           });

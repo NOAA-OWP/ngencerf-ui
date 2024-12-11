@@ -13,7 +13,7 @@ export default defineEventHandler(async (event): Promise<void | string[] | strin
   // get request method
   const requestMethod = event.node.req.method;
 
-  if (requestMethod == "POST") { 
+  if (requestMethod === "POST") { 
     // Read the request body to get the access token.
     const { accessToken } = await readBody(event);
 

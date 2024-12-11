@@ -75,7 +75,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   const loadValidationStatusInformation = async ( validation_run_id: number ) => {
     queryIterationValidationRunStatus().then( response => {
       const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
-        return validation.validation_run_id == validation_run_id
+        return validation.validation_run_id === validation_run_id
       });
       if ( find_validation_run ) {
         displayValidationId.value = validation_run_id;
@@ -102,7 +102,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
    * @returns {boolean}
    */
   const isValidationRunDone = (status: string) => {
-    return status.toUpperCase() == 'DONE';
+    return status.toUpperCase() === 'DONE';
   }
 
   /**

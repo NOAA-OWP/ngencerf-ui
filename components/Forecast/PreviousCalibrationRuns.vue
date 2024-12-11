@@ -219,7 +219,7 @@ const deleteSelectedCalibrationRun = () => {
 }
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       fetchUserValidatedCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {

@@ -21,7 +21,7 @@
               <div class="mt-2 mb-2 hr"></div>
             </div>
             <div class="col-span-1">
-              <form @submit.prevent="changePassword" @cancel="closeAccountBox" v-if="showForm == 'changePassword'">
+              <form @submit.prevent="changePassword" @cancel="closeAccountBox" v-if="showForm === 'changePassword'">
                 <div class="passwordBox grid row-auto">
 
                   <label for="OldPass">Old password</label>
@@ -61,7 +61,7 @@
               </form>
             </div>
             <div class="col-span-1">
-              <div id="passwordNotes" v-if="showForm == 'changePassword'">                
+              <div id="passwordNotes" v-if="showForm === 'changePassword'">                
                 <strong>Password format:</strong><br>
                 <ul>
                   <li>Cannot be a commonly used password</li>
@@ -70,7 +70,7 @@
                 </ul>
               </div>
 
-              <form @submit.prevent="updateName" @cancel="closeAccountBox" v-if="showForm == 'updateName'">
+              <form @submit.prevent="updateName" @cancel="closeAccountBox" v-if="showForm === 'updateName'">
                 <div class="passwordBox grid row-auto">
                   <label for="FirstName">First Name</label>
                   <div class="mb-3">
@@ -128,7 +128,7 @@ const changePasswordClasses = ref("chgpwd sel");
 const updateNameClasses = ref("updtnm");
 
 watch(showForm, async () => {
-  if (showForm.value == 'updateName') {
+  if (showForm.value === 'updateName') {
     changePasswordClasses.value = "chgpwd";
     updateNameClasses.value = "updtnm sel";
   } else {

@@ -249,11 +249,11 @@ const updateMetricFlowFieldVisibility = () => {
     cbIsCategorical.value = metricInfo?.categorical ?? false;
     cbIsEvenBased.value = metricInfo?.event_based ?? false;
 
-    if (metricInfo?.categorical == true) {
+    if (metricInfo?.categorical === true) {
       showObjectiveFunctionStreamFlow.value = true;
       cbCategoricalDisabled.value = true;
     }
-    if (metricInfo?.event_based == true) {
+    if (metricInfo?.event_based === true) {
       showObjectiveFunctionPeakFlow.value = true;
       cbEventBasedDisabled.value = true;
     }
@@ -298,20 +298,20 @@ const optimizationSelectChange = () => {
 watch(() => optimizationStore_data_loading.value, (loading_status) => {
   const metricInfo = getSelectedMetricInfo.value?.pop();
 
-  if (metricInfo?.categorical == true) {
+  if (metricInfo?.categorical === true) {
     showObjectiveFunctionStreamFlow.value = true;
     cbCategoricalDisabled.value = true;
     cbIsCategorical.value = true;
-  } else if (metricInfo?.categorical == false && uiStreamFlowThreshold.value) {
+  } else if (metricInfo?.categorical === false && uiStreamFlowThreshold.value) {
     showMetricStreamFlow.value = true;
     cbIsCategorical.value = true;
   }
 
-  if (metricInfo?.event_based == true) {
+  if (metricInfo?.event_based === true) {
     showObjectiveFunctionPeakFlow.value = true;
     cbEventBasedDisabled.value = true;
     cbIsEvenBased.value = true;
-  } else if (metricInfo?.event_based == false && uiPeakFlowThreshold.value) {
+  } else if (metricInfo?.event_based === false && uiPeakFlowThreshold.value) {
     showMetricPeakFlow.value = true;
     cbIsEvenBased.value = true;
   }
@@ -328,7 +328,7 @@ const saveOptMetData = () => {
   } else {
     toast.removeAllGroups();
     saveOptimizationTabData().then(response => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         toast.add({ severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?._data?.message });
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
