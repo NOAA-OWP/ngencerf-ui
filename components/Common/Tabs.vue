@@ -50,7 +50,7 @@
           </span>
           <span v-show="calibrationJobId > 0">
             <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Evaluate Tab"
-              v-show="evaluateValidationRunId > 0" title=" Evaluate tab">
+              v-show="evaluateValidationRunId > 0 && ( evaluateValidationRunStatus && evaluateValidationRunStatus !== 'Running' )" title=" Evaluate tab">
               Evaluate
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
@@ -59,7 +59,7 @@
               Select Alternate Iteration
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
-            <span v-show="evaluateIterationRunId && evaluateIterationRunId > 0">
+            <span v-show="( evaluateIterationRunId && evaluateIterationRunId > 0 ) || ( evaluateValidationRunId && evaluateValidationRunId > 0 )">
               <div data-tab="4" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
                 aria-label="Run Validation tab" title="Run Validation tab">
                 Run / Status
@@ -132,7 +132,7 @@ import { storeToRefs } from "pinia";
 import { generalStore } from "@/stores/common/GeneralStore";
 //import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
 
-const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
+const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
