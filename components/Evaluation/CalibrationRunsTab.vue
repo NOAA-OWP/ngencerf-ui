@@ -197,6 +197,7 @@ const onRowContextMenu = (event: any) => {
   if ( crRowData.validation_runs === 1 ) {
     cmCalibrationRun.value.push( { label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => viewValidationRunStatus( crRowData.calibration_run_id ) } )
   }
+  cmCalibrationRun.value.push( { label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) } );
   cmCalibrationRun.value.push( { label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } );
 };
 
@@ -212,6 +213,7 @@ const onRowVrContextMenu = ( event: any ) => {
     cmValidationRun.value.push( { label: 'View Status Details', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun( vrRowData.validation_run_id, vrRowData.status ) } );  
     cmValidationRun.value.push( { label: 'Cancel', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun( vrRowData.validation_run_id, vrRowData.status ) } );
   }
+  cmValidationRun.value.push( { label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) } );
 }
 
 const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
@@ -290,6 +292,17 @@ const navigationToStatusRun = ( validation_run_id: number, validation_status: st
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
   e.click();
+}
+
+const viewSelectAlternateIteration = async ( calibration_run_id: number ) => {
+  setSelectedCalibrationRunId( calibration_run_id );
+  if (userSelectedEvalCalibrationRunId.value > 0) {
+    const tabs = document.getElementsByClassName("tabs");
+    const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
+    e.click();
+  } else {
+    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 })
+  }
 }
 
 const navigateToAlternateIteration = (event: any) => {
