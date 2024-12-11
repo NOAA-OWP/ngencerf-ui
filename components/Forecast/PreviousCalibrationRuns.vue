@@ -154,7 +154,7 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
 
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
-  if (updatedRunData != undefined && Object.keys(updatedRunData).length > 0) {
+  if (updatedRunData !== undefined && Object.keys(updatedRunData).length > 0) {
     nextTick(() => {
       isLoading.value = false;
       loadCalibrationDataComplete.value = true;

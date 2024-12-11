@@ -85,7 +85,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
     if (runListDataResult?._data?.jobs.length > 0) {
       runListDataResult?._data?.jobs.forEach((runItem: ValidatedCalibrationRunListItem) => {
-        if (runItem.status.toLowerCase() === "done" && runItem.submit_date != null) {
+        if (runItem.status.toLowerCase() === "done" && runItem.submit_date !== null) {
           userEvaluationCalibrationRunListData.value.push(runItem);
         }
       });

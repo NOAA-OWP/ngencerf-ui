@@ -110,7 +110,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 const acceptDelete = (selectedRunId: number) => {
     toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
-    // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id != selectedRunId )
+    // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id !== selectedRunId )
     // calibration_jobs_list.value = reduced_calibration_job_list
     // refreshJobListData()
     selectedCalibrationRun.value = undefined

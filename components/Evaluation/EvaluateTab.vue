@@ -57,7 +57,7 @@
         </div>
       </div>
       <div>
-        <div class="text-center" v-if="plotTableErrorMessage != '' && selectedSupplementalTable === 0">
+        <div class="text-center" v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0">
           {{ plotTableErrorMessage }}
         </div>
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
@@ -307,7 +307,7 @@ onMounted(() => {
         for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
           let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
           iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
-          if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] === '') && iterationMetricsRecord[metric_name] != 0) {
+          if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] === '') && iterationMetricsRecord[metric_name] !== 0) {
             iterationMetricsRecord[metric_name] = 'N/A';
           } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
             iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
@@ -322,7 +322,7 @@ onMounted(() => {
         for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
           let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
           iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
-          if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] === '') && iterationParamsRecord[param_name] != 0) {
+          if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] === '') && iterationParamsRecord[param_name] !== 0) {
             iterationParamsRecord[param_name] = 'N/A';
           } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
             iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
@@ -563,7 +563,7 @@ watch(selectedPlotName, async () => {
             plotTableList.value.push({ name: key });
           });
           selectedPlotTable.value = plotTableList.value[0].name;
-          if (selectedPlotTable.value != '') {
+          if (selectedPlotTable.value !== '') {
             plotTableData.value = plotTables.value[selectedPlotTable.value];
           } else {
             plotTableData.value = [];
@@ -612,7 +612,7 @@ watch(selectedPlotName, async () => {
 // Handle selectedPlotTable changes
 watch(selectedPlotTable, async () => {
   console.log('selectedPlotName changed');
-  if (selectedPlotTable.value != '') {
+  if (selectedPlotTable.value !== '') {
     plotTableData.value = plotTables.value[selectedPlotTable.value];
     adjustPlotTableColumns();
   }
@@ -635,7 +635,7 @@ function adjustPlotTableColumns() {
     });
     for (let d = 0; d < plotTableData.value.length; d++) {
       Object.keys(plotTableData.value[d]).forEach(key => {
-        if (plotTableData.value[d][key] != 0 && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
+        if (plotTableData.value[d][key] !== 0 && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
           plotTableData.value[d][key] = 'N/A';
         } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
@@ -689,12 +689,12 @@ watch(plotTableCurrentPage, async () => {
 
 // Handle selectedCalibrationLog/selectedValidationLog changes
 watch(selectedCalibrationLog, async () => {
-  if (selectedCalibrationLog.value != '') {
+  if (selectedCalibrationLog.value !== '') {
     calibrationLogDisplay.value = calibrationLogData.value[selectedCalibrationLog.value];
   }
 });
 watch(selectedValidationLog, async () => {
-  if (selectedValidationLog.value != '') {
+  if (selectedValidationLog.value !== '') {
     validationLogDisplay.value = validationLogData.value[selectedValidationLog.value];
   }
 });

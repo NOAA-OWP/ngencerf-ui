@@ -237,7 +237,7 @@ onMounted(() => {
 
 const addSlothOnEnter = (e: KeyboardEvent) => {
   const ele = e.target as HTMLElement;
-  if (e.key === "Enter" && new_sloth_variable_name.value.trim() != '') {
+  if (e.key === "Enter" && new_sloth_variable_name.value.trim() !== '') {
     addSlothVariable();
   }
 };
@@ -246,7 +246,7 @@ const addSlothOnEnter = (e: KeyboardEvent) => {
  * add sloth variable entry to table and reset name field
  */
 const addSlothVariable = () => {
-  if (new_sloth_variable_name.value.trim() != '') {
+  if (new_sloth_variable_name.value.trim() !== '') {
     addNewSlothVariable(new_sloth_variable_name.value);
     new_sloth_variable_name.value = '';
   }

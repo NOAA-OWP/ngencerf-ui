@@ -173,10 +173,10 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     if (uiOptimizationInputs.value.length > 0) savePayload.value["optimization_inputs"] = uiOptimizationInputs.value;
     if (uiOptimization.value) savePayload.value["optimization"] = uiOptimization.value;
     if (uiObjectiveFunction.value) savePayload.value["objective_function"] = uiObjectiveFunction.value;
-    if (uiStreamFlowThreshold.value != undefined && uiStreamFlowThreshold.value > 0) savePayload.value["streamflow_threshold"] = uiStreamFlowThreshold.value;
-    if (uiPeakFlowThreshold.value != undefined && uiPeakFlowThreshold.value > 0) savePayload.value["peak_flow_threshold"] = uiPeakFlowThreshold.value;
-    if (uiStopCriteria.value != undefined && uiStopCriteria.value > 0) savePayload.value["stop_criteria"] = uiStopCriteria.value;
-    if (uiPlotFrequency.value != undefined && uiPlotFrequency.value > 0) savePayload.value["save_plot_iteration_frequency"] = uiPlotFrequency.value;
+    if (uiStreamFlowThreshold.value !== undefined && uiStreamFlowThreshold.value > 0) savePayload.value["streamflow_threshold"] = uiStreamFlowThreshold.value;
+    if (uiPeakFlowThreshold.value !== undefined && uiPeakFlowThreshold.value > 0) savePayload.value["peak_flow_threshold"] = uiPeakFlowThreshold.value;
+    if (uiStopCriteria.value !== undefined && uiStopCriteria.value > 0) savePayload.value["stop_criteria"] = uiStopCriteria.value;
+    if (uiPlotFrequency.value !== undefined && uiPlotFrequency.value > 0) savePayload.value["save_plot_iteration_frequency"] = uiPlotFrequency.value;
 
     if (Object.keys(savePayload.value).length > 0) {
       savePayload.value["calibration_run_id"] = calibrationJobId.value;

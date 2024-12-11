@@ -249,7 +249,7 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
   * @returns {void}
   */
   function deleteSlothVariable(variable_name: string): void {
-    slothParameterInputs.value = slothParameterInputs.value.filter(param => param.param_name != variable_name)
+    slothParameterInputs.value = slothParameterInputs.value.filter(param => param.param_name !== variable_name)
   }
 
   /**
