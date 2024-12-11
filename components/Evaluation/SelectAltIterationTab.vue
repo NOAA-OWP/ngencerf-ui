@@ -2,11 +2,9 @@
 
   <div id="RunDetailsTbl" class="text-left mt-3 p-3">
     <div class="tableTitle">Run Details</div>
-    <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px"
-      @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect" table-style="min-width: 50rem"
-      selectionMode="single" class="boxed" ref="calibrationRunDetailTable"
-      v-model:selection="selectedCalibrationByIterationDetailRow"
-      :rowClass="({ validation_run_id }) => validation_run_id > 0 ? 'disabled-row' : null">
+    <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
+      table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow"
+      :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''">
       <ColumnGroup type="header">
         <Row>
           <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header"
@@ -25,10 +23,9 @@
   <div class="mt-3">
     <div id="CalTuningParamsTbl" class="text-left mt-3 p-3">
       <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
-      <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"
-        @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect" selectionMode="single"
-        ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"
-        :rowClass="({ validation_run_id }) => validation_run_id > 0 ? 'disabled-row' : null">
+      <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"  @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect"
+        selectionMode="single" ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"
+        :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''"> 
         <ColumnGroup type="header">
           <Row :class="['table-header']">
             <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header"
@@ -86,8 +83,8 @@ const {
 } = storeToRefs(useEvaluationAltIterationStore());
 
 const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
-const { iterationValidationRunId } = storeToRefs(useEvaluationRunStatusStore());
-const { evaluateIterationRunId } = storeToRefs(generalStore());
+const { iterationValidationRunId } = storeToRefs( useEvaluationRunStatusStore() );
+const { evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs( generalStore() );
 
 const selectedCalibrationByIterationDetailRow = ref<any>();
 const selectedCalibrationByIterationParameterRow = ref<any>();
@@ -115,16 +112,16 @@ onMounted(() => {
   })
 })
 
-const onDetailTableRowSelect = (event: DataTableRowClickEvent) => {
-  console.log('onDetailTableRowSelect event.data.validation_run_id', event.data.validation_run_id);
+const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
   //userSelectedCalibrationIterationId.value = event.data.iteration_id;
   if (event.data.validation_run_id === "") {
     evaluateIterationRunId.value = event.data.iteration_id;
   } else {
     evaluateIterationRunId.value = 0;
   }
-  const paramDataIndex = computedtuningParametersDataList.value.findIndex(paramData => paramData.iteration_id == event.data.iteration_id);
-  selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[paramDataIndex];
+  evaluateDisplayIterationNumber.value = event.data.iteration_num;
+  const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
+  selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];   
 }
 
 const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
@@ -134,8 +131,9 @@ const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
   } else {
     evaluateIterationRunId.value = 0;
   }
-  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex(paramData => paramData.iteration_id == event.data.iteration_id);
-  selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[detailDataIndex];
+  evaluateDisplayIterationNumber.value = event.data.iteration_num;
+  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
+  selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];
 }
 
 const onTableRowUnselect = (event: DataTableRowClickEvent) => {
@@ -143,11 +141,12 @@ const onTableRowUnselect = (event: DataTableRowClickEvent) => {
   selectedCalibrationByIterationDetailRow.value = null;
   //userSelectedCalibrationIterationId.value = null;
   evaluateIterationRunId.value = 0;
+  evaluateDisplayIterationNumber.value = 0;
 }
 
-const navigateToEvaluateStatus = (event: any) => {
-  if (evaluateIterationRunId.value && evaluateIterationRunId.value > 0) {
-    iterationValidationRunId.value = 0;
+const navigateToEvaluateStatus = ( event : any ) => {
+  if ( evaluateIterationRunId.value && evaluateIterationRunId.value > 0 ) {
+    iterationValidationRunId.value = evaluateValidationRunId.value = 0;
     clearRunningStatusInfo();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
@@ -181,10 +180,6 @@ const navigateToEvaluateStatus = (event: any) => {
   border: $ngwcp_blue_lt;
   color: var(--p-datatable-row-color) !important;
 }
-
-// .p-datatable-tbody .p-datatable-selectable-row td {
-//   font-size: 0.8em;
-// }
 
 .p-datatable-tbody .p-datatable-selectable-row.disabled-row td {
   font-weight: 500;

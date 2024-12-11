@@ -57,7 +57,7 @@
         </div>
       </div>
       <div>
-        <div class="text-center" v-if="plotTableErrorMessage !== '' && selectedSupplementalTable == 0">
+        <div class="text-center" v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0">
           {{ plotTableErrorMessage }}
         </div>
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
@@ -252,19 +252,19 @@ const supplementalTableOptions = [
 onMounted( () => {
   nextTick( async () => {
     hilightTab(EvaluationTabs.tab_evaluate);
+    
+    // make sure page loads with no plots/tables selected
+    selectedPlotName.value = null;
+    selectedPlotFilename.value = null;
+    selectedPlotFileUrl.value = null;
+    selectedSupplementalTable.value = 0;
 
     if (!userCalibrationRunData?.value) {
       await fetchUserCalibrationRunData();
     }
     
-    // make sure page loads with no plot selected
-    selectedPlotName.value = null;
-    selectedPlotFilename.value = null;
-    selectedPlotFileUrl.value = null;
-    selectedSupplementalTable.value = 0;
-    
     // Get Plot Names
-    if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
+    if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
       plotNames.value = await queryGetPlotNames();
     }
 
@@ -272,7 +272,7 @@ onMounted( () => {
     await loadRunStatusStore();
 
     // Get Plot Names
-    if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
+    if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
       plotNames.value = await queryGetPlotNames();
     }
 
@@ -286,193 +286,10 @@ onMounted( () => {
     
     //console.log('userCalibrationRunData: ', userCalibrationRunData.value);
     
-    // Get Iteration Data
-    iterations.value = await queryGetIterations();
-    //console.log('iterations:', iterations.value?._data);
-    
-    // Add Iteration Metrics/Parameters Tables to the dropdown
-    if (iterations.value?._data?.iteration_data) {
-      if (!plotList.value.some(item => item.name === supplementalTableOptions[0])) {
-        plotList.value.push({ name: supplementalTableOptions[0], description: '' });
-      }
-      if (!plotList.value.some(item => item.name === supplementalTableOptions[1])) {
-        plotList.value.push({ name: supplementalTableOptions[1], description: '' });
-      }
-    }
-
-    // set up arrays for iterationMetricsData and iterationParamsData
-    iterationMetricsData.value = [];
-    iterationParamsData.value = [];
-    iterationMetricsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
-    iterationParamsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
-    if (iterations.value?._data?.iteration_data) {
-      for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
-        const iterationMetricsRecord: DynamicObject = {};
-        iterationMetricsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
-        for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
-          let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
-          iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
-          if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] === '') && iterationMetricsRecord[metric_name] !== 0) {
-            iterationMetricsRecord[metric_name] = 'N/A';
-          } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
-            iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
-          }
-          if (i === 0) {
-            iterationMetricsColumns.value.push({ header: metric_name, field: metric_name });
-          }
-        }
-        iterationMetricsData.value.push(iterationMetricsRecord);
-        const iterationParamsRecord: DynamicObject = {};
-        iterationParamsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
-        for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
-          let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
-          iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
-          if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] === '') && iterationParamsRecord[param_name] !== 0) {
-            iterationParamsRecord[param_name] = 'N/A';
-          } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
-            iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
-          }
-          if (i === 0) {
-            iterationParamsColumns.value.push({ header: param_name, field: param_name });
-          }
-        }
-        iterationParamsData.value.push(iterationParamsRecord);
-      }
-    }
-    //console.log('iterationMetricsData:', iterationMetricsData.value);
-    //console.log('iterationMetricsColumns:', iterationMetricsColumns);
-    //console.log('iterationParamsData:', iterationParamsData.value);
-    //console.log('iterationParamsColumns:', iterationParamsColumns);
-
-    // Get Performance Metrics - put each one into the table as its own row
-    performanceMetrics.value = await queryGetPerformanceMetrics();
-    performanceMetricsData.value = [];
-    if (performanceMetrics.value?._data) {
-      //console.log('performanceMetrics:', performanceMetrics.value?._data);
-      if (performanceMetrics.value?._data?.performance_metrics) {
-        // First add the metric names and the values from our Calibration run
-        performanceMetricsColumns.push({ header: 'Calibration Job ID ' + calibrationJobId.value, field: 'calibration_job_id_' + calibrationJobId.value });
-        Object.keys(performanceMetrics.value?._data.performance_metrics).forEach(key => {
-          performanceMetricsData.value.push({ 'metric': key });
-          performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = performanceMetrics.value?._data?.performance_metrics[key];
-        });
-        // Now go through the values from our Validations and add each metric value to the appropriate row
-        if (performanceMetrics.value?._data?.validations) {
-          for (let v = 0; v < performanceMetrics.value?._data?.validations.length; v++) {
-            let validation_run_id = performanceMetrics.value?._data?.validations[v].validation_run_id;
-            performanceMetricsColumns.push({ header: 'Validation Job ID ' + validation_run_id, field: 'validation_job_id_' + validation_run_id });
-            if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
-              Object.keys(performanceMetrics.value?._data?.validations[v].performance_metrics).forEach(key => {
-                // Loop through our existing rows and see if we have this metric already
-                let metricRow = -1;
-                for (let m = 0; m < performanceMetricsData.value.length; m++) {
-                  if (performanceMetricsData.value[m].metric === key) {
-                    metricRow = m;
-                    performanceMetricsData.value[m]['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
-                    break;
-                  }
-                }
-                if (metricRow === -1) {
-                  // We didn't find this metric, so create a new row for it
-                  performanceMetricsData.value.push({ 'metric': key });
-                  performanceMetricsData.value.at(-1)['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
-                }
-              });
-            }
-          }
-          // Now clean up our metric names so that they display nicely
-          for (let m = 0; m < performanceMetricsData.value.length; m++) {
-            let column_header_words = performanceMetricsData.value[m].metric.split("_");
-            for (let w = 0; w < column_header_words.length; w++) {
-              let word = column_header_words[w]
-              column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
-            }
-            let column_header = column_header_words.join(" ");
-            performanceMetricsData.value[m].metric = column_header;
-          }
-        }
-      }
-      //console.log('performanceMetricsData:', performanceMetricsData.value);
-      //console.log('performanceMetricsColumns:', performanceMetricsColumns);
-    }
-
-    // Add Performance Metrics Table to the dropdown
-    if (!plotList.value.some(item => item.name === supplementalTableOptions[2])) {
-      plotList.value.push({ name: supplementalTableOptions[2], description: '' });
-    }
-    //console.log('plotList:', plotList.value);
-
-    // Get Calibration/Validation Logs
-    logs.value = await queryGetLogs(
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
-    );
-    console.log('logs: ', logs.value);
-    calibrationLogData.value = {};
-    calibrationLogList.value = [];
-    validationLogData.value = {};
-    validationLogList.value = [];
-    if (logs.value?._data?.logs) {
-      if (logs.value?._data?.logs.length === 0) {
-        // try to get calibration logs separately
-        let calibration_logs = await queryGetLogs(evaluateValidationRunId.value);
-        if (calibration_logs._data?.logs) {
-          logs.value._data.logs = calibration_logs._data?.logs;
-        }
-      }
-      //console.log('logs: ', logs.value?._data?.logs);
-      for (let l = 0; l < logs.value?._data?.logs.length; l++) {
-        Object.keys(logs.value?._data?.logs[l]).forEach(key => {
-          let logText = "";
-          for (let t = 0; t < Math.min(logs.value?._data?.logs[l][key].length, 1000); t++) {
-            logText += logs.value?._data?.logs[l][key][t] + '<br/>\n';
-          }
-          calibrationLogData.value[key] = logText;
-          calibrationLogList.value.push({ name: key });
-        });
-      }
-      if (calibrationLogList.value.length > 0) {
-        selectedCalibrationLog.value = calibrationLogList.value[0]['name'];
-      }
-      console.log('calibrationLogData: ', calibrationLogData.value);
-      console.log('calibrationLogList: ', calibrationLogList.value);
-      console.log('selectedCalibrationLog: ', selectedCalibrationLog.value);
-    }
-    if (logs.value?._data?.validations) {
-      for (let v = 0; v < logs.value?._data?.validations.length; v++) {
-        console.log('validation_run_id: ', logs.value?._data?.validations[v].validation_run_id);
-        if (logs.value?._data?.validations[v].validation_run_id == evaluateValidationRunId.value) {
-          if (logs.value?._data?.validations[v].logs) {
-            for (let l = 0; l < logs.value?._data?.validations[v].logs?.length; l++) {
-              Object.keys(logs.value?._data?.validations[v].logs[l]).forEach(key => {
-                let logText = "";
-                for (let t = 0; t < Math.min(logs.value?._data?.validations[v].logs[l][key].length, 1000); t++) {
-                  logText += logs.value?._data?.validations[v].logs[l][key][t] + '<br/>\n';
-                }
-                validationLogData.value[key] = logText;
-                validationLogList.value.push({ name: key });
-              });
-            }
-          }
-          break;
-        }
-      }
-      if (validationLogList.value.length > 0) {
-        selectedValidationLog.value = validationLogList.value[0]['name'];
-      }
-      //console.log('validationLogData: ', validationLogData.value);
-      //console.log('validationLogList: ', validationLogList.value);
-      //console.log('selectedValidationLog: ', selectedValidationLog.value);
-    }
-
-    // Add Calibration/Validation Logs to the dropdown
-    if (logs.value?._data?.logs) {
-      if (!plotList.value.some(item => item.name === supplementalTableOptions[3])) {
-        plotList.value.push({ name: supplementalTableOptions[3], description: '' });
-      }
-      if (logs.value?._data?.validations) {
-        if (!plotList.value.some(item => item.name === supplementalTableOptions[4])) {
-          plotList.value.push({ name: supplementalTableOptions[4], description: '' });
-        }
+    // Add Supplemental Table Options to the dropdown
+    for (let t = 0; t < supplementalTableOptions.length; t++) {
+      if (!plotList.value.some(item => item.name === supplementalTableOptions[t])) {
+        plotList.value.push({ name: supplementalTableOptions[t], description: '' });
       }
     }
   })
@@ -485,20 +302,220 @@ watch(selectedPlotName, async () => {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
     selectedSupplementalTable.value = supplementalTableOptions.indexOf(selectedPlotName.value) + 1;
-    if (selectedSupplementalTable.value === 1 && !iterationMetricsData.value.length) {
-      toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: 5000 });
-    }
-    if (selectedSupplementalTable.value === 2 && !iterationParamsData.value.length) {
-      toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: 5000 });
-    }
-    if (selectedSupplementalTable.value === 3 && !performanceMetricsData.value.length) {
-      toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: 5000 });
-    }
-    if (selectedSupplementalTable.value === 4 && !calibrationLogList.value.length) {
-      toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no logs', life: 5000 });
-    }
-    if (selectedSupplementalTable.value === 5 && !validationLogList.value.length) {
-      toast.add({ severity: 'info', summary: 'Validation Run ' + evaluateValidationRunId.value + ' has no logs', life: 5000 });
+    if (selectedSupplementalTable.value === 1) {
+      // Get Iteration Data
+      if (!iterations.value?._data || !iterations.value?._data?.length) {
+        iterations.value = await queryGetIterations();
+      }
+      //console.log('iterations:', iterations.value?._data);
+
+      // set up array for iterationMetricsData
+      iterationMetricsData.value = [];
+      iterationMetricsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
+      if (iterations.value?._data?.iteration_data) {
+        for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
+          const iterationMetricsRecord: DynamicObject = {};
+          iterationMetricsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
+          for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
+            let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
+            iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
+            if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] === '') && iterationMetricsRecord[metric_name]) {
+              iterationMetricsRecord[metric_name] = 'N/A';
+            } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
+              iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
+            }
+            if (i === 0) {
+              iterationMetricsColumns.value.push({ header: metric_name, field: metric_name });
+            }
+          }
+          iterationMetricsData.value.push(iterationMetricsRecord);
+        }
+      }
+      //console.log('iterationMetricsData:', iterationMetricsData.value);
+      //console.log('iterationMetricsColumns:', iterationMetricsColumns);
+      if (!iterationMetricsData.value.length) {
+        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: 5000 });
+      }
+    } else if (selectedSupplementalTable.value === 2) {
+      // Get Iteration Data
+      if (!iterations.value?._data || !iterations.value?._data?.length) {
+        iterations.value = await queryGetIterations();
+      }
+      //console.log('iterations:', iterations.value?._data);
+
+      // set up array for iterationParamsData
+      iterationParamsData.value = [];
+      iterationParamsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
+      if (iterations.value?._data?.iteration_data) {
+        for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
+          const iterationParamsRecord: DynamicObject = {};
+          iterationParamsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
+          for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
+            let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
+            iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
+            if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] === '') && iterationParamsRecord[param_name]) {
+              iterationParamsRecord[param_name] = 'N/A';
+            } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
+              iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
+            }
+            if (i === 0) {
+              iterationParamsColumns.value.push({ header: param_name, field: param_name });
+            }
+          }
+          iterationParamsData.value.push(iterationParamsRecord);
+        }
+      }
+      //console.log('iterationParamsData:', iterationParamsData.value);
+      //console.log('iterationParamsColumns:', iterationParamsColumns);
+      if (!iterationParamsData.value.length) {
+        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: 5000 });
+      }
+    } else if (selectedSupplementalTable.value === 3) {
+      // Get Performance Metrics - put each one into the table as its own row
+      if (!performanceMetrics.value?._data || !performanceMetrics.value?._data?.length) {
+        performanceMetrics.value = await queryGetPerformanceMetrics();
+      }
+
+      performanceMetricsData.value = [];
+      if (performanceMetrics.value?._data) {
+        //console.log('performanceMetrics:', performanceMetrics.value?._data);
+        if (performanceMetrics.value?._data?.performance_metrics) {
+          // First add the metric names and the values from our Calibration run
+          performanceMetricsColumns.push({ header: 'Calibration Job ID ' + calibrationJobId.value, field: 'calibration_job_id_' + calibrationJobId.value });
+          Object.keys(performanceMetrics.value?._data.performance_metrics).forEach(key => {
+            performanceMetricsData.value.push({ 'metric': key });
+            performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = performanceMetrics.value?._data?.performance_metrics[key];
+          });
+          // Now go through the values from our Validations and add each metric value to the appropriate row
+          if (performanceMetrics.value?._data?.validations) {
+            for (let v = 0; v < performanceMetrics.value?._data?.validations.length; v++) {
+              let validation_run_id = performanceMetrics.value?._data?.validations[v].validation_run_id;
+              performanceMetricsColumns.push({ header: 'Validation Job ID ' + validation_run_id, field: 'validation_job_id_' + validation_run_id });
+              if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
+                Object.keys(performanceMetrics.value?._data?.validations[v].performance_metrics).forEach(key => {
+                  // Loop through our existing rows and see if we have this metric already
+                  let metricRow = -1;
+                  for (let m = 0; m < performanceMetricsData.value.length; m++) {
+                    if (performanceMetricsData.value[m].metric === key) {
+                      metricRow = m;
+                      performanceMetricsData.value[m]['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
+                      break;
+                    }
+                  }
+                  if (metricRow === -1) {
+                    // We didn't find this metric, so create a new row for it
+                    performanceMetricsData.value.push({ 'metric': key });
+                    performanceMetricsData.value.at(-1)['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
+                  }
+                });
+              }
+            }
+            // Now clean up our metric names so that they display nicely
+            for (let m = 0; m < performanceMetricsData.value.length; m++) {
+              let column_header_words = performanceMetricsData.value[m].metric.split("_");
+              for (let w = 0; w < column_header_words.length; w++) {
+                let word = column_header_words[w]
+                column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+              }
+              let column_header = column_header_words.join(" ");
+              performanceMetricsData.value[m].metric = column_header;
+            }
+          }
+        }
+        //console.log('performanceMetricsData:', performanceMetricsData.value);
+        //console.log('performanceMetricsColumns:', performanceMetricsColumns);
+      }
+      if (!performanceMetricsData.value.length) {
+        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: 5000 });
+      }
+    } else if (selectedSupplementalTable.value === 4) {
+      // Get Calibration Logs
+      if (!logs.value?._data || !logs.value?._data?.length) {
+        logs.value = await queryGetLogs(
+          (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
+        );
+      }
+
+      //console.log('logs: ', logs.value);
+      calibrationLogData.value = {};
+      calibrationLogList.value = [];
+      if (logs.value?._data?.logs) {
+        //console.log('logs: ', logs.value?._data?.logs);
+        for (let l = 0; l < logs.value?._data?.logs.length; l++) {
+          Object.keys(logs.value?._data?.logs[l]).forEach(key => {
+            let logPages = [];
+            let logText = "";
+            for (let t = 0; t < logs.value?._data?.logs[l][key].length; t++) {
+              logText += logs.value?._data?.logs[l][key][t] + '<br/>\n';
+              if (logText !== "" && ((t+1) % 1000 === 0 || t === logs.value?._data?.logs[l][key].length-1)) {
+                logPages.push(logText);
+                logText = "";
+              }
+            }
+            calibrationLogData.value[key] = {
+              pages: logPages,
+              num_rows: logs.value?._data?.logs[l][key].length
+            }
+            calibrationLogList.value.push({ name: key });
+          });
+        }
+        if (calibrationLogList.value.length > 0) {
+          selectedCalibrationLog.value = calibrationLogList.value[0]['name'];
+        }
+        //console.log('calibrationLogData: ', calibrationLogData.value);
+        //console.log('calibrationLogList: ', calibrationLogList.value);
+        //console.log('selectedCalibrationLog: ', selectedCalibrationLog.value);
+      }
+      if (!calibrationLogList.value.length) {
+        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no logs', life: 5000 });
+      }
+    } else if (selectedSupplementalTable.value === 5) {
+      // Get Validation Logs
+      if (!logs.value?._data || !logs.value?._data?.length) {
+        logs.value = await queryGetLogs(
+          (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
+        );
+      }
+
+      //console.log('logs: ', logs.value);
+      validationLogData.value = {};
+      validationLogList.value = [];
+      if (logs.value?._data?.validations) {
+        for (let v = 0; v < logs.value?._data?.validations.length; v++) {
+          if (logs.value?._data?.validations[v].validation_run_id === evaluateValidationRunId.value) {
+            if (logs.value?._data?.validations[v].logs) {
+              for (let l = 0; l < logs.value?._data?.validations[v].logs?.length; l++) {
+                Object.keys(logs.value?._data?.validations[v].logs[l]).forEach(key => {
+                  let logPages = [];
+                  let logText = "";
+                  for (let t = 0; t < logs.value?._data?.validations[v].logs[l][key].length; t++) {
+                    logText += logs.value?._data?.validations[v].logs[l][key][t] + '<br/>\n';
+                    if (logText !== "" && ((t+1) % 1000 === 0 || t === logs.value?._data?.validations[v].logs[l][key].length-1)) {
+                      logPages.push(logText);
+                      logText = "";
+                    }
+                  }
+                  validationLogData.value[key] = {
+                    pages: logPages,
+                    num_rows: logs.value?._data?.validations[v].logs[l][key].length
+                  }
+                  validationLogList.value.push({ name: key });
+                });
+              }
+            }
+            break;
+          }
+        }
+        if (validationLogList.value.length > 0) {
+          selectedValidationLog.value = validationLogList.value[0]['name'];
+        }
+        //console.log('validationLogData: ', validationLogData.value);
+        //console.log('validationLogList: ', validationLogList.value);
+        //console.log('selectedValidationLog: ', selectedValidationLog.value);
+      }
+      if (!validationLogList.value.length) {
+        toast.add({ severity: 'info', summary: 'Validation Run ' + evaluateValidationRunId.value + ' has no logs', life: 5000 });
+      }
     }
     plotTableData.value = [];
     plotTableColumns.value = [];
@@ -633,7 +650,7 @@ function adjustPlotTableColumns() {
     });
     for (let d = 0; d < plotTableData.value.length; d++) {
       Object.keys(plotTableData.value[d]).forEach(key => {
-        if (plotTableData.value[d][key] !== 0 && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
+        if (plotTableData.value[d][key] && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
           plotTableData.value[d][key] = 'N/A';
         } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
@@ -717,6 +734,14 @@ const toggleMessagesGroup = () => {
     showMessagesGroup.value = true;
   }
 }
+
+onUnmounted( () => {
+  // make sure page clears all selected plots/tables when the user leaves
+  selectedPlotName.value = null;
+  selectedPlotFilename.value = null;
+  selectedPlotFileUrl.value = null;
+  selectedSupplementalTable.value = 0;
+})
 </script>
 
 <style lang="scss" scoped>

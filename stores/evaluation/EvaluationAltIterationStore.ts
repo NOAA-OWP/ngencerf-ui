@@ -1,6 +1,7 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
+import { generalStore } from "../common/GeneralStore";
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { useBackendConfig } from "~/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "~/composables/UserAuth"
@@ -9,7 +10,8 @@ import type { CalibrationRunIterationParameterData, AlternativeIterationCalibrat
 export const useEvaluationAltIterationStore = defineStore('EvaluationAltIterationStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
-  const { userCalibrationRunData, userSelectedCalibrationIterationId } = storeToRefs(useUserDataStore());
+  const { userSelectedCalibrationIterationId } = storeToRefs(useUserDataStore());
+  const { calibrationJobId } = storeToRefs( generalStore() );
 
   const calibrationRunDetailDataList = ref<AlternativeIterationCalibrationRunData[]>([]);
   const tuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
@@ -62,7 +64,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: userCalibrationRunData?.value?.calibration_run_id })
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     });
 
     if (runListDataResult._data.retrospective_data) {
@@ -201,7 +203,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        calibration_run_id: userCalibrationRunData?.value?.calibration_run_id,
+        calibration_run_id: calibrationJobId.value,
         iteration_id: userSelectedCalibrationIterationId.value
       })
     });
