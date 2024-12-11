@@ -73,7 +73,6 @@ onMounted(async () => {
       await loadSetupForecastTabData();
     }
     console.log('forecastCycles', forecastCycles.value);
-    //console.log('forecastCycle[0]["Data Sources"]:', forecastCycles?.value[0]["Data Sources"]);
   });
 });
 

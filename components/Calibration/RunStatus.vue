@@ -210,13 +210,12 @@ const plotNamesToExclude = [
 ];
 
 onMounted(() => {
-  hilightTab(CalibrationTabs.tab_statusRun);
-
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
   nextTick(async () => {
+    hilightTab(CalibrationTabs.tab_statusRun);
     if (userCalibrationRunData.value) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
 
@@ -244,7 +243,7 @@ onMounted(() => {
 const createElapsedTimeInterval = () => {
 
   elapsedTimeIntervalId.value = setInterval(async () => {
-    if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' && 
+    if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate elapsedTime every second while Calibration is Running or Validation is not Done
       elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
@@ -346,8 +345,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         }
 
         // Calculate Running Time every second while calibration is Running or calibration is Done and valid_control and valid_best have not started or are Ready or Running
-        if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' && 
-        (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
+        if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
+          (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
           elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
 
           // Create an interval to update elapsedTime every second while Calibration is Running or Validation is not Done
@@ -371,14 +370,13 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       }
 
       // Get Plot Names
-      if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
+      if (!((plotNames?.value as any)?._data?.plot_names) || (plotNames?.value as any)?._data?.plot_names.length === 0) {
         plotNames.value = await queryGetPlotNames();
       }
 
-      if (plotNames.value?._data.plot_names) {
-
+      if ((plotNames.value as any)?._data.plot_names) {
         // setting plotList will populate the dropdown
-        plotList.value = plotNames.value?._data?.plot_names?.filter(
+        plotList.value = (plotNames.value as any)?._data?.plot_names?.filter(
           (plot: any) => !plotNamesToExclude.includes(plot.name)
         );
       } else {
@@ -438,8 +436,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             }
           }, 10000) as unknown as number;
         }
-      } 
-      
+      }
+
       else if (['Done', 'Cancelled', 'Failed', 'Server Error'].includes(validControlAndValidBestStatus.value ?? '')) {
         const getStatusResponse = await queryGetCalibrationStatus();
         const validations = getStatusResponse?._data?.validations;
@@ -532,7 +530,7 @@ watch(iteration, async () => {
     } else {
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage});
+      toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage });
     }
   }
 });
@@ -596,12 +594,8 @@ watch(iteration, async () => {
   }
 
   .p-progressbar-value {
-    color: green;
-    background-color: green;
-  }
-
-  .p-progressbar-value {
     color: black;
+    background-color: green;
   }
 
   .p-progressbar-label {

@@ -136,7 +136,7 @@
         </span>
         <span v-else>
           <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-            Run on {{ formatDateForRunOnString(submitTimeDate) }}
+            Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
           </div>
         </span>
         <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
@@ -163,7 +163,7 @@
       <DynamicDialog />
     </div>
     <div class="waitgif" v-if="formulationStore_data_loading">
-      <img src="@/assets/styles/img/wait.gif" />
+      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
 </template>
@@ -522,10 +522,4 @@ h1 {
   width: 120px;
 }
 
-/*
-#FormulationBottomButtons {
-  height: 54px;
-  width: 100%;
-}
-*/
 </style>

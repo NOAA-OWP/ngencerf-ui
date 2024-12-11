@@ -142,8 +142,7 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
       name: "",
       description: "ALL"
     }]
-    //let groups_list = fetchModuleCoveredGroupList();
-    formulationTabData.value?.module_groups.forEach((group) => {
+      formulationTabData.value?.module_groups.forEach((group) => {
       groupOptionsList.push({
         name: group,
         description: group,

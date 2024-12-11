@@ -36,7 +36,6 @@ import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
 import type { CalibrationRun } from "@/composables/NextGenModel";
-//import { useCalibrationRunStore } from "@/stores/CalibrationRunStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
@@ -64,11 +63,6 @@ onMounted(() => {
   hilightTab(VerificationTabs.tab_calibrationRuns);
   
 })
-
-
-// async function initCalibrationRunList() {
-//     await calibrationRunStore.retrieveCalibrationRuns()
-// }
 
 const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
     setEvalRunSelected(true);
@@ -118,7 +112,6 @@ const acceptDelete = (selectedRunId: number) => {
 
 const rowStyle = (data: any) => {
     if (!['Saved', 'Ready'].includes(data.status)) {
-        //return { backgroundColor: 'gainsboro' }
         return { backgroundColor: 'white' }
     }
 }

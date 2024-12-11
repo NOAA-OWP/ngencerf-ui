@@ -202,7 +202,7 @@ export interface GageTabData {
   calibration_run_id: number;
   forcing_source_values: ForcingSourceValueData[];
   observational_source_values: ObservationalSourceValueData[];
-  geopackage_source_values: GeopackageSourceValueData[];
+  geopackage_source_values: NameAndDescription[];
   gages: GageOptionData[];
   gage: GageData;
   geopackage_image_url: string;
@@ -251,11 +251,10 @@ export interface ObservationalSourceValueData {
   is_active: boolean;
 }
 
-export interface GeopackageSourceValueData {
+export interface NameAndDescription {
   name: string;
   description: string;
 }
-
 
 export interface SaveGageTabResponse extends GeneralApiSaveResponse {
   geopackage_image: string;
@@ -685,4 +684,10 @@ export const ValidationFormFields = {
   peak_flow_threshold: "Peak Flow Threshold",
   objective_function: "Objective Function",
   optimization: "Optimization Algorithm"
+}
+
+export type PlotNames = {
+  calibration_run_id: number,
+  plot_names: NameAndDescription[];
+  status: string;
 }

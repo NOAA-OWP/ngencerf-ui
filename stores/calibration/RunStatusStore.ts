@@ -112,7 +112,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
     // load plotNames and plotList from get_plot_names
     plotNames.value = await queryGetPlotNames();
-    plotList.value = plotNames?.value?._data?.plot_names;
+    plotList.value = ((plotNames?.value as any)?._data as PlotNames)?.plot_names;
 
     // load iteration from get_iteration.
     const getIterationResponse = await queryGetIteration();
