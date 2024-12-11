@@ -92,6 +92,19 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     }
   }
 
+  const fetchValidationRunListByCalibrationRun = async () => {
+    const runListDataResult = await makeProtectedApiCall<CalibrationValidationJobList>(`${ngencerfBaseUrl}/calibration/get_validation_jobs/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: userSelectedEvalCalibrationRunId.value })
+    });
+
+    return runListDataResult._data?.validation_jobs as CalibrationValidationJobData[];
+  }
+
   const fetchUserSelectedCalibrationValidationRunList = async () => {
     const runListDataResult = await makeProtectedApiCall<CalibrationValidationJobList>(`${ngencerfBaseUrl}/calibration/get_validation_jobs/`, {
       method: "POST",
@@ -134,9 +147,28 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     }
   }
 
+  const setSelectedCalibrationRunId = ( calibration_run_id: number ):void => {
+    userSelectedEvalCalibrationRunId.value = calibrationJobId.value = calibration_run_id;
+  }
+
+  /**
+  * @returns {number}
+  */
+  const getValidationRunIdByCalibrationRunId =  computed( () => {
+    const find_validation_run = userEvaluationCalibrationRunListData.value.filter( ( validation: ValidatedCalibrationRunListItem ) => {
+      return validation.calibration_run_id === calibrationJobId.value;
+    });
+    if ( !find_validation_run ) {
+      return 0;
+    } else {
+      // make sure we actually has validation run
+      const validation_run = find_validation_run.shift();
+      return validation_run?.validation_run_ids[0] ?? 0;
+    }
+  });
+
   const loadSelectedCalibrationRun = async (calibration_run_id: number) => {
-    calibrationJobId.value = calibration_run_id;
-    userSelectedEvalCalibrationRunId.value = calibration_run_id;
+    setSelectedCalibrationRunId( calibration_run_id );
     await fetchUserCalibrationRunData();
   }
 
@@ -194,6 +226,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     userSelectedEvalCalibrationRunId,
     loadCalibrationDataComplete,
 
+    setSelectedCalibrationRunId,
     loadSelectedCalibrationRun,
     fetchUserValidatedCalibrationJobsListData,
     resetUserSelectedEvalCalibrationRun,
@@ -202,7 +235,9 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     fetchUserSelectedCalibrationValidationRunList,
     resetUserSelectedEvalValidationRun,
     clearUserCalibrationRunData,
+    fetchValidationRunListByCalibrationRun,
 
+    getValidationRunIdByCalibrationRunId,
     userEvaluationCalibrationRunListData,
     calibrationValidationRunListHeaders,
     computedCalibrationValidationRunList,

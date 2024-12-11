@@ -8,8 +8,7 @@ import { makeProtectedApiCall } from "~/composables/UserAuth"
 import { calculateElapsedTime } from '~/utils/TimeHelpers';
 
 export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore', () => {
-  const { evaluateIterationRunId, iterationValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());
-  const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+  const { calibrationJobId, evaluateIterationRunId, iterationValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
 
@@ -42,7 +41,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: userCalibrationRunData.value?.calibration_run_id, iteration_id: evaluateIterationRunId.value })
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value, iteration_id: evaluateIterationRunId.value })
     });
   }
 
@@ -56,7 +55,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: userCalibrationRunData.value?.calibration_run_id })
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     });
   }
 
@@ -68,9 +67,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        calibration_run_id: userCalibrationRunData.value?.calibration_run_id,
-        validation_run_id: iterationValidationRunId.value,
-        forecast_run_id: 0
+        validation_run_id: iterationValidationRunId.value
       })
     });
   }

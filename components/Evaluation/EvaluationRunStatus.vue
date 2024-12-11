@@ -192,6 +192,8 @@ onUnmounted( () => {
 const cancelRun = async () => {
   executeCancelIterationValidationRun().then( response => {
     validationStatus.value = response?._data.status;
+    clearInterval( validationStatusCheckingInterval.value );
+    clearInterval( validationRunningTimeInterval.value );
   })
 }
 
