@@ -15,8 +15,8 @@
         <div class="ml-auto mt-2">
           <div id="NewButton" class="">
             <Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
-              v-if="forecastJobId"
-              @click="navigateToSetupForecast">New Forecast</Button>
+              v-if="calibrationRunForForecast && calibrationRunForForecast.calibration_run_id"
+              @click="openSelectedCalibrationRun">New Forecast</Button>
           </div>
         </div>
       </div>
@@ -37,11 +37,11 @@
             <!-- @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" -->
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-            <DataTable id="ForecastRunTable" :value="forecastRuns" scrollable scroll-height="400px"
+              :model="cmCalibrationRun" @hide="calibrationRunForForecast = undefined"></ContextMenu>
+            <DataTable id="ForecastRunTable" :value="calibrationRunsForForecast" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"              
               
-              v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
+              v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
               @row-dblclick="onRowDblClick($event)" @rowContextmenu="onRowContextMenu" class="boxed">
               <Column field="calibration_run_id" header="Job ID" sortable></Column>
               <Column field="status" header="Status" sortable></Column>
@@ -87,7 +87,7 @@ const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
 
 const forecastStore = useForecastStore();
-const { loadForecastRuns } = forecastStore;
+const { getCalibrationJobsForForecast } = forecastStore;
 
 
 const toast = useToast();
@@ -103,7 +103,6 @@ const cmCalibrationRun = ref([
 ]);
 const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent);
-  forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
 };
 
 const {
@@ -122,7 +121,7 @@ const {
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
-const { forecastRuns, forecastRunGageList, forecastJobId } = storeToRefs(useForecastStore());
+const { calibrationRunsForForecast, calibrationRunForForecast, forecastRunGageList } = storeToRefs(useForecastStore());
 
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRun>();
@@ -133,25 +132,21 @@ onMounted(async () => {
   hilightTab(EvaluationTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
-  forecastJobId.value = 0;
-  //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
+  //clear calibration data if user were on calibration tab and clear evaluation previous run data user may have selected
   resetUserSelectedEvalCalibrationRun();
-  await loadForecastRuns();
+  await getCalibrationJobsForForecast();
   isLoading.value = false;
 
 });
 
 const onForecastRowSelect = async () => {
+  console.log('onForecastRowSelect');
+  console.log('calibrationRunForForecast', calibrationRunForForecast.value);
   isLoading.value = true;
-  await loadSelectedCalibrationRun(forecastJobId.value as number);
+  await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
   await fetchUserSelectedCalibrationValidationRunList();
   isLoading.value = false;
-}
-
-const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
-  forecastJobId.value = 0;
-}
-
+};
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
   if (updatedRunData != undefined && Object.keys(updatedRunData).length > 0) {
@@ -164,20 +159,21 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
 
 const onRowDblClick = (event: any) => {
   const rowData = event.data;
-  forecastJobId.value = rowData.calibration_run_id;
   openSelectedCalibrationRun();
 }
 
-const openSelectedCalibrationRun = () => {
+const openSelectedCalibrationRun = async () => {
+  console.log('openSelectedCalibrationRun');
+  console.log('calibrationRunForForecast.value.calibration_run_id: ', calibrationRunForForecast.value?.calibration_run_id);
   isLoading.value = true;
   resetUserSelectedEvalValidationRun();
-  nextTick(async () => {
-    await loadSelectedCalibrationRun(forecastJobId.value as number);
-    await fetchUserSelectedCalibrationValidationRunList();
-    navigateToSetupForecast();
-    isLoading.value = false;
-  })
-}
+  console.log('calibrationRunForForecast.value.calibration_run_id: ', calibrationRunForForecast.value?.calibration_run_id);
+
+  await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
+  await fetchUserSelectedCalibrationValidationRunList();
+  navigateToSetupForecast();
+  isLoading.value = false;
+};
 
 const navigateToSetupForecast = () => {
   if (userSelectedEvalCalibrationRunId.value > 0) {
@@ -196,8 +192,9 @@ const rowStyle = (data: any) => {
 }
 
 const confirmDelte = useConfirm();
+
 const deleteSelectedCalibrationRun = () => {
-  const selectedRunId = forecastJobId.value as number;
+  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
   let confirmMessage = "Are you sure you want to delete this run?"
   confirmDelte.require({
     message: confirmMessage,
@@ -216,7 +213,8 @@ const deleteSelectedCalibrationRun = () => {
       //do nothing
     }
   })
-}
+};
+
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
     if (response.status == 200) {
@@ -228,7 +226,7 @@ const acceptDelete = (selectedRunId: number) => {
     }
   });
   selectedCalibrationRun.value = undefined;
-}
+};
 
 </script>
 

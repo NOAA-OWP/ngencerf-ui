@@ -649,11 +649,12 @@ export type ForecastCycle = {
   name: string;
   data_sources: string;
   time_range: string;
+  is_active: boolean;
 }
 
-export type ForecastRuns = ForecastRun[];
+export type CalibrationRunsForForecast = CalibrationRunForForecast[];
 
-export type ForecastRun = {
+export type CalibrationRunForForecast = {
   calibration_run_id: number;
   gage_id: string;
   job_genesis: string;
