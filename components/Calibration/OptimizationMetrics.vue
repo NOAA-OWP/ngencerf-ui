@@ -302,7 +302,7 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
     showObjectiveFunctionStreamFlow.value = true;
     cbCategoricalDisabled.value = true;
     cbIsCategorical.value = true;
-  } else if (metricInfo?.categorical === false && uiStreamFlowThreshold.value) {
+  } else if (!metricInfo?.categorical && uiStreamFlowThreshold.value) {
     showMetricStreamFlow.value = true;
     cbIsCategorical.value = true;
   }
@@ -311,7 +311,7 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
     showObjectiveFunctionPeakFlow.value = true;
     cbEventBasedDisabled.value = true;
     cbIsEvenBased.value = true;
-  } else if (metricInfo?.event_based === false && uiPeakFlowThreshold.value) {
+  } else if (!metricInfo?.event_based && uiPeakFlowThreshold.value) {
     showMetricPeakFlow.value = true;
     cbIsEvenBased.value = true;
   }
