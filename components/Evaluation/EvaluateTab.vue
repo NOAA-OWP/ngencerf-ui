@@ -373,11 +373,19 @@ watch(selectedPlotName, async () => {
           if (performanceMetrics.value?._data?.validations) {
             for (let v = 0; v < performanceMetrics.value?._data?.validations.length; v++) {
               let validation_run_id = performanceMetrics.value?._data?.validations[v].validation_run_id;
-              let validation_type = performanceMetrics.value?._data?.validations[v].validation_type.replace('valid_','');
-              if (performanceMetrics.value?._data?.validations[v].iteration_num > 0) {
-                validation_type = 'Iter ' + performanceMetrics.value?._data?.validations[v].iteration_num;
-              } else {
-                validation_type = validation_type.charAt(0).toUpperCase() + validation_type.slice(1);
+              let validation_type = performanceMetrics.value?._data?.validations[v].validation_type;
+              if (validation_type == 'valid_iteration') {
+                validation_type = 'Iter';
+              } else if (validation_type == 'valid_control') {
+                validation_type = 'Control';
+              } else if (validation_type == 'valid_best') {
+                validation_type = 'Best';
+              }
+              if (performanceMetrics.value?._data?.validations[v].iteration_num !== null) {
+                if (validation_type != 'Iter') {
+                  validation_type += ': Iter';
+                }
+                validation_type += ' ' + performanceMetrics.value?._data?.validations[v].iteration_num;
               }
               performanceMetricsColumns.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id});
               if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
