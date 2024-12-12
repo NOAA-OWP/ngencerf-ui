@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import type { SelectOption, ForecastRun, ForecastRuns, ForecastCycle } from "@/composables/NextGenModel";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { makeProtectedApiCall } from "~/composables/UserAuth";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { isValidDate } from '~/utils/CommonHelpers';
-import { convertTimeZone } from '~/utils/TimeHelpers';
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { isValidDate } from '@/utils/CommonHelpers';
+import { convertTimeZone } from '@/utils/TimeHelpers';
 
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();

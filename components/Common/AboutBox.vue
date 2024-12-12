@@ -2,7 +2,7 @@
   <!-- About Box -->
   <div id="AboutBox">
     <div class="text-right sticky top-0">
-      <img alt="Close" title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+      <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
         class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeAboutBox" />
     </div>
 
@@ -73,9 +73,9 @@
 </template>
 
 <script setup lang="ts">
-import type { ServerInfo } from "~/composables/NextGenModel";
+import type { ServerInfo } from "@/composables/NextGenModel";
 import json from "@/assets/version.json";
-import { generalStore } from "~/stores/common/GeneralStore";
+import { generalStore } from "@/stores/common/GeneralStore";
 
 const genStore = generalStore();
 const { getServerInfo } = generalStore();

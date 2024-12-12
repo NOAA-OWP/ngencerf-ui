@@ -66,12 +66,12 @@
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun } from "~/composables/NextGenModel";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { hilightTab } from '~/composables/TabHilight';
+import type { CalibrationRun } from "@/composables/NextGenModel";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { hilightTab } from '@/composables/TabHilight';
 import { storeToRefs } from "pinia";
-import { useForecastStore } from "~/stores/forecast/ForecastStore";
+import { useForecastStore } from "@/stores/forecast/ForecastStore";
 
 const forecastStore = useForecastStore();
 const { forecastRunGageList, forecastJobId, uiGageId } = forecastStore;

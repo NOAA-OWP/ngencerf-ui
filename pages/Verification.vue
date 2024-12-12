@@ -5,7 +5,7 @@
   </template>
   
   <script lang="ts" setup>
-  import VerificationLayout from "~/layouts/VerificationLayout.vue";
+  import VerificationLayout from "@/layouts/VerificationLayout.vue";
   
   </script>
   

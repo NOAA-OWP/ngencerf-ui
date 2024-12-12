@@ -3,22 +3,22 @@
   <div>
     <CommonTabs @tabNumber="tabChanged" />
     
-    <div v-if="activeTab == 1">
+    <div v-if="activeTab === 1">
       <CalibrationCalibrationRunsTab />
     </div> 
-    <div v-else-if="activeTab == 2">
+    <div v-else-if="activeTab === 2">
       <CalibrationHeadwaterBasinGage />
     </div>
-    <div v-else-if="activeTab == 3">
+    <div v-else-if="activeTab === 3">
       <CalibrationFormulation />
     </div>
-    <div v-else-if="activeTab == 4">
+    <div v-else-if="activeTab === 4">
       <CalibrationTuningControls />
     </div>
-    <div v-else-if="activeTab == 5">
+    <div v-else-if="activeTab === 5">
       <CalibrationOptimizationMetrics />
     </div>
-    <div v-else-if="activeTab == 6">
+    <div v-else-if="activeTab === 6">
       <CalibrationRunStatus />
     </div>
     

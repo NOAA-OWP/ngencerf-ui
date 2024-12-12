@@ -66,18 +66,18 @@
 import { onMounted } from "vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import type { JobListItem } from "~/composables/NextGenModel";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { generalStore } from "~/stores/common/GeneralStore";
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
+import type { JobListItem } from "@/composables/NextGenModel";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
-import { useGageStore } from "~/stores/calibration/GageStore";
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { useTuningStore } from "~/stores/calibration/TuningStore";
-import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
-import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "~/composables/ValidationHandlers";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
+import { useGageStore } from "@/stores/calibration/GageStore";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
+import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
+import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
@@ -90,7 +90,7 @@ const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrati
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
-import { hilightTab } from '~/composables/TabHilight';
+import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -170,7 +170,7 @@ const createNewCalibration = async () => {
   clearUserCalibrationRunData();
 
   fetchNewCalibrationRunId().then(response => {
-    if (response.status == 201) {
+    if (response.status === 201) {
       if (response?._data && response?._data?.calibration_run_id && response?._data?.calibration_run_id > 0) {
         calibrationJobId.value = response?._data?.calibration_run_id;
         queryUserCalibrationRunData().then(queryResponse => {
@@ -207,7 +207,7 @@ const gotoHeadwaterBasinGage = () => {
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   cloneCalibrationRun(selectedRunId).then(response => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       fetchUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
@@ -222,7 +222,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const confirm_delete = ref(false)
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   let confirmMessage = "Are you sure you want to delete this run?"
-  if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
+  if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
 
   confirmDelte.require({
     message: confirmMessage,
@@ -244,7 +244,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       fetchUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {

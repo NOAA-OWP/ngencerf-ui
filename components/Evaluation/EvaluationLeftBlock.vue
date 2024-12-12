@@ -3,16 +3,16 @@
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
-      <span v-if="activeTab == 1">
+      <span v-if="activeTab === 1">
         <CalibrationRunsTab />
       </span>
-      <span v-else-if="activeTab == 2">
+      <span v-else-if="activeTab === 2">
         <EvaluateTab />
       </span>
-      <span v-else-if="activeTab == 3">
+      <span v-else-if="activeTab === 3">
         <SelectAltIterationTab />
       </span>
-      <span v-else-if="activeTab == 4">
+      <span v-else-if="activeTab === 4">
         <RunStatus />
       </span>
     </div>

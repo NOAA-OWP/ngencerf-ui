@@ -70,16 +70,16 @@
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun, CalibrationValidationJobData } from "~/composables/NextGenModel";
+import type { CalibrationRun, CalibrationValidationJobData } from "@/composables/NextGenModel";
 
-import { EvaluationTabs } from "~/composables/NextgenEnums";
-import { useForecastStore } from "~/stores/forecast/ForecastStore";
-import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
+import { EvaluationTabs } from "@/composables/NextgenEnums";
+import { useForecastStore } from "@/stores/forecast/ForecastStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { hilightTab } from '~/composables/TabHilight';
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { hilightTab } from '@/composables/TabHilight';
 import { storeToRefs } from "pinia";
 const { deleteCalibrationRun } = useCalibrationJobStore();
 
@@ -154,7 +154,7 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
 
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
-  if (updatedRunData != undefined && Object.keys(updatedRunData).length > 0) {
+  if (updatedRunData !== undefined && Object.keys(updatedRunData).length > 0) {
     nextTick(() => {
       isLoading.value = false;
       loadCalibrationDataComplete.value = true;
@@ -219,7 +219,7 @@ const deleteSelectedCalibrationRun = () => {
 }
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       fetchUserValidatedCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {

@@ -2,7 +2,7 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
           class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
@@ -109,13 +109,13 @@ import { useToast } from "primevue/usetoast";
 
 import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NextGenModel";
 import { EvaluationTabs } from "@/composables/NextgenEnums";
-import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { hilightTab } from '~/composables/TabHilight';
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { hilightTab } from '@/composables/TabHilight';
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const { deleteCalibrationRun } = useCalibrationJobStore();
@@ -218,7 +218,7 @@ const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
 }
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
-  if (updatedRunData != undefined && Object.keys(updatedRunData).length > 0) {
+  if (updatedRunData !== undefined && Object.keys(updatedRunData).length > 0) {
     nextTick(() => {
       isLoading.value = false;
       loadCalibrationDataComplete.value = true;
@@ -310,7 +310,7 @@ const navigateToAlternateIteration = (event: any) => {
 const evaluateValidationJobFromCalibration = async ( calibration_run_id: number ): Promise<void> => {
   loadSelectedCalibrationRun( calibration_run_id );
   await fetchValidationRunListByCalibrationRun().then( validationRunList => {
-    if ( validationRunList.length == 1 ) {
+    if ( validationRunList.length === 1 ) {
       evaluateValidationRunId.value = validationRunList[0].validation_run_id;
       evaluateValidationRunStatus.value = validationRunList[0].status;
       
@@ -334,7 +334,7 @@ const viewValidationRunStatus = async ( calibration_run_id : number ): Promise<v
   nextTick(async () => {
     setSelectedCalibrationRunId( calibration_run_id );
     await fetchValidationRunListByCalibrationRun().then( validationRunList => {
-      if ( validationRunList.length == 1 ) {
+      if ( validationRunList.length === 1 ) {
         navigationToStatusRun( validationRunList[0].validation_run_id, validationRunList[0].status);
       }
     });
@@ -381,7 +381,7 @@ const deleteSelectedCalibrationRun = () => {
 }
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       fetchUserValidatedCalibrationJobsListData();
       resetUserSelectedEvalValidationRun();
     } else {
