@@ -43,17 +43,17 @@
               
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
               @row-dblclick="onRowDblClick($event)" @rowContextmenu="onRowContextMenu" class="boxed">
-              <Column field="calibration_run_id" header="Job ID" sortable></Column>
-              <Column field="status" header="Status" sortable></Column>
+              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
+              <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
               <Column field="submit_date" header="Run Date" sortable>
                 <template #body="slotProps">
                   {{ formatDateForDisplay(slotProps.data.created_at) }}
                 </template>
               </Column>
-              <Column field="formulation_name" header="Formulation Name" sortable></Column>
-              <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-              <Column field="objective_function" header="Objective Function" sortable></Column>
-              <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
+              <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
+              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
+              <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable></Column>
+              <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
             </DataTable>
           </div>
         </div>
@@ -85,6 +85,10 @@ const { deleteCalibrationRun } = useCalibrationJobStore();
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
 
 const forecastStore = useForecastStore();
 const { loadForecastRuns } = forecastStore;
