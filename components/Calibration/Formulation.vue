@@ -78,44 +78,44 @@
             scroll-height="157px" table-style="min-width: 50rem" v-model:selection="selectedSlothParameterData"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedSlothParameterData"
             @rowContextmenu="onRowContextMenu">
-            <Column field="param_name" header="SLoTH Output Var" sortable></Column>
-            <Column field="param_count" header="Count" sortable>
+            <Column :pt="ptColumn" field="param_name" header="SLoTH Output Var" sortable></Column>
+            <Column :pt="ptColumn" field="param_count" header="Count" sortable>
               <template #editor="{ index }">
                 <InputNumber v-model="slothParameterInputs[index].param_count" autofocus class="w-12 p-1">
                 </InputNumber>
               </template>
             </Column>
-            <Column field="param_type" header="Type" sortable>
+            <Column :pt="ptColumn" field="param_type" header="Type" sortable>
               <template #editor="{ index }">
                 <Select v-model="slothParameterInputs[index].param_type"
                   :options="fetchFormulationSlothParameterTypeOptions" optionLabel="name" optionValue="name"></Select>
               </template>
             </Column>
-            <Column field="param_units" header="Units" sortable>
+            <Column :pt="ptColumn" field="param_units" header="Units" sortable>
               <template #editor="{ index }">
                 <Select v-model="slothParameterInputs[index].param_units"
                   :options="fetchFormulationSlothParameterUnitOptions" optionLabel="name" optionValue="name"></Select>
               </template>
             </Column>
-            <Column field="param_location" header="Location" sortable>
+            <Column :pt="ptColumn" field="param_location" header="Location" sortable>
               <template #editor="{ index }">
                 <InputText v-model="slothParameterInputs[index].param_location" autofocus class="w-20 p-1">
                 </InputText>
               </template>
             </Column>
-            <Column field="maps_to_module" header="For Module" sortable>
+            <Column :pt="ptColumn" field="maps_to_module" header="For Module" sortable>
               <template #editor="{ index }">
                 <Select v-model="slothParameterInputs[index].maps_to_module" filter
                   :options="fetchSelectedFormulationModuleOptions" optionLabel="name" optionValue="name"></Select>
               </template>
             </Column>
-            <Column field="maps_to_variable_name" header="Module Param" sortable>
+            <Column :pt="ptColumn" field="maps_to_variable_name" header="Module Param" sortable>
               <template #editor="{ index }">
                 <InputText v-model="slothParameterInputs[index].maps_to_variable_name" autofocus fluid>
                 </InputText>
               </template>
             </Column>
-            <Column field="param_value" header="Value" sortable>
+            <Column :pt="ptColumn" field="param_value" header="Value" sortable>
               <template #editor="{ index }">
                 <InputNumber v-model="slothParameterInputs[index].param_value" autofocus :minFractionDigits="0"
                   :maxFractionDigits="2" class="w-12 p-1" fluid>
@@ -192,6 +192,11 @@ const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
 const slothParamContextMenu = ref() //sloth parameter table context menu
+
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
 
 
 const cmSlothParameterData = ref([

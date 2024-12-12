@@ -10,19 +10,19 @@
 
         <ul v-show="isUserLoggedIn() && location.name !== 'Login'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
-            <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
+            <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
               @click="MenuChanged">Calibration</NuxtLink>
           </li>
           <li aria-label="Evaluation" title="Evaluation">
-            <NuxtLink :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2'
+            <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2'
               @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
+            <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
               @click="MenuChanged">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
-            <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
+            <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
               @click="" class="disabled">Verification</NuxtLink>
           </li>
         </ul>
@@ -171,12 +171,9 @@ const userItems = ref([
 ])
 
 const userContextMenu = ref();
-
 const uMenu = ref(false);
-
 const showHelp = ref(false);
 let observer = null;
-
 const isOnDiv = ref(false);
 
 const onImageRightClick = (event: any) => {
@@ -274,7 +271,10 @@ const displayHelp = () => {
 const MenuChanged = (e: MouseEvent) => {
   nextTick(() => {
     const currentMenu = getMenuIndex();
-    const ele = e.currentTarget as HTMLElement;
+    let ele = e.currentTarget as HTMLElement;
+    if( !ele ) {
+      ele = e.target as HTMLElement;
+    }
     const m = ele.getAttribute('data-menu');
     const tabs = document.getElementsByClassName("tabs");
     const tab = <HTMLElement>tabs[0];

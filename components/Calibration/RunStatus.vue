@@ -63,6 +63,16 @@
                       </Select>
                     </td>
                   </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                      <div v-if="validControlAndValidBestStatus === 'Done'">
+                        <div class="ngenButtonDiv mt-4">
+                          <button class="font-normal" @click="gotoEvaluation">Go to Evaluation</button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -97,22 +107,8 @@
         </div>
       </div>
     </div>
-    <span v-if="calibrationStatus === 'Done'">
-      <!-- NOTE TO DEVELOPERS: temporary commenting out block below until the functionality for this button is ready-->
-      <!-- 
-      <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
-        <div class="row-span-1">
-          <div id="ResultsArea" class="ngenButtonDiv row-span-1">
-            <button class="font-normal">Go to Evaluation</button>
-          </div>
-          <div class="col-span-7">&nbsp;</div>
-        </div>
-      </div>
-      -->
-    </span>
 
-    <span v-else>
-
+    <span v-if="calibrationStatus !== 'Done'">
       <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
         <div class="row-span-1">
           <div id="StatusRunBottomButtons" class="grid grid-cols-8">
@@ -159,6 +155,8 @@ import { onMounted } from "vue";
 import { ValidationPlotNames } from "@/composables/NextgenEnums";
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { generalStore } from "~/stores/common/GeneralStore";
+import { useEvaluationRunStatusStore } from "~/stores/evaluation/EvaluationRunStatusStore";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
 import { convertTimeZone, calculateElapsedTime } from '@/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
@@ -166,6 +164,10 @@ import { hilightTab } from '@/composables/TabHilight';
 
 const runStatusStore = useRunStatusStore();
 const userDataStore = useUserDataStore();
+const evalRunStatusStore = useEvaluationRunStatusStore();
+const {  setMenuIndex } = generalStore();
+const { validationStatus } = storeToRefs(evalRunStatusStore);
+
 const toast = useToast();
 
 const {
@@ -535,6 +537,15 @@ watch(iteration, async () => {
   }
 });
 
+const gotoEvaluation = () => {
+  const ele = document.getElementById("MainMenuEvaluation");
+  ele?.click();
+ //       setMenuIndex(NextgenPages.page_evaluation);
+
+  // const allTabs = document.getElementsByClassName("tabs");
+  // const e = allTabs[CalibrationTabs.tab_statusRun] as HTMLElement;
+  // e.click();
+}
 </script>
 
 <style lang="scss" scoped>

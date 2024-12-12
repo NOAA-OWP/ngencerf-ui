@@ -24,11 +24,11 @@
             scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
             @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
-            <Column field="calibration_run_id" header="Job ID" sortable></Column>
-            <Column field="job_genesis" header="Job Genesis" sortable></Column>
-            <Column field="formulation_name" header="Formulation Name" sortable></Column>
-            <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-            <Column field="created_at" header="Creation Date" sortable>
+            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
+            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable></Column>
+            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
+            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
+            <Column field="created_at" header="Creation Date" sortable>Column
               <template #body="slotProps">
                 {{ formatDateForDisplay(slotProps.data.created_at) }}
               </template>
@@ -49,7 +49,7 @@
                 </span>
               </template>
             </Column>
-            <Column field="status" header="Status" sortable></Column>
+            <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
           </DataTable>
         </div>
 
@@ -104,6 +104,11 @@ const cmCalibrationRun = ref([
 const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent);
 };
+
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
 
 onMounted(() => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
@@ -170,7 +175,7 @@ const createNewCalibration = async () => {
   clearUserCalibrationRunData();
 
   fetchNewCalibrationRunId().then(response => {
-    if (response.status === 201) {
+    if (response.status == 201) {
       if (response?._data && response?._data?.calibration_run_id && response?._data?.calibration_run_id > 0) {
         calibrationJobId.value = response?._data?.calibration_run_id;
         queryUserCalibrationRunData().then(queryResponse => {
@@ -207,7 +212,7 @@ const gotoHeadwaterBasinGage = () => {
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   cloneCalibrationRun(selectedRunId).then(response => {
-    if (response.status === 200) {
+    if (response.status == 200) {
       fetchUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
@@ -222,7 +227,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const confirm_delete = ref(false)
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   let confirmMessage = "Are you sure you want to delete this run?"
-  if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
+  if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
 
   confirmDelte.require({
     message: confirmMessage,
@@ -244,7 +249,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
-    if (response.status === 200) {
+    if (response.status == 200) {
       fetchUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
