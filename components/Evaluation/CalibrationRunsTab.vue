@@ -53,7 +53,7 @@
             @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
             <Column field="calibration_run_id" header="Job ID" sortable></Column>
-            <Column field="formulation_name" header="formulation_name" sortable></Column>
+            <Column field="formulation_name" header="Formulation Name" sortable></Column>
             <Column field="validation_runs" header="Validation Runs" sortable></Column>
             <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
             <Column field="objective_function" header="Objective Function" sortable></Column>
