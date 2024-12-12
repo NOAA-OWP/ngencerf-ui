@@ -170,7 +170,7 @@ const createNewCalibration = async () => {
   clearUserCalibrationRunData();
 
   fetchNewCalibrationRunId().then(response => {
-    if (response.status === 201) {
+    if (response.status == 201) {
       if (response?._data && response?._data?.calibration_run_id && response?._data?.calibration_run_id > 0) {
         calibrationJobId.value = response?._data?.calibration_run_id;
         queryUserCalibrationRunData().then(queryResponse => {
@@ -207,7 +207,7 @@ const gotoHeadwaterBasinGage = () => {
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   cloneCalibrationRun(selectedRunId).then(response => {
-    if (response.status === 200) {
+    if (response.status == 200) {
       fetchUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
@@ -222,7 +222,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const confirm_delete = ref(false)
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   let confirmMessage = "Are you sure you want to delete this run?"
-  if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
+  if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
 
   confirmDelte.require({
     message: confirmMessage,
@@ -244,7 +244,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
-    if (response.status === 200) {
+    if (response.status == 200) {
       fetchUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
