@@ -499,6 +499,7 @@ export interface CalibrationValidationJobList {
 }
 
 export interface CalibrationValidationJobData extends CalibrationValidationRunData {
+  iteration_num: number;
   best?: boolean;
 }
 
@@ -598,9 +599,12 @@ export interface CalibrationGetStatusResponse {
 
 export interface CalibrationGetStatusValidationItem {
   validation_run_id: number;
+  iteration_num: number;
   status: string;
   validation_type: string;
   submit_date: Date;
+  run_end: Date;
+  run_start: Date;
   elapsed_time?: string | null;
   performance_metrics?: CalibrationGetStatusPerformanceMetricItem[] | null;
 }
@@ -613,6 +617,15 @@ export interface CalibrationGetStatusPerformanceMetricItem {
   max_disk_read: string;
   max_disk_write: string;
   reserved_time: string;
+}
+
+/**
+ * context menu option types
+ */
+export interface DataTableContextMenuOption {
+  label: string;
+  icon: string;
+  command: any;
 }
 
 /**
@@ -632,6 +645,8 @@ export type ServerInfo = {
   date: string;
   contact_email: string;
   commit_hash: string;
+  ngenCerf_version: string;
+  ngenCerf_date: string;
 }
 
 export type ForecastCycle = {

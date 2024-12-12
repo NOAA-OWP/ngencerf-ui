@@ -3,6 +3,10 @@
     <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">
       Forecast Cycle Selection
     </h1>
+    <p style="font-size: 12px;font-weight: normal;margin-top:-20px;">
+      Select a cycle then click Next.
+    </p>
+    <br />
   </div>
   <div>
     <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
@@ -13,7 +17,7 @@
     </DataTable>
   </div>
   <div class="text-normal mt-2 mx-auto text-center">
-    * Cycles in <span class="text-gray-500">grey</span> are currently unavailable from the GUI. Use the CLI to run these
+    Cycles in <span class="text-gray-500">grey</span> are currently unavailable from the GUI. Use the CLI to run these
     cycles.
   </div>
   <div>
