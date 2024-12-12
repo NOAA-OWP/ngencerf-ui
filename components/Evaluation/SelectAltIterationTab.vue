@@ -59,11 +59,11 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import type { DataTableRowClickEvent } from 'primevue/datatable';
-import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAltIterationStore';
+import { useEvaluationAltIterationStore } from '@/stores/evaluation/EvaluationAltIterationStore';
 import { useToast } from "primevue/usetoast";
-import { generalStore } from '~/stores/common/GeneralStore';
-import { hilightTab } from '~/composables/TabHilight';
-import { useEvaluationRunStatusStore } from '~/stores/evaluation/EvaluationRunStatusStore';
+import { generalStore } from '@/stores/common/GeneralStore';
+import { hilightTab } from '@/composables/TabHilight';
+import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 
 const toast = useToast();
 const {
@@ -98,7 +98,6 @@ onMounted(() => {
   nextTick(() => {
     resetEvaluationAltIterationStore();
     fetchCalibrationDataByIterationDataList();
-    //fetchTuningParametersDataList();
 
     const syncScroll = (source: any, target: any) => {
       source.addEventListener("scroll", (event: Event) => {
@@ -107,8 +106,8 @@ onMounted(() => {
       });
     };
 
-    syncScroll(calibrationRunDetailTable.value?.$el.children[0], tuningParametersTable.value?.$el.children[0]);
-    syncScroll(tuningParametersTable.value?.$el.children[0], calibrationRunDetailTable.value?.$el.children[0]);
+    syncScroll(((calibrationRunDetailTable.value as any)?.$el as HTMLTableElement).children[0], ((tuningParametersTable.value as any)?.$el as HTMLTableElement)?.children[0]);
+    syncScroll(((tuningParametersTable.value as any)?.$el as HTMLTableElement)?.children[0], ((calibrationRunDetailTable.value as any)?.$el as HTMLTableElement)?.children[0]);
   })
 })
 
@@ -120,7 +119,7 @@ const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
     evaluateIterationRunId.value = 0;
   }
   evaluateDisplayIterationNumber.value = event.data.iteration_num;
-  const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
+  const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id === event.data.iteration_id );
   selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];   
 }
 
@@ -132,7 +131,7 @@ const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
     evaluateIterationRunId.value = 0;
   }
   evaluateDisplayIterationNumber.value = event.data.iteration_num;
-  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
+  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id === event.data.iteration_id );
   selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];
 }
 

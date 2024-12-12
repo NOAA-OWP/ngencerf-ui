@@ -22,7 +22,7 @@ const params = ref<string>("");
 const goNext = ref<boolean>();
 
 onMounted(() => {
-  params.value = dialogRef.value.data.body; // {user: 'primetime'}
+  params.value = dialogRef.value.data.body;
   goNext.value = dialogRef.value.data.direction;
 })
 

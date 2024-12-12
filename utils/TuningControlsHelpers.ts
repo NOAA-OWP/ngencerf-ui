@@ -10,7 +10,7 @@ export const ifEDSErrorsExist = (data: any): string => {
     const edsErrorMessage = data.eds_errors.message;
 
     // if the error message is that the connection failed or timed out, we return a specific message
-    if (edsErrorMessage && edsErrorMessage.includes('failed to connect or timed out')) {
+    if (edsErrorMessage && edsErrorMessage.includes('failed to connect or timed out') === true) {
       return 'Calibration setup can not be completed because Enterprise Data Services is unavailable.'
     }
 

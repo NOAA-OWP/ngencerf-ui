@@ -2,8 +2,8 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
-          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close"/>
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
     </div>
@@ -15,7 +15,7 @@
           <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
           <div class="inline-block w-2/3">
             <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-              optionLabel="name" optionValue="name">
+              optionLabel="name" optionValue="name" :disabled="!plotList">
             </Select>
           </div>
 
@@ -83,7 +83,7 @@
                 </span>
                 <span v-for="page of plotTablePageOptions">
                   <!-- Current page -->
-                  <span v-if="page.number == plotTableCurrentPage" class="pagingLink active">
+                  <span v-if="page.number === plotTableCurrentPage" class="pagingLink active">
                     {{ page.number }}
                   </span>
 
@@ -98,8 +98,8 @@
                   </span>
 
                   <!-- Show "..." in gaps where page numbers are not sequential - this should only happen if current page +/-2 doesn't fit the above criteria -->
-                  <span v-else-if="page.number == (plotTableCurrentPage - 2) ||
-                    page.number == (plotTableCurrentPage + 2)" class="pagingLink">
+                  <span v-else-if="page.number === (plotTableCurrentPage - 2) ||
+                    page.number === (plotTableCurrentPage + 2)" class="pagingLink">
                     ...
                   </span>
                 </span>
@@ -114,7 +114,7 @@
             <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true scrollable scroll-height="500px"
               :multi-sort="true">
               <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header"
-                :sortable="plotTableTotalPages == 1"></Column>
+                :sortable="plotTableTotalPages === 1"></Column>
             </DataTable>
           </div>
         </div>
@@ -143,7 +143,7 @@
             :options="calibrationLogList" optionLabel="name" optionValue="name">
           </Select>
         </div>
-        <div v-if="calibrationLogList.length == 1"><b>{{ selectedCalibrationLog }}</b></div>
+        <div v-if="calibrationLogList.length === 1"><b>{{ selectedCalibrationLog }}</b></div>
         <div id="CalibrationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
           <div v-html="calibrationLogDisplay" class="whitespace-nowrap"></div>
         </div>
@@ -155,7 +155,7 @@
             :options="validationLogList" optionLabel="name" optionValue="name">
           </Select>
         </div>
-        <div v-if="validationLogList.length == 1"><b>{{ selectedValidationLog }}</b></div>
+        <div v-if="validationLogList.length === 1"><b>{{ selectedValidationLog }}</b></div>
         <div id="ValidationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
           <div v-html="validationLogDisplay" class="whitespace-nowrap"></div>
         </div>
@@ -165,13 +165,13 @@
 </template>
 
 <script setup lang="ts">
-import { generalStore } from '~/stores/common/GeneralStore';
-import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
-import { useEvaluationSupplementalDataStore } from '~/stores/evaluation/EvaluationSupplementalDataStore';
-import { useUserDataStore } from '~/stores/common/UserDataStore';
+import { generalStore } from '@/stores/common/GeneralStore';
+import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
+import { useEvaluationSupplementalDataStore } from '@/stores/evaluation/EvaluationSupplementalDataStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useToast } from 'primevue/usetoast';
-import type { DynamicObject } from "~/composables/NextGenModel";
-import { hilightTab } from '~/composables/TabHilight';
+import type { DynamicObject } from "@/composables/NextGenModel";
+import { hilightTab } from '@/composables/TabHilight';
 
 import MessagesGroup from "../Common/MessagesGroup.vue";
 import { nextTick } from 'vue';
@@ -650,7 +650,11 @@ function adjustPlotTableColumns() {
     });
     for (let d = 0; d < plotTableData.value.length; d++) {
       Object.keys(plotTableData.value[d]).forEach(key => {
+<<<<<<< HEAD
         if (plotTableData.value[d][key] && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
+=======
+        if (plotTableData.value[d][key] !== 0 && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
+>>>>>>> development
           plotTableData.value[d][key] = 'N/A';
         } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
@@ -704,12 +708,12 @@ watch(plotTableCurrentPage, async () => {
 
 // Handle selectedCalibrationLog/selectedValidationLog changes
 watch(selectedCalibrationLog, async () => {
-  if (selectedCalibrationLog.value != '') {
+  if (selectedCalibrationLog.value !== '') {
     calibrationLogDisplay.value = calibrationLogData.value[selectedCalibrationLog.value];
   }
 });
 watch(selectedValidationLog, async () => {
-  if (selectedValidationLog.value != '') {
+  if (selectedValidationLog.value !== '') {
     validationLogDisplay.value = validationLogData.value[selectedValidationLog.value];
   }
 });

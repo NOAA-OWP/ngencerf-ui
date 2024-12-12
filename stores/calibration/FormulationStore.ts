@@ -2,11 +2,11 @@
 
 import { defineStore, storeToRefs } from "pinia";
 import { generalStore } from "../common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { makeProtectedApiCall } from "~/composables/UserAuth";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, SaveFormulationTabPayload } from "~/composables/NextGenModel";
-import { useCalibrationFormulationTabSaveValidate } from "~/composables/ValidationHandlers";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import type { SelectOption, FormulationTabData, SlothParameterData, GeneralApiSaveResponse, SaveFormulationTabPayload } from "@/composables/NextGenModel";
+import { useCalibrationFormulationTabSaveValidate } from "@/composables/ValidationHandlers";
 
 export const useFormulationStore = defineStore('FormulationStore', () => {
   /**
@@ -142,8 +142,7 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
       name: "",
       description: "ALL"
     }]
-    //let groups_list = fetchModuleCoveredGroupList();
-    formulationTabData.value?.module_groups.forEach((group) => {
+      formulationTabData.value?.module_groups.forEach((group) => {
       groupOptionsList.push({
         name: group,
         description: group,
@@ -249,7 +248,7 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
   * @returns {void}
   */
   function deleteSlothVariable(variable_name: string): void {
-    slothParameterInputs.value = slothParameterInputs.value.filter(param => param.param_name != variable_name)
+    slothParameterInputs.value = slothParameterInputs.value.filter(param => param.param_name !== variable_name)
   }
 
   /**

@@ -1,11 +1,11 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { makeProtectedApiCall } from "~/composables/UserAuth"
-import { calculateElapsedTime } from '~/utils/TimeHelpers';
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { makeProtectedApiCall } from "@/composables/UserAuth"
+import { calculateElapsedTime } from '@/utils/TimeHelpers';
 
 export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore', () => {
   const { calibrationJobId, evaluateIterationRunId, iterationValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());
@@ -75,7 +75,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   const loadValidationStatusInformation = async ( validation_run_id: number ) => {
     queryIterationValidationRunStatus().then( response => {
       const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
-        return validation.validation_run_id == validation_run_id
+        return validation.validation_run_id === validation_run_id
       });
       if ( find_validation_run ) {
         displayValidationId.value = validation_run_id;
@@ -102,7 +102,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
    * @returns {boolean}
    */
   const isValidationRunDone = (status: string) => {
-    return status.toUpperCase() == 'DONE';
+    return status.toUpperCase() === 'DONE';
   }
 
   /**

@@ -3,19 +3,19 @@
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
-      <span v-if="activeTab == 1">
+      <span v-if="activeTab === 1">
         <PreviousCalibrationRuns />
       </span>
-      <span v-else-if="activeTab == 2">
+      <span v-else-if="activeTab === 2">
         <ForecastRunsTab />
       </span>
-      <span v-else-if="activeTab == 3">
+      <span v-else-if="activeTab === 3">
        <SetupForecastTab />
       </span>
-      <span v-else-if="activeTab == 4">
+      <span v-else-if="activeTab === 4">
         <StatusRunTab />
       </span>
-      <span v-else-if="activeTab == 5">
+      <span v-else-if="activeTab === 5">
         <ResultsTab />
       </span>
     </div>

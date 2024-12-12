@@ -88,13 +88,13 @@
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted } from "vue";
-import { generalStore } from '~/stores/common/GeneralStore';
-import { useEvaluationRunStatusStore } from '~/stores/evaluation/EvaluationRunStatusStore';
-import { useUserDataStore } from '~/stores/common/UserDataStore';
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
+import { generalStore } from '@/stores/common/GeneralStore';
+import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
-import type { CalibrationGetStatusValidationItem } from "~/composables/NextGenModel";
-import { hilightTab } from '~/composables/TabHilight';
+import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+import { hilightTab } from '@/composables/TabHilight';
 
 const userDataStore = useUserDataStore();
 const toast = useToast();
@@ -161,7 +161,7 @@ watch( validationStatus, async ( newStatus, initialStatus ) => {
     validationStatusCheckingInterval.value = setInterval( async () => {
       queryIterationValidationRunStatus().then( response => {
         const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
-          return validation.validation_run_id == iterationValidationRunId.value
+          return validation.validation_run_id === iterationValidationRunId.value
         });
         if ( !find_validation_run ) {
           validationStatus.value = 'Fail';
