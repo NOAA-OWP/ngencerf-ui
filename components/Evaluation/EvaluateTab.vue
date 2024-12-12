@@ -650,11 +650,7 @@ function adjustPlotTableColumns() {
     });
     for (let d = 0; d < plotTableData.value.length; d++) {
       Object.keys(plotTableData.value[d]).forEach(key => {
-<<<<<<< HEAD
         if (plotTableData.value[d][key] && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
-=======
-        if (plotTableData.value[d][key] !== 0 && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
->>>>>>> development
           plotTableData.value[d][key] = 'N/A';
         } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
