@@ -14,7 +14,7 @@ export default defineEventHandler(async (event): Promise<string | string[]> => {
   // get request method
   const requestMethod = event.node.req.method;
 
-  if (requestMethod == "POST") {
+  if (requestMethod === "POST") {
     // Read the request body to get the refresh token
     const { refreshToken } = await readBody(event);
 

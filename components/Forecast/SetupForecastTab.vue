@@ -34,8 +34,8 @@
 </template>
 
 <script setup lang="ts">
-import { hilightTab } from '~/composables/TabHilight';
-import { useForecastStore } from '~/stores/forecast/ForecastStore';
+import { hilightTab } from '@/composables/TabHilight';
+import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { useToast } from 'primevue/usetoast';
 
 const isLoading = ref<boolean>(false); // loading indicator
@@ -73,7 +73,6 @@ onMounted(async () => {
       await loadSetupForecastTabData();
     }
     console.log('forecastCycles', forecastCycles.value);
-    //console.log('forecastCycle[0]["Data Sources"]:', forecastCycles?.value[0]["Data Sources"]);
   });
 });
 

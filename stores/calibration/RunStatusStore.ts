@@ -1,13 +1,13 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import type { CalibrationStatus, CalibrationPlotListNamesData } from "~/composables/NextGenModel";
-import { makeProtectedApiCall } from "~/composables/UserAuth";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { isValidDate, isCalibrationJobFinished } from '~/utils/CommonHelpers';
-import { convertTimeZone } from '~/utils/TimeHelpers';
+import type { CalibrationStatus, CalibrationPlotListNamesData } from "@/composables/NextGenModel";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { isValidDate, isCalibrationJobFinished } from '@/utils/CommonHelpers';
+import { convertTimeZone } from '@/utils/TimeHelpers';
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
@@ -112,7 +112,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
     // load plotNames and plotList from get_plot_names
     plotNames.value = await queryGetPlotNames();
-    plotList.value = plotNames?.value?._data?.plot_names;
+    plotList.value = ((plotNames?.value as any)?._data as PlotNames)?.plot_names;
 
     // load iteration from get_iteration.
     const getIterationResponse = await queryGetIteration();

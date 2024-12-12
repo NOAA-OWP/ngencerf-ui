@@ -27,7 +27,7 @@
 import { storeToRefs } from "pinia";
 import MessagesGroup from "../Common/MessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 const { userCalibrationRunData } = storeToRefs( useUserDataStore() );
 const messageGroupTitle = computed(() => 'Setup - Calibration Job ID' );
 </script>

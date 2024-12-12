@@ -6,6 +6,6 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { useUserDataStore } from '~/stores/common/UserDataStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
 const { userCalibrationRunData } = storeToRefs( useUserDataStore() );
 </script>

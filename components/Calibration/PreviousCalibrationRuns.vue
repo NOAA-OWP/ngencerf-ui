@@ -24,11 +24,11 @@
             scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
             @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
-            <Column field="calibration_run_id" header="Job ID" sortable></Column>
-            <Column field="job_genesis" header="Job Genesis" sortable></Column>
-            <Column field="formulation_name" header="Formulation Name" sortable></Column>
-            <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-            <Column field="created_at" header="Creation Date" sortable>
+            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
+            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable></Column>
+            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
+            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
+            <Column field="created_at" header="Creation Date" sortable>Column
               <template #body="slotProps">
                 {{ formatDateForDisplay(slotProps.data.created_at) }}
               </template>
@@ -49,7 +49,7 @@
                 </span>
               </template>
             </Column>
-            <Column field="status" header="Status" sortable></Column>
+            <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
           </DataTable>
         </div>
 
@@ -66,18 +66,18 @@
 import { onMounted } from "vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import type { JobListItem } from "~/composables/NextGenModel";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { generalStore } from "~/stores/common/GeneralStore";
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
+import type { JobListItem } from "@/composables/NextGenModel";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
-import { useGageStore } from "~/stores/calibration/GageStore";
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { useTuningStore } from "~/stores/calibration/TuningStore";
-import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
-import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "~/composables/ValidationHandlers";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
+import { useGageStore } from "@/stores/calibration/GageStore";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
+import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
+import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
 const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
@@ -90,7 +90,7 @@ const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrati
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
-import { hilightTab } from '~/composables/TabHilight';
+import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -104,6 +104,11 @@ const cmCalibrationRun = ref([
 const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent);
 };
+
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
 
 onMounted(() => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu

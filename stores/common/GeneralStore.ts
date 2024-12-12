@@ -4,7 +4,7 @@
  *  Data will include the current menu status and the current tab status for each of the 4 menu items
  */
 import { defineStore } from "pinia";
-import type { ServerInfo } from "~/composables/NextGenModel";
+import type { ServerInfo } from "@/composables/NextGenModel";
 
 export const generalStore = defineStore(
   "generalStore",

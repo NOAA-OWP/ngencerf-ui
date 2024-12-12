@@ -1,11 +1,11 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralApiSaveResponse, SaveOptimizationPayload } from "~/composables/NextGenModel";
-import { makeProtectedApiCall } from "~/composables/UserAuth";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import type { OptimizationTabData, SelectOption, UserCalibrationRunOptimizationInputData, GeneralApiSaveResponse, SaveOptimizationPayload } from "@/composables/NextGenModel";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 
 export const useOptimizationStore = defineStore('OptimizationStore', () => {
   /**
@@ -143,7 +143,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   */
   const getOptimizationInputUserData = computed(() => {
     let data_items: UserCalibrationRunOptimizationInputData[] = []
-    let optimization_data = optimizationTabData.value?.optimizations.filter((optimization_option) => optimization_option.name == uiOptimization.value)
+    let optimization_data = optimizationTabData.value?.optimizations.filter((optimization_option) => optimization_option.name === uiOptimization.value)
 
     optimization_data?.forEach((data) => {
       data.inputs.forEach((data_input) => {
@@ -151,18 +151,21 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
           name: data_input.name,
           value: data_input.default_value,
         }
-        let user_optimization_input =
-          userCalibrationRunData.value?.optimization_inputs.filter((optimization_input) => optimization_input.name == data_input.name)
-        if (user_optimization_input && user_optimization_input.length) {
+        let user_optimization_input = filterCalRunData(data_input.name);
+
+        if (user_optimization_input && user_optimization_input.length !== 0) {
           data_item.value = user_optimization_input[0].value
         }
 
         data_items.push(data_item)
       })
     })
-
     return data_items
   })
+
+  const filterCalRunData = (dinput: string) => {
+    return userCalibrationRunData.value?.optimization_inputs.filter((optimization_input) => optimization_input.name === dinput)
+  }
 
   /**
   * return save formulation tab response from the server
@@ -173,10 +176,10 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     if (uiOptimizationInputs.value.length > 0) savePayload.value["optimization_inputs"] = uiOptimizationInputs.value;
     if (uiOptimization.value) savePayload.value["optimization"] = uiOptimization.value;
     if (uiObjectiveFunction.value) savePayload.value["objective_function"] = uiObjectiveFunction.value;
-    if (uiStreamFlowThreshold.value != undefined && uiStreamFlowThreshold.value > 0) savePayload.value["streamflow_threshold"] = uiStreamFlowThreshold.value;
-    if (uiPeakFlowThreshold.value != undefined && uiPeakFlowThreshold.value > 0) savePayload.value["peak_flow_threshold"] = uiPeakFlowThreshold.value;
-    if (uiStopCriteria.value != undefined && uiStopCriteria.value > 0) savePayload.value["stop_criteria"] = uiStopCriteria.value;
-    if (uiPlotFrequency.value != undefined && uiPlotFrequency.value > 0) savePayload.value["save_plot_iteration_frequency"] = uiPlotFrequency.value;
+    if (uiStreamFlowThreshold.value !== undefined && uiStreamFlowThreshold.value > 0) savePayload.value["streamflow_threshold"] = uiStreamFlowThreshold.value;
+    if (uiPeakFlowThreshold.value !== undefined && uiPeakFlowThreshold.value > 0) savePayload.value["peak_flow_threshold"] = uiPeakFlowThreshold.value;
+    if (uiStopCriteria.value !== undefined && uiStopCriteria.value > 0) savePayload.value["stop_criteria"] = uiStopCriteria.value;
+    if (uiPlotFrequency.value !== undefined && uiPlotFrequency.value > 0) savePayload.value["save_plot_iteration_frequency"] = uiPlotFrequency.value;
 
     if (Object.keys(savePayload.value).length > 0) {
       savePayload.value["calibration_run_id"] = calibrationJobId.value;
@@ -205,7 +208,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   }
 
   const getSelectedMetricInfo = computed(() => {
-    const selectedMetric = optimizationTabData.value?.metrics.filter((metric_data) => metric_data.name == uiObjectiveFunction.value)
+    const selectedMetric = optimizationTabData.value?.metrics.filter((metric_data) => metric_data.name === uiObjectiveFunction.value)
     return selectedMetric
   })
 

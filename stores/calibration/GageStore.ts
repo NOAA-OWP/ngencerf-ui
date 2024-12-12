@@ -1,11 +1,11 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { makeProtectedApiCall } from "~/composables/UserAuth"
-import type { SelectOption, GageTabData, GeneralApiSaveResponse, GeneralErrorResponse, SaveGageTabResponse, SaveGageTabPayload } from "~/composables/NextGenModel";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { makeProtectedApiCall } from "@/composables/UserAuth"
+import type { SelectOption, GageTabData, GeneralApiSaveResponse, GeneralErrorResponse, SaveGageTabResponse, SaveGageTabPayload } from "@/composables/NextGenModel";
 
 export const useGageStore = defineStore('GageStore', () => {
   /**
@@ -92,10 +92,10 @@ export const useGageStore = defineStore('GageStore', () => {
   * @returns {string}
   */
   const getSavedDomainValue = computed(() => {
-    if (userCalibrationRunData.value?.gage == undefined || userCalibrationRunData.value?.gage.gage_id == "") {
+    if (userCalibrationRunData.value?.gage === undefined || userCalibrationRunData.value?.gage.gage_id === "") {
       return ""
     } else {
-      let selected_gage_item = gageTabData.value?.gages.find((gage_item) => gage_item.gage_id == userCalibrationRunData.value?.gage.gage_id)
+      let selected_gage_item = gageTabData.value?.gages.find((gage_item) => gage_item.gage_id === userCalibrationRunData.value?.gage.gage_id)
       return selected_gage_item?.domain
     }
   })
@@ -125,7 +125,7 @@ export const useGageStore = defineStore('GageStore', () => {
   const getGageOptionsList = computed(() => {
     gageOptionsList.value = []
     gageTabData.value?.gages.forEach((gage_value) => {
-      if (selectedDomainValue.value == "" || gage_value.domain == selectedDomainValue.value) {
+      if (selectedDomainValue.value === "" || gage_value.domain === selectedDomainValue.value) {
         if ((gage_value.nwm_v3_calibration)) {
           gageOptionsList.value.push({
             name: gage_value.gage_id,

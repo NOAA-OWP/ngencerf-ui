@@ -2,8 +2,8 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
-          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close"/>
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
     </div>
@@ -15,7 +15,7 @@
           <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
           <div class="inline-block w-2/3">
             <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-              optionLabel="name" optionValue="name">
+              optionLabel="name" optionValue="name" :disabled="!plotList">
             </Select>
           </div>
 
@@ -137,13 +137,13 @@
 </template>
 
 <script setup lang="ts">
-import { generalStore } from '~/stores/common/GeneralStore';
-import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
-import { useEvaluationSupplementalDataStore } from '~/stores/evaluation/EvaluationSupplementalDataStore';
-import { useUserDataStore } from '~/stores/common/UserDataStore';
+import { generalStore } from '@/stores/common/GeneralStore';
+import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
+import { useEvaluationSupplementalDataStore } from '@/stores/evaluation/EvaluationSupplementalDataStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useToast } from 'primevue/usetoast';
-import type { DynamicObject } from "~/composables/NextGenModel";
-import { hilightTab } from '~/composables/TabHilight';
+import type { DynamicObject } from "@/composables/NextGenModel";
+import { hilightTab } from '@/composables/TabHilight';
 
 import MessagesGroup from "../Common/MessagesGroup.vue";
 import Paging from "../Common/Paging.vue";
@@ -419,7 +419,7 @@ watch(selectedPlotName, async () => {
         );
       }
 
-      console.log('logs: ', logs.value);
+      //console.log('logs: ', logs.value);
       calibrationLogData.value = {};
       calibrationLogList.value = [];
       if (logs.value?._data?.logs) {
@@ -460,7 +460,7 @@ watch(selectedPlotName, async () => {
         );
       }
 
-      console.log('logs: ', logs.value);
+      //console.log('logs: ', logs.value);
       validationLogData.value = {};
       validationLogList.value = [];
       if (logs.value?._data?.validations) {

@@ -37,17 +37,17 @@
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
               @row-dblclick="onRowDblClick($event)"
               @rowContextmenu="onRowContextMenu" class="boxed">
-              <Column field="calibration_run_id" header="Run ID" sortable></Column>
-              <Column field="status" header="Status" sortable></Column>
+              <Column :pt="ptColumn" field="calibration_run_id" header="Run ID" sortable></Column>
+              <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
               <Column field="submit_date" header="Run Date" sortable>
                 <template #body="slotProps">
                   {{ formatDateForDisplay(slotProps.data.created_at) }}
                 </template>
               </Column>
-              <Column field="formulation_name" header="Formulation Name" sortable></Column>
-              <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-              <Column field="objective_function" header="Objective Function" sortable></Column>
-              <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
+              <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
+              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
+              <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable></Column>
+              <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
             </DataTable>
             <div class="mt-4 mx-auto">
               * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.</div>
@@ -66,12 +66,12 @@
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun } from "~/composables/NextGenModel";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { hilightTab } from '~/composables/TabHilight';
+import type { CalibrationRun } from "@/composables/NextGenModel";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { hilightTab } from '@/composables/TabHilight';
 import { storeToRefs } from "pinia";
-import { useForecastStore } from "~/stores/forecast/ForecastStore";
+import { useForecastStore } from "@/stores/forecast/ForecastStore";
 
 const forecastStore = useForecastStore();
 const { forecastRunGageList, forecastJobId, uiGageId } = forecastStore;
@@ -89,6 +89,11 @@ const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent);
   contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
 };
+
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
 
 const {clearUserCalibrationRunData } = useUserDataStore();
 
