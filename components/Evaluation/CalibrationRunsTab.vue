@@ -52,14 +52,14 @@
             v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column field="calibration_run_id" header="Job ID" sortable></Column>
-            <Column field="formulation_name" header="Formulation Name" sortable></Column>
-            <Column field="validation_runs" header="Validation Runs" sortable></Column>
-            <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-            <Column field="objective_function" header="Objective Function" sortable></Column>
-            <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
-            <Column field="job_genesis" header="Job Genesis" sortable></Column>
-            <Column field="created_at" header="Creation Date" sortable>
+            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
+            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
+            <Column :pt="ptColumn" field="validation_runs" header="Validation Runs" sortable></Column>
+            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
+            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable></Column>
+            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
+            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable></Column>
+            <Column :pt="ptColumn" field="created_at" header="Creation Date" sortable>
               <template #body="slotProps">
                 {{ formatDateForDisplay(slotProps.data.created_at) }}
               </template>
@@ -134,6 +134,11 @@ const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const cmValidationRun = ref<DataTableContextMenuOption[]>([]);
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
+
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
 
 const {
   uiGageId,
