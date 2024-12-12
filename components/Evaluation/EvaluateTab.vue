@@ -15,7 +15,7 @@
           <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
           <div class="inline-block w-2/3">
             <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-              optionLabel="name" optionValue="name">
+              optionLabel="name" optionValue="name" :disabled="!plotList">
             </Select>
           </div>
 
