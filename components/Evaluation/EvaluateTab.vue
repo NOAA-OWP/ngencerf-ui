@@ -373,7 +373,13 @@ watch(selectedPlotName, async () => {
           if (performanceMetrics.value?._data?.validations) {
             for (let v = 0; v < performanceMetrics.value?._data?.validations.length; v++) {
               let validation_run_id = performanceMetrics.value?._data?.validations[v].validation_run_id;
-              performanceMetricsColumns.push({ header: 'Validation Job ID ' + validation_run_id, field: 'validation_job_id_' + validation_run_id });
+              let validation_type = performanceMetrics.value?._data?.validations[v].validation_type.replace('valid_','');
+              if (performanceMetrics.value?._data?.validations[v].iteration_num > 0) {
+                validation_type = 'Iter ' + performanceMetrics.value?._data?.validations[v].iteration_num;
+              } else {
+                validation_type = validation_type.charAt(0).toUpperCase() + validation_type.slice(1);
+              }
+              performanceMetricsColumns.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id});
               if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
                 Object.keys(performanceMetrics.value?._data?.validations[v].performance_metrics).forEach(key => {
                   // Loop through our existing rows and see if we have this metric already
