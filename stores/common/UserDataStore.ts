@@ -1,11 +1,11 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "./GeneralStore";
-import { makeProtectedApiCall } from "~/composables/UserAuth";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
 
-import type { JobsList, JobListItem, UserCalibrationRunData } from "~/composables/NextGenModel";
+import type { JobsList, JobListItem, UserCalibrationRunData } from "@/composables/NextGenModel";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
   const { ngencerfBaseUrl } = useBackendConfig();

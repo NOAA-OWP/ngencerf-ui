@@ -21,7 +21,7 @@
               <div class="mt-2 mb-2 hr"></div>
             </div>
             <div class="col-span-1">
-              <form @submit.prevent="changePassword" @cancel="closeAccountBox" v-if="showForm == 'changePassword'">
+              <form @submit.prevent="changePassword" @cancel="closeAccountBox" v-if="showForm === 'changePassword'">
                 <div class="passwordBox grid row-auto">
 
                   <label for="OldPass">Old password</label>
@@ -61,7 +61,7 @@
               </form>
             </div>
             <div class="col-span-1">
-              <div id="passwordNotes" v-if="showForm == 'changePassword'">                
+              <div id="passwordNotes" v-if="showForm === 'changePassword'">                
                 <strong>Password format:</strong><br>
                 <ul>
                   <li>Cannot be a commonly used password</li>
@@ -70,7 +70,7 @@
                 </ul>
               </div>
 
-              <form @submit.prevent="updateName" @cancel="closeAccountBox" v-if="showForm == 'updateName'">
+              <form @submit.prevent="updateName" @cancel="closeAccountBox" v-if="showForm === 'updateName'">
                 <div class="passwordBox grid row-auto">
                   <label for="FirstName">First Name</label>
                   <div class="mb-3">
@@ -106,9 +106,9 @@
 <script setup lang="ts">
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
-import { useUserDataStore } from '~/stores/common/UserDataStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useToast } from "primevue/usetoast";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 
 const { 
   getAccessToken, 
@@ -128,7 +128,7 @@ const changePasswordClasses = ref("chgpwd sel");
 const updateNameClasses = ref("updtnm");
 
 watch(showForm, async () => {
-  if (showForm.value == 'updateName') {
+  if (showForm.value === 'updateName') {
     changePasswordClasses.value = "chgpwd";
     updateNameClasses.value = "updtnm sel";
   } else {
@@ -188,6 +188,7 @@ const changePassword = async () => {
       console.error("Error during user creation:", error.value?.message, error.value?.data);
       return;
     }
+    console.log("changePassword", data);
     // Clear out the inputs and report success
     oldpass.value = "";
     newpass.value = "";
@@ -225,6 +226,7 @@ const updateName = async () => {
       console.error("Error during user update:", error.value?.message, error.value?.data);
       return;
     }
+    console.log("UpdateNameData", data);
     // Clear out the inputs and report success
     setFirstName(updateNameData.first_name);
     setLastName(updateNameData.last_name);

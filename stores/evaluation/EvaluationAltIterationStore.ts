@@ -2,10 +2,10 @@
 
 import { defineStore, storeToRefs } from "pinia";
 import { generalStore } from "../common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { makeProtectedApiCall } from "~/composables/UserAuth"
-import type { CalibrationRunIterationParameterData, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn, CalibrationRunIterationMetricData, CalibrationRunByIterationRetrospectiveData } from "~/composables/NextGenModel";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { makeProtectedApiCall } from "@/composables/UserAuth"
+import type { CalibrationRunIterationParameterData, AlternativeIterationCalibrationRunData, AlternativeIterationTuningParameters, DynamicTableColumnHeader, DynamicTableColumn, CalibrationRunIterationMetricData, CalibrationRunByIterationRetrospectiveData } from "@/composables/NextGenModel";
 
 export const useEvaluationAltIterationStore = defineStore('EvaluationAltIterationStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -116,7 +116,7 @@ export const useEvaluationAltIterationStore = defineStore('EvaluationAltIteratio
           iteration_data.metrics.forEach( ( metric: CalibrationRunIterationMetricData ) => {            
             let metric_header_label = metric.metric_name;
             let headerColumn = <DynamicTableColumn>{ field: metric.metric_name, header: metric_header_label }
-            if (metric.metric_name == runListDataResult._data.objective_function_metric) {
+            if (metric.metric_name === runListDataResult._data.objective_function_metric) {
               headerColumn['styles'] = ['bg-objective-function-col'];
             }
             calibrationRunDetailTableColumn.value.push(headerColumn);

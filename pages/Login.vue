@@ -113,20 +113,20 @@
 <script setup lang="ts">
 
 import { ref, onMounted } from "vue";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-import AppFooter from "~/components/Common/AppFooter.vue";
-import AppHeader from "~/components/Common/AppHeader.vue";
+import AppFooter from "@/components/Common/AppFooter.vue";
+import AppHeader from "@/components/Common/AppHeader.vue";
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 
-import { useGageStore } from "~/stores/calibration/GageStore";
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
-import { useTuningStore } from "~/stores/calibration/TuningStore";
-import { generalStore } from "~/stores/common/GeneralStore";
+import { useGageStore } from "@/stores/calibration/GageStore";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
+import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
+import { generalStore } from "@/stores/common/GeneralStore";
 
 const { calibrationJobId } = storeToRefs(generalStore());
 

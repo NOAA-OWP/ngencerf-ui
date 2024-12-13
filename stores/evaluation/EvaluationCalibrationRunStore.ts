@@ -1,12 +1,12 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
-import { makeProtectedApiCall } from "~/composables/UserAuth"
-import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "~/composables/NextGenModel";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { makeProtectedApiCall } from "@/composables/UserAuth"
+import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NextGenModel";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {
   const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
@@ -85,7 +85,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
     if (runListDataResult?._data?.jobs.length > 0) {
       runListDataResult?._data?.jobs.forEach((runItem: ValidatedCalibrationRunListItem) => {
-        if (runItem.status.toLowerCase() == "done" && runItem.submit_date != null) {
+        if (runItem.status.toLowerCase() === "done" && runItem.submit_date !== null) {
           userEvaluationCalibrationRunListData.value.push(runItem);
         }
       });
@@ -117,7 +117,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
     if (runListDataResult._data?.validation_jobs) {
       //if there is only 1 validation job, we automatically set the selected validation id to that validation job     
-      if (runListDataResult._data?.validation_jobs.length == 1) {
+      if (runListDataResult._data?.validation_jobs.length === 1) {
         const defaultValidationJob = runListDataResult._data?.validation_jobs[0] as CalibrationValidationJobData;
         evaluateValidationRunId.value = defaultValidationJob.validation_run_id;
         evaluateValidationRunStatus.value = defaultValidationJob.status;

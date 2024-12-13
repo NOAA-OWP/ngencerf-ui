@@ -34,7 +34,7 @@ export default defineEventHandler(async (event): Promise<AuthResponse> => {
   // get request method
   const requestMethod = event.node.req.method;
 
-  if (requestMethod == "POST") {
+  if (requestMethod === "POST") {
     // Read the request body to get the username and password.
     const { username, password } = await readBody(event);
 

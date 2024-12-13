@@ -2,7 +2,7 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
           class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
@@ -16,83 +16,72 @@
             <span v-if="computedCalibrationValidationRunList.length <= 1">
               Calibration Runs<br />
               <span style="font-size: 14px;font-weight: normal;">
-                Right click on row for available options.
+                Select row then right click for available options.
               </span>
             </span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
               userSelectedEvalCalibrationRunId }}<br />
               <span style="font-size: 14px;font-weight: normal;">
-                Right click on row for available options.
+                Select row then right click for available options.
               </span>
             </span>
           </h1>
-        </div>
-        <div class="ml-auto mt-2">
-          <div id="NewButton" class="">
-            <Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4 w-40"
-              v-if="userSelectedEvalCalibrationRunId > 0 && loadCalibrationDataComplete === true"
-              @click.stop="navigateToAlternateIteration">New Validation</Button>
-          </div>
-          <br/>
-          <div id="NewButton" class="">
-            <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4"
-              v-if="computedCalibrationValidationRunList.length > 0 && loadCalibrationDataComplete === true && evaluateValidationRunId > 0 && evaluateValidationRunStatus !== 'Running'"
-              @click.stop="navigateToEvaluation">Evaluate</Button>
-          </div>
         </div>
       </div>
 
       <div id="calibrationRunList"
         v-if="userEvaluationCalibrationRunListData.length > 0 && computedCalibrationValidationRunList.length <= 1">
 
-          <div id="CalTable">
-            <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
-              <div class="col-span-1">
-                <div class="ml-10">
-                  <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-                  <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                    :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
-                    placeholder=""></Select>
-                </div>
+        <div id="CalTable">
+          <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
+            <div class="col-span-1">
+              <div class="ml-10">
+                <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
+                <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
+                  :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
+                  placeholder=""></Select>
               </div>
             </div>
-
-            <ConfirmDialog></ConfirmDialog>
-            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-            <DataTable id="EvalRunTable" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
-              sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
-              v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
-              @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect" @rowContextmenu="onRowContextMenu" class="boxed">
-              <Column field="calibration_run_id" header="Job ID" sortable></Column>
-              <Column field="job_genesis" header="Job Genesis" sortable></Column>
-              <Column field="created_at" header="Creation Date" sortable>
-                <template #body="slotProps">
-                  {{ formatDateForDisplay(slotProps.data.created_at) }}
-                </template>
-              </Column>
-              <Column field="submit_date" header="Submit Date" sortable>
-                <template #body="slotProps">
-                  {{ formatDateForDisplay(slotProps.data.submit_date) }}
-                </template>
-              </Column>
-              <Column field="formulation_name" header="formulation_name" sortable></Column>
-              <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-              <Column field="objective_function" header="Objective Function" sortable></Column>
-              <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
-              <Column field="validation_runs" header="Validation Runs" sortable></Column>
-            </DataTable>
           </div>
+
+          <ConfirmDialog></ConfirmDialog>
+          <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+            :model="cmCalibrationRun"></ContextMenu>
+          <DataTable id="EvalRunTable" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
+            sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
+            v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
+            @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
+            @rowContextmenu="onRowContextMenu" class="boxed">
+            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
+            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
+            <Column :pt="ptColumn" field="validation_runs" header="Validation Runs" sortable></Column>
+            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
+            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable></Column>
+            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
+            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable></Column>
+            <Column :pt="ptColumn" field="created_at" header="Creation Date" sortable>
+              <template #body="slotProps">
+                {{ formatDateForDisplay(slotProps.data.created_at) }}
+              </template>
+            </Column>
+            <Column field="submit_date" header="Submit Date" sortable>
+              <template #body="slotProps">
+                {{ formatDateForDisplay(slotProps.data.submit_date) }}
+              </template>
+            </Column>
+          </DataTable>
+        </div>
 
       </div>
       <div v-if="computedCalibrationValidationRunList.length > 1">
         <div id="evaluationCalibrationList">
           <ContextMenu :pt="{ root: { id: 'vr-context-menu' } }" class="bg-white" ref="vrContextMenu"
-          :model="cmValidationRun" @hide="selectedCalibrationValidationRun = undefined"></ContextMenu>          
+            :model="cmValidationRun"></ContextMenu>
           <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px"
             sortField="validation_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="single"
-            v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle" @rowContextmenu="onRowVrContextMenu" 
-            @rowSelect="onEvalValdiationRowSelect" @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
+            v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle"
+            @rowContextmenu="onRowVrContextMenu" @rowSelect="onEvalValdiationRowSelect"
+            @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
             <Column v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field">
             </Column>
@@ -104,7 +93,9 @@
         <div class="flex mt-2">
           <div class="ml-auto mt-4">
             <div id="NewButton" class="">
-              <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return to Calibration Jobs</Button>
+              <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return
+                to
+                Calibration Jobs</Button>
             </div>
           </div>
         </div>
@@ -122,13 +113,13 @@ import { useToast } from "primevue/usetoast";
 
 import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NextGenModel";
 import { EvaluationTabs } from "@/composables/NextgenEnums";
-import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { storeToRefs } from "pinia";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { hilightTab } from '~/composables/TabHilight';
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { hilightTab } from '@/composables/TabHilight';
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const { deleteCalibrationRun } = useCalibrationJobStore();
@@ -143,6 +134,11 @@ const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const cmValidationRun = ref<DataTableContextMenuOption[]>([]);
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
+
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
 
 const {
   uiGageId,
@@ -185,49 +181,53 @@ onMounted(() => {
 
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
-  contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
-  crContextMenu.value.show(event.originalEvent);
   const crRowData = event.data as ValidatedCalibrationRunListItem;
-  if ( crRowData.validation_runs > 1 ) {
-    cmCalibrationRun.value.push( { label: 'Select Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns( crRowData.calibration_run_id ) } )
-  } if ( crRowData.validation_runs === 1 ) {
-    cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJobFromCalibration( crRowData.calibration_run_id ) } )
+  if (selectedCalibrationRun && selectedCalibrationRun.value?.calibration_run_id == crRowData.calibration_run_id) {
+    crContextMenu.value.show(event.originalEvent);
+    contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
+    if (crRowData.validation_runs > 1) {
+      cmCalibrationRun.value.push({ label: 'Select Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns(crRowData.calibration_run_id) })
+    } if (crRowData.validation_runs === 1) {
+      cmCalibrationRun.value.push({ label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJobFromCalibration(crRowData.calibration_run_id) })
+    }
+    cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
+    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    if (crRowData.validation_runs === 1) {
+      cmCalibrationRun.value.push({ label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => viewValidationRunStatus(crRowData.calibration_run_id) })
+    }
+    cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() });
   }
-  cmCalibrationRun.value.push( { label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) } );
-  cmCalibrationRun.value.push( { label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails( crRowData.calibration_run_id ) } )
-  if ( crRowData.validation_runs === 1 ) {
-    cmCalibrationRun.value.push( { label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => viewValidationRunStatus( crRowData.calibration_run_id ) } )
-  }
-  cmCalibrationRun.value.push( { label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } );
 };
 
-const onRowVrContextMenu = ( event: any ) => {
+const onRowVrContextMenu = (event: any) => {
   cmValidationRun.value = [];
-  vrContextMenu.value.show( event.originalEvent );
   const vrRowData = event.data as CalibrationValidationJobData;
-  if ( vrRowData.status.toLocaleUpperCase() !== 'RUNNING' ) {
-    cmValidationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJob( vrRowData.validation_run_id, vrRowData.status ) } );
-  }
-  cmValidationRun.value.push( { label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) } );
-  cmValidationRun.value.push( { label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails( userSelectedEvalCalibrationRunId.value ) } );
-  cmValidationRun.value.push( { label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun( vrRowData.validation_run_id, vrRowData.status ) } );  
-  if ( vrRowData.status.toLocaleUpperCase() === 'RUNNING' ) {
-    cmValidationRun.value.push( { label: 'Cancel', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun( vrRowData.validation_run_id, vrRowData.status ) } );
+  if (selectedCalibrationValidationRun && selectedCalibrationValidationRun.value?.validation_run_id === vrRowData.validation_run_id) {
+    vrContextMenu.value.show(event.originalEvent);
+    if (vrRowData.status.toLocaleUpperCase() !== 'RUNNING') {
+      cmValidationRun.value.push({ label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJob(vrRowData.validation_run_id, vrRowData.status) });
+    }
+    cmValidationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) });
+    cmValidationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(userSelectedEvalCalibrationRunId.value) });
+    cmValidationRun.value.push({ label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
+    if (vrRowData.status.toLocaleUpperCase() === 'RUNNING') {
+      cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
+    }
   }
 }
 
 const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   resetUserSelectedEvalValidationRun();
   //loadSelectedCalibrationRun(event.data.calibration_run_id);
-  setSelectedCalibrationRunId( event.data.calibration_run_id );
+  setSelectedCalibrationRunId(event.data.calibration_run_id);
   //isLoading.value = true;
-  if ( event.data.validation_runs === 1 ) {
+  if (event.data.validation_runs === 1) {
     fetchUserSelectedCalibrationValidationRunList();
   }
 }
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
-  if (updatedRunData != undefined && Object.keys(updatedRunData).length > 0) {
+  if (updatedRunData !== undefined && Object.keys(updatedRunData).length > 0) {
     nextTick(() => {
       isLoading.value = false;
       loadCalibrationDataComplete.value = true;
@@ -260,33 +260,34 @@ const openSelectedCalibrationRun = () => {
   isLoading.value = true;
   resetUserSelectedEvalValidationRun();
   nextTick(async () => {
-    setSelectedCalibrationRunId( contextMenuJob.value as number );
+    setSelectedCalibrationRunId(contextMenuJob.value as number);
     await fetchUserSelectedCalibrationValidationRunList();
     isLoading.value = false;
   })
 }
 
-const viewCalibrationDetails = async ( calibration_run_id: number ) => {
+const viewCalibrationDetails = async (calibration_run_id: number) => {
   //resetUserSelectedEvalValidationRun();
-  isLoading.value = true;  
-  nextTick(async () => {  
-    await loadSelectedCalibrationRun( calibration_run_id );
+  console.log('viewCalibrationDetails selectedCalibrationRun ', selectedCalibrationRun);
+  isLoading.value = true;
+  nextTick(async () => {
+    await loadSelectedCalibrationRun(calibration_run_id);
     isLoading.value = false;
     showMessagesGroup.value = true;
-  })  
+  })
 }
 
-const viewSelectedCalibrationValidationRuns = async ( calibration_run_id: number ) => {
+const viewSelectedCalibrationValidationRuns = async (calibration_run_id: number) => {
   resetUserSelectedEvalValidationRun();
-  isLoading.value = true;  
+  isLoading.value = true;
   nextTick(async () => {
-    setSelectedCalibrationRunId( calibration_run_id );
+    setSelectedCalibrationRunId(calibration_run_id);
     await fetchUserSelectedCalibrationValidationRunList();
     isLoading.value = false;
-  })  
+  })
 }
 
-const navigationToStatusRun = ( validation_run_id: number, validation_status: string ) => {
+const navigationToStatusRun = (validation_run_id: number, validation_status: string) => {
   evaluateValidationRunId.value = validation_run_id;
   evaluateValidationRunStatus.value = validation_status;
   const tabs = document.getElementsByClassName("tabs");
@@ -294,8 +295,8 @@ const navigationToStatusRun = ( validation_run_id: number, validation_status: st
   e.click();
 }
 
-const viewSelectAlternateIteration = async ( calibration_run_id: number ) => {
-  setSelectedCalibrationRunId( calibration_run_id );
+const viewSelectAlternateIteration = async (calibration_run_id: number) => {
+  setSelectedCalibrationRunId(calibration_run_id);
   if (userSelectedEvalCalibrationRunId.value > 0) {
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
@@ -315,13 +316,13 @@ const navigateToAlternateIteration = (event: any) => {
   }
 }
 
-const evaluateValidationJobFromCalibration = async ( calibration_run_id: number ): Promise<void> => {
-  loadSelectedCalibrationRun( calibration_run_id );
-  await fetchValidationRunListByCalibrationRun().then( validationRunList => {
-    if ( validationRunList.length == 1 ) {
+const evaluateValidationJobFromCalibration = async (calibration_run_id: number): Promise<void> => {
+  loadSelectedCalibrationRun(calibration_run_id);
+  await fetchValidationRunListByCalibrationRun().then(validationRunList => {
+    if (validationRunList.length === 1) {
       evaluateValidationRunId.value = validationRunList[0].validation_run_id;
       evaluateValidationRunStatus.value = validationRunList[0].status;
-      
+
       const tabs = document.getElementsByClassName("tabs");
       const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
       e.click();
@@ -329,7 +330,7 @@ const evaluateValidationJobFromCalibration = async ( calibration_run_id: number 
   });
 }
 
-const evaluateValidationJob = ( validation_run_id: number, validation_status: string ): void => {
+const evaluateValidationJob = (validation_run_id: number, validation_status: string): void => {
   evaluateValidationRunId.value = validation_run_id;
   evaluateValidationRunStatus.value = validation_status;
   const tabs = document.getElementsByClassName("tabs");
@@ -337,13 +338,13 @@ const evaluateValidationJob = ( validation_run_id: number, validation_status: st
   e.click();
 }
 
-const viewValidationRunStatus = async ( calibration_run_id : number ): Promise<void> => {
+const viewValidationRunStatus = async (calibration_run_id: number): Promise<void> => {
   resetUserSelectedEvalValidationRun();
   nextTick(async () => {
-    setSelectedCalibrationRunId( calibration_run_id );
-    await fetchValidationRunListByCalibrationRun().then( validationRunList => {
-      if ( validationRunList.length == 1 ) {
-        navigationToStatusRun( validationRunList[0].validation_run_id, validationRunList[0].status);
+    setSelectedCalibrationRunId(calibration_run_id);
+    await fetchValidationRunListByCalibrationRun().then(validationRunList => {
+      if (validationRunList.length === 1) {
+        navigationToStatusRun(validationRunList[0].validation_run_id, validationRunList[0].status);
       }
     });
   })
@@ -389,7 +390,7 @@ const deleteSelectedCalibrationRun = () => {
 }
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       fetchUserValidatedCalibrationJobsListData();
       resetUserSelectedEvalValidationRun();
     } else {
@@ -399,7 +400,7 @@ const acceptDelete = (selectedRunId: number) => {
     }
   });
   //selectedCalibrationRun.value = undefined;
-  
+
 }
 
 const toggleMessagesGroup = () => {
@@ -424,6 +425,7 @@ const rowStyle = (data: any) => {
 #calibrationRunList {
   height: 80%;
 }
+
 #HeadwaterBasinGage {
   width: 300px;
 }
