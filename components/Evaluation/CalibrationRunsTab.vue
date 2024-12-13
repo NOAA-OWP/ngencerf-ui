@@ -273,12 +273,10 @@ const openSelectedCalibrationRun = () => {
   })
 }
 
-const viewCalibrationDetails = async (calibration_run_id: number) => {
-  //resetUserSelectedEvalValidationRun();
-  console.log('viewCalibrationDetails selectedCalibrationRun ', selectedCalibrationRun);
-  isLoading.value = true;
-  nextTick(async () => {
-    await loadSelectedCalibrationRun(calibration_run_id);
+const viewCalibrationDetails = async ( calibration_run_id: number ) => {
+  isLoading.value = true;  
+  nextTick(async () => {  
+    await loadSelectedCalibrationRun( calibration_run_id );
     isLoading.value = false;
     showMessagesGroup.value = true;
   })
