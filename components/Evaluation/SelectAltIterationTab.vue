@@ -1,16 +1,8 @@
 <template>
   <client-only>
     <div class="h-screen-inner pr-2">
-      <div class="flex mt-2">
-        <div class="w-full">
-          <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
-            <span>Calibration Job ID {{ calibrationJobId }}</span>
-          </h1>
-        </div>
-      </div>
-
       <div id="RunDetailsTbl" class="text-left mt-3 p-3">
-        <div class="tableTitle">Run Details</div>
+        <div class="tableTitle">Run Details - Calibration Job ID {{ calibrationJobId }}</div>
         <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
           table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow"
           :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''">
@@ -70,11 +62,11 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import type { DataTableRowClickEvent } from 'primevue/datatable';
-import { useEvaluationAltIterationStore } from '~/stores/evaluation/EvaluationAltIterationStore';
+import { useEvaluationAltIterationStore } from '@/stores/evaluation/EvaluationAltIterationStore';
 import { useToast } from "primevue/usetoast";
-import { generalStore } from '~/stores/common/GeneralStore';
-import { hilightTab } from '~/composables/TabHilight';
-import { useEvaluationRunStatusStore } from '~/stores/evaluation/EvaluationRunStatusStore';
+import { generalStore } from '@/stores/common/GeneralStore';
+import { hilightTab } from '@/composables/TabHilight';
+import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 
 const toast = useToast();
 const {
@@ -103,13 +95,17 @@ const selectedCalibrationByIterationParameterRow = ref<any>();
 const calibrationRunDetailTable = ref<HTMLTableElement>();
 const tuningParametersTable = ref<HTMLTableElement>();
 
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "right" } }
+});
+
 onMounted(() => {
   hilightTab(EvaluationTabs.tab_selectAltIteration);
 
   nextTick(() => {
     resetEvaluationAltIterationStore();
     fetchCalibrationDataByIterationDataList();
-    //fetchTuningParametersDataList();
 
     const syncScroll = (source: any, target: any) => {
       source.addEventListener("scroll", (event: Event) => {
@@ -118,8 +114,8 @@ onMounted(() => {
       });
     };
 
-    syncScroll(calibrationRunDetailTable.value?.$el.children[0], tuningParametersTable.value?.$el.children[0]);
-    syncScroll(tuningParametersTable.value?.$el.children[0], calibrationRunDetailTable.value?.$el.children[0]);
+    syncScroll(((calibrationRunDetailTable.value as any)?.$el as HTMLTableElement).children[0], ((tuningParametersTable.value as any)?.$el as HTMLTableElement)?.children[0]);
+    syncScroll(((tuningParametersTable.value as any)?.$el as HTMLTableElement)?.children[0], ((calibrationRunDetailTable.value as any)?.$el as HTMLTableElement)?.children[0]);
   })
 })
 
@@ -131,7 +127,7 @@ const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
     evaluateIterationRunId.value = 0;
   }
   evaluateDisplayIterationNumber.value = event.data.iteration_num;
-  const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
+  const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id === event.data.iteration_id );
   selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];   
 }
 
@@ -143,7 +139,7 @@ const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
     evaluateIterationRunId.value = 0;
   }
   evaluateDisplayIterationNumber.value = event.data.iteration_num;
-  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id == event.data.iteration_id );
+  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id === event.data.iteration_id );
   selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];
 }
 

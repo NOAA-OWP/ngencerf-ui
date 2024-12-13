@@ -63,6 +63,16 @@
                       </Select>
                     </td>
                   </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                      <div v-if="validControlAndValidBestStatus === 'Done'">
+                        <div class="ngenButtonDiv mt-4">
+                          <button class="font-normal" @click="gotoEvaluation">Go to Evaluation</button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -97,22 +107,8 @@
         </div>
       </div>
     </div>
-    <span v-if="calibrationStatus === 'Done'">
-      <!-- NOTE TO DEVELOPERS: temporary commenting out block below until the functionality for this button is ready-->
-      <!-- 
-      <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
-        <div class="row-span-1">
-          <div id="ResultsArea" class="ngenButtonDiv row-span-1">
-            <button class="font-normal">Go to Evaluation</button>
-          </div>
-          <div class="col-span-7">&nbsp;</div>
-        </div>
-      </div>
-      -->
-    </span>
 
-    <span v-else>
-
+    <span v-if="calibrationStatus !== 'Done'">
       <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
         <div class="row-span-1">
           <div id="StatusRunBottomButtons" class="grid grid-cols-8">
@@ -156,16 +152,22 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-import { ValidationPlotNames } from "~/composables/NextgenEnums";
-import { useRunStatusStore } from '~/stores/calibration/RunStatusStore';
-import { useUserDataStore } from '~/stores/common/UserDataStore';
-import { isValidDate, isNotNullOrUndefined } from '~/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime } from '~/utils/TimeHelpers';
+import { ValidationPlotNames } from "@/composables/NextgenEnums";
+import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { generalStore } from "~/stores/common/GeneralStore";
+import { useEvaluationRunStatusStore } from "~/stores/evaluation/EvaluationRunStatusStore";
+import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
+import { convertTimeZone, calculateElapsedTime } from '@/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
-import { hilightTab } from '~/composables/TabHilight';
+import { hilightTab } from '@/composables/TabHilight';
 
 const runStatusStore = useRunStatusStore();
 const userDataStore = useUserDataStore();
+const evalRunStatusStore = useEvaluationRunStatusStore();
+const {  setMenuIndex } = generalStore();
+const { validationStatus } = storeToRefs(evalRunStatusStore);
+
 const toast = useToast();
 
 const {
@@ -210,13 +212,12 @@ const plotNamesToExclude = [
 ];
 
 onMounted(() => {
-  hilightTab(CalibrationTabs.tab_statusRun);
-
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
   nextTick(async () => {
+    hilightTab(CalibrationTabs.tab_statusRun);
     if (userCalibrationRunData.value) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
 
@@ -244,7 +245,7 @@ onMounted(() => {
 const createElapsedTimeInterval = () => {
 
   elapsedTimeIntervalId.value = setInterval(async () => {
-    if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' && 
+    if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate elapsedTime every second while Calibration is Running or Validation is not Done
       elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
@@ -346,8 +347,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         }
 
         // Calculate Running Time every second while calibration is Running or calibration is Done and valid_control and valid_best have not started or are Ready or Running
-        if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' && 
-        (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
+        if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
+          (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
           elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
 
           // Create an interval to update elapsedTime every second while Calibration is Running or Validation is not Done
@@ -371,14 +372,13 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       }
 
       // Get Plot Names
-      if (!plotNames?.value?._data?.plot_names || plotNames?.value?._data?.plot_names.length === 0) {
+      if (!((plotNames?.value as any)?._data?.plot_names) || (plotNames?.value as any)?._data?.plot_names.length === 0) {
         plotNames.value = await queryGetPlotNames();
       }
 
-      if (plotNames.value?._data.plot_names) {
-
+      if ((plotNames.value as any)?._data.plot_names) {
         // setting plotList will populate the dropdown
-        plotList.value = plotNames.value?._data?.plot_names?.filter(
+        plotList.value = (plotNames.value as any)?._data?.plot_names?.filter(
           (plot: any) => !plotNamesToExclude.includes(plot.name)
         );
       } else {
@@ -438,8 +438,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             }
           }, 10000) as unknown as number;
         }
-      } 
-      
+      }
+
       else if (['Done', 'Cancelled', 'Failed', 'Server Error'].includes(validControlAndValidBestStatus.value ?? '')) {
         const getStatusResponse = await queryGetCalibrationStatus();
         const validations = getStatusResponse?._data?.validations;
@@ -532,11 +532,20 @@ watch(iteration, async () => {
     } else {
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage});
+      toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage });
     }
   }
 });
 
+const gotoEvaluation = () => {
+  const ele = document.getElementById("MainMenuEvaluation");
+  ele?.click();
+ //       setMenuIndex(NextgenPages.page_evaluation);
+
+  // const allTabs = document.getElementsByClassName("tabs");
+  // const e = allTabs[CalibrationTabs.tab_statusRun] as HTMLElement;
+  // e.click();
+}
 </script>
 
 <style lang="scss" scoped>
@@ -596,12 +605,8 @@ watch(iteration, async () => {
   }
 
   .p-progressbar-value {
-    color: green;
-    background-color: green;
-  }
-
-  .p-progressbar-value {
     color: black;
+    background-color: green;
   }
 
   .p-progressbar-label {

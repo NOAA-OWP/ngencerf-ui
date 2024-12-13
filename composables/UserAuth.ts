@@ -3,8 +3,7 @@
  */
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
-import type { FetchResponse } from 'ofetch';
-import { useLogout } from "~/composables/UseEventBus";
+import { useLogout } from "@/composables/UseEventBus";
 
 /**
  * Refreshes access token

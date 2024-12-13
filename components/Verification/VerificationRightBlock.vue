@@ -25,7 +25,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import VerificationProgressGroup from "~/components/Verification/VerificationProgressGroup.vue"
+import VerificationProgressGroup from "@/components/Verification/VerificationProgressGroup.vue"
 import MessagesGroup from "../Common/MessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 </script>

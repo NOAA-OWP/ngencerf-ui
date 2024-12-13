@@ -42,17 +42,17 @@
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
               @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu" class="boxed">
-              <Column field="calibration_run_id" header="Job ID" sortable></Column>
-              <Column field="status" header="Status" sortable></Column>
+              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
+              <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
               <Column field="submit_date" header="Run Date" sortable>
                 <template #body="slotProps">
                   {{ formatDateForDisplay(slotProps.data.created_at) }}
                 </template>
               </Column>
-              <Column field="formulation_name" header="Formulation Name" sortable></Column>
-              <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-              <Column field="objective_function" header="Objective Function" sortable></Column>
-              <Column field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
+              <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
+              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
+              <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable></Column>
+              <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
             </DataTable>
           </div>
         </div>
@@ -69,14 +69,14 @@
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
 import type { ForecastRun, DataTableContextMenuOption } from "~/composables/NextGenModel";
-import { EvaluationTabs } from "~/composables/NextgenEnums";
-import { useForecastStore } from "~/stores/forecast/ForecastStore";
-import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
+import { EvaluationTabs } from "@/composables/NextgenEnums";
+import { useForecastStore } from "@/stores/forecast/ForecastStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { formatDateForDisplay } from '~/utils/TimeHelpers';
-import { hilightTab } from '~/composables/TabHilight';
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { hilightTab } from '@/composables/TabHilight';
 import { storeToRefs } from "pinia";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
@@ -84,6 +84,11 @@ const { deleteCalibrationRun } = useCalibrationJobStore();
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 const showMessagesGroup = ref<boolean>(false);
+
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
 
 const forecastStore = useForecastStore();
 const { loadForecastRuns } = forecastStore;
@@ -172,7 +177,7 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
 
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
-  if (updatedRunData != undefined && Object.keys(updatedRunData).length > 0) {
+  if (updatedRunData !== undefined && Object.keys(updatedRunData).length > 0) {
     nextTick(() => {
       isLoading.value = false;
       loadCalibrationDataComplete.value = true;
@@ -237,7 +242,7 @@ const deleteSelectedCalibrationRun = () => {
 }
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       fetchUserValidatedCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {

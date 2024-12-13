@@ -13,9 +13,9 @@ export const useCalibrationTabValidation = ( requiredFields: any ) => {
   Object.keys( requiredFields ).forEach( key => {
     let failed = false
     if ( typeof requiredFields[ key ] === "string" ) {
-        if ( requiredFields[ key ] == "" ) failed = true
+        if ( requiredFields[ key ] === "" ) failed = true
     } else if ( Array.isArray( requiredFields[ key ] ) ) {
-        if ( requiredFields[ key ].length == 0 ) failed = true
+        if ( requiredFields[ key ].length === 0 ) failed = true
     }
     if ( failed ) {
         errors.value[ key as keyof typeof errors] = ['field is required.']
@@ -80,7 +80,7 @@ export const useCalibrationFormulationSlothTableValidation = ( slothParameters: 
 
 export const useCalibrationFormulationTabSaveValidate = ( savePayload: SaveFormulationTabPayload ) => {
   const errors = ref<any>({});
-  if ( savePayload.hasOwnProperty( "formulation_name" ) && /^[a-z0-9-_]+$/i.test( savePayload['formulation_name'] ?? "" ) == false ) {
+  if ( savePayload.hasOwnProperty( "formulation_name" ) && /^[a-z0-9-_]+$/i.test( savePayload['formulation_name'] ?? "" ) === false ) {
     errors.value[ 'formulation_name' ]= [ 'Formulation name can only include alpha numeric charaters and underscore.' ];
   }
   if ( savePayload.hasOwnProperty( "sloth_parameters" ) && !savePayload.hasOwnProperty( "modules" ) ) {
@@ -111,15 +111,15 @@ export const useCalibrationFormulationTabSaveWarning = ( formulation_warning: Fo
  * @returns [<string>messages]
  */
 export const useApiErrorResponseValidator = ( validationErrors: any ) => {
-  let errors = <String[]>[];
+  let errors = <string[]>[];
   Object.keys( validationErrors ).forEach( key => {
     let field_label = key;
     if ( key in ValidationFormFields ) field_label = ValidationFormFields[ key as keyof typeof ValidationFormFields ];
     validationErrors[ key ].forEach( ( validation_error: any ) => {
-        if ( typeof validation_error == "string" ) {
+        if ( typeof validation_error === "string" ) {
           errors.push( `${field_label} ${validation_error}`);
         }
-        if ( typeof validation_error == "object" ) {
+        if ( typeof validation_error === "object" ) {
           let error_messages = useApiErrorResponseValidator( validation_error );
           errors = errors.concat( error_messages );
         }
@@ -129,7 +129,7 @@ export const useApiErrorResponseValidator = ( validationErrors: any ) => {
 }
 
 export const useApiErrorResponsePreprocess = ( errorResponse: any ) => {
-  let errors = <String[]>[];
+  let errors = <string[]>[];
   if ( errorResponse?._data?.validation_errors ) {
     errors = useApiErrorResponseValidator( errorResponse?._data?.validation_errors );
   }

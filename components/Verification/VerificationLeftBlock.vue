@@ -3,16 +3,16 @@
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
-      <span v-if="activeTab == 1">
+      <span v-if="activeTab === 1">
         <PreviousRunsTab />
       </span>
-      <span v-else-if="activeTab == 2">
+      <span v-else-if="activeTab === 2">
         <ResultsTab />
       </span>
-      <span v-else-if="activeTab == 3">
+      <span v-else-if="activeTab === 3">
         <ResultsTab />
       </span>
-      <span v-else-if="activeTab == 4">
+      <span v-else-if="activeTab === 4">
         <ResultsTab />
       </span>
     </div>
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import Tabs from '~/components/Common/Tabs.vue'
+import Tabs from '@/components/Common/Tabs.vue'
 
 // Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";

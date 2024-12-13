@@ -136,20 +136,20 @@
 import { storeToRefs } from "pinia";
 import type { ToastMessageOptions } from "primevue/toast";
 import { onMounted, onUnmounted } from "vue";
-import { useGageStore } from "~/stores/calibration/GageStore";
-import { generalStore } from "~/stores/common/GeneralStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+import { useGageStore } from "@/stores/calibration/GageStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import type { SelectChangeEvent } from "primevue/select";
-import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
-import { formatDateForRunOnString } from "~/utils/TimeHelpers";
-import { hilightTab } from '~/composables/TabHilight';
+import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
+import { formatDateForRunOnString } from "@/utils/TimeHelpers";
+import { hilightTab } from '@/composables/TabHilight';
 
-import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "~/composables/ValidationHandlers";
+import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
 
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -222,7 +222,7 @@ const showForcingFileUploadDialog = (headerText: string) => {
 
 const handleDialogClose = (opt: any) => {
   if (opt && opt.data) {
-    if (opt.data.saveFileResponseResult.status == 200) {
+    if (opt.data.saveFileResponseResult.status === 200) {
       toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 })
     } else {
       useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach( message => {
@@ -320,7 +320,7 @@ const saveTabData = () => {
   } else {
     toast.removeAllGroups();
     saveGageTabData().then( response => {
-      if ( response.status == 200 ) {
+      if ( response.status === 200 ) {
         useProcessCalibrationGageSavedResponse( response?._data ).forEach( ( toastMessage : ToastMessageOptions ) => {
           toast.add( toastMessage );
         })        

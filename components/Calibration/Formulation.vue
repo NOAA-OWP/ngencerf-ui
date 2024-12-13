@@ -27,7 +27,7 @@
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
               optionLabel="name" optionValue="name" class="h-60">
               <template #option="slotProps">
-                <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'">
+                <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
                   <div class="font-ui pl-2 leading-none">{{ slotProps.option.name }}</div>
                 </div>
               </template>
@@ -41,7 +41,7 @@
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
                 optionValue="name" scrollHeight="18rem" class="border-0">
                 <template #option="slotProps">
-                  <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'"><span
+                  <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'"><span
                       class="font-ui pl-2">{{ slotProps.option.name }}</span></div>
                 </template>
               </Listbox>
@@ -78,44 +78,44 @@
             scroll-height="157px" table-style="min-width: 50rem" v-model:selection="selectedSlothParameterData"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedSlothParameterData"
             @rowContextmenu="onRowContextMenu">
-            <Column field="param_name" header="SLoTH Output Var" sortable></Column>
-            <Column field="param_count" header="Count" sortable>
+            <Column :pt="ptColumn" field="param_name" header="SLoTH Output Var" sortable></Column>
+            <Column :pt="ptColumn" field="param_count" header="Count" sortable>
               <template #editor="{ index }">
                 <InputNumber v-model="slothParameterInputs[index].param_count" autofocus class="w-12 p-1">
                 </InputNumber>
               </template>
             </Column>
-            <Column field="param_type" header="Type" sortable>
+            <Column :pt="ptColumn" field="param_type" header="Type" sortable>
               <template #editor="{ index }">
                 <Select v-model="slothParameterInputs[index].param_type"
                   :options="fetchFormulationSlothParameterTypeOptions" optionLabel="name" optionValue="name"></Select>
               </template>
             </Column>
-            <Column field="param_units" header="Units" sortable>
+            <Column :pt="ptColumn" field="param_units" header="Units" sortable>
               <template #editor="{ index }">
                 <Select v-model="slothParameterInputs[index].param_units"
                   :options="fetchFormulationSlothParameterUnitOptions" optionLabel="name" optionValue="name"></Select>
               </template>
             </Column>
-            <Column field="param_location" header="Location" sortable>
+            <Column :pt="ptColumn" field="param_location" header="Location" sortable>
               <template #editor="{ index }">
                 <InputText v-model="slothParameterInputs[index].param_location" autofocus class="w-20 p-1">
                 </InputText>
               </template>
             </Column>
-            <Column field="maps_to_module" header="For Module" sortable>
+            <Column :pt="ptColumn" field="maps_to_module" header="For Module" sortable>
               <template #editor="{ index }">
                 <Select v-model="slothParameterInputs[index].maps_to_module" filter
                   :options="fetchSelectedFormulationModuleOptions" optionLabel="name" optionValue="name"></Select>
               </template>
             </Column>
-            <Column field="maps_to_variable_name" header="Module Param" sortable>
+            <Column :pt="ptColumn" field="maps_to_variable_name" header="Module Param" sortable>
               <template #editor="{ index }">
                 <InputText v-model="slothParameterInputs[index].maps_to_variable_name" autofocus fluid>
                 </InputText>
               </template>
             </Column>
-            <Column field="param_value" header="Value" sortable>
+            <Column :pt="ptColumn" field="param_value" header="Value" sortable>
               <template #editor="{ index }">
                 <InputNumber v-model="slothParameterInputs[index].param_value" autofocus :minFractionDigits="0"
                   :maxFractionDigits="2" class="w-12 p-1" fluid>
@@ -136,7 +136,7 @@
         </span>
         <span v-else>
           <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-            Run on {{ formatDateForRunOnString(submitTimeDate) }}
+            Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
           </div>
         </span>
         <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
@@ -163,7 +163,7 @@
       <DynamicDialog />
     </div>
     <div class="waitgif" v-if="formulationStore_data_loading">
-      <img src="@/assets/styles/img/wait.gif" />
+      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
 </template>
@@ -171,27 +171,32 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
-import type { UserCalibrationRunData } from "~/composables/NextGenModel";
-import { isCalibrationJobStatusSavedOrReady } from "~/utils/CommonHelpers";
-import { formatDateForRunOnString } from "~/utils/TimeHelpers";
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { generalStore } from "~/stores/common/GeneralStore";
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
+import type { UserCalibrationRunData } from "@/composables/NextGenModel";
+import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
+import { formatDateForRunOnString } from "@/utils/TimeHelpers";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useToast } from "primevue/usetoast";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import type { SlothParameterData } from '~/composables/NextGenModel';
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import type { SlothParameterData } from '@/composables/NextGenModel';
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
-import { hilightTab } from '~/composables/TabHilight';
+import { hilightTab } from '@/composables/TabHilight';
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
-import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "~/composables/ValidationHandlers";
+import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
 
 const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
 const slothParamContextMenu = ref() //sloth parameter table context menu
+
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
 
 
 const cmSlothParameterData = ref([
@@ -237,7 +242,7 @@ onMounted(() => {
 
 const addSlothOnEnter = (e: KeyboardEvent) => {
   const ele = e.target as HTMLElement;
-  if (e.key === "Enter" && new_sloth_variable_name.value.trim() != '') {
+  if (e.key === "Enter" && new_sloth_variable_name.value.trim() !== '') {
     addSlothVariable();
   }
 };
@@ -246,7 +251,7 @@ const addSlothOnEnter = (e: KeyboardEvent) => {
  * add sloth variable entry to table and reset name field
  */
 const addSlothVariable = () => {
-  if (new_sloth_variable_name.value.trim() != '') {
+  if (new_sloth_variable_name.value.trim() !== '') {
     addNewSlothVariable(new_sloth_variable_name.value);
     new_sloth_variable_name.value = '';
   }
@@ -297,9 +302,9 @@ const saveFormulationData = () => {
   } else {
     toast.removeAllGroups();
     saveFormulationTabData().then( response => {
-      if ( response.status == 200 ) {
+      if ( response.status === 200 ) {
         toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
-        if ( response?._data?.nwm_warning == true ) {
+        if ( response?._data?.nwm_warning === true ) {
           useCalibrationFormulationTabSaveWarning( response?._data?.formulation_warning ?? {} ).forEach( warning => {
             toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning });
           });
@@ -522,10 +527,4 @@ h1 {
   width: 120px;
 }
 
-/*
-#FormulationBottomButtons {
-  height: 54px;
-  width: 100%;
-}
-*/
 </style>

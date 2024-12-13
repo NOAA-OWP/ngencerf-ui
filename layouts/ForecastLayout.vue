@@ -34,4 +34,4 @@ import AppHeader from "~/components/Common/AppHeader.vue";
 import ForecastLeftBlock from "~/components/Forecast/ForecastLeftBlock.vue";
 
 </script>
-<style lang="scss" scoped></style>
+
