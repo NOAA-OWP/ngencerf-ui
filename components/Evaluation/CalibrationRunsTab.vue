@@ -142,7 +142,7 @@ const ptColumn = ref({
 
 const ptValColumns = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
-  bodyCell: { style: { "text-align": "right" } }
+  bodyCell: { style: { "text-align": "right", "padding-right": "10px" } }
 });
 
 

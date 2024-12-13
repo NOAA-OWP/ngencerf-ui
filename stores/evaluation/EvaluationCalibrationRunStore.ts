@@ -7,6 +7,7 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "@/composables/UserAuth"
 import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NextGenModel";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { fixFloatToFivePlaces } from "@/utils/CommonHelpers";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {
   const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
@@ -140,25 +141,25 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         rowData['status'] = validation_job.status;
         rowData['submit_date'] = formatDateForDisplay(validation_job.submit_date);
         validation_job.parameters.forEach((parameter: CalibrationRunValidationParameterData) => {
-          rowData[parameter.name] = parameter.value;
+          rowData[parameter.name] = fixFloatToFivePlaces(parameter.value)
         });
         computedCalibrationValidationRunList.value.push(rowData);
       });
     }
   }
 
-  const setSelectedCalibrationRunId = ( calibration_run_id: number ):void => {
+  const setSelectedCalibrationRunId = (calibration_run_id: number): void => {
     userSelectedEvalCalibrationRunId.value = calibrationJobId.value = calibration_run_id;
   }
 
   /**
   * @returns {number}
   */
-  const getValidationRunIdByCalibrationRunId =  computed( () => {
-    const find_validation_run = userEvaluationCalibrationRunListData.value.filter( ( validation: ValidatedCalibrationRunListItem ) => {
+  const getValidationRunIdByCalibrationRunId = computed(() => {
+    const find_validation_run = userEvaluationCalibrationRunListData.value.filter((validation: ValidatedCalibrationRunListItem) => {
       return validation.calibration_run_id === calibrationJobId.value;
     });
-    if ( !find_validation_run ) {
+    if (!find_validation_run) {
       return 0;
     } else {
       // make sure we actually has validation run
@@ -168,7 +169,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   });
 
   const loadSelectedCalibrationRun = async (calibration_run_id: number) => {
-    setSelectedCalibrationRunId( calibration_run_id );
+    setSelectedCalibrationRunId(calibration_run_id);
     await fetchUserCalibrationRunData();
   }
 
@@ -209,7 +210,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     calibrationJobId.value = userSelectedEvalCalibrationRunId.value = evaluateIterationRunId.value = 0;
     evaluateValidationRunId.value = 0;
     calibrationValidationRunListHeaders.value = [];
-    computedCalibrationValidationRunList.value = [];    
+    computedCalibrationValidationRunList.value = [];
     evaluateValidationRunStatus.value = '';
   }
 
