@@ -101,7 +101,7 @@
             </span>
             <span v-else>
               <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-                Run on {{ formatDateForRunOnString(submitTimeDate) }}
+                Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
               </div>
             </span>
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
@@ -171,7 +171,7 @@ const isLoading = ref(true);
 
 onMounted(() => {
   hilightTab(CalibrationTabs.tab_headwaterBasinGage);
-  
+
   toast.removeAllGroups();
   isLoading.value = false;
 
@@ -221,11 +221,16 @@ const showForcingFileUploadDialog = (headerText: string) => {
 }
 
 const handleDialogClose = (opt: any) => {
+  if (opt.type === 'dialog-close' && !opt.data) {
+    fileUploadDialogOpened.value = false;
+    return;
+  }
+
   if (opt && opt.data) {
     if (opt.data.saveFileResponseResult.status === 200) {
       toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 })
     } else {
-      useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach( message => {
+      useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
         toast.add({ severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
       });
     }
@@ -319,15 +324,15 @@ const saveTabData = () => {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
-    saveGageTabData().then( response => {
-      if ( response.status === 200 ) {
-        useProcessCalibrationGageSavedResponse( response?._data ).forEach( ( toastMessage : ToastMessageOptions ) => {
-          toast.add( toastMessage );
-        })        
+    saveGageTabData().then(response => {
+      if (response.status === 200) {
+        useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
+          toast.add(toastMessage);
+        })
         fetchUserCalibrationRunData();
       } else {
-        useApiErrorResponsePreprocess( response ).forEach( message => {
-          toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Gage Tab Data Failed.', detail: message });
+        useApiErrorResponsePreprocess(response).forEach(message => {
+          toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message });
         });
       }
     });
@@ -384,7 +389,7 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
   if (opt.data.moveToNextResponse) {
-      selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
+    selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
     gotoNext();
   }
 }
