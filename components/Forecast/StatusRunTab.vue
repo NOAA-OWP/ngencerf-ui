@@ -80,10 +80,18 @@
             </div>
           </span>
           <span v-if="forecastJobStatus === 'Running'">
-            <div class="col-span-1 mr-3"><!--c-blue font-normal text-xl underline pt-1-->
+            <div class="col-span-1 mr-3">
               <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelForecastRun()"
                 aria-label="Cancel Button">
                 Cancel
+              </button>
+            </div>
+          </span>
+          <span v-if="forecastJobStatus === 'Done'">
+            <div class="col-span-1 mr-3">
+              <button class="ngenButtonDiv ml-6 font-normal h-8" title="View Results Button" @click="viewResults()"
+                aria-label="View Results Button">
+                View Results
               </button>
             </div>
           </span>
@@ -124,6 +132,7 @@ const {
   loadForecastStatusRunTabData,
   loadForecastTab,
   createAndRunForecastJob,
+  cancelForecastJob,
   getStatus,
 } = useForecastStore();
 
@@ -211,8 +220,23 @@ const startForecastRun = async () => {
 /**
  * Cancel the forecast run
  */
-const cancelForecastRun = () => {
-  console.log('cancelForecastRun');
+const cancelForecastRun = async () => {
+  try {
+    const cancelForecastJobResponse = await cancelForecastJob();
+
+    if (cancelForecastJobResponse?._data?.status) {
+      forecastJobStatus.value = cancelForecastJobResponse._data.status;
+
+      if (forecastJobStatus.value !== 'Cancelled') {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL' });
+      }
+      await loadForecastStatusRunTabData();
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get Forecast status from server' });
+    }
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Forecast job' });
+  }
 };
 
 /**

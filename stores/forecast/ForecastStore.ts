@@ -100,6 +100,20 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   /**
+   * Cancel Forecast Job by querying cancel_job endpoint
+   */
+  const cancelForecastJob = async (): Promise<any> => {
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/cancel_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ forecast_run_id: forecastJobId.value })
+    });
+  };
+
+  /**
    * Query get_calibration_jobs_for_forecast endpoint
    */
   const getCalibrationJobsForForecast = async (): Promise<any> => {
@@ -169,9 +183,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     loadForecastStatusRunTabData,
     loadForecastTab,
     createAndRunForecastJob,
+    cancelForecastJob,
     getCalibrationJobsForForecast,
     resetUserSelectedForecastCalibrationRun,
-
     forecastRunGageList,
     calibrationRunsForForecast,
     calibrationRunForForecast,
