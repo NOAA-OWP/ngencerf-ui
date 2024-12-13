@@ -1,4 +1,13 @@
 <template>
+  <Transition name="slide-fade">
+    <div id="MessagesGroupWindow" v-if="showMessagesGroup">
+      <div class="text-right sticky top-0">
+        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
+      </div>
+      <MessagesGroup />
+    </div>
+  </Transition>
   <client-only>
     <div class="h-screen-inner pr-2">
 
@@ -11,20 +20,12 @@
             </span>
           </h1>
         </div>
-
-        <div class="ml-auto mt-2">
-          <div id="NewButton" class="">
-            <Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
-              v-if="forecastJobId"
-              @click="navigateToSetupForecast">New Forecast</Button>
-          </div>
-        </div>
       </div>
 
       <div id="calibrationRunList">
         <div>
           <div id="CalTable">
-            <div class="grid grid-cols-2 mb-5">
+            <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
               <div class="col-span-1">
                 <div class="ml-10">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
@@ -34,15 +35,13 @@
                 </div>
               </div>
             </div>
-            <!-- @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" -->
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+              :model="cmCalibrationRun"></ContextMenu>
             <DataTable id="ForecastRunTable" :value="forecastRuns" scrollable scroll-height="400px"
-              sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"              
-              
+              sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
-              @row-dblclick="onRowDblClick($event)" @rowContextmenu="onRowContextMenu" class="boxed">
+              @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu" class="boxed">
               <Column field="calibration_run_id" header="Job ID" sortable></Column>
               <Column field="status" header="Status" sortable></Column>
               <Column field="submit_date" header="Run Date" sortable>
@@ -69,9 +68,7 @@
 
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
-
-import type { CalibrationRun, CalibrationValidationJobData } from "~/composables/NextGenModel";
-
+import type { ForecastRun, DataTableContextMenuOption } from "~/composables/NextGenModel";
 import { EvaluationTabs } from "~/composables/NextgenEnums";
 import { useForecastStore } from "~/stores/forecast/ForecastStore";
 import { useEvaluationCalibrationRunStore } from "~/stores/evaluation/EvaluationCalibrationRunStore";
@@ -81,10 +78,12 @@ import { useUserDataStore } from "~/stores/common/UserDataStore";
 import { formatDateForDisplay } from '~/utils/TimeHelpers';
 import { hilightTab } from '~/composables/TabHilight';
 import { storeToRefs } from "pinia";
+import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+
 const { deleteCalibrationRun } = useCalibrationJobStore();
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
-
+const showMessagesGroup = ref<boolean>(false);
 
 const forecastStore = useForecastStore();
 const { loadForecastRuns } = forecastStore;
@@ -93,17 +92,24 @@ const { loadForecastRuns } = forecastStore;
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 
+//this model is for highlighting purpose
+const selectedCalibrationRun = ref<ForecastRun>();
+
 const isLoading = ref(true);
-const cmCalibrationRun = ref([
-{ label: 'Setup Forecast', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() },
-{ label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onForecastRowSelect() },
-
-
-  // { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun() }
-]);
+const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {
-  crContextMenu.value.show(event.originalEvent);
-  forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
+  cmCalibrationRun.value = [];
+  const crRowData = event.data as ForecastRun; 
+  if ( selectedCalibrationRun && selectedCalibrationRun.value?.calibration_run_id == crRowData.calibration_run_id ) {
+    crContextMenu.value.show(event.originalEvent);
+    //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
+    setSelectedCalibrationRunId( parseInt(event.originalEvent.currentTarget.children[0].textContent) );
+    cmCalibrationRun.value.push( { label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => navigateToSetupForecast() } );    
+    cmCalibrationRun.value.push( { label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails( crRowData.calibration_run_id ) } )
+    //cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() } );
+    //cmCalibrationRun.value.push( { label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onForecastRowSelect() } );    
+    cmCalibrationRun.value.push( { label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } );
+  }  
 };
 
 const {
@@ -124,16 +130,15 @@ const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
 const { forecastRuns, forecastRunGageList, forecastJobId } = storeToRefs(useForecastStore());
 
-//this model is for highlighting purpose
-const selectedCalibrationRun = ref<CalibrationRun>();
-const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
+const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId } = useForecastStore();
 
 onMounted(async () => {
   isLoading.value = true;
   hilightTab(EvaluationTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
-  forecastJobId.value = 0;
+  //forecastJobId.value = 0;
+  resetSelectedCalibrationRunId();
   //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
   resetUserSelectedEvalCalibrationRun();
   await loadForecastRuns();
@@ -141,15 +146,28 @@ onMounted(async () => {
 
 });
 
-const onForecastRowSelect = async () => {
-  isLoading.value = true;
-  await loadSelectedCalibrationRun(forecastJobId.value as number);
-  await fetchUserSelectedCalibrationValidationRunList();
-  isLoading.value = false;
+const viewCalibrationDetails = async ( calibration_run_id: number ) => {
+  isLoading.value = true;  
+  nextTick(async () => {  
+    await loadSelectedCalibrationRun( calibration_run_id );
+    isLoading.value = false;
+    showMessagesGroup.value = true;
+  })  
+}
+
+const onForecastRowSelect = async (event: any) => {
+  //isLoading.value = true;
+  const rowData = event.data as ForecastRun; 
+  setSelectedCalibrationRunId( rowData.calibration_run_id );
+  //forecastJobId.value = rowData.calibration_run_id;
+  //await loadSelectedCalibrationRun(forecastJobId.value as number);
+  //await fetchUserSelectedCalibrationValidationRunList();
+  //isLoading.value = false;
 }
 
 const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
-  forecastJobId.value = 0;
+  //forecastJobId.value = 0;
+  resetSelectedCalibrationRunId();
 }
 
 
@@ -180,7 +198,7 @@ const openSelectedCalibrationRun = () => {
 }
 
 const navigateToSetupForecast = () => {
-  if (userSelectedEvalCalibrationRunId.value > 0) {
+  if (forecastJobId.value > 0) {
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
     e.click();
@@ -230,6 +248,14 @@ const acceptDelete = (selectedRunId: number) => {
   selectedCalibrationRun.value = undefined;
 }
 
+const toggleMessagesGroup = () => {
+  if (showMessagesGroup.value) {
+    showMessagesGroup.value = false;
+  } else {
+    showMessagesGroup.value = true;
+  }
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -242,8 +268,24 @@ const acceptDelete = (selectedRunId: number) => {
   width: 300px;
 }
 
-#ForecastRunTable {
+#ForecastRunTable,
+.gage-filter-wrapper  {
   width: 1270px;
   margin: 0 auto;
+}
+
+.gage-filter-wrapper {
+  margin-bottom: 1rem;
+}
+
+#MessagesGroupWindow {
+  z-index: 9999;
+  border: 1px solid black;
+  position: absolute;
+  right: 2%;
+  top: 161px;
+  width: 48%;
+  background-color: white;
+  overflow: auto;
 }
 </style>

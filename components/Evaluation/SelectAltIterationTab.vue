@@ -1,59 +1,70 @@
 <template>
+  <client-only>
+    <div class="h-screen-inner pr-2">
+      <div class="flex mt-2">
+        <div class="w-full">
+          <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
+            <span>Calibration Job ID {{ calibrationJobId }}</span>
+          </h1>
+        </div>
+      </div>
 
-  <div id="RunDetailsTbl" class="text-left mt-3 p-3">
-    <div class="tableTitle">Run Details</div>
-    <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
-      table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow"
-      :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''">
-      <ColumnGroup type="header">
-        <Row>
-          <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header"
-            :field="col.field" :hidden="col.hidden ?? false" :class="col.styles ?? []" sortable></Column>
-        </Row>
-        <Row v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index" :pt="{ id: index }">
-          <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan"></Column>
-        </Row>
-      </ColumnGroup>
-      <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :field="col.field"
-        :hidden="col.hidden ?? false"></Column>
-    </DataTable>
-    <div class="text-sm">* Metric used as Objective Function</div>
-  </div>
+      <div id="RunDetailsTbl" class="text-left mt-3 p-3">
+        <div class="tableTitle">Run Details</div>
+        <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
+          table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow"
+          :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''">
+          <ColumnGroup type="header">
+            <Row>
+              <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header"
+                :field="col.field" :hidden="col.hidden ?? false" :class="col.styles ?? []" sortable></Column>
+            </Row>
+            <Row v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index" :pt="{ id: index }">
+              <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan"></Column>
+            </Row>
+          </ColumnGroup>
+          <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :field="col.field"
+            :hidden="col.hidden ?? false"></Column>
+        </DataTable>
+        <div class="text-sm">* Metric used as Objective Function</div>
+      </div>
 
-  <div class="mt-3">
-    <div id="CalTuningParamsTbl" class="text-left mt-3 p-3">
-      <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
-      <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"  @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect"
-        selectionMode="single" ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"
-        :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''"> 
-        <ColumnGroup type="header">
-          <Row :class="['table-header']">
+      <div class="mt-3">
+        <div id="CalTuningParamsTbl" class="text-left mt-3 p-3">
+          <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
+          <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"  @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect"
+            selectionMode="single" ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"
+            :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''"> 
+            <ColumnGroup type="header">
+              <Row :class="['table-header']">
+                <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header"
+                  :field="col.field" :hidden="col.hidden ?? false" sortable></Column>
+              </Row>
+              <Row v-for="(row, index) in tuningParametersDataListHeaders" :key="index">
+                <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan">
+                </Column>
+              </Row>
+            </ColumnGroup>
             <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header"
-              :field="col.field" :hidden="col.hidden ?? false" sortable></Column>
-          </Row>
-          <Row v-for="(row, index) in tuningParametersDataListHeaders" :key="index">
-            <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan">
-            </Column>
-          </Row>
-        </ColumnGroup>
-        <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header"
-          :field="col.field" :hidden="col.hidden ?? false"></Column>
-      </DataTable>
-    </div>
-  </div>
+              :field="col.field" :hidden="col.hidden ?? false"></Column>
+          </DataTable>
+        </div>
+      </div>
 
-  <div class="b-0 grid grid-cols-8 mt-6 ActionButtonsBox" v-show="evaluateIterationRunId && evaluateIterationRunId > 0">
-    <div class="col-span-7"></div>
-    <div class="col-span-1 mr-4">
-      <div>
-        <button class="ngenButtonDiv ml-6 font-normal h-8" title="Validate Selected Iteration" aria-label="Run Button"
-          @click="navigateToEvaluateStatus">
-          Next
-        </button>
+      <div class="b-0 grid grid-cols-8 mt-6 ActionButtonsBox" v-show="evaluateIterationRunId && evaluateIterationRunId > 0">
+        <div class="col-span-7"></div>
+        <div class="col-span-1 mr-4">
+          <div>
+            <button class="ngenButtonDiv ml-6 font-normal h-8" title="Validate Selected Iteration" aria-label="Run Button"
+              @click="navigateToEvaluateStatus">
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
+</client-only>
 </template>
 
 <script setup lang="ts">
@@ -84,7 +95,7 @@ const {
 
 const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
 const { iterationValidationRunId } = storeToRefs( useEvaluationRunStatusStore() );
-const { evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs( generalStore() );
+const { calibrationJobId, evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs( generalStore() );
 
 const selectedCalibrationByIterationDetailRow = ref<any>();
 const selectedCalibrationByIterationParameterRow = ref<any>();
