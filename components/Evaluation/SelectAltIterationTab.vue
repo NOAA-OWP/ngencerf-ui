@@ -1,7 +1,7 @@
 <template>
 
   <div id="RunDetailsTbl" class="text-left mt-3 p-3">
-    <div class="tableTitle">Run Details</div>
+    <div class="tableTitle">Run Details - Calibration Job ID {{ calibrationJobId }} </div>
     <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="200px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
       table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow"
       :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''">
@@ -84,7 +84,7 @@ const {
 
 const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
 const { iterationValidationRunId } = storeToRefs( useEvaluationRunStatusStore() );
-const { evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs( generalStore() );
+const { calibrationJobId, evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs( generalStore() );
 
 const selectedCalibrationByIterationDetailRow = ref<any>();
 const selectedCalibrationByIterationParameterRow = ref<any>();
