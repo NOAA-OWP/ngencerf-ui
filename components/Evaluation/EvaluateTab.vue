@@ -114,7 +114,7 @@
             <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true scrollable scroll-height="500px"
               :multi-sort="true">
               <Column v-for="col of plotTableColumns" :key="col.value" :field="col.value" :header="col.header"
-                :sortable="plotTableTotalPages === 1"></Column>
+                :sortable="plotTableTotalPages === 1" :pt="ptColumn"></Column>
             </DataTable>
           </div>
         </div>
@@ -184,6 +184,12 @@ const toast = useToast();
 const showMessagesGroup = ref<Boolean>(false);
 
 const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
+
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "right", "padding-right": "10px !important" } }
+});
+
 
 const {
   resultsPathname
