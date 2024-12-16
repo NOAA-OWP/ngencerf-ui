@@ -2,15 +2,13 @@
   <table id="ForecastProgressTable" class="progressTable prevent-select">
     <tbody>
       <tr>
-        <td><i v-if="calibrationRunForForecast?.calibration_run_id"
-            :class="(calibrationRunForForecast?.calibration_run_id) ? 'checkMark': ''"
+        <td><i :class="(calibrationRunForForecast?.calibration_run_id) ? 'checkMark': ''"
             class="pi pi-check font-bold"></i></td>
         <td data-tab="1" title="Calibration Run" aria-label="Calibration Run"
           @click="tabClicked">Calibration Run</td>
       </tr>
       <tr>
-        <td><i v-if="forecastCycle?.is_active"
-            :class="(forecastCycle?.is_active) ? 'checkMark': ''"
+        <td><i :class="(forecastCycle?.is_active) ? 'checkMark': ''"
             class="pi pi-check font-bold"></i></td>
         <td data-tab="2" title="Cycle" aria-label="Cycle" @click="tabClicked">Cycle</td>
       </tr>

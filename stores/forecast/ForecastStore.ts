@@ -151,11 +151,11 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   }
 
   const setSelectedCalibrationRunId = ( calibration_run_id: number ):void => {
-    calibrationJobId.value = forecastJobId.value = calibration_run_id;
+    calibrationJobId.value = calibration_run_id;
   }
 
   const resetSelectedCalibrationRunId = (): void => {
-    calibrationJobId.value = forecastJobId.value = 0;
+    calibrationJobId.value = 0;
   }
 
   /**
