@@ -45,3 +45,17 @@ export const isCalibrationJobStatusSavedOrReady = (status?: string): boolean => 
 export const isCalibrationJobFinished = (status?: string): boolean => {
   return status === 'Done' || status === 'Cancelled' || status === 'Failed' || status === 'Server Error';
 };
+
+export const fixFloatToFivePlaces = (f: number) => {
+  let s = f.toString();
+  let p = s.indexOf('.');
+  if (p !== -1) {
+    if (s.substring(p + 1).length > 5) {
+      return f.toFixed(5);
+    } else {
+      return f;
+    }
+  } else {
+    return f;
+  }
+}

@@ -1,6 +1,7 @@
-import { defineStore } from "pinia";
+import { defineStore, storeToRefs } from "pinia";
 import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastCycle } from "@/composables/NextGenModel";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { generalStore } from "../common/GeneralStore";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { isValidDate } from '@/utils/CommonHelpers';
@@ -8,10 +9,10 @@ import { convertTimeZone } from '@/utils/TimeHelpers';
 
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken, clearUserCalibrationRunData } = useUserDataStore();
-
+  const { getAccessToken, fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
+  const { calibrationJobId } = storeToRefs(generalStore());
   // refs
-  const forecastJobId = ref<number>();
+  const forecastJobId = ref<number>(0);
   const forecastCycles = ref<ForecastCycle[]>();
   const forecastCycle = ref<ForecastCycle>();
   const forecastJobStatus = ref<string>();
@@ -144,6 +145,19 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     });
   };
 
+  const loadSelectedCalibrationRun = async (calibration_run_id: number) => {
+    setSelectedCalibrationRunId( calibration_run_id );
+    await fetchUserCalibrationRunData();
+  }
+
+  const setSelectedCalibrationRunId = ( calibration_run_id: number ):void => {
+    calibrationJobId.value = forecastJobId.value = calibration_run_id;
+  }
+
+  const resetSelectedCalibrationRunId = (): void => {
+    calibrationJobId.value = forecastJobId.value = 0;
+  }
+
   /**
    * Hard Reset Forecast Store
    */
@@ -179,6 +193,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     elapsedTimeIntervalId,
     forecastJobStatusIntervalId,
     resultsPathname,
+    forecastRunGageList,
+    calibrationRunsForForecast,
+    calibrationRunForForecast,
+    uiGageId,
     loadSetupForecastTabData,
     loadForecastStatusRunTabData,
     loadForecastTab,
@@ -186,12 +204,11 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     cancelForecastJob,
     getCalibrationJobsForForecast,
     resetUserSelectedForecastCalibrationRun,
-    forecastRunGageList,
-    calibrationRunsForForecast,
-    calibrationRunForForecast,
+    loadSelectedCalibrationRun,
+    setSelectedCalibrationRunId,
+    resetSelectedCalibrationRunId,
     getStatus,
     hardResetForecastStore,
-    uiGageId
   };
 }, {
   persist: {

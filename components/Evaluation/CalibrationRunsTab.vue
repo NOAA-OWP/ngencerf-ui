@@ -82,7 +82,7 @@
             v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle"
             @rowContextmenu="onRowVrContextMenu" @rowSelect="onEvalValdiationRowSelect"
             @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
-            <Column v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex"
+            <Column :pt="ptValColumns" v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field">
             </Column>
           </DataTable>
@@ -140,6 +140,13 @@ const ptColumn = ref({
   bodyCell: { style: { "text-align": "center" } }
 });
 
+const ptValColumns = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "right", "padding-right": "10px" } }
+});
+
+
+ptValColumns
 const {
   uiGageId,
   evaluationCalibrationRunGageList,
@@ -266,12 +273,10 @@ const openSelectedCalibrationRun = () => {
   })
 }
 
-const viewCalibrationDetails = async (calibration_run_id: number) => {
-  //resetUserSelectedEvalValidationRun();
-  console.log('viewCalibrationDetails selectedCalibrationRun ', selectedCalibrationRun);
-  isLoading.value = true;
-  nextTick(async () => {
-    await loadSelectedCalibrationRun(calibration_run_id);
+const viewCalibrationDetails = async ( calibration_run_id: number ) => {
+  isLoading.value = true;  
+  nextTick(async () => {  
+    await loadSelectedCalibrationRun( calibration_run_id );
     isLoading.value = false;
     showMessagesGroup.value = true;
   })
