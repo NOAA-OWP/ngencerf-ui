@@ -29,7 +29,8 @@
             <div class="col-span-1">
               <label for="Forcing">Forcing Data</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                optionValue="name" class="user-select" defaultValue="AORC" @change="uploadForcingDlgOpen($event)"></Select>
+                optionValue="name" class="user-select" defaultValue="AORC"
+                @change="uploadForcingDlgOpen($event)"></Select>
             </div>
 
             <div class="col-span-1">
@@ -177,24 +178,19 @@ onMounted(() => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
+  if (getForcingOptionsList.value) {
+    selectedForcingValue.value = getForcingOptionsList.value[0].name;
+  }
+  if (getObservationalOptionsList.value) {
+    selectedObservationalValue.value = getObservationalOptionsList.value[0].name;
+  }
+  if (getGeopackageOptionsList.value) {
+    selectedGeopackageValue.value = getGeopackageOptionsList.value[0].name;
+  }
 
-  nextTick(() => {
-    setTimeout(() => {
-      console.log("Values: ", selectedForcingValue.value)
-      if (getForcingOptionsList.value) {
-        console.log(getForcingOptionsList);
-        selectedForcingValue.value = getForcingOptionsList.value[0].toString();
-      }
-    }, 1000)
-
-
-  })
-
-
-  // const selectElements = document.getElementsByClassName("user-select");
-  // (selectElements[0] as HTMLSelectElement).selectedIndex = 0;
 
 })
+
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
