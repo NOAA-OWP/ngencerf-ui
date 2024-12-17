@@ -16,6 +16,7 @@
       v-model:selection="forecastCycle"
       selectionMode="single"
       :rowClass="rowClass"
+      :rowStyle="rowStyle"
     >
       <Column field="name" header="Cycle"></Column>
       <Column field="data_sources" header="Data Sources"></Column>
@@ -66,8 +67,19 @@ const {
  * Disable row if forecast cycle is not active
  */
 const rowClass = (data: any) => {
-  return [{ 'bg-gray-200 text-gray-500 pointer-events-none': !data.is_active }];
+  return [{ 'pointer-events-none': !data.is_active }];
 };
+
+/**
+ * Add row styling if forecast cycle is not active.
+ */
+ const rowStyle = (data: any) => {
+  return {
+    color: !data.is_active ? 'grey' : 'black',
+    backgroundColor: !data.is_active ? '#f0f0f0' : ''
+  };
+};
+
 
 onMounted(async () => {
   toast.removeAllGroups(); // clear all toast messages
