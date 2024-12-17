@@ -67,8 +67,6 @@ export const useGageStore = defineStore('GageStore', () => {
   watch(isNWMv3, (isNWMv3) => { sessionStorage.setItem('isNWMv3', JSON.stringify(isNWMv3)); })
   watch(gageStore_data_loading, (gageStore_data_loading) => { sessionStorage.setItem('gageStore_data_loading', JSON.stringify(gageStore_data_loading)); })
 
-
-
   const loadGageTabStaticData = () => {
     gageStore_data_loading.value = true
     makeProtectedApiCall<GageTabData>(`${ngencerfBaseUrl}/calibration/load_gage_tab/`, {
@@ -92,10 +90,10 @@ export const useGageStore = defineStore('GageStore', () => {
   * @returns {string}
   */
   const getSavedDomainValue = computed(() => {
-    if (userCalibrationRunData.value?.gage === undefined || userCalibrationRunData.value?.gage.gage_id === "") {
+    if (userCalibrationRunData.value?.gage === undefined || userCalibrationRunData.value?.gage?.gage_id === "") {
       return ""
     } else {
-      let selected_gage_item = gageTabData.value?.gages.find((gage_item) => gage_item.gage_id === userCalibrationRunData.value?.gage.gage_id)
+      let selected_gage_item = gageTabData.value?.gages.find((gage_item) => gage_item.gage_id === userCalibrationRunData.value?.gage?.gage_id)
       return selected_gage_item?.domain
     }
   })
