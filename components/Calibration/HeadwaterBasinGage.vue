@@ -29,20 +29,21 @@
             <div class="col-span-1">
               <label for="Forcing">Forcing Data</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                optionValue="name" placeholder=" ... " class="" @change="uploadForcingDlgOpen($event)"></Select>
+                optionValue="name" class="user-select" defaultValue="AORC"
+                @change="uploadForcingDlgOpen($event)"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Observational">Observational Data</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
-                optionLabel="name" optionValue="name" placeholder=" ... " class=""
+                optionLabel="name" optionValue="name" class="user-select"
                 @change="uploadObservationalDlgOpen($event)"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Geopackage">Geo Package</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
-                optionValue="name" placeholder=" ... " class="" @change="uploadGeopackageDlgOpen($event)"></Select>
+                optionValue="name" class="user-select" @change="uploadGeopackageDlgOpen($event)"></Select>
 
             </div>
           </div>
@@ -154,7 +155,6 @@ import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, 
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 
-
 const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
   getObservationalOptionsList } = storeToRefs(useGageStore());
@@ -178,7 +178,19 @@ onMounted(() => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
+  if (getForcingOptionsList.value) {
+    selectedForcingValue.value = getForcingOptionsList.value[0].name;
+  }
+  if (getObservationalOptionsList.value) {
+    selectedObservationalValue.value = getObservationalOptionsList.value[0].name;
+  }
+  if (getGeopackageOptionsList.value) {
+    selectedGeopackageValue.value = getGeopackageOptionsList.value[0].name;
+  }
+
+
 })
+
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
