@@ -93,6 +93,10 @@ input::-webkit-input-placeholder {
 .underline button {
   text-decoration: underline;
 }
+.prompt-txt {
+  font-size: 15px;
+  font-weight: normal;
+}
 .ngenButtonDiv {
   cursor: pointer;
   color: white;
@@ -343,6 +347,19 @@ select option {
   background-color: #D8FFD8 !important;    
   color: black;
 }
+#MainLeftDataArea .p-datatable-selectable-row:hover {background-color: whitesmoke !important;}
+
+.pagination-box {
+  display: grid;
+  grid-template-columns: 35% 65%;
+  gap: 10px;
+}
+.pagination-rows, .pagination-go-to-page, .pagination-pages {margin-bottom: 4px;}
+.pagination-rows {}
+.pagination-go-to-page input {width:70px; display: inline-block; padding: 5px 3px;}
+.pagination-go-to-page, .pagination-pages {display:inline-block; margin-top:-10px;}
+.pagination-go-to-page {width:50%;}
+.pagination-pages {width:50%;}
 
 // default color ovewrites
 .bg-green { background-color: $ngwcp_secondary4 !important; }

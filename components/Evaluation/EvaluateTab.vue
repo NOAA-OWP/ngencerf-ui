@@ -35,7 +35,7 @@
                 <td class="text-left font-bold" style="width: 150px;font-size:0.9em;">
                     <label for="resultsPathname">Results Pathname</label>
                 </td>
-                <td class="pl-3"><InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled /></td>
+                <td class="pl-3"><InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled style="padding-left:0px !important"/></td>
               </tr>
             </tbody>
           </table>
@@ -57,9 +57,15 @@
         </div>
       </div>
       <div>
+        
         <div class="text-center" v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0">
-          {{ plotTableErrorMessage }}
+            <div class="grid place-items-center" style="height: 45vh;">
+                <div>
+                    {{ plotTableErrorMessage }}
+                </div>
+            </div>
         </div>
+
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
           <div v-if="plotTableList && plotTableList.length > 1">
             <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
@@ -68,8 +74,8 @@
             </Select>
           </div>
           <div class="pt-6 pb-2">
-            <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0">
-              <div>Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{ plotTableTotalSize }}</div>
+            <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0" class="pagination-box">
+              <div class="pagination-rows">Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{ plotTableTotalSize }}</div>
               <Paging
                 v-model:currentPage="plotTableCurrentPage"
                 :totalPages=plotTableTotalPages
@@ -103,17 +109,23 @@
       <div class="pl-4" v-if="calibrationLogList && calibrationLogList.length > 0 && selectedSupplementalTable === 4">
         <div v-if="calibrationLogList.length > 1">
           <label for="CalibrationLogOptions" class="pr-2 pt-3">Select Calibration Log</label>
-          <Select id="CalibrationLogOptions" class="p-select" 
+          <Select id="CalibrationLogOptions" class="p-select" style="width:35%" 
             v-model="selectedCalibrationLog" :options="calibrationLogList" optionLabel="name" optionValue="name">
           </Select>
         </div>
-        <div v-if="calibrationLogList.length === 1"><b>{{ selectedCalibrationLog }}</b></div>
+        <div v-if="calibrationLogList.length === 1" style="font-size: 0.9em;"><b style="width:160px; display:inline-block;">Log File Name</b> {{ selectedCalibrationLog }}</div>
+
+        <div class="flex justify-end" style="margin-top:-23px;">
+            <div class="ml-auto">
         <div>Rows {{ calibrationLogStartRow }} to {{ calibrationLogEndRow }} of {{ calibrationLogTotalSize }}</div>
         <Paging
           v-model:currentPage="calibrationLogCurrentPage"
           :totalPages=calibrationLogTotalPages
         />
-        <div id="CalibrationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
+            </div>
+        </div>
+
+        <div id="CalibrationLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
           <div v-html="calibrationLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
@@ -124,13 +136,19 @@
             v-model="selectedValidationLog" :options="validationLogList" optionLabel="name" optionValue="name">
           </Select>
         </div>
-        <div v-if="validationLogList.length === 1"><b>{{ selectedValidationLog }}</b></div>
+        <div v-if="validationLogList.length === 1" style="font-size: 0.9em;"><b style="width:160px; display:inline-block;">Log File Name</b> {{ selectedValidationLog }}</div>        
+
+        <div class="flex justify-end" style="margin-top:-23px;">
+            <div class="ml-auto">
         <div>Rows {{ validationLogStartRow }} to {{ validationLogEndRow }} of {{ validationLogTotalSize }}</div>
         <Paging
           v-model:currentPage="validationLogCurrentPage"
           :totalPages=validationLogTotalPages
         />
-        <div id="ValidationLogDisplay" class="p-2 gray-border mt-5 h-600 overflow-scroll">
+            </div>
+        </div>
+
+        <div id="ValidationLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
           <div v-html="validationLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
