@@ -1,7 +1,7 @@
 <template>
   <client-only>
     <div class="h-screen-inner pr-2">
-      <div id="RunDetailsTbl" class="text-left mt-3 p-3">
+      <div id="RunDetailsTbl" class="text-left mt-3 pr-3 pl-3 pt-1">
         <div class="tableTitle">Run Details - Calibration Job ID {{ calibrationJobId }}</div>
         <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="250px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
           table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow"
@@ -22,7 +22,7 @@
       </div>
 
   <div class="mt-1">
-    <div id="CalTuningParamsTbl" class="text-left p-3">
+    <div id="CalTuningParamsTbl" class="text-left pr-3 pl-3 pt-1">
           <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
           <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"  @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect"
             selectionMode="single" ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"

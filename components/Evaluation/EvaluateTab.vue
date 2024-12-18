@@ -109,7 +109,7 @@
       <div class="pl-4" v-if="calibrationLogList && calibrationLogList.length > 0 && selectedSupplementalTable === 4">
         <div v-if="calibrationLogList.length > 1">
           <label for="CalibrationLogOptions" class="pr-2 pt-3">Select Calibration Log</label>
-          <Select id="CalibrationLogOptions" class="p-select" style="width:35%" 
+          <Select id="CalibrationLogOptions" class="p-select"  
             v-model="selectedCalibrationLog" :options="calibrationLogList" optionLabel="name" optionValue="name">
           </Select>
         </div>
@@ -117,11 +117,11 @@
 
         <div class="flex justify-end" style="margin-top:-23px;">
             <div class="ml-auto">
-        <div>Rows {{ calibrationLogStartRow }} to {{ calibrationLogEndRow }} of {{ calibrationLogTotalSize }}</div>
-        <Paging
-          v-model:currentPage="calibrationLogCurrentPage"
-          :totalPages=calibrationLogTotalPages
-        />
+                <div>Rows {{ calibrationLogStartRow }} to {{ calibrationLogEndRow }} of {{ calibrationLogTotalSize }}</div>
+                <Paging
+                v-model:currentPage="calibrationLogCurrentPage"
+                :totalPages=calibrationLogTotalPages
+                />
             </div>
         </div>
 
@@ -140,11 +140,11 @@
 
         <div class="flex justify-end" style="margin-top:-23px;">
             <div class="ml-auto">
-        <div>Rows {{ validationLogStartRow }} to {{ validationLogEndRow }} of {{ validationLogTotalSize }}</div>
-        <Paging
-          v-model:currentPage="validationLogCurrentPage"
-          :totalPages=validationLogTotalPages
-        />
+                <div>Rows {{ validationLogStartRow }} to {{ validationLogEndRow }} of {{ validationLogTotalSize }}</div>
+                <Paging
+                v-model:currentPage="validationLogCurrentPage"
+                :totalPages=validationLogTotalPages
+                />
             </div>
         </div>
 
@@ -807,6 +807,13 @@ onUnmounted( () => {
 #DisplayOptions {
   width: 375px;
   margin-left: 0px;
+}
+
+#CalibrationLogOptions{
+    width: 268px;
+}
+#validationLogOptions {
+    width: 275px;
 }
 
 #GraphArea img {

@@ -64,13 +64,34 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>&nbsp;</td>
-                    <td>
-                      <div v-if="validControlAndValidBestStatus === 'Done'">
-                        <div class="ngenButtonDiv mt-4">
+                    <!--<td>&nbsp;</td>-->
+                    <td colspan="2">
+                      
+                      <div v-if="validControlAndValidBestStatus === 'Done'" style="margin-top:4px;margin-bottom:-4px;">
+                        <div class="ngenButtonDiv">
                           <button class="font-normal" @click="gotoEvaluation">Go to Evaluation</button>
                         </div>
                       </div>
+
+                      <div v-if="calibrationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
+                        <span v-if="calibrationStatus === 'Ready'">
+                          <div class="ngenButtonDiv-green h-8">
+                            <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
+                              Run
+                            </button>
+                          </div>
+                        </span>
+                        
+                        <span v-if="calibrationStatus === 'Running'">
+                          <div class="mr-3">
+                            <button class="ngenButtonDiv-red h-8" title="Cancel Button" @click="cancelRun()"
+                              aria-label="Cancel Button">
+                              Cancel
+                            </button>
+                          </div>
+                        </span>                              
+                      </div>
+
                     </td>
                   </tr>
                 </tbody>
@@ -107,7 +128,7 @@
         </div>
       </div>
     </div>
-
+<!--
     <span v-if="calibrationStatus !== 'Done'">
       <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
         <div class="row-span-1">
@@ -123,7 +144,7 @@
               <div class="col-span-1 mr-6 h-8 whitespace-nowrap">&nbsp;</div>
             </span>
             <span v-if="calibrationStatus === 'Running'">
-              <div class="col-span-1 mr-3"><!--c-blue font-normal text-xl underline pt-1-->
+              <div class="col-span-1 mr-3">
                 <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelRun()"
                   aria-label="Cancel Button">
                   Cancel
@@ -143,7 +164,7 @@
       </div>
 
     </span>
-
+  -->
     <div class="waitgif" v-if="isLoading">
       <img src="@/assets/styles/img/wait.gif" alt="Wait gif" />
     </div>

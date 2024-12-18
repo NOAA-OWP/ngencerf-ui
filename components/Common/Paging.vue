@@ -1,9 +1,5 @@
 <template>
     <div v-if="totalPages > 1">
-        <div class="pagination-go-to-page">
-            <label for="PlotTablePageNumber" class="pr-2 pt-3">Go to Page:</label>
-            <input type="number" min="1" :max="totalPages" :value="currentPage" @input="gotoPage(parseInt($event.target.value))">
-        </div>
         <div class="text-center pagination-pages" v-if="totalPages > 1">
             <!-- Previous page -->
             <span v-if="currentPage > 1" class="pagingLink">
@@ -40,6 +36,10 @@
                 &gt;
                 </a>
             </span>
+        </div>
+        <div class="pagination-go-to-page">
+            <label for="PlotTablePageNumber" class="pr-2 pt-3">Page:</label>
+            <input type="number" min="1" :max="totalPages" :value="currentPage" @input="gotoPage(parseInt($event.target.value))">
         </div>
     </div>
 </template>
