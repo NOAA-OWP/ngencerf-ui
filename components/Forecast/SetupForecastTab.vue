@@ -9,8 +9,15 @@
     <br />
   </div>
   <div>
-    <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
-      selectionMode="single">
+    <DataTable
+      :value="forecastCycles"
+      sortField="cycle"
+      scrollable
+      v-model:selection="forecastCycle"
+      selectionMode="single"
+      :rowClass="rowClass"
+      :rowStyle="rowStyle"
+    >
       <Column field="name" header="Cycle"></Column>
       <Column field="data_sources" header="Data Sources"></Column>
       <Column field="time_range" header="Time Range (ngenCERF)"></Column>
@@ -21,7 +28,7 @@
     cycles.
   </div>
   <div>
-    <span v-if="forecastCycle">
+    <span v-if="forecastCycle && forecastCycle.is_active">
       <div class="col-span-1 mr-4">
         <button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
           @click="goToStatusRunTab()">
@@ -56,6 +63,24 @@ const {
   hardResetForecastStore
 } = useForecastStore();
 
+/**
+ * Disable row if forecast cycle is not active
+ */
+const rowClass = (data: any) => {
+  return [{ 'pointer-events-none': !data.is_active }];
+};
+
+/**
+ * Add row styling if forecast cycle is not active.
+ */
+ const rowStyle = (data: any) => {
+  return {
+    color: !data.is_active ? 'grey' : 'black',
+    backgroundColor: !data.is_active ? '#f0f0f0' : ''
+  };
+};
+
+
 onMounted(async () => {
   toast.removeAllGroups(); // clear all toast messages
   isLoading.value = false; // set isLoading to false
@@ -75,6 +100,14 @@ onMounted(async () => {
     console.log('forecastCycles', forecastCycles.value);
   });
 });
+
+/**
+ * On DataTable row selection
+ */
+const onRowSelect = (e: any) => {
+  console.log('onRowSelect', e);
+  toast.add({ severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: 3000 });
+};
 
 /**
  * Go to the Status Run tab
