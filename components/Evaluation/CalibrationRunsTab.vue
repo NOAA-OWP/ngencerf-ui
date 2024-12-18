@@ -12,16 +12,16 @@
     <div class="h-screen-inner pr-2">
       <div class="flex mt-2">
         <div class="w-full">
-          <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
+          <h1 class="pt-3 mb-6 text-3xl font-bold text-center">
             <span v-if="computedCalibrationValidationRunList.length <= 1">
               Calibration Runs<br />
-              <span style="font-size: 14px;font-weight: normal;">
+              <span class="prompt-txt">
                 Select row then right click for available options.
               </span>
             </span>
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
               userSelectedEvalCalibrationRunId }}<br />
-              <span style="font-size: 14px;font-weight: normal;">
+              <span class="prompt-txt">
                 Select row then right click for available options.
               </span>
             </span>
@@ -35,18 +35,18 @@
         <div id="CalTable">
           <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
             <div class="col-span-1">
-              <div class="ml-10">
                 <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                 <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
                   :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
                   placeholder=""></Select>
-              </div>
             </div>
           </div>
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
+            
+          <div style="overflow: auto; ">
           <DataTable id="EvalRunTable" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
             v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
@@ -70,6 +70,8 @@
               </template>
             </Column>
           </DataTable>
+          </div>
+
         </div>
 
       </div>
@@ -86,7 +88,7 @@
               :header="col.header" :field="col.field">
             </Column>
           </DataTable>
-          <div class="mt-3 mx-auto" style="font-size:0.85em;">
+          <div class="mt-3 mx-auto prompt-txt">
             * Iteration containing best parameter set determined during calibration.
           </div>
         </div>

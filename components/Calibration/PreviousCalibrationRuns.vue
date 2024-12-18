@@ -6,13 +6,13 @@
         <span class="ngenButtonDiv-alt bg-blue4 ml-8" @click="createNewCalibration"><button>New</button>
         </span>
         <br />
-        <p style="font-size: 12px;font-weight: normal; margin-top:-10px;">
+        <p class="prompt-txt mb-6" style="margin-top:-10px;">
               Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
         </p>
         <div id="CalTable" class="w-max mx-auto">
-          <div class="grid grid-cols-1 mb-5">
-            <div class="col-span-1">
-              <div class="text-left">Headwater Basin Gage Filter</div>
+          <div class="grid grid-cols-1 mb-5 mt-2">
+            <div class="col-span-1 text-left">
+              <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
               <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter float-left" v-model="uiGageId" :options="calibrationRunGageList" filter
                 optionLabel="name" optionValue="name" placeholder=""></Select>
             </div>
