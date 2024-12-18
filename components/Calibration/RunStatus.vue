@@ -8,7 +8,7 @@
             <div class="col-span-1">
               <table>
                 <tbody>
-                  <tr height="40px">
+                  <tr height="38px">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Submit Time</div>
                     </th>
@@ -33,7 +33,7 @@
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
                 <tbody>
-                  <tr height="40px">
+                  <tr height="38px">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
                     <td class="pl-5">
                       <span v-if="calibrationStatus !== 'Done'">
@@ -63,10 +63,10 @@
                       </Select>
                     </td>
                   </tr>
-                  <tr>
-                    <!--<td>&nbsp;</td>-->
+                  <tr>                    
                     <td colspan="2">
-                      
+
+                      <!--BUTTONS - START-->
                       <div v-if="validControlAndValidBestStatus === 'Done'" style="margin-top:4px;margin-bottom:-4px;">
                         <div class="ngenButtonDiv">
                           <button class="font-normal" @click="gotoEvaluation">Go to Evaluation</button>
@@ -91,6 +91,7 @@
                           </div>
                         </span>                              
                       </div>
+                       <!--BUTTONS - END-->
 
                     </td>
                   </tr>
@@ -101,7 +102,7 @@
             <div class="col-span-2">
               <table style="width:100%">
                 <tbody>
-                  <tr height="40px">
+                  <tr height="38px">
                     <th scope="row" class="text-right font-bold" style="width: 140px;">
                       <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
                     </th>
