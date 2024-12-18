@@ -12,7 +12,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const { getAccessToken, fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
   const { calibrationJobId } = storeToRefs(generalStore());
   // refs
-  const forecastJobId = ref<number>(0);
+  const forecastJobId = ref<number>();
   const forecastCycles = ref<ForecastCycle[]>();
   const forecastCycle = ref<ForecastCycle>();
   const forecastJobStatus = ref<string>();
@@ -166,16 +166,16 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   const resetUserSelectedForecastCalibrationRun = (): void => {
-    forecastJobId.value =  0
+    forecastJobId.value =  undefined;
     forecastCycles.value =  [];
     forecastCycle.value =  undefined;
-    forecastJobStatus.value =  "";
-    elapsedTime.value =  "";
+    forecastJobStatus.value =  undefined;
+    elapsedTime.value =  undefined;
     submitTimeDate.value = undefined;
-    submitTime.value =  "";
-    elapsedTimeIntervalId.value =  0;
-    forecastJobStatusIntervalId.value =  0;
-    resultsPathname.value =  "";  
+    submitTime.value =  undefined;
+    elapsedTimeIntervalId.value =  undefined;
+    forecastJobStatusIntervalId.value =  undefined;
+    resultsPathname.value =  undefined;  
     calibrationRunsForForecast.value = [];
     calibrationRunForForecast.value = undefined;
     clearUserCalibrationRunData();
