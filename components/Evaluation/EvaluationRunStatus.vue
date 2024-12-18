@@ -7,13 +7,19 @@
             <div class="col-span-1">
               <table>
                 <tbody>
-                  <tr height="45px">
+                  <tr height="38px">
                     <td class="text-right font-bold">Submit Time</td>
                     <td class="pl-5">{{ startTime ? formatDateForDisplay( startTime ) : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="45px">
+                  <tr height="38px">
                     <td class="text-right font-bold">Elapsed Time</td>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
+                  </tr>
+                  <tr height="38px">
+                    <td class="text-right"><label for="iterationNum">Iteration</label></td>
+                    <td class="pl-5">
+                      {{ evaluateDisplayIterationNumber }}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -22,22 +28,45 @@
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
                 <tbody>
-                  <tr height="45px">
+                  <tr height="38px">
                     <td class="text-right"><label for="RunStatus">Status</label></td>
                     <td class="pl-5">
                       {{ validationStatus }}
                     </td>
                   </tr>
-                  <tr height="45px">
+                  <tr height="38px">
                     <td class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></td>
                     <td class="pl-5">
                       {{ displayValidationId }}
                     </td>
                   </tr>
-                  <tr height="45px">
-                    <td class="text-right"><label for="iterationNum">Iteration</label></td>
-                    <td class="pl-5">
-                      {{ evaluateDisplayIterationNumber }}
+                  <tr height="38px">
+                    <td class="pl-5" colspan="2">
+
+                      <!--BUTTONS - START-->
+                      <span v-if="validationStatus === 'Done'">                                              
+                        <div id="ResultsArea" class="ngenButtonDiv">
+                          <button class="font-normal" @click.stop="navigateToEvaluation">Go to Evaluation</button>
+                        </div>
+                      </span>
+
+                      <span v-else>
+                        
+                        <div v-if="!isStartHidden()" class="ngenButtonDiv-green h-8">
+                          <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
+                            Run
+                          </button>
+                        </div>
+                      
+                        <!--<div v-else class="h-8">&nbsp;</div>-->
+                    
+                        <div class="ngenButtonDiv-red h-8 hidden" v-if="!isCancelHidden()">
+                          <button class="font-normal" title="Cancel Button" @click="cancelRun()" 
+                            aria-label="Cancel Button">Cancel</button>
+                        </div>
+
+                      </span>                      
+                      <!--BUTTONS - END-->
                     </td>
                   </tr>                  
                 </tbody>
@@ -49,7 +78,7 @@
       </div>
     </div>
 
-
+<!--
     <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
       <div class="row-span-1">
         <span v-if="validationStatus === 'Done'">
@@ -82,7 +111,7 @@
         </span>
       </div>
     </div>
-
+-->
   </div>
 </template>
 
