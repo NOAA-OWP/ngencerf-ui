@@ -14,21 +14,21 @@
         <table>
           <tbody>
             <tr height="40px">
-              <td class="text-right font-bold">
+              <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Forecast Job ID</div>
-              </td>
+              </th>
               <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
             </tr>
             <tr height="32px">
-              <td class="text-right font-bold">
+              <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Submit Time</div>
-              </td>
+              </th>
               <td class="pl-5">{{ submitTime ?? '-'.repeat(30) }}</td>
             </tr>
             <tr height="32px">
-              <td class="text-right font-bold">
+              <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Elapsed Time</div>
-              </td>
+              </th>
               <td class="pl-5">{{ elapsedTime ?? '-'.repeat(30) }}</td>
             </tr>
           </tbody>
