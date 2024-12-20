@@ -168,14 +168,15 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   }
 
   const setSelectedForecastRowData = ( forecast_row_data: ForecastJob ): void => {
-    console.log( forecast_row_data )
     setSelectedForecastRunId( forecast_row_data.forecast_run_id );
+    setSelectedCalibrationRunId( forecast_row_data.calibration_run_id );
     forecastJobStatus.value = forecast_row_data.status;
   }
 
   const resetSelectedForecastRunId = (): void => {
     forecastJobId.value = undefined;
     forecastJobStatus.value = undefined;
+    resetSelectedCalibrationRunId();
   }
 
   /**
