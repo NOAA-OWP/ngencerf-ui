@@ -1,5 +1,5 @@
 import { defineStore, storeToRefs } from "pinia";
-import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastCycle } from "@/composables/NextGenModel";
+import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastCycle, ForecastJob } from "@/composables/NextGenModel";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
@@ -28,6 +28,11 @@ export const useForecastStore = defineStore('ForecastStore', () => {
 
   const uiGageId = ref<string>("");
 
+  const forecastRuns = ref([
+    {"forecast_run_id":1,"calibration_run_id":1,"gage_id":"01123000","job_genesis":"import","created_at":"2024-12-18T00:35:50.545158Z","status":"Done","calibration_start_period":"2014-10-01T00:00:00Z","calibration_end_period":"2016-05-18T23:00:00Z","formulation_name":"my-cfe-noah","submit_date":"2024-12-18T00:35:58.879486Z","objective_function":"KGE","optimization_algorithm":"DDS"},
+    {"forecast_run_id":2,"calibration_run_id":2,"gage_id":"01123000","job_genesis":"import","created_at":"2024-12-18T00:40:26.882348Z","status":"Running","calibration_start_period":"2014-10-01T00:00:00Z","calibration_end_period":"2016-05-18T23:00:00Z","formulation_name":"my-cfe-noah","submit_date":"2024-12-18T00:40:34.958684Z","objective_function":"KGE","optimization_algorithm":"DDS"}
+  ]);
+  
   /**
   * @returns {SelectOption[]}
   */
@@ -158,6 +163,21 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationJobId.value = 0;
   }
 
+  const setSelectedForecastRunId = (forecast_job_id: number): void => {
+    forecastJobId.value = forecast_job_id;
+  }
+
+  const setSelectedForecastRowData = ( forecast_row_data: ForecastJob ): void => {
+    console.log( forecast_row_data )
+    setSelectedForecastRunId( forecast_row_data.forecast_run_id );
+    forecastJobStatus.value = forecast_row_data.status;
+  }
+
+  const resetSelectedForecastRunId = (): void => {
+    forecastJobId.value = undefined;
+    forecastJobStatus.value = undefined;
+  }
+
   /**
    * Hard Reset Forecast Store
    */
@@ -197,6 +217,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationRunsForForecast,
     calibrationRunForForecast,
     uiGageId,
+    forecastRuns,
     loadSetupForecastTabData,
     loadForecastStatusRunTabData,
     loadForecastTab,
@@ -209,6 +230,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     resetSelectedCalibrationRunId,
     getStatus,
     hardResetForecastStore,
+    setSelectedForecastRunId,
+    resetSelectedForecastRunId,
+    setSelectedForecastRowData
   };
 }, {
   persist: {
