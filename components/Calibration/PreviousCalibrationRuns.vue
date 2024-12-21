@@ -89,7 +89,8 @@ const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
-const { hardResetRunStatusStore } = useRunStatusStore();
+const { overallCalibrationValidatinStatus } = storeToRefs(useRunStatusStore());
+const { loadRunStatusStore, hardResetRunStatusStore } = useRunStatusStore();
 import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
@@ -119,6 +120,7 @@ onMounted(() => {
     hardResetTuningStore();
     hardResetRunStatusStore();
     fetchUserCalibrationJobsListData();
+    loadRunStatusStore();
   }
 })
 

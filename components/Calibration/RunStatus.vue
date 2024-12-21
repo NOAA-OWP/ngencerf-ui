@@ -36,22 +36,9 @@
                   <tr height="38px">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
                     <td class="pl-5">
-                      <span v-if="calibrationStatus !== 'Done'">
-                        <input id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md"
-                          style="background-color: white;" v-model="calibrationStatus" disabled />
-                      </span>
-                      <span v-else-if="calibrationStatus === 'Done' && !validControlAndValidBestStatus" id="RunStatus"
+                      <span id="RunStatus" 
                         class="dummyProgress ml-2 whitespace-nowrap text-md" style="background-color: white;">
-                        Calibration Done, Validation Running
-                      </span>
-                      <span v-else-if="calibrationStatus === 'Done' && validControlAndValidBestStatus === 'Done'"
-                        id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md"
-                        style="background-color: white;">
-                        Done
-                      </span>
-                      <span v-else-if="calibrationStatus === 'Done' && validControlAndValidBestStatus" id="RunStatus"
-                        class="dummyProgress ml-2 whitespace-nowrap text-md" style="background-color: white;">
-                        Calibration Done, Validation {{ validControlAndValidBestStatus }}
+                        {{ overallCalibrationValidationStatus }}
                       </span>
                     </td>
                   </tr>
@@ -208,7 +195,10 @@ const {
   calibrationStatusIntervalId,
   validationsStatusIntervalId,
   validControlAndValidBestStatus,
-  resultsPathname
+  validationControlStatus,
+  validationBestStatus,
+  resultsPathname,
+  overallCalibrationValidationStatus
 } = storeToRefs(runStatusStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -254,8 +244,14 @@ onMounted(() => {
       const validations = getStatusResponse?._data?.validations;
       const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
       const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
-      if (validControl && validBest) {
-        validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validControl, validBest);
+      if (validControl?.status) {
+      validationControlStatus.value = validControl.status;
+      }
+      if (validBest?.status) {
+        validationBestStatus.value = validBest.status;
+      }
+      if (validationControlStatus?.value && validationBestStatus?.value) {
+        validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
       }
     }
   });
@@ -364,8 +360,14 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         const validations = getStatusResponse?._data?.validations;
         const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
-        if (validControl && validBest) {
-          validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validControl, validBest);
+        if (validControl?.status) {
+          validationControlStatus.value = validControl.status;
+        }
+        if (validBest?.status) {
+          validationBestStatus.value = validBest.status;
+        }
+        if (validationControlStatus?.value && validationBestStatus?.value) {
+          validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
         }
 
         // Calculate Running Time every second while calibration is Running or calibration is Done and valid_control and valid_best have not started or are Ready or Running
@@ -448,8 +450,14 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             const validations = getStatusResponse?._data?.validations;
             const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
             const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
-            if (validControl && validBest) {
-              validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validControl, validBest);
+            if (validControl?.status) {
+              validationControlStatus.value = validControl.status;
+            }
+            if (validBest?.status) {
+              validationBestStatus.value = validBest.status;
+            }
+            if (validationControlStatus?.value && validationBestStatus?.value) {
+              validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
             }
 
             // if valid_control and valid_best are Done, Cancelled, Failed, or Server error, clear the interval
@@ -468,8 +476,15 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
         // get elapsed time from valid_best
-        if (validControl && validBest) {
+        if (validBest?.elapsed_time) {
           elapsedTime.value = validBest.elapsed_time;
+        }
+        
+        if (validControl?.status) {
+          validationControlStatus.value = validControl.status;
+        }
+        if (validBest?.status) {
+          validationBestStatus.value = validBest.status;
         }
       }
 
