@@ -39,47 +39,6 @@
           <td class="td2">&nbsp;</td>
         </tr>
         <tr>
-          <td class="td1"><span class="text-1xl" style="font-size:1.15em;">SLoTH Variables</span></td>
-          <td class="td2">Simple Logical Tautology Handler (SLoTH) variables enable testing a module without having all
-            necessary upstream
-            modules in the formulation. The user defines a SLoTH variable to hold expected output and maps it to
-            the module variable requiring the data. For more details see
-            <a href="https://github.com/NOAA-OWP/SLoTH" target="_blank" class="underline">NOAA-OWP SLoTH Repository</a>
-            REAMDE file.<br />
-          </td>
-        </tr>
-        <tr>
-          <td class="td1">Add SLoTH output variable for formulation:</td>
-          <td class="td2">Selecting this checkbox will present the user with a field to create the name SLoTH variable
-            and a
-            button to add it to the formulation.</td>
-        </tr>
-        <tr>
-          <td class="td1">SLoTH Name:</td>
-          <td class="td2">SLoTH variable name to add to SLoTH table.
-          </td>
-        </tr>
-        <tr>
-          <td class="td1">Add Button:</td>
-          <td class="td2">Adds SLoTH variable name specified in the name field to the table of SLoTH Variables.
-            User must supply all fields in the table row for the added variable.
-          </td>
-        </tr>
-        <tr>
-          <td class="td1">SLoTH Variable Table:</td>
-          <td class="td2">Columns: (All columns must be entered.)<br>
-             <b>SLoTH Output Var</b>: User defined name.<br />
-            <b>Count</b>: Number of variables<br />
-            <b>Type</b>: Data type of elements<br />
-            <b>Units</b>: Dimensions<br />
-            <b>Location</b>: node (always node)<br />
-            <b>For Module</b>: Name of module to received SLoTH variable<br />
-            <b>Module Param</b>: Module Parameter name to receive the SLoTH variable value<br />
-            <b>Value</b>: Value of variable<br />
-            <b>HINT: </b>To change the variable name, right-click and delete it then Add a new variable.<br />
-          </td>
-        </tr>
-        <tr>
           <td class="td1">Save Button:</td>
           <td class="td2">Save data from the tab. Partial saves are allowed.</td>
         </tr>
