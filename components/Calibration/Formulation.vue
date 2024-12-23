@@ -49,8 +49,10 @@
           </div>
           <div class="col-span-1">&nbsp;</div>
         </div>
-        <div class="mt-3 mb-5 hr"></div>
+<!--        <div class="mt-3 mb-5 hr"></div> -->
       </div>
+<!--
+      /* Don't Display this implemented SLoTH capability until available to send SLoTH variables to ngen-cal */
       <div class="row-span-2 -mt-2">
 
         <div class="flex">
@@ -125,7 +127,7 @@
           </DataTable>
         </div>
       </div>
-
+-->
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3 ActionButtonsBox">
         <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
           <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
@@ -350,7 +352,7 @@ const validateTab = () => {
       }
     })
   }
-  /* Has user checked/unchecked Add SLoTH outpu8t variables? */
+  /* Has user checked/unchecked Add SLoTH output variables? */
   if (useSlothParameters.value !== userCalibrationRunData?.value?.use_sloth) {
     error = true;
     text.push("Add SLoth output has changed");

@@ -42,7 +42,7 @@
               <td class="text-right font-bold">
                 <div style="width: 140px;">Status</div>
               </td>
-              <td class="pl-5">{{ forecastJobStatus ?? '-'.repeat(30) }}</td>
+              <td class="pl-5">{{ forecastJobStatus ?? 'Ready' }}</td>
             </tr>
             <tr height="32px">
               <td class="text-right font-bold">
@@ -72,7 +72,7 @@
     <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
       <div class="row-span-1">
         <div class="grid grid-cols-8">
-          <span v-if="forecastJobStatus === 'Ready'">
+          <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
             <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
               <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startForecastRun()">
                 Run
@@ -80,10 +80,18 @@
             </div>
           </span>
           <span v-if="forecastJobStatus === 'Running'">
-            <div class="col-span-1 mr-3"><!--c-blue font-normal text-xl underline pt-1-->
+            <div class="col-span-1 mr-3">
               <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelForecastRun()"
                 aria-label="Cancel Button">
                 Cancel
+              </button>
+            </div>
+          </span>
+          <span v-if="forecastJobStatus === 'Done'">
+            <div class="col-span-1 mr-3">
+              <button class="ngenButtonDiv ml-6 font-normal h-8" title="View Results Button" @click="viewResults()"
+                aria-label="View Results Button">
+                View Results
               </button>
             </div>
           </span>
@@ -116,6 +124,7 @@ const {
   elapsedTimeIntervalId,
   forecastJobStatusIntervalId,
   resultsPathname,
+  calibrationRunForForecast,
 } = storeToRefs(useForecastStore()); 
 
 const {
@@ -123,6 +132,7 @@ const {
   loadForecastStatusRunTabData,
   loadForecastTab,
   createAndRunForecastJob,
+  cancelForecastJob,
   getStatus,
 } = useForecastStore();
 
@@ -184,7 +194,7 @@ const startForecastRun = async () => {
   forecastJobStatus.value = 'Submitted';
 
   try {
-    const createAndRunForecastJobResponse = await createAndRunForecastJob(forecastCycle?.value?.name as string);
+    const createAndRunForecastJobResponse = await createAndRunForecastJob(calibrationRunForForecast?.value?.calibration_run_id as number, forecastCycle?.value?.name as string);
 
     if (createAndRunForecastJobResponse?._data?.status) {
       forecastJobStatus.value = createAndRunForecastJobResponse._data.status;
@@ -210,8 +220,23 @@ const startForecastRun = async () => {
 /**
  * Cancel the forecast run
  */
-const cancelForecastRun = () => {
-  console.log('cancelForecastRun');
+const cancelForecastRun = async () => {
+  try {
+    const cancelForecastJobResponse = await cancelForecastJob();
+
+    if (cancelForecastJobResponse?._data?.status) {
+      forecastJobStatus.value = cancelForecastJobResponse._data.status;
+
+      if (forecastJobStatus.value !== 'Cancelled') {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL' });
+      }
+      await loadForecastStatusRunTabData();
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get Forecast status from server' });
+    }
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Forecast job' });
+  }
 };
 
 /**
