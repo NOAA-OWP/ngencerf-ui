@@ -7,6 +7,20 @@
 
   </div>
   <hr class="mt-2 mb-4" />
+  <table class="_help-table">
+      <tbody>
+        <tr>
+          <td class="td1">New Validation Button</td>
+          <td class="td2">Select an alternate iteration to run a validation to generate the associated plots.</td>
+        </tr>
+        <tr>
+          <td class="td1">Show Calibration Details Link</td>
+          <td class="td2">A window will be displayed summarizing the details for the calibration.</td>
+        </tr>
+      </tbody>
+    </table>
+
+  <hr class="mt-2 mb-4" />
   <p class="text-center" style="font-weight: bold;">Calibration Plots</p>
   <table class="_help-table">
       <tbody>
