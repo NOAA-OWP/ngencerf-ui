@@ -240,7 +240,7 @@ onMounted(() => {
 
     // if calibration is Done, check if all validation statuses are Done
     if (userCalibrationRunData?.value?.status === 'Done') {
-      const getStatusResponse = await queryGetCalibrationStatus();
+      const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
       const validations = getStatusResponse?._data?.validations;
       const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
       const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
@@ -356,7 +356,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       if (submitTimeDate.value && submitTimeDate.value instanceof Date && !isNaN(submitTimeDate?.value.getTime())) {
         submitTime.value = convertTimeZone(submitTimeDate.value); // create a string from submit_date and convert it to local time format
 
-        const getStatusResponse = await queryGetCalibrationStatus();
+        const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
         const validations = getStatusResponse?._data?.validations;
         const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
@@ -446,7 +446,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         // create an interval to keep checking validation statuses every 10 seconds while valid_control and valid_best are not Done, Cancelled, Failed, or Server error
         if (!validationsStatusIntervalId.value) {
           validationsStatusIntervalId.value = setInterval(async () => {
-            const getStatusResponse = await queryGetCalibrationStatus();
+            const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
             const validations = getStatusResponse?._data?.validations;
             const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
             const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
@@ -471,7 +471,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       }
 
       else if (['Done', 'Cancelled', 'Failed', 'Server Error'].includes(validControlAndValidBestStatus.value ?? '')) {
-        const getStatusResponse = await queryGetCalibrationStatus();
+        const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
         const validations = getStatusResponse?._data?.validations;
         const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');

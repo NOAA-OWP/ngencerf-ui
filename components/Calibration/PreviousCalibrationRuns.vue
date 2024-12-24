@@ -20,7 +20,7 @@
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white boxed" ref="crContextMenu"
             :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-          <DataTable id="cr-list" :value="userCalibrationJobsListData" sortField="calibration_run_id" :sortOrder="-1"
+          <DataTable id="cr-list" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id" :sortOrder="-1"
             scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
             @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
@@ -66,7 +66,7 @@
 import { onMounted } from "vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import type { JobListItem } from "@/composables/NextGenModel";
+import type { JobListItem, ValidationJobListItem } from "@/composables/NextGenModel";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
@@ -77,6 +77,7 @@ import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
+import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
@@ -89,14 +90,15 @@ const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
-const { overallCalibrationValidatinStatus } = storeToRefs(useRunStatusStore());
-const { loadRunStatusStore, hardResetRunStatusStore } = useRunStatusStore();
+const { overallCalibrationValidationStatus } = storeToRefs(useRunStatusStore());
+const { queryGetCalibrationStatus, hardResetRunStatusStore } = useRunStatusStore();
 import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 const isLoading = ref(true);
 const selectedCalibrationRun = ref<JobListItem>();
+const updatedUserCalibrationJobsListData = ref<JobListItem[]>();
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
@@ -120,7 +122,8 @@ onMounted(() => {
     hardResetTuningStore();
     hardResetRunStatusStore();
     fetchUserCalibrationJobsListData();
-    loadRunStatusStore();
+    // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
+    updateUserCalibrationJobsListData();
   }
 })
 
@@ -261,6 +264,46 @@ const acceptDelete = (selectedRunId: number) => {
   });
   selectedCalibrationRun.value = undefined;
 }
+
+/**
+ * Populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
+ */
+const updateUserCalibrationJobsListData = async (): Promise<void>  => {
+  updatedUserCalibrationJobsListData.value = await Promise.all(
+    userCalibrationJobsListData.value // .filter((job: JobListItem) => job.status === 'Done')
+    .map(async (job: JobListItem) => {
+      if (job.status === 'Done') {
+        const getStatusResponse: any = await queryGetCalibrationStatus(job.calibration_run_id);
+
+        if (getStatusResponse.status === 200) {
+          const validationControlJob: ValidationJobListItem | undefined = getStatusResponse?._data?.validations?.find(
+          (validationJob: ValidationJobListItem) => validationJob.validation_type === 'valid_control');
+
+          const validationBestJob: ValidationJobListItem | undefined = getStatusResponse?._data?.validations?.find(
+            (validationJob: ValidationJobListItem) => validationJob.validation_type === 'valid_best');
+
+          const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
+            job.status,
+            validationControlJob?.status,
+            validationBestJob?.status
+          );
+          
+          // save userCalibrationJobsListData with the updated status for the job
+          return {
+            ...job,
+            status: overallCalibrationValidationStatus
+          }; 
+        } else {
+          toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to get calibration status', life: 10000 });
+          return job;
+        }
+      } else {
+        return job;
+      }
+    })
+  );
+};
+
 
 </script>
 
