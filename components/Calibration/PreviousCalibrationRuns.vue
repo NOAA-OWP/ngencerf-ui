@@ -90,7 +90,6 @@ const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
-const { overallCalibrationValidationStatus } = storeToRefs(useRunStatusStore());
 const { queryGetCalibrationStatus, hardResetRunStatusStore } = useRunStatusStore();
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -271,12 +270,12 @@ const acceptDelete = (selectedRunId: number) => {
 const updateUserCalibrationJobsListData = async (): Promise<void>  => {
   // set updatedUserCalibrationJobsListData to userCalibrationJobsListData, but with the updated status for the job to include the validation status
   updatedUserCalibrationJobsListData.value = await Promise.all(
-    userCalibrationJobsListData.value // .filter((job: JobListItem) => job.status === 'Done')
-    .map(async (job: JobListItem) => {
+    userCalibrationJobsListData.value
+    .map(async (calibrationJob: JobListItem) => {
       // if the job is done, get the calibration status to include the validation status
-      if (job.status === 'Done') {
+      if (calibrationJob.status === 'Done') {
         // get the calibration status
-        const getStatusResponse: any = await queryGetCalibrationStatus(job.calibration_run_id);
+        const getStatusResponse: any = await queryGetCalibrationStatus(calibrationJob.calibration_run_id);
 
         if (getStatusResponse.status === 200) {
           // get validation control and best jobs
@@ -288,23 +287,23 @@ const updateUserCalibrationJobsListData = async (): Promise<void>  => {
 
           // get the overall calibration/validation status
           const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
-            job.status,
+            calibrationJob.status,
             validationControlJob?.status,
             validationBestJob?.status
           );
           
           // save userCalibrationJobsListData with the updated status for the job
           return {
-            ...job,
+            ...calibrationJob,
             status: overallCalibrationValidationStatus
           }; 
         } else {
           toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to get calibration status', life: 10000 });
-          return job;
+          return calibrationJob;
         }
       } else {
         // Calibration is not done, so just return the job data with the status as is
-        return job;
+        return calibrationJob;
       }
     })
   );

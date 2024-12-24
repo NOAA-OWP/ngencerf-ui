@@ -231,7 +231,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   /**
    * fetch user validation jobs associated with the selected calibration run
    * @param {number} calibrationRunId
-   * @return {Promise<JobsList>}
+   * @return {Promise<ValidationJobsList>}
    */
   const getValidationJobs = async (calibrationRunId: number): Promise<ValidationJobsList> => {
     const getValidationJobsResponse: any = await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_validation_jobs/`, {
