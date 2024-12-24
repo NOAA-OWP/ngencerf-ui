@@ -61,7 +61,7 @@ export const fixFloatToFivePlaces = (f: number) => {
 };
 
 /**
- * Get overall Calibration/Validation status
+ * Get overall Calibration/Validation status to display in PreviousCalibrationsRuns and RunStatus tabs
  * @param calibrationStatus
  * @param validationControlStatus
  * @param validationBestStatus
@@ -71,6 +71,7 @@ export const getOverallCalibrationValidationStatus = (
   calibrationStatus: string, 
   validationControlStatus?: string, 
   validationBestStatus?: string): string => {
+  // simply show calibration status if it is not 'Done'  
   if (calibrationStatus !== 'Done') {
     return `Calibration ${calibrationStatus}`;
   } else if (calibrationStatus === 'Done' && validationControlStatus && validationControlStatus === 'Running') {
@@ -84,6 +85,7 @@ export const getOverallCalibrationValidationStatus = (
     ) {
     return 'Done';
   } else if (calibrationStatus === 'Done' && validationControlStatus && validationBestStatus) {
+    // get the overall status of validation control and validation best
     const validationControlBestStatus = getValidControlAndValidBestStatus(validationControlStatus, validationBestStatus);
     return `Calibration Done, Validation ${validationControlBestStatus}`;
   }

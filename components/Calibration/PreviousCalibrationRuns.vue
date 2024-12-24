@@ -269,19 +269,24 @@ const acceptDelete = (selectedRunId: number) => {
  * Populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
  */
 const updateUserCalibrationJobsListData = async (): Promise<void>  => {
+  // set updatedUserCalibrationJobsListData to userCalibrationJobsListData, but with the updated status for the job to include the validation status
   updatedUserCalibrationJobsListData.value = await Promise.all(
     userCalibrationJobsListData.value // .filter((job: JobListItem) => job.status === 'Done')
     .map(async (job: JobListItem) => {
+      // if the job is done, get the calibration status to include the validation status
       if (job.status === 'Done') {
+        // get the calibration status
         const getStatusResponse: any = await queryGetCalibrationStatus(job.calibration_run_id);
 
         if (getStatusResponse.status === 200) {
+          // get validation control and best jobs
           const validationControlJob: ValidationJobListItem | undefined = getStatusResponse?._data?.validations?.find(
           (validationJob: ValidationJobListItem) => validationJob.validation_type === 'valid_control');
 
           const validationBestJob: ValidationJobListItem | undefined = getStatusResponse?._data?.validations?.find(
             (validationJob: ValidationJobListItem) => validationJob.validation_type === 'valid_best');
 
+          // get the overall calibration/validation status
           const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
             job.status,
             validationControlJob?.status,
@@ -298,6 +303,7 @@ const updateUserCalibrationJobsListData = async (): Promise<void>  => {
           return job;
         }
       } else {
+        // Calibration is not done, so just return the job data with the status as is
         return job;
       }
     })
