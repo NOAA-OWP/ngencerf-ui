@@ -29,8 +29,7 @@
         </tr>
         <tr>
           <td class="td1">Forcing:</td>
-          <td class="td2">Pull down to select Forcing data source for the selected gage. Either Data Services for Enterprise
-            Hydrofabric Services or Upload to upload from local computer. <br /> <br />
+          <td class="td2">Pull down to select Forcing data source for the selected gage. Either AORC or Upload to upload from local computer. <br /> <br />
             A gage must have already been selected to upload a file. Upload allows the user to specify their own csv 
             file containing hourly time-series details of forcing data. The files (one per catchment in the headwater 
             basin for the selected gage)

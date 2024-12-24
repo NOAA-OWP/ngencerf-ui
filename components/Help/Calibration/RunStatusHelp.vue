@@ -61,6 +61,10 @@
           <td class="td1">Cancel Button:</td>
           <td class="td2">Stop/cancel the calibration before it has completed. Appears only when a job is running.</td>
         </tr>
+        <tr>
+          <td class="td1">Go To Evaluation Button:</td>
+          <td class="td2">Got the Evaluation workflow to view more details about the run, including plots, plot data, performance metrics and logs.</td>
+        </tr>
 
       </tbody>
     </table>
