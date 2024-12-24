@@ -3,7 +3,7 @@
     <div class="_help-title">ngenCERF Calibration Workflow - Tuning Controls Tab</div>
     <div class="_help-subtitle">
         This tab provides the user the ability to select the time periods to run the calibration, 
-        the time periods for an automatic validation after calibration is complete based on the best set of parameters
+        the time periods for an automatic validation based on the best set of parameters 
         determined during the calibration process, the output variable to calibrate and which module parameters for 
         the selected formulation to tune during calibration.
     </div>
@@ -106,7 +106,8 @@
         
         <tr>
           <td class="td1">Load Params Button:</td>
-          <td class="td2">Click this to upload calibration tuning parameters from text file.</td>
+          <td class="td2">Click this to upload calibration tuning parameters from text file. If a parameter in the table is also in the updloaded file,
+            the value from the file will overwrite the table value.</td>
         </tr>
         <tr>
           <td class="td1">Name:</td>
@@ -115,19 +116,19 @@
         <tr>
           <td class="td1">Parameter Table:</td>
           <td class="td2">Lists the calibration parameters chosen. The source for these entries can be from the Name
-            dropdown or uploaded from a file. User must supply the minimum, maximum and initial values.</td>
+            dropdown or uploaded from a file. Minimum, maximum and initial values must be provided.</td>
+        </tr>
+        <tr>
+          <td class="td1">Clear Link:</td>
+          <td class="td2">Clear all entries in the parameters table.</td>
         </tr>
         <tr>
           <td class="td1">Save Button:</td>
           <td class="td2">Save data from the tab. Partial saves are allowed.</td>
         </tr>
         <tr>
-          <td class="td1">Reset Link:</td>
-          <td class="td2">Reset data to default information for the Tuning Controls Tab only.</td>
-        </tr>
-        <tr>
           <td class="td1">Next Button:</td>
-          <td class="td2">Move to the Tuning Controls Tab. If there is any unsaved data, the user will first be prompted
+          <td class="td2">Move to the Optimization / Metrics Tab. If there is any unsaved data, the user will first be prompted
             to save.</td>
         </tr>
         <tr>
