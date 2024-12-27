@@ -59,11 +59,11 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   };
 
   /**
-   * Get Calibration/Validation Logs
+   * Get Calibration/Validation Log Names
    * @return {any}
    */
-  const queryGetLogs = async (validation_run_id: number=0): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_logs/`, {
+  const queryGetLogNames = async (validation_run_id: number=0): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -71,6 +71,33 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
       },
       body: JSON.stringify({
         validation_run_id: validation_run_id
+      })
+    });
+  };
+
+  /**
+   * Get Calibration/Validation Log Data
+   * @return {any}
+   */
+  const queryGetLogData = async (
+    log_category: string,
+    log_name: string,
+    validation_run_id: number=0,
+    start?: number,
+    limit?: number
+  ): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        validation_run_id: validation_run_id,
+        log_category: log_category,
+        log_name: log_name,
+        start: start !== undefined ? start.toString() : '',
+        limit: limit !== undefined ? limit.toString() : ''
       })
     });
   };
@@ -83,7 +110,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedPlotFileUrl,
     queryGetIterations,
     queryGetPerformanceMetrics,
-    queryGetLogs,
+    queryGetLogNames,
+    queryGetLogData,
   };
 },
 {
