@@ -106,74 +106,29 @@
         <Column v-for="( col, colIndex ) in performanceMetricsColumns" :key="colIndex" :header="col.header"
           :field="col.field"></Column>
       </DataTable>
-      <div class="pl-4" v-if="calibrationLogList && calibrationLogList.length > 0 && selectedSupplementalTable === 4">
-        <div v-if="calibrationLogList.length > 1">
-          <label for="CalibrationLogOptions" class="pr-2 pt-3">Select Calibration Log</label>
-          <Select id="CalibrationLogOptions" class="p-select"  
-            v-model="selectedCalibrationLog" :options="calibrationLogList" optionLabel="name" optionValue="name">
+    </div>
+    <div id="LogDisplayArea" class="p-2" v-if="selectedLogCategory != '' && selectedLogList && selectedLogList.length > 0">
+      <div class="pl-4">
+        <div v-if="selectedLogList.length > 1">
+          <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
+          <Select id="selectedLogOptions" class="p-select"  
+            v-model="selectedLogName" :options="selectedLogList" optionLabel="name" optionValue="name">
           </Select>
         </div>
-        <div v-if="calibrationLogList.length === 1" style="font-size: 0.9em;"><b style="width:160px; display:inline-block;">Log File Name</b> {{ selectedCalibrationLog }}</div>
+        <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b style="width:160px; display:inline-block;">Log File Name</b> {{ selectedLogName }}</div>
 
         <div class="flex justify-end" style="margin-top:-23px;">
             <div class="ml-auto">
-                <div>Rows {{ calibrationLogStartRow }} to {{ calibrationLogEndRow }} of {{ calibrationLogTotalSize }}</div>
+                <div>Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
                 <Paging
-                v-model:currentPage="calibrationLogCurrentPage"
-                :totalPages=calibrationLogTotalPages
+                v-model:currentPage="selectedLogCurrentPage"
+                :totalPages=selectedLogTotalPages
                 />
             </div>
         </div>
 
-        <div id="CalibrationLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
-          <div v-html="calibrationLogDisplay" class="whitespace-nowrap"></div>
-        </div>
-      </div>
-      <div class="pl-4" v-if="validationLogList && validationLogList.length > 0 && selectedSupplementalTable === 5">
-        <div v-if="validationLogList.length > 1">
-          <label for="validationLogOptions" class="pr-2 pt-3">Select Validation Log</label>
-          <Select id="validationLogOptions" class="p-select" 
-            v-model="selectedValidationLog" :options="validationLogList" optionLabel="name" optionValue="name">
-          </Select>
-        </div>
-        <div v-if="validationLogList.length === 1" style="font-size: 0.9em;"><b style="width:160px; display:inline-block;">Log File Name</b> {{ selectedValidationLog }}</div>        
-
-        <div class="flex justify-end" style="margin-top:-23px;">
-            <div class="ml-auto">
-                <div>Rows {{ validationLogStartRow }} to {{ validationLogEndRow }} of {{ validationLogTotalSize }}</div>
-                <Paging
-                v-model:currentPage="validationLogCurrentPage"
-                :totalPages=validationLogTotalPages
-                />
-            </div>
-        </div>
-
-        <div id="ValidationLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
-          <div v-html="validationLogDisplay" class="whitespace-nowrap"></div>
-        </div>
-      </div>
-
-      <div class="pl-4" v-if="globalLogList && globalLogList.length > 0 && selectedSupplementalTable === 6">
-        <div v-if="globalLogList.length > 1">
-          <label for="globalLogOptions" class="pr-2 pt-3">Select Global Log</label>
-          <Select id="globalLogOptions" class="p-select" 
-            v-model="selectedGlobalLog" :options="globalLogList" optionLabel="name" optionValue="name">
-          </Select>
-        </div>
-        <div v-if="globalLogList.length === 1" style="font-size: 0.9em;"><b style="width:160px; display:inline-block;">Log File Name</b> {{ selectedGlobalLog }}</div>        
-
-        <div class="flex justify-end" style="margin-top:-23px;">
-            <div class="ml-auto">
-                <div>Rows {{ globalLogStartRow }} to {{ globalLogEndRow }} of {{ globalLogTotalSize }}</div>
-                <Paging
-                v-model:currentPage="globalLogCurrentPage"
-                :totalPages=globalLogTotalPages
-                />
-            </div>
-        </div>
-
-        <div id="GlobalLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
-          <div v-html="globalLogDisplay" class="whitespace-nowrap"></div>
+        <div id="selectedLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
+          <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
     </div>
@@ -254,40 +209,23 @@ const iterationParamsColumns = ref<any[]>([]);
 const selectedSupplementalTable = ref<number>( 0 );
 const performanceMetrics = ref<APIResponse>({});
 const performanceMetricsData = ref<any[]>([]);
-const logs = ref<APIResponse>({});
 const performanceMetricsColumns = [{ header: 'Metric', field: 'metric' }];
+const logs = ref<APIResponse>({});
 const logDataPageSize = ref<number>(1000);
-const calibrationLogList = ref<any[]>([]);
-const calibrationLogDisplay = ref<string>('');
-const selectedCalibrationLog = ref<string>('');
-const calibrationLogTotalSize = ref<number>(0);
-const calibrationLogCurrentPage = ref<number>(1);
-const calibrationLogTotalPages = ref<number>(1);
-const calibrationLogStartRow = ref<number>(1);
-const calibrationLogEndRow = ref<number>(logDataPageSize.value);
-const validationLogList = ref<any[]>([]);
-const validationLogDisplay = ref<string>('');
-const selectedValidationLog = ref<string>('');
-const validationLogTotalSize = ref<number>(0);
-const validationLogCurrentPage = ref<number>(1);
-const validationLogTotalPages = ref<number>(1);
-const validationLogStartRow = ref<number>(1);
-const validationLogEndRow = ref<number>(logDataPageSize.value);
-const globalLogList = ref<any[]>([]);
-const globalLogDisplay = ref<string>('');
-const selectedGlobalLog = ref<string>('');
-const globalLogTotalSize = ref<number>(0);
-const globalLogCurrentPage = ref<number>(1);
-const globalLogTotalPages = ref<number>(1);
-const globalLogStartRow = ref<number>(1);
-const globalLogEndRow = ref<number>(logDataPageSize.value);
+const logLists = ref<DynamicObject>({});
+const selectedLogCategory = ref<string>('');
+const selectedLogList = ref<any[]>([]);
+const selectedLogName = ref<string>('');
+const selectedLogDisplay = ref<string>('');
+const selectedLogTotalSize = ref<number>(0);
+const selectedLogCurrentPage = ref<number>(1);
+const selectedLogTotalPages = ref<number>(1);
+const selectedLogStartRow = ref<number>(1);
+const selectedLogEndRow = ref<number>(logDataPageSize.value);
 const supplementalTableOptions = [
   'Iteration Metrics Table',
   'Iteration Parameters Table',
-  'Performance Metrics Table',
-  'Calibration Logs',
-  'Validation Logs',
-  'Global Logs'
+  'Performance Metrics Table'
 ]
 
 onMounted( () => {
@@ -326,6 +264,13 @@ onMounted( () => {
     }
     
     //console.log('userCalibrationRunData: ', userCalibrationRunData.value);
+    
+    // Add Supplemental Table Options to the dropdown
+    for (let t = 0; t < supplementalTableOptions.length; t++) {
+      if (!plotList.value.some(item => item.name === supplementalTableOptions[t])) {
+        plotList.value.push({ name: supplementalTableOptions[t], description: '' });
+      }
+    }
 
     // Get Names of ALL Logs
     if (!logs.value?._data || !logs.value?._data?.length) {
@@ -334,30 +279,24 @@ onMounted( () => {
       );
       console.log('logs: ', logs.value);
       for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-        if (logs.value?._data?.log_names[l]?.calibration) {
-          for (let n = 0; n < logs.value?._data?.log_names[l]?.calibration.length; n++) {
-            calibrationLogList.value.push({'name': logs.value?._data?.log_names[l]?.calibration[n]});
+        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+          let logList = [];
+          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+            logList.push({'name': logs.value?._data?.log_names[l][key][n]});
           }
-        } else if (logs.value?._data?.log_names[l]?.validation) {
-          for (let n = 0; n < logs.value?._data?.log_names[l]?.validation.length; n++) {
-            validationLogList.value.push({'name': logs.value?._data?.log_names[l]?.validation[n]});
-          }
-        } else if (logs.value?._data?.log_names[l]?.global) {
-          for (let n = 0; n < logs.value?._data?.log_names[l]?.global.length; n++) {
-            globalLogList.value.push({'name': logs.value?._data?.log_names[l]?.global[n]});
-          }
+          logLists.value[key] = logList;
+        });
+      }
+      
+      // Add Log Options to the dropdown
+      Object.keys(logLists.value).forEach(key => {
+        let optionName = capitalCase(key) + ' Logs';
+        if (!plotList.value.some(item => item.name === optionName)) {
+          plotList.value.push({ name: optionName, description: '' });
         }
-      }
-      console.log('calibrationLogList: ', calibrationLogList.value);
-      console.log('validationLogList: ', validationLogList.value);
-      console.log('globalLogList: ', globalLogList.value);
-    }
-    
-    // Add Supplemental Table Options to the dropdown
-    for (let t = 0; t < supplementalTableOptions.length; t++) {
-      if (!plotList.value.some(item => item.name === supplementalTableOptions[t])) {
-        plotList.value.push({ name: supplementalTableOptions[t], description: '' });
-      }
+      });
+
+      console.log('logLists: ', logLists.value);
     }
   })
 });
@@ -365,6 +304,7 @@ onMounted( () => {
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   // is the selected option a plot or iteration table?
+  // console.log('selectedPlotName: ', selectedPlotName.value);
   if (selectedPlotName.value && supplementalTableOptions.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
@@ -509,35 +449,23 @@ watch(selectedPlotName, async () => {
       if (!performanceMetricsData.value.length) {
         toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: 5000 });
       }
-    } else if (selectedSupplementalTable.value === 4) {
-      if (calibrationLogList.value.length && !calibrationLogList.value.some(item => item.name === selectedCalibrationLog.value)) {
-        // start with the first log if one isn't already selected
-        selectedCalibrationLog.value = calibrationLogList.value[0].name;
-      }
-      if (!calibrationLogList.value.length) {
-        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no logs', life: 5000 });
-      }
-    } else if (selectedSupplementalTable.value === 5) {
-      if (validationLogList.value.length && !validationLogList.value.some(item => item.name === selectedValidationLog.value)) {
-        // start with the first log if one isn't already selected
-        selectedValidationLog.value = validationLogList.value[0].name;
-      }
-      if (!validationLogList.value.length) {
-        toast.add({ severity: 'info', summary: 'Validation Run ' + evaluateValidationRunId.value + ' has no logs', life: 5000 });
-      }
-    } else if (selectedSupplementalTable.value === 6) {
-      if (globalLogList.value.length && !globalLogList.value.some(item => item.name === selectedGlobalLog.value)) {
-        // start with the first log if one isn't already selected
-        selectedGlobalLog.value = globalLogList.value[0].name;
-      }
-      if (!globalLogList.value.length) {
-        toast.add({ severity: 'info', summary: 'Global Logs are unavailable', life: 5000 });
-      }
     }
     plotTableData.value = [];
     plotTableColumns.value = [];
+    selectedLogCategory.value = '';
+    selectedLogList.value = [];
+  } else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs","").toLowerCase() in logLists.value) {
+    selectedPlotFilename.value = null;
+    selectedPlotFileUrl.value = null;
+    plotTableData.value = [];
+    plotTableColumns.value = [];
+    selectedSupplementalTable.value = 0;
+    selectedLogName.value = '';
+    selectedLogCategory.value = selectedPlotName.value.replace(" Logs","").toLowerCase();
   } else if (selectedPlotName.value) {
     selectedSupplementalTable.value = 0;
+    selectedLogCategory.value = '';
+    selectedLogList.value = [];
     plotTableCurrentPage.value = 1;
     
     // get selected plot file name and url from server
@@ -643,7 +571,7 @@ watch(selectedPlotName, async () => {
 
 // Handle selectedPlotTable changes
 watch(selectedPlotTable, async () => {
-  console.log('selectedPlotName changed');
+  //console.log('selectedPlotName changed');
   if (selectedPlotTable.value !== '') {
     plotTableData.value = plotTables.value[selectedPlotTable.value];
     adjustPlotTableColumns();
@@ -652,7 +580,7 @@ watch(selectedPlotTable, async () => {
 
 // set plotTableColumns whenever plotTableData is changed
 function adjustPlotTableColumns() {
-  console.log('adjusting plotTableColumns');
+  //console.log('adjusting plotTableColumns');
   plotTableErrorMessage.value = '';
   plotTableColumns.value = [];
   if (plotTableData.value.length > 0) {
@@ -707,44 +635,26 @@ watch(plotTableCurrentPage, async () => {
   }
 });
 
-// Handle selectedCalibrationLog/selectedValidationLog changes
-watch(selectedCalibrationLog, async () => {
-  if (selectedCalibrationLog.value !== '') {
-    calibrationLogCurrentPage.value = 1;
-    const response: any = await queryGetLogData(
-      'calibration', // log_category,
-      selectedCalibrationLog.value, // log_name
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      0, // start
-      logDataPageSize.value // limit
-    );
-    if (response?._data) {
-      let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
-      }
-      calibrationLogDisplay.value = logText;
-      calibrationLogTotalSize.value = response?._data?.pagination_metadata?.count;
-      calibrationLogTotalPages.value = Math.ceil(calibrationLogTotalSize.value / logDataPageSize.value);
-      calibrationLogStartRow.value = 1;
-      if (calibrationLogTotalPages.value === 1 ) {
-        calibrationLogEndRow.value = calibrationLogTotalSize.value;
-      } else {
-        calibrationLogEndRow.value = logDataPageSize.value;
-      }
-      console.log('Loading rows ' + calibrationLogStartRow.value + '-' + calibrationLogEndRow.value + ' from the ' + calibrationLogTotalSize.value + ' total stored in the backend');
-    }
-    plotTables.value = {};
-    plotTableList.value = [];
-    plotTableData.value = [];
+// Handle selectedLogCategory changes
+watch(selectedLogCategory, async () => {
+  selectedLogList.value = logLists.value[selectedLogCategory.value];
+  // start with the first log
+  selectedLogName.value = selectedLogList.value[0].name;
+  console.log('selectedLogCategory: ', selectedLogCategory.value);
+  console.log('selectedLogList: ', selectedLogList.value);
+  console.log('selectedLogName: ', selectedLogName.value);
+  if (!selectedLogList.value.length) {
+    toast.add({ severity: 'info', summary: selectedPlotName.value + ' not available', life: 5000 });
   }
 });
-watch(selectedValidationLog, async () => {
-  if (selectedValidationLog.value !== '') {
-    validationLogCurrentPage.value = 1;
+
+// Handle selectedLogName changes
+watch(selectedLogName, async () => {
+  if (selectedLogName.value !== '') {
+    selectedLogCurrentPage.value = 1;
     const response: any = await queryGetLogData(
-      'validation', // log_category,
-      selectedValidationLog.value, // log_name
+      selectedLogCategory.value, // log_category,
+      selectedLogName.value, // log_name
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
       0, // start
       logDataPageSize.value // limit
@@ -754,47 +664,16 @@ watch(selectedValidationLog, async () => {
       for (let t = 0; t < response?._data?.log_data.length; t++) {
         logText += response?._data?.log_data[t] + '<br/>\n';
       }
-      validationLogDisplay.value = logText;
-      validationLogTotalSize.value = response?._data?.pagination_metadata?.count;
-      validationLogTotalPages.value = Math.ceil(validationLogTotalSize.value / logDataPageSize.value);
-      validationLogStartRow.value = 1;
-      if (validationLogTotalPages.value === 1 ) {
-        validationLogEndRow.value = validationLogTotalSize.value;
+      selectedLogDisplay.value = logText;
+      selectedLogTotalSize.value = response?._data?.pagination_metadata?.count;
+      selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
+      selectedLogStartRow.value = 1;
+      if (selectedLogTotalPages.value === 1 ) {
+        selectedLogEndRow.value = selectedLogTotalSize.value;
       } else {
-        validationLogEndRow.value = logDataPageSize.value;
+        selectedLogEndRow.value = logDataPageSize.value;
       }
-      console.log('Loading rows ' + validationLogStartRow.value + '-' + validationLogEndRow.value + ' from the ' + validationLogTotalSize.value + ' total stored in the backend');
-    }
-    plotTables.value = {};
-    plotTableList.value = [];
-    plotTableData.value = [];
-  }
-});
-watch(selectedGlobalLog, async () => {
-  if (selectedGlobalLog.value !== '') {
-    globalLogCurrentPage.value = 1;
-    const response: any = await queryGetLogData(
-      'global', // log_category,
-      selectedGlobalLog.value, // log_name
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      0, // start
-      logDataPageSize.value // limit
-    );
-    if (response?._data) {
-      let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
-      }
-      globalLogDisplay.value = logText;
-      globalLogTotalSize.value = response?._data?.pagination_metadata?.count;
-      globalLogTotalPages.value = Math.ceil(globalLogTotalSize.value / logDataPageSize.value);
-      globalLogStartRow.value = 1;
-      if (globalLogTotalPages.value === 1 ) {
-        globalLogEndRow.value = globalLogTotalSize.value % logDataPageSize.value;
-      } else {
-        globalLogEndRow.value = logDataPageSize.value;
-      }
-      console.log('Loading rows ' + globalLogStartRow.value + '-' + globalLogEndRow.value + ' from the ' + globalLogTotalSize.value + ' total stored in the backend');
+      console.log('Loading rows ' + selectedLogStartRow.value + '-' + selectedLogEndRow.value + ' from the ' + selectedLogTotalSize.value + ' total stored in the backend');
     }
     plotTables.value = {};
     plotTableList.value = [];
@@ -803,21 +682,21 @@ watch(selectedGlobalLog, async () => {
 });
 
 // Watch for page number changes in logs
-watch(calibrationLogCurrentPage, async () => {
-  if (calibrationLogCurrentPage.value < 1 || calibrationLogCurrentPage.value > calibrationLogTotalPages.value) {
-    console.log('ERROR: Page number ' + calibrationLogCurrentPage.value + ' out of bounds');
+watch(selectedLogCurrentPage, async () => {
+  if (selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
+    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
   } else {
-    calibrationLogStartRow.value = (logDataPageSize.value * (calibrationLogCurrentPage.value-1)) + 1;
-    if (calibrationLogCurrentPage.value === calibrationLogTotalPages.value ) {
-      calibrationLogEndRow.value = calibrationLogTotalSize.value;
+    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value-1)) + 1;
+    if (selectedLogCurrentPage.value === selectedLogTotalPages.value ) {
+      selectedLogEndRow.value = selectedLogTotalSize.value;
     } else {
-      calibrationLogEndRow.value = (calibrationLogStartRow.value + logDataPageSize.value) - 1;
+      selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
     }
     const response: any = await queryGetLogData(
-      'calibration', // log_category,
-      selectedCalibrationLog.value, // log_name
+      selectedLogCategory.value, // log_category,
+      selectedLogName.value, // log_name
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      calibrationLogStartRow.value-1, // start
+      selectedLogStartRow.value-1, // start
       logDataPageSize.value // limit
     );
     if (response?._data) {
@@ -825,65 +704,15 @@ watch(calibrationLogCurrentPage, async () => {
       for (let t = 0; t < response?._data?.log_data.length; t++) {
         logText += response?._data?.log_data[t] + '<br/>\n';
       }
-      calibrationLogDisplay.value = logText;
+      selectedLogDisplay.value = logText;
     }
-    console.log('Loading rows ' + calibrationLogStartRow.value + '-' + calibrationLogEndRow.value + ' from the ' + calibrationLogTotalSize.value + ' total stored in the backend');
+    console.log('Loading rows ' + selectedLogStartRow.value + '-' + selectedLogEndRow.value + ' from the ' + selectedLogTotalSize.value + ' total stored in the backend');
   }
 });
-watch(validationLogCurrentPage, async () => {
-  if (validationLogCurrentPage.value < 1 || validationLogCurrentPage.value > validationLogTotalPages.value) {
-    console.log('ERROR: Page number ' + validationLogCurrentPage.value + ' out of bounds');
-  } else {
-    validationLogStartRow.value = (logDataPageSize.value * (validationLogCurrentPage.value-1)) + 1;
-    if (validationLogCurrentPage.value === validationLogTotalPages.value ) {
-      validationLogEndRow.value = validationLogTotalSize.value;
-    } else {
-      validationLogEndRow.value = (validationLogStartRow.value + logDataPageSize.value) - 1;
-    }
-    const response: any = await queryGetLogData(
-      'validation', // log_category,
-      selectedValidationLog.value, // log_name
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      validationLogStartRow.value-1, // start
-      logDataPageSize.value // limit
-    );
-    if (response?._data) {
-      let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
-      }
-      validationLogDisplay.value = logText;
-    }
-    console.log('Loading rows ' + validationLogStartRow.value + '-' + validationLogEndRow.value + ' from the ' + validationLogTotalSize.value + ' total stored in the backend');
-  }
-});
-watch(globalLogCurrentPage, async () => {
-  if (globalLogCurrentPage.value < 1 || globalLogCurrentPage.value > globalLogTotalPages.value) {
-    console.log('ERROR: Page number ' + globalLogCurrentPage.value + ' out of bounds');
-  } else {
-    globalLogStartRow.value = (logDataPageSize.value * (globalLogCurrentPage.value-1)) + 1;
-    if (globalLogCurrentPage.value === globalLogTotalPages.value ) {
-      globalLogEndRow.value = globalLogTotalSize.value;
-    } else {
-      globalLogEndRow.value = (globalLogStartRow.value + logDataPageSize.value) - 1;
-    }
-    const response: any = await queryGetLogData(
-      'global', // log_category,
-      selectedGlobalLog.value, // log_name
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      globalLogStartRow.value-1, // start
-      logDataPageSize.value // limit
-    );
-    if (response?._data) {
-      let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
-      }
-      globalLogDisplay.value = logText;
-    }
-    console.log('Loading rows ' + globalLogStartRow.value + '-' + globalLogEndRow.value + ' from the ' + globalLogTotalSize.value + ' total stored in the backend');
-  }
-});
+
+function capitalCase(str: string) {
+  return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
 
 const gotoSelectAlternateIteration = () => {
   nextTick(() => {
@@ -891,7 +720,6 @@ const gotoSelectAlternateIteration = () => {
     const e = <HTMLElement>tabs[2];
     e.click();
   })
-
 }
 
 const newValidation = () => {
@@ -912,6 +740,8 @@ onUnmounted( () => {
   selectedPlotFilename.value = null;
   selectedPlotFileUrl.value = null;
   selectedSupplementalTable.value = 0;
+  selectedLogName.value = '';
+  selectedLogList.value = [];
 })
 </script>
 
@@ -945,7 +775,7 @@ onUnmounted( () => {
   overflow: auto;
 }
 
-#CalibrationLogDisplay,
+#selectedLogDisplay,
 #ValidationLogDisplay {
   max-height: 400px;
 }
