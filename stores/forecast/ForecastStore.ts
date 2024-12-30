@@ -145,6 +145,20 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     });
   };
 
+  /**
+   * Get Forecast Plots
+   */
+  const getForecastPlotNames = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot_names/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ forecast_run_id: forecastJobId.value })
+    });
+  };
+
   const loadSelectedCalibrationRun = async (calibration_run_id: number) => {
     setSelectedCalibrationRunId( calibration_run_id );
     await fetchUserCalibrationRunData();
@@ -208,6 +222,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     setSelectedCalibrationRunId,
     resetSelectedCalibrationRunId,
     getStatus,
+    getForecastPlotNames,
     hardResetForecastStore,
   };
 }, {
