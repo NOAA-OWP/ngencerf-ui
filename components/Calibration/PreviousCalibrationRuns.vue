@@ -114,7 +114,7 @@ const ptColumn = ref({
 
 onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
-  hilightTab(CalibrationTabs.tab_calibrationRuns);
+    hilightTab(CalibrationTabs.tab_calibrationRuns);
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
