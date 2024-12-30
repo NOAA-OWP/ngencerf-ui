@@ -112,17 +112,17 @@ const ptColumn = ref({
   bodyCell: { style: { "text-align": "center" } }
 });
 
-onMounted(() => {
+onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
-    hilightTab(CalibrationTabs.tab_calibrationRuns);
+  hilightTab(CalibrationTabs.tab_calibrationRuns);
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
     hardResetTuningStore();
     hardResetRunStatusStore();
-    fetchUserCalibrationJobsListData();
+    await fetchUserCalibrationJobsListData();
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
-    updateUserCalibrationJobsListData();
+    await updateUserCalibrationJobsListData();
   }
 })
 
@@ -215,16 +215,18 @@ const gotoHeadwaterBasinGage = () => {
  */
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
-  cloneCalibrationRun(selectedRunId).then(response => {
+  cloneCalibrationRun(selectedRunId).then(async (response) => {
     if (response.status == 200) {
-      fetchUserCalibrationJobsListData();
+      await fetchUserCalibrationJobsListData();
+      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
+      await updateUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Clone Calibration Job Failed.', detail: message, life: 10000 });
       });
     }
   });
-}
+};
 
 const confirmDelte = useConfirm();
 const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
@@ -252,9 +254,11 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   })
 }
 const acceptDelete = (selectedRunId: number) => {
-  deleteCalibrationRun(selectedRunId).then(response => {
+  deleteCalibrationRun(selectedRunId).then(async (response) => {
     if (response.status == 200) {
-      fetchUserCalibrationJobsListData();
+      await fetchUserCalibrationJobsListData();
+      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
+      await updateUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });

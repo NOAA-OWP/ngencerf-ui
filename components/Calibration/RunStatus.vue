@@ -54,7 +54,7 @@
                     <td colspan="2">
 
                       <!--BUTTONS - START-->
-                      <div v-if="validControlAndValidBestStatus === 'Done'" style="margin-top:4px;margin-bottom:-4px;">
+                      <div v-if="overallCalibrationValidationStatus === 'Done'" style="margin-top:4px;margin-bottom:-4px;">
                         <div class="ngenButtonDiv">
                           <button class="font-normal" @click="gotoEvaluation">Go to Evaluation</button>
                         </div>
