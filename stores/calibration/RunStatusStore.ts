@@ -6,7 +6,7 @@ import { generalStore } from "../common/GeneralStore";
 import type { CalibrationStatus, CalibrationPlotListNamesData } from "@/composables/NextGenModel";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
-import { isValidDate, isCalibrationJobFinished } from '@/utils/CommonHelpers';
+import { isValidDate, isCalibrationJobFinished, getValidControlAndValidBestStatus } from '@/utils/CommonHelpers';
 import { convertTimeZone } from '@/utils/TimeHelpers';
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
@@ -32,8 +32,33 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const elapsedTimeIntervalId = ref<number>();
   const calibrationStatusIntervalId = ref<number>();
   const validationsStatusIntervalId = ref<number>();
+  const validationControlStatus = ref<string>();
+  const validationBestStatus = ref<string>();
   const validControlAndValidBestStatus = ref<string>();
   const resultsPathname = ref<string>();
+
+  /**
+   * Compute Overall Calibration Validation Status
+   */
+  const overallCalibrationValidationStatus = computed<string>(() => {
+    if (userCalibrationRunData?.value?.status !== 'Done') {
+      return `Calibration ${userCalibrationRunData?.value?.status}`;
+    } else if (userCalibrationRunData?.value?.status === 'Done' && validationControlStatus?.value === 'Running') {
+      return `Calibration Done, Validation Control Running`;
+    } else if (userCalibrationRunData?.value?.status === 'Done' && validationBestStatus?.value === 'Running') {
+      return `Calibration Done, Validation Best Running`;
+    } else if (
+      userCalibrationRunData?.value.status === 'Done' &&
+      validationControlStatus?.value === 'Done' &&
+      validationBestStatus?.value === 'Done'
+    ) {
+      return 'Done';
+    } else if (userCalibrationRunData.value.status === 'Done' && validControlAndValidBestStatus.value) {
+      return `Calibration Done, Validation ${validControlAndValidBestStatus.value}`;
+    }
+    return '';
+  });
+
 
   // // Restore state from sessionStorage if available
   // if (typeof window !== 'undefined') {
@@ -97,12 +122,20 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     // load validControlAndValidBestStatus and elapsedTime from queryGetCalibrationStatus
     // Calibration must be Done to get validations
     // Calibration and Validations must be Done and run on Parallel Works to get completed elapsedTime
-    const getStatusResponse = await queryGetCalibrationStatus();
+    const getStatusResponse = await queryGetCalibrationStatus(calibrationJobId.value);
     const validations = getStatusResponse?._data?.validations;
     const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
     const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
-    if (validControl && validBest) {
-      validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validControl, validBest);
+    
+    if (validControl?.status) {
+      validationControlStatus.value = validControl.status;
+    }
+    if (validBest?.status) {
+      validationBestStatus.value = validBest.status;
+    }
+    
+    if (validationControlStatus?.value && validationBestStatus?.value) {
+      validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
 
       // get elapsed time from valid_best
       if (validBest.elapsed_time) {
@@ -124,53 +157,17 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   /**
-   * Get the status of valid_control and valid_best to determine the overall status
-   * @param validControl
-   * @param validBest
-   * @returns {string}
-   */
-  const getValidControlAndValidBestStatus = (validControl: any, validBest: any): string => {
-    const validControlStatus: string = validControl.status;
-    const validBestStatus: string = validBest.status;
-
-    if (validControlStatus === 'Saved' || validBestStatus === 'Saved') {
-      return 'Saved';
-    }
-    else if (validControlStatus === 'Ready' || validBestStatus === 'Ready') {
-      return 'Ready';
-    }
-    else if (validControlStatus === 'Running' || validBestStatus === 'Running') {
-      return 'Running';
-    }
-    else if (validControlStatus === 'Cancelled' || validBestStatus === 'Cancelled') {
-      return 'Cancelled';
-    }
-    else if (validControlStatus === 'Failed' || validBestStatus === 'Failed') {
-      return 'Failed';
-    }
-    else if (validControlStatus === 'Server Error' || validBestStatus === 'Server Error') {
-      return 'Server Error';
-    }
-    else if (validControlStatus === 'Done' && validBestStatus === 'Done') {
-      return 'Done';
-    }
-    else {
-      return 'Unknown';
-    }
-  };
-
-  /**
    * Get Calibration Status
    * @return {any}
    */
-  const queryGetCalibrationStatus = async (): Promise<any> => {
+  const queryGetCalibrationStatus = async (calibrationJobId: number): Promise<any> => {
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({ calibration_run_id: calibrationJobId })
     });
   };
 
@@ -339,8 +336,11 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     elapsedTimeIntervalId,
     calibrationStatusIntervalId,
     validationsStatusIntervalId,
+    validationControlStatus,
+    validationBestStatus,
     validControlAndValidBestStatus,
     resultsPathname,
+    overallCalibrationValidationStatus,
     loadRunStatusStore,
     getValidControlAndValidBestStatus,
     queryGetCalibrationStatus,
