@@ -136,7 +136,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import type { ToastMessageOptions } from "primevue/toast";
-import { onMounted, onUnmounted } from "vue";
+import { onMounted } from "vue";
 import { useGageStore } from "@/stores/calibration/GageStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
@@ -170,27 +170,13 @@ const isLoading = ref(true);
 
 
 onMounted(() => {
-  nextTick( () => {
+  nextTick(() => {
     hilightTab(CalibrationTabs.tab_headwaterBasinGage);
+    toast.removeAllGroups();
+    isLoading.value = false;
+    let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
+    if (ele) { ele.scrollTo(0, 0); }
   });
-
-  toast.removeAllGroups();
-  isLoading.value = false;
-
-  let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-  if (ele) { ele.scrollTo(0, 0); }
-
-  if (getForcingOptionsList.value) {
-    selectedForcingValue.value = getForcingOptionsList.value[0].name;
-  }
-  if (getObservationalOptionsList.value) {
-    selectedObservationalValue.value = getObservationalOptionsList.value[0].name;
-  }
-  if (getGeopackageOptionsList.value) {
-    selectedGeopackageValue.value = getGeopackageOptionsList.value[0].name;
-  }
-
-
 })
 
 
