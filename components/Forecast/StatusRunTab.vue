@@ -89,7 +89,7 @@
           </span>
           <span v-if="forecastJobStatus === 'Done'">
             <div class="col-span-1 mr-3">
-              <button class="ngenButtonDiv ml-6 font-normal h-8" title="View Results Button" @click="viewResults()"
+              <button class="ngenButtonDiv ml-6 font-normal h-8" title="View Results Button" @click="goToResultsTab()"
                 aria-label="View Results Button">
                 View Results
               </button>
@@ -108,6 +108,7 @@
 import { hilightTab } from '@/composables/TabHilight';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { useToast } from 'primevue/usetoast';
+import { getForecastStatus } from '@/utils/CommonHelpers';
 import { calculateElapsedTime } from '@/utils/TimeHelpers';
 
 const isLoading = ref<boolean>(false); // loading indicator
@@ -128,12 +129,11 @@ const {
 } = storeToRefs(useForecastStore()); 
 
 const {
-  loadSetupForecastTabData,
   loadForecastStatusRunTabData,
-  loadForecastTab,
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
+  getJobDataDirectory,
 } = useForecastStore();
 
 onMounted(async () => {
@@ -196,8 +196,9 @@ const startForecastRun = async () => {
   try {
     const createAndRunForecastJobResponse = await createAndRunForecastJob(calibrationRunForForecast?.value?.calibration_run_id as number, forecastCycle?.value?.name as string);
 
-    if (createAndRunForecastJobResponse?._data?.status) {
-      forecastJobStatus.value = createAndRunForecastJobResponse._data.status;
+    if (createAndRunForecastJobResponse?._data?.forecast_forcing_download_status && createAndRunForecastJobResponse?._data?.forecast_status) {
+      forecastJobStatus.value = getForecastStatus(createAndRunForecastJobResponse._data.forecast_forcing_download_status, createAndRunForecastJobResponse._data.forecast_status);
+      forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get Forecast status from server' });
     }
@@ -208,10 +209,17 @@ const startForecastRun = async () => {
       toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
     }
 
+    const queryGetJobDataDirectoryResponse = await getJobDataDirectory();
+
+    if (queryGetJobDataDirectoryResponse?._data?.data_dir) {
+      resultsPathname.value = queryGetJobDataDirectoryResponse._data.data_dir;
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get results pathname from server' });
+    }
+
     if (forecastJobStatus.value !== 'Running') {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Forecast status not set to Running after clicking START' });
     }
-    await loadForecastTab();
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Forecast job' });
   }
@@ -258,8 +266,15 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
     createElapsedTimeInterval();
     createForecastJobStatusInterval();
 
-    const loadForecastTabResponse: any = await loadForecastTab();
-    resultsPathname.value = loadForecastTabResponse?._data?.data_dir;
+    if (!resultsPathname.value) {
+      const queryGetJobDataDirectoryResponse = await getJobDataDirectory();
+
+      if (queryGetJobDataDirectoryResponse?._data?.data_dir) {
+        resultsPathname.value = queryGetJobDataDirectoryResponse._data.data_dir;
+      } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get results pathname from server' });
+      }
+    }
   }
 
   // when forecastJobStatus changes to Done, look for elapsedTime from server
@@ -267,8 +282,13 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
     const getStatusResponse = await getStatus();
 
     if (!resultsPathname.value) {
-      const loadForecastTabResponse: any = await loadForecastTab();
-      resultsPathname.value = loadForecastTabResponse?._data?.data_dir;
+      const queryGetJobDataDirectoryResponse = await getJobDataDirectory();
+
+      if (queryGetJobDataDirectoryResponse?._data?.data_dir) {
+        resultsPathname.value = queryGetJobDataDirectoryResponse._data.data_dir;
+      } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get results pathname from server' });
+      }
     }
 
     const forecasts: any[] = getStatusResponse?._data.forecasts;
@@ -283,7 +303,7 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`});
     }
-    goToResultsTab();
+    // goToResultsTab(); // do we want to navigate to the Results tab when forecastJobStatus changes to Done?
   }
 
   onCleanup(() => {
