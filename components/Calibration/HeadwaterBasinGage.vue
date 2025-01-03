@@ -170,7 +170,9 @@ const isLoading = ref(true);
 
 
 onMounted(() => {
-  hilightTab(CalibrationTabs.tab_headwaterBasinGage);
+  nextTick( () => {
+    hilightTab(CalibrationTabs.tab_headwaterBasinGage);
+  });
 
   toast.removeAllGroups();
   isLoading.value = false;
