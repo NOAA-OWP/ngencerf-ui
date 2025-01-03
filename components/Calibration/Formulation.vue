@@ -304,7 +304,14 @@ const saveFormulationData = () => {
   } else {
     toast.removeAllGroups();
     saveFormulationTabData().then( response => {
-      if ( response.status === 200 ) {
+      if ( response.status === 200 || response.status === "Saved") {
+
+        if( response._data.eds_errors ) {
+          response._data.eds_errors .forEach( (err: any) => {
+            toast.add({ severity: 'warn', summary: 'External Data Error', detail: err.message });
+          });
+        }
+
         toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
         if ( response?._data?.nwm_warning === true ) {
           useCalibrationFormulationTabSaveWarning( response?._data?.formulation_warning ?? {} ).forEach( warning => {
