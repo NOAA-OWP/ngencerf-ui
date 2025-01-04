@@ -61,19 +61,28 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * Load Forecast Status/Run tab data
    */
   const loadForecastStatusRunTabData = async (): Promise<void> => {
-    // load forecast status
+    // get forecast status
     const getStatusResponse: any = await getStatus();
     
-    // parse response with forecastJobId to get the values below
+    // get forecast job data
+    // TODO: create forecastJob interface, fix typing
+    const forecastJob: any  = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
 
-    forecastJobStatus.value = loadForecastTabResponse?._data?.status;
-    elapsedTime.value = loadForecastTabResponse?._data?.elapsed_time;
-    submitTimeDate.value = new Date(loadForecastTabResponse?._data?.submit_date as string);
+    // set forecastJobStatus, elapsedTime, submitTime, and resultsPathname
+    forecastJobStatus.value = forecastJob.status;
+    elapsedTime.value = forecastJob.elapsed_time;
+    submitTimeDate.value = new Date(forecastJob.submit_date as string);
     if (isValidDate(submitTimeDate.value)) {
       submitTime.value = convertTimeZone(submitTimeDate.value);
     }
-    resultsPathname.value = loadForecastTabResponse?._data?.data_dir;
 
+    const queryGetJobDataDirectoryResponse = await getJobDataDirectory();
+
+    if (queryGetJobDataDirectoryResponse?._data?.data_dir) {
+      resultsPathname.value = queryGetJobDataDirectoryResponse._data.data_dir;
+    } else {
+      console.log('Could not get results pathname from server');
+    }
   };
 
   /**

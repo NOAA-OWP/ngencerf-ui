@@ -108,7 +108,7 @@
 import { hilightTab } from '@/composables/TabHilight';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { useToast } from 'primevue/usetoast';
-import { getForecastStatus } from '@/utils/CommonHelpers';
+import { isValidDate, getForecastStatus } from '@/utils/CommonHelpers';
 import { calculateElapsedTime } from '@/utils/TimeHelpers';
 
 const isLoading = ref<boolean>(false); // loading indicator
@@ -205,6 +205,10 @@ const startForecastRun = async () => {
 
     if (createAndRunForecastJobResponse?._data?.submit_date) {
       submitTimeDate.value = new Date(createAndRunForecastJobResponse?._data?.submit_date);
+
+      if (isValidDate(submitTimeDate.value)) {
+      submitTime.value = convertTimeZone(submitTimeDate.value);
+    }
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
     }
