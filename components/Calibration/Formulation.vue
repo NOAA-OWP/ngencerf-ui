@@ -7,7 +7,8 @@
             <div id="FormulationName" class="block mt-1" aria-label="Forumulation Name" title="Formulation Name">
               <label for="formulationNameInput" class="text-lg">Formulation Name </label>
               <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
-                aria-label="Input Forumulation Name" title="Input Formulation Name" required @keypress="checkValidCharacters($event)"></InputText>
+                aria-label="Input Forumulation Name" title="Input Formulation Name" required
+                @keypress="checkValidCharacters($event)"></InputText>
             </div>
           </div>
         </div>
@@ -49,9 +50,9 @@
           </div>
           <div class="col-span-1">&nbsp;</div>
         </div>
-<!--        <div class="mt-3 mb-5 hr"></div> -->
+        <!--        <div class="mt-3 mb-5 hr"></div> -->
       </div>
-<!--
+      <!--
       /* Don't Display this implemented SLoTH capability until available to send SLoTH variables to ngen-cal */
       <div class="row-span-2 -mt-2">
 
@@ -236,7 +237,7 @@ const toast = useToast();
 
 onMounted(() => {
   hilightTab(CalibrationTabs.tab_formulation);
-  
+
   toast.removeAllGroups();
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
@@ -288,7 +289,7 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
  * Prevent unwanted characters
  */
 const checkValidCharacters = (e: KeyboardEvent) => {
-  if(/^[a-zA-Z0-9_-]+$/.test(e.key) === false) {
+  if (/^[a-zA-Z0-9_-]+$/.test(e.key) === false) {
     e.preventDefault();
     return true;
   }
@@ -303,25 +304,23 @@ const saveFormulationData = () => {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
-    saveFormulationTabData().then( response => {
-      if ( response.status === 200 || response.status === "Saved") {
-
-        if( response._data.eds_errors ) {
-          response._data.eds_errors .forEach( (err: any) => {
+    saveFormulationTabData().then(response => {
+      if (response.status === 200) {
+        if (response._data.eds_errors) {
+          response._data.eds_errors.forEach((err: any) => {
             toast.add({ severity: 'warn', summary: 'External Data Error', detail: err.message });
           });
         }
-
         toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
-        if ( response?._data?.nwm_warning === true ) {
-          useCalibrationFormulationTabSaveWarning( response?._data?.formulation_warning ?? {} ).forEach( warning => {
+        if (response?._data?.nwm_warning === true) {
+          useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
             toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning });
           });
-        }   
-        fetchUserCalibrationRunData();   
+        }
+        fetchUserCalibrationRunData();
       } else {
-        useApiErrorResponsePreprocess( response ).forEach( message => {
-          toast.add({ severity: useApiResponseToastSeverityCode( response?.status ), summary: 'Save Formulation Tab Data Failed.', detail: message});
+        useApiErrorResponsePreprocess(response).forEach(message => {
+          toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message });
         });
       }
     });
@@ -338,7 +337,7 @@ const validateTab = () => {
   let error = false;
   let text = [];
   /* Check if formulation name changed */
-  let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : ''  ;
+  let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : '';
   let newName = formulationNameInput.value ? formulationNameInput.value : '';
   if (savedName !== newName) {
     error = true;
@@ -373,8 +372,8 @@ const validateTab = () => {
 }
 
 const restorePage = () => {
-  selectedModuleValues.value  = userCalibrationRunData?.value?.modules ? userCalibrationRunData?.value?.modules : [];
-  formulationNameInput.value  = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";  
+  selectedModuleValues.value = userCalibrationRunData?.value?.modules ? userCalibrationRunData?.value?.modules : [];
+  formulationNameInput.value = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";
   if (userCalibrationRunData.value) {
     useSlothParameters.value = userCalibrationRunData?.value?.use_sloth;
     slothParameterInputs.value = userCalibrationRunData?.value?.sloth_parameters;
@@ -535,5 +534,4 @@ h1 {
   text-align: right;
   width: 120px;
 }
-
 </style>
