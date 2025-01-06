@@ -57,10 +57,10 @@
       <div class="col-span-2">
         <table style="width:100%">
           <tbody>
-            <tr height="40px">
-              <td class="text-right font-bold" style="width: 140px;">
+            <tr height="38px">
+              <th scope="row" class="text-right font-bold" style="width: 140px;">
                 <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
-              </td>
+              </th>
               <td class="pl-5">
                 <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
               </td>
@@ -318,4 +318,13 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
 
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";
+
+#resultsPathname {
+  background-color: #fff;
+  border: 0px solid #fff;
+  border-left: 0;
+  border-right: 0;
+  color: black;
+  box-shadow: none;
+}
 </style>

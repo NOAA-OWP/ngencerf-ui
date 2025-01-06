@@ -143,7 +143,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   /**
-   * Call get_status endpoint with calibrationRunForForecast's calibration_run_id
+   * Call get_status endpoint with calibrationRunForForecast.value.calibration_run_id
    * @return {any}
    */
   const getStatus = async (): Promise<any> => {
