@@ -124,3 +124,26 @@ export const getValidControlAndValidBestStatus = (validControlStatus: string, va
     return 'Unknown';
   }
 };
+
+/**
+ * Get the combined status of  forecast_forcing_download_status and forecast_status
+ * @param forecastForcingDownloadStatus
+ * @param forecastStatus
+ * @returns {string}
+ */
+export const getForecastStatus = (forecastForcingDownloadStatus: string, forecastStatus: string): string => {
+  if (['Saved', 'Ready', 'Running', 'Cancelled', 'Failed', 'Server Error'].includes(forecastForcingDownloadStatus)) {
+    return forecastForcingDownloadStatus;
+  }
+  else if (forecastForcingDownloadStatus === 'Done') {
+    if (['Saved', 'Ready', 'Running', 'Cancelled', 'Failed', 'Server Error'].includes(forecastStatus)) {
+      return forecastStatus;
+    }
+    else {
+      return 'Unknown';
+    }
+  }
+  else {
+    return 'Unknown';
+  }
+};

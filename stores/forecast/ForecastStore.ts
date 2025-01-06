@@ -61,16 +61,28 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * Load Forecast Status/Run tab data
    */
   const loadForecastStatusRunTabData = async (): Promise<void> => {
-    // load forecast status
-    const loadForecastTabResponse: any = await loadForecastTab();
-    forecastJobStatus.value = loadForecastTabResponse?._data?.status;
-    elapsedTime.value = loadForecastTabResponse?._data?.elapsed_time;
-    submitTimeDate.value = new Date(loadForecastTabResponse?._data?.submit_date as string);
+    // get forecast status
+    const getStatusResponse: any = await getStatus();
+    
+    // get forecast job data
+    // TODO: create forecastJob interface, fix typing
+    const forecastJob: any  = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
+
+    // set forecastJobStatus, elapsedTime, submitTime, and resultsPathname
+    forecastJobStatus.value = forecastJob.status;
+    elapsedTime.value = forecastJob.elapsed_time;
+    submitTimeDate.value = new Date(forecastJob.submit_date as string);
     if (isValidDate(submitTimeDate.value)) {
       submitTime.value = convertTimeZone(submitTimeDate.value);
     }
-    resultsPathname.value = loadForecastTabResponse?._data?.data_dir;
 
+    const queryGetJobDataDirectoryResponse = await getJobDataDirectory();
+
+    if (queryGetJobDataDirectoryResponse?._data?.data_dir) {
+      resultsPathname.value = queryGetJobDataDirectoryResponse._data.data_dir;
+    } else {
+      console.log('Could not get results pathname from server');
+    }
   };
 
   /**
@@ -126,12 +138,12 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       },
       body: ""
     }).then((result) => {
-      calibrationRunsForForecast.value = result._data.jobs
+      calibrationRunsForForecast.value = result._data.jobs;
     });
   };
 
   /**
-   * Call get_status endpoint with calibrationRunForForecast's calibration_run_id
+   * Call get_status endpoint with calibrationRunForForecast.value.calibration_run_id
    * @return {any}
    */
   const getStatus = async (): Promise<any> => {
@@ -156,6 +168,21 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({ forecast_run_id: forecastJobId.value })
+    });
+  };
+
+  /**
+   * Get Job Data Directory
+   * @returns {any}
+   */
+  const getJobDataDirectory = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_job_data_dir/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibrationRunForForecast.value?.calibration_run_id })
     });
   };
 
@@ -223,6 +250,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     resetSelectedCalibrationRunId,
     getStatus,
     getForecastPlotNames,
+    getJobDataDirectory,
     hardResetForecastStore,
   };
 }, {
