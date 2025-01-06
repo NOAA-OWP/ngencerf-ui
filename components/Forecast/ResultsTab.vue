@@ -1,10 +1,10 @@
 <template>
   <div class="text-center text-2xl mt-20">Results</div>
   <div>
-        <div id="GraphArea" class="text-center text-2xl mt-20" v-if="selectedPlotFileUrl">
+        <div v-if="selectedPlotFileUrl" id="GraphArea" class="text-center text-2xl mt-20">
           <img :src="selectedPlotFileUrl" alt="Selected Plot" />
         </div>
-        <div id="GraphArea" class="text-center text-2xl mt-20" v-else>
+        <div v-else id="GraphArea" class="text-center text-2xl mt-20">
           <!--Data Display-->
         </div>
       </div>
