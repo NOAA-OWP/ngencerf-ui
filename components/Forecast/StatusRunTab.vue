@@ -39,9 +39,9 @@
         <table>
           <tbody>
             <tr height="40px">
-              <td class="text-right font-bold">
+              <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Status</div>
-              </td>
+              </th>
               <td class="pl-5">{{ forecastJobStatus ?? 'Ready' }}</td>
             </tr>
             <tr height="32px">
@@ -89,7 +89,7 @@
           </span>
           <span v-if="forecastJobStatus === 'Done'">
             <div class="col-span-1 mr-3">
-              <button class="ngenButtonDiv ml-6 font-normal h-8" title="View Results Button" @click="goToResultsTab()"
+              <button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button" @click="goToResultsTab()"
                 aria-label="View Results Button">
                 View Results
               </button>
@@ -291,7 +291,7 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
       if (queryGetJobDataDirectoryResponse?._data?.data_dir) {
         resultsPathname.value = queryGetJobDataDirectoryResponse._data.data_dir;
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get results pathname from server' });
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Could not get results pathname from server' });
       }
     }
 
@@ -302,12 +302,11 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
       if (forecast.elapsed_time) {
         elapsedTime.value = forecast.elapsed_time;
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response`});
+        toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response`});
       }
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`});
     }
-    // goToResultsTab(); // do we want to navigate to the Results tab when forecastJobStatus changes to Done?
   }
 
   onCleanup(() => {

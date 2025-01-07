@@ -1,7 +1,29 @@
 <template>
   <div class="col-span-2">
-    <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
-    <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+    <table>
+      <tbody>
+        <tr height="38px">
+          <th scope="row" class="text-right font-bold">
+            <div style="width: 140px;">Forecast Job ID</div>
+          </th>
+          <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
+        </tr>
+        <tr height="38px">
+          <th scope="row" class="text-right font-bold" style="width: 140px;">
+            <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
+          </th>
+          <td class="pl-5">
+            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+          </td>
+        </tr>
+        <tr height="32px">
+          <th scope="row" class="text-right font-bold">
+            <div style="width: 140px;">Cycle</div>
+          </th>
+          <td class="pl-5">{{ (forecastCycle as ForecastCycle).name ?? '-'.repeat(30) }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <div>
     <div v-if="forecastPlot" id="GraphArea" class="p-2">
@@ -20,6 +42,8 @@ import { useToast } from 'primevue/usetoast';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 
 const {
+  forecastJobId,
+  forecastCycle,
   resultsPathname,
   forecastPlot,
 } = storeToRefs(useForecastStore());
@@ -38,7 +62,7 @@ onMounted(async () => {
   hilightTab(ForecastTabs.tab_results);
 
   // load Results tab data
-  const messages: string [] = await loadForecastResultsTabData();
+  const messages: string[] = await loadForecastResultsTabData();
 
   if (messages.length > 0) {
     messages.forEach((message: string) => {
