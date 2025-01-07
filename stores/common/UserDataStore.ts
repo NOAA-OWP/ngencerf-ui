@@ -5,7 +5,7 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "./GeneralStore";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 
-import type { JobsList, JobListItem, UserCalibrationRunData } from "@/composables/NextGenModel";
+import type { JobsList, JobListItem, ValidationJobsList, UserCalibrationRunData } from "@/composables/NextGenModel";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -229,6 +229,24 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   }
 
   /**
+   * fetch user validation jobs associated with the selected calibration run
+   * @param {number} calibrationRunId
+   * @return {Promise<ValidationJobsList>}
+   */
+  const getValidationJobs = async (calibrationRunId: number): Promise<ValidationJobsList> => {
+    const getValidationJobsResponse: any = await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_validation_jobs/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibrationRunId })
+    });
+
+    return getValidationJobsResponse?._data ?? {} as ValidationJobsList;
+  };
+
+  /**
    * @returns {Promise<any>}
    */
   async function queryUserCalibrationRunData() {
@@ -301,6 +319,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     getAccessToken,
     getRefreshToken,
     fetchUserCalibrationJobsListData,
+    getValidationJobs,
     userCalibrationJobsListData,
     userCalibrationRunData,
     queryUserCalibrationRunData,
