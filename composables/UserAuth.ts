@@ -64,38 +64,65 @@ export const makeProtectedApiCall = async <T>(
   try {
     const response = await fetch(url, {
       ...userOptions,
-      async onRequest({ request, options }: { request: any, options: any }) {
+      async onRequest({ request, options }: { request: any; options: any }) {
         // stringify body if it is an object
-        if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
+        if (
+          options.body &&
+          typeof options.body === "object" &&
+          !Array.isArray(options.body) &&
+          !(options.body instanceof FormData)
+        ) {
           options.body = JSON.stringify(options.body);
         }
-      }
+      },
     });
-    if (response.ok) {
-      responseData = {_data: await response.json(), status: response.status, ok: response.ok };
-       console.log(responseData);
-       return responseData;
-    } 
-    if( response.status === 401) {
+
+    let myResponse = { ok: response.ok, status: response.status };
+
+    if (myResponse.status >= 500) {
+      console.log("Server Error");
+      return {
+        _data: null,
+        status: myResponse.status,
+        ok: myResponse.ok,
+      };
+     }
+
+    if (myResponse.ok) {
+      responseData = {
+        _data: await response.json(),
+        status: response.status,
+        ok: response.ok,
+      };
+      console.log(responseData);
+      return responseData;
+    }
+    if (myResponse.status === 401) {
       const userDataStore = useUserDataStore();
       const { ngencerfBaseUrl } = useBackendConfig();
-      const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
+      const refreshAccessTokenSuccess = await refreshAccessToken(
+        ngencerfBaseUrl
+      );
       if (!refreshAccessTokenSuccess) {
         sendUserToLogin();
         return;
       }
       rqstUserOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
-      return makeProtectedApiCall( rqstUrl, rqstUserOptions);
+      return makeProtectedApiCall(rqstUrl, rqstUserOptions);
     } else {
-      responseData = {_data: await response.json(), status: response.status, ok: response.ok };
-       console.log(responseData);
-       return responseData;
+      responseData = {
+        _data: await response.json(),
+        status: response.status,
+        ok: response.ok,
+      };
+      console.log(responseData);
+      return responseData;
     }
   } catch {
     sendUserToLogin();
   }
-
 };
+
 
 const sendUserToLogin = () => {
   const userDataStore = useUserDataStore();
