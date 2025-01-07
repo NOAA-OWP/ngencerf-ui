@@ -38,7 +38,13 @@ onMounted(async () => {
   hilightTab(ForecastTabs.tab_results);
 
   // load Results tab data
-  await loadForecastResultsTabData();
+  const messages: string [] = await loadForecastResultsTabData();
+
+  if (messages.length > 0) {
+    messages.forEach((message: string) => {
+      toast.add({ severity: 'error', summary: 'Error', detail: message });
+    });
+  }
 });
 </script>
 
