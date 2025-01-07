@@ -206,11 +206,14 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       plot_name: plotName,
       include_data: include_data.toString(),
       force_include_plot: force_include_plot.toString(),
-      calibration_run_id: (calibration_run_id > 0) ? calibration_run_id.toString() : '',
-      validation_run_id: (validation_run_id > 0) ? validation_run_id.toString() : '',
       start: start !== undefined ? start.toString() : '',
       limit: limit !== undefined ? limit.toString() : ''
     });
+    if (validation_run_id > 0) {
+      params.set('validation_run_id', validation_run_id.toString());
+    } else {
+      params.set('calibration_run_id', calibration_run_id.toString());
+    }
 
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/?${params.toString()}`, {
       method: "GET",
