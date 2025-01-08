@@ -108,10 +108,10 @@
         </div>
       </div>
       <div>
-        <div id="GraphArea" class="p-2" v-if="selectedPlotFileUrl">
+        <div v-if="selectedPlotFileUrl" id="GraphArea" class="p-2">
           <img :src="selectedPlotFileUrl" alt="Selected Plot" />
         </div>
-        <div id="GraphArea" class="p-2" v-else>
+        <div v-else id="GraphArea" class="p-2">
           <!--Data Display-->
         </div>
       </div>
