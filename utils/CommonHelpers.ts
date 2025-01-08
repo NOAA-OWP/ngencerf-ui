@@ -1,6 +1,5 @@
 import { DateTime } from "luxon";
 
-
 /**
  * Checks if an object is a valid Date object
  * @param obj
@@ -33,8 +32,10 @@ export const isNotNullOrUndefined = (variable: any): boolean => {
  * @param status
  * @returns {boolean}
  */
-export const isCalibrationJobStatusSavedOrReady = (status?: string): boolean => {
-  return status === 'Saved' || status === 'Ready';
+export const isCalibrationJobStatusSavedOrReady = (
+  status?: string
+): boolean => {
+  return status === "Saved" || status === "Ready";
 };
 
 /**
@@ -43,12 +44,17 @@ export const isCalibrationJobStatusSavedOrReady = (status?: string): boolean => 
  * @returns {boolean}
  */
 export const isCalibrationJobFinished = (status?: string): boolean => {
-  return status === 'Done' || status === 'Cancelled' || status === 'Failed' || status === 'Server Error';
+  return (
+    status === "Done" ||
+    status === "Cancelled" ||
+    status === "Failed" ||
+    status === "Server Error"
+  );
 };
 
 export const fixFloatToFivePlaces = (f: number) => {
   let s = f.toString();
-  let p = s.indexOf('.');
+  let p = s.indexOf(".");
   if (p !== -1) {
     if (s.substring(p + 1).length > 5) {
       return f.toFixed(5);
@@ -68,28 +74,46 @@ export const fixFloatToFivePlaces = (f: number) => {
  * @returns {string}
  */
 export const getOverallCalibrationValidationStatus = (
-  calibrationStatus: string, 
-  validationControlStatus?: string, 
-  validationBestStatus?: string): string => {
-  // simply show calibration status if it is not 'Done'  
-  if (calibrationStatus !== 'Done') {
+  calibrationStatus: string,
+  validationControlStatus?: string,
+  validationBestStatus?: string
+): string => {
+  // simply show calibration status if it is not 'Done'
+  if (calibrationStatus !== "Done") {
     return `Calibration ${calibrationStatus}`;
-  } else if (calibrationStatus === 'Done' && validationControlStatus && validationControlStatus === 'Running') {
+  } else if (
+    calibrationStatus === "Done" &&
+    validationControlStatus &&
+    validationControlStatus === "Running"
+  ) {
     return `Calibration Done, Validation Control Running`;
-  } else if (calibrationStatus === 'Done' && validationBestStatus && validationBestStatus === 'Running') {
+  } else if (
+    calibrationStatus === "Done" &&
+    validationBestStatus &&
+    validationBestStatus === "Running"
+  ) {
     return `Calibration Done, Validation Best Running`;
   } else if (
-    calibrationStatus === 'Done' &&
-    validationControlStatus && validationControlStatus === 'Done' &&
-    validationBestStatus && validationBestStatus === 'Done'
-    ) {
-    return 'Done';
-  } else if (calibrationStatus === 'Done' && validationControlStatus && validationBestStatus) {
+    calibrationStatus === "Done" &&
+    validationControlStatus &&
+    validationControlStatus === "Done" &&
+    validationBestStatus &&
+    validationBestStatus === "Done"
+  ) {
+    return "Done";
+  } else if (
+    calibrationStatus === "Done" &&
+    validationControlStatus &&
+    validationBestStatus
+  ) {
     // get the overall status of validation control and validation best
-    const validationControlBestStatus = getValidControlAndValidBestStatus(validationControlStatus, validationBestStatus);
+    const validationControlBestStatus = getValidControlAndValidBestStatus(
+      validationControlStatus,
+      validationBestStatus
+    );
     return `Calibration Done, Validation ${validationControlBestStatus}`;
   }
-  return '';
+  return "";
 };
 
 /**
@@ -98,30 +122,35 @@ export const getOverallCalibrationValidationStatus = (
  * @param validBest
  * @returns {string}
  */
-export const getValidControlAndValidBestStatus = (validControlStatus: string, validBestStatus: string): string => {
-  if (validControlStatus === 'Saved' || validBestStatus === 'Saved') {
-    return 'Saved';
-  }
-  else if (validControlStatus === 'Ready' || validBestStatus === 'Ready') {
-    return 'Ready';
-  }
-  else if (validControlStatus === 'Running' || validBestStatus === 'Running') {
-    return 'Running';
-  }
-  else if (validControlStatus === 'Cancelled' || validBestStatus === 'Cancelled') {
-    return 'Cancelled';
-  }
-  else if (validControlStatus === 'Failed' || validBestStatus === 'Failed') {
-    return 'Failed';
-  }
-  else if (validControlStatus === 'Server Error' || validBestStatus === 'Server Error') {
-    return 'Server Error';
-  }
-  else if (validControlStatus === 'Done' && validBestStatus === 'Done') {
-    return 'Done';
-  }
-  else {
-    return 'Unknown';
+export const getValidControlAndValidBestStatus = (
+  validControlStatus: string,
+  validBestStatus: string
+): string => {
+  if (validControlStatus === "Saved" || validBestStatus === "Saved") {
+    return "Saved";
+  } else if (validControlStatus === "Ready" || validBestStatus === "Ready") {
+    return "Ready";
+  } else if (
+    validControlStatus === "Running" ||
+    validBestStatus === "Running"
+  ) {
+    return "Running";
+  } else if (
+    validControlStatus === "Cancelled" ||
+    validBestStatus === "Cancelled"
+  ) {
+    return "Cancelled";
+  } else if (validControlStatus === "Failed" || validBestStatus === "Failed") {
+    return "Failed";
+  } else if (
+    validControlStatus === "Server Error" ||
+    validBestStatus === "Server Error"
+  ) {
+    return "Server Error";
+  } else if (validControlStatus === "Done" && validBestStatus === "Done") {
+    return "Done";
+  } else {
+    return "Unknown";
   }
 };
 
@@ -131,19 +160,49 @@ export const getValidControlAndValidBestStatus = (validControlStatus: string, va
  * @param forecastStatus
  * @returns {string}
  */
-export const getForecastStatus = (forecastForcingDownloadStatus: string, forecastStatus: string): string => {
-  if (['Saved', 'Ready', 'Running', 'Cancelled', 'Failed', 'Server Error'].includes(forecastForcingDownloadStatus)) {
+export const getForecastStatus = (
+  forecastForcingDownloadStatus: string,
+  forecastStatus: string
+): string => {
+  if (
+    [
+      "Saved",
+      "Ready",
+      "Running",
+      "Cancelled",
+      "Failed",
+      "Server Error",
+    ].includes(forecastForcingDownloadStatus)
+  ) {
     return forecastForcingDownloadStatus;
-  }
-  else if (forecastForcingDownloadStatus === 'Done') {
-    if (['Saved', 'Ready', 'Running', 'Cancelled', 'Failed', 'Server Error'].includes(forecastStatus)) {
+  } else if (forecastForcingDownloadStatus === "Done") {
+    if (
+      [
+        "Saved",
+        "Ready",
+        "Running",
+        "Cancelled",
+        "Failed",
+        "Server Error",
+      ].includes(forecastStatus)
+    ) {
       return forecastStatus;
+    } else {
+      return "Unknown";
     }
-    else {
-      return 'Unknown';
-    }
+  } else {
+    return "Unknown";
   }
-  else {
-    return 'Unknown';
+};
+
+export const areArraysEqual = (arr1: any, arr2: any) => {
+  if (arr1.length !== arr2.length) return false;
+  // implement custom sort if necessary
+  arr1.sort();
+  arr2.sort();
+  // use normal for loop so we can return immediately if not equal
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) return false;
   }
+  return true;
 };

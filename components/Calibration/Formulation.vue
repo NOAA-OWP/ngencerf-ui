@@ -17,7 +17,6 @@
           <div class="col-span-5">
             <div class="text-left text-lg mt-2"><strong>Formulation Modules</strong></div>
             <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
-
               <div class="font-bold">Groups Filter
                 <Select id="Groups" v-model="filterGroup" filter
                   :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description"
@@ -175,17 +174,20 @@
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
 import type { UserCalibrationRunData } from "@/composables/NextGenModel";
-import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
+import { isCalibrationJobStatusSavedOrReady, areArraysEqual } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
 import type { SlothParameterData } from '@/composables/NextGenModel';
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import { hilightTab } from '@/composables/TabHilight';
+
+const { clearCalibratableParameters } = useTuningStore();
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -304,6 +306,14 @@ const saveFormulationData = () => {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
+    var valOK = validateModules();
+    if( !valOK ) {
+      // delete all of the Calabratable paramt
+      // ers on the Tuning Controls tab
+      console.log("clearCalibratableParameters")
+      clearCalibratableParameters();
+    }
+
     saveFormulationTabData().then(response => {
       if (response.status === 200) {
         if (response._data.eds_errors) {
@@ -331,7 +341,16 @@ const resetFormulationData = () => {
   resetUserSelectionFormulation();
 }
 
-
+const validateModules = () => {
+  fetchUserCalibrationRunData();
+  /* check if list of modules changed */
+  let selModules = selectedModuleValues.value;
+  let savedModules = userCalibrationRunData?.value?.modules;
+  if ( !areArraysEqual(selModules, savedModules) ) {
+    return true;
+  } 
+  return false;
+}
 const validateTab = () => {
   fetchUserCalibrationRunData();
   let error = false;
@@ -346,7 +365,7 @@ const validateTab = () => {
   /* check if list of modules changed */
   let selModules = selectedModuleValues.value;
   let savedModules = userCalibrationRunData?.value?.modules;
-  if (selModules.length !== savedModules?.length) {
+  if ( !areArraysEqual(selModules, savedModules) ) {
     error = true;
     text.push("Selected Modules have been changed");
   } else {

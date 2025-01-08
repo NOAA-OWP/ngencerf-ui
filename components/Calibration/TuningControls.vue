@@ -168,7 +168,8 @@
         </div>
 
         <div class="col-span-1 mt-2 relative">
-          <button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg" @click="clearUserSelectedCalibrationTuningParameters()">Clear</button>
+          <button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
+            @click="clearUserSelectedCalibrationTuningParameters()">Clear</button>
         </div>
 
       </div>
@@ -358,6 +359,11 @@ onMounted(async () => {
   if (calibrationJobId.value) {
     // fetch user calibration data
     await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
+
+    if (!userSelectedCalibrationTuningParameters.value.length) {
+      console.log("Clearing out selectedTuningParameterData");
+      selectedTuningParameterData.value = null;
+    }
 
     // if Tuning Tab static data is not loaded, fetch it
     if (loadTuningTabData?.value?._data?.modules.length === 0) {

@@ -189,6 +189,12 @@ export const useTuningStore = defineStore('TuningStore', () => {
     }
   })
 
+  
+  function clearCalibratableParameters() {
+    userSelectedCalibrationTuningParameters.value = [];
+  }
+
+
   /**
    * Hard Reset Tuning Store
    */
@@ -235,6 +241,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     rangeDateTo,
     saveTuningTabRequestBody,
     saveTuningTabData,
+    clearCalibratableParameters,
     hardResetTuningStore
   };
 },

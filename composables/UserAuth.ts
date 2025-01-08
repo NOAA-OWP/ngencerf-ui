@@ -73,7 +73,7 @@ export const makeProtectedApiCall = async <T>(
     });
     if (response.ok) {
       responseData = {_data: await response.json(), status: response.status, ok: response.ok };
-       console.log(responseData);
+       //console.log(responseData);
        return responseData;
     } 
     if( response.status === 401) {
@@ -88,7 +88,7 @@ export const makeProtectedApiCall = async <T>(
       return makeProtectedApiCall( rqstUrl, rqstUserOptions);
     } else {
       responseData = {_data: await response.json(), status: response.status, ok: response.ok };
-       console.log(responseData);
+       //console.log(responseData);
        return responseData;
     }
   } catch {
