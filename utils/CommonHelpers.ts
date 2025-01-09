@@ -195,14 +195,30 @@ export const getForecastStatus = (
   }
 };
 
-export const areArraysEqual = (arr1: any, arr2: any) => {
-  if (arr1.length !== arr2.length) return false;
-  // implement custom sort if necessary
-  arr1.sort();
-  arr2.sort();
-  // use normal for loop so we can return immediately if not equal
-  for (let i = 0; i < arr1.length; i++) {
-    if (arr1[i] !== arr2[i]) return false;
+export const arraysEqual = (arr1: any, arr2: any) => {
+  // Check if the arrays have the same length
+  if (arr1.length !== arr2.length) {
+    return false;
   }
+
+  // Sort both arrays (if they contain primitives)
+  arr1 = arr1.sort();
+  arr2 = arr2.sort();
+
+  // Iterate over each element in the arrays
+  for (let i = 0; i < arr1.length; i++) {
+    // If the elements are not equal, return false
+    if (arr1[i] !== arr2[i]) {
+      // If the elements are objects, recursively compare them
+      if (typeof arr1[i] === "object" && typeof arr2[i] === "object") {
+        if (!arraysEqual(arr1[i], arr2[i])) {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+  }
+  // If all elements are equal, return true
   return true;
-};
+}

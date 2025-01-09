@@ -192,6 +192,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
   
   function clearCalibratableParameters() {
     userSelectedCalibrationTuningParameters.value = [];
+   // calibrationTuningModules.value = null;
   }
 
 

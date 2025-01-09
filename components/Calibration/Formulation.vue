@@ -173,8 +173,9 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
+
 import type { UserCalibrationRunData } from "@/composables/NextGenModel";
-import { isCalibrationJobStatusSavedOrReady, areArraysEqual } from "@/utils/CommonHelpers";
+import { isCalibrationJobStatusSavedOrReady, arraysEqual } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -308,8 +309,7 @@ const saveFormulationData = () => {
     toast.removeAllGroups();
     var valOK = validateModules();
     if( !valOK ) {
-      // delete all of the Calabratable paramt
-      // ers on the Tuning Controls tab
+      // delete all of the Calabratable parameters on the Tuning Controls tab
       console.log("clearCalibratableParameters")
       clearCalibratableParameters();
     }
@@ -346,7 +346,7 @@ const validateModules = () => {
   /* check if list of modules changed */
   let selModules = selectedModuleValues.value;
   let savedModules = userCalibrationRunData?.value?.modules;
-  if ( !areArraysEqual(selModules, savedModules) ) {
+  if( arraysEqual(selModules, savedModules)) {
     return true;
   } 
   return false;
@@ -356,8 +356,12 @@ const validateTab = () => {
   let error = false;
   let text = [];
   /* Check if formulation name changed */
-  let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : '';
   let newName = formulationNameInput.value ? formulationNameInput.value : '';
+  if( newName.trim === "" )  {
+    error = true;
+    text.push("Please enter a valid Forumulation Name");
+  }
+  let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : '';
   if (savedName !== newName) {
     error = true;
     text.push("Formulation Name has been changed");
