@@ -141,6 +141,7 @@ import { useGageStore } from "@/stores/calibration/GageStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
@@ -152,6 +153,7 @@ import { hilightTab } from '@/composables/TabHilight';
 
 import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
 
+const { hardResetTuningTimeConrols } = useTuningStore();
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 
@@ -185,7 +187,20 @@ const fileUploadDialogOpened = ref<boolean>(false);
 const nextPrevDialogOpened = ref<boolean>(false);
 
 const onGageSelectionChange = () => {
-  fetchSelectedGageData()
+  // check for an actual change
+  if (userCalibrationRunData.value.gage.gage_id !== selectedGageValue.value) {
+    fetchSelectedGageData();
+    hardResetTuningTimeConrols();
+    userCalibrationRunData.value.calibration_times.calibration_start_time = "";
+    userCalibrationRunData.value.calibration_times.calibration_end_time = "";
+    userCalibrationRunData.value.calibration_times.simulation_start_time = "";
+    userCalibrationRunData.value.calibration_times.simulation_end_time = "";
+
+    userCalibrationRunData.value.validation_times.validation_start_time = "";
+    userCalibrationRunData.value.validation_times.validation_end_time = "";
+    userCalibrationRunData.value.validation_times.simulation_start_time = "";
+    userCalibrationRunData.value.validation_times.simulation_end_time = "";
+  }
 }
 
 const uploadForcingDlgOpen = (e: SelectChangeEvent) => {

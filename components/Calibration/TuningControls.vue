@@ -358,7 +358,7 @@ onMounted(async () => {
   // Check to see if there is a job. If not, don't initialize this tab!
   if (calibrationJobId.value) {
     // fetch user calibration data
-    await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
+    //await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
 
     if (!userSelectedCalibrationTuningParameters.value.length) {
       console.log("Clearing out selectedTuningParameterData");

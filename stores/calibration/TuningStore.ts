@@ -182,18 +182,29 @@ export const useTuningStore = defineStore('TuningStore', () => {
     return saveTuningTabResponse;
   };
 
-
   useLogoutListen('logoutEvent', (evStr: string) => {
     if (evStr === "logout") {
       hardResetTuningStore();
     }
   })
-
   
   function clearCalibratableParameters() {
     userSelectedCalibrationTuningParameters.value = [];
-   // calibrationTuningModules.value = null;
   }
+
+  /**
+   * Hard Reset Tuning Store
+   */
+  const hardResetTuningTimeConrols = (): void => {
+    simStartTime.value = "";
+    simEndTime.value = "";
+    calStartTime.value = "";
+    calEndTime.value = "";
+    avSimStartTime.value = "";
+    avSimEndTime.value = "";
+    avCalStartTime.value = "";
+    avCalEndTime.value = "";
+  };
 
 
   /**
@@ -243,6 +254,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     saveTuningTabRequestBody,
     saveTuningTabData,
     clearCalibratableParameters,
+    hardResetTuningTimeConrols,
     hardResetTuningStore
   };
 },
