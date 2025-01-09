@@ -200,6 +200,15 @@ const onGageSelectionChange = () => {
     userCalibrationRunData.value.validation_times.validation_end_time = "";
     userCalibrationRunData.value.validation_times.simulation_start_time = "";
     userCalibrationRunData.value.validation_times.simulation_end_time = "";
+
+    userCalibrationRunData.value?.external_data_status.observational === false;
+    userCalibrationRunData.value?.external_data_status.forcing === false;
+    userCalibrationRunData.value?.external_data_status.geopackage === false;
+
+    selectedForcingValue.value = getForcingOptionsList.value[0].name;
+    selectedObservationalValue.value = getObservationalOptionsList.value[0].name;
+    selectedGeopackageValue.value = getGeopackageOptionsList.value[0].name;
+    document.getElementById("OutVar").value = "";
   }
 }
 
