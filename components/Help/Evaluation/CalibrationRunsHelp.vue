@@ -1,22 +1,43 @@
 <template>
   <div class="_help-page">
-    <div class="_help-title">ngenCERF Evaluation Workflow - Calibration Runs Tab</div>
-    <!-- <div class="_help-subtitle">&nbsp;</div> -->
-    <p class="text-center">
-      Displays table of previous calibration run with some basic details. User selects one of the runs in the list to
-      evaluate.<br />If the run has multiple validation runs, the user will be provided a list of the associated calibrations
+    <div class="_help-title">Evaluation - Calibration Runs Tab</div>
+    <p class="_help-subtitle">
+      Displays table of calibration run with some basic details. User selects one of the runs in the list to
+      evaluate. If the run has multiple validation runs, the user will be provided a list of the associated validation
       runs to select from.
     </p>
+    <p class="text-center" style="color:#cc5500;font-size:0.8em;">
+      WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
+    </p>
     <hr class="mt-2 mb-4" />
-    <div class="mb-1">Filter the entries in the table by:</div>
-    <ul class="helpfile-ul mb-4 ml-8">
-      <li>The Headwater Basin Gage</li>
-      <li>Whether or not the calibration run has a validation run.</li>
-    </ul>
-    <p>User can right click on an entry in the table to Delete the selected job. User will remain on this tab.</p>
-    <p>Once the job is selected, the job details are displayed in the summary area.</p>
-    <p>The user can then click the Evaluate button to be taken to the visualizer for evaluation the calibration run or
-      choose to setup a new validation run.</p>
+    <table class="_help-table">
+      <tbody>
+        <tr>
+          <td class="td1">Right Click</td>
+          <td class="td2"><strong>Provides a context menu with some of the following options:</strong></td>
+        </tr>
+        <tr>
+          <td class="td1">Evaluate</td>
+          <td class="td2">If only one validation run has been performed selecting this will take the user to the Evaluate tab to view calibration and validation results.</td>
+        </tr>
+        <tr>
+          <td class="td1">New Validation Run</td>
+          <td class="td2">Since only the control, last and best iteration runs data are saved, use this to generate data for a different iteration from the calibration run.</td>
+        </tr>
+        <tr>
+          <td class="td1">Select Validation Run</td>
+          <td class="td2">If more than one validation has been done, the user will be taken to a table to select the validation job to evaluate.</td>
+        </tr>
+        <tr>
+          <td class="td1">View Valdiation Run Status</td>
+          <td class="td2">View the status of the validation run.</td>
+        </tr>
+        <tr>
+          <td class="td1">Delete Calibration Job</td>
+          <td class="td2">Delete the selected calibration job and all it's associated validation jobs. User will remain on this page.</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 

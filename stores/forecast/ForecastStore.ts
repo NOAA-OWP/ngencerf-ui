@@ -4,6 +4,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import { isValidDate } from '@/utils/CommonHelpers';
 import { convertTimeZone } from '@/utils/TimeHelpers';
 
@@ -22,6 +23,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const elapsedTimeIntervalId = ref<number>();
   const forecastJobStatusIntervalId = ref<number>();
   const resultsPathname = ref<string>();
+  const forecastPlotName = ref<any>(); // TODO: create forecastPlotName interface
+  const forecastPlot = ref<any>(); // TODO: create forecastPlot interface
 
   const calibrationRunsForForecast = ref<CalibrationRunsForForecast[]>([]);
   const calibrationRunForForecast = ref<CalibrationRunForForecast>();
@@ -66,16 +69,36 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * Load Forecast Status/Run tab data
    */
   const loadForecastStatusRunTabData = async (): Promise<void> => {
-    // load forecast status
-    const loadForecastTabResponse: any = await loadForecastTab();
-    forecastJobStatus.value = loadForecastTabResponse?._data?.status;
-    elapsedTime.value = loadForecastTabResponse?._data?.elapsed_time;
-    submitTimeDate.value = new Date(loadForecastTabResponse?._data?.submit_date as string);
-    if (isValidDate(submitTimeDate.value)) {
-      submitTime.value = convertTimeZone(submitTimeDate.value);
-    }
-    resultsPathname.value = loadForecastTabResponse?._data?.data_dir;
+    // get forecast job data
+    if (forecastJobId?.value) {
+      // get forecast status
+      const getStatusResponse: any = await getStatus();
 
+      // TODO: create forecastJob interface
+      const forecastJob: any  = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
+
+      // set forecastJobStatus, elapsedTime, submitTime, and resultsPathname
+      forecastJobStatus.value = forecastJob.status;
+      elapsedTime.value = forecastJob.elapsed_time;
+      submitTimeDate.value = new Date(forecastJob.submit_date as string);
+      if (isValidDate(submitTimeDate.value)) {
+        submitTime.value = convertTimeZone(submitTimeDate.value);
+      }
+    }
+    // set resultsPathname
+    await setResultsPathname();
+  };
+
+  /**
+   * Load Forecast Results tab data
+   */
+  const loadForecastResultsTabData = async (): Promise<string[]> => {
+    const results = await Promise.all([
+      setResultsPathname(), // set resultsPathname
+      setForecastPlot(), // set forecastPlot
+    ]);
+  
+    return results.flat(); // combine results from both function calls
   };
 
   /**
@@ -131,16 +154,75 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       },
       body: ""
     }).then((result) => {
-      calibrationRunsForForecast.value = result._data.jobs
+      calibrationRunsForForecast.value = result._data.jobs;
     });
   };
 
   /**
-   * Call get_status endpoint with calibrationRunForForecast's calibration_run_id
+   * Call get_status endpoint with calibrationRunForForecast.value.calibration_run_id
    * @return {any}
    */
   const getStatus = async (): Promise<any> => {
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibrationRunForForecast.value?.calibration_run_id })
+    });
+  };
+
+  /**
+   * Get Forecast Plots
+   */
+  const getForecastPlotNames = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot_names/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ forecast_run_id: forecastJobId.value })
+    });
+  };
+
+  /**
+   * Get Forecast Plot
+   */
+  const getForecastPlot = async ({
+    plotName,
+    include_data = false,
+    force_include_plot = false,
+  }: {
+    plotName: string;
+    include_data?: boolean;
+    force_include_plot?: boolean;
+  }): Promise<any> => {
+    if (forecastJobId.value) {
+      const params = new URLSearchParams({
+        plot_name: plotName,
+        include_data: include_data.toString(),
+        force_include_plot: force_include_plot.toString(),
+        forecast_run_id: forecastJobId.value.toString(),
+      });
+
+      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/?${params.toString()}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": "application/json"
+        }
+      });
+    }
+  };
+
+  /**
+   * Get Job Data Directory
+   * @returns {any}
+   */
+  const getJobDataDirectory = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_job_data_dir/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -180,6 +262,64 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   }
 
   /**
+   * Set resultsPathname
+   */
+  const setResultsPathname = async (): Promise<string[]> => {
+    if (calibrationRunForForecast.value?.calibration_run_id) {
+      const queryGetJobDataDirectoryResponse = await getJobDataDirectory();
+
+      if (queryGetJobDataDirectoryResponse?._data?.data_dir) {
+        resultsPathname.value = queryGetJobDataDirectoryResponse._data.data_dir;
+        return [];
+      } else {
+        return ['No data directory found from get_job_data_dir endpoint'];
+      }
+    } else {
+      return ['No calibration run id found'];
+    }
+  };
+
+  /**
+   * Set forecastPlot
+   */
+  const setForecastPlot = async (): Promise<string[]> => {
+    if (forecastJobId?.value) {
+      const getForecastPlotNamesResponse: any = await getForecastPlotNames();
+
+      // set forecastPlotNamesList
+      if (getForecastPlotNamesResponse.status === 200) {
+        if (getForecastPlotNamesResponse?._data?.plot_names) {
+          const forecastPlotNamesList: any[] = getForecastPlotNamesResponse._data.plot_names;
+
+          if (forecastPlotNamesList.length === 1) {
+            forecastPlotName.value = forecastPlotNamesList[0];
+            const getForecastPlotResponse: any = await getForecastPlot({
+              plotName: (forecastPlotName?.value?.name as string),
+              include_data: true,
+              force_include_plot: true
+            });
+
+            if (getForecastPlotResponse.status === 200) {
+              forecastPlot.value = getForecastPlotResponse._data;
+              return [];
+            } else {
+              return useApiErrorResponsePreprocess(getForecastPlotResponse);
+            }
+          } else {
+            return [`${forecastPlotNamesList.length} forecast plots found`];
+          }
+        } else {
+          return ['Could not get forecast plot names from get_plot_names endpoint'];
+        }
+      } else {
+        return useApiErrorResponsePreprocess(getForecastPlotNamesResponse);
+      }
+    } else {
+      return ['No forecast job id found'];
+    }
+  };
+
+  /**
    * Hard Reset Forecast Store
    */
   const hardResetForecastStore = (): void => {
@@ -196,7 +336,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     submitTime.value =  undefined;
     elapsedTimeIntervalId.value =  undefined;
     forecastJobStatusIntervalId.value =  undefined;
-    resultsPathname.value =  undefined;  
+    resultsPathname.value =  undefined;
+    forecastPlotName.value =  undefined;
+    forecastPlot.value = undefined;
     calibrationRunsForForecast.value = [];
     calibrationRunForForecast.value = undefined;
     clearUserCalibrationRunData();
@@ -214,6 +356,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     elapsedTimeIntervalId,
     forecastJobStatusIntervalId,
     resultsPathname,
+    forecastPlotName,
+    forecastPlot,
     forecastRunGageList,
     calibrationRunsForForecast,
     calibrationRunForForecast,
@@ -221,6 +365,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastRuns,
     loadSetupForecastTabData,
     loadForecastStatusRunTabData,
+    loadForecastResultsTabData,
     loadForecastTab,
     createAndRunForecastJob,
     cancelForecastJob,
@@ -229,7 +374,12 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     loadSelectedCalibrationRun,
     setSelectedCalibrationRunId,
     resetSelectedCalibrationRunId,
+    setResultsPathname,
+    setForecastPlot,
     getStatus,
+    getForecastPlotNames,
+    getForecastPlot,
+    getJobDataDirectory,
     hardResetForecastStore,
     setSelectedForecastRunId,
     resetSelectedForecastRunId,

@@ -16,7 +16,7 @@
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
             Calibration Runs<br />
             <span style="font-size: 12px;font-weight: normal;">
-              Double click on a row to setup a forecast, or select row and right click for more options.
+              Select row and right click for options.
             </span>
           </h1>
         </div>

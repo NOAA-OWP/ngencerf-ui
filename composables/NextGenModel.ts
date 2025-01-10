@@ -75,7 +75,7 @@ export interface FormulationTabSaveWarningGroupRequirement {
  */
 export interface JobsList {
   jobs: JobListItem[];
-}
+};
 
 export interface JobListItem {
   calibration_run_id: number;
@@ -87,7 +87,29 @@ export interface JobListItem {
   calibration_end_period: Date;
   formulation_name: string;
   submit_date: Date;
-}
+};
+
+/**
+ * model for validation job lists
+ */
+export interface ValidationJobsList {
+  validation_jobs: ValidationJobListItem[];
+};
+
+export interface ValidationJobListItem {
+  validation_run_id: number;
+  submit_date: Date;
+  validation_type: string;
+  iteration_num: number;
+  status: string;
+  parameters: ValidationJobParameter[];
+  best: boolean;
+};
+
+export interface ValidationJobParameter {
+  name: string;
+  value: number;
+};
 
 /**
  * module for user input calibration tab data
