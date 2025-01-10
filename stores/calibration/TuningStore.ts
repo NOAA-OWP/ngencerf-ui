@@ -43,6 +43,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const tuningStore_data_loading = ref(true);
   const saveTuningTabRequestBody = ref<any>({});
 
+  const selectedOutputVariable = ref<any>(null);
+
   // Restore state from sessionStorage if available
   if (typeof window !== 'undefined') {
     let ls;
@@ -219,7 +221,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
     calibrationTuningModules.value = null;
     calibrationTuningParameters.value = [];
     userSelectedCalibrationTuningParameters.value = [];
-    userOutputVariableToCalibrate.value.name = '';
     userOutputVariableToCalibrate.value.module = null;
     outputVariables.value = [];
     automatic_validation.value = true;
@@ -243,6 +244,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     calibrationTuningParameters,
     userSelectedCalibrationTuningParameters,
     userOutputVariableToCalibrate,
+    selectedOutputVariable,
     outputVariables,
     automatic_validation,
     avSimStartTime,

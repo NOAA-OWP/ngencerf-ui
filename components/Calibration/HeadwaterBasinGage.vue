@@ -168,6 +168,9 @@ const { fetchUserCalibrationRunData } = useUserDataStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
+const tuningStore = useUserDataStore();
+const { selectedOutputVariable, userOutputVariableToCalibrate } = storeToRefs(useTuningStore);
+
 const isLoading = ref(true);
 
 
@@ -201,14 +204,22 @@ const onGageSelectionChange = () => {
     userCalibrationRunData.value.validation_times.simulation_start_time = "";
     userCalibrationRunData.value.validation_times.simulation_end_time = "";
 
-    userCalibrationRunData.value?.external_data_status.observational === false;
-    userCalibrationRunData.value?.external_data_status.forcing === false;
-    userCalibrationRunData.value?.external_data_status.geopackage === false;
-
-    selectedForcingValue.value = getForcingOptionsList.value[0].name;
-    selectedObservationalValue.value = getObservationalOptionsList.value[0].name;
-    selectedGeopackageValue.value = getGeopackageOptionsList.value[0].name;
-    document.getElementById("OutVar").value = "";
+    if (userCalibrationRunData?.value) {
+      if (userCalibrationRunData.value.external_data_status.observational) {
+        selectedObservationalValue.value = getObservationalOptionsList.value[0].name;
+        userCalibrationRunData.value.external_data_status.observational = false;
+      }
+      if (userCalibrationRunData.value.external_data_status.forcing) {
+        selectedForcingValue.value = getForcingOptionsList.value[0].name;
+        userCalibrationRunData.value.external_data_status.forcing = false;
+      }
+      if (userCalibrationRunData.value.external_data_status.geopackage) {
+        selectedGeopackageValue.value = getGeopackageOptionsList.value[0].name;
+        userCalibrationRunData.value.external_data_status.geopackage = false;
+      }
+    }
+    // userOutputVariableToCalibrate.value.name = '';
+    // userOutputVariableToCalibrate.value.module = null;
   }
 }
 

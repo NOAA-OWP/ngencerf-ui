@@ -317,6 +317,7 @@ const {
   calibrationTuningParameters,
   userSelectedCalibrationTuningParameters,
   userOutputVariableToCalibrate,
+  selectedOutputVariable,
   outputVariables,
   automatic_validation,
   avSimStartTime,
@@ -330,7 +331,6 @@ const {
 
 const toast = useToast();
 const selectedParameter = ref<any>(null);
-const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isInitialSetupDone = ref(false);
 const selectedTuningParameterData = ref();
