@@ -18,7 +18,7 @@
               <label for="Gage">Gage</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
-                @change="onGageSelectionChange" class=""></Select>
+                @change="onGageSelectionChange" @focus="focusSelectInput" class=""></Select>
             </div>
 
             <div class="col-span-1">&nbsp;</div>
@@ -154,12 +154,15 @@ import { hilightTab } from '@/composables/TabHilight';
 import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
 
 const { hardResetTuningTimeConrols } = useTuningStore();
+const { selectedOutputVariable, userOutputVariableToCalibrate } = storeToRefs(useTuningStore());
+
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 
 const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
   getObservationalOptionsList } = storeToRefs(useGageStore());
+
 const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
   saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
 const { getCalibrationTabIndex } = generalStore();
@@ -168,8 +171,7 @@ const { fetchUserCalibrationRunData } = useUserDataStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
-const tuningStore = useUserDataStore();
-const { selectedOutputVariable, userOutputVariableToCalibrate } = storeToRefs(useTuningStore);
+
 
 const isLoading = ref(true);
 
@@ -218,8 +220,8 @@ const onGageSelectionChange = () => {
         userCalibrationRunData.value.external_data_status.geopackage = false;
       }
     }
-    // userOutputVariableToCalibrate.value.name = '';
-    // userOutputVariableToCalibrate.value.module = null;
+    userOutputVariableToCalibrate.value.name = '';
+    userOutputVariableToCalibrate.value.module = null;
   }
 }
 
@@ -227,6 +229,16 @@ const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
   if (e && e.value === 'User Upload') {
     showForcingFileUploadDialog('Forcing Files')
   }
+}
+
+/**
+ * Force focus on text input area when user clicks on dropdown.
+ * @param e Event
+ */
+const focusSelectInput = (e: any) => {
+  setTimeout(() => {
+    document.getElementsByClassName('p-select-filter')[0].focus();
+  }, 0);
 }
 
 const showForcingFileUploadDialog = (headerText: string) => {
