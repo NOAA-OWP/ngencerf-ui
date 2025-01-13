@@ -15,7 +15,7 @@
             </div>
 
             <div class="col-span-1">
-              <label for="Gage">Gage</label><br />
+              <label for="Gage" @focus="focusSelectInput">Gage</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
                 @change="onGageSelectionChange" @focus="focusSelectInput" class=""></Select>
@@ -236,9 +236,9 @@ const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
  * @param e Event
  */
 const focusSelectInput = (e: any) => {
-  setTimeout(() => {
+  setTimeout( () => {
     document.getElementsByClassName('p-select-filter')[0].focus();
-  }, 0);
+  }, 200);
 }
 
 const showForcingFileUploadDialog = (headerText: string) => {
