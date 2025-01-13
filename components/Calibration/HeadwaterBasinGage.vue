@@ -194,35 +194,41 @@ const nextPrevDialogOpened = ref<boolean>(false);
 const onGageSelectionChange = () => {
   // check for an actual change
   if (userCalibrationRunData.value.gage.gage_id !== selectedGageValue.value) {
-    fetchSelectedGageData();
-    hardResetTuningTimeConrols();
-    userCalibrationRunData.value.calibration_times.calibration_start_time = "";
-    userCalibrationRunData.value.calibration_times.calibration_end_time = "";
-    userCalibrationRunData.value.calibration_times.simulation_start_time = "";
-    userCalibrationRunData.value.calibration_times.simulation_end_time = "";
+    isLoading.value = true;
+    setTimeout(() => {
+      fetchSelectedGageData();
+      hardResetTuningTimeConrols();
+      userCalibrationRunData.value.calibration_times.calibration_start_time = "";
+      userCalibrationRunData.value.calibration_times.calibration_end_time = "";
+      userCalibrationRunData.value.calibration_times.simulation_start_time = "";
+      userCalibrationRunData.value.calibration_times.simulation_end_time = "";
 
-    userCalibrationRunData.value.validation_times.validation_start_time = "";
-    userCalibrationRunData.value.validation_times.validation_end_time = "";
-    userCalibrationRunData.value.validation_times.simulation_start_time = "";
-    userCalibrationRunData.value.validation_times.simulation_end_time = "";
+      userCalibrationRunData.value.validation_times.validation_start_time = "";
+      userCalibrationRunData.value.validation_times.validation_end_time = "";
+      userCalibrationRunData.value.validation_times.simulation_start_time = "";
+      userCalibrationRunData.value.validation_times.simulation_end_time = "";
 
-    if (userCalibrationRunData?.value) {
-      if (userCalibrationRunData.value.external_data_status.observational) {
-        selectedObservationalValue.value = getObservationalOptionsList.value[0].name;
-        userCalibrationRunData.value.external_data_status.observational = false;
+      if (userCalibrationRunData?.value) {
+        if (userCalibrationRunData.value.external_data_status.observational) {
+          selectedObservationalValue.value = getObservationalOptionsList.value[0].name;
+          userCalibrationRunData.value.external_data_status.observational = false;
+        }
+        if (userCalibrationRunData.value.external_data_status.forcing) {
+          selectedForcingValue.value = getForcingOptionsList.value[0].name;
+          userCalibrationRunData.value.external_data_status.forcing = false;
+        }
+        if (userCalibrationRunData.value.external_data_status.geopackage) {
+          selectedGeopackageValue.value = getGeopackageOptionsList.value[0].name;
+          userCalibrationRunData.value.external_data_status.geopackage = false;
+        }
       }
-      if (userCalibrationRunData.value.external_data_status.forcing) {
-        selectedForcingValue.value = getForcingOptionsList.value[0].name;
-        userCalibrationRunData.value.external_data_status.forcing = false;
-      }
-      if (userCalibrationRunData.value.external_data_status.geopackage) {
-        selectedGeopackageValue.value = getGeopackageOptionsList.value[0].name;
-        userCalibrationRunData.value.external_data_status.geopackage = false;
-      }
-    }
-    selectedOutputVariable.value = "";
-    userOutputVariableToCalibrate.value ={ name: '', module: null}
-    userCalibrationRunData.value.output_variable_to_calibrate = { name: '', module: null};
+      selectedOutputVariable.value = "";
+      userOutputVariableToCalibrate.value = { name: '', module: null }
+      userCalibrationRunData.value.output_variable_to_calibrate = { name: '', module: null };
+      isLoading.value = false;
+      toast.add({ severity: 'info', summary: `Gage Changed`, detail: "You must save this tab for the change to effect the run.", life: 5000 })
+
+    }, 100);
   }
 }
 
@@ -238,8 +244,11 @@ const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
  */
 const focusSelectInput = (e: any) => {
   setTimeout( () => {
-    document.getElementsByClassName('p-select-filter')[0].focus();
-  }, 200);
+    let eles = document.getElementsByClassName('p-select-filter');
+    if (eles.length) {
+      eles[0].focus();
+    }
+  }, 150);
 }
 
 const showForcingFileUploadDialog = (headerText: string) => {
