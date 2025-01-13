@@ -220,8 +220,9 @@ const onGageSelectionChange = () => {
         userCalibrationRunData.value.external_data_status.geopackage = false;
       }
     }
-    userOutputVariableToCalibrate.value.name = '';
-    userOutputVariableToCalibrate.value.module = null;
+    selectedOutputVariable.value = "";
+    userOutputVariableToCalibrate.value ={ name: '', module: null}
+    userCalibrationRunData.value.output_variable_to_calibrate = { name: '', module: null};
   }
 }
 
