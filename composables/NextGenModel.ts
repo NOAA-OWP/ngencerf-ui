@@ -73,20 +73,23 @@ export interface FormulationTabSaveWarningGroupRequirement {
 /**
  * model for calibration job list
  */
-export interface JobsList {
-  jobs: JobListItem[];
+export interface CalibrationJobsList {
+  jobs: CalibrationJobListItem[];
 };
 
-export interface JobListItem {
+export interface CalibrationJobListItem {
   calibration_run_id: number;
   gage_id: string;
-  status: string;
-  created_at: Date;
   job_genesis: string;
+  created_at: Date;
+  status: string;
   calibration_start_period: Date;
   calibration_end_period: Date;
   formulation_name: string;
   submit_date: Date;
+  objective_function: string;
+  optimization_algorithm: string;
+  validations: 
 };
 
 /**
@@ -497,7 +500,7 @@ export interface CalibrationPlotListData extends SelectOption {
 /**
  * Evaluation models
  */
-export interface ValidatedCalibrationRunListItem extends JobListItem {
+export interface ValidatedCalibrationRunListItem extends CalibrationJobListItem {
   objective_function: string;
   optimization_algorithm: string;
   validation_runs: number;

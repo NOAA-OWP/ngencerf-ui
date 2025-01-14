@@ -66,7 +66,7 @@
 import { onMounted } from "vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import type { JobListItem, ValidationJobListItem } from "@/composables/NextGenModel";
+import type { CalibrationJobListItem, ValidationJobListItem } from "@/composables/NextGenModel";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
@@ -96,8 +96,8 @@ import { hilightTab } from '@/composables/TabHilight';
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 const isLoading = ref(true);
-const selectedCalibrationRun = ref<JobListItem>();
-const updatedUserCalibrationJobsListData = ref<JobListItem[]>();
+const selectedCalibrationRun = ref<CalibrationJobListItem>();
+const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>();
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
@@ -275,7 +275,7 @@ const updateUserCalibrationJobsListData = async (): Promise<void>  => {
   // set updatedUserCalibrationJobsListData to userCalibrationJobsListData, but with the updated status for the job to include the validation status
   updatedUserCalibrationJobsListData.value = await Promise.all(
     userCalibrationJobsListData.value
-    .map(async (calibrationJob: JobListItem) => {
+    .map(async (calibrationJob: CalibrationJobListItem) => {
       // if the job is done, get the calibration status to include the validation status
       if (calibrationJob.status === 'Done') {
         // get the calibration status

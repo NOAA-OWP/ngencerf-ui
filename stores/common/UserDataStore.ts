@@ -5,7 +5,7 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "./GeneralStore";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 
-import type { JobsList, JobListItem, ValidationJobsList, UserCalibrationRunData } from "@/composables/NextGenModel";
+import type { CalibrationJobListItem, ValidationJobsList, UserCalibrationRunData } from "@/composables/NextGenModel";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -20,7 +20,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
 
   const tokenExpired = ref<boolean>(false);
 
-  const userCalibrationJobsListData = ref<JobListItem[]>([]);
+  const userCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
   const userCalibrationRunData = ref<UserCalibrationRunData>();
 
   const userSelectedCalibrationIterationId = ref<number | null>(null);
