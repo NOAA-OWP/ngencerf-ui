@@ -111,7 +111,7 @@
               </div>
             </span>
             <span v-else>
-              <div class="col-span-1 mr-3">
+              <div class="ngenButtonDiv-yellow-spacer col-span-1 mr-3">
                 &nbsp;
               </div>
             </span>

@@ -179,6 +179,15 @@ input::-webkit-input-placeholder {
 .ngenButtonDiv-yellow:hover {
   background-color: $ngwcp_yellow_dark2;
 }
+
+.ngenButtonDiv-yellow-spacer {
+  padding: 6px 25px;
+  border-radius: 28px;
+  background-color: transparent;
+  font-size: 18px;
+  border: 0px;
+  display: inline-block;
+}
 .btn-left {
   margin-right: auto;
   margin-left: 0px;

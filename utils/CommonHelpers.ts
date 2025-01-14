@@ -67,7 +67,7 @@ export const fixFloatToFivePlaces = (f: number) => {
 };
 
 /**
- * Get overall Calibration/Validation status to display in PreviousCalibrationsRuns and RunStatus tabs
+ * Get overall Calibration/Validation status to display in PreviousCalibrationsRuns tab
  * @param calibrationStatus
  * @param validationControlStatus
  * @param validationBestStatus
@@ -94,18 +94,12 @@ export const getOverallCalibrationValidationStatus = (
   ) {
     return `Calibration Done, Validation Best Running`;
   } else if (
-    calibrationStatus === "Done" &&
-    validationControlStatus &&
-    validationControlStatus === "Done" &&
-    validationBestStatus &&
-    validationBestStatus === "Done"
-  ) {
-    return "Done";
-  } else if (
-    calibrationStatus === "Done" &&
-    validationControlStatus &&
-    validationBestStatus
-  ) {
+    calibrationStatus === 'Done' &&
+    validationControlStatus && validationControlStatus === 'Done' &&
+    validationBestStatus && validationBestStatus === 'Done'
+    ) {
+    return 'Done';
+  } else if (calibrationStatus === 'Done' && validationControlStatus) {
     // get the overall status of validation control and validation best
     const validationControlBestStatus = getValidControlAndValidBestStatus(
       validationControlStatus,
@@ -122,40 +116,35 @@ export const getOverallCalibrationValidationStatus = (
  * @param validBest
  * @returns {string}
  */
-export const getValidControlAndValidBestStatus = (
-  validControlStatus: string,
-  validBestStatus: string
-): string => {
-  if (validControlStatus === "Saved" || validBestStatus === "Saved") {
-    return "Saved";
-  } else if (validControlStatus === "Ready" || validBestStatus === "Ready") {
-    return "Ready";
-  } else if (
-    validControlStatus === "Running" ||
-    validBestStatus === "Running"
-  ) {
-    return "Running";
-  } else if (
-    validControlStatus === "Cancelled" ||
-    validBestStatus === "Cancelled"
-  ) {
-    return "Cancelled";
-  } else if (validControlStatus === "Failed" || validBestStatus === "Failed") {
-    return "Failed";
-  } else if (
-    validControlStatus === "Server Error" ||
-    validBestStatus === "Server Error"
-  ) {
-    return "Server Error";
-  } else if (validControlStatus === "Done" && validBestStatus === "Done") {
-    return "Done";
-  } else {
-    return "Unknown";
+export const getValidControlAndValidBestStatus = (validControlStatus: string, validBestStatus?: string): string => {
+  if (validControlStatus === 'Saved' || validBestStatus === 'Saved') {
+    return 'Saved';
+  }
+  else if (validControlStatus === 'Ready' || validBestStatus === 'Ready') {
+    return 'Ready';
+  }
+  else if (validControlStatus === 'Running' || validBestStatus === 'Running') {
+    return 'Running';
+  }
+  else if (validControlStatus === 'Cancelled' || validBestStatus === 'Cancelled') {
+    return 'Cancelled';
+  }
+  else if (validControlStatus === 'Failed' || validBestStatus === 'Failed') {
+    return 'Failed';
+  }
+  else if (validControlStatus === 'Server Error' || validBestStatus === 'Server Error') {
+    return 'Server Error';
+  }
+  else if (validControlStatus === 'Done' && validBestStatus === 'Done') {
+    return 'Done';
+  }
+  else {
+    return 'Unknown';
   }
 };
 
 /**
- * Get the combined status of  forecast_forcing_download_status and forecast_status
+ * Get the combined status of forecast_forcing_download_status and forecast_status
  * @param forecastForcingDownloadStatus
  * @param forecastStatus
  * @returns {string}
