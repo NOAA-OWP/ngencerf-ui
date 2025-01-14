@@ -104,14 +104,16 @@
                 Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
               </div>
             </span>
-            <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
+            <span v-if="gageHasChanged">
               <div class="col-span-1 mr-3">
-                <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
-                  aria-label="Reset Button">Reset</button>-->
+                <button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Reset Gage" @click="gageSelectionReset()"
+                  aria-label="Reset Gage">Reset</button>
               </div>
             </span>
             <span v-else>
-              <div class="col-span-1 mr-3">&nbsp;</div>
+              <div class="col-span-1 mr-3">
+                &nbsp;
+              </div>
             </span>
             <div class="col-span-4">&nbsp;</div>
             <div class="col-span-1">&nbsp;</div>
@@ -121,7 +123,7 @@
             </div>
           </div>
         </div>
-
+        n
       </div>
 
     </div>
@@ -182,9 +184,11 @@ onMounted(() => {
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
+    if (gageHasChanged.value && userCalibrationRunData?.value?.gage?.gage_id) {
+      gageSelectionReset();
+    }
   });
 })
-
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
@@ -192,6 +196,21 @@ const nextPrevDialogOpened = ref<boolean>(false);
 
 const onGageSelectionChange = () => {
   gageHasChanged.value = true;
+  fetchSelectedGageData();
+}
+
+/**
+ * Resets the Gage to the previous gage if it was changed and not saved.
+ */
+const gageSelectionReset = () => {
+  selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
+  fetchSelectedGageData();
+  gageHasChanged.value = false;
+  const optList = getGageOptionsList;
+  const index = optList.value.findIndex(item => item.name === selectedGageValue.value);
+  selectedGageValue.value = optList.value[index].name;  
+  const g = document.getElementById('Gage');
+  g.childNodes[0].innerText = optList.value[index].name
 }
 
 const clearDataDueToGageChange = () => {
@@ -246,7 +265,7 @@ const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
  * @param e Event
  */
 const focusSelectInput = (e: any) => {
-  setTimeout( () => {
+  setTimeout(() => {
     let eles = document.getElementsByClassName('p-select-filter');
     if (eles.length) {
       eles[0].focus();
@@ -386,9 +405,10 @@ const saveTabData = () => {
     toast.removeAllGroups();
 
     // Check for gage change
-    if (gageHasChanged.value ) {
+    if (gageHasChanged.value) {
       clearDataDueToGageChange();
       gageHasChanged.value = false;
+      return;
     }
 
     saveGageTabData().then(response => {
@@ -459,7 +479,7 @@ const handleNextPrevDialogClose = (opt: any) => {
     selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
     gotoNext();
   }
-  if( opt.type && opt.type === 'dialog-close') {
+  if (opt.type && opt.type === 'dialog-close') {
     return;
   }
 }
