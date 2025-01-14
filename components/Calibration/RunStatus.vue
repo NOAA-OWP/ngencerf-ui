@@ -250,7 +250,7 @@ onMounted(() => {
       if (validBest?.status) {
         validationBestStatus.value = validBest.status;
       }
-      if (validationControlStatus?.value && validationBestStatus?.value) {
+      if (validationControlStatus?.value) {
         validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
       }
     }
@@ -261,7 +261,6 @@ onMounted(() => {
  * Create elapsedTimeIntervalId to update elapsedTime every second while Calibration is Running or Validation is not Done
  */
 const createElapsedTimeInterval = () => {
-
   elapsedTimeIntervalId.value = setInterval(async () => {
     if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
@@ -366,7 +365,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         if (validBest?.status) {
           validationBestStatus.value = validBest.status;
         }
-        if (validationControlStatus?.value && validationBestStatus?.value) {
+        if (validationControlStatus?.value) {
           validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
         }
 
@@ -456,12 +455,12 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             if (validBest?.status) {
               validationBestStatus.value = validBest.status;
             }
-            if (validationControlStatus?.value && validationBestStatus?.value) {
+            if (validationControlStatus?.value) {
               validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
             }
 
-            // if valid_control and valid_best are Done, Cancelled, Failed, or Server error, clear the interval
-            if (['Done', 'Cancelled', 'Failed', 'Server Error'].includes(validControlAndValidBestStatus.value ?? '')) {
+            // if valid_control and valid_best are Done, Cancelled, Failed, Server error, or Unknown, clear the interval
+            if (['Done', 'Cancelled', 'Failed', 'Server Error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
               elapsedTime.value = validBest.elapsed_time;
