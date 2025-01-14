@@ -141,14 +141,17 @@
             Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
           </div>
         </span>
-        <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
+
+        <span v-if="modulesHaveChanged">
           <div class="col-span-1 mr-3">
-            <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
-              @click="resetFormulationData()" aria-label="Reset Button">Reset</button>-->
+            <button v-if="modulesHaveChanged" class="ngenButtonDiv-yellow" title="Reset Gage"
+              @click="" aria-label="Reset Gage">Reset</button>
           </div>
         </span>
         <span v-else>
-          <div class="col-span-1 mr-3"></div>
+          <div class="col-span-1 mr-3">
+            &nbsp;
+          </div>
         </span>
 
         <div class="col-span-4">&nbsp;</div>
@@ -231,6 +234,10 @@ const { fetchUserCalibrationRunData } = useUserDataStore();
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { getCalibrationTabIndex } = generalStore();
+
+const useGeneralStore = generalStore();
+const { modulesHaveChanged } = storeToRefs(useGeneralStore)
+
 const runStatusStore = useRunStatusStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 let mainLeftAreaElement: HTMLElement | null = null;
@@ -252,6 +259,11 @@ const addSlothOnEnter = (e: KeyboardEvent) => {
     addSlothVariable();
   }
 };
+
+
+const resetForumulationTab = () => {
+  loadFormulationTabStaticData();
+}
 
 /**
  * add sloth variable entry to table and reset name field
@@ -308,10 +320,11 @@ const saveFormulationData = () => {
   } else {
     toast.removeAllGroups();
     var valOK = validateModules();
-    if( !valOK ) {
+    if (!valOK) {
+      modulesHaveChanged.value = true;
       // delete all of the Calabratable parameters on the Tuning Controls tab
-      console.log("clearCalibratableParameters")
-      clearCalibratableParameters();
+      // console.log("clearCalibratableParameters")
+      // clearCalibratableParameters();
     }
 
     saveFormulationTabData().then(response => {
@@ -346,9 +359,9 @@ const validateModules = () => {
   /* check if list of modules changed */
   let selModules = selectedModuleValues.value;
   let savedModules = userCalibrationRunData?.value?.modules;
-  if( arraysEqual(selModules, savedModules)) {
+  if (arraysEqual(selModules, savedModules)) {
     return true;
-  } 
+  }
   return false;
 }
 const validateTab = () => {
@@ -357,7 +370,7 @@ const validateTab = () => {
   let text = [];
   /* Check if formulation name changed */
   let newName = formulationNameInput.value ? formulationNameInput.value : '';
-  if( newName.trim === "" )  {
+  if (newName.trim() === "") {
     error = true;
     text.push("Please enter a valid Forumulation Name");
   }
@@ -369,12 +382,12 @@ const validateTab = () => {
   /* check if list of modules changed */
   let selModules = selectedModuleValues.value;
   let savedModules = userCalibrationRunData?.value?.modules;
-  if ( !arraysEqual(selModules, savedModules) ) {
+  if (!arraysEqual(selModules, savedModules)) {
     error = true;
     text.push("Selected Modules have been changed");
   } else {
     selModules.every((module) => {
-      if (savedModules.indexOf(module) === -1) {
+      if (savedModules && savedModules.indexOf(module) === -1) {
         error = true;
         text.push("Selected Modules have been changed");
         return false;
@@ -465,7 +478,7 @@ const handleNextPrevDialogClose = (opt: any) => {
       gotoPrev();
     }
   }
-  if( opt.type && opt.type === 'dialog-close') {
+  if (opt.type && opt.type === 'dialog-close') {
     return;
   }
 }

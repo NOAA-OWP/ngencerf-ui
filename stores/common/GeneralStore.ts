@@ -33,7 +33,10 @@ export const generalStore = defineStore(
 
     const serverInfo = ref<ServerInfo>();
 
-    const gageHasChanged = ref<boolean>(false)
+    // This is set if the user changes the gage.  Resets when saved.
+    const gageHasChanged = ref<boolean>(false);
+    // This is set if the user changes the modules on the Formulation page
+    const modulesHaveChanged = ref<boolean>(false);
 
     // Restore state from sessionStorage if available
     if (typeof window !== 'undefined') {
@@ -150,7 +153,8 @@ export const generalStore = defineStore(
       resetGeneralStore,
       setServerInfo,
       getServerInfo,
-      gageHasChanged
+      gageHasChanged,
+      modulesHaveChanged
     };
   },
   {
