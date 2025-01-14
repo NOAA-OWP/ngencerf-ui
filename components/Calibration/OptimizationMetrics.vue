@@ -455,7 +455,7 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 }
 
 const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data && opt.data.moveToNextResponse)) {
+  if (opt.data && opt.data.moveToNextResponse) {
     restorePage();
     if (opt.data.goNext) {
       gotoNext();
