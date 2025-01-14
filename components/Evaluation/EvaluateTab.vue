@@ -45,7 +45,7 @@
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
               @click="gotoSelectAlternateIteration">New Validation</button></span>
           <br />
-          <a href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">
+          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">
             Show Calibration Details</a>
         </div>
       </div>
@@ -252,8 +252,6 @@ onMounted( () => {
       toast.removeAllGroups();
       toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
     }
-    
-    //console.log('userCalibrationRunData: ', userCalibrationRunData.value);
     
     // Add Supplemental Table Options to the dropdown
     for (let t = 0; t < supplementalTableOptions.length; t++) {
