@@ -221,6 +221,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     calibrationTuningModules.value = null;
     calibrationTuningParameters.value = [];
     userSelectedCalibrationTuningParameters.value = [];
+    userOutputVariableToCalibrate.value.name = '';
     userOutputVariableToCalibrate.value.module = null;
     outputVariables.value = [];
     automatic_validation.value = true;

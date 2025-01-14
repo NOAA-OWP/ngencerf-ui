@@ -33,6 +33,8 @@ export const generalStore = defineStore(
 
     const serverInfo = ref<ServerInfo>();
 
+    const gageHasChanged = ref<boolean>(false)
+
     // Restore state from sessionStorage if available
     if (typeof window !== 'undefined') {
       calibrationTabIndex.value = sessionStorage.getItem('calibrationTabIndex') as string;
@@ -147,7 +149,8 @@ export const generalStore = defineStore(
       forecastTabIndex,
       resetGeneralStore,
       setServerInfo,
-      getServerInfo
+      getServerInfo,
+      gageHasChanged
     };
   },
   {

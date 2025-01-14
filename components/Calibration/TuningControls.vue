@@ -1179,13 +1179,16 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 }
 
 const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data.moveToNextResponse) {
+  if (opt.data && opt.data.moveToNextResponse) {
     restorePage();
     if (opt.data.goNext) {
       gotoNext();
     } else {
       gotoPrev();
     }
+  }
+  if( opt.type && opt.type === 'dialog-close') {
+    return;
   }
 }
 </script>

@@ -222,3 +222,4 @@ export const arraysEqual = (arr1: any, arr2: any) => {
   // If all elements are equal, return true
   return true;
 }
+

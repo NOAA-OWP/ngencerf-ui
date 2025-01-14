@@ -4,7 +4,6 @@
       <div class="grid grid-rows-8 gap-6">
 
         <div class="row-span-1">
-
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
               <div class="col-span-1">
@@ -166,7 +165,7 @@ const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, 
 const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
   saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
 const { getCalibrationTabIndex } = generalStore();
-const { calibrationJobId } = storeToRefs(generalStore());
+const { calibrationJobId, gageHasChanged } = storeToRefs(generalStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
@@ -192,6 +191,10 @@ const fileUploadDialogOpened = ref<boolean>(false);
 const nextPrevDialogOpened = ref<boolean>(false);
 
 const onGageSelectionChange = () => {
+  gageHasChanged.value = true;
+}
+
+const clearDataDueToGageChange = () => {
   // check for an actual change
   if (userCalibrationRunData.value.gage.gage_id !== selectedGageValue.value) {
     isLoading.value = true;
@@ -381,6 +384,13 @@ const saveTabData = () => {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
+
+    // Check for gage change
+    if (gageHasChanged.value ) {
+      clearDataDueToGageChange();
+      gageHasChanged.value = false;
+    }
+
     saveGageTabData().then(response => {
       if (response.status === 200) {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
@@ -445,9 +455,12 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 }
 
 const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data.moveToNextResponse) {
+  if (opt.data && opt.data.moveToNextResponse) {
     selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
     gotoNext();
+  }
+  if( opt.type && opt.type === 'dialog-close') {
+    return;
   }
 }
 
