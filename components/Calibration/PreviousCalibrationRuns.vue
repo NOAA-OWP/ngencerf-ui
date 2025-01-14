@@ -66,7 +66,7 @@
 import { onMounted } from "vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import type { CalibrationJobListItem, ValidationJobListItem } from "@/composables/NextGenModel";
+import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
@@ -276,35 +276,25 @@ const updateUserCalibrationJobsListData = async (): Promise<void>  => {
   updatedUserCalibrationJobsListData.value = await Promise.all(
     userCalibrationJobsListData.value
     .map(async (calibrationJob: CalibrationJobListItem) => {
-      // if the job is done, get the calibration status to include the validation status
+      // if Calibration job is done, get validation statuses and update the overall status
       if (calibrationJob.status === 'Done') {
-        // get the calibration status
-        const getStatusResponse: any = await queryGetCalibrationStatus(calibrationJob.calibration_run_id);
+        const validationControlJobStatus: string | undefined  = calibrationJob.validations?.find((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_control')?.status;
 
-        if (getStatusResponse.status === 200) {
-          // get validation control and best jobs
-          const validationControlJob: ValidationJobListItem | undefined = getStatusResponse?._data?.validations?.find(
-          (validationJob: ValidationJobListItem) => validationJob.validation_type === 'valid_control');
+        const validationBestJobStatus: string | undefined = calibrationJob.validations?.find
+        ((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_best')?.status;
 
-          const validationBestJob: ValidationJobListItem | undefined = getStatusResponse?._data?.validations?.find(
-            (validationJob: ValidationJobListItem) => validationJob.validation_type === 'valid_best');
-
-          // get the overall calibration/validation status
-          const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
-            calibrationJob.status,
-            validationControlJob?.status,
-            validationBestJob?.status
-          );
+        // get the overall calibration/validation status
+        const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
+          calibrationJob.status,
+          validationControlJobStatus,
+          validationBestJobStatus
+        );
           
-          // save userCalibrationJobsListData with the updated status for the job
-          return {
-            ...calibrationJob,
-            status: overallCalibrationValidationStatus
-          }; 
-        } else {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to get calibration status', life: 10000 });
-          return calibrationJob;
-        }
+        // save userCalibrationJobsListData with the updated status for the job
+        return {
+          ...calibrationJob,
+          status: overallCalibrationValidationStatus
+        };
       } else {
         // Calibration is not done, so just return the job data with the status as is
         return calibrationJob;

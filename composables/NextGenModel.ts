@@ -89,8 +89,17 @@ export interface CalibrationJobListItem {
   submit_date: Date;
   objective_function: string;
   optimization_algorithm: string;
-  validations: 
+  validations: CalibrationJobValidationItem[];
 };
+
+/**
+ * Interface to be used with CalibrationJobListItem
+ */
+export interface CalibrationJobValidationItem {
+  validation_run_id: number;
+  validation_type: string;
+  status: string;
+}
 
 /**
  * model for validation job lists
