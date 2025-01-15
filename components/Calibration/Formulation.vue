@@ -50,9 +50,9 @@
           </div>
           <div class="col-span-1">&nbsp;</div>
         </div>
-        <!--        <div class="mt-3 mb-5 hr"></div> -->
+<!--        <div class="mt-3 mb-5 hr"></div> -->
       </div>
-      <!--
+<!--
       /* Don't Display this implemented SLoTH capability until available to send SLoTH variables to ngen-cal */
       <div class="row-span-2 -mt-2">
 
@@ -144,8 +144,9 @@
         </span>
         <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
           <div class="col-span-1 mr-3">
-            <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
-              @click="resetFormulationData()" aria-label="Reset Button">Reset</button>-->
+<!--        <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
+              @click="resetFormulationData()" aria-label="Reset Button">Reset</button>
+-->
           </div>
         </span>
         <span v-else>
@@ -314,7 +315,7 @@ const saveFormulationData = () => {
         toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
         if (response?._data?.nwm_warning === true) {
           useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
-            toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning });
+            toast.add({ severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning });
           });
         }
         fetchUserCalibrationRunData();
