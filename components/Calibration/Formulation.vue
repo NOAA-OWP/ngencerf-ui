@@ -49,9 +49,9 @@
           </div>
           <div class="col-span-1">&nbsp;</div>
         </div>
-        <!--        <div class="mt-3 mb-5 hr"></div> -->
+<!--        <div class="mt-3 mb-5 hr"></div> -->
       </div>
-      <!--
+<!--
       /* Don't Display this implemented SLoTH capability until available to send SLoTH variables to ngen-cal */
       <div class="row-span-2 -mt-2">
 
@@ -351,13 +351,13 @@ const saveFormulationData = () => {
       if (response.status === 200) {
         if (response._data.eds_errors) {
           response._data.eds_errors.forEach((err: any) => {
-            toast.add({ severity: 'warn', summary: 'External Data Error', detail: err.message });
+            toast.add({ severity: 'warn', summary: 'External Formulation Error', detail: err.message });
           });
         }
         toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
         if (response?._data?.nwm_warning === true) {
           useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
-            toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning });
+            toast.add({ severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000  });
           });
         }
        // fetchUserCalibrationRunData();
