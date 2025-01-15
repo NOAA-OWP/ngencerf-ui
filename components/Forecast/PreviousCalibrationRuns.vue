@@ -38,7 +38,7 @@
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun"></ContextMenu>
-            <DataTable id="CalibrationRunForForecastTable" :value="calibrationRunsForForecast" scrollable scroll-height="400px"
+            <DataTable id="CalibrationRunForForecastTable" :value="filteredData" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
               @rowSelect="onCalibrationRunForForecastRowSelect" @rowUnselect="onCalibrationRunForForecastRowUnSelect" @rowContextmenu="onRowContextMenu" class="boxed">
@@ -150,6 +150,10 @@ onMounted(async () => {
   await getCalibrationJobsForForecast();
   isLoading.value = false;
 });
+
+// Computed filtered data for DataTables
+const filteredData = computed(() => calibrationRunsForForecast?.value?.filter((row) => (row as any as CalibrationJobListItem).gage_id === uiGageId.value));
+
 
 const viewCalibrationDetails = async ( calibration_run_id: number ) => {
   isLoading.value = true;  
