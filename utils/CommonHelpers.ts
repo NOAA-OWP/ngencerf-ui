@@ -61,7 +61,7 @@ export const fixFloatToFivePlaces = (f: number) => {
 };
 
 /**
- * Get overall Calibration/Validation status to display in PreviousCalibrationsRuns and RunStatus tabs
+ * Get overall Calibration/Validation status to display in PreviousCalibrationsRuns tab
  * @param calibrationStatus
  * @param validationControlStatus
  * @param validationBestStatus
@@ -84,7 +84,7 @@ export const getOverallCalibrationValidationStatus = (
     validationBestStatus && validationBestStatus === 'Done'
     ) {
     return 'Done';
-  } else if (calibrationStatus === 'Done' && validationControlStatus && validationBestStatus) {
+  } else if (calibrationStatus === 'Done' && validationControlStatus) {
     // get the overall status of validation control and validation best
     const validationControlBestStatus = getValidControlAndValidBestStatus(validationControlStatus, validationBestStatus);
     return `Calibration Done, Validation ${validationControlBestStatus}`;
@@ -98,7 +98,7 @@ export const getOverallCalibrationValidationStatus = (
  * @param validBest
  * @returns {string}
  */
-export const getValidControlAndValidBestStatus = (validControlStatus: string, validBestStatus: string): string => {
+export const getValidControlAndValidBestStatus = (validControlStatus: string, validBestStatus?: string): string => {
   if (validControlStatus === 'Saved' || validBestStatus === 'Saved') {
     return 'Saved';
   }
@@ -126,7 +126,7 @@ export const getValidControlAndValidBestStatus = (validControlStatus: string, va
 };
 
 /**
- * Get the combined status of  forecast_forcing_download_status and forecast_status
+ * Get the combined status of forecast_forcing_download_status and forecast_status
  * @param forecastForcingDownloadStatus
  * @param forecastStatus
  * @returns {string}

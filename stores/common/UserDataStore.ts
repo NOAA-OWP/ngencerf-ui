@@ -5,7 +5,7 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "./GeneralStore";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 
-import type { JobsList, JobListItem, ValidationJobsList, UserCalibrationRunData } from "@/composables/NextGenModel";
+import type { CalibrationJobListItem, ValidationJobsList, UserCalibrationRunData } from "@/composables/NextGenModel";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -20,7 +20,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
 
   const tokenExpired = ref<boolean>(false);
 
-  const userCalibrationJobsListData = ref<JobListItem[]>([]);
+  const userCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
   const userCalibrationRunData = ref<UserCalibrationRunData>();
 
   const userSelectedCalibrationIterationId = ref<number | null>(null);
@@ -249,7 +249,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   /**
    * @returns {Promise<any>}
    */
-  async function queryUserCalibrationRunData() {
+  async function queryUserCalibrationRunData(include_gpkg_map: boolean = true) {
     if (!calibrationJobId.value) {
       return null;
     }
@@ -259,7 +259,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value, include_gpkg_map: include_gpkg_map})
     })
 
     return userCalibrationRunDataResult
@@ -269,8 +269,8 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * fetch user selected calibration run user saved data
    * @return {void}
    */
-  async function fetchUserCalibrationRunData() {
-    const userCalibrationRunDataResult = await queryUserCalibrationRunData()
+  async function fetchUserCalibrationRunData(include_gpkg_map: boolean = true) {
+    const userCalibrationRunDataResult = await queryUserCalibrationRunData(include_gpkg_map)
 
     userCalibrationRunData.value = userCalibrationRunDataResult?._data ?? undefined;
   }
