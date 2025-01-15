@@ -168,9 +168,9 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     }
   });
 
-  const loadSelectedCalibrationRun = async (calibration_run_id: number) => {
+  const loadSelectedCalibrationRun = async (calibration_run_id: number, include_gpkg_map: boolean = true) => {
     setSelectedCalibrationRunId(calibration_run_id);
-    await fetchUserCalibrationRunData();
+    await fetchUserCalibrationRunData(include_gpkg_map);
   }
 
   const resetUserSelectedCalibrationValidationRunList = () => {

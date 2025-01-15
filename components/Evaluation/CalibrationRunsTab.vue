@@ -327,7 +327,7 @@ const navigateToAlternateIteration = (event: any) => {
 }
 
 const evaluateValidationJobFromCalibration = async (calibration_run_id: number): Promise<void> => {
-  loadSelectedCalibrationRun(calibration_run_id);
+  loadSelectedCalibrationRun(calibration_run_id, false);
   await fetchValidationRunListByCalibrationRun().then(validationRunList => {
     if (validationRunList.length === 1) {
       evaluateValidationRunId.value = validationRunList[0].validation_run_id;
