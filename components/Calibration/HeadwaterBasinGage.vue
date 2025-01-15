@@ -104,7 +104,7 @@
                 Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
               </div>
             </span>
-            <span v-if="gageHasChanged">
+            <span v-if="gageHasChanged && userCalibrationRunData?.gage !== null">
               <div class="col-span-1 mr-3">
                 <button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Reset Gage"
                   @click="gageSelectionReset()" aria-label="Reset Gage">Revert</button>
@@ -123,7 +123,6 @@
             </div>
           </div>
         </div>
-        n
       </div>
 
     </div>
@@ -194,33 +193,44 @@ const fileUploadDialogOpened = ref<boolean>(false);
 const nextPrevDialogOpened = ref<boolean>(false);
 
 const onGageSelectionChange = () => {
-  gageHasChanged.value = true;
-  fetchSelectedGageData();
+  // Was there a previous gage?
+  if (userCalibrationRunData?.value?.gage) {
+    gageHasChanged.value = true;
+    if (userCalibrationRunData?.value?.external_data_status) {
+      userCalibrationRunData.value.external_data_status.forcing = false;
+      userCalibrationRunData.value.external_data_status.geopackage = false;
+      userCalibrationRunData.value.external_data_status.observational = false;
+    }
+    const gage = document.getElementById('Gage');
+    (gage?.childNodes[0] as HTMLInputElement).innerText = selectedGageValue.value;
+  }
+    fetchSelectedGageData(); 
 }
 
 /**
  * Resets the Gage to the previous gage if it was changed and not saved.
  */
 const gageSelectionReset = () => {
-  selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
-  fetchSelectedGageData();
-  gageHasChanged.value = false;
-  const optList = getGageOptionsList;
-  const gage = document.getElementById('Gage');
-  if (selectedGageValue.value) {
-    const index = optList.value.findIndex(item => item.name === selectedGageValue.value);
-    selectedGageValue.value = optList.value[index].name;    
-    (gage?.childNodes[0] as HTMLInputElement).innerText = optList.value[index].name;
-  } else {
-    selectedGageValue.value = '';
-    (gage?.childNodes[0] as HTMLInputElement).innerText = '';
-  }
+
+    selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
+    fetchSelectedGageData();
+    gageHasChanged.value = false;
+    const optList = getGageOptionsList;
+    const gage = document.getElementById('Gage');
+    if (selectedGageValue.value) {
+      const index = optList.value.findIndex(item => item.name === selectedGageValue.value);
+      selectedGageValue.value = optList.value[index].name;
+      (gage?.childNodes[0] as HTMLInputElement).innerText = optList.value[index].name;
+    } else {
+      selectedGageValue.value = '';
+      (gage?.childNodes[0] as HTMLInputElement).innerText = '';
+    }
 
 }
 
 const clearDataDueToGageChange = () => {
   // check for an actual change
-  if (userCalibrationRunData?.value?.gage.gage_id !== selectedGageValue.value) {
+  if (userCalibrationRunData?.value?.gage !== null && userCalibrationRunData?.value?.gage.gage_id !== selectedGageValue.value) {
     isLoading.value = true;
     setTimeout(() => {
       fetchSelectedGageData();

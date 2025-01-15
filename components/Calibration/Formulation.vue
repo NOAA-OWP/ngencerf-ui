@@ -378,7 +378,7 @@ const resetFormulationData = () => {
 const validateModules = () => {
  // fetchUserCalibrationRunData();
   /* check if list of modules changed */
-  return arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+  return userCalibrationRunData?.value?.modules !== null && !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }
 const validateTab = () => {
   fetchUserCalibrationRunData();
