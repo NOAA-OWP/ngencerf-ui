@@ -25,7 +25,7 @@
             </div>
             <div class="pt-4 mb-1 font-bold text-base">Select Modules</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="h-60">
+              optionLabel="name" optionValue="name" class="h-60" @change="moduleListChanged">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
                   <div class="font-ui pl-2 leading-none">{{ slotProps.option.name }}</div>
@@ -144,8 +144,9 @@
 
         <span v-if="modulesHaveChanged">
           <div class="col-span-1 mr-3">
-            <button v-if="modulesHaveChanged" class="ngenButtonDiv-yellow" title="Reset Gage"
-              @click="" aria-label="Reset Gage">Reset</button>
+            <button class="ngenButtonDiv-yellow" title="Reset Gage" @click="resetModuleList()"
+              aria-label="Reset Gage">Reset
+              List</button>
           </div>
         </span>
         <span v-else>
@@ -193,9 +194,12 @@ import { hilightTab } from '@/composables/TabHilight';
 
 const { clearCalibratableParameters } = useTuningStore();
 
+const { selectedOutputVariable, userOutputVariableToCalibrate } = storeToRefs(useTuningStore());
+
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
 import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
+import type { ListboxChangeEvent } from "primevue/listbox";
 
 const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
@@ -246,11 +250,13 @@ let dataTableElement: HTMLElement | null = null;
 const toast = useToast();
 
 onMounted(() => {
-  hilightTab(CalibrationTabs.tab_formulation);
-
-  toast.removeAllGroups();
-  mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
-  if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
+  nextTick(() => {
+    hilightTab(CalibrationTabs.tab_formulation);
+    toast.removeAllGroups();
+    mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+    if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
+    modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+  })
 });
 
 const addSlothOnEnter = (e: KeyboardEvent) => {
@@ -300,6 +306,17 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
   deleteSlothVariable(selectedSlothParameterData.value.param_name);
 }
 
+const moduleListChanged = (e: ListboxChangeEvent) => {
+  modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+}
+
+const resetModuleList = () => {
+  if (selectedModuleValues.value && userCalibrationRunData?.value?.modules) {
+    selectedModuleValues.value = userCalibrationRunData?.value?.modules
+    modulesHaveChanged.value = false;
+  }
+}
+
 /**
  * Prevent unwanted characters
  */
@@ -321,10 +338,14 @@ const saveFormulationData = () => {
     toast.removeAllGroups();
     var valOK = validateModules();
     if (!valOK) {
-      modulesHaveChanged.value = true;
+      modulesHaveChanged.value = false;
+      selectedOutputVariable.value = "";
+      userOutputVariableToCalibrate.value = { name: '', module: null }
+      if (userCalibrationRunData.value) {
+        userCalibrationRunData.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value as UserCalibrationRunOutputVariableToCalibrateData;
+      }
       // delete all of the Calabratable parameters on the Tuning Controls tab
-      // console.log("clearCalibratableParameters")
-      // clearCalibratableParameters();
+       clearCalibratableParameters();
     }
 
     saveFormulationTabData().then(response => {
@@ -355,14 +376,9 @@ const resetFormulationData = () => {
 }
 
 const validateModules = () => {
-  fetchUserCalibrationRunData();
+ // fetchUserCalibrationRunData();
   /* check if list of modules changed */
-  let selModules = selectedModuleValues.value;
-  let savedModules = userCalibrationRunData?.value?.modules;
-  if (arraysEqual(selModules, savedModules)) {
-    return true;
-  }
-  return false;
+  return arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }
 const validateTab = () => {
   fetchUserCalibrationRunData();
@@ -382,7 +398,7 @@ const validateTab = () => {
   /* check if list of modules changed */
   let selModules = selectedModuleValues.value;
   let savedModules = userCalibrationRunData?.value?.modules;
-  if (!arraysEqual(selModules, savedModules)) {
+  if (!arraysEqual(selectedModuleValues, userCalibrationRunData?.value?.modules)) {
     error = true;
     text.push("Selected Modules have been changed");
   } else {
