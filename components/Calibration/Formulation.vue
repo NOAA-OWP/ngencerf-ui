@@ -361,7 +361,7 @@ const saveFormulationData = () => {
             toast.add({ severity: 'warn', summary: 'Formulation Incomplete or Invalid.', detail: warning });
           });
         }
-        fetchUserCalibrationRunData();
+       // fetchUserCalibrationRunData();
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message });
@@ -381,7 +381,7 @@ const validateModules = () => {
   return userCalibrationRunData?.value?.modules !== null && !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }
 const validateTab = () => {
-  fetchUserCalibrationRunData();
+  //fetchUserCalibrationRunData();
   let error = false;
   let text = [];
   /* Check if formulation name changed */
