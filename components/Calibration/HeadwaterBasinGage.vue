@@ -107,7 +107,7 @@
             <span v-if="gageHasChanged">
               <div class="col-span-1 mr-3">
                 <button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Reset Gage"
-                  @click="gageSelectionReset()" aria-label="Reset Gage">Reset</button>
+                  @click="gageSelectionReset()" aria-label="Reset Gage">Revert</button>
               </div>
             </span>
             <span v-else>
@@ -206,10 +206,16 @@ const gageSelectionReset = () => {
   fetchSelectedGageData();
   gageHasChanged.value = false;
   const optList = getGageOptionsList;
-  const index = optList.value.findIndex(item => item.name === selectedGageValue.value);
-  selectedGageValue.value = optList.value[index].name;
-  const g = document.getElementById('Gage');
-  g.childNodes[0].innerText = optList.value[index].name
+  const gage = document.getElementById('Gage');
+  if (selectedGageValue.value) {
+    const index = optList.value.findIndex(item => item.name === selectedGageValue.value);
+    selectedGageValue.value = optList.value[index].name;    
+    (gage?.childNodes[0] as HTMLInputElement).innerText = optList.value[index].name;
+  } else {
+    selectedGageValue.value = '';
+    (gage?.childNodes[0] as HTMLInputElement).innerText = '';
+  }
+
 }
 
 const clearDataDueToGageChange = () => {
@@ -257,7 +263,7 @@ const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
   }
 }
 
-     
+
 /**
  * Force focus on text input area when user clicks on dropdown.
  * @param e Event
