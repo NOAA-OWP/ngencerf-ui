@@ -170,6 +170,16 @@ const { fetchUserCalibrationRunData } = useUserDataStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
+const resetData = ref<GageResetData>({
+  external_data_status: {
+    observational: false,
+    forcing: false,
+    geopackage: false,
+  },
+  geopackage_source: "",
+  observational_source: "",
+  forcing_source: ""
+})
 
 
 const isLoading = ref(true);
@@ -196,36 +206,50 @@ const onGageSelectionChange = () => {
   // Was there a previous gage?
   if (userCalibrationRunData?.value?.gage) {
     gageHasChanged.value = true;
+
+    // Save all information from the external data  JSON.parse(JSON.stringify(obj));
+
+    resetData.value.external_data_status = JSON.parse(JSON.stringify(userCalibrationRunData.value.external_data_status));
+    resetData.value.geopackage_source = userCalibrationRunData.value.geopackage_source;
+    resetData.value.observational_source = userCalibrationRunData.value.observational_source;
+    resetData.value.forcing_source = userCalibrationRunData.value.forcing_source;
+
     if (userCalibrationRunData?.value?.external_data_status) {
       userCalibrationRunData.value.external_data_status.forcing = false;
       userCalibrationRunData.value.external_data_status.geopackage = false;
       userCalibrationRunData.value.external_data_status.observational = false;
     }
-    const gage = document.getElementById('Gage');
-    (gage?.childNodes[0] as HTMLInputElement).innerText = selectedGageValue.value;
+    nextTick( () => {
+      const gage = document.getElementById('Gage');
+      (gage?.childNodes[0] as HTMLInputElement).innerText = selectedGageValue.value;
+    });
   }
-    fetchSelectedGageData(); 
+  fetchSelectedGageData();
 }
 
 /**
  * Resets the Gage to the previous gage if it was changed and not saved.
  */
 const gageSelectionReset = () => {
+  selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
+  fetchSelectedGageData();
+  gageHasChanged.value = false;
+  const optList = getGageOptionsList;
+  const gage = document.getElementById('Gage');
+  if (selectedGageValue.value) {
+    const index = optList.value.findIndex(item => item.name === selectedGageValue.value);
+    selectedGageValue.value = optList.value[index].name;
+    (gage?.childNodes[0] as HTMLInputElement).innerText = optList.value[index].name;
+  } else {
+    selectedGageValue.value = '';
+    (gage?.childNodes[0] as HTMLInputElement).innerText = '';  }
 
-    selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
-    fetchSelectedGageData();
-    gageHasChanged.value = false;
-    const optList = getGageOptionsList;
-    const gage = document.getElementById('Gage');
-    if (selectedGageValue.value) {
-      const index = optList.value.findIndex(item => item.name === selectedGageValue.value);
-      selectedGageValue.value = optList.value[index].name;
-      (gage?.childNodes[0] as HTMLInputElement).innerText = optList.value[index].name;
-    } else {
-      selectedGageValue.value = '';
-      (gage?.childNodes[0] as HTMLInputElement).innerText = '';
-    }
-
+  if (userCalibrationRunData.value) {
+    userCalibrationRunData.value.external_data_status = JSON.parse(JSON.stringify(resetData.value.external_data_status))
+    userCalibrationRunData.value.geopackage_source = resetData.value.geopackage_source
+    userCalibrationRunData.value.observational_source = resetData.value.observational_source
+    userCalibrationRunData.value.forcing_source = resetData.value.forcing_source
+  }
 }
 
 const clearDataDueToGageChange = () => {
