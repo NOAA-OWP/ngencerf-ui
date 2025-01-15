@@ -45,8 +45,8 @@
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
               @click="gotoSelectAlternateIteration">New Validation</button></span>
           <br />
-          <a href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">Show
-            Calibration Details</a>
+          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">
+            Show Calibration Details</a>
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@
       </div>
       <div>
         
-        <div class="text-center" v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0">
+        <div class="text-center" v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0 && selectedLogCategory == ''">
             <div class="grid place-items-center" style="height: 45vh;">
                 <div>
                     {{ plotTableErrorMessage }}
@@ -176,7 +176,6 @@ const {
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
-
 const {
   loadRunStatusStore,
   queryGetPlotNames,
@@ -238,15 +237,6 @@ onMounted( () => {
     selectedPlotFileUrl.value = null;
     selectedSupplementalTable.value = 0;
 
-    /* if (!userCalibrationRunData?.value) {
-      await fetchUserCalibrationRunData();
-    } */
-    
-    // Get Plot Names
-    if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
-      plotNames.value = await queryGetPlotNames();
-    }
-
     // Load Run Status Store to load resultsPathname
     await loadRunStatusStore();
 
@@ -262,8 +252,6 @@ onMounted( () => {
       toast.removeAllGroups();
       toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
     }
-    
-    //console.log('userCalibrationRunData: ', userCalibrationRunData.value);
     
     // Add Supplemental Table Options to the dropdown
     for (let t = 0; t < supplementalTableOptions.length; t++) {
@@ -726,10 +714,13 @@ const newValidation = () => {
   alert('newValidation');
   //tabChanged.value = 3;
 }
-const toggleMessagesGroup = () => {
+const toggleMessagesGroup = async() => {
   if (showMessagesGroup.value) {
     showMessagesGroup.value = false;
   } else {
+    if (!userCalibrationRunData.value) {
+      await fetchUserCalibrationRunData();
+    }
     showMessagesGroup.value = true;
   }
 }
