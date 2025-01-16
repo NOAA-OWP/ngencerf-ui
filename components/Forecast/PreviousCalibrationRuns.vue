@@ -30,7 +30,7 @@
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
                     :options="forecastRunGageList" filter optionLabel="name" optionValue="name"
-                    placeholder="All Runs"></Select>
+                    placeholder="All"></Select>
 
               </div>
             </div>
@@ -152,7 +152,7 @@ onMounted(async () => {
 
 // Computed filtered data for DataTables
 const filteredData = computed(() => {
-      if (!uiGageId.value || uiGageId.value === "All Runs") {
+      if (!uiGageId.value || uiGageId.value === "All") {
         return calibrationRunsForForecast?.value;
       } else {
         return calibrationRunsForForecast?.value?.filter((row) => (row as any as CalibrationJobListItem).gage_id === uiGageId.value);
