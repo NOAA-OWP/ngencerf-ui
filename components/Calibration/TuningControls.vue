@@ -366,11 +366,8 @@ onMounted(async () => {
     }
 
     // if Tuning Tab static data is not loaded, fetch it
-    // if (loadTuningTabData?.value?._data?.modules.length === 0) {
-    //   await loadTuningTabStaticData();
-    // } else {
-    // }
-
+    await loadTuningTabStaticData();
+  
     // check if EDS errors exist
     const edsErrorMessage = loadTuningTabData.value ? ifEDSErrorsExist(loadTuningTabData.value._data) : '';
     if (edsErrorMessage) {

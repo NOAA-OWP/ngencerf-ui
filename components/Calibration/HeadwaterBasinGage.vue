@@ -458,7 +458,6 @@ const saveTabData = () => {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
           toast.add(toastMessage);
         })
-        fetchUserCalibrationRunData();
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message });
