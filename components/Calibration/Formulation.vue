@@ -144,8 +144,8 @@
 
         <span v-if="modulesHaveChanged">
           <div class="col-span-1 mr-3">
-            <button class="ngenButtonDiv-yellow" title="Reset Gage" @click="resetModuleList()"
-              aria-label="Reset Gage">Reset</button>
+            <button class="ngenButtonDiv-yellow" title="Revert Gage" @click="resetModuleList()"
+              aria-label="Revert Gage">Revert</button>
           </div>
         </span>
         <span v-else>

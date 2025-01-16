@@ -106,8 +106,8 @@
             </span>
             <span v-if="gageHasChanged && userCalibrationRunData?.gage !== null">
               <div class="col-span-1 mr-3">
-                <button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Reset Gage"
-                  @click="gageSelectionReset()" aria-label="Reset Gage">Revert</button>
+                <button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Revert Gage"
+                  @click="gageSelectionReset()" aria-label="Revert">Revert</button>
               </div>
             </span>
             <span v-else>
