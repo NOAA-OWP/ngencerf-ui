@@ -260,7 +260,8 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
 
     savePayload.value.formulation_name = formulationNameInput.value ? formulationNameInput.value : "";
     savePayload.value.modules = selectedModuleValues.value.length > 0 ? selectedModuleValues.value : [];
-    savePayload.value.sloth_parameters = slothParameterInputs.value.length > 0 ? slothParameterInputs.value : [];
+    // DO NOT DELETE. Sloth parameters will be used in the future.
+    // savePayload.value.sloth_parameters = slothParameterInputs.value.length > 0 ? slothParameterInputs.value : [];
 
     if (Object.keys(savePayload.value).length > 0) {
       const saveValidation = useCalibrationFormulationTabSaveValidate(savePayload.value);
@@ -276,7 +277,8 @@ export const useFormulationStore = defineStore('FormulationStore', () => {
         });
       } else {
         savePayload.value['calibration_run_id'] = calibrationJobId.value;
-        savePayload.value['use_sloth'] = useSlothParameters.value;
+        // set to false for now. Set to useSlothParameters.value when asked to allow sloth parameters again.
+        savePayload.value['use_sloth'] = false;
         return await makeProtectedApiCall<GeneralApiSaveResponse>(`${ngencerfBaseUrl}/calibration/save_formulation_tab/`, {
           method: "POST",
           headers: {
