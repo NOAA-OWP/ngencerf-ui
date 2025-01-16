@@ -94,7 +94,8 @@
           <div class="grid grid-cols-8">
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <button id="HBGSaveButton" class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
+                <button id="HBGSaveButton" class="font-normal" title="Save" aria-label="Save Button"
+                  @click="saveTabData()">
                   Save
                 </button>
               </div>
@@ -219,7 +220,7 @@ const onGageSelectionChange = () => {
       userCalibrationRunData.value.external_data_status.geopackage = false;
       userCalibrationRunData.value.external_data_status.observational = false;
     }
-    nextTick( () => {
+    nextTick(() => {
       const gage = document.getElementById('Gage');
       (gage?.childNodes[0] as HTMLInputElement).innerText = selectedGageValue.value;
       document.getElementById("HBGSaveButton")?.focus();
@@ -243,7 +244,8 @@ const gageSelectionReset = () => {
     (gage?.childNodes[0] as HTMLInputElement).innerText = optList.value[index].name;
   } else {
     selectedGageValue.value = '';
-    (gage?.childNodes[0] as HTMLInputElement).innerText = '';  }
+    (gage?.childNodes[0] as HTMLInputElement).innerText = '';
+  }
 
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.external_data_status = JSON.parse(JSON.stringify(resetData.value.external_data_status))
@@ -286,8 +288,10 @@ const clearDataDueToGageChange = () => {
         }
       }
       isLoading.value = false;
-      toast.add({ severity: 'info', summary: `Gage Changed`, detail: "You must save this tab for the change to effect the run.", life: 5000 })
-
+      toast.add({
+        severity: 'info', summary: `Gage Changed`,
+        detail: "You must save this tab for the change to effect the run. Calibration and Validation times must be set on the Tuning Controls tab", life: 5000
+      })
     }, 100);
   }
 }

@@ -49,9 +49,9 @@
           </div>
           <div class="col-span-1">&nbsp;</div>
         </div>
-<!--        <div class="mt-3 mb-5 hr"></div> -->
+        <!--        <div class="mt-3 mb-5 hr"></div> -->
       </div>
-<!--
+      <!--
       /* Don't Display this implemented SLoTH capability until available to send SLoTH variables to ngen-cal */
       <div class="row-span-2 -mt-2">
 
@@ -344,7 +344,7 @@ const saveFormulationData = () => {
         userCalibrationRunData.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value as UserCalibrationRunOutputVariableToCalibrateData;
       }
       // delete all of the Calabratable parameters on the Tuning Controls tab
-       clearCalibratableParameters();
+      clearCalibratableParameters();
     }
 
     saveFormulationTabData().then(response => {
@@ -357,10 +357,10 @@ const saveFormulationData = () => {
         toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
         if (response?._data?.nwm_warning === true) {
           useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
-            toast.add({ severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000  });
+            toast.add({ severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000 });
           });
         }
-       // fetchUserCalibrationRunData();
+        // fetchUserCalibrationRunData();
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message });
@@ -375,7 +375,7 @@ const resetFormulationData = () => {
 }
 
 const validateModules = () => {
- // fetchUserCalibrationRunData();
+  // fetchUserCalibrationRunData();
   /* check if list of modules changed */
   return userCalibrationRunData?.value?.modules !== null && !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }

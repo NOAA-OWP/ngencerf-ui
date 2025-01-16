@@ -1036,7 +1036,7 @@ const saveTuningData = () => {
 };
 
 /**
- * Reset Tuning Tab data
+ * git stat Tuning Tab data
  */
 const resetTuningData = () => {
   // hardResetTuningStore(); // disable for now
@@ -1187,7 +1187,7 @@ const handleNextPrevDialogClose = (opt: any) => {
       gotoPrev();
     }
   }
-  if( opt.type && opt.type === 'dialog-close') {
+  if (opt.type && opt.type === 'dialog-close') {
     return;
   }
 }
