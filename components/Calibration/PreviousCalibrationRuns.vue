@@ -14,7 +14,8 @@
             <div class="col-span-1 text-left">
               <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
               <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter float-left" v-model="uiGageId" :options="calibrationRunGageList" filter
-                optionLabel="name" optionValue="name" placeholder=""></Select>
+                optionLabel="name" optionValue="name" placeholder="All Runs">                
+              </Select>
             </div>
           </div>
           <ConfirmDialog></ConfirmDialog>
@@ -127,7 +128,13 @@ onMounted(async () => {
 })
 
 // Computed filtered data for DataTables
-const filteredData = computed(() => updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value));
+const filteredData = computed(() => {
+      if (!uiGageId.value || uiGageId.value === "All Runs") {
+        return updatedUserCalibrationJobsListData?.value;
+      } else {
+        return updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
+      }
+    });
 
 const onRowDblClick = (e: any) => {
   const data = ref<any>();

@@ -27,12 +27,11 @@
           <div id="CalTable">
             <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
               <div class="col-span-1">
-                <div class="ml-10">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
                     :options="forecastRunGageList" filter optionLabel="name" optionValue="name"
-                    placeholder=""></Select>
-                </div>
+                    placeholder="All Runs"></Select>
+
               </div>
             </div>
             <ConfirmDialog></ConfirmDialog>
@@ -152,7 +151,13 @@ onMounted(async () => {
 });
 
 // Computed filtered data for DataTables
-const filteredData = computed(() => calibrationRunsForForecast?.value?.filter((row) => (row as any as CalibrationJobListItem).gage_id === uiGageId.value));
+const filteredData = computed(() => {
+      if (!uiGageId.value || uiGageId.value === "All Runs") {
+        return calibrationRunsForForecast?.value;
+      } else {
+        return calibrationRunsForForecast?.value?.filter((row) => (row as any as CalibrationJobListItem).gage_id === uiGageId.value);
+      }
+    });
 
 
 const viewCalibrationDetails = async ( calibration_run_id: number ) => {
