@@ -43,6 +43,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
   const tuningStore_data_loading = ref(true);
   const saveTuningTabRequestBody = ref<any>({});
 
+  const selectedOutputVariable = ref<any>(null);
+
   // Restore state from sessionStorage if available
   if (typeof window !== 'undefined') {
     let ls;
@@ -182,12 +184,30 @@ export const useTuningStore = defineStore('TuningStore', () => {
     return saveTuningTabResponse;
   };
 
-
   useLogoutListen('logoutEvent', (evStr: string) => {
     if (evStr === "logout") {
       hardResetTuningStore();
     }
   })
+  
+  function clearCalibratableParameters() {
+    userSelectedCalibrationTuningParameters.value = [];
+  }
+
+  /**
+   * Hard Reset Tuning Store
+   */
+  const hardResetTuningTimeConrols = (): void => {
+    simStartTime.value = "";
+    simEndTime.value = "";
+    calStartTime.value = "";
+    calEndTime.value = "";
+    avSimStartTime.value = "";
+    avSimEndTime.value = "";
+    avCalStartTime.value = "";
+    avCalEndTime.value = "";
+  };
+
 
   /**
    * Hard Reset Tuning Store
@@ -225,6 +245,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
     calibrationTuningParameters,
     userSelectedCalibrationTuningParameters,
     userOutputVariableToCalibrate,
+    selectedOutputVariable,
     outputVariables,
     automatic_validation,
     avSimStartTime,
@@ -235,6 +256,8 @@ export const useTuningStore = defineStore('TuningStore', () => {
     rangeDateTo,
     saveTuningTabRequestBody,
     saveTuningTabData,
+    clearCalibratableParameters,
+    hardResetTuningTimeConrols,
     hardResetTuningStore
   };
 },

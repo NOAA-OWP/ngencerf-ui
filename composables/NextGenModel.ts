@@ -34,7 +34,7 @@ export interface GeneralErrorResponse {
 }
 
 export interface ValidationErrorObject {
-  [key: string]: string
+  [key: string]: string;
 }
 
 export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
@@ -75,7 +75,7 @@ export interface FormulationTabSaveWarningGroupRequirement {
  */
 export interface CalibrationJobsList {
   jobs: CalibrationJobListItem[];
-};
+}
 
 export interface CalibrationJobListItem {
   calibration_run_id: number;
@@ -90,7 +90,7 @@ export interface CalibrationJobListItem {
   objective_function: string;
   optimization_algorithm: string;
   validations: CalibrationJobValidationItem[];
-};
+}
 
 /**
  * Interface to be used with CalibrationJobListItem
@@ -106,7 +106,7 @@ export interface CalibrationJobValidationItem {
  */
 export interface ValidationJobsList {
   validation_jobs: ValidationJobListItem[];
-};
+}
 
 export interface ValidationJobListItem {
   validation_run_id: number;
@@ -116,12 +116,12 @@ export interface ValidationJobListItem {
   status: string;
   parameters: ValidationJobParameter[];
   best: boolean;
-};
+}
 
 export interface ValidationJobParameter {
   name: string;
   value: number;
-};
+}
 
 /**
  * module for user input calibration tab data
@@ -164,15 +164,15 @@ export interface UserCalibrationRunData {
 }
 
 export interface FormulationWarning {
-  exclude_modules: string[],
-  group_requirements: GroupRequirements[],
-  messages: string[]
+  exclude_modules: string[];
+  group_requirements: GroupRequirements[];
+  messages: string[];
 }
 
 export interface GroupRequirements {
-  group_name: string,
-  required_count: number[],
-  has_count: number
+  group_name: string;
+  required_count: number[];
+  has_count: number;
 }
 export interface ExternalDataStatus {
   observational: boolean;
@@ -327,13 +327,13 @@ export interface tuning_load {
     calibration_end_time: string;
     simulation_start_time: string;
     simulation_end_time: string;
-  }
+  };
   validation_times: {
     validation_start_time: string;
     validatoin_end_time: string;
     simulation_start_time: string;
     simulation_end_time: string;
-  }
+  };
 }
 
 export interface tuning_save {
@@ -342,7 +342,7 @@ export interface tuning_save {
   output_variable_to_calibrate: {
     name: string;
     module: string;
-  }
+  };
   module_output_variables: name_description_type[];
   parameters: module_params[];
   calibration_times: {
@@ -350,13 +350,13 @@ export interface tuning_save {
     calibration_end_time: string;
     simulation_start_time: string;
     simulation_end_time: string;
-  }
+  };
   validation_times: {
     validation_start_time: string;
     validatoin_end_time: string;
     simulation_start_time: string;
     simulation_end_time: string;
-  }
+  };
 }
 
 /**
@@ -467,21 +467,14 @@ export interface CalibrationRun {
   status: string;
 }
 
-export interface AlgorithmParameter {
+export interface AlgorithmParameter {}
 
-}
-
-export interface CalibrationTuningData {
-
-
-}
+export interface CalibrationTuningData {}
 
 /**
  * Model for Calibration Run Status tab
  */
-export interface CalibrationRunStatusTabData {
-
-}
+export interface CalibrationRunStatusTabData {}
 
 export interface CalibrationStatus {
   message: string;
@@ -509,7 +502,8 @@ export interface CalibrationPlotListData extends SelectOption {
 /**
  * Evaluation models
  */
-export interface ValidatedCalibrationRunListItem extends CalibrationJobListItem {
+export interface ValidatedCalibrationRunListItem
+  extends CalibrationJobListItem {
   objective_function: string;
   optimization_algorithm: string;
   validation_runs: number;
@@ -531,7 +525,8 @@ export interface CalibrationValidationJobList {
   validation_jobs: CalibrationValidationJobData[];
 }
 
-export interface CalibrationValidationJobData extends CalibrationValidationRunData {
+export interface CalibrationValidationJobData
+  extends CalibrationValidationRunData {
   iteration_num: number;
   best?: boolean;
 }
@@ -595,24 +590,24 @@ export interface CalibrationRunIterationMetricData {
 
 export interface AlternativeIterationCalibrationRunData {
   iteration_id: number;
-  validation_run_id: number|string;
+  validation_run_id: number | string;
   worker_name: string;
   iteration_num: number;
   objective_function_value: number;
-  [name: string]: string|number;
+  [name: string]: string | number;
 }
 
 export interface AlternativeIterationTuningParameters {
   iteration_id: number;
-  validation_run_id: number|string;
+  validation_run_id: number | string;
   worker_name: string;
   iteration_num: number;
-  
+
   [name: string]: string | number;
 }
 
 export interface APIResponse {
-  _data?: {[key: string]: any;};
+  _data?: { [key: string]: any };
 }
 
 export interface DynamicObject {
@@ -666,12 +661,12 @@ export interface DataTableContextMenuOption {
  */
 export type LogoutEvent = {
   logoutEvent: string;
-}
+};
 
 export type AccountEvent = {
   accountEvent: string;
   aboutBoxEvent: string;
-}
+};
 
 export type ServerInfo = {
   version: string;
@@ -680,14 +675,14 @@ export type ServerInfo = {
   commit_hash: string;
   ngenCerf_version: string;
   ngenCerf_date: string;
-}
+};
 
 export type ForecastCycle = {
   name: string;
   data_sources: string;
   time_range: string;
   is_active: boolean;
-}
+};
 
 export type CalibrationRunsForForecast = CalibrationRunForForecast[];
 
@@ -703,7 +698,7 @@ export type CalibrationRunForForecast = {
   submit_date: string;
   objective_function: string;
   optimization_algorithm: string;
-}
+};
 
 export const ValidationFormFields = {
   formulation_name: "Formulation Name",
@@ -718,11 +713,22 @@ export const ValidationFormFields = {
   streamflow_threshold: "Flow Threshold",
   peak_flow_threshold: "Peak Flow Threshold",
   objective_function: "Objective Function",
-  optimization: "Optimization Algorithm"
-}
+  optimization: "Optimization Algorithm",
+};
 
 export type PlotNames = {
-  calibration_run_id: number,
+  calibration_run_id: number;
   plot_names: NameAndDescription[];
   status: string;
+};
+
+export interface GageResetData {
+  external_data_status: {
+    observational: boolean;
+    forcing: boolean;
+    geopackage: boolean;
+  };
+  geopackage_source: string;
+  observational_source: string;
+  forcing_source: string;
 }

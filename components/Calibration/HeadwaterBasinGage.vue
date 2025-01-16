@@ -4,7 +4,6 @@
       <div class="grid grid-rows-8 gap-6">
 
         <div class="row-span-1">
-
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
               <div class="col-span-1">
@@ -15,10 +14,10 @@
             </div>
 
             <div class="col-span-1">
-              <label for="Gage">Gage</label><br />
+              <label for="Gage" @focus="focusSelectInput">Gage</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
-                @change="onGageSelectionChange" class=""></Select>
+                @change="onGageSelectionChange" @focus="focusSelectInput" class=""></Select>
             </div>
 
             <div class="col-span-1">&nbsp;</div>
@@ -95,7 +94,8 @@
           <div class="grid grid-cols-8">
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
+                <button id="HBGSaveButton" class="font-normal" title="Save" aria-label="Save Button"
+                  @click="saveTabData()">
                   Save
                 </button>
               </div>
@@ -105,14 +105,16 @@
                 Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
               </div>
             </span>
-            <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
+            <span v-if="gageHasChanged && userCalibrationRunData?.gage !== null">
               <div class="col-span-1 mr-3">
-                <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTabData()"
-                  aria-label="Reset Button">Reset</button>-->
+                <button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Revert Gage"
+                  @click="gageSelectionReset()" aria-label="Revert">Revert</button>
               </div>
             </span>
             <span v-else>
-              <div class="col-span-1 mr-3">&nbsp;</div>
+              <div class="ngenButtonDiv-yellow-spacer col-span-1 mr-3">
+                &nbsp;
+              </div>
             </span>
             <div class="col-span-4">&nbsp;</div>
             <div class="col-span-1">&nbsp;</div>
@@ -122,7 +124,6 @@
             </div>
           </div>
         </div>
-
       </div>
 
     </div>
@@ -141,6 +142,7 @@ import { useGageStore } from "@/stores/calibration/GageStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
@@ -152,19 +154,34 @@ import { hilightTab } from '@/composables/TabHilight';
 
 import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
 
+const { hardResetTuningTimeConrols } = useTuningStore();
+
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 
 const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
   getObservationalOptionsList } = storeToRefs(useGageStore());
+
 const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
   saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
 const { getCalibrationTabIndex } = generalStore();
-const { calibrationJobId } = storeToRefs(generalStore());
+const { calibrationJobId, gageHasChanged } = storeToRefs(generalStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
+
+const resetData = ref<GageResetData>({
+  external_data_status: {
+    observational: false,
+    forcing: false,
+    geopackage: false,
+  },
+  geopackage_source: "",
+  observational_source: "",
+  forcing_source: ""
+})
+
 
 const isLoading = ref(true);
 
@@ -176,22 +193,127 @@ onMounted(() => {
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
+    if (gageHasChanged.value && userCalibrationRunData?.value?.gage?.gage_id) {
+      gageSelectionReset();
+    }
   });
 })
-
 
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
 const nextPrevDialogOpened = ref<boolean>(false);
 
 const onGageSelectionChange = () => {
-  fetchSelectedGageData()
+  // Was there a previous gage?
+  if (userCalibrationRunData?.value?.gage) {
+    gageHasChanged.value = true;
+
+    // Save all information from the external data  JSON.parse(JSON.stringify(obj));
+
+    resetData.value.external_data_status = JSON.parse(JSON.stringify(userCalibrationRunData.value.external_data_status));
+    resetData.value.geopackage_source = userCalibrationRunData.value.geopackage_source;
+    resetData.value.observational_source = userCalibrationRunData.value.observational_source;
+    resetData.value.forcing_source = userCalibrationRunData.value.forcing_source;
+
+    if (userCalibrationRunData?.value?.external_data_status) {
+      userCalibrationRunData.value.external_data_status.forcing = false;
+      userCalibrationRunData.value.external_data_status.geopackage = false;
+      userCalibrationRunData.value.external_data_status.observational = false;
+    }
+    nextTick(() => {
+      const gage = document.getElementById('Gage');
+      (gage?.childNodes[0] as HTMLInputElement).innerText = selectedGageValue.value;
+      document.getElementById("HBGSaveButton")?.focus();
+    });
+  }
+  fetchSelectedGageData();
+}
+
+/**
+ * Resets the Gage to the previous gage if it was changed and not saved.
+ */
+const gageSelectionReset = () => {
+  selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
+  fetchSelectedGageData();
+  gageHasChanged.value = false;
+  const optList = getGageOptionsList;
+  const gage = document.getElementById('Gage');
+  if (selectedGageValue.value) {
+    const index = optList.value.findIndex(item => item.name === selectedGageValue.value);
+    selectedGageValue.value = optList.value[index].name;
+    (gage?.childNodes[0] as HTMLInputElement).innerText = optList.value[index].name;
+  } else {
+    selectedGageValue.value = '';
+    (gage?.childNodes[0] as HTMLInputElement).innerText = '';
+  }
+
+  if (userCalibrationRunData.value) {
+    userCalibrationRunData.value.external_data_status = JSON.parse(JSON.stringify(resetData.value.external_data_status))
+    userCalibrationRunData.value.geopackage_source = resetData.value.geopackage_source
+    userCalibrationRunData.value.observational_source = resetData.value.observational_source
+    userCalibrationRunData.value.forcing_source = resetData.value.forcing_source
+  }
+}
+
+const clearDataDueToGageChange = () => {
+  // check for an actual change
+  if (userCalibrationRunData?.value?.gage !== null && userCalibrationRunData?.value?.gage.gage_id !== selectedGageValue.value) {
+    isLoading.value = true;
+    setTimeout(() => {
+      fetchSelectedGageData();
+      hardResetTuningTimeConrols();
+      if (userCalibrationRunData.value) {
+        userCalibrationRunData.value.calibration_times.calibration_start_time = "";
+        userCalibrationRunData.value.calibration_times.calibration_end_time = "";
+        userCalibrationRunData.value.calibration_times.simulation_start_time = "";
+        userCalibrationRunData.value.calibration_times.simulation_end_time = "";
+
+        userCalibrationRunData.value.validation_times.validation_start_time = "";
+        userCalibrationRunData.value.validation_times.validation_end_time = "";
+        userCalibrationRunData.value.validation_times.simulation_start_time = "";
+        userCalibrationRunData.value.validation_times.simulation_end_time = "";
+
+
+        if (userCalibrationRunData.value.external_data_status.observational) {
+          selectedObservationalValue.value = getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '';
+          userCalibrationRunData.value.external_data_status.observational = false;
+        }
+        if (userCalibrationRunData.value.external_data_status.forcing) {
+          selectedForcingValue.value = getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
+          userCalibrationRunData.value.external_data_status.forcing = false;
+        }
+        if (userCalibrationRunData.value.external_data_status.geopackage) {
+          selectedGeopackageValue.value = getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
+          userCalibrationRunData.value.external_data_status.geopackage = false;
+        }
+      }
+      isLoading.value = false;
+      toast.add({
+        severity: 'info', summary: `Gage Changed`,
+        detail: "You must save this tab for the change to effect the run. Calibration and Validation times must be set on the Tuning Controls tab", life: 5000
+      })
+    }, 100);
+  }
 }
 
 const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
   if (e && e.value === 'User Upload') {
     showForcingFileUploadDialog('Forcing Files')
   }
+}
+
+
+/**
+ * Force focus on text input area when user clicks on dropdown.
+ * @param e Event
+ */
+const focusSelectInput = (e: any) => {
+  setTimeout(() => {
+    let eles = document.getElementsByClassName('p-select-filter');
+    if (eles.length) {
+      (eles[0] as HTMLInputElement).focus();
+    }
+  }, 150);
 }
 
 const showForcingFileUploadDialog = (headerText: string) => {
@@ -324,6 +446,13 @@ const saveTabData = () => {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
+
+    // Check for gage change
+    if (gageHasChanged.value) {
+      clearDataDueToGageChange();
+      gageHasChanged.value = false;
+    }
+
     saveGageTabData().then(response => {
       if (response.status === 200) {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
@@ -388,9 +517,12 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 }
 
 const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data.moveToNextResponse) {
+  if (opt.data && opt.data.moveToNextResponse) {
     selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
     gotoNext();
+  }
+  if (opt.type && opt.type === 'dialog-close') {
+    return;
   }
 }
 

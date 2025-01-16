@@ -17,7 +17,6 @@
           <div class="col-span-5">
             <div class="text-left text-lg mt-2"><strong>Formulation Modules</strong></div>
             <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
-
               <div class="font-bold">Groups Filter
                 <Select id="Groups" v-model="filterGroup" filter
                   :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description"
@@ -26,7 +25,7 @@
             </div>
             <div class="pt-4 mb-1 font-bold text-base">Select Modules</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="h-60">
+              optionLabel="name" optionValue="name" class="h-60" @change="moduleListChanged">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
                   <div class="font-ui pl-2 leading-none">{{ slotProps.option.name }}</div>
@@ -50,9 +49,9 @@
           </div>
           <div class="col-span-1">&nbsp;</div>
         </div>
-<!--        <div class="mt-3 mb-5 hr"></div> -->
+        <!--        <div class="mt-3 mb-5 hr"></div> -->
       </div>
-<!--
+      <!--
       /* Don't Display this implemented SLoTH capability until available to send SLoTH variables to ngen-cal */
       <div class="row-span-2 -mt-2">
 
@@ -142,15 +141,17 @@
             Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
           </div>
         </span>
-        <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
+
+        <span v-if="modulesHaveChanged">
           <div class="col-span-1 mr-3">
-<!--        <button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
-              @click="resetFormulationData()" aria-label="Reset Button">Reset</button>
--->
+            <button class="ngenButtonDiv-yellow" title="Revert Gage" @click="resetModuleList()"
+              aria-label="Revert Gage">Revert</button>
           </div>
         </span>
         <span v-else>
-          <div class="col-span-1 mr-3"></div>
+          <div class="col-span-1 mr-3">
+            &nbsp;
+          </div>
         </span>
 
         <div class="col-span-4">&nbsp;</div>
@@ -175,22 +176,29 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
+
 import type { UserCalibrationRunData } from "@/composables/NextGenModel";
-import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
+import { isCalibrationJobStatusSavedOrReady, arraysEqual } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
 import type { SlothParameterData } from '@/composables/NextGenModel';
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import { hilightTab } from '@/composables/TabHilight';
 
+const { clearCalibratableParameters } = useTuningStore();
+
+const { selectedOutputVariable, userOutputVariableToCalibrate } = storeToRefs(useTuningStore());
+
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
 import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
+import type { ListboxChangeEvent } from "primevue/listbox";
 
 const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
@@ -229,6 +237,10 @@ const { fetchUserCalibrationRunData } = useUserDataStore();
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { getCalibrationTabIndex } = generalStore();
+
+const useGeneralStore = generalStore();
+const { modulesHaveChanged } = storeToRefs(useGeneralStore)
+
 const runStatusStore = useRunStatusStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 let mainLeftAreaElement: HTMLElement | null = null;
@@ -237,11 +249,13 @@ let dataTableElement: HTMLElement | null = null;
 const toast = useToast();
 
 onMounted(() => {
-  hilightTab(CalibrationTabs.tab_formulation);
-
-  toast.removeAllGroups();
-  mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
-  if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
+  nextTick(() => {
+    hilightTab(CalibrationTabs.tab_formulation);
+    toast.removeAllGroups();
+    mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+    if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
+    modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+  })
 });
 
 const addSlothOnEnter = (e: KeyboardEvent) => {
@@ -250,6 +264,11 @@ const addSlothOnEnter = (e: KeyboardEvent) => {
     addSlothVariable();
   }
 };
+
+
+const resetForumulationTab = () => {
+  loadFormulationTabStaticData();
+}
 
 /**
  * add sloth variable entry to table and reset name field
@@ -286,6 +305,17 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
   deleteSlothVariable(selectedSlothParameterData.value.param_name);
 }
 
+const moduleListChanged = (e: ListboxChangeEvent) => {
+  modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+}
+
+const resetModuleList = () => {
+  if (selectedModuleValues.value && userCalibrationRunData?.value?.modules) {
+    selectedModuleValues.value = userCalibrationRunData?.value?.modules
+    modulesHaveChanged.value = false;
+  }
+}
+
 /**
  * Prevent unwanted characters
  */
@@ -305,6 +335,18 @@ const saveFormulationData = () => {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
     toast.removeAllGroups();
+    var valOK = validateModules();
+    if (!valOK) {
+      modulesHaveChanged.value = false;
+      selectedOutputVariable.value = "";
+      userOutputVariableToCalibrate.value = { name: '', module: null }
+      if (userCalibrationRunData.value) {
+        userCalibrationRunData.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value as UserCalibrationRunOutputVariableToCalibrateData;
+      }
+      // delete all of the Calabratable parameters on the Tuning Controls tab
+      clearCalibratableParameters();
+    }
+
     saveFormulationTabData().then(response => {
       if (response.status === 200) {
         if (response._data.eds_errors) {
@@ -315,10 +357,10 @@ const saveFormulationData = () => {
         toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
         if (response?._data?.nwm_warning === true) {
           useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
-            toast.add({ severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000  });
+            toast.add({ severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000 });
           });
         }
-        fetchUserCalibrationRunData();
+        // fetchUserCalibrationRunData();
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message });
@@ -332,14 +374,22 @@ const resetFormulationData = () => {
   resetUserSelectionFormulation();
 }
 
-
+const validateModules = () => {
+  // fetchUserCalibrationRunData();
+  /* check if list of modules changed */
+  return userCalibrationRunData?.value?.modules !== null && arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+}
 const validateTab = () => {
-  fetchUserCalibrationRunData();
+  //fetchUserCalibrationRunData();
   let error = false;
   let text = [];
   /* Check if formulation name changed */
-  let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : '';
   let newName = formulationNameInput.value ? formulationNameInput.value : '';
+  if (newName.trim() === "") {
+    error = true;
+    text.push("Please enter a valid Forumulation Name");
+  }
+  let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : '';
   if (savedName !== newName) {
     error = true;
     text.push("Formulation Name has been changed");
@@ -347,12 +397,12 @@ const validateTab = () => {
   /* check if list of modules changed */
   let selModules = selectedModuleValues.value;
   let savedModules = userCalibrationRunData?.value?.modules;
-  if (selModules.length !== savedModules?.length) {
+  if (!arraysEqual(selectedModuleValues, userCalibrationRunData?.value?.modules)) {
     error = true;
     text.push("Selected Modules have been changed");
   } else {
     selModules.every((module) => {
-      if (savedModules.indexOf(module) === -1) {
+      if (savedModules && savedModules.indexOf(module) === -1) {
         error = true;
         text.push("Selected Modules have been changed");
         return false;
@@ -435,13 +485,16 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 }
 
 const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data.moveToNextResponse) {
+  if (opt.data && opt.data.moveToNextResponse) {
     restorePage();
     if (opt.data.goNext) {
       gotoNext();
     } else {
       gotoPrev();
     }
+  }
+  if (opt.type && opt.type === 'dialog-close') {
+    return;
   }
 }
 

@@ -168,7 +168,8 @@
         </div>
 
         <div class="col-span-1 mt-2 relative">
-          <button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg" @click="clearUserSelectedCalibrationTuningParameters()">Clear</button>
+          <button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
+            @click="clearUserSelectedCalibrationTuningParameters()">Clear</button>
         </div>
 
       </div>
@@ -235,8 +236,8 @@
 
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-3">
-          <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button" @click="resetTuningData()"
-            aria-label="Reset Button">Reset</button>-->
+          <!--<button class="c-blue font-normal text-xl underline pt-1" title="Revert Button" @click="resetTuningData()"
+            aria-label="Revert Button">Revert</button>-->
         </div>
       </span>
 
@@ -316,6 +317,7 @@ const {
   calibrationTuningParameters,
   userSelectedCalibrationTuningParameters,
   userOutputVariableToCalibrate,
+  selectedOutputVariable,
   outputVariables,
   automatic_validation,
   avSimStartTime,
@@ -329,7 +331,6 @@ const {
 
 const toast = useToast();
 const selectedParameter = ref<any>(null);
-const selectedOutputVariable = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isInitialSetupDone = ref(false);
 const selectedTuningParameterData = ref();
@@ -357,13 +358,18 @@ onMounted(async () => {
   // Check to see if there is a job. If not, don't initialize this tab!
   if (calibrationJobId.value) {
     // fetch user calibration data
-    await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
+    //await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
+
+    if (!userSelectedCalibrationTuningParameters.value.length) {
+      console.log("Clearing out selectedTuningParameterData");
+      selectedTuningParameterData.value = null;
+    }
 
     // if Tuning Tab static data is not loaded, fetch it
-    if (loadTuningTabData?.value?._data?.modules.length === 0) {
-      await loadTuningTabStaticData();
-    } else {
-    }
+    // if (loadTuningTabData?.value?._data?.modules.length === 0) {
+    //   await loadTuningTabStaticData();
+    // } else {
+    // }
 
     // check if EDS errors exist
     const edsErrorMessage = loadTuningTabData.value ? ifEDSErrorsExist(loadTuningTabData.value._data) : '';
@@ -1030,7 +1036,7 @@ const saveTuningData = () => {
 };
 
 /**
- * Reset Tuning Tab data
+ * git stat Tuning Tab data
  */
 const resetTuningData = () => {
   // hardResetTuningStore(); // disable for now
@@ -1173,13 +1179,16 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 }
 
 const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data.moveToNextResponse) {
+  if (opt.data && opt.data.moveToNextResponse) {
     restorePage();
     if (opt.data.goNext) {
       gotoNext();
     } else {
       gotoPrev();
     }
+  }
+  if (opt.type && opt.type === 'dialog-close') {
+    return;
   }
 }
 </script>

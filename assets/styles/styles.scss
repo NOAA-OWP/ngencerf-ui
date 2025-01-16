@@ -164,6 +164,30 @@ input::-webkit-input-placeholder {
 .ngenButtonDiv-red:hover {
   background-color: $ngwcp_red_dark2;
 }
+
+.ngenButtonDiv-yellow {
+  cursor: pointer;
+  color: black;
+  padding: 6px 25px;
+  border-radius: 28px;
+  background-color: $ngwcp_yellow_dark1;
+  text-align: center;
+  font-size: 18px;
+  border: 0px;
+  display: inline-block;
+}
+.ngenButtonDiv-yellow:hover {
+  background-color: $ngwcp_yellow_dark2;
+}
+
+.ngenButtonDiv-yellow-spacer {
+  padding: 6px 25px;
+  border-radius: 28px;
+  background-color: transparent;
+  font-size: 18px;
+  border: 0px;
+  display: inline-block;
+}
 .btn-left {
   margin-right: auto;
   margin-left: 0px;

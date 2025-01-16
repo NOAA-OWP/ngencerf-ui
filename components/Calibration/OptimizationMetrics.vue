@@ -208,7 +208,7 @@ const ele = document.getElementById("MainLeftDataArea") as HTMLElement;
 
 onMounted(() => {
   hilightTab(CalibrationTabs.tab_optimizationMetrics);
-  
+
   toast.removeAllGroups();
 
   if (ele) { ele.scrollTo(0, 0); }
@@ -356,7 +356,7 @@ const validateTab = () => {
     error = true;
     text.push("Objective Function has been changed");
   }
-  if ((userCalibrationRunData?.value?.stop_criteria || 0 )!== uiStopCriteria.value) {
+  if ((userCalibrationRunData?.value?.stop_criteria || 0) !== uiStopCriteria.value) {
     error = true;
     text.push("Calibration Stop Criteria has been changed");
   }
@@ -455,13 +455,16 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 }
 
 const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data.moveToNextResponse) {
+  if (opt.data && opt.data.moveToNextResponse) {
     restorePage();
     if (opt.data.goNext) {
       gotoNext();
     } else {
       gotoPrev();
     }
+  }
+  if (opt.type && opt.type === 'dialog-close') {
+    return;
   }
 }
 </script>

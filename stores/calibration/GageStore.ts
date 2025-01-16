@@ -260,9 +260,9 @@ export const useGageStore = defineStore('GageStore', () => {
   const setUserSelection = (): void => {
     selectedDomainValue.value = getSavedDomainValue.value ?? ""
     selectedGageValue.value = userCalibrationRunData.value?.gage?.gage_id ?? ""
-    selectedForcingValue.value =  !userCalibrationRunData.value?.external_data_status.observational && getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
-    selectedObservationalValue.value = !userCalibrationRunData.value?.external_data_status.forcing && getObservationalOptionsList.value ? getObservationalOptionsList.value [0].name : "";
-    selectedGeopackageValue.value = !userCalibrationRunData.value?.external_data_status.geopackage && getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
+    selectedForcingValue.value =  userCalibrationRunData.value?.external_data_status.observational && getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
+    selectedObservationalValue.value = userCalibrationRunData.value?.external_data_status.forcing && getObservationalOptionsList.value ? getObservationalOptionsList.value [0].name : "";
+    selectedGeopackageValue.value = userCalibrationRunData.value?.external_data_status.geopackage && getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
     gageData.value = userCalibrationRunData.value?.gage ?? undefined
   }
 
