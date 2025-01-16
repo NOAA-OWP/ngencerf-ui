@@ -38,7 +38,7 @@
                 <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                 <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
                   :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
-                  placeholder=""></Select>
+                  placeholder="All"></Select>
             </div>
           </div>
 
@@ -47,7 +47,7 @@
             :model="cmCalibrationRun"></ContextMenu>
             
           <div style="overflow: auto; ">
-          <DataTable id="EvalRunTable" :value="userEvaluationCalibrationRunListData" scrollable scroll-height="400px"
+          <DataTable id="EvalRunTable" :value="filteredData" scrollable scroll-height="400px"
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
             v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
@@ -187,6 +187,15 @@ onMounted(() => {
   fetchUserValidatedCalibrationJobsListData();
   isLoading.value = false;
 });
+
+// Computed filtered data for DataTables
+const filteredData = computed(() => {
+      if (!uiGageId.value || uiGageId.value === "All") {
+        return userEvaluationCalibrationRunListData?.value;
+      } else {
+        return userEvaluationCalibrationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
+      }
+    });
 
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];

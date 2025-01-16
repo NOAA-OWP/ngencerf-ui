@@ -55,6 +55,10 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   */
   const evaluationCalibrationRunGageList = computed(() => {
     let gageOptionList = <SelectOption[]>[];
+    gageOptionList.push({
+      'name': "All",
+      'description': "All"
+    });
     userEvaluationCalibrationRunListData.value.forEach(runItem => {
       const checkGageIndex = gageOptionList.findIndex(
         (gageOption) =>

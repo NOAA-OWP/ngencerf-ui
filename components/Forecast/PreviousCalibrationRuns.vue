@@ -27,18 +27,17 @@
           <div id="CalTable">
             <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
               <div class="col-span-1">
-                <div class="ml-10">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
                     :options="forecastRunGageList" filter optionLabel="name" optionValue="name"
-                    placeholder=""></Select>
-                </div>
+                    placeholder="All"></Select>
+
               </div>
             </div>
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun"></ContextMenu>
-            <DataTable id="CalibrationRunForForecastTable" :value="calibrationRunsForForecast" scrollable scroll-height="400px"
+            <DataTable id="CalibrationRunForForecastTable" :value="filteredData" scrollable scroll-height="400px"
               sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
               @rowSelect="onCalibrationRunForForecastRowSelect" @rowUnselect="onCalibrationRunForForecastRowUnSelect" @rowContextmenu="onRowContextMenu" class="boxed">
@@ -150,6 +149,16 @@ onMounted(async () => {
   await getCalibrationJobsForForecast();
   isLoading.value = false;
 });
+
+// Computed filtered data for DataTables
+const filteredData = computed(() => {
+      if (!uiGageId.value || uiGageId.value === "All") {
+        return calibrationRunsForForecast?.value;
+      } else {
+        return calibrationRunsForForecast?.value?.filter((row) => (row as any as CalibrationJobListItem).gage_id === uiGageId.value);
+      }
+    });
+
 
 const viewCalibrationDetails = async ( calibration_run_id: number ) => {
   isLoading.value = true;  

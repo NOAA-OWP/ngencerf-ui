@@ -197,6 +197,10 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
 */
   const calibrationRunGageList = computed(() => {
     let gageOptionList = <SelectOption[]>[];
+    gageOptionList.push({
+      'name': "All",
+      'description': "All"
+    });
     userCalibrationJobsListData.value.forEach(runItem => {
       const checkGageIndex = gageOptionList.findIndex(
         (gageOption) =>

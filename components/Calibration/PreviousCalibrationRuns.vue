@@ -14,13 +14,14 @@
             <div class="col-span-1 text-left">
               <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
               <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter float-left" v-model="uiGageId" :options="calibrationRunGageList" filter
-                optionLabel="name" optionValue="name" placeholder=""></Select>
+                optionLabel="name" optionValue="name" placeholder="All">                
+              </Select>
             </div>
           </div>
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white boxed" ref="crContextMenu"
             :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-          <DataTable id="cr-list" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id" :sortOrder="-1"
+          <DataTable id="cr-list" :value="filteredData" sortField="calibration_run_id" :sortOrder="-1"
             scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
             @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
@@ -125,6 +126,15 @@ onMounted(async () => {
     await updateUserCalibrationJobsListData();
   }
 })
+
+// Computed filtered data for DataTables
+const filteredData = computed(() => {
+      if (!uiGageId.value || uiGageId.value === "All") {
+        return updatedUserCalibrationJobsListData?.value;
+      } else {
+        return updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
+      }
+    });
 
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
