@@ -94,7 +94,7 @@
           <div class="grid grid-cols-8">
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
+                <button id="HBGSaveButton" class="font-normal" title="Save" aria-label="Save Button" @click="saveTabData()">
                   Save
                 </button>
               </div>
@@ -222,6 +222,7 @@ const onGageSelectionChange = () => {
     nextTick( () => {
       const gage = document.getElementById('Gage');
       (gage?.childNodes[0] as HTMLInputElement).innerText = selectedGageValue.value;
+      document.getElementById("HBGSaveButton")?.focus();
     });
   }
   fetchSelectedGageData();
@@ -446,7 +447,6 @@ const saveTabData = () => {
     if (gageHasChanged.value) {
       clearDataDueToGageChange();
       gageHasChanged.value = false;
-      return;
     }
 
     saveGageTabData().then(response => {
