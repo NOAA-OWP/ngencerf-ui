@@ -161,6 +161,7 @@ onMounted(() => {
 
   nextTick(() => {
     sessionStorage.clear();
+    localStorage.clear();
     calibrationJobId.value = 0;
     hardResetUserDataStore();
     resetGeneralStore();

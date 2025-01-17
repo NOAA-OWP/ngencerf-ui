@@ -2,7 +2,7 @@
  * This Composable contains utility functions for user authentication and making JWT-based API calls
  */
 
-import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useLogout } from "@/composables/UseEventBus";
 
 /**
@@ -10,7 +10,9 @@ import { useLogout } from "@/composables/UseEventBus";
  * @param ngencerfBaseUrl
  * @returns {boolean} true if access token is refreshed successfully, false otherwise
  */
-export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boolean> => {
+export const refreshAccessToken = async (
+  ngencerfBaseUrl: string
+): Promise<boolean> => {
   const userDataStore = useUserDataStore();
   const refreshToken = userDataStore.getRefreshToken();
 
@@ -22,7 +24,7 @@ export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boole
   try {
     // Make a request to server to refresh the access token
     const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/refresh/`, {
-      method: 'POST',
+      method: "POST",
       body: { refresh: refreshToken },
     });
     const { access } = data;
@@ -32,19 +34,19 @@ export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boole
       userDataStore.setAccessToken(access);
       return true;
     } else {
-      console.error('Token refresh failed');
-      return false
+      console.error("Token refresh failed");
+      return false;
     }
   } catch (error) {
-    console.error('Error refreshing token:', error);
+    console.error("Error refreshing token:", error);
     return false;
   }
 };
 
 /**
  * This function makes a protected-API call to the server
- * @param url 
- * @param userOptions 
+ * @param url
+ * @param userOptions
  * @returns response from the API call
  */
 
@@ -53,48 +55,72 @@ let rqstUserOptions: any;
 
 export const makeProtectedApiCall = async <T>(
   url: string,
-  userOptions: any = {},
+  userOptions: any = {}
 ): Promise<any> => {
   // Save the call data in case we need to refresh.
-   rqstUrl = url;
-   rqstUserOptions = userOptions; 
+  rqstUrl = url;
+  rqstUserOptions = userOptions;
 
-  let responseData: any; 
+  let responseData: any;
 
   try {
     const response = await fetch(url, {
       ...userOptions,
-      async onRequest({ request, options }: { request: any, options: any }) {
+      async onRequest({ request, options }: { request: any; options: any }) {
         // stringify body if it is an object
-        if (options.body && typeof options.body === 'object' && !Array.isArray(options.body) && !(options.body instanceof FormData)) {
+        if (
+          options.body &&
+          typeof options.body === "object" &&
+          !Array.isArray(options.body) &&
+          !(options.body instanceof FormData)
+        ) {
           options.body = JSON.stringify(options.body);
         }
-      }
+      },
     });
-    if (response.ok) {
-      responseData = {_data: await response.json(), status: response.status, ok: response.ok };
-      // console.log(responseData);
-       return responseData;
-    } 
-    if( response.status === 401) {
+
+    let myResponse = { ok: response.ok, status: response.status };
+
+    if (myResponse.status >= 500 && myResponse.status < 600) {
+      console.log("Server Error");
+      return {
+        _data: null,
+        status: myResponse.status,
+        ok: myResponse.ok,
+      };
+    }
+
+    if (myResponse.ok) {
+      responseData = {
+        _data: await response.json(),
+        status: response.status,
+        ok: response.ok,
+      };
+      return responseData;
+    }
+    if (myResponse.status === 401) {
       const userDataStore = useUserDataStore();
       const { ngencerfBaseUrl } = useBackendConfig();
-      const refreshAccessTokenSuccess = await refreshAccessToken(ngencerfBaseUrl);
+      const refreshAccessTokenSuccess = await refreshAccessToken(
+        ngencerfBaseUrl
+      );
       if (!refreshAccessTokenSuccess) {
         sendUserToLogin();
         return;
       }
       rqstUserOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
-      return makeProtectedApiCall( rqstUrl, rqstUserOptions);
+      return makeProtectedApiCall(rqstUrl, rqstUserOptions);
     } else {
-      responseData = {_data: await response.json(), status: response.status, ok: response.ok };
-       //console.log(responseData);
-       return responseData;
+      responseData = {
+        _data: await response.json(),
+        status: response.status,
+        ok: response.ok,
+      };
+      return responseData;
     }
   } catch {
     sendUserToLogin();
   }
-
 };
 
 const sendUserToLogin = () => {
@@ -102,6 +128,4 @@ const sendUserToLogin = () => {
   userDataStore.logUserOut();
   useLogout("logoutEvent", "token");
   return null;
-}
-
-
+};
