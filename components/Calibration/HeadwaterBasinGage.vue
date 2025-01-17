@@ -154,6 +154,8 @@ import { hilightTab } from '@/composables/TabHilight';
 
 import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
 
+const isLoading = ref(true);
+
 const { hardResetTuningTimeConrols } = useTuningStore();
 
 const userDataStore = useUserDataStore();
@@ -170,6 +172,9 @@ const { calibrationJobId, gageHasChanged } = storeToRefs(generalStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
+const dialog = useDialog();
+const fileUploadDialogOpened = ref<boolean>(false);
+const nextPrevDialogOpened = ref<boolean>(false);
 
 const resetData = ref<GageResetData>({
   external_data_status: {
@@ -182,26 +187,19 @@ const resetData = ref<GageResetData>({
   forcing_source: ""
 })
 
-
-const isLoading = ref(true);
-
-
 onMounted(() => {
   nextTick(() => {
     hilightTab(CalibrationTabs.tab_headwaterBasinGage);
     toast.removeAllGroups();
-    isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
     if (gageHasChanged.value && userCalibrationRunData?.value?.gage?.gage_id) {
       gageSelectionReset();
     }
+    isLoading.value = false;
   });
 })
 
-const dialog = useDialog();
-const fileUploadDialogOpened = ref<boolean>(false);
-const nextPrevDialogOpened = ref<boolean>(false);
 
 const onGageSelectionChange = () => {
   // Was there a previous gage?
@@ -442,6 +440,7 @@ const toggle_isNWMv3 = () => {
 };
 
 const saveTabData = () => {
+  isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
@@ -463,6 +462,7 @@ const saveTabData = () => {
           toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message });
         });
       }
+      isLoading.value = false;
     });
   }
 };
