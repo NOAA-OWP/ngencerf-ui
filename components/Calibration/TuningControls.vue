@@ -258,7 +258,7 @@
     </div>
   </div>
   <DynamicDialog />
-  <div class="waitgif" v-if="isLoading">
+  <div class="waitgif" v-if="isLoading || tuningStore_data_loading">
     <img alt="Please wait" src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
@@ -291,7 +291,8 @@ const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
 
 const format = formatDateForDisplay;
-const isLoading = ref(false);
+
+const isLoading = ref(true);
 
 const { calibrationJobId } = storeToRefs(generalStore());
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -309,6 +310,7 @@ const { fetchUserCalibrationRunData, getAccessToken } = userDataStore;
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { loadTuningTabStaticData, saveTuningTabData, hardResetTuningStore } = tuningStore;
 const {
+  tuningStore_data_loading,
   loadTuningTabData,
   simStartTime,
   simEndTime,
@@ -367,7 +369,8 @@ onMounted(async () => {
 
     // if Tuning Tab static data is not loaded, fetch it
     await loadTuningTabStaticData();
-  
+    tuningStore_data_loading.value = false;
+    
     // check if EDS errors exist
     const edsErrorMessage = loadTuningTabData.value ? ifEDSErrorsExist(loadTuningTabData.value._data) : '';
     if (edsErrorMessage) {
@@ -418,6 +421,8 @@ onMounted(async () => {
   } else {
     toast.add({ severity: 'warn', summary: 'No Calibration Job ID', detail: 'No calibration job ID found. Please go back to the Calibration Runs tab and select a job.' });
   }
+
+  isLoading.value = false;
 });
 
 /**
@@ -1002,6 +1007,7 @@ const isOutputVariableSet = (): boolean => {
   */
 const saveTuningData = () => {
   // handle saving Tuning Tab data
+  tuningStore_data_loading.value = true;
   const handleSaveTuningTab = async () => {
     const saveTuningTabResponse = await saveTuningTabData();
     if (saveTuningTabResponse?.ok) {
@@ -1019,7 +1025,8 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
-    fetchUserCalibrationRunData();
+    tuningStore_data_loading.value = false;
+    //fetchUserCalibrationRunData();
   };
 
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {

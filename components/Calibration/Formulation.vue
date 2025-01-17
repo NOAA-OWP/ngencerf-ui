@@ -360,6 +360,7 @@ const saveFormulationData = () => {
             toast.add({ severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000 });
           });
         }
+        formulationStore_data_loading.value = false;
         // fetchUserCalibrationRunData();
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {

@@ -207,7 +207,6 @@ const onGageSelectionChange = () => {
     gageHasChanged.value = true;
 
     // Save all information from the external data  JSON.parse(JSON.stringify(obj));
-
     resetData.value.external_data_status = JSON.parse(JSON.stringify(userCalibrationRunData.value.external_data_status));
     resetData.value.geopackage_source = userCalibrationRunData.value.geopackage_source;
     resetData.value.observational_source = userCalibrationRunData.value.observational_source;

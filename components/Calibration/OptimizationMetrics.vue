@@ -150,6 +150,9 @@
 
     </div>
 
+    <div class="waitgif" v-if="isLoading || optimizationStore_data_loading">
+      <img alt="Please wait" src="@/assets/styles/img/wait.gif" />
+    </div>
   </div>
 </template>
 
@@ -167,6 +170,8 @@ import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
+
+const isLoading = ref<boolean>(true);
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -208,11 +213,8 @@ const ele = document.getElementById("MainLeftDataArea") as HTMLElement;
 
 onMounted(() => {
   hilightTab(CalibrationTabs.tab_optimizationMetrics);
-
   toast.removeAllGroups();
-
   if (ele) { ele.scrollTo(0, 0); }
-
   if (userCalibrationRunData.value?.streamflow_threshold) {
     cbIsCategorical.value = true;
     showMetricStreamFlow.value = true;
@@ -224,9 +226,7 @@ onMounted(() => {
     showMetricPeakFlow.value = true;
     uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold
   }
-
-  // uiStreamFlowThreshold
-  // uiPeakFlowThreshold
+  isLoading.value = false;
 })
 
 /**
@@ -323,6 +323,7 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
 * event bus for calibration button group click
 */
 const saveOptMetData = () => {
+  isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
   } else {
@@ -335,7 +336,8 @@ const saveOptMetData = () => {
           toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message });
         });
       }
-      fetchUserCalibrationRunData();
+      isLoading.value = false;
+      //fetchUserCalibrationRunData();
     });
   }
 };

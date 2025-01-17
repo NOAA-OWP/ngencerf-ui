@@ -73,7 +73,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
     avCalEndTime.value = sessionStorage.getItem('avCalEndTime') as string;
     rangeDateFrom.value = sessionStorage.getItem('rangeDateFrom') as string;
     rangeDateTo.value = sessionStorage.getItem('rangeDateTo') as string;
-    tuningStore_data_loading.value = JSON.parse(sessionStorage.getItem('tuningStore_data_loading') as string) === "true";
     ls = sessionStorage.getItem('saveTuningTabRequestBody');
     if (ls !== "undefined") { saveTuningTabRequestBody.value = ls ? JSON.parse(ls) : {} }
   }
@@ -94,8 +93,7 @@ export const useTuningStore = defineStore('TuningStore', () => {
   watch(avCalStartTime, (avCalStartTime) => { sessionStorage.setItem('avCalStartTime', avCalStartTime ?? ""); });
   watch(avCalEndTime, (avCalEndTime) => { sessionStorage.setItem('avCalEndTime', avCalEndTime ?? ""); });
   watch(rangeDateFrom, (rangeDateFrom) => { sessionStorage.setItem('rangeDateFrom', rangeDateFrom ?? ""); });
-  watch(tuningStore_data_loading, (tuningStore_data_loading) => { sessionStorage.setItem('tuningStore_data_loading', JSON.stringify(tuningStore_data_loading)); });
-
+  
 
   /**
    * Load Tuning Tab data
@@ -103,7 +101,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
    */
   async function loadTuningTabStaticData(): Promise<any> {
     tuningStore_data_loading.value = true;
-
     loadTuningTabData.value = await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_tuning_tab/`, {
       method: "POST",
       headers: {
@@ -112,7 +109,6 @@ export const useTuningStore = defineStore('TuningStore', () => {
       },
       body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     });
-
     tuningStore_data_loading.value = false;
 
     // set time range

@@ -57,9 +57,6 @@ export const useFormulationStore = defineStore(
       ) as string;
       useSlothParameters.value =
         (sessionStorage.getItem("useSlothParameters") as string) === "true";
-      formulationStore_data_loading.value =
-        (sessionStorage.getItem("formulationStore_data_loading") as string) ===
-        "true";
     }
 
     watch(slothParameterInputs, (slothParameterInputs) => {
@@ -90,12 +87,6 @@ export const useFormulationStore = defineStore(
       sessionStorage.setItem(
         "useSlothParameters",
         JSON.stringify(useSlothParameters)
-      );
-    });
-    watch(formulationStore_data_loading, (formulationStore_data_loading) => {
-      sessionStorage.setItem(
-        "formulationStore_data_loading",
-        JSON.stringify(formulationStore_data_loading)
       );
     });
 
@@ -332,6 +323,7 @@ export const useFormulationStore = defineStore(
      * @returns {GeneralApiSaveResponse}
      */
     async function saveFormulationTabData() {
+      formulationStore_data_loading.value = true;
       const savePayload = ref<SaveFormulationTabPayload>({});
 
       savePayload.value.formulation_name = formulationNameInput.value
