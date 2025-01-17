@@ -462,9 +462,21 @@ const saveTabData = () => {
         });
       }
       isLoading.value = false;
+      updateJobData();
     });
   }
 };
+
+const updateJobData = () => {
+  if (userCalibrationRunData.value) {
+    userCalibrationRunData.value.gage.gage_id = gageData.value?.gage_id ?? '';
+    userCalibrationRunData.value.gage.agency = gageData.value?.agency ?? '';
+    userCalibrationRunData.value.gage.station_name = gageData.value?.station_name ?? '';
+    userCalibrationRunData.value.gage.latitude = gageData.value?.latitude ?? 0;
+    userCalibrationRunData.value.gage.longitude = gageData.value?.longitude ?? 0;
+    userCalibrationRunData.value.gage.altitude = gageData.value?.altitude ?? 0;
+  }
+}
 
 const resetTabData = () => {
   resetUserSelectionGage();

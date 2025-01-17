@@ -229,7 +229,8 @@ const {
   fetchFormulationModuleCoveredGroupOptions,
   fetchFormulationSlothParameterTypeOptions,
   fetchFormulationSlothParameterUnitOptions,
-  fetchSelectedFormulationModuleOptions
+  fetchSelectedFormulationModuleOptions,
+  saveFormulationPayload
 } = storeToRefs(useFormulationStore());
 
 const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
@@ -345,6 +346,7 @@ const saveFormulationData = () => {
       }
       // delete all of the Calabratable parameters on the Tuning Controls tab
       clearCalibratableParameters();
+
     }
 
     saveFormulationTabData().then(response => {
@@ -361,6 +363,7 @@ const saveFormulationData = () => {
           });
         }
         formulationStore_data_loading.value = false;
+        updateJobData();
         // fetchUserCalibrationRunData();
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
@@ -371,6 +374,16 @@ const saveFormulationData = () => {
   }
 }
 
+const updateJobData = () => {
+  if (userCalibrationRunData.value) {
+    userCalibrationRunData.value.formulation_name =  saveFormulationPayload.value.formulation_name ?? '';
+    userCalibrationRunData.value.modules = saveFormulationPayload.value.modules as string[];
+    userCalibrationRunData.value.sloth_parameters = saveFormulationPayload.value.sloth_parameters as [];
+    userCalibrationRunData.value.use_sloth = saveFormulationPayload.value.use_sloth as boolean;
+    clearCalibratableParameters();
+  }
+};
+
 const resetFormulationData = () => {
   resetUserSelectionFormulation();
 }
@@ -380,8 +393,8 @@ const validateModules = () => {
   /* check if list of modules changed */
   return userCalibrationRunData?.value?.modules !== null && arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }
+
 const validateTab = () => {
-  //fetchUserCalibrationRunData();
   let error = false;
   let text = [];
   /* Check if formulation name changed */

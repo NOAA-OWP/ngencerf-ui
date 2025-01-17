@@ -192,7 +192,9 @@ const {
   showObjectiveFunctionStreamFlow,
   getSelectedMetricInfo,
   getOptimizationInputUserData,
+  saveOptMetPayload
 } = storeToRefs(optimizationStore);
+
 const { loadOptimizationTabStaticData, saveOptimizationTabData, resetOptimizationInputs, resetUserSelectionOptimization } = optimizationStore;
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const userDataStore = useUserDataStore();
@@ -317,8 +319,6 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
   }
 })
 
-
-
 /**
 * event bus for calibration button group click
 */
@@ -336,12 +336,24 @@ const saveOptMetData = () => {
           toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message });
         });
       }
+      updateJobData();
       isLoading.value = false;
-      //fetchUserCalibrationRunData();
     });
   }
 };
 
+const updateJobData = () => {
+  if (userCalibrationRunData.value) {
+    userCalibrationRunData.value.optimization_inputs = saveOptMetPayload.value.optimization_inputs as [];
+    userCalibrationRunData.value.optimization = saveOptMetPayload.value.optimization ?? '';
+    userCalibrationRunData.value.objective_function = saveOptMetPayload.value.objective_function as string;
+    userCalibrationRunData.value.streamflow_threshold = saveOptMetPayload.value.streamflow_threshold as number
+    userCalibrationRunData.value.peak_flow_threshold = saveOptMetPayload.value.peak_flow_threshold as number
+    userCalibrationRunData.value.stop_criteria = saveOptMetPayload.value.stop_criteria as number
+    userCalibrationRunData.value.save_plot_iteration_frequency = saveOptMetPayload.value.save_plot_iteration_frequency as number
+    userCalibrationRunData.value.save_output_iteration = saveOptMetPayload.value.save_output_iteration as boolean
+  }
+};
 
 const validateTab = () => {
   let error = false;

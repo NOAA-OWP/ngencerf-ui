@@ -35,6 +35,8 @@ export const useFormulationStore = defineStore(
     const formulationTabData = ref<FormulationTabData>();
     const formulationStore_data_loading = ref<boolean>(true);
 
+    const saveFormulationPayload = ref<SaveFormulationTabPayload>({});
+
     // Restore state from sessionStorage if available
     if (typeof window !== "undefined") {
       let ls;
@@ -324,19 +326,19 @@ export const useFormulationStore = defineStore(
      */
     async function saveFormulationTabData() {
       formulationStore_data_loading.value = true;
-      const savePayload = ref<SaveFormulationTabPayload>({});
+      saveFormulationPayload.value = <SaveFormulationTabPayload>{};
 
-      savePayload.value.formulation_name = formulationNameInput.value
+      saveFormulationPayload.value.formulation_name = formulationNameInput.value
         ? formulationNameInput.value
         : "";
-      savePayload.value.modules =
+      saveFormulationPayload.value.modules =
         selectedModuleValues.value.length > 0 ? selectedModuleValues.value : [];
-      savePayload.value.sloth_parameters =
+      saveFormulationPayload.value.sloth_parameters =
         slothParameterInputs.value.length > 0 ? slothParameterInputs.value : [];
 
-      if (Object.keys(savePayload.value).length > 0) {
+      if (Object.keys(saveFormulationPayload.value).length > 0) {
         const saveValidation = useCalibrationFormulationTabSaveValidate(
-          savePayload.value
+          saveFormulationPayload.value
         );
         if (Object.keys(saveValidation.value).length > 0) {
           return Promise.resolve({
@@ -349,8 +351,8 @@ export const useFormulationStore = defineStore(
             status: 400,
           });
         } else {
-          savePayload.value["calibration_run_id"] = calibrationJobId.value;
-          savePayload.value["use_sloth"] = useSlothParameters.value;
+          saveFormulationPayload.value["calibration_run_id"] = calibrationJobId.value;
+          saveFormulationPayload.value["use_sloth"] = useSlothParameters.value;
           return await makeProtectedApiCall<GeneralApiSaveResponse>(
             `${ngencerfBaseUrl}/calibration/save_formulation_tab/`,
             {
@@ -359,7 +361,7 @@ export const useFormulationStore = defineStore(
                 Authorization: `Bearer ${getAccessToken()}`,
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify(savePayload.value),
+              body: JSON.stringify(saveFormulationPayload.value),
             }
           );
         }
@@ -421,6 +423,7 @@ export const useFormulationStore = defineStore(
       deleteSlothVariable,
       resetFormulationStore,
       loadFormulationTabStaticData,
+      saveFormulationPayload
     };
   },
   {

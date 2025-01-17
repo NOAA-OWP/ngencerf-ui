@@ -1025,9 +1025,17 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
+    updateJobData();
     tuningStore_data_loading.value = false;
-    //fetchUserCalibrationRunData();
   };
+
+
+  const updateJobData = () => {
+  if (userCalibrationRunData.value) {
+    //userCalibrationRunData.value.gage.gage_id = gageData.value?.gage_id ?? '';
+    console.log("Tuning Data: ", saveTuningTabRequestBody);
+  }
+};
 
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
