@@ -411,7 +411,7 @@ const validateTab = () => {
   /* check if list of modules changed */
   let selModules = selectedModuleValues.value;
   let savedModules = userCalibrationRunData?.value?.modules;
-  if (!arraysEqual(selectedModuleValues, userCalibrationRunData?.value?.modules)) {
+  if (!arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules)) {
     error = true;
     text.push("Selected Modules have been changed");
   } else {
