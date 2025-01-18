@@ -163,7 +163,7 @@ const { userCalibrationRunData } = storeToRefs(userDataStore);
 
 const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
-  getObservationalOptionsList } = storeToRefs(useGageStore());
+  getObservationalOptionsList, gagePayload } = storeToRefs(useGageStore());
 
 const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
   saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
@@ -467,74 +467,82 @@ const saveTabData = () => {
   }
 };
 
-const updateJobData = () => {
+const updateJobData = async () => {
   if (userCalibrationRunData.value) {
-    userCalibrationRunData.value.gage.gage_id = gageData.value?.gage_id ?? '';
-    userCalibrationRunData.value.gage.agency = gageData.value?.agency ?? '';
-    userCalibrationRunData.value.gage.station_name = gageData.value?.station_name ?? '';
-    userCalibrationRunData.value.gage.latitude = gageData.value?.latitude ?? 0;
-    userCalibrationRunData.value.gage.longitude = gageData.value?.longitude ?? 0;
-    userCalibrationRunData.value.gage.altitude = gageData.value?.altitude ?? 0;
+    let newGage = {
+      gage_id: gageData.value?.gage_id ?? '',
+      agency: gageData.value?.agency ?? '',
+      station_name: gageData.value?.station_name ?? '',
+      latitude: gageData.value?.latitude ?? 0,
+      longitude: gageData.value?.longitude ?? 0,
+      altitude: gageData.value?.altitude ?? 0
+    }
+
+    userCalibrationRunData.value.gage = newGage;
+    userCalibrationRunData.value.forcing_source = gagePayload.value.forcing_source as string;
+    userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
+    userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
   }
 }
 
-const resetTabData = () => {
-  resetUserSelectionGage();
-};
 
-const validateTab = () => {
-  let error = false;
-  let text = [];
-  if (userCalibrationRunData?.value?.gage === null && selectedGageValue.value ||
-    userCalibrationRunData?.value?.gage?.gage_id && (userCalibrationRunData?.value?.gage?.gage_id !== selectedGageValue.value)) {
-    error = true;
-    text.push("Gage value has been changed");
-  }
-  return { error: error, text: text }
-}
+  const resetTabData = () => {
+    resetUserSelectionGage();
+  };
 
-const goNextTab = () => {
-  const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, true);
-  } else {
-    gotoNext();
+  const validateTab = () => {
+    let error = false;
+    let text = [];
+    if (userCalibrationRunData?.value?.gage === null && selectedGageValue.value ||
+      userCalibrationRunData?.value?.gage?.gage_id && (userCalibrationRunData?.value?.gage?.gage_id !== selectedGageValue.value)) {
+      error = true;
+      text.push("Gage value has been changed");
+    }
+    return { error: error, text: text }
   }
 
-};
+  const goNextTab = () => {
+    const errors = validateTab();
+    if (errors.error) {
+      showPrevNextDialog(errors.text, true);
+    } else {
+      gotoNext();
+    }
 
-const showPrevNextDialog = (body: string[], next: boolean) => {
-  if (!nextPrevDialogOpened.value) {
-    dialog.open(MoveNextPrevDialog, {
-      props: {
-        header: "Unsaved changes!",
-        style: {
-          width: 'auto',
+  };
+
+  const showPrevNextDialog = (body: string[], next: boolean) => {
+    if (!nextPrevDialogOpened.value) {
+      dialog.open(MoveNextPrevDialog, {
+        props: {
+          header: "Unsaved changes!",
+          style: {
+            width: 'auto',
+          },
+          modal: true,
         },
-        modal: true,
-      },
-      data: {
-        body: body,
-        direction: next
-      },
-      onClose: (opt) => {
-        nextPrevDialogOpened.value = false;
-        handleNextPrevDialogClose(opt);
-      },
-    })
-    nextPrevDialogOpened.value = true
+        data: {
+          body: body,
+          direction: next
+        },
+        onClose: (opt) => {
+          nextPrevDialogOpened.value = false;
+          handleNextPrevDialogClose(opt);
+        },
+      })
+      nextPrevDialogOpened.value = true
+    }
   }
-}
 
-const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data && opt.data.moveToNextResponse) {
-    selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
-    gotoNext();
+  const handleNextPrevDialogClose = (opt: any) => {
+    if (opt.data && opt.data.moveToNextResponse) {
+      selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
+      gotoNext();
+    }
+    if (opt.type && opt.type === 'dialog-close') {
+      return;
+    }
   }
-  if (opt.type && opt.type === 'dialog-close') {
-    return;
-  }
-}
 
 </script>
 <style lang="scss" scoped>

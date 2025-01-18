@@ -41,6 +41,8 @@ export const useGageStore = defineStore(
 
     const gageStore_data_loading = ref<boolean>(true);
 
+    const gagePayload = ref(<SaveGageTabPayload>{});
+
     // Restore state from sessionStorage if available
     if (typeof window !== "undefined") {
       let ls;
@@ -253,21 +255,20 @@ export const useGageStore = defineStore(
      * @returns {SaveGageTabResponse}
      */
     async function saveGageTabData() {
-      let savePayload = <SaveGageTabPayload>{};
       if (selectedGageValue.value)
-        savePayload["gage_id"] = selectedGageValue.value;
+        gagePayload.value["gage_id"] = selectedGageValue.value;
       if (selectedForcingValue.value)
-        savePayload["forcing_source"] = selectedForcingValue.value;
+        gagePayload.value["forcing_source"] = selectedForcingValue.value;
       if (selectedObservationalValue.value)
-        savePayload["observational_source"] = selectedObservationalValue.value;
+        gagePayload.value["observational_source"] = selectedObservationalValue.value;
       if (selectedGeopackageValue.value)
-        savePayload["geopackage_source"] = selectedGeopackageValue.value;
+        gagePayload.value["geopackage_source"] = selectedGeopackageValue.value;
 
       if (
-        Object.keys(savePayload).length > 0 &&
-        savePayload.hasOwnProperty("gage_id")
+        Object.keys(gagePayload.value).length > 0 &&
+        gagePayload.value.hasOwnProperty("gage_id")
       ) {
-        savePayload["calibration_run_id"] = calibrationJobId.value;
+        gagePayload.value["calibration_run_id"] = calibrationJobId.value;
 
         const saveGageTabDataResponse =
           await makeProtectedApiCall<SaveGageTabResponse>(
@@ -278,7 +279,7 @@ export const useGageStore = defineStore(
                 Authorization: `Bearer ${getAccessToken()}`,
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify(savePayload),
+              body: JSON.stringify(gagePayload.value),
             }
           );
 
@@ -433,6 +434,7 @@ export const useGageStore = defineStore(
       saveUserGeopackageFile,
       resetGageStore,
       loadGageTabStaticData,
+      gagePayload
     };
   },
   {
