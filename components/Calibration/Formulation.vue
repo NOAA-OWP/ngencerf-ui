@@ -366,6 +366,7 @@ const saveFormulationData = () => {
         updateJobData();
         // fetchUserCalibrationRunData();
       } else {
+        formulationStore_data_loading.value = false;
         useApiErrorResponsePreprocess(response).forEach(message => {
           toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message });
         });
