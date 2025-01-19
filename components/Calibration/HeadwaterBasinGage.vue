@@ -482,6 +482,10 @@ const updateJobData = async () => {
     userCalibrationRunData.value.forcing_source = gagePayload.value.forcing_source as string;
     userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
+
+    userCalibrationRunData.value.external_data_status.forcing = !(userCalibrationRunData.value.forcing_source === "");
+    userCalibrationRunData.value.external_data_status.observational = !(userCalibrationRunData.value.observational_source === "");
+    userCalibrationRunData.value.external_data_status.geopackage = !(userCalibrationRunData.value.geopackage_source === "");
   }
 }
 
