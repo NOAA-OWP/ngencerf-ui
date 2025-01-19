@@ -370,7 +370,7 @@ onMounted(async () => {
     // if Tuning Tab static data is not loaded, fetch it
     await loadTuningTabStaticData();
     tuningStore_data_loading.value = false;
-    
+
     // check if EDS errors exist
     const edsErrorMessage = loadTuningTabData.value ? ifEDSErrorsExist(loadTuningTabData.value._data) : '';
     if (edsErrorMessage) {
@@ -1029,13 +1029,18 @@ const saveTuningData = () => {
     tuningStore_data_loading.value = false;
   };
 
-
   const updateJobData = () => {
-  if (userCalibrationRunData.value) {
-    //userCalibrationRunData.value.gage.gage_id = gageData.value?.gage_id ?? '';
-    console.log("Tuning Data: ", saveTuningTabRequestBody);
-  }
-};
+    if (userCalibrationRunData.value) {
+      console.log("Tuning Data: ", saveTuningTabRequestBody);
+      userCalibrationRunData.value.automatic_validation = saveTuningTabRequestBody.value.automatic_validation;
+      userCalibrationRunData.value.calibration_times = saveTuningTabRequestBody.value.calibration_times;
+      userCalibrationRunData.value.output_variable_to_calibrate = saveTuningTabRequestBody.value.output_variable_to_calibrate;
+      userCalibrationRunData.value.validation_times = saveTuningTabRequestBody.value.validation_times;
+      userCalibrationRunData.value.parameters = userSelectedCalibrationTuningParameters.value;
+      userCalibrationRunData.value.parameters_selected = userSelectedCalibrationTuningParameters.value.length > 0;
+
+    }
+  };
 
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
