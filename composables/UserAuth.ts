@@ -123,6 +123,7 @@ export const makeProtectedApiCall = async <T>(
   }
 };
 
+
 const sendUserToLogin = () => {
   const userDataStore = useUserDataStore();
   userDataStore.logUserOut();
