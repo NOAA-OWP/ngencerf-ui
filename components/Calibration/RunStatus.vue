@@ -223,10 +223,15 @@ const plotNamesToExclude = [
   "Performance Metrics Table",
 ];
 
-onMounted(() => {
+onMounted( async () => {
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
+  const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
+
+  if( userCalibrationRunData?.value  && getStatusResponse.status === 200) {
+    userCalibrationRunData.value.status = getStatusResponse._data.status;
+  }
 
   nextTick(async () => {
     hilightTab(CalibrationTabs.tab_statusRun);
@@ -576,11 +581,6 @@ watch(iteration, async () => {
 const gotoEvaluation = () => {
   const ele = document.getElementById("MainMenuEvaluation");
   ele?.click();
- //       setMenuIndex(NextgenPages.page_evaluation);
-
-  // const allTabs = document.getElementsByClassName("tabs");
-  // const e = allTabs[CalibrationTabs.tab_statusRun] as HTMLElement;
-  // e.click();
 }
 </script>
 
