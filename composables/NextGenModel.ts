@@ -722,7 +722,7 @@ export type PlotNames = {
   status: string;
 };
 
-export interface GageResetData {
+export type GageResetData  = {
   external_data_status: {
     observational: boolean;
     forcing: boolean;

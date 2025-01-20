@@ -142,6 +142,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import type { ToastMessageOptions } from "primevue/toast";
+import type { GageResetData } from "@/composables/NextGenModel.ts"
 import { onMounted } from "vue";
 import { useGageStore } from "@/stores/calibration/GageStore";
 import { generalStore } from "@/stores/common/GeneralStore";
