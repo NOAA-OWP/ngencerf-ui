@@ -19,13 +19,13 @@
         </div>
       </div>
 
-      <div class="grid grid-cols=1 gap=1 text-sm mt-4">
+      <div class="grid grid-cols=1 gap=1 text-sm mt-2">
         <div class="col-span-1">
           <div v-if="calData?.modules?.length"><span class="font-medium">Modules: </span>{{ getModuleList() }}</div>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap=1 text-sm text-left mt-4">
+      <div class="grid grid-cols-2 gap=1 text-sm text-left mt-2">
         <div class="col-span-1">
           <div v-if="calData?.calibration_times?.simulation_start_time"><span class="font-medium">Calibration Run</span>
           </div>
@@ -133,7 +133,7 @@ const formatDate = (d: any) => {
 
 <style lang="scss" scoped>
 #Messages {
-  padding: 15px;
+  padding: 0 15px;
   font-size: 1.2em;
 }
 
