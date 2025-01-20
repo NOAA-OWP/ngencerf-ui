@@ -206,63 +206,64 @@ export const useTuningStore = defineStore(
         rangeDateFrom.value = timeRange?.start_time;
         rangeDateTo.value = timeRange?.end_time;
         if (userCalibrationRunData.value) {
-          userCalibrationRunData.value.time_range.start_time = rangeDateFrom.value;
+          userCalibrationRunData.value.time_range.start_time =
+            rangeDateFrom.value;
           userCalibrationRunData.value.time_range.end_time = rangeDateTo.value;
         }
       }
 
       calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
 
-      if (calibrationTuningModules?.value.length > 0) {
-        // set calibration tuning parameters dropdown if not already set
-        if (
-          !calibrationTuningParameters.value ||
-          calibrationTuningParameters.value.length === 0
-        ) {
-          calibrationTuningParameters.value =
-            calibrationTuningModules?.value?.flatMap((module: any) =>
-              module?.parameters?.map((param: any) => ({
-                name: param.name,
-                minimum: param.minimum,
-                maximum: param.maximum,
-                initial_value: param.initial_value,
-                user_selected_for_tuning: param.user_selected_for_tuning,
-                module: module.name,
-                output: `${param.name} (${module.name})`,
-              }))
-            ) || [];
-        }
-
-        // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
-        if (
-          !userSelectedCalibrationTuningParameters.value ||
-          userSelectedCalibrationTuningParameters.value.length === 0
-        ) {
-          userSelectedCalibrationTuningParameters.value =
-            calibrationTuningParameters.value
-              ?.filter((param: any) => param?.user_selected_for_tuning)
-              ?.map((param: any) => ({
-                name: param.name,
-                minimum: param.minimum,
-                maximum: param.maximum,
-                initial_value: param.initial_value,
-                module: param.module,
-              })) || [];
-        }
-
-        // set output variables if not already set
-        if (!outputVariables.value || outputVariables.value.length === 0) {
-          outputVariables.value =
-            calibrationTuningModules?.value?.flatMap((module: any) =>
-              module?.output_variables?.map((outputVar: any) => ({
-                name: outputVar.name,
-                description: outputVar.description,
-                module: module.name,
-                output: `${outputVar.name} (${module.name})`,
-              }))
-            ) || [];
-        }
+      // if (calibrationTuningModules?.value.length > 0) {
+      // set calibration tuning parameters dropdown if not already set
+      if (
+        !calibrationTuningParameters.value ||
+        calibrationTuningParameters.value.length === 0
+      ) {
+        calibrationTuningParameters.value =
+          calibrationTuningModules?.value?.flatMap((module: any) =>
+            module?.parameters?.map((param: any) => ({
+              name: param.name,
+              minimum: param.minimum,
+              maximum: param.maximum,
+              initial_value: param.initial_value,
+              user_selected_for_tuning: param.user_selected_for_tuning,
+              module: module.name,
+              output: `${param.name} (${module.name})`,
+            }))
+          ) || [];
       }
+
+      // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
+      if (
+        !userSelectedCalibrationTuningParameters.value ||
+        userSelectedCalibrationTuningParameters.value.length === 0
+      ) {
+        userSelectedCalibrationTuningParameters.value =
+          calibrationTuningParameters.value
+            ?.filter((param: any) => param?.user_selected_for_tuning)
+            ?.map((param: any) => ({
+              name: param.name,
+              minimum: param.minimum,
+              maximum: param.maximum,
+              initial_value: param.initial_value,
+              module: param.module,
+            })) || [];
+      }
+
+      // set output variables if not already set
+      if (!outputVariables.value || outputVariables.value.length === 0) {
+        outputVariables.value =
+          calibrationTuningModules?.value?.flatMap((module: any) =>
+            module?.output_variables?.map((outputVar: any) => ({
+              name: outputVar.name,
+              description: outputVar.description,
+              module: module.name,
+              output: `${outputVar.name} (${module.name})`,
+            }))
+          ) || [];
+      }
+      // }
 
       return loadTuningTabData.value;
     }
