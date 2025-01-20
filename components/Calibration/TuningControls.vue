@@ -206,7 +206,7 @@
         <!-- module column, uneditable -->
         <Column field="module" header="Module" sortable>
           <template #body="slotProps">
-            <span style="background-color: lightgrey; padding: 4px; display: block;">
+            <span style="background-color: lightgrey; padding: 4px; display: inline-block; white-space: nowrap;">
               {{ slotProps.data.module }}
             </span>
           </template>
