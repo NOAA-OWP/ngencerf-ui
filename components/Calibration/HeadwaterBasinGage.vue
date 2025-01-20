@@ -9,7 +9,8 @@
               <div class="col-span-1">
                 <label for="Domain">Domain</label><br />
                 <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
-                  optionValue="name" placeholder=" ... " class=""></Select>
+                  optionValue="name" placeholder=" ... " 
+                  :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               </div>
             </div>
 
@@ -17,7 +18,8 @@
               <label for="Gage" @focus="focusSelectInput">Gage</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
-                @change="onGageSelectionChange" @focus="focusSelectInput" class=""></Select>
+                @change="onGageSelectionChange" @focus="focusSelectInput" 
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
             <div class="col-span-1">&nbsp;</div>
@@ -29,20 +31,23 @@
               <label for="Forcing">Forcing Data</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" defaultValue="AORC"
-                @change="uploadForcingDlgOpen($event)"></Select>
+                @change="uploadForcingDlgOpen($event)"
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Observational">Observational Data</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
                 optionLabel="name" optionValue="name" class="user-select"
-                @change="uploadObservationalDlgOpen($event)"></Select>
+                @change="uploadObservationalDlgOpen($event)"
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Geopackage">Geo Package</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
-                optionValue="name" class="user-select" @change="uploadGeopackageDlgOpen($event)"></Select>
+                optionValue="name" class="user-select" @change="uploadGeopackageDlgOpen($event)"
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
 
             </div>
           </div>

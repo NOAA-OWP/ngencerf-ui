@@ -8,7 +8,8 @@
               <label for="formulationNameInput" class="text-lg">Formulation Name </label>
               <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
                 aria-label="Input Forumulation Name" title="Input Formulation Name" required
-                @keypress="checkValidCharacters($event)"></InputText>
+                @keypress="checkValidCharacters($event)"
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputText>
             </div>
           </div>
         </div>
@@ -20,12 +21,14 @@
               <div class="font-bold">Groups Filter
                 <Select id="Groups" v-model="filterGroup" filter
                   :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description"
-                  optionValue="name" placeholder="Select group..."></Select>
+                  optionValue="name" placeholder="Select group..."
+                  :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               </div>
             </div>
             <div class="pt-4 mb-1 font-bold text-base">Select Modules</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="h-60" @change="moduleListChanged">
+              optionLabel="name" optionValue="name" class="h-60" @change="moduleListChanged"
+              :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
                   <div class="font-ui pl-2 leading-none">{{ slotProps.option.name }}</div>
