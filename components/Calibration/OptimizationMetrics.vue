@@ -55,12 +55,12 @@
                 :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
                 @change="updateMetricFlowFieldVisibility"></Select>
               <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-2">
-                Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
+                Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold" :minFractionDigits="2"
                   class="w-24">
                 </InputNumber> m3/s
               </div>
               <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-2">
-                Peak Flow Threshold <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
+                Peak Flow Threshold <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold" :minFractionDigits="2"
                   class="w-24"></InputNumber> quantile
               </div>
             </div>
@@ -78,7 +78,7 @@
                 <span class="text-sm ml-2">(POD, CSI, FAR)</span>
               </div>
               <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-2 pl-8">
-                Flow Threshold <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
+                Flow Threshold <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold" :minFractionDigits="2"
                   class="w-24"></InputNumber> m3/s
               </div><br />
 
@@ -90,7 +90,7 @@
                 <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
               </div>
               <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-2 pl-8">
-                Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
+                Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold" :minFractionDigits="2"
                   class="w-24"></InputNumber> quantile
               </div>
             </div>

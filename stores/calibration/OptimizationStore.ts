@@ -48,8 +48,8 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
 
     uiOptimization.value = sessionStorage.getItem('uiOptimization') as string;
     uiObjectiveFunction.value = sessionStorage.getItem('uiObjectiveFunction') as string;
-    uiStreamFlowThreshold.value = parseInt(sessionStorage.getItem('uiStreamFlowThreshold') as string, 10);
-    uiPeakFlowThreshold.value = parseInt(sessionStorage.getItem('uiPeakFlowThreshold') as string, 10);
+    uiStreamFlowThreshold.value = parseFloat(sessionStorage.getItem('uiStreamFlowThreshold') as string);
+    uiPeakFlowThreshold.value = parseFloat(sessionStorage.getItem('uiPeakFlowThreshold') as string);
     uiPlotFrequency.value = parseInt(sessionStorage.getItem('uiPlotFrequency') as string, 10);
     uiStopCriteria.value = parseInt(sessionStorage.getItem('uiStopCriteria') as string, 10);
 
