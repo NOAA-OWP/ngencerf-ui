@@ -190,6 +190,15 @@
           </template>
         </Column>
 
+        <!-- module column, uneditable -->
+        <Column field="module" header="Module" sortable>
+          <template #body="slotProps">
+            <span style="background-color: lightgrey; padding: 4px; display: block;">
+              {{ slotProps.data.module }}
+            </span>
+          </template>
+        </Column>
+
         <!-- min column, editable -->
         <Column field="min" header="Min" sortable>
           <template #body="slotProps">
