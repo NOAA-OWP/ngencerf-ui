@@ -1222,17 +1222,16 @@ const handleNextPrevDialogClose = (opt: any) => {
 }
 
 const rowClass = () => {
-  return [{ "pointer-events-none": !isCalibrationJobStatusSavedOrReady(data) }];
+  return [{ "pointer-events-none": !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status) }];
 }
 
 const rowStyle = () => {
-  let t = !isCalibrationJobStatusSavedOrReady(data);
+  let t = !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status) ;
   return {
-    color: t ? "grey" : "black",
-    backgroundColor: t ? "#f0f0f0" : "",
-  };
-};
-
+    color: t ? "grey" : 'black',
+     backgroundColor: t ? '#f0f0f0' : ''
+  }
+}
 
 </script>
 
