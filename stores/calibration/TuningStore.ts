@@ -214,18 +214,18 @@ export const useTuningStore = defineStore(
 
       calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
 
-        calibrationTuningParameters.value =
-          calibrationTuningModules?.value?.flatMap((module: any) =>
-            module?.parameters?.map((param: any) => ({
-              name: param.name,
-              minimum: param.minimum,
-              maximum: param.maximum,
-              initial_value: param.initial_value,
-              user_selected_for_tuning: param.user_selected_for_tuning,
-              module: module.name,
-              output: `${param.name} (${module.name})`,
-            }))
-          ) || [];
+      calibrationTuningParameters.value =
+        calibrationTuningModules?.value?.flatMap((module: any) =>
+          module?.parameters?.map((param: any) => ({
+            name: param.name,
+            minimum: param.minimum,
+            maximum: param.maximum,
+            initial_value: param.initial_value,
+            user_selected_for_tuning: param.user_selected_for_tuning,
+            module: module.name,
+            output: `${param.name} (${module.name})`,
+          }))
+        ) || [];
 
       // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
       if (
