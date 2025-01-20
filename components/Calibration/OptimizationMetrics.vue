@@ -72,7 +72,6 @@
           <div class="col-span-1">
             <div id="Metrics">
               <div class="font-bold">Metrics</div><br>
-
               <Checkbox id="CalcCatMetCB" inputId="CalcCatMetCB" class="h-5 w-5 mr-3" style="display:inline-block"
                 :binary="true" v-model="cbIsCategorical" :disabled="cbCategoricalDisabled ||!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 @change="toggleMetricStreamFlowInput" />
@@ -81,6 +80,7 @@
                 <span class="text-sm ml-2">(POD, CSI, FAR)</span>
               </div>
               <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-2 pl-8">
+
                 Flow Threshold <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
                   class="w-24"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber> m3/s
@@ -95,7 +95,7 @@
               </div>
               <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-2 pl-8">
                 Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
-                  class="w-24"
+                  class="w-24"strassner-4969-bugfix
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber> quantile
               </div>
             </div>
