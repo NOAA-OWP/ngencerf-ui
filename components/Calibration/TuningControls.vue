@@ -34,7 +34,7 @@
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                        @update:model-value="handleSimEndUpdate" 
+                        @update:model-value="handleSimEndUpdate"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                   </tr>
@@ -45,7 +45,7 @@
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                        @update:model-value="handleCalStartUpdate" 
+                        @update:model-value="handleCalStartUpdate"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                     <th scope="row" class="pl-6 w-1/6">
@@ -54,8 +54,8 @@
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                        @update:model-value="handleCalEndUpdate" 
-                        :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
+                        @update:model-value="handleCalEndUpdate"
+                        :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                   </tr>
                 </tbody>
@@ -93,7 +93,7 @@
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark" v-model="avSimEndTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                          @update:model-value="handleAvSimEndUpdate" 
+                          @update:model-value="handleAvSimEndUpdate"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                       </td>
                     </tr>
@@ -104,7 +104,7 @@
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark" v-model="avCalStartTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                          @update:model-value="handleAvCalStartUpdate" 
+                          @update:model-value="handleAvCalStartUpdate"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                       </td>
                       <th scope="row" class="pl-6 w-1/6">
@@ -113,8 +113,8 @@
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                          @update:model-value="handleAvCalEndUpdate" 
-                          :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
+                          @update:model-value="handleAvCalEndUpdate"
+                          :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                       </td>
                     </tr>
                   </tbody>
@@ -137,8 +137,8 @@
           <div class="mt-6 mb-3 hr"></div>
           <div class="mb-2 font-bold">Output Variable To Calibrate</div>
           <div class="mt-2 text-sm">
-            <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable" 
-              :options="outputVariables" optionLabel="output" optionValue="output"
+            <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable" :options="outputVariables"
+              optionLabel="output" optionValue="output"
               :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
             </Select>
           </div>
@@ -152,9 +152,9 @@
           <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
           <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
             <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-            <button @click="triggerFileInput" 
-            :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
-            Load Parameters File (optional)</button>
+            <button @click="triggerFileInput"
+              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+              Load Parameters File (optional)</button>
             <div v-if="!isFormulationDataSaved()" class="overlay"></div>
           </div>
         </div>
@@ -163,16 +163,15 @@
           <div class="text-left mt-2">
             <div class="font-bold">Calibratable Parameters</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
-              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" 
-              :options="calibrationTuningParameters" optionLabel="output"
-              optionValue="output">
+              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+              :options="calibrationTuningParameters" optionLabel="output" optionValue="output">
               <template #option="slotProps">
                 <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
               </template>
             </Select>
             <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
-              <button @click="addCalibrationTuningParameter" 
-              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</button>
+              <button @click="addCalibrationTuningParameter"
+                :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</button>
             </div>
           </div>
 
@@ -193,13 +192,14 @@
         :model="cmTuningParameterData"></ContextMenu>
       <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
         v-model:selection="selectedTuningParameterData" selectionMode="single" contextMenu
-        v-model:contextMenuSelection="selectedTuningParameterData" @rowContextmenu="onRowContextMenu">
+        v-model:contextMenuSelection="selectedTuningParameterData" @rowContextmenu="onRowContextMenu"
+        :rowClass="rowClass" :rowStyle="rowStyle">
+
         <!-- parameter column, uneditable -->
         <Column field="parameter" header="Parameter" sortable>
           <template #body="slotProps">
             <span style="background-color: lightgrey; padding: 4px; display: block;">
-              {{ slotProps.data.name }}
-            </span>
+              {{ slotProps.data.name }} </span>
           </template>
         </Column>
 
@@ -1220,6 +1220,20 @@ const handleNextPrevDialogClose = (opt: any) => {
     return;
   }
 }
+
+const rowClass = () => {
+  return [{ "pointer-events-none": !isCalibrationJobStatusSavedOrReady(data) }];
+}
+
+const rowStyle = () => {
+  let t = !isCalibrationJobStatusSavedOrReady(data);
+  return {
+    color: t ? "grey" : "black",
+    backgroundColor: t ? "#f0f0f0" : "",
+  };
+};
+
+
 </script>
 
 <style lang="scss" scoped>
