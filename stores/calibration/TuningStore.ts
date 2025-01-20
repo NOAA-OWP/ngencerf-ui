@@ -214,12 +214,6 @@ export const useTuningStore = defineStore(
 
       calibrationTuningModules.value = loadTuningTabData.value?._data?.modules;
 
-      // if (calibrationTuningModules?.value.length > 0) {
-      // set calibration tuning parameters dropdown if not already set
-      if (
-        !calibrationTuningParameters.value ||
-        calibrationTuningParameters.value.length === 0
-      ) {
         calibrationTuningParameters.value =
           calibrationTuningModules?.value?.flatMap((module: any) =>
             module?.parameters?.map((param: any) => ({
@@ -232,7 +226,6 @@ export const useTuningStore = defineStore(
               output: `${param.name} (${module.name})`,
             }))
           ) || [];
-      }
 
       // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
       if (
