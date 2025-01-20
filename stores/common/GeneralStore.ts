@@ -33,6 +33,11 @@ export const generalStore = defineStore(
 
     const serverInfo = ref<ServerInfo>();
 
+    // This is set if the user changes the gage.  Resets when saved.
+    const gageHasChanged = ref<boolean>(false);
+    // This is set if the user changes the modules on the Formulation page
+    const modulesHaveChanged = ref<boolean>(false);
+
     // Restore state from sessionStorage if available
     if (typeof window !== 'undefined') {
       calibrationTabIndex.value = sessionStorage.getItem('calibrationTabIndex') as string;
@@ -147,7 +152,9 @@ export const generalStore = defineStore(
       forecastTabIndex,
       resetGeneralStore,
       setServerInfo,
-      getServerInfo
+      getServerInfo,
+      gageHasChanged,
+      modulesHaveChanged
     };
   },
   {

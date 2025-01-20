@@ -2,7 +2,7 @@
  * This Composable contains utility functions for user authentication and making JWT-based API calls
  */
 
-import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useLogout } from "@/composables/UseEventBus";
 
 /**
@@ -10,7 +10,9 @@ import { useLogout } from "@/composables/UseEventBus";
  * @param ngencerfBaseUrl
  * @returns {boolean} true if access token is refreshed successfully, false otherwise
  */
-export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boolean> => {
+export const refreshAccessToken = async (
+  ngencerfBaseUrl: string
+): Promise<boolean> => {
   const userDataStore = useUserDataStore();
   const refreshToken = userDataStore.getRefreshToken();
 
@@ -22,7 +24,7 @@ export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boole
   try {
     // Make a request to server to refresh the access token
     const data = await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/refresh/`, {
-      method: 'POST',
+      method: "POST",
       body: { refresh: refreshToken },
     });
     const { access } = data;
@@ -32,19 +34,19 @@ export const refreshAccessToken = async (ngencerfBaseUrl: string): Promise<boole
       userDataStore.setAccessToken(access);
       return true;
     } else {
-      console.error('Token refresh failed');
-      return false
+      console.error("Token refresh failed");
+      return false;
     }
   } catch (error) {
-    console.error('Error refreshing token:', error);
+    console.error("Error refreshing token:", error);
     return false;
   }
 };
 
 /**
  * This function makes a protected-API call to the server
- * @param url 
- * @param userOptions 
+ * @param url
+ * @param userOptions
  * @returns response from the API call
  */
 
@@ -53,13 +55,13 @@ let rqstUserOptions: any;
 
 export const makeProtectedApiCall = async <T>(
   url: string,
-  userOptions: any = {},
+  userOptions: any = {}
 ): Promise<any> => {
   // Save the call data in case we need to refresh.
-   rqstUrl = url;
-   rqstUserOptions = userOptions; 
+  rqstUrl = url;
+  rqstUserOptions = userOptions;
 
-  let responseData: any; 
+  let responseData: any;
 
   try {
     const response = await fetch(url, {
@@ -79,14 +81,14 @@ export const makeProtectedApiCall = async <T>(
 
     let myResponse = { ok: response.ok, status: response.status };
 
-    if (myResponse.status >= 500) {
+    if (myResponse.status >= 500 && myResponse.status < 600) {
       console.log("Server Error");
       return {
         _data: null,
         status: myResponse.status,
         ok: myResponse.ok,
       };
-     }
+    }
 
     if (myResponse.ok) {
       responseData = {
@@ -94,7 +96,6 @@ export const makeProtectedApiCall = async <T>(
         status: response.status,
         ok: response.ok,
       };
-      console.log(responseData);
       return responseData;
     }
     if (myResponse.status === 401) {
@@ -115,7 +116,6 @@ export const makeProtectedApiCall = async <T>(
         status: response.status,
         ok: response.ok,
       };
-      console.log(responseData);
       return responseData;
     }
   } catch {
@@ -129,6 +129,4 @@ const sendUserToLogin = () => {
   userDataStore.logUserOut();
   useLogout("logoutEvent", "token");
   return null;
-}
-
-
+};
