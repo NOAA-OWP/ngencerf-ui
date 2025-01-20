@@ -63,7 +63,7 @@ $dark: $ngwcp_secondary1;
 
 @layer components {
     .white-tall-content-box {
-        @apply w-full px-4 py-2 text-left bg-white rounded-[10px] h-screen-inner;
+        @apply w-full px-1 py-2 text-left bg-white rounded-[10px] h-screen-inner;
     }
     .hr {
         @apply w-full h-[1px] bg-gray-md;
