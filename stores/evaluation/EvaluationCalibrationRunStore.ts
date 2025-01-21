@@ -55,6 +55,10 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   */
   const evaluationCalibrationRunGageList = computed(() => {
     let gageOptionList = <SelectOption[]>[];
+    gageOptionList.push({
+      'name': "All",
+      'description': "All"
+    });
     userEvaluationCalibrationRunListData.value.forEach(runItem => {
       const checkGageIndex = gageOptionList.findIndex(
         (gageOption) =>
@@ -168,9 +172,9 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     }
   });
 
-  const loadSelectedCalibrationRun = async (calibration_run_id: number) => {
+  const loadSelectedCalibrationRun = async (calibration_run_id: number, include_gpkg_map: boolean = true) => {
     setSelectedCalibrationRunId(calibration_run_id);
-    await fetchUserCalibrationRunData();
+    await fetchUserCalibrationRunData(include_gpkg_map);
   }
 
   const resetUserSelectedCalibrationValidationRunList = () => {

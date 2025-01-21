@@ -73,16 +73,19 @@ export const useCalibrationFormulationSlothTableValidation = ( slothParameters: 
     });
   } catch ( error: any ) {
     errors.value[ error?.message as keyof typeof errors ] = [ 'All sloth parameter fields are required.' ];
-  }
-  
+  }  
   return errors;
 }
 
 export const useCalibrationFormulationTabSaveValidate = ( savePayload: SaveFormulationTabPayload ) => {
   const errors = ref<any>({});
-  if ( savePayload.hasOwnProperty( "formulation_name" ) && /^[a-z0-9-_]+$/i.test( savePayload['formulation_name'] ?? "" ) === false ) {
-    errors.value[ 'formulation_name' ]= [ 'Formulation name can only include alpha numeric charaters and underscore.' ];
+  if ( (document.getElementById('formulationNameInput') as HTMLInputElement).value === "") {
+    errors.value[ 'formulation_name' ]= [ ' is empty. Please enter a required Formlulation Name' ];
+    document.getElementById('formulationNameInput')?.focus();
+  } else if ( savePayload.hasOwnProperty( "formulation_name" ) && /^[a-z0-9-_]+$/i.test( savePayload['formulation_name'] ?? "" ) === false ) {
+    errors.value[ 'formulation_name' ]= [ ' can only include alpha numeric charaters and underscore.' ];
   }
+
   if ( savePayload.hasOwnProperty( "sloth_parameters" ) && !savePayload.hasOwnProperty( "modules" ) ) {
     errors.value[ 'selectedModuleValues' ]= [ 'Selecting module is required for Sloth Parameter.' ];
   }

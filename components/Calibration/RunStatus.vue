@@ -223,10 +223,15 @@ const plotNamesToExclude = [
   "Performance Metrics Table",
 ];
 
-onMounted(() => {
+onMounted( async () => {
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
+  const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
+
+  if( userCalibrationRunData?.value  && getStatusResponse.status === 200) {
+    userCalibrationRunData.value.status = getStatusResponse._data.status;
+  }
 
   nextTick(async () => {
     hilightTab(CalibrationTabs.tab_statusRun);
@@ -250,7 +255,7 @@ onMounted(() => {
       if (validBest?.status) {
         validationBestStatus.value = validBest.status;
       }
-      if (validationControlStatus?.value && validationBestStatus?.value) {
+      if (validationControlStatus?.value) {
         validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
       }
     }
@@ -261,7 +266,6 @@ onMounted(() => {
  * Create elapsedTimeIntervalId to update elapsedTime every second while Calibration is Running or Validation is not Done
  */
 const createElapsedTimeInterval = () => {
-
   elapsedTimeIntervalId.value = setInterval(async () => {
     if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
@@ -366,7 +370,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         if (validBest?.status) {
           validationBestStatus.value = validBest.status;
         }
-        if (validationControlStatus?.value && validationBestStatus?.value) {
+        if (validationControlStatus?.value) {
           validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
         }
 
@@ -456,12 +460,12 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             if (validBest?.status) {
               validationBestStatus.value = validBest.status;
             }
-            if (validationControlStatus?.value && validationBestStatus?.value) {
+            if (validationControlStatus?.value) {
               validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
             }
 
-            // if valid_control and valid_best are Done, Cancelled, Failed, or Server error, clear the interval
-            if (['Done', 'Cancelled', 'Failed', 'Server Error'].includes(validControlAndValidBestStatus.value ?? '')) {
+            // if valid_control and valid_best are Done, Cancelled, Failed, Server error, or Unknown, clear the interval
+            if (['Done', 'Cancelled', 'Failed', 'Server Error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
               elapsedTime.value = validBest.elapsed_time;
@@ -577,11 +581,6 @@ watch(iteration, async () => {
 const gotoEvaluation = () => {
   const ele = document.getElementById("MainMenuEvaluation");
   ele?.click();
- //       setMenuIndex(NextgenPages.page_evaluation);
-
-  // const allTabs = document.getElementsByClassName("tabs");
-  // const e = allTabs[CalibrationTabs.tab_statusRun] as HTMLElement;
-  // e.click();
 }
 </script>
 

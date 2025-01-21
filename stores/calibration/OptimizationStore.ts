@@ -34,6 +34,8 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   const showObjectiveFunctionPeakFlow = ref<boolean>(false)
   const showObjectiveFunctionStreamFlow = ref<boolean>(false)
 
+  const saveOptMetPayload = ref<SaveOptimizationPayload>({});
+
   // Restore state from sessionStorage if available
   if (typeof window !== 'undefined') {
     let ls;
@@ -48,8 +50,8 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
 
     uiOptimization.value = sessionStorage.getItem('uiOptimization') as string;
     uiObjectiveFunction.value = sessionStorage.getItem('uiObjectiveFunction') as string;
-    uiStreamFlowThreshold.value = parseInt(sessionStorage.getItem('uiStreamFlowThreshold') as string, 10);
-    uiPeakFlowThreshold.value = parseInt(sessionStorage.getItem('uiPeakFlowThreshold') as string, 10);
+    uiStreamFlowThreshold.value = parseFloat(sessionStorage.getItem('uiStreamFlowThreshold') as string);
+    uiPeakFlowThreshold.value = parseFloat(sessionStorage.getItem('uiPeakFlowThreshold') as string);
     uiPlotFrequency.value = parseInt(sessionStorage.getItem('uiPlotFrequency') as string, 10);
     uiStopCriteria.value = parseInt(sessionStorage.getItem('uiStopCriteria') as string, 10);
 
@@ -172,25 +174,25 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
   * @returns {GeneralApiSaveResponse}
   */
   async function saveOptimizationTabData() {
-    const savePayload = ref<SaveOptimizationPayload>({});
-    if (uiOptimizationInputs.value.length > 0) savePayload.value["optimization_inputs"] = uiOptimizationInputs.value;
-    if (uiOptimization.value) savePayload.value["optimization"] = uiOptimization.value;
-    if (uiObjectiveFunction.value) savePayload.value["objective_function"] = uiObjectiveFunction.value;
-    if (uiStreamFlowThreshold.value !== undefined && uiStreamFlowThreshold.value > 0) savePayload.value["streamflow_threshold"] = uiStreamFlowThreshold.value;
-    if (uiPeakFlowThreshold.value !== undefined && uiPeakFlowThreshold.value > 0) savePayload.value["peak_flow_threshold"] = uiPeakFlowThreshold.value;
-    if (uiStopCriteria.value !== undefined && uiStopCriteria.value > 0) savePayload.value["stop_criteria"] = uiStopCriteria.value;
-    if (uiPlotFrequency.value !== undefined && uiPlotFrequency.value > 0) savePayload.value["save_plot_iteration_frequency"] = uiPlotFrequency.value;
+    saveOptMetPayload.value = <SaveOptimizationPayload>{};
+    if (uiOptimizationInputs.value.length > 0) saveOptMetPayload.value["optimization_inputs"] = uiOptimizationInputs.value;
+    if (uiOptimization.value) saveOptMetPayload.value["optimization"] = uiOptimization.value;
+    if (uiObjectiveFunction.value) saveOptMetPayload.value["objective_function"] = uiObjectiveFunction.value;
+    if (uiStreamFlowThreshold.value !== undefined && uiStreamFlowThreshold.value > 0) saveOptMetPayload.value["streamflow_threshold"] = uiStreamFlowThreshold.value;
+    if (uiPeakFlowThreshold.value !== undefined && uiPeakFlowThreshold.value > 0) saveOptMetPayload.value["peak_flow_threshold"] = uiPeakFlowThreshold.value;
+    if (uiStopCriteria.value !== undefined && uiStopCriteria.value > 0) saveOptMetPayload.value["stop_criteria"] = uiStopCriteria.value;
+    if (uiPlotFrequency.value !== undefined && uiPlotFrequency.value > 0) saveOptMetPayload.value["save_plot_iteration_frequency"] = uiPlotFrequency.value;
 
-    if (Object.keys(savePayload.value).length > 0) {
-      savePayload.value["calibration_run_id"] = calibrationJobId.value;
-      savePayload.value["save_output_iteration"] = true;
+    if (Object.keys(saveOptMetPayload.value).length > 0) {
+      saveOptMetPayload.value["calibration_run_id"] = calibrationJobId.value;
+      saveOptMetPayload.value["save_output_iteration"] = true;
       return await makeProtectedApiCall<GeneralApiSaveResponse>(`${ngencerfBaseUrl}/calibration/save_optimization_tab/`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${getAccessToken()}`,
           "Content-Type": 'application/json'
         },
-        body: JSON.stringify(savePayload.value)
+        body: JSON.stringify(saveOptMetPayload.value)
       });
     } else {
       return Promise.resolve({
@@ -269,7 +271,8 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
     resetOptimizationInputs,
     resetUserSelectionOptimization,
     resetOptimizationStore,
-    loadOptimizationTabStaticData
+    loadOptimizationTabStaticData,
+    saveOptMetPayload
   }
 },
   {

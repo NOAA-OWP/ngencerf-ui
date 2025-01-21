@@ -41,6 +41,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   */
   const forecastRunGageList = computed(() => {
     let gageOptionList = <SelectOption[]>[];
+    gageOptionList.push({
+      'name': "All",
+      'description': "All"
+    });
     calibrationRunsForForecast.value.forEach(runItem => {
       const checkGageIndex = gageOptionList.findIndex(
         (gageOption) =>
