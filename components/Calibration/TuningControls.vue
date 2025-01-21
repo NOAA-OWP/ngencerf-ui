@@ -1050,12 +1050,23 @@ const saveTuningData = () => {
 
   const updateJobData = () => {
     if (userCalibrationRunData.value) {
+      console.log("Tuning Data: ", saveTuningTabRequestBody);
       userCalibrationRunData.value.automatic_validation = saveTuningTabRequestBody.value.automatic_validation;
-      userCalibrationRunData.value.calibration_times = saveTuningTabRequestBody.value.calibration_times;
-      if (saveTuningTabRequestBody.value.output_variable_to_calibrate && saveTuningTabRequestBody.value.output_variable_to_calibrate.name !== undefined) {
-        userCalibrationRunData.value.output_variable_to_calibrate = saveTuningTabRequestBody.value.output_variable_to_calibrate;
+      // saveTuningTabRequestBody.value.calibration_times are in Luxon DateTime format. Calling toISO() to convert to string
+      userCalibrationRunData.value.calibration_times = {
+        calibration_start_time: saveTuningTabRequestBody.value.calibration_times.calibration_start_time.toISO(),
+        calibration_end_time: saveTuningTabRequestBody.value.calibration_times.calibration_end_time.toISO(),
+        simulation_start_time: saveTuningTabRequestBody.value.calibration_times.simulation_start_time.toISO(),
+        simulation_end_time: saveTuningTabRequestBody.value.calibration_times.simulation_end_time.toISO()
       }
-      userCalibrationRunData.value.validation_times = saveTuningTabRequestBody.value.validation_times;
+      userCalibrationRunData.value.output_variable_to_calibrate = saveTuningTabRequestBody.value.output_variable_to_calibrate;
+      // saveTuningTabRequestBody.value.validation_times are in Luxon DateTime format. Calling toISO() to convert to string
+      userCalibrationRunData.value.validation_times = {
+        validation_start_time: saveTuningTabRequestBody.value.validation_times.validation_start_time.toISO(),
+        validation_end_time: saveTuningTabRequestBody.value.validation_times.validation_end_time.toISO(),
+        simulation_start_time: saveTuningTabRequestBody.value.validation_times.simulation_start_time.toISO(),
+        simulation_end_time: saveTuningTabRequestBody.value.validation_times.simulation_end_time.toISO()
+      }
       userCalibrationRunData.value.parameters = userSelectedCalibrationTuningParameters.value;
       userCalibrationRunData.value.parameters_selected = userSelectedCalibrationTuningParameters.value.length > 0;
     }
