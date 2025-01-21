@@ -116,7 +116,6 @@ const toast = useToast();
 
 const {
   forecastJobId,
-  forecastCycles,
   forecastCycle,
   forecastJobStatus,
   elapsedTime,

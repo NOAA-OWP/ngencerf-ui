@@ -39,8 +39,7 @@
           Start and End Times</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.output_variable_to_calibrate.name &&
-          userCalibrationRunData?.output_variable_to_calibrate.module" class="pi pi-check font-bold checkMark"></i>
+        <td><i v-if="userCalibrationRunData?.output_variable_to_calibrate === undefined" class="pi pi-check font-bold checkMark"></i>
         </td>
         <td data-tab="4" title="Calibration Output Variable"
           aria-label="Calibration Output Variable" @click="tabClicked">Calibration Output Variable</td>
@@ -79,7 +78,6 @@
 
 <script lang="ts" setup>
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 
@@ -90,10 +88,9 @@ const currentCalibrationTab = ref(getCalibrationTabIndex());
 
 const emit = defineEmits(["tabNumber"]);
 
-const tuningStore = useTuningStore();
-
 const checkStartEndTimeValues = () => {
   return (
+    userCalibrationRunData.value?.calibration_times &&
     userCalibrationRunData.value?.calibration_times.calibration_end_time &&
     userCalibrationRunData.value?.calibration_times.calibration_start_time &&
     userCalibrationRunData.value?.calibration_times.simulation_end_time &&
@@ -104,7 +101,6 @@ const checkStartEndTimeValues = () => {
     userCalibrationRunData.value?.validation_times.validation_start_time
   )
 }
-
 
 const tabClicked = (event: Event) => {
   event.preventDefault();

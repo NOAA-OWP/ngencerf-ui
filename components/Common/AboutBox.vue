@@ -76,8 +76,6 @@
 import type { ServerInfo } from "@/composables/NextGenModel";
 import json from "@/assets/version.json";
 import { generalStore } from "@/stores/common/GeneralStore";
-
-const genStore = generalStore();
 const { getServerInfo } = generalStore();
 
 const info = json;

@@ -143,9 +143,6 @@ const currentForecastTab = ref(getForecastTabIndex());
 const currentVerificationTab = ref(getVerificationTabIndex());
 const currentMenu = ref(getMenuIndex());
 
-//store specific import
-//const { loadCalibrationDataComplete } = storeToRefs(useEvaluationCalibrationRunStore())
-
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
 

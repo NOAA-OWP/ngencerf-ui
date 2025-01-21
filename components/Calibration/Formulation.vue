@@ -180,7 +180,6 @@
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
 
-import type { UserCalibrationRunData } from "@/composables/NextGenModel";
 import { isCalibrationJobStatusSavedOrReady, arraysEqual } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
@@ -203,7 +202,6 @@ const nextPrevDialogOpened = ref<boolean>(false);
 import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
 import type { ListboxChangeEvent } from "primevue/listbox";
 
-const isLoading = ref(false);
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
 const slothParamContextMenu = ref() //sloth parameter table context menu
@@ -212,7 +210,6 @@ const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   bodyCell: { style: { "text-align": "center" } }
 });
-
 
 const cmSlothParameterData = ref([
   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedSlothParameterData(selectedSlothParameterData) }
@@ -343,10 +340,10 @@ const saveFormulationData = () => {
     if (!valOK) {
       modulesHaveChanged.value = false;
       selectedOutputVariable.value = "";
-      userOutputVariableToCalibrate.value = { name: '', module: null }
-      if (userCalibrationRunData.value) {
-        userCalibrationRunData.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value as UserCalibrationRunOutputVariableToCalibrateData;
-      }
+      // userOutputVariableToCalibrate.value = { name: '', module: null }
+      // if (userCalibrationRunData.value) {
+      //   userCalibrationRunData.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value as UserCalibrationRunOutputVariableToCalibrateData;
+      // }
       // delete all of the Calabratable parameters on the Tuning Controls tab
       clearCalibratableParameters();
 

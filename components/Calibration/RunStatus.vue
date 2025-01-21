@@ -164,8 +164,6 @@ import { onMounted } from "vue";
 import { ValidationPlotNames } from "@/composables/NextgenEnums";
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
-import { generalStore } from "~/stores/common/GeneralStore";
-import { useEvaluationRunStatusStore } from "~/stores/evaluation/EvaluationRunStatusStore";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
 import { convertTimeZone, calculateElapsedTime } from '@/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
@@ -173,9 +171,6 @@ import { hilightTab } from '@/composables/TabHilight';
 
 const runStatusStore = useRunStatusStore();
 const userDataStore = useUserDataStore();
-const evalRunStatusStore = useEvaluationRunStatusStore();
-const {  setMenuIndex } = generalStore();
-const { validationStatus } = storeToRefs(evalRunStatusStore);
 
 const toast = useToast();
 

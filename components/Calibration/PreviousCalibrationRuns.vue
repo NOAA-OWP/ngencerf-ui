@@ -81,17 +81,17 @@ import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "
 import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
-const { loadGageTabStaticData, gageStore_data_loading } = useGageStore();
-const { loadFormulationTabStaticData, formulationStore_data_loading } = useFormulationStore();
-const { loadOptimizationTabStaticData, optimizationStore_data_loading } = useOptimizationStore();
-const { loadTuningTabStaticData, tuningStore_data_loading, hardResetTuningStore } = useTuningStore();
+const { loadGageTabStaticData } = useGageStore();
+const { loadFormulationTabStaticData } = useFormulationStore();
+const { loadOptimizationTabStaticData } = useOptimizationStore();
+const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 const { calibrationJobId } = storeToRefs(generalStore());
-const { getCalibrationTabIndex, getMenuIndex } = generalStore();
+const { getMenuIndex } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
-const { queryGetCalibrationStatus, hardResetRunStatusStore } = useRunStatusStore();
+const { hardResetRunStatusStore } = useRunStatusStore();
 import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();

@@ -128,8 +128,8 @@
         </div>
         <DynamicDialog />
       </div>
-
     </div>
+
     <div id="OptMetBottomButtons" class="absolute b-0 grid grid-cols-8 mt-6 ActionButtonsBox">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
@@ -170,7 +170,6 @@ import { onMounted, onUnmounted } from "vue";
 import { useOptimizationStore } from '@/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
-import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useDialog } from "primevue/usedialog";
@@ -202,11 +201,9 @@ const {
   saveOptMetPayload
 } = storeToRefs(optimizationStore);
 
-const { loadOptimizationTabStaticData, saveOptimizationTabData, resetOptimizationInputs, resetUserSelectionOptimization } = optimizationStore;
-const { fetchUserCalibrationRunData } = useUserDataStore();
+const { saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
-const { getCalibrationTabIndex } = generalStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
@@ -500,7 +497,7 @@ const handleNextPrevDialogClose = (opt: any) => {
   max-height: 8rem !important;
 }
 
-#OptMetbuttons {
-  height: 40px;
+#OptMetBottomButtons {
+  z-index: 9999;
 }
 </style>
