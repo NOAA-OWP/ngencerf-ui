@@ -1036,7 +1036,10 @@ const saveTuningData = () => {
         detail: 'Saved Tuning Tab data',
         life: 3000,
       });
+      updateJobData();
+      tuningStore_data_loading.value = false;
     } else {
+      tuningStore_data_loading.value = false;
       const errorMessage = saveTuningTabResponse?._data.message;
       toast.add({
         severity: 'error',
@@ -1044,13 +1047,11 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
-    updateJobData();
-    tuningStore_data_loading.value = false;
+    
   };
 
   const updateJobData = () => {
     if (userCalibrationRunData.value) {
-      console.log("Tuning Data: ", saveTuningTabRequestBody);
       userCalibrationRunData.value.automatic_validation = saveTuningTabRequestBody.value.automatic_validation;
       // saveTuningTabRequestBody.value.calibration_times are in Luxon DateTime format. Calling toISO() to convert to string
       userCalibrationRunData.value.calibration_times = {
