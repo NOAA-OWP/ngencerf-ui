@@ -21,7 +21,7 @@ WORKDIR /var/www/ngencerf/nuxt-app
 # install node dependencies
 COPY package*.json ./
 RUN set -eux; \
-    npm install
+    npm ci
 
 COPY . .
 
