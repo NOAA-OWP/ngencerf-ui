@@ -9,7 +9,7 @@
               <div class="col-span-1">
                 <label for="Domain">Domain</label><br />
                 <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
-                  optionValue="name" placeholder=" ... " 
+                  optionValue="name" placeholder=" ... "
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               </div>
             </div>
@@ -18,7 +18,7 @@
               <label for="Gage" @focus="focusSelectInput">Gage</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
-                @change="onGageSelectionChange" @focus="focusSelectInput" 
+                @change="onGageSelectionChange" @focus="focusSelectInput"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
@@ -30,16 +30,14 @@
             <div class="col-span-1">
               <label for="Forcing">Forcing Data</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                optionValue="name" class="user-select" defaultValue="AORC"
-                @change="uploadForcingDlgOpen($event)"
+                optionValue="name" class="user-select" defaultValue="AORC" @change="uploadForcingDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Observational">Observational Data</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
-                optionLabel="name" optionValue="name" class="user-select"
-                @change="uploadObservationalDlgOpen($event)"
+                optionLabel="name" optionValue="name" class="user-select" @change="uploadObservationalDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
@@ -201,6 +199,10 @@ onMounted(() => {
     if (ele) { ele.scrollTo(0, 0); }
     if (gageHasChanged.value && userCalibrationRunData?.value?.gage?.gage_id) {
       gageSelectionReset();
+    } else {
+      selectedObservationalValue.value = getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '';
+      selectedForcingValue.value = getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
+      selectedGeopackageValue.value = getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
     }
     isLoading.value = false;
   });
@@ -276,19 +278,15 @@ const clearDataDueToGageChange = () => {
         userCalibrationRunData.value.validation_times.simulation_start_time = "";
         userCalibrationRunData.value.validation_times.simulation_end_time = "";
 
+        selectedObservationalValue.value = getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '';
+        userCalibrationRunData.value.external_data_status.observational = false;
 
-        if (userCalibrationRunData.value.external_data_status.observational) {
-          selectedObservationalValue.value = getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '';
-          userCalibrationRunData.value.external_data_status.observational = false;
-        }
-        if (userCalibrationRunData.value.external_data_status.forcing) {
-          selectedForcingValue.value = getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
-          userCalibrationRunData.value.external_data_status.forcing = false;
-        }
-        if (userCalibrationRunData.value.external_data_status.geopackage) {
-          selectedGeopackageValue.value = getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
-          userCalibrationRunData.value.external_data_status.geopackage = false;
-        }
+        selectedForcingValue.value = getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
+        userCalibrationRunData.value.external_data_status.forcing = false;
+
+        selectedGeopackageValue.value = getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
+        userCalibrationRunData.value.external_data_status.geopackage = false;
+
       }
       isLoading.value = false;
       toast.add({
@@ -496,63 +494,63 @@ const updateJobData = async () => {
 }
 
 
-  const resetTabData = () => {
-    resetUserSelectionGage();
-  };
+const resetTabData = () => {
+  resetUserSelectionGage();
+};
 
-  const validateTab = () => {
-    let error = false;
-    let text = [];
-    if (userCalibrationRunData?.value?.gage === null && selectedGageValue.value ||
-      userCalibrationRunData?.value?.gage?.gage_id && (userCalibrationRunData?.value?.gage?.gage_id !== selectedGageValue.value)) {
-      error = true;
-      text.push("Gage value has been changed");
-    }
-    return { error: error, text: text }
+const validateTab = () => {
+  let error = false;
+  let text = [];
+  if (userCalibrationRunData?.value?.gage === null && selectedGageValue.value ||
+    userCalibrationRunData?.value?.gage?.gage_id && (userCalibrationRunData?.value?.gage?.gage_id !== selectedGageValue.value)) {
+    error = true;
+    text.push("Gage value has been changed");
+  }
+  return { error: error, text: text }
+}
+
+const goNextTab = () => {
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text, true);
+  } else {
+    gotoNext();
   }
 
-  const goNextTab = () => {
-    const errors = validateTab();
-    if (errors.error) {
-      showPrevNextDialog(errors.text, true);
-    } else {
-      gotoNext();
-    }
+};
 
-  };
-
-  const showPrevNextDialog = (body: string[], next: boolean) => {
-    if (!nextPrevDialogOpened.value) {
-      dialog.open(MoveNextPrevDialog, {
-        props: {
-          header: "Unsaved changes!",
-          style: {
-            width: 'auto',
-          },
-          modal: true,
+const showPrevNextDialog = (body: string[], next: boolean) => {
+  if (!nextPrevDialogOpened.value) {
+    dialog.open(MoveNextPrevDialog, {
+      props: {
+        header: "Unsaved changes!",
+        style: {
+          width: 'auto',
         },
-        data: {
-          body: body,
-          direction: next
-        },
-        onClose: (opt) => {
-          nextPrevDialogOpened.value = false;
-          handleNextPrevDialogClose(opt);
-        },
-      })
-      nextPrevDialogOpened.value = true
-    }
+        modal: true,
+      },
+      data: {
+        body: body,
+        direction: next
+      },
+      onClose: (opt) => {
+        nextPrevDialogOpened.value = false;
+        handleNextPrevDialogClose(opt);
+      },
+    })
+    nextPrevDialogOpened.value = true
   }
+}
 
-  const handleNextPrevDialogClose = (opt: any) => {
-    if (opt.data && opt.data.moveToNextResponse) {
-      selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
-      gotoNext();
-    }
-    if (opt.type && opt.type === 'dialog-close') {
-      return;
-    }
+const handleNextPrevDialogClose = (opt: any) => {
+  if (opt.data && opt.data.moveToNextResponse) {
+    selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
+    gotoNext();
   }
+  if (opt.type && opt.type === 'dialog-close') {
+    return;
+  }
+}
 
 </script>
 <style lang="scss" scoped>
