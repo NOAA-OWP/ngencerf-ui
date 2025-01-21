@@ -19,7 +19,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols=1 gap=1 text-sm mt-2">
+      <div class="grid grid-cols=1 gap=1 text-sm">
         <div class="col-span-1">
           <div v-if="calData?.modules?.length"><span class="font-medium">Modules: </span>{{ getModuleList() }}</div>
         </div>
@@ -45,7 +45,7 @@
           <div class="datePos">
             {{ formatDate(calData?.calibration_times?.calibration_end_time) }}</div>
           </div>
-          <div>&nbsp;</div>
+          <div class="line-spacer">&nbsp;</div>
           <div v-if="calData?.optimization"><span class="font-medium">Optimization Algorithm:</span>
             {{ calData?.optimization }}</div>
           <div v-if="calData?.stop_criteria"><span class="font-medium">Calibration Stop Criteria:</span>
@@ -71,7 +71,7 @@
           <div class="datePos">
             {{ formatDate(calData?.validation_times?.validation_end_time) }}</div>
           </div>
-          <div>&nbsp;</div>
+          <div class="line-spacer">&nbsp;</div>
           <div v-if="userSelectedCalibrationTuningParameters && userSelectedCalibrationTuningParameters.length > 0">
             <span class="font-medium">Tuning Parameters:</span>
             {{ userSelectedCalibrationTuningParameters.length }}
@@ -144,5 +144,9 @@ div {
 .datePos {
   float: right;
   margin-right: 50px;
+}
+
+.line-spacer {
+  line-height: 1em;
 }
 </style>

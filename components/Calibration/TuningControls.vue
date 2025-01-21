@@ -327,7 +327,7 @@ const {
   slothParameterInputs
 } = storeToRefs(useFormulationStore());
 
-const { fetchUserCalibrationRunData, getAccessToken } = userDataStore;
+const { getAccessToken } = userDataStore;
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { loadTuningTabStaticData, saveTuningTabData, hardResetTuningStore } = tuningStore;
 const {
@@ -380,8 +380,6 @@ onMounted(async () => {
 
   // Check to see if there is a job. If not, don't initialize this tab!
   if (calibrationJobId.value) {
-    // fetch user calibration data
-    //await fetchUserCalibrationRunData(); // how often should this be called? every visit to the Tuning tab?
 
     if (!userSelectedCalibrationTuningParameters.value.length) {
       console.log("Clearing out selectedTuningParameterData");
@@ -437,7 +435,6 @@ onMounted(async () => {
         selectedOutputVariable.value = `${name} (${module})`;
       }
     };
-
     isInitialSetupDone.value = true; // set to true after initial setup
   } else {
     toast.add({ severity: 'warn', summary: 'No Calibration Job ID', detail: 'No calibration job ID found. Please go back to the Calibration Runs tab and select a job.' });
@@ -1028,6 +1025,7 @@ const isOutputVariableSet = (): boolean => {
   */
 const saveTuningData = () => {
   // handle saving Tuning Tab data
+  toast.removeAllGroups();
   tuningStore_data_loading.value = true;
   const handleSaveTuningTab = async () => {
     const saveTuningTabResponse = await saveTuningTabData();
@@ -1046,20 +1044,18 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
-    updateJobData();
     tuningStore_data_loading.value = false;
+    updateJobData();    
   };
 
   const updateJobData = () => {
     if (userCalibrationRunData.value) {
-      console.log("Tuning Data: ", saveTuningTabRequestBody);
       userCalibrationRunData.value.automatic_validation = saveTuningTabRequestBody.value.automatic_validation;
       userCalibrationRunData.value.calibration_times = saveTuningTabRequestBody.value.calibration_times;
       userCalibrationRunData.value.output_variable_to_calibrate = saveTuningTabRequestBody.value.output_variable_to_calibrate;
       userCalibrationRunData.value.validation_times = saveTuningTabRequestBody.value.validation_times;
       userCalibrationRunData.value.parameters = userSelectedCalibrationTuningParameters.value;
       userCalibrationRunData.value.parameters_selected = userSelectedCalibrationTuningParameters.value.length > 0;
-
     }
   };
 

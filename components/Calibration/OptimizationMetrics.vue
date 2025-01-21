@@ -170,7 +170,6 @@ import { onMounted, onUnmounted } from "vue";
 import { useOptimizationStore } from '@/stores/calibration/OptimizationStore';
 import { useToast } from "primevue/usetoast";
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
-import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useDialog } from "primevue/usedialog";
@@ -202,11 +201,9 @@ const {
   saveOptMetPayload
 } = storeToRefs(optimizationStore);
 
-const { loadOptimizationTabStaticData, saveOptimizationTabData, resetOptimizationInputs, resetUserSelectionOptimization } = optimizationStore;
-const { fetchUserCalibrationRunData } = useUserDataStore();
+const { saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
-const { getCalibrationTabIndex } = generalStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 

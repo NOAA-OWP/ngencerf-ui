@@ -16,7 +16,6 @@
 </template>
 
 <script lang="ts" setup>
-import json from "@/assets/version.json";
 import type { ServerInfo } from "@/composables/NextGenModel";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -24,7 +23,6 @@ import { generalStore } from "@/stores/common/GeneralStore";
 const { getServerInfo, setServerInfo } = generalStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
-const info = json;
 const serverInfo = ref<ServerInfo>();
 
 onMounted( async () => {
