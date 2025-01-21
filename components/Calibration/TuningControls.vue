@@ -1044,8 +1044,8 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
-    tuningStore_data_loading.value = false;
-    updateJobData();    
+    updateJobData();  
+    tuningStore_data_loading.value = false;  
   };
 
   const updateJobData = () => {
