@@ -79,7 +79,6 @@
 
 <script lang="ts" setup>
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 
@@ -89,8 +88,6 @@ const { userCalibrationRunData } = storeToRefs(userDataStore);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 
 const emit = defineEmits(["tabNumber"]);
-
-const tuningStore = useTuningStore();
 
 const checkStartEndTimeValues = () => {
   return (
@@ -104,7 +101,6 @@ const checkStartEndTimeValues = () => {
     userCalibrationRunData.value?.validation_times.validation_start_time
   )
 }
-
 
 const tabClicked = (event: Event) => {
   event.preventDefault();

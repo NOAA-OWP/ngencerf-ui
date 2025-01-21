@@ -130,7 +130,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { generalStore } from "@/stores/common/GeneralStore";
-//import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
 
 const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
@@ -140,9 +139,6 @@ const currentEvaluationTab = ref(getEvaluationTabIndex());
 const currentForecastTab = ref(getForecastTabIndex());
 const currentVerificationTab = ref(getVerificationTabIndex());
 const currentMenu = ref(getMenuIndex());
-
-//store specific import
-//const { loadCalibrationDataComplete } = storeToRefs(useEvaluationCalibrationRunStore())
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);

@@ -71,8 +71,7 @@ import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunSt
 const toast = useToast();
 const {
   fetchCalibrationDataByIterationDataList,
-  resetEvaluationAltIterationStore,
-  createNewValidationJob
+  resetEvaluationAltIterationStore, 
 } = useEvaluationAltIterationStore();
 
 const {
@@ -82,7 +81,6 @@ const {
   tuningParametersTableColumn,
   computedCalibrationRunDetailDataList,
   computedtuningParametersDataList,
-  userSelectedCalibrationIterationId,
 } = storeToRefs(useEvaluationAltIterationStore());
 
 const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
@@ -120,7 +118,6 @@ onMounted(() => {
 })
 
 const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
-  //userSelectedCalibrationIterationId.value = event.data.iteration_id;
   if (event.data.validation_run_id === "") {
     evaluateIterationRunId.value = event.data.iteration_id;
   } else {
@@ -132,7 +129,6 @@ const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
 }
 
 const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
-  //userSelectedCalibrationIterationId.value = event.data.iteration_id;
   if (event.data.validation_run_id === "") {
     evaluateIterationRunId.value = event.data.iteration_id;
   } else {
@@ -146,7 +142,6 @@ const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
 const onTableRowUnselect = (event: DataTableRowClickEvent) => {
   selectedCalibrationByIterationParameterRow.value = null;
   selectedCalibrationByIterationDetailRow.value = null;
-  //userSelectedCalibrationIterationId.value = null;
   evaluateIterationRunId.value = 0;
   evaluateDisplayIterationNumber.value = 0;
 }

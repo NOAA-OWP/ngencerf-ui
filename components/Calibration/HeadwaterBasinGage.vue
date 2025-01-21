@@ -171,9 +171,7 @@ const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, 
 
 const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
   saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
-const { getCalibrationTabIndex } = generalStore();
 const { calibrationJobId, gageHasChanged } = storeToRefs(generalStore());
-const { fetchUserCalibrationRunData } = useUserDataStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 const dialog = useDialog();

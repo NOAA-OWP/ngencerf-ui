@@ -9,7 +9,7 @@
                 <tbody>
                   <tr height="38px">
                     <td class="text-right font-bold">Submit Time</td>
-                    <td class="pl-5">{{ startTime ? formatDateForDisplay( startTime ) : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ startTime ? formatDateForDisplay(startTime) : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="38px">
                     <td class="text-right font-bold">Elapsed Time</td>
@@ -23,7 +23,7 @@
                   </tr>
                 </tbody>
               </table>
-            </div>            
+            </div>
 
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
@@ -44,31 +44,31 @@
                     <td class="pl-5" colspan="2">
 
                       <!--BUTTONS - START-->
-                      <span v-if="validationStatus === 'Done'">                                              
+                      <span v-if="validationStatus === 'Done'">
                         <div id="ResultsArea" class="ngenButtonDiv">
                           <button class="font-normal" @click.stop="navigateToEvaluation">Go to Evaluation</button>
                         </div>
                       </span>
 
                       <span v-else>
-                        
+
                         <div v-if="!isStartHidden()" class="ngenButtonDiv-green h-8">
                           <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
                             Run
                           </button>
                         </div>
-                      
+
                         <!--<div v-else class="h-8">&nbsp;</div>-->
-                    
+
                         <div class="ngenButtonDiv-red h-8 hidden" v-if="!isCancelHidden()">
-                          <button class="font-normal" title="Cancel Button" @click="cancelRun()" 
+                          <button class="font-normal" title="Cancel Button" @click="cancelRun()"
                             aria-label="Cancel Button">Cancel</button>
                         </div>
 
-                      </span>                      
+                      </span>
                       <!--BUTTONS - END-->
                     </td>
-                  </tr>                  
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -78,7 +78,7 @@
       </div>
     </div>
 
-<!--
+    <!--
     <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
       <div class="row-span-1">
         <span v-if="validationStatus === 'Done'">
@@ -119,33 +119,31 @@
 import { onMounted, onUnmounted } from "vue";
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
-import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 import { useToast } from 'primevue/usetoast';
 import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
 import { hilightTab } from '@/composables/TabHilight';
 
-const userDataStore = useUserDataStore();
 const toast = useToast();
 
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 
-const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, evaluateDisplayIterationNumber } = storeToRefs( useEvaluationRunStatusStore() );
+const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, evaluateDisplayIterationNumber } = storeToRefs(useEvaluationRunStatusStore());
 const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime } = useEvaluationRunStatusStore();
 
 const validationStatusCheckingInterval = ref<any>();
 
 onMounted(async () => {
   hilightTab(EvaluationTabs.tab_runStatus);
-  
+
   toast.removeAllGroups();
 
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
-  
+
   // assume having evaluateValidationRunId but not evaluateIterationRunId means user is intend to view the status of a done/stopped job
-  if ( evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0 ) {
-    loadValidationStatusInformation( evaluateValidationRunId.value );
+  if (evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0) {
+    loadValidationStatusInformation(evaluateValidationRunId.value);
   } else {
     // this condition assume we have evaluateIterationRunId value which also assume user want to run a new validation
     // this condition is specifically use to handle user click on status/run tab which can not reset certain value until user land on the tab
@@ -156,15 +154,15 @@ onMounted(async () => {
 
 const isStartHidden = (): boolean => {
   let hidden = false;
-  if ( validationStatus.value !== "" ) {
+  if (validationStatus.value !== "") {
     hidden = true;
   }
   return hidden;
 }
 
-const isCancelHidden = ():boolean => {
+const isCancelHidden = (): boolean => {
   let hidden = false;
-  if ( validationStatus.value === "" || ( validationStatus.value !== "" && isValidationRunStopped( validationStatus.value ) ) ) {
+  if (validationStatus.value === "" || (validationStatus.value !== "" && isValidationRunStopped(validationStatus.value))) {
     hidden = true;
   }
   return hidden;
@@ -173,63 +171,63 @@ const isCancelHidden = ():boolean => {
 const startRun = async () => {
   toast.removeAllGroups();
 
-  executeIterationValidationRun().then( ( response ) => {
-    if ( response.status === 201 ) {
+  executeIterationValidationRun().then((response) => {
+    if (response.status === 201) {
       validationStatus.value = response?._data?.status;
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
-      validationRunningTimeInterval.value = setInterval( updateRunningTime, 1000 );
+      validationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
     } else {
       toast.add({ severity: 'warn', summary: 'Unable to Create Validation' });
-    }    
+    }
   });
 }
 
-watch( validationStatus, async ( newStatus, initialStatus ) => {
-  if ( newStatus !== null && !isValidationRunStopped( newStatus )) {
-    validationStatusCheckingInterval.value = setInterval( async () => {
-      queryIterationValidationRunStatus().then( response => {
-        const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
+watch(validationStatus, async (newStatus, initialStatus) => {
+  if (newStatus !== null && !isValidationRunStopped(newStatus)) {
+    validationStatusCheckingInterval.value = setInterval(async () => {
+      queryIterationValidationRunStatus().then(response => {
+        const find_validation_run = response._data.validations.filter((validation: CalibrationGetStatusValidationItem) => {
           return validation.validation_run_id === iterationValidationRunId.value
         });
-        if ( !find_validation_run ) {
+        if (!find_validation_run) {
           validationStatus.value = 'Fail';
         } else {
           // make sure we actually has validation run
           const validation_run = find_validation_run.shift();
-          if ( !validation_run ) {
+          if (!validation_run) {
             validationStatus.value = 'Fail';
           } else {
             validationStatus.value = validation_run.status;
           }
         }
       })
-    }, 10000 );
+    }, 10000);
   } else {
     // this is for value assignment is only for running job that is now done/stopped
-    if ( iterationValidationRunId.value > 0 ) evaluateValidationRunId.value = iterationValidationRunId.value;
-    clearInterval( validationStatusCheckingInterval.value );
-    clearInterval( validationRunningTimeInterval.value );
+    if (iterationValidationRunId.value > 0) evaluateValidationRunId.value = iterationValidationRunId.value;
+    clearInterval(validationStatusCheckingInterval.value);
+    clearInterval(validationRunningTimeInterval.value);
   }
 });
 
-onUnmounted( () => {
-  clearInterval( validationStatusCheckingInterval.value );
-  clearInterval( validationRunningTimeInterval.value );
+onUnmounted(() => {
+  clearInterval(validationStatusCheckingInterval.value);
+  clearInterval(validationRunningTimeInterval.value);
 })
 
 const cancelRun = async () => {
-  executeCancelIterationValidationRun().then( response => {
+  executeCancelIterationValidationRun().then(response => {
     validationStatus.value = response?._data.status;
-    clearInterval( validationStatusCheckingInterval.value );
-    clearInterval( validationRunningTimeInterval.value );
+    clearInterval(validationStatusCheckingInterval.value);
+    clearInterval(validationRunningTimeInterval.value);
   })
 }
 
-const navigateToEvaluation = ( event: any ) => {
-  if ( evaluateValidationRunId.value > 0 ) {
+const navigateToEvaluation = (event: any) => {
+  if (evaluateValidationRunId.value > 0) {
     const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[ EvaluationTabs.tab_evaluate ];
+    const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
     e.click();
   } else {
     toast.add({ severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 })
