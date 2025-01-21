@@ -46,18 +46,19 @@
               v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
               @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect"
               @rowContextmenu="onRowContextMenu" class="boxed">
-              <Column :pt="ptColumn" field="forecast_run_id" header="Forecast ID" :hidden="true"></Column>
-              <Column :pt="ptColumn" field="calibration_run_id" header="Run ID" sortable></Column>
-              <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
-              <Column field="submit_date" header="Run Date" sortable>
+              <Column :pt="ptColumn" field="forecast_run_id" header="Forecast Job ID" sortable></Column>              
+              <Column :pt="ptColumn" field="cycle" header="Forecast Cycle" sortable></Column>
+              <Column :pt="ptColumn" field="forecast_status" header="Job Status" sortable></Column>
+              <Column field="submit_date" header="Submit Date" sortable>
                 <template #body="slotProps">
-                  {{ formatDateForDisplay(slotProps.data.created_at) }}
+                  <span v-if="slotProps.data.submit_date">
+                    {{ formatDateForDisplay(slotProps.data.submit_date) }}
+                  </span>
                 </template>
-              </Column>
-              <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
+              </Column>              
               <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
-              <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable></Column>
-              <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
+              <Column :pt="ptColumn" field="calibration_run_id" header="Calibration Job ID" sortable></Column>
+              <Column :pt="ptColumn" field="forcing_download_status" header="Forcing Download Status" sortable></Column>
             </DataTable>
             <div class="mt-4 mx-auto">
               * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.</div>
@@ -87,7 +88,7 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const forecastStore = useForecastStore();
 const { forecastRunGageList, forecastJobId, uiGageId, forecastRuns } = storeToRefs( forecastStore );
-const {setSelectedForecastRunId, resetSelectedForecastRunId, loadSelectedCalibrationRun, setSelectedForecastRowData } = useForecastStore();
+const {setSelectedForecastRunId, resetSelectedForecastRunId, loadSelectedCalibrationRun, setSelectedForecastRowData, fetchForecastJobsListData } = useForecastStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -110,11 +111,12 @@ const selectedForecastJob = ref<ForecastJob>();
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
   const crRowData = event.data as ForecastJob; 
+  
   if ( selectedForecastJob && selectedForecastJob.value?.forecast_run_id == crRowData.forecast_run_id ) {
     crContextMenu.value.show(event.originalEvent);
     //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     setSelectedForecastRunId( parseInt(event.originalEvent.currentTarget.children[0].textContent) );
-    if ( crRowData.status.toUpperCase() !== 'RUNNING' ) {
+    if ( crRowData.forecast_status.toUpperCase() !== 'RUNNING' ) {
       cmCalibrationRun.value.push( { label: 'View Results', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastResults() } ); 
     } else {
       cmCalibrationRun.value.push( { label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() } ); 
@@ -126,12 +128,12 @@ const onRowContextMenu = (event: any) => {
   }
 };
 
-onMounted(() => {
+onMounted( async () => {
   isLoading.value = true;
   hilightTab(ForecastTabs.tab_forecastRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
-
+  await fetchForecastJobsListData();
   isLoading.value = false;
 });
 
@@ -213,5 +215,16 @@ const toggleMessagesGroup = () => {
 
 #HeadwaterBasinGage {
   width: 300px;
+}
+
+#MessagesGroupWindow {
+  z-index: 9999;
+  border: 1px solid black;
+  position: absolute;
+  right: 2%;
+  top: 161px;
+  width: 48%;
+  background-color: white;
+  overflow: auto;
 }
 </style>

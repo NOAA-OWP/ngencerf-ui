@@ -702,6 +702,13 @@ export type CalibrationRunForForecast = {
 
 export interface ForecastJob extends CalibrationRunForForecast {
   forecast_run_id: number;
+  cycle: string;
+  forecast_status: string;
+  forcing_download_status: string;
+}
+
+export type ForecastJobs = {
+  forecast_jobs: ForecastJob[];
 }
 
 export const ValidationFormFields = {
