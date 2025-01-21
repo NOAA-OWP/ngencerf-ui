@@ -1044,15 +1044,17 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
+    updateJobData();
     tuningStore_data_loading.value = false;
-    updateJobData();    
   };
 
   const updateJobData = () => {
     if (userCalibrationRunData.value) {
       userCalibrationRunData.value.automatic_validation = saveTuningTabRequestBody.value.automatic_validation;
       userCalibrationRunData.value.calibration_times = saveTuningTabRequestBody.value.calibration_times;
-      userCalibrationRunData.value.output_variable_to_calibrate = saveTuningTabRequestBody.value.output_variable_to_calibrate;
+      if (saveTuningTabRequestBody.value.output_variable_to_calibrate && saveTuningTabRequestBody.value.output_variable_to_calibrate.name !== undefined) {
+        userCalibrationRunData.value.output_variable_to_calibrate = saveTuningTabRequestBody.value.output_variable_to_calibrate;
+      }
       userCalibrationRunData.value.validation_times = saveTuningTabRequestBody.value.validation_times;
       userCalibrationRunData.value.parameters = userSelectedCalibrationTuningParameters.value;
       userCalibrationRunData.value.parameters_selected = userSelectedCalibrationTuningParameters.value.length > 0;
@@ -1231,10 +1233,10 @@ const rowClass = () => {
 }
 
 const rowStyle = () => {
-  let t = !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status) ;
+  let t = !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status);
   return {
     color: t ? "grey" : 'black',
-     backgroundColor: t ? '#f0f0f0' : ''
+    backgroundColor: t ? '#f0f0f0' : ''
   }
 }
 

@@ -39,7 +39,7 @@
           Start and End Times</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.output_variable_to_calibrate" class="pi pi-check font-bold checkMark"></i>
+        <td><i v-if="userCalibrationRunData?.output_variable_to_calibrate === undefined" class="pi pi-check font-bold checkMark"></i>
         </td>
         <td data-tab="4" title="Calibration Output Variable"
           aria-label="Calibration Output Variable" @click="tabClicked">Calibration Output Variable</td>
@@ -90,6 +90,7 @@ const emit = defineEmits(["tabNumber"]);
 
 const checkStartEndTimeValues = () => {
   return (
+    userCalibrationRunData.value?.calibration_times &&
     userCalibrationRunData.value?.calibration_times.calibration_end_time &&
     userCalibrationRunData.value?.calibration_times.calibration_start_time &&
     userCalibrationRunData.value?.calibration_times.simulation_end_time &&

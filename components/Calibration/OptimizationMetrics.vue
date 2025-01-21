@@ -128,8 +128,8 @@
         </div>
         <DynamicDialog />
       </div>
-
     </div>
+
     <div id="OptMetBottomButtons" class="absolute b-0 grid grid-cols-8 mt-6 ActionButtonsBox">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
@@ -497,7 +497,7 @@ const handleNextPrevDialogClose = (opt: any) => {
   max-height: 8rem !important;
 }
 
-#OptMetbuttons {
-  height: 40px;
+#OptMetBottomButtons {
+  z-index: 9999;
 }
 </style>

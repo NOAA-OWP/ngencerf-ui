@@ -370,7 +370,7 @@ export const useFormulationStore = defineStore(
           _data: {
             message: "No formulation tab data to save.",
             validation_errors: {
-              "Tab Error": ["Please update at least 1 field before saving."],
+              "Missing Data": ["Please update at least 1 field before saving."],
             },
             calibration_run_id: calibrationJobId.value,
             status: "error",

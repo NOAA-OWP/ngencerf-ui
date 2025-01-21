@@ -340,10 +340,10 @@ const saveFormulationData = () => {
     if (!valOK) {
       modulesHaveChanged.value = false;
       selectedOutputVariable.value = "";
-      userOutputVariableToCalibrate.value = { name: '', module: null }
-      if (userCalibrationRunData.value) {
-        userCalibrationRunData.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value as UserCalibrationRunOutputVariableToCalibrateData;
-      }
+      // userOutputVariableToCalibrate.value = { name: '', module: null }
+      // if (userCalibrationRunData.value) {
+      //   userCalibrationRunData.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value as UserCalibrationRunOutputVariableToCalibrateData;
+      // }
       // delete all of the Calabratable parameters on the Tuning Controls tab
       clearCalibratableParameters();
 
