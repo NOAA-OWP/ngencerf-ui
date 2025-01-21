@@ -90,6 +90,7 @@ const emit = defineEmits(["tabNumber"]);
 
 const checkStartEndTimeValues = () => {
   return (
+    userCalibrationRunData.value?.calibration_times &&
     userCalibrationRunData.value?.calibration_times.calibration_end_time &&
     userCalibrationRunData.value?.calibration_times.calibration_start_time &&
     userCalibrationRunData.value?.calibration_times.simulation_end_time &&
