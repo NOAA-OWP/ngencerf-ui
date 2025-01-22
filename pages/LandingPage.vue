@@ -32,11 +32,28 @@ import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
+import { useGageStore } from "@/stores/calibration/GageStore";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
+import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
+
+const { resetGageStore } = useGageStore();
+const { resetFormulationStore } = useFormulationStore();
+const { resetOptimizationStore } = useOptimizationStore();
+const { hardResetRunStatusStore } = useRunStatusStore();
+const { hardResetTuningStore } = useTuningStore();
+
 const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs(useCalibrationJobStore());
 const { fetchUserCalibrationJobsListData, getUserName } = useUserDataStore()
 
 onMounted(() => {
   nextTick(() => {
+    resetGageStore();
+    resetFormulationStore();
+    resetOptimizationStore();
+    hardResetRunStatusStore();
+    hardResetTuningStore();
     fetchUserCalibrationJobsListData();
   })
 })
