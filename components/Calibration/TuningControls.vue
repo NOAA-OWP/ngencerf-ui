@@ -785,7 +785,7 @@ const AutoValChecked = () => {
 
 /**
  * Validate and build save_tuning_tab request body. Return false if validation fails
- * @returns boolean
+ * @returns booleanvalidateAndBuildRequestBody
  */
 const validateAndBuildRequestBody = (): boolean => {
   saveTuningTabRequestBody.value.calibration_run_id = calibrationJobId.value;
@@ -1047,26 +1047,34 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
-    
+
   };
 
   const updateJobData = () => {
     if (userCalibrationRunData.value) {
       userCalibrationRunData.value.automatic_validation = saveTuningTabRequestBody.value.automatic_validation;
       // saveTuningTabRequestBody.value.calibration_times are in Luxon DateTime format. Calling toISO() to convert to string
-      userCalibrationRunData.value.calibration_times = {
-        calibration_start_time: saveTuningTabRequestBody.value.calibration_times.calibration_start_time.toISO(),
-        calibration_end_time: saveTuningTabRequestBody.value.calibration_times.calibration_end_time.toISO(),
-        simulation_start_time: saveTuningTabRequestBody.value.calibration_times.simulation_start_time.toISO(),
-        simulation_end_time: saveTuningTabRequestBody.value.calibration_times.simulation_end_time.toISO()
+      if (Object.keys(userCalibrationRunData.value.calibration_times).length) {
+        userCalibrationRunData.value.calibration_times = {
+          calibration_start_time: saveTuningTabRequestBody.value.calibration_times.calibration_start_time.toISO(),
+          calibration_end_time: saveTuningTabRequestBody.value.calibration_times.calibration_end_time.toISO(),
+          simulation_start_time: saveTuningTabRequestBody.value.calibration_times.simulation_start_time.toISO(),
+          simulation_end_time: saveTuningTabRequestBody.value.calibration_times.simulation_end_time.toISO()
+        }
       }
-      userCalibrationRunData.value.output_variable_to_calibrate = saveTuningTabRequestBody.value.output_variable_to_calibrate;
       // saveTuningTabRequestBody.value.validation_times are in Luxon DateTime format. Calling toISO() to convert to string
-      userCalibrationRunData.value.validation_times = {
-        validation_start_time: saveTuningTabRequestBody.value.validation_times.validation_start_time.toISO(),
-        validation_end_time: saveTuningTabRequestBody.value.validation_times.validation_end_time.toISO(),
-        simulation_start_time: saveTuningTabRequestBody.value.validation_times.simulation_start_time.toISO(),
-        simulation_end_time: saveTuningTabRequestBody.value.validation_times.simulation_end_time.toISO()
+
+      if (Object.keys(userCalibrationRunData.value.validation_times).length) {
+        userCalibrationRunData.value.validation_times = {
+          validation_start_time: saveTuningTabRequestBody.value.validation_times.validation_start_time.toISO(),
+          validation_end_time: saveTuningTabRequestBody.value.validation_times.validation_end_time.toISO(),
+          simulation_start_time: saveTuningTabRequestBody.value.validation_times.simulation_start_time.toISO(),
+          simulation_end_time: saveTuningTabRequestBody.value.validation_times.simulation_end_time.toISO()
+        }
+      }
+
+      if (saveTuningTabRequestBody.value.output_variable_to_calibrate) {
+        userCalibrationRunData.value.output_variable_to_calibrate = saveTuningTabRequestBody.value.output_variable_to_calibrate;
       }
       userCalibrationRunData.value.parameters = userSelectedCalibrationTuningParameters.value;
       userCalibrationRunData.value.parameters_selected = userSelectedCalibrationTuningParameters.value.length > 0;
