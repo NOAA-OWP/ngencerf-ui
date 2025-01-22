@@ -88,7 +88,7 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const forecastStore = useForecastStore();
 const { forecastRunGageList, forecastJobId, uiGageId, forecastRuns } = storeToRefs( forecastStore );
-const {setSelectedForecastRunId, resetSelectedForecastRunId, loadSelectedCalibrationRun, setSelectedForecastRowData, fetchForecastJobsListData } = useForecastStore();
+const {setSelectedForecastRunId, resetSelectedForecastRunId, loadSelectedCalibrationRun, setSelectedForecastRowData, fetchForecastJobsListData, resetSelectedCalibrationRunId } = useForecastStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -135,6 +135,7 @@ onMounted( async () => {
   if (ele) { ele.scrollTo(0, 0); }
   await fetchForecastJobsListData();
   isLoading.value = false;
+  resetSelectedCalibrationRunId();
 });
 
 const onRowDblClick = (event: any) => {
