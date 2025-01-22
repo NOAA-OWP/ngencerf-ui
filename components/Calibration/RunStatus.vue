@@ -222,6 +222,11 @@ onMounted( async () => {
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
+
+  // Do not initiate this component if there is no job.
+  if( !userCalibrationRunData?.value?.calibration_run_id ) {
+    return;
+  }
   const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
 
   if( userCalibrationRunData?.value  && getStatusResponse.status === 200) {

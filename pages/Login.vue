@@ -121,22 +121,13 @@ import AppHeader from "@/components/Common/AppHeader.vue";
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 
-import { useGageStore } from "@/stores/calibration/GageStore";
-import { useFormulationStore } from "@/stores/calibration/FormulationStore";
-import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
-import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
-import { useTuningStore } from "@/stores/calibration/TuningStore";
+
 import { generalStore } from "@/stores/common/GeneralStore";
 
 const { calibrationJobId } = storeToRefs(generalStore());
 
-const { logUserIn, setUserName, setFirstName, setLastName, hardResetUserDataStore } = useUserDataStore();
+const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
 const { resetGeneralStore } = generalStore();
-const { resetGageStore, gageStore_data_loading } = useGageStore();
-const { resetFormulationStore, formulationStore_data_loading } = useFormulationStore();
-const { resetOptimizationStore, optimizationStore_data_loading } = useOptimizationStore();
-const { hardResetRunStatusStore } = useRunStatusStore();
-const { hardResetTuningStore, tuningStore_data_loading } = useTuningStore();
 
 
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -165,11 +156,6 @@ onMounted(() => {
     calibrationJobId.value = 0;
     hardResetUserDataStore();
     resetGeneralStore();
-    resetGageStore();
-    resetFormulationStore();
-    resetOptimizationStore();
-    hardResetRunStatusStore();
-    hardResetTuningStore();
   })
 });
 
