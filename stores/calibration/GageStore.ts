@@ -283,8 +283,7 @@ export const useGageStore = defineStore(
             }
           );
 
-          geopackageImageUrl.value =
-          saveGageTabDataResponse?._data?.geopackage_image_url ?? "";
+        geopackageImageUrl.value = saveGageTabDataResponse?._data?.geopackage_image_url ?? "";
 
         return saveGageTabDataResponse;
       } else {
