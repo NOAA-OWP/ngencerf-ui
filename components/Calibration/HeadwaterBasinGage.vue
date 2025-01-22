@@ -286,7 +286,6 @@ const clearDataDueToGageChange = () => {
         userCalibrationRunData.value.external_data_status.geopackage = false;
 
       }
-      isLoading.value = false;
       toast.add({
         severity: 'info', summary: `Gage Changed`,
         detail: "You must save this tab for the change to effect the run. Calibration and Validation times must be set on the Tuning Controls tab", life: 5000
