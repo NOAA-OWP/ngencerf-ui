@@ -240,6 +240,12 @@ onMounted( () => {
     // Load Run Status Store to load resultsPathname
     await loadRunStatusStore();
 
+    console.log('userCalibrationRunData initial', userCalibrationRunData.value);
+    if (!userCalibrationRunData.value) {
+      await fetchUserCalibrationRunData();
+      console.log('userCalibrationRunData after fetch', userCalibrationRunData.value);
+    }
+
     // Get Plot Names
     if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
       plotNames.value = await queryGetPlotNames();
@@ -265,7 +271,7 @@ onMounted( () => {
       logs.value = await queryGetLogNames(
         (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
       );
-      console.log('logs: ', logs.value);
+      //console.log('logs: ', logs.value);
       for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
         Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
           let logList = [];
@@ -284,7 +290,7 @@ onMounted( () => {
         }
       });
 
-      console.log('logLists: ', logLists.value);
+      //console.log('logLists: ', logLists.value);
     }
   })
 });
@@ -718,9 +724,6 @@ const toggleMessagesGroup = async() => {
   if (showMessagesGroup.value) {
     showMessagesGroup.value = false;
   } else {
-    if (!userCalibrationRunData.value) {
-      await fetchUserCalibrationRunData();
-    }
     showMessagesGroup.value = true;
   }
 }
