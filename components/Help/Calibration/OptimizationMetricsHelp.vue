@@ -15,56 +15,61 @@
     <table class="_help-table">
       <tbody>
         <tr>
-          <td class="td1">Optimization Algorithm:</td>
+          <td class="td1">Optimization Algorithm</td>
           <td class="td2">Select from the dropdown which optimization algorithm to use for the calibration. Once one is
             selected any required algorithm parameters will be populated in the Parameter table. </td>
         </tr>
         <tr>
-          <td class="td1">Algorithm Parameters:</td>
+          <td class="td1">Algorithm Parameters</td>
           <td class="td2">The parameter name is provided. The user must provide the value.</td>
         </tr>
         <tr>
-          <td class="td1">Calibration Stop Criteria:</td>
+          <td class="td1">Calibration Stop Criteria</td>
           <td class="td2">The number of iterations for each worker to execute while performing calibration. DDS has one
             worker, but both GWO and PSO have 20 workers.
           </td>
         </tr>
         <tr>
-          <td class="td1">Objective Function:</td>
+          <td class="td1">Objective Function</td>
           <td class="td2">
-            Select a metric to use as the objective function during calibration.<br />
+            Select a metric to use as the objective function during calibration. Note that all metric
+            in the table below are appropriate to use as an objective function. (MFDC, FBIAS, NSWwt)<br />
             If a Categorical metric (POD, CSI, FAR) is selected, the user must provide the Flow Threshold.<br />
             If an Event based metric (PKBIAS, PKTE, EVBIAS) is selected, the user must provide the Peak Flow Threshold.
           </td>
         </tr>
         <tr>
-          <td class="td1">Categorical Metrics:</td>
-          <td class="td2">If a Categorical metric (POD, CSI, FAR) is not selected as the objective function, the user can select this checkbox to have
-            the program also calculate the Categorical Metrics.
+          <td class="td1">Calculate Categorical Metrics</td>
+          <td class="td2">If a Categorical metric (POD, CSI, FAR) is not selected as the objective function, 
+            the user can select this checkbox to have the program also calculate the Categorical Metrics. The 
+            Flow Threshold must be entered by the user.
           </td>
         </tr>
         <tr>
-          <td class="td1">Calculate Categorical Metrics</td>
-          <td class="td2">If an Event Based metric is not selected as the objective function, the user can select select this checkbox to
-            have the program also calculate the Event Based Metrics.</td>
+          <td class="td1">Calculate Event Based Metrics</td>
+          <td class="td2">If an Event Based metric (PKBIAS, PKTE, EVBIAS) is not selected as the objective function, the user can select
+            this checkbox to have the program also calculate the Event Based Metrics.
+            The Peak Flow Threshold must be entered by the user.
+          </td>
         </tr>
         <tr>
-          <td class="td1">Save Button:</td>
+          <td class="td1">Save Button</td>
           <td class="td2">Save data from the tab. Partial saves are allowed.</td>
         </tr>
         <tr>
-          <td class="td1">Prev Button:</td>
+          <td class="td1">Prev Button</td>
           <td class="td2">Move to the Tuning Controls Tab. If there is any unsaved data, the user will first be prompted
             to save.</td>
         </tr>
         <tr>
-          <td class="td1">Next Button:</td>
+          <td class="td1">Next Button</td>
           <td class="td2">Move to the Status/Run Tab. If there is any unsaved data, the user will first be prompted
             to save.</td>
         </tr>
       </tbody>
     </table>
     <div class="mt-4">
+      <p style="text-align: center;font-weight: bold;">Metric Definitions</p>
       <img class="mx-auto" width="90%" :src="image1" />
     </div>
   </div>

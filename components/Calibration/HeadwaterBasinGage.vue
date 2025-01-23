@@ -42,7 +42,7 @@
             </div>
 
             <div class="col-span-1">
-              <label for="Geopackage">Geo Package</label><br />
+              <label for="Geopackage">GeoPackage</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" @change="uploadGeopackageDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
