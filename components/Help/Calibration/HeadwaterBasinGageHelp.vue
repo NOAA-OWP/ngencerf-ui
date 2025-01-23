@@ -79,6 +79,11 @@
           <td class="td2">Save data from the tab. Partial saves are allowed.</td>
         </tr>
         <tr>
+          <td class="td1">Revert Button</td>
+          <td class="td2">If the saved gage ID is changed, the Revert button will appear. When
+            clicked it will undo the change, reverting to the saved gage ID.</td>
+        </tr>
+        <tr>
           <td class="td1">Next Button:</td>
           <td class="td2">Move to the Formulation Tab. If there is any unsaved data, the user will first be prompted to save.</td>
         </tr>
