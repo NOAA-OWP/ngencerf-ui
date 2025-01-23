@@ -87,8 +87,8 @@ import type { DataTableRowClickEvent } from "primevue/datatable";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const forecastStore = useForecastStore();
-const { forecastRunGageList, forecastJobId, uiGageId, forecastRuns } = storeToRefs( forecastStore );
-const {setSelectedForecastRunId, resetSelectedForecastRunId, loadSelectedCalibrationRun, setSelectedForecastRowData, fetchForecastJobsListData, resetSelectedCalibrationRunId } = useForecastStore();
+const { forecastRunGageList, forecastJobId, uiGageId, forecastRuns, forecastCycles } = storeToRefs( forecastStore );
+const {setSelectedForecastRunId, resetSelectedForecastRunId, loadSelectedCalibrationRun, setSelectedForecastRowData, fetchForecastJobsListData, resetSelectedCalibrationRunId, loadSetupForecastTabData } = useForecastStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -134,6 +134,9 @@ onMounted( async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
   await fetchForecastJobsListData();
+  if (!forecastCycles.value || forecastCycles.value.length === 0) {
+      await loadSetupForecastTabData();
+    }
   isLoading.value = false;
   resetSelectedCalibrationRunId();
 });

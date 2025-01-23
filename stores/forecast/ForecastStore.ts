@@ -274,6 +274,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const setSelectedForecastRowData = ( forecast_row_data: ForecastJob ): void => {
     setSelectedForecastRunId( forecast_row_data.forecast_run_id );
     setSelectedCalibrationRunId( forecast_row_data.calibration_run_id );
+    forecastCycle.value = forecastCycles.value?.find( (forecast_cycle_data : ForecastCycle ) =>
+      forecast_cycle_data.name === forecast_row_data.cycle
+    );
     forecastJobStatus.value = forecast_row_data.status;
   }
 
