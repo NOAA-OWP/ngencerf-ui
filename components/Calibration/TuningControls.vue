@@ -1054,7 +1054,7 @@ const saveTuningData = () => {
     if (userCalibrationRunData.value) {
       userCalibrationRunData.value.automatic_validation = saveTuningTabRequestBody.value.automatic_validation;
       // saveTuningTabRequestBody.value.calibration_times are in Luxon DateTime format. Calling toISO() to convert to string
-      if (Object.keys(userCalibrationRunData.value.calibration_times).length) {
+      if (saveTuningTabRequestBody.value.calibration_times && Object.keys(saveTuningTabRequestBody.value.calibration_times).length) {
         userCalibrationRunData.value.calibration_times = {
           calibration_start_time: saveTuningTabRequestBody.value.calibration_times.calibration_start_time.toISO(),
           calibration_end_time: saveTuningTabRequestBody.value.calibration_times.calibration_end_time.toISO(),
@@ -1064,7 +1064,7 @@ const saveTuningData = () => {
       }
       // saveTuningTabRequestBody.value.validation_times are in Luxon DateTime format. Calling toISO() to convert to string
 
-      if (Object.keys(userCalibrationRunData.value.validation_times).length) {
+      if (saveTuningTabRequestBody.value.validation_times && Object.keys(saveTuningTabRequestBody.value.validation_times).length) {
         userCalibrationRunData.value.validation_times = {
           validation_start_time: saveTuningTabRequestBody.value.validation_times.validation_start_time.toISO(),
           validation_end_time: saveTuningTabRequestBody.value.validation_times.validation_end_time.toISO(),
