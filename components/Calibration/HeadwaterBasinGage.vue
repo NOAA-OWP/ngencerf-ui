@@ -138,25 +138,29 @@
 
 </template>
 <script lang="ts" setup>
+import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
+import { useToast } from "primevue/usetoast";
+import { useDialog } from "primevue/usedialog";
+
+import type { SelectChangeEvent } from "primevue/select";
 import type { ToastMessageOptions } from "primevue/toast";
 import type { GageResetData } from "@/composables/NextGenModel.ts"
-import { onMounted } from "vue";
+
 import { useGageStore } from "@/stores/calibration/GageStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
-import { useToast } from "primevue/usetoast";
-import { useDialog } from "primevue/usedialog";
+
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
-import type { SelectChangeEvent } from "primevue/select";
+
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
-
-import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
+import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
+          useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
 
 const isLoading = ref(true);
 

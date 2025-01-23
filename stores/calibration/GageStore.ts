@@ -1,10 +1,13 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
+
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
+
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
+
 import type {
   SelectOption,
   GageTabData,

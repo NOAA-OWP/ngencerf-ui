@@ -1,11 +1,13 @@
 // @ts-check
-
 import { defineStore, storeToRefs } from "pinia";
+
+import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NextGenModel";
+
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { generalStore } from "../common/GeneralStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "@/composables/UserAuth"
-import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NextGenModel";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 import { fixFloatToFivePlaces } from "@/utils/CommonHelpers";
 

@@ -1,7 +1,10 @@
 import { defineStore, storeToRefs } from "pinia";
+
 import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastCycle } from "@/composables/NextGenModel";
+
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { generalStore } from "../common/GeneralStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";

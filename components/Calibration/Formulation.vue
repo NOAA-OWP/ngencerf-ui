@@ -177,21 +177,24 @@
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useDialog } from "primevue/usedialog";
+import { useToast } from "primevue/usetoast";
 
-import { isCalibrationJobStatusSavedOrReady, arraysEqual } from "@/utils/CommonHelpers";
-import { formatDateForRunOnString } from "@/utils/TimeHelpers";
+import type { SlothParameterData } from '@/composables/NextGenModel';
+
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
-import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
-import type { SlothParameterData } from '@/composables/NextGenModel';
-import { useDialog } from "primevue/usedialog";
+
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+
 import { hilightTab } from '@/composables/TabHilight';
+import { isCalibrationJobStatusSavedOrReady, arraysEqual } from "@/utils/CommonHelpers";
+import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 
 const { clearCalibratableParameters } = useTuningStore();
 

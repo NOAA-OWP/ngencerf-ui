@@ -16,9 +16,11 @@
 </template>
 
 <script lang="ts" setup>
-import type { ServerInfo } from "@/composables/NextGenModel";
-import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "@/stores/common/GeneralStore";
+
+import type { ServerInfo } from "@/composables/NextGenModel";
+
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 
 const { getServerInfo, setServerInfo } = generalStore();
 

@@ -20,18 +20,16 @@
 </template>
 
 <script setup lang="ts">
-import Tabs from '@/components/Common/Tabs.vue'
+import { generalStore } from "@/stores/common/GeneralStore";
 
+import Tabs from '@/components/Common/Tabs.vue'
 import EvaluateTab from './EvaluateTab.vue';
 import SelectAltIterationTab from './SelectAltIterationTab.vue';
 import CalibrationRunsTab from './CalibrationRunsTab.vue';
 import RunStatus from './EvaluationRunStatus.vue';
 
-// Default to Tab 1, HeadwaterBasinGage
-import { generalStore } from "@/stores/common/GeneralStore";
 const { getEvaluationTabIndex, setEvaluationTabIndex } = generalStore();
 
-// Default to Tab 1, HeadwaterBasinGage
 const activeTab = ref(getEvaluationTabIndex());
 
 // Activate new tab

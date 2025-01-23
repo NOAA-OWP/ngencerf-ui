@@ -1,9 +1,11 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "../common/UserDataStore";
+
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
-import { generalStore } from "../common/GeneralStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+
 import { makeProtectedApiCall } from "#imports";
 import type { CalibrationJobListItem } from "@/composables/NextGenModel";
 

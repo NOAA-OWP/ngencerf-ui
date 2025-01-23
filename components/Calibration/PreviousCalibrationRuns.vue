@@ -65,18 +65,21 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
+import { storeToRefs } from "pinia";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
+
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
+
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
-import { storeToRefs } from "pinia";
 import { useGageStore } from "@/stores/calibration/GageStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';

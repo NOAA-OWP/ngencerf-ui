@@ -73,9 +73,12 @@
 </template>
 
 <script setup lang="ts">
-import type { ServerInfo } from "@/composables/NextGenModel";
-import json from "@/assets/version.json";
 import { generalStore } from "@/stores/common/GeneralStore";
+
+import type { ServerInfo } from "@/composables/NextGenModel";
+
+import json from "@/assets/version.json";
+
 const { getServerInfo } = generalStore();
 
 const info = json;

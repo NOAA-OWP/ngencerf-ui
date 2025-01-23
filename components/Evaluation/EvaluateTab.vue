@@ -136,17 +136,20 @@
 </template>
 
 <script setup lang="ts">
+import { nextTick } from 'vue';
+import { useToast } from 'primevue/usetoast';
+
+import type { DynamicObject } from "@/composables/NextGenModel";
+
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useEvaluationSupplementalDataStore } from '@/stores/evaluation/EvaluationSupplementalDataStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
-import { useToast } from 'primevue/usetoast';
-import type { DynamicObject } from "@/composables/NextGenModel";
-import { hilightTab } from '@/composables/TabHilight';
 
 import MessagesGroup from "../Common/MessagesGroup.vue";
 import Paging from "../Common/Paging.vue";
-import { nextTick } from 'vue';
+
+import { hilightTab } from '@/composables/TabHilight';
 
 const runStatusStore = useRunStatusStore();
 const EvaluationSupplementalDataStore = useEvaluationSupplementalDataStore();

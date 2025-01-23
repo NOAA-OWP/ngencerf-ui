@@ -1,9 +1,11 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
+
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { generalStore } from "../common/GeneralStore";
+
+import { makeProtectedApiCall } from "@/composables/UserAuth";
 
 export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplementalDataStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());

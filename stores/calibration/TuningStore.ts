@@ -1,11 +1,11 @@
 // @ts-check
-
 import { defineStore } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
-import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 export const useTuningStore = defineStore(
   "TuningStore",
