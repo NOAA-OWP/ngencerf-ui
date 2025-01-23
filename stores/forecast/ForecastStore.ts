@@ -283,6 +283,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const resetSelectedForecastRunId = (): void => {
     forecastJobId.value = undefined;
     forecastJobStatus.value = undefined;
+    forecastCycle.value = undefined;
     resetSelectedCalibrationRunId();
   }
 
