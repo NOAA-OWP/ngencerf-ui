@@ -277,6 +277,11 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastCycle.value = forecastCycles.value?.find( (forecast_cycle_data : ForecastCycle ) =>
       forecast_cycle_data.name === forecast_row_data.cycle
     );
+    /*
+     * the follow is hack to get around the fact that we are using calibrationRunForForecast to check for calibration_run_id, but it's only set on calibration run tab
+     * user should be able to go straight to forecast runs and view results so this is a easy way to provide it.
+     */
+    calibrationRunForForecast.value = ( forecast_row_data as any as CalibrationRunForForecast); 
     forecastJobStatus.value = forecast_row_data.status;
   }
 
