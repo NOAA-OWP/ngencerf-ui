@@ -731,4 +731,5 @@ export type GageResetData  = {
   geopackage_source: string;
   observational_source: string;
   forcing_source: string;
+  geopackage_image_url: string;
 }
