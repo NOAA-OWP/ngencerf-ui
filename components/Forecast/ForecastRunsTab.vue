@@ -14,7 +14,10 @@
       <div class="flex mt-2">
         <div class="w-2/3">
           <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
-            <span>Forecast Runs *</span>
+            <span>Forecast Runs</span><br />
+            <span style="font-size: 12px;font-weight: normal;padding-left: 5px;">
+              Select row and right click for options.
+            </span>
           </h1>
         </div>
         <div class="ml-auto mt-2">
