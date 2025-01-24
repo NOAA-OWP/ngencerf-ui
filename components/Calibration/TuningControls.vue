@@ -280,7 +280,7 @@
   </div>
   <DynamicDialog />
   <div class="waitgif" v-if="isLoading || tuningStore_data_loading">
-    <img alt="Please wait" src="@/assets/styles/img/wait.gif" />
+    <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
 
