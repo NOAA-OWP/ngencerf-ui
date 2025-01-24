@@ -138,7 +138,7 @@ onMounted( async () => {
       await loadSetupForecastTabData();
     }
   isLoading.value = false;
-  resetSelectedCalibrationRunId();
+  resetSelectedForecastRunId();
 });
 
 const onRowDblClick = (event: any) => {
