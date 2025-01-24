@@ -186,18 +186,6 @@ export const useFormulationStore = defineStore(
     }
 
     /**
-     * return list of selected module name
-     * @returns {string[]}
-     */
-    // const getSavedModuleSelection = computed(() => {
-    //   let selectedModules = <string[]>[]
-    //   formulationTabData.value?.modules.forEach((moduleData) => {
-    //     if (moduleData.used_by_calibration_run) selectedModules.push(moduleData.name)
-    //   })
-    //   return selectedModules
-    // })
-
-    /**
      * return list of group options for the group filter field
      * @returns {SelectOption[]}
      */
