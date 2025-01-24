@@ -16,6 +16,14 @@
             and a summary of the choices made for the setup.</li>
         <li>Once all the required data has been entered, all checkmarks will be set 
             and the status will be Ready. Otherwise the status will be Saved or one of the finished statuses.</li>
+        <li>When the user hits Run, the final subsetting of acquired data occurs. Depending on the size of
+            the headwater basin, this could delay the actual start of the calibration run. Another delay can 
+            occur while waiting for resources.
+        </li>
+        <li>Normal Status Transitions: <br />
+          <strong>Calibration Ready -&gt; Submitted -&gt; Calibration Running -&gt; Calibration Done, Validation Control Running -&gt;
+            Calibration Done, Validation Best Running -&gt; Done </strong>
+        </li>
         <li>Once the calibration job has started, after the 1st iteratoin, the user can view plots. These plots will be automatically updated
             while the job is running based on the plot interval specified by the user.</li>
         <li>The user can stop a running job by clicking the Cancel button.</li>
@@ -27,7 +35,10 @@
       <tbody>
         <tr>
           <td class="td1">Submit Time</td>
-          <td class="td2">Date/Time the job was submitted to run.</td>
+          <td class="td2">Date/Time the button job was submitted to run. The display of this time 
+            may be delayed or updated based on factors such as the size of the headwater basin or
+            waiting for resources.
+          </td>
         </tr>
         <tr>
           <td class="td1">Elapsed Time</td>
@@ -42,7 +53,7 @@
           <td class="td2">Job status.</td>
         </tr>
         <tr>
-          <td class="td1">Display:</td>
+          <td class="td1">Display</td>
           <td class="td2">Once at least one iteration has been completed, plots are available for monitoring the calibration 
             process. Use this pulldown to select the plot. A message will appear if the plot is not available yet. These plots
             are also available to view after the run is complete. Go to the Evaluation workflow to view the time series and other
@@ -54,15 +65,15 @@
         </tr>
 
         <tr>
-          <td class="td1">Run Button:</td>
+          <td class="td1">Run Button</td>
           <td class="td2">Start the Calibration. Appears when job is in the Ready state.</td>
         </tr>
         <tr>
-          <td class="td1">Cancel Button:</td>
+          <td class="td1">Cancel Button</td>
           <td class="td2">Stop/cancel the calibration before it has completed. Appears only when a job is running.</td>
         </tr>
         <tr>
-          <td class="td1">Go To Evaluation Button:</td>
+          <td class="td1">Go To Evaluation Button</td>
           <td class="td2">Got the Evaluation workflow to view more details about the run, including plots, plot data, performance metrics and logs.</td>
         </tr>
 

@@ -13,7 +13,7 @@ export const useTuningStore = defineStore(
     // server-data properties
     const userDataStore = useUserDataStore();
     const loadTuningTabData = ref<any>();
-    // const saveTuningTabData = ref<SaveTuningTabRequestBody>()
+
     const { calibrationJobId } = storeToRefs(generalStore());
     const { getAccessToken } = userDataStore;
 

@@ -280,7 +280,7 @@
   </div>
   <DynamicDialog />
   <div class="waitgif" v-if="isLoading || tuningStore_data_loading">
-    <img alt="Please wait" src="@/assets/styles/img/wait.gif" />
+    <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
 
@@ -821,10 +821,6 @@ const validateAndBuildRequestBody = (): boolean => {
     saveTuningTabRequestBody.value.parameters = userSelectedCalibrationTuningParameters.value;
   }
 
-  if (isOutputVariableSet()) {
-    saveTuningTabRequestBody.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
-  }
-
   if (Object.keys(saveTuningTabRequestBody.value).length === 0) {
     toast.add({ severity: 'error', summary: 'No data to save', detail: 'No valid data has been entered to save' });
     return false;
@@ -1058,7 +1054,7 @@ const saveTuningData = () => {
     if (userCalibrationRunData.value) {
       userCalibrationRunData.value.automatic_validation = saveTuningTabRequestBody.value.automatic_validation;
       // saveTuningTabRequestBody.value.calibration_times are in Luxon DateTime format. Calling toISO() to convert to string
-      if (Object.keys(userCalibrationRunData.value.calibration_times).length) {
+      if (saveTuningTabRequestBody.value.calibration_times && Object.keys(saveTuningTabRequestBody.value.calibration_times).length) {
         userCalibrationRunData.value.calibration_times = {
           calibration_start_time: saveTuningTabRequestBody.value.calibration_times.calibration_start_time.toISO(),
           calibration_end_time: saveTuningTabRequestBody.value.calibration_times.calibration_end_time.toISO(),
@@ -1068,7 +1064,7 @@ const saveTuningData = () => {
       }
       // saveTuningTabRequestBody.value.validation_times are in Luxon DateTime format. Calling toISO() to convert to string
 
-      if (Object.keys(userCalibrationRunData.value.validation_times).length) {
+      if (saveTuningTabRequestBody.value.validation_times && Object.keys(saveTuningTabRequestBody.value.validation_times).length) {
         userCalibrationRunData.value.validation_times = {
           validation_start_time: saveTuningTabRequestBody.value.validation_times.validation_start_time.toISO(),
           validation_end_time: saveTuningTabRequestBody.value.validation_times.validation_end_time.toISO(),

@@ -140,24 +140,31 @@ export const useFormulationStore = defineStore(
     const fetchFormulationModuleOptions = computed(() => {
       let modules_list = <SelectOption[]>[];
       let selected_mouldes_list = <SelectOption[]>[];
-      formulationTabData.value?.modules.forEach((moduleData) => {
-        if (
-          !filterGroup.value ||
-          moduleData.groups.includes(filterGroup.value)
-        ) {
-          const selectOptionItem = {
-            name: moduleData.name,
-            description: moduleData.name,
-            selected: false,
-            groups: moduleData.groups,
-          };
-          if (userCalibrationRunData.value?.modules.includes(moduleData.name)) {
-            selected_mouldes_list.push(selectOptionItem);
-          } else {
-            modules_list.push(selectOptionItem);
+      if (
+        formulationTabData.value?.modules &&
+        formulationTabData.value?.modules.length > 0
+      ) {
+        formulationTabData.value?.modules.forEach((moduleData) => {
+          if (
+            !filterGroup.value ||
+            moduleData.groups.includes(filterGroup.value)
+          ) {
+            const selectOptionItem = {
+              name: moduleData.name,
+              description: moduleData.name,
+              selected: false,
+              groups: moduleData.groups,
+            };
+            if (
+              userCalibrationRunData.value?.modules.includes(moduleData.name)
+            ) {
+              selected_mouldes_list.push(selectOptionItem);
+            } else {
+              modules_list.push(selectOptionItem);
+            }
           }
-        }
-      });
+        });
+      }
 
       return selected_mouldes_list
         .slice()
@@ -180,18 +187,6 @@ export const useFormulationStore = defineStore(
       });
       return selectedGroups;
     }
-
-    /**
-     * return list of selected module name
-     * @returns {string[]}
-     */
-    // const getSavedModuleSelection = computed(() => {
-    //   let selectedModules = <string[]>[]
-    //   formulationTabData.value?.modules.forEach((moduleData) => {
-    //     if (moduleData.used_by_calibration_run) selectedModules.push(moduleData.name)
-    //   })
-    //   return selectedModules
-    // })
 
     /**
      * return list of group options for the group filter field
@@ -354,7 +349,8 @@ export const useFormulationStore = defineStore(
             status: 400,
           });
         } else {
-          saveFormulationPayload.value["calibration_run_id"] = calibrationJobId.value;
+          saveFormulationPayload.value["calibration_run_id"] =
+            calibrationJobId.value;
           saveFormulationPayload.value["use_sloth"] = useSlothParameters.value;
           return await makeProtectedApiCall<GeneralApiSaveResponse>(
             `${ngencerfBaseUrl}/calibration/save_formulation_tab/`,
@@ -426,7 +422,7 @@ export const useFormulationStore = defineStore(
       deleteSlothVariable,
       resetFormulationStore,
       loadFormulationTabStaticData,
-      saveFormulationPayload
+      saveFormulationPayload,
     };
   },
   {
