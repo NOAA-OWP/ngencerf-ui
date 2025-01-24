@@ -158,7 +158,7 @@
     </div>
 
     <div class="waitgif" v-if="isLoading || optimizationStore_data_loading">
-      <img alt="Please wait" src="@/assets/styles/img/wait.gif" />
+      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
 </template>
