@@ -811,6 +811,8 @@ const validateAndBuildRequestBody = (): boolean => {
     }
   }
 
+  saveTuningTabRequestBody.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
+
   saveTuningTabRequestBody.value.automatic_validation = automatic_validation.value;
 
   if (areTuningParametersSet()) {
