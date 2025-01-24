@@ -154,7 +154,7 @@
     </span>
   -->
     <div class="waitgif" v-if="isLoading">
-      <img src="@/assets/styles/img/wait.gif" alt="Wait gif" />
+      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
 </template>
@@ -280,43 +280,43 @@ const createElapsedTimeInterval = () => {
 
 // Run Calibration Job
 const startRun = async () => {
-  if (calibrationStatus.value === 'Ready') {
-    if (userCalibrationRunData.value) {
-      userCalibrationRunData.value.status = 'Submitted';
-    }
-    try {
-      const runCalibrationResponse = await runCalibrationJob();
-
-      if (runCalibrationResponse._data) {
-        if (runCalibrationResponse._data.status) {
-          if (userCalibrationRunData.value) {
-            userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
-          } else {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'load_calibration_run_data from server failed' });
-          }
-        } else {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server' });
-        }
-
-        if (runCalibrationResponse._data.submit_date) {
-          submitTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
-        } else {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
-        }
-
-        if (userCalibrationRunData?.value?.status !== 'Running') {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
-        }
-        fetchUserCalibrationRunData();
-      } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'run_calibration from server failed' });
-      }
-    } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration' });
-    }
-  } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Ready. Cannot run Calibration' });
+  isLoading.value = true;
+  
+  if (userCalibrationRunData.value) {
+    userCalibrationRunData.value.status = 'Preparing Job Data';
   }
+  try {
+    const runCalibrationResponse = await runCalibrationJob();
+
+    if (runCalibrationResponse._data) {
+      if (runCalibrationResponse._data.status) {
+        if (userCalibrationRunData.value) {
+          userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
+        } else {
+          toast.add({ severity: 'error', summary: 'Error', detail: 'load_calibration_run from server failed' });
+        }
+      } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server' });
+      }
+
+      if (runCalibrationResponse._data.submit_date) {
+        // set submitTimeDate to submit_date from server as a Date object. watch function for submitTimeDate will set submitTime, which shows the time in local time format
+        submitTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
+      } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
+      }
+
+      if (userCalibrationRunData?.value?.status !== 'Running') {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
+      }
+      fetchUserCalibrationRunData();
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'run_calibration from server failed' });
+    }
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration' });
+  }
+  isLoading.value = false;
 };
 
 // Cancel Calibration Job
