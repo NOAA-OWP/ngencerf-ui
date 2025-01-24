@@ -42,7 +42,7 @@
             </div>
 
             <div class="col-span-1">
-              <label for="Geopackage">Geo Package</label><br />
+              <label for="Geopackage">GeoPackage</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" @change="uploadGeopackageDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
@@ -186,7 +186,8 @@ const resetData = ref<GageResetData>({
   },
   geopackage_source: "",
   observational_source: "",
-  forcing_source: ""
+  forcing_source: "",
+  geopackage_image_url: ""
 })
 
 onMounted(() => {
@@ -212,11 +213,12 @@ const onGageSelectionChange = () => {
   if (userCalibrationRunData?.value?.gage) {
     gageHasChanged.value = true;
 
-    // Save all information from the external data  JSON.parse(JSON.stringify(obj));
+    // Save all information from the external data JSON.parse(JSON.stringify(obj));
     resetData.value.external_data_status = JSON.parse(JSON.stringify(userCalibrationRunData.value.external_data_status));
     resetData.value.geopackage_source = userCalibrationRunData.value.geopackage_source;
     resetData.value.observational_source = userCalibrationRunData.value.observational_source;
     resetData.value.forcing_source = userCalibrationRunData.value.forcing_source;
+    resetData.value.geopackage_image_url = userCalibrationRunData.value.geopackage_image_url;
 
     if (userCalibrationRunData?.value?.external_data_status) {
       userCalibrationRunData.value.external_data_status.forcing = false;
@@ -252,9 +254,10 @@ const gageSelectionReset = () => {
 
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.external_data_status = JSON.parse(JSON.stringify(resetData.value.external_data_status))
-    userCalibrationRunData.value.geopackage_source = resetData.value.geopackage_source
-    userCalibrationRunData.value.observational_source = resetData.value.observational_source
-    userCalibrationRunData.value.forcing_source = resetData.value.forcing_source
+    userCalibrationRunData.value.geopackage_source = resetData.value.geopackage_source;
+    userCalibrationRunData.value.observational_source = resetData.value.observational_source;
+    userCalibrationRunData.value.forcing_source = resetData.value.forcing_source;
+    userCalibrationRunData.value.geopackage_image_url = resetData.value.geopackage_image_url;
   }
 }
 
@@ -285,8 +288,10 @@ const clearDataDueToGageChange = () => {
         selectedGeopackageValue.value = getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
         userCalibrationRunData.value.external_data_status.geopackage = false;
 
+        // clear out geopackage_image_url
+        userCalibrationRunData.value.geopackage_image_url = "";
+
       }
-      isLoading.value = false;
       toast.add({
         severity: 'info', summary: `Gage Changed`,
         detail: "You must save this tab for the change to effect the run. Calibration and Validation times must be set on the Tuning Controls tab", life: 5000
@@ -464,12 +469,12 @@ const saveTabData = () => {
         });
       }
       isLoading.value = false;
-      updateJobData();
+      updateJobData(response);
     });
   }
 };
 
-const updateJobData = async () => {
+const updateJobData = async (response: any) => {
   if (userCalibrationRunData.value) {
     let newGage = {
       gage_id: gageData.value?.gage_id ?? '',
@@ -484,6 +489,7 @@ const updateJobData = async () => {
     userCalibrationRunData.value.forcing_source = gagePayload.value.forcing_source as string;
     userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
+    userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
 
     userCalibrationRunData.value.external_data_status.forcing = !(userCalibrationRunData.value.forcing_source === "");
     userCalibrationRunData.value.external_data_status.observational = !(userCalibrationRunData.value.observational_source === "");
@@ -494,6 +500,10 @@ const updateJobData = async () => {
 
 const resetTabData = () => {
   resetUserSelectionGage();
+  // reset geopackage_image_url to clear out image
+  if (userCalibrationRunData?.value?.geopackage_image_url) {
+    userCalibrationRunData.value.geopackage_image_url = "";
+  }
 };
 
 const validateTab = () => {
