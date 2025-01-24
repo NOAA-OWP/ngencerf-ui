@@ -427,9 +427,7 @@ onMounted(async () => {
     // set output variable to calibrate
     if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
       const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
-
-      // set output variable to calibrate only if it is not already set
-      if (!selectedOutputVariable.value) {
+      if (selectedOutputVariable.value) {
         userOutputVariableToCalibrate.value.name = name;
         userOutputVariableToCalibrate.value.module = module;
         selectedOutputVariable.value = `${name} (${module})`;
