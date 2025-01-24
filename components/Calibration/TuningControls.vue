@@ -817,10 +817,6 @@ const validateAndBuildRequestBody = (): boolean => {
     saveTuningTabRequestBody.value.parameters = userSelectedCalibrationTuningParameters.value;
   }
 
-  if (isOutputVariableSet()) {
-    saveTuningTabRequestBody.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
-  }
-
   if (Object.keys(saveTuningTabRequestBody.value).length === 0) {
     toast.add({ severity: 'error', summary: 'No data to save', detail: 'No valid data has been entered to save' });
     return false;

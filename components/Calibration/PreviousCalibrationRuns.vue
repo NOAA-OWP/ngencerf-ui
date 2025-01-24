@@ -160,11 +160,12 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
 
 const loadEntireRun = () => {
   isLoading.value = true;
-  nextTick(() => {
-    loadGageTabStaticData();
-    loadFormulationTabStaticData();
-    loadTuningTabStaticData();
-    loadOptimizationTabStaticData();
+  nextTick( async () => {
+    await loadGageTabStaticData();
+    await loadFormulationTabStaticData();
+    isLoading.value = true;
+    await loadTuningTabStaticData();
+    await loadOptimizationTabStaticData();
     isLoading.value = false;
     gotoRunStatusTab();
   })
