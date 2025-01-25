@@ -113,30 +113,21 @@
 <script setup lang="ts">
 
 import { ref, onMounted } from "vue";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-import AppFooter from "~/components/Common/AppFooter.vue";
-import AppHeader from "~/components/Common/AppHeader.vue";
+import AppFooter from "@/components/Common/AppFooter.vue";
+import AppHeader from "@/components/Common/AppHeader.vue";
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 
-import { useGageStore } from "~/stores/calibration/GageStore";
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { useOptimizationStore } from "~/stores/calibration/OptimizationStore";
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
-import { useTuningStore } from "~/stores/calibration/TuningStore";
-import { generalStore } from "~/stores/common/GeneralStore";
+
+import { generalStore } from "@/stores/common/GeneralStore";
 
 const { calibrationJobId } = storeToRefs(generalStore());
 
-const { logUserIn, setUserName, setFirstName, setLastName, hardResetUserDataStore } = useUserDataStore();
+const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
 const { resetGeneralStore } = generalStore();
-const { resetGageStore, gageStore_data_loading } = useGageStore();
-const { resetFormulationStore, formulationStore_data_loading } = useFormulationStore();
-const { resetOptimizationStore, optimizationStore_data_loading } = useOptimizationStore();
-const { hardResetRunStatusStore } = useRunStatusStore();
-const { hardResetTuningStore, tuningStore_data_loading } = useTuningStore();
 
 
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -147,7 +138,6 @@ const userName = ref<string>("");
 const userPassword = ref<string>("");
 const showDialog = ref(false);
 
-//const newUsername = ref('');
 const newEmail = ref('');
 const newFirstName = ref('');
 const newLastName = ref('');
@@ -159,16 +149,13 @@ const createAccountButtonClasses = ref<string[]>(["ngenButtonDiv", "btn-left", "
 const cancelCreateAccountLinkClasses = ref<string[]>(['c-blue'])
 
 onMounted(() => {
+
   nextTick(() => {
+    sessionStorage.clear();
     localStorage.clear();
     calibrationJobId.value = 0;
     hardResetUserDataStore();
     resetGeneralStore();
-    resetGageStore();
-    resetFormulationStore();
-    resetOptimizationStore();
-    hardResetRunStatusStore();
-    hardResetTuningStore();
   })
 });
 
@@ -183,13 +170,12 @@ const closeDialog = () => {
 const ForgotUsername = () => {
   //
 };
+
 const ForgotPassword = () => {
-  //
+  toast.add({ severity: 'info', summary: 'Info', detail: 'Please contact the ngenCERF administrator to reset your password.'});
 };
 
 const autoSubmit = (e: KeyboardEvent) => {
-  const u = document.getElementById("uname");
-  const p = document.getElementById('pword');
   if (e.key === "Enter" && (userName.value.trim() !== "" && userPassword.value.trim() !== "")) {
     SubmitLoginForm(e);
   }
@@ -212,7 +198,6 @@ const SubmitLoginForm = async (e: Event) => {
         password: userPassword.value
       }
     }).then(response => {
-      console.log("Response: ", response)
       setUserName(userName.value.toLowerCase());
       // store tokens in UserDataStore
       userDataStore.setAccessToken(response.access);
@@ -224,12 +209,10 @@ const SubmitLoginForm = async (e: Event) => {
       GoToLanding();
     }
     ).catch(error => {
-      console.log(error);
       if (error) {
         let err = error.data?.detail;
         if (!err) {
           err = "Cannot reach server. Error code: " + error.statusCode;
-          console.log("StatusCode: ", e);
         }
         toast.add({ severity: 'error', summary: 'Error', detail: err, life: 3000 });
         console.error("Error during user creation:", error.message, error.data.detail);

@@ -21,11 +21,13 @@ WORKDIR /var/www/ngencerf/nuxt-app
 # install node dependencies
 COPY package*.json ./
 RUN set -eux; \
-    npm install
+    npm ci
 
 COPY . .
 
-ENV NGENCERF_BASE_URL=/api/
+# override NGENCERF URL to facilitate ParallelWorks sessions sharing
+ARG NGENCERF_BASE_URL
+ENV NGENCERF_BASE_URL=${NGENCERF_BASE_URL}
 
 RUN set -eux; \
     npm run build

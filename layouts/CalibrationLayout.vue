@@ -34,7 +34,7 @@
           <div class="col-span-4">
             <div class="grid grid-rows-12 mx-auto px-2 py-2">
               <div class="grid row-span-12 white-tall-content-box">
-                <div id="MainLeftDataArea" class="overflow-auto"> 
+                <div id="MainRightDataArea" class="overflow-auto"> 
                   <CalibrationRightBlock />
                 </div>
               </div>
@@ -50,12 +50,12 @@
 </template>
 
 <script setup lang="ts">
-import AppFooter from "~/components/Common/AppFooter.vue";
-import AppHeader from "~/components/Common/AppHeader.vue";
-import CalibrationRightBlock from "~/components/Calibration/CalibrationRightBlock.vue";
-import CalibrationLeftBlock from "~/components/Calibration/CalibrationLeftBlock.vue";
+import AppFooter from "@/components/Common/AppFooter.vue";
+import AppHeader from "@/components/Common/AppHeader.vue";
+import CalibrationRightBlock from "@/components/Calibration/CalibrationRightBlock.vue";
+import CalibrationLeftBlock from "@/components/Calibration/CalibrationLeftBlock.vue";
 import { generalStore } from "@/stores/common/GeneralStore";
 
 const { getMenuIndex, getCalibrationTabIndex } = generalStore();
 </script>
-<style lang="scss" scoped></style>
+

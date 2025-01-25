@@ -7,7 +7,9 @@
             <div id="FormulationName" class="block mt-1" aria-label="Forumulation Name" title="Formulation Name">
               <label for="formulationNameInput" class="text-lg">Formulation Name </label>
               <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
-                aria-label="Input Forumulation Name" title="Input Formulation Name" required></InputText>
+                aria-label="Input Forumulation Name" title="Input Formulation Name" required
+                @keypress="checkValidCharacters($event)"
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputText>
             </div>
           </div>
         </div>
@@ -16,18 +18,19 @@
           <div class="col-span-5">
             <div class="text-left text-lg mt-2"><strong>Formulation Modules</strong></div>
             <div class="mb-2 mt-2" aria-label="Group Select" title="Group Select">
-
               <div class="font-bold">Groups Filter
                 <Select id="Groups" v-model="filterGroup" filter
                   :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description"
-                  optionValue="name" placeholder="Select group..."></Select>
+                  optionValue="name" placeholder="Select group..."
+                  :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               </div>
             </div>
             <div class="pt-4 mb-1 font-bold text-base">Select Modules</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="h-60">
+              optionLabel="name" optionValue="name" class="h-60" @change="moduleListChanged"
+              :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               <template #option="slotProps">
-                <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'">
+                <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
                   <div class="font-ui pl-2 leading-none">{{ slotProps.option.name }}</div>
                 </div>
               </template>
@@ -41,7 +44,7 @@
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
                 optionValue="name" scrollHeight="18rem" class="border-0">
                 <template #option="slotProps">
-                  <div v-bind:class="(slotProps.option.selected == true) ? 'pi pi-check font-bold' : 'pl-5'"><span
+                  <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'"><span
                       class="font-ui pl-2">{{ slotProps.option.name }}</span></div>
                 </template>
               </Listbox>
@@ -49,14 +52,17 @@
           </div>
           <div class="col-span-1">&nbsp;</div>
         </div>
-        <div class="mt-3 mb-5 hr"></div>
+        <!--        <div class="mt-3 mb-5 hr"></div> -->
       </div>
+      <!--
+      /* Don't Display this implemented SLoTH capability until available to send SLoTH variables to ngen-cal */
       <div class="row-span-2 -mt-2">
 
         <div class="flex">
           <span class="text-left pt-1">
             <input type="checkbox" id="SlothCheck" class="ml-2" v-model="useSlothParameters" />
-            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for formulation</label>
+            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for
+              formulation</label>
           </span>
           <span v-show="useSlothParameters" class="ml-auto pr-2">
             <label class="inline-block  text-[16px] pl-10 pr-4" for="SlothName">SLoTH Name</label>
@@ -68,7 +74,8 @@
           </span>
         </div>
 
-        <div id="SlothDataTable" v-show="useSlothParameters" class="items-center pl-2 pr-2 mt-2 overflow-auto max-h-[157px]">
+        <div id="SlothDataTable" v-show="useSlothParameters"
+          class="items-center pl-2 pr-2 mt-2 overflow-auto max-h-[157px]">
 
           <ContextMenu :pt="{ root: { id: 'loth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
             :model="cmSlothParameterData"></ContextMenu>
@@ -76,44 +83,44 @@
             scroll-height="157px" table-style="min-width: 50rem" v-model:selection="selectedSlothParameterData"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedSlothParameterData"
             @rowContextmenu="onRowContextMenu">
-            <Column field="param_name" header="SLoTH Output Var" sortable></Column>
-            <Column field="param_count" header="Count" sortable>
+            <Column :pt="ptColumn" field="param_name" header="SLoTH Output Var" sortable></Column>
+            <Column :pt="ptColumn" field="param_count" header="Count" sortable>
               <template #editor="{ index }">
                 <InputNumber v-model="slothParameterInputs[index].param_count" autofocus class="w-12 p-1">
                 </InputNumber>
               </template>
             </Column>
-            <Column field="param_type" header="Type" sortable>
+            <Column :pt="ptColumn" field="param_type" header="Type" sortable>
               <template #editor="{ index }">
                 <Select v-model="slothParameterInputs[index].param_type"
                   :options="fetchFormulationSlothParameterTypeOptions" optionLabel="name" optionValue="name"></Select>
               </template>
             </Column>
-            <Column field="param_units" header="Units" sortable>
+            <Column :pt="ptColumn" field="param_units" header="Units" sortable>
               <template #editor="{ index }">
                 <Select v-model="slothParameterInputs[index].param_units"
                   :options="fetchFormulationSlothParameterUnitOptions" optionLabel="name" optionValue="name"></Select>
               </template>
             </Column>
-            <Column field="param_location" header="Location" sortable>
+            <Column :pt="ptColumn" field="param_location" header="Location" sortable>
               <template #editor="{ index }">
                 <InputText v-model="slothParameterInputs[index].param_location" autofocus class="w-20 p-1">
                 </InputText>
               </template>
             </Column>
-            <Column field="maps_to_module" header="For Module" sortable>
+            <Column :pt="ptColumn" field="maps_to_module" header="For Module" sortable>
               <template #editor="{ index }">
                 <Select v-model="slothParameterInputs[index].maps_to_module" filter
                   :options="fetchSelectedFormulationModuleOptions" optionLabel="name" optionValue="name"></Select>
               </template>
             </Column>
-            <Column field="maps_to_variable_name" header="Module Param" sortable>
+            <Column :pt="ptColumn" field="maps_to_variable_name" header="Module Param" sortable>
               <template #editor="{ index }">
                 <InputText v-model="slothParameterInputs[index].maps_to_variable_name" autofocus fluid>
                 </InputText>
               </template>
             </Column>
-            <Column field="param_value" header="Value" sortable>
+            <Column :pt="ptColumn" field="param_value" header="Value" sortable>
               <template #editor="{ index }">
                 <InputNumber v-model="slothParameterInputs[index].param_value" autofocus :minFractionDigits="0"
                   :maxFractionDigits="2" class="w-12 p-1" fluid>
@@ -123,9 +130,9 @@
           </DataTable>
         </div>
       </div>
-
+-->
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3 ActionButtonsBox">
-        <span v-if="calibrationStatus !== 'Running'">
+        <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
           <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
             <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
               Save
@@ -133,16 +140,21 @@
           </div>
         </span>
         <span v-else>
-          <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">&nbsp;</div>
+          <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
+            Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
+          </div>
         </span>
-        <span v-if="calibrationStatus !== 'Running'">
+
+        <span v-if="modulesHaveChanged">
           <div class="col-span-1 mr-3">
-            <!--<button class="c-blue font-normal text-xl underline pt-1" title="Reset Button"
-              @click="resetFormulationData()" aria-label="Reset Button">Reset</button>-->
+            <button class="ngenButtonDiv-yellow" title="Revert Gage" @click="resetModuleList()"
+              aria-label="Revert Gage">Revert</button>
           </div>
         </span>
         <span v-else>
-          <div class="col-span-1 mr-3"></div>
+          <div class="col-span-1 mr-3">
+            &nbsp;
+          </div>
         </span>
 
         <div class="col-span-4">&nbsp;</div>
@@ -156,29 +168,48 @@
         </div>
 
       </div>
-
+      <DynamicDialog />
     </div>
     <div class="waitgif" v-if="formulationStore_data_loading">
-      <img src="@/assets/styles/img/wait.gif" />
+      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { onMounted, onUnmounted } from "vue";
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { generalStore } from "~/stores/common/GeneralStore";
-import { useToast } from "primevue/usetoast";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
-import type { SlothParameterData } from '~/composables/NextGenModel';
-import { useApiErrorResponseValidator } from "~/composables/ValidationHandlers";
+import { onMounted } from "vue";
 
-const isLoading = ref(false);
+import { isCalibrationJobStatusSavedOrReady, arraysEqual } from "@/utils/CommonHelpers";
+import { formatDateForRunOnString } from "@/utils/TimeHelpers";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+import { useToast } from "primevue/usetoast";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
+import type { SlothParameterData } from '@/composables/NextGenModel';
+import { useDialog } from "primevue/usedialog";
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+import { hilightTab } from '@/composables/TabHilight';
+
+const { clearCalibratableParameters } = useTuningStore();
+
+const { selectedOutputVariable, userOutputVariableToCalibrate } = storeToRefs(useTuningStore());
+
+const dialog = useDialog();
+const nextPrevDialogOpened = ref<boolean>(false);
+import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
+import type { ListboxChangeEvent } from "primevue/listbox";
+
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
 const slothParamContextMenu = ref() //sloth parameter table context menu
 
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
 
 const cmSlothParameterData = ref([
   { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedSlothParameterData(selectedSlothParameterData) }
@@ -198,40 +229,53 @@ const {
   fetchFormulationModuleCoveredGroupOptions,
   fetchFormulationSlothParameterTypeOptions,
   fetchFormulationSlothParameterUnitOptions,
-  fetchSelectedFormulationModuleOptions
+  fetchSelectedFormulationModuleOptions,
+  saveFormulationPayload
 } = storeToRefs(useFormulationStore());
 
 const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
-const { fetchUserCalibrationRunData, userCalibrationRunData } = useUserDataStore()
+const { fetchUserCalibrationRunData } = useUserDataStore();
+const userDataStore = useUserDataStore();
+const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { getCalibrationTabIndex } = generalStore();
-import { useRunStatusStore } from "~/stores/calibration/RunStatusStore";
-import { data } from "autoprefixer";
+
+const useGeneralStore = generalStore();
+const { modulesHaveChanged } = storeToRefs(useGeneralStore)
+
 const runStatusStore = useRunStatusStore();
-const { calibrationStatus } = storeToRefs(runStatusStore);
+const { submitTimeDate } = storeToRefs(useRunStatusStore());
 let mainLeftAreaElement: HTMLElement | null = null;
 let dataTableElement: HTMLElement | null = null;
 
 const toast = useToast();
 
 onMounted(() => {
-  toast.removeAllGroups();
-  mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
-  if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
-
+  nextTick(() => {
+    hilightTab(CalibrationTabs.tab_formulation);
+    toast.removeAllGroups();
+    mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+    if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
+    modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+  })
 });
 
 const addSlothOnEnter = (e: KeyboardEvent) => {
   const ele = e.target as HTMLElement;
-  if (e.key === "Enter" && new_sloth_variable_name.value.trim() != '') {
+  if (e.key === "Enter" && new_sloth_variable_name.value.trim() !== '') {
     addSlothVariable();
   }
 };
+
+
+const resetForumulationTab = () => {
+  loadFormulationTabStaticData();
+}
 
 /**
  * add sloth variable entry to table and reset name field
  */
 const addSlothVariable = () => {
-  if (new_sloth_variable_name.value.trim() != '') {
+  if (new_sloth_variable_name.value.trim() !== '') {
     addNewSlothVariable(new_sloth_variable_name.value);
     new_sloth_variable_name.value = '';
   }
@@ -262,58 +306,144 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
   deleteSlothVariable(selectedSlothParameterData.value.param_name);
 }
 
+const moduleListChanged = (e: ListboxChangeEvent) => {
+  modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+}
+
+const resetModuleList = () => {
+  if (selectedModuleValues.value && userCalibrationRunData?.value?.modules) {
+    selectedModuleValues.value = userCalibrationRunData?.value?.modules
+    modulesHaveChanged.value = false;
+  }
+}
+
+/**
+ * Prevent unwanted characters
+ */
+const checkValidCharacters = (e: KeyboardEvent) => {
+  if (/^[a-zA-Z0-9_-]+$/.test(e.key) === false) {
+    e.preventDefault();
+    return true;
+  }
+  return false;
+}
 
 /**
 * event bus for calibration button group click
 */
 const saveFormulationData = () => {
-  toast.removeAllGroups()
-  const save_formulation_response = saveFormulationTabData();
-  save_formulation_response.then((response) => {
-    if (response?.validation_errors) {
-      useApiErrorResponseValidator(response?.validation_errors).forEach((message: String) => {
-        toast.add({ severity: "error", summary: response?.message, detail: message })
-      })
-    } else {
-      toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?.message, life: 3000 })
-      fetchUserCalibrationRunData();
+  if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
+    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
+  } else {
+    toast.removeAllGroups();
+    var valOK = validateModules();
+    if (!valOK) {
+      modulesHaveChanged.value = false;
+      selectedOutputVariable.value = "";
+      // userOutputVariableToCalibrate.value = { name: '', module: null }
+      // if (userCalibrationRunData.value) {
+      //   userCalibrationRunData.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value as UserCalibrationRunOutputVariableToCalibrateData;
+      // }
+      // delete all of the Calabratable parameters on the Tuning Controls tab
+      clearCalibratableParameters();
+
     }
-  })
+
+    saveFormulationTabData().then(response => {
+      if (response.status === 200) {
+        if (response._data.eds_errors) {
+          response._data.eds_errors.forEach((err: any) => {
+            toast.add({ severity: 'warn', summary: 'External Formulation Error', detail: err.message });
+          });
+        }
+        toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
+        if (response?._data?.nwm_warning === true) {
+          useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
+            toast.add({ severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000 });
+          });
+        }
+        formulationStore_data_loading.value = false;
+        updateJobData();
+        // fetchUserCalibrationRunData();
+      } else {
+        formulationStore_data_loading.value = false;
+        useApiErrorResponsePreprocess(response).forEach(message => {
+          toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message });
+        });
+      }
+    });
+  }
 }
+
+const updateJobData = () => {
+  if (userCalibrationRunData.value) {
+    userCalibrationRunData.value.formulation_name =  saveFormulationPayload.value.formulation_name ?? '';
+    userCalibrationRunData.value.modules = saveFormulationPayload.value.modules as string[];
+    userCalibrationRunData.value.sloth_parameters = saveFormulationPayload.value.sloth_parameters as [];
+    userCalibrationRunData.value.use_sloth = saveFormulationPayload.value.use_sloth as boolean;
+    clearCalibratableParameters();
+  }
+};
 
 const resetFormulationData = () => {
-  resetUserSelectionFormulation()
+  resetUserSelectionFormulation();
 }
 
-const goNextTab = () => {
-  // let err = false;
-  // let txt = "Please correct the following:";
-  // if (!userCalibrationRunData?.formulation_name ) {
-  //   txt += "\nA Formulation Name is required.";
-  //   err = true;  // let err = false;
-  // let txt = "Please correct the following:";
-  // if (!userCalibrationRunData?.formulation_name ) {
-  //   txt += "\nA Formulation Name is required.";
-  //   err = true;
-  // }
-  // if (!userCalibrationRunData?.modules.length ) {
-  //   txt += "\nModule Selection is required."
-  //   err = true;
-  // }
-  // if (err) {
-  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-  //   return;
-  // }
-  // }
-  // if (!userCalibrationRunData?.modules.length ) {
-  //   txt += "\nModule Selection is required."
-  //   err = true;
-  // }
-  // if (err) {
-  //   toast.add({ severity: 'warn', summary: "Tab data is incomplete", detail: txt, life: 5000 });
-  //   return;
-  // }
-  gotoNext();
+const validateModules = () => {
+  // fetchUserCalibrationRunData();
+  /* check if list of modules changed */
+  return userCalibrationRunData?.value?.modules !== null && arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+}
+
+const validateTab = () => {
+  let error = false;
+  let text = [];
+  /* Check if formulation name changed */
+  let newName = formulationNameInput.value ? formulationNameInput.value : '';
+  if (newName.trim() === "") {
+    error = true;
+    text.push("Please enter a valid Forumulation Name");
+  }
+  let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : '';
+  if (savedName !== newName) {
+    error = true;
+    text.push("Formulation Name has been changed");
+  }
+  /* check if list of modules changed */
+  let selModules = selectedModuleValues.value;
+  let savedModules = userCalibrationRunData?.value?.modules;
+  if (!arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules)) {
+    error = true;
+    text.push("Selected Modules have been changed");
+  } else {
+    selModules.every((module) => {
+      if (savedModules && savedModules.indexOf(module) === -1) {
+        error = true;
+        text.push("Selected Modules have been changed");
+        return false;
+      }
+    })
+  }
+  /* Has user checked/unchecked Add SLoTH output variables? */
+  if (useSlothParameters.value !== userCalibrationRunData?.value?.use_sloth) {
+    error = true;
+    text.push("Add SLoth output has changed");
+  }
+  /* has the number of SLoTH vars changed? */
+  if (slothParameterInputs.value.length !== userCalibrationRunData?.value?.sloth_parameters.length) {
+    error = true;
+    text.push("Add SLoth variable list has changed");
+  }
+  return { error: error, text: text }
+}
+
+const restorePage = () => {
+  selectedModuleValues.value = userCalibrationRunData?.value?.modules ? userCalibrationRunData?.value?.modules : [];
+  formulationNameInput.value = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";
+  if (userCalibrationRunData.value) {
+    useSlothParameters.value = userCalibrationRunData?.value?.use_sloth;
+    slothParameterInputs.value = userCalibrationRunData?.value?.sloth_parameters;
+  }
 }
 
 const gotoNext = () => {
@@ -321,19 +451,78 @@ const gotoNext = () => {
   const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
   e.click();
 }
-const goPrevTab = () => {
+const gotoPrev = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
   e.click();
+}
+
+const goNextTab = () => {
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text, true);
+  } else {
+    gotoNext();
+  }
+};
+
+const goPrevTab = () => {
+  const errors = validateTab();
+  if (errors.error) {
+    showPrevNextDialog(errors.text, false);
+  } else {
+    gotoPrev();
+  }
+};
+
+const showPrevNextDialog = (body: string[], next: boolean) => {
+  if (!nextPrevDialogOpened.value) {
+    dialog.open(MoveNextPrevDialog, {
+      props: {
+        header: "Unsaved changes!",
+        style: {
+          width: 'auto',
+        },
+        modal: true,
+      },
+      data: {
+        body: body,
+        direction: next
+      },
+      onClose: (opt) => {
+        nextPrevDialogOpened.value = false;
+        handleNextPrevDialogClose(opt);
+      },
+
+    })
+    nextPrevDialogOpened.value = true
+  }
+}
+
+const handleNextPrevDialogClose = (opt: any) => {
+  if (opt.data && opt.data.moveToNextResponse) {
+    restorePage();
+    if (opt.data.goNext) {
+      gotoNext();
+    } else {
+      gotoPrev();
+    }
+  }
+  if (opt.type && opt.type === 'dialog-close') {
+    return;
+  }
 }
 
 </script>
 
 <style lang="scss" scoped>
 @import "@/assets/styles/styles.scss";
-#Groups, #formulationNameInput {
+
+#Groups,
+#formulationNameInput {
   width: 256px;
 }
+
 #Formulation {
   width: auto;
 }
@@ -414,10 +603,4 @@ h1 {
   text-align: right;
   width: 120px;
 }
-/*
-#FormulationBottomButtons {
-  height: 54px;
-  width: 100%;
-}
-*/
 </style>

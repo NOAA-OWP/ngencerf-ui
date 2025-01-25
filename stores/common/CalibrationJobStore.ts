@@ -2,10 +2,10 @@
 
 import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "../common/UserDataStore";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "../common/GeneralStore";
 import { makeProtectedApiCall } from "#imports";
-import type { JobListItem } from "~/composables/NextGenModel";
+import type { CalibrationJobListItem } from "@/composables/NextGenModel";
 
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -15,7 +15,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
 
   /**
  * returns list of calibration job data from server
- * @returns {JobListItem[]}
+ * @returns {CalibrationJobListItem[]}
  */
   const fetchJobsListData = computed( () => {
     return userCalibrationJobsListData.value ?? []
@@ -26,8 +26,8 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
  * @returns {number}
  */
   const savedCalibrationJobs = computed( () => {
-    return userCalibrationJobsListData.value?.reduce( ( total_saved_jobs: number, job: JobListItem  ) => {
-        if( job.status.toLowerCase() == 'saved' ) total_saved_jobs += 1;
+    return userCalibrationJobsListData.value?.reduce( ( total_saved_jobs: number, job: CalibrationJobListItem  ) => {
+        if( job.status.toLowerCase() === 'saved' ) total_saved_jobs += 1;
         return total_saved_jobs;
     }, 0 )
   })
@@ -37,8 +37,8 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
  * @returns {number}
  */
   const runningCalibrationJobs = computed( () => {
-    return userCalibrationJobsListData.value?.reduce( ( total_running_jobs: number, job: JobListItem  ) => {
-        if( job.status.toLowerCase() == 'running' ) total_running_jobs += 1;
+    return userCalibrationJobsListData.value?.reduce( ( total_running_jobs: number, job: CalibrationJobListItem  ) => {
+        if( job.status.toLowerCase() === 'running' ) total_running_jobs += 1;
         return total_running_jobs;
     }, 0 )
   })

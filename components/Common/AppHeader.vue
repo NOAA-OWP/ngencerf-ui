@@ -4,25 +4,25 @@
     <div id="TopBar">&nbsp;</div>
     <div class="grid grid-cols-12 gap-1" style="height: 80px">
       <div id="PgmName" class="col-span-2 mt-6">
-        <NuxtLink to="LandingPage">NgenCERF</NuxtLink>
+        <NuxtLink to="LandingPage">ngenCERF</NuxtLink>
       </div>
       <div id="Col2" class="col-span-8">
 
         <ul v-show="isUserLoggedIn() && location.name !== 'Login'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
-            <NuxtLink :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
+            <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
               @click="MenuChanged">Calibration</NuxtLink>
           </li>
           <li aria-label="Evaluation" title="Evaluation">
-            <NuxtLink :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2'
+            <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2'
               @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3' @click=""
-              class="disabled">Forecast</NuxtLink>
+            <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
+              @click="MenuChanged">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
-            <NuxtLink :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
+            <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
               @click="" class="disabled">Verification</NuxtLink>
           </li>
         </ul>
@@ -51,54 +51,70 @@
       <Transition name="slide-fade">
         <div v-if="showHelp" id="HelpWindow">
           <div class="text-right sticky top-0">
-            <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+            <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
               class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
           </div>
           <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
-            <HelpLandingPageHelp />
+            <LazyHelpLandingPageHelp />
           </div>
 
           <div v-if="location.name === 'Calibration'" class="py-10 px-1">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
-                <HelpPreviousRunsHelp />
+                <LazyCalibrationHelpPreviousRunsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 2">
-                <HelpHeadwaterBasinGageHelp />
+                <LazyCalibrationHelpHeadwaterBasinGageHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 3">
-                <HelpFormulationHelp />
+                <LazyCalibrationHelpFormulationHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 4">
-                <HelpTuningControlsHelp />
+                <LazyCalibrationHelpTuningControlsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 5">
-                <HelpOptimizationMetricsHelp />
+                <LazyCalibrationHelpOptimizationMetricsHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 6">
-                <HelpRunStatusHelp />
+                <LazyCalibrationHelpRunStatusHelp />
               </span>
               <span v-else-if="getCalibrationTabIndex() === 7">
-                <HelpResultsHelp />
+                <LazyCalibrationHelpResultsHelp />
               </span>
             </div>
           </div>
 
           <div v-else-if="getMenuIndex() === 2">
-
+            <span v-if="getEvaluationTabIndex() === 1">
+              <LazyEvaluationCalibrationRunsHelp />
+            </span>
+            <span v-if="getEvaluationTabIndex() === 2">
+              <LazyEvaluationEvaluatesHelp />
+            </span>
+            <span v-if="getEvaluationTabIndex() === 3">
+              <LazyEvaluationCalibrationSelectAltInterationssHelp />
+            </span>
           </div>
+
+
           <div v-else-if="getMenuIndex() === 3">
-
+            <span v-if="getForecastTabIndex() === 1">
+              <h2 class="mt-8 text-center">Help for Calibration Runs</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 2">
+              <h2 class="mt-8 text-center">Help for Setup Forecast</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 3">
+              <h2 class="mt-8 text-center">Help for Status/Run</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 4">
+              <h2 class="mt-8 text-center">Help for Results</h2>
+            </span>
+            <span v-if="getForecastTabIndex() === 5">
+              <h2 class="mt-8 text-center">Help for Forecast Runs</h2>
+            </span>
           </div>
-          <div v-else-if="getMenuIndex() === 4">
 
-          </div>
-          <div v-else-if="getMenuIndex() === 5">
-
-          </div>
-          <div v-else-if="getMenuIndex() === 6">
-
-          </div>
         </div>
       </Transition>
 
@@ -106,6 +122,9 @@
   </div>
   <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
     <UserAccount />
+  </div>  
+  <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
+    <LazyAboutBox />
   </div>
 </template>
 
@@ -115,52 +134,53 @@ import { useRoute } from "vue-router";
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 import ContextMenu from 'primevue/contextmenu';
-import ConfirmPopup from 'primevue/confirmpopup';
 
-import { useLogout } from "~/composables/UseEventBus";
+import { useLogout, useLogoutListen } from "@/composables/UseEventBus";
 
-import UserAccount from "~/components/Common/UserAccount.vue";
+import UserAccount from "@/components/Common/UserAccount.vue";
 
-const HelpLandingPageHelp = defineAsyncComponent(() => import("../Help/LandingPageHelp.vue"))
-const HelpPreviousRunsHelp = defineAsyncComponent(() => import("../Help/PreviousRunsHelp.vue"))
-const HelpHeadwaterBasinGageHelp = defineAsyncComponent(() => import("../Help/HeadwaterBasinGageHelp.vue"))
-const HelpTuningControlsHelp = defineAsyncComponent(() => import("../Help/TuningControlsHelp.vue"))
-const HelpFormulationHelp = defineAsyncComponent(() => import("../Help/FormulationHelp.vue"))
-const HelpOptimizationMetricsHelp = defineAsyncComponent(() => import("../Help/OptimizationMetricsHelp.vue"))
-const HelpRunStatusHelp = defineAsyncComponent(() => import("../Help/RunStatusHelp.vue"))
-const HelpResultsHelp = defineAsyncComponent(() => import("../Help/ResultsHelp.vue"))
+const LazyHelpLandingPageHelp = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
+const LazyCalibrationHelpPreviousRunsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/PreviousRunsHelp.vue"))
+const LazyCalibrationHelpHeadwaterBasinGageHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/HeadwaterBasinGageHelp.vue"))
+const LazyCalibrationHelpTuningControlsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/TuningControlsHelp.vue"))
+const LazyCalibrationHelpFormulationHelp = defineAsyncComponent(() => import("../Help/Calibration/FormulationHelp.vue"))
+const LazyCalibrationHelpOptimizationMetricsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/OptimizationMetricsHelp.vue"))
+const LazyCalibrationHelpRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/RunStatusHelp.vue"))
+const LazyCalibrationHelpResultsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/ResultsHelp.vue"))
+
+const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/CalibrationRunsHelp.vue"))
+const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
+const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
+const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 
 const emit = defineEmits(["logoutEvent"]);
 
 const accountOverlay = ref();
+const aboutOverlay = ref();
 
-const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, } = generalStore();
+const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex } = generalStore();
 
-const { isUserLoggedIn, getUserInitials, hardResetUserDataStore } = useUserDataStore();
+const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
 const location = useRoute();
 
 const userItems = ref([
+  { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
   { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
   { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
 ])
 
 const userContextMenu = ref();
-
 const uMenu = ref(false);
-
 const showHelp = ref(false);
 let observer = null;
-
 const isOnDiv = ref(false);
 
 const onImageRightClick = (event: any) => {
-  console.log("Activating user manu")
   userContextMenu.value.show(event)
 }
 
 onMounted(() => {
-  console.log('MOUNTED: AppHeader');
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
     let headerHeight = document.getElementById('Header')?.clientHeight;
@@ -185,7 +205,7 @@ const sizeHelpWindow = () => {
   let headerHeight = document.getElementById('Header')?.clientHeight;
   let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
   if (footerTop && headerHeight) {
-    let h = (footerTop - headerHeight) + 54;
+    let h = (footerTop - headerHeight) - 20;
     let hpx = h + 'px'
     let ele = document.getElementById("HelpWindow");
     if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
@@ -195,8 +215,12 @@ const sizeHelpWindow = () => {
 /**
  * 
  */
-const gotoAccount = async () => {
+ const gotoAccount = async () => {
   accountOverlay.value.style.display = "block";
+}
+
+const aboutBox = async () => {
+  aboutOverlay.value.style.display = "block";
 }
 
 useAccountEventListen('accountEvent', () => {
@@ -204,10 +228,23 @@ useAccountEventListen('accountEvent', () => {
   ele.style.display = "none";
 })
 
+useAccountEventListen('aboutBoxEvent', () => {
+  const ele = document.getElementById('AboutBoxOverlay') as HTMLElement;
+  ele.style.display = "none";
+})
+
+useLogoutListen('logoutEvent', (evStr: string) => {
+  if (evStr === "token" && !getIsTokenExpired()) {
+    setIsTokenExpired();
+    alert("Your session has expired. Please log in again.");
+    useLogout("logoutEvent", "logout");
+    navigateTo('login');
+  }
+})
+
 const logoutUser = async () => {
-  if (confirm("Are you sure you want to logout?") == true) {
-    console.log("Logging out...");
-    useLogout("logoutEvent", "");
+  if (confirm("Are you sure you want to logout?")) {
+    useLogout("logoutEvent", "logout");
     await navigateTo('login');
   }
 }
@@ -232,12 +269,25 @@ const displayHelp = () => {
 }
 
 const MenuChanged = (e: MouseEvent) => {
-  const ele = e.currentTarget as HTMLElement;
-  const m = ele.getAttribute('data-menu');
-  if (m) {
-    setMenuIndex(parseInt(m, 10));
-  }
+  nextTick(() => {
+    const currentMenu = getMenuIndex();
+    let ele = e.currentTarget as HTMLElement;
+    if( !ele ) {
+      ele = e.target as HTMLElement;
+    }
+    const m = ele.getAttribute('data-menu');
+    const tabs = document.getElementsByClassName("tabs");
+    const tab = <HTMLElement>tabs[0];
+    if (m && e) {
+      if (currentMenu && currentMenu.toString() === m) {
+        if (tab) { tab.click(); }
+      } else {
+        setMenuIndex(parseInt(m, 10));
+      }
+    }
+  });
 }
+
 </script>
 
 <style lang="scss" scoped>
@@ -272,7 +322,7 @@ const MenuChanged = (e: MouseEvent) => {
 #TopMenu {
   display: inline;
   font-size: 20px;
-  font: 20px Arial, sans-serif;
+  font-family: Arial, sans-serif;
 }
 
 #MainMenu {
@@ -332,6 +382,7 @@ const MenuChanged = (e: MouseEvent) => {
   border-radius: 50%;
   font-size: 30px;
   padding-top: 20px;
+  margin-right: 10px;
 }
 
 #HelpCircle {
@@ -345,10 +396,6 @@ const MenuChanged = (e: MouseEvent) => {
   font-size: 38px;
   padding-top: 12px;
   border: 1px solid #000;
-}
-
-#UserCircle {
-  margin-right: 10px;
 }
 
 #UserCircle:hover {
@@ -374,7 +421,7 @@ const MenuChanged = (e: MouseEvent) => {
   width: 60px;
   display: inline-block;
 
-  HelpWindow #HelpCircle {
+  #HelpCircle {
     text-align: center;
     margin-top: 15px;
   }
@@ -405,8 +452,7 @@ const MenuChanged = (e: MouseEvent) => {
 }
 
 .slide-fade-leave-active {
-  //transition: all 1s cubic-bezier(0.075, 0.82, 0.165, 1)
-  transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1)
+  transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .slide-fade-enter-from,

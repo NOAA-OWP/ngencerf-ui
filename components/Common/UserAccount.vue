@@ -1,84 +1,141 @@
 <template>
   <!-- User Page -->
 
-        <div id="UserBox" class="bg-white mx-auto px-16 pt-10 pb-16 rounded-[10px] max-w-screen-md">
+  <div id="UserBox" class="bg-white mx-auto px-16 pt-10 pb-16 rounded-[10px] max-w-screen-md">
 
-          <div class="grid grid-cols-2 gap-3">
-            <div class="col-span-2">
-              <div class="ttl">Your Account</div>
-              <div class="name">
-                {{ getUserFullName() }}
-                <div class="pt-1" style="font-size:0.7em;">{{ getUserName() }}</div>
-              </div>
-              <div class="mt-2 mb-2 hr"></div>
-              <div class="chgpwd mt-6 mb-6">Change Password</div>
-            </div>
-            <div class="col-span-1">
-              <form @submit.prevent="changePassword" @cancel="closeAccountBox">
-                <div class="passwordBox grid row-auto">
+    <div class="grid grid-cols-2 gap-3">
+      <div class="col-span-2">
+        <div class="ttl">Your Account</div>
+        <div class="name">
+          {{ getUserFullName() }}
+          <div class="pt-1" style="font-size:0.7em;">{{ getUserName() }}</div>
+        </div>
+      </div>
+      <div class="col-span-1">
+        <a href="#" @click="showForm = 'changePassword'" class="mt-6 mb-6" :class="changePasswordClasses">Change
+          Password</a>
+      </div>
+      <div class="col-span-1">
+        <a href="#" @click="showForm = 'updateName'" class="mt-6 mb-6" :class="updateNameClasses">Update Name</a>
+      </div>
+      <div class="col-span-2">
+        <div class="mt-2 mb-2 hr"></div>
+      </div>
+      <div class="col-span-1">
+        <form @submit.prevent="changePassword" @cancel="closeAccountBox" v-if="showForm === 'changePassword'">
+          <div class="passwordBox grid row-auto">
 
-                  <label for="OldPass">Old password</label>
-                  <div class="mb-3">
-                    <Password id="OldPass" type="password" name="password" :inputProps="{ autocomplete: true }"
-                      autocomplete="current-password" v-model="oldpass" aria-label="Enter old password here" toggleMask
-                      :feedback="false" />
-                  </div>
-                  
-                  <label for="NewPass">New password</label>
-                  <div class="mb-3">
-                    <Password id="NewPass" type="password" name="password" :inputProps="{ autocomplete: true }"
-                      autocomplete="new-password" v-model="newpass" aaria-label="Enter new password here" toggleMask
-                      :feedback="true" />
-                  </div>
-                  
-                  <label for="ReNewPass">Confirm New password</label>
-                  <div class="mb-3">
-                    <Password id="ReNewPass" type="password" name="password" :inputProps="{ autocomplete: true }"
-                      autocomplete="new-password" v-model="confirmNewpass" aria-label="Password" toggleMask
-                      :feedback="false" />
-
-                  </div>
-                </div>
-
-                <div class="buttonArea mt-4">
-                  <button class="ngenButtonDiv mr-6" id="UpdateButton" type="submit"
-                    aria-label="Update with new password">
-                    Update
-                  </button>
-                   <button class="c-blue font-normal underline" id="closeBtn" name="cancel" value="Cancel" type="button" v-on:click="closeAccountBox"
-                    aria-label="Close Account Box">
-                    Close
-                  </button>
-                </div>
-
-              </form>
-            </div>
-            <div class="col-span-1">
-              <div id="passwordNotes">                
-                <strong>Password format:</strong><br>
-                <ul>
-                  <li>Cannot be a commonly used password</li>
-                  <li>Must be at least 8 characters long</li>
-                  <li>Must contain at least one non-numeric character</li>
-                </ul>
-              </div>
+            <label for="OldPass">Old password</label>
+            <div class="mb-3">
+              <Password id="OldPass" type="password" name="password" autocomplete="current-password" v-model="oldpass"
+                aria-label="Enter old password here" toggleMask :feedback="false" />
             </div>
 
+            <label for="NewPass">New password</label>
+            <div class="mb-3">
+              <Password id="NewPass" type="password" name="password" autocomplete="new-password" v-model="newpass"
+                aarigia-label="Enter new password here" toggleMask :feedback="true" />
+            </div>
+
+            <label for="ReNewPass">Confirm New password</label>
+            <div class="mb-3">
+              <Password id="ReNewPass" type="password" name="password" autocomplete="new-password"
+                v-model="confirmNewpass" aria-label="Password" toggleMask :feedback="false" />
+
+            </div>
           </div>
 
+          <div class="buttonArea mt-4">
+            <button class="ngenButtonDiv mr-6" id="UpdateButton" type="submit" aria-label="Update with new password">
+              Update
+            </button>
+            <button class="c-blue font-normal underline" id="closeBtn" name="cancel" value="Cancel" type="button"
+              v-on:click="closeAccountBox" aria-label="Close Account Box">
+              Close
+            </button>
+          </div>
+
+        </form>
+      </div>
+      <div class="col-span-1">
+        <div id="passwordNotes" v-if="showForm === 'changePassword'">
+          <strong>Password format:</strong><br>
+          <ul>
+            <li>Cannot be a commonly used password</li>
+            <li>Must be at least 8 characters long</li>
+            <li>Must contain at least one non-numeric character</li>
+          </ul>
         </div>
+
+        <form @submit.prevent="updateName" @cancel="closeAccountBox" v-if="showForm === 'updateName'">
+          <div class="passwordBox grid row-auto">
+            <label for="FirstName">First Name</label>
+            <div class="mb-3">
+              <InputText id="FirstName" type="text" name="first_name" v-model="newFirstName"
+                aria-label="Enter first name here" />
+            </div>
+
+            <label for="LastName">Last Name</label>
+            <div class="mb-3">
+              <InputText id="LastName" type="text" name="last_name" v-model="newLastName"
+                aria-label="Enter last name here" />
+            </div>
+          </div>
+
+          <div class="buttonArea mt-4">
+            <button class="ngenButtonDiv mr-6" id="UpdateNameButton" type="submit" aria-label="Update with new name">
+              Update
+            </button>
+            <button class="c-blue font-normal underline" id="closeNameBtn" name="cancel" value="Cancel" type="button"
+              v-on:click="closeAccountBox" aria-label="Close Account Box">
+              Close
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+
+  </div>
 
 </template>
 
 <script setup lang="ts">
+import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
-import { useUserDataStore } from '~/stores/common/UserDataStore';
 import { useToast } from "primevue/usetoast";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
 
-const { getAccessToken, getUserInitials, getUserName, getUserFullName } = useUserDataStore()
+import { useUserDataStore } from '@/stores/common/UserDataStore';
+
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+
+const {
+  getAccessToken,
+  getUserInitials,
+  getUserName,
+  getUserFullName,
+  getUserFirstName,
+  getUserLastName,
+  setFirstName,
+  setLastName
+} = useUserDataStore();
 const toast = useToast();
 const { ngencerfBaseUrl } = useBackendConfig();
+
+const showForm = ref("changePassword");
+const changePasswordClasses = ref("chgpwd sel");
+const updateNameClasses = ref("updtnm");
+
+watch(showForm, async () => {
+  if (showForm.value === 'updateName') {
+    changePasswordClasses.value = "chgpwd";
+    updateNameClasses.value = "updtnm sel";
+  } else {
+    changePasswordClasses.value = "chgpwd sel";
+    updateNameClasses.value = "updtnm";
+  }
+});
 
 const oldpass = ref("");
 const newpass = ref("");
@@ -90,6 +147,14 @@ const passwordChangeData = {
   "new_password": "string",
   "re_new_password": "string",
   "current_password": "string"
+};
+
+const newFirstName = ref(getUserFirstName());
+const newLastName = ref(getUserLastName());
+
+const updateNameData = {
+  "first_name": "string",
+  "last_name": "string"
 };
 
 const emit = defineEmits(["closeAccountBox"]);
@@ -118,12 +183,12 @@ const changePassword = async () => {
       let e = error.value?.data?.detail;
       if (!e) {
         e = "Cannot reach server. Error code: " + error.value.statusCode;
-        console.log("StatusCode: ", e);
       }
       toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 });
       console.error("Error during user creation:", error.value?.message, error.value?.data);
       return;
     }
+    console.log("changePassword", data);
     // Clear out the inputs and report success
     oldpass.value = "";
     newpass.value = "";
@@ -131,6 +196,43 @@ const changePassword = async () => {
     toast.add({ severity: 'success', summary: 'Password Change Successful', detail: "You have successfully changed your password", life: 3000 });
   } else {
     toast.add({ severity: 'error', summary: 'Password Change Error', detail: "Password was not changed", life: 3000 });
+  }
+}
+
+/** 
+* Submits the name change
+* @param e - event object
+*/
+const updateName = async () => {
+  updateNameData.first_name = newFirstName.value.trim();
+  updateNameData.last_name = newLastName.value.trim();
+
+  if (updateNameData.first_name !== "" && updateNameData.last_name !== "") {
+    const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/me/`, {
+      method: 'PATCH',
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: updateNameData
+    });
+    // error.value.statuscode
+    if (error.value) {
+      let e = error.value?.data?.detail;
+      if (!e) {
+        e = "Cannot reach server. Error code: " + error.value.statusCode;
+      }
+      toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 });
+      console.error("Error during user update:", error.value?.message, error.value?.data);
+      return;
+    }
+    console.log("UpdateNameData", data);
+    // Clear out the inputs and report success
+    setFirstName(updateNameData.first_name);
+    setLastName(updateNameData.last_name);
+    toast.add({ severity: 'success', summary: 'Name Change Successful', detail: "You have successfully changed your name", life: 3000 });
+  } else {
+    toast.add({ severity: 'error', summary: 'Name Change Error', detail: "Name was not changed", life: 3000 });
   }
 }
 
@@ -148,13 +250,12 @@ const closeAccountBox = () => {
   top: Calc(50vh - 300px);
   border: 5px solid #ccc;
   z-index: 9999;
+
   #avatar {
     width: 150px;
     height: 150px;
     float: right;
     margin: 20px 20px 40px 0;
-
-    /*border: 1px solid #105d84;*/
     text-align: right;
     vertical-align: top;
   }
@@ -162,13 +263,15 @@ const closeAccountBox = () => {
   #passwordNotes {
     text-align: left;
     padding-left: 20px;
+
     ul {
       list-style: disc;
-      margin-top:10px;
+      margin-top: 10px;
     }
+
     li {
-      margin-top:5px;
-      margin-left:18px;
+      margin-top: 5px;
+      margin-left: 18px;
     }
   }
 
@@ -188,9 +291,20 @@ const closeAccountBox = () => {
     margin-top: 25px;
   }
 
-  .chgpwd {
-    font-size: 25px; 
+  .chgpwd,
+  .updtnm {
+    font-size: 25px;
     text-align: center;
+    color: #0077ff;
+    font-weight: normal;
+    text-decoration: underline;
+  }
+
+  .chgpwd.sel,
+  .updtnm.sel {
+    color: #000000;
+    font-weight: bold;
+    text-decoration: none;
   }
 
 }

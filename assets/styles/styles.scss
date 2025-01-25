@@ -12,15 +12,6 @@ html {
   height: 100%;
 }
 
-h1 {
-  font-size: 30px;
-  margin: 0;
-}
-
-h2 {
-  font-size: 24px;
-}
-
 .construction-images {
   width: 30%;
 }
@@ -39,17 +30,23 @@ body {
   -ms-flex-direction: column;
   flex-direction: column;
   overflow: hidden;
-  min-width: 1530px !important;
-  min-height: 945px !important;
+  min-width: 1280px !important;
+  min-height: 670px !important;
 }
 .font-ui {
-  font-family: ui-sans-serif, system-ui, sans-serif, sans-serif, Arial, Helvetica;
+  font-family: ui-sans-serif, system-ui, sans-serif, Arial, Helvetica;
 }
 .boxed {
   border: 1px solid #BBBBBF;
 }
-.h-full {height: 100vh;}
-label {font-weight: bold;}
+.h-full {
+  height: 100vh;
+}
+
+label {
+  font-weight: bold;
+  cursor: pointer
+}
 input, .p-select, .varInputs {
   width: 100%;
   font-size: 16px;
@@ -80,18 +77,25 @@ input::-webkit-input-placeholder {
 .inputBox {
   margin-top: 20px;
 }
-.h-screen-inner {
+.h-screen-outer {
   height: Calc(100vh - 180px);
+}
+.h-screen-inner {
+  height: Calc(100vh - 150px);
+}
+.min-h-screen-inner {
+  height: Calc(100vh - 150px);
 }
 .h-screen-inner-less {
   height: Calc(100vh - 240px);
 }
-.bg-white {
-  background-color: #fff;
-}
 .underline,
 .underline button {
   text-decoration: underline;
+}
+.prompt-txt {
+  font-size: 15px;
+  font-weight: normal;
 }
 .ngenButtonDiv {
   cursor: pointer;
@@ -146,6 +150,44 @@ input::-webkit-input-placeholder {
 .ngenButtonDiv-green:hover {
   background-color: $ngwcp_secondary4lt;
 }
+.ngenButtonDiv-red {
+  cursor: pointer;
+  color: white;
+  padding: 6px 25px;
+  border-radius: 28px;
+  background-color: $ngwcp_red_dark1;
+  text-align: center;
+  font-size: 18px;
+  border: 0px;
+  display: inline-block;
+}
+.ngenButtonDiv-red:hover {
+  background-color: $ngwcp_red_dark2;
+}
+
+.ngenButtonDiv-yellow {
+  cursor: pointer;
+  color: black;
+  padding: 6px 25px;
+  border-radius: 28px;
+  background-color: $ngwcp_yellow_dark1;
+  text-align: center;
+  font-size: 18px;
+  border: 0px;
+  display: inline-block;
+}
+.ngenButtonDiv-yellow:hover {
+  background-color: $ngwcp_yellow_dark2;
+}
+
+.ngenButtonDiv-yellow-spacer {
+  padding: 6px 25px;
+  border-radius: 28px;
+  background-color: transparent;
+  font-size: 18px;
+  border: 0px;
+  display: inline-block;
+}
 .btn-left {
   margin-right: auto;
   margin-left: 0px;
@@ -165,7 +207,14 @@ input::-webkit-input-placeholder {
   user-select: none; /* Standard syntax */
 }
 
+
+h1 {
+  font-size: 30px;
+  margin: 0;
+}
+
 h2 {
+  font-size: 24px;
   display: block;
 }
 
@@ -193,10 +242,6 @@ fieldset {
   border-style: solid;
   margin: 1em;
   line-height: 1.5em;
-}
-
-label {
-  cursor: pointer;
 }
 
 select {
@@ -277,9 +322,7 @@ select option {
 .dp__input_icons {
   padding: 10px 12px !important;
 }
-.dp--clear-btn,
-.dp__input_icon {
-  /*top: 40% !important;*/
+.dp--clear-btn, .dp__input_icon {
   top: 16px !important;
 }
 .p-listbox-option {
@@ -295,6 +338,7 @@ select option {
 .p-datatable-tbody > tr > td {
   padding: 5px !important;
   border-color: #BBBBBF !important;
+  font-size: .9em;
 }
 .p-datatable-tbody {
   border-right: 1px solid #BBBBBF;
@@ -302,7 +346,6 @@ select option {
 }
 
 .p-datatable-thead tr th {
-  /*background-color: $ngwcp_primary1;*/
   background-color: #003D64;
   color: white;
   border-left: 1px solid white;
@@ -322,7 +365,24 @@ select option {
 
 .p-datatable-column-title {
   font-size: 0.8em;
+  white-space: nowrap;
 }
+#MainLeftDataArea .p-datatable-tbody > tr.p-datatable-row-selected {
+  background-color: #D8FFD8 !important;    
+  color: black;
+}
+#MainLeftDataArea .p-datatable-selectable-row:hover {background-color: whitesmoke !important;}
+
+.pagination-box {
+  display: grid;
+  grid-template-columns: 35% 65%;
+  gap: 10px;
+}
+.pagination-rows, .pagination-go-to-page, .pagination-pages {margin-bottom: 4px; font-weight: normal; font-size: 13px;}
+.pagination-go-to-page input {width:70px; display: inline-block; padding: 2px 3px;font-size: 13px;}
+.pagination-go-to-page, .pagination-pages {display:inline-block; margin-top:-10px;}
+.pagination-go-to-page {width:30%;text-align: center;}
+.pagination-pages {width:70%;}
 
 // default color ovewrites
 .bg-green { background-color: $ngwcp_secondary4 !important; }
@@ -392,6 +452,7 @@ table.cols-bordered {
 
 .bg_green_lt { background-color: $ngwcp_green_lt; }
 .bg_blue_lt { background-color: $ngwcp_blue_lt; }
+.bg_blue_md { background-color: $ngwcp_blue_md; }
 
 // Help Pages
 ._help-page {
@@ -437,7 +498,7 @@ table.cols-bordered {
 
 /* Right Side Blocks */
 #TopRightBlock {
-  padding: 10px;
+  padding: 0 10px;
   height: fit-content;
 }
 
@@ -451,40 +512,16 @@ table.cols-bordered {
 
 }
 
-/* Progress Tables */
-/* .progressTable {
-  width: 100%;
-  margin-left: 15px;
-
-  table {
-    tr {
-      line-height: calc(1.3vw + 0.41vh); // font-size: 14px;
-    }
-  }
-}
-.checkMark {
-  text-align: right;
-}
-
-.ptype {
-  width: 90%;
-  cursor: pointer;
-}
-
-.ptype:hover {
-  color: $ngwcp_primary1;
-} */
-
-
 /* Toast */
 .p-toast {
   width: min(25rem, 100vw) !important;
 }
-.p-toast-top-center {
-}
+
+// .p-toast-top-center {
+// }
 
 .p-toast-message {
-  border: 2px solid red;
+  border: 2px solid;
 }
 
 /* Listbox select (for Tuning Tab) */
@@ -498,7 +535,11 @@ table.cols-bordered {
   margin-top: 7px;
 }
 .p-listbox-option-selected {
-  background-color: $ngwcp_green_lt; 
+  background-color: $ngwcp_green_lt !important; 
+}
+#MainLeftDataArea .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected {
+  color: var(--p-listbox-option-color); 
+  font-weight: 500;
 }
 
 /* Action Buttons repositioning */
@@ -508,4 +549,33 @@ table.cols-bordered {
   background-color: white;
   padding:20px 30px 5px;
   z-index: 1;
+}
+
+#EvaluatePage #TableArea {
+  .p-datatable-table {
+    width:auto; 
+    min-width:450px;
+    max-width: 100%;
+
+    td {
+      font-size: 13px;
+      padding:4px !important;
+    }
+    th {
+      padding-left: 4px !important;
+      padding-right: 4px !important;
+
+      .p-datatable-column-header-content {
+        gap: 0.3rem;
+      }
+    }
+
+    .p-datatable-sort-icon {
+      zoom: 0.8;
+    }
+  }
+}
+
+.basin-gage-filter { 
+  width: 220px !important;
 }

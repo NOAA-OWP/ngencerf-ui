@@ -1,6 +1,6 @@
 <template>
   <Head>
-    <Title>NgenCERF</Title>
+    <Title>ngenCERF</Title>
   </Head>
 
 </template>

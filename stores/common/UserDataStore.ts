@@ -1,23 +1,55 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "./GeneralStore";
-import { makeProtectedApiCall } from "~/composables/UserAuth";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
 
-import type { JobsList, JobListItem, UserCalibrationRunData } from "~/composables/NextGenModel";
+import type { CalibrationJobListItem, ValidationJobsList, UserCalibrationRunData } from "@/composables/NextGenModel";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
+  const { ngencerfBaseUrl } = useBackendConfig();
+  const { calibrationJobId } = storeToRefs(generalStore());
+
   const isLoggedIn = ref<boolean>(false);
   const userName = ref("");
   const firstName = ref("");
   const lastName = ref("");
   const accessToken = ref<string | null>(null);
   const refreshToken = ref<string | null>(null);
-  const { ngencerfBaseUrl } = useBackendConfig();
-  const { calibrationJobId } = storeToRefs(generalStore());
-  const userCalibrationJobsListData = ref<JobListItem[]>([]);
+
+  const tokenExpired = ref<boolean>(false);
+
+  const userCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
   const userCalibrationRunData = ref<UserCalibrationRunData>();
+
+  const userSelectedCalibrationIterationId = ref<number | null>(null);
+  const uiGageId = ref<string>("");
+
+  // Restore state from sessionStorage if available
+  if (typeof window !== 'undefined') {
+    let ls;
+    ls = sessionStorage.getItem('userCalibrationJobsListData');
+    if (ls !== "undefined") { userCalibrationJobsListData.value = ls ? JSON.parse(ls) : [] }
+    ls = sessionStorage.getItem('userCalibrationRunData');
+    if (ls !== "undefined") { userCalibrationRunData.value = JSON.parse(ls as string) }
+    isLoggedIn.value = sessionStorage.getItem('isLoggedIn') as string === "true";
+    userName.value = sessionStorage.getItem('userName') as string;
+    firstName.value = sessionStorage.getItem('firstName') as string;
+    lastName.value = sessionStorage.getItem('lastName') as string;
+    accessToken.value = sessionStorage.getItem('accessToken') as string;
+    refreshToken.value = sessionStorage.getItem('refreshToken') as string;
+  }
+
+  watch(userCalibrationJobsListData, (userCalibrationJobsListData) => { sessionStorage.setItem('userCalibrationJobsListData', JSON.stringify(userCalibrationJobsListData)); });
+  watch(userCalibrationRunData, (userCalibrationRunData) => { sessionStorage.setItem('userCalibrationRunData', JSON.stringify(userCalibrationRunData)); });
+  watch(calibrationJobId, (calibrationJobId) => { sessionStorage.setItem('calibrationJobId', JSON.stringify(calibrationJobId)); });
+  watch(isLoggedIn, (isLoggedIn) => { sessionStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn)); });
+  watch(userName, (userName) => { sessionStorage.setItem('userName', userName); });
+  watch(firstName, (firstName) => { sessionStorage.setItem('firstName', firstName); });
+  watch(lastName, (lastName) => { sessionStorage.setItem('lastName', lastName); });
+  watch(accessToken, (accessToken) => { sessionStorage.setItem('accessToken', accessToken ?? ""); });
+  watch(refreshToken, (refreshToken) => { sessionStorage.setItem('refreshToken', refreshToken ?? ""); });
 
   /**
    * Checks if user is logged in
@@ -57,17 +89,20 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    */
   function getUserInitials(): string {
     let n = userName.value;
-    let atSignPos = n.indexOf("@");
-    if (atSignPos !== -1) {
-      let name = n.substring(0, atSignPos);
-      let dotPos = name.lastIndexOf('.');
-      if (dotPos !== -1) {
-        return (name[0] + name.substring(dotPos + 1)[0]).toUpperCase();
+    if (n) {
+      let atSignPos = n.indexOf("@");
+      if (atSignPos !== -1) {
+        let name = n.substring(0, atSignPos);
+        let dotPos = name.lastIndexOf('.');
+        if (dotPos !== -1) {
+          return (name[0] + name.substring(dotPos + 1)[0]).toUpperCase();
+        }
+        return userName.value.toUpperCase()[0];
+      } else {
+        return userName.value.toUpperCase()[0];
       }
-      return userName.value.toUpperCase()[0];
-    } else {
-      return userName.value.toUpperCase()[0];
     }
+    return "";
   }
 
   /**
@@ -150,12 +185,43 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     return refreshToken.value;
   }
 
+  function setIsTokenExpired() {
+    tokenExpired.value = true;
+  }
+
+  function getIsTokenExpired() {
+    return tokenExpired.value;
+  }
+  /**
+* @returns {SelectOption[]}
+*/
+  const calibrationRunGageList = computed(() => {
+    let gageOptionList = <SelectOption[]>[];
+    gageOptionList.push({
+      'name': "All",
+      'description': "All"
+    });
+    userCalibrationJobsListData.value.forEach(runItem => {
+      const checkGageIndex = gageOptionList.findIndex(
+        (gageOption) =>
+          gageOption.name === runItem.gage_id
+      ) !== -1;
+      if (!checkGageIndex) {
+        gageOptionList.push({
+          'name': runItem.gage_id,
+          'description': runItem.gage_id
+        });
+      }
+    });
+    return gageOptionList;
+  });
+
   /**
    * fetch user created calibration job list data
    * @return {void}
    */
   async function fetchUserCalibrationJobsListData() {
-    const jobsListDataResult = await makeProtectedApiCall<JobsList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs/`, {
+    const jobsListDataResult = await makeProtectedApiCall<CalibrationJobsList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -167,16 +233,37 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   }
 
   /**
+   * fetch user validation jobs associated with the selected calibration run
+   * @param {number} calibrationRunId
+   * @return {Promise<ValidationJobsList>}
+   */
+  const getValidationJobs = async (calibrationRunId: number): Promise<ValidationJobsList> => {
+    const getValidationJobsResponse: any = await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_validation_jobs/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibrationRunId })
+    });
+
+    return getValidationJobsResponse?._data ?? {} as ValidationJobsList;
+  };
+
+  /**
    * @returns {Promise<any>}
    */
-  async function queryUserCalibrationRunData() {
+  async function queryUserCalibrationRunData(include_gpkg_map: boolean = true) {
+    if (!calibrationJobId.value) {
+      return null;
+    }
     const userCalibrationRunDataResult = await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/load_calibration_run/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value, include_gpkg_map: include_gpkg_map})
     })
 
     return userCalibrationRunDataResult
@@ -186,14 +273,16 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
    * fetch user selected calibration run user saved data
    * @return {void}
    */
-  async function fetchUserCalibrationRunData() {
-    const userCalibrationRunDataResult = await queryUserCalibrationRunData()
+  async function fetchUserCalibrationRunData(include_gpkg_map: boolean = true) {
+    const userCalibrationRunDataResult = await queryUserCalibrationRunData(include_gpkg_map)
 
     userCalibrationRunData.value = userCalibrationRunDataResult?._data ?? undefined;
   }
 
-  useLogoutListen('logoutEvent', () => {
-    hardResetUserDataStore();
+  useLogoutListen('logoutEvent', (evStr: string) => {
+    if (evStr === "logout") {
+      hardResetUserDataStore();
+    }
   })
 
   /**
@@ -206,7 +295,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     refreshToken.value = null;
     userCalibrationJobsListData.value = [];
     userCalibrationRunData.value = undefined;
-    console.log("User Data Store Reset");
   }
 
   /**
@@ -227,23 +315,29 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     getUserInitials,
     setAccessToken,
     setRefreshToken,
+    setIsTokenExpired,
+    getIsTokenExpired,
     setUserName,
     setFirstName,
     setLastName,
     getAccessToken,
     getRefreshToken,
     fetchUserCalibrationJobsListData,
+    getValidationJobs,
     userCalibrationJobsListData,
     userCalibrationRunData,
     queryUserCalibrationRunData,
     fetchUserCalibrationRunData,
     hardResetUserDataStore,
-    clearUserCalibrationRunData,   
+    clearUserCalibrationRunData,
+    userSelectedCalibrationIterationId,
+    calibrationRunGageList,
+    uiGageId
   };
 },
   {
     persist: {
-      storage: persistedState.localStorage
+      storage: persistedState.sessionStorage
     },
   });
 

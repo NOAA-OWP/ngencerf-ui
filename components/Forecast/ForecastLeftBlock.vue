@@ -1,18 +1,21 @@
-<template> 
+<template>
   <!-- ForecastLeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
-      <span v-if="activeTab == 1">
-        <PreviousRunsTab />
+      <span v-if="activeTab === 1">
+        <PreviousCalibrationRuns />
       </span>
-      <span v-else-if="activeTab == 2">
-       <SetupForecastRunTab />
+      <span v-else-if="activeTab === 2">
+        <ForecastRunsTab />
       </span>
-      <span v-else-if="activeTab == 3">
-        <StatusTab />
+      <span v-else-if="activeTab === 3">
+       <SetupForecastTab />
       </span>
-      <span v-else-if="activeTab == 4">
+      <span v-else-if="activeTab === 4">
+        <StatusRunTab />
+      </span>
+      <span v-else-if="activeTab === 5">
         <ResultsTab />
       </span>
     </div>
@@ -20,19 +23,17 @@
 </template>
 
 <script setup lang="ts">
-import Tabs from '~/components/Common/Tabs.vue'
+import Tabs from '@/components/Common/Tabs.vue'
 
-
-// Default to Tab 1, HeadwaterBasinGage
 import { generalStore } from "@/stores/common/GeneralStore";
-import PreviousRunsTab from '~/components/Forecast/PreviousRunsTab.vue'
-import SetupForecastRunTab from './SetupForecastRunTab.vue'
-import StatusTab from './StatusTab.vue'
-import ResultsTab from './ResultsTab.vue'
+import PreviousCalibrationRuns from '@/components/Forecast/PreviousCalibrationRuns.vue';
+import ForecastRunsTab from './ForecastRunsTab.vue';
+import SetupForecastTab from './SetupForecastTab.vue';
+import StatusRunTab from './StatusRunTab.vue';
+import ResultsTab from './ResultsTab.vue';
 
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 
-// Default to Tab 1, HeadwaterBasinGage
 const activeTab = ref(getForecastTabIndex());
 
 // Activate new tab

@@ -21,7 +21,7 @@
                     <Column field="calibration_run_id" header="Run ID" sortable></Column>
                     <Column field="formulation_name" header="Formulation Name" sortable></Column>
                     <Column field="gage_id" header="Headwater Basin Gage" sortable></Column>
-                    <Column field="run_date" header="Run Date" sortable></Column>
+                    <Column field="submit_date" header="Submit Date" sortable></Column>
                     <Column field="calibration_start_period" header="Calibration Period" sortable></Column>
                     <Column field="status" header="Status" sortable></Column>
                 </DataTable>
@@ -35,9 +35,8 @@
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun } from "~/composables/NextGenModel";
-//import { useCalibrationRunStore } from "~/stores/CalibrationRunStore";
-import { useCalibrationJobStore } from "~/stores/common/CalibrationJobStore";
+import type { CalibrationRun } from "@/composables/NextGenModel";
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -59,9 +58,11 @@ const calibrationJobStore = useCalibrationJobStore()
 const { fetchJobsListData } = storeToRefs(calibrationJobStore)
 const { fetchNewCalibrationRunId } = calibrationJobStore
 
-// async function initCalibrationRunList() {
-//     await calibrationRunStore.retrieveCalibrationRuns()
-// }
+import { hilightTab } from '@/composables/TabHilight';
+onMounted(() => {
+  hilightTab(VerificationTabs.tab_calibrationRuns);
+  
+})
 
 const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
     setEvalRunSelected(true);
@@ -79,10 +80,9 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 const confirmDelte = useConfirm();
 
 const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-    const confirm_delete = ref(false)
     const selectedRunId = selectedCalibrationRun.value.runId
     let confirmMessage = "Are you sure you want to delete?"
-    if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
+    if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
 
     confirmDelte.require({
         message: confirmMessage,
@@ -104,7 +104,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 const acceptDelete = (selectedRunId: number) => {
     toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 })
-    // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id != selectedRunId )
+    // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id !== selectedRunId )
     // calibration_jobs_list.value = reduced_calibration_job_list
     // refreshJobListData()
     selectedCalibrationRun.value = undefined
@@ -112,7 +112,7 @@ const acceptDelete = (selectedRunId: number) => {
 
 const rowStyle = (data: any) => {
     if (!['Saved', 'Ready'].includes(data.status)) {
-        return { backgroundColor: 'gainsboro' }
+        return { backgroundColor: 'white' }
     }
 }
 
@@ -142,8 +142,6 @@ const NewCalibration = async () => {
 #CalTable {
     width: 1000px;
     margin: 0 auto;
-    //border: 1px solid $ngwcp_primary1;
-
     .table {
         thead tr th {
             background-color: #F5A4A4;

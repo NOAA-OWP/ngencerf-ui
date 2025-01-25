@@ -1,15 +1,14 @@
 <template>
-  <div id="Footer" class=" prevent-select cursor-default">
+  <div id="Footer" class="prevent-select cursor-default">
+    <div id="FloatingInfo" class="hidden">
+      <div id="ServerDate" class="text-left">Release Date: {{ serverInfo?.ngenCerf_date }}</div>
+    </div>
     <div class="grid grid-rows-1 gap-1">
-      <div class="row-span-1 footerColor">
+      <div class="row-span-1 footerColor text-sm">
         <div id="FooterData" class="version">
-          Version {{ info.program_info.version }},&nbsp;&nbsp;{{
-            info.program_info.release_date
-          }}
+          <span @mouseenter="showServerInfo" @mouseleave="hideServerInfo">Version:
+            {{ serverInfo?.ngenCerf_version }}</span>
         </div>
-        <!-- <div class="text-center">
-          Job ID: {{userCalibrationRunData?.calibration_run_id}}, 
-        </div> -->
         <div class="copyright">Copyright &COPY;2024, RTX</div>
       </div>
     </div>
@@ -17,28 +16,70 @@
 </template>
 
 <script lang="ts" setup>
-import json from "@/assets/versionInfo.json";
-import { generalStore } from "~/stores/common/GeneralStore";
-import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { useRoute } from "vue-router";
+import type { ServerInfo } from "@/composables/NextGenModel";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { generalStore } from "@/stores/common/GeneralStore";
 
-const { getCalibrationTabIndex } = generalStore();
+const { getServerInfo, setServerInfo } = generalStore();
 
-const { isUserLoggedIn, userCalibrationRunData } = useUserDataStore();
-const location = useRoute();
-const info = json;
+const { ngencerfBaseUrl } = useBackendConfig();
+const serverInfo = ref<ServerInfo>();
 
-const canDisplayBeforeRun = computed(() => {
-  return isUserLoggedIn() && location.name !== 'LandingPage' && location.name !== 'Login';
-});
+onMounted( async () => {
+  serverInfo.value = getServerInfo();
+  if( !serverInfo.value || !serverInfo.value.version )  {
+    await getFooterInformation();
+  }
+})
+
+const showServerInfo = () => {
+  const e = document.getElementById('FloatingInfo');
+  (e as HTMLElement).style.display = "inline-block"
+}
+
+const hideServerInfo = () => {
+  const e = document.getElementById('FloatingInfo');
+  (e as HTMLElement).style.display = "none"
+}
+
+// Get footer infongenCERF
+const getFooterInformation = () => {
+  makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": 'application/json'
+    },
+    body: ""
+  }).then((result) => {
+    serverInfo.value = result._data;
+    if(serverInfo.value) {
+      setServerInfo(serverInfo.value);
+    }    
+  })
+}
 
 </script>
 
 <style lang="scss" scoped>
 @import "/assets/styles/styles.scss";
 
+#FloatingInfo {
+  position:sticky;
+  margin-left: 20px;
+  height: 2em;
+  font-size: 0.8em;
+  z-index: 9999;
+}
+
+#AppDate, #ServerDate {
+  border: 2px solid black;
+  padding: 5px;
+  border-radius: 10px;
+  background-color: white;
+}
 #Footer {
-  font: 18px NeueFrutigerWorld-Book, sans-serif;
+  font-size: 18px;
+  font-family: NeueFrutigerWorld-Book, sans-serif;
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -48,25 +89,18 @@ const canDisplayBeforeRun = computed(() => {
 }
 
 #FooterData {
-  height: 50px;
+  height: 40px;
   z-index: 9;
 }
 
 .footerColor {
   background-color: $ngwcp_background;
-  ;
 }
-
-/*
-.topBar {
-  background-color: black;
-  height: 1px;
-}*/
 
 .version,
 .copyright {
   display: block;
-  margin-top: 10px;
+  margin-top: 16px;
 }
 
 .version {
