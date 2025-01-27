@@ -448,7 +448,7 @@ const rowStyle = (data: any) => {
 
 #EvalRunTable,
 .gage-filter-wrapper {
-  width: 1270px;
+  width: 1400px;
   margin: 0 auto;
 }
 
