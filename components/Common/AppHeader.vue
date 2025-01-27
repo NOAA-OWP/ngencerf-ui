@@ -350,7 +350,7 @@ const MenuChanged = (e: MouseEvent) => {
     }
 
     a:hover {
-      background-color: $gray-20;
+      background-color: #aaa;
       text-decoration: none;
     }
 
