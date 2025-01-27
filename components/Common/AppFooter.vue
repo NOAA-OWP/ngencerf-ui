@@ -9,7 +9,7 @@
           <span @mouseenter="showServerInfo" @mouseleave="hideServerInfo">Version:
             {{ serverInfo?.ngenCerf_version }}</span>
         </div>
-        <div class="copyright">Copyright &COPY;2024, RTX</div>
+        <div class="copyright">Copyright {{ jsonData.release_info.copyright}}</div>
       </div>
     </div>
   </div>
@@ -21,6 +21,7 @@ import { generalStore } from "@/stores/common/GeneralStore";
 import type { ServerInfo } from "@/composables/NextGenModel";
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
+import jsonData from '@/assets/version.json';
 
 const { getServerInfo, setServerInfo } = generalStore();
 
