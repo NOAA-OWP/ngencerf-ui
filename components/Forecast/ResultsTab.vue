@@ -1,6 +1,10 @@
 <template>
   <div class="col-span-2">
-    <table>
+    <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
+      <span id="tab-title">Forecast Run Results</span>
+    </h1>
+      
+    <table aria-describedby="tab-title">
       <tbody>
         <tr height="38px">
           <th scope="row" class="text-right font-bold">

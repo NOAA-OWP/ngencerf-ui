@@ -12,6 +12,7 @@
     <div class="grid grid-cols-2">
       <div class="col-span-1">
         <table>
+          <caption style="text-align: left;">Forecast Job Run Time</caption>
           <tbody>
             <tr height="40px">
               <th scope="row" class="text-right font-bold">
@@ -43,6 +44,7 @@
 
       <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
         <table>
+          <caption>Forecast Job Status</caption>
           <tbody>
             <tr height="40px">
               <th scope="row" class="text-right font-bold">
@@ -61,18 +63,15 @@
       </div>
 
       <div class="col-span-2">
-        <table style="width:100%">
-          <tbody>
-            <tr height="38px">
-              <th scope="row" class="text-right font-bold" style="width: 140px;">
-                <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
-              </th>
-              <td class="pl-5">
-                <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div style="display:flex; margin-top: 1em;">
+          <div  class="text-right font-bold" style="width: 155px;">
+            <label class="text-right" for="resultsPathname" style="width: 155px;">Results Pathname</label>
+          </div>
+          <div class="pl-5" style="width: 100%;">
+            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory"
+                  disabled />
+          </div>
+        </div>
       </div>
     </div>
     <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
