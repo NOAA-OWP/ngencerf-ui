@@ -9,7 +9,7 @@
   <hr class="mt-2 mb-4" />
   <table class="_help-table">
     <thead>
-      <th>Item</th>
+      <th class="td1">Item</th>
       <th>Description</th>
     </thead>
     <tbody>
@@ -28,7 +28,7 @@
   <p class="text-center" style="font-weight: bold;">Calibration Plots</p>
   <table class="_help-table">
     <thead>
-      <th>Item</th>
+      <th class="td1">Item</th>
       <th>Description</th>
     </thead>
     <tbody>
@@ -74,7 +74,7 @@
   <p class="text-center" style="font-weight: bold;">Validation Plots</p>
   <table class="_help-table">
       <thead>
-        <th>Item</th>
+        <th class="td1">Item</th>
         <th>Description</th>
       </thead>
       <tbody>
@@ -108,7 +108,7 @@
   <p class="text-center" style="font-weight: bold;">Tables</p>
   <table class="_help-table">
       <thead>
-        <th>Item</th>
+        <th class="td1">Item</th>
         <th>Description</th>
       </thead>
       <tbody>
@@ -131,7 +131,7 @@
   <p class="text-center" style="font-weight: bold;">Logs</p>
   <table class="_help-table">
     <thead>
-        <th>Item</th>
+        <th class="td1">Item</th>
         <th>Description</th>
       </thead>
     <tbody>

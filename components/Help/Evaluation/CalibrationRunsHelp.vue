@@ -12,7 +12,7 @@
     <hr class="mt-2 mb-4" />
     <table class="_help-table">
       <thead>
-        <th>Item</th>
+        <th class="td1">Item</th>
         <th>Description</th>
       </thead>
       <tbody>
