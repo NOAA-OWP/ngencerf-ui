@@ -6,22 +6,23 @@
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
+                <caption>Evaluation Run Time & Iteration</caption>
                 <thead>
                     <tr>
-                      <th class="text-right" colspan="2">Evaluation Run Time & Iteration</th>
+                      <th class="text-right" colspan="2"></th>
                     </tr>
                   </thead>
                 <tbody>
                   <tr height="38px">
-                    <td class="text-right font-bold">Submit Time</td>
+                    <th scope="row" class="text-right font-bold">Submit Time</th>
                     <td class="pl-5">{{ startTime ? formatDateForDisplay(startTime) : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="38px">
-                    <td class="text-right font-bold">Elapsed Time</td>
+                    <th scope="row" class="text-right font-bold">Elapsed Time</th>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="38px">
-                    <td class="text-right"><label for="iterationNum">Iteration</label></td>
+                    <th scope="row" class="text-right"><label for="iterationNum">Iteration</label></th>
                     <td class="pl-5">
                       {{ evaluateDisplayIterationNumber }}
                     </td>
@@ -32,20 +33,16 @@
 
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
-                <thead>
-                  <tr>
-                    <th class="text-right" colspan="2">Evaluation Status</th>
-                  </tr>
-                </thead>
+                <caption>Evaluation Status</caption>
                 <tbody>
                   <tr height="38px">
-                    <td class="text-right"><label for="RunStatus">Status</label></td>
+                    <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
                     <td class="pl-5">
                       {{ validationStatus }}
                     </td>
                   </tr>
                   <tr height="38px">
-                    <td class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></td>
+                    <th scope="row" class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></th>
                     <td class="pl-5">
                       {{ displayValidationId }}
                     </td>
