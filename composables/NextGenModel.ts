@@ -700,6 +700,17 @@ export type CalibrationRunForForecast = {
   optimization_algorithm: string;
 };
 
+export interface ForecastJob extends CalibrationRunForForecast {
+  forecast_run_id: number;
+  cycle: string;
+  forecast_status: string;
+  forcing_download_status: string;
+}
+
+export type ForecastJobs = {
+  forecast_jobs: ForecastJob[];
+}
+
 export const ValidationFormFields = {
   formulation_name: "Formulation Name",
   modules: "Formulation Modules",

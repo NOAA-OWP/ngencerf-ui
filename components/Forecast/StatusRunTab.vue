@@ -15,6 +15,12 @@
           <tbody>
             <tr height="40px">
               <th scope="row" class="text-right font-bold">
+                <div style="width: 140px;">Calibration Job ID</div>
+              </th>
+              <td class="pl-5">{{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(30) }}</td>
+            </tr>
+            <tr height="40px">
+              <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Forecast Job ID</div>
               </th>
               <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
@@ -315,7 +321,8 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
 </script>
 
 <style lang="scss" scoped>
-@import "/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #resultsPathname {
   background-color: #fff;

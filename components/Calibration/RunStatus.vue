@@ -585,7 +585,8 @@ const gotoEvaluation = () => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #ResultsDisplay {
   width: 50vw;
@@ -593,7 +594,7 @@ const gotoEvaluation = () => {
   margin: 5px auto;
   padding: 6px 10px 6px 20px;
   border-radius: 10px;
-  border: 0px solid $ngwcp_neutral_gray_md;
+  border: 0px solid global.$ngwcp_neutral_gray_md;
 
 }
 

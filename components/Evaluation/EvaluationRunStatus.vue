@@ -236,7 +236,8 @@ const navigateToEvaluation = (event: any) => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #ResultsDisplay {
   width: 50vw;
@@ -244,7 +245,7 @@ const navigateToEvaluation = (event: any) => {
   padding: 10px 10px 10px 20px;
   border-radius: 10px;
   height: 100px;
-  border: 0px solid $ngwcp_neutral_gray_md;
+  border: 0px solid global.$ngwcp_neutral_gray_md;
   min-width: 750px;
 
 }
@@ -253,7 +254,7 @@ const navigateToEvaluation = (event: any) => {
   height: 40vh;
   width: 100%;
   margin: 8px auto 0 auto;
-  border: 1px solid $ngwcp_neutral_gray_md;
+  border: 1px solid global.$ngwcp_neutral_gray_md;
 }
 
 #RunStatus,

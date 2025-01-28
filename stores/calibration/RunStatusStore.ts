@@ -358,7 +358,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 }, {
     persist: {
-      storage: persistedState.sessionStorage
+      storage: piniaPluginPersistedstate.sessionStorage
     },
 });
 
