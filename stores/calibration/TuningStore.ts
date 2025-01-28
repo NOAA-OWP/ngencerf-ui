@@ -55,54 +55,54 @@ export const useTuningStore = defineStore(
     const selectedOutputVariable = ref<any>(null);
 
     // Restore state from sessionStorage if available
-    if (typeof window !== "undefined") {
-      let ls;
-      ls = sessionStorage.getItem("loadTuningTabData");
-      if (ls !== "undefined") {
-        loadTuningTabData.value = JSON.parse(ls as string);
-      }
+    // if (typeof window !== "undefined") {
+    //   let ls;
+    //   ls = sessionStorage.getItem("loadTuningTabData");
+    //   if (ls !== "undefined") {
+    //     loadTuningTabData.value = JSON.parse(ls as string);
+    //   }
 
-      simStartTime.value = sessionStorage.getItem("simStartTime") as string;
-      simEndTime.value = sessionStorage.getItem("simEndTime") as string;
-      calStartTime.value = sessionStorage.getItem("calStartTime") as string;
-      calEndTime.value = sessionStorage.getItem("calEndTime") as string;
+    //   simStartTime.value = sessionStorage.getItem("simStartTime") as string;
+    //   simEndTime.value = sessionStorage.getItem("simEndTime") as string;
+    //   calStartTime.value = sessionStorage.getItem("calStartTime") as string;
+    //   calEndTime.value = sessionStorage.getItem("calEndTime") as string;
 
-      ls = sessionStorage.getItem("calibrationTuningModules");
-      if (ls !== "undefined") {
-        calibrationTuningModules.value = JSON.parse(ls as string);
-      }
-      ls = sessionStorage.getItem("calibrationTuningParameters");
-      if (ls !== "undefined") {
-        calibrationTuningParameters.value = ls ? JSON.parse(ls) : [];
-      }
-      ls = sessionStorage.getItem("userSelectedCalibrationTuningParameters");
-      if (ls !== "undefined") {
-        userSelectedCalibrationTuningParameters.value = ls
-          ? JSON.parse(ls)
-          : [];
-      }
-      ls = sessionStorage.getItem("userOutputVariableToCalibrate");
-      if (ls !== "undefined") {
-        userOutputVariableToCalibrate.value = ls ? JSON.parse(ls) : [];
-      }
-      ls = sessionStorage.getItem("outputVariables");
-      if (ls !== "undefined") {
-        outputVariables.value = ls ? JSON.parse(ls) : [];
-      }
-      automatic_validation.value =
-        JSON.parse(sessionStorage.getItem("automatic_validation") as string) ===
-        "true";
-      avSimStartTime.value = sessionStorage.getItem("avSimStartTime") as string;
-      avSimEndTime.value = sessionStorage.getItem("avSimEndTime") as string;
-      avCalStartTime.value = sessionStorage.getItem("avCalStartTime") as string;
-      avCalEndTime.value = sessionStorage.getItem("avCalEndTime") as string;
-      rangeDateFrom.value = sessionStorage.getItem("rangeDateFrom") as string;
-      rangeDateTo.value = sessionStorage.getItem("rangeDateTo") as string;
-      ls = sessionStorage.getItem("saveTuningTabRequestBody");
-      if (ls !== "undefined") {
-        saveTuningTabRequestBody.value = ls ? JSON.parse(ls) : {};
-      }
-    }
+    //   ls = sessionStorage.getItem("calibrationTuningModules");
+    //   if (ls !== "undefined") {
+    //     calibrationTuningModules.value = JSON.parse(ls as string);
+    //   }
+    //   ls = sessionStorage.getItem("calibrationTuningParameters");
+    //   if (ls !== "undefined") {
+    //     calibrationTuningParameters.value = ls ? JSON.parse(ls) : [];
+    //   }
+    //   ls = sessionStorage.getItem("userSelectedCalibrationTuningParameters");
+    //   if (ls !== "undefined") {
+    //     userSelectedCalibrationTuningParameters.value = ls
+    //       ? JSON.parse(ls)
+    //       : [];
+    //   }
+    //   ls = sessionStorage.getItem("userOutputVariableToCalibrate");
+    //   if (ls !== "undefined") {
+    //     userOutputVariableToCalibrate.value = ls ? JSON.parse(ls) : [];
+    //   }
+    //   ls = sessionStorage.getItem("outputVariables");
+    //   if (ls !== "undefined") {
+    //     outputVariables.value = ls ? JSON.parse(ls) : [];
+    //   }
+    //   automatic_validation.value =
+    //     JSON.parse(sessionStorage.getItem("automatic_validation") as string) ===
+    //     "true";
+    //   avSimStartTime.value = sessionStorage.getItem("avSimStartTime") as string;
+    //   avSimEndTime.value = sessionStorage.getItem("avSimEndTime") as string;
+    //   avCalStartTime.value = sessionStorage.getItem("avCalStartTime") as string;
+    //   avCalEndTime.value = sessionStorage.getItem("avCalEndTime") as string;
+    //   rangeDateFrom.value = sessionStorage.getItem("rangeDateFrom") as string;
+    //   rangeDateTo.value = sessionStorage.getItem("rangeDateTo") as string;
+    //   ls = sessionStorage.getItem("saveTuningTabRequestBody");
+    //   if (ls !== "undefined") {
+    //     saveTuningTabRequestBody.value = ls ? JSON.parse(ls) : {};
+    //   }
+    // }
 
     watch(loadTuningTabData, (loadTuningTabData) => {
       sessionStorage.setItem(
@@ -317,8 +317,7 @@ export const useTuningStore = defineStore(
       calibrationTuningModules.value = null;
       calibrationTuningParameters.value = [];
       userSelectedCalibrationTuningParameters.value = [];
-      userOutputVariableToCalibrate.value.name = "";
-      userOutputVariableToCalibrate.value.module = null;
+      userOutputVariableToCalibrate.value = { name: "", module: "" };      
       outputVariables.value = [];
       automatic_validation.value = true;
       avSimStartTime.value = "";
