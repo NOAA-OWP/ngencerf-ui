@@ -15,7 +15,7 @@ RUN set -eux; \
     ; \
     dnf clean all
 
-ARG NODE_TAR_URL="https://nodejs.org/dist/v20.17.0/node-v20.17.0-linux-x64.tar.xz"
+ARG NODE_TAR_URL="https://nodejs.org/dist/v22.13.1/node-v22.13.1-linux-x64.tar.xz"
 
 # install Node.js
 RUN curl --fail --silent --show-error --location "$NODE_TAR_URL" | \

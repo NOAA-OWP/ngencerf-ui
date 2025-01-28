@@ -168,7 +168,8 @@ const tabClicked = (event: Event) => {
 }
 </script>
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #MainTabs {
   overflow-x: hidden;
@@ -189,7 +190,7 @@ const tabClicked = (event: Event) => {
   }
 
   .tabs:hover {
-    color: $ngwcp_primary1;
+    color: global.$ngwcp_primary1;
   }
 
   .errorDot {
@@ -209,7 +210,7 @@ const tabClicked = (event: Event) => {
   }
 
   .activeTab {
-    border-bottom: 5px solid $ngwcp_primary1;
+    border-bottom: 5px solid global.$ngwcp_primary1;
   }
 }
 </style>

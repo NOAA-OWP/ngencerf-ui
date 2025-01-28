@@ -291,13 +291,14 @@ const MenuChanged = (e: MouseEvent) => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #TopBar {
   position: fixed;
   top: 0;
   height: 6px;
-  background-color: $ngwcp_primary1;
+  background-color: global.$ngwcp_primary1;
   width: 100%;
 }
 
@@ -344,7 +345,7 @@ const MenuChanged = (e: MouseEvent) => {
       text-decoration: none;
       color: #000;
       font-weight: bold;
-      background-color: $ngwcp_neutral_gray_md;
+      background-color: global.$ngwcp_neutral_gray_md;
       border-radius: 5px;
       padding: 15px 28px;
     }
@@ -356,12 +357,12 @@ const MenuChanged = (e: MouseEvent) => {
 
     .isActive {
       color: #fff;
-      background-color: $ngwcp_primary1;
+      background-color: global.$ngwcp_primary1;
     }
 
     .isActive:hover {
       color: #fff;
-      background-color: $ngwcp_primary1;
+      background-color: global.$ngwcp_primary1;
     }
   }
 }
@@ -378,7 +379,7 @@ const MenuChanged = (e: MouseEvent) => {
   height: 70px;
   width: 70px;
   margin-top: 10px;
-  background-color: $ngwcp_neutral_gray_md;
+  background-color: global.$ngwcp_neutral_gray_md;
   border-radius: 50%;
   font-size: 30px;
   padding-top: 20px;
@@ -390,7 +391,7 @@ const MenuChanged = (e: MouseEvent) => {
   height: 50px;
   width: 50px;
   margin-top: 20px;
-  background-color: $ngwcp_primary2;
+  background-color: global.$ngwcp_primary2;
   color: white;
   border-radius: 50%;
   font-size: 38px;
@@ -399,11 +400,11 @@ const MenuChanged = (e: MouseEvent) => {
 }
 
 #UserCircle:hover {
-  background-color: $ngwcp_primary2;
+  background-color: global.$ngwcp_primary2;
 }
 
 #HelpCircle:hover {
-  background-color: $ngwcp_primary2;
+  background-color: global.$ngwcp_primary2;
 }
 
 .userInitials {
@@ -440,7 +441,7 @@ const MenuChanged = (e: MouseEvent) => {
 
 .disabled,
 .disabled:hover {
-  background-color: $ngwcp_neutral_gray_md !important;
+  background-color: global.$ngwcp_neutral_gray_md !important;
 }
 
 /*

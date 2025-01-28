@@ -321,7 +321,8 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
 </script>
 
 <style lang="scss" scoped>
-@import "/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #resultsPathname {
   background-color: #fff;
