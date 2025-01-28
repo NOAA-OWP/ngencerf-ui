@@ -298,7 +298,7 @@ const clearDataDueToGageChange = () => {
       }
       toast.add({
         severity: 'info', summary: `Gage Changed`,
-        detail: "You must save this tab for the change to effect the run. Calibration and Validation times must be set on the Tuning Controls tab", life: 5000
+        detail: "Calibration and Validation times must be set on the Tuning Controls tab", life: 5000
       })
     }, 100);
   }
