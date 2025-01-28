@@ -35,7 +35,7 @@ const stayOnTab = (w: boolean) => {
 }
 
 </script>
-<style lang="sass" scoped>
-@import "@/assets/styles/styles.scss"
-
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 </style>

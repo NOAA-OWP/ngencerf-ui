@@ -277,7 +277,7 @@ export const useOptimizationStore = defineStore('OptimizationStore', () => {
 },
   {
     persist: {
-      storage: persistedState.sessionStorage
+      storage: piniaPluginPersistedstate.sessionStorage
     },
   })
 

@@ -159,7 +159,7 @@ export const generalStore = defineStore(
   },
   {
     persist: {
-      storage: persistedState.sessionStorage,
+      storage: piniaPluginPersistedstate.sessionStorage,
     },
   }
 );
