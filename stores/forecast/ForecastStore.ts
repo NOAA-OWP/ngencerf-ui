@@ -419,7 +419,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 }, {
   persist: {
-    storage: persistedState.sessionStorage
+    storage: piniaPluginPersistedstate.sessionStorage
   },
 });
 

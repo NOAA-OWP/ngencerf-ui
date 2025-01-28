@@ -116,7 +116,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
 },
 {
   persist: {
-    storage: persistedState.sessionStorage
+    storage: piniaPluginPersistedstate.sessionStorage
   },
 });
 

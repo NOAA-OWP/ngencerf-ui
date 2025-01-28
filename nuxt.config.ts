@@ -14,7 +14,7 @@ export default defineNuxtConfig({
         autoImports: ["defineStore", ["defineStore", "definePiniaStore"], "acceptHMRUpdate"],
       },
     ],
-    '@pinia-plugin-persistedstate/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
     "@nuxtjs/google-fonts",
     '@primevue/nuxt-module'
   ],
