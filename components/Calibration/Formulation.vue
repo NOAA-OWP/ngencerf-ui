@@ -343,7 +343,7 @@ const saveFormulationData = () => {
     if (!valOK) {
       modulesHaveChanged.value = false;
       selectedOutputVariable.value = "";
-      toast.add({ severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate ana teh Tuning Paramters on the Tuning Control tab" });
+      toast.add({ severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate and then Tuning Paramters on the Tuning Control tab" });
       clearCalibratableParameters();
     }
 
