@@ -6,6 +6,11 @@
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
+                <thead>
+                    <tr>
+                      <th class="text-right" colspan="2">Evaluation Run Time & Iteration</th>
+                    </tr>
+                  </thead>
                 <tbody>
                   <tr height="38px">
                     <td class="text-right font-bold">Submit Time</td>
@@ -27,6 +32,11 @@
 
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
+                <thead>
+                  <tr>
+                    <th class="text-right" colspan="2">Evaluation Status</th>
+                  </tr>
+                </thead>
                 <tbody>
                   <tr height="38px">
                     <td class="text-right"><label for="RunStatus">Status</label></td>

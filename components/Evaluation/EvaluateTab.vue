@@ -19,27 +19,24 @@
             </Select>
           </div>
 
-          <table class="mt-2" style="width:100%">
-            <tbody>
-              <tr>
-                <td class="text-left" style="width: 150px;font-size:0.9em;">
-                  <label for="calibrationJobId">Calibration Job ID </label>
-                  {{ calibrationJobId }}
-                </td>
-                <td class="text-left pl-3" style="font-size:0.9em;">
-                  <label for="validationJobId">Validation Job ID </label>
-                  {{ evaluateValidationRunId }}
-                </td>
-              </tr>
-              <tr>
-                <td class="text-left font-bold" style="width: 150px;font-size:0.9em;">
-                    <label for="resultsPathname">Results Pathname</label>
-                </td>
-                <td class="pl-3"><InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled style="padding-left:0px !important"/></td>
-              </tr>
-            </tbody>
-          </table>
-
+          <div class="layout__table mt-2" style="width:100%">
+            <div class="layout__row">
+              <div class="text-left" style="width: 150px;font-size:0.9em;">
+                <label for="calibrationJobId">Calibration Job ID </label>
+                {{ calibrationJobId }}
+              </div>
+              <div class="text-left pl-3" style="font-size:0.9em;">
+                <label for="validationJobId">Validation Job ID </label>
+                {{ evaluateValidationRunId }}
+              </div>
+            </div>
+            <div class="layout__row">
+              <div class="text-left font-bold center-label">
+                  <label for="resultsPathname" style="width: 150px;font-size:0.9em;">Results Pathname</label>
+              </div>
+              <div class="pl-3" style="width:100%"><InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled style="padding-left:0px !important"/></div>
+            </div>
+          </div>            
         </div>
         <div class="ml-auto">
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
@@ -815,5 +812,23 @@ onUnmounted( () => {
 
 .pagingLink.active {
   font-weight: bold;
+}
+
+
+.layout__table {
+  position: relative;
+  display: block;
+}
+.layout__row {
+  display: flex;
+}
+
+.layout__row div {
+  line-height: 2em;
+}
+
+.center-label {
+  display: flex;
+  align-items: center
 }
 </style>
