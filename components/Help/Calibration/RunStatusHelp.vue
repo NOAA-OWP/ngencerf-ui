@@ -32,6 +32,10 @@
     </div>
  
     <table class="_help-table">
+      <thead>
+        <th>Item</th>
+        <th>Description</th>
+      </thead>
       <tbody>
         <tr>
           <td class="td1">Submit Time</td>

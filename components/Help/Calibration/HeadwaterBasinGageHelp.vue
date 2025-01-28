@@ -14,6 +14,10 @@
     </p>
 
     <table class="_help-table">
+      <thead>
+        <th>Item</th>
+        <th>Description</th>
+      </thead>      
       <tbody>
         <tr>
           <td class="td1">Domain</td>
@@ -41,8 +45,8 @@
             Time, LWDOWN, PFC, Q2D, RAINRATE, SWDOWN, T2D, U2D, V2D<br />
             <br>
             Example:<span style="font-size:0.9em;"> <em>(Clicking on image makes it larger in a new tab.)</em></span><br />
-            <a :href=image1 target="_blank"><img :src=image1 /></a><br />
-            <img :src=image2 width="90%" class="mb-2" />
+            <a :href=image1 target="_blank"><img :src=image1 alt="" /></a><br />
+            <img :src=image2 width="90%" class="mb-2" alt="" />
           </td>
         </tr>
         <tr>
@@ -58,7 +62,7 @@
             <br />
             <span class="italic">dateTime, q_cms</span><br />
             Example:<br />
-            <img :src=image3 /><br />
+            <img :src=image3 alt="" /><br />
           </td>
         </tr>
         <tr>
