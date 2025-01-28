@@ -813,7 +813,9 @@ const validateAndBuildRequestBody = (): boolean => {
     }
   }
 
-  saveTuningTabRequestBody.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
+  if ( userOutputVariableToCalibrate.value && userOutputVariableToCalibrate.value.name) {
+    saveTuningTabRequestBody.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
+  }
 
   saveTuningTabRequestBody.value.automatic_validation = automatic_validation.value;
 
@@ -828,7 +830,7 @@ const validateAndBuildRequestBody = (): boolean => {
 
   return true;
 };
-
+ 
 /**
  * Check if all calibration times are set
  * @returns boolean
@@ -1047,7 +1049,6 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
-
   };
 
   const updateJobData = () => {
@@ -1175,9 +1176,9 @@ const restorePage = async () => {
     avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
   };
 
-  if (selectedOutputVariable.value !== null &&
-    selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
-  }
+  // if (selectedOutputVariable.value !== null &&
+  //   selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
+  // }
 }
 
 const gotoNext = () => {
