@@ -115,7 +115,7 @@ import { useToast } from 'primevue/usetoast';
 import { hilightTab } from '@/composables/TabHilight';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { isValidDate, getForecastStatus } from '@/utils/CommonHelpers';
-import { calculateElapsedTime } from '@/utils/TimeHelpers';
+import { calculateElapsedTime, formatElapsedTime } from '@/utils/TimeHelpers';
 
 const isLoading = ref<boolean>(false); // loading indicator
 const toast = useToast();
@@ -305,7 +305,7 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
 
     if (forecast) {
       if (forecast.elapsed_time) {
-        elapsedTime.value = forecast.elapsed_time;
+        elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
       } else {
         toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response`});
       }
