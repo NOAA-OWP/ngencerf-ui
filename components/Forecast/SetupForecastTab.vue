@@ -2,10 +2,11 @@
   <div>
     <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">
       Forecast Cycle Selection
-    </h1>
-    <p style="font-size: 12px;font-weight: normal;margin-top:-20px;">
-      Select a cycle then click Next.
-    </p>
+    </h1>    
+    <div style="font-size: 12px;font-weight: normal;margin-top:-20px;">
+      <h2>Calibration Job ID: {{ calibrationRunForForecast?.calibration_run_id }}</h2>      
+    </div>
+    <p  style="font-size: 12px;font-weight: normal;">Select a cycle then click Next.</p>
     <br />
   </div>
   <div>
@@ -51,6 +52,7 @@ const isLoading = ref<boolean>(false); // loading indicator
 const toast = useToast();
 
 const {
+  calibrationRunForForecast,
   forecastJobId,
   forecastCycles,
   forecastCycle,
@@ -123,5 +125,6 @@ const goToStatusRunTab = () => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 </style>

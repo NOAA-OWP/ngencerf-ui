@@ -77,24 +77,24 @@
             Calibration Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
-          <div data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast Tab"
+          <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Forecast Runs Tab"
+            title="Forecast Runs Tab">
+            Forecast Runs
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-if="calibrationJobId" data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast Tab"
             title="Setup Forecast tab">
             Setup Forecast
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status/Run tab"
+          <div v-if="calibrationJobId && forecastCycle" data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status/Run tab"
             title="Status/Run Tab">
             Status/Run
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
+          <div v-if="forecastJobId && forecastJobStatus !== 'Running'" data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
             title="Results tab">
             Results
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div data-tab="2" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Forecast Runs Tab"
-            title="Forecast Runs Tab">
-            Forecast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
         </div>
@@ -131,8 +131,11 @@
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useForecastStore } from "@/stores/forecast/ForecastStore";
+//import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
 
 const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
+const { forecastJobId, forecastJobStatus, forecastCycle } = storeToRefs(useForecastStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
@@ -166,7 +169,8 @@ const tabClicked = (event: Event) => {
 }
 </script>
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #MainTabs {
   overflow-x: hidden;
@@ -187,7 +191,7 @@ const tabClicked = (event: Event) => {
   }
 
   .tabs:hover {
-    color: $ngwcp_primary1;
+    color: global.$ngwcp_primary1;
   }
 
   .errorDot {
@@ -207,7 +211,7 @@ const tabClicked = (event: Event) => {
   }
 
   .activeTab {
-    border-bottom: 5px solid $ngwcp_primary1;
+    border-bottom: 5px solid global.$ngwcp_primary1;
   }
 }
 </style>

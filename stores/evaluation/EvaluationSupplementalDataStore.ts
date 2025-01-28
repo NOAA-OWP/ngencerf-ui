@@ -117,9 +117,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   };
 },
 {
-  persist: {
-    storage: persistedState.sessionStorage
-  },
+  persist: true,
 });
 
 /* Pinia supports Hot Module replacement so you can edit your stores

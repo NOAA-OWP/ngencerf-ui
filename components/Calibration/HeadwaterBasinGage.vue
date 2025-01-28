@@ -566,7 +566,8 @@ const handleNextPrevDialogClose = (opt: any) => {
 
 </script>
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #GageReport {
   table {
@@ -581,7 +582,7 @@ const handleNextPrevDialogClose = (opt: any) => {
         padding: 4px 15px;
         cursor: default;
         border-bottom: 1px solid #ccc;
-        background-color: $ngwcp_neutral_gray_lt;
+        background-color: global.$ngwcp_neutral_gray_lt;
       }
 
       .td1 {

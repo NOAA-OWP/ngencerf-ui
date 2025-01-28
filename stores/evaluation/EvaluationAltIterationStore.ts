@@ -406,6 +406,9 @@ export const useEvaluationAltIterationStore = defineStore(
       userSelectedCalibrationIterationId,
       createNewValidationJob,
     };
+  },
+  {
+    persist: true,
   }
 );
 

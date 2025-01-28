@@ -148,6 +148,9 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     loadValidationStatusInformation,
     updateRunningTime
   }
+},
+{
+  persist: true,
 })
 
 /* Pinia supports Hot Module replacement so you can edit your stores

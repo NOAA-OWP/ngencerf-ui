@@ -1,7 +1,5 @@
 import { defineStore, storeToRefs } from "pinia";
-
-import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastCycle } from "@/composables/NextGenModel";
-
+import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastCycle, ForecastJob, ForecastJobs } from "@/composables/NextGenModel";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
@@ -33,6 +31,29 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const calibrationRunForForecast = ref<CalibrationRunForForecast>();
 
   const uiGageId = ref<string>("");
+
+  const forecastRuns = ref<ForecastJob[]>([]);
+  
+  /**
+   * fetch user created forecast job list data
+   * @return {void}
+   */
+  const fetchForecastJobsListData = async (): Promise<any> => {
+    forecastRuns.value = [];
+    const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      }
+    });
+
+    if (runListDataResult?._data?.forecast_jobs.length > 0) {
+      runListDataResult?._data?.forecast_jobs.forEach((jobItem: ForecastJob) => {
+        forecastRuns.value.push(jobItem);
+      });
+    }
+  }
 
   /**
   * @returns {SelectOption[]}
@@ -247,6 +268,31 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationJobId.value = 0;
   }
 
+  const setSelectedForecastRunId = (forecast_job_id: number): void => {
+    forecastJobId.value = forecast_job_id;
+  }
+
+  const setSelectedForecastRowData = ( forecast_row_data: ForecastJob ): void => {
+    setSelectedForecastRunId( forecast_row_data.forecast_run_id );
+    setSelectedCalibrationRunId( forecast_row_data.calibration_run_id );
+    forecastCycle.value = forecastCycles.value?.find( (forecast_cycle_data : ForecastCycle ) =>
+      forecast_cycle_data.name === forecast_row_data.cycle
+    );
+    /*
+     * the follow is hack to get around the fact that we are using calibrationRunForForecast to check for calibration_run_id, but it's only set on calibration run tab
+     * user should be able to go straight to forecast runs and view results so this is a easy way to provide it.
+     */
+    calibrationRunForForecast.value = ( forecast_row_data as any as CalibrationRunForForecast); 
+    forecastJobStatus.value = forecast_row_data.status;
+  }
+
+  const resetSelectedForecastRunId = (): void => {
+    forecastJobId.value = undefined;
+    forecastJobStatus.value = undefined;
+    forecastCycle.value = undefined;
+    resetSelectedCalibrationRunId();
+  }
+
   /**
    * Set resultsPathname
    */
@@ -348,6 +394,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationRunsForForecast,
     calibrationRunForForecast,
     uiGageId,
+    forecastRuns,
+    fetchForecastJobsListData,
     loadSetupForecastTabData,
     loadForecastStatusRunTabData,
     loadForecastResultsTabData,
@@ -366,11 +414,12 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     getForecastPlot,
     getJobDataDirectory,
     hardResetForecastStore,
+    setSelectedForecastRunId,
+    resetSelectedForecastRunId,
+    setSelectedForecastRowData
   };
 }, {
-  persist: {
-    storage: persistedState.sessionStorage
-  },
+  persist:  true,
 });
 
 /* Pinia supports Hot Module replacement so you can edit your stores

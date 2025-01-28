@@ -97,6 +97,9 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
     cloneCalibrationRun,
     deleteCalibrationRun
   }
+},
+{
+  persist: true,
 })
 
 /* Pinia supports Hot Module replacement so you can edit your stores

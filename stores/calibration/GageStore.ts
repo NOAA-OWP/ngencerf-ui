@@ -426,9 +426,7 @@ export const useGageStore = defineStore(
     };
   },
   {
-    persist: {
-      storage: persistedState.sessionStorage,
-    },
+    persist: true,
   }
 );
 

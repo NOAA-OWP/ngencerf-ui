@@ -426,9 +426,7 @@ export const useFormulationStore = defineStore(
     };
   },
   {
-    persist: {
-      storage: persistedState.sessionStorage,
-    },
+    persist: true,
   }
 );
 

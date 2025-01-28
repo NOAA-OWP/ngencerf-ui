@@ -519,7 +519,8 @@ const handleNextPrevDialogClose = (opt: any) => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #Groups,
 #formulationNameInput {
@@ -551,12 +552,12 @@ ul#ModulesList {
   }
 
   li:hover {
-    background-color: $ngwcp_secondary3;
+    background-color: global.$ngwcp_secondary3;
     color: black;
   }
 
   .liActive {
-    background-color: $ngwcp_primary3;
+    background-color: global.$ngwcp_primary3;
     color: white;
   }
 }
@@ -581,7 +582,7 @@ table#CoveredBy {
 #SlothBackground {
   height: 301px;
   width: 35vw;
-  background-color: $ngwcp_groupsbkg;
+  background-color: global.$ngwcp_groupsbkg;
   border-radius: 20px;
   border: 1px solid #000;
   padding: 10px 15px;

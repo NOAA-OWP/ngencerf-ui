@@ -159,9 +159,7 @@ export const generalStore = defineStore(
     };
   },
   {
-    persist: {
-      storage: persistedState.sessionStorage,
-    },
+    persist: true,
   }
 );
 

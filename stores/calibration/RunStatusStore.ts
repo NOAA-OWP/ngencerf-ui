@@ -360,9 +360,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     hardResetRunStatusStore
   };
 }, {
-    persist: {
-      storage: persistedState.sessionStorage
-    },
+    persist: true,
 });
 
 /* Pinia supports Hot Module replacement so you can edit your stores

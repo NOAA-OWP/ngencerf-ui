@@ -64,7 +64,8 @@ const getFooterInformation = () => {
 </script>
 
 <style lang="scss" scoped>
-@import "/assets/styles/styles.scss";
+@use '@/assets/styles/global.scss';
+@use '@/assets/styles/styles.scss';
 
 #FloatingInfo {
   position:sticky;
@@ -97,7 +98,7 @@ const getFooterInformation = () => {
 }
 
 .footerColor {
-  background-color: $ngwcp_background;
+  background-color: global.$ngwcp_background;
 }
 
 .version,

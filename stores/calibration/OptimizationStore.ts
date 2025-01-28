@@ -415,9 +415,7 @@ export const useOptimizationStore = defineStore(
     };
   },
   {
-    persist: {
-      storage: persistedState.sessionStorage,
-    },
+    persist: true,
   }
 );
 
