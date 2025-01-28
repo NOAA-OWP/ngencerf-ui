@@ -87,19 +87,15 @@
             </div>
 
             <div class="col-span-2">
-              <table style="width:100%">
-                <tbody>
-                  <tr height="38px">
-                    <th scope="row" class="text-right font-bold" style="width: 140px;">
-                      <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
-                    </th>
-                    <td class="pl-5">
-                      <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory"
+              <div style="display:flex; margin-top: 1em;">
+                <div  class="text-right font-bold" style="width: 170px;">
+                  <label class="text-right" for="resultsPathname" style="width: 170px;">Results Pathname</label>
+                </div>
+                <div class="pl-5" style="width: 100%;">
+                  <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory"
                         disabled />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                </div>
+              </div>
 
 
             </div>

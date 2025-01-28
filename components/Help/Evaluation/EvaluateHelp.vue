@@ -7,10 +7,13 @@
 
   </div>
   <hr class="mt-2 mb-4" />
-  <table class="_help-table">
+  <p class="text-center" style="font-weight: bold;" id="actionsSectionTitle">Available Actions</p>
+  <table class="_help-table" aria-describedby="actionsSectionTitle">
     <thead>
-      <th class="td1">Item</th>
-      <th>Description</th>
+      <tr>
+        <th class="td1">Item</th>
+        <th>Description</th>
+      </tr>
     </thead>
     <tbody>
         <tr>
@@ -25,11 +28,13 @@
     </table>
 
   <hr class="mt-2 mb-4" />
-  <p class="text-center" style="font-weight: bold;">Calibration Plots</p>
-  <table class="_help-table">
+  <p class="text-center" style="font-weight: bold;" id="CaliPlotSectionTitle">Calibration Plots</p>
+  <table class="_help-table" aria-describedby="CaliPlotSectionTitle">
     <thead>
-      <th class="td1">Item</th>
-      <th>Description</th>
+      <tr>
+        <th class="td1">Item</th>
+        <th>Description</th>
+      </tr>
     </thead>
     <tbody>
         <tr>
@@ -71,11 +76,13 @@
       </tbody>
     </table>
   <br />
-  <p class="text-center" style="font-weight: bold;">Validation Plots</p>
-  <table class="_help-table">
+  <p class="text-center" style="font-weight: bold;" id="ValidatePlotSectionTitle">Validation Plots</p>
+  <table class="_help-table" aria-describedby="ValidatePlotSectionTitle">
       <thead>
-        <th class="td1">Item</th>
-        <th>Description</th>
+        <tr>
+          <th class="td1">Item</th>
+          <th>Description</th>
+        </tr>
       </thead>
       <tbody>
         <tr>
@@ -105,11 +112,13 @@
       </tbody>
     </table>
   <br />
-  <p class="text-center" style="font-weight: bold;">Tables</p>
-  <table class="_help-table">
+  <p class="text-center" style="font-weight: bold;" id="TableSectionTitle">Tables</p>
+  <table class="_help-table" aria-describedby="TableSectionTitle">
       <thead>
-        <th class="td1">Item</th>
-        <th>Description</th>
+        <tr>
+          <th class="td1">Item</th>
+          <th>Description</th>
+        </tr>
       </thead>
       <tbody>
         <tr>
@@ -128,12 +137,14 @@
       </tbody>
     </table>
   <br />
-  <p class="text-center" style="font-weight: bold;">Logs</p>
-  <table class="_help-table">
+  <p class="text-center" style="font-weight: bold;" id="LogSectionTitle">Logs</p>
+  <table class="_help-table" aria-describedby="LogSectionTitle">
     <thead>
+      <tr>
         <th class="td1">Item</th>
         <th>Description</th>
-      </thead>
+      </tr>
+    </thead>
     <tbody>
       <tr>
         <td class="td1">Calibration</td>
