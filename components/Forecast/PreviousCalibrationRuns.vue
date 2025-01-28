@@ -66,18 +66,22 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
+import type { DataTableRowClickEvent } from 'primevue/datatable';
+
 import type { CalibrationRunForForecast, DataTableContextMenuOption } from "@/composables/NextGenModel";
-import { ForecastTabs } from "@/composables/NextgenEnums";
+
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
-import type { DataTableRowClickEvent } from 'primevue/datatable';
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+
+import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
-import { storeToRefs } from "pinia";
-import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import { ForecastTabs } from "@/composables/NextgenEnums";
 
 const { deleteCalibrationRun } = useCalibrationJobStore();
 

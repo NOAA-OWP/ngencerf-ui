@@ -111,9 +111,10 @@
 </template>
 
 <script setup lang="ts">
+import { useToast } from 'primevue/usetoast';
+
 import { hilightTab } from '@/composables/TabHilight';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
-import { useToast } from 'primevue/usetoast';
 import { isValidDate, getForecastStatus } from '@/utils/CommonHelpers';
 import { calculateElapsedTime } from '@/utils/TimeHelpers';
 

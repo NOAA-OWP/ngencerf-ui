@@ -1,9 +1,12 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { generalStore } from "../common/GeneralStore";
+
 import type { CalibrationStatus, CalibrationPlotListNamesData } from "@/composables/NextGenModel";
+
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { generalStore } from "@/stores/common/GeneralStore";
+
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { isValidDate, isCalibrationJobFinished, getValidControlAndValidBestStatus } from '@/utils/CommonHelpers';
@@ -357,9 +360,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     hardResetRunStatusStore
   };
 }, {
-    persist: {
-      storage: piniaPluginPersistedstate.sessionStorage
-    },
+    persist: true,
 });
 
 /* Pinia supports Hot Module replacement so you can edit your stores

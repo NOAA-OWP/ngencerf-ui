@@ -78,13 +78,13 @@
 </template>
 
 <script lang="ts" setup>
+ 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
-const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 
 const userDataStore = useUserDataStore();
+const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
-
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 
 const emit = defineEmits(["tabNumber"]);

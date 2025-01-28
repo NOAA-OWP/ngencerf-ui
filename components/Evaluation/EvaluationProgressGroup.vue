@@ -52,8 +52,10 @@
 
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
+
 const { getEvaluationTabIndex, getMenuIndex } = generalStore();
 const currentEvaluationTab = ref(getEvaluationTabIndex());
+
 const emit = defineEmits(["tabNumber"]);
 
 const tabClicked = (event: Event) => {

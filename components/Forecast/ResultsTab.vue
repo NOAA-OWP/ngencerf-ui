@@ -42,10 +42,11 @@
 </template>
 
 <script setup lang="ts">
+import { useToast } from 'primevue/usetoast';
+
+import { useForecastStore } from '@/stores/forecast/ForecastStore';
 
 import { hilightTab } from '@/composables/TabHilight';
-import { useToast } from 'primevue/usetoast';
-import { useForecastStore } from '@/stores/forecast/ForecastStore';
 
 const {
   calibrationRunForForecast,

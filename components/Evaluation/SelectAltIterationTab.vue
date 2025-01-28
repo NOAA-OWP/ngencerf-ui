@@ -61,12 +61,15 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import type { DataTableRowClickEvent } from 'primevue/datatable';
-import { useEvaluationAltIterationStore } from '@/stores/evaluation/EvaluationAltIterationStore';
 import { useToast } from "primevue/usetoast";
+
+import type { DataTableRowClickEvent } from 'primevue/datatable';
+
+import { useEvaluationAltIterationStore } from '@/stores/evaluation/EvaluationAltIterationStore';
 import { generalStore } from '@/stores/common/GeneralStore';
-import { hilightTab } from '@/composables/TabHilight';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
+
+import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 const {

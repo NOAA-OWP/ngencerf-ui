@@ -78,14 +78,16 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 
 import type { CalibrationRun, DataTableContextMenuOption, ForecastJob } from "@/composables/NextGenModel";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useForecastStore } from "@/stores/forecast/ForecastStore";
+
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
-import { storeToRefs } from "pinia";
-import { useForecastStore } from "@/stores/forecast/ForecastStore";
+
 import type { DataTableRowClickEvent } from "primevue/datatable";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 

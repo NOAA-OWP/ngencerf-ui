@@ -177,21 +177,24 @@
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useDialog } from "primevue/usedialog";
+import { useToast } from "primevue/usetoast";
 
-import { isCalibrationJobStatusSavedOrReady, arraysEqual } from "@/utils/CommonHelpers";
-import { formatDateForRunOnString } from "@/utils/TimeHelpers";
+import type { SlothParameterData } from '@/composables/NextGenModel';
+
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
-import { useToast } from "primevue/usetoast";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
-import type { SlothParameterData } from '@/composables/NextGenModel';
-import { useDialog } from "primevue/usedialog";
+
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+
 import { hilightTab } from '@/composables/TabHilight';
+import { isCalibrationJobStatusSavedOrReady, arraysEqual } from "@/utils/CommonHelpers";
+import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 
 const { clearCalibratableParameters } = useTuningStore();
 
@@ -340,13 +343,8 @@ const saveFormulationData = () => {
     if (!valOK) {
       modulesHaveChanged.value = false;
       selectedOutputVariable.value = "";
-      // userOutputVariableToCalibrate.value = { name: '', module: null }
-      // if (userCalibrationRunData.value) {
-      //   userCalibrationRunData.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value as UserCalibrationRunOutputVariableToCalibrateData;
-      // }
-      // delete all of the Calabratable parameters on the Tuning Controls tab
+      toast.add({ severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate and then Tuning Paramters on the Tuning Control tab" });
       clearCalibratableParameters();
-
     }
 
     saveFormulationTabData().then(response => {

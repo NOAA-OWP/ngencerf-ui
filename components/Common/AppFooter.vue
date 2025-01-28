@@ -16,10 +16,11 @@
 </template>
 
 <script lang="ts" setup>
-import type { ServerInfo } from "@/composables/NextGenModel";
-import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "@/stores/common/GeneralStore";
 
+import type { ServerInfo } from "@/composables/NextGenModel";
+
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 import jsonData from '@/assets/version.json';
 
 const { getServerInfo, setServerInfo } = generalStore();

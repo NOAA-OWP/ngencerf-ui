@@ -26,12 +26,13 @@
 </template>
 <script setup lang="ts">
 import { onMounted, nextTick } from "vue";
-import AppHeader from '@/components/Common/AppHeader.vue';
-import AppFooter from '@/components/Common/AppFooter.vue';
-import { useUserDataStore } from '@/stores/common/UserDataStore';
-import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { storeToRefs } from "pinia";
 
+import AppHeader from '@/components/Common/AppHeader.vue';
+import AppFooter from '@/components/Common/AppFooter.vue';
+
+import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { useGageStore } from "@/stores/calibration/GageStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";

@@ -24,9 +24,10 @@
   </div>
 </template>
 <script lang="ts" setup>
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import MessagesGroup from "../Common/MessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
-import { useUserDataStore } from "@/stores/common/UserDataStore";
+
 const { userCalibrationRunData } = storeToRefs( useUserDataStore() );
 </script>
