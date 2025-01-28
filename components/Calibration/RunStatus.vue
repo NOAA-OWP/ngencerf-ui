@@ -168,7 +168,7 @@ import { useUserDataStore } from '@/stores/common/UserDataStore';
 
 import { ValidationPlotNames } from "@/composables/NextgenEnums";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime } from '@/utils/TimeHelpers';
+import { convertTimeZone, calculateElapsedTime, formatElapsedTime } from '@/utils/TimeHelpers';
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -471,7 +471,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             if (['Done', 'Cancelled', 'Failed', 'Server Error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
-              elapsedTime.value = validBest.elapsed_time;
+              elapsedTime.value = formatElapsedTime(validBest.elapsed_time);
             }
           }, 10000) as unknown as number;
         }
@@ -484,7 +484,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
         // get elapsed time from valid_best
         if (validBest?.elapsed_time) {
-          elapsedTime.value = validBest.elapsed_time;
+          elapsedTime.value = formatElapsedTime(validBest.elapsed_time);
         }
         
         if (validControl?.status) {
