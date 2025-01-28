@@ -8,7 +8,11 @@
   </div>
   <hr class="mt-2 mb-4" />
   <table class="_help-table">
-      <tbody>
+    <thead>
+      <th class="td1">Item</th>
+      <th>Description</th>
+    </thead>
+    <tbody>
         <tr>
           <td class="td1">New Validation Button</td>
           <td class="td2">Select an alternate iteration to run a validation to generate the associated plots.</td>
@@ -23,7 +27,11 @@
   <hr class="mt-2 mb-4" />
   <p class="text-center" style="font-weight: bold;">Calibration Plots</p>
   <table class="_help-table">
-      <tbody>
+    <thead>
+      <th class="td1">Item</th>
+      <th>Description</th>
+    </thead>
+    <tbody>
         <tr>
           <td class="td1">Hydrograph evolution</td>
           <td class="td2">Comparison of streamflow time series between observation and simulations from the control, last, and best runs. Associated data displayed in adjacent table.</td>
@@ -65,6 +73,10 @@
   <br />
   <p class="text-center" style="font-weight: bold;">Validation Plots</p>
   <table class="_help-table">
+      <thead>
+        <th class="td1">Item</th>
+        <th>Description</th>
+      </thead>
       <tbody>
         <tr>
           <td class="td1">Bar Chart Metrics</td>
@@ -95,6 +107,10 @@
   <br />
   <p class="text-center" style="font-weight: bold;">Tables</p>
   <table class="_help-table">
+      <thead>
+        <th class="td1">Item</th>
+        <th>Description</th>
+      </thead>
       <tbody>
         <tr>
           <td class="td1">Iteration Metrics Table</td>
@@ -114,6 +130,10 @@
   <br />
   <p class="text-center" style="font-weight: bold;">Logs</p>
   <table class="_help-table">
+    <thead>
+        <th class="td1">Item</th>
+        <th>Description</th>
+      </thead>
     <tbody>
       <tr>
         <td class="td1">Calibration</td>
