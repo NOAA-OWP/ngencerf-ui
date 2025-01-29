@@ -136,11 +136,6 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     loadValidationStatusInformation,
     updateRunningTime,
   }
-},
-{
-    persist: {
-    storage: piniaPluginPersistedstate.localStorage(),
-  },
 })
 
 /* Pinia supports Hot Module replacement so you can edit your stores

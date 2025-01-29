@@ -235,10 +235,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     evaluateValidationRunStatus,
     userSelectedEvalCalibrationRun,
     }
-},{
-    persist: {
-    storage: piniaPluginPersistedstate.localStorage(),
-  },
 })
 
 /* Pinia supports Hot Module replacement so you can edit your stores

@@ -229,13 +229,7 @@ export const useTuningStore = defineStore(
       hardResetTuningTimeConrols,
       hardResetTuningStore,
     };
-  },
-  {
-      persist: {
-    storage: piniaPluginPersistedstate.localStorage(),
-  },
-  }
-);
+  });
 
 /* Pinia supports Hot Module replacement so you can edit your stores
    and interact with them directly in your app without reloading the page,
