@@ -38,7 +38,9 @@ const activeTab = ref(getForecastTabIndex());
 
 // Activate new tab
 const tabChanged = (tabNum: number) => {
-  activeTab.value = tabNum;
-  setForecastTabIndex(tabNum);
+  if (activeTab.value !== tabNum) {
+    activeTab.value = tabNum;
+    setForecastTabIndex(tabNum);
+  } 
 };
 </script>
