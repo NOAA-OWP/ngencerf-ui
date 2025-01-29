@@ -159,7 +159,9 @@ export const generalStore = defineStore(
     };
   },
   {
-    persist: true,
+      persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+  },
   }
 );
 

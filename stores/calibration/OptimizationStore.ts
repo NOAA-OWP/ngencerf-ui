@@ -415,7 +415,9 @@ export const useOptimizationStore = defineStore(
     };
   },
   {
-    persist: true,
+      persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+  },
   }
 );
 

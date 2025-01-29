@@ -426,7 +426,9 @@ export const useGageStore = defineStore(
     };
   },
   {
-    persist: true,
+      persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+  },
   }
 );
 

@@ -419,7 +419,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     setSelectedForecastRowData
   };
 }, {
-  persist:  true,
+    persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+  },
 });
 
 /* Pinia supports Hot Module replacement so you can edit your stores

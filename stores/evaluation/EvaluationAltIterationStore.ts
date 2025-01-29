@@ -408,7 +408,9 @@ export const useEvaluationAltIterationStore = defineStore(
     };
   },
   {
-    persist: true,
+      persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+  },
   }
 );
 

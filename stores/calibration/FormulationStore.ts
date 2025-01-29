@@ -426,7 +426,9 @@ export const useFormulationStore = defineStore(
     };
   },
   {
-    persist: true,
+      persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+  },
   }
 );
 
