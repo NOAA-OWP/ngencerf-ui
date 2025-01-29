@@ -57,7 +57,7 @@
           <div id="GageReport" v-if="gageData" class="text-sm inline ml-0">
             <div id="GrBox" class="mt-5">
               <table class="table-auto">
-                <caption>Gage Report</caption>
+                <caption><span style="font-size:1.2em;font-weight: bold;">Gage Detail</span></caption>
                 <tbody>
                   <tr v-if="selectedDomainValue" class="rowOdd">
                     <th scope="row" class="dataName td1">Domain:</th>
