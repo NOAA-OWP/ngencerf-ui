@@ -128,12 +128,9 @@ export const generalStore = defineStore(
       getServerInfo,
       gageHasChanged,
       modulesHaveChanged,
-
-
       verificationTabIndex,
       menuIndex,
       evaluationRunSelected,
-
     };
   },
   {
