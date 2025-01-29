@@ -124,7 +124,7 @@
     <UserAccount />
   </div>  
   <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
-    <LazyAboutBox />
+    <AboutBox />
   </div>
 </template>
 
@@ -152,7 +152,7 @@ const LazyCalibrationHelpResultsHelp = defineAsyncComponent(() => import("@/comp
 const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/CalibrationRunsHelp.vue"))
 const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
-const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
+const AboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 
 const emit = defineEmits(["logoutEvent"]);
 
