@@ -1,4 +1,4 @@
-import { DateTime } from "luxon";
+import { DateTime, Duration } from "luxon";
 
 
 /**
@@ -101,7 +101,7 @@ export function calculateTimeRange(
  * Calculates the elapsed time between two Date objects
  * @param start_time Date object representing the start time
  * @param end_time Date object representing the end time
- * @returns {string} string of the elapsed time in '0 days, 01:23:45' format
+ * @returns {string} string of the elapsed time in 'd 'Days,' hh:mm:ss' format
  */
 export function calculateElapsedTime(start_time: Date, end_time: Date): string {
   const start = DateTime.fromJSDate(start_time);
@@ -109,4 +109,23 @@ export function calculateElapsedTime(start_time: Date, end_time: Date): string {
   const diff = end.diff(start, ["days", "hours", "minutes", "seconds"]);
   
   return diff.toFormat("d 'Days,' hh:mm:ss");
+};
+
+/**
+ * 
+ * @param elapsed_time string representation of a Duration object in the format 'hh:mm:ss.sss'
+ * @returns {string} string representation of a Duration object in the format 'd 'Days,' hh:mm:ss'
+ */
+export function formatElapsedTime(elapsed_time: string): string {
+  // parse out hours, minutes, and seconds from the elapsed_time string
+  const [hours, minutes, seconds] = elapsed_time.split(':').map(Number);
+
+  // convert elapsed_time string into a Duration object
+  const formatted_elapsed_time = Duration.fromObject({
+    hours: hours || 0,
+    minutes: minutes || 0,
+    seconds: Math.floor(seconds) // ignore fractions
+  });
+
+  return formatted_elapsed_time.toFormat("d 'Days,' hh:mm:ss");
 };
