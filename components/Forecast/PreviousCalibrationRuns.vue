@@ -23,7 +23,6 @@
       </div>
 
       <div id="calibrationRunList">
-        <div>
           <div id="CalTable">
             <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
               <div class="col-span-1">
@@ -54,7 +53,6 @@
               <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
             </DataTable>
           </div>
-        </div>
       </div>
 
     </div>
