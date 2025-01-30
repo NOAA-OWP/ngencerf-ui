@@ -355,9 +355,6 @@ export const useTuningStore = defineStore(
       hardResetTuningTimeConrols,
       hardResetTuningStore,
     };
-  },
-  {
-    persist: true,
   }
 );
 
