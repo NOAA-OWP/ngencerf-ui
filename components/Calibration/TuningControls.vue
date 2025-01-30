@@ -286,27 +286,31 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-import { useToast } from "primevue/usetoast";
+
 import VueDatePicker from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
 import { DateTime } from "luxon";
 import Select from "primevue/select";
+import type { DatePickerProps } from "primevue/datepicker";
+import { useToast } from "primevue/usetoast";
+import { useDialog } from "primevue/usedialog";
 
-import { isCalibrationJobStatusSavedOrReady, isValidDateTime, isNotNullOrUndefined } from "@/utils/CommonHelpers";
-import { formatDateForDisplay } from "@/utils/TimeHelpers";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+
+import { isCalibrationJobStatusSavedOrReady, isValidDateTime, isNotNullOrUndefined } from "@/utils/CommonHelpers";
+import { formatDateForDisplay } from "@/utils/TimeHelpers";
 import { makeProtectedApiCall } from '@/composables/UserAuth';
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { ifEDSErrorsExist } from "@/utils/TuningControlsHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
-import { useDialog } from "primevue/usedialog";
-import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
-import type { DatePickerProps } from "primevue/datepicker";
 import { hilightTab } from '@/composables/TabHilight';
+
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+
+import "@vuepic/vue-datepicker/dist/main.css";
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -809,7 +813,9 @@ const validateAndBuildRequestBody = (): boolean => {
     }
   }
 
-  saveTuningTabRequestBody.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
+  if ( userOutputVariableToCalibrate.value && userOutputVariableToCalibrate.value.name) {
+    saveTuningTabRequestBody.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
+  }
 
   saveTuningTabRequestBody.value.automatic_validation = automatic_validation.value;
 
@@ -824,7 +830,7 @@ const validateAndBuildRequestBody = (): boolean => {
 
   return true;
 };
-
+ 
 /**
  * Check if all calibration times are set
  * @returns boolean
@@ -1043,7 +1049,6 @@ const saveTuningData = () => {
         detail: errorMessage
       });
     }
-
   };
 
   const updateJobData = () => {
@@ -1171,9 +1176,9 @@ const restorePage = async () => {
     avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
   };
 
-  if (selectedOutputVariable.value !== null &&
-    selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
-  }
+  // if (selectedOutputVariable.value !== null &&
+  //   selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
+  // }
 }
 
 const gotoNext = () => {
@@ -1259,7 +1264,8 @@ const rowStyle = () => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #OutVar {
   width: 600px;

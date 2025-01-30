@@ -111,18 +111,21 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
+import type { DataTableRowClickEvent } from 'primevue/datatable';
 
 import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NextGenModel";
-import { EvaluationTabs } from "@/composables/NextgenEnums";
+
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
-import type { DataTableRowClickEvent } from 'primevue/datatable';
-import { storeToRefs } from "pinia";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
+
+import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
-import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
-import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import { EvaluationTabs } from "@/composables/NextgenEnums";
 
 const { deleteCalibrationRun } = useCalibrationJobStore();
 const showMessagesGroup = ref<boolean>(false);
@@ -436,7 +439,8 @@ const rowStyle = (data: any) => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #calibrationRunList {
   height: 80%;
@@ -448,7 +452,7 @@ const rowStyle = (data: any) => {
 
 #EvalRunTable,
 .gage-filter-wrapper {
-  width: 1270px;
+  width: 1400px;
   margin: 0 auto;
 }
 

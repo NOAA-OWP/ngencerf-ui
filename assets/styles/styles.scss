@@ -1,14 +1,14 @@
 // Scss Document
 
+@use "global.scss";
+@use "primeicons/primeicons.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import "global.scss";
-@import "primeicons/primeicons.css";
-
 html {
-  background: $ngwcp_background;
+  background: global.$ngwcp_background;
   height: 100%;
 }
 
@@ -64,8 +64,8 @@ input, .varInputs {
 .bg-white,
 .white-tall-content-box {
   input, .p-select, .p-inputtext, .p-password-input, .varInputs {
-    background-color: $ngwcp_neutral_gray_lt;  
-    border: 0px solid $ngwcp_neutral_gray_md;
+    background-color: global.$ngwcp_neutral_gray_lt;  
+    border: 0px solid global.$ngwcp_neutral_gray_md;
   }
   .p-select-dropdown {
     color: #000000;
@@ -102,14 +102,14 @@ input::-webkit-input-placeholder {
   color: white;
   padding: 6px 25px;
   border-radius: 28px;
-  background-color: $ngwcp_primary1;
+  background-color: global.$ngwcp_primary1;
   text-align: center;
   font-size: 18px;
   border: 0px;
   display: inline-block;
 }
 .ngenButtonDiv:hover {
-  background-color: $ngwcp_primary3;
+  background-color: global.$ngwcp_primary3;
   color: white;
 }
 .ngenButtonDiv-alt {
@@ -117,14 +117,14 @@ input::-webkit-input-placeholder {
   color: white;
   padding: 5px 20px;
   border-radius: 28px;
-  background-color: $ngwcp_primary4;
+  background-color: global.$ngwcp_primary4;
   text-align: center;
   font-size: 18px;
   border: 0px;
   display: inline-block;
 }
 .ngenButtonDiv-alt:hover {
-  background-color: $ngwcp_primary3;
+  background-color: global.$ngwcp_primary3;
   color: white;
 }
 .ngenButtonDiv-alt button,
@@ -141,28 +141,28 @@ input::-webkit-input-placeholder {
   color: white;
   padding: 6px 25px;
   border-radius: 28px;
-  background-color: $ngwcp_secondary4;
+  background-color: global.$ngwcp_secondary4;
   text-align: center;
   font-size: 18px;
   border: 0px;
   display: inline-block;
 }
 .ngenButtonDiv-green:hover {
-  background-color: $ngwcp_secondary4lt;
+  background-color: global.$ngwcp_secondary4lt;
 }
 .ngenButtonDiv-red {
   cursor: pointer;
   color: white;
   padding: 6px 25px;
   border-radius: 28px;
-  background-color: $ngwcp_red_dark1;
+  background-color: global.$ngwcp_red_dark1;
   text-align: center;
   font-size: 18px;
   border: 0px;
   display: inline-block;
 }
 .ngenButtonDiv-red:hover {
-  background-color: $ngwcp_red_dark2;
+  background-color: global.$ngwcp_red_dark2;
 }
 
 .ngenButtonDiv-yellow {
@@ -170,14 +170,14 @@ input::-webkit-input-placeholder {
   color: black;
   padding: 6px 25px;
   border-radius: 28px;
-  background-color: $ngwcp_yellow_dark1;
+  background-color: global.$ngwcp_yellow_dark1;
   text-align: center;
   font-size: 18px;
   border: 0px;
   display: inline-block;
 }
 .ngenButtonDiv-yellow:hover {
-  background-color: $ngwcp_yellow_dark2;
+  background-color: global.$ngwcp_yellow_dark2;
 }
 
 .ngenButtonDiv-yellow-spacer {
@@ -219,26 +219,26 @@ h2 {
 }
 
 h3 {
-  color: $staticText;
+  color: global.$staticText;
   display: inline;
   text-transform: capitalize;
   font-weight: normal;
 }
 
 h4 {
-  color: $staticText;
+  color: global.$staticText;
   display: inline;
   text-transform: capitalize;
   font-weight: normal;
 }
 
 h5 {
-  color: $staticText;
+  color: global.$staticText;
   font-weight: normal;
 }
 
 fieldset {
-  border-color: $inactiveColor;
+  border-color: global.$inactiveColor;
   border-style: solid;
   margin: 1em;
   line-height: 1.5em;
@@ -355,7 +355,7 @@ select option {
 }
 
 .p-datatable-thead tr th:hover {
-  background-color: $ngwcp_primary3 !important;
+  background-color: global.$ngwcp_primary3 !important;
   color: white !important;
 }
 
@@ -385,19 +385,19 @@ select option {
 .pagination-pages {width:70%;}
 
 // default color ovewrites
-.bg-green { background-color: $ngwcp_secondary4 !important; }
-.bg-lt-green { background-color: $ngwcp_secondary4lt !important}
-.bg-blue1 { background-color: $ngwcp_primary1 !important; }
-.bg-blue2 { background-color: $ngwcp_primary2 !important; }
-.bg-blue3 { background-color: $ngwcp_primary3 !important; }
-.bg-blue4 { background-color: $ngwcp_primary4 !important; }
+.bg-green { background-color: global.$ngwcp_secondary4 !important; }
+.bg-lt-green { background-color: global.$ngwcp_secondary4lt !important}
+.bg-blue1 { background-color: global.$ngwcp_primary1 !important; }
+.bg-blue2 { background-color: global.$ngwcp_primary2 !important; }
+.bg-blue3 { background-color: global.$ngwcp_primary3 !important; }
+.bg-blue4 { background-color: global.$ngwcp_primary4 !important; }
 .bg-white { background-color: white !important; }
-.c-blue { color: $color-blue !important; }
-.c-blue-primary1 { color: $ngwcp_primary1 !important; }
-.c-black { color: $black !important; }
+.c-blue { color: global.$color-blue !important; }
+.c-blue-primary1 { color: global.$ngwcp_primary1 !important; }
+.c-black { color: global.$black !important; }
 
-.c-gray-bg {background-color: $ngwcp_background !important }
-.bg-gray-md {background-color: $ngwcp_neutral_gray_md !important }
+.c-gray-bg {background-color: global.$ngwcp_background !important }
+.bg-gray-md {background-color: global.$ngwcp_neutral_gray_md !important }
 
 
 #ProgressGroup {
@@ -423,7 +423,7 @@ select option {
         cursor: pointer;
     }
     .ptype:hover {
-        color: $ngwcp_primary1;
+        color: global.$ngwcp_primary1;
     }
   }
 }
@@ -433,10 +433,10 @@ table.alt-row-colors {
     padding-left: 8px;
   }
   tr:nth-child(even) {
-    background-color: $ngwcp_neutral_gray_lt;
+    background-color: global.$ngwcp_neutral_gray_lt;
   }
   tr:nth-child(odd) {
-    background-color: $ngwcp_neutral_gray_md;
+    background-color: global.$ngwcp_neutral_gray_md;
   }
 }
 table.cols-bordered {
@@ -450,9 +450,9 @@ table.cols-bordered {
   }
 }
 
-.bg_green_lt { background-color: $ngwcp_green_lt; }
-.bg_blue_lt { background-color: $ngwcp_blue_lt; }
-.bg_blue_md { background-color: $ngwcp_blue_md; }
+.bg_green_lt { background-color: global.$ngwcp_green_lt; }
+.bg_blue_lt { background-color: global.$ngwcp_blue_lt; }
+.bg_blue_md { background-color: global.$ngwcp_blue_md; }
 
 // Help Pages
 ._help-page {
@@ -535,7 +535,7 @@ table.cols-bordered {
   margin-top: 7px;
 }
 .p-listbox-option-selected {
-  background-color: $ngwcp_green_lt !important; 
+  background-color: global.$ngwcp_green_lt !important; 
 }
 #MainLeftDataArea .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected {
   color: var(--p-listbox-option-color); 

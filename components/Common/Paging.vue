@@ -39,12 +39,13 @@
         </div>
         <div class="pagination-go-to-page">
             <label for="PlotTablePageNumber" class="pr-2 pt-3">Page:</label>
-            <input type="number" min="1" :max="totalPages" :value="currentPage" @input="gotoPage(parseInt($event.target.value))">
+            <input type="number" min="1" :max="totalPages" :value="currentPage" @input="gotoPage(parseInt(($event.target as HTMLInputElement).value))">
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+
 const props = defineProps([
     'currentPage',
     'totalPages'
@@ -58,7 +59,9 @@ function gotoPage(page: number) {
 </script>
 
 <style lang="scss" scoped>
-@import "/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 .pagingLink {
   padding-left: 4px;
   padding-right: 4px;

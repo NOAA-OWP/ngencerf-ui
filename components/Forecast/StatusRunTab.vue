@@ -12,6 +12,7 @@
     <div class="grid grid-cols-2">
       <div class="col-span-1">
         <table>
+          <caption style="text-align: left;">Forecast Job Run Time</caption>
           <tbody>
             <tr height="40px">
               <th scope="row" class="text-right font-bold">
@@ -43,6 +44,7 @@
 
       <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
         <table>
+          <caption>Forecast Job Status</caption>
           <tbody>
             <tr height="40px">
               <th scope="row" class="text-right font-bold">
@@ -61,18 +63,15 @@
       </div>
 
       <div class="col-span-2">
-        <table style="width:100%">
-          <tbody>
-            <tr height="38px">
-              <th scope="row" class="text-right font-bold" style="width: 140px;">
-                <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
-              </th>
-              <td class="pl-5">
-                <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div style="display:flex; margin-top: 1em;">
+          <div  class="text-right font-bold" style="width: 155px;">
+            <label class="text-right" for="resultsPathname" style="width: 155px;">Results Pathname</label>
+          </div>
+          <div class="pl-5" style="width: 100%;">
+            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory"
+                  disabled />
+          </div>
+        </div>
       </div>
     </div>
     <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
@@ -111,11 +110,12 @@
 </template>
 
 <script setup lang="ts">
+import { useToast } from 'primevue/usetoast';
+
 import { hilightTab } from '@/composables/TabHilight';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
-import { useToast } from 'primevue/usetoast';
 import { isValidDate, getForecastStatus } from '@/utils/CommonHelpers';
-import { calculateElapsedTime } from '@/utils/TimeHelpers';
+import { calculateElapsedTime, formatElapsedTime } from '@/utils/TimeHelpers';
 
 const isLoading = ref<boolean>(false); // loading indicator
 const toast = useToast();
@@ -305,7 +305,7 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
 
     if (forecast) {
       if (forecast.elapsed_time) {
-        elapsedTime.value = forecast.elapsed_time;
+        elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
       } else {
         toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response`});
       }
@@ -321,7 +321,8 @@ watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCl
 </script>
 
 <style lang="scss" scoped>
-@import "/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #resultsPathname {
   background-color: #fff;

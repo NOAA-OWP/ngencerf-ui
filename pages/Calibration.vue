@@ -9,6 +9,7 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
+
 import NextgenLayout from "@/layouts/CalibrationLayout.vue";
 
 onMounted(() => {

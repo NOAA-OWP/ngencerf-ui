@@ -65,7 +65,11 @@
       in that field will be discarded.</em>
   </p>
   <table class="_help-table">
-      <tbody>
+    <thead>
+        <th>Item</th>
+        <th>Description</th>
+      </thead>
+    <tbody>
         <tr>
           <td class="td1">Entering Times</td>
           <td class="td2">Times are UTC.<br >
@@ -180,5 +184,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 </style>

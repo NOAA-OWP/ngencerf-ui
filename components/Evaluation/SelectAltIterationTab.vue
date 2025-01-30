@@ -61,12 +61,15 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import type { DataTableRowClickEvent } from 'primevue/datatable';
-import { useEvaluationAltIterationStore } from '@/stores/evaluation/EvaluationAltIterationStore';
 import { useToast } from "primevue/usetoast";
+
+import type { DataTableRowClickEvent } from 'primevue/datatable';
+
+import { useEvaluationAltIterationStore } from '@/stores/evaluation/EvaluationAltIterationStore';
 import { generalStore } from '@/stores/common/GeneralStore';
-import { hilightTab } from '@/composables/TabHilight';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
+
+import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 const {
@@ -160,26 +163,27 @@ const navigateToEvaluateStatus = ( event : any ) => {
 </script>
 
 <style lang="scss">
-@import "/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #RunDetailsTbl .p-datatable-thead>tr:nth-child(2) th,
 #RunDetailsTbl .p-datatable-thead>tr:nth-child(2) th:hover {
-  background-color: $ngwcp_blue_md !important;
-  border: $ngwcp_blue_md;
+  background-color: global.$ngwcp_blue_md !important;
+  border: global.$ngwcp_blue_md;
   color: var(--p-datatable-row-color) !important;
 }
 
 #RunDetailsTbl .p-datatable-thead>tr:nth-child(3) th,
 #RunDetailsTbl .p-datatable-thead>tr:nth-child(3) th:hover {
-  background-color: $ngwcp_blue_lt !important;
-  border: $ngwcp_blue_lt;
+  background-color: global.$ngwcp_blue_lt !important;
+  border: global.$ngwcp_blue_lt;
   color: var(--p-datatable-row-color) !important;
 }
 
 #CalTuningParamsTbl .p-datatable-thead>tr:nth-child(2) th,
 #CalTuningParamsTbl .p-datatable-thead>tr:nth-child(2) th:hover {
-  background-color: $ngwcp_blue_lt !important;
-  border: $ngwcp_blue_lt;
+  background-color: global.$ngwcp_blue_lt !important;
+  border: global.$ngwcp_blue_lt;
   color: var(--p-datatable-row-color) !important;
 }
 

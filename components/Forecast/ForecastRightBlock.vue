@@ -8,7 +8,7 @@
             <h2>Progress</h2>
           </div>
           <div id="ProgressGroup" class="col-span-3">
-            <ForecastProgressGroup" />
+            <ForecastProgressGroup />
           </div>
           <div id="GageCutout" class="col-span-2">
             <GageCutout />
@@ -24,9 +24,10 @@
   </div>
 </template>
 <script lang="ts" setup>
-
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import ForecastProgressGroup from "./ForecastProgressGroup.vue";
 import MessagesGroup from "../Common/MessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
-import { useUserDataStore } from "@/stores/common/UserDataStore";
+
 const { userCalibrationRunData } = storeToRefs( useUserDataStore() );
 </script>

@@ -16,10 +16,11 @@
 </template>
 
 <script lang="ts" setup>
-import type { ServerInfo } from "@/composables/NextGenModel";
-import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "@/stores/common/GeneralStore";
 
+import type { ServerInfo } from "@/composables/NextGenModel";
+
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 import jsonData from '@/assets/version.json';
 
 const { getServerInfo, setServerInfo } = generalStore();
@@ -63,7 +64,8 @@ const getFooterInformation = () => {
 </script>
 
 <style lang="scss" scoped>
-@import "/assets/styles/styles.scss";
+@use '@/assets/styles/global.scss';
+@use '@/assets/styles/styles.scss';
 
 #FloatingInfo {
   position:sticky;
@@ -96,7 +98,7 @@ const getFooterInformation = () => {
 }
 
 .footerColor {
-  background-color: $ngwcp_background;
+  background-color: global.$ngwcp_background;
 }
 
 .version,
