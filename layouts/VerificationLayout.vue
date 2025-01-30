@@ -45,5 +45,6 @@ import VerificationLeftBlock from "@/components/Verification/VerificationLeftBlo
 
 </script>
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 </style>

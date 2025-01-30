@@ -1,7 +1,7 @@
 <template>
   <div class="_help-page">
     <div class="_help-title">Evaluation - Calibration Runs Tab</div>
-    <p class="_help-subtitle">
+    <p id="help-subtitle" class="_help-subtitle">
       Displays table of calibration run with some basic details. User selects one of the runs in the list to
       evaluate. If the run has multiple validation runs, the user will be provided a list of the associated validation
       runs to select from.
@@ -10,7 +10,13 @@
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
     <hr class="mt-2 mb-4" />
-    <table class="_help-table">
+    <table class="_help-table" aria-describedby="help-subtitle">
+      <thead>
+        <tr>
+          <th class="td1">Item</th>
+          <th>Description</th>
+        </tr>
+      </thead>
       <tbody>
         <tr>
           <td class="td1">Right Click</td>
@@ -46,7 +52,8 @@
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 .helpfile-ul {
   list-style-type:disc !important;

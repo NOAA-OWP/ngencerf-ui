@@ -23,9 +23,9 @@
 </template>
 
 <script setup lang="ts">
-import Tabs from '@/components/Common/Tabs.vue'
-
 import { generalStore } from "@/stores/common/GeneralStore";
+
+import Tabs from '@/components/Common/Tabs.vue'
 import PreviousCalibrationRuns from '@/components/Forecast/PreviousCalibrationRuns.vue';
 import ForecastRunsTab from './ForecastRunsTab.vue';
 import SetupForecastTab from './SetupForecastTab.vue';

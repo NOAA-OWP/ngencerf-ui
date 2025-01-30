@@ -65,7 +65,11 @@
       in that field will be discarded.</em>
   </p>
   <table class="_help-table">
-      <tbody>
+    <thead>
+        <th>Item</th>
+        <th>Description</th>
+      </thead>
+    <tbody>
         <tr>
           <td class="td1">Entering Times</td>
           <td class="td2">Times are UTC.<br >
@@ -170,6 +174,11 @@
           <td class="td2">The Formulation has not been chosen. Go to the Formulation tab and select the formulation.
           </td>
         </tr>
+        <tr>
+          <td class="td1"><strong>No data in parameter file</strong></td>
+          <td class="td2">The file may not exit, be empty, missing a require column or data.
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -180,5 +189,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 </style>

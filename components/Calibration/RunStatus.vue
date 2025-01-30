@@ -87,19 +87,15 @@
             </div>
 
             <div class="col-span-2">
-              <table style="width:100%">
-                <tbody>
-                  <tr height="38px">
-                    <th scope="row" class="text-right font-bold" style="width: 140px;">
-                      <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
-                    </th>
-                    <td class="pl-5">
-                      <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory"
+              <div style="display:flex; margin-top: 1em;">
+                <div  class="text-right font-bold" style="width: 170px;">
+                  <label class="text-right" for="resultsPathname" style="width: 170px;">Results Pathname</label>
+                </div>
+                <div class="pl-5" style="width: 100%;">
+                  <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory"
                         disabled />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                </div>
+              </div>
 
 
             </div>
@@ -161,12 +157,15 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-import { ValidationPlotNames } from "@/composables/NextgenEnums";
+import { useToast } from 'primevue/usetoast';
+
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
+
+import { ValidationPlotNames } from "@/composables/NextgenEnums";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime } from '@/utils/TimeHelpers';
-import { useToast } from 'primevue/usetoast';
+import { convertTimeZone, calculateElapsedTime, formatElapsedTime } from '@/utils/TimeHelpers';
+
 import { hilightTab } from '@/composables/TabHilight';
 
 const runStatusStore = useRunStatusStore();
@@ -468,7 +467,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             if (['Done', 'Cancelled', 'Failed', 'Server Error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
-              elapsedTime.value = validBest.elapsed_time;
+              elapsedTime.value = formatElapsedTime(validBest.elapsed_time);
             }
           }, 10000) as unknown as number;
         }
@@ -481,7 +480,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
         // get elapsed time from valid_best
         if (validBest?.elapsed_time) {
-          elapsedTime.value = validBest.elapsed_time;
+          elapsedTime.value = formatElapsedTime(validBest.elapsed_time);
         }
         
         if (validControl?.status) {
@@ -585,7 +584,8 @@ const gotoEvaluation = () => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #ResultsDisplay {
   width: 50vw;
@@ -593,7 +593,7 @@ const gotoEvaluation = () => {
   margin: 5px auto;
   padding: 6px 10px 6px 20px;
   border-radius: 10px;
-  border: 0px solid $ngwcp_neutral_gray_md;
+  border: 0px solid global.$ngwcp_neutral_gray_md;
 
 }
 

@@ -6,17 +6,23 @@
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
+                <caption>Evaluation Run Time & Iteration</caption>
+                <thead>
+                    <tr>
+                      <th class="text-right" colspan="2"></th>
+                    </tr>
+                  </thead>
                 <tbody>
                   <tr height="38px">
-                    <td class="text-right font-bold">Submit Time</td>
+                    <th scope="row" class="text-right font-bold">Submit Time</th>
                     <td class="pl-5">{{ startTime ? formatDateForDisplay(startTime) : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="38px">
-                    <td class="text-right font-bold">Elapsed Time</td>
+                    <th scope="row" class="text-right font-bold">Elapsed Time</th>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="38px">
-                    <td class="text-right"><label for="iterationNum">Iteration</label></td>
+                    <th scope="row" class="text-right"><label for="iterationNum">Iteration</label></th>
                     <td class="pl-5">
                       {{ evaluateDisplayIterationNumber }}
                     </td>
@@ -27,15 +33,16 @@
 
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
+                <caption>Evaluation Status</caption>
                 <tbody>
                   <tr height="38px">
-                    <td class="text-right"><label for="RunStatus">Status</label></td>
+                    <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
                     <td class="pl-5">
                       {{ validationStatus }}
                     </td>
                   </tr>
                   <tr height="38px">
-                    <td class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></td>
+                    <th scope="row" class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></th>
                     <td class="pl-5">
                       {{ displayValidationId }}
                     </td>
@@ -117,11 +124,14 @@
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted } from "vue";
+import { useToast } from 'primevue/usetoast';
+
+import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
+
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
-import { useToast } from 'primevue/usetoast';
-import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
 import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
@@ -236,7 +246,8 @@ const navigateToEvaluation = (event: any) => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #ResultsDisplay {
   width: 50vw;
@@ -244,7 +255,7 @@ const navigateToEvaluation = (event: any) => {
   padding: 10px 10px 10px 20px;
   border-radius: 10px;
   height: 100px;
-  border: 0px solid $ngwcp_neutral_gray_md;
+  border: 0px solid global.$ngwcp_neutral_gray_md;
   min-width: 750px;
 
 }
@@ -253,7 +264,7 @@ const navigateToEvaluation = (event: any) => {
   height: 40vh;
   width: 100%;
   margin: 8px auto 0 auto;
-  border: 1px solid $ngwcp_neutral_gray_md;
+  border: 1px solid global.$ngwcp_neutral_gray_md;
 }
 
 #RunStatus,

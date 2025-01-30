@@ -111,18 +111,18 @@
 </template>
 
 <script setup lang="ts">
-
 import { ref, onMounted } from "vue";
-import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { useToast } from "primevue/usetoast";
-import { useUserDataStore } from "@/stores/common/UserDataStore";
-import AppFooter from "@/components/Common/AppFooter.vue";
-import AppHeader from "@/components/Common/AppHeader.vue";
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 
-
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
+
+import AppFooter from "@/components/Common/AppFooter.vue";
+import AppHeader from "@/components/Common/AppHeader.vue";
+
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 
 const { calibrationJobId } = storeToRefs(generalStore());
 
@@ -289,7 +289,8 @@ const GoToLanding = () => {
 
 </script>
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 .needAccount {
   font-size: 18px;

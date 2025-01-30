@@ -7,8 +7,15 @@
 
   </div>
   <hr class="mt-2 mb-4" />
-  <table class="_help-table">
-      <tbody>
+  <p class="text-center" style="font-weight: bold;" id="actionsSectionTitle">Available Actions</p>
+  <table class="_help-table" aria-describedby="actionsSectionTitle">
+    <thead>
+      <tr>
+        <th class="td1">Item</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
         <tr>
           <td class="td1">New Validation Button</td>
           <td class="td2">Select an alternate iteration to run a validation to generate the associated plots.</td>
@@ -21,9 +28,15 @@
     </table>
 
   <hr class="mt-2 mb-4" />
-  <p class="text-center" style="font-weight: bold;">Calibration Plots</p>
-  <table class="_help-table">
-      <tbody>
+  <p class="text-center" style="font-weight: bold;" id="CaliPlotSectionTitle">Calibration Plots</p>
+  <table class="_help-table" aria-describedby="CaliPlotSectionTitle">
+    <thead>
+      <tr>
+        <th class="td1">Item</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
         <tr>
           <td class="td1">Hydrograph evolution</td>
           <td class="td2">Comparison of streamflow time series between observation and simulations from the control, last, and best runs. Associated data displayed in adjacent table.</td>
@@ -63,8 +76,14 @@
       </tbody>
     </table>
   <br />
-  <p class="text-center" style="font-weight: bold;">Validation Plots</p>
-  <table class="_help-table">
+  <p class="text-center" style="font-weight: bold;" id="ValidatePlotSectionTitle">Validation Plots</p>
+  <table class="_help-table" aria-describedby="ValidatePlotSectionTitle">
+      <thead>
+        <tr>
+          <th class="td1">Item</th>
+          <th>Description</th>
+        </tr>
+      </thead>
       <tbody>
         <tr>
           <td class="td1">Bar Chart Metrics</td>
@@ -93,8 +112,14 @@
       </tbody>
     </table>
   <br />
-  <p class="text-center" style="font-weight: bold;">Tables</p>
-  <table class="_help-table">
+  <p class="text-center" style="font-weight: bold;" id="TableSectionTitle">Tables</p>
+  <table class="_help-table" aria-describedby="TableSectionTitle">
+      <thead>
+        <tr>
+          <th class="td1">Item</th>
+          <th>Description</th>
+        </tr>
+      </thead>
       <tbody>
         <tr>
           <td class="td1">Iteration Metrics Table</td>
@@ -112,8 +137,14 @@
       </tbody>
     </table>
   <br />
-  <p class="text-center" style="font-weight: bold;">Logs</p>
-  <table class="_help-table">
+  <p class="text-center" style="font-weight: bold;" id="LogSectionTitle">Logs</p>
+  <table class="_help-table" aria-describedby="LogSectionTitle">
+    <thead>
+      <tr>
+        <th class="td1">Item</th>
+        <th>Description</th>
+      </tr>
+    </thead>
     <tbody>
       <tr>
         <td class="td1">Calibration</td>
@@ -132,5 +163,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 </style>

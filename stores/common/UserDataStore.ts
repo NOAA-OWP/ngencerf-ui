@@ -1,11 +1,13 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { useBackendConfig } from "@/composables/UseBackendConfig";
-import { generalStore } from "./GeneralStore";
-import { makeProtectedApiCall } from "@/composables/UserAuth";
 
 import type { CalibrationJobListItem, ValidationJobsList, UserCalibrationRunData } from "@/composables/NextGenModel";
+
+import { generalStore } from "@/stores/common/GeneralStore";
+
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
 
 export const useUserDataStore = defineStore("UserDataStore", () => {
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -336,9 +338,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   };
 },
   {
-    persist: {
-      storage: persistedState.sessionStorage
-    },
+    persist: true,
   });
 
 /* Pinia supports Hot Module replacement so you can edit your stores

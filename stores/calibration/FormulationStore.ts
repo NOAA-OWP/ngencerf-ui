@@ -1,10 +1,13 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
+
 import { generalStore } from "../common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
+
 import type {
   SelectOption,
   FormulationTabData,
@@ -423,9 +426,7 @@ export const useFormulationStore = defineStore(
     };
   },
   {
-    persist: {
-      storage: persistedState.sessionStorage,
-    },
+    persist: true,
   }
 );
 

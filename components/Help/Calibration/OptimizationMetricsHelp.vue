@@ -13,6 +13,10 @@
     </p>
 
     <table class="_help-table">
+      <thead>
+        <th>Item</th>
+        <th>Description</th>
+      </thead>      
       <tbody>
         <tr>
           <td class="td1">Optimization Algorithm</td>
@@ -70,7 +74,7 @@
     </table>
     <div class="mt-4">
       <p style="text-align: center;font-weight: bold;">Metric Definitions</p>
-      <img class="mx-auto" width="90%" :src="image1" />
+      <img class="mx-auto" width="90%" :src="image1" alt="" />
     </div>
   </div>
 </template>
@@ -80,5 +84,6 @@ import image1 from "@/assets/styles/img/OptimizationMetricsTable.png"
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 </style>

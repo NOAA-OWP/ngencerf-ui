@@ -7,6 +7,10 @@
     </p>
 
     <table class="_help-table">
+      <thead>
+        <th>Item</th>
+        <th>Description</th>
+      </thead>
       <tbody>
         <tr>
           <td class="td1">New Button</td>
@@ -68,6 +72,10 @@
     </table>
 
     <table class="_help-table">
+      <thead>
+        <th>Menu Item</th>
+        <th>Description</th>
+      </thead>
       <tbody>
         <tr>
           <td class="td1">Right Click</td>
@@ -96,7 +104,8 @@
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 ._help-table .td1 {
   width: 150px;

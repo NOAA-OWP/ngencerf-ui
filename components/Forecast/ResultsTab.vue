@@ -1,6 +1,10 @@
 <template>
   <div class="col-span-2">
-    <table>
+    <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
+      <span id="tab-title">Forecast Run Results</span>
+    </h1>
+      
+    <table aria-describedby="tab-title">
       <tbody>
         <tr height="38px">
           <th scope="row" class="text-right font-bold">
@@ -42,10 +46,11 @@
 </template>
 
 <script setup lang="ts">
+import { useToast } from 'primevue/usetoast';
+
+import { useForecastStore } from '@/stores/forecast/ForecastStore';
 
 import { hilightTab } from '@/composables/TabHilight';
-import { useToast } from 'primevue/usetoast';
-import { useForecastStore } from '@/stores/forecast/ForecastStore';
 
 const {
   calibrationRunForForecast,
@@ -80,7 +85,8 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/styles.scss";
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 
 #resultsPathname {
   background-color: #fff;
