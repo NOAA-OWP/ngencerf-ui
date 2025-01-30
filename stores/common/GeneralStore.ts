@@ -126,6 +126,7 @@ export const generalStore = defineStore(
       resetGeneralStore,
       setServerInfo,
       getServerInfo,
+      serverInfo,
       gageHasChanged,
       modulesHaveChanged,
       verificationTabIndex,
