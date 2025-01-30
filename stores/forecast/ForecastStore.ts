@@ -18,6 +18,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const forecastCycles = ref<ForecastCycle[]>();
   const forecastCycle = ref<ForecastCycle>();
   const forecastJobStatus = ref<string>();
+  const forcingDownloadStatus = ref<string>();
   const elapsedTime = ref<string>();
   const submitTimeDate = ref<Date>();
   const submitTime = ref<string>();
@@ -33,6 +34,43 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const uiGageId = ref<string>("");
 
   const forecastRuns = ref<ForecastJob[]>([]);
+
+  /**
+   * Compute Overall Forcing Download and Forecast status
+   */
+  const overallForcingDownloadForecastStatus = computed<string>(() => {
+    if (
+      [
+        "Saved",
+        "Ready",
+        "Running",
+        "Cancelled",
+        "Failed",
+        "Server Error",
+      ].includes(forcingDownloadStatus.value as string)
+    ) {
+      return `Forcing Download ${forcingDownloadStatus.value as string}`;
+    } else if (forcingDownloadStatus.value === "Done") {
+      if (
+        [
+          "Saved",
+          "Ready",
+          "Running",
+          "Cancelled",
+          "Failed",
+          "Server Error",
+        ].includes(forecastJobStatus.value as string)
+      ) {
+        return `Forcing Download Done, Forecast ${forecastJobStatus.value as string}`;
+      } else if (forecastJobStatus.value === "Done") {
+        return "Done";
+      } else {
+        return "Unknown";
+      }
+    } else {
+      return "Unknown";
+    }
+  });
   
   /**
    * fetch user created forecast job list data
@@ -102,6 +140,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
 
       // set forecastJobStatus, elapsedTime, submitTime, and resultsPathname
       forecastJobStatus.value = forecastJob.status;
+      forcingDownloadStatus.value = forecastJob.forcing_download.status;
       elapsedTime.value = forecastJob.elapsed_time;
       submitTimeDate.value = new Date(forecastJob.submit_date as string);
       if (isValidDate(submitTimeDate.value)) {
@@ -323,6 +362,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         if (getForecastPlotNamesResponse?._data?.plot_names) {
           const forecastPlotNamesList: any[] = getForecastPlotNamesResponse._data.plot_names;
 
+          // there should only be one forecast plot
           if (forecastPlotNamesList.length === 1) {
             forecastPlotName.value = forecastPlotNamesList[0];
             const getForecastPlotResponse: any = await getForecastPlot({
@@ -338,7 +378,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
               return useApiErrorResponsePreprocess(getForecastPlotResponse);
             }
           } else {
-            return [`${forecastPlotNamesList.length} forecast plots found`];
+            return [`${forecastPlotNamesList.length} forecast plots found. Only one forecast plot is expected.`];
           }
         } else {
           return ['Could not get forecast plot names from get_plot_names endpoint'];
@@ -363,6 +403,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastCycles.value =  [];
     forecastCycle.value =  undefined;
     forecastJobStatus.value =  undefined;
+    forcingDownloadStatus.value =  undefined;
     elapsedTime.value =  undefined;
     submitTimeDate.value = undefined;
     submitTime.value =  undefined;
@@ -382,6 +423,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastCycles,
     forecastCycle,
     forecastJobStatus,
+    forcingDownloadStatus,
     elapsedTime,
     submitTimeDate,
     submitTime,
@@ -395,6 +437,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationRunForForecast,
     uiGageId,
     forecastRuns,
+    overallForcingDownloadForecastStatus,
     fetchForecastJobsListData,
     loadSetupForecastTabData,
     loadForecastStatusRunTabData,
