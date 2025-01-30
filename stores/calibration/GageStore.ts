@@ -424,9 +424,6 @@ export const useGageStore = defineStore(
       loadGageTabStaticData,
       gagePayload
     };
-  },
-  {
-    persist: true,
   }
 );
 

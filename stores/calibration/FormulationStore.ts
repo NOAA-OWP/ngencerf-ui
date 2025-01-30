@@ -424,9 +424,6 @@ export const useFormulationStore = defineStore(
       loadFormulationTabStaticData,
       saveFormulationPayload,
     };
-  },
-  {
-    persist: true,
   }
 );
 
