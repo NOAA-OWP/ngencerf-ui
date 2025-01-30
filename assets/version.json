@@ -1,8 +1,8 @@
 {
   "release_info": {
-    "version": "rc-1.0.0",
-    "date": "2025-01-24",
-    "commit": "ab5e2f460ee37949849a7040d33ad5b6ad40e5fe",
+    "version": "rc-1.0.0A",
+    "date": "2025-01-30",
+    "commit": "ceb5eee0ab1de51011619fa4d7e3e9291300f679",
     "copyright": "© 2024-2025, RTX"
   }
 }
