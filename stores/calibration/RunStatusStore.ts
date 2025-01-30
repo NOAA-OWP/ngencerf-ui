@@ -359,8 +359,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     cancelCalibrationJob,
     hardResetRunStatusStore
   };
-}, {
-    persist: true,
 });
 
 /* Pinia supports Hot Module replacement so you can edit your stores
