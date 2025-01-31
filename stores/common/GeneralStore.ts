@@ -157,9 +157,6 @@ export const generalStore = defineStore(
       gageHasChanged,
       modulesHaveChanged
     };
-  },
-  {
-    persist: true,
   }
 );
 

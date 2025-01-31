@@ -115,9 +115,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     queryGetLogNames,
     queryGetLogData,
   };
-},
-{
-  persist: true,
 });
 
 /* Pinia supports Hot Module replacement so you can edit your stores
