@@ -50,7 +50,8 @@
               <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Status</div>
               </th>
-              <td v-if="forcingDownloadStatus && forecastJobStatus" class="pl-5">{{ overallForcingDownloadForecastStatus }}</td>
+              <td v-if="forcingDownloadStatus && forecastJobStatus" class="pl-5">{{ overallForcingDownloadForecastStatus
+                }}</td>
               <td v-else class="pl-5">Ready</td>
             </tr>
             <tr height="32px">
@@ -65,12 +66,11 @@
 
       <div class="col-span-2">
         <div style="display:flex; margin-top: 1em;">
-          <div  class="text-right font-bold" style="width: 155px;">
+          <div class="text-right font-bold" style="width: 155px;">
             <label class="text-right" for="resultsPathname" style="width: 155px;">Results Pathname</label>
           </div>
           <div class="pl-5" style="width: 100%;">
-            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory"
-                  disabled />
+            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
           </div>
         </div>
       </div>
@@ -95,8 +95,8 @@
           </span>
           <span v-if="overallForcingDownloadForecastStatus === 'Done'">
             <div class="col-span-1 mr-3">
-              <button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button" @click="goToResultsTab()"
-                aria-label="View Results Button">
+              <button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button"
+                @click="goToResultsTab()" aria-label="View Results Button">
                 View Results
               </button>
             </div>
@@ -134,7 +134,7 @@ const {
   resultsPathname,
   calibrationRunForForecast,
   overallForcingDownloadForecastStatus
-} = storeToRefs(useForecastStore()); 
+} = storeToRefs(useForecastStore());
 
 const {
   loadForecastStatusRunTabData,
@@ -202,11 +202,11 @@ const createForcingDownloadAndForecastStatusInterval = () => {
         if (forecast.elapsed_time) {
           elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
         } else {
-          toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response`});
+          toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` });
         }
       }
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`});
+      toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` });
     }
   }, 10000) as unknown as number;
 };
@@ -228,8 +228,8 @@ const startForecastRun = async () => {
       submitTimeDate.value = new Date(createAndRunForecastJobResponse?._data?.submit_date);
 
       if (isValidDate(submitTimeDate.value)) {
-      submitTime.value = convertTimeZone(submitTimeDate.value);
-    }
+        submitTime.value = convertTimeZone(submitTimeDate.value);
+      }
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
     }
@@ -267,7 +267,7 @@ const cancelForecastRun = async () => {
 /**
  * Go to the Status Run tab
  */
- const goToResultsTab = () => {
+const goToResultsTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
   const e = allTabs[ForecastTabs.tab_results] as HTMLElement;
   e.click();
@@ -313,10 +313,10 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
         if (forecast.elapsed_time) {
           elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
         } else {
-          toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response`});
+          toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` });
         }
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`});
+        toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` });
       }
     }
   }
