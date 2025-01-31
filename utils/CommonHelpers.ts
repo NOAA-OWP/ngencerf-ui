@@ -149,7 +149,7 @@ export const getValidControlAndValidBestStatus = (validControlStatus: string, va
  * @param forecastStatus
  * @returns {string}
  */
-export const getForecastStatus = (
+export const getOverallForecastStatus = (
   forecastForcingDownloadStatus: string,
   forecastStatus: string
 ): string => {
@@ -163,7 +163,7 @@ export const getForecastStatus = (
       "Server Error",
     ].includes(forecastForcingDownloadStatus)
   ) {
-    return forecastForcingDownloadStatus;
+    return `Forcing Download ${forecastForcingDownloadStatus}`;
   } else if (forecastForcingDownloadStatus === "Done") {
     if (
       [
@@ -175,7 +175,9 @@ export const getForecastStatus = (
         "Server Error",
       ].includes(forecastStatus)
     ) {
-      return forecastStatus;
+      return `Forcing Download Done, Forecast ${forecastStatus}`;
+    } else if (forecastStatus === "Done") {
+      return "Done";
     } else {
       return "Unknown";
     }
