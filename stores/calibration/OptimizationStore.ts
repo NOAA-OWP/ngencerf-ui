@@ -413,9 +413,6 @@ export const useOptimizationStore = defineStore(
       loadOptimizationTabStaticData,
       saveOptMetPayload,
     };
-  },
-  {
-    persist: true,
   }
 );
 
