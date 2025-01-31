@@ -12,7 +12,6 @@ stages:
 image: registry.sh.nextgenwaterprediction.com/infrastructure/docker/docker:latest
 
 variables:
-    DOCKER_COMPOSE_NAME: ngencerf-ui-ngencerf-app
     DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE
     DOCKER_IMAGE_TAG: $CI_COMMIT_REF_NAME
 
@@ -23,11 +22,11 @@ build:
     - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     - echo "Building ${CI_PROJECT_NAME} docker image.. "
     - docker compose build
-    - docker tag $DOCKER_COMPOSE_NAME:latest $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - docker tag $DOCKER_IMAGE_NAME:latest $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
     - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
     - echo "Building ${CI_PROJECT_NAME} Production docker image.. "
     - docker compose -f production-pw.yaml build
-    - docker tag $DOCKER_COMPOSE_NAME:latest $DOCKER_IMAGE_NAME:prod
+    - docker tag $DOCKER_IMAGE_NAME:latest $DOCKER_IMAGE_NAME:prod
     - docker logout
 
 unit-test:
@@ -54,9 +53,6 @@ sonarqube:
       - .sonar/cache
   script:
     - sonar-scanner -X -Dsonar.verbose=true
-  rules:
-    # SonarQube CommunityEdition only supports analyzing a single branch.
-    - if: '$CI_COMMIT_BRANCH == "development"'
 
 container_scanning:
   stage: test
