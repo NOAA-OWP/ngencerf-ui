@@ -50,7 +50,9 @@
               <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Status</div>
               </th>
-              <td class="pl-5">{{ forecastJobStatus ?? 'Ready' }}</td>
+              <td v-if="forcingDownloadStatus && forecastJobStatus" class="pl-5">{{ overallForcingDownloadForecastStatus
+                }}</td>
+              <td v-else class="pl-5">Ready</td>
             </tr>
             <tr height="32px">
               <td class="text-right font-bold">
@@ -64,12 +66,11 @@
 
       <div class="col-span-2">
         <div style="display:flex; margin-top: 1em;">
-          <div  class="text-right font-bold" style="width: 155px;">
+          <div class="text-right font-bold" style="width: 155px;">
             <label class="text-right" for="resultsPathname" style="width: 155px;">Results Pathname</label>
           </div>
           <div class="pl-5" style="width: 100%;">
-            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory"
-                  disabled />
+            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
           </div>
         </div>
       </div>
@@ -84,7 +85,7 @@
               </button>
             </div>
           </span>
-          <span v-if="forecastJobStatus === 'Running'">
+          <span v-if="forcingDownloadStatus === 'Running' || forecastJobStatus === 'Running'">
             <div class="col-span-1 mr-3">
               <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelForecastRun()"
                 aria-label="Cancel Button">
@@ -92,10 +93,10 @@
               </button>
             </div>
           </span>
-          <span v-if="forecastJobStatus === 'Done'">
+          <span v-if="overallForcingDownloadForecastStatus === 'Done'">
             <div class="col-span-1 mr-3">
-              <button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button" @click="goToResultsTab()"
-                aria-label="View Results Button">
+              <button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button"
+                @click="goToResultsTab()" aria-label="View Results Button">
                 View Results
               </button>
             </div>
@@ -114,7 +115,7 @@ import { useToast } from 'primevue/usetoast';
 
 import { hilightTab } from '@/composables/TabHilight';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
-import { isValidDate, getForecastStatus } from '@/utils/CommonHelpers';
+import { isValidDate } from '@/utils/CommonHelpers';
 import { calculateElapsedTime, formatElapsedTime } from '@/utils/TimeHelpers';
 
 const isLoading = ref<boolean>(false); // loading indicator
@@ -124,6 +125,7 @@ const {
   forecastJobId,
   forecastCycle,
   forecastJobStatus,
+  forcingDownloadStatus,
   elapsedTime,
   submitTimeDate,
   submitTime,
@@ -131,7 +133,8 @@ const {
   forecastJobStatusIntervalId,
   resultsPathname,
   calibrationRunForForecast,
-} = storeToRefs(useForecastStore()); 
+  overallForcingDownloadForecastStatus
+} = storeToRefs(useForecastStore());
 
 const {
   loadForecastStatusRunTabData,
@@ -139,6 +142,7 @@ const {
   cancelForecastJob,
   getStatus,
   getJobDataDirectory,
+  setResultsPathname
 } = useForecastStore();
 
 onMounted(async () => {
@@ -157,12 +161,14 @@ onMounted(async () => {
 });
 
 /**
- * Create elapsedTimeIntervalId to update elapsedTime every second while Forecast job is Running
+ * Create elapsedTimeIntervalId to increment elapsedTime every second while forcingDownloadStatus
+ * or forecastJobStatus is Running
  */
 const createElapsedTimeInterval = () => {
   elapsedTimeIntervalId.value = setInterval(async () => {
-    if (forecastJobStatus.value === 'Running') {
-      // Calculate elapsedTime every second while Forecast job is Running
+    // continue incrementing elapsedTime every second while forcingDownloadStatus or forecastJobStatus
+    // is Running
+    if (forcingDownloadStatus.value === 'Running' || forecastJobStatus.value === 'Running') {
       elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
     } else {
       clearInterval(elapsedTimeIntervalId.value);
@@ -172,22 +178,35 @@ const createElapsedTimeInterval = () => {
 };
 
 /**
- * Create forecastJobStatusIntervalId to update forecastJobStatus every 10 seconds
+ * Create forecastJobStatusIntervalId to update forcingDownloadStatus and forecastJobStatus every 10 seconds
+ * while forcingDownloadStatus or forecastJobStatus is Running
  */
-const createForecastJobStatusInterval = () => {
+const createForcingDownloadAndForecastStatusInterval = () => {
   forecastJobStatusIntervalId.value = setInterval(async () => {
     const getStatusResponse = await getStatus();
     const forecasts: any[] = getStatusResponse?._data.forecasts;
     const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
     if (forecast) {
-      if (forecast.status !== 'Running') {
+      // if forcing download and forecast job is not running, clear the interval
+      if (forecast.forcing_download.status != 'Running' && forecast.status !== 'Running') {
         clearInterval(forecastJobStatusIntervalId.value);
         forecastJobStatusIntervalId.value = undefined;
-        forecastJobStatus.value = forecast.status;
-      } 
+      }
+      // update forcingDownloadStatus and forecastJobStatus
+      forecastJobStatus.value = forecast.status;
+      forcingDownloadStatus.value = forecast.forcing_download.status;
+
+      // if overallForcingDownloadForecastStatus is Done, set elapsedTime to Forecast job's elapsed_time
+      if (overallForcingDownloadForecastStatus.value === 'Done') {
+        if (forecast.elapsed_time) {
+          elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
+        } else {
+          toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` });
+        }
+      }
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`});
+      toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` });
     }
   }, 10000) as unknown as number;
 };
@@ -201,34 +220,23 @@ const startForecastRun = async () => {
   try {
     const createAndRunForecastJobResponse = await createAndRunForecastJob(calibrationRunForForecast?.value?.calibration_run_id as number, forecastCycle?.value?.name as string);
 
-    if (createAndRunForecastJobResponse?._data?.forecast_forcing_download_status && createAndRunForecastJobResponse?._data?.forecast_status) {
-      forecastJobStatus.value = getForecastStatus(createAndRunForecastJobResponse._data.forecast_forcing_download_status, createAndRunForecastJobResponse._data.forecast_status);
-      forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get Forecast status from server' });
-    }
+    forecastJobStatus.value = createAndRunForecastJobResponse._data.forecast_status;
+    forcingDownloadStatus.value = createAndRunForecastJobResponse._data.forecast_forcing_download_status;
+    forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
 
     if (createAndRunForecastJobResponse?._data?.submit_date) {
       submitTimeDate.value = new Date(createAndRunForecastJobResponse?._data?.submit_date);
 
       if (isValidDate(submitTimeDate.value)) {
-      submitTime.value = convertTimeZone(submitTimeDate.value);
-    }
+        submitTime.value = convertTimeZone(submitTimeDate.value);
+      }
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
     }
 
-    const queryGetJobDataDirectoryResponse = await getJobDataDirectory();
+    // set resultsPathname
+    await setResultsPathname();
 
-    if (queryGetJobDataDirectoryResponse?._data?.data_dir) {
-      resultsPathname.value = queryGetJobDataDirectoryResponse._data.data_dir;
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get results pathname from server' });
-    }
-
-    if (forecastJobStatus.value !== 'Running') {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Forecast status not set to Running after clicking START' });
-    }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Forecast job' });
   }
@@ -259,58 +267,57 @@ const cancelForecastRun = async () => {
 /**
  * Go to the Status Run tab
  */
- const goToResultsTab = () => {
+const goToResultsTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
   const e = allTabs[ForecastTabs.tab_results] as HTMLElement;
   e.click();
 };
 
 /**
- * Watch the forecast job status for changes
+ * Watch overallForcingDownloadForecastStatus for changes
+ * overallForcingDownloadForecastStatus is a computed value based on forcingDownloadStatus and forecastJobStatus
+ * so we're essentially watching both forcingDownloadStatus and forecastJobStatus for changes
  */
-watch(forecastJobStatus, async (oldForecastJobStatus, newForecastJobStatus, onCleanup) => {
-  // when forecastJobStatus changes to Running, start incrementing elapsedTime every second
-  // and start checking forecastJobStatus every 10 seconds until forecastJobStatus changes from Running
-  if (forecastJobStatus.value === 'Running') {
-    createElapsedTimeInterval();
-    createForecastJobStatusInterval();
+watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newForecastJobStatus, onCleanup) => {
+  // set resultsPathname if not already set
+  if (!resultsPathname.value) {
+    await setResultsPathname();
+  }
 
-    if (!resultsPathname.value) {
-      const queryGetJobDataDirectoryResponse = await getJobDataDirectory();
-
-      if (queryGetJobDataDirectoryResponse?._data?.data_dir) {
-        resultsPathname.value = queryGetJobDataDirectoryResponse._data.data_dir;
-      } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get results pathname from server' });
-      }
+  // when overallForcingDownloadForecastStatus first changes to Running, start incrementing elapsedTime every second until
+  // overallForcingDownloadForecastStatus changes to Done, Cancelled, Failed, or Server Error
+  if (forcingDownloadStatus.value === 'Running' || forecastJobStatus.value === 'Running') {
+    // create elapsedTimeIntervalId to update elapsedTime every second while overallForcingDownloadForecastStatus 
+    // is Running if not already created
+    if (!elapsedTimeIntervalId.value) {
+      createElapsedTimeInterval();
+    }
+    // create forecastJobStatusIntervalId to update forcingDownloadStatus and forecastJobStatus every 10 seconds
+    // while forcingDownloadStatus or forecastJobStatus is Running if not already created
+    if (!forecastJobStatusIntervalId.value) {
+      createForcingDownloadAndForecastStatusInterval();
     }
   }
 
-  // when forecastJobStatus changes to Done, look for elapsedTime from server
-  if (forecastJobStatus.value === 'Done') {
-    const getStatusResponse = await getStatus();
+  // when overallForcingDownloadForecastStatus changes to Done, look for elapsedTime from server
+  // if interval incrementing elapsedTime every second is no longer running
+  if (forcingDownloadStatus.value === 'Done' || forecastJobStatus.value === 'Done') {
+    // if forecastJobStatusIntervalId is not set, that means elapsedTime is no longer incrementing every second
+    // so we need to get elapsed_time from the server
+    if (!forecastJobStatusIntervalId.value) {
+      const getStatusResponse = await getStatus();
+      const forecasts: any[] = getStatusResponse?._data.forecasts;
+      const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
-    if (!resultsPathname.value) {
-      const queryGetJobDataDirectoryResponse = await getJobDataDirectory();
-
-      if (queryGetJobDataDirectoryResponse?._data?.data_dir) {
-        resultsPathname.value = queryGetJobDataDirectoryResponse._data.data_dir;
+      if (forecast) {
+        if (forecast.elapsed_time) {
+          elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
+        } else {
+          toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` });
+        }
       } else {
-        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Could not get results pathname from server' });
+        toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` });
       }
-    }
-
-    const forecasts: any[] = getStatusResponse?._data.forecasts;
-    const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
-
-    if (forecast) {
-      if (forecast.elapsed_time) {
-        elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
-      } else {
-        toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response`});
-      }
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`});
     }
   }
 

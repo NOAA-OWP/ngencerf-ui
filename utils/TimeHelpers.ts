@@ -112,7 +112,7 @@ export function calculateElapsedTime(start_time: Date, end_time: Date): string {
 };
 
 /**
- * 
+ * Format string representation of a Duration object from format 'hh:mm:ss.sss' to 'd 'Days,' hh:mm:ss'
  * @param elapsed_time string representation of a Duration object in the format 'hh:mm:ss.sss'
  * @returns {string} string representation of a Duration object in the format 'd 'Days,' hh:mm:ss'
  */
