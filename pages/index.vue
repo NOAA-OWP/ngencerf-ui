@@ -1,13 +1,13 @@
 <template>
   <Head>
-    <Title>NEXTGEN</Title>
+    <Title>ngenCERF</Title>
   </Head>
 
 </template>
 <script lang="ts" setup>
-const appConfig = useAppConfig();
+import { onMounted } from "vue";
+
 onMounted(() => {
-  //this can be removed once we implement the page
-   window.location.href = "calibration";
+   window.location.href = "login";
 });
 </script>

@@ -1,0 +1,109 @@
+// @ts-check
+
+import { defineStore, storeToRefs } from "pinia";
+
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { generalStore } from "@/stores/common/GeneralStore";
+
+import { makeProtectedApiCall } from "#imports";
+import type { CalibrationJobListItem } from "@/composables/NextGenModel";
+
+export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
+  const { ngencerfBaseUrl } = useBackendConfig();
+  const { getAccessToken } = useUserDataStore()
+  const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
+  const { calibrationJobId } = storeToRefs( generalStore() )
+
+  /**
+ * returns list of calibration job data from server
+ * @returns {CalibrationJobListItem[]}
+ */
+  const fetchJobsListData = computed( () => {
+    return userCalibrationJobsListData.value ?? []
+  })
+
+  /**
+ * based on the current user's list of calibration job return number of job with status of "saved"
+ * @returns {number}
+ */
+  const savedCalibrationJobs = computed( () => {
+    return userCalibrationJobsListData.value?.reduce( ( total_saved_jobs: number, job: CalibrationJobListItem  ) => {
+        if( job.status.toLowerCase() === 'saved' ) total_saved_jobs += 1;
+        return total_saved_jobs;
+    }, 0 )
+  })
+
+  /**
+ * based on the current user's list of calibration job return number of job with status of "running"
+ * @returns {number}
+ */
+  const runningCalibrationJobs = computed( () => {
+    return userCalibrationJobsListData.value?.reduce( ( total_running_jobs: number, job: CalibrationJobListItem  ) => {
+        if( job.status.toLowerCase() === 'running' ) total_running_jobs += 1;
+        return total_running_jobs;
+    }, 0 )
+  })
+
+  /**
+ * return a new calibration run id generated from the server
+ * @returns {CreatedCalibrationRun}
+ */
+  async function fetchNewCalibrationRunId() {
+    return await makeProtectedApiCall<CreatedCalibrationRun>( `${ngencerfBaseUrl}/calibration/create_calibration_run/`, {
+        method: "POST",
+        headers: { 
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+        }
+    } );
+  }
+
+
+  /**
+  * Delete a job
+  */
+  async function deleteCalibrationRun(runId: number) {
+    return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/delete_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: runId })
+    })
+  }
+
+  /**
+ * Clone a job
+ */
+  async function cloneCalibrationRun(runId: number) {
+    return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/clone_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: runId })
+    })
+  }
+
+  return {
+    fetchJobsListData,
+    calibrationJobId,
+    savedCalibrationJobs,
+    runningCalibrationJobs,
+    fetchNewCalibrationRunId,
+    cloneCalibrationRun,
+    deleteCalibrationRun
+  }
+});
+
+/* Pinia supports Hot Module replacement so you can edit your stores
+  and interact with them directly in your app without reloading the page,
+  allowing you to keep the existing state, add, or even remove state,
+  actions, and getters.
+*/
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useCalibrationJobStore, import.meta.hot));
+}

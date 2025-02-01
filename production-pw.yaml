@@ -1,0 +1,12 @@
+name: ngencerf-ui
+
+services:
+  ngencerf-app:
+    extends:
+      file: compose.yaml
+      service: ngencerf-app
+    image: registry.sh.nextgenwaterprediction.com/ngwpc/nwm-ngen/ngencerf_ui:prod
+    pull_policy: always
+    build: 
+      dockerfile: ./Dockerfile.production-pw
+

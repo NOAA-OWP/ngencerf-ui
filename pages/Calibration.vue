@@ -1,10 +1,23 @@
 <!-- Calibration.vue -->
 <template>
-  <DataEntry>
-
-  </DataEntry>
+  <client-only>
+    <NextgenLayout>
+      <slot />
+    </NextgenLayout>
+  </client-only>
 </template>
+
 <script lang="ts" setup>
-import DataEntry from "@/layouts/DataEntry.vue";
+import { onMounted } from "vue";
+
+import NextgenLayout from "@/layouts/CalibrationLayout.vue";
+
+onMounted(() => {
+  nextTick(() => {
+    const allTabs = document.getElementsByClassName("tabs");
+    const e = allTabs[CalibrationTabs.tab_calibrationRuns] as HTMLElement;
+    e.click();
+  });
+});
+
 </script>
-<style lang="css" scoped></style>

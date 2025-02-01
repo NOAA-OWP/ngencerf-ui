@@ -1,14 +1,31 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { Base } from '#build/components';
+import Aura from '@primevue/themes/aura';
+import { b } from 'vitest/dist/suite-IbNSsUWN.js';
+
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   css: ["/assets/styles/styles.scss"],
-  modules: ["@nuxtjs/google-fonts"],
+  modules: [
+    [
+      "@pinia/nuxt",
+      {
+        // automatically imports `defineStore` and imports `defineStore` as `definePiniaStore`
+        autoImports: ["defineStore", ["defineStore", "definePiniaStore"], "acceptHMRUpdate"],
+      },
+    ],
+    'pinia-plugin-persistedstate/nuxt',
+    "@nuxtjs/google-fonts",
+    '@primevue/nuxt-module'
+  ],
+
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
     },
   },
+
   googleFonts: {
     families: {
       Roboto: true,
@@ -24,5 +41,21 @@ export default defineNuxtConfig({
         ital: '200..700',
       }
     }
+  },
+
+  primevue: {
+    options: {
+      theme: {
+        preset: Aura
+      },
+    }
+  },
+
+  compatibilityDate: '2024-07-05',
+
+  runtimeConfig: {
+    public: {
+      ngencerfBaseUrl: process.env.NGENCERF_BASE_URL || 'http://localhost:8000'
+    }
   }
-})
+});
