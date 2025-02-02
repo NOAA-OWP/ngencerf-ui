@@ -160,8 +160,10 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
-import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
-          useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
+import {
+  useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
+  useApiResponseToastSeverityCode
+} from "@/composables/ValidationHandlers";
 
 const isLoading = ref(true);
 
@@ -211,7 +213,6 @@ onMounted(() => {
     isLoading.value = false;
   });
 })
-
 
 const onGageSelectionChange = () => {
   // Was there a previous gage?
@@ -310,7 +311,6 @@ const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
     showForcingFileUploadDialog('Forcing Files')
   }
 }
-
 
 /**
  * Force focus on text input area when user clicks on dropdown.
@@ -502,7 +502,6 @@ const updateJobData = async (response: any) => {
   }
 }
 
-
 const resetTabData = () => {
   resetUserSelectionGage();
   // reset geopackage_image_url to clear out image
@@ -578,12 +577,14 @@ const handleNextPrevDialogClose = (opt: any) => {
 
     tr {
       line-height: 27px;
+
       th {
         padding: 4px 15px;
         cursor: default;
         border-bottom: 1px solid #ccc;
         background-color: global.$ngwcp_neutral_gray_lt;
       }
+
       td {
         padding: 4px 15px;
         cursor: default;
