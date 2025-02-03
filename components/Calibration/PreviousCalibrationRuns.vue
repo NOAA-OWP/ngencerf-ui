@@ -212,11 +212,11 @@ const createNewCalibration = async () => {
 }
 
 const gotoHeadwaterBasinGage = () => {
-  nextTick(() => {
-    loadGageTabStaticData();
-    loadFormulationTabStaticData();
-    loadTuningTabStaticData();
-    loadOptimizationTabStaticData();
+  nextTick( async () => {
+    await loadGageTabStaticData();
+    await loadFormulationTabStaticData();
+    await loadTuningTabStaticData();
+    await loadOptimizationTabStaticData();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
     e.click();
