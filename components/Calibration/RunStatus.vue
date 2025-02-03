@@ -18,7 +18,7 @@
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Elapsed Time</div>
                     </th>
-                    <td class="pl-5">{{ elapsedTime ? elapsedTime : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="32px">
                     <th scope="row" class="text-right font-bold">
@@ -164,7 +164,7 @@ import { useUserDataStore } from '@/stores/common/UserDataStore';
 
 import { ValidationPlotNames } from "@/composables/NextgenEnums";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime, formatElapsedTime } from '@/utils/TimeHelpers';
+import { convertTimeZone, calculateElapsedTime, formatElapsedTime, addAllTimesInArray } from '@/utils/TimeHelpers';
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -176,7 +176,7 @@ const toast = useToast();
 const {
   submitTimeDate,
   submitTime,
-  elapsedTime,
+  calibrationElapsedTime,
   plotNames,
   plotList,
   selectedPlotName,
@@ -232,6 +232,14 @@ onMounted( async () => {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
   }
 
+  let timeArray = [];
+   timeArray.push(new Date("2020-09-06T12:00"));
+   timeArray.push(new Date(new Date("2020-09-06T14:00")));
+   timeArray.push(new Date(new Date("2020-09-06T15:00")));
+
+   let x = addAllTimesInArray(timeArray)
+     console.log(formatDateForDisplay(x));
+  
   nextTick(async () => {
     hilightTab(CalibrationTabs.tab_statusRun);
     if (userCalibrationRunData.value) {
@@ -262,14 +270,14 @@ onMounted( async () => {
 });
 
 /**
- * Create elapsedTimeIntervalId to update elapsedTime every second while Calibration is Running or Validation is not Done
+ * Create elapsedTimeIntervalId to update calibrationElapsedTime every second while Calibration is Running or Validation is not Done
  */
 const createElapsedTimeInterval = () => {
   elapsedTimeIntervalId.value = setInterval(async () => {
     if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
-      // Calculate elapsedTime every second while Calibration is Running or Validation is not Done
-      elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
+      // Calculate calibrationElapsedTime every second while Calibration is Running or Validation is not Done
+      calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
     } else {
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
@@ -376,9 +384,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         // Calculate Running Time every second while calibration is Running or calibration is Done and valid_control and valid_best have not started or are Ready or Running
         if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
           (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
-          elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
+          calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
 
-          // Create an interval to update elapsedTime every second while Calibration is Running or Validation is not Done
+          // Create an interval to update calibrationElapsedTime every second while Calibration is Running or Validation is not Done
           if (!elapsedTimeIntervalId.value) {
             createElapsedTimeInterval();
           }
@@ -467,7 +475,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             if (['Done', 'Cancelled', 'Failed', 'Server Error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
-              elapsedTime.value = formatElapsedTime(validBest.elapsed_time);
+              calibrationElapsedTime.value = formatElapsedTime(validBest.elapsed_time);
             }
           }, 10000) as unknown as number;
         }
@@ -480,7 +488,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
         // get elapsed time from valid_best
         if (validBest?.elapsed_time) {
-          elapsedTime.value = formatElapsedTime(validBest.elapsed_time);
+          calibrationElapsedTime.value = formatElapsedTime(validBest.elapsed_time);
         }
         
         if (validControl?.status) {

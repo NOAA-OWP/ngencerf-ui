@@ -19,7 +19,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
   // refs
-  const elapsedTime = ref<string>();
+  const calibrationElapsedTime = ref<string>();
   const submitTimeDate = ref<Date>();
   const submitTime = ref<string>();
 
@@ -71,7 +71,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   //   ls = sessionStorage.getItem('plotNames');
   //   if (ls !== "undefined") { plotNames.value = JSON.parse(ls as string) }
 
-  //   elapsedTime.value = sessionStorage.getItem('elapsedTime') as string;
+  //   calibrationElapsedTime.value = sessionStorage.getItem('calibrationElapsedTime') as string;
   //   submitTimeDate.value = sessionStorage.getItem('submitTimeDate') as any as Date;
   //   submitTime.value = sessionStorage.getItem('submitTime') as string;
   //   selectedPlotName.value = sessionStorage.getItem('selectedPlotName') as string;
@@ -92,7 +92,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
   // watch(plotList, (plotList) => { sessionStorage.setItem('plotList', JSON.stringify(plotList)); });
   // watch(plotNames, (plotNames) => { sessionStorage.setItem('', JSON.stringify(plotNames)); });
-  // watch(elapsedTime, (elapsedTime) => { sessionStorage.setItem('elapsedTime', elapsedTime ?? ""); });
+  // watch(calibrationElapsedTime, (calibrationElapsedTime) => { sessionStorage.setItem('calibrationElapsedTime', calibrationElapsedTime ?? ""); });
   // watch(submitTimeDate, (submitTimeDate) => { sessionStorage.setItem('submitTimeDate', JSON.stringify(submitTimeDate)); });
   // watch(submitTime, (submitTime) => { sessionStorage.setItem('submitTime', submitTime ?? ""); });
   // watch(selectedPlotName, (selectedPlotName) => { sessionStorage.setItem('selectedPlotName', selectedPlotName ?? ""); });
@@ -122,9 +122,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       }
     }
 
-    // load validControlAndValidBestStatus and elapsedTime from queryGetCalibrationStatus
+    // load validControlAndValidBestStatus and calibrationElapsedTime from queryGetCalibrationStatus
     // Calibration must be Done to get validations
-    // Calibration and Validations must be Done and run on Parallel Works to get completed elapsedTime
+    // Calibration and Validations must be Done and run on Parallel Works to get completed calibrationElapsedTime
     const getStatusResponse = await queryGetCalibrationStatus(calibrationJobId.value);
     const validations = getStatusResponse?._data?.validations;
     const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
@@ -141,7 +141,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
       // get elapsed time from valid_best
       if (validBest.elapsed_time) {
-        elapsedTime.value = validBest.elapsed_time;
+        calibrationElapsedTime.value = validBest.elapsed_time;
       }
     }
 
@@ -298,7 +298,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Hard Reset Run/Status Store
    */
   const hardResetRunStatusStore = (): void => {
-    elapsedTime.value = "";
+    calibrationElapsedTime.value = "";
     submitTimeDate.value = undefined;
     submitTime.value = "";
     plotNames.value = {};
@@ -331,7 +331,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   return {
     submitTimeDate,
     submitTime,
-    elapsedTime,
+    calibrationElapsedTime,
     plotNames,
     plotList,
     selectedPlotName,
