@@ -92,6 +92,7 @@
             </div>
           </div>
 
+          <div id="map"></div>
         </div>
 
         <div class="row-span-1 mt-4 ActionButtonsBox">
@@ -146,7 +147,7 @@ import { useDialog } from "primevue/usedialog";
 
 import type { SelectChangeEvent } from "primevue/select";
 import type { ToastMessageOptions } from "primevue/toast";
-import type { GageResetData } from "@/composables/NextGenModel.ts"
+import type { GageTabData, GageResetData } from "@/composables/NextGenModel.ts"
 
 import { useGageStore } from "@/stores/calibration/GageStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -165,14 +166,18 @@ import {
   useApiResponseToastSeverityCode
 } from "@/composables/ValidationHandlers";
 
+import * as Plot from "@observablehq/plot";
+import * as d3 from 'd3';
+import * as topojson from 'topojson-client';
+
 const isLoading = ref(true);
 
-const { hardResetTuningTimeConrols } = useTuningStore();
+const { hardResetTuningTimeControls } = useTuningStore();
 
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 
-const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
+const { gageData, gageTabData, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
   getObservationalOptionsList, gagePayload } = storeToRefs(useGageStore());
 
@@ -197,12 +202,13 @@ const resetData = ref<GageResetData>({
   geopackage_image_url: ""
 })
 
-onMounted(() => {
-  nextTick(() => {
+onMounted(async () => {
+  await nextTick(() => {
     hilightTab(CalibrationTabs.tab_headwaterBasinGage);
     toast.removeAllGroups();
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
+
     if (gageHasChanged.value && userCalibrationRunData?.value?.gage?.gage_id) {
       gageSelectionReset();
     } else {
@@ -210,8 +216,54 @@ onMounted(() => {
       selectedForcingValue.value = getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
       selectedGeopackageValue.value = getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
     }
-    isLoading.value = false;
   });
+  
+  const us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json');
+  if (!us) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load US map data' });
+    return;
+  }
+  const width = 800;
+  const height = 500;
+
+  const projection = d3.geoAlbersUsa().fitSize([width, height], topojson.feature(us, us.objects.states));
+  const path = d3.geoPath(projection);
+
+
+  // plot code
+  const plot = Plot.plot({
+    width,
+    height,
+    projection: "albers-usa",
+    marks: [
+      Plot.geo(topojson.feature(us, us.objects.states), { stroke: "#999", fill: "#ddd" }),
+      Plot.dot((gageTabData.value as GageTabData), {
+        x: d => projection([d.longitude, d.latitude])[0],
+        y: d => projection([d.longitude, d.latitude])[1],
+        fill: "red",
+        r: 5,
+      }
+    ],
+  });
+
+  // save plot to div
+  const plotDiv = document.querySelector("#map") as HTMLElement | null;
+  (plotDiv as HTMLElement).append(plot);
+
+  // apply D3 zoom with scaling to focus on the cursor
+  const svg = d3.select(plotDiv as HTMLElement).select("svg");
+  const g = svg.select("g");
+
+  const zoom = d3.zoom()
+    .scaleExtent([1, 10]) // Allow zooming up to 10x
+    .translateExtent([[0, 0], [width, height]]) // Limit panning to stay within bounds
+    .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+      g.attr("transform", (event).transform.toString()); // Apply zoom transformation
+    });
+
+  svg.call(zoom);
+
+  isLoading.value = false;
 })
 
 const onGageSelectionChange = () => {
@@ -273,7 +325,7 @@ const clearDataDueToGageChange = () => {
     isLoading.value = true;
     setTimeout(() => {
       fetchSelectedGageData();
-      hardResetTuningTimeConrols();
+      hardResetTuningTimeControls();
       if (userCalibrationRunData.value) {
         userCalibrationRunData.value.calibration_times.calibration_start_time = "";
         userCalibrationRunData.value.calibration_times.calibration_end_time = "";

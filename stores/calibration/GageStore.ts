@@ -136,7 +136,7 @@ export const useGageStore = defineStore(
       );
     });
 
-    const loadGageTabStaticData = () => {
+    const loadGageTabStaticData = (include_gages: boolean) => {
       gageStore_data_loading.value = true;
       makeProtectedApiCall<GageTabData>(
         `${ngencerfBaseUrl}/calibration/load_gage_tab/`,
@@ -146,7 +146,10 @@ export const useGageStore = defineStore(
             Authorization: `Bearer ${getAccessToken()}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ calibration_run_id: calibrationJobId.value }),
+          body: JSON.stringify({ 
+            calibration_run_id: calibrationJobId.value,
+            include_gages: include_gages, 
+          }),
         }
       ).then((gageTabDataResult) => {
         gageTabData.value = gageTabDataResult?._data ?? undefined;
@@ -158,7 +161,7 @@ export const useGageStore = defineStore(
       });
     };
     /**
-     * get iser se;ected domain name based on the selected gage
+     * get user selected domain name based on the selected gage
      * @returns {string}
      */
     const getSavedDomainValue = computed(() => {

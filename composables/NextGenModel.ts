@@ -238,7 +238,6 @@ export interface GageTabData {
   observational_source_values: ObservationalSourceValueData[];
   geopackage_source_values: NameAndDescription[];
   gages: GageOptionData[];
-  gage: GageData;
   geopackage_image_url: string;
   domain_values: DomainValueData[];
 }
@@ -248,6 +247,9 @@ export interface GageOptionData {
   nsw_id: string;
   domain: string;
   nwm_v3_calibration: boolean;
+  latitude: number;
+  longitude: number;
+  altitude: number;
 }
 
 export interface SaveGageTabPayload {

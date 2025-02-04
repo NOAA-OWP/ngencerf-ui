@@ -164,7 +164,7 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
 const loadEntireRun = () => {
   isLoading.value = true;
   nextTick( async () => {
-    await loadGageTabStaticData();
+    await loadGageTabStaticData(true);
     await loadFormulationTabStaticData();
     isLoading.value = true;
     await loadTuningTabStaticData();
@@ -213,7 +213,7 @@ const createNewCalibration = async () => {
 
 const gotoHeadwaterBasinGage = () => {
   nextTick(() => {
-    loadGageTabStaticData();
+    loadGageTabStaticData(true);
     loadFormulationTabStaticData();
     loadTuningTabStaticData();
     loadOptimizationTabStaticData();

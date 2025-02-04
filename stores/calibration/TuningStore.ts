@@ -294,7 +294,7 @@ export const useTuningStore = defineStore(
     /**
      * Hard Reset Tuning Store
      */
-    const hardResetTuningTimeConrols = (): void => {
+    const hardResetTuningTimeControls = (): void => {
       simStartTime.value = "";
       simEndTime.value = "";
       calStartTime.value = "";
@@ -352,7 +352,7 @@ export const useTuningStore = defineStore(
       saveTuningTabRequestBody,
       saveTuningTabData,
       clearCalibratableParameters,
-      hardResetTuningTimeConrols,
+      hardResetTuningTimeControls,
       hardResetTuningStore,
     };
   }
