@@ -43,12 +43,12 @@
                     </td>
                   </tr>
                   <tr height="32px">
-                    <th scope="row" class="text-right"><label for="DisplayOptions">Display</label></th>
-                    <td class="pl-5">
-                      <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-                        optionLabel="name" optionValue="name">
-                      </Select>
-                    </td>
+                      <th scope="row" class="text-right"><label for="DisplayOptions">{{ iteration && iteration >= 1 ? 'Display' : ''}}</label></th>
+                      <td class="pl-5" v-show='iteration && iteration >= 1'>
+                        <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
+                          optionLabel="name" optionValue="name">
+                        </Select>
+                      </td>
                   </tr>
                   <tr>
                     <td colspan="2">
@@ -92,7 +92,7 @@
                 <div class="text-right font-bold" style="width: 170px;">
                   <label class="text-right" for="resultsPathname" style="width: 170px;">Results Pathname</label>
                 </div>
-                <div class="pl-5" style="width: 100%;">
+                <div class="pl-5" style="width: 100%; margin-top: -5px;">
                   <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
                 </div>
               </div>
