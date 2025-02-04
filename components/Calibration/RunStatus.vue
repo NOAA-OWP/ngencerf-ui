@@ -36,8 +36,8 @@
                   <tr height="38px">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
                     <td class="pl-5">
-                      <span id="RunStatus" 
-                        class="dummyProgress ml-2 whitespace-nowrap text-md" style="background-color: white;">
+                      <span id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md"
+                        style="background-color: white;">
                         {{ overallCalibrationValidationStatus }}
                       </span>
                     </td>
@@ -50,11 +50,12 @@
                       </Select>
                     </td>
                   </tr>
-                  <tr>                    
+                  <tr>
                     <td colspan="2">
 
                       <!--BUTTONS - START-->
-                      <div v-if="overallCalibrationValidationStatus === 'Done'" style="margin-top:4px;margin-bottom:-4px;">
+                      <div v-if="overallCalibrationValidationStatus === 'Done'"
+                        style="margin-top:4px;margin-bottom:-4px;">
                         <div class="ngenButtonDiv">
                           <button class="font-normal" @click="gotoEvaluation">Go to Evaluation</button>
                         </div>
@@ -68,7 +69,7 @@
                             </button>
                           </div>
                         </span>
-                        
+
                         <span v-if="calibrationStatus === 'Running'">
                           <div class="mr-3">
                             <button class="ngenButtonDiv-red h-8" title="Cancel Button" @click="cancelRun()"
@@ -76,9 +77,9 @@
                               Cancel
                             </button>
                           </div>
-                        </span>                              
+                        </span>
                       </div>
-                       <!--BUTTONS - END-->
+                      <!--BUTTONS - END-->
 
                     </td>
                   </tr>
@@ -88,12 +89,11 @@
 
             <div class="col-span-2">
               <div style="display:flex; margin-top: 1em;">
-                <div  class="text-right font-bold" style="width: 170px;">
+                <div class="text-right font-bold" style="width: 170px;">
                   <label class="text-right" for="resultsPathname" style="width: 170px;">Results Pathname</label>
                 </div>
                 <div class="pl-5" style="width: 100%;">
-                  <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory"
-                        disabled />
+                  <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
                 </div>
               </div>
 
@@ -112,7 +112,7 @@
         </div>
       </div>
     </div>
-<!--
+    <!--
     <span v-if="calibrationStatus !== 'Done'">
       <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
         <div class="row-span-1">
@@ -159,12 +159,14 @@
 import { onMounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
+import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 
 import { ValidationPlotNames } from "@/composables/NextgenEnums";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime, formatElapsedTime, addAllTimesInArray } from '@/utils/TimeHelpers';
+import { convertTimeZone, calculateElapsedTime, formatElapsedTime, sumDurations } from '@/utils/TimeHelpers';
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -217,29 +219,21 @@ const plotNamesToExclude = [
   "Performance Metrics Table",
 ];
 
-onMounted( async () => {
+onMounted(async () => {
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
   // Do not initiate this component if there is no job.
-  if( !userCalibrationRunData?.value?.calibration_run_id ) {
+  if (!userCalibrationRunData?.value?.calibration_run_id) {
     return;
   }
   const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
 
-  if( userCalibrationRunData?.value  && getStatusResponse.status === 200) {
+  if (userCalibrationRunData?.value && getStatusResponse.status === 200) {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
   }
 
-  let timeArray = [];
-   timeArray.push(new Date("2020-09-06T12:00"));
-   timeArray.push(new Date(new Date("2020-09-06T14:00")));
-   timeArray.push(new Date(new Date("2020-09-06T15:00")));
-
-   let x = addAllTimesInArray(timeArray)
-     console.log(formatDateForDisplay(x));
-  
   nextTick(async () => {
     hilightTab(CalibrationTabs.tab_statusRun);
     if (userCalibrationRunData.value) {
@@ -256,8 +250,20 @@ onMounted( async () => {
       const validations = getStatusResponse?._data?.validations;
       const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
       const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
+
+      const allDurs = [getStatusResponse._data.elapsed_time]
+      if (allDurs.length && allDurs[0]) {
+        validations.forEach((value: CalibrationGetStatusValidationItem) => {
+          if (value.elapsed_time) {
+            allDurs.push(value.elapsed_time);
+          }
+        });
+        calibrationElapsedTime.value = formatElapsedTime(sumDurations(allDurs));
+      }
+
+
       if (validControl?.status) {
-      validationControlStatus.value = validControl.status;
+        validationControlStatus.value = validControl.status;
       }
       if (validBest?.status) {
         validationBestStatus.value = validBest.status;
@@ -288,7 +294,7 @@ const createElapsedTimeInterval = () => {
 // Run Calibration Job
 const startRun = async () => {
   isLoading.value = true;
-  
+
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Preparing Job Data';
   }
@@ -371,6 +377,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         const validations = getStatusResponse?._data?.validations;
         const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
+
         if (validControl?.status) {
           validationControlStatus.value = validControl.status;
         }
@@ -384,8 +391,16 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         // Calculate Running Time every second while calibration is Running or calibration is Done and valid_control and valid_best have not started or are Ready or Running
         if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
           (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
-          calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
 
+          const allDurs = [getStatusResponse._data.elapsed_time]
+          if (allDurs.length && allDurs[0]) {
+            validations.forEach((value: CalibrationGetStatusValidationItem) => {
+              if (value.elapsed_time) {
+                allDurs.push(value.elapsed_time);
+              }
+            });
+            calibrationElapsedTime.value = formatElapsedTime(sumDurations(allDurs));
+          }
           // Create an interval to update calibrationElapsedTime every second while Calibration is Running or Validation is not Done
           if (!elapsedTimeIntervalId.value) {
             createElapsedTimeInterval();
@@ -475,7 +490,17 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             if (['Done', 'Cancelled', 'Failed', 'Server Error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
-              calibrationElapsedTime.value = formatElapsedTime(validBest.elapsed_time);
+
+              const allDurs = [getStatusResponse._data.elapsed_time]
+              if (allDurs.length && allDurs[0]) {
+                validations.forEach((value: CalibrationGetStatusValidationItem) => {
+                  if (value.elapsed_time) {
+                    allDurs.push(value.elapsed_time);
+                  }
+                });
+                calibrationElapsedTime.value = formatElapsedTime(sumDurations(allDurs));
+              }
+
             }
           }, 10000) as unknown as number;
         }
@@ -483,14 +508,22 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
       else if (['Done', 'Cancelled', 'Failed', 'Server Error'].includes(validControlAndValidBestStatus.value ?? '')) {
         const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
+
         const validations = getStatusResponse?._data?.validations;
         const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
-        // get elapsed time from valid_best
-        if (validBest?.elapsed_time) {
-          calibrationElapsedTime.value = formatElapsedTime(validBest.elapsed_time);
+
+        // Calculate elapsed time
+        const allDurs = [getStatusResponse._data.elapsed_time]
+        if (allDurs.length && allDurs[0]) {
+          validations.forEach((value: CalibrationGetStatusValidationItem) => {
+            if (value.elapsed_time) {
+              allDurs.push(value.elapsed_time);
+            }
+          });
+          calibrationElapsedTime.value = formatElapsedTime(sumDurations(allDurs));
         }
-        
+
         if (validControl?.status) {
           validationControlStatus.value = validControl.status;
         }
