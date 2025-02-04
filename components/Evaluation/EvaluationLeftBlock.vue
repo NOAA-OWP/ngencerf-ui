@@ -34,8 +34,10 @@ const activeTab = ref(getEvaluationTabIndex());
 
 // Activate new tab
 const tabChanged = (tabNum: number) => {
-  activeTab.value = tabNum;
-  setEvaluationTabIndex(tabNum);
+  if (activeTab.value !== tabNum) {
+    activeTab.value = tabNum;
+    setEvaluationTabIndex(tabNum);
+  } 
 };
 </script>
 
