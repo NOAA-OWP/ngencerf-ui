@@ -128,8 +128,8 @@ const closeAboutBox = () => {
   top: 90px;
   border: 5px solid #ccc;
   z-index: 9999;
-  width: 544px;
-  height: 400px;
+  width: 550px;
+  height: 363px;
   background-color: white;
 
 
@@ -154,7 +154,7 @@ const closeAboutBox = () => {
     padding-bottom: 20px;
   }
   .layout__cell.td1 {
-    width: 140px;
+    width: 150px;
   }
 
   .td1 {

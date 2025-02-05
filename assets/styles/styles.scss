@@ -302,8 +302,10 @@ select option {
 .waitgif {
   position: absolute;
   top: 40%;
-  left: 33%;
-  width: 80px;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  padding: 10px;
   margin: 0 auto;
   z-index: 9999;
 }
