@@ -93,6 +93,12 @@
           </div>
 
           <div id="map"></div>
+          <div v-if="tooltipData"
+            :style="{ left: `${tooltipData.x + 10}px`, top: `${tooltipData.y + 10}px` }"
+            class="absolute bg-white text-black p-2 border rounded shadow-md pointer-events-none"
+          >
+            {{ tooltipData.content }}
+          </div>
         </div>
 
         <div class="row-span-1 mt-4 ActionButtonsBox">
@@ -147,7 +153,7 @@ import { useDialog } from "primevue/usedialog";
 
 import type { SelectChangeEvent } from "primevue/select";
 import type { ToastMessageOptions } from "primevue/toast";
-import type { GageTabData, GageResetData } from "@/composables/NextGenModel.ts"
+import type { GageTabData, GageResetData, GageOptionData } from "@/composables/NextGenModel.ts"
 
 import { useGageStore } from "@/stores/calibration/GageStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -158,7 +164,7 @@ import { useTuningStore } from "@/stores/calibration/TuningStore";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 
-import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
+import { isCalibrationJobStatusSavedOrReady, structureGageData } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
 import {
@@ -169,6 +175,9 @@ import {
 import * as Plot from "@observablehq/plot";
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
+
+const currentZoom = ref<number>(1); // track map zoom level
+const tooltipData = ref<{ x: number; y: number; content: string } | null>(null); // tooltip state
 
 const isLoading = ref(true);
 
@@ -218,50 +227,97 @@ onMounted(async () => {
     }
   });
   
-  const us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json');
-  if (!us) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load US map data' });
-    return;
-  }
-  const width = 800;
-  const height = 500;
+  if (gageTabData.value) {
+    const structuredGageData = structureGageData(gageTabData.value.gages as GageOptionData[]);
 
-  const projection = d3.geoAlbersUsa().fitSize([width, height], topojson.feature(us, us.objects.states));
-  const path = d3.geoPath(projection);
+    const us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json');
+    if (!us) {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load US map data' });
+      return;
+    }
+    const width = 800;
+    const height = 500;
 
+    const projection = d3.geoAlbersUsa().fitSize([width, height], topojson.feature(us, us.objects.states));
+    const path = d3.geoPath().projection(projection);
 
-  // plot code
-  const plot = Plot.plot({
-    width,
-    height,
-    projection: "albers-usa",
-    marks: [
-      Plot.geo(topojson.feature(us, us.objects.states), { stroke: "#999", fill: "#ddd" }),
-      Plot.dot((gageTabData.value as GageTabData), {
-        x: d => projection([d.longitude, d.latitude])[0],
-        y: d => projection([d.longitude, d.latitude])[1],
-        fill: "red",
-        r: 5,
-      }
-    ],
-  });
+    console.log("structuredGageData", structuredGageData);
+    console.log("is structuredGageData an array?", Array.isArray(structuredGageData));
 
-  // save plot to div
-  const plotDiv = document.querySelector("#map") as HTMLElement | null;
-  (plotDiv as HTMLElement).append(plot);
+    // add plot to div
+    const mapElement = document.querySelector("#map") as HTMLElement | null;
+    if (mapElement) {
+      mapElement.innerHTML = ""; // clear previous plot if needed
+    }
 
-  // apply D3 zoom with scaling to focus on the cursor
-  const svg = d3.select(plotDiv as HTMLElement).select("svg");
-  const g = svg.select("g");
+    // select svg and g elements from map for zooming
+    const svg = d3.select(mapElement)
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
 
-  const zoom = d3.zoom()
-    .scaleExtent([1, 10]) // Allow zooming up to 10x
-    .translateExtent([[0, 0], [width, height]]) // Limit panning to stay within bounds
-    .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
-      g.attr("transform", (event).transform.toString()); // Apply zoom transformation
+    const g = svg.append("g"); // group for zooming
+
+     // draw map
+    g.append("path")
+      .datum(topojson.feature(us, us.objects.states))
+      .attr("d", path)
+      .attr("stroke", "#999")
+      .attr("fill", "#ddd");
+
+    // plot dots inside `g`
+    const dots = g.selectAll("circle")
+      .data(structuredGageData)
+      .enter()
+      .append("circle")
+      .attr("cx", d => {
+        const coords = projection([d.longitude, d.latitude]);
+        return coords ? coords[0] : 0;
+      })
+      .attr("cy", d => {
+        const coords = projection([d.longitude, d.latitude]);
+        return coords ? coords[1] : 0;
+      })
+      .attr("r", 5)
+      .attr("fill", "red")
+      .attr("opacity", 0.8);
+
+    // apply zoom with scaling to focus on the cursor
+    const zoom = d3.zoom<SVGSVGElement, unknown>()
+      .scaleExtent([1, 20]) // allow zooming up to 20x
+      .translateExtent([[0, 0], [width, height]]) // prevent panning out of map area
+      .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+        currentZoom.value = event.transform.k; // track zoom level
+        g.attr("transform", (event).transform.toString()); // apply zoom transformation
+        // dynamically adjust circle size based on zoom level
+        dots.attr("r", 5 / event.transform.k);
+      });
+
+    svg.call(zoom); // apply zoom to svg object
+
+    // handle click to zoom functionality
+    svg.on("click", (event) => {
+    const [x, y] = d3.pointer(event);
+    svg.transition()
+      .duration(500)
+      .call(zoom.translateTo, x, y)
+      .call(zoom.scaleTo, Math.min(currentZoom.value * 2, 6)); // max zoom limit
     });
 
-  svg.call(zoom);
+    // create hover effect with gage data
+    dots.on("mouseenter", (event, d) => {
+      if (currentZoom.value < 3) return;
+      const [x, y] = d3.pointer(event, svg.node());
+      tooltipData.value = {
+        x,
+        y,
+        content: `${d.gage_id}: ${d.altitude}`
+      };
+    })
+    .on("mouseleave", () => {
+      tooltipData.value = null;
+    });
+  }
 
   isLoading.value = false;
 })

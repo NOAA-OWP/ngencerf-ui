@@ -212,5 +212,18 @@ export const arraysEqual = (arr1: any, arr2: any) => {
   }
   // If all elements are equal, return true
   return true;
-}
+};
 
+export const structureGageData = (gageData: any) => {
+  return gageData.map((data: any) => {
+    return {
+      gage_id: data.gage_id,
+      nsw_id: data.nsw_id,
+      domain: data.domain,
+      nwm_v3_calibration: data.nwm_v3_calibration,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      altitude: data.altitude,
+    };
+  });
+};
