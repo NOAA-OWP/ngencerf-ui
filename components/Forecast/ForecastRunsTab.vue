@@ -82,6 +82,8 @@ import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 
 import type { CalibrationRun, DataTableContextMenuOption, ForecastJob } from "@/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
+
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 
@@ -187,7 +189,8 @@ const navigateToSetupForecast = () => {
     const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: 6000 };
+toast.add(tMsg);
   }
 }
 

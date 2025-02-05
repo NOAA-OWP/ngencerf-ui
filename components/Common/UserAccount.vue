@@ -106,6 +106,9 @@ import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import { useToast } from "primevue/usetoast";
 
+import type { ToastMessageOptions } from "primevue/toast";
+
+
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
@@ -191,7 +194,8 @@ const changePassword = async () => {
       if (!e) {
         e = "Cannot reach server. Error code: " + error.value.statusCode;
       }
-      toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: 3000 };
+toast.add(tMsg);
       console.error("Error during user creation:", error.value?.message, error.value?.data);
       return;
     }
@@ -200,9 +204,11 @@ const changePassword = async () => {
     oldpass.value = "";
     newpass.value = "";
     confirmNewpass.value = "";
-    toast.add({ severity: 'success', summary: 'Password Change Successful', detail: "You have successfully changed your password", life: 3000 });
+    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Password Change Successful', detail: "You have successfully changed your password", life: 3000 };
+toast.add(tMsg);
   } else {
-    toast.add({ severity: 'error', summary: 'Password Change Error', detail: "Password was not changed", life: 3000 });
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: "Password was not changed", life: 3000 };
+toast.add(tMsg);
   }
 }
 
@@ -229,7 +235,8 @@ const updateName = async () => {
       if (!e) {
         e = "Cannot reach server. Error code: " + error.value.statusCode;
       }
-      toast.add({ severity: 'error', summary: 'Error', detail: e, life: 3000 });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: 3000 };
+toast.add(tMsg);
       console.error("Error during user update:", error.value?.message, error.value?.data);
       return;
     }
@@ -237,9 +244,11 @@ const updateName = async () => {
     // Clear out the inputs and report success
     setFirstName(updateNameData.first_name);
     setLastName(updateNameData.last_name);
-    toast.add({ severity: 'success', summary: 'Name Change Successful', detail: "You have successfully changed your name", life: 3000 });
+    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Name Change Successful', detail: "You have successfully changed your name", life: 3000 };
+toast.add(tMsg);
   } else {
-    toast.add({ severity: 'error', summary: 'Name Change Error', detail: "Name was not changed", life: 3000 });
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: "Name was not changed", life: 3000 };
+toast.add(tMsg);
   }
 }
 

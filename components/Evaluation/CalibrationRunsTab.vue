@@ -112,8 +112,9 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
-import type { DataTableRowClickEvent } from 'primevue/datatable';
 
+import type { DataTableRowClickEvent } from 'primevue/datatable';
+import type { ToastMessageOptions } from "primevue/toast";
 import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NextGenModel";
 
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
@@ -320,7 +321,8 @@ const viewSelectAlternateIteration = async (calibration_run_id: number) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 };
+toast.add(tMsg);
   }
 }
 
@@ -330,7 +332,8 @@ const navigateToAlternateIteration = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 };
+toast.add(tMsg);
   }
 }
 
@@ -374,7 +377,8 @@ const navigateToEvaluation = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 };
+toast.add(tMsg);
   }
 }
 
@@ -413,7 +417,8 @@ const acceptDelete = (selectedRunId: number) => {
       resetUserSelectedEvalValidationRun();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 };
+toast.add(tMsg);
       });
     }
   });

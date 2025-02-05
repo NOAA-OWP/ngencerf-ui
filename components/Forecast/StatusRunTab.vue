@@ -113,6 +113,8 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
 
+import type { ToastMessageOptions } from "primevue/toast";
+
 import { hilightTab } from '@/composables/TabHilight';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { isValidDate } from '@/utils/CommonHelpers';
@@ -202,11 +204,13 @@ const createForcingDownloadAndForecastStatusInterval = () => {
         if (forecast.elapsed_time) {
           elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
         } else {
-          toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` });
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` };
+toast.add(tMsg);;
         }
       }
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` };
+toast.add(tMsg);;
     }
   }, 10000) as unknown as number;
 };
@@ -231,14 +235,16 @@ const startForecastRun = async () => {
         submitTime.value = convertTimeZone(submitTimeDate.value);
       }
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
+toast.add(tMsg);
     }
 
     // set resultsPathname
     await setResultsPathname();
 
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Forecast job' });
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error running Forecast job' };
+toast.add(tMsg);
   }
 };
 
@@ -253,14 +259,17 @@ const cancelForecastRun = async () => {
       forecastJobStatus.value = cancelForecastJobResponse._data.status;
 
       if (forecastJobStatus.value !== 'Cancelled') {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL' };
+toast.add(tMsg);
       }
       await loadForecastStatusRunTabData();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get Forecast status from server' });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Forecast status from server' };
+toast.add(tMsg);
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Forecast job' });
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Forecast job' };
+toast.add(tMsg);
   }
 };
 
@@ -313,10 +322,12 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
         if (forecast.elapsed_time) {
           elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
         } else {
-          toast.add({ severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` });
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` };
+toast.add(tMsg);;
         }
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` };
+toast.add(tMsg);;
       }
     }
   }

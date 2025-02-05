@@ -144,6 +144,7 @@ import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 
+
 import type { SelectChangeEvent } from "primevue/select";
 import type { ToastMessageOptions } from "primevue/toast";
 import type { GageResetData } from "@/composables/NextGenModel.ts"
@@ -359,14 +360,17 @@ const handleDialogClose = (opt: any) => {
 
   if (opt && opt.data) {
     if (opt.data.saveFileResponseResult.status === 200) {
-      toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 })
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 };
+toast.add(tMsg);
     } else {
       useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 };
+toast.add(tMsg);
       });
     }
   } else {
-    toast.add({ severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: 10000 })
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: 10000 };
+toast.add(tMsg);
   }
   fileUploadDialogOpened.value = false
 }
@@ -453,7 +457,8 @@ const toggle_isNWMv3 = () => {
 const saveTabData = () => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
+toast.add(tMsg);
   } else {
     toast.removeAllGroups();
 
@@ -470,7 +475,8 @@ const saveTabData = () => {
         })
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
-          toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message });
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message };
+toast.add(tMsg);
         });
       }
       isLoading.value = false;

@@ -162,6 +162,7 @@ import { onMounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
 import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
 
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
@@ -317,28 +318,34 @@ const startRun = async () => {
         if (userCalibrationRunData.value) {
           userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
         } else {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'load_calibration_run from server failed' });
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'load_calibration_run from server failed' };
+toast.add(tMsg);
         }
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server' };
+toast.add(tMsg);
       }
 
       if (runCalibrationResponse._data.submit_date) {
         // set submitTimeDate to submit_date from server as a Date object. watch function for submitTimeDate will set submitTime, which shows the time in local time format
         submitTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
+toast.add(tMsg);
       }
 
       if (userCalibrationRunData?.value?.status !== 'Running') {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' };
+toast.add(tMsg);
       }
       fetchUserCalibrationRunData();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'run_calibration from server failed' });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'run_calibration from server failed' };
+toast.add(tMsg);
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration' });
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error running Calibration' };
+toast.add(tMsg);
   }
   isLoading.value = false;
 };
@@ -354,17 +361,21 @@ const cancelRun = async () => {
           userCalibrationRunData.value.status = cancelCalibrationResponse?._data.status;
         }
         if (userCalibrationRunData?.value?.status !== 'Cancelled') {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' });
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' };
+toast.add(tMsg);
         }
         fetchUserCalibrationRunData();
       } else {
-        toast.add({ severity: 'error', summary: 'Error cancelling Calibration', detail: 'Cannot get Calibration status' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error cancelling Calibration', detail: 'Cannot get Calibration status' };
+toast.add(tMsg);
       }
     } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run' });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run' };
+toast.add(tMsg);
     }
   } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration' });
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration' };
+toast.add(tMsg);
   }
 };
 
@@ -418,7 +429,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           }
         }
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
+toast.add(tMsg);
       }
 
       // get job data directory
@@ -428,7 +440,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         if (getJobDataDirectoryResponse?._data.data_dir) {
           resultsPathname.value = getJobDataDirectoryResponse._data.data_dir;
         } else {
-          toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Job Data Directory' });
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Job Data Directory' };
+toast.add(tMsg);
         }
       }
 
@@ -443,7 +456,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           (plot: any) => !plotNamesToExclude.includes(plot.name)
         );
       } else {
-        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
+toast.add(tMsg);
       }
     }
 
@@ -462,7 +476,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
               }
             }
           } else {
-            toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status' };
+toast.add(tMsg);
           }
 
           // check if iteration changes
@@ -592,12 +607,14 @@ watch(selectedPlotName, async () => {
       toast.removeAllGroups();
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage });
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
+toast.add(tMsg);
     }
   } else {
     selectedPlotFilename.value = "";
     selectedPlotFileUrl.value = "";
-    toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage });
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
+toast.add(tMsg);
   }
 });
 
@@ -606,7 +623,8 @@ watch(submitTimeDate, () => {
   if (isValidDate(submitTimeDate.value)) {
     submitTime.value = convertTimeZone(submitTimeDate.value as Date);
   } else {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
+toast.add(tMsg);
   }
 });
 
@@ -628,7 +646,8 @@ watch(iteration, async () => {
     } else {
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage });
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
+toast.add(tMsg);
     }
   }
 });

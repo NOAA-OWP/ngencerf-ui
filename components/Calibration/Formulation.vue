@@ -183,6 +183,7 @@ import { useDialog } from "primevue/usedialog";
 import { useToast } from "primevue/usetoast";
 
 import type { SlothParameterData } from '@/composables/NextGenModel';
+import type { ToastMessageOptions } from "primevue/toast";
 
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -336,14 +337,16 @@ const checkValidCharacters = (e: KeyboardEvent) => {
 */
 const saveFormulationData = () => {
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
+toast.add(tMsg);
   } else {
     toast.removeAllGroups();
     var valOK = validateModules();
     if (!valOK) {
       modulesHaveChanged.value = false;
       selectedOutputVariable.value = "";
-      toast.add({ severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate and then Tuning Paramters on the Tuning Control tab" });
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate and then Tuning Paramters on the Tuning Control tab" };
+toast.add(tMsg);
       clearCalibratableParameters();
     }
 
@@ -351,13 +354,16 @@ const saveFormulationData = () => {
       if (response.status === 200) {
         if (response._data.eds_errors) {
           response._data.eds_errors.forEach((err: any) => {
-            toast.add({ severity: 'warn', summary: 'External Formulation Error', detail: err.message });
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'External Formulation Error', detail: err.message };
+toast.add(tMsg);
           });
         }
-        toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 };
+toast.add(tMsg);
         if (response?._data?.nwm_warning === true) {
           useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
-            toast.add({ severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000 });
+            const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000 };
+toast.add(tMsg);
           });
         }
         formulationStore_data_loading.value = false;
@@ -366,7 +372,8 @@ const saveFormulationData = () => {
       } else {
         formulationStore_data_loading.value = false;
         useApiErrorResponsePreprocess(response).forEach(message => {
-          toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message });
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message };
+toast.add(tMsg);
         });
       }
     });

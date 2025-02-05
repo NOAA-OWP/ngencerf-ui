@@ -137,6 +137,8 @@ import { nextTick } from 'vue';
 import { useToast } from 'primevue/usetoast';
 
 import type { DynamicObject } from "@/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
+
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
@@ -256,7 +258,8 @@ onMounted( () => {
       plotList.value = plotNames?.value?._data?.plot_names;
     } else {
       toast.removeAllGroups();
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
+toast.add(tMsg);
     }
     
     // Add Supplemental Table Options to the dropdown
@@ -335,7 +338,8 @@ watch(selectedPlotName, async () => {
       //console.log('iterationMetricsData:', iterationMetricsData.value);
       //console.log('iterationMetricsColumns:', iterationMetricsColumns);
       if (!iterationMetricsData.value.length) {
-        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: 5000 });
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: 5000 };
+toast.add(tMsg);
       }
     } else if (selectedSupplementalTable.value === 2) {
       // Get Iteration Data
@@ -369,7 +373,8 @@ watch(selectedPlotName, async () => {
       //console.log('iterationParamsData:', iterationParamsData.value);
       //console.log('iterationParamsColumns:', iterationParamsColumns);
       if (!iterationParamsData.value.length) {
-        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: 5000 });
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: 5000 };
+toast.add(tMsg);
       }
     } else if (selectedSupplementalTable.value === 3) {
       // Get Performance Metrics - put each one into the table as its own row
@@ -441,7 +446,8 @@ watch(selectedPlotName, async () => {
         //console.log('performanceMetricsColumns:', performanceMetricsColumns);
       }
       if (!performanceMetricsData.value.length) {
-        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: 5000 });
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: 5000 };
+toast.add(tMsg);
       }
     }
     plotTableData.value = [];
@@ -481,7 +487,8 @@ watch(selectedPlotName, async () => {
         selectedPlotFilename.value = null;
         selectedPlotFileUrl.value = null;
         toast.removeAllGroups();
-        toast.add({ severity: 'info', summary: 'Plot graph is currently unavailable', life: 5000 });
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: 5000 };
+toast.add(tMsg);
       }
 
       if (response?._data?.plot_data && response?._data?.plot_data.length > 0) {
@@ -558,7 +565,8 @@ watch(selectedPlotName, async () => {
       plotTableData.value = [];
       plotTableColumns.value = [];
       toast.removeAllGroups();
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot', life: 5000 });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot', life: 5000 };
+toast.add(tMsg);
     }
   }
 });
@@ -638,7 +646,8 @@ watch(selectedLogCategory, async () => {
   console.log('selectedLogList: ', selectedLogList.value);
   console.log('selectedLogName: ', selectedLogName.value);
   if (!selectedLogList.value.length) {
-    toast.add({ severity: 'info', summary: selectedPlotName.value + ' not available', life: 5000 });
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: 5000 };
+toast.add(tMsg);
   }
 });
 
