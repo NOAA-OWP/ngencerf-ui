@@ -8,7 +8,7 @@
       </div>
       <div id="Col2" class="col-span-8">
 
-        <ul v-show="isUserLoggedIn() && location.name !== 'Login'" id="MainMenu">
+        <ul v-show="userLoggedIn && location.name !== 'Login'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
             <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
               @click="MenuChanged">Calibration</NuxtLink>
@@ -33,15 +33,15 @@
         <div id="UserGroup" class="grid grid-cols-2">
 
           <div class="col-span-1">
-            <div v-show="!uMenu && isUserLoggedIn() && location.name !== 'Login'" id="UserCircle"
+            <div v-show="!uMenu && userLoggedIn && location.name !== 'Login'" id="UserCircle"
               class="float-right userInitials" @contextmenu="onImageRightClick" @click="onImageRightClick">
-              {{ getUserInitials() }}<i class="pi pi-angle-down"></i>
+              {{ userInitials }}<i class="pi pi-angle-down"></i>
               <ContextMenu ref="userContextMenu" :model="userItems" :autoZIndex="true" />
             </div>
 
           </div>
           <div class="col-span-1">
-            <button v-if="isUserLoggedIn() && location.name !== 'Login'" class="float-left" style="padding-top:0px"
+            <button v-if="userLoggedIn && location.name !== 'Login'" class="float-left" style="padding-top:0px"
               id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</button>
           </div>
 
@@ -124,7 +124,7 @@
     <UserAccount />
   </div>  
   <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
-    <LazyAboutBox />
+    <AboutBox />
   </div>
 </template>
 
@@ -152,7 +152,7 @@ const LazyCalibrationHelpResultsHelp = defineAsyncComponent(() => import("@/comp
 const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/CalibrationRunsHelp.vue"))
 const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
-const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
+const AboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 
 const emit = defineEmits(["logoutEvent"]);
 
@@ -164,6 +164,9 @@ const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabInde
 const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
 const location = useRoute();
+
+const userInitials = ref<string>('');
+const userLoggedIn= ref<boolean>();
 
 const userItems = ref([
   { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
@@ -182,6 +185,9 @@ const onImageRightClick = (event: any) => {
 }
 
 onMounted(() => {
+  userInitials.value = getUserInitials();
+  userLoggedIn.value = isUserLoggedIn();
+
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
     let headerHeight = document.getElementById('Header')?.clientHeight;
@@ -200,6 +206,14 @@ onUnmounted(() => {
   window.removeEventListener('resize', function (event) {
     sizeHelpWindow();
   });
+});
+
+
+
+// Handle submitTimeDate changes
+watch(userLoggedIn, () => {
+  const uli = isUserLoggedIn();
+  userLoggedIn.value = uli;
 });
 
 const sizeHelpWindow = () => {

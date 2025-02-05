@@ -7,8 +7,8 @@
       <div class="col-span-2">
         <div class="ttl">Your Account</div>
         <div class="name">
-          {{ getUserFullName() }}
-          <div class="pt-1" style="font-size:0.7em;">{{ getUserName() }}</div>
+          {{ fullName }}
+          <div class="pt-1" style="font-size:0.7em;">{{ userName }}</div>
         </div>
       </div>
       <div class="col-span-1">
@@ -112,7 +112,6 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 
 const {
   getAccessToken,
-  getUserInitials,
   getUserName,
   getUserFullName,
   getUserFirstName,
@@ -126,6 +125,14 @@ const { ngencerfBaseUrl } = useBackendConfig();
 const showForm = ref("changePassword");
 const changePasswordClasses = ref("chgpwd sel");
 const updateNameClasses = ref("updtnm");
+
+const fullName = ref<string>("");
+const userName = ref<string>("")
+
+onMounted( () => {
+  fullName.value = getUserFullName();
+  userName.value = getUserName();
+});
 
 watch(showForm, async () => {
   if (showForm.value === 'updateName') {

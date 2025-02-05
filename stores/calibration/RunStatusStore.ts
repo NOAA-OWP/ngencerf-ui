@@ -63,9 +63,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     return '';
   });
 
-
-  
-  /** 
+   /** 
    * Load RunStatusStore
    */
   const loadRunStatusStore = async (): Promise<void> => {
