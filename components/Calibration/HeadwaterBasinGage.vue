@@ -161,8 +161,10 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
-import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
-          useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
+import {
+  useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
+  useApiResponseToastSeverityCode
+} from "@/composables/ValidationHandlers";
 
 const isLoading = ref(true);
 
@@ -298,10 +300,13 @@ const clearDataDueToGageChange = () => {
         userCalibrationRunData.value.geopackage_image_url = "";
 
       }
-      toast.add({
+
+      const tMsg: ToastMessageOptions = {
         severity: 'info', summary: `Gage Changed`,
         detail: "Calibration and Validation times must be set on the Tuning Controls tab"
-      })
+      };
+      toast.add(tMsg);
+
     }, 100);
   }
 }
@@ -361,16 +366,16 @@ const handleDialogClose = (opt: any) => {
   if (opt && opt.data) {
     if (opt.data.saveFileResponseResult.status === 200) {
       const tMsg: ToastMessageOptions = { severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 };
-toast.add(tMsg);
+      toast.add(tMsg);
     } else {
       useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 };
-toast.add(tMsg);
+        toast.add(tMsg);
       });
     }
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: 10000 };
-toast.add(tMsg);
+    toast.add(tMsg);
   }
   fileUploadDialogOpened.value = false
 }
@@ -458,7 +463,7 @@ const saveTabData = () => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
-toast.add(tMsg);
+    toast.add(tMsg);
   } else {
     toast.removeAllGroups();
 
@@ -476,7 +481,7 @@ toast.add(tMsg);
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message };
-toast.add(tMsg);
+          toast.add(tMsg);
         });
       }
       isLoading.value = false;
@@ -584,12 +589,14 @@ const handleNextPrevDialogClose = (opt: any) => {
 
     tr {
       line-height: 27px;
+
       th {
         padding: 4px 15px;
         cursor: default;
         border-bottom: 1px solid #ccc;
         background-color: global.$ngwcp_neutral_gray_lt;
       }
+
       td {
         padding: 4px 15px;
         cursor: default;
