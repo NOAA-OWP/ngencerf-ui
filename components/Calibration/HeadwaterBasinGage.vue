@@ -92,7 +92,8 @@
             </div>
           </div>
 
-          <div id="map"></div>
+          <div id="map" class="w-full h-[500px] border border-gray-300"></div>
+
           <div v-if="tooltipData"
             :style="{ left: `${tooltipData.x + 10}px`, top: `${tooltipData.y + 10}px` }"
             class="absolute bg-white text-black p-2 border rounded shadow-md pointer-events-none"
@@ -175,8 +176,8 @@ import {
 import * as Plot from "@observablehq/plot";
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
-
-const currentZoom = ref<number>(1); // track map zoom level
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 const tooltipData = ref<{ x: number; y: number; content: string } | null>(null); // tooltip state
 
 const isLoading = ref(true);
@@ -211,6 +212,8 @@ const resetData = ref<GageResetData>({
   geopackage_image_url: ""
 })
 
+let map: L.Map | null = null; // Store Leaflet map globally
+
 onMounted(async () => {
   await nextTick(() => {
     hilightTab(CalibrationTabs.tab_headwaterBasinGage);
@@ -227,100 +230,88 @@ onMounted(async () => {
     }
   });
   
-  if (gageTabData.value) {
-    const structuredGageData = structureGageData(gageTabData.value.gages as GageOptionData[]);
-
-    const us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json');
-    if (!us) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load US map data' });
-      return;
-    }
-    const width = 800;
-    const height = 500;
-
-    const projection = d3.geoAlbersUsa().fitSize([width, height], topojson.feature(us, us.objects.states));
-    const path = d3.geoPath().projection(projection);
-
-    console.log("structuredGageData", structuredGageData);
-    console.log("is structuredGageData an array?", Array.isArray(structuredGageData));
-
-    // add plot to div
-    const mapElement = document.querySelector("#map") as HTMLElement | null;
-    if (mapElement) {
-      mapElement.innerHTML = ""; // clear previous plot if needed
-    }
-
-    // select svg and g elements from map for zooming
-    const svg = d3.select(mapElement)
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-    const g = svg.append("g"); // group for zooming
-
-     // draw map
-    g.append("path")
-      .datum(topojson.feature(us, us.objects.states))
-      .attr("d", path)
-      .attr("stroke", "#999")
-      .attr("fill", "#ddd");
-
-    // plot dots inside `g`
-    const dots = g.selectAll("circle")
-      .data(structuredGageData)
-      .enter()
-      .append("circle")
-      .attr("cx", d => {
-        const coords = projection([d.longitude, d.latitude]);
-        return coords ? coords[0] : 0;
-      })
-      .attr("cy", d => {
-        const coords = projection([d.longitude, d.latitude]);
-        return coords ? coords[1] : 0;
-      })
-      .attr("r", 5)
-      .attr("fill", "red")
-      .attr("opacity", 0.8);
-
-    // apply zoom with scaling to focus on the cursor
-    const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([1, 20]) // allow zooming up to 20x
-      .translateExtent([[0, 0], [width, height]]) // prevent panning out of map area
-      .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
-        currentZoom.value = event.transform.k; // track zoom level
-        g.attr("transform", (event).transform.toString()); // apply zoom transformation
-        // dynamically adjust circle size based on zoom level
-        dots.attr("r", 5 / event.transform.k);
-      });
-
-    svg.call(zoom); // apply zoom to svg object
-
-    // handle click to zoom functionality
-    svg.on("click", (event) => {
-    const [x, y] = d3.pointer(event);
-    svg.transition()
-      .duration(500)
-      .call(zoom.translateTo, x, y)
-      .call(zoom.scaleTo, Math.min(currentZoom.value * 2, 6)); // max zoom limit
-    });
-
-    // create hover effect with gage data
-    dots.on("mouseenter", (event, d) => {
-      if (currentZoom.value < 3) return;
-      const [x, y] = d3.pointer(event, svg.node());
-      tooltipData.value = {
-        x,
-        y,
-        content: `${d.gage_id}: ${d.altitude}`
-      };
-    })
-    .on("mouseleave", () => {
-      tooltipData.value = null;
-    });
-  }
+  createGageMap();
 
   isLoading.value = false;
 })
+
+/**
+ * Create a CONUS map with Gages
+ */
+const createGageMap = async () => {
+  if (gageTabData?.value?.gages) {
+    // format gage data from an array of proxy objects to an array of plain objects to work with d3
+    // we are filtering out gages outside of the CONUS
+    const structuredGageData = structureGageData(gageTabData.value.gages as GageOptionData[])
+      .filter(d => d.latitude >= 24.5 && d.latitude <= 49.5 && d.longitude >= -125 && d.longitude <= -66);
+
+    // get map element
+    const mapContainer = document.getElementById("map");
+    if (!mapContainer) {
+      console.error("Map container not found");
+      return;
+    }
+
+    // Remove previous map instance if it exists
+    if (map) {
+      map.remove();
+    }
+
+    // initialize Leaflet map centered on CONUS
+    map = L.map(mapContainer).setView([37.8, -96], 4); // centered on US
+
+    // add Tile Layer (OpenStreetMap or CartoDB)
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors",
+    }).addTo(map);
+
+    // fetch external GeoJSON data (Rivers, Highways, Cities)
+    const [rivers, highways, cities] = await Promise.all([
+      fetch("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_rivers_lake_centerlines.geojson").then(res => res.json()),
+      fetch("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_roads.geojson").then(res => res.json()),
+      fetch("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_populated_places.geojson").then(res => res.json()),
+    ]);
+
+    // draw Rivers
+    L.geoJSON(rivers, {
+      style: { color: "blue", weight: 1, opacity: 0.6 },
+    }).addTo(map);
+
+    // Draw Highways
+    L.geoJSON(highways, {
+      style: { color: "orange", weight: 1.5, opacity: 0.8 },
+    }).addTo(map);
+
+    // Draw Cities
+    L.geoJSON(cities, {
+      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+        radius: 2,
+        fillColor: "black",
+        color: "black",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 1
+      })
+    }).addTo(map);
+
+    // ad Gage Locations
+    structuredGageData.forEach(gage => {
+      L.circleMarker([gage.latitude, gage.longitude], {
+        radius: 4,
+        fillColor: "red",
+        color: "black",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      })
+        .addTo(map)
+        .bindPopup(`<b>Gage ID:</b> ${gage.gage_id}<br/><b>Altitude:</b> ${gage.altitude}`);
+    });
+      
+    // enable zoom controls
+    map.zoomControl.setPosition("topright");
+  }
+}
 
 const onGageSelectionChange = () => {
   // Was there a previous gage?
@@ -715,5 +706,11 @@ const handleNextPrevDialogClose = (opt: any) => {
 #HBCbuttons {
   height: 54px;
   width: 100%;
+}
+
+#map {
+  width: 100%;
+  height: 500px; /* ensure height is set */
+  border: 1px solid #ccc; /* add a border to check visibility */
 }
 </style>

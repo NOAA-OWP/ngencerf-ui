@@ -214,6 +214,11 @@ export const arraysEqual = (arr1: any, arr2: any) => {
   return true;
 };
 
+/**
+ * Returns an array of plain JS objects from an array of proxy objects
+ * @param gageData 
+ * @returns 
+ */
 export const structureGageData = (gageData: any) => {
   return gageData.map((data: any) => {
     return {
