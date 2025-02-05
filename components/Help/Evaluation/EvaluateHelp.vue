@@ -131,8 +131,19 @@
         </tr>
         <tr>
           <td class="td1">Performance Metrics Table</td>
-          <td class="td2">Contains elapsed time, number of CPUs, CPU time (aka run time), maximum RSS, maximum disk read, 
-            maximum disk write, reserved time (time waiting for resources) I/O throughput.</td>
+          <td class="td2">Metric:
+            <ul style="margin-left: 10px;">
+              <li><b>Elapsed Time</b> - <em>The job's elapsed time</em></li>
+              <li><b>Num Cpus</b> - <em>Total number of CPUs allocated to the job</em></li>
+              <li><b>Cpu Time </b>- <em>Elapsed time * CPU count</em></li>
+              <li><b>Max Rss</b> - <em>Maximum resident set size of all tasks in job</em></li>
+              <li><b>Max Disk Read</b> - <em>Maximum number of bytes read by all tasks in job</em></li>
+              <li><b>Max Disk Write</b> - <em>Maximum number of bytes written by all tasks in job</em></li>
+              <li><b>Planned Time</b> - <em>How much wall clock time was used as planned time for this job. This is derived from how long a job was waiting in PW from eligible time to when it started or was cancelled.</em></li>
+              <li><b>Io Throughput</b> - <em> Computed: (Max Disk Read + Max Disk Write) / Elapsed Time</em></li>
+            </ul>
+            <p style="margin-top:12px;margin-left: 10px;">Note: <em>Elapsed time fields are presented as</em> [days-]hours:minutes:seconds[.microseconds]</p>
+          </td>
         </tr>
       </tbody>
     </table>
