@@ -22,9 +22,10 @@
                   </tr>
                   <tr height="32px">
                     <th scope="row" class="text-right font-bold">
-                      <div style="width: 140px;">Iteration</div>
+                      <div style="width: 140px;">{{ validationBestAchieved.isBest ? 'Best ' : '' }} Iteration</div>
                     </th>
-                    <td class="pl-5">{{ iteration ?? '-'.repeat(30) }}</td>
+                    <td v-if="validationBestAchieved.isBest" class="pl-5">{{ validationBestAchieved.iteration }}</td>
+                    <td v-else class="pl-5">{{ iteration ?? '-'.repeat(30) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -43,12 +44,13 @@
                     </td>
                   </tr>
                   <tr height="32px">
-                      <th scope="row" class="text-right"><label for="DisplayOptions">{{ iteration && iteration >= 1 ? 'Display' : ''}}</label></th>
-                      <td class="pl-5" v-show='iteration && iteration >= 1'>
-                        <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-                          optionLabel="name" optionValue="name">
-                        </Select>
-                      </td>
+                    <th scope="row" class="text-right"><label for="DisplayOptions">{{ iteration && iteration >= 1 ?
+                        'Display' : ''}}</label></th>
+                    <td class="pl-5" v-show='iteration && iteration >= 1'>
+                      <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
+                        optionLabel="name" optionValue="name">
+                      </Select>
+                    </td>
                   </tr>
                   <tr>
                     <td colspan="2">
@@ -194,7 +196,8 @@ const {
   validationControlStatus,
   validationBestStatus,
   resultsPathname,
-  overallCalibrationValidationStatus
+  overallCalibrationValidationStatus,
+  validationBestAchieved
 } = storeToRefs(runStatusStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -234,6 +237,9 @@ onMounted(async () => {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
   }
 
+  // Clear best iteration flag
+  validationBestAchieved.value.isBest = false;
+
   nextTick(async () => {
     hilightTab(CalibrationTabs.tab_statusRun);
     if (userCalibrationRunData.value) {
@@ -250,6 +256,11 @@ onMounted(async () => {
       const validations = getStatusResponse?._data?.validations;
       const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
       const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
+
+      if (validBest?.status) {
+        validationBestAchieved.value.isBest = (validBest.validation_type === "valid_best");
+        validationBestAchieved.value.iteration = validBest.iteration_num;
+      }
 
       const allDurs = [getStatusResponse._data.elapsed_time]
       if (allDurs.length && allDurs[0]) {
@@ -294,7 +305,7 @@ const createElapsedTimeInterval = () => {
 // Run Calibration Job
 const startRun = async () => {
   isLoading.value = true;
-
+  validationBestAchieved.value.isBest = false;
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Preparing Job Data';
   }
@@ -476,12 +487,16 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             const validations = getStatusResponse?._data?.validations;
             const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
             const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
+
             if (validControl?.status) {
               validationControlStatus.value = validControl.status;
             }
             if (validBest?.status) {
               validationBestStatus.value = validBest.status;
+              validationBestAchieved.value.isBest = (validBest.validation_type === "valid_best");
+              validationBestAchieved.value.iteration = validBest.iteration_num;
             }
+
             if (validationControlStatus?.value) {
               validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
             }

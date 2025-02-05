@@ -2,7 +2,7 @@
 
 import { defineStore, storeToRefs } from "pinia";
 
-import type { CalibrationStatus, CalibrationPlotListNamesData } from "@/composables/NextGenModel";
+import type { CalibrationStatus, CalibrationPlotListNamesData, BestIterationData } from "@/composables/NextGenModel";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -39,7 +39,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validationBestStatus = ref<string>();
   const validControlAndValidBestStatus = ref<string>();
   const resultsPathname = ref<string>();
-
+  const validationBestAchieved = ref<BestIterationData>({ iteration: 0, isBest: false});
+;
   /**
    * Compute Overall Calibration Validation Status
    */
@@ -313,7 +314,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     queryGetIteration,
     queryGetJobDataDirectory,
     cancelCalibrationJob,
-    hardResetRunStatusStore
+    hardResetRunStatusStore,
+    validationBestAchieved
   };
 });
 

@@ -744,3 +744,8 @@ export type GageResetData  = {
   forcing_source: string;
   geopackage_image_url: string;
 }
+
+export type BestIterationData = {
+  iteration: number;
+  isBest: boolean;
+}
