@@ -278,7 +278,7 @@ const createGageMap = async () => {
     // ad Gage Locations
     structuredGageData.forEach(gage => {
       const marker = L.circleMarker([gage.latitude, gage.longitude], {
-        radius: 4,
+        radius: 6,
         fillColor: "red",
         color: "black",
         weight: 2,
@@ -287,7 +287,7 @@ const createGageMap = async () => {
       })
       .bindPopup(`<b>Gage ID:</b> ${gage.gage_id}<br/><b>Altitude:</b> ${gage.altitude}`)
       .on("mouseover", (e) => {
-          e.target.setStyle({ radius: 8, fillColor: "darkred" }); // Increase size & darken
+          e.target.setStyle({ radius: 10, fillColor: "darkred" }); // Increase size & darken
         })
       .on("mouseout", (e) => {
         e.target.setStyle({ radius: 6, fillColor: "red" }); // Reset to normal
