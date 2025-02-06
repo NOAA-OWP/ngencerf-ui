@@ -9,44 +9,66 @@
     </div>
   </Transition>
   <div id="EvaluatePage">
-    <div class="pl-6 pr-2 pt-2">
-      <div class="flex mt-2">
-        <div class="w-2/3">
-          <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
-          <div class="inline-block w-2/3">
-            <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-              optionLabel="name" optionValue="name" :disabled="!plotList">
-            </Select>
+
+    <div class="grid grid-rows-3 gap-y-0">
+      <div class="row-span-1 mt-3">
+        <div class="grid grid-cols-2">
+
+          <div class="col-span-1 pl-8">
+            <label for="DisplayOptions">Display </label>
+            <div class="inline-block w-2/3">
+              <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
+                optionLabel="name" optionValue="name" :disabled="!plotList">
+              </Select>
+            </div>
+          </div>
+          <div class="col-span-1 pr-8">
+            <div class="text-right">
+              <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
+                  @click="gotoSelectAlternateIteration">New Validation</button></span>
+            </div>
           </div>
 
-          <div class="layout__table mt-2" style="width:100%">
-            <div class="layout__row">
-              <div class="text-left" style="width: 150px;font-size:0.9em;">
-                <label for="calibrationJobId">Calibration Job ID </label>
-                {{ calibrationJobId }}
-              </div>
-              <div class="text-left pl-3" style="font-size:0.9em;">
-                <label for="validationJobId">Validation Job ID </label>
-                {{ evaluateValidationRunId }}
-              </div>
-            </div>
-            <div class="layout__row">
-              <div class="text-left font-bold center-label">
-                  <label for="resultsPathname" style="width: 150px;font-size:0.9em;">Results Pathname</label>
-              </div>
-              <div class="pl-3" style="width:100%"><InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled style="padding-left:0px !important"/></div>
-            </div>
-          </div>            
         </div>
-        <div class="ml-auto">
-          <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
-              @click="gotoSelectAlternateIteration">New Validation</button></span>
-          <br />
-          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">
-            Show Calibration Details</a>
+      </div>
+
+      <div class="row-span-1 mt-3">
+        <div class="grid grid-cols-4">
+
+          <div class="col-span-2">
+            <div class="text-left pt9em pl-8">
+              <label for="calibrationJobId" class="text-bold">Calibration Job ID </label>{{ calibrationJobId }}
+              <div class="inline-block ml-16">
+                <label for="evaluateValidationRunId" class="text-bold">Validation Job ID</label> {{
+                  evaluateValidationRunId }}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-span-1">&nbsp;</div>
+          <div class="col-span-1 text-right pr-8">
+            <a v-if="userCalibrationRunData" href="#" class="c-blue text-sm underline mt-1 text-right"
+              @click="toggleMessagesGroup">Show Calibration Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row-span-1">
+        <div class="grid grid-cols-4">
+          <div class="col-span-2 pl-8">
+            <label style="display: table-cell; white-space: nowrap" for="resultsPathname" class="pt9em">Results
+              Pathname</label>
+            <span class="table-cell">
+              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+            </span>
+          </div>
+
+
         </div>
       </div>
     </div>
+
+
     <div class="grid grid-cols-2">
       <div class="text-center">
         <div id="GraphArea" class="p-2" v-if="selectedPlotName && selectedPlotFileUrl">
@@ -54,29 +76,28 @@
         </div>
       </div>
       <div>
-        
-        <div class="text-center" v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0 && selectedLogCategory == ''">
-            <div class="grid place-items-center" style="height: 45vh;">
-                <div>
-                    {{ plotTableErrorMessage }}
-                </div>
+
+        <div class="text-center"
+          v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0 && selectedLogCategory == ''">
+          <div class="grid place-items-center" style="height: 45vh;">
+            <div>
+              {{ plotTableErrorMessage }}
             </div>
+          </div>
         </div>
 
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
           <div v-if="plotTableList && plotTableList.length > 1">
             <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
-            <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable"
-              :options="plotTableList" optionLabel="name" optionValue="name">
+            <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable" :options="plotTableList"
+              optionLabel="name" optionValue="name">
             </Select>
           </div>
           <div class="pt-6 pb-2">
             <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0" class="pagination-box">
-              <div class="pagination-rows">Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{ plotTableTotalSize }}</div>
-              <Paging
-                v-model:currentPage="plotTableCurrentPage"
-                :totalPages=plotTableTotalPages
-              />
+              <div class="pagination-rows">Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{
+                plotTableTotalSize }}</div>
+              <Paging v-model:currentPage="plotTableCurrentPage" :totalPages=plotTableTotalPages />
             </div>
             <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true scrollable scroll-height="500px"
               :multi-sort="true">
@@ -104,24 +125,23 @@
           :field="col.field"></Column>
       </DataTable>
     </div>
-    <div id="LogDisplayArea" class="p-2" v-if="selectedLogCategory != '' && selectedLogList && selectedLogList.length > 0">
+    <div id="LogDisplayArea" class="p-2"
+      v-if="selectedLogCategory != '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
         <div v-if="selectedLogList.length > 1">
           <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
-          <Select id="selectedLogOptions" class="p-select"  
-            v-model="selectedLogName" :options="selectedLogList" optionLabel="name" optionValue="name">
+          <Select id="selectedLogOptions" class="p-select" v-model="selectedLogName" :options="selectedLogList"
+            optionLabel="name" optionValue="name">
           </Select>
         </div>
-        <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b style="width:160px; display:inline-block;">Log File Name</b> {{ selectedLogName }}</div>
+        <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b
+            style="width:160px; display:inline-block;">Log File Name</b> {{ selectedLogName }}</div>
 
         <div class="flex justify-end" style="margin-top:-23px;">
-            <div class="ml-auto">
-                <div>Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
-                <Paging
-                v-model:currentPage="selectedLogCurrentPage"
-                :totalPages=selectedLogTotalPages
-                />
-            </div>
+          <div class="ml-auto">
+            <div>Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
+            <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
+          </div>
         </div>
 
         <div id="selectedLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
@@ -161,7 +181,6 @@ const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   bodyCell: { style: { "text-align": "right", "padding-right": "10px !important" } }
 });
-
 
 const {
   resultsPathname
@@ -205,7 +224,7 @@ const iterationMetricsData = ref<any[]>([]);
 const iterationParamsData = ref<any[]>([]);
 const iterationMetricsColumns = ref<any[]>([]);
 const iterationParamsColumns = ref<any[]>([]);
-const selectedSupplementalTable = ref<number>( 0 );
+const selectedSupplementalTable = ref<number>(0);
 const performanceMetrics = ref<APIResponse>({});
 const performanceMetricsData = ref<any[]>([]);
 const performanceMetricsColumns = [{ header: 'Metric', field: 'metric' }];
@@ -227,10 +246,10 @@ const supplementalTableOptions = [
   'Performance Metrics Table'
 ]
 
-onMounted( () => {
-  nextTick( async () => {
+onMounted(() => {
+  nextTick(async () => {
     hilightTab(EvaluationTabs.tab_evaluate);
-    
+
     // make sure page loads with no plots/tables selected
     selectedPlotName.value = null;
     selectedPlotFilename.value = null;
@@ -258,7 +277,7 @@ onMounted( () => {
       toast.removeAllGroups();
       toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
     }
-    
+
     // Add Supplemental Table Options to the dropdown
     for (let t = 0; t < supplementalTableOptions.length; t++) {
       if (!plotList.value.some(item => item.name === supplementalTableOptions[t])) {
@@ -276,12 +295,12 @@ onMounted( () => {
         Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
           let logList = [];
           for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-            logList.push({'name': logs.value?._data?.log_names[l][key][n]});
+            logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
           }
           logLists.value[key] = logList;
         });
       }
-      
+
       // Add Log Options to the dropdown
       Object.keys(logLists.value).forEach(key => {
         let optionName = capitalCase(key) + ' Logs';
@@ -405,7 +424,7 @@ watch(selectedPlotName, async () => {
                 }
                 validation_type += ' ' + performanceMetrics.value?._data?.validations[v].iteration_num;
               }
-              performanceMetricsColumns.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id});
+              performanceMetricsColumns.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id });
               if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
                 Object.keys(performanceMetrics.value?._data?.validations[v].performance_metrics).forEach(key => {
                   // Loop through our existing rows and see if we have this metric already
@@ -448,20 +467,20 @@ watch(selectedPlotName, async () => {
     plotTableColumns.value = [];
     selectedLogCategory.value = '';
     selectedLogList.value = [];
-  } else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs","").toLowerCase() in logLists.value) {
+  } else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
     plotTableData.value = [];
     plotTableColumns.value = [];
     selectedSupplementalTable.value = 0;
     selectedLogName.value = '';
-    selectedLogCategory.value = selectedPlotName.value.replace(" Logs","").toLowerCase();
+    selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
   } else if (selectedPlotName.value) {
     selectedSupplementalTable.value = 0;
     selectedLogCategory.value = '';
     selectedLogList.value = [];
     plotTableCurrentPage.value = 1;
-    
+
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(
       selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
@@ -608,11 +627,11 @@ function adjustPlotTableColumns() {
 
 // Watch for page number changes in plot table
 watch(plotTableCurrentPage, async () => {
-  if (plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value/plotTablePageSize.value)) {
+  if (plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value / plotTablePageSize.value)) {
     console.log('ERROR: Page number ' + plotTableCurrentPage.value + ' out of bounds');
   } else {
-    plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value-1)) + 1;
-    plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value-1),plotTableTotalSize.value);
+    plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value - 1)) + 1;
+    plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value - 1), plotTableTotalSize.value);
     console.log('Loading rows ' + plotTableStartRow.value + '-' + plotTableEndRow.value + ' from the ' + plotTableTotalSize.value + ' total stored in the backend');
     const response: any = await queryGetPlot(
       selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
@@ -620,7 +639,7 @@ watch(plotTableCurrentPage, async () => {
       false, // force_include_plot
       (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      plotTableStartRow.value-1, // start
+      plotTableStartRow.value - 1, // start
       plotTablePageSize.value // limit
     );
     if (response?._data?.plot_data) {
@@ -662,7 +681,7 @@ watch(selectedLogName, async () => {
       selectedLogTotalSize.value = response?._data?.pagination_metadata?.count;
       selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
       selectedLogStartRow.value = 1;
-      if (selectedLogTotalPages.value === 1 ) {
+      if (selectedLogTotalPages.value === 1) {
         selectedLogEndRow.value = selectedLogTotalSize.value;
       } else {
         selectedLogEndRow.value = logDataPageSize.value;
@@ -680,8 +699,8 @@ watch(selectedLogCurrentPage, async () => {
   if (selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
     console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
   } else {
-    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value-1)) + 1;
-    if (selectedLogCurrentPage.value === selectedLogTotalPages.value ) {
+    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
+    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
       selectedLogEndRow.value = selectedLogTotalSize.value;
     } else {
       selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
@@ -690,7 +709,7 @@ watch(selectedLogCurrentPage, async () => {
       selectedLogCategory.value, // log_category,
       selectedLogName.value, // log_name
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      selectedLogStartRow.value-1, // start
+      selectedLogStartRow.value - 1, // start
       logDataPageSize.value // limit
     );
     if (response?._data) {
@@ -720,7 +739,7 @@ const newValidation = () => {
   alert('newValidation');
   //tabChanged.value = 3;
 }
-const toggleMessagesGroup = async() => {
+const toggleMessagesGroup = async () => {
   if (showMessagesGroup.value) {
     showMessagesGroup.value = false;
   } else {
@@ -728,7 +747,7 @@ const toggleMessagesGroup = async() => {
   }
 }
 
-onUnmounted( () => {
+onUnmounted(() => {
   // make sure page clears all selected plots/tables when the user leaves
   selectedPlotName.value = null;
   selectedPlotFilename.value = null;
@@ -748,11 +767,12 @@ onUnmounted( () => {
   margin-left: 0px;
 }
 
-#CalibrationLogOptions{
-    width: 268px;
+#CalibrationLogOptions {
+  width: 268px;
 }
+
 #validationLogOptions {
-    width: 275px;
+  width: 275px;
 }
 
 #GraphArea img {
@@ -819,6 +839,7 @@ onUnmounted( () => {
   position: relative;
   display: block;
 }
+
 .layout__row {
   display: flex;
 }
