@@ -94,14 +94,14 @@
 
         </div>
 
-        <div class="row-span-1 mt-4 ActionButtonsBox">
+        <div class="row-span-1 mt-4 ActionButtonsBox z-9999">
           <div class="grid grid-cols-8">
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <button id="HBGSaveButton" class="font-normal" title="Save" aria-label="Save Button"
+                <Button id="HBGSaveButton" class="font-normal" title="Save" aria-label="Save Button"
                   @click="saveTabData()">
                   Save
-                </button>
+                </Button>
               </div>
             </span>
             <span v-else>
