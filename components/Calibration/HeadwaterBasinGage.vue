@@ -253,11 +253,19 @@ const createGageMap = async () => {
     }
 
     // initialize Leaflet map centered on CONUS
-    map = L.map("map").setView([37.0902, -95.7129], 4);
+    map = L.map("map", {
+      preferCanvas: true, // Uses canvas for smoother rendering
+      zoomSnap: 0.25, // Allows finer zoom adjustments
+      zoomDelta: 0.25, // Prevents sudden zoom jumps
+      wheelPxPerZoomLevel: 60, // Improves zoom responsiveness
+    }).setView([37.0902, -95.7129], 4);
 
     // add Tile Layer
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "© OpenStreetMap contributors",
+      detectRetina: true, // Enables Retina tiles for sharper display
+      maxNativeZoom: 18, // Prevents blurry tiles when zooming in
+      maxZoom: 20, // Allows higher zoom levels
     }).addTo(map);
 
     // use marker clustering for gages
@@ -273,11 +281,17 @@ const createGageMap = async () => {
         radius: 4,
         fillColor: "red",
         color: "black",
-        weight: 1,
+        weight: 2,
         opacity: 1,
-        fillOpacity: 0.8
+        fillOpacity: 0.9
       })
-      .bindPopup(`<b>Gage ID:</b> ${gage.gage_id}<br/><b>Altitude:</b> ${gage.altitude}`);
+      .bindPopup(`<b>Gage ID:</b> ${gage.gage_id}<br/><b>Altitude:</b> ${gage.altitude}`)
+      .on("mouseover", (e) => {
+          e.target.setStyle({ radius: 8, fillColor: "darkred" }); // Increase size & darken
+        })
+      .on("mouseout", (e) => {
+        e.target.setStyle({ radius: 6, fillColor: "red" }); // Reset to normal
+      });
 
       gageClusterLayer.addLayer(marker); // add marker to cluster layer
     });
@@ -689,7 +703,11 @@ const handleNextPrevDialogClose = (opt: any) => {
 
 #map {
   width: 100%;
-  height: 500px; /* ensure height is set */
-  border: 1px solid #ccc; /* add a border to check visibility */
+  height: 500px; /* Set a fixed height */
+  image-rendering: crisp-edges; /* Improve sharpness */
+  image-rendering: -webkit-optimize-contrast;
+  transform: translateZ(0); /* Prevents blurry tiles */
+  border: 1px solid #ccc;
 }
+
 </style>
