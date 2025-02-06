@@ -162,8 +162,9 @@ import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
 import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
           useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
-
-const isLoading = ref(true);
+          
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
 
 const { hardResetTuningTimeConrols } = useTuningStore();
 

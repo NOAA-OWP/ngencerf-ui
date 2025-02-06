@@ -165,6 +165,7 @@ import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenMo
 
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { generalStore } from "~/stores/common/GeneralStore";
 
 import { ValidationPlotNames } from "@/composables/NextgenEnums";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
@@ -214,7 +215,9 @@ const {
   cancelCalibrationJob,
 } = runStatusStore;
 
-const isLoading = ref(false);
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
+
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 const plotNamesToExclude = [
   "Iteration Metrics Table",

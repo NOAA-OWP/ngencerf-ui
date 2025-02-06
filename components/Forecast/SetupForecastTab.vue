@@ -45,10 +45,13 @@
 import { useToast } from 'primevue/usetoast';
 
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { generalStore } from '~/stores/common/GeneralStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 
-const isLoading = ref<boolean>(false); // loading indicator
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
+
 const toast = useToast();
 
 const {

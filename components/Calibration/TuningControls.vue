@@ -317,7 +317,8 @@ const nextPrevDialogOpened = ref<boolean>(false);
 
 const format = formatDateForDisplay;
 
-const isLoading = ref(true);
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
 
 const { calibrationJobId } = storeToRefs(generalStore());
 const { ngencerfBaseUrl } = useBackendConfig();

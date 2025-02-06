@@ -113,12 +113,16 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
 
+import { generalStore } from '~/stores/common/GeneralStore';
+
 import { hilightTab } from '@/composables/TabHilight';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { isValidDate } from '@/utils/CommonHelpers';
 import { calculateElapsedTime, formatElapsedTime } from '@/utils/TimeHelpers';
 
-const isLoading = ref<boolean>(false); // loading indicator
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
+
 const toast = useToast();
 
 const {

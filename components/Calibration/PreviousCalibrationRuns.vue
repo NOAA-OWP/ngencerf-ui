@@ -71,7 +71,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 
-import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { useGageStore } from "@/stores/calibration/GageStore";
@@ -88,6 +88,7 @@ const { loadGageTabStaticData } = useGageStore();
 const { loadFormulationTabStaticData } = useFormulationStore();
 const { loadOptimizationTabStaticData } = useOptimizationStore();
 const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
+
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex } = generalStore();
 
@@ -99,7 +100,10 @@ import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
-const isLoading = ref(true);
+
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
+
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>();
 const cmCalibrationRun = ref([
@@ -119,6 +123,7 @@ const ptColumn = ref({
 onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
     hilightTab(CalibrationTabs.tab_calibrationRuns);
+
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }

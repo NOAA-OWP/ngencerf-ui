@@ -172,14 +172,13 @@ import { useDialog } from "primevue/usedialog";
 import { useOptimizationStore } from '@/stores/calibration/OptimizationStore';
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+import { generalStore } from "~/stores/common/GeneralStore";
 
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
-
-const isLoading = ref<boolean>(true);
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -209,7 +208,8 @@ const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
-//const isLoading = ref(true);
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
 
 const cbCategoricalDisabled = ref<boolean>(false);
 const cbEventBasedDisabled = ref<boolean>(false);
