@@ -92,14 +92,7 @@
             </div>
           </div>
 
-          <div id="map" class="w-full h-[500px] border border-gray-300"></div>
-
-          <div v-if="tooltipData"
-            :style="{ left: `${tooltipData.x + 10}px`, top: `${tooltipData.y + 10}px` }"
-            class="absolute bg-white text-black p-2 border rounded shadow-md pointer-events-none"
-          >
-            {{ tooltipData.content }}
-          </div>
+          <div id="map"></div>
         </div>
 
         <div class="row-span-1 mt-4 ActionButtonsBox">
@@ -178,7 +171,7 @@ import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-const tooltipData = ref<{ x: number; y: number; content: string } | null>(null); // tooltip state
+import "leaflet.markercluster";
 
 const isLoading = ref(true);
 
@@ -213,6 +206,7 @@ const resetData = ref<GageResetData>({
 })
 
 let map: L.Map | null = null; // Store Leaflet map globally
+let gageClusterLayer: L.MarkerClusterGroup | null = null; // store cluster layer
 
 onMounted(async () => {
   await nextTick(() => {
@@ -255,48 +249,27 @@ const createGageMap = async () => {
     // Remove previous map instance if it exists
     if (map) {
       map.remove();
+      map = null;
     }
 
     // initialize Leaflet map centered on CONUS
-    map = L.map(mapContainer).setView([37.8, -96], 4); // centered on US
+    map = L.map("map").setView([37.0902, -95.7129], 4);
 
-    // add Tile Layer (OpenStreetMap or CartoDB)
+    // add Tile Layer
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "© OpenStreetMap contributors",
     }).addTo(map);
 
-    // fetch external GeoJSON data (Rivers, Highways, Cities)
-    const [rivers, highways, cities] = await Promise.all([
-      fetch("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_rivers_lake_centerlines.geojson").then(res => res.json()),
-      fetch("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_roads.geojson").then(res => res.json()),
-      fetch("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_populated_places.geojson").then(res => res.json()),
-    ]);
-
-    // draw Rivers
-    L.geoJSON(rivers, {
-      style: { color: "blue", weight: 1, opacity: 0.6 },
-    }).addTo(map);
-
-    // Draw Highways
-    L.geoJSON(highways, {
-      style: { color: "orange", weight: 1.5, opacity: 0.8 },
-    }).addTo(map);
-
-    // Draw Cities
-    L.geoJSON(cities, {
-      pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
-        radius: 2,
-        fillColor: "black",
-        color: "black",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 1
-      })
-    }).addTo(map);
+    // use marker clustering for gages
+    if (gageClusterLayer) {
+      gageClusterLayer.clearLayers();
+    } else {
+      gageClusterLayer = L.markerClusterGroup();
+    }
 
     // ad Gage Locations
     structuredGageData.forEach(gage => {
-      L.circleMarker([gage.latitude, gage.longitude], {
+      const marker = L.circleMarker([gage.latitude, gage.longitude], {
         radius: 4,
         fillColor: "red",
         color: "black",
@@ -304,12 +277,18 @@ const createGageMap = async () => {
         opacity: 1,
         fillOpacity: 0.8
       })
-        .addTo(map)
-        .bindPopup(`<b>Gage ID:</b> ${gage.gage_id}<br/><b>Altitude:</b> ${gage.altitude}`);
+      .bindPopup(`<b>Gage ID:</b> ${gage.gage_id}<br/><b>Altitude:</b> ${gage.altitude}`);
+
+      gageClusterLayer.addLayer(marker); // add marker to cluster layer
     });
+
+    // add cluster layer to map
+    map.addLayer(gageClusterLayer);
       
     // enable zoom controls
     map.zoomControl.setPosition("topright");
+
+    console.log(`Leaflet map initialized with ${structuredGageData.length} gages.`);
   }
 }
 
