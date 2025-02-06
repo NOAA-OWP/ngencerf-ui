@@ -58,15 +58,15 @@
                       <!--BUTTONS - START-->
                       <div v-if="overallCalibrationValidationStatus === 'Done'"
                         style="margin-top:4px;margin-bottom:-4px;">
-                        <div class="ngenButtonDiv">
-                          <button class="font-normal" @click="gotoEvaluation">Go to Evaluation</button>
+                        <div class="ngenButtonDiv" @click="gotoEvaluation">
+                          <Button class="font-normal">Go to Evaluation</button>
                         </div>
                       </div>
 
                       <div v-if="calibrationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
                         <span v-if="calibrationStatus === 'Ready'">
-                          <div class="ngenButtonDiv-green h-8">
-                            <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
+                          <div class="ngenButtonDiv-green h-8" @click="startRun()">
+                            <Button class="font-normal" title="Run Button" aria-label="Run Button">
                               Run
                             </button>
                           </div>
@@ -74,7 +74,7 @@
 
                         <span v-if="calibrationStatus === 'Running'">
                           <div class="mr-3">
-                            <button class="ngenButtonDiv-red h-8" title="Cancel Button" @click="cancelRun()"
+                            <Button class="ngenButtonDiv-red h-8" title="Cancel Button" @click="cancelRun()"
                               aria-label="Cancel Button">
                               Cancel
                             </button>
@@ -121,7 +121,7 @@
           <div id="StatusRunBottomButtons" class="grid grid-cols-8">
             <span v-if="calibrationStatus === 'Ready'">
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
+                <Button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
                   Run
                 </button>
               </div>
@@ -131,7 +131,7 @@
             </span>
             <span v-if="calibrationStatus === 'Running'">
               <div class="col-span-1 mr-3">
-                <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelRun()"
+                <Button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelRun()"
                   aria-label="Cancel Button">
                   Cancel
                 </button>

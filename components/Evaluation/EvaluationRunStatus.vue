@@ -52,23 +52,23 @@
 
                       <!--BUTTONS - START-->
                       <span v-if="validationStatus === 'Done'">
-                        <div id="ResultsArea" class="ngenButtonDiv">
-                          <button class="font-normal" @click.stop="navigateToEvaluation">Go to Evaluation</button>
+                        <div id="ResultsArea" class="ngenButtonDiv" @click.stop="navigateToEvaluation">
+                          <Button class="font-normal">Go to Evaluation</button>
                         </div>
                       </span>
 
                       <span v-else>
 
-                        <div v-if="!isStartHidden()" class="ngenButtonDiv-green h-8">
-                          <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
+                        <div v-if="!isStartHidden()" class="ngenButtonDiv-green h-8" @click="startRun()">
+                          <Button class="font-normal" title="Run Button" aria-label="Run Button">
                             Run
                           </button>
                         </div>
 
                         <!--<div v-else class="h-8">&nbsp;</div>-->
 
-                        <div class="ngenButtonDiv-red h-8 hidden" v-if="!isCancelHidden()">
-                          <button class="font-normal" title="Cancel Button" @click="cancelRun()"
+                        <div class="ngenButtonDiv-red h-8 hidden" v-if="!isCancelHidden()" @click="cancelRun()">
+                          <Button class="font-normal" title="Cancel Button"
                             aria-label="Cancel Button">Cancel</button>
                         </div>
 
@@ -90,7 +90,7 @@
       <div class="row-span-1">
         <span v-if="validationStatus === 'Done'">
           <div id="ResultsArea" class="ngenButtonDiv row-span-1">
-            <button class="font-normal" @click.stop="navigateToEvaluation">Go to Evaluation</button>
+            <Button class="font-normal" @click.stop="navigateToEvaluation">Go to Evaluation</button>
           </div>
           <div class="col-span-7">&nbsp;</div>
         </span>
@@ -100,7 +100,7 @@
           <div id="StausRunBottomButtons" class="grid grid-cols-6">
           
               <div v-if="!isStartHidden()" class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
+                <Button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
                   Run
                 </button>
               </div>
@@ -108,7 +108,7 @@
               <div v-else class="col-span-1 mr-6 h-8">&nbsp;</div>
            
               <div class="col-span-1 ngenButtonDiv-red mr-6 h-8 hidden" v-if="!isCancelHidden()">
-                <button class="font-normal" title="Cancel Button" @click="cancelRun()" 
+                <Button class="font-normal" title="Cancel Button" @click="cancelRun()" 
                   aria-label="Cancel Button">Cancel</button>
               </div>
               <div class="col-span-2">&nbsp;</div>

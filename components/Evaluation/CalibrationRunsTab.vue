@@ -93,7 +93,7 @@
         </div>
         <div class="flex mt-2">
           <div class="ml-auto mt-4">
-            <div id="NewButton" class="">
+            <div id="NewButton">
               <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return
                 to
                 Calibration Jobs</Button>

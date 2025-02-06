@@ -31,7 +31,7 @@
   <div>
     <span v-if="forecastCycle && forecastCycle.is_active">
       <div class="col-span-1 mr-4">
-        <button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
+        <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
           @click="goToStatusRunTab()">
           Next
         </button>

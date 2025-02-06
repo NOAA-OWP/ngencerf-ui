@@ -23,7 +23,7 @@
                       <label for="uname" style="font-weight: normal;">Email</label><br>
                       <input id="uname" class="w-[350px]" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
                         autocomplete="email" v-on:keypress="autoSubmit" />
-                      <!-- <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
+                      <!-- <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Email
                       </button> -->
                     </div>
@@ -32,16 +32,16 @@
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
                         placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block w-[350px]" 
                         v-on:keypress="autoSubmit" />
-                      <button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
+                      <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
                         Forgot Password
                       </button>
                     </div>
                     <div class="ngenButtonDiv bg-blue1 btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">
-                      <button id="LoginButton">Sign In</button>
+                      <Button id="LoginButton">Sign In</button>
                     </div>
 
                     <div class="signupButton underline text-base mt-2" aria-label="sign up">
-                      <button @click="openDialog" class="c-blue">Create an Account</button>
+                      <Button @click="openDialog" class="c-blue">Create an Account</button>
                     </div>
 
                   </form>
@@ -87,10 +87,10 @@
                             required toggleMask class="block" />
                         </div>
                         <div :class="createAccountButtonClasses">
-                          <button type="submit" :disabled="disableCreateAccountBtn">Create Account</button>
+                          <Button type="submit" :disabled="disableCreateAccountBtn">Create Account</button>
                         </div>
                         <div class="signupButton underline text-base inline pl-6">
-                          <button type="button" @click="closeDialog" :class="cancelCreateAccountLinkClasses" :disabled="disableCreateAccountBtn">Cancel</button>
+                          <Button type="button" @click="closeDialog" :class="cancelCreateAccountLinkClasses" :disabled="disableCreateAccountBtn">Cancel</button>
                         </div>
                       </form>
                     </div>

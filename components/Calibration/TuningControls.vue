@@ -150,10 +150,9 @@
 
 
           <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
-          <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;">
+          <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;" @click="triggerFileInput">
             <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-            <button @click="triggerFileInput"
-              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+            <Button :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               Load Parameters File (optional)</button>
             <div v-if="!isFormulationDataSaved()" class="overlay"></div>
           </div>
@@ -169,16 +168,15 @@
                 <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
               </template>
             </Select>
-            <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3">
-              <button @click="addCalibrationTuningParameter"
-                :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</button>
+            <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" @click="addCalibrationTuningParameter">
+              <Button :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</button>
             </div>
           </div>
 
         </div>
 
         <div class="col-span-1 mt-2 relative">
-          <button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
+          <Button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
             @click="clearUserSelectedCalibrationTuningParameters()"
             :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</button>
         </div>
@@ -243,8 +241,8 @@
   <div class="grid grid-rows-1 mt-8 ActionButtonsBox" id="Tuningbuttons">
     <div id="TuningBottomButtons" class="grid grid-cols-8">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
-        <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-          <button class="font-normal" title="Save" aria-label="Save Button" @click="saveTuningData()">
+        <div class="col-span-1 ngenButtonDiv-green mr-6 h-8" @click="saveTuningData()">
+          <Button class="font-normal" title="Save" aria-label="Save Button">
             Save
           </button>
         </div>
@@ -257,7 +255,7 @@
 
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-3">
-          <!--<button class="c-blue font-normal text-xl underline pt-1" title="Revert Button" @click="resetTuningData()"
+          <!--<Button class="c-blue font-normal text-xl underline pt-1" title="Revert Button" @click="resetTuningData()"
             aria-label="Revert Button">Revert</button>-->
         </div>
       </span>
@@ -268,11 +266,11 @@
 
       <div class="col-span-4">&nbsp;</div>
       <div class="col-span-1">
-        <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+        <div><Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
             aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
       </div>
       <div class="col-span-1 mr-4">
-        <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+        <div><Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
             @click="goNextTab()">Next</button></div>
       </div>
 

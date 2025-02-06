@@ -21,7 +21,7 @@
           </h1>
         </div>
         <div class="ml-auto mt-2">
-          <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
+          <div id="NewButton"><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
               v-if="forecastJobId && forecastJobId > 0"
               @click="navigateToSetupForecast">New Forecast</Button></div>
         </div>

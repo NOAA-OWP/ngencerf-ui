@@ -79,15 +79,15 @@
       <div class="row-span-1">
         <div class="grid grid-cols-8">
           <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
-            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-              <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startForecastRun()">
+            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8" @click="startForecastRun()">
+              <Button class="font-normal" title="Run Button" aria-label="Run Button">
                 Run
               </button>
             </div>
           </span>
           <span v-if="forcingDownloadStatus === 'Running' || forecastJobStatus === 'Running'">
             <div class="col-span-1 mr-3">
-              <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelForecastRun()"
+              <Button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelForecastRun()"
                 aria-label="Cancel Button">
                 Cancel
               </button>
@@ -95,7 +95,7 @@
           </span>
           <span v-if="overallForcingDownloadForecastStatus === 'Done'">
             <div class="col-span-1 mr-3">
-              <button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button"
+              <Button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button"
                 @click="goToResultsTab()" aria-label="View Results Button">
                 View Results
               </button>

@@ -24,8 +24,8 @@
           </div>
           <div class="col-span-1 pr-8">
             <div class="text-right">
-              <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
-                  @click="gotoSelectAlternateIteration">New Validation</button></span>
+              <span id="NewButton" class="ngenButtonDiv-alt bg-blue4" @click="gotoSelectAlternateIteration">
+                <Button id="NewValidationBtn">New Validation</button></span>
             </div>
           </div>
 
