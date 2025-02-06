@@ -97,8 +97,8 @@
         <div class="row-span-1 mt-4 ActionButtonsBox z-9999">
           <div class="grid grid-cols-8">
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
-              <div class="col-span-1 ngenButtonDiv-green mr-6 h-8" @click="saveTabData()">
-                <Button id="HBGSaveButton" class="font-normal" title="Save" aria-label="Save Button">
+              <div class="col-span-1 mr-6 h-8" @click="saveTabData()">
+                <Button id="HBGSaveButton" class="font-normal ngenButtonDiv-green " title="Save" aria-label="Save Button">
                   Save
                 </Button>
               </div>

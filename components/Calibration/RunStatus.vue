@@ -45,7 +45,7 @@
                   </tr>
                   <tr height="32px">
                     <th scope="row" class="text-right"><label for="DisplayOptions">{{ iteration && iteration >= 1 ?
-                        'Display' : ''}}</label></th>
+                      'Display' : '' }}</label></th>
                     <td class="pl-5" v-show='iteration && iteration >= 1'>
                       <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
                         optionLabel="name" optionValue="name">
@@ -65,8 +65,9 @@
 
                       <div v-if="calibrationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
                         <span v-if="calibrationStatus === 'Ready'">
-                          <div class="ngenButtonDiv-green h-8" @click="startRun()">
-                            <Button class="font-normal" title="Run Button" aria-label="Run Button">
+                          <div class="h-8">
+                            <Button class="font-normal ngenButtonDiv-green" title="Run Button" aria-label="Run Button"
+                              @click="startRun()">
                               Run
                             </button>
                           </div>

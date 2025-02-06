@@ -150,9 +150,9 @@
 
 
           <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
-          <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" style="position: relative;" @click="triggerFileInput">
+          <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
             <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-            <Button :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+            <Button class="ngenButtonDiv-alt" :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               Load Parameters File (optional)</button>
             <div v-if="!isFormulationDataSaved()" class="overlay"></div>
           </div>
@@ -168,8 +168,8 @@
                 <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
               </template>
             </Select>
-            <div id="UploadParams" class="ngenButtonDiv-alt bg-blue4 inline ml-3" @click="addCalibrationTuningParameter">
-              <Button :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</button>
+            <div id="UploadParams" class="inline ml-3" @click="addCalibrationTuningParameter">
+              <Button class="ngenButtonDiv-alt" :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</Button>
             </div>
           </div>
 
@@ -241,8 +241,8 @@
   <div class="grid grid-rows-1 mt-8 ActionButtonsBox" id="Tuningbuttons">
     <div id="TuningBottomButtons" class="grid grid-cols-8">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
-        <div class="col-span-1 ngenButtonDiv-green mr-6 h-8" @click="saveTuningData()">
-          <Button class="font-normal" title="Save" aria-label="Save Button">
+        <div class="col-span-1 mr-6 h-8" @click="saveTuningData()">
+          <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button">
             Save
           </button>
         </div>

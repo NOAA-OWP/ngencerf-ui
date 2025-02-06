@@ -36,9 +36,9 @@
                         Forgot Password
                       </button>
                     </div>
-                    <div class="ngenButtonDiv bg-blue1 btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">
-                      <Button id="LoginButton">Sign In</button>
-                    </div>
+
+                      <Button id="LoginButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">Sign In</button>
+
 
                     <div class="signupButton underline text-base mt-2" aria-label="sign up">
                       <Button @click="openDialog" class="c-blue">Create an Account</button>
