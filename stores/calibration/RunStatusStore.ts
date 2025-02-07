@@ -2,7 +2,7 @@
 
 import { defineStore, storeToRefs } from "pinia";
 
-import type { CalibrationStatus, CalibrationPlotListNamesData } from "@/composables/NextGenModel";
+import type { CalibrationStatus, CalibrationPlotListNamesData, BestIterationData } from "@/composables/NextGenModel";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -19,7 +19,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
   // refs
-  const elapsedTime = ref<string>();
+  const calibrationElapsedTime = ref<string>();
   const submitTimeDate = ref<Date>();
   const submitTime = ref<string>();
 
@@ -39,7 +39,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validationBestStatus = ref<string>();
   const validControlAndValidBestStatus = ref<string>();
   const resultsPathname = ref<string>();
-
+  const validationBestAchieved = ref<BestIterationData>({ iteration: 0, isBest: false});
+;
   /**
    * Compute Overall Calibration Validation Status
    */
@@ -62,7 +63,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     return '';
   });
 
-    /** 
+   /** 
    * Load RunStatusStore
    */
   const loadRunStatusStore = async (): Promise<void> => {
@@ -76,9 +77,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       }
     }
 
-    // load validControlAndValidBestStatus and elapsedTime from queryGetCalibrationStatus
+    // load validControlAndValidBestStatus and calibrationElapsedTime from queryGetCalibrationStatus
     // Calibration must be Done to get validations
-    // Calibration and Validations must be Done and run on Parallel Works to get completed elapsedTime
+    // Calibration and Validations must be Done and run on Parallel Works to get completed calibrationElapsedTime
     const getStatusResponse = await queryGetCalibrationStatus(calibrationJobId.value);
     const validations = getStatusResponse?._data?.validations;
     const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
@@ -95,7 +96,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
       // get elapsed time from valid_best
       if (validBest.elapsed_time) {
-        elapsedTime.value = validBest.elapsed_time;
+        calibrationElapsedTime.value = validBest.elapsed_time;
       }
     }
 
@@ -252,7 +253,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Hard Reset Run/Status Store
    */
   const hardResetRunStatusStore = (): void => {
-    elapsedTime.value = "";
+    calibrationElapsedTime.value = "";
     submitTimeDate.value = undefined;
     submitTime.value = "";
     plotNames.value = {};
@@ -285,7 +286,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   return {
     submitTimeDate,
     submitTime,
-    elapsedTime,
+    calibrationElapsedTime,
     plotNames,
     plotList,
     selectedPlotName,
@@ -311,7 +312,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     queryGetIteration,
     queryGetJobDataDirectory,
     cancelCalibrationJob,
-    hardResetRunStatusStore
+    hardResetRunStatusStore,
+    validationBestAchieved
   };
 });
 

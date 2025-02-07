@@ -34,6 +34,8 @@ export const generalStore = defineStore(
 
     const serverInfo = ref<ServerInfo>();
 
+    const isLoading = ref<boolean>(false);
+
     // This is set if the user changes the gage.  Resets when saved.
     const gageHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
@@ -132,6 +134,7 @@ export const generalStore = defineStore(
       verificationTabIndex,
       menuIndex,
       evaluationRunSelected,
+      isLoading
     };
   },
   {

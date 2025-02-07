@@ -129,3 +129,40 @@ export function formatElapsedTime(elapsed_time: string): string {
 
   return formatted_elapsed_time.toFormat("d 'Days,' hh:mm:ss");
 };
+
+/** 
+ * Add up all the DateTimes in the supplied array and return the total time
+ * @param durations
+ * @returns {string} string of the elapsed time in 'd 'Days,' hh:mm:ss' format
+ */
+
+export function sumDurations(timeArray: string[]) {
+  let totalMilliseconds = 0;
+  
+  timeArray.forEach(time => {
+    if(!time) {debugger;}
+      let [hours, minutes, seconds] = time.split(':');
+      let [secs, millis] = seconds.split('.');
+
+      if( millis.length > 4 ) {
+        millis = millis.substring(0, 4)
+      }
+      
+      totalMilliseconds += 
+          parseInt(hours) * 3600000 +
+          parseInt(minutes) * 60000 +
+          parseInt(secs) * 1000 +
+          parseInt(millis);
+  });
+  
+  let hours = Math.floor(totalMilliseconds / 3600000);
+  totalMilliseconds %= 3600000;
+  let minutes = Math.floor(totalMilliseconds / 60000);
+  totalMilliseconds %= 60000;
+  let seconds = Math.floor(totalMilliseconds / 1000);
+  let milliseconds = totalMilliseconds % 1000;
+  
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+}
+
+

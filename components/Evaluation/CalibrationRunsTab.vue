@@ -93,7 +93,7 @@
         </div>
         <div class="flex mt-2">
           <div class="ml-auto mt-4">
-            <div id="NewButton" class="">
+            <div id="NewButton">
               <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return
                 to
                 Calibration Jobs</Button>
@@ -119,6 +119,7 @@ import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
+import { generalStore } from "@/stores/common/GeneralStore"
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
@@ -175,7 +176,9 @@ const {
 } = evaluationCalibrationRunStore;
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-const isLoading = ref<boolean>(true);
+
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
 
 const toast = useToast();
 //this model is for highlighting purpose
