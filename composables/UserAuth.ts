@@ -61,8 +61,8 @@ export const makeProtectedApiCall = async <T>(
   url: string,
   userOptions: any = {}
 ): Promise<any> => {
-    const gstore = generalStore();
-    const { isLoading } = storeToRefs(gstore);
+  const gstore = generalStore();
+  const { isLoading } = storeToRefs(gstore);
   // Save the call data in case we need to refresh.
   rqstUrl = url;
   rqstUserOptions = userOptions;
@@ -87,7 +87,7 @@ export const makeProtectedApiCall = async <T>(
 
     let myResponse = { ok: response.ok, status: response.status };
 
-    if (myResponse.ok && myResponse.status === 200) {
+    if (myResponse.ok && myResponse.status >= 200 && myResponse.status < 300) {
       responseData = {
         _data: await response.json(),
         status: response.status,
