@@ -69,7 +69,7 @@
             <input class="inline-block w-auto" id="SlothName" type="text" v-model="new_sloth_variable_name"
               @keypress="addSlothOnEnter($event)">
             <div class="ngenButtonDiv ml-3 inline-block">
-              <button id="SlothAddBtn" @click="addSlothVariable">Add</button>
+              <Button id="SlothAddBtn" @click="addSlothVariable">Add</button>
             </div>
           </span>
         </div>
@@ -133,8 +133,8 @@
 -->
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3 ActionButtonsBox">
         <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
-          <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-            <button class="font-normal" title="Save" aria-label="Save Button" @click="saveFormulationData()">
+          <div class="col-span-1 mr-6 h-8" @click="saveFormulationData()">
+            <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button">
               Save
             </button>
           </div>
@@ -147,7 +147,7 @@
 
         <span v-if="modulesHaveChanged">
           <div class="col-span-1 mr-3">
-            <button class="ngenButtonDiv-yellow" title="Revert Gage" @click="resetModuleList()"
+            <Button class="ngenButtonDiv-yellow" title="Revert Gage" @click="resetModuleList()"
               aria-label="Revert Gage">Revert</button>
           </div>
         </span>
@@ -159,11 +159,11 @@
 
         <div class="col-span-4">&nbsp;</div>
         <div class="col-span-1">
-          <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+          <div><Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
               aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
         </div>
         <div class="col-span-1 mr-4">
-          <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+          <div><Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
               @click="goNextTab()">Next</button></div>
         </div>
 
