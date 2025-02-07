@@ -5,6 +5,10 @@
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useLogout } from "@/composables/UseEventBus";
 
+import { generalStore } from "@/stores/common/GeneralStore";
+//const gstore = generalStore();
+// const { isLoading } = storeToRefs(gstore);
+
 /**
  * Refreshes access token
  * @param ngencerfBaseUrl
@@ -57,6 +61,8 @@ export const makeProtectedApiCall = async <T>(
   url: string,
   userOptions: any = {}
 ): Promise<any> => {
+    const gstore = generalStore();
+    const { isLoading } = storeToRefs(gstore);
   // Save the call data in case we need to refresh.
   rqstUrl = url;
   rqstUserOptions = userOptions;
@@ -81,16 +87,7 @@ export const makeProtectedApiCall = async <T>(
 
     let myResponse = { ok: response.ok, status: response.status };
 
-    if (myResponse.status >= 500 && myResponse.status < 600) {
-      console.log("Server Error");
-      return {
-        _data: null,
-        status: myResponse.status,
-        ok: myResponse.ok,
-      };
-    }
-
-    if (myResponse.ok) {
+    if (myResponse.ok && myResponse.status === 200) {
       responseData = {
         _data: await response.json(),
         status: response.status,
@@ -98,6 +95,7 @@ export const makeProtectedApiCall = async <T>(
       };
       return responseData;
     }
+
     if (myResponse.status === 401) {
       const userDataStore = useUserDataStore();
       const { ngencerfBaseUrl } = useBackendConfig();
@@ -110,7 +108,12 @@ export const makeProtectedApiCall = async <T>(
       }
       rqstUserOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
       return makeProtectedApiCall(rqstUrl, rqstUserOptions);
-    } else {
+    }
+
+    isLoading.value = false;
+
+    if (myResponse.status >= 500 && myResponse.status < 600) {
+      console.log("Server Error");
       responseData = {
         _data: await response.json(),
         status: response.status,
@@ -122,7 +125,6 @@ export const makeProtectedApiCall = async <T>(
     sendUserToLogin();
   }
 };
-
 
 const sendUserToLogin = () => {
   const userDataStore = useUserDataStore();
