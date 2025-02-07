@@ -20,9 +20,9 @@
                 <div class="flex mt-2">
                   <div class="text-left font-bold">Algorithm Parameter(s)</div>
                   <div id="ClearTableBtn" class="ml-auto">
-                    <button @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2"
+                    <Button @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2"
                     :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear
-                      <!-- <i class="pi pi-arrow-up"></i>--></button>
+                      <!-- <i class="pi pi-arrow-up"></i>--></Button>
                   </div>
                 </div>
 
@@ -132,10 +132,10 @@
 
     <div id="OptMetBottomButtons" class="absolute b-0 grid grid-cols-8 mt-6 ActionButtonsBox">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
-        <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-          <button class="font-normal" title="Save" aria-label="Save Button" @click="saveOptMetData()">
+        <div class="col-span-1 mr-6 h-8" @click="saveOptMetData()">
+          <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button">
             Save
-          </button>
+          </Button>
         </div>
       </span>
       <span v-else>
@@ -147,12 +147,12 @@
       </div>
       <div class="col-span-4">&nbsp;</div>
       <div class="col-span-1">
-        <div><button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-            aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
+        <div><Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+            aria-label="Previous Tab Button" @click="goPrevTab()">Prev</Button></div>
       </div>
       <div class="col-span-1 mr-4">
-        <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
-            @click="goNextTab()">Next</button></div>
+        <div><Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+            @click="goNextTab()">Next</Button></div>
       </div>
 
     </div>
@@ -174,14 +174,13 @@ import type { ToastMessageOptions } from "primevue/toast";
 import { useOptimizationStore } from '@/stores/calibration/OptimizationStore';
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
+import { generalStore } from "~/stores/common/GeneralStore";
 
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
-
-const isLoading = ref<boolean>(true);
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -211,7 +210,8 @@ const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
-//const isLoading = ref(true);
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
 
 const cbCategoricalDisabled = ref<boolean>(false);
 const cbEventBasedDisabled = ref<boolean>(false);

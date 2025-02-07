@@ -31,7 +31,7 @@
   <div>
     <span v-if="forecastCycle && forecastCycle.is_active">
       <div class="col-span-1 mr-4">
-        <button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
+        <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
           @click="goToStatusRunTab()">
           Next
         </button>
@@ -47,10 +47,13 @@ import { useToast } from 'primevue/usetoast';
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { generalStore } from '~/stores/common/GeneralStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 
-const isLoading = ref<boolean>(false); // loading indicator
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
+
 const toast = useToast();
 
 const {
