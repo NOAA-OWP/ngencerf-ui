@@ -96,8 +96,6 @@ export const makeProtectedApiCall = async <T>(
       return responseData;
     }
 
-    isLoading.value = false;
-
     if (myResponse.status === 401) {
       const userDataStore = useUserDataStore();
       const { ngencerfBaseUrl } = useBackendConfig();
@@ -111,6 +109,8 @@ export const makeProtectedApiCall = async <T>(
       rqstUserOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
       return makeProtectedApiCall(rqstUrl, rqstUserOptions);
     }
+
+    isLoading.value = false;
 
     if (myResponse.status >= 500 && myResponse.status < 600) {
       console.log("Server Error");
