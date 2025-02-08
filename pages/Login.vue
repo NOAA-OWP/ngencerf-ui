@@ -25,7 +25,7 @@
                         autocomplete="email" v-on:keypress="autoSubmit" />
                       <!-- <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Email
-                      </button> -->
+                      </Button> -->
                     </div>
                     <div class="mt-4">
                       <label for="pword" style="font-weight: normal;">Password</label><br>
@@ -34,14 +34,14 @@
                         v-on:keypress="autoSubmit" />
                       <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
                         Forgot Password
-                      </button>
+                      </Button>
                     </div>
 
-                      <Button id="LoginButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">Sign In</button>
+                      <Button id="LoginButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">Sign In</Button>
 
 
                     <div class="signupButton underline text-base mt-2" aria-label="sign up">
-                      <Button @click="openDialog" class="c-blue">Create an Account</button>
+                      <Button @click="openDialog" class="c-blue">Create an Account</Button>
                     </div>
 
                   </form>
@@ -87,10 +87,10 @@
                             required toggleMask class="block" />
                         </div>
                         <div :class="createAccountButtonClasses">
-                          <Button type="submit" :disabled="disableCreateAccountBtn">Create Account</button>
+                          <Button type="submit" :disabled="disableCreateAccountBtn">Create Account</Button>
                         </div>
                         <div class="signupButton underline text-base inline pl-6">
-                          <Button type="button" @click="closeDialog" :class="cancelCreateAccountLinkClasses" :disabled="disableCreateAccountBtn">Cancel</button>
+                          <Button type="Button" @click="closeDialog" :class="cancelCreateAccountLinkClasses" :disabled="disableCreateAccountBtn">Cancel</Button>
                         </div>
                       </form>
                     </div>
