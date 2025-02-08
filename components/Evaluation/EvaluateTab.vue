@@ -467,7 +467,9 @@ watch(selectedPlotName, async () => {
     plotTableColumns.value = [];
     selectedLogCategory.value = '';
     selectedLogList.value = [];
-  } else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
+  }
+  // selectedPlotName is a log 
+  else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
     plotTableData.value = [];
