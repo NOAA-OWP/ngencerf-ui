@@ -56,7 +56,7 @@
                       </span>
 
                       <span v-else>
-                          <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()" itle="Run Button" aria-label="Run Button">
+                          <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()" title="Run Button" aria-label="Run Button">
                             Run
                           </button>
                           <Button v-if="!isCancelHidden()" @click="cancelRun()" class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button"
