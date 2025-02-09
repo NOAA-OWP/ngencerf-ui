@@ -19,8 +19,7 @@
       </thead>
       <tbody>
         <tr>
-          <td class="td1">Right Click</td>
-          <td class="td2"><strong>Provides a context menu with some of the following options:</strong></td>
+          <td colspan="2" style="padding-left:80px;"><strong>Right click provides a context menu with some of the following options:</strong></td>
         </tr>
         <tr>
           <td class="td1">Evaluate</td>

@@ -2,32 +2,21 @@
   <div class="_help-page">
     <div class="_help-title">Forecast - Setup Forecast Tab</div>
     <p id="help-subtitle" class="_help-subtitle">
-      &nbsp;
+      Select the type of forecast to run. Greyed out rows in the table are not yet available from the GUI. Use the ngenCERF CLI to run those cycles.
     </p>
     <p class="text-center" style="color:#cc5500;font-size:0.8em;">
-      WARNING: 
+      WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
     <hr class="mt-2 mb-4" />
-    <table class="_help-table" aria-describedby="help-subtitle">
-      <thead>
-        <tr>
-          <th class="td1">Item</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="td1">Title</td>
-          <td class="td2"><strong>Definition:</strong></td>
-        </tr>
-      </tbody>
-    </table>
+    <p class="text-center">
+      Once the forecast cycle is selected, click on the Next button to review and run the forecast.
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
 
-</script>components/Help/Evaluation/CalibrationRunsHelp.vue
+</script>
 
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
