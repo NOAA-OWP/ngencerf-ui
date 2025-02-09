@@ -19,6 +19,22 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const selectedPlotFilename = ref<string | null>(null);
   const selectedPlotFileUrl = ref<string | null>(null);
 
+  // grid refs
+  const simulatedSources = ref<string[]>([
+    'Calibration Best Run',
+    'Calibration Last Run',
+    'Calibration Control Run',
+    'Validation Control Run',
+    'Validation Best Run',
+    'Validation Alt Iteration X Run'
+  ]);
+  const selectedSimulatedSource = ref<string>();
+  const gridTypes = ref<string[]>([
+    'Gridded',
+    'Catchment Means'
+  ]);
+  const selectedGridType = ref<string>();
+
   /**
    * Get Calibration Iteration Data
    * @return {any}
@@ -110,6 +126,10 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedPlotName,
     selectedPlotFilename,
     selectedPlotFileUrl,
+    simulatedSources,
+    selectedSimulatedSource,
+    gridTypes,
+    selectedGridType,
     queryGetIterations,
     queryGetPerformanceMetrics,
     queryGetLogNames,

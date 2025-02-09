@@ -149,6 +149,34 @@
         </div>
       </div>
     </div>
+
+    <!-- Grid Data -->
+    <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)" class="p-4">
+      <div class="grid grid-cols-3 gap-4 mt-4">
+        <div>
+          <div class="flex items-center space-x-4">
+            <h1 class="text-xl font-bold">SNODAS</h1>
+            <div class="flex items-center space-x-2">
+              <RadioButton v-model="selectedGridType" inputId="gridType1" value="gridded" name="gridType" />
+              <label for="gridType1">Gridded</label>
+              <RadioButton v-model="selectedGridType" inputId="gridType2" value="catchment" name="gridType" />
+              <label for="gridType2">Catchment Means</label>
+            </div>
+          </div>
+          <p class="text-[12px] text-gray-600">Snow Water Equivalent (SWE) - Raw Values</p>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold">Simulated</h1>
+          <p class="text-[12px] text-gray-600">Snow Water Equivalent (SWE) - Catchment Means</p>
+        </div>
+        <div>
+          <label for="simulatedSources" class="block text-sm font-medium text-gray-700">Select Simulated Source</label>
+          <Select v-model="selectedSimulatedSource" :options="simulatedSources" inputId="simulatedSources"
+            class="w-full mt-1" placeholder="Select" />
+        </div>
+      </div>
+
+    </div>
   </div>
 </template>
 
@@ -167,6 +195,8 @@ import MessagesGroup from "../Common/MessagesGroup.vue";
 import Paging from "../Common/Paging.vue";
 
 import { hilightTab } from '@/composables/TabHilight';
+
+import * as Plot from "@observablehq/plot";
 
 const runStatusStore = useRunStatusStore();
 const EvaluationSupplementalDataStore = useEvaluationSupplementalDataStore();
@@ -191,6 +221,10 @@ const {
   selectedPlotName,
   selectedPlotFilename,
   selectedPlotFileUrl,
+  simulatedSources,
+  selectedSimulatedSource,
+  gridTypes,
+  selectedGridType,
 } = storeToRefs(EvaluationSupplementalDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -244,6 +278,9 @@ const supplementalTableOptions = [
   'Iteration Metrics Table',
   'Iteration Parameters Table',
   'Performance Metrics Table'
+]
+const gridDisplayOptions = [
+  "Snow Water Equivalent",
 ]
 
 onMounted(() => {
@@ -311,6 +348,13 @@ onMounted(() => {
 
       //console.log('logLists: ', logLists.value);
     }
+
+    // add grid display options to the dropdown if not added already
+    gridDisplayOptions.forEach(option => {
+      if (!plotList.value.some(item => item.name === option)) {
+        plotList.value.push({ name: option, description: '' });
+      }
+    });
   })
 });
 
@@ -477,6 +521,22 @@ watch(selectedPlotName, async () => {
     selectedSupplementalTable.value = 0;
     selectedLogName.value = '';
     selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
+  }
+  // selectedPlotName is a grid display option
+  else if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
+    // clear out previous Display data
+    selectedPlotFilename.value = null;
+    selectedPlotFileUrl.value = null;
+    plotTableErrorMessage.value = '';
+    plotTableData.value = [];
+    plotTableColumns.value = [];
+    selectedSupplementalTable.value = 0;
+    selectedLogCategory.value = '';
+    selectedLogList.value = [];
+    selectedLogName.value = '';
+
+
+
   } else if (selectedPlotName.value) {
     selectedSupplementalTable.value = 0;
     selectedLogCategory.value = '';
