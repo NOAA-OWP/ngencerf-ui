@@ -6,10 +6,10 @@
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
-                <caption>Evaluation Run Time & Iteration</caption>
+                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Run Time & Iteration</caption>
                 <thead>
-                    <tr>
-                      <th class="text-right" colspan="2"></th>
+                    <tr height="25px">
+                      <th class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
                     </tr>
                   </thead>
                 <tbody>
@@ -33,7 +33,12 @@
 
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
-                <caption>Evaluation Status</caption>
+                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Status</caption>
+                <thead>
+                    <tr height="25px">
+                      <th class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                    </tr>
+                </thead>
                 <tbody>
                   <tr height="38px">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
