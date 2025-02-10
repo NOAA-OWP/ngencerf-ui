@@ -12,7 +12,12 @@
     <div class="grid grid-cols-2">
       <div class="col-span-1">
         <table>
-          <caption style="text-align: left;">Forecast Job Run Time</caption>
+          <caption style="text-align: center;font-size:1.1em;font-weight:bold;margin-bottom:3px;">Forecast Job Run Time</caption>
+          <thead>
+            <tr height="25px">
+              <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+            </tr>
+          </thead>
           <tbody>
             <tr height="40px">
               <th scope="row" class="text-right font-bold">
@@ -44,7 +49,12 @@
 
       <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
         <table>
-          <caption>Forecast Job Status</caption>
+          <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Forecast Job Status</caption>
+          <thead>
+            <tr height="25px">
+              <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+            </tr>
+          </thead>
           <tbody>
             <tr height="40px">
               <th scope="row" class="text-right font-bold">
