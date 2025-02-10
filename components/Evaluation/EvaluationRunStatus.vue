@@ -9,7 +9,7 @@
                 <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Run Time & Iteration</caption>
                 <thead>
                     <tr height="25px">
-                      <th class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                      <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
                     </tr>
                   </thead>
                 <tbody>
@@ -36,7 +36,7 @@
                 <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Status</caption>
                 <thead>
                     <tr height="25px">
-                      <th class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                      <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
                     </tr>
                 </thead>
                 <tbody>
