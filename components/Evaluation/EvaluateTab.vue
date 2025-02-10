@@ -180,8 +180,8 @@
           </div>
 
           <div class="mt-3 relative z-10">
-            <VueDatePicker v-model="selectedEvaluateDate" class="datePickers dp__theme_dark" time-picker-inline
-              text-input utc='preserve' format="yyyy-MM-dd" :teleport="true" />
+            <VueDatePicker v-model="selectedEvaluateDate" class="datePickers dp__theme_dark"
+              text-input format="yyyy-MM-dd" :enable-time-picker="false" :teleport="true" />
           </div>
         </div>
       </div>
@@ -925,5 +925,11 @@ onUnmounted(() => {
 .center-label {
   display: flex;
   align-items: center
+}
+
+.datePickers {
+  width: 230px;
+  display: inline-block;
+  text-align: center;
 }
 </style>
