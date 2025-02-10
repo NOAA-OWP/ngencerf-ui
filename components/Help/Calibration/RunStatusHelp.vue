@@ -6,10 +6,6 @@
     <p class="text-center" style="color:#cc5500;font-size:0.8em;">
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
-    <p style="margin-left: 40px; margin-top:20px;font-size:0.9em; line-height: 20px;">
-      <strong>NOTE:</strong> <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup,
-        starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress area to go to that specific setup tab.</em>
-    </p>
     <div style="margin-left: 75px; margin-top:20px;">
       <ul style="list-style-type: disc;">
         <li>The right side of each tab in the Calibration workflow shows the Progress towards completing a calibration setup
@@ -39,18 +35,18 @@
       <tbody>
         <tr>
           <td class="td1">Submit Time</td>
-          <td class="td2">Date/Time the button job was submitted to run. The display of this time 
-            may be delayed or updated based on factors such as the size of the headwater basin or
-            waiting for resources.
+          <td class="td2">Date/Time the job was submitted to run.
           </td>
         </tr>
         <tr>
           <td class="td1">Elapsed Time</td>
-          <td class="td2">Time elapsed since the job was submitted.</td>
+          <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
         </tr>
         <tr>
           <td class="td1">Iteration</td>
-          <td class="td2">Iteration number completed.</td>
+          <td class="td2">Iteration number completed. When both the calibration and validation jobs are complete, This
+                          represents the best iteration number from the calibration and the label changes.
+          </td>
         </tr>
         <tr>
           <td class="td1">Status</td>
@@ -78,7 +74,7 @@
         </tr>
         <tr>
           <td class="td1">Go To Evaluation Button</td>
-          <td class="td2">Got the Evaluation workflow to view more details about the run, including plots, plot data, performance metrics and logs.</td>
+          <td class="td2">Go the Evaluation workflow to view more details about the run, including plots, plot data, performance metrics and logs.</td>
         </tr>
 
       </tbody>
