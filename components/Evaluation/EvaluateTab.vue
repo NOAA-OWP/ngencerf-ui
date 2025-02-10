@@ -24,8 +24,7 @@
           </div>
           <div class="col-span-1 pr-8">
             <div class="text-right">
-              <span id="NewButton" class="ngenButtonDiv-alt bg-blue4" @click="gotoSelectAlternateIteration">
-                <Button id="NewValidationBtn">New Validation</button></span>
+                <Button id="NewValidationBtn" class="ngenButtonDiv" @click="gotoSelectAlternateIteration">New Validation</button>
             </div>
           </div>
 
@@ -194,7 +193,6 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import VueDatePicker from "@vuepic/vue-datepicker";
 

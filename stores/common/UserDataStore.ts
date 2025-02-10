@@ -86,9 +86,13 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
 
   /**
    * Gets users full name (first and last)
-   * @returns full name of user
+   * @returns full name of user, 
+   *   or the the initals from the email address if there is no name
    */
   function getUserFullName(): string {
+    if (!firstName.value && !lastName.value) {
+      return getUserInitials();
+    }
     return firstName.value + " " + lastName.value;
   }
 
