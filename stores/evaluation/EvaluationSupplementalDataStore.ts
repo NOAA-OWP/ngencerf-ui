@@ -1,6 +1,7 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
+import { DateTime } from "luxon";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
@@ -34,7 +35,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     'Catchment Means'
   ]);
   const selectedGridType = ref<string>();
-
+  const selectedEvaluateDate = ref<any>();
   /**
    * Get Calibration Iteration Data
    * @return {any}
@@ -130,6 +131,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedSimulatedSource,
     gridTypes,
     selectedGridType,
+    selectedEvaluateDate,
     queryGetIterations,
     queryGetPerformanceMetrics,
     queryGetLogNames,

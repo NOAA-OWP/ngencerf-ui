@@ -23,6 +23,7 @@
     "@primeuix/styled": "^0.4.0",
     "@primeuix/utils": "^0.4.0",
     "@primevue/themes": "^4.2.5",
+    "@types/luxon": "^3.4.2",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "@vuepic/vue-datepicker": "^9.0.1",
     "datatables.net-dt": "^2.0.8",

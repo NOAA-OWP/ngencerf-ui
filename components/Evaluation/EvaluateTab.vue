@@ -55,15 +55,13 @@
 
       <div class="row-span-1">
         <div class="grid grid-cols-4">
-          <div class="col-span-2 pl-8">
-            <label style="display: table-cell; white-space: nowrap" for="resultsPathname" class="pt9em">Results
-              Pathname</label>
-            <span class="table-cell">
-              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+          <div class="col-span-2 pl-8 flex items-center space-x-2 w-full">
+            <label for="resultsPathname" class="text-xs whitespace-nowrap font-bold">Results Pathname</label>
+            <span class="flex-grow">
+              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled
+                class="w-full" />
             </span>
           </div>
-
-
         </div>
       </div>
     </div>
@@ -151,38 +149,51 @@
     </div>
 
     <!-- Grid Data -->
-    <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)" class="p-4">
-      <div class="grid grid-cols-3 gap-4 mt-4">
-        <div>
-          <div class="flex items-center space-x-4">
-            <h1 class="text-xl font-bold">SNODAS</h1>
-            <div class="flex items-center space-x-2">
-              <RadioButton v-model="selectedGridType" inputId="gridType1" value="gridded" name="gridType" />
-              <label for="gridType1">Gridded</label>
-              <RadioButton v-model="selectedGridType" inputId="gridType2" value="catchment" name="gridType" />
-              <label for="gridType2">Catchment Means</label>
-            </div>
+    <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)"
+      class="p-4 min-h-screen overflow-visible">
+      <div class="grid grid-cols-3 gap-4 mt-4 p-2">
+        <div class="flex flex-col items-center p-2">
+          <h1 class="text-xl font-bold">SNODAS</h1>
+          <div class="flex items-center justify-center space-x-2 p-2 w-full">
+            <RadioButton v-model="selectedGridType" inputId="gridType1" value="gridded" name="gridType" />
+            <label for="gridType1">Gridded</label>
+            <RadioButton v-model="selectedGridType" inputId="gridType2" value="catchment" name="gridType" />
+            <label for="gridType2">Catchment Means</label>
           </div>
-          <p class="text-[12px] text-gray-600">Snow Water Equivalent (SWE) - Raw Values</p>
+          <p class="text-[12px] text-gray-600 text-center">Snow Water Equivalent (SWE) - Raw Values</p>
         </div>
-        <div>
+        <div class="flex flex-col items-center p-2">
           <h1 class="text-xl font-bold">Simulated</h1>
-          <p class="text-[12px] text-gray-600">Snow Water Equivalent (SWE) - Catchment Means</p>
+          <p class="text-[12px] text-gray-600 mt-9">Snow Water Equivalent (SWE) - Catchment Means</p>
         </div>
-        <div>
+        <div class="p-2 relative overflow-visible">
           <label for="simulatedSources" class="block text-sm font-medium text-gray-700">Select Simulated Source</label>
           <Select v-model="selectedSimulatedSource" :options="simulatedSources" inputId="simulatedSources"
             class="w-full mt-1" placeholder="Select" />
+          <div class="flex justify-end">
+            <button class="c-blue text-sm underline mt-6 ml-auto">Show SWE Time Series</button>
+          </div>
+          <div class="text-sm font-semibold text-blue-800 mt-3">
+            <p>Ranges:</p>
+            <p><span class="font-bold">Calibration:</span> 2014-01-01 to 2015-04-30</p>
+            <p><span class="font-bold">Validation:</span> 2015-05-01 to 2016-05-18</p>
+          </div>
+
+          <div class="mt-3 relative z-10">
+            <VueDatePicker v-model="selectedEvaluateDate" class="datePickers dp__theme_dark" time-picker-inline
+              text-input utc='preserve' format="yyyy-MM-dd" :teleport="true" />
+          </div>
         </div>
       </div>
-
     </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { nextTick } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import VueDatePicker from "@vuepic/vue-datepicker";
 
 import type { DynamicObject } from "@/composables/NextGenModel";
 
@@ -225,6 +236,7 @@ const {
   selectedSimulatedSource,
   gridTypes,
   selectedGridType,
+  selectedEvaluateDate
 } = storeToRefs(EvaluationSupplementalDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
