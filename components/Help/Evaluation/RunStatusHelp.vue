@@ -6,7 +6,7 @@
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
  
-    <table class="_help-table">
+    <table class="_help-table" aria-label="Evaluation Run/Status Help Table">
       <thead>
         <th>Item</th>
         <th>Description</th>
