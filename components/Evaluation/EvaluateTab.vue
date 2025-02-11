@@ -171,7 +171,7 @@
           <Select v-model="selectedSimulatedSource" :options="simulatedSources" inputId="simulatedSources"
             class="w-full mt-1" placeholder="Select" />
           <div class="flex justify-end">
-            <button class="c-blue text-sm underline mt-6 ml-auto">Show SWE Time Series</button>
+            <a class="c-blue text-sm underline mt-6 ml-auto" href="#" >Show SWE Time Series</a>
           </div>
           <div class="text-sm font-semibold text-blue-800 mt-3">
             <p>Ranges:</p>
