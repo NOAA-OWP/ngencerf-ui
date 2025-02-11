@@ -127,7 +127,7 @@
     <AboutBox />
   </div>
   <div id="ErrorLogOverlay" class="hidden" ref="errorOverlay">
-    <ErrorLog />
+    <LazyErrorLog />
   </div>
 
 </template>
@@ -157,7 +157,7 @@ const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/c
 const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
 const AboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
-const ErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
+const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
 
 const emit = defineEmits(["logoutEvent"]);
 

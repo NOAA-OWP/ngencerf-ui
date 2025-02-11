@@ -1,5 +1,5 @@
 <template>
-  <div id="ErrorLog">
+  <div id="ErrorLog" ref="errorLog">
     <div class="">
       <div class="inline text-xl font-bold text-right ml-5 mt-3">Error Log</div>
       <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
@@ -12,14 +12,14 @@
     <div class="mainframe">
       <div class="wrapper">
         <div class="allow-scroll">
-          <table class="mt-5 w-full">
+          <table class="mt-5 ml-3 mr-3">
             <colgroup>
-              <col span="1" style="width: 20%;">
+              <col span="1" style="width: 20;">
               <col span="1" style="width: 6%;">
-              <col span="1" style="width: 20%;">tableFixHead
-              <col span="1" style="width: 34%;">
+              <col span="1" style="width: 15%;">tableFixHead
+              <col span="1" style="width: 39%;">
             </colgroup>
-            <thead style="border-bottom: 1px solid #000">
+            <thead style="border-bottom: 1px solid #000;">
               <tr>
                 <th>Date</th>
                 <th>Severity</th>
@@ -41,20 +41,57 @@
     </div>
   </div>
 </template>
-200pox
+
 <script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { generalStore } from '~/stores/common/GeneralStore';
 
-onMounted(() => {
-  //console.log(toastRecords.value)
-  let ele = document.getElementById("ErrorLogOverlay");
-  let ele1 = document.getElementsByClassName("mainframe");
-  if( ele && ele1 ) {
-    (ele1[0] as HTMLElement).style.height = ele.clientHeight + "px";    
-  }
+const errorLog = ref<HTMLElement | null>(null);
+let observer: IntersectionObserver | null = null;
 
- // debugger;
+onMounted(() => {
+  console.log(toastRecords.value)
+  // Example usage: add a listener and define the callback function
+  addVisibilityListener((isVisible) => {
+    if (isVisible) {
+      setTimeout(() => {
+        console.log('Component is visible');
+        let ele = document.getElementById("ErrorLog");
+        let ele1 = document.getElementsByClassName("mainframe");
+        if (ele && ele1) {
+          (ele1[0] as HTMLElement).style.height = ele.clientHeight + "px";
+        }
+        // Perform actions when the component is visible
+      }, 0)
+    } else {
+      console.log('Component is not visible');
+      // Perform actions when the component is not visible
+    }
+  });
+
 });
+
+onBeforeUnmount(() => {
+  observer?.disconnect();
+  observer = null;
+});
+
+// Define the type for the callback function
+type VisibilityCallback = (isVisible: boolean) => void;
+
+// Define the event listener function with a callback parameter
+const addVisibilityListener = (callback: VisibilityCallback) => {
+  if (!errorLog.value) return;
+
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      callback(entry.isIntersecting);
+    });
+  });
+
+  observer.observe(errorLog.value);
+};
+
 
 const closeErroLogBox = () => {
   useAccountEvent("errorLogEvent", "");
@@ -74,22 +111,25 @@ const { toastRecords } = storeToRefs(gstore);
   width: 888px;
   min-height: 500px;
   background-color: white;
-  //overflow:hidden;
-  //overflow-y: scroll;
 }
 
+table {
+  width: 97%;
+}
+
+table thead tr {
+  position: sticky;
+}
 .mainframe {
   overflow: hidden;
   position: fixed;
-  height: 200px;
-  width: 500px;
+
+  width: auto;
 }
 
 .wrapper {
-  margin: 5%;
-  width: 90%;
-  height: 90%;
-  background-color: red;
+  width: 95%;
+  height: 95%;
 }
 
 .allow-scroll {
@@ -97,8 +137,8 @@ const { toastRecords } = storeToRefs(gstore);
   height: 100%;
   width: 100%;
   overflow-y: scroll;
-  overflow-x: scroll;
-  background-color: lime;
+  overflow-x: hidden;
+
 }
 
 .dataCell {
