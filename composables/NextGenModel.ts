@@ -50,7 +50,7 @@ export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
 export interface edsError {
   name: string;
   message: string;
-  status_code: string;
+  status_code: number | null;
 }
 
 export interface FormulationTabSaveWarning {
@@ -262,12 +262,38 @@ export interface SaveGageTabPayload {
 
 export interface GageData {
   gage_id: string;
+  domain: string;
   agency: string;
   station_name: string;
   latitude: number;
   longitude: number;
   altitude: number;
 }
+
+export interface GeopackageInfo {
+  catchments: {
+    [key: string]: string; // key is the catchment id, value is the catchment POLYGON string
+  }
+  crs: string;
+  gage_coordinates: {
+    latitude: number;
+    longitude: number;
+  }
+}
+
+export interface GetGageSuccessResponse {
+  gage: GageData;
+  geopackage_info: GeopackageInfo;
+
+}
+
+export interface GetGageEDSErrorResponse {
+  gage: GageData;
+  geopackage_info: null,
+  eds_errors: edsError[];
+}
+
+export type GetGageResponse = GetGageSuccessResponse | GetGageEDSErrorResponse;
 
 export interface DomainValueData {
   name: string;

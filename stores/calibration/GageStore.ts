@@ -10,6 +10,7 @@ import { makeProtectedApiCall } from "@/composables/UserAuth";
 
 import type {
   SelectOption,
+  GetGageResponse,
   GageTabData,
   GeneralApiSaveResponse,
   GeneralErrorResponse,
@@ -150,7 +151,7 @@ export const useGageStore = defineStore(
      *  @returns {void}
      */
     async function fetchSelectedGageData(): Promise<void> {
-      const selectedGageDataResponse = await makeProtectedApiCall<GageData>(
+      const selectedGageDataResponse = await makeProtectedApiCall<GetGageResponse>(
         `${ngencerfBaseUrl}/calibration/get_gage/`,
         {
           method: "POST",
