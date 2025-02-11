@@ -30,22 +30,22 @@
             <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
             <Column field="created_at" header="Creation Date" sortable>Column
               <template #body="slotProps">
-                {{ formatDateForDisplay(slotProps.data.created_at) }}
+                {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
               </template>
             </Column>
             <Column field="submit_date" header="Submit Date" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.submit_date">
-                  {{ formatDateForDisplay(slotProps.data.submit_date) }}
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
                 </span>
               </template>
             </Column>
             <Column header="Calibration Period" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period">
-                  {{ formatDateForDisplay(slotProps.data.calibration_start_period) }} <span
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_start_period) }} <span
                     v-if="slotProps.data.calibration_end_period">to</span>
-                  {{ formatDateForDisplay(slotProps.data.calibration_end_period) }}
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_end_period) }}
                 </span>
               </template>
             </Column>
@@ -81,7 +81,7 @@ import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
-import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData } = useGageStore();
 const { loadFormulationTabStaticData } = useFormulationStore();

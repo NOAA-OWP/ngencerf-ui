@@ -97,7 +97,7 @@ import { storeToRefs } from 'pinia';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 
-import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
 const calRunStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(calRunStore);
@@ -127,7 +127,7 @@ const formatDate = (d: any) => {
   if ((d instanceof Date)) {
     console.log('Date');
   } else {
-    return formatDateForDisplay(d);
+    return formatISOStringOrDateToYYYYMMDDHHMM(d);
   }
 };
 

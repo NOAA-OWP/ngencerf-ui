@@ -159,7 +159,8 @@
             <RadioButton v-model="selectedGridType" inputId="gridType2" value="catchment" name="gridType" />
             <label for="gridType2">Catchment Means</label>
           </div>
-          <p class="text-[12px] text-gray-600 text-center">Snow Water Equivalent (SWE) - Raw Values</p>
+          <p v-if="selectedGridType === 'gridded'" class="text-[12px] text-gray-600 text-center">Snow Water Equivalent (SWE) - Raw Values</p>
+          <p v-if="selectedGridType === 'catchment'" class="text-[12px] text-gray-600 text-center">Snow Water Equivalent (SWE) - Catchment Means</p>
         </div>
         <div class="flex flex-col items-center p-2">
           <h1 class="text-xl font-bold">Simulated</h1>
@@ -174,8 +175,7 @@
           </div>
           <div class="text-sm font-semibold text-blue-800 mt-3">
             <p>Ranges:</p>
-            <p><span class="font-bold">Calibration:</span> 2014-01-01 to 2015-04-30</p>
-            <p><span class="font-bold">Validation:</span> 2015-05-01 to 2016-05-18</p>
+            <p v-if="selectedSimulatedSource" ><span class="font-bold">{{ selectedSimulatedSourceTimeRange }}</span></p>
           </div>
 
           <div class="mt-3 relative z-10">
@@ -237,7 +237,8 @@ const {
   selectedSimulatedSource,
   gridTypes,
   selectedGridType,
-  selectedEvaluateDate
+  selectedEvaluateDate,
+  selectedSimulatedSourceTimeRange
 } = storeToRefs(EvaluationSupplementalDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -294,7 +295,7 @@ const supplementalTableOptions = [
 ]
 const gridDisplayOptions = [
   "Snow Water Equivalent",
-]
+] 
 
 onMounted(() => {
   nextTick(async () => {
@@ -798,6 +799,11 @@ watch(selectedLogCurrentPage, async () => {
   }
 });
 
+// watch for changes in selectedGridType
+watch(selectedGridType, () => {
+  console.log('selectedGridType: ', selectedGridType.value);
+});
+
 function capitalCase(str: string) {
   return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -814,6 +820,7 @@ const newValidation = () => {
   alert('newValidation');
   //tabChanged.value = 3;
 }
+
 const toggleMessagesGroup = async () => {
   if (showMessagesGroup.value) {
     showMessagesGroup.value = false;

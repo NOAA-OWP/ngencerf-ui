@@ -61,12 +61,12 @@
             <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable></Column>
             <Column :pt="ptColumn" field="created_at" header="Creation Date" sortable>
               <template #body="slotProps">
-                {{ formatDateForDisplay(slotProps.data.created_at) }}
+                {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
               </template>
             </Column>
             <Column field="submit_date" header="Submit Date" sortable>
               <template #body="slotProps">
-                {{ formatDateForDisplay(slotProps.data.submit_date) }}
+                {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
               </template>
             </Column>
           </DataTable>
@@ -123,7 +123,7 @@ import { generalStore } from "@/stores/common/GeneralStore"
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
-import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 import { EvaluationTabs } from "@/composables/NextgenEnums";
 

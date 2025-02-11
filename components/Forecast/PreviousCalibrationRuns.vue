@@ -44,7 +44,7 @@
               <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
               <Column field="submit_date" header="Run Date" sortable>
                 <template #body="slotProps">
-                  {{ formatDateForDisplay(slotProps.data.created_at) }}
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
                 </template>
               </Column>
               <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
@@ -78,7 +78,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
-import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 import { ForecastTabs } from "@/composables/NextgenEnums";
 

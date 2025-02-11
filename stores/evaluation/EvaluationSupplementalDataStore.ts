@@ -1,17 +1,18 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import { DateTime } from "luxon";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
-
 import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { formatISOStringOrDateToYYYYMMDD } from '@/utils/TimeHelpers';
 
 export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplementalDataStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
+  const { userCalibrationRunData } = storeToRefs(useUserDataStore());
   const { getAccessToken } = useUserDataStore();
+
 
   // refs
   const plotNames = ref<APIResponse>({});
@@ -36,6 +37,27 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   ]);
   const selectedGridType = ref<string>();
   const selectedEvaluateDate = ref<any>();
+
+  /**
+   * Computes the selected simulated source time range depending on the selected simulated source
+   */
+  const selectedSimulatedSourceTimeRange = computed(() => {
+    let selectedSimulatedSourceStartDate: string = '';
+    let selectedSimulatedSourceEndDate: string = '';
+
+    if (selectedSimulatedSource?.value?.includes('Calibration')) {
+    selectedSimulatedSourceStartDate = `Calibration: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_start_time as string)}`;
+    selectedSimulatedSourceEndDate = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_end_time as string);
+    }
+
+    else if (selectedSimulatedSource?.value?.includes('Validation')) {
+    selectedSimulatedSourceStartDate = `Validation: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string)}`;
+    selectedSimulatedSourceEndDate = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_end_time as string);
+    }
+
+    return `${selectedSimulatedSourceStartDate} to ${selectedSimulatedSourceEndDate}`;
+  });
+
   /**
    * Get Calibration Iteration Data
    * @return {any}
@@ -132,6 +154,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     gridTypes,
     selectedGridType,
     selectedEvaluateDate,
+    selectedSimulatedSourceTimeRange,
     queryGetIterations,
     queryGetPerformanceMetrics,
     queryGetLogNames,

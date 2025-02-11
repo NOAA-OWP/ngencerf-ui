@@ -8,7 +8,7 @@ import { generalStore } from "@/stores/common/GeneralStore";
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { makeProtectedApiCall } from "@/composables/UserAuth"
-import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { fixFloatToFivePlaces } from "@/utils/CommonHelpers";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {
@@ -127,7 +127,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         rowData['validation_run_id'] = validation_job.validation_run_id;
         rowData['iteration_num'] = (validation_job.best === true) ? validation_job.iteration_num.toString() + "*" : validation_job.iteration_num;
         rowData['status'] = validation_job.status;
-        rowData['submit_date'] = formatDateForDisplay(validation_job.submit_date);
+        rowData['submit_date'] = formatISOStringOrDateToYYYYMMDDHHMM(validation_job.submit_date);
         validation_job.parameters.forEach((parameter: CalibrationRunValidationParameterData) => {
           rowData[parameter.name] = fixFloatToFivePlaces(parameter.value)
         });
