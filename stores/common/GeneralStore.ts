@@ -6,9 +6,11 @@
 import { defineStore } from "pinia";
 
 import type { ServerInfo, ToastRecord } from "@/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
 
 export const generalStore = defineStore(
-  "generalStore",  () => {
+  "generalStore",
+  () => {
     const calibrationTabIndex = ref("1");
     const evaluationTabIndex = ref("1");
     const forecastTabIndex = ref("1");
@@ -35,20 +37,228 @@ export const generalStore = defineStore(
 
     const isLoading = ref<boolean>(false);
 
-    // This is set if the user changes the gage.  Resets when saved.
+    // This is set if the user changes the gage.  Resets when saved.toastRecord
     const gageHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
 
     const toastRecords = ref<ToastRecord[]>([]);
 
-    function addToastRecord(rec: ToastRecord) {
-      rec["datetime"] = Date().toString().substring(4, 24);
-      toastRecords.value.push(rec);
+    
+    function addToastRecord(rec: ToastMessageOptions) {
+      let dt = { datetime: Date().toString().substring(4, 24) };
+      let newRec = { ...rec, ...dt };
+      toastRecords.value.push(newRec as ToastRecord);
     }
 
     function clearToastRecords() {
       toastRecords.value = [];
+      toastRecords.value = [
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:19",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:21",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:22",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:23",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:24",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:25",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:26",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:27",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:28",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:29",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:30",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:31",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:32",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:33",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:34",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:35",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:42",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:43",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:43",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:44",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:45",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:46",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:47",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:48",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:48",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:49",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:50",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:51",
+      },
+      {
+        severity: "error",
+        summary: "Unable to Save",
+        detail: "Calibration and Validation times must not overlap",
+
+        datetime: "Feb 11 2025 14:28:52",
+      },
+    ];
+
     }
     function getServerInfo() {
       return serverInfo.value;
@@ -145,7 +355,7 @@ export const generalStore = defineStore(
       isLoading,
       toastRecords,
       addToastRecord,
-      clearToastRecords
+      clearToastRecords,
     };
   },
   {
