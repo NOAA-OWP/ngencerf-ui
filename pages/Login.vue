@@ -21,27 +21,28 @@
 
                     <div class="mt-10">
                       <label for="uname" style="font-weight: normal;">Email</label><br>
-                      <input id="uname" class="w-[350px]" type="text" v-model="userName" placeholder=" Email" aria-label="Username"
-                        autocomplete="email" v-on:keypress="autoSubmit" />
+                      <input id="uname" class="w-[350px]" type="text" v-model="userName" placeholder=" Email"
+                        aria-label="Username" autocomplete="email" v-on:keypress="autoSubmit" />
                       <!-- <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
                         Forgot Email
-                      </button> -->
+                      </Button> -->
                     </div>
                     <div class="mt-4">
                       <label for="pword" style="font-weight: normal;">Password</label><br>
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
-                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false" class="block w-[350px]" 
-                        v-on:keypress="autoSubmit" />
+                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false"
+                        class="block w-[350px]" v-on:keypress="autoSubmit" />
                       <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
                         Forgot Password
-                      </button>
+                      </Button>
                     </div>
 
-                      <Button id="LoginButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">Sign In</button>
+                    <Button id="LoginButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm"
+                      aria-label="sign in">Sign In</Button>
 
 
                     <div class="signupButton underline text-base mt-2" aria-label="sign up">
-                      <Button @click="openDialog" class="c-blue">Create an Account</button>
+                      <Button @click="openDialog" class="c-blue">Create an Account</Button>
                     </div>
 
                   </form>
@@ -87,10 +88,11 @@
                             required toggleMask class="block" />
                         </div>
                         <div :class="createAccountButtonClasses">
-                          <Button type="submit" :disabled="disableCreateAccountBtn">Create Account</button>
+                          <Button type="submit" :disabled="disableCreateAccountBtn">Create Account</Button>
                         </div>
                         <div class="signupButton underline text-base inline pl-6">
-                          <Button type="button" @click="closeDialog" :class="cancelCreateAccountLinkClasses" :disabled="disableCreateAccountBtn">Cancel</button>
+                          <Button @click="closeDialog" :class="cancelCreateAccountLinkClasses"
+                            :disabled="disableCreateAccountBtn">Cancel</Button>
                         </div>
                       </form>
                     </div>
@@ -129,7 +131,7 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 const { calibrationJobId } = storeToRefs(generalStore());
 
 const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
-const { resetGeneralStore } = generalStore();
+const { resetGeneralStore, clearToastRecords } = generalStore();
 
 
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -155,6 +157,7 @@ onMounted(() => {
   nextTick(() => {
     sessionStorage.clear();
     localStorage.clear();
+    clearToastRecords();
     calibrationJobId.value = 0;
     hardResetUserDataStore();
     resetGeneralStore();
@@ -174,8 +177,8 @@ const ForgotUsername = () => {
 };
 
 const ForgotPassword = () => {
-  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Info', detail: 'Please contact the ngenCERF administrator to reset your password.'};
-toast.add(tMsg);
+  const tMsg: ToastMessageOptions =  { severity: 'info', summary: 'Info', detail: 'Please contact the ngenCERF administrator to reset your password.' };
+  toast.add(tMsg);
 };
 
 const autoSubmit = (e: KeyboardEvent) => {
@@ -217,30 +220,30 @@ const SubmitLoginForm = async (e: Event) => {
         if (!err) {
           err = "Cannot reach server. Error code: " + error.statusCode;
         }
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: err, life: 3000 };
-toast.add(tMsg);
+        const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: err, life: 3000 };
+        toast.add(tMsg);
         console.error("Error during user creation:", error.message, error.data.detail);
       }
     });
   } else if (userName.value.trim() === "" || userPassword.value.trim() === "") {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: "A Username and Password are required", life: 3000 };
-toast.add(tMsg);
+    const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: "A Username and Password are required", life: 3000 };
+    toast.add(tMsg);
   }
 }
 
 const SubmitNewAccountForm = async () => {
   if (newPassword.value !== confirmPassword.value) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 3000 };
-toast.add(tMsg);
+    const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 3000 };
+    toast.add(tMsg);
     return;
   }
 
   disableCreateAccountBtn.value = true;
-  if ( !createAccountButtonClasses.value.includes( 'disabledButton' ) ) createAccountButtonClasses.value.push( 'disabledButton' );
-  if ( !cancelCreateAccountLinkClasses.value.includes( 'disabledLink' ) ) cancelCreateAccountLinkClasses.value.push( 'disabledLink' );
+  if (!createAccountButtonClasses.value.includes('disabledButton')) createAccountButtonClasses.value.push('disabledButton');
+  if (!cancelCreateAccountLinkClasses.value.includes('disabledLink')) cancelCreateAccountLinkClasses.value.push('disabledLink');
 
   //try to create a new account for user
-  const { data, error,  } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
+  const { data, error, } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
     method: 'POST',
     body: {
       email: newEmail.value.toLowerCase(),
@@ -251,42 +254,44 @@ toast.add(tMsg);
     }
   });
 
-  if (error.value) {    
+  if (error.value) {
     disableCreateAccountBtn.value = false;
-    createAccountButtonClasses.value.splice( createAccountButtonClasses.value.indexOf( 'disabledButton' ), 1);
-    cancelCreateAccountLinkClasses.value.splice( cancelCreateAccountLinkClasses.value.indexOf( 'disabledLink' ), 1);
+    createAccountButtonClasses.value.splice(createAccountButtonClasses.value.indexOf('disabledButton'), 1);
+    cancelCreateAccountLinkClasses.value.splice(cancelCreateAccountLinkClasses.value.indexOf('disabledLink'), 1);
     if (error.value?.data.email) {
       let detail = error.value?.data.email[0];
       if (detail.indexOf('already exists')) {
         // customize error message since the one we get back from Djoser isn't ideal
         detail = 'A user with this Email address has already registered.'
       }
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: detail, life: 3000 };
-toast.add(tMsg);
+      const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: detail, life: 3000 };
+      toast.add(tMsg);
       return;
     } else if (error.value?.data.first_name) {
       let detail = error.value?.data.first_name[0];
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: detail, life: 3000 };
-toast.add(tMsg);
+      const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: detail, life: 3000 };
+      toast.add(tMsg);
       return;
     } else if (error.value?.data.last_name) {
       let detail = error.value?.data.last_name[0];
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: detail, life: 3000 };
-toast.add(tMsg);
+      const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: detail, life: 3000 };
+      toast.add(tMsg);
       return;
     } else if (error.value?.data.password) {
-      error.value?.data.password.forEach((e: any) => const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: 3000 };
-toast.add(tMsg););
+      error.value?.data.password.forEach((e: any) => {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: 3000 }
+        toast.add(tMsg);
+      });
       return;
     }
   }
 
   if (data.value.email && data.value.id) {
     disableCreateAccountBtn.value = false;
-    createAccountButtonClasses.value.splice( createAccountButtonClasses.value.indexOf( 'disabledButton' ), 1);
-    cancelCreateAccountLinkClasses.value.splice( cancelCreateAccountLinkClasses.value.indexOf( 'disabledLink' ), 1);
-    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 3000 };
-toast.add(tMsg);
+    createAccountButtonClasses.value.splice(createAccountButtonClasses.value.indexOf('disabledButton'), 1);
+    cancelCreateAccountLinkClasses.value.splice(cancelCreateAccountLinkClasses.value.indexOf('disabledLink'), 1);
+    const tMsg: ToastMessageOptions =  { severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 3000 };
+    toast.add(tMsg);
     closeDialog();
   };
 };

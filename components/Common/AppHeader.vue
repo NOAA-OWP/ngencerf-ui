@@ -10,20 +10,20 @@
 
         <ul v-show="userLoggedIn && location.name !== 'Login'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
-            <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
-              @click="MenuChanged">Calibration</NuxtLink>
+            <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''"
+              to="calibration" data-menu='1' @click="MenuChanged">Calibration</NuxtLink>
           </li>
           <li aria-label="Evaluation" title="Evaluation">
-            <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2'
-              @click="MenuChanged">Evaluation</NuxtLink>
+            <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation"
+              data-menu='2' @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
-              @click="MenuChanged">Forecast</NuxtLink>
+            <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast"
+              data-menu='3' @click="MenuChanged">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
-            <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
-              @click="" class="disabled">Verification</NuxtLink>
+            <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
+              to="verification" data-menu='4' @click="" class="disabled">Verification</NuxtLink>
           </li>
         </ul>
 
@@ -49,6 +49,7 @@
       </div>
 
       <Transition name="slide-fade">
+
         <div v-if="showHelp" id="HelpWindow">
           <div class="text-right sticky top-0">
             <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
@@ -57,7 +58,6 @@
           <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
             <LazyHelpLandingPageHelp />
           </div>
-
           <div v-if="location.name === 'Calibration'" class="py-10 px-1">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
@@ -122,10 +122,14 @@
   </div>
   <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
     <UserAccount />
-  </div>  
+  </div>
   <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
     <AboutBox />
   </div>
+  <div id="ErrorLogOverlay" class="hidden" ref="errorOverlay">
+    <ErrorLog />
+  </div>
+
 </template>
 
 <script lang="ts" setup>
@@ -153,11 +157,13 @@ const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/c
 const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
 const AboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
+const ErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
 
 const emit = defineEmits(["logoutEvent"]);
 
 const accountOverlay = ref();
 const aboutOverlay = ref();
+const errorOverlay = ref();
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex } = generalStore();
 
@@ -166,12 +172,13 @@ const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } 
 const location = useRoute();
 
 const userInitials = ref<string>('');
-const userLoggedIn= ref<boolean>();
+const userLoggedIn = ref<boolean>();
 
 const userItems = ref([
   { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
   { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
-  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
+  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() },
+  { label: 'Error Log', icon: 'pi pi-fw-times', command: () => errorLog() }
 ])
 
 const userContextMenu = ref();
@@ -230,12 +237,16 @@ const sizeHelpWindow = () => {
 /**
  * 
  */
- const gotoAccount = async () => {
+const gotoAccount = async () => {
   accountOverlay.value.style.display = "block";
 }
 
 const aboutBox = async () => {
   aboutOverlay.value.style.display = "block";
+}
+
+const errorLog = async () => {
+  errorOverlay.value.style.display = "block";
 }
 
 useAccountEventListen('accountEvent', () => {
@@ -245,6 +256,11 @@ useAccountEventListen('accountEvent', () => {
 
 useAccountEventListen('aboutBoxEvent', () => {
   const ele = document.getElementById('AboutBoxOverlay') as HTMLElement;
+  ele.style.display = "none";
+})
+
+useAccountEventListen('errorLogEvent', () => {
+  const ele = document.getElementById('ErrorLogOverlay') as HTMLElement;
   ele.style.display = "none";
 })
 
@@ -287,7 +303,7 @@ const MenuChanged = (e: MouseEvent) => {
   nextTick(() => {
     const currentMenu = getMenuIndex();
     let ele = e.currentTarget as HTMLElement;
-    if( !ele ) {
+    if (!ele) {
       ele = e.target as HTMLElement;
     }
     const m = ele.getAttribute('data-menu');

@@ -5,11 +5,10 @@
  */
 import { defineStore } from "pinia";
 
-import type { ServerInfo } from "@/composables/NextGenModel";
+import type { ServerInfo, ToastRecord } from "@/composables/NextGenModel";
 
 export const generalStore = defineStore(
-  "generalStore",
-  () => {
+  "generalStore",  () => {
     const calibrationTabIndex = ref("1");
     const evaluationTabIndex = ref("1");
     const forecastTabIndex = ref("1");
@@ -25,9 +24,9 @@ export const generalStore = defineStore(
     // running validation run id from selected iteration
     const iterationValidationRunId = ref<number>(0);
     // user selected validation run status
-    const evaluateValidationRunStatus = ref<string>('');
+    const evaluateValidationRunStatus = ref<string>("");
     // user seleted iteration run number for display only
-    const evaluateDisplayIterationNumber = ref<number>( 0 );
+    const evaluateDisplayIterationNumber = ref<number>(0);
 
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
@@ -41,7 +40,16 @@ export const generalStore = defineStore(
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
 
- 
+    const toastRecords = ref<ToastRecord[]>([]);
+
+    function addToastRecord(rec: ToastRecord) {
+      rec["datetime"] = Date().toString().substring(4, 24);
+      toastRecords.value.push(rec);
+    }
+
+    function clearToastRecords() {
+      toastRecords.value = [];
+    }
     function getServerInfo() {
       return serverInfo.value;
     }
@@ -134,16 +142,18 @@ export const generalStore = defineStore(
       verificationTabIndex,
       menuIndex,
       evaluationRunSelected,
-      isLoading
+      isLoading,
+      toastRecords,
+      addToastRecord,
+      clearToastRecords
     };
   },
   {
-      persist: {
-    storage: piniaPluginPersistedstate.localStorage(),
-  },
+    persist: {
+      storage: piniaPluginPersistedstate.localStorage(),
+    },
   }
 );
-
 
 /* Pinia supports Hot Module replacement so you can edit your stores
    and interact with them directly in your app without reloading the page,

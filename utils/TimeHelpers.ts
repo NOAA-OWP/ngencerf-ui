@@ -24,7 +24,7 @@ export const formatDateForDisplay = ( d: string | Date ): string => {
     dateTime = DateTime.fromJSDate(d, { zone: 'utc' });
   }
 
-  // Return the formatted date in 'yyyy-MM-dd HH:mm' format
+  // Return the formatted date in 'yyyy-MM-dd HH:mm' fformatDateForDisplayormat
   return dateTime.toFormat('yyyy-MM-dd HH:mm');
 };
 

@@ -293,6 +293,7 @@ import { useDialog } from "primevue/usedialog";
 
 import type { DatePickerProps } from "primevue/datepicker";
 import type { ToastMessageOptions } from "primevue/toast";
+import type {ToastRecord} from "@/composables/NextGenModel";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
@@ -318,9 +319,10 @@ const nextPrevDialogOpened = ref<boolean>(false);
 const format = formatDateForDisplay;
 
 const gstore = generalStore();
+const { addToastRecord } = generalStore();
 const { isLoading } = storeToRefs(gstore);
 
-const { calibrationJobId } = storeToRefs(generalStore());
+const { calibrationJobId, toastRecords } = storeToRefs(generalStore());
 const { ngencerfBaseUrl } = useBackendConfig();
 const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
@@ -380,6 +382,8 @@ onMounted(async () => {
 
   toast.removeAllGroups();
 
+  console.log(toastRecords.value);
+
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
 
@@ -399,7 +403,7 @@ onMounted(async () => {
     const edsErrorMessage = loadTuningTabData.value ? ifEDSErrorsExist(loadTuningTabData.value._data) : '';
     if (edsErrorMessage) {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'EDS Error', detail: edsErrorMessage };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
     }
 
     // set calibration times
@@ -442,7 +446,7 @@ onMounted(async () => {
     isInitialSetupDone.value = true; // set to true after initial setup
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No Calibration Job ID', detail: 'No calibration job ID found. Please go back to the Calibration Runs tab and select a job.' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 
   isLoading.value = false;
@@ -478,7 +482,7 @@ const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 };
 
@@ -486,7 +490,7 @@ const handleOutputVariablesParametersClick = (event: Event) => {
   if (!isFormulationDataSaved()) {
     event.preventDefault(); // Prevent any default action
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or parameters because Formulation data has not been saved.' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 };
 
@@ -681,20 +685,20 @@ const handleFileUpload = async (event: Event) => {
 
         if (invalidParameters.length > 0) {
           const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters in the uploaded file were not imported because they are not calibratable:\n ${invalidParameters.join(', ')}` };
-          toast.add(tMsg);;
+          toast.add(tMsg); addToastRecord(tMsg);
         }
       } else {
         const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No data in parameter file' };
-        toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       }
     } catch (error) {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'File upload failed' };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       console.error('File upload failed:', error);
     }
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No file selected' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     console.error('No file selected');
   }
 };
@@ -835,7 +839,7 @@ const validateAndBuildRequestBody = (): boolean => {
 
   if (Object.keys(saveTuningTabRequestBody.value).length === 0) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'No data to save', detail: 'No valid data has been entered to save' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
@@ -866,7 +870,7 @@ const areCalibrationTimesValidated = (): boolean => {
   // check if time_range is not set
   if (!rangeDateFrom.value || !rangeDateTo.value) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'time_range must be set' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
@@ -886,7 +890,7 @@ const areCalibrationTimesValidated = (): boolean => {
   // check if time_range and calibration_times are null after converted to Date objects
   if (!rangeStartDate || !rangeEndDate || !simStartDate || !simEndDate || !calStartDate || !calEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'time_range and/or calibration_times cannot be converted to Date objects' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
@@ -899,28 +903,28 @@ const areCalibrationTimesValidated = (): boolean => {
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'calibration_times must be within time_range' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if simulation_end_time is not after simulation_start_time
   if (simStartDate >= simEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'simulation_end_time must be after simulation_start_time' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
   if (calStartDate <= simStartDate || calStartDate > simEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
@@ -953,7 +957,7 @@ const areValidationTimesValidated = (): boolean => {
   // check if Date objects are valid
   if (!avSimStartDate || !avSimEndDate || !avCalStartDate || !avCalEndDate || !rangeStartDate || !rangeEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'time_range and/or validation_times cannot be converted to Date objects for validation' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
@@ -976,7 +980,7 @@ const areValidationTimesValidated = (): boolean => {
     // check if validation simulation times do not encompass both calibration and validation times
     if (isAvSimStartAfterCalStart || isAvSimEndBeforeCalEnd || isAvSimStartAfterAvCalStart || isAvSimEndBeforeAvCalEnd) {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Validation Simulation times must encompass both Calibration and Validation times' };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       return false;
     }
 
@@ -987,7 +991,7 @@ const areValidationTimesValidated = (): boolean => {
     // check if calibration times and validation times overlap
     if (isAvCalStartBeforeOrEqualToCalEnd && isAvCalEndAfterOrEqualToCalStart) {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Calibration and Validation times must not overlap' };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       return false;
     }
   }
@@ -995,21 +999,21 @@ const areValidationTimesValidated = (): boolean => {
   // check if avSimEndDate is not after avSimStartDate
   if (avSimStartDate >= avSimEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Validation Simulation End must be after Simulation Start' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if avCalStartDate is not within avSimStartDate and avSimEndDate
   if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Validation Calibration Start must be within Simulation Start and End' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
   if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Validation Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
@@ -1107,7 +1111,7 @@ const saveTuningData = () => {
 
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   } else {
     // check if Tuning Tab data is validated before saving
     if (validateAndBuildRequestBody()) {

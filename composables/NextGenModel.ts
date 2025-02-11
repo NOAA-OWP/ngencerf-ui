@@ -1,3 +1,5 @@
+import type { ToastMessageOptions } from "primevue/toast"
+
 export interface User {
   uid: number;
   first_name: string;
@@ -666,6 +668,7 @@ export type LogoutEvent = {
 export type AccountEvent = {
   accountEvent: string;
   aboutBoxEvent: string;
+  errorLogEvent: string;
 };
 
 export type ServerInfo = {
@@ -733,7 +736,7 @@ export type PlotNames = {
   status: string;
 };
 
-export type GageResetData  = {
+export type GageResetData = {
   external_data_status: {
     observational: boolean;
     forcing: boolean;
@@ -748,4 +751,8 @@ export type GageResetData  = {
 export type BestIterationData = {
   iteration: number;
   isBest: boolean;
+}
+
+export interface ToastRecord extends ToastMessageOptions {
+  datetime: string;
 }
