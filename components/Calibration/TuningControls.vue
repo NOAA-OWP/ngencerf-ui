@@ -676,7 +676,7 @@ const handleFileUpload = async (event: Event) => {
           } else {
             errorMessage = response._data?.message;
             const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Invalid data in parameter file', detail: errorMessage };
-            toast.add(tMsg);
+            toast.add(tMsg); addToastRecord(tMsg);
           }
         });
 
@@ -693,7 +693,7 @@ const handleFileUpload = async (event: Event) => {
       }
     } catch (error) {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'File upload failed' };
-      toast.add(tMsg); addToastRecord(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);addToastRecord(tMsg);
       console.error('File upload failed:', error);
     }
   } else {

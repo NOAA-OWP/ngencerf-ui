@@ -165,6 +165,7 @@ import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
           
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+const { addToastRecord } = generalStore();
 
 const { hardResetTuningTimeConrols } = useTuningStore();
 
@@ -373,7 +374,7 @@ const handleDialogClose = (opt: any) => {
     }
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: 10000 };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
   fileUploadDialogOpened.value = false
 }
@@ -479,7 +480,7 @@ const saveTabData = () => {
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message };
-          toast.add(tMsg);
+          toast.add(tMsg); addToastRecord(tMsg);
         });
       }
       isLoading.value = false;

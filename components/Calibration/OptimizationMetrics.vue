@@ -21,7 +21,7 @@
                   <div class="text-left font-bold">Algorithm Parameter(s)</div>
                   <div id="ClearTableBtn" class="ml-auto">
                     <Button @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2"
-                    :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear
+                      :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear
                       <!-- <i class="pi pi-arrow-up"></i>--></Button>
                   </div>
                 </div>
@@ -58,13 +58,16 @@
                 @change="updateMetricFlowFieldVisibility"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-2">
-                Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold" :minFractionDigits="2"
-                  class="w-24" :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+                Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
+                  :minFractionDigits="2" class="w-24"
+                  :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
                 </InputNumber> m3/s
               </div>
               <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-2">
-                Peak Flow Threshold <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold" :minFractionDigits="2"
-                  class="w-24" :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber> quantile
+                Peak Flow Threshold <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
+                  :minFractionDigits="2" class="w-24"
+                  :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber>
+                quantile
               </div>
             </div>
           </div>
@@ -73,7 +76,8 @@
             <div id="Metrics">
               <div class="font-bold">Metrics</div><br>
               <Checkbox id="CalcCatMetCB" inputId="CalcCatMetCB" class="h-5 w-5 mr-3" style="display:inline-block"
-                :binary="true" v-model="cbIsCategorical" :disabled="cbCategoricalDisabled ||!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                :binary="true" v-model="cbIsCategorical"
+                :disabled="cbCategoricalDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 @change="toggleMetricStreamFlowInput" />
               <label for="CalcCatMetCB" class="inline">Calculate Categorical Metrics</label>
               <div class="pl-8">
@@ -81,22 +85,24 @@
               </div>
               <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-2 pl-8">
 
-                Flow Threshold <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold" :minFractionDigits="2"
-                  class="w-24"
+                Flow Threshold <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
+                  :minFractionDigits="2" class="w-24"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber> m3/s
               </div><br />
 
               <Checkbox id="CalEventMetCB" inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline"
-                style="display:inline-block" :binary="true" v-model="cbIsEvenBased" :disabled="cbEventBasedDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                style="display:inline-block" :binary="true" v-model="cbIsEvenBased"
+                :disabled="cbEventBasedDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 @change="toggleMetricPeakFlowInput" />
               <label for="CalEventMetCB" class="inline">Calculate Event Based Metrics</label>
               <div class="pl-8">
                 <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
               </div>
               <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-2 pl-8">
-                Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold" :minFractionDigits="2"
-                  class="w-24"strassner-4969-bugfix
-                  :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber> quantile
+                Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
+                  :minFractionDigits="2" class="w-24" strassner-4969-bugfix
+                  :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber>
+                quantile
               </div>
             </div>
           </div>
@@ -112,7 +118,7 @@
             <div id="CalibrationStopCriteria" class="bordered">
               <label for="StopCriteria">Calibration Stop Criteria</label><br>
               <InputNumber id="StopCriteria" inputId="stopCriteria" v-model="uiStopCriteria" showButtons :min="0"
-              :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               </InputNumber>
               <div class="ml-3 mt-1">Iterations per Worker</div>
             </div>
@@ -122,7 +128,8 @@
               <label for="PlotFrequency">Plot Generation Frequency (0 = off)</label><br>
               Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency"
                 v-model="uiPlotFrequency" showButtons :min="0"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber>&nbsp;&nbsp;Iterations
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber>
+              &nbsp;&nbsp;Iterations
             </div>
           </div>
         </div>
@@ -212,6 +219,7 @@ const toast = useToast();
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+const { addToastRecord } = generalStore();
 
 const cbCategoricalDisabled = ref<boolean>(false);
 const cbEventBasedDisabled = ref<boolean>(false);
@@ -334,17 +342,17 @@ const saveOptMetData = () => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
-toast.add(tMsg);
+    toast.add(tMsg);
   } else {
     toast.removeAllGroups();
     saveOptimizationTabData().then(response => {
       if (response.status === 200) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?._data?.message };
-toast.add(tMsg);
+        toast.add(tMsg);
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message };
-toast.add(tMsg);
+          toast.add(tMsg); addToastRecord(tMsg);
         });
       }
       updateJobData();

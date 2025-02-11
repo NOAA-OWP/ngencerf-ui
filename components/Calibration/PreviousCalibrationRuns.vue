@@ -90,7 +90,7 @@ const { loadOptimizationTabStaticData } = useOptimizationStore();
 const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 
 const { calibrationJobId } = storeToRefs(generalStore());
-const { getMenuIndex } = generalStore();
+const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
@@ -210,12 +210,12 @@ const createNewCalibration = async () => {
         });
       } else {
         const tMsg: ToastMessageOptions = { severity: "error", summary: 'Create Calibration Job Failed.', detail: "Unable to Retrieve Valid Calibration Job Id", life: 10000 };
-toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       }
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Create Calibration Job Failed.', detail: message, life: 10000 };
-toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });
@@ -247,7 +247,7 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Clone Calibration Job Failed.', detail: message, life: 10000 };
-toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });
@@ -287,7 +287,7 @@ const acceptDelete = (selectedRunId: number) => {
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 };
-toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });

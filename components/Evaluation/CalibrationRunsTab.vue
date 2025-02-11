@@ -35,18 +35,18 @@
         <div id="CalTable">
           <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
             <div class="col-span-1">
-                <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-                <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                  :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
-                  placeholder="All"></Select>
+              <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
+              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
+                :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
+                placeholder="All"></Select>
             </div>
           </div>
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
-            
-  
+
+
           <DataTable id="EvalRunTable" :value="filteredData" scrollable scroll-height="400px"
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
             v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
@@ -180,6 +180,7 @@ const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+const { addToastRecord } = generalStore();
 
 const toast = useToast();
 //this model is for highlighting purpose
@@ -196,12 +197,12 @@ onMounted(() => {
 
 // Computed filtered data for DataTables
 const filteredData = computed(() => {
-      if (!uiGageId.value || uiGageId.value === "All") {
-        return userEvaluationCalibrationRunListData?.value;
-      } else {
-        return userEvaluationCalibrationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
-      }
-    });
+  if (!uiGageId.value || uiGageId.value === "All") {
+    return userEvaluationCalibrationRunListData?.value;
+  } else {
+    return userEvaluationCalibrationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
+  }
+});
 
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
@@ -290,10 +291,10 @@ const openSelectedCalibrationRun = () => {
   })
 }
 
-const viewCalibrationDetails = async ( calibration_run_id: number ) => {
-  isLoading.value = true;  
-  nextTick(async () => {  
-    await loadSelectedCalibrationRun( calibration_run_id );
+const viewCalibrationDetails = async (calibration_run_id: number) => {
+  isLoading.value = true;
+  nextTick(async () => {
+    await loadSelectedCalibrationRun(calibration_run_id);
     isLoading.value = false;
     showMessagesGroup.value = true;
   })
@@ -325,7 +326,7 @@ const viewSelectAlternateIteration = async (calibration_run_id: number) => {
     e.click();
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 };
-toast.add(tMsg);
+    toast.add(tMsg);
   }
 }
 
@@ -336,7 +337,7 @@ const navigateToAlternateIteration = (event: any) => {
     e.click();
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 };
-toast.add(tMsg);
+    toast.add(tMsg);
   }
 }
 
@@ -381,7 +382,7 @@ const navigateToEvaluation = (event: any) => {
     e.click();
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 };
-toast.add(tMsg);
+    toast.add(tMsg);
   }
 }
 
@@ -421,7 +422,7 @@ const acceptDelete = (selectedRunId: number) => {
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 };
-toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });

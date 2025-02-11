@@ -114,15 +114,17 @@
 import { useToast } from 'primevue/usetoast';
 
 import type { ToastMessageOptions } from "primevue/toast";
+
 import { generalStore } from '~/stores/common/GeneralStore';
+import { useForecastStore } from '@/stores/forecast/ForecastStore';
 
 import { hilightTab } from '@/composables/TabHilight';
-import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { isValidDate } from '@/utils/CommonHelpers';
 import { calculateElapsedTime, formatElapsedTime } from '@/utils/TimeHelpers';
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
@@ -208,12 +210,12 @@ const createForcingDownloadAndForecastStatusInterval = () => {
           elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
         } else {
           const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` };
-toast.add(tMsg);;
+          toast.add(tMsg);
         }
       }
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` };
-toast.add(tMsg);;
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   }, 10000) as unknown as number;
 };
@@ -239,7 +241,7 @@ const startForecastRun = async () => {
       }
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
-toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
     }
 
     // set resultsPathname
@@ -247,7 +249,7 @@ toast.add(tMsg);
 
   } catch (error) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error running Forecast job' };
-toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 };
 
@@ -263,16 +265,16 @@ const cancelForecastRun = async () => {
 
       if (forecastJobStatus.value !== 'Cancelled') {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL' };
-toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       }
       await loadForecastStatusRunTabData();
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Forecast status from server' };
-toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   } catch (error) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Forecast job' };
-toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 };
 
@@ -326,11 +328,11 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
           elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
         } else {
           const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` };
-toast.add(tMsg);;
+          toast.add(tMsg); addToastRecord(tMsg);
         }
       } else {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` };
-toast.add(tMsg);;
+        toast.add(tMsg); addToastRecord(tMsg);
       }
     }
   }

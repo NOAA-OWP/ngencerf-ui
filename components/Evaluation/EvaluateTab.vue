@@ -178,6 +178,7 @@ const toast = useToast();
 const showMessagesGroup = ref<Boolean>(false);
 
 const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
+const { addToastRecord } = generalStore();
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
@@ -278,7 +279,7 @@ onMounted(() => {
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
-toast.add(tMsg);
+      toast.add(tMsg);
     }
 
     // Add Supplemental Table Options to the dropdown
@@ -358,7 +359,7 @@ watch(selectedPlotName, async () => {
       //console.log('iterationMetricsColumns:', iterationMetricsColumns);
       if (!iterationMetricsData.value.length) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: 5000 };
-toast.add(tMsg);
+        toast.add(tMsg);
       }
     } else if (selectedSupplementalTable.value === 2) {
       // Get Iteration Data
@@ -393,7 +394,7 @@ toast.add(tMsg);
       //console.log('iterationParamsColumns:', iterationParamsColumns);
       if (!iterationParamsData.value.length) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: 5000 };
-toast.add(tMsg);
+        toast.add(tMsg);
       }
     } else if (selectedSupplementalTable.value === 3) {
       // Get Performance Metrics - put each one into the table as its own row
@@ -466,7 +467,7 @@ toast.add(tMsg);
       }
       if (!performanceMetricsData.value.length) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: 5000 };
-toast.add(tMsg);
+        toast.add(tMsg);
       }
     }
     plotTableData.value = [];
@@ -507,7 +508,7 @@ toast.add(tMsg);
         selectedPlotFileUrl.value = null;
         toast.removeAllGroups();
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: 5000 };
-toast.add(tMsg);
+        toast.add(tMsg);
       }
 
       if (response?._data?.plot_data && response?._data?.plot_data.length > 0) {
@@ -585,7 +586,7 @@ toast.add(tMsg);
       plotTableColumns.value = [];
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot', life: 5000 };
-toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 });
@@ -666,7 +667,7 @@ watch(selectedLogCategory, async () => {
   console.log('selectedLogName: ', selectedLogName.value);
   if (!selectedLogList.value.length) {
     const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: 5000 };
-toast.add(tMsg);
+    toast.add(tMsg);
   }
 });
 
