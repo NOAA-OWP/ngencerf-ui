@@ -475,7 +475,7 @@ const saveTabData = () => {
     saveGageTabData().then(response => {
       if (response.status === 200) {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
-          toast.add(toastMessage);
+          toast.add(toastMessage); addToastRecord(toastMessage);
         })
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {

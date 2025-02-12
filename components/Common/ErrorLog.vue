@@ -8,14 +8,16 @@
     <div v-if="toastRecords.length === 0" class="text-lg font-bold text-center">
       There are no log records at this time.
     </div>
-
-    <DataTable :value="toastRecords" class="p-datatable-striped">
-      <Column field="datetime" header="Date"></Column>
-      <Column field="severity" header="Severity"></Column>
-      <Column field="summary" header="Summary"></Column>
-      <Column field="detail" header="Detail"></Column>
-    </DataTable>
-
+    <div class="mainframe">
+      <div class="wrapper">
+        <DataTable id="ErrorTable" :value="toastRecords" class="p-datatable-striped" scrollable scroller="true">
+          <Column :pt="ptColumn" field="datetime" header="Date"></Column>
+          <Column :pt="ptColumn" field="severity" header="Severity"></Column>
+          <Column :pt="ptColumn" field="summary" header="Summary"></Column>
+          <Column :pt="ptColumn" field="detail" header="Detail"></Column>
+        </DataTable>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -23,20 +25,25 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { generalStore } from '~/stores/common/GeneralStore';
 
+const gstore = generalStore();
+const { toastRecords } = storeToRefs(gstore);
+
 const errorLog = ref<HTMLElement | null>(null);
 let observer: IntersectionObserver | null = null;
 
 onMounted(() => {
   console.log(toastRecords.value)
-  // Example usage: add a listener and define the callback function
+  //Example usage: add a listener and define the callback function
   // addVisibilityListener((isVisible) => {
   //   if (isVisible) {
   //     setTimeout(() => {
   //       console.log('Component is visible');
   //       let ele = document.getElementById("ErrorLog");
   //       let ele1 = document.getElementsByClassName("mainframe");
+  //       let ele2 = document.getElementById('ErrorTable')
   //       if (ele && ele1) {
   //         (ele1[0] as HTMLElement).style.height = ele.clientHeight + "px";
+  //         if( ele2) { ele2.style.height = ele.clientHeight + "px"; }
   //       }
   //       // Perform actions when the component is visible
   //     }, 0)
@@ -53,7 +60,7 @@ onBeforeUnmount(() => {
   // observer = null;
 });
 
-// // Define the type for the callback function
+// Define the type for the callback function
 // type VisibilityCallback = (isVisible: boolean) => void;
 
 // // Define the event listener function with a callback parameter
@@ -69,13 +76,19 @@ onBeforeUnmount(() => {
 //   observer.observe(errorLog.value);
 // };
 
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
+
+const scrollHeight = () => {
+  let ele = document.getElementById("ErrorLog");
+  return ele ? ele.style.height : "500px";
+}
 
 const closeErroLogBox = () => {
   useAccountEvent("errorLogEvent", "");
 }
-
-const gstore = generalStore();
-const { toastRecords } = storeToRefs(gstore);
 
 </script>
 
@@ -97,6 +110,7 @@ table {
 table thead tr {
   position: sticky;
 }
+
 .mainframe {
   overflow: hidden;
   position: fixed;
