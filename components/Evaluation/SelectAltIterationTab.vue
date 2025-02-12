@@ -3,16 +3,19 @@
     <div class="h-screen-inner pr-2">
       <div id="RunDetailsTbl" class="text-left mt-3 pr-3 pl-3 pt-1">
         <div class="tableTitle">Run Details - Calibration Job ID {{ calibrationJobId }}</div>
-        <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="250px" @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect"
-          table-style="min-width: 50rem" selectionMode="single" class="boxed" ref="calibrationRunDetailTable" v-model:selection="selectedCalibrationByIterationDetailRow"
-          :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''">
+        <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="250px"
+          @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect" table-style="min-width: 50rem"
+          selectionMode="single" class="boxed" ref="calibrationRunDetailTable"
+          v-model:selection="selectedCalibrationByIterationDetailRow"
+          :rowClass="({ validation_run_id }) => validation_run_id > 0 ? 'disabled-row' : ''">
           <ColumnGroup type="header">
             <Row>
               <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header"
                 :field="col.field" :hidden="col.hidden ?? false" :class="col.styles ?? []" sortable></Column>
             </Row>
             <Row v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index" :pt="{ id: index }">
-              <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan"></Column>
+              <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan">
+              </Column>
             </Row>
           </ColumnGroup>
           <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :field="col.field"
@@ -21,12 +24,13 @@
         <div class="text-sm">* Metric used as Objective Function</div>
       </div>
 
-  <div class="mt-1">
-    <div id="CalTuningParamsTbl" class="text-left pr-3 pl-3 pt-1">
+      <div class="mt-1">
+        <div id="CalTuningParamsTbl" class="text-left pr-3 pl-3 pt-1">
           <div class="tableTitle">Corresponding Calibration Tuning Parameters</div>
-          <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"  @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect"
-            selectionMode="single" ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"
-            :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''"> 
+          <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"
+            @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect" selectionMode="single"
+            ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"
+            :rowClass="({ validation_run_id }) => validation_run_id > 0 ? 'disabled-row' : ''">
             <ColumnGroup type="header">
               <Row :class="['table-header']">
                 <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header"
@@ -43,12 +47,13 @@
         </div>
       </div>
 
-      <div class="b-0 grid grid-cols-8 mt-6 ActionButtonsBox" v-show="evaluateIterationRunId && evaluateIterationRunId > 0">
+      <div class="b-0 grid grid-cols-8 mt-6 ActionButtonsBox"
+        v-show="evaluateIterationRunId && evaluateIterationRunId > 0">
         <div class="col-span-7"></div>
         <div class="col-span-1 mr-4">
           <div>
-            <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Validate Selected Iteration" aria-label="Run Button"
-              @click="navigateToEvaluateStatus">
+            <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Validate Selected Iteration"
+              aria-label="Run Button" @click="navigateToEvaluateStatus">
               Next
             </button>
           </div>
@@ -56,7 +61,7 @@
       </div>
     </div>
 
-</client-only>
+  </client-only>
 </template>
 
 <script setup lang="ts">
@@ -73,10 +78,12 @@ import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunSt
 
 import { hilightTab } from '@/composables/TabHilight';
 
+const { addToastRecord } = generalStore();
+
 const toast = useToast();
 const {
   fetchCalibrationDataByIterationDataList,
-  resetEvaluationAltIterationStore, 
+  resetEvaluationAltIterationStore,
 } = useEvaluationAltIterationStore();
 
 const {
@@ -89,8 +96,8 @@ const {
 } = storeToRefs(useEvaluationAltIterationStore());
 
 const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
-const { iterationValidationRunId } = storeToRefs( useEvaluationRunStatusStore() );
-const { calibrationJobId, evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs( generalStore() );
+const { iterationValidationRunId } = storeToRefs(useEvaluationRunStatusStore());
+const { calibrationJobId, evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());
 
 const selectedCalibrationByIterationDetailRow = ref<any>();
 const selectedCalibrationByIterationParameterRow = ref<any>();
@@ -122,15 +129,15 @@ onMounted(() => {
   })
 })
 
-const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
+const onDetailTableRowSelect = (event: DataTableRowClickEvent) => {
   if (event.data.validation_run_id === "") {
     evaluateIterationRunId.value = event.data.iteration_id;
   } else {
     evaluateIterationRunId.value = 0;
   }
   evaluateDisplayIterationNumber.value = event.data.iteration_num;
-  const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id === event.data.iteration_id );
-  selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];   
+  const paramDataIndex = computedtuningParametersDataList.value.findIndex(paramData => paramData.iteration_id === event.data.iteration_id);
+  selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[paramDataIndex];
 }
 
 const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
@@ -140,8 +147,8 @@ const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
     evaluateIterationRunId.value = 0;
   }
   evaluateDisplayIterationNumber.value = event.data.iteration_num;
-  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id === event.data.iteration_id );
-  selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];
+  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex(paramData => paramData.iteration_id === event.data.iteration_id);
+  selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[detailDataIndex];
 }
 
 const onTableRowUnselect = (event: DataTableRowClickEvent) => {
@@ -151,8 +158,8 @@ const onTableRowUnselect = (event: DataTableRowClickEvent) => {
   evaluateDisplayIterationNumber.value = 0;
 }
 
-const navigateToEvaluateStatus = ( event : any ) => {
-  if ( evaluateIterationRunId.value && evaluateIterationRunId.value > 0 ) {
+const navigateToEvaluateStatus = (event: any) => {
+  if (evaluateIterationRunId.value && evaluateIterationRunId.value > 0) {
     iterationValidationRunId.value = evaluateValidationRunId.value = 0;
     clearRunningStatusInfo();
     const tabs = document.getElementsByClassName("tabs");
@@ -160,7 +167,7 @@ const navigateToEvaluateStatus = ( event : any ) => {
     e.click();
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Iteration ID', detail: 'Pleasea select a iteration job first.', life: 6000 };
-toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 </script>

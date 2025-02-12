@@ -155,11 +155,11 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   //keep the following for references purpose
   /*
   if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 };
-toast.add(tMsg);
+    toast.add(tMsg);
   if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 };
-toast.add(tMsg);
+    toast.add(tMsg);
   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 };
-toast.add(tMsg);
+    toast.add(tMsg);
   */
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
   queryUserCalibrationRunData().then(queryResponse => {

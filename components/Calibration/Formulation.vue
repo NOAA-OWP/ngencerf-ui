@@ -201,6 +201,8 @@ const { clearCalibratableParameters } = useTuningStore();
 
 const { selectedOutputVariable, userOutputVariableToCalibrate } = storeToRefs(useTuningStore());
 
+const { addToastRecord } = generalStore();
+
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
 import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
@@ -338,7 +340,7 @@ const checkValidCharacters = (e: KeyboardEvent) => {
 const saveFormulationData = () => {
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
-toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
     var valOK = validateModules();
@@ -346,7 +348,7 @@ toast.add(tMsg);
       modulesHaveChanged.value = false;
       selectedOutputVariable.value = "";
       const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate and then Tuning Paramters on the Tuning Control tab" };
-toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       clearCalibratableParameters();
     }
 
@@ -355,15 +357,15 @@ toast.add(tMsg);
         if (response._data.eds_errors) {
           response._data.eds_errors.forEach((err: any) => {
             const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'External Formulation Error', detail: err.message };
-toast.add(tMsg);
+            toast.add(tMsg); addToastRecord(tMsg);
           });
         }
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 };
-toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
         if (response?._data?.nwm_warning === true) {
           useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
             const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000 };
-toast.add(tMsg);
+            toast.add(tMsg); addToastRecord(tMsg);
           });
         }
         formulationStore_data_loading.value = false;
@@ -373,7 +375,7 @@ toast.add(tMsg);
         formulationStore_data_loading.value = false;
         useApiErrorResponsePreprocess(response).forEach(message => {
           const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message };
-toast.add(tMsg);
+          toast.add(tMsg); addToastRecord(tMsg);
         });
       }
     });
@@ -382,7 +384,7 @@ toast.add(tMsg);
 
 const updateJobData = () => {
   if (userCalibrationRunData.value) {
-    userCalibrationRunData.value.formulation_name =  saveFormulationPayload.value.formulation_name ?? '';
+    userCalibrationRunData.value.formulation_name = saveFormulationPayload.value.formulation_name ?? '';
     userCalibrationRunData.value.modules = saveFormulationPayload.value.modules as string[];
     userCalibrationRunData.value.sloth_parameters = saveFormulationPayload.value.sloth_parameters as [];
     userCalibrationRunData.value.use_sloth = saveFormulationPayload.value.use_sloth as boolean;

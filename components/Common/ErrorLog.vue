@@ -8,37 +8,14 @@
     <div v-if="toastRecords.length === 0" class="text-lg font-bold text-center">
       There are no log records at this time.
     </div>
-    <!-- <div id="TableFixHead" class="tableFixHead"> -->
-    <div class="mainframe">
-      <div class="wrapper">
-        <div class="allow-scroll">
-          <table class="mt-5 ml-3 mr-3">
-            <colgroup>
-              <col span="1" style="width: 20;">
-              <col span="1" style="width: 6%;">
-              <col span="1" style="width: 15%;">tableFixHead
-              <col span="1" style="width: 39%;">
-            </colgroup>
-            <thead style="border-bottom: 1px solid #000;">
-              <tr>
-                <th>Date</th>
-                <th>Severity</th>
-                <th>Summary</th>
-                <th>Detail</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="t in toastRecords" class="dataRow">
-                <td class="dataCell">{{ t.datetime }}</td>
-                <td class="dataCell">{{ t.severity }}</td>
-                <td class="dataCell">{{ t.summary }}</td>
-                <td>{{ t.detail }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+
+    <DataTable :value="toastRecords" class="p-datatable-striped">
+      <Column field="datetime" header="Date"></Column>
+      <Column field="severity" header="Severity"></Column>
+      <Column field="summary" header="Summary"></Column>
+      <Column field="detail" header="Detail"></Column>
+    </DataTable>
+
   </div>
 </template>
 
@@ -52,45 +29,45 @@ let observer: IntersectionObserver | null = null;
 onMounted(() => {
   console.log(toastRecords.value)
   // Example usage: add a listener and define the callback function
-  addVisibilityListener((isVisible) => {
-    if (isVisible) {
-      setTimeout(() => {
-        console.log('Component is visible');
-        let ele = document.getElementById("ErrorLog");
-        let ele1 = document.getElementsByClassName("mainframe");
-        if (ele && ele1) {
-          (ele1[0] as HTMLElement).style.height = ele.clientHeight + "px";
-        }
-        // Perform actions when the component is visible
-      }, 0)
-    } else {
-      console.log('Component is not visible');
-      // Perform actions when the component is not visible
-    }
-  });
+  // addVisibilityListener((isVisible) => {
+  //   if (isVisible) {
+  //     setTimeout(() => {
+  //       console.log('Component is visible');
+  //       let ele = document.getElementById("ErrorLog");
+  //       let ele1 = document.getElementsByClassName("mainframe");
+  //       if (ele && ele1) {
+  //         (ele1[0] as HTMLElement).style.height = ele.clientHeight + "px";
+  //       }
+  //       // Perform actions when the component is visible
+  //     }, 0)
+  //   } else {
+  //     console.log('Component is not visible');
+  //     // Perform actions when the component is not visible
+  //   }
+  // });
 
 });
 
 onBeforeUnmount(() => {
-  observer?.disconnect();
-  observer = null;
+  // observer?.disconnect();
+  // observer = null;
 });
 
-// Define the type for the callback function
-type VisibilityCallback = (isVisible: boolean) => void;
+// // Define the type for the callback function
+// type VisibilityCallback = (isVisible: boolean) => void;
 
-// Define the event listener function with a callback parameter
-const addVisibilityListener = (callback: VisibilityCallback) => {
-  if (!errorLog.value) return;
+// // Define the event listener function with a callback parameter
+// const addVisibilityListener = (callback: VisibilityCallback) => {
+//   if (!errorLog.value) return;
 
-  observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      callback(entry.isIntersecting);
-    });
-  });
+//   observer = new IntersectionObserver((entries) => {
+//     entries.forEach(entry => {
+//       callback(entry.isIntersecting);
+//     });
+//   });
 
-  observer.observe(errorLog.value);
-};
+//   observer.observe(errorLog.value);
+// };
 
 
 const closeErroLogBox = () => {

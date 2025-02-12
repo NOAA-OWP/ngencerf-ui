@@ -8,10 +8,10 @@
               <table>
                 <caption>Evaluation Run Time & Iteration</caption>
                 <thead>
-                    <tr>
-                      <th class="text-right" colspan="2"></th>
-                    </tr>
-                  </thead>
+                  <tr>
+                    <th class="text-right" colspan="2"></th>
+                  </tr>
+                </thead>
                 <tbody>
                   <tr height="38px">
                     <th scope="row" class="text-right font-bold">Submit Time</th>
@@ -68,8 +68,7 @@
                         <!--<div v-else class="h-8">&nbsp;</div>-->
 
                         <div class="ngenButtonDiv-red h-8 hidden" v-if="!isCancelHidden()" @click="cancelRun()">
-                          <Button class="font-normal" title="Cancel Button"
-                            aria-label="Cancel Button">Cancel</button>
+                          <Button class="font-normal" title="Cancel Button" aria-label="Cancel Button">Cancel</button>
                         </div>
 
                       </span>
@@ -190,7 +189,7 @@ const startRun = async () => {
       validationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
     } else {
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation' };
-toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   });
 }
@@ -243,7 +242,7 @@ const navigateToEvaluation = (event: any) => {
     e.click();
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 };
-toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 </script>

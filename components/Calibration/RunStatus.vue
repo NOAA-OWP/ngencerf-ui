@@ -380,7 +380,7 @@ const cancelRun = async () => {
     }
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 };
 
@@ -446,7 +446,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           resultsPathname.value = getJobDataDirectoryResponse._data.data_dir;
         } else {
           const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Job Data Directory' };
-          toast.add(tMsg);
+          toast.add(tMsg); addToastRecord(tMsg);
         }
       }
 
@@ -462,7 +462,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         );
       } else {
         const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
-        toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       }
     }
 
@@ -482,7 +482,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             }
           } else {
             const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status' };
-            toast.add(tMsg);
+            toast.add(tMsg); addToastRecord(tMsg);
           }
 
           // check if iteration changes
@@ -613,13 +613,13 @@ watch(selectedPlotName, async () => {
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
     selectedPlotFilename.value = "";
     selectedPlotFileUrl.value = "";
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 });
 
@@ -652,7 +652,7 @@ watch(iteration, async () => {
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 });

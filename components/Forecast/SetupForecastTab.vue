@@ -2,23 +2,16 @@
   <div>
     <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">
       Forecast Cycle Selection
-    </h1>    
+    </h1>
     <div style="font-size: 12px;font-weight: normal;margin-top:-20px;">
-      <h2>Calibration Job ID: {{ calibrationRunForForecast?.calibration_run_id }}</h2>      
+      <h2>Calibration Job ID: {{ calibrationRunForForecast?.calibration_run_id }}</h2>
     </div>
-    <p  style="font-size: 12px;font-weight: normal;">Select a cycle then click Next.</p>
+    <p style="font-size: 12px;font-weight: normal;">Select a cycle then click Next.</p>
     <br />
   </div>
   <div>
-    <DataTable
-      :value="forecastCycles"
-      sortField="cycle"
-      scrollable
-      v-model:selection="forecastCycle"
-      selectionMode="single"
-      :rowClass="rowClass"
-      :rowStyle="rowStyle"
-    >
+    <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
+      selectionMode="single" :rowClass="rowClass" :rowStyle="rowStyle">
       <Column field="name" header="Cycle"></Column>
       <Column field="data_sources" header="Data Sources"></Column>
       <Column field="time_range" header="Time Range (ngenCERF)"></Column>
@@ -53,6 +46,7 @@ import { hilightTab } from '@/composables/TabHilight';
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
@@ -82,7 +76,7 @@ const rowClass = (data: any) => {
 /**
  * Add row styling if forecast cycle is not active.
  */
- const rowStyle = (data: any) => {
+const rowStyle = (data: any) => {
   return {
     color: !data.is_active ? 'grey' : 'black',
     backgroundColor: !data.is_active ? '#f0f0f0' : ''
@@ -116,7 +110,7 @@ onMounted(async () => {
 const onRowSelect = (e: any) => {
   console.log('onRowSelect', e);
   const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: 3000 };
-toast.add(tMsg);;
+  toast.add(tMsg); addToastRecord(tMsg);
 };
 
 /**

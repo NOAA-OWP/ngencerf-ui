@@ -304,7 +304,7 @@ const clearDataDueToGageChange = () => {
         severity: 'info', summary: `Gage Changed`,
         detail: "Calibration and Validation times must be set on the Tuning Controls tab"
       };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
 
     }, 100);
   }
@@ -365,11 +365,11 @@ const handleDialogClose = (opt: any) => {
   if (opt && opt.data) {
     if (opt.data.saveFileResponseResult.status === 200) {
       const tMsg: ToastMessageOptions = { severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
     } else {
       useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 };
-        toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   } else {
@@ -462,7 +462,7 @@ const saveTabData = () => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
 

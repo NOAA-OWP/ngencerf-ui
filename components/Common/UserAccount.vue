@@ -109,9 +109,11 @@ import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
-import {}
+import { generalStore } from '~/stores/common/GeneralStore';
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
+
+const { addToastRecord } = generalStore();
 
 const {
   getAccessToken,
@@ -132,7 +134,7 @@ const updateNameClasses = ref("updtnm");
 const fullName = ref<string>("");
 const userName = ref<string>("")
 
-onMounted( () => {
+onMounted(() => {
   fullName.value = getUserFullName();
   userName.value = getUserName();
 });
@@ -195,7 +197,7 @@ const changePassword = async () => {
         e = "Cannot reach server. Error code: " + error.value.statusCode;
       }
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: 3000 };
-toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       console.error("Error during user creation:", error.value?.message, error.value?.data);
       return;
     }
@@ -205,10 +207,10 @@ toast.add(tMsg);
     newpass.value = "";
     confirmNewpass.value = "";
     const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Password Change Successful', detail: "You have successfully changed your password", life: 3000 };
-toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: "Password was not changed", life: 3000 };
-toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
@@ -236,7 +238,7 @@ const updateName = async () => {
         e = "Cannot reach server. Error code: " + error.value.statusCode;
       }
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: 3000 };
-toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       console.error("Error during user update:", error.value?.message, error.value?.data);
       return;
     }
@@ -245,10 +247,10 @@ toast.add(tMsg);
     setFirstName(updateNameData.first_name);
     setLastName(updateNameData.last_name);
     const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Name Change Successful', detail: "You have successfully changed your name", life: 3000 };
-toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: "Name was not changed", life: 3000 };
-toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 

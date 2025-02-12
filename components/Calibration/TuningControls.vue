@@ -693,7 +693,7 @@ const handleFileUpload = async (event: Event) => {
       }
     } catch (error) {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'File upload failed' };
-      toast.add(tMsg); addToastRecord(tMsg);addToastRecord(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       console.error('File upload failed:', error);
     }
   } else {
@@ -1064,7 +1064,7 @@ const saveTuningData = () => {
         detail: "Saved Tuning Tab data",
         life: 3000
       };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       updateJobData();
       tuningStore_data_loading.value = false;
     } else {

@@ -210,7 +210,7 @@ const createForcingDownloadAndForecastStatusInterval = () => {
           elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
         } else {
           const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` };
-          toast.add(tMsg);
+          toast.add(tMsg); addToastRecord(tMsg);
         }
       }
     } else {

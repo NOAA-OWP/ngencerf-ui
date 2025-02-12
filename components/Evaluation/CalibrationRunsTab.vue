@@ -326,7 +326,7 @@ const viewSelectAlternateIteration = async (calibration_run_id: number) => {
     e.click();
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
@@ -337,7 +337,7 @@ const navigateToAlternateIteration = (event: any) => {
     e.click();
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
@@ -382,7 +382,7 @@ const navigateToEvaluation = (event: any) => {
     e.click();
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 

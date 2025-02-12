@@ -70,15 +70,15 @@ const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
     setEvalRunSelected(true);
     if (['Done', 'Failed', 'SEVER_ERROR'].includes(selectedCalibrationRun.value.status)) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open Forumulation tab', life: 3000 };
-        toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
     }
     if (['Saved', 'Ready'].includes(selectedCalibrationRun.value.status)) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open corresponding saved tab', life: 3000 };
-        toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
     }
     if (selectedCalibrationRun.value && ['Running'].includes(selectedCalibrationRun.value.status)) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.runId + ' will open Run/Status tab', life: 3000 };
-        toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
     }
 }
 
@@ -86,7 +86,7 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
     console.log('clone')
     console.log(selectedCalibrationRun.value.runId)
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: 3000 };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
 }
 
 const confirmDelte = useConfirm();
@@ -116,7 +116,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 const acceptDelete = (selectedRunId: number) => {
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: 3000 };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id !== selectedRunId )
     // calibration_jobs_list.value = reduced_calibration_job_list
     // refreshJobListData()

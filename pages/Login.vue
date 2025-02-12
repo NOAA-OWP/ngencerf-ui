@@ -131,7 +131,7 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 const { calibrationJobId } = storeToRefs(generalStore());
 
 const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
-const { resetGeneralStore, clearToastRecords } = generalStore();
+const { resetGeneralStore, clearToastRecords, addToastRecord } = generalStore();
 
 
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -178,7 +178,7 @@ const ForgotUsername = () => {
 
 const ForgotPassword = () => {
   const tMsg: ToastMessageOptions =  { severity: 'info', summary: 'Info', detail: 'Please contact the ngenCERF administrator to reset your password.' };
-  toast.add(tMsg);
+  toast.add(tMsg); addToastRecord(tMsg);
 };
 
 const autoSubmit = (e: KeyboardEvent) => {
@@ -221,20 +221,20 @@ const SubmitLoginForm = async (e: Event) => {
           err = "Cannot reach server. Error code: " + error.statusCode;
         }
         const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: err, life: 3000 };
-        toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
         console.error("Error during user creation:", error.message, error.data.detail);
       }
     });
   } else if (userName.value.trim() === "" || userPassword.value.trim() === "") {
     const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: "A Username and Password are required", life: 3000 };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
 const SubmitNewAccountForm = async () => {
   if (newPassword.value !== confirmPassword.value) {
     const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: 3000 };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     return;
   }
 
@@ -265,22 +265,22 @@ const SubmitNewAccountForm = async () => {
         detail = 'A user with this Email address has already registered.'
       }
       const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: detail, life: 3000 };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       return;
     } else if (error.value?.data.first_name) {
       let detail = error.value?.data.first_name[0];
       const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: detail, life: 3000 };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       return;
     } else if (error.value?.data.last_name) {
       let detail = error.value?.data.last_name[0];
       const tMsg: ToastMessageOptions =  { severity: 'error', summary: 'Error', detail: detail, life: 3000 };
-      toast.add(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg);
       return;
     } else if (error.value?.data.password) {
       error.value?.data.password.forEach((e: any) => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: 3000 }
-        toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       });
       return;
     }
@@ -291,7 +291,7 @@ const SubmitNewAccountForm = async () => {
     createAccountButtonClasses.value.splice(createAccountButtonClasses.value.indexOf('disabledButton'), 1);
     cancelCreateAccountLinkClasses.value.splice(cancelCreateAccountLinkClasses.value.indexOf('disabledLink'), 1);
     const tMsg: ToastMessageOptions =  { severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: 3000 };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
     closeDialog();
   };
 };
