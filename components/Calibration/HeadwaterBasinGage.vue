@@ -95,14 +95,13 @@
           <div id="map"></div>
         </div>
 
-        <div class="row-span-1 mt-4 ActionButtonsBox">
+        <div class="row-span-1 mt-4 ActionButtonsBox z-9999">
           <div class="grid grid-cols-8">
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
-              <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <button id="HBGSaveButton" class="font-normal" title="Save" aria-label="Save Button"
-                  @click="saveTabData()">
+              <div class="col-span-1 mr-6 h-8" @click="saveTabData()">
+                <Button id="HBGSaveButton" class="font-normal ngenButtonDiv-green " title="Save" aria-label="Save Button">
                   Save
-                </button>
+                </Button>
               </div>
             </span>
             <span v-else>
@@ -112,7 +111,7 @@
             </span>
             <span v-if="gageHasChanged && userCalibrationRunData?.gage !== null">
               <div class="col-span-1 mr-3">
-                <button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Revert Gage"
+                <Button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Revert Gage"
                   @click="gageSelectionReset()" aria-label="Revert">Revert</button>
               </div>
             </span>
@@ -124,7 +123,7 @@
             <div class="col-span-4">&nbsp;</div>
             <div class="col-span-1">&nbsp;</div>
             <div class="col-span-1 mr-4">
-              <div><button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next"
+              <div><Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next"
                   @click="goNextTab()">Next</button></div>
             </div>
           </div>
@@ -161,10 +160,8 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import { isCalibrationJobStatusSavedOrReady, structureGageData } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
-import {
-  useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
-  useApiResponseToastSeverityCode
-} from "@/composables/ValidationHandlers";
+import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
+          useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
 
 import * as Plot from "@observablehq/plot";
 import * as d3 from 'd3';
@@ -172,8 +169,9 @@ import * as topojson from 'topojson-client';
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster";
-
-const isLoading = ref(true);
+          
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
 
 const { hardResetTuningTimeControls } = useTuningStore();
 

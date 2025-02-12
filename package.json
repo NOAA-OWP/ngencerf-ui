@@ -48,7 +48,7 @@
     "primevue": "^4.2.5",
     "tailwindcss-primeui": "^0.3.4",
     "topojson-client": "^3.1.0",
-    "vitest": "^1.6.0",
+    "vitest": "^1.6.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },

@@ -97,6 +97,19 @@ input::-webkit-input-placeholder {
   font-size: 15px;
   font-weight: normal;
 }
+
+Button, button,
+.ngenButtonDiv, .ngenButtonDiv-alt,
+.ngenButtonDiv-green, .ngenButtonDiv-red,
+.ngenButtonDiv-yellow  {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+     -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none;
+}
+
 .ngenButtonDiv {
   cursor: pointer;
   color: white;
@@ -109,9 +122,11 @@ input::-webkit-input-placeholder {
   display: inline-block;
 }
 .ngenButtonDiv:hover {
-  background-color: global.$ngwcp_primary3;
+  background-color: global.$ngwcp_primary3 !important;
   color: white;
+  border: none;
 }
+
 .ngenButtonDiv-alt {
   cursor: pointer;
   color: white;
@@ -126,6 +141,7 @@ input::-webkit-input-placeholder {
 .ngenButtonDiv-alt:hover {
   background-color: global.$ngwcp_primary3;
   color: white;
+  border: none;
 }
 .ngenButtonDiv-alt button,
 .ngenButtonDiv-alt button:hover,
@@ -149,6 +165,7 @@ input::-webkit-input-placeholder {
 }
 .ngenButtonDiv-green:hover {
   background-color: global.$ngwcp_secondary4lt;
+  border: none;
 }
 .ngenButtonDiv-red {
   cursor: pointer;
@@ -163,6 +180,7 @@ input::-webkit-input-placeholder {
 }
 .ngenButtonDiv-red:hover {
   background-color: global.$ngwcp_red_dark2;
+  border: none;
 }
 
 .ngenButtonDiv-yellow {
@@ -201,12 +219,15 @@ input::-webkit-input-placeholder {
   margin-left: auto;
 }
 
-.prevent-select {
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
 }
-
 
 h1 {
   font-size: 30px;
@@ -301,15 +322,18 @@ select option {
 
 .waitgif {
   position: absolute;
-  top: 40%;
-  left: 50%;
-  width: 160px;
-  height: 160px;
+  top: 30%;
+  left: 30%;
+  width: 120px;
+  height: 120px;
   padding: 10px;
   margin: 0 auto;
   z-index: 9999;
 }
 
+.pt9em {
+  font-size: .9em;
+}
 
 // TimeDatePicker
 .dp__input {
@@ -395,6 +419,7 @@ select option {
 .bg-blue4 { background-color: global.$ngwcp_primary4 !important; }
 .bg-white { background-color: white !important; }
 .c-blue { color: global.$color-blue !important; }
+.c-blue:hover { color: global.$ngwcp_primary3 !important;}
 .c-blue-primary1 { color: global.$ngwcp_primary1 !important; }
 .c-black { color: global.$black !important; }
 
