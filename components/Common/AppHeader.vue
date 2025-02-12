@@ -206,18 +206,7 @@ onMounted(() => {
       if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
     };
   });
-
-  window.addEventListener('resize', function (event) {
-    sizeLogWindow();
-    let headerHeight = document.getElementById('Header')?.clientHeight;
-    let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
-    if (footerTop && headerHeight) {
-      let h = (footerTop - headerHeight) + 54;
-      let hpx = h + 'px'
-      let ele = document.getElementById("ErrorLogOverlay");
-      if (ele) { ele.style.height = parseInt(hpx) + 'px'; } 
-    };
-  });  
+ 
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 });
 
@@ -248,18 +237,18 @@ const sizeHelpWindow = () => {
   };
 };
 
-const sizeLogWindow = () => {
-  let headerHeight = document.getElementById('Header')?.clientHeight;
-  let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
-  if (footerTop && headerHeight) {
-    let h = (footerTop - headerHeight) - 20;
-    let hpx = h + 'px'
-    let ele = document.getElementById("ErrorLog");
-    if (ele) { ele.style.height = parseInt(hpx) + 'px'; } 
-    // let ele2 = document.getElementById("TableFixHead");
-    // if (ele && ele2) { ele2.style.height = (ele.clientHeight) + 'px'; }
-  };
-};
+// const sizeLogWindow = () => {
+//   let headerHeight = document.getElementById('Header')?.clientHeight;
+//   let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
+//   if (footerTop && headerHeight) {
+//     let h = (footerTop - headerHeight) - 20;
+//     let hpx = h + 'px'
+//     let ele = document.getElementById("ErrorLog");
+//     if (ele) { ele.style.height = parseInt(hpx) + 'px'; } 
+//     // let ele2 = document.getElementById("TableFixHead");
+//     // if (ele && ele2) { ele2.style.height = (ele.clientHeight) + 'px'; }
+//   };
+// };
 
 /**
  * 
@@ -274,7 +263,7 @@ const aboutBox = async () => {
 
 const errorLog = async () => {
   errorOverlay.value.style.display = "block";
-  setTimeout(function () { sizeLogWindow() }, 0);
+  //setTimeout(function () { sizeLogWindow() }, 0);
 }
 
 useAccountEventListen('accountEvent', () => {
