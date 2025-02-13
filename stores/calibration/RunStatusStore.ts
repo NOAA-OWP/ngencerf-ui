@@ -2,7 +2,7 @@
 
 import { defineStore, storeToRefs } from "pinia";
 
-import type { CalibrationStatus, CalibrationPlotListNamesData } from "@/composables/NextGenModel";
+import type { CalibrationStatus, CalibrationPlotListNamesData, BestIterationData } from "@/composables/NextGenModel";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -19,7 +19,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
   // refs
-  const elapsedTime = ref<string>();
+  const calibrationElapsedTime = ref<string>();
   const submitTimeDate = ref<Date>();
   const submitTime = ref<string>();
 
@@ -39,7 +39,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validationBestStatus = ref<string>();
   const validControlAndValidBestStatus = ref<string>();
   const resultsPathname = ref<string>();
-
+  const validationBestAchieved = ref<BestIterationData>({ iteration: 0, isBest: false});
+;
   /**
    * Compute Overall Calibration Validation Status
    */
@@ -62,53 +63,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     return '';
   });
 
-
-  // // Restore state from sessionStorage if available
-  // if (typeof window !== 'undefined') {
-  //   let ls;
-  //   ls = sessionStorage.getItem('plotList');
-  //   if (ls !== "undefined") { plotList.value = ls ? JSON.parse(ls) : [] }
-  //   ls = sessionStorage.getItem('plotNames');
-  //   if (ls !== "undefined") { plotNames.value = JSON.parse(ls as string) }
-
-  //   elapsedTime.value = sessionStorage.getItem('elapsedTime') as string;
-  //   submitTimeDate.value = sessionStorage.getItem('submitTimeDate') as any as Date;
-  //   submitTime.value = sessionStorage.getItem('submitTime') as string;
-  //   selectedPlotName.value = sessionStorage.getItem('selectedPlotName') as string;
-  //   selectedPlotFilename.value = sessionStorage.getItem('selectedPlotFilename') as string;
-  //   selectedPlotFileUrl.value = sessionStorage.getItem('selectedPlotFileUrl') as string;
-  //   iteration.value = parseInt(sessionStorage.getItem('iteration') as string, 10);
-  //   stopCriteria.value = parseInt(sessionStorage.getItem('stopCriteria') as string, 10);
-  //   elapsedTimeIntervalId.value = parseInt(sessionStorage.getItem('elapsedTimeIntervalId') as string, 10);
-  //   calibrationStatusIntervalId.value = parseInt(sessionStorage.getItem('calibrationStatusIntervalId') as string, 10);
-  //   validationsStatusIntervalId.value = parseInt(sessionStorage.getItem('validationsStatusIntervalId') as string, 10);
-  //   validControlAndValidBestDone.value = JSON.parse(sessionStorage.getItem('validControlAndValidBestDone') as string) === "true";
-  //   stopCriteriaMet.value = JSON.parse(sessionStorage.getItem('stopCriteriaMet') as string) === "true";
-  //   resultsPathname.value = sessionStorage.getItem('resultsPathname') as string;
-  //   calibrationJobId.value = 0;
-  //   console.log("Run Status has been refreshed from sessionStorage");
-    
-  // }
-
-  // watch(plotList, (plotList) => { sessionStorage.setItem('plotList', JSON.stringify(plotList)); });
-  // watch(plotNames, (plotNames) => { sessionStorage.setItem('', JSON.stringify(plotNames)); });
-  // watch(elapsedTime, (elapsedTime) => { sessionStorage.setItem('elapsedTime', elapsedTime ?? ""); });
-  // watch(submitTimeDate, (submitTimeDate) => { sessionStorage.setItem('submitTimeDate', JSON.stringify(submitTimeDate)); });
-  // watch(submitTime, (submitTime) => { sessionStorage.setItem('submitTime', submitTime ?? ""); });
-  // watch(selectedPlotName, (selectedPlotName) => { sessionStorage.setItem('selectedPlotName', selectedPlotName ?? ""); });
-  // watch(selectedPlotFilename, (selectedPlotFilename) => { sessionStorage.setItem('selectedPlotFilename', selectedPlotFilename ?? ""); });
-  // watch(selectedPlotFileUrl, (selectedPlotFileUrl) => { sessionStorage.setItem('selectedPlotFileUrl', selectedPlotFileUrl ?? ""); });
-  // watch(iteration, (iteration) => { sessionStorage.setItem('iteration', JSON.stringify(iteration)); });
-  // watch(stopCriteria, (stopCriteria) => { sessionStorage.setItem('', JSON.stringify(stopCriteria)); });
-  // watch(elapsedTimeIntervalId, (elapsedTimeIntervalId) => { sessionStorage.setItem('elapsedTimeIntervalId', JSON.stringify(elapsedTimeIntervalId)); });
-  // watch(calibrationStatusIntervalId, (calibrationStatusIntervalId) => { sessionStorage.setItem('calibrationStatusIntervalId', JSON.stringify(calibrationStatusIntervalId)); });
-  // watch(validationsStatusIntervalId, (validationsStatusIntervalId) => { sessionStorage.setItem('validationsStatusIntervalId', JSON.stringify(validationsStatusIntervalId)); });
-  // watch(validControlAndValidBestDone, (validControlAndValidBestDone) => { sessionStorage.setItem('validControlAndValidBestDone', JSON.stringify(validControlAndValidBestDone)); });
-  // watch(stopCriteriaMet, (stopCriteriaMet) => { sessionStorage.setItem('stopCriteriaMet', JSON.stringify(stopCriteriaMet)); });
-  // watch(resultsPathname, (resultsPathname) => { sessionStorage.setItem('resultsPathname', resultsPathname ?? ""); });
-
-
-  /** 
+   /** 
    * Load RunStatusStore
    */
   const loadRunStatusStore = async (): Promise<void> => {
@@ -122,9 +77,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       }
     }
 
-    // load validControlAndValidBestStatus and elapsedTime from queryGetCalibrationStatus
+    // load validControlAndValidBestStatus and calibrationElapsedTime from queryGetCalibrationStatus
     // Calibration must be Done to get validations
-    // Calibration and Validations must be Done and run on Parallel Works to get completed elapsedTime
+    // Calibration and Validations must be Done and run on Parallel Works to get completed calibrationElapsedTime
     const getStatusResponse = await queryGetCalibrationStatus(calibrationJobId.value);
     const validations = getStatusResponse?._data?.validations;
     const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
@@ -141,7 +96,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
       // get elapsed time from valid_best
       if (validBest.elapsed_time) {
-        elapsedTime.value = validBest.elapsed_time;
+        calibrationElapsedTime.value = validBest.elapsed_time;
       }
     }
 
@@ -298,7 +253,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Hard Reset Run/Status Store
    */
   const hardResetRunStatusStore = (): void => {
-    elapsedTime.value = "";
+    calibrationElapsedTime.value = "";
     submitTimeDate.value = undefined;
     submitTime.value = "";
     plotNames.value = {};
@@ -331,7 +286,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   return {
     submitTimeDate,
     submitTime,
-    elapsedTime,
+    calibrationElapsedTime,
     plotNames,
     plotList,
     selectedPlotName,
@@ -357,7 +312,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     queryGetIteration,
     queryGetJobDataDirectory,
     cancelCalibrationJob,
-    hardResetRunStatusStore
+    hardResetRunStatusStore,
+    validationBestAchieved
   };
 });
 

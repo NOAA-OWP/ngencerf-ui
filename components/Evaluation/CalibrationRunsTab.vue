@@ -9,7 +9,7 @@
     </div>
   </Transition>
   <client-only>
-    <div class="h-screen-inner pr-2">
+    <div class="pr-2">
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-6 text-3xl font-bold text-center">
@@ -46,7 +46,7 @@
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
             
-          <div style="overflow: auto; ">
+  
           <DataTable id="EvalRunTable" :value="filteredData" scrollable scroll-height="400px"
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
             v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
@@ -70,7 +70,6 @@
               </template>
             </Column>
           </DataTable>
-          </div>
 
         </div>
 
@@ -94,8 +93,8 @@
         </div>
         <div class="flex mt-2">
           <div class="ml-auto mt-4">
-            <div id="NewButton" class="">
-              <Button id="btn-evaluate" class="ngenButtonDiv-alt bg-blue4" @click.stop="returnCalibrationJobList">Return
+            <div id="NewButton">
+              <Button id="btn-evaluate" class="ngenButtonDiv" @click.stop="returnCalibrationJobList">Return
                 to
                 Calibration Jobs</Button>
             </div>
@@ -120,6 +119,7 @@ import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
+import { generalStore } from "@/stores/common/GeneralStore"
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
@@ -176,7 +176,9 @@ const {
 } = evaluationCalibrationRunStore;
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-const isLoading = ref<boolean>(true);
+
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
 
 const toast = useToast();
 //this model is for highlighting purpose

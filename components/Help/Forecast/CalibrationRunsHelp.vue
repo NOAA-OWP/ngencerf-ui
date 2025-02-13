@@ -2,9 +2,8 @@
   <div class="_help-page">
     <div class="_help-title">Evaluation - Calibration Runs Tab</div>
     <p id="help-subtitle" class="_help-subtitle">
-      Displays table of calibration run with some basic details. User selects one of the runs in the list to
-      evaluate. If the run has multiple validation runs, the user will be provided a list of the associated validation
-      runs to select from.
+      Displays table of calibration runs with some basic details. User selects one of the runs in the list to
+      use as the basis for a forecast run.
     </p>
     <p class="text-center" style="color:#cc5500;font-size:0.8em;">
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
@@ -22,20 +21,12 @@
           <td colspan="2" style="padding-left:80px;"><strong>Right click provides a context menu with some of the following options:</strong></td>
         </tr>
         <tr>
-          <td class="td1">Evaluate</td>
-          <td class="td2">If only one validation run has been performed selecting this will take the user to the Evaluate tab to view calibration and validation results.</td>
+          <td class="td1">Run New Forecast</td>
+          <td class="td2">Run a new foreast using this calibration as the basis for the job.</td>
         </tr>
         <tr>
-          <td class="td1">New Validation Run</td>
-          <td class="td2">Since only the control, last and best iteration runs data are saved, use this to generate data for a different iteration from the calibration run.</td>
-        </tr>
-        <tr>
-          <td class="td1">Select Validation Run</td>
-          <td class="td2">If more than one validation has been done, the user will be taken to a table to select the validation job to evaluate.</td>
-        </tr>
-        <tr>
-          <td class="td1">View Valdiation Run Status</td>
-          <td class="td2">View the status of the validation run.</td>
+          <td class="td1">View Calibration Details</td>
+          <td class="td2">View more details about the calibration job than what is shown in the table.</td>
         </tr>
         <tr>
           <td class="td1">Delete Calibration Job</td>

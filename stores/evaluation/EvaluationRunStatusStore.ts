@@ -22,18 +22,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   const displayValidationId = ref<number>( 0 );
   const validationRunningTimeInterval = ref<any>();
 
-  // Restore state from sessionStorage if available
-  if (typeof window !== 'undefined') {
-    validationStatus.value = sessionStorage.getItem('validationStatus') ?? "";
-    runningTime.value = sessionStorage.getItem('runningTime') ?? "";
-    startTime.value = sessionStorage.getItem('startTime') ?? "";
-  }
-
-  watch(validationStatus, (validationStatus) => { sessionStorage.setItem('validationStatus', JSON.stringify(validationStatus)); })
-  watch(runningTime, (runningTime) => { sessionStorage.setItem('runningTime', JSON.stringify(runningTime)); })
-  watch(startTime, (startTime) => { sessionStorage.setItem('startTime', JSON.stringify(startTime)); })
-
-  /**
+   /**
     * @returns {Promise<any>}
     */
   const executeIterationValidationRun = async () => {
@@ -137,7 +126,6 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     displayValidationId,
     validationRunningTimeInterval,
     evaluateDisplayIterationNumber,
-
     executeIterationValidationRun,
     queryIterationValidationRunStatus,
     executeCancelIterationValidationRun,
@@ -146,9 +134,9 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     isValidationRunDone,
     isValidationRerunable,
     loadValidationStatusInformation,
-    updateRunningTime
+    updateRunningTime,
   }
-});
+})
 
 /* Pinia supports Hot Module replacement so you can edit your stores
   and interact with them directly in your app without reloading the page,

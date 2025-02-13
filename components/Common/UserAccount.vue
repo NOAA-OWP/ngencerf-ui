@@ -7,8 +7,8 @@
       <div class="col-span-2">
         <div class="ttl">Your Account</div>
         <div class="name">
-          {{ getUserFullName() }}
-          <div class="pt-1" style="font-size:0.7em;">{{ getUserName() }}</div>
+          {{ fullName }}
+          <div class="pt-1" style="font-size:0.7em;">{{ userName }}</div>
         </div>
       </div>
       <div class="col-span-1">
@@ -46,10 +46,10 @@
           </div>
 
           <div class="buttonArea mt-4">
-            <button class="ngenButtonDiv mr-6" id="UpdateButton" type="submit" aria-label="Update with new password">
+            <Button class="ngenButtonDiv mr-6" id="UpdateButton" type="submit" aria-label="Update with new password">
               Update
             </button>
-            <button class="c-blue font-normal underline" id="closeBtn" name="cancel" value="Cancel" type="button"
+            <Button class="c-blue font-normal underline" id="closeBtn" name="cancel" value="Cancel" type="button"
               v-on:click="closeAccountBox" aria-label="Close Account Box">
               Close
             </button>
@@ -83,10 +83,10 @@
           </div>
 
           <div class="buttonArea mt-4">
-            <button class="ngenButtonDiv mr-6" id="UpdateNameButton" type="submit" aria-label="Update with new name">
+            <Button class="ngenButtonDiv mr-6" id="UpdateNameButton" type="submit" aria-label="Update with new name">
               Update
             </button>
-            <button class="c-blue font-normal underline" id="closeNameBtn" name="cancel" value="Cancel" type="button"
+            <Button class="c-blue font-normal underline" id="closeNameBtn" name="cancel" value="Cancel" type="button"
               v-on:click="closeAccountBox" aria-label="Close Account Box">
               Close
             </button>
@@ -112,7 +112,6 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 
 const {
   getAccessToken,
-  getUserInitials,
   getUserName,
   getUserFullName,
   getUserFirstName,
@@ -126,6 +125,14 @@ const { ngencerfBaseUrl } = useBackendConfig();
 const showForm = ref("changePassword");
 const changePasswordClasses = ref("chgpwd sel");
 const updateNameClasses = ref("updtnm");
+
+const fullName = ref<string>("");
+const userName = ref<string>("")
+
+onMounted( () => {
+  fullName.value = getUserFullName();
+  userName.value = getUserName();
+});
 
 watch(showForm, async () => {
   if (showForm.value === 'updateName') {

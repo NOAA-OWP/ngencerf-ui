@@ -34,40 +34,14 @@ export const generalStore = defineStore(
 
     const serverInfo = ref<ServerInfo>();
 
+    const isLoading = ref<boolean>(false);
+
     // This is set if the user changes the gage.  Resets when saved.
     const gageHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
 
-    // Restore state from sessionStorage if available
-    if (typeof window !== 'undefined') {
-      calibrationTabIndex.value = sessionStorage.getItem('calibrationTabIndex') as string;
-      evaluationTabIndex.value = sessionStorage.getItem('evaluationTabIndex') as string;
-      forecastTabIndex.value = sessionStorage.getItem('forecastTabIndex') as string;
-      verificationTabIndex.value = sessionStorage.getItem('verificationTabIndex') as string;
-      menuIndex.value = sessionStorage.getItem('menuIndex') as string;
-      calibrationJobId.value = parseInt(JSON.parse(sessionStorage.getItem('calibrationJobId') as string), 10);
-      evaluateValidationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('evaluateValidationRunId') as string), 10);
-      evaluateIterationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('evaluateIterationRunId') as string), 10);
-      iterationValidationRunId.value = parseInt(JSON.parse(sessionStorage.getItem('iterationValidationRunId') as string), 10);
-      evaluationRunSelected.value = JSON.parse(sessionStorage.getItem('evaluationRunSelected') as string);
-      evaluateValidationRunStatus.value = JSON.parse(sessionStorage.getItem('evaluateValidationRunStatus') as string);
-      evaluateDisplayIterationNumber.value = parseInt(JSON.parse(sessionStorage.getItem('evaluateDisplayIterationNumber') as string), 10);
-    }
-
-    watch(calibrationTabIndex, (calibrationTabIndex) => { sessionStorage.setItem('calibrationTabIndex', calibrationTabIndex); })
-    watch(evaluationTabIndex, (evaluationTabIndex) => { sessionStorage.setItem('evaluationTabIndex', evaluationTabIndex); })
-    watch(forecastTabIndex, (forecastTabIndex) => { sessionStorage.setItem('forecastTabIndex', forecastTabIndex); })
-    watch(verificationTabIndex, (verificationTabIndex) => { sessionStorage.setItem('verificationTabIndex', verificationTabIndex); })
-    watch(menuIndex, (menuIndex) => { sessionStorage.setItem('menuIndex', menuIndex); })
-    watch(calibrationJobId, (calibrationJobId) => { sessionStorage.setItem('calibrationJobId', JSON.stringify(calibrationJobId)); })
-    watch(iterationValidationRunId, (iterationValidationRunId) => { sessionStorage.setItem('iterationValidationRunId', JSON.stringify(iterationValidationRunId)); })
-    watch(evaluateValidationRunId, (evaluateValidationRunId) => { sessionStorage.setItem('evaluateValidationRunId', JSON.stringify(evaluateValidationRunId)); })
-    watch(evaluateIterationRunId, (evaluateIterationRunId) => { sessionStorage.setItem('evaluateIterationRunId', JSON.stringify(evaluateIterationRunId)); })
-    watch(evaluationRunSelected, (evaluationRunSelected) => { sessionStorage.setItem('evaluationRunSelected', JSON.stringify(evaluationRunSelected)); })
-    watch(evaluateValidationRunStatus, (evaluateValidationRunStatus) => { sessionStorage.setItem('evaluateValidationRunStatus', JSON.stringify(evaluateValidationRunStatus)); })
-    watch(evaluateDisplayIterationNumber, (evaluateDisplayIterationNumber) => { sessionStorage.setItem('evaluateDisplayIterationNumber', JSON.stringify(evaluateDisplayIterationNumber)); })
-
+ 
     function getServerInfo() {
       return serverInfo.value;
     }
@@ -154,9 +128,19 @@ export const generalStore = defineStore(
       resetGeneralStore,
       setServerInfo,
       getServerInfo,
+      serverInfo,
       gageHasChanged,
-      modulesHaveChanged
+      modulesHaveChanged,
+      verificationTabIndex,
+      menuIndex,
+      evaluationRunSelected,
+      isLoading
     };
+  },
+  {
+      persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+  },
   }
 );
 
