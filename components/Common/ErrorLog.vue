@@ -26,10 +26,10 @@
       </div>
       <DataTable id="ErrorTable" :value="getToastArray()" class="p-datatable-striped" scrollable scroller="true"
         scroll-height="500px">
-        <Column :pt="ptColumn" field="datetime" header="Date"></Column>
-        <Column :pt="ptColumn" field="severity" header="Severity"></Column>
-        <Column :pt="ptColumn" field="summary" header="Summary"></Column>
-        <Column :pt="ptColumn" field="detail" header="Detail"></Column>
+        <Column :pt="ptColumn" field="datetime" header="Date" class="columnClass text-center" style="width: 20%;"></Column>
+        <Column :pt="ptColumn" field="severity" header="Severity" class="columnClass text-center" style="width: 10%;"></Column>
+        <Column :pt="ptColumn" field="summary" header="Summary" class="columnClass text-center" style="width: 20%;"></Column>
+        <Column :pt="ptColumn" field="detail" header="Detail" class="columnClass text-left" style="width: 30%;"></Column>
       </DataTable>
     </div>
   </div>
@@ -67,7 +67,7 @@ const getToastArray = () => {
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
-  bodyCell: { style: { "text-align": "center" } }
+//bodyCell: { style: { "text-align": "center" } }
 });
 
 const closeErroLogBox = () => {
@@ -90,5 +90,9 @@ const closeErroLogBox = () => {
 #ErrorTable {
   height: 500px;
   width: 100%;
+}
+
+.columnClass {
+  vertical-align: top;
 }
 </style>
