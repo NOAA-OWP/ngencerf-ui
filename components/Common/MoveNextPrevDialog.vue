@@ -6,10 +6,10 @@
   </div>
   <div>&nbsp;</div>
   <div>
-    <button class="ngenButtonDiv" @click="stayOnTab(false)">
+    <Button class="ngenButtonDiv" @click="stayOnTab(false)">
       Stay on tab
     </button> &nbsp;
-    <button class="ngenButtonDiv" @click="stayOnTab(true)">
+    <Button class="ngenButtonDiv" @click="stayOnTab(true)">
       Discard changes
     </button>
   </div>

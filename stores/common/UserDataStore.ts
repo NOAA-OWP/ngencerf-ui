@@ -28,30 +28,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   const userSelectedCalibrationIterationId = ref<number | null>(null);
   const uiGageId = ref<string>("");
 
-  // Restore state from sessionStorage if available
-  if (typeof window !== 'undefined') {
-    let ls;
-    ls = sessionStorage.getItem('userCalibrationJobsListData');
-    if (ls !== "undefined") { userCalibrationJobsListData.value = ls ? JSON.parse(ls) : [] }
-    ls = sessionStorage.getItem('userCalibrationRunData');
-    if (ls !== "undefined") { userCalibrationRunData.value = JSON.parse(ls as string) }
-    isLoggedIn.value = sessionStorage.getItem('isLoggedIn') as string === "true";
-    userName.value = sessionStorage.getItem('userName') as string;
-    firstName.value = sessionStorage.getItem('firstName') as string;
-    lastName.value = sessionStorage.getItem('lastName') as string;
-    accessToken.value = sessionStorage.getItem('accessToken') as string;
-    refreshToken.value = sessionStorage.getItem('refreshToken') as string;
-  }
 
-  watch(userCalibrationJobsListData, (userCalibrationJobsListData) => { sessionStorage.setItem('userCalibrationJobsListData', JSON.stringify(userCalibrationJobsListData)); });
-  watch(userCalibrationRunData, (userCalibrationRunData) => { sessionStorage.setItem('userCalibrationRunData', JSON.stringify(userCalibrationRunData)); });
-  watch(calibrationJobId, (calibrationJobId) => { sessionStorage.setItem('calibrationJobId', JSON.stringify(calibrationJobId)); });
-  watch(isLoggedIn, (isLoggedIn) => { sessionStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn)); });
-  watch(userName, (userName) => { sessionStorage.setItem('userName', userName); });
-  watch(firstName, (firstName) => { sessionStorage.setItem('firstName', firstName); });
-  watch(lastName, (lastName) => { sessionStorage.setItem('lastName', lastName); });
-  watch(accessToken, (accessToken) => { sessionStorage.setItem('accessToken', accessToken ?? ""); });
-  watch(refreshToken, (refreshToken) => { sessionStorage.setItem('refreshToken', refreshToken ?? ""); });
 
   /**
    * Checks if user is logged in
@@ -109,9 +86,13 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
 
   /**
    * Gets users full name (first and last)
-   * @returns full name of user
+   * @returns full name of user, 
+   *   or the the initals from the email address if there is no name
    */
   function getUserFullName(): string {
+    if (!firstName.value && !lastName.value) {
+      return getUserInitials();
+    }
     return firstName.value + " " + lastName.value;
   }
 
@@ -334,9 +315,20 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     clearUserCalibrationRunData,
     userSelectedCalibrationIterationId,
     calibrationRunGageList,
-    uiGageId
+    uiGageId,
+    isLoggedIn,
+    userName,
+    firstName,
+    lastName,
+    accessToken,
+    refreshToken,
   };
-});
+},
+  {
+      persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+  },
+  });
 
 /* Pinia supports Hot Module replacement so you can edit your stores
    and interact with them directly in your app without reloading the page,
