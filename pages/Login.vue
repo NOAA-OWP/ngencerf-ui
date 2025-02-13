@@ -90,7 +90,7 @@
                           <Button type="submit" :disabled="disableCreateAccountBtn">Create Account</Button>
                         </div>
                         <div class="signupButton underline text-base inline pl-6">
-                          <Button type="Button" @click="closeDialog" :class="cancelCreateAccountLinkClasses" :disabled="disableCreateAccountBtn">Cancel</Button>
+                          <Button @click="closeDialog" :class="cancelCreateAccountLinkClasses" :disabled="disableCreateAccountBtn">Cancel</Button>
                         </div>
                       </form>
                     </div>

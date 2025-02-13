@@ -12,7 +12,8 @@
     <div class="grid grid-cols-2">
       <div class="col-span-1">
         <table>
-          <caption style="text-align: center;font-size:1.1em;font-weight:bold;margin-bottom:3px;">Forecast Job Run Time</caption>
+          <caption style="text-align: center;font-size:1.1em;font-weight:bold;margin-bottom:3px;">Forecast Job Run Time
+          </caption>
           <thead>
             <tr height="25px">
               <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
@@ -89,10 +90,11 @@
       <div class="row-span-1">
         <div class="grid grid-cols-8">
           <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
-            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8" @click="startForecastRun()">
-              <Button class="font-normal" title="Run Button" aria-label="Run Button">
+            <div class="col-span-1mr-6 h-8">
+              <Button class=" ngenButtonDiv-green  font-normal" title="Run Button" aria-label="Run Button"
+                @click="startForecastRun()">
                 Run
-              </button>
+              </Button>
             </div>
           </span>
           <span v-if="forcingDownloadStatus === 'Running' || forecastJobStatus === 'Running'">
@@ -100,7 +102,7 @@
               <Button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelForecastRun()"
                 aria-label="Cancel Button">
                 Cancel
-              </button>
+              </Button>
             </div>
           </span>
           <span v-if="overallForcingDownloadForecastStatus === 'Done'">
@@ -108,7 +110,7 @@
               <Button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button"
                 @click="goToResultsTab()" aria-label="View Results Button">
                 View Results
-              </button>
+              </Button>
             </div>
           </span>
         </div>

@@ -2,23 +2,16 @@
   <div>
     <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">
       Forecast Cycle Selection
-    </h1>    
+    </h1>
     <div style="font-size: 12px;font-weight: normal;margin-top:-20px;">
-      <h2>Calibration Job ID: {{ calibrationRunForForecast?.calibration_run_id }}</h2>      
+      <h2>Calibration Job ID: {{ calibrationRunForForecast?.calibration_run_id }}</h2>
     </div>
-    <p  style="font-size: 12px;font-weight: normal;">Select a cycle then click Next.</p>
+    <p style="font-size: 12px;font-weight: normal;">Select a cycle then click Next.</p>
     <br />
   </div>
   <div>
-    <DataTable
-      :value="forecastCycles"
-      sortField="cycle"
-      scrollable
-      v-model:selection="forecastCycle"
-      selectionMode="single"
-      :rowClass="rowClass"
-      :rowStyle="rowStyle"
-    >
+    <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
+      selectionMode="single" :rowClass="rowClass" :rowStyle="rowStyle">
       <Column field="name" header="Cycle"></Column>
       <Column field="data_sources" header="Data Sources"></Column>
       <Column field="time_range" header="Time Range (ngenCERF)"></Column>
@@ -34,7 +27,7 @@
         <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
           @click="goToStatusRunTab()">
           Next
-        </button>
+        </Button>
       </div>
     </span>
   </div>
