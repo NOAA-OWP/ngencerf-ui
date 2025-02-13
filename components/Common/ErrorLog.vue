@@ -23,13 +23,23 @@
           <Checkbox v-model="errorToast" inputId="errorToast" name="errorToast" value="error" binary />
           <label for="errorToast">Errors</label>
         </div>
+        <div class="flex items-center gap-2">
+          <Checkbox v-model="successToast" inputId="successToast" name="successToast" value="success" binary />
+          <label for="successToast">Success</label>
+        </div>
       </div>
       <DataTable id="ErrorTable" :value="getToastArray()" class="p-datatable-striped" scrollable scroller="true"
         scroll-height="500px">
-        <Column :pt="ptColumn" field="datetime" header="Date" class="columnClass text-center" style="width: 20%;"></Column>
-        <Column :pt="ptColumn" field="severity" header="Severity" class="columnClass text-center" style="width: 10%;"></Column>
-        <Column :pt="ptColumn" field="summary" header="Summary" class="columnClass text-center" style="width: 20%;"></Column>
-        <Column :pt="ptColumn" field="detail" header="Detail" class="columnClass text-left" style="width: 30%;"></Column>
+        <Column :pt="ptColumn" field="datetime" header="Date" class="columnClass" style="width: 20%; text-align:center">
+        </Column>
+        <Column :pt="ptColumn" field="severity" header="Severity" class="columnClass text-center"
+          style="width: 10%; text-align:center">
+        </Column>
+        <Column :pt="ptColumn" field="summary" header="Summary" class="columnClass text-center"
+          style="width: 28%; text-align:center">
+        </Column>
+        <Column :pt="ptColumn" field="detail" header="Detail" class="columnClass text-left" style="width: 45%;">
+        </Column>
       </DataTable>
     </div>
   </div>
@@ -45,10 +55,10 @@ const { toastRecords } = storeToRefs(gstore);
 
 const errorLog = ref<HTMLElement | null>(null);
 
-const errorsToDisplay = ref();
 const infoToast = ref<boolean>(true);
 const warnToast = ref<boolean>(true);
 const errorToast = ref<boolean>(true);
+const successToast = ref<boolean>(true);
 
 const toastsToDisplay = ref();
 
@@ -57,7 +67,8 @@ const getToastArray = () => {
   toastRecords.value.forEach((item) => {
     if ((infoToast.value && item.severity === "info") ||
       (warnToast.value && item.severity === "warn") ||
-      (errorToast.value && item.severity === "error")
+      (errorToast.value && item.severity === "error") ||
+      (successToast.value && item.severity === "success")
     ) {
       toastsToDisplay.value.push(item);
     }
@@ -67,7 +78,7 @@ const getToastArray = () => {
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
-//bodyCell: { style: { "text-align": "center" } }
+  //bodyCell: { style: { "text-align": "center" } }
 });
 
 const closeErroLogBox = () => {

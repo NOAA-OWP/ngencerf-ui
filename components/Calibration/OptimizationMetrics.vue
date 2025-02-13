@@ -342,13 +342,13 @@ const saveOptMetData = () => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
-    toast.add(tMsg);
+    toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
     saveOptimizationTabData().then(response => {
       if (response.status === 200) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?._data?.message };
-        toast.add(tMsg);
+        toast.add(tMsg); addToastRecord(tMsg);
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message };
