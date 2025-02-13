@@ -93,25 +93,27 @@
             </span>
             <span v-if="getEvaluationTabIndex() === 3">
               <LazyEvaluationCalibrationSelectAltInterationssHelp />
+            </span> 
+             <span v-if="getEvaluationTabIndex() === 4">
+              <LazyEvaluationRunStatusHelp />
             </span>
           </div>
 
-
           <div v-else-if="getMenuIndex() === 3">
             <span v-if="getForecastTabIndex() === 1">
-              <h2 class="mt-8 text-center">Help for Calibration Runs</h2>
+             <LazyForecastCalibrationRunsHelp />
             </span>
             <span v-if="getForecastTabIndex() === 2">
-              <h2 class="mt-8 text-center">Help for Setup Forecast</h2>
+              <LazyForecastForecastRunsHelp />
             </span>
             <span v-if="getForecastTabIndex() === 3">
-              <h2 class="mt-8 text-center">Help for Status/Run</h2>
+             <LazyForecastSetupForecastHelp />
             </span>
             <span v-if="getForecastTabIndex() === 4">
-              <h2 class="mt-8 text-center">Help for Results</h2>
+              <LazyForecastStatusRunHelp />
             </span>
             <span v-if="getForecastTabIndex() === 5">
-              <h2 class="mt-8 text-center">Help for Forecast Runs</h2>
+              <LazyForecastResultesHelp />
             </span>
           </div>
 
@@ -156,8 +158,16 @@ const LazyCalibrationHelpResultsHelp = defineAsyncComponent(() => import("@/comp
 const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/CalibrationRunsHelp.vue"))
 const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
+const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/RunStatusHelp.vue"))
 const AboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
+
+const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
+const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
+const LazyForecastResultesHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
+const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
+const LazyForecastStatusRunHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/StatusRunHelp.vue"));
+
 
 const emit = defineEmits(["logoutEvent"]);
 

@@ -37,9 +37,7 @@
                       </Button>
                     </div>
 
-                    <Button id="LoginButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm"
-                      aria-label="sign in">Sign In</Button>
-
+                      <Button id="LoginButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm" aria-label="sign in">Sign In</Button>
 
                     <div class="signupButton underline text-base mt-2" aria-label="sign up">
                       <Button @click="openDialog" class="c-blue">Create an Account</Button>
@@ -91,8 +89,7 @@
                           <Button type="submit" :disabled="disableCreateAccountBtn">Create Account</Button>
                         </div>
                         <div class="signupButton underline text-base inline pl-6">
-                          <Button @click="closeDialog" :class="cancelCreateAccountLinkClasses"
-                            :disabled="disableCreateAccountBtn">Cancel</Button>
+                          <Button @click="closeDialog" :class="cancelCreateAccountLinkClasses" :disabled="disableCreateAccountBtn">Cancel</Button>
                         </div>
                       </form>
                     </div>

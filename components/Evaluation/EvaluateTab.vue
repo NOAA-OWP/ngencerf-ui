@@ -24,8 +24,7 @@
           </div>
           <div class="col-span-1 pr-8">
             <div class="text-right">
-              <span id="NewButton" class="ngenButtonDiv-alt bg-blue4" @click="gotoSelectAlternateIteration">
-                <Button id="NewValidationBtn">New Validation</button></span>
+                <Button id="NewValidationBtn" class="ngenButtonDiv" @click="gotoSelectAlternateIteration">New Validation</button>
             </div>
           </div>
 
@@ -55,15 +54,13 @@
 
       <div class="row-span-1">
         <div class="grid grid-cols-4">
-          <div class="col-span-2 pl-8">
-            <label style="display: table-cell; white-space: nowrap" for="resultsPathname" class="pt9em">Results
-              Pathname</label>
-            <span class="table-cell">
-              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+          <div class="col-span-2 pl-8 flex items-center space-x-2 w-full">
+            <label for="resultsPathname" class="text-xs whitespace-nowrap font-bold">Results Pathname</label>
+            <span class="flex-grow">
+              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled
+                class="w-full" />
             </span>
           </div>
-
-
         </div>
       </div>
     </div>
@@ -153,7 +150,6 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick } from 'vue';
 import { useToast } from 'primevue/usetoast';
 
 import type { DynamicObject } from "@/composables/NextGenModel";

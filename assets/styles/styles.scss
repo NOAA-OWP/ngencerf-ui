@@ -97,6 +97,19 @@ input::-webkit-input-placeholder {
   font-size: 15px;
   font-weight: normal;
 }
+
+Button, button,
+.ngenButtonDiv, .ngenButtonDiv-alt,
+.ngenButtonDiv-green, .ngenButtonDiv-red,
+.ngenButtonDiv-yellow  {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+     -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none;
+}
+
 .ngenButtonDiv {
   cursor: pointer;
   color: white;
@@ -109,11 +122,11 @@ input::-webkit-input-placeholder {
   display: inline-block;
 }
 .ngenButtonDiv:hover {
-  background-color: global.$ngwcp_primary3;
+  background-color: global.$ngwcp_primary3 !important;
   color: white;
   border: none;
-  user-select: none;
 }
+
 .ngenButtonDiv-alt {
   cursor: pointer;
   color: white;
@@ -129,7 +142,6 @@ input::-webkit-input-placeholder {
   background-color: global.$ngwcp_primary3;
   color: white;
   border: none;
-  user-select: none;
 }
 .ngenButtonDiv-alt button,
 .ngenButtonDiv-alt button:hover,
@@ -154,7 +166,6 @@ input::-webkit-input-placeholder {
 .ngenButtonDiv-green:hover {
   background-color: global.$ngwcp_secondary4lt;
   border: none;
-  user-select: none;
 }
 .ngenButtonDiv-red {
   cursor: pointer;
@@ -170,7 +181,6 @@ input::-webkit-input-placeholder {
 .ngenButtonDiv-red:hover {
   background-color: global.$ngwcp_red_dark2;
   border: none;
-  user-select: none;
 }
 
 .ngenButtonDiv-yellow {
@@ -310,17 +320,12 @@ select option {
   color: #777777 !important;
 }
 
-Button, button {
-  user-select: none;
-
-}
-
 .waitgif {
   position: absolute;
   top: 30%;
   left: 30%;
-  width: 160px;
-  height: 160px;
+  width: 120px;
+  height: 120px;
   padding: 10px;
   margin: 0 auto;
   z-index: 9999;
@@ -414,6 +419,7 @@ Button, button {
 .bg-blue4 { background-color: global.$ngwcp_primary4 !important; }
 .bg-white { background-color: white !important; }
 .c-blue { color: global.$color-blue !important; }
+.c-blue:hover { color: global.$ngwcp_primary3 !important;}
 .c-blue-primary1 { color: global.$ngwcp_primary1 !important; }
 .c-black { color: global.$black !important; }
 

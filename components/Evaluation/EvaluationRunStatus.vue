@@ -6,12 +6,12 @@
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
-                <caption>Evaluation Run Time & Iteration</caption>
+                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Run Time & Iteration</caption>
                 <thead>
-                  <tr>
-                    <th class="text-right" colspan="2"></th>
-                  </tr>
-                </thead>
+                    <tr height="25px">
+                      <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                    </tr>
+                  </thead>
                 <tbody>
                   <tr height="38px">
                     <th scope="row" class="text-right font-bold">Submit Time</th>
@@ -33,7 +33,12 @@
 
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
-                <caption>Evaluation Status</caption>
+                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Status</caption>
+                <thead>
+                    <tr height="25px">
+                      <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                    </tr>
+                </thead>
                 <tbody>
                   <tr height="38px">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
@@ -52,25 +57,16 @@
 
                       <!--BUTTONS - START-->
                       <span v-if="validationStatus === 'Done'">
-                        <div id="ResultsArea" class="ngenButtonDiv" @click.stop="navigateToEvaluation">
-                          <Button class="font-normal">Go to Evaluation</button>
-                        </div>
+                          <Button id="ResultsArea" class="ngenButtonDiv " @click.stop="navigateToEvaluation">Go to Evaluation</button>
                       </span>
 
                       <span v-else>
-
-                        <div v-if="!isStartHidden()" class="ngenButtonDiv-green h-8" @click="startRun()">
-                          <Button class="font-normal" title="Run Button" aria-label="Run Button">
+                          <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()" title="Run Button" aria-label="Run Button">
                             Run
                           </button>
-                        </div>
-
-                        <!--<div v-else class="h-8">&nbsp;</div>-->
-
-                        <div class="ngenButtonDiv-red h-8 hidden" v-if="!isCancelHidden()" @click="cancelRun()">
-                          <Button class="font-normal" title="Cancel Button" aria-label="Cancel Button">Cancel</button>
-                        </div>
-
+                          <Button v-if="!isCancelHidden()" @click="cancelRun()" class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button"
+                            aria-label="Cancel Button">Cancel
+                          </button>
                       </span>
                       <!--BUTTONS - END-->
                     </td>
@@ -137,6 +133,7 @@ import { hilightTab } from '@/composables/TabHilight';
 const toast = useToast();
 
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
+const { addToastRecord } = generalStore();
 
 const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, evaluateDisplayIterationNumber } = storeToRefs(useEvaluationRunStatusStore());
 const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime } = useEvaluationRunStatusStore();
