@@ -283,7 +283,15 @@ const createGageMap = async () => {
         opacity: 1,
         fillOpacity: 0.9
       })
-      .bindPopup(`<b>Gage ID:</b> ${gage.gage_id}<br/><b>Altitude:</b> ${gage.altitude}`)
+      .bindPopup(`
+        <b>Station Name:</b> ${gage.station_name}<br/>
+        <b>Gage ID:</b> ${gage.gage_id}<br/>
+        <b>Domain:</b> ${gage.domain}<br/>
+        <b>Agency:</b> ${gage.agency}<br/>
+        <b>Latitude:</b> ${gage.latitude}<br/>
+        <b>Longitude:</b> ${gage.longitude}<br/>
+        <b>Altitude:</b> ${gage.altitude}
+      `)
       .on("mouseover", (e) => {
           e.target.setStyle({ radius: 10, fillColor: "darkred" }); // Increase size & darken
         })
