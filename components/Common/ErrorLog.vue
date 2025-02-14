@@ -28,7 +28,7 @@
           <label for="successToast">Success</label>
         </div>
       </div>
-      <DataTable id="ErrorTable" :value="getToastArray()" class="p-datatable-striped" scrollable scroller="true"
+      <DataTable id="ErrorTable" :value="getToastArray" class="p-datatable-striped" scrollable scroller="true"
         scroll-height="500px">
         <Column :pt="ptColumn" field="datetime" header="Date" class="columnClass" style="width: 20%; text-align:center">
         </Column>
@@ -62,7 +62,7 @@ const successToast = ref<boolean>(true);
 
 const toastsToDisplay = ref();
 
-const getToastArray = () => {
+const getToastArray = computed(() => {
   toastsToDisplay.value = [];
   toastRecords.value.forEach((item) => {
     if ((infoToast.value && item.severity === "info") ||
@@ -74,7 +74,7 @@ const getToastArray = () => {
     }
   })
   return toastsToDisplay.value;
-}
+});
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
