@@ -120,8 +120,6 @@ export const generalStore = defineStore(
       popupActive.value = false;
     }
 
-
-
     return {
       getMenuIndex,
       setMenuIndex,

@@ -109,7 +109,6 @@ import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
-import { generalStore } from '~/stores/common/GeneralStore';
 
 import { generalStore } from '@/stores/common/GeneralStore';
 const { popupActive } = storeToRefs(generalStore());

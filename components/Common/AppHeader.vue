@@ -202,7 +202,7 @@ const isOnDiv = ref(false);
 const onImageRightClick = (event: any) => {
   if (!popupActive.value) {
     userContextMenu.value.show(event)
-  }  
+  }
 }
 
 onMounted(() => {
@@ -220,14 +220,14 @@ onMounted(() => {
       if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
     };
   });
- 
+
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', function (event) {
     sizeHelpWindow();
-  }); 
+  });
   // window.removeEventListener('resize', function (event) {
   //   sizeLogWindow();
   // });
@@ -282,27 +282,33 @@ const aboutBox = async () => {
 }
 
 const errorLog = async () => {
-  errorOverlay.value.style.display = "block";
-  //setTimeout(function () { sizeLogWindow() }, 0);
+  if (!popupActive.value) {
+    errorOverlay.value.style.display = "block";
+    popupActive.value = true;
+  }
 }
 
 useAccountEventListen('accountEvent', () => {
   const ele = document.getElementById('UserAccountOverlay') as HTMLElement;
   ele.style.display = "none";
+  popupActive.value = false;  
 })
 
 useAccountEventListen('aboutBoxEvent', () => {
   const ele = document.getElementById('AboutBoxOverlay') as HTMLElement;
   ele.style.display = "none";
+  popupActive.value = false;
 })
 
 useAccountEventListen('errorLogEvent', () => {
   const ele = document.getElementById('ErrorLogOverlay') as HTMLElement;
   ele.style.display = "none";
+  popupActive.value = false;
 })
 
 useLogoutListen('logoutEvent', (evStr: string) => {
   if (evStr === "token" && !getIsTokenExpired()) {
+    popupActive.value = false;  
     setIsTokenExpired();
     alert("Your session has expired. Please log in again.");
     useLogout("logoutEvent", "logout");

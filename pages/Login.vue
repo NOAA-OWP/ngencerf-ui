@@ -125,11 +125,13 @@ import AppHeader from "@/components/Common/AppHeader.vue";
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 
+const gstore = generalStore();
+const { popupActive } = storeToRefs(gstore);
+
 const { calibrationJobId } = storeToRefs(generalStore());
 
 const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
 const { resetGeneralStore, clearToastRecords, addToastRecord } = generalStore();
-
 
 const { ngencerfBaseUrl } = useBackendConfig();
 
@@ -150,7 +152,7 @@ const createAccountButtonClasses = ref<string[]>(["ngenButtonDiv", "btn-left", "
 const cancelCreateAccountLinkClasses = ref<string[]>(['c-blue'])
 
 onMounted(() => {
-
+  popupActive.value = false;
   nextTick(() => {
     sessionStorage.clear();
     localStorage.clear();
