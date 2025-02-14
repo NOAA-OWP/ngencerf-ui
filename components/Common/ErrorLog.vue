@@ -1,7 +1,7 @@
 <template>
   <div id="ErrorLog" ref="errorLog">
-    <div class="">
-      <div class="inline text-xl font-bold text-right ml-5 mt-5">Application Log</div>
+    <div class="mt-2">
+      <div class="inline text-xl font-bold text-right ml-5 mt-5">Notifications</div>
       <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
         class="absolute cursor-pointer right-0 boxed mt-1 mr-1 inline-block" @click="closeErroLogBox" />
     </div>
@@ -11,7 +11,10 @@
     <div id="TableWrapper" class="mt-5">
 
       <div class="flex flex-wrap gap-4 mb-5">
-        <div class="flex items-center gap-2 ml-5">
+        <div class="flex items-center ml-5">
+          Show notifications for
+        </div>
+        <div class="flex items-center gap-2">
           <Checkbox v-model="infoToast" inputId="infoToast" name="infoToast" value="info" binary />
           <label for="infoToast">Information</label>
         </div>

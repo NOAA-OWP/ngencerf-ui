@@ -188,7 +188,7 @@ const userItems = ref([
   { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
   { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
   { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() },
-  { label: 'Error Log', icon: 'pi pi-fw-times', command: () => errorLog() }
+  { label: 'Notifications', icon: 'pi pi-fw-times', command: () => errorLog() }
 ])
 
 const userContextMenu = ref();
