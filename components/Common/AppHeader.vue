@@ -10,20 +10,20 @@
 
         <ul v-show="userLoggedIn && location.name !== 'Login'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
-            <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
-              @click="MenuChanged">Calibration</NuxtLink>
+            <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''"
+              to="calibration" data-menu='1' @click="MenuChanged">Calibration</NuxtLink>
           </li>
           <li aria-label="Evaluation" title="Evaluation">
-            <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2'
-              @click="MenuChanged">Evaluation</NuxtLink>
+            <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation"
+              data-menu='2' @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
-              @click="MenuChanged">Forecast</NuxtLink>
+            <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast"
+              data-menu='3' @click="MenuChanged">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
-            <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
-              @click="" class="disabled">Verification</NuxtLink>
+            <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
+              to="verification" data-menu='4' @click="" class="disabled">Verification</NuxtLink>
           </li>
         </ul>
 
@@ -42,7 +42,7 @@
           </div>
           <div class="col-span-1">
             <Button v-if="userLoggedIn && location.name !== 'Login'" class="float-left" style="padding-top:0px"
-              id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</button>
+              id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</Button>
           </div>
 
         </div>
@@ -93,21 +93,21 @@
             </span>
             <span v-if="getEvaluationTabIndex() === 3">
               <LazyEvaluationCalibrationSelectAltInterationssHelp />
-            </span> 
-             <span v-if="getEvaluationTabIndex() === 4">
+            </span>
+            <span v-if="getEvaluationTabIndex() === 4">
               <LazyEvaluationRunStatusHelp />
             </span>
           </div>
 
           <div v-else-if="getMenuIndex() === 3">
             <span v-if="getForecastTabIndex() === 1">
-             <LazyForecastCalibrationRunsHelp />
+              <LazyForecastCalibrationRunsHelp />
             </span>
             <span v-if="getForecastTabIndex() === 2">
               <LazyForecastForecastRunsHelp />
             </span>
             <span v-if="getForecastTabIndex() === 3">
-             <LazyForecastSetupForecastHelp />
+              <LazyForecastSetupForecastHelp />
             </span>
             <span v-if="getForecastTabIndex() === 4">
               <LazyForecastStatusRunHelp />
@@ -124,7 +124,7 @@
   </div>
   <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
     <UserAccount />
-  </div>  
+  </div>
   <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
     <AboutBox />
   </div>

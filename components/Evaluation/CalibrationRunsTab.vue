@@ -35,18 +35,18 @@
         <div id="CalTable">
           <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
             <div class="col-span-1">
-                <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-                <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                  :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
-                  placeholder="All"></Select>
+              <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
+              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
+                :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
+                placeholder="All"></Select>
             </div>
           </div>
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
-            
-  
+
+
           <DataTable id="EvalRunTable" :value="filteredData" scrollable scroll-height="400px"
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
             v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
@@ -94,9 +94,9 @@
         <div class="flex mt-2">
           <div class="ml-auto mt-4">
             <div id="NewButton">
-              <Button id="btn-evaluate" class="ngenButtonDiv" @click.stop="returnCalibrationJobList">Return
-                to
-                Calibration Jobs</Button>
+              <Button id="btn-evaluate" class="ngenButtonDiv" @click.stop="returnCalibrationJobList">
+                Return to Calibration Jobs
+              </Button>
             </div>
           </div>
         </div>
@@ -195,12 +195,12 @@ onMounted(() => {
 
 // Computed filtered data for DataTables
 const filteredData = computed(() => {
-      if (!uiGageId.value || uiGageId.value === "All") {
-        return userEvaluationCalibrationRunListData?.value;
-      } else {
-        return userEvaluationCalibrationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
-      }
-    });
+  if (!uiGageId.value || uiGageId.value === "All") {
+    return userEvaluationCalibrationRunListData?.value;
+  } else {
+    return userEvaluationCalibrationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
+  }
+});
 
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
@@ -289,10 +289,10 @@ const openSelectedCalibrationRun = () => {
   })
 }
 
-const viewCalibrationDetails = async ( calibration_run_id: number ) => {
-  isLoading.value = true;  
-  nextTick(async () => {  
-    await loadSelectedCalibrationRun( calibration_run_id );
+const viewCalibrationDetails = async (calibration_run_id: number) => {
+  isLoading.value = true;
+  nextTick(async () => {
+    await loadSelectedCalibrationRun(calibration_run_id);
     isLoading.value = false;
     showMessagesGroup.value = true;
   })
