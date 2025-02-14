@@ -247,7 +247,7 @@ export interface GageOptionData {
   gage_id: string;
   nsw_id: string;
   domain: string;
-  nwm_v3_calibration: boolean;
+  headwater_calibration: boolean;
 }
 
 export interface SaveGageTabPayload {
