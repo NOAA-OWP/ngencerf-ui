@@ -10,20 +10,20 @@
 
         <ul v-show="userLoggedIn && location.name !== 'Login'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
-            <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
-              @click="MenuChanged">Calibration</NuxtLink>
+            <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''"
+              to="calibration" data-menu='1' @click="MenuChanged">Calibration</NuxtLink>
           </li>
           <li aria-label="Evaluation" title="Evaluation">
-            <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2'
-              @click="MenuChanged">Evaluation</NuxtLink>
+            <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation"
+              data-menu='2' @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
-              @click="MenuChanged">Forecast</NuxtLink>
+            <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast"
+              data-menu='3' @click="MenuChanged">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
-            <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
-              @click="" class="disabled">Verification</NuxtLink>
+            <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
+              to="verification" data-menu='4' @click="" class="disabled">Verification</NuxtLink>
           </li>
         </ul>
 
@@ -34,7 +34,7 @@
 
           <div class="col-span-1">
             <div v-show="!uMenu && userLoggedIn && location.name !== 'Login'" id="UserCircle"
-              class="float-right userInitials" @contextmenu="onImageRightClick" @click="onImageRightClick">
+              class="float-right userInitials z-9999" @contextmenu="onImageRightClick" @click="onImageRightClick">
               {{ userInitials }}<i class="pi pi-angle-down"></i>
               <ContextMenu ref="userContextMenu" :model="userItems" :autoZIndex="true" />
             </div>
@@ -93,21 +93,21 @@
             </span>
             <span v-if="getEvaluationTabIndex() === 3">
               <LazyEvaluationCalibrationSelectAltInterationssHelp />
-            </span> 
-             <span v-if="getEvaluationTabIndex() === 4">
+            </span>
+            <span v-if="getEvaluationTabIndex() === 4">
               <LazyEvaluationRunStatusHelp />
             </span>
           </div>
 
           <div v-else-if="getMenuIndex() === 3">
             <span v-if="getForecastTabIndex() === 1">
-             <LazyForecastCalibrationRunsHelp />
+              <LazyForecastCalibrationRunsHelp />
             </span>
             <span v-if="getForecastTabIndex() === 2">
               <LazyForecastForecastRunsHelp />
             </span>
             <span v-if="getForecastTabIndex() === 3">
-             <LazyForecastSetupForecastHelp />
+              <LazyForecastSetupForecastHelp />
             </span>
             <span v-if="getForecastTabIndex() === 4">
               <LazyForecastStatusRunHelp />
@@ -124,7 +124,7 @@
   </div>
   <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
     <UserAccount />
-  </div>  
+  </div>
   <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
     <AboutBox />
   </div>
@@ -163,6 +163,8 @@ const LazyForecastResultesHelp = defineAsyncComponent(() => import("@/components
 const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
 const LazyForecastStatusRunHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/StatusRunHelp.vue"));
 
+const gstore = generalStore();
+const { popupActive } = storeToRefs(gstore);
 
 const emit = defineEmits(["logoutEvent"]);
 
@@ -176,7 +178,7 @@ const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } 
 const location = useRoute();
 
 const userInitials = ref<string>('');
-const userLoggedIn= ref<boolean>();
+const userLoggedIn = ref<boolean>();
 
 const userItems = ref([
   { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
@@ -191,7 +193,9 @@ let observer = null;
 const isOnDiv = ref(false);
 
 const onImageRightClick = (event: any) => {
-  userContextMenu.value.show(event)
+  if (!popupActive.value) {
+    userContextMenu.value.show(event)
+  }  
 }
 
 onMounted(() => {
@@ -240,12 +244,18 @@ const sizeHelpWindow = () => {
 /**
  * 
  */
- const gotoAccount = async () => {
-  accountOverlay.value.style.display = "block";
+const gotoAccount = async () => {
+  if (!popupActive.value) {
+    accountOverlay.value.style.display = "block";
+    popupActive.value = true;
+  }
 }
 
 const aboutBox = async () => {
-  aboutOverlay.value.style.display = "block";
+  if (!popupActive.value) {
+    aboutOverlay.value.style.display = "block";
+    popupActive.value = true;
+  }
 }
 
 useAccountEventListen('accountEvent', () => {
@@ -268,9 +278,11 @@ useLogoutListen('logoutEvent', (evStr: string) => {
 })
 
 const logoutUser = async () => {
-  if (confirm("Are you sure you want to logout?")) {
-    useLogout("logoutEvent", "logout");
-    await navigateTo('login');
+  if (!popupActive.value) {
+    if (confirm("Are you sure you want to logout?")) {
+      useLogout("logoutEvent", "logout");
+      await navigateTo('login');
+    }
   }
 }
 
@@ -287,17 +299,21 @@ const hideUserMenu = () => {
 
 const closeHelp = () => {
   showHelp.value = false;
+  popupActive.value = false;
 }
 const displayHelp = () => {
-  showHelp.value = true;
-  setTimeout(function () { sizeHelpWindow() }, 0);
+  if (!popupActive.value) {
+    popupActive.value = true;
+    showHelp.value = true;
+    setTimeout(function () { sizeHelpWindow() }, 0);
+  }
 }
 
 const MenuChanged = (e: MouseEvent) => {
   nextTick(() => {
     const currentMenu = getMenuIndex();
     let ele = e.currentTarget as HTMLElement;
-    if( !ele ) {
+    if (!ele) {
       ele = e.target as HTMLElement;
     }
     const m = ele.getAttribute('data-menu');
@@ -454,7 +470,7 @@ const MenuChanged = (e: MouseEvent) => {
 }
 
 #HelpWindow {
-  z-index: 9999;
+  z-index: 999;
   border: 1px solid black;
   position: absolute;
   right: 2%;
