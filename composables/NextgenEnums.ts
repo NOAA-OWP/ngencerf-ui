@@ -1,3 +1,4 @@
+import { warn } from "vue"
 
 export const CalibrationTabs =  {
   tab_calibrationRuns: 0,
@@ -53,3 +54,13 @@ export const ValidationPlotNames = [
   'Hydrograph Validation',
   'Streamflow Validation Precipitation'
 ]
+
+export const ToastTimeout = {
+  warn: 3000,
+  info: 3000,
+  error: 10000,
+  success: 3000,
+  timeout5000: 5000,
+  timeout6000: 6000,
+  timeout10000: 10000
+}

@@ -39,10 +39,11 @@ import type { CalibrationRun } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
+
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
-const { getEvalRunSelected, setEvalRunSelected } = generalStore();
+const { getEvalRunSelected, setEvalRunSelected, addToastRecord } = generalStore();
 
 const toast = useToast();
 const crContextMenu = ref() //calibration run context menu
@@ -58,7 +59,8 @@ const onRowContextMenu = (event: any) => {
 
 const calibrationJobStore = useCalibrationJobStore()
 const { fetchJobsListData } = storeToRefs(calibrationJobStore)
-const { fetchNewCalibrationRunId } = calibrationJobStore
+
+
 
 import { hilightTab } from '@/composables/TabHilight';
 onMounted(() => {
