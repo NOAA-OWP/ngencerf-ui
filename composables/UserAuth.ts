@@ -85,6 +85,7 @@ export const makeProtectedApiCall = async <T>(
 
     let myResponse = { ok: response.ok, status: response.status };
 
+    // Success
     if (myResponse.ok && myResponse.status >= 200 && myResponse.status < 300) {
       responseData = {
         _data: await response.json(),
@@ -94,6 +95,9 @@ export const makeProtectedApiCall = async <T>(
       return responseData;
     }
 
+    isLoading.value = false;
+
+    // Token expired, unauthorized
     if (myResponse.status === 401) {
       const userDataStore = useUserDataStore();
       const { ngencerfBaseUrl } = useBackendConfig();
@@ -108,10 +112,19 @@ export const makeProtectedApiCall = async <T>(
       return makeProtectedApiCall(rqstUrl, rqstUserOptions);
     }
 
-    isLoading.value = false;
 
+    // Client bad requests, except for Unauthorized, which is handled above
+    if (!myResponse.ok && myResponse.status === 400 || (myResponse.status > 401 && myResponse.status < 500)) {
+      responseData = {
+        _data: await response.json(),
+        status: response.status,
+        ok: response.ok,
+      };
+      return responseData;     
+    }
+
+    // server Errors
     if (myResponse.status >= 500 && myResponse.status < 600) {
-      console.log("Server Error");
       responseData = {
         _data: await response.json(),
         status: response.status,

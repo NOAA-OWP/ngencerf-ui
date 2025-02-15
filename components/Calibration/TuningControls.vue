@@ -152,7 +152,8 @@
           <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
           <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
             <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-            <Button class="ngenButtonDiv-alt" :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+            <Button class="ngenButtonDiv-alt"
+              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               Load Parameters File (optional)</button>
             <div v-if="!isFormulationDataSaved()" class="overlay"></div>
           </div>
@@ -169,7 +170,8 @@
               </template>
             </Select>
             <div id="UploadParams" class="inline ml-3" @click="addCalibrationTuningParameter">
-              <Button class="ngenButtonDiv-alt" :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</Button>
+              <Button class="ngenButtonDiv-alt"
+                :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</Button>
             </div>
           </div>
 
@@ -291,6 +293,8 @@ import Select from "primevue/select";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 
+import type { GeneralErrorResponse, ValidationErrorObject, NonFieldError } from "@/composables/NextGenModel"
+
 import type { DatePickerProps } from "primevue/datepicker";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
@@ -382,8 +386,6 @@ onMounted(async () => {
 
   toast.removeAllGroups();
 
-  console.log(toastRecords.value);
-
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
 
@@ -391,7 +393,6 @@ onMounted(async () => {
   if (calibrationJobId.value) {
 
     if (!userSelectedCalibrationTuningParameters.value.length) {
-      console.log("Clearing out selectedTuningParameterData");
       selectedTuningParameterData.value = null;
     }
 
@@ -1069,12 +1070,33 @@ const saveTuningData = () => {
       tuningStore_data_loading.value = false;
     } else {
       tuningStore_data_loading.value = false;
-      const errorMessage = saveTuningTabResponse?._data.message;
 
-      const tMsg: ToastMessageOptions = {
-        severity: 'error', summary: `Error Saving Tuning Tab Data`,
-        detail: errorMessage
-      };
+      if (saveTuningTabResponse._data && saveTuningTabResponse._data.response_type) {
+        if (saveTuningTabResponse._data.response_type === "validation_error") {
+          if (saveTuningTabResponse._data.validation_errors) {
+            if (saveTuningTabResponse._data.validation_errors && saveTuningTabResponse._data.validation_errors.parameters) {
+              saveTuningTabResponse._data.validation_errors.parameters.forEach((err: GeneralErrorResponse) => {
+                if (Object.keys(err).length) {
+                  (err as any as NonFieldError).non_field_errors.forEach(er => {
+                    const tMsg: ToastMessageOptions = {
+                      severity: 'error', summary: `Error Saving Tuning Tab Data`,
+                      detail: er
+                    };
+                    toast.add(tMsg); addToastRecord(tMsg);
+                  });
+                }
+              });
+            }
+          }
+        }
+      } else {
+        const errorMessage = saveTuningTabResponse?._data.message;
+        const tMsg: ToastMessageOptions = {
+          severity: 'error', summary: `Error Saving Tuning Tab Data`,
+          detail: errorMessage
+        };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
     }
   };
 
