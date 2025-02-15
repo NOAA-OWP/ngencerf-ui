@@ -143,10 +143,10 @@ import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 
-
 import type { SelectChangeEvent } from "primevue/select";
 import type { ToastMessageOptions } from "primevue/toast";
 import type { GageResetData } from "@/composables/NextGenModel.ts"
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useGageStore } from "@/stores/calibration/GageStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -364,16 +364,16 @@ const handleDialogClose = (opt: any) => {
 
   if (opt && opt.data) {
     if (opt.data.saveFileResponseResult.status === 200) {
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 };
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: ToastTimeout.timeout5000 };
       toast.add(tMsg); addToastRecord(tMsg);
     } else {
       useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 };
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: ToastTimeout.timeout10000 };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: 10000 };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: ToastTimeout.timeout10000 };
     toast.add(tMsg); addToastRecord(tMsg);
   }
   fileUploadDialogOpened.value = false

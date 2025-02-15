@@ -38,6 +38,7 @@
 import { useToast } from 'primevue/usetoast';
 
 import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { generalStore } from '~/stores/common/GeneralStore';
@@ -109,7 +110,7 @@ onMounted(async () => {
  */
 const onRowSelect = (e: any) => {
   console.log('onRowSelect', e);
-  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: 3000 };
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeout3000 };
   toast.add(tMsg); addToastRecord(tMsg);
 };
 

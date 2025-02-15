@@ -82,6 +82,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { CalibrationRun, DataTableContextMenuOption, ForecastJob } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
@@ -193,7 +194,7 @@ const navigateToSetupForecast = () => {
     const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: 6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }

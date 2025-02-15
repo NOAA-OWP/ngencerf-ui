@@ -40,7 +40,7 @@ export const useProcessCalibrationGageSavedResponse = ( savedResponse: GageBasin
     severity: 'success',
     summary: `Gage Tab Data Saved`, 
     detail: savedResponse.message, 
-    life: 5000 
+    life: ToastTimeout.timeout5000 
   });
 
   if ( savedResponse.hasOwnProperty( 'eds_errors' ) && savedResponse.eds_errors.length > 0 ) {
@@ -49,7 +49,7 @@ export const useProcessCalibrationGageSavedResponse = ( savedResponse: GageBasin
         severity: 'warn',
         summary: 'EDS Error',
         detail: eds_error.message,
-        life: 10000
+        life: ToastTimeout.timeout10000
       });
     })
   }

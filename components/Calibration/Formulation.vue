@@ -184,6 +184,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { SlothParameterData } from '@/composables/NextGenModel';
 import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -360,11 +361,11 @@ const saveFormulationData = () => {
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: ToastTimeout.timeout3000 };
         toast.add(tMsg); addToastRecord(tMsg);
         if (response?._data?.nwm_warning === true) {
           useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
-            const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000 };
+            const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: ToastTimeout.timeout10000 };
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }

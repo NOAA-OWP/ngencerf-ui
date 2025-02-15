@@ -293,7 +293,7 @@ import { useDialog } from "primevue/usedialog";
 
 import type { DatePickerProps } from "primevue/datepicker";
 import type { ToastMessageOptions } from "primevue/toast";
-import type {ToastRecord} from "@/composables/NextGenModel";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
@@ -1062,7 +1062,7 @@ const saveTuningData = () => {
       const tMsg: ToastMessageOptions = {
         severity: 'success', summary: `Success`,
         detail: "Saved Tuning Tab data",
-        life: 3000
+        life: ToastTimeout.timeout3000
       };
       toast.add(tMsg); addToastRecord(tMsg);
       updateJobData();

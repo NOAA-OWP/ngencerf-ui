@@ -6,8 +6,6 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useLogout } from "@/composables/UseEventBus";
 
 import { generalStore } from "@/stores/common/GeneralStore";
-//const gstore = generalStore();
-// const { isLoading } = storeToRefs(gstore);
 
 /**
  * Refreshes access token
