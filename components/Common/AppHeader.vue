@@ -42,7 +42,7 @@
           </div>
           <div class="col-span-1">
             <Button v-if="userLoggedIn && location.name !== 'Login'" class="float-left" style="padding-top:0px"
-              id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</button>
+              id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</Button>
           </div>
 
         </div>
@@ -93,21 +93,21 @@
             </span>
             <span v-if="getEvaluationTabIndex() === 3">
               <LazyEvaluationCalibrationSelectAltInterationssHelp />
-            </span> 
-             <span v-if="getEvaluationTabIndex() === 4">
+            </span>
+            <span v-if="getEvaluationTabIndex() === 4">
               <LazyEvaluationRunStatusHelp />
             </span>
           </div>
 
           <div v-else-if="getMenuIndex() === 3">
             <span v-if="getForecastTabIndex() === 1">
-             <LazyForecastCalibrationRunsHelp />
+              <LazyForecastCalibrationRunsHelp />
             </span>
             <span v-if="getForecastTabIndex() === 2">
               <LazyForecastForecastRunsHelp />
             </span>
             <span v-if="getForecastTabIndex() === 3">
-             <LazyForecastSetupForecastHelp />
+              <LazyForecastSetupForecastHelp />
             </span>
             <span v-if="getForecastTabIndex() === 4">
               <LazyForecastStatusRunHelp />

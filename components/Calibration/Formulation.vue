@@ -69,7 +69,7 @@
             <input class="inline-block w-auto" id="SlothName" type="text" v-model="new_sloth_variable_name"
               @keypress="addSlothOnEnter($event)">
             <div class="ngenButtonDiv ml-3 inline-block">
-              <Button id="SlothAddBtn" @click="addSlothVariable">Add</button>
+              <Button id="SlothAddBtn" @click="addSlothVariable">Add</Button>
             </div>
           </span>
         </div>
@@ -136,7 +136,7 @@
           <div class="col-span-1 mr-6 h-8" @click="saveFormulationData()">
             <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button">
               Save
-            </button>
+            </Button>
           </div>
         </span>
         <span v-else>
@@ -148,23 +148,21 @@
         <span v-if="modulesHaveChanged">
           <div class="col-span-1 mr-3">
             <Button class="ngenButtonDiv-yellow" title="Revert Gage" @click="resetModuleList()"
-              aria-label="Revert Gage">Revert</button>
+              aria-label="Revert Gage">Revert</Button>
           </div>
         </span>
         <span v-else>
-          <div class="col-span-1 mr-3">
-            &nbsp;
-          </div>
+          <div class="col-span-1 mr-3">&nbsp;</div>
         </span>
 
         <div class="col-span-4">&nbsp;</div>
         <div class="col-span-1">
-          <div><Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-              aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
+          <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+            aria-label="Previous Tab Button" @click="goPrevTab()">Prev</Button>
         </div>
         <div class="col-span-1 mr-4">
-          <div><Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
-              @click="goNextTab()">Next</button></div>
+          <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+            @click="goNextTab()">Next</Button>
         </div>
 
       </div>

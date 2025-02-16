@@ -154,7 +154,7 @@
             <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
             <Button class="ngenButtonDiv-alt"
               :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
-              Load Parameters File (optional)</button>
+              Load Parameters File (optional)</Button>
             <div v-if="!isFormulationDataSaved()" class="overlay"></div>
           </div>
         </div>
@@ -180,7 +180,7 @@
         <div class="col-span-1 mt-2 relative">
           <Button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
             @click="clearUserSelectedCalibrationTuningParameters()"
-            :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</button>
+            :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</Button>
         </div>
 
       </div>
@@ -246,7 +246,7 @@
         <div class="col-span-1 mr-6 h-8" @click="saveTuningData()">
           <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button">
             Save
-          </button>
+          </Button>
         </div>
       </span>
       <span v-else>
@@ -258,7 +258,7 @@
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-3">
           <!--<Button class="c-blue font-normal text-xl underline pt-1" title="Revert Button" @click="resetTuningData()"
-            aria-label="Revert Button">Revert</button>-->
+            aria-label="Revert Button">Revert</Button>-->
         </div>
       </span>
 
@@ -268,12 +268,12 @@
 
       <div class="col-span-4">&nbsp;</div>
       <div class="col-span-1">
-        <div><Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-            aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
+        <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+          aria-label="Previous Tab Button" @click="goPrevTab()">Prev</Button>
       </div>
       <div class="col-span-1 mr-4">
-        <div><Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
-            @click="goNextTab()">Next</button></div>
+        <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+          @click="goNextTab()">Next</Button>
       </div>
 
     </div>

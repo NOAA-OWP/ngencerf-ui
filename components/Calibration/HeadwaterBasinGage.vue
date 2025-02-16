@@ -98,7 +98,8 @@
           <div class="grid grid-cols-8">
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 mr-6 h-8" @click="saveTabData()">
-                <Button id="HBGSaveButton" class="font-normal ngenButtonDiv-green " title="Save" aria-label="Save Button">
+                <Button id="HBGSaveButton" class="font-normal ngenButtonDiv-green " title="Save"
+                  aria-label="Save Button">
                   Save
                 </Button>
               </div>
@@ -111,7 +112,7 @@
             <span v-if="gageHasChanged && userCalibrationRunData?.gage !== null">
               <div class="col-span-1 mr-3">
                 <Button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Revert Gage"
-                  @click="gageSelectionReset()" aria-label="Revert">Revert</button>
+                  @click="gageSelectionReset()" aria-label="Revert">Revert</Button>
               </div>
             </span>
             <span v-else>
@@ -122,8 +123,8 @@
             <div class="col-span-4">&nbsp;</div>
             <div class="col-span-1">&nbsp;</div>
             <div class="col-span-1 mr-4">
-              <div><Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next"
-                  @click="goNextTab()">Next</button></div>
+              <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next"
+                  @click="goNextTab()">Next</Button>
             </div>
           </div>
         </div>

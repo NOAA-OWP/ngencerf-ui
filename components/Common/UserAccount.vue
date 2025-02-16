@@ -48,11 +48,11 @@
           <div class="buttonArea mt-4">
             <Button class="ngenButtonDiv mr-6" id="UpdateButton" type="submit" aria-label="Update with new password">
               Update
-            </button>
-            <Button class="c-blue font-normal underline" id="closeBtn" name="cancel" value="Cancel" type="button"
+            </Button>
+            <Button class="c-blue font-normal underline" id="closeBtn" name="cancel" value="Cancel"
               v-on:click="closeAccountBox" aria-label="Close Account Box">
               Close
-            </button>
+            </Button>
           </div>
 
         </form>
@@ -85,11 +85,11 @@
           <div class="buttonArea mt-4">
             <Button class="ngenButtonDiv mr-6" id="UpdateNameButton" type="submit" aria-label="Update with new name">
               Update
-            </button>
-            <Button class="c-blue font-normal underline" id="closeNameBtn" name="cancel" value="Cancel" type="button"
+            </Button>
+            <Button class="c-blue font-normal underline" id="closeNameBtn" name="cancel" value="Cancel"
               v-on:click="closeAccountBox" aria-label="Close Account Box">
               Close
-            </button>
+            </Button>
           </div>
 
         </form>

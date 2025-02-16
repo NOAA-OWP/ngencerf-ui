@@ -6,12 +6,13 @@
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
-                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Run Time & Iteration</caption>
+                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Run Time & Iteration
+                </caption>
                 <thead>
-                    <tr height="25px">
-                      <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
-                    </tr>
-                  </thead>
+                  <tr height="25px">
+                    <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                  </tr>
+                </thead>
                 <tbody>
                   <tr height="38px">
                     <th scope="row" class="text-right font-bold">Submit Time</th>
@@ -35,9 +36,9 @@
               <table>
                 <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Status</caption>
                 <thead>
-                    <tr height="25px">
-                      <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
-                    </tr>
+                  <tr height="25px">
+                    <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                  </tr>
                 </thead>
                 <tbody>
                   <tr height="38px">
@@ -57,16 +58,19 @@
 
                       <!--BUTTONS - START-->
                       <span v-if="validationStatus === 'Done'">
-                          <Button id="ResultsArea" class="ngenButtonDiv " @click.stop="navigateToEvaluation">Go to Evaluation</button>
+                        <Button id="ResultsArea" class="ngenButtonDiv" @click.stop="navigateToEvaluation">Go to
+                          Evaluation</Button>
                       </span>
 
                       <span v-else>
-                          <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()" title="Run Button" aria-label="Run Button">
-                            Run
-                          </button>
-                          <Button v-if="!isCancelHidden()" @click="cancelRun()" class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button"
-                            aria-label="Cancel Button">Cancel
-                          </button>
+                        <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()"
+                          title="Run Button" aria-label="Run Button">
+                          Run
+                        </Button>
+                        <Button v-if="!isCancelHidden()" @click="cancelRun()"
+                          class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button"
+                          aria-label="Cancel Button">Cancel
+                        </Button>
                       </span>
                       <!--BUTTONS - END-->
                     </td>
@@ -85,7 +89,7 @@
       <div class="row-span-1">
         <span v-if="validationStatus === 'Done'">
           <div id="ResultsArea" class="ngenButtonDiv row-span-1">
-            <Button class="font-normal" @click.stop="navigateToEvaluation">Go to Evaluation</button>
+            <Button class="font-normal" @click.stop="navigateToEvaluation">Go to Evaluation</Button>
           </div>
           <div class="col-span-7">&nbsp;</div>
         </span>
@@ -97,14 +101,14 @@
               <div v-if="!isStartHidden()" class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                 <Button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
                   Run
-                </button>
+                </Button>
               </div>
             
               <div v-else class="col-span-1 mr-6 h-8">&nbsp;</div>
            
               <div class="col-span-1 ngenButtonDiv-red mr-6 h-8 hidden" v-if="!isCancelHidden()">
                 <Button class="font-normal" title="Cancel Button" @click="cancelRun()" 
-                  aria-label="Cancel Button">Cancel</button>
+                  aria-label="Cancel Button">Cancel</Button>
               </div>
               <div class="col-span-2">&nbsp;</div>
               <div class="col-span-1 mr-4">
