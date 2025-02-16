@@ -368,7 +368,7 @@ const handleDialogClose = (opt: any) => {
       toast.add(tMsg); addToastRecord(tMsg);
     } else {
       useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Data Failed.', detail: message, life: ToastTimeout.timeout10000 };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }
@@ -479,7 +479,7 @@ const saveTabData = () => {
         })
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
-          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message };
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Data Failed.', detail: message };
           toast.add(tMsg); addToastRecord(tMsg);
         });
       }

@@ -31,19 +31,23 @@
           <label for="successToast">Success</label>
         </div>
       </div>
+
       <DataTable id="ErrorTable" :value="getToastArray" class="p-datatable-striped" scrollable scroller="true"
         scroll-height="500px">
-        <Column :pt="ptColumn" field="datetime" header="Date" class="columnClass" style="width: 20%; text-align:center">
+        <Column :pt="ptColumn" field="datetime" header="Date" class="columnClass"
+          style="width: 20%; text-align:center; vertical-align: top;">
         </Column>
         <Column :pt="ptColumn" field="severity" header="Severity" class="columnClass text-center"
-          style="width: 10%; text-align:center">
+          style="width: 10%; text-align:center; vertical-align: top;">
         </Column>
         <Column :pt="ptColumn" field="summary" header="Summary" class="columnClass text-center"
-          style="width: 28%; text-align:center">
+          style="width: 28%; text-align:center; vertical-align: top;">
         </Column>
-        <Column :pt="ptColumn" field="detail" header="Detail" class="columnClass text-left" style="width: 45%;">
+        <Column :pt="ptColumn" field="detail" header="Detail" class="columnClass text-left"
+          style="width: 45%; vertical-align: top;">
         </Column>
       </DataTable>
+
     </div>
   </div>
 </template>ingredient

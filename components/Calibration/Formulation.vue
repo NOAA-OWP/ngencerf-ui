@@ -361,7 +361,7 @@ const saveFormulationData = () => {
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: ToastTimeout.timeout3000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeout3000 };
         toast.add(tMsg); addToastRecord(tMsg);
         if (response?._data?.nwm_warning === true) {
           useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
@@ -375,7 +375,7 @@ const saveFormulationData = () => {
       } else {
         formulationStore_data_loading.value = false;
         useApiErrorResponsePreprocess(response).forEach(message => {
-          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message };
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Data Failed.', detail: message };
           toast.add(tMsg); addToastRecord(tMsg);
         });
       }

@@ -316,6 +316,7 @@ import { hilightTab } from '@/composables/TabHilight';
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 
 import "@vuepic/vue-datepicker/dist/main.css";
+import { errorMessages } from "vue/compiler-sfc";
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -1062,7 +1063,7 @@ const saveTuningData = () => {
     if (saveTuningTabResponse?.ok) {
       const tMsg: ToastMessageOptions = {
         severity: 'success', summary: `Success`,
-        detail: "Saved Tuning Tab data",
+        detail: "Saved Tuning data",
         life: ToastTimeout.timeout3000
       };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -1079,8 +1080,10 @@ const saveTuningData = () => {
                 if (Object.keys(err).length) {
                   (err as any as NonFieldError).non_field_errors.forEach(er => {
                     const tMsg: ToastMessageOptions = {
-                      severity: 'error', summary: `Error Saving Tuning Tab Data`,
-                      detail: er
+                      severity: 'error', 
+                      summary: `Error Saving Tuning Data`,
+                      detail: er,
+                      life: ToastTimeout.timeout10000,
                     };
                     toast.add(tMsg); addToastRecord(tMsg);
                   });
@@ -1092,8 +1095,10 @@ const saveTuningData = () => {
       } else {
         const errorMessage = saveTuningTabResponse?._data.message;
         const tMsg: ToastMessageOptions = {
-          severity: 'error', summary: `Error Saving Tuning Tab Data`,
-          detail: errorMessage
+          severity: 'error',
+          summary: `Error Saving Tuning Data`,
+          detail: errorMessage,
+          life: ToastTimeout.timeout10000,
         };
         toast.add(tMsg); addToastRecord(tMsg);
       }

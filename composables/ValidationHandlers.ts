@@ -38,7 +38,7 @@ export const useProcessCalibrationGageSavedResponse = ( savedResponse: GageBasin
   const messages = ref<ToastMessageOptions[]>([]);
   messages.value.push({
     severity: 'success',
-    summary: `Gage Tab Data Saved`, 
+    summary: `Gage Data Saved`, 
     detail: savedResponse.message, 
     life: ToastTimeout.timeout5000 
   });
