@@ -15,7 +15,7 @@
           Show notifications for
         </div>
         <div class="flex items-center gap-2">
-          <Checkbox v-model="infoToast" inputId="infoToast" name="infoToast" value="info" binary />
+          <Checkbox v-model="infoToast" inputId="infoToast" name="infoToast" value="info" binary/>
           <label for="infoToast">Information</label>
         </div>
         <div class="flex items-center gap-2">
@@ -34,17 +34,23 @@
 
       <DataTable id="ErrorTable" :value="getToastArray" class="p-datatable-striped" scrollable scroller="true"
         scroll-height="500px">
+
+        <Column :pt="ptColumn" header="" class="" style="width: 1%; text-align:center; vertical-align: top;">
+          <template #body="scope">
+            <div :style="{ backgroundColor: getColor(scope.data.severity) }">&nbsp;</div>
+          </template>
+        </Column>
         <Column :pt="ptColumn" field="datetime" header="Date" class="columnClass"
-          style="width: 20%; text-align:center; vertical-align: top;">
+          style="width: 19%; text-align:center; vertical-align: top;">
         </Column>
         <Column :pt="ptColumn" field="severity" header="Severity" class="columnClass text-center"
-          style="width: 10%; text-align:center; vertical-align: top;">
+          style="width: 8%; text-align:center; vertical-align: top;">
         </Column>
         <Column :pt="ptColumn" field="summary" header="Summary" class="columnClass text-center"
-          style="width: 28%; text-align:center; vertical-align: top;">
+          style="width: 29%; text-align:left; vertical-align: top;">
         </Column>
         <Column :pt="ptColumn" field="detail" header="Detail" class="columnClass text-left"
-          style="width: 45%; vertical-align: top;">
+          style="width: 43%; vertical-align: top;">
         </Column>
       </DataTable>
 
@@ -83,6 +89,13 @@ const getToastArray = computed(() => {
   return toastsToDisplay.value;
 });
 
+const getColor = (s: string) => {
+  if (s === 'info') return "white";
+  else if (s === 'warn') return "yellow";
+  else if (s === 'error') return "red";
+  else if (s === 'success') return "green";
+}
+
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   //bodyCell: { style: { "text-align": "center" } }
@@ -95,12 +108,15 @@ const closeErroLogBox = () => {
 </script>
 
 <style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #ErrorLog {
   position: absolute;
   right: 5px;
   border: 5px solid #ccc;
   z-index: 9999;
-  width: 888px;
+  width: 975px;
   background-color: white;
   height: 629px;
 }
