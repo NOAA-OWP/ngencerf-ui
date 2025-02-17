@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
+    <h1 class="pt-3 mb-8 text-3xl font-bold text-center" aria-label="Forecast Status Run Tab" title="Forecast Status Run Tab">
       Forecast
     </h1>
     <p class="text-center" style="font-size: 12px;font-weight: normal;margin-top:-20px;">
@@ -12,7 +12,8 @@
     <div class="grid grid-cols-2">
       <div class="col-span-1">
         <table>
-          <caption style="text-align: center;font-size:1.1em;font-weight:bold;margin-bottom:3px;">Forecast Job Run Time
+          <caption style="text-align: center;font-size:1.1em;font-weight:bold;margin-bottom:3px;"
+            aria-label="Forecast Job Run Time Area" title="Forecast Job Run Time Area">Forecast Job Run Time
           </caption>
           <thead>
             <tr height="25px">
@@ -20,25 +21,27 @@
             </tr>
           </thead>
           <tbody>
-            <tr height="40px">
+            <tr height="40px" :aria-label="'Calibration Job ID ' + calibrationRunForForecast?.calibration_run_id"
+              :title="'Calibration Job ID ' + calibrationRunForForecast?.calibration_run_id">
               <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Calibration Job ID</div>
               </th>
               <td class="pl-5">{{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(30) }}</td>
             </tr>
-            <tr height="40px">
+            <tr height="40px" :aria-label="'Forecast Job ID ' + forecastJobId"
+              :title="'Forecast Job ID ' + forecastJobId">
               <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Forecast Job ID</div>
               </th>
               <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
             </tr>
-            <tr height="32px">
+            <tr height="32px" :aria-label="'Submit Time ' + submitTime" :title="'Submit Time ' + submitTime">
               <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Submit Time</div>
               </th>
               <td class="pl-5">{{ submitTime ?? '-'.repeat(30) }}</td>
             </tr>
-            <tr height="32px">
+            <tr height="32px" :aria-label="'Elapsed Time ' + elapsedTime" :title="'Elapsed Time ' + elapsedTime">
               <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Elapsed Time</div>
               </th>
@@ -50,14 +53,16 @@
 
       <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
         <table>
-          <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Forecast Job Status</caption>
+          <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;" aria-label="Forecast Job Status area"
+            title="Forecast Job Status area">Forecast Job Status</caption>
           <thead>
             <tr height="25px">
               <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
             </tr>
           </thead>
           <tbody>
-            <tr height="40px">
+            <tr height="40px" :aria-label="'Status is ' + overallForcingDownloadForecastStatus"
+              :title="'Status is ' + overallForcingDownloadForecastStatus">
               <th scope="row" class="text-right font-bold">
                 <div style="width: 140px;">Status</div>
               </th>
@@ -65,7 +70,8 @@
                 }}</td>
               <td v-else class="pl-5">Ready</td>
             </tr>
-            <tr height="32px">
+            <tr height="32px" :aria-label="'Cycle is ' + (forecastCycle as ForecastCycle).name"
+              :title="'Cycle is ' + (forecastCycle as ForecastCycle).name">
               <td class="text-right font-bold">
                 <div style="width: 140px;">Cycle</div>
               </td>
@@ -76,7 +82,8 @@
       </div>
 
       <div class="col-span-2">
-        <div style="display:flex; margin-top: 1em;">
+        <div style="display:flex; margin-top: 1em;" :aria-label="'Results pathname is ' + resultsPathname"
+          :title="'Results pathname is ' + resultsPathname">
           <div class="text-right font-bold" style="width: 155px;">
             <label class="text-right" for="resultsPathname" style="width: 155px;">Results Pathname</label>
           </div>

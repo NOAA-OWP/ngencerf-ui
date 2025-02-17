@@ -9,7 +9,7 @@
               <div class="col-span-1">
                 <label for="Domain">Domain</label><br />
                 <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
-                  optionValue="name" placeholder=" ... "
+                  optionValue="name" placeholder=" ... " aria-label="Domain Select" title="Domain Select"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               </div>
             </div>
@@ -18,7 +18,7 @@
               <label for="Gage" @focus="focusSelectInput">Gage</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
-                @change="onGageSelectionChange" @focus="focusSelectInput"
+                @change="onGageSelectionChange" @focus="focusSelectInput" aria-label="Gage Select" title="Gage Select"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
@@ -31,22 +31,24 @@
               <label for="Forcing">Forcing Data</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" defaultValue="AORC" @change="uploadForcingDlgOpen($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                aria-label="Forcing Data Select" title="Forcing Data Select"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Observational">Observational Data</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
                 optionLabel="name" optionValue="name" class="user-select" @change="uploadObservationalDlgOpen($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                aria-label="Observational Data Select" title="Observational Data Select"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Geopackage">GeoPackage</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" @change="uploadGeopackageDlgOpen($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
-
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                aria-label="GeoPackage Data Select" title="GeoPackage Data Select"></Select>
             </div>
           </div>
 
@@ -59,31 +61,39 @@
               <table class="table-auto">
                 <caption><span style="font-size:1.2em;font-weight: bold;">Gage Detail</span></caption>
                 <tbody>
-                  <tr v-if="selectedDomainValue" class="rowOdd">
+                  <tr v-if="selectedDomainValue" class="rowOdd" :aria-label="'Domain: ' + selectedDomainValue"
+                    :title="'Domain: ' + selectedDomainValue">
                     <th scope="row" class="dataName td1">Domain:</th>
                     <td class="dataText td2">{{ selectedDomainValue }}</td>
                   </tr>
-                  <tr v-if="gageData?.gage_id" lass="rowEven">
+                  <tr v-if="gageData?.gage_id" lass="rowEven" :aria-label="'Gage ID: ' + gageData?.gage_id"
+                    :title="'>Gage ID: ' + gageData?.gage_id">
                     <th scope="row" class="dataName td1">Gage ID:</th>
                     <td class="dataText td2">{{ gageData?.gage_id }}</td>
                   </tr>
-                  <tr v-if="gageData?.agency" class="rowOdd">
+                  <tr v-if="gageData?.agency" class="rowOdd" :aria-label="'Agency: ' + gageData?.agency"
+                    :title="'Agency: ' + gageData?.agency">
                     <th scope="row" class="dataName td1">Agency:</th>
                     <td class="dataText td2">{{ gageData?.agency }}</td>
                   </tr>
-                  <tr v-if="gageData?.station_name" class="rowEven">
+                  <tr v-if="gageData?.station_name" class="rowEven"
+                    :aria-label="'Station Name: ' + gageData?.station_name"
+                    :title="'Station Name: ' + gageData?.station_name">
                     <th scope="row" class="dataName td1">Station Name:</th>
                     <td class="dataText td2">{{ gageData?.station_name }}</td>
                   </tr>
-                  <tr v-if="gageData?.latitude" class="rowEven">
+                  <tr v-if="gageData?.latitude" class="rowEven" :aria-label="'Latitude: ' + gageData?.latitude"
+                    :title="'Latitude: ' + gageData?.latitude">
                     <th scope="row" class="dataName td1">Latitude:</th>
                     <td class="dataText td2">{{ gageData?.latitude }}</td>
                   </tr>
-                  <tr v-if="gageData?.longitude" class="rowOdd">
+                  <tr v-if="gageData?.longitude" class="rowOdd" :aria-label="'Longitude: ' + gageData?.longitude"
+                    :title="'Longitude: ' + gageData?.longitude">
                     <th scope="row" class="dataName td1">Longitude:</th>
                     <td class="dataText td2">{{ gageData?.longitude }}</td>
                   </tr>
-                  <tr v-if="gageData?.altitude" class="rowEven">
+                  <tr v-if="gageData?.altitude" class="rowEven" :aria-label="'Altitude: ' + gageData?.altitude"
+                    :title="'Altitude: ' + gageData?.altitude">
                     <th scope="row" class="dataName td1">Altitude:</th>
                     <td class="dataText td2">{{ gageData?.altitude }}</td>
                   </tr>
@@ -124,7 +134,7 @@
             <div class="col-span-1">&nbsp;</div>
             <div class="col-span-1 mr-4">
               <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next"
-                  @click="goNextTab()">Next</Button>
+                @click="goNextTab()">Next</Button>
             </div>
           </div>
         </div>
@@ -160,9 +170,11 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
-import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
-          useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
-          
+import {
+  useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
+  useApiResponseToastSeverityCode
+} from "@/composables/ValidationHandlers";
+
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
 
@@ -579,12 +591,14 @@ const handleNextPrevDialogClose = (opt: any) => {
 
     tr {
       line-height: 27px;
+
       th {
         padding: 4px 15px;
         cursor: default;
         border-bottom: 1px solid #ccc;
         background-color: global.$ngwcp_neutral_gray_lt;
       }
+
       td {
         padding: 4px 15px;
         cursor: default;

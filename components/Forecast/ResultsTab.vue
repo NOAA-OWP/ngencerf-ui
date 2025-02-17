@@ -3,30 +3,35 @@
     <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
       <span id="tab-title">Forecast Run Results</span>
     </h1>
-      
+
     <table aria-describedby="tab-title">
       <tbody>
-        <tr height="38px">
+        <tr height="38px" :aria-label="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id"
+          :title="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id">
           <th scope="row" class="text-right font-bold">
             <div style="width: 140px;">Calibration Job ID</div>
           </th>
           <td class="pl-5">{{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(30) }}</td>
         </tr>
-        <tr height="38px">
+        <tr height="38px" :aria-label="'Forecast Job ID is ' + forecastJobId"
+          :title="'Forecast Job ID is ' + forecastJobId">
           <th scope="row" class="text-right font-bold">
             <div style="width: 140px;">Forecast Job ID</div>
           </th>
           <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
         </tr>
-        <tr height="38px">
+        <tr height="38px" :aria-label="'Results Pathname is ' + resultsPathname"
+          :title="'Results Pathname is ' + resultsPathname">
           <th scope="row" class="text-right font-bold" style="width: 140px;">
             <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
           </th>
-          <td class="pl-5">
+          <td class="pl-5" :aria-label="'Job Data Directory is ' + resultsPathname"
+            :title="'Job Data Directory is ' + resultsPathname">
             <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
           </td>
         </tr>
-        <tr height="32px">
+        <tr height="32px" :aria-label="'Cycle is ' + (forecastCycle as ForecastCycle).name"
+          :title="'Cycle is ' + (forecastCycle as ForecastCycle).name">
           <th scope="row" class="text-right font-bold">
             <div style="width: 140px;">Cycle</div>
           </th>
@@ -36,7 +41,7 @@
     </table>
   </div>
   <div>
-    <div v-if="forecastPlot" id="GraphArea" class="p-2">
+    <div v-if="forecastPlot" id="GraphArea" class="p-2" aria-label="Graph display area" title="Graph display area">
       <img :src="forecastPlot.plot_url" alt="Selected Plot" />
     </div>
     <div v-else id="GraphArea" class="p-2">

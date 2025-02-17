@@ -34,7 +34,8 @@
 
           <div class="col-span-1">
             <div v-show="!uMenu && userLoggedIn && location.name !== 'Login'" id="UserCircle"
-              class="float-right userInitials" @contextmenu="onImageRightClick" @click="onImageRightClick">
+              class="float-right userInitials" @contextmenu="onImageRightClick" @click="onImageRightClick"
+              aria-label="User Menu" title="User Menu">
               {{ userInitials }}<i class="pi pi-angle-down"></i>
               <ContextMenu ref="userContextMenu" :model="userItems" :autoZIndex="true" />
             </div>
@@ -42,7 +43,8 @@
           </div>
           <div class="col-span-1">
             <Button v-if="userLoggedIn && location.name !== 'Login'" class="float-left" style="padding-top:0px"
-              id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</Button>
+              id="HelpCircle" title="Help for current tab" aria-label="Help for current tab"
+              @click="displayHelp">?</Button>
           </div>
 
         </div>
