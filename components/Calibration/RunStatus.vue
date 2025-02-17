@@ -45,7 +45,7 @@
                   </tr>
                   <tr height="32px">
                     <th scope="row" class="text-right"><label for="DisplayOptions">{{ iteration && iteration >= 1 ?
-                      'Display' : '' }}</label></th>
+                        'Display' : '' }}</label></th>
                     <td class="pl-5" v-show='iteration && iteration >= 1'>
                       <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
                         optionLabel="name" optionValue="name">
@@ -58,28 +58,17 @@
                       <!--BUTTONS - START-->
                       <div v-if="overallCalibrationValidationStatus === 'Done'"
                         style="margin-top:4px;margin-bottom:-4px;">
-                        <div class="ngenButtonDiv" @click="gotoEvaluation">
-                          <Button class="font-normal">Go to Evaluation</button>
-                        </div>
+                        <Button class="ngenButtonDiv font-normal" @click="gotoEvaluation">Go to Evaluation</Button>
                       </div>
 
                       <div v-if="calibrationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
                         <span v-if="calibrationStatus === 'Ready'">
-                          <div class="h-8">
-                            <Button class="font-normal ngenButtonDiv-green" title="Run Button" aria-label="Run Button"
-                              @click="startRun()">
-                              Run
-                            </button>
-                          </div>
+                          <Button class="font-normal ngenButtonDiv-green h-8" title="Run Button" aria-label="Run Button"
+                            @click="startRun()">Run</Button>
                         </span>
-
                         <span v-if="calibrationStatus === 'Running'">
-                          <div class="mr-3">
-                            <Button class="ngenButtonDiv-red h-8" title="Cancel Button" @click="cancelRun()"
-                              aria-label="Cancel Button">
-                              Cancel
-                            </button>
-                          </div>
+                          <Button class="ngenButtonDiv-red h-8 mr-3" title="Cancel Button" @click="cancelRun()"
+                            aria-label="Cancel Button">Cancel</Button>
                         </span>
                       </div>
                       <!--BUTTONS - END-->
@@ -124,7 +113,7 @@
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                 <Button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
                   Run
-                </button>
+                </Button>
               </div>
             </span>
             <span v-else>
@@ -135,7 +124,7 @@
                 <Button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelRun()"
                   aria-label="Cancel Button">
                   Cancel
-                </button>
+                </Button>
               </div>
             </span>
             <span v-else>

@@ -7,7 +7,7 @@
           @row-select="onDetailTableRowSelect" @row-unselect="onTableRowUnselect" table-style="min-width: 50rem"
           selectionMode="single" class="boxed" ref="calibrationRunDetailTable"
           v-model:selection="selectedCalibrationByIterationDetailRow"
-          :rowClass="({ validation_run_id }) => validation_run_id > 0 ? 'disabled-row' : ''">
+          :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''">
           <ColumnGroup type="header">
             <Row>
               <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header"
@@ -30,7 +30,7 @@
           <DataTable class="dtable boxed" :value="computedtuningParametersDataList" scrollable scroll-height="200px"
             @row-select="onParameterTableRowSelect" @row-unselect="onTableRowUnselect" selectionMode="single"
             ref="tuningParametersTable" v-model:selection="selectedCalibrationByIterationParameterRow"
-            :rowClass="({ validation_run_id }) => validation_run_id > 0 ? 'disabled-row' : ''">
+            :rowClass="( {validation_run_id} ) => validation_run_id > 0 ? 'disabled-row' : ''">
             <ColumnGroup type="header">
               <Row :class="['table-header']">
                 <Column v-for="( col, colIndex ) in tuningParametersTableColumn" :key="colIndex" :header="col.header"
@@ -51,10 +51,10 @@
         v-show="evaluateIterationRunId && evaluateIterationRunId > 0">
         <div class="col-span-7"></div>
         <div class="col-span-1 mr-4">
-            <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Validate Selected Iteration" aria-label="Run Button"
-              @click="navigateToEvaluateStatus">
-              Next
-            </button>
+          <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Validate Selected Iteration" aria-label="Run Button"
+            @click="navigateToEvaluateStatus">
+            Next
+          </Button>
         </div>
       </div>
     </div>

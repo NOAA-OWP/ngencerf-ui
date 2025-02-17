@@ -27,7 +27,7 @@
         <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
           @click="goToStatusRunTab()">
           Next
-        </button>
+        </Button>
       </div>
     </span>
   </div>

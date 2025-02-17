@@ -3,7 +3,7 @@
     <div class="mx-auto px-8 text-center overflow-auto">
       <div class="width-full">
         <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs</h1>
-        <Button class="ngenButtonDiv ml-8" @click="createNewCalibration">New</button>
+        <Button class="ngenButtonDiv ml-8" @click="createNewCalibration">New</Button>
         <br />
         <p class="prompt-txt mb-6" style="margin-top:-10px;">
           Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.

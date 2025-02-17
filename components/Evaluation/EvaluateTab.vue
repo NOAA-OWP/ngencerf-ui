@@ -24,7 +24,8 @@
           </div>
           <div class="col-span-1 pr-8">
             <div class="text-right">
-                <Button id="NewValidationBtn" class="ngenButtonDiv" @click="gotoSelectAlternateIteration">New Validation</button>
+              <Button id="NewValidationBtn" class="ngenButtonDiv" @click="gotoSelectAlternateIteration">New
+                Validation</Button>
             </div>
           </div>
 
@@ -39,7 +40,7 @@
               <label for="calibrationJobId" class="text-bold">Calibration Job ID </label>{{ calibrationJobId }}
               <div class="inline-block ml-16">
                 <label for="evaluateValidationRunId" class="text-bold">Validation Job ID</label> {{
-                  evaluateValidationRunId }}
+                evaluateValidationRunId }}
               </div>
             </div>
           </div>

@@ -21,8 +21,7 @@
                   <div class="text-left font-bold">Algorithm Parameter(s)</div>
                   <div id="ClearTableBtn" class="ml-auto">
                     <Button @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2"
-                      :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear
-                      <!-- <i class="pi pi-arrow-up"></i>--></Button>
+                    :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</Button>
                   </div>
                 </div>
 
@@ -154,12 +153,12 @@
       </div>
       <div class="col-span-4">&nbsp;</div>
       <div class="col-span-1">
-        <div><Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-            aria-label="Previous Tab Button" @click="goPrevTab()">Prev</Button></div>
+        <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+            aria-label="Previous Tab Button" @click="goPrevTab()">Prev</Button>
       </div>
       <div class="col-span-1 mr-4">
-        <div><Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
-            @click="goNextTab()">Next</Button></div>
+        <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+            @click="goNextTab()">Next</Button>
       </div>
 
     </div>
