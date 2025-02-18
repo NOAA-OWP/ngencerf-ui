@@ -28,7 +28,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const forecastPlotName = ref<any>(); // TODO: create forecastPlotName interface
   const forecastPlot = ref<any>(); // TODO: create forecastPlot interface
 
-  const calibrationRunsForForecast = ref<CalibrationRunsForForecast[]>([]);
+  const calibrationRunsForForecast = ref<CalibrationRunsForForecast>([]);
   const calibrationRunForForecast = ref<CalibrationRunForForecast>();
 
   const uiGageId = ref<string>("");
@@ -73,7 +73,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   });
   
   /**
-   * fetch user created forecast job list data
+   * fetch get_forecast_jobs
    * @return {void}
    */
   const fetchForecastJobsListData = async (): Promise<any> => {
@@ -391,13 +391,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     }
   };
 
-  /**
-   * Hard Reset Forecast Store
-   */
-  const hardResetForecastStore = (): void => {
-      
-  };
 
+  /**
+   * Reset user-selected forecast calibration run
+   */
   const resetUserSelectedForecastCalibrationRun = (): void => {
     forecastJobId.value =  undefined;
     forecastCycles.value =  [];
@@ -412,8 +409,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     resultsPathname.value =  undefined;
     forecastPlotName.value =  undefined;
     forecastPlot.value = undefined;
-    calibrationRunsForForecast.value = [];
-    calibrationRunForForecast.value = undefined;
     clearUserCalibrationRunData();
   }
 
@@ -456,7 +451,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     getForecastPlotNames,
     getForecastPlot,
     getJobDataDirectory,
-    hardResetForecastStore,
     setSelectedForecastRunId,
     resetSelectedForecastRunId,
     setSelectedForecastRowData
