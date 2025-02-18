@@ -108,6 +108,8 @@ import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -128,7 +130,7 @@ const { loadOptimizationTabStaticData } = useOptimizationStore();
 const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 
 const { calibrationJobId } = storeToRefs(generalStore());
-const { getMenuIndex } = generalStore();
+const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
@@ -192,9 +194,12 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   isLoading.value = true;
   //keep the following for references purpose
   /*
-  if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: 3000 })
-  if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: 3000 })
-  if( ['Running'].includes( selectedCalibrationRun.value.status ) ) toast.add({ severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: 3000 })
+  if( ['Done','Failed','SEVER_ERROR'].includes( selectedCalibrationRun.value.status ) ) const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Results tab', life: ToastTimeout.timeout3000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  if( ['Saved','Ready'].includes( selectedCalibrationRun.value.status ) ) const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open corresponding saved tab', life: ToastTimeout.timeout3000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  if( ['Running'].includes( selectedCalibrationRun.value.status ) ) const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: ToastTimeout.timeout3000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   */
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
   queryUserCalibrationRunData().then(queryResponse => {
@@ -244,11 +249,13 @@ const createNewCalibration = async () => {
           gotoHeadwaterBasinGage();
         });
       } else {
-        toast.add({ severity: "error", summary: 'Create Calibration Job Failed.', detail: "Unable to Retrieve Valid Calibration Job Id", life: 10000 });
+        const tMsg: ToastMessageOptions = { severity: "error", summary: 'Create Calibration Job Failed.', detail: "Unable to Retrieve Valid Calibration Job Id", life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Create Calibration Job Failed.', detail: message, life: 10000 });
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Create Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });
@@ -279,7 +286,8 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
       await updateUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Clone Calibration Job Failed.', detail: message, life: 10000 });
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Clone Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });
@@ -318,7 +326,8 @@ const acceptDelete = (selectedRunId: number) => {
       await updateUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });

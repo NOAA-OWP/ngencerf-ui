@@ -129,6 +129,8 @@ import { onMounted, onUnmounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
 import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
@@ -139,6 +141,7 @@ import { hilightTab } from '@/composables/TabHilight';
 const toast = useToast();
 
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
+const { addToastRecord } = generalStore();
 
 const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, evaluateDisplayIterationNumber } = storeToRefs(useEvaluationRunStatusStore());
 const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime } = useEvaluationRunStatusStore();
@@ -190,7 +193,8 @@ const startRun = async () => {
       startTime.value = response?._data?.submit_date;
       validationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
     } else {
-      toast.add({ severity: 'warn', summary: 'Unable to Create Validation' });
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation' };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   });
 }
@@ -242,7 +246,8 @@ const navigateToEvaluation = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 </script>

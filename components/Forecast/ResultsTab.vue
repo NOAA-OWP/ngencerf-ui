@@ -53,9 +53,14 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
 
+import type { ToastMessageOptions } from "primevue/toast";
+
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { generalStore } from '~/stores/common/GeneralStore';
 
 import { hilightTab } from '@/composables/TabHilight';
+
+const { addToastRecord } = generalStore();
 
 const {
   calibrationRunForForecast,
@@ -83,7 +88,8 @@ onMounted(async () => {
 
   if (messages.length > 0) {
     messages.forEach((message: string) => {
-      toast.add({ severity: 'error', summary: 'Error', detail: message });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: message };
+      toast.add(tMsg); addToastRecord(tMsg);
     });
   }
 });

@@ -205,7 +205,7 @@ export const useOptimizationStore = defineStore(
         return Promise.resolve({
           _data: {
             respone_type: "exception",
-            message: "Error saving Optimization Tab Data",
+            message: "Error saving Optimization Data",
             validation_errors: {
               "Tab Error": ["Please select at least 1 field before saving."],
             },

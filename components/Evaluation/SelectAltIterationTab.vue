@@ -67,6 +67,8 @@ import { storeToRefs } from 'pinia';
 import { useToast } from "primevue/usetoast";
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useEvaluationAltIterationStore } from '@/stores/evaluation/EvaluationAltIterationStore';
 import { generalStore } from '@/stores/common/GeneralStore';
@@ -74,10 +76,12 @@ import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunSt
 
 import { hilightTab } from '@/composables/TabHilight';
 
+const { addToastRecord } = generalStore();
+
 const toast = useToast();
 const {
   fetchCalibrationDataByIterationDataList,
-  resetEvaluationAltIterationStore, 
+  resetEvaluationAltIterationStore,
 } = useEvaluationAltIterationStore();
 
 const {
@@ -90,8 +94,8 @@ const {
 } = storeToRefs(useEvaluationAltIterationStore());
 
 const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
-const { iterationValidationRunId } = storeToRefs( useEvaluationRunStatusStore() );
-const { calibrationJobId, evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs( generalStore() );
+const { iterationValidationRunId } = storeToRefs(useEvaluationRunStatusStore());
+const { calibrationJobId, evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());
 
 const selectedCalibrationByIterationDetailRow = ref<any>();
 const selectedCalibrationByIterationParameterRow = ref<any>();
@@ -123,15 +127,15 @@ onMounted(() => {
   })
 })
 
-const onDetailTableRowSelect = ( event: DataTableRowClickEvent ) => {
+const onDetailTableRowSelect = (event: DataTableRowClickEvent) => {
   if (event.data.validation_run_id === "") {
     evaluateIterationRunId.value = event.data.iteration_id;
   } else {
     evaluateIterationRunId.value = 0;
   }
   evaluateDisplayIterationNumber.value = event.data.iteration_num;
-  const paramDataIndex = computedtuningParametersDataList.value.findIndex( paramData => paramData.iteration_id === event.data.iteration_id );
-  selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[ paramDataIndex ];   
+  const paramDataIndex = computedtuningParametersDataList.value.findIndex(paramData => paramData.iteration_id === event.data.iteration_id);
+  selectedCalibrationByIterationParameterRow.value = computedtuningParametersDataList.value[paramDataIndex];
 }
 
 const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
@@ -141,8 +145,8 @@ const onParameterTableRowSelect = (event: DataTableRowClickEvent) => {
     evaluateIterationRunId.value = 0;
   }
   evaluateDisplayIterationNumber.value = event.data.iteration_num;
-  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex( paramData => paramData.iteration_id === event.data.iteration_id );
-  selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[ detailDataIndex ];
+  const detailDataIndex = computedCalibrationRunDetailDataList.value.findIndex(paramData => paramData.iteration_id === event.data.iteration_id);
+  selectedCalibrationByIterationDetailRow.value = computedCalibrationRunDetailDataList.value[detailDataIndex];
 }
 
 const onTableRowUnselect = (event: DataTableRowClickEvent) => {
@@ -152,15 +156,16 @@ const onTableRowUnselect = (event: DataTableRowClickEvent) => {
   evaluateDisplayIterationNumber.value = 0;
 }
 
-const navigateToEvaluateStatus = ( event : any ) => {
-  if ( evaluateIterationRunId.value && evaluateIterationRunId.value > 0 ) {
+const navigateToEvaluateStatus = (event: any) => {
+  if (evaluateIterationRunId.value && evaluateIterationRunId.value > 0) {
     iterationValidationRunId.value = evaluateValidationRunId.value = 0;
     clearRunningStatusInfo();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Iteration ID', detail: 'Pleasea select a iteration job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Iteration ID', detail: 'Pleasea select a iteration job first.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 </script>

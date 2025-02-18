@@ -165,9 +165,11 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
-import type { DataTableRowClickEvent } from 'primevue/datatable';
 
+import type { DataTableRowClickEvent } from 'primevue/datatable';
+import type { ToastMessageOptions } from "primevue/toast";
 import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NextGenModel";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
@@ -232,6 +234,7 @@ const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+const { addToastRecord } = generalStore();
 
 const toast = useToast();
 //this model is for highlighting purpose
@@ -376,7 +379,8 @@ const viewSelectAlternateIteration = async (calibration_run_id: number) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
@@ -386,7 +390,8 @@ const navigateToAlternateIteration = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Pleasea select a calibration job first.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
@@ -430,7 +435,8 @@ const navigateToEvaluation = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
@@ -469,7 +475,8 @@ const acceptDelete = (selectedRunId: number) => {
       resetUserSelectedEvalValidationRun();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });
