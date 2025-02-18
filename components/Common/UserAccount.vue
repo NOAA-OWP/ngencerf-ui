@@ -110,7 +110,9 @@ import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
-import { generalStore } from '~/stores/common/GeneralStore';
+
+import { generalStore } from '@/stores/common/GeneralStore';
+const { popupActive } = storeToRefs(generalStore());
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 
@@ -256,6 +258,7 @@ const updateName = async () => {
 }
 
 const closeAccountBox = () => {
+  popupActive.value = false;
   useAccountEvent("accountEvent", "");
 }
 
@@ -269,7 +272,7 @@ const closeAccountBox = () => {
   left: Calc(50vw - 365px);
   top: Calc(50vh - 300px);
   border: 5px solid #ccc;
-  z-index: 9999;
+  z-index: 999;
 
   #avatar {
     width: 150px;

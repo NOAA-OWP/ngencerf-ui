@@ -236,7 +236,7 @@ const toggleMessagesGroup = () => {
 }
 
 #MessagesGroupWindow {
-  z-index: 9999;
+  z-index: 999;
   border: 1px solid black;
   position: absolute;
   right: 2%;

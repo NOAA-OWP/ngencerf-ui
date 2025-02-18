@@ -39,6 +39,10 @@ import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 
+import { generalStore } from "~/stores/common/GeneralStore";
+const gstore = generalStore();
+const { popupActive } = storeToRefs(gstore);
+
 const { resetGageStore } = useGageStore();
 const { resetFormulationStore } = useFormulationStore();
 const { resetOptimizationStore } = useOptimizationStore();
@@ -49,6 +53,7 @@ const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs(useCalibrat
 const { fetchUserCalibrationJobsListData, getUserName, getUserFullName} = useUserDataStore()
 
 onMounted(() => {
+  popupActive.value = false;
   nextTick(() => {
     resetGageStore();
     resetFormulationStore();

@@ -9,10 +9,14 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-
 import NextgenLayout from "@/layouts/CalibrationLayout.vue";
 
+import { generalStore } from "~/stores/common/GeneralStore";
+const gstore = generalStore();
+const { popupActive } = storeToRefs(gstore);
+
 onMounted(() => {
+  popupActive.value = false;
   nextTick(() => {
     const allTabs = document.getElementsByClassName("tabs");
     const e = allTabs[CalibrationTabs.tab_calibrationRuns] as HTMLElement;
