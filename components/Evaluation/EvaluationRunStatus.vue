@@ -14,15 +14,17 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Submit Time ' + formatDateForDisplay(startTime)"
+                    :title="'Submit Time ' + formatDateForDisplay(startTime)">
                     <th scope="row" class="text-right font-bold">Submit Time</th>
                     <td class="pl-5">{{ startTime ? formatDateForDisplay(startTime) : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Elapsed Time ' + runningTime" :title="'Elapsed Time ' + runningTime">
                     <th scope="row" class="text-right font-bold">Elapsed Time</th>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Iteration ' + evaluateDisplayIterationNumber"
+                    :title="'Iteration ' + evaluateDisplayIterationNumber">
                     <th scope="row" class="text-right"><label for="iterationNum">Iteration</label></th>
                     <td class="pl-5">
                       {{ evaluateDisplayIterationNumber }}
@@ -41,13 +43,14 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Status ' + validationStatus" :title="'Status ' + validationStatus">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
                     <td class="pl-5">
                       {{ validationStatus }}
                     </td>
                   </tr>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Validation Job ID ' + displayValidationId"
+                    :title="'Validation Job ID ' + displayValidationId">
                     <th scope="row" class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></th>
                     <td class="pl-5">
                       {{ displayValidationId }}
@@ -58,8 +61,8 @@
 
                       <!--BUTTONS - START-->
                       <span v-if="validationStatus === 'Done'">
-                        <Button id="ResultsArea" class="ngenButtonDiv" @click.stop="navigateToEvaluation">Go to
-                          Evaluation</Button>
+                        <Button id="ResultsArea" class="ngenButtonDiv" @click.stop="navigateToEvaluation"
+                          aria-label="Go to Evaluation Button" title="Go to Evaluation Button">Go to Evaluation</Button>
                       </span>
 
                       <span v-else>

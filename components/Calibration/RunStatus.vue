@@ -8,19 +8,22 @@
             <div class="col-span-1">
               <table>
                 <tbody>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Submit Time ' + submitTime " :title="'Submit Time ' + submitTime">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Submit Time</div>
                     </th>
                     <td class="pl-5">{{ submitTime ? submitTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="32px">
+                  <tr height="32px" :aria-label="'Elapsed Time ' + calibrationElapsedTime"
+                    :title="'Elapsed Time ' + calibrationElapsedTime">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Elapsed Time</div>
                     </th>
                     <td class="pl-5">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="32px">
+                  <tr height="32px" :aria-label="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration : 
+                    'Interation ' + iteration" :title="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
+                      'Interation ' + iteration">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">{{ validationBestAchieved.isBest ? 'Best ' : '' }} Iteration</div>
                     </th>
@@ -34,7 +37,8 @@
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
                 <tbody>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Status ' + overallCalibrationValidationStatus"
+                    :title="'Status ' + overallCalibrationValidationStatus">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
                     <td class="pl-5">
                       <span id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md"
@@ -43,7 +47,7 @@
                       </span>
                     </td>
                   </tr>
-                  <tr height="32px">
+                  <tr height="32px" aria-label="Select Plot Name" title="Select Plot Name">
                     <th scope="row" class="text-right"><label for="DisplayOptions">{{ iteration && iteration >= 1 ?
                         'Display' : '' }}</label></th>
                     <td class="pl-5" v-show='iteration && iteration >= 1'>
@@ -58,7 +62,8 @@
                       <!--BUTTONS - START-->
                       <div v-if="overallCalibrationValidationStatus === 'Done'"
                         style="margin-top:4px;margin-bottom:-4px;">
-                        <Button class="ngenButtonDiv font-normal" @click="gotoEvaluation">Go to Evaluation</Button>
+                        <Button class="ngenButtonDiv font-normal" @click="gotoEvaluation" aria-label="Go to
+                          Evaluation" title="Go to Evaluation">Go to Evaluation</Button>
                       </div>
 
                       <div v-if="calibrationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
@@ -80,7 +85,8 @@
             </div>
 
             <div class="col-span-2">
-              <div style="display:flex; margin-top: 1em;">
+              <div style="display:flex; margin-top: 1em;" :aria-label="'Results Pathname ' + resultsPathname"
+                :title="'Results Pathname ' + resultsPathname">
                 <div class="text-right font-bold" style="width: 170px;">
                   <label class="text-right" for="resultsPathname" style="width: 170px;">Results Pathname</label>
                 </div>

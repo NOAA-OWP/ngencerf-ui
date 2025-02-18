@@ -18,14 +18,15 @@
             <label for="DisplayOptions">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-                optionLabel="name" optionValue="name" :disabled="!plotList">
+                optionLabel="name" optionValue="name" :disabled="!plotList" aria-label="Select display"
+                title="Select display">
               </Select>
             </div>
           </div>
           <div class="col-span-1 pr-8">
             <div class="text-right">
-              <Button id="NewValidationBtn" class="ngenButtonDiv" @click="gotoSelectAlternateIteration">New
-                Validation</Button>
+              <Button id="NewValidationBtn" class="ngenButtonDiv" @click="gotoSelectAlternateIteration"
+                aria-label="New Validation Button" title="New Validation Button">New Validation</Button>
             </div>
           </div>
 
@@ -37,10 +38,13 @@
 
           <div class="col-span-2">
             <div class="text-left pt9em pl-8">
-              <label for="calibrationJobId" class="text-bold">Calibration Job ID </label>{{ calibrationJobId }}
+              <label for="calibrationJobId" class="text-bold" :aria-label="'Calibration Job ID ' + calibrationJobId"
+                :title="'Calibration Job ID ' + calibrationJobId">Calibration Job ID </label>{{ calibrationJobId }}
               <div class="inline-block ml-16">
-                <label for="evaluateValidationRunId" class="text-bold">Validation Job ID</label> {{
-                evaluateValidationRunId }}
+                <label for="evaluateValidationRunId" class="text-bold"
+                  :aria-label="'Validation Job ID ' + calibrationJobId"
+                  :title="'Validation Job ID ' + calibrationJobId">Validation Job ID</label> {{
+                    evaluateValidationRunId }}
               </div>
             </div>
           </div>
@@ -48,14 +52,17 @@
           <div class="col-span-1">&nbsp;</div>
           <div class="col-span-1 text-right pr-8">
             <a v-if="userCalibrationRunData" href="#" class="c-blue text-sm underline mt-1 text-right"
-              @click="toggleMessagesGroup">Show Calibration Details</a>
+              @click="toggleMessagesGroup" aria-label="Show Calibration Details Button"
+              title="Show Calibration Details Button">Show
+              Calibration Details</a>
           </div>
         </div>
       </div>
 
       <div class="row-span-1">
         <div class="grid grid-cols-4">
-          <div class="col-span-2 pl-8 flex items-center space-x-2 w-full">
+          <div class="col-span-2 pl-8 flex items-center space-x-2 w-full"
+            :aria-label="'Results Pathname is ' + resultsPathname" :title="'Results Pathname is ' + resultsPathname">
             <label for="resultsPathname" class="text-xs whitespace-nowrap font-bold">Results Pathname</label>
             <span class="flex-grow">
               <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled
@@ -109,17 +116,17 @@
     <div id="SupplementalTableArea" class="p-2" v-if="selectedSupplementalTable">
       <DataTable :value="iterationMetricsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true"
         v-if="iterationMetricsData && selectedSupplementalTable === 1">
-        <Column v-for="( col, colIndex ) in iterationMetricsColumns" :key="colIndex" :header="col.header"
+        <Column v-for="(col, colIndex) in iterationMetricsColumns" :key="colIndex" :header="col.header"
           :field="col.field" sortable></Column>
       </DataTable>
       <DataTable :value="iterationParamsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true"
         v-if="iterationParamsData && selectedSupplementalTable === 2">
-        <Column v-for="( col, colIndex ) in iterationParamsColumns" :key="colIndex" :header="col.header"
+        <Column v-for="(col, colIndex) in iterationParamsColumns" :key="colIndex" :header="col.header"
           :field="col.field" sortable></Column>
       </DataTable>
       <DataTable :value="performanceMetricsData" fixedHeader=true
         v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable === 3">
-        <Column v-for="( col, colIndex ) in performanceMetricsColumns" :key="colIndex" :header="col.header"
+        <Column v-for="(col, colIndex) in performanceMetricsColumns" :key="colIndex" :header="col.header"
           :field="col.field"></Column>
       </DataTable>
     </div>
