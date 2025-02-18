@@ -3,7 +3,7 @@
     <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
       <span id="tab-title">Forecast Run Results</span>
     </h1>
-      
+
     <table aria-describedby="tab-title">
       <tbody>
         <tr height="38px">
@@ -48,9 +48,14 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
 
+import type { ToastMessageOptions } from "primevue/toast";
+
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { generalStore } from '~/stores/common/GeneralStore';
 
 import { hilightTab } from '@/composables/TabHilight';
+
+const { addToastRecord } = generalStore();
 
 const {
   calibrationRunForForecast,
@@ -78,7 +83,8 @@ onMounted(async () => {
 
   if (messages.length > 0) {
     messages.forEach((message: string) => {
-      toast.add({ severity: 'error', summary: 'Error', detail: message });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: message };
+      toast.add(tMsg); addToastRecord(tMsg);
     });
   }
 });

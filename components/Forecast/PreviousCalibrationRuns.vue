@@ -23,36 +23,36 @@
       </div>
 
       <div id="calibrationRunList">
-          <div id="CalTable">
-            <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
-              <div class="col-span-1">
-                  <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-                  <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                    :options="forecastRunGageList" filter optionLabel="name" optionValue="name"
-                    placeholder="All"></Select>
+        <div id="CalTable">
+          <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
+            <div class="col-span-1">
+              <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
+              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
+                :options="forecastRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"></Select>
 
-              </div>
             </div>
-            <ConfirmDialog></ConfirmDialog>
-            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmCalibrationRun"></ContextMenu>
-            <DataTable id="CalibrationRunForForecastTable" :value="filteredData" scrollable scroll-height="400px"
-              sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
-              v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
-              @rowSelect="onCalibrationRunForForecastRowSelect" @rowUnselect="onCalibrationRunForForecastRowUnSelect" @rowContextmenu="onRowContextMenu" class="boxed">
-              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
-              <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
-              <Column field="submit_date" header="Run Date" sortable>
-                <template #body="slotProps">
-                  {{ formatDateForDisplay(slotProps.data.created_at) }}
-                </template>
-              </Column>
-              <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
-              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
-              <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable></Column>
-              <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
-            </DataTable>
           </div>
+          <ConfirmDialog></ConfirmDialog>
+          <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+            :model="cmCalibrationRun"></ContextMenu>
+          <DataTable id="CalibrationRunForForecastTable" :value="filteredData" scrollable scroll-height="400px"
+            sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
+            v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
+            @rowSelect="onCalibrationRunForForecastRowSelect" @rowUnselect="onCalibrationRunForForecastRowUnSelect"
+            @rowContextmenu="onRowContextMenu" class="boxed">
+            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
+            <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
+            <Column field="submit_date" header="Run Date" sortable>
+              <template #body="slotProps">
+                {{ formatDateForDisplay(slotProps.data.created_at) }}
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
+            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
+            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable></Column>
+            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
+          </DataTable>
+        </div>
       </div>
 
     </div>
@@ -66,9 +66,11 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
-import type { DataTableRowClickEvent } from 'primevue/datatable';
 
+import type { DataTableRowClickEvent } from 'primevue/datatable';
+import type { ToastMessageOptions } from "primevue/toast";
 import type { CalibrationRunForForecast, DataTableContextMenuOption } from "@/composables/NextGenModel";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
@@ -83,6 +85,8 @@ import { hilightTab } from '@/composables/TabHilight';
 import { ForecastTabs } from "@/composables/NextgenEnums";
 
 const { deleteCalibrationRun } = useCalibrationJobStore();
+
+const { addToastRecord } = generalStore();
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 const showMessagesGroup = ref<boolean>(false);
@@ -108,17 +112,17 @@ const { isLoading } = storeToRefs(gstore);
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
-  const crRowData = event.data as CalibrationRunForForecast; 
-  if ( calibrationRunForForecast && calibrationRunForForecast.value?.calibration_run_id == crRowData.calibration_run_id ) {
+  const crRowData = event.data as CalibrationRunForForecast;
+  if (calibrationRunForForecast && calibrationRunForForecast.value?.calibration_run_id == crRowData.calibration_run_id) {
     crContextMenu.value.show(event.originalEvent);
     //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
-    setSelectedCalibrationRunId( parseInt(event.originalEvent.currentTarget.children[0].textContent) );
-    cmCalibrationRun.value.push( { label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => navigateToSetupForecast() } );    
-    cmCalibrationRun.value.push( { label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails( crRowData.calibration_run_id ) } )
+    setSelectedCalibrationRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
+    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => navigateToSetupForecast() });
+    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
     //cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() } );
     //cmCalibrationRun.value.push( { label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onCalibrationRunForForecastRowSelect() } );    
-    cmCalibrationRun.value.push( { label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() } );
-  }  
+    cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() });
+  }
 };
 
 const {
@@ -157,27 +161,27 @@ onMounted(async () => {
 
 // Computed filtered data for DataTables
 const filteredData = computed(() => {
-      if (!uiGageId.value || uiGageId.value === "All") {
-        return calibrationRunsForForecast?.value;
-      } else {
-        return calibrationRunsForForecast?.value?.filter((row) => (row as any as CalibrationJobListItem).gage_id === uiGageId.value);
-      }
-    });
+  if (!uiGageId.value || uiGageId.value === "All") {
+    return calibrationRunsForForecast?.value;
+  } else {
+    return calibrationRunsForForecast?.value?.filter((row) => (row as any as CalibrationJobListItem).gage_id === uiGageId.value);
+  }
+});
 
 
-const viewCalibrationDetails = async ( calibration_run_id: number ) => {
-  isLoading.value = true;  
-  nextTick(async () => {  
-    await loadSelectedCalibrationRun( calibration_run_id );
+const viewCalibrationDetails = async (calibration_run_id: number) => {
+  isLoading.value = true;
+  nextTick(async () => {
+    await loadSelectedCalibrationRun(calibration_run_id);
     isLoading.value = false;
     showMessagesGroup.value = true;
-  })  
+  })
 }
 
 const onCalibrationRunForForecastRowSelect = async (event: any) => {
   //isLoading.value = true;
-  const rowData = event.data as CalibrationRunForForecast; 
-  setSelectedCalibrationRunId( rowData.calibration_run_id );
+  const rowData = event.data as CalibrationRunForForecast;
+  setSelectedCalibrationRunId(rowData.calibration_run_id);
   //forecastJobId.value = rowData.calibration_run_id;
   //await loadSelectedCalibrationRun(forecastJobId.value as number);
   //await fetchUserSelectedCalibrationValidationRunList();
@@ -217,7 +221,8 @@ const navigateToSetupForecast = () => {
     const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
@@ -257,7 +262,8 @@ const acceptDelete = (selectedRunId: number) => {
       fetchUserValidatedCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });
@@ -281,12 +287,13 @@ const toggleMessagesGroup = () => {
 #calibrationRunList {
   height: 80%;
 }
+
 #HeadwaterBasinGage {
   width: 300px;
 }
 
 #CalibrationRunForForecastTable,
-.gage-filter-wrapper  {
+.gage-filter-wrapper {
   width: 1270px;
   margin: 0 auto;
 }

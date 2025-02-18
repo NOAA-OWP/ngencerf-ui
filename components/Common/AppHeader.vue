@@ -49,6 +49,7 @@
       </div>
 
       <Transition name="slide-fade">
+
         <div v-if="showHelp" id="HelpWindow">
           <div class="text-right sticky top-0">
             <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
@@ -57,7 +58,6 @@
           <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
             <LazyHelpLandingPageHelp />
           </div>
-
           <div v-if="location.name === 'Calibration'" class="py-10 px-1">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
@@ -128,6 +128,10 @@
   <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
     <AboutBox />
   </div>
+  <div id="ErrorLogOverlay" class="hidden" ref="errorOverlay">
+    <LazyErrorLog />
+  </div>
+
 </template>
 
 <script lang="ts" setup>
@@ -156,6 +160,7 @@ const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/compone
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
 const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/RunStatusHelp.vue"))
 const AboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
+const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
 
 const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
 const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
@@ -168,6 +173,7 @@ const emit = defineEmits(["logoutEvent"]);
 
 const accountOverlay = ref();
 const aboutOverlay = ref();
+const errorOverlay = ref();
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex } = generalStore();
 
@@ -176,12 +182,13 @@ const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } 
 const location = useRoute();
 
 const userInitials = ref<string>('');
-const userLoggedIn= ref<boolean>();
+const userLoggedIn = ref<boolean>();
 
 const userItems = ref([
   { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
   { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
-  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
+  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() },
+  { label: 'Notifications', icon: 'pi pi-fw-times', command: () => errorLog() }
 ])
 
 const userContextMenu = ref();
@@ -209,15 +216,18 @@ onMounted(() => {
       if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
     };
   });
+ 
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', function (event) {
     sizeHelpWindow();
-  });
+  }); 
+  // window.removeEventListener('resize', function (event) {
+  //   sizeLogWindow();
+  // });
 });
-
 
 
 // Handle submitTimeDate changes
@@ -237,15 +247,33 @@ const sizeHelpWindow = () => {
   };
 };
 
+// const sizeLogWindow = () => {
+//   let headerHeight = document.getElementById('Header')?.clientHeight;
+//   let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
+//   if (footerTop && headerHeight) {
+//     let h = (footerTop - headerHeight) - 20;
+//     let hpx = h + 'px'
+//     let ele = document.getElementById("ErrorLog");
+//     if (ele) { ele.style.height = parseInt(hpx) + 'px'; } 
+//     // let ele2 = document.getElementById("TableFixHead");
+//     // if (ele && ele2) { ele2.style.height = (ele.clientHeight) + 'px'; }
+//   };
+// };
+
 /**
  * 
  */
- const gotoAccount = async () => {
+const gotoAccount = async () => {
   accountOverlay.value.style.display = "block";
 }
 
 const aboutBox = async () => {
   aboutOverlay.value.style.display = "block";
+}
+
+const errorLog = async () => {
+  errorOverlay.value.style.display = "block";
+  //setTimeout(function () { sizeLogWindow() }, 0);
 }
 
 useAccountEventListen('accountEvent', () => {
@@ -255,6 +283,11 @@ useAccountEventListen('accountEvent', () => {
 
 useAccountEventListen('aboutBoxEvent', () => {
   const ele = document.getElementById('AboutBoxOverlay') as HTMLElement;
+  ele.style.display = "none";
+})
+
+useAccountEventListen('errorLogEvent', () => {
+  const ele = document.getElementById('ErrorLogOverlay') as HTMLElement;
   ele.style.display = "none";
 })
 
@@ -272,10 +305,6 @@ const logoutUser = async () => {
     useLogout("logoutEvent", "logout");
     await navigateTo('login');
   }
-}
-
-const showUserMenu = () => {
-  uMenu.value = true;
 }
 
 const hideUserMenu = () => {
@@ -297,7 +326,7 @@ const MenuChanged = (e: MouseEvent) => {
   nextTick(() => {
     const currentMenu = getMenuIndex();
     let ele = e.currentTarget as HTMLElement;
-    if( !ele ) {
+    if (!ele) {
       ele = e.target as HTMLElement;
     }
     const m = ele.getAttribute('data-menu');
@@ -464,9 +493,12 @@ const MenuChanged = (e: MouseEvent) => {
   overflow: auto;
 }
 
-.disabled,
-.disabled:hover {
-  background-color: global.$ngwcp_neutral_gray_md !important;
+#ErrorLogOverlay {
+  z-index: 9999;
+  border: 1px solid black;
+  position: absolute;
+  right: 2%;
+  background-color: white;
 }
 
 /*
