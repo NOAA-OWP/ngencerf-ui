@@ -66,9 +66,11 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
-import type { DataTableRowClickEvent } from 'primevue/datatable';
 
+import type { DataTableRowClickEvent } from 'primevue/datatable';
+import type { ToastMessageOptions } from "primevue/toast";
 import type { CalibrationRunForForecast, DataTableContextMenuOption } from "@/composables/NextGenModel";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
@@ -83,6 +85,8 @@ import { hilightTab } from '@/composables/TabHilight';
 import { ForecastTabs } from "@/composables/NextgenEnums";
 
 const { deleteCalibrationRun } = useCalibrationJobStore();
+
+const { addToastRecord } = generalStore();
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 const showMessagesGroup = ref<boolean>(false);
@@ -217,7 +221,8 @@ const navigateToSetupForecast = () => {
     const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
@@ -257,7 +262,8 @@ const acceptDelete = (selectedRunId: number) => {
       fetchUserValidatedCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 });
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });

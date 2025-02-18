@@ -5,7 +5,8 @@
  */
 import { defineStore } from "pinia";
 
-import type { ServerInfo } from "@/composables/NextGenModel";
+import type { ServerInfo, ToastRecord } from "@/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
 
 export const generalStore = defineStore(
   "generalStore",
@@ -25,9 +26,9 @@ export const generalStore = defineStore(
     // running validation run id from selected iteration
     const iterationValidationRunId = ref<number>(0);
     // user selected validation run status
-    const evaluateValidationRunStatus = ref<string>('');
+    const evaluateValidationRunStatus = ref<string>("");
     // user seleted iteration run number for display only
-    const evaluateDisplayIterationNumber = ref<number>( 0 );
+    const evaluateDisplayIterationNumber = ref<number>(0);
 
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
@@ -36,12 +37,24 @@ export const generalStore = defineStore(
 
     const isLoading = ref<boolean>(false);
 
-    // This is set if the user changes the gage.  Resets when saved.
+    // This is set if the user changes the gage.  Resets when saved.toastRecord
     const gageHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
 
- 
+    const toastRecords = ref<ToastRecord[]>([]);
+
+    
+    function addToastRecord(rec: ToastMessageOptions) {
+      let dt = { datetime: Date().toString().substring(4, 24) };
+      let newRec = { ...rec, ...dt };
+      toastRecords.value.push(newRec as ToastRecord);
+    }
+
+    function clearToastRecords() {
+      toastRecords.value = [];
+    }
+    
     function getServerInfo() {
       return serverInfo.value;
     }
@@ -134,16 +147,18 @@ export const generalStore = defineStore(
       verificationTabIndex,
       menuIndex,
       evaluationRunSelected,
-      isLoading
+      isLoading,
+      toastRecords,
+      addToastRecord,
+      clearToastRecords,
     };
   },
   {
-      persist: {
-    storage: piniaPluginPersistedstate.localStorage(),
-  },
+    persist: {
+      storage: piniaPluginPersistedstate.localStorage(),
+    },
   }
 );
-
 
 /* Pinia supports Hot Module replacement so you can edit your stores
    and interact with them directly in your app without reloading the page,
