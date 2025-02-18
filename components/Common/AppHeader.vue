@@ -173,6 +173,8 @@ const LazyForecastResultesHelp = defineAsyncComponent(() => import("@/components
 const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
 const LazyForecastStatusRunHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/StatusRunHelp.vue"));
 
+const gstore = generalStore();
+const { popupActive } = storeToRefs(gstore);
 
 const emit = defineEmits(["logoutEvent"]);
 
@@ -203,7 +205,9 @@ let observer = null;
 const isOnDiv = ref(false);
 
 const onImageRightClick = (event: any) => {
-  userContextMenu.value.show(event)
+  if (!popupActive.value) {
+    userContextMenu.value.show(event)
+  }
 }
 
 onMounted(() => {
@@ -221,14 +225,14 @@ onMounted(() => {
       if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
     };
   });
- 
+
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', function (event) {
     sizeHelpWindow();
-  }); 
+  });
   // window.removeEventListener('resize', function (event) {
   //   sizeLogWindow();
   // });
@@ -269,35 +273,47 @@ const sizeHelpWindow = () => {
  * 
  */
 const gotoAccount = async () => {
-  accountOverlay.value.style.display = "block";
+  if (!popupActive.value) {
+    accountOverlay.value.style.display = "block";
+    popupActive.value = true;
+  }
 }
 
 const aboutBox = async () => {
-  aboutOverlay.value.style.display = "block";
+  if (!popupActive.value) {
+    aboutOverlay.value.style.display = "block";
+    popupActive.value = true;
+  }
 }
 
 const errorLog = async () => {
-  errorOverlay.value.style.display = "block";
-  //setTimeout(function () { sizeLogWindow() }, 0);
+  if (!popupActive.value) {
+    errorOverlay.value.style.display = "block";
+    popupActive.value = true;
+  }
 }
 
 useAccountEventListen('accountEvent', () => {
   const ele = document.getElementById('UserAccountOverlay') as HTMLElement;
   ele.style.display = "none";
+  popupActive.value = false;  
 })
 
 useAccountEventListen('aboutBoxEvent', () => {
   const ele = document.getElementById('AboutBoxOverlay') as HTMLElement;
   ele.style.display = "none";
+  popupActive.value = false;
 })
 
 useAccountEventListen('errorLogEvent', () => {
   const ele = document.getElementById('ErrorLogOverlay') as HTMLElement;
   ele.style.display = "none";
+  popupActive.value = false;
 })
 
 useLogoutListen('logoutEvent', (evStr: string) => {
   if (evStr === "token" && !getIsTokenExpired()) {
+    popupActive.value = false;  
     setIsTokenExpired();
     alert("Your session has expired. Please log in again.");
     useLogout("logoutEvent", "logout");
@@ -306,9 +322,11 @@ useLogoutListen('logoutEvent', (evStr: string) => {
 })
 
 const logoutUser = async () => {
-  if (confirm("Are you sure you want to logout?")) {
-    useLogout("logoutEvent", "logout");
-    await navigateTo('login');
+  if (!popupActive.value) {
+    if (confirm("Are you sure you want to logout?")) {
+      useLogout("logoutEvent", "logout");
+      await navigateTo('login');
+    }
   }
 }
 
@@ -321,10 +339,14 @@ const hideUserMenu = () => {
 
 const closeHelp = () => {
   showHelp.value = false;
+  popupActive.value = false;
 }
 const displayHelp = () => {
-  showHelp.value = true;
-  setTimeout(function () { sizeHelpWindow() }, 0);
+  if (!popupActive.value) {
+    popupActive.value = true;
+    showHelp.value = true;
+    setTimeout(function () { sizeHelpWindow() }, 0);
+  }
 }
 
 const MenuChanged = (e: MouseEvent) => {
@@ -488,7 +510,7 @@ const MenuChanged = (e: MouseEvent) => {
 }
 
 #HelpWindow {
-  z-index: 9999;
+  z-index: 999;
   border: 1px solid black;
   position: absolute;
   right: 2%;

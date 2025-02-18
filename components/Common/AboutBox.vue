@@ -106,6 +106,8 @@ import json from "@/assets/version.json";
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getServerInfo } = generalStore();
 
+const { popupActive } = storeToRefs(generalStore());
+
 const info = json;
 const serverInfo = ref<ServerInfo>();
 
@@ -115,6 +117,7 @@ onMounted(async () => {
 
 const closeAboutBox = () => {
   useAccountEvent("aboutBoxEvent", "");
+   popupActive.value = false;
 }
 
 </script>
@@ -127,7 +130,7 @@ const closeAboutBox = () => {
   right: 5px;
   top: 90px;
   border: 5px solid #ccc;
-  z-index: 9999;
+  z-index: 999;
   width: 550px;
   height: 363px;
   background-color: white;
