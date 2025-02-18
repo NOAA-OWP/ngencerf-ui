@@ -33,7 +33,7 @@
                   <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
                     <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
                   :title="slotProps.option.name">
-                      {{ slotProps.option.name }}</div>
+                    {{ slotProps.option.name }}</div>
                   </div>
 
               </template>

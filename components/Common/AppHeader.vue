@@ -3,8 +3,11 @@
   <div id="Header" class="header  prevent-select">
     <div id="TopBar">&nbsp;</div>
     <div class="grid grid-cols-12 gap-1" style="height: 80px">
-      <div id="PgmName" class="col-span-2 mt-6">
-        <NuxtLink to="LandingPage">ngenCERF</NuxtLink>
+      <div v-if="isUserLoggedIn()" id="PgmName" class="col-span-2 mt-6">
+        <NuxtLink title="Link to Landing Page" to="LandingPage">ngenCERF</NuxtLink>
+      </div>
+      <div v-else id="PgmName" class="col-span-2 mt-6">
+        <div>ngenCERF</div>
       </div>
       <div id="Col2" class="col-span-8">
 
