@@ -346,11 +346,11 @@ const saveOptMetData = () => {
     toast.removeAllGroups();
     saveOptimizationTabData().then(response => {
       if (response.status === 200) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Optimization Metrics Tab Data Saved', detail: response?._data?.message };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Optimization Metrics Data Saved', detail: response?._data?.message };
         toast.add(tMsg); addToastRecord(tMsg);
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
-          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Tab Data Failed.', detail: message };
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Data Failed.', detail: message };
           toast.add(tMsg); addToastRecord(tMsg);
         });
       }

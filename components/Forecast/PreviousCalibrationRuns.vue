@@ -70,6 +70,7 @@ import { useToast } from "primevue/usetoast";
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
 import type { CalibrationRunForForecast, DataTableContextMenuOption } from "@/composables/NextGenModel";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
@@ -220,7 +221,7 @@ const navigateToSetupForecast = () => {
     const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: 6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -261,7 +262,7 @@ const acceptDelete = (selectedRunId: number) => {
       fetchUserValidatedCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: 10000 };
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }

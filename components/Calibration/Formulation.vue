@@ -182,6 +182,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { SlothParameterData } from '@/composables/NextGenModel';
 import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -337,7 +338,7 @@ const checkValidCharacters = (e: KeyboardEvent) => {
 */
 const saveFormulationData = () => {
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
@@ -345,7 +346,7 @@ const saveFormulationData = () => {
     if (!valOK) {
       modulesHaveChanged.value = false;
       selectedOutputVariable.value = "";
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate and then Tuning Paramters on the Tuning Control tab" };
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate and then Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000};
       toast.add(tMsg); addToastRecord(tMsg);
       clearCalibratableParameters();
     }
@@ -354,15 +355,15 @@ const saveFormulationData = () => {
       if (response.status === 200) {
         if (response._data.eds_errors) {
           response._data.eds_errors.forEach((err: any) => {
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'External Formulation Error', detail: err.message };
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeout6000 };
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeout3000 };
         toast.add(tMsg); addToastRecord(tMsg);
         if (response?._data?.nwm_warning === true) {
           useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
-            const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000 };
+            const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: ToastTimeout.timeout6000 };
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
@@ -372,7 +373,7 @@ const saveFormulationData = () => {
       } else {
         formulationStore_data_loading.value = false;
         useApiErrorResponsePreprocess(response).forEach(message => {
-          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message };
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Data Failed.', detail: message, life: ToastTimeout.timeout10000 };
           toast.add(tMsg); addToastRecord(tMsg);
         });
       }

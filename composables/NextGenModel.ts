@@ -39,6 +39,9 @@ export interface ValidationErrorObject {
   [key: string]: string;
 }
 
+export interface NonFieldError {
+  non_field_errors: string[];
+}
 export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
   geopackage_image_url?: string | null;
   eds_errors: edsError[];

@@ -293,9 +293,11 @@ import Select from "primevue/select";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 
+import type { GeneralErrorResponse, ValidationErrorObject, NonFieldError } from "@/composables/NextGenModel"
+
 import type { DatePickerProps } from "primevue/datepicker";
 import type { ToastMessageOptions } from "primevue/toast";
-import type {ToastRecord} from "@/composables/NextGenModel";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
@@ -314,6 +316,7 @@ import { hilightTab } from '@/composables/TabHilight';
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 
 import "@vuepic/vue-datepicker/dist/main.css";
+import { errorMessages } from "vue/compiler-sfc";
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -384,8 +387,6 @@ onMounted(async () => {
 
   toast.removeAllGroups();
 
-  console.log(toastRecords.value);
-
   mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
 
@@ -393,7 +394,6 @@ onMounted(async () => {
   if (calibrationJobId.value) {
 
     if (!userSelectedCalibrationTuningParameters.value.length) {
-      console.log("Clearing out selectedTuningParameterData");
       selectedTuningParameterData.value = null;
     }
 
@@ -483,7 +483,7 @@ const isFormulationDataSaved = (): boolean => {
 const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Calibration Tuning Controls disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Calibration Tuning Controls are disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.' };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
@@ -491,7 +491,7 @@ const handleCalibrationTimeControlsClick = (event: Event) => {
 const handleOutputVariablesParametersClick = (event: Event) => {
   if (!isFormulationDataSaved()) {
     event.preventDefault(); // Prevent any default action
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Output Variables and Parameters disabled', detail: 'You cannot interact with output variables or parameters because Formulation data has not been saved.' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Output Variables and Parameters are disabled', detail: 'You cannot interact with output variables or parameters because Formulation data has not been saved.' };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
@@ -904,28 +904,28 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'calibration_times must be within time_range' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'calibrationtimes must be within time_range. Was not saved.' };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if simulation_end_time is not after simulation_start_time
   if (simStartDate >= simEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'simulation_end_time must be after simulation_start_time' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Simulation time problem', detail: 'simulation_end_time must be after simulation_start_time. Was not saved.' };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
   if (calStartDate <= simStartDate || calStartDate > simEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time. Was not saved.' };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time. Was not saved.' };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -992,7 +992,7 @@ const areValidationTimesValidated = (): boolean => {
 
     // check if calibration times and validation times overlap
     if (isAvCalStartBeforeOrEqualToCalEnd && isAvCalEndAfterOrEqualToCalStart) {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Calibration and Validation times must not overlap' };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Overlapping Times', detail: 'Calibration and Validation times must not overlap' };
       toast.add(tMsg); addToastRecord(tMsg);
       return false;
     }
@@ -1000,21 +1000,21 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if avSimEndDate is not after avSimStartDate
   if (avSimStartDate >= avSimEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Validation Simulation End must be after Simulation Start' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Simulation End must be after Simulation Start' };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if avCalStartDate is not within avSimStartDate and avSimEndDate
   if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Validation Calibration Start must be within Simulation Start and End' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Calibration Start must be within Simulation Start and End' };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
   if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Validation Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End' };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -1063,20 +1063,45 @@ const saveTuningData = () => {
     if (saveTuningTabResponse?.ok) {
       const tMsg: ToastMessageOptions = {
         severity: 'success', summary: `Success`,
-        detail: "Saved Tuning Tab data",
-        life: 3000
+        detail: "Saved Tuning data",
+        life: ToastTimeout.timeout3000
       };
       toast.add(tMsg); addToastRecord(tMsg);
       updateJobData();
       tuningStore_data_loading.value = false;
     } else {
       tuningStore_data_loading.value = false;
-      const errorMessage = saveTuningTabResponse?._data.message;
 
-      const tMsg: ToastMessageOptions = {
-        severity: 'error', summary: `Error Saving Tuning Tab Data`,
-        detail: errorMessage
-      };
+      if (saveTuningTabResponse._data && saveTuningTabResponse._data.response_type) {
+        if (saveTuningTabResponse._data.response_type === "validation_error") {
+          if (saveTuningTabResponse._data.validation_errors) {
+            if (saveTuningTabResponse._data.validation_errors && saveTuningTabResponse._data.validation_errors.parameters) {
+              saveTuningTabResponse._data.validation_errors.parameters.forEach((err: GeneralErrorResponse) => {
+                if (Object.keys(err).length) {
+                  (err as any as NonFieldError).non_field_errors.forEach(er => {
+                    const tMsg: ToastMessageOptions = {
+                      severity: 'error', 
+                      summary: `Error Saving Tuning Data`,
+                      detail: er,
+                      life: ToastTimeout.timeout10000,
+                    };
+                    toast.add(tMsg); addToastRecord(tMsg);
+                  });
+                }
+              });
+            }
+          }
+        }
+      } else {
+        const errorMessage = saveTuningTabResponse?._data.message;
+        const tMsg: ToastMessageOptions = {
+          severity: 'error',
+          summary: `Error Saving Tuning Data`,
+          detail: errorMessage,
+          life: ToastTimeout.timeout10000,
+        };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
     }
   };
 
