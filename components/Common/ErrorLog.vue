@@ -151,7 +151,7 @@ const getToastArray = computed(() => {
 });
 
 const getColor = (s: string) => {
-  if (s === 'info') return "white";
+  if (s === 'info') return "#2563eb";
   else if (s === 'warn') return "yellow";
   else if (s === 'error') return "red";
   else if (s === 'success') return "green";
