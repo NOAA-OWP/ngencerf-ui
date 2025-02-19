@@ -38,6 +38,9 @@ export const generalStore = defineStore(
     const isLoading = ref<boolean>(false);
 
     // This is set if the user changes the gage.  Resets when saved.toastRecord
+    const popupActive = ref<boolean>(false);
+
+    // This is set if the user changes the gage.  Resets when saved.
     const gageHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
@@ -114,6 +117,7 @@ export const generalStore = defineStore(
 
     function resetGeneralStore() {
       calibrationJobId.value = 0;
+      popupActive.value = false;
     }
 
     return {
@@ -151,6 +155,7 @@ export const generalStore = defineStore(
       toastRecords,
       addToastRecord,
       clearToastRecords,
+      popupActive
     };
   },
   {

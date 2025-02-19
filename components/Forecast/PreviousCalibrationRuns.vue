@@ -28,8 +28,9 @@
             <div class="col-span-1">
               <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
               <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                :options="forecastRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"></Select>
-
+                :options="forecastRunGageList" filter optionLabel="name" optionValue="name"
+                aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
+                placeholder="All"></Select>
             </div>
           </div>
           <ConfirmDialog></ConfirmDialog>
@@ -40,17 +41,66 @@
             v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onCalibrationRunForForecastRowSelect" @rowUnselect="onCalibrationRunForForecastRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
-            <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
-            <Column field="submit_date" header="Run Date" sortable>
+            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable>
               <template #body="slotProps">
-                {{ formatDateForDisplay(slotProps.data.created_at) }}
+                <span v-if="slotProps.data.calibration_run_id"
+                  :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
+                  :title="'Job ID ' + slotProps.data.calibration_run_id">
+                  {{ slotProps.data.calibration_run_id }}
+                </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
-            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
-            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable></Column>
-            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
+            <Column :pt="ptColumn" field="status" header="Status" sortable>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
+                  :title="'Status ' + slotProps.data.status">
+                  {{ slotProps.data.status }}
+                </span>
+              </template>
+            </Column>
+            <Column field="submit_date" header="Run Date" sortable>
+              <template #body="slotProps">
+                <span :aria-label="'Run Date ' + formatDateForDisplay(slotProps.data.submit_date)"
+                  :title="'Run Date ' + formatDateForDisplay(slotProps.data.submit_date)">
+                  {{ formatDateForDisplay(slotProps.data.submit_date) }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.formulation_name"
+                  :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
+                  :title="'Formulation Name ' + slotProps.data.formulation_name">
+                  {{ slotProps.data.formulation_name }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
+                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
+                  {{ slotProps.data.gage_id }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.objective_function"
+                  :aria-label="'Objective Function ' + slotProps.data.objective_function"
+                  :title="'Objective Function ' + slotProps.data.objective_function">
+                  {{ slotProps.data.objective_function }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.optimization_algorithm"
+                  :aria-label="'Optimization Algorithm ' + slotProps.data.optimization_algorithm"
+                  :title="'Optimization Algorithm ' + slotProps.data.optimization_algorithm">
+                  {{ slotProps.data.optimization_algorithm }}
+                </span>
+              </template>
+            </Column>
           </DataTable>
         </div>
       </div>
@@ -303,7 +353,7 @@ const toggleMessagesGroup = () => {
 }
 
 #MessagesGroupWindow {
-  z-index: 9999;
+  z-index: 999;
   border: 1px solid black;
   position: absolute;
   right: 2%;

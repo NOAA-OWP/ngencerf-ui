@@ -3,7 +3,9 @@
     <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">
       Forecast Cycle Selection
     </h1>
-    <div style="font-size: 12px;font-weight: normal;margin-top:-20px;">
+    <div style="font-size: 12px;font-weight: normal;margin-top:-20px;"
+      aria-label="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id"
+      title="'Calibration Job ID is  ' + calibrationRunForForecast?.calibration_run_id">
       <h2>Calibration Job ID: {{ calibrationRunForForecast?.calibration_run_id }}</h2>
     </div>
     <p style="font-size: 12px;font-weight: normal;">Select a cycle then click Next.</p>
@@ -12,13 +14,30 @@
   <div>
     <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
       selectionMode="single" :rowClass="rowClass" :rowStyle="rowStyle">
-      <Column field="name" header="Cycle"></Column>
-      <Column field="data_sources" header="Data Sources"></Column>
-      <Column field="time_range" header="Time Range (ngenCERF)"></Column>
+      <Column field="name" header="Cycle">
+        <template #body="slotProps">
+          <div :aria-label="'Cycle is ' + slotProps.data.name" :title="'Cycle is ' + slotProps.data.name">{{
+            slotProps.data.name }}</div>
+        </template>
+      </Column>
+      <Column field="data_sources" header="Data Sources">
+        <template #body="slotProps">
+          <div :aria-label="'Data Sources: ' + slotProps.data.data_sources"
+            :title="'Data Sources: ' + slotProps.data.data_sources">{{
+              slotProps.data.data_sources }}</div>
+        </template>
+      </Column>
+      <Column field="time_range" header="Time Range (ngenCERF)">
+        <template #body="slotProps">
+          <div :aria-label="'Time Range is ' + slotProps.data.name"
+            :title="'Time Range is ' + slotProps.data.time_range">{{
+              slotProps.data.time_range }}</div>
+        </template>
+      </Column>
     </DataTable>
   </div>
   <div class="text-normal mt-2 mx-auto text-center">
-    Cycles in <span class="text-gray-500">grey</span> are currently unavailable from the GUI. Use the CLI to run these
+    Cycles in <span class="text-gray-500">grey</span>
     cycles.
   </div>
   <div>

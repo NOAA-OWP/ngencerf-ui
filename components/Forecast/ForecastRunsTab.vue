@@ -30,7 +30,8 @@
                 <div class="inline ">
                   <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
                   <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                    :options="forecastRunGageList" filter optionLabel="name" optionValue="name" placeholder=""></Select>
+                    :options="forecastRunGageList" filter optionLabel="name" optionValue="name" placeholder=""
+                    aria-label="Select Headwater Basin Gage Filter" title="Select Headwater Basin Gage Filter"></Select>
                 </div>
               </div>
             </div>
@@ -43,19 +44,66 @@
               v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
               @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
               class="boxed">
-              <Column :pt="ptColumn" field="forecast_run_id" header="Forecast Job ID" sortable></Column>
-              <Column :pt="ptColumn" field="cycle" header="Forecast Cycle" sortable></Column>
-              <Column :pt="ptColumn" field="forecast_status" header="Job Status" sortable></Column>
+              <Column :pt="ptColumn" field="forecast_run_id" header="Forecast Job ID" sortable>
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.forecast_run_id"
+                    :aria-label="'Forecast Job ID ' + slotProps.data.forecast_run_id"
+                    :title="'Forecast Job ID ' + slotProps.data.forecast_run_id">
+                    {{ slotProps.data.forecast_run_id }}
+                  </span>
+                </template>
+              </Column>
+              <Column :pt="ptColumn" field="cycle" header="Forecast Cycle" sortable>
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.cycle" :aria-label="'Forecast Cycle ' + slotProps.data.cycle"
+                    :title="'Forecast Cycle ' + slotProps.data.cycle">
+                    {{ slotProps.data.cycle }}
+                  </span>
+                </template>
+              </Column>
+              <Column :pt="ptColumn" field="forecast_status" header="Job Status" sortable>
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.forecast_status"
+                    :aria-label="'Job Status ' + slotProps.data.forecast_status"
+                    :title="'Job Status ' + slotProps.data.forecast_status">
+                    {{ slotProps.data.forecast_status }}
+                  </span>
+                </template>
+              </Column>
               <Column field="submit_date" header="Submit Date" sortable>
                 <template #body="slotProps">
-                  <span v-if="slotProps.data.submit_date">
+                  <span v-if="slotProps.data.submit_date" :aria-label="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)"
+                    :title="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)">
                     {{ formatDateForDisplay(slotProps.data.submit_date) }}
                   </span>
                 </template>
               </Column>
-              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
-              <Column :pt="ptColumn" field="calibration_run_id" header="Calibration Job ID" sortable></Column>
-              <Column :pt="ptColumn" field="forcing_download_status" header="Forcing Download Status" sortable></Column>
+              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
+                    :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
+                    {{ slotProps.data.gage_id }}
+                  </span>
+                </template>
+              </Column>
+              <Column :pt="ptColumn" field="calibration_run_id" header="Calibration Job ID" sortable>
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.calibration_run_id"
+                    :aria-label="'Calibration Job ID ' + slotProps.data.calibration_run_id"
+                    :title="'Calibration Job ID ' + slotProps.data.calibration_run_id">
+                    {{ slotProps.data.calibration_run_id }}
+                  </span>
+                </template>
+              </Column>
+              <Column :pt="ptColumn" field="forcing_download_status" header="Forcing Download Status" sortable>
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.forcing_download_status"
+                    :aria-label="'Forcing Download Status ' + slotProps.data.forcing_download_status"
+                    :title="'Forcing Download Status ' + slotProps.data.forcing_download_status">
+                    {{ slotProps.data.forcing_download_status }}
+                  </span>
+                </template>
+              </Column>
             </DataTable>
             <div class="mt-4 mx-auto">
               * Double click on a row to open, or right click for other options. Click "New Forecast" for a fresh setup.
@@ -65,7 +113,7 @@
       </div>
 
     </div>
-
+    gage_id
     <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
@@ -258,7 +306,7 @@ const toggleMessagesGroup = () => {
 }
 
 #MessagesGroupWindow {
-  z-index: 9999;
+  z-index: 999;
   border: 1px solid black;
   position: absolute;
   right: 2%;

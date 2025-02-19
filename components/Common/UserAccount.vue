@@ -12,11 +12,12 @@
         </div>
       </div>
       <div class="col-span-1">
-        <a href="#" @click="showForm = 'changePassword'" class="mt-6 mb-6" :class="changePasswordClasses">Change
-          Password</a>
+        <a href="#" @click="showForm = 'changePassword'" class="mt-6 mb-6" :class="changePasswordClasses"
+          aria-label="Change Password" title="Change Password">Change Password</a>
       </div>
       <div class="col-span-1">
-        <a href="#" @click="showForm = 'updateName'" class="mt-6 mb-6" :class="updateNameClasses">Update Name</a>
+        <a href="#" @click="showForm = 'updateName'" class="mt-6 mb-6" :class="updateNameClasses"
+          aria-label="Update Name" title="Update Name">Update Name</a>
       </div>
       <div class="col-span-2">
         <div class="mt-2 mb-2 hr"></div>
@@ -28,29 +29,31 @@
             <label for="OldPass">Old password</label>
             <div class="mb-3">
               <Password id="OldPass" type="password" name="password" autocomplete="current-password" v-model="oldpass"
-                aria-label="Enter old password here" toggleMask :feedback="false" />
+                aria-label="Enter old password here" title="Enter old password here" toggleMask :feedback="false" />
             </div>
 
             <label for="NewPass">New password</label>
             <div class="mb-3">
               <Password id="NewPass" type="password" name="password" autocomplete="new-password" v-model="newpass"
-                aarigia-label="Enter new password here" toggleMask :feedback="true" />
+                aria-label="Enter new password here" title="Enter new password here" toggleMask :feedback="true" />
             </div>
 
             <label for="ReNewPass">Confirm New password</label>
             <div class="mb-3">
               <Password id="ReNewPass" type="password" name="password" autocomplete="new-password"
-                v-model="confirmNewpass" aria-label="Password" toggleMask :feedback="false" />
+                v-model="confirmNewpass" aria-label="Confirm New Password" title="Confirm New Password" toggleMask
+                :feedback="false" />
 
             </div>
           </div>
 
           <div class="buttonArea mt-4">
-            <Button class="ngenButtonDiv mr-6" id="UpdateButton" type="submit" aria-label="Update with new password">
+            <Button class="ngenButtonDiv mr-6" id="UpdateButton" type="submit" aria-label="Update with new password"
+              title="Update with new password">
               Update
             </Button>
             <Button class="c-blue font-normal underline" id="closeBtn" name="cancel" value="Cancel"
-              v-on:click="closeAccountBox" aria-label="Close Account Box">
+              v-on:click="closeAccountBox" aria-label="Close Account Box" titlel="Close Account Box">
               Close
             </Button>
           </div>
@@ -72,22 +75,23 @@
             <label for="FirstName">First Name</label>
             <div class="mb-3">
               <InputText id="FirstName" type="text" name="first_name" v-model="newFirstName"
-                aria-label="Enter first name here" />
+                aria-label="Enter first name here" title="Enter first name here" />
             </div>
 
             <label for="LastName">Last Name</label>
             <div class="mb-3">
               <InputText id="LastName" type="text" name="last_name" v-model="newLastName"
-                aria-label="Enter last name here" />
+                aria-label="Enter last name here" title="Enter last name here" />
             </div>
           </div>
 
           <div class="buttonArea mt-4">
-            <Button class="ngenButtonDiv mr-6" id="UpdateNameButton" type="submit" aria-label="Update with new name">
+            <Button class="ngenButtonDiv mr-6" id="UpdateNameButton" type="submit" aria-label="Update with new name"
+              title="Update with new name">
               Update
             </Button>
             <Button class="c-blue font-normal underline" id="closeNameBtn" name="cancel" value="Cancel"
-              v-on:click="closeAccountBox" aria-label="Close Account Box">
+              v-on:click="closeAccountBox" aria-label="Close Account Box" title="Close Account Box">
               Close
             </Button>
           </div>
@@ -110,7 +114,9 @@ import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
-import { generalStore } from '~/stores/common/GeneralStore';
+
+import { generalStore } from '@/stores/common/GeneralStore';
+const { popupActive } = storeToRefs(generalStore());
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 
@@ -256,6 +262,7 @@ const updateName = async () => {
 }
 
 const closeAccountBox = () => {
+  popupActive.value = false;
   useAccountEvent("accountEvent", "");
 }
 
@@ -269,7 +276,7 @@ const closeAccountBox = () => {
   left: Calc(50vw - 365px);
   top: Calc(50vh - 300px);
   border: 5px solid #ccc;
-  z-index: 9999;
+  z-index: 999;
 
   #avatar {
     width: 150px;

@@ -30,9 +30,12 @@
               optionLabel="name" optionValue="name" class="h-60" @change="moduleListChanged"
               :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               <template #option="slotProps">
-                <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
-                  <div class="font-ui pl-2 leading-none">{{ slotProps.option.name }}</div>
-                </div>
+                  <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
+                    <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
+                  :title="slotProps.option.name">
+                    {{ slotProps.option.name }}</div>
+                  </div>
+
               </template>
             </Listbox>
           </div>
@@ -44,9 +47,13 @@
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
                 optionValue="name" scrollHeight="18rem" class="border-0">
                 <template #option="slotProps">
-                  <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'"><span
-                      class="font-ui pl-2">{{ slotProps.option.name }}</span></div>
+                  <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'"
+                    :aria-label="slotProps.option.name + ' is ' + (slotProps.option.selected === true ? 'Checked' : 'Not Checked')"
+                    :title="slotProps.option.name + ' is ' + (slotProps.option.selected === true ? 'Checked' : 'Not Checked')">
+                    <span class="font-ui pl-2">{{ slotProps.option.name }}</span>
+                  </div>
                 </template>
+
               </Listbox>
             </div>
           </div>
