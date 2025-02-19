@@ -216,26 +216,16 @@ onMounted(() => {
 
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
-    let headerHeight = document.getElementById('Header')?.clientHeight;
-    let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
-    if (footerTop && headerHeight) {
-      let h = (footerTop - headerHeight) + 54;
-      let hpx = h + 'px'
-      let ele = document.getElementById("HelpWindow");
-      if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
-    };
-  });
-
+    sizeLogWindow();
+  });  
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', function (event) {
     sizeHelpWindow();
-  });
-  // window.removeEventListener('resize', function (event) {
-  //   sizeLogWindow();
-  // });
+    sizeLogWindow();
+  }); 
 });
 
 
@@ -250,24 +240,20 @@ const sizeHelpWindow = () => {
   let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
   if (footerTop && headerHeight) {
     let h = (footerTop - headerHeight) - 20;
-    let hpx = h + 'px'
     let ele = document.getElementById("HelpWindow");
-    if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
+    if (ele) { ele.style.height = h + 'px'; }
   };
 };
 
-// const sizeLogWindow = () => {
-//   let headerHeight = document.getElementById('Header')?.clientHeight;
-//   let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
-//   if (footerTop && headerHeight) {
-//     let h = (footerTop - headerHeight) - 20;
-//     let hpx = h + 'px'
-//     let ele = document.getElementById("ErrorLog");
-//     if (ele) { ele.style.height = parseInt(hpx) + 'px'; } 
-//     // let ele2 = document.getElementById("TableFixHead");
-//     // if (ele && ele2) { ele2.style.height = (ele.clientHeight) + 'px'; }
-//   };
-// };
+const sizeLogWindow = () => {
+  let headerHeight = document.getElementById('Header')?.clientHeight;
+  let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
+  if (footerTop && headerHeight) {
+    let h = (footerTop - headerHeight) - 20;
+    let ele = document.getElementById("ErrorLog");
+    if (ele) { ele.style.height = h + 'px'; } 
+ };
+};
 
 /**
  * 
@@ -287,10 +273,8 @@ const aboutBox = async () => {
 }
 
 const errorLog = async () => {
-  if (!popupActive.value) {
-    errorOverlay.value.style.display = "block";
-    popupActive.value = true;
-  }
+  errorOverlay.value.style.display = "block";
+  setTimeout(function () { sizeLogWindow() }, 0);
 }
 
 useAccountEventListen('accountEvent', () => {
@@ -522,7 +506,6 @@ const MenuChanged = (e: MouseEvent) => {
 
 #ErrorLogOverlay {
   z-index: 9999;
-  border: 1px solid black;
   position: absolute;
   right: 2%;
   background-color: white;
