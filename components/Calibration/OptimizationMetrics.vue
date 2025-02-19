@@ -9,7 +9,8 @@
               <label for="OptimizationAlgorithm">Optimization Algorithm</label>
               <Select id="OptimizationAlgorithm" class="mt-1" v-model="uiOptimization"
                 :options="getOptimizationAlgorithmOptionsList" filter optionLabel="name" optionValue="name"
-                placeholder="" @change="optimizationSelectChange"
+                placeholder="" @change="optimizationSelectChange" aria-label="Optimization Algorithm"
+                title="Optimization Algorithm"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
@@ -20,8 +21,9 @@
                 <div class="flex mt-2">
                   <div class="text-left font-bold">Algorithm Parameter(s)</div>
                   <div id="ClearTableBtn" class="ml-auto">
-                    <Button @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2"
-                    :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</Button>
+                    <Button id="ClrBtn" @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2"
+                      :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                      aria-label="Algorithm Parameters" title="Algorithm Parameter">Clear</Button>
                   </div>
                 </div>
 
@@ -32,7 +34,8 @@
                     <Column field="value" header="Initial Value" sortable>
                       <template #editor="{ index }">
                         <InputNumber v-model="uiOptimizationInputs[index].value" inputId="locale-us" locale="en-US"
-                          :minFractionDigits="2" fluid autofocus class="w-12 p-1">
+                          :minFractionDigits="2" fluid autofocus class="w-12 p-1" aria-label="Initial Value"
+                          title="Initial Value">
                         </InputNumber>
                       </template>
                     </Column>
@@ -54,17 +57,17 @@
               <label for="ObjectiveFunction<">Objective Function</label>
               <Select id="ObjectiveFunction" class="rounded-md" filter v-model="uiObjectiveFunction"
                 :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
-                @change="updateMetricFlowFieldVisibility"
+                @change="updateMetricFlowFieldVisibility" aria-label="Objective Function" title="Objective Function"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-2">
                 Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
-                  :minFractionDigits="2" class="w-24"
+                  :minFractionDigits="2" class="w-24" aria-label="Flow Threshold" title="Flow Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
                 </InputNumber> m3/s
               </div>
               <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-2">
                 Peak Flow Threshold <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
-                  :minFractionDigits="2" class="w-24"
+                  :minFractionDigits="2" class="w-24" aria-label="Peak Flow Threshold" title="Peak Flow Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber>
                 quantile
               </div>
@@ -75,8 +78,9 @@
             <div id="Metrics">
               <div class="font-bold">Metrics</div><br>
               <Checkbox id="CalcCatMetCB" inputId="CalcCatMetCB" class="h-5 w-5 mr-3" style="display:inline-block"
-                :binary="true" v-model="cbIsCategorical"
-                :disabled="cbCategoricalDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                :binary="true" v-model="cbIsCategorical" aria-label="Calculate Categorical Metrics Checkbox"
+                title="Calculate Categorical Metrics Checkbox"
+                :disabled="cbCategoricalDisabled ||!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 @change="toggleMetricStreamFlowInput" />
               <label for="CalcCatMetCB" class="inline">Calculate Categorical Metrics</label>
               <div class="pl-8">
@@ -85,12 +89,13 @@
               <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-2 pl-8">
 
                 Flow Threshold <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
-                  :minFractionDigits="2" class="w-24"
+                  :minFractionDigits="2" class="w-24" aria-label="Flow Threshold" title="Flow Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber> m3/s
               </div><br />
 
               <Checkbox id="CalEventMetCB" inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline"
                 style="display:inline-block" :binary="true" v-model="cbIsEvenBased"
+                aria-label="Calculate Event Based Metrics Checkbox" title="Calculate Event Based Metrics Checkbox"
                 :disabled="cbEventBasedDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 @change="toggleMetricPeakFlowInput" />
               <label for="CalEventMetCB" class="inline">Calculate Event Based Metrics</label>
@@ -99,7 +104,7 @@
               </div>
               <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-2 pl-8">
                 Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
-                  :minFractionDigits="2" class="w-24" strassner-4969-bugfix
+                  :minFractionDigits="2" class="w-24" aria-label=" Peak Flow Threshold" title=" Peak Flow Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber>
                 quantile
               </div>
@@ -117,7 +122,8 @@
             <div id="CalibrationStopCriteria" class="bordered">
               <label for="StopCriteria">Calibration Stop Criteria</label><br>
               <InputNumber id="StopCriteria" inputId="stopCriteria" v-model="uiStopCriteria" showButtons :min="0"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                aria-label="Calibration Stop Criteria" title="Calibration Stop Criteria">
               </InputNumber>
               <div class="ml-3 mt-1">Iterations per Worker</div>
             </div>
@@ -126,7 +132,8 @@
             <div id="PlotGenFreq" class="bordered">
               <label for="PlotFrequency">Plot Generation Frequency (0 = off)</label><br>
               Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency"
-                v-model="uiPlotFrequency" showButtons :min="0"
+                v-model="uiPlotFrequency" showButtons :min="0" aria-label="Plot Generation Frequency, zero equals off"
+                title="Plot Generation Frequency, zero equals off"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber>
               &nbsp;&nbsp;Iterations
             </div>
@@ -138,8 +145,9 @@
 
     <div id="OptMetBottomButtons" class="absolute b-0 grid grid-cols-8 mt-6 ActionButtonsBox">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
-        <div class="col-span-1 mr-6 h-8" @click="saveOptMetData()">
-          <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button">
+        <div class="col-span-1 mr-6 h-8">
+          <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button"
+            @click="saveOptMetData()">
             Save
           </Button>
         </div>
@@ -154,11 +162,11 @@
       <div class="col-span-4">&nbsp;</div>
       <div class="col-span-1">
         <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-            aria-label="Previous Tab Button" @click="goPrevTab()">Prev</Button>
+          aria-label="Previous Tab Button" @click="goPrevTab()">Prev</Button>
       </div>
       <div class="col-span-1 mr-4">
         <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
-            @click="goNextTab()">Next</Button>
+          @click="goNextTab()">Next</Button>
       </div>
 
     </div>
@@ -514,5 +522,14 @@ const handleNextPrevDialogClose = (opt: any) => {
 
 #OptMetBottomButtons {
   z-index: 9999;
+}
+
+#ClrBtn {
+  font-weight: bold;
+}
+#ClrBtn:hover {
+  background-color: transparent;
+  border: none;
+  color: global.$ngwcp_primary3 !important;
 }
 </style>

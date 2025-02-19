@@ -38,7 +38,8 @@
               <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
               <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
                 :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
-                placeholder="All"></Select>
+                placeholder="All" aria-label="Headwater Basin Gage Filter Select"
+                title="Headwater Basin Gage Filter Select"></Select>
             </div>
           </div>
 
@@ -52,21 +53,73 @@
             v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
-            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
-            <Column :pt="ptColumn" field="validation_runs" header="Validation Runs" sortable></Column>
-            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
-            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable></Column>
-            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
-            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable></Column>
+            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable> <template #body="slotProps">
+                <span v-if="slotProps.data.calibration_run_id"
+                  :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
+                  :title="'Job ID ' + slotProps.data.calibration_run_id">
+                  {{ slotProps.data.calibration_run_id }}
+                </span>
+              </template></Column>
+            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable> <template
+                #body="slotProps">
+                <span v-if="slotProps.data.formulation_name"
+                  :aria-label="'ormulation Name ' + slotProps.data.formulation_name"
+                  :title="'ormulation Name ' + slotProps.data.formulation_name">
+                  {{ slotProps.data.formulation_name }}
+                </span>
+              </template></Column>
+            <Column :pt="ptColumn" field="validation_runs" header="Validation Runs" sortable> <template
+                #body="slotProps">
+                <span v-if="slotProps.data.validation_runs"
+                  :aria-label="'Validation Run ' + slotProps.data.validation_runs"
+                  :title="'Validation Run ' + slotProps.data.validation_runs">
+                  {{ slotProps.data.validation_runs }}
+                </span>
+              </template></Column>
+            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable> <template #body="slotProps">
+                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
+                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
+                  {{ slotProps.data.gage_id }}
+                </span>
+              </template></Column>
+            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable> <template
+                #body="slotProps">
+                <span v-if="slotProps.data.objective_function"
+                  :aria-label="'Objective Function ' + slotProps.data.objective_function"
+                  :title="'Objective Function ' + slotProps.data.objective_function">
+                  {{ slotProps.data.objective_function }}
+                </span>
+              </template></Column>
+            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable> <template
+                #body="slotProps">
+                <span v-if="slotProps.data.optimization_algorithm"
+                  :aria-label="'Optimization Algorithm ' + slotProps.data.optimization_algorithm"
+                  :title="'Optimization Algorithm ' + slotProps.data.optimization_algorithm">
+                  {{ slotProps.data.optimization_algorithm }}
+                </span>
+              </template></Column>
+            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
+                  :title="'Job Genesis ' + slotProps.data.job_genesis">
+                  {{ slotProps.data.job_genesis }}
+                </span>
+              </template>
+            </Column>
             <Column :pt="ptColumn" field="created_at" header="Creation Date" sortable>
               <template #body="slotProps">
-                {{ formatDateForDisplay(slotProps.data.created_at) }}
+                <span :aria-label="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)"
+                  :title="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)">
+                  {{ formatDateForDisplay(slotProps.data.created_at) }}
+                </span>
               </template>
             </Column>
             <Column field="submit_date" header="Submit Date" sortable>
               <template #body="slotProps">
-                {{ formatDateForDisplay(slotProps.data.submit_date) }}
+                <span :aria-label="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)"
+                  :title="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)">
+                  {{ formatDateForDisplay(slotProps.data.submit_date) }} 
+                </span>
               </template>
             </Column>
           </DataTable>
@@ -76,14 +129,14 @@
       </div>
       <div v-if="computedCalibrationValidationRunList.length > 1">
         <div id="evaluationCalibrationList">
-          <ContextMenu :pt="{ root: { id: 'vr-context-menu' } }" class="bg-white" ref="vrContextMenu"
+          <ContextMenu :pt="{ root: { id: ' vr-context-menu' } }" class="bg-white" ref="vrContextMenu"
             :model="cmValidationRun"></ContextMenu>
           <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px"
             sortField="validation_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="single"
             v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle"
             @rowContextmenu="onRowVrContextMenu" @rowSelect="onEvalValdiationRowSelect"
             @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
-            <Column :pt="ptValColumns" v-for="( col, colIndex ) in calibrationValidationRunListHeaders" :key="colIndex"
+            <Column :pt="ptValColumns" v-for="(col, colIndex) in calibrationValidationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field">
             </Column>
           </DataTable>
@@ -470,7 +523,7 @@ const rowStyle = (data: any) => {
 }
 
 #MessagesGroupWindow {
-  z-index: 9999;
+  z-index: 999;
   border: 1px solid black;
   position: absolute;
   right: 2%;

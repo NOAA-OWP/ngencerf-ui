@@ -1,7 +1,9 @@
 <template>
   <div id="TuningControls" class="">
     <div class="mt-3 mb-2">
-      <div v-if="rangeDateFrom && rangeDateTo" class="text-left mt-1 text-xl c-blue-primary1 font-bold" id="RangeDates">
+      <div v-if="rangeDateFrom && rangeDateTo" class="text-left mt-1 text-xl c-blue-primary1 font-bold" id="RangeDates"
+        :aria-label="'Range is from ' + format(rangeDateFrom) + ' to ' + format(rangeDateTo)"
+        :title="'Range is from ' + format(rangeDateFrom) + ' to ' + format(rangeDateTo)">
         RANGE: {{ format(rangeDateFrom) }} GMT to {{ format(rangeDateTo) }} GMT
       </div>
     </div>
@@ -10,7 +12,9 @@
       <div class="col-span-2">
         <div id="BoxLeft" class="text-left">
           <div id="BoxTopLeft" class="pt-2">
-            <span class="tabTitles font-bold">Calibration Time Controls <span class="font-normal"><small>(* All
+            <span class="tabTitles font-bold" aria-label="Calibration Time Controls, All times entered must be in GMT"
+              title="Calibration Time Controls, All times entered must be in GMT">Calibration Time
+              Controls <span class="font-normal"><small>(* All
                   times entered must be in GMT)</small></span></span>
           </div>
           <div id="BoxBottomLeft" class="pt-2">
@@ -25,7 +29,8 @@
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                        @update:model-value="handleSimStartUpdate"
+                        @update:model-value="handleSimStartUpdate" aria-label="Calibration Time Simulation Start"
+                        title="Calibration Time Simulation Start"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                     <th scope="row" class="pl-6 w-1/6">
@@ -34,7 +39,8 @@
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                        @update:model-value="handleSimEndUpdate"
+                        @update:model-value="handleSimEndUpdate" aria-label="Calibration Time Simulation End"
+                        title="Calibration Time Simulation End"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                   </tr>
@@ -45,7 +51,8 @@
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                        @update:model-value="handleCalStartUpdate"
+                        @update:model-value="handleCalStartUpdate" aria-label="Calibration Time Calibration Start"
+                        title="Calibration Time Calibration Start"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                     <th scope="row" class="pl-6 w-1/6">
@@ -54,7 +61,8 @@
                     <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                        @update:model-value="handleCalEndUpdate"
+                        @update:model-value="handleCalEndUpdate" aria-label="Calibration Time Calibration End"
+                        title="Calibration Time Calibration End"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                   </tr>
@@ -78,13 +86,14 @@
                   <tbody>
                     <tr>
                       <th scope="row" class="w-1/6">
-                        <label for="ValSimulationStart" class="whitespace-nowrap">Simulation
-                          Start </label>
+                        <label for="ValSimulationStart" class="whitespace-nowrap">Simulation Start </label>
                       </th>
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
                           v-model="avSimStartTime" time-picker-inline text-input utc='preserve'
                           format="yyyy-MM-dd HH:00" @update:model-value="handleAvSimStartUpdate"
+                          aria-label="Automatic Validation Time Simulation Start"
+                          title="Automatic Validation Time Simulation Start"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                       </td>
                       <th scope="row" class="pl-6 w-1/6">
@@ -94,6 +103,8 @@
                         <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark" v-model="avSimEndTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                           @update:model-value="handleAvSimEndUpdate"
+                          aria-label="Automatic Validation Time Simulation End"
+                          title="Automatic Validation Time Simulation End"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                       </td>
                     </tr>
@@ -105,6 +116,8 @@
                         <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark" v-model="avCalStartTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                           @update:model-value="handleAvCalStartUpdate"
+                          aria-label="VAutomatic Validation Time alidation Start"
+                          title="Automatic Validation Time Validation Start"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                       </td>
                       <th scope="row" class="pl-6 w-1/6">
@@ -114,6 +127,8 @@
                         <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                           @update:model-value="handleAvCalEndUpdate"
+                          aria-label="Automatic Validation Time Validation End"
+                          title="Automatic Validation Time Validation End"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                       </td>
                     </tr>
@@ -138,7 +153,8 @@
           <div class="mb-2 font-bold">Output Variable To Calibrate</div>
           <div class="mt-2 text-sm">
             <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable" :options="outputVariables"
-              optionLabel="output" optionValue="output"
+              optionLabel="output" optionValue="output" aria-label=">Output Variable To Calibrate"
+              title=">Output Variable To Calibrate"
               :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
             </Select>
           </div>
@@ -153,7 +169,8 @@
           <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
             <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
             <Button class="ngenButtonDiv-alt"
-              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+              aria-label="Load Parameters File optional" title="Load Parameters File optional">
               Load Parameters File (optional)</Button>
             <div v-if="!isFormulationDataSaved()" class="overlay"></div>
           </div>
@@ -164,13 +181,15 @@
             <div class="font-bold">Calibratable Parameters</div>
             <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
               :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
-              :options="calibrationTuningParameters" optionLabel="output" optionValue="output">
+              :options="calibrationTuningParameters" optionLabel="output" optionValue="output"
+              aria-label="Select Calibratable Parameters" title="Select Calibratable Parameters">
               <template #option="slotProps">
                 <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
               </template>
             </Select>
             <div id="UploadParams" class="inline ml-3" @click="addCalibrationTuningParameter">
-              <Button class="ngenButtonDiv-alt"
+              <Button class="ngenButtonDiv-alt" aria-label="Add Selected Calibratable Parameter Button"
+                title="Add Selected Calibratable Parameter Button"
                 :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</Button>
             </div>
           </div>
@@ -179,7 +198,8 @@
 
         <div class="col-span-1 mt-2 relative">
           <Button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
-            @click="clearUserSelectedCalibrationTuningParameters()"
+            @click="clearUserSelectedCalibrationTuningParameters()" aria-label="Clear Calibratable Parameters"
+            title="Clear Calibratable Parameters"
             :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</Button>
         </div>
 
@@ -198,7 +218,9 @@
         <!-- parameter column, uneditable -->
         <Column field="parameter" header="Parameter" sortable>
           <template #body="slotProps">
-            <span style="background-color: lightgrey; padding: 4px; display: block;">
+            <span style="background-color: lightgrey; padding: 4px; display: block;"
+              :aria-label="'Parameter name is ' + slotProps.data.name"
+              :title="'Parameter name is' + slotProps.data.name">
               {{ slotProps.data.name }} </span>
           </template>
         </Column>
@@ -206,7 +228,9 @@
         <!-- module column, uneditable -->
         <Column field="module" header="Module" sortable>
           <template #body="slotProps">
-            <span style="background-color: lightgrey; padding: 4px; display: inline-block; white-space: nowrap;">
+            <span style="background-color: lightgrey; padding: 4px; display: inline-block; white-space: nowrap;"
+              :aria-label="'Module name is ' + slotProps.data.module"
+              :title="'Module name is ' + slotProps.data.module">
               {{ slotProps.data.module }}
             </span>
           </template>
@@ -216,7 +240,9 @@
         <Column field="min" header="Min" sortable>
           <template #body="slotProps">
             <input type="text" v-model="slotProps.data.minimum"
-              @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;" />
+              @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;"
+              :aria-label="'Minimum value is ' + slotProps.data.minimum"
+              :title="'Minimum value is ' + slotProps.data.minimum" />
           </template>
         </Column>
 
@@ -224,7 +250,9 @@
         <Column field="max" header="Max" sortable>
           <template #body="slotProps">
             <input type="text" v-model="slotProps.data.maximum"
-              @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;" />
+              @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;"
+              :aria-label="'Maximum value is ' + slotProps.data.maximum"
+              :title="'Maximum value is ' + slotProps.data.maximum" />
           </template>
         </Column>
 
@@ -232,8 +260,9 @@
         <Column field="initValue" header="Initial Value" sortable>
           <template #body="slotProps">
             <input type="text" v-model="slotProps.data.initial_value"
-              @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)"
-              style="width: 100%;" />
+              @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)" style="width: 100%;"
+              slotProps.data.maximum :aria-label="'Initial value is ' + slotProps.data.initial_value"
+              :title="'Initial value is ' + slotProps.data.initial_value" />
           </template>
         </Column>
       </DataTable>

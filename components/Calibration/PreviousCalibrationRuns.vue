@@ -3,7 +3,8 @@
     <div class="mx-auto px-8 text-center overflow-auto">
       <div class="width-full">
         <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs</h1>
-        <Button class="ngenButtonDiv ml-8" @click="createNewCalibration">New</Button>
+        <Button class="ngenButtonDiv ml-8" @click="createNewCalibration" aria-label="New Calibration Job"
+          title="New Calibration Job">New</Button>
         <br />
         <p class="prompt-txt mb-6" style="margin-top:-10px;">
           Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
@@ -13,7 +14,8 @@
             <div class="col-span-1 text-left">
               <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
               <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter float-left" v-model="uiGageId"
-                :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All">
+                :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
+                aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
               </Select>
             </div>
           </div>
@@ -24,32 +26,69 @@
             scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
             @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
-            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
-            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable></Column>
-            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable></Column>
-            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable></Column>
+            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable> <template #body="slotProps">
+                <span v-if="slotProps.data.calibration_run_id"
+                  :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
+                  :title="'Job ID ' + slotProps.data.calibration_run_id">
+                  {{ slotProps.data.calibration_run_id }}
+                </span>
+              </template></Column>
+            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable> <template #body="slotProps">
+                <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
+                  :title="'Job Genesis ' + slotProps.data.job_genesis">
+                  {{ slotProps.data.job_genesis }}
+                </span>
+              </template></Column>
+            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable> <template
+                #body="slotProps">
+                <span v-if="slotProps.data.formulation_name"
+                  :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
+                  :title="'Formulation Name ' + slotProps.data.formulation_name">
+                  {{ slotProps.data.formulation_name }}
+                </span>
+              </template></Column>
+            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable> <template #body="slotProps">
+                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
+                  :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
+                  {{ slotProps.data.gage_id }}
+                </span>
+              </template></Column>
+
+
             <Column field="created_at" header="Creation Date" sortable>Column
               <template #body="slotProps">
-                {{ formatDateForDisplay(slotProps.data.created_at) }}
+                <span :aria-label="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)"
+                  :title="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)">
+                  {{ formatDateForDisplay(slotProps.data.created_at) }}
+                </span>
               </template>
             </Column>
             <Column field="submit_date" header="Submit Date" sortable>
               <template #body="slotProps">
-                <span v-if="slotProps.data.submit_date">
+                <span v-if="slotProps.data.submit_date"
+                  :aria-label="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)"
+                  :title="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)">
                   {{ formatDateForDisplay(slotProps.data.submit_date) }}
                 </span>
               </template>
             </Column>
             <Column header="Calibration Period" sortable>
               <template #body="slotProps">
-                <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period">
+                <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period"
+                  :aria-label="'Calibration Period ' + formatDateForDisplay(slotProps.data.calibration_start_period) + ' to ' + formatDateForDisplay(slotProps.data.calibration_end_period)"
+                  :title="'Calibration Period ' + formatDateForDisplay(slotProps.data.calibration_start_period) + ' to ' + formatDateForDisplay(slotProps.data.calibration_end_period)">
                   {{ formatDateForDisplay(slotProps.data.calibration_start_period) }} <span
                     v-if="slotProps.data.calibration_end_period">to</span>
                   {{ formatDateForDisplay(slotProps.data.calibration_end_period) }}
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="status" header="Status" sortable></Column>
+            <Column :pt="ptColumn" field="status" header="Status" sortable> <template #body="slotProps">
+                <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
+                  :title="'Status ' + slotProps.data.status">
+                  {{ slotProps.data.status }}
+                </span>
+              </template></Column>
           </DataTable>
         </div>
 
