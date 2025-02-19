@@ -409,6 +409,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     resultsPathname.value =  undefined;
     forecastPlotName.value =  undefined;
     forecastPlot.value = undefined;
+    calibrationRunForForecast.value =  undefined;
     clearUserCalibrationRunData();
   }
 

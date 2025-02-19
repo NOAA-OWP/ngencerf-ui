@@ -141,7 +141,7 @@ const onRowContextMenu = (event: any) => {
     } else {
       cmCalibrationRun.value.push({ label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() });
     }
-    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => clearForecastDataAndNavigateToSetupForecast() });
+    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => clearDataAndNavigateToSetupForecast() });
     cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
     //cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() } );
     //cmCalibrationRun.value.push( { label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onCalibrationRunForForecastRowSelect() } );    
@@ -154,16 +154,14 @@ onMounted(async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
-  // clear forecastJobId, forecastJobStatus, forecastCycle, and calibrationJobId
-  resetSelectedForecastRunId();
+  nextTick(async () => {
+    // clear all user-selected forecast and calibration data
+    resetUserSelectedForecastCalibrationRun();
 
-  // load forecastRuns
-  await fetchForecastJobsListData();
+    // load forecastRuns
+    await fetchForecastJobsListData();
+  });
 
-  // load forecastCycles if not set
-  if (!forecastCycles.value || forecastCycles.value.length === 0) {
-    await loadSetupForecastTabData();
-  }
   isLoading.value = false;
 });
 
@@ -202,11 +200,10 @@ const openSelectedCalibrationRun = () => {
   })
 }
 
-const clearForecastDataAndNavigateToSetupForecast = () => {
+const clearDataAndNavigateToSetupForecast = () => {
   isLoading.value = true;
 
   nextTick(async () => {
-    resetUserSelectedForecastCalibrationRun();
     navigateToSetupForecast();
   });
 
