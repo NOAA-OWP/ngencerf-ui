@@ -55,10 +55,10 @@
                 <div :style="{ backgroundColor: getColor(scope.data.severity) }">&nbsp;</div>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="datetime" header="Date" class="columnClass"
+            <Column :pt="ptColumn" field="datetime" header="Date" class="columnClass" sortable
               style="width: 19%; text-align:center; vertical-align: top;">
             </Column>
-            <Column :pt="ptColumn" field="severity" header="Severity" class="columnClass text-center"
+            <Column :pt="ptColumn" field="severity" header="Severity" class="columnClass text-center" sortable
               style="width: 8%; text-align:center; vertical-align: top;">
             </Column>
             <Column :pt="ptColumn" field="summary" header="Summary" class="columnClass text-center"
@@ -157,8 +157,6 @@ const getColor = (s: string) => {
   else if (s === 'success') return "green";
 }
 
-
-
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   //bodyCell: { style: { "text-align": "center" } }
@@ -181,11 +179,9 @@ const closeErroLogBox = () => {
   z-index: 9999;
   width: 975px;
   background-color: white;
-  // height: 800px; //629px;
 }
 
 #ErrorTable {
-  //  height: 500px;
   width: 100%;
 }
 

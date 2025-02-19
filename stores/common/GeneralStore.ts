@@ -61,7 +61,7 @@ export const generalStore = defineStore(
           datetime: "Feb 11 2025 14:28:19",
         },
         {
-          severity: "error",
+          severity: "info",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
@@ -82,28 +82,28 @@ export const generalStore = defineStore(
           datetime: "Feb 11 2025 14:28:23",
         },
         {
-          severity: "error",
+          severity: "info",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
           datetime: "Feb 11 2025 14:28:21",
         },
         {
-          severity: "error",
+          severity: "warn",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
           datetime: "Feb 11 2025 14:28:22",
         },
         {
-          severity: "error",
+          severity: "warn",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
           datetime: "Feb 11 2025 14:28:23",
         },
         {
-          severity: "error",
+          severity: "info",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
@@ -117,7 +117,7 @@ export const generalStore = defineStore(
           datetime: "Feb 11 2025 14:28:25",
         },
         {
-          severity: "error",
+          severity: "info",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
@@ -138,28 +138,28 @@ export const generalStore = defineStore(
           datetime: "Feb 11 2025 14:28:28",
         },
         {
-          severity: "error",
+          severity: "warn",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
           datetime: "Feb 11 2025 14:28:29",
         },
         {
-          severity: "error",
+          severity: "warn",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
           datetime: "Feb 11 2025 14:28:30",
         },
         {
-          severity: "error",
+          severity: "info",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
           datetime: "Feb 11 2025 14:28:31",
         },
         {
-          severity: "error",
+          severity: "info",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
@@ -180,7 +180,7 @@ export const generalStore = defineStore(
           datetime: "Feb 11 2025 14:28:34",
         },
         {
-          severity: "error",
+          severity: "warn",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
@@ -194,21 +194,21 @@ export const generalStore = defineStore(
           datetime: "Feb 11 2025 14:28:42",
         },
         {
-          severity: "error",
+          severity: "warn",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
           datetime: "Feb 11 2025 14:28:43",
         },
         {
-          severity: "error",
+          severity: "warn",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
           datetime: "Feb 11 2025 14:28:43",
         },
         {
-          severity: "error",
+          severity: "success",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
@@ -229,7 +229,7 @@ export const generalStore = defineStore(
           datetime: "Feb 11 2025 14:28:46",
         },
         {
-          severity: "error",
+          severity: "success",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
@@ -243,14 +243,14 @@ export const generalStore = defineStore(
           datetime: "Feb 11 2025 14:28:48",
         },
         {
-          severity: "error",
+          severity: "success",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
           datetime: "Feb 11 2025 14:28:48",
         },
         {
-          severity: "error",
+          severity: "success",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
@@ -319,14 +319,14 @@ export const generalStore = defineStore(
           datetime: "Feb 11 2025 14:28:29",
         },
         {
-          severity: "error",
+          severity: "success",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
           datetime: "Feb 11 2025 14:28:30",
         },
         {
-          severity: "error",
+          severity: "success",
           summary: "Unable to Save",
           detail: "Calibration and Validation times must not overlap",
 
