@@ -151,10 +151,10 @@ const getToastArray = computed(() => {
 });
 
 const getColor = (s: string) => {
-  if (s === 'info') return "#2563eb";
-  else if (s === 'warn') return "yellow";
-  else if (s === 'error') return "red";
-  else if (s === 'success') return "green";
+  if (s === 'info') return "#3498db";
+  else if (s === 'warn') return "#f1c40f";
+  else if (s === 'error') return "#e74c3c";
+  else if (s === 'success') return "#07bc0c";
 }
 
 const ptColumn = ref({
