@@ -47,7 +47,6 @@ export const generalStore = defineStore(
 
     const toastRecords = ref<ToastRecord[]>([]);
 
-    
     function addToastRecord(rec: ToastMessageOptions) {
       let dt = { datetime: Date().toString().substring(4, 24) };
       let newRec = { ...rec, ...dt };
@@ -57,7 +56,7 @@ export const generalStore = defineStore(
     function clearToastRecords() {
       toastRecords.value = [];
     }
-    
+
     function getServerInfo() {
       return serverInfo.value;
     }

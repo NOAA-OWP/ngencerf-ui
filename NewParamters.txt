@@ -1,0 +1,16 @@
+param         min         max         init         model
+b            2            15           4.05        CFE-S 
+satpsi       0.03         0.955        0.355       CFE-S
+satdk        1e-7         0.000726     3.38e-06    CFE-S
+slope        0.0          1.0          0.1         CFE-S
+max_gw_storage 0.01       0.25         0.05        CFE-S
+expon          1.0        8.0          3.0         CFE-S
+Cgw            1.8e-06    0.0018       1.8e-05     CFE-S
+Klf            0.0        1.0          0.01        CFE-S
+RSURF_EXP      1.0        6.0          5.0         Noah-OWP-Modular
+CWP            0.09       0.36         0.18        Noah-OWP-Modular
+MP             3.6        12.6         9.0         Noah-OWP-Modular
+VCMX25         24         112          52.2        Noah-OWP-Modular
+MFSNO          0.5        4            2           Noah-OWP-Modular
+RSURF_SNOW     0.136      100          50          Noah-OWP-Modular
+
