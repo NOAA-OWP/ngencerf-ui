@@ -48,7 +48,7 @@
       <div id="Row 3" class="row-span-10">
         <div id="TableWrapper">
           <DataTable id="ErrorTable" :value="getToastArray" class="p-datatable-striped" scrollable scroller="true"
-            :scroll-height="scrollHeight">
+            :scroll-height="scrollHeight" :sortOrder="-1" :sortField="'datetime'">
 
             <Column :pt="ptColumn" header="" class="" style="width: 1%; text-align:center; vertical-align: top;">
               <template #body="scope">
