@@ -124,7 +124,7 @@
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun, DataTableContextMenuOption, ForecastJob } from "@/composables/NextGenModel";
+import type { CalibrationRun, CalibrationRunForForecast, DataTableContextMenuOption, ForecastJob } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 
@@ -142,7 +142,9 @@ const forecastStore = useForecastStore();
 const { 
   forecastRunGageList, 
   forecastJobId, 
-  uiGageId, 
+  uiGageId,
+  calibrationRunForForecast,
+  calibrationRunsForForecast,
   forecastRuns, 
   forecastCycles } = storeToRefs(forecastStore);
 const { 
@@ -150,9 +152,9 @@ const {
   resetSelectedForecastRunId,
   loadSelectedCalibrationRun, 
   setSelectedForecastRowData, 
-  fetchForecastJobsListData, 
-  resetUserSelectedForecastCalibrationRun,
-  loadSetupForecastTabData } = useForecastStore();
+  getForecastJobs,
+  getCalibrationJobsForForecast,
+  resetUserSelectedForecastCalibrationRun } = useForecastStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -191,8 +193,6 @@ const onRowContextMenu = (event: any) => {
     }
     cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => clearDataAndNavigateToSetupForecast() });
     cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
-    //cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() } );
-    //cmCalibrationRun.value.push( { label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onCalibrationRunForForecastRowSelect() } );    
   }
 };
 
@@ -207,17 +207,14 @@ onMounted(async () => {
     resetUserSelectedForecastCalibrationRun();
 
     // load forecastRuns
-    await fetchForecastJobsListData();
+    await getForecastJobs();
+
+    // load calibrationRunsForForecast
+    await getCalibrationJobsForForecast();
   });
 
   isLoading.value = false;
 });
-
-const onRowDblClick = (event: any) => {
-  const rowData = event.data;
-  contextMenuJob.value = rowData.calibration_run_id;
-  openSelectedCalibrationRun();
-}
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
   const rowData = event.data as ForecastJob;
@@ -237,47 +234,48 @@ const viewCalibrationDetails = async (calibration_run_id: number) => {
   })
 }
 
-const openSelectedCalibrationRun = () => {
-  isLoading.value = true;
-  // resetUserSelectedEvalValidationRun();
-  nextTick(async () => {
-    // await loadSelectedCalibrationRun(contextMenuJob.value as number);
-    // await fetchUserSelectedCalibrationValidationRunList();
-    navigateToSetupForecast();
-    isLoading.value = false;
-  })
-}
-
 const clearDataAndNavigateToSetupForecast = () => {
   isLoading.value = true;
 
   nextTick(async () => {
+    // clear all user-selected forecast data
+    resetUserSelectedForecastCalibrationRun();
+
+    // set calibrationRunForForecast based on selectedForecastJob
+    calibrationRunForForecast.value = calibrationRunsForForecast.value.find((calibrationRun: CalibrationRunForForecast) => {
+      return calibrationRun.calibration_run_id === selectedForecastJob.value?.calibration_run_id;
+    }) as CalibrationRunForForecast;
+
+    // set userCalibrationRunData
+    await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+
     navigateToSetupForecast();
   });
 
   isLoading.value = false;
-}
+};
 
 const navigateToSetupForecast = () => {
-  if (true) {
-    const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
-    e.click();
-  } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeout6000 };
-    toast.add(tMsg); addToastRecord(tMsg);
-  }
+  const tabs = document.getElementsByClassName("tabs");
+  console.log('tabs', tabs);
+  const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
+  console.log('e', e);
+  e.click();
 }
 
 const navigateToForecastRunStatus = () => {
   const tabs = document.getElementsByClassName("tabs");
+  console.log('tabs', tabs);
   const e = <HTMLElement>tabs[ForecastTabs.tab_statusRun];
+  console.log('e', e);
   e.click();
 }
 
 const navigateToForecastResults = () => {
   const tabs = document.getElementsByClassName("tabs");
+  console.log('tabs', tabs);
   const e = <HTMLElement>tabs[ForecastTabs.tab_results];
+  console.log('e', e);
   e.click();
 }
 

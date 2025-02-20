@@ -690,9 +690,7 @@ export type ForecastCycle = {
   is_active: boolean;
 };
 
-export type CalibrationRunsForForecast = {
-  jobs: CalibrationRunForForecast[];
-}
+export type CalibrationRunsForForecast = CalibrationRunForForecast[];
 
 export type CalibrationRunForForecast = {
   calibration_run_id: number;

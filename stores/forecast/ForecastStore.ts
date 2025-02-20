@@ -76,7 +76,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * fetch get_forecast_jobs
    * @return {void}
    */
-  const fetchForecastJobsListData = async (): Promise<any> => {
+  const getForecastJobs = async (): Promise<any> => {
     forecastRuns.value = [];
     const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs/`, {
       method: "POST",
@@ -393,7 +393,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
 
 
   /**
-   * Reset user-selected forecast calibration run
+   * reset user-selected forecast data
    */
   const resetUserSelectedForecastCalibrationRun = (): void => {
     forecastJobId.value =  undefined;
@@ -434,7 +434,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     uiGageId,
     forecastRuns,
     overallForcingDownloadForecastStatus,
-    fetchForecastJobsListData,
+    getForecastJobs,
     loadSetupForecastTabData,
     loadForecastStatusRunTabData,
     loadForecastResultsTabData,
