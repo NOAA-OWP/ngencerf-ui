@@ -9,21 +9,57 @@
         <p class="prompt-txt mb-6" style="margin-top:-10px;">
           Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
         </p>
-        <div id="CalTable" class="w-max mx-auto">
-          <div class="grid grid-cols-1 mb-5 mt-2">
-            <div class="col-span-1 text-left">
-              <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter float-left" v-model="uiGageId"
+        <div id="CalTable" class="w-max mx-auto border border-gray-400">
+          <div id="FilterGroup"
+            class="grid grid-cols-8 mb-1 border-t-2 border-l-2 border-r-2 border-gray-400 pt-1 pb-1">
+            <div class="col-span-1 text-center">
+              <label for="HeadwaterBasinGage">Gage</label><br>
+              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
                 :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
                 aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
               </Select>
             </div>
+            <div class="col-span-3 text-center border-l-2 pl-1 border-gray-400">
+              <div class="grid grid-cols-3 text-center">
+                <div class="col-span-1">From</div>
+                <div class="col-span-1 font-bold">Date Range</div>
+                <div class="col-span-1">To</div>
+              </div>
+              <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
+                time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
+                @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
+              <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark" v-model="calDateEnd" time-picker-inline
+                text-input utc='preserve' format="yyyy-MM-dd HH:00" @update:model-value="handleCalDateStart"
+                aria-label="aria-label" title="title" />
+            </div>
+            <div class="col-span-1 text-center border-l-2 pl-1 pr-1 border-gray-400">
+              <label for="archived">Status</label><br>
+              <Select id="StatusTypeFilter" class="mr-2 text-center" v-model="statusTypeFilter" :options="StatusTypes"
+                filter optionLabel="status" optionValue="filterValue" placeholder="Any" aria-label="Select"
+                title="Select">
+              </Select>
+            </div>
+            <div class="col-span-1 text-center border-l-2 pl-1 pr-1 border-gray-400">
+              <label for="ModuleFilter">Modules</label><br>
+              <Select id="ModuleFilter" class="mr-2 text-center" v-model="selectedModuleValues"
+                :options="fetchFormulationModuleOptions" optionLabel="name" optionValue="name" placeholder="Any"
+                aria-label="Select" title="Select">
+              </Select>
+            </div>
+            <div class="col-span-1 text-center pt-5 border-l-2 border-gray-400 pl-1">
+              <Checkbox v-model="showArchivedJobsOnly" inputId="archived" name="archived" value="info" binary />
+              <label class="ml-3" for="showArchivedJobsOnly">Archived only</label>
+            </div>
+            <div class="col-span-1 text-center border-l-2 pl-1 pt-3 border-gray-400 align-middle"><Button
+                class="ngenButtonDiv">Reset</Button></div>
           </div>
+
+
           <ConfirmDialog></ConfirmDialog>
-          <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white boxed" ref="crContextMenu"
+          <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
           <DataTable id="cr-list" :value="filteredData" sortField="calibration_run_id" :sortOrder="-1" scrollable
-            scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
+            scroll-height="400px" table-style="min-width: 50rem;" v-model:selection="selectedCalibrationRun"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
             @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
             <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable> <template #body="slotProps">
@@ -106,6 +142,9 @@ import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
+import VueDatePicker from "@vuepic/vue-datepicker";
+import { DateTime } from "luxon";
+import Checkbox from 'primevue/checkbox';
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -124,8 +163,14 @@ import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "
 import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
+import { StatusTypes } from "@/composables/NextgenEnums";
+
 const { loadGageTabStaticData } = useGageStore();
-const { loadFormulationTabStaticData } = useFormulationStore();
+const { loadFormulationTabStaticData, fetchFormulationModuleOptions } = useFormulationStore();
+
+const { selectedModuleValues } = storeToRefs(useFormulationStore());
+
+
 const { loadOptimizationTabStaticData } = useOptimizationStore();
 const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 
@@ -143,6 +188,13 @@ const crContextMenu = ref(); //calibration run context menu
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+
+const statusTypeFilter = ref<string>("");
+
+const calDateStart = ref<any>(new Date("Jan 01 2025"));
+const calDateEnd = ref<any>(new Date());
+
+const showArchivedJobsOnly = ref<boolean>(false);
 
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>();
@@ -183,6 +235,16 @@ const filteredData = computed(() => {
     return updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
   }
 });
+
+/**
+ * Save filter start date
+ * @param e 
+ */
+const handleCalDateStart = (value: any) => {
+  if (typeof value === 'string') {
+    calDateStart.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+};
 
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
@@ -375,4 +437,22 @@ const updateUserCalibrationJobsListData = async (): Promise<void> => {
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
+
+#FilterGroup {
+  color: black;
+  font-weight: 600;
+}
+
+#CalDateStart {
+//
+}
+#CalDateEnd {
+  border-left: 1px solid #444;
+}
+
+.datePickers {
+  width: 50%;
+  display: inline-block;
+  text-align: center;
+}
 </style>
