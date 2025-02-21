@@ -61,10 +61,11 @@ export const ToastTimeout = {
 };
 
 export const StatusTypes = [
-  { status: "Saved", filterValue: "saved" },
-  { status: "Ready", filterValue: "ready" },
-  { status: "Running", filterValue: "running" },
-  { status: "Cancelled", filterValue: "cancelled" },
-  { status: "Failed", filterValue: "failed" },
-  { status: "Server Error", filterValue: "server error" },
+  { status: "Any", filterValue: "Any" },
+  { status: "Saved", filterValue: "Saved" },
+  { status: "Ready", filterValue: "Ready" },
+  { status: "Running", filterValue: "Running" },
+  { status: "Cancelled", filterValue: "Cancelled" },
+  { status: "Failed", filterValue: "Failed" },
+  { status: "Server Error", filterValue: "Server Error" },
 ];

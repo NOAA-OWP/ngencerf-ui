@@ -1,131 +1,160 @@
 <template>
   <client-only>
     <div class="mx-auto px-8 text-center overflow-auto">
-      <div class="width-full">
-        <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs</h1>
-        <Button class="ngenButtonDiv ml-8" @click="createNewCalibration" aria-label="New Calibration Job"
-          title="New Calibration Job">New</Button>
-        <br />
-        <p class="prompt-txt mb-6" style="margin-top:-10px;">
-          Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
-        </p>
-        <div id="CalTable" class="w-max mx-auto border border-gray-400">
-          <div id="FilterGroup"
-            class="grid grid-cols-8 mb-1 border-t-2 border-l-2 border-r-2 border-gray-400 pt-1 pb-1">
-            <div class="col-span-1 text-center">
-              <label for="HeadwaterBasinGage">Gage</label><br>
+      <div>
+        <!-- Page top -->
+        <div>
+          <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs</h1>
+          <Button class="ngenButtonDiv ml-8" @click="createNewCalibration" aria-label="New Calibration Job"
+            title="New Calibration Job">New</Button>
+          <br />
+          <p class="prompt-txt mb-6" style="margin-top:-10px;">
+            Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
+          </p>
+        </div>
+
+        <!-- Filters -->
+        <div id="FilterButton" class="text-center mb-1 w-full"><Button class="filter-link" @click="toggleShowFilters">{{
+          showFilters ? 'Hide' : 'Show' }}
+            Filters</Button>
+        </div>
+        <div v-show="showFilters">
+          <div id="FilterGroup" class="grid grid-cols-8 mb-1 pt-1 pb-1 -z-9999">
+            <div class="col-span-1 text-right">
+              <label for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
               <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
                 :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
                 aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
               </Select>
             </div>
-            <div class="col-span-3 text-center border-l-2 pl-1 border-gray-400">
+
+            <div class="col-span-3 text-center  pl-1">
               <div class="grid grid-cols-3 text-center">
-                <div class="col-span-1">From</div>
-                <div class="col-span-1 font-bold">Date Range</div>
-                <div class="col-span-1">To</div>
+                <div class="col-span-1 small-label">From</div>
+                <div class="col-span-1 small-label font-bold">Date Range</div>
+                <div class="col-span-1 small-label">To</div>
               </div>
-              <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
-                time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
-              <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark" v-model="calDateEnd" time-picker-inline
-                text-input utc='preserve' format="yyyy-MM-dd HH:00" @update:model-value="handleCalDateStart"
-                aria-label="aria-label" title="title" />
+
+              <div class="grid grid-cols-9">
+
+                <div class="col-span-4">
+                  <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
+                    time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
+                    @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
+                </div>
+                <div class="col-span-1">
+                  <Checkbox v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
+                </div>
+
+
+                <div class="col-span-4">
+                  <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark" v-model="calDateEnd"
+                    time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
+                    @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
+                </div>
+
+              </div>
             </div>
-            <div class="col-span-1 text-center border-l-2 pl-1 pr-1 border-gray-400">
+
+            <div class="col-span-1 text-center pl-1 pr-1">
               <label for="archived">Status</label><br>
               <Select id="StatusTypeFilter" class="mr-2 text-center" v-model="statusTypeFilter" :options="StatusTypes"
                 filter optionLabel="status" optionValue="filterValue" placeholder="Any" aria-label="Select"
                 title="Select">
               </Select>
             </div>
-            <div class="col-span-1 text-center border-l-2 pl-1 pr-1 border-gray-400">
+            <div class="col-span-1 text-center pl-1 pr-1">
               <label for="ModuleFilter">Modules</label><br>
               <Select id="ModuleFilter" class="mr-2 text-center" v-model="selectedModuleValues"
                 :options="fetchFormulationModuleOptions" optionLabel="name" optionValue="name" placeholder="Any"
                 aria-label="Select" title="Select">
               </Select>
             </div>
-            <div class="col-span-1 text-center pt-5 border-l-2 border-gray-400 pl-1">
+            <div class="col-span-1 text-center pt-5  pl-1">
               <Checkbox v-model="showArchivedJobsOnly" inputId="archived" name="archived" value="info" binary />
               <label class="ml-3" for="showArchivedJobsOnly">Archived only</label>
             </div>
-            <div class="col-span-1 text-center border-l-2 pl-1 pt-3 border-gray-400 align-middle"><Button
-                class="ngenButtonDiv">Reset</Button></div>
+            <div class="col-span-1 text-center  pl-1 pt-3 align-middle"><Button class="ngenButtonDiv">Reset</Button>
+            </div>
           </div>
+        </div>
+
+        <!-- Table -->
+        <div class="">
+          <div id="CalTable" class="w-max mx-auto">
+            <ConfirmDialog></ConfirmDialog>
+            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+              :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+            <DataTable id="cr-list" :value="filteredData" sortField="calibration_run_id" :sortOrder="-1" scrollable
+              scroll-height="400px" table-style="min-width: 50rem;" v-model:selection="selectedCalibrationRun"
+              selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
+              @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
+              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable> <template #body="slotProps">
+                  <span v-if="slotProps.data.calibration_run_id"
+                    :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
+                    :title="'Job ID ' + slotProps.data.calibration_run_id">
+                    {{ slotProps.data.calibration_run_id }}
+                  </span>
+                </template></Column>
+              <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable> <template #body="slotProps">
+                  <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
+                    :title="'Job Genesis ' + slotProps.data.job_genesis">
+                    {{ slotProps.data.job_genesis }}
+                  </span>
+                </template></Column>
+              <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable> <template
+                  #body="slotProps">
+                  <span v-if="slotProps.data.formulation_name"
+                    :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
+                    :title="'Formulation Name ' + slotProps.data.formulation_name">
+                    {{ slotProps.data.formulation_name }}
+                  </span>
+                </template></Column>
+              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable> <template
+                  #body="slotProps">
+                  <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
+                    :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
+                    {{ slotProps.data.gage_id }}
+                  </span>
+                </template></Column>
 
 
-          <ConfirmDialog></ConfirmDialog>
-          <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-            :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-          <DataTable id="cr-list" :value="filteredData" sortField="calibration_run_id" :sortOrder="-1" scrollable
-            scroll-height="400px" table-style="min-width: 50rem;" v-model:selection="selectedCalibrationRun"
-            selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-            @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
-            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable> <template #body="slotProps">
-                <span v-if="slotProps.data.calibration_run_id"
-                  :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
-                  :title="'Job ID ' + slotProps.data.calibration_run_id">
-                  {{ slotProps.data.calibration_run_id }}
-                </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable> <template #body="slotProps">
-                <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
-                  :title="'Job Genesis ' + slotProps.data.job_genesis">
-                  {{ slotProps.data.job_genesis }}
-                </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable> <template
-                #body="slotProps">
-                <span v-if="slotProps.data.formulation_name"
-                  :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
-                  :title="'Formulation Name ' + slotProps.data.formulation_name">
-                  {{ slotProps.data.formulation_name }}
-                </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable> <template #body="slotProps">
-                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
-                  :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
-                  {{ slotProps.data.gage_id }}
-                </span>
-              </template></Column>
-
-
-            <Column field="created_at" header="Creation Date" sortable>Column
-              <template #body="slotProps">
-                <span :aria-label="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)"
-                  :title="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)">
-                  {{ formatDateForDisplay(slotProps.data.created_at) }}
-                </span>
-              </template>
-            </Column>
-            <Column field="submit_date" header="Submit Date" sortable>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.submit_date"
-                  :aria-label="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)"
-                  :title="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)">
-                  {{ formatDateForDisplay(slotProps.data.submit_date) }}
-                </span>
-              </template>
-            </Column>
-            <Column header="Calibration Period" sortable>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period"
-                  :aria-label="'Calibration Period ' + formatDateForDisplay(slotProps.data.calibration_start_period) + ' to ' + formatDateForDisplay(slotProps.data.calibration_end_period)"
-                  :title="'Calibration Period ' + formatDateForDisplay(slotProps.data.calibration_start_period) + ' to ' + formatDateForDisplay(slotProps.data.calibration_end_period)">
-                  {{ formatDateForDisplay(slotProps.data.calibration_start_period) }} <span
-                    v-if="slotProps.data.calibration_end_period">to</span>
-                  {{ formatDateForDisplay(slotProps.data.calibration_end_period) }}
-                </span>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="status" header="Status" sortable> <template #body="slotProps">
-                <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
-                  :title="'Status ' + slotProps.data.status">
-                  {{ slotProps.data.status }}
-                </span>
-              </template></Column>
-          </DataTable>
+              <Column field="created_at" header="Creation Date" sortable>Column
+                <template #body="slotProps">
+                  <span :aria-label="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)"
+                    :title="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)">
+                    {{ formatDateForDisplay(slotProps.data.created_at) }}
+                  </span>
+                </template>
+              </Column>
+              <Column field="submit_date" header="Submit Date" sortable>
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.submit_date"
+                    :aria-label="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)"
+                    :title="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)">
+                    {{ formatDateForDisplay(slotProps.data.submit_date) }}
+                  </span>
+                </template>
+              </Column>
+              <Column header="Calibration Period" sortable>
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period"
+                    :aria-label="'Calibration Period ' + formatDateForDisplay(slotProps.data.calibration_start_period) + ' to ' + formatDateForDisplay(slotProps.data.calibration_end_period)"
+                    :title="'Calibration Period ' + formatDateForDisplay(slotProps.data.calibration_start_period) + ' to ' + formatDateForDisplay(slotProps.data.calibration_end_period)">
+                    {{ formatDateForDisplay(slotProps.data.calibration_start_period) }} <span
+                      v-if="slotProps.data.calibration_end_period">to</span>
+                    {{ formatDateForDisplay(slotProps.data.calibration_end_period) }}
+                  </span>
+                </template>
+              </Column>
+              <Column :pt="ptColumn" field="status" header="Status" sortable> <template #body="slotProps">
+                  <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
+                    :title="'Status ' + slotProps.data.status">
+                    {{ slotProps.data.status }}
+                  </span>
+                </template></Column>
+            </DataTable>
+          </div>
         </div>
 
       </div>
@@ -196,6 +225,13 @@ const calDateEnd = ref<any>(new Date());
 
 const showArchivedJobsOnly = ref<boolean>(false);
 
+const showFilters = ref<boolean>(false);
+
+const useDateRange = ref<boolean>(false);
+
+const earliestTime = ref<Date>();
+const latestTime = ref<Date>();
+
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>();
 const cmCalibrationRun = ref([
@@ -224,17 +260,71 @@ onMounted(async () => {
     await fetchUserCalibrationJobsListData();
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     await updateUserCalibrationJobsListData();
+
+    if (updatedUserCalibrationJobsListData.value) {
+      console.log(findEarliestAndLatest(updatedUserCalibrationJobsListData.value));
+    }
   }
 })
 
-// Computed filtered data for DataTables
+// Computed filtered data based on multiple filters
 const filteredData = computed(() => {
-  if (!uiGageId.value || uiGageId.value === "All") {
-    return updatedUserCalibrationJobsListData?.value;
-  } else {
-    return updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
+  let newCalJobList = updatedUserCalibrationJobsListData?.value;
+
+  if (newCalJobList) {
+    // Filter Headwater Basin Gage
+    if (uiGageId.value && uiGageId.value !== "All") {
+      newCalJobList = updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
+    }
+
+    // Filter Status
+    if (statusTypeFilter.value && statusTypeFilter.value !== "Any") {
+      newCalJobList = newCalJobList?.filter((row) => (row as CalibrationJobListItem).status === statusTypeFilter.value);
+    }
+
+    if (useDateRange.value) {
+      newCalJobList = filterByDateRange(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
+    }
+
+    return newCalJobList;
   }
 });
+
+const filterByDateRange = (data: any[], calDateStart: string, calDateEnd: string) => {
+  const startDate = new Date(calDateStart).getTime();
+  const endDate = new Date(calDateEnd).getTime();
+
+  return data.filter((item) => {
+    const itemDate = new Date(item.created_at).getTime();
+    return itemDate >= startDate && itemDate <= endDate;
+  });
+}
+
+
+const findEarliestAndLatest = (items: CalibrationJobListItem[]) => {
+  if (!items.length) return null;
+
+  let earliest = items[0].created_at;
+  let latest = items[0].created_at;
+
+  for (const item of items) {
+    if (new Date(item.created_at) < new Date(earliest)) {
+      earliest = item.created_at;
+    }
+    if (new Date(item.created_at) > new Date(latest)) {
+      latest = item.created_at;
+    }
+  }
+
+  earliestTime.value = calDateStart.value = earliest;
+  latestTime.value = calDateEnd.value = latest;
+
+};
+
+// Template for the "Archived" column (Yes/No display)
+const archivedTemplate = (rowData: any) => {
+  return rowData.archived ? 'Yes' : 'No';
+};
 
 /**
  * Save filter start date
@@ -431,27 +521,65 @@ const updateUserCalibrationJobsListData = async (): Promise<void> => {
   );
 };
 
-
+const toggleShowFilters = () => {
+  showFilters.value = !showFilters.value;
+}
 </script>
 
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
 
+label,
+small-label,
+.--dp-font-size {
+  font-size: 0.9em !important;
+}
+
+#HeadwaterBasinGage {
+  width: auto;
+}
+
 #FilterGroup {
   color: black;
   font-weight: 600;
+  width: 1350px;
+  margin: 0 auto;
 }
 
-#CalDateStart {
-//
+#CalTable {
+  min-height: 400px
 }
-#CalDateEnd {
-  border-left: 1px solid #444;
+
+#CalDateEnd,
+#CalDateStart {
+  padding: 0 4px;
+  width: 100%;
+
+  :first-child {
+    > :first-child {
+      > :first-child {
+        font-size: 0.9em;
+      }
+    }
+  }
+
+}
+
+.filter-link {
+  color: global.$color-blue;
+  text-decoration: underline;
+  background-color: transparent !important;
+  padding: 5px;
+}
+
+.filter-link:hover {
+  background-color: global.$ngwcp_primary1 !important;
+  padding: 5px;
+  border: none;
 }
 
 .datePickers {
-  width: 50%;
   display: inline-block;
   text-align: center;
 }

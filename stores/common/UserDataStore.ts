@@ -28,8 +28,6 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
   const userSelectedCalibrationIterationId = ref<number | null>(null);
   const uiGageId = ref<string>("");
 
-
-
   /**
    * Checks if user is logged in
    * @returns {boolean} true if user is logged in, false otherwise.
@@ -278,6 +276,7 @@ export const useUserDataStore = defineStore("UserDataStore", () => {
     refreshToken.value = null;
     userCalibrationJobsListData.value = [];
     userCalibrationRunData.value = undefined;
+    uiGageId.value = "";
   }
 
   /**
