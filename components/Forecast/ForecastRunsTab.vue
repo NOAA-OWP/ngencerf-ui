@@ -272,11 +272,13 @@ const navigateToForecastRunStatus = () => {
 }
 
 const navigateToForecastResults = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  console.log('tabs', tabs);
-  const e = <HTMLElement>tabs[ForecastTabs.tab_results];
-  console.log('e', e);
-  e.click();
+  nextTick(() => {
+    const tabs = document.getElementsByClassName("tabs");
+    console.log('tabs', tabs);
+    const e = <HTMLElement>tabs[ForecastTabs.tab_results];
+    console.log('e', e);
+    e.click();
+  });
 }
 
 const rowStyle = (data: any) => {
