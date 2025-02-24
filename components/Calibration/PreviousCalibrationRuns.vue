@@ -195,7 +195,7 @@ import { formatDateForDisplay } from '@/utils/TimeHelpers';
 import { StatusTypes } from "@/composables/NextgenEnums";
 
 const { loadGageTabStaticData } = useGageStore();
-const { loadFormulationTabStaticData, fetchFormulationModuleOptions } = useFormulationStore();
+const { fetchFormulationModuleOptions } = useFormulationStore();
 
 const { selectedModuleValues } = storeToRefs(useFormulationStore());
 
@@ -262,7 +262,7 @@ onMounted(async () => {
     await updateUserCalibrationJobsListData();
 
     if (updatedUserCalibrationJobsListData.value) {
-      console.log(findEarliestAndLatest(updatedUserCalibrationJobsListData.value));
+      findEarliestAndLatest(updatedUserCalibrationJobsListData.value);
     }
   }
 })
@@ -365,7 +365,6 @@ const loadEntireRun = () => {
   isLoading.value = true;
   nextTick(async () => {
     await loadGageTabStaticData();
-    await loadFormulationTabStaticData();
     isLoading.value = true;
     await loadTuningTabStaticData();
     await loadOptimizationTabStaticData();
@@ -416,7 +415,6 @@ const createNewCalibration = async () => {
 const gotoHeadwaterBasinGage = () => {
   nextTick(async () => {
     await loadGageTabStaticData();
-    await loadFormulationTabStaticData();
     await loadTuningTabStaticData();
     await loadOptimizationTabStaticData();
     const tabs = document.getElementsByClassName("tabs");

@@ -44,7 +44,7 @@ const gstore = generalStore();
 const { popupActive } = storeToRefs(gstore);
 
 const { resetGageStore } = useGageStore();
-const { resetFormulationStore } = useFormulationStore();
+const { resetFormulationStore, loadFormulationModels } = useFormulationStore();
 const { resetOptimizationStore } = useOptimizationStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
 const { hardResetTuningStore } = useTuningStore();
@@ -54,13 +54,14 @@ const { fetchUserCalibrationJobsListData, getUserName, getUserFullName} = useUse
 
 onMounted(() => {
   popupActive.value = false;
-  nextTick(() => {
+  nextTick( async () => {
     resetGageStore();
     resetFormulationStore();
     resetOptimizationStore();
     hardResetRunStatusStore();
-    hardResetTuningStore();
-    fetchUserCalibrationJobsListData();
+    hardResetTuningStore(); 
+    await fetchUserCalibrationJobsListData();
+    await loadFormulationModels();
   })
 })
 
