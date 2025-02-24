@@ -128,10 +128,10 @@
     </div>
   </div>
   <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
-    <UserAccount />
+    <LazyUserAccount />
   </div>
   <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
-    <AboutBox />
+    <LazyAboutBox />
   </div>
   <div id="ErrorLogOverlay" class="hidden" ref="errorOverlay">
     <LazyErrorLog />
@@ -147,9 +147,9 @@ import ContextMenu from 'primevue/contextmenu';
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 
-import UserAccount from "@/components/Common/UserAccount.vue";
-
 import { useLogout, useLogoutListen } from "@/composables/UseEventBus";
+
+const LazyUserAccount = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
 
 const LazyHelpLandingPageHelp = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
 const LazyCalibrationHelpPreviousRunsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/PreviousRunsHelp.vue"))
@@ -164,7 +164,7 @@ const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/c
 const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
 const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/RunStatusHelp.vue"))
-const AboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
+const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
 
 const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
