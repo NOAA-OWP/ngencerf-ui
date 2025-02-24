@@ -18,66 +18,90 @@
           showFilters ? 'Hide' : 'Show' }}
             Filters</Button>
         </div>
-        <div v-show="showFilters">
-          <div id="FilterGroup" class="grid grid-cols-8 mb-1 pt-1 pb-1 -z-9999">
-            <div class="col-span-1 text-right">
-              <label for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
-              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
-                :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
-                aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
-              </Select>
-            </div>
 
-            <div class="col-span-3 text-center  pl-1">
-              <div class="grid grid-cols-3 text-center">
-                <div class="col-span-1 small-label">From</div>
-                <div class="col-span-1 small-label font-bold">Date Range</div>
-                <div class="col-span-1 small-label">To</div>
+
+        <Transition>
+          <div v-show="showFilters" class="mb-5">
+            <div id="FilterGroup" class="grid grid-cols-8 mb-1 pt-1 pb-1 -z-9999">
+              <div class="col-span-1 text-right">
+                <label for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
+                <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
+                  :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
+                  aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
+                </Select>
               </div>
 
-              <div class="grid grid-cols-9">
-
-                <div class="col-span-4">
-                  <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
-                    time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
-                    @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
-                </div>
-                <div class="col-span-1">
-                  <Checkbox v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
+              <div class="col-span-3 text-center  pl-1">
+                <div class="grid grid-cols-3 text-center">
+                  <div class="col-span-1 small-label">From</div>
+                  <div class="col-span-1 small-label font-bold">Date Range</div>
+                  <div class="col-span-1 small-label">To</div>
                 </div>
 
+                <div class="grid grid-cols-9">
 
-                <div class="col-span-4">
-                  <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark" v-model="calDateEnd"
-                    time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
-                    @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
+                  <div class="col-span-4">
+                    <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
+                      time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
+                      @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
+                  </div>
+                  <div class="col-span-1">
+                    <Checkbox v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
+                  </div>
+
+                  <div class="col-span-4">
+                    <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark" v-model="calDateEnd"
+                      time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
+                      @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
+                  </div>
+
                 </div>
-
               </div>
-            </div>
 
-            <div class="col-span-1 text-center pl-1 pr-1">
-              <label for="archived">Status</label><br>
-              <Select id="StatusTypeFilter" class="mr-2 text-center" v-model="statusTypeFilter" :options="StatusTypes"
-                filter optionLabel="status" optionValue="filterValue" placeholder="Any" aria-label="Select"
-                title="Select">
-              </Select>
-            </div>
-            <div class="col-span-1 text-center pl-1 pr-1">
-              <label for="ModuleFilter">Modules</label><br>
-              <Select id="ModuleFilter" class="mr-2 text-center" v-model="selectedModuleValues"
-                :options="fetchFormulationModuleOptions" optionLabel="name" optionValue="name" placeholder="Any"
-                aria-label="Select" title="Select">
-              </Select>
-            </div>
-            <div class="col-span-1 text-center pt-5  pl-1">
-              <Checkbox v-model="showArchivedJobsOnly" inputId="archived" name="archived" value="info" binary />
-              <label class="ml-3" for="showArchivedJobsOnly">Archived only</label>
-            </div>
-            <div class="col-span-1 text-center  pl-1 pt-3 align-middle"><Button class="ngenButtonDiv">Reset</Button>
+              <div class="col-span-1 text-center pl-1 pr-1">
+                <label for="archived">Status</label><br>
+                <Select id="StatusTypeFilter" class="mr-2 text-center" v-model="statusTypeFilter" :options="StatusTypes"
+                  filter optionLabel="status" optionValue="filterValue" placeholder="Any" aria-label="Select"
+                  title="Select">
+                </Select>
+              </div>
+              <div class="col-span-1 text-center pl-1 pr-1">
+                <label for="ModuleFilter">Modules</label><br>
+                <Button class="module-select font-normal" @click="moduleFilterSelectVisible = true"
+                  :title="getModuleFilterList()">
+                  Click to Select
+                </Button>
+              </div>
+              <div class="col-span-1 text-center pt-5  pl-1">
+                <Checkbox v-model="showArchivedJobsOnly" inputId="archived" name="archived" value="info" binary />
+                <label class="ml-3" for="showArchivedJobsOnly">Archived only</label>
+              </div>
+              <div class="col-span-1 text-center  pl-1 pt-3 align-middle"><Button class="ngenButtonDiv">Reset</Button>
+              </div>
             </div>
           </div>
-        </div>
+        </Transition>
+
+        <Dialog v-model:visible="moduleFilterSelectVisible" modal header="Select Modules" :style="{ width: '25rem' }">
+          <div class="pt-4 mb-1 font-bold text-base">Select Modules</div>
+          <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
+            optionLabel="name" optionValue="name" class="h-60" @change="true === true">
+            <template #option="slotProps">
+              <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
+                <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
+                  :title="slotProps.option.name">
+                  {{ slotProps.option.name }}</div>
+              </div>
+
+            </template>
+          </Listbox>
+          <div class="flex justify-end gap-2">
+            <Button type="button" label="Cancel" severity="secondary"
+              @click="moduleFilterSelectVisible = false"></Button>
+            <Button type="button" label="Ok" @click="moduleFilterSelectVisible = false"></Button>
+          </div>
+        </Dialog>
+
 
         <!-- Table -->
         <div class="">
@@ -174,6 +198,7 @@ import { useToast } from "primevue/usetoast";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 import Checkbox from 'primevue/checkbox';
+import MultiSelect from 'primevue/multiselect';
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -232,6 +257,10 @@ const useDateRange = ref<boolean>(false);
 const earliestTime = ref<Date>();
 const latestTime = ref<Date>();
 
+const moduleFilterSelectVisible = ref<boolean>(false);
+
+const modulesFilterList = ref<string[]>([]);
+
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>();
 const cmCalibrationRun = ref([
@@ -286,6 +315,13 @@ const filteredData = computed(() => {
       newCalJobList = filterByDateRange(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
     }
 
+    let test = ""
+    if (modulesFilterList.value.length) {
+      newCalJobList = newCalJobList?.filter(job =>
+        job.modules.some(module => modulesFilterList.value.includes(module))
+      );
+    }
+    //modulesFilterList
     return newCalJobList;
   }
 });
@@ -519,8 +555,29 @@ const updateUserCalibrationJobsListData = async (): Promise<void> => {
   );
 };
 
+/**
+ * Toggle filters on/off
+ * 
+ */
 const toggleShowFilters = () => {
   showFilters.value = !showFilters.value;
+}
+
+
+/**
+ * Create a comma separated list of module names
+ * 
+ * returns string array
+ */
+const getModuleFilterList = () => {
+  let l = "";
+  modulesFilterList.value.forEach((e, idx) => {
+    l += e;
+    if (idx !== modulesFilterList.value.length - 1) {
+      l += ", ";
+    }
+  });
+  return l;
 }
 </script>
 
@@ -561,24 +618,49 @@ small-label,
       }
     }
   }
-
 }
 
-.filter-link {
+.filter-link,
+.module-select {
   color: global.$color-blue;
   text-decoration: underline;
   background-color: transparent !important;
   padding: 5px;
 }
 
-.filter-link:hover {
-  background-color: global.$ngwcp_primary1 !important;
-  padding: 5px;
+.filter-link:hover,
+.module-select:hover {
+  font-weight: bold !important;
   border: none;
+}
+
+.p-button:not(:disabled):hover {
+  background-color: transparent;
 }
 
 .datePickers {
   display: inline-block;
   text-align: center;
 }
+
+/* we will explain what these classes do next! */
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+#ModuleFilter {
+  height: 37px;
+  background-color: #f3f3f3;
+  p-multiselect-label-container {
+    margin-top: -6px;
+  }
+}
+
+
 </style>
