@@ -261,20 +261,26 @@ const clearDataAndNavigateToSetupForecast = () => {
 
 const navigateToSetupForecast = () => {
   nextTick(() => {
-    const tabs = document.getElementsByClassName("tabs");
-    console.log('tabs', tabs);
-    const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
-    console.log('e', e);
-    e.click();
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast tab"]');
+
+    if (e) {
+      e.click();
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast tab not found' } as ToastMessageOptions);
+    }
   });
 }
 
 const navigateToForecastRunStatus = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  console.log('tabs', tabs);
-  const e = <HTMLElement>tabs[ForecastTabs.tab_statusRun];
-  console.log('e', e);
-  e.click();
+  nextTick(() => {
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Status/Run Tab"]');
+
+    if (e) {
+      e.click();
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Status/Run tab not found' } as ToastMessageOptions);
+    }
+  });
 }
 
 const navigateToForecastResults = async () => {
