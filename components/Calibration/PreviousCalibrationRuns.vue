@@ -15,7 +15,7 @@
 
         <!-- Filters -->
         <div id="FilterButton" class="text-center mb-1 w-full"><Button class="filter-link" @click="toggleShowFilters">{{
-          showFilters ? 'Hide' : 'Show' }}
+            showFilters ? 'Hide' : 'Show' }}
             Filters</Button>
         </div>
 
@@ -80,7 +80,9 @@
               </div>
             </div>
           </div>
-        </Transition>
+        </Transition> 
+       
+
 
         <Dialog v-model:visible="moduleFilterSelectVisible" modal header="Select Modules" :style="{ width: '25rem' }">
           <div class="pt-4 mb-1 font-bold text-base">Select Modules</div>
@@ -101,6 +103,7 @@
             <Button type="button" label="Ok" @click="moduleFilterSelectVisible = false"></Button>
           </div>
         </Dialog>
+        
 
 
         <!-- Table -->
@@ -217,6 +220,8 @@ import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "
 import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
+import JobFilterDialog from "../Common/JobFilterDialog.vue";
+
 import { StatusTypes } from "@/composables/NextgenEnums";
 
 const { loadGageTabStaticData } = useGageStore();
@@ -262,7 +267,9 @@ const moduleFilterSelectVisible = ref<boolean>(false);
 const modulesFilterList = ref<string[]>([]);
 
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
+
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>();
+
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
@@ -561,6 +568,7 @@ const updateUserCalibrationJobsListData = async (): Promise<void> => {
  */
 const toggleShowFilters = () => {
   showFilters.value = !showFilters.value;
+  console.log(showFilters.value)
 }
 
 
@@ -636,6 +644,8 @@ small-label,
 
 .p-button:not(:disabled):hover {
   background-color: transparent;
+  color: global.$color-blue;
+  font-weight: bold;
 }
 
 .datePickers {
