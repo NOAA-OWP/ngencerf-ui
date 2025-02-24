@@ -17,6 +17,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const forecastJobId = ref<number>();
   const forecastCycles = ref<ForecastCycle[]>();
   const forecastCycle = ref<ForecastCycle>();
+  const forecastCycleName = ref<string>();
   const forecastJobStatus = ref<string>();
   const forcingDownloadStatus = ref<string>();
   const elapsedTime = ref<string>();
@@ -132,17 +133,18 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const loadForecastStatusRunTabData = async (): Promise<void> => {
     // get forecast job data
     if (forecastJobId?.value) {
-      // get forecast status
+      // query get_status endpoint
       const getStatusResponse: any = await getStatus();
 
       // TODO: create forecastJob interface
       const forecastJob: any  = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
 
-      // set forecastJobStatus, elapsedTime, submitTime, and resultsPathname
-      forecastJobStatus.value = forecastJob.status;
-      forcingDownloadStatus.value = forecastJob.forcing_download.status;
-      elapsedTime.value = forecastJob.elapsed_time;
-      submitTimeDate.value = new Date(forecastJob.submit_date as string);
+      // set forecastCycle, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
+      forecastCycleName.value = forecastJob?.cycle;
+      forecastJobStatus.value = forecastJob?.status;
+      forcingDownloadStatus.value = forecastJob?.forcing_download?.status;
+      elapsedTime.value = forecastJob?.elapsed_time;
+      submitTimeDate.value = new Date(forecastJob?.submit_date as string);
       if (isValidDate(submitTimeDate.value)) {
         submitTime.value = convertTimeZone(submitTimeDate.value);
       }
@@ -154,13 +156,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   /**
    * Load Forecast Results tab data
    */
-  const loadForecastResultsTabData = async (): Promise<string[]> => {
-    const results = await Promise.all([
-      setResultsPathname(), // set resultsPathname
-      setForecastPlot(), // set forecastPlot
-    ]);
-  
-    return results.flat(); // combine results from both function calls
+  const loadForecastResultsTabData = async (): Promise<void> => {
+    await loadForecastStatusRunTabData() // load forecast status/run tab data
+    await setForecastPlot() // set forecastPlot  
   };
 
   /**
@@ -399,6 +397,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobId.value =  undefined;
     forecastCycles.value =  [];
     forecastCycle.value =  undefined;
+    forecastCycleName.value =  undefined;
     forecastJobStatus.value =  undefined;
     forcingDownloadStatus.value =  undefined;
     elapsedTime.value =  undefined;
@@ -418,6 +417,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobId,
     forecastCycles,
     forecastCycle,
+    forecastCycleName,
     forecastJobStatus,
     forcingDownloadStatus,
     elapsedTime,

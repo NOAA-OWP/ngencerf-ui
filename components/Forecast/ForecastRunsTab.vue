@@ -142,6 +142,7 @@ const forecastStore = useForecastStore();
 const { 
   forecastRunGageList, 
   forecastJobId, 
+  forecastJobStatus,
   uiGageId,
   calibrationRunForForecast,
   calibrationRunsForForecast,
@@ -150,6 +151,9 @@ const {
 const { 
   setSelectedForecastRunId, 
   resetSelectedForecastRunId,
+  loadSetupForecastTabData,
+  loadForecastStatusRunTabData,
+  loadForecastResultsTabData,
   loadSelectedCalibrationRun, 
   setSelectedForecastRowData, 
   getForecastJobs,
@@ -256,11 +260,13 @@ const clearDataAndNavigateToSetupForecast = () => {
 };
 
 const navigateToSetupForecast = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  console.log('tabs', tabs);
-  const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
-  console.log('e', e);
-  e.click();
+  nextTick(() => {
+    const tabs = document.getElementsByClassName("tabs");
+    console.log('tabs', tabs);
+    const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
+    console.log('e', e);
+    e.click();
+  });
 }
 
 const navigateToForecastRunStatus = () => {
@@ -271,13 +277,15 @@ const navigateToForecastRunStatus = () => {
   e.click();
 }
 
-const navigateToForecastResults = () => {
+const navigateToForecastResults = async () => {
   nextTick(() => {
-    const tabs = document.getElementsByClassName("tabs");
-    console.log('tabs', tabs);
-    const e = <HTMLElement>tabs[ForecastTabs.tab_results];
-    console.log('e', e);
-    e.click();
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Results tab"]');
+
+    if (e) {
+      e.click();
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found' } as ToastMessageOptions);
+    }
   });
 }
 

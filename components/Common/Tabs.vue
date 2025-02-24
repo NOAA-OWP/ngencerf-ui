@@ -92,7 +92,7 @@
             Status/Run
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-if="forecastJobId && forecastJobStatus !== 'Running'" data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
+          <div v-if="forecastJobId" data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
             title="Results tab">
             Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
@@ -116,7 +116,7 @@
             Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
+          <div id="results-tab" data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
             title="Results tab">
             Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>

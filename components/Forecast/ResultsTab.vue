@@ -30,12 +30,12 @@
             <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
           </td>
         </tr>
-        <tr height="32px" :aria-label="'Cycle is ' + (forecastCycle as ForecastCycle).name"
-          :title="'Cycle is ' + (forecastCycle as ForecastCycle).name">
+        <tr height="32px" :aria-label="'Cycle is ' + forecastCycleName"
+          :title="'Cycle is ' + forecastCycleName">
           <th scope="row" class="text-right font-bold">
             <div style="width: 140px;">Cycle</div>
           </th>
-          <td class="pl-5">{{ (forecastCycle as ForecastCycle).name ?? '-'.repeat(30) }}</td>
+          <td class="pl-5">{{ forecastCycleName ?? '-'.repeat(30) }}</td>
         </tr>
       </tbody>
     </table>
@@ -65,7 +65,7 @@ const { addToastRecord } = generalStore();
 const {
   calibrationRunForForecast,
   forecastJobId,
-  forecastCycle,
+  forecastCycleName,
   resultsPathname,
   forecastPlot,
 } = storeToRefs(useForecastStore());
@@ -84,14 +84,7 @@ onMounted(async () => {
   hilightTab(ForecastTabs.tab_results);
 
   // load Results tab data
-  const messages: string[] = await loadForecastResultsTabData();
-
-  if (messages.length > 0) {
-    messages.forEach((message: string) => {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: message };
-      toast.add(tMsg); addToastRecord(tMsg);
-    });
-  }
+  await loadForecastResultsTabData();
 });
 </script>
 
