@@ -22,57 +22,6 @@
 
 
         <!-- <Transition>
-          <div v-show="showFilters" class="mb-5">
-            <div id="FilterGroup" class="grid grid-cols-8 mb-1 pt-1 pb-1 -z-9999">
-              <div class="col-span-1 text-right">
-                <label for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
-                <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
-                  :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
-                  aria-label="Headwater Basin Gage Filter SelmodulesFilterListect" title="Headwater Basin Gage Filter Select">
-                </Select>
-              </div>
-
-              <div class="col-span-3 text-center  pl-1">
-                <div class="grid grid-cols-3 text-center">
-                  <div class="col-span-1 small-label">From</div>
-                  <div class="col-span-1 small-label font-bold">Date Range</div>
-                  <div class="col-span-1 small-label">To</div>
-                </div>
-
-                <div class="grid grid-cols-9">
-
-                  <div class="col-span-4">
-                    <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
-                      time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
-                      @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
-                  </div>
-                  <div class="col-span-1">
-                    <Checkbox v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
-                  </div>
-
-                  <div class="col-span-4">
-                    <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark" v-model="calDateEnd"
-                      time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
-                      @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
-                  </div>
-
-                </div>
-              </div>
-
-              <div class="col-span-1 text-center pl-1 pr-1">
-                <label for="archived">Status</label><br>
-                <Select id="StatusTypeFilter" class="mr-2 text-center" v-model="statusTypeFilter" :options="StatusTypes"
-                  filter optionLabel="status" optionValue="filterValue" placeholder="Any" aria-label="Select"
-                  title="Select">
-                </Select>
-              </div>
-              <div class="col-span-1 text-center pl-1 pr-1">
-                <label for="ModuleFilter">Modules</label><br>
-                <Button class="module-select font-normal" @click="moduleFilterSelectVisible = true"
-                  :title="getModuleFilterList()">
-                  Click to Select
-                </Button>
-              </div>
               <div class="col-span-1 text-center pt-5  pl-1">
                 <Checkbox v-model="showArchivedJobsOnly" inputId="archived" name="archived" value="info" binary />
                 <label class="ml-3" for="showArchivedJobsOnly">Archived only</label>
@@ -217,7 +166,7 @@ const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
-const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList, modulesFilterList } = storeToRefs(useUserDataStore());
+const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList, statusTypeFilter, calDateStart, calDateEnd, earliestTime, latestTime } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -229,19 +178,11 @@ const crContextMenu = ref(); //calibration run context menu
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
 
-const statusTypeFilter = ref<string>("");
-
-const calDateStart = ref<any>(new Date("Jan 01 2025"));
-const calDateEnd = ref<any>(new Date());
-
 const showArchivedJobsOnly = ref<boolean>(false);
 
 const showFilters = ref<boolean>(false);
-
 const useDateRange = ref<boolean>(false);
 
-const earliestTime = ref<Date>();
-const latestTime = ref<Date>();
 
 const moduleFilterSelectVisible = ref<boolean>(false);
 

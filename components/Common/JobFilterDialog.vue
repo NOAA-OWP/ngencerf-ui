@@ -1,8 +1,9 @@
 <template>
   <div id="JobFilterDialog">
+    <div id="Header" class="w-full h-8 mb-2">
+      <div class="mb-2 pt-1 ml-3 font-bold text-base text-white">Select Modules</div>
+    </div>
     <div id="ModuleDialog">
-      <div class="mb-1 font-bold text-base">Select Modules</div>
-
       <div class="mb-3">
         <div class="grid grid-cols-4">
 
@@ -42,27 +43,35 @@
       </div>
 
       <div class="row-span-1">
-        <label for="ModuleList">Modules</label>
-        <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
-          optionLabel="name" optionValue="name" class="h-60">
-          <template #option="slotProps">
-            <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
-              <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name" :title="slotProps.option.name">
-                {{ slotProps.option.name }}</div>
-            </div>
-          </template>
-        </Listbox>
-      </div>
-      <div class="row-span-1 boxed">
-        <div class="flex justify-end gap-2">
-          <Button type="button" label="Cancel" severity="secondary" @click="sendClose()"></Button>
-          <Button type="button" label="Ok"></Button>
+        <div class="grid grid-cols-3">
+          <div class="col-span-1">
+            <label for="ModuleList">Modules</label>
+            <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
+              optionLabel="name" optionValue="name" class="h-60">
+              <template #option="slotProps">
+                <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
+                  <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
+                    :title="slotProps.option.name">
+                    {{ slotProps.option.name }}</div>
+                </div>
+              </template>
+            </Listbox>
+          </div>
+          <div class="col-span-1 text-center">
+            <label for="StatusTypeFilter">Status</label><br>
+            <Select id="StatusTypeFilter" class="mr-3" v-model="statusTypeFilter" :options="StatusTypes" filter
+              optionLabel="status" optionValue="filterValue" placeholder="Any" aria-label="Select" title="Select">
+            </Select>
+          </div>
+          <div class="col-span-1">&nbsp;</div>
         </div>
+
       </div>
 
-
-
-
+      <div id="ButtonArea" class="flex justify-end gap-5">
+        <Button class="ngenButtonDiv" label="Reset" severity="secondary" @click="sendClose()"></Button>
+        <Button class="ngenButtonDiv" label="Close"></Button>
+      </div>
 
     </div>
   </div>
@@ -82,20 +91,12 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 const userStore = useUserDataStore();
-const { uiGageId, calibrationRunGageList, modulesFilterList } = storeToRefs(useUserDataStore());
+const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilter, calDateStart, calDateEnd, earliestTime, latestTime } = storeToRefs(useUserDataStore());
 
 import { defineEmits } from "vue";
 const emit = defineEmits(["ModulesFilterDialogClosing"]);
 
-const calDateStart = ref<any>(new Date("Jan 01 2025"));
-const calDateEnd = ref<any>(new Date());
-
 const useDateRange = ref<boolean>(false);
-
-const earliestTime = ref<Date>();
-const latestTime = ref<Date>();
-
-const statusTypeFilter = ref<string>("");
 
 const showArchivedJobsOnly = ref<boolean>(false);
 
@@ -105,28 +106,17 @@ const props = defineProps<{
 
 
 onMounted(() => {
-  console.log(uiGageId, calibrationRunGageList)
+  console.log(uiGageId, calibrationRunGageList);
   nextTick(() => {
     setTimeout(() => {
       findEarliestAndLatest(props.calJobs);
     }, 0)
-  })
+  });
 })
 
 const sendClose = () => {
   emit("ModulesFilterDialogClosing");
 };
-
-
-const filterByDateRange = (data: any[], calDateStart: string, calDateEnd: string) => {
-  const startDate = new Date(calDateStart).getTime();
-  const endDate = new Date(calDateEnd).getTime();
-
-  return data.filter((item) => {
-    const itemDate = new Date(item.created_at).getTime();
-    return itemDate >= startDate && itemDate <= endDate;
-  });
-}
 
 
 const findEarliestAndLatest = (items: CalibrationJobListItem[]) => {
@@ -173,10 +163,12 @@ const handleCalDateStart = (value: any) => {
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
 
+#Header {
+  background-color: global.$ngwcp_primary3;
+}
 #JobFilterDialog {
-  width: 800px;
+  width: 750;
   height: 500px;
-  padding: 15px;
   position: absolute;
   top: 20%;
   left: 30%;
@@ -185,13 +177,25 @@ const handleCalDateStart = (value: any) => {
   z-index: 99;
 }
 
+#ModuleDialog {
+  padding: 0 15px;
+}
 #ModuleList {
-  width: 230px;
   border: 1px solid #888888;
+}
+
+#ButtonArea {
+  position: fixed;
+  margin-left: 350px;
+  margin-top: -36px;
 }
 
 #HeadwaterBasinGage {
   width: auto;
+}
+
+#StatusTypeFilter {
+  width: 170px;
 }
 
 #CalDateEnd,
