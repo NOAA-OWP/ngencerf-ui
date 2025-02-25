@@ -18,13 +18,15 @@
             <label for="DisplayOptions">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-                optionLabel="name" optionValue="name" :disabled="!plotList">
+                optionLabel="name" optionValue="name" :disabled="!plotList" aria-label="Select display"
+                title="Select display">
               </Select>
             </div>
           </div>
           <div class="col-span-1 pr-8">
             <div class="text-right">
-                <Button id="NewValidationBtn" class="ngenButtonDiv" @click="gotoSelectAlternateIteration">New Validation</button>
+              <Button id="NewValidationBtn" class="ngenButtonDiv" @click="gotoSelectAlternateIteration"
+                aria-label="New Validation Button" title="New Validation Button">New Validation</Button>
             </div>
           </div>
 
@@ -36,10 +38,13 @@
 
           <div class="col-span-2">
             <div class="text-left pt9em pl-8">
-              <label for="calibrationJobId" class="text-bold">Calibration Job ID </label>{{ calibrationJobId }}
+              <label for="calibrationJobId" class="text-bold" :aria-label="'Calibration Job ID ' + calibrationJobId"
+                :title="'Calibration Job ID ' + calibrationJobId">Calibration Job ID </label>{{ calibrationJobId }}
               <div class="inline-block ml-16">
-                <label for="evaluateValidationRunId" class="text-bold">Validation Job ID</label> {{
-                  evaluateValidationRunId }}
+                <label for="evaluateValidationRunId" class="text-bold"
+                  :aria-label="'Validation Job ID ' + calibrationJobId"
+                  :title="'Validation Job ID ' + calibrationJobId">Validation Job ID</label> {{
+                    evaluateValidationRunId }}
               </div>
             </div>
           </div>
@@ -47,14 +52,17 @@
           <div class="col-span-1">&nbsp;</div>
           <div class="col-span-1 text-right pr-8">
             <a v-if="userCalibrationRunData" href="#" class="c-blue text-sm underline mt-1 text-right"
-              @click="toggleMessagesGroup">Show Calibration Details</a>
+              @click="toggleMessagesGroup" aria-label="Show Calibration Details Button"
+              title="Show Calibration Details Button">Show
+              Calibration Details</a>
           </div>
         </div>
       </div>
 
       <div class="row-span-1">
         <div class="grid grid-cols-4">
-          <div class="col-span-2 pl-8 flex items-center space-x-2 w-full">
+          <div class="col-span-2 pl-8 flex items-center space-x-2 w-full"
+            :aria-label="'Results Pathname is ' + resultsPathname" :title="'Results Pathname is ' + resultsPathname">
             <label for="resultsPathname" class="text-xs whitespace-nowrap font-bold">Results Pathname</label>
             <span class="flex-grow">
               <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled
@@ -108,17 +116,17 @@
     <div id="SupplementalTableArea" class="p-2" v-if="selectedSupplementalTable">
       <DataTable :value="iterationMetricsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true"
         v-if="iterationMetricsData && selectedSupplementalTable === 1">
-        <Column v-for="( col, colIndex ) in iterationMetricsColumns" :key="colIndex" :header="col.header"
+        <Column v-for="(col, colIndex) in iterationMetricsColumns" :key="colIndex" :header="col.header"
           :field="col.field" sortable></Column>
       </DataTable>
       <DataTable :value="iterationParamsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true"
         v-if="iterationParamsData && selectedSupplementalTable === 2">
-        <Column v-for="( col, colIndex ) in iterationParamsColumns" :key="colIndex" :header="col.header"
+        <Column v-for="(col, colIndex) in iterationParamsColumns" :key="colIndex" :header="col.header"
           :field="col.field" sortable></Column>
       </DataTable>
       <DataTable :value="performanceMetricsData" fixedHeader=true
         v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable === 3">
-        <Column v-for="( col, colIndex ) in performanceMetricsColumns" :key="colIndex" :header="col.header"
+        <Column v-for="(col, colIndex) in performanceMetricsColumns" :key="colIndex" :header="col.header"
           :field="col.field"></Column>
       </DataTable>
     </div>
@@ -197,6 +205,8 @@ import { useToast } from 'primevue/usetoast';
 import VueDatePicker from "@vuepic/vue-datepicker";
 
 import type { DynamicObject } from "@/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
@@ -218,6 +228,7 @@ const toast = useToast();
 const showMessagesGroup = ref<Boolean>(false);
 
 const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
+const { addToastRecord } = generalStore();
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
@@ -326,7 +337,8 @@ onMounted(() => {
       plotList.value = plotNames?.value?._data?.plot_names;
     } else {
       toast.removeAllGroups();
-      toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
 
     // Add Supplemental Table Options to the dropdown
@@ -412,7 +424,8 @@ watch(selectedPlotName, async () => {
       //console.log('iterationMetricsData:', iterationMetricsData.value);
       //console.log('iterationMetricsColumns:', iterationMetricsColumns);
       if (!iterationMetricsData.value.length) {
-        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: 5000 });
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: ToastTimeout.timeout5000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
     } else if (selectedSupplementalTable.value === 2) {
       // Get Iteration Data
@@ -446,7 +459,8 @@ watch(selectedPlotName, async () => {
       //console.log('iterationParamsData:', iterationParamsData.value);
       //console.log('iterationParamsColumns:', iterationParamsColumns);
       if (!iterationParamsData.value.length) {
-        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: 5000 });
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: ToastTimeout.timeout5000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
     } else if (selectedSupplementalTable.value === 3) {
       // Get Performance Metrics - put each one into the table as its own row
@@ -518,7 +532,8 @@ watch(selectedPlotName, async () => {
         //console.log('performanceMetricsColumns:', performanceMetricsColumns);
       }
       if (!performanceMetricsData.value.length) {
-        toast.add({ severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: 5000 });
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: ToastTimeout.timeout5000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
     }
     plotTableData.value = [];
@@ -576,7 +591,8 @@ watch(selectedPlotName, async () => {
         selectedPlotFilename.value = null;
         selectedPlotFileUrl.value = null;
         toast.removeAllGroups();
-        toast.add({ severity: 'info', summary: 'Plot graph is currently unavailable', life: 5000 });
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: ToastTimeout.timeout5000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
 
       if (response?._data?.plot_data && response?._data?.plot_data.length > 0) {
@@ -653,7 +669,8 @@ watch(selectedPlotName, async () => {
       plotTableData.value = [];
       plotTableColumns.value = [];
       toast.removeAllGroups();
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error getting plot', life: 5000 });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot', life: ToastTimeout.timeout5000 };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 });
@@ -733,7 +750,8 @@ watch(selectedLogCategory, async () => {
   console.log('selectedLogList: ', selectedLogList.value);
   console.log('selectedLogName: ', selectedLogName.value);
   if (!selectedLogList.value.length) {
-    toast.add({ severity: 'info', summary: selectedPlotName.value + ' not available', life: 5000 });
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeout5000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 });
 
@@ -862,7 +880,7 @@ onUnmounted(() => {
 }
 
 #MessagesGroupWindow {
-  z-index: 9999;
+  z-index: 999;
   border: 1px solid black;
   position: absolute;
   right: 2%;

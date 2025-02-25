@@ -116,7 +116,7 @@ export const useGageStore = defineStore(
           selectedDomainValue.value === "" ||
           gage_value.domain === selectedDomainValue.value
         ) {
-          if (gage_value.nwm_v3_calibration) {
+          if (gage_value.headwater_calibration) {
             gageOptionsList.value.push({
               name: gage_value.gage_id,
               description: gage_value.gage_id,

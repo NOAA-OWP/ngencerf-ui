@@ -6,22 +6,25 @@
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
-                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Run Time & Iteration</caption>
+                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Run Time & Iteration
+                </caption>
                 <thead>
-                    <tr height="25px">
-                      <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
-                    </tr>
-                  </thead>
+                  <tr height="25px">
+                    <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                  </tr>
+                </thead>
                 <tbody>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Submit Time ' + formatDateForDisplay(startTime)"
+                    :title="'Submit Time ' + formatDateForDisplay(startTime)">
                     <th scope="row" class="text-right font-bold">Submit Time</th>
                     <td class="pl-5">{{ startTime ? formatISOStringOrDateToYYYYMMDDHHMM(startTime) : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Elapsed Time ' + runningTime" :title="'Elapsed Time ' + runningTime">
                     <th scope="row" class="text-right font-bold">Elapsed Time</th>
                     <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Iteration ' + evaluateDisplayIterationNumber"
+                    :title="'Iteration ' + evaluateDisplayIterationNumber">
                     <th scope="row" class="text-right"><label for="iterationNum">Iteration</label></th>
                     <td class="pl-5">
                       {{ evaluateDisplayIterationNumber }}
@@ -35,18 +38,19 @@
               <table>
                 <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Status</caption>
                 <thead>
-                    <tr height="25px">
-                      <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
-                    </tr>
+                  <tr height="25px">
+                    <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                  </tr>
                 </thead>
                 <tbody>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Status ' + validationStatus" :title="'Status ' + validationStatus">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
                     <td class="pl-5">
                       {{ validationStatus }}
                     </td>
                   </tr>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Validation Job ID ' + displayValidationId"
+                    :title="'Validation Job ID ' + displayValidationId">
                     <th scope="row" class="text-right"><label for="ValidatioinJobId">Validation Job ID</label></th>
                     <td class="pl-5">
                       {{ displayValidationId }}
@@ -57,16 +61,19 @@
 
                       <!--BUTTONS - START-->
                       <span v-if="validationStatus === 'Done'">
-                          <Button id="ResultsArea" class="ngenButtonDiv " @click.stop="navigateToEvaluation">Go to Evaluation</button>
+                        <Button id="ResultsArea" class="ngenButtonDiv" @click.stop="navigateToEvaluation"
+                          aria-label="Go to Evaluation Button" title="Go to Evaluation Button">Go to Evaluation</Button>
                       </span>
 
                       <span v-else>
-                          <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()" title="Run Button" aria-label="Run Button">
-                            Run
-                          </button>
-                          <Button v-if="!isCancelHidden()" @click="cancelRun()" class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button"
-                            aria-label="Cancel Button">Cancel
-                          </button>
+                        <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()"
+                          title="Run Button" aria-label="Run Button">
+                          Run
+                        </Button>
+                        <Button v-if="!isCancelHidden()" @click="cancelRun()"
+                          class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button"
+                          aria-label="Cancel Button">Cancel
+                        </Button>
                       </span>
                       <!--BUTTONS - END-->
                     </td>
@@ -85,7 +92,7 @@
       <div class="row-span-1">
         <span v-if="validationStatus === 'Done'">
           <div id="ResultsArea" class="ngenButtonDiv row-span-1">
-            <Button class="font-normal" @click.stop="navigateToEvaluation">Go to Evaluation</button>
+            <Button class="font-normal" @click.stop="navigateToEvaluation">Go to Evaluation</Button>
           </div>
           <div class="col-span-7">&nbsp;</div>
         </span>
@@ -97,14 +104,14 @@
               <div v-if="!isStartHidden()" class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                 <Button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
                   Run
-                </button>
+                </Button>
               </div>
             
               <div v-else class="col-span-1 mr-6 h-8">&nbsp;</div>
            
               <div class="col-span-1 ngenButtonDiv-red mr-6 h-8 hidden" v-if="!isCancelHidden()">
                 <Button class="font-normal" title="Cancel Button" @click="cancelRun()" 
-                  aria-label="Cancel Button">Cancel</button>
+                  aria-label="Cancel Button">Cancel</Button>
               </div>
               <div class="col-span-2">&nbsp;</div>
               <div class="col-span-1 mr-4">
@@ -122,6 +129,8 @@ import { onMounted, onUnmounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
 import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
@@ -132,6 +141,7 @@ import { hilightTab } from '@/composables/TabHilight';
 const toast = useToast();
 
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
+const { addToastRecord } = generalStore();
 
 const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, evaluateDisplayIterationNumber } = storeToRefs(useEvaluationRunStatusStore());
 const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime } = useEvaluationRunStatusStore();
@@ -183,7 +193,8 @@ const startRun = async () => {
       startTime.value = response?._data?.submit_date;
       validationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
     } else {
-      toast.add({ severity: 'warn', summary: 'Unable to Create Validation' });
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation' };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   });
 }
@@ -235,7 +246,8 @@ const navigateToEvaluation = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
     e.click();
   } else {
-    toast.add({ severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: 6000 })
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 </script>

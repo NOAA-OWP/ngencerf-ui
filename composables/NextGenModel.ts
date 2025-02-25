@@ -1,3 +1,5 @@
+import type { ToastMessageOptions } from "primevue/toast"
+
 export interface User {
   uid: number;
   first_name: string;
@@ -37,6 +39,9 @@ export interface ValidationErrorObject {
   [key: string]: string;
 }
 
+export interface NonFieldError {
+  non_field_errors: string[];
+}
 export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
   geopackage_image_url?: string | null;
   eds_errors: edsError[];
@@ -247,7 +252,7 @@ export interface GageOptionData {
   gage_id: string;
   nsw_id: string;
   domain: string;
-  nwm_v3_calibration: boolean;
+  headwater_calibration: boolean;
 }
 
 export interface SaveGageTabPayload {
@@ -666,6 +671,7 @@ export type LogoutEvent = {
 export type AccountEvent = {
   accountEvent: string;
   aboutBoxEvent: string;
+  errorLogEvent: string;
 };
 
 export type ServerInfo = {
@@ -733,7 +739,7 @@ export type PlotNames = {
   status: string;
 };
 
-export type GageResetData  = {
+export type GageResetData = {
   external_data_status: {
     observational: boolean;
     forcing: boolean;
@@ -748,4 +754,8 @@ export type GageResetData  = {
 export type BestIterationData = {
   iteration: number;
   isBest: boolean;
+}
+
+export interface ToastRecord extends ToastMessageOptions {
+  datetime: string;
 }

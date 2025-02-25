@@ -2,30 +2,42 @@
   <div>
     <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">
       Forecast Cycle Selection
-    </h1>    
-    <div style="font-size: 12px;font-weight: normal;margin-top:-20px;">
-      <h2>Calibration Job ID: {{ calibrationRunForForecast?.calibration_run_id }}</h2>      
+    </h1>
+    <div style="font-size: 12px;font-weight: normal;margin-top:-20px;"
+      aria-label="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id"
+      title="'Calibration Job ID is  ' + calibrationRunForForecast?.calibration_run_id">
+      <h2>Calibration Job ID: {{ calibrationRunForForecast?.calibration_run_id }}</h2>
     </div>
-    <p  style="font-size: 12px;font-weight: normal;">Select a cycle then click Next.</p>
+    <p style="font-size: 12px;font-weight: normal;">Select a cycle then click Next.</p>
     <br />
   </div>
   <div>
-    <DataTable
-      :value="forecastCycles"
-      sortField="cycle"
-      scrollable
-      v-model:selection="forecastCycle"
-      selectionMode="single"
-      :rowClass="rowClass"
-      :rowStyle="rowStyle"
-    >
-      <Column field="name" header="Cycle"></Column>
-      <Column field="data_sources" header="Data Sources"></Column>
-      <Column field="time_range" header="Time Range (ngenCERF)"></Column>
+    <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
+      selectionMode="single" :rowClass="rowClass" :rowStyle="rowStyle">
+      <Column field="name" header="Cycle">
+        <template #body="slotProps">
+          <div :aria-label="'Cycle is ' + slotProps.data.name" :title="'Cycle is ' + slotProps.data.name">{{
+            slotProps.data.name }}</div>
+        </template>
+      </Column>
+      <Column field="data_sources" header="Data Sources">
+        <template #body="slotProps">
+          <div :aria-label="'Data Sources: ' + slotProps.data.data_sources"
+            :title="'Data Sources: ' + slotProps.data.data_sources">{{
+              slotProps.data.data_sources }}</div>
+        </template>
+      </Column>
+      <Column field="time_range" header="Time Range (ngenCERF)">
+        <template #body="slotProps">
+          <div :aria-label="'Time Range is ' + slotProps.data.name"
+            :title="'Time Range is ' + slotProps.data.time_range">{{
+              slotProps.data.time_range }}</div>
+        </template>
+      </Column>
     </DataTable>
   </div>
   <div class="text-normal mt-2 mx-auto text-center">
-    Cycles in <span class="text-gray-500">grey</span> are currently unavailable from the GUI. Use the CLI to run these
+    Cycles in <span class="text-gray-500">grey</span>
     cycles.
   </div>
   <div>
@@ -34,7 +46,7 @@
         <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
           @click="goToStatusRunTab()">
           Next
-        </button>
+        </Button>
       </div>
     </span>
   </div>
@@ -44,6 +56,9 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
 
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
+
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { generalStore } from '~/stores/common/GeneralStore';
 
@@ -51,6 +66,7 @@ import { hilightTab } from '@/composables/TabHilight';
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
@@ -80,7 +96,7 @@ const rowClass = (data: any) => {
 /**
  * Add row styling if forecast cycle is not active.
  */
- const rowStyle = (data: any) => {
+const rowStyle = (data: any) => {
   return {
     color: !data.is_active ? 'grey' : 'black',
     backgroundColor: !data.is_active ? '#f0f0f0' : ''
@@ -113,7 +129,8 @@ onMounted(async () => {
  */
 const onRowSelect = (e: any) => {
   console.log('onRowSelect', e);
-  toast.add({ severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: 3000 });
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeout3000 };
+  toast.add(tMsg); addToastRecord(tMsg);
 };
 
 /**

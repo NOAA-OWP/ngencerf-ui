@@ -5,14 +5,13 @@
     {{ line }}
   </div>
   <div>&nbsp;</div>
-  <div>
     <Button class="ngenButtonDiv" @click="stayOnTab(false)">
       Stay on tab
-    </button> &nbsp;
+    </Button> &nbsp;
     <Button class="ngenButtonDiv" @click="stayOnTab(true)">
       Discard changes
-    </button>
-  </div>
+    </Button>
+
 </template>
 
 <script lang="ts" setup>

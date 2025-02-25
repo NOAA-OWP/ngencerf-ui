@@ -3,27 +3,30 @@
   <div id="Header" class="header  prevent-select">
     <div id="TopBar">&nbsp;</div>
     <div class="grid grid-cols-12 gap-1" style="height: 80px">
-      <div id="PgmName" class="col-span-2 mt-6">
-        <NuxtLink to="LandingPage">ngenCERF</NuxtLink>
+      <div v-if="isUserLoggedIn()" id="PgmName" class="col-span-2 mt-6">
+        <NuxtLink title="Link to Landing Page" to="LandingPage">ngenCERF</NuxtLink>
+      </div>
+      <div v-else id="PgmName" class="col-span-2 mt-6">
+        <div>ngenCERF</div>
       </div>
       <div id="Col2" class="col-span-8">
 
         <ul v-show="userLoggedIn && location.name !== 'Login'" id="MainMenu">
           <li aria-label="Calibration" title="Calibration">
-            <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''" to="calibration" data-menu='1'
-              @click="MenuChanged">Calibration</NuxtLink>
+            <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''"
+              to="calibration" data-menu='1' @click="MenuChanged">Calibration</NuxtLink>
           </li>
           <li aria-label="Evaluation" title="Evaluation">
-            <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation" data-menu='2'
-              @click="MenuChanged">Evaluation</NuxtLink>
+            <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''" to="evaluation"
+              data-menu='2' @click="MenuChanged">Evaluation</NuxtLink>
           </li>
           <li aria-label="Forecast" title="Forecast">
-            <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast" data-menu='3'
-              @click="MenuChanged">Forecast</NuxtLink>
+            <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''" to="forecast"
+              data-menu='3' @click="MenuChanged">Forecast</NuxtLink>
           </li>
           <li aria-label="Verification" title="Verification">
-            <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''" to="verification" data-menu='4'
-              @click="" class="disabled">Verification</NuxtLink>
+            <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
+              to="verification" data-menu='4' @click="" class="disabled">Verification</NuxtLink>
           </li>
         </ul>
 
@@ -34,7 +37,8 @@
 
           <div class="col-span-1">
             <div v-show="!uMenu && userLoggedIn && location.name !== 'Login'" id="UserCircle"
-              class="float-right userInitials" @contextmenu="onImageRightClick" @click="onImageRightClick">
+              class="float-right userInitials" @contextmenu="onImageRightClick" @click="onImageRightClick"
+              aria-label="User Menu" title="User Menu">
               {{ userInitials }}<i class="pi pi-angle-down"></i>
               <ContextMenu ref="userContextMenu" :model="userItems" :autoZIndex="true" />
             </div>
@@ -42,13 +46,15 @@
           </div>
           <div class="col-span-1">
             <Button v-if="userLoggedIn && location.name !== 'Login'" class="float-left" style="padding-top:0px"
-              id="HelpCircle" title="Help" aria-label="help" @click="displayHelp">?</button>
+              id="HelpCircle" title="Help for current tab" aria-label="Help for current tab"
+              @click="displayHelp">?</Button>
           </div>
 
         </div>
       </div>
 
       <Transition name="slide-fade">
+
         <div v-if="showHelp" id="HelpWindow">
           <div class="text-right sticky top-0">
             <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
@@ -57,7 +63,6 @@
           <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
             <LazyHelpLandingPageHelp />
           </div>
-
           <div v-if="location.name === 'Calibration'" class="py-10 px-1">
             <div v-if="getMenuIndex() === 1">
               <span v-if="getCalibrationTabIndex() === 1">
@@ -93,21 +98,21 @@
             </span>
             <span v-if="getEvaluationTabIndex() === 3">
               <LazyEvaluationCalibrationSelectAltInterationssHelp />
-            </span> 
-             <span v-if="getEvaluationTabIndex() === 4">
+            </span>
+            <span v-if="getEvaluationTabIndex() === 4">
               <LazyEvaluationRunStatusHelp />
             </span>
           </div>
 
           <div v-else-if="getMenuIndex() === 3">
             <span v-if="getForecastTabIndex() === 1">
-             <LazyForecastCalibrationRunsHelp />
+              <LazyForecastCalibrationRunsHelp />
             </span>
             <span v-if="getForecastTabIndex() === 2">
               <LazyForecastForecastRunsHelp />
             </span>
             <span v-if="getForecastTabIndex() === 3">
-             <LazyForecastSetupForecastHelp />
+              <LazyForecastSetupForecastHelp />
             </span>
             <span v-if="getForecastTabIndex() === 4">
               <LazyForecastStatusRunHelp />
@@ -124,10 +129,14 @@
   </div>
   <div id="UserAccountOverlay" class="hidden" ref="accountOverlay">
     <UserAccount />
-  </div>  
+  </div>
   <div id="AboutBoxOverlay" class="hidden" ref="aboutOverlay">
     <AboutBox />
   </div>
+  <div id="ErrorLogOverlay" class="hidden" ref="errorOverlay">
+    <LazyErrorLog />
+  </div>
+
 </template>
 
 <script lang="ts" setup>
@@ -156,6 +165,7 @@ const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/compone
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
 const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/RunStatusHelp.vue"))
 const AboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
+const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
 
 const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
 const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
@@ -163,11 +173,14 @@ const LazyForecastResultesHelp = defineAsyncComponent(() => import("@/components
 const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
 const LazyForecastStatusRunHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/StatusRunHelp.vue"));
 
+const gstore = generalStore();
+const { popupActive } = storeToRefs(gstore);
 
 const emit = defineEmits(["logoutEvent"]);
 
 const accountOverlay = ref();
 const aboutOverlay = ref();
+const errorOverlay = ref();
 
 const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex } = generalStore();
 
@@ -176,12 +189,13 @@ const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } 
 const location = useRoute();
 
 const userInitials = ref<string>('');
-const userLoggedIn= ref<boolean>();
+const userLoggedIn = ref<boolean>();
 
 const userItems = ref([
   { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
   { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
-  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
+  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() },
+  { label: 'Notifications', icon: 'pi pi-fw-times', command: () => errorLog() }
 ])
 
 const userContextMenu = ref();
@@ -191,7 +205,9 @@ let observer = null;
 const isOnDiv = ref(false);
 
 const onImageRightClick = (event: any) => {
-  userContextMenu.value.show(event)
+  if (!popupActive.value) {
+    userContextMenu.value.show(event)
+  }
 }
 
 onMounted(() => {
@@ -200,24 +216,17 @@ onMounted(() => {
 
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
-    let headerHeight = document.getElementById('Header')?.clientHeight;
-    let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
-    if (footerTop && headerHeight) {
-      let h = (footerTop - headerHeight) + 54;
-      let hpx = h + 'px'
-      let ele = document.getElementById("HelpWindow");
-      if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
-    };
-  });
+    sizeLogWindow();
+  });  
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', function (event) {
     sizeHelpWindow();
-  });
+    sizeLogWindow();
+  }); 
 });
-
 
 
 // Handle submitTimeDate changes
@@ -231,35 +240,64 @@ const sizeHelpWindow = () => {
   let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
   if (footerTop && headerHeight) {
     let h = (footerTop - headerHeight) - 20;
-    let hpx = h + 'px'
     let ele = document.getElementById("HelpWindow");
-    if (ele) { ele.style.height = parseInt(hpx) + 'px'; }
+    if (ele) { ele.style.height = h + 'px'; }
   };
+};
+
+const sizeLogWindow = () => {
+  let headerHeight = document.getElementById('Header')?.clientHeight;
+  let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
+  if (footerTop && headerHeight) {
+    let h = (footerTop - headerHeight) - 20;
+    let ele = document.getElementById("ErrorLog");
+    if (ele) { ele.style.height = h + 'px'; } 
+ };
 };
 
 /**
  * 
  */
- const gotoAccount = async () => {
-  accountOverlay.value.style.display = "block";
+const gotoAccount = async () => {
+  if (!popupActive.value) {
+    accountOverlay.value.style.display = "block";
+    popupActive.value = true;
+  }
 }
 
 const aboutBox = async () => {
-  aboutOverlay.value.style.display = "block";
+  if (!popupActive.value) {
+    aboutOverlay.value.style.display = "block";
+    popupActive.value = true;
+  }
+}
+
+const errorLog = async () => {
+  errorOverlay.value.style.display = "block";
+  setTimeout(function () { sizeLogWindow() }, 0);
 }
 
 useAccountEventListen('accountEvent', () => {
   const ele = document.getElementById('UserAccountOverlay') as HTMLElement;
   ele.style.display = "none";
+  popupActive.value = false;  
 })
 
 useAccountEventListen('aboutBoxEvent', () => {
   const ele = document.getElementById('AboutBoxOverlay') as HTMLElement;
   ele.style.display = "none";
+  popupActive.value = false;
+})
+
+useAccountEventListen('errorLogEvent', () => {
+  const ele = document.getElementById('ErrorLogOverlay') as HTMLElement;
+  ele.style.display = "none";
+  popupActive.value = false;
 })
 
 useLogoutListen('logoutEvent', (evStr: string) => {
   if (evStr === "token" && !getIsTokenExpired()) {
+    popupActive.value = false;  
     setIsTokenExpired();
     alert("Your session has expired. Please log in again.");
     useLogout("logoutEvent", "logout");
@@ -268,14 +306,12 @@ useLogoutListen('logoutEvent', (evStr: string) => {
 })
 
 const logoutUser = async () => {
-  if (confirm("Are you sure you want to logout?")) {
-    useLogout("logoutEvent", "logout");
-    await navigateTo('login');
+  if (!popupActive.value) {
+    if (confirm("Are you sure you want to logout?")) {
+      useLogout("logoutEvent", "logout");
+      await navigateTo('login');
+    }
   }
-}
-
-const showUserMenu = () => {
-  uMenu.value = true;
 }
 
 const hideUserMenu = () => {
@@ -287,17 +323,21 @@ const hideUserMenu = () => {
 
 const closeHelp = () => {
   showHelp.value = false;
+  popupActive.value = false;
 }
 const displayHelp = () => {
-  showHelp.value = true;
-  setTimeout(function () { sizeHelpWindow() }, 0);
+  if (!popupActive.value) {
+    popupActive.value = true;
+    showHelp.value = true;
+    setTimeout(function () { sizeHelpWindow() }, 0);
+  }
 }
 
 const MenuChanged = (e: MouseEvent) => {
   nextTick(() => {
     const currentMenu = getMenuIndex();
     let ele = e.currentTarget as HTMLElement;
-    if( !ele ) {
+    if (!ele) {
       ele = e.target as HTMLElement;
     }
     const m = ele.getAttribute('data-menu');
@@ -454,7 +494,7 @@ const MenuChanged = (e: MouseEvent) => {
 }
 
 #HelpWindow {
-  z-index: 9999;
+  z-index: 999;
   border: 1px solid black;
   position: absolute;
   right: 2%;
@@ -464,9 +504,11 @@ const MenuChanged = (e: MouseEvent) => {
   overflow: auto;
 }
 
-.disabled,
-.disabled:hover {
-  background-color: global.$ngwcp_neutral_gray_md !important;
+#ErrorLogOverlay {
+  z-index: 9999;
+  position: absolute;
+  right: 2%;
+  background-color: white;
 }
 
 /*

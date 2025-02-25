@@ -9,7 +9,7 @@
               <div class="col-span-1">
                 <label for="Domain">Domain</label><br />
                 <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
-                  optionValue="name" placeholder=" ... "
+                  optionValue="name" placeholder=" ... " aria-label="Domain Select" title="Domain Select"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               </div>
             </div>
@@ -18,7 +18,7 @@
               <label for="Gage" @focus="focusSelectInput">Gage</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
-                @change="onGageSelectionChange" @focus="focusSelectInput"
+                @change="onGageSelectionChange" @focus="focusSelectInput" aria-label="Gage Select" title="Gage Select"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
@@ -31,22 +31,24 @@
               <label for="Forcing">Forcing Data</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" defaultValue="AORC" @change="uploadForcingDlgOpen($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                aria-label="Forcing Data Select" title="Forcing Data Select"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Observational">Observational Data</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
                 optionLabel="name" optionValue="name" class="user-select" @change="uploadObservationalDlgOpen($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                aria-label="Observational Data Select" title="Observational Data Select"></Select>
             </div>
 
             <div class="col-span-1">
               <label for="Geopackage">GeoPackage</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" @change="uploadGeopackageDlgOpen($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
-
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                aria-label="GeoPackage Data Select" title="GeoPackage Data Select"></Select>
             </div>
           </div>
 
@@ -59,31 +61,39 @@
               <table class="table-auto">
                 <caption><span style="font-size:1.2em;font-weight: bold;">Gage Detail</span></caption>
                 <tbody>
-                  <tr v-if="selectedDomainValue" class="rowOdd">
+                  <tr v-if="selectedDomainValue" class="rowOdd" :aria-label="'Domain: ' + selectedDomainValue"
+                    :title="'Domain: ' + selectedDomainValue">
                     <th scope="row" class="dataName td1">Domain:</th>
                     <td class="dataText td2">{{ selectedDomainValue }}</td>
                   </tr>
-                  <tr v-if="gageData?.gage_id" lass="rowEven">
+                  <tr v-if="gageData?.gage_id" lass="rowEven" :aria-label="'Gage ID: ' + gageData?.gage_id"
+                    :title="'>Gage ID: ' + gageData?.gage_id">
                     <th scope="row" class="dataName td1">Gage ID:</th>
                     <td class="dataText td2">{{ gageData?.gage_id }}</td>
                   </tr>
-                  <tr v-if="gageData?.agency" class="rowOdd">
+                  <tr v-if="gageData?.agency" class="rowOdd" :aria-label="'Agency: ' + gageData?.agency"
+                    :title="'Agency: ' + gageData?.agency">
                     <th scope="row" class="dataName td1">Agency:</th>
                     <td class="dataText td2">{{ gageData?.agency }}</td>
                   </tr>
-                  <tr v-if="gageData?.station_name" class="rowEven">
+                  <tr v-if="gageData?.station_name" class="rowEven"
+                    :aria-label="'Station Name: ' + gageData?.station_name"
+                    :title="'Station Name: ' + gageData?.station_name">
                     <th scope="row" class="dataName td1">Station Name:</th>
                     <td class="dataText td2">{{ gageData?.station_name }}</td>
                   </tr>
-                  <tr v-if="gageData?.latitude" class="rowEven">
+                  <tr v-if="gageData?.latitude" class="rowEven" :aria-label="'Latitude: ' + gageData?.latitude"
+                    :title="'Latitude: ' + gageData?.latitude">
                     <th scope="row" class="dataName td1">Latitude:</th>
                     <td class="dataText td2">{{ gageData?.latitude }}</td>
                   </tr>
-                  <tr v-if="gageData?.longitude" class="rowOdd">
+                  <tr v-if="gageData?.longitude" class="rowOdd" :aria-label="'Longitude: ' + gageData?.longitude"
+                    :title="'Longitude: ' + gageData?.longitude">
                     <th scope="row" class="dataName td1">Longitude:</th>
                     <td class="dataText td2">{{ gageData?.longitude }}</td>
                   </tr>
-                  <tr v-if="gageData?.altitude" class="rowEven">
+                  <tr v-if="gageData?.altitude" class="rowEven" :aria-label="'Altitude: ' + gageData?.altitude"
+                    :title="'Altitude: ' + gageData?.altitude">
                     <th scope="row" class="dataName td1">Altitude:</th>
                     <td class="dataText td2">{{ gageData?.altitude }}</td>
                   </tr>
@@ -98,7 +108,8 @@
           <div class="grid grid-cols-8">
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 mr-6 h-8" @click="saveTabData()">
-                <Button id="HBGSaveButton" class="font-normal ngenButtonDiv-green " title="Save" aria-label="Save Button">
+                <Button id="HBGSaveButton" class="font-normal ngenButtonDiv-green " title="Save"
+                  aria-label="Save Button">
                   Save
                 </Button>
               </div>
@@ -111,7 +122,7 @@
             <span v-if="gageHasChanged && userCalibrationRunData?.gage !== null">
               <div class="col-span-1 mr-3">
                 <Button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Revert Gage"
-                  @click="gageSelectionReset()" aria-label="Revert">Revert</button>
+                  @click="gageSelectionReset()" aria-label="Revert">Revert</Button>
               </div>
             </span>
             <span v-else>
@@ -122,8 +133,8 @@
             <div class="col-span-4">&nbsp;</div>
             <div class="col-span-1">&nbsp;</div>
             <div class="col-span-1 mr-4">
-              <div><Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next"
-                  @click="goNextTab()">Next</button></div>
+              <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next"
+                @click="goNextTab()">Next</Button>
             </div>
           </div>
         </div>
@@ -146,6 +157,7 @@ import { useDialog } from "primevue/usedialog";
 import type { SelectChangeEvent } from "primevue/select";
 import type { ToastMessageOptions } from "primevue/toast";
 import type { GageResetData } from "@/composables/NextGenModel.ts"
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useGageStore } from "@/stores/calibration/GageStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -159,11 +171,14 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
-import { useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
-          useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
-          
+import {
+  useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
+  useApiResponseToastSeverityCode
+} from "@/composables/ValidationHandlers";
+
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+const { addToastRecord } = generalStore();
 
 const { hardResetTuningTimeConrols } = useTuningStore();
 
@@ -297,10 +312,13 @@ const clearDataDueToGageChange = () => {
         userCalibrationRunData.value.geopackage_image_url = "";
 
       }
-      toast.add({
+
+      const tMsg: ToastMessageOptions = {
         severity: 'info', summary: `Gage Changed`,
         detail: "Calibration and Validation times must be set on the Tuning Controls tab"
-      })
+      };
+      toast.add(tMsg); addToastRecord(tMsg);
+
     }, 100);
   }
 }
@@ -359,14 +377,17 @@ const handleDialogClose = (opt: any) => {
 
   if (opt && opt.data) {
     if (opt.data.saveFileResponseResult.status === 200) {
-      toast.add({ severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: 5000 })
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: ToastTimeout.timeout5000 };
+      toast.add(tMsg); addToastRecord(tMsg);
     } else {
       useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
-        toast.add({ severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Tab Data Failed.', detail: message, life: 10000 });
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Data Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   } else {
-    toast.add({ severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: 10000 })
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: ToastTimeout.timeout10000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
   fileUploadDialogOpened.value = false
 }
@@ -453,7 +474,8 @@ const toggle_isNWMv3 = () => {
 const saveTabData = () => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeout10000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
 
@@ -466,11 +488,12 @@ const saveTabData = () => {
     saveGageTabData().then(response => {
       if (response.status === 200) {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
-          toast.add(toastMessage);
+          toast.add(toastMessage); addToastRecord(toastMessage);
         })
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
-          toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Tab Data Failed.', detail: message });
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Data Failed.', detail: message };
+          toast.add(tMsg); addToastRecord(tMsg);
         });
       }
       isLoading.value = false;
@@ -578,12 +601,14 @@ const handleNextPrevDialogClose = (opt: any) => {
 
     tr {
       line-height: 27px;
+
       th {
         padding: 4px 15px;
         cursor: default;
         border-bottom: 1px solid #ccc;
         background-color: global.$ngwcp_neutral_gray_lt;
       }
+
       td {
         padding: 4px 15px;
         cursor: default;
