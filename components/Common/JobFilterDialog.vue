@@ -49,7 +49,7 @@
             <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
               optionLabel="name" optionValue="name" class="h-60">
               <template #option="slotProps">
-                <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
+                <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-2'">
                   <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
                     :title="slotProps.option.name">
                     {{ slotProps.option.name }}</div>
@@ -57,12 +57,13 @@
               </template>
             </Listbox>
           </div>
-          <div class="col-span-1 text-center">
-            <label for="StatusTypeFilter">Status</label><br>
-            <Select id="StatusTypeFilter" class="mr-3" v-model="statusTypeFilter" :options="StatusTypes" filter
-              optionLabel="status" optionValue="filterValue" placeholder="Any" aria-label="Select" title="Select">
-            </Select>
+          <div class="col-span-1 text-left ml-6">
+            <label for="StatusList">Status</label><br>
+            <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
+              optionValue="filterValue" multiple>
+            </Listbox>
           </div>
+
           <div class="col-span-1">&nbsp;</div>
         </div>
 
@@ -85,13 +86,14 @@ import { DateTime } from "luxon";
 import Checkbox from 'primevue/checkbox';
 
 import type { CalibrationJobListItem } from "@/composables/NextGenModel"
+import { StatusTypes } from "@/composables/NextgenEnums";
 
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
 const { fetchFormulationModuleOptions } = useFormulationStore();
 
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 const userStore = useUserDataStore();
-const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilter, 
+const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList, 
   calDateStart, calDateEnd, earliestTime, latestTime, useDateRange } = storeToRefs(useUserDataStore());
 
 import { defineEmits } from "vue";
@@ -155,15 +157,16 @@ const sendClose = () => {
 const resetFilters = () => {
   uiGageId.value = 'All';
   modulesFilterList.value = [];
-  statusTypeFilter.value = "Any";
+  statusTypeFilterList.value = [];
   nextTick( () => {
     findEarliestAndLatest(props.calJobs);
   })
 }
 
 const enableReset = computed(() => {
-  return (uiGageId.value !== 'All' && modulesFilterList.value.length > 0
-       && statusTypeFilter.value !== "Any" && useDateRange.value === false) === true;
+  return false;
+  // return (uiGageId.value !== 'All' || modulesFilterList.value.length > 0
+  //      || statusTypeFilterList.value.length > 0 || useDateRange.value === false) === true;
 })
 
 const findEarliestAndLatest = (items: CalibrationJobListItem[]) => {
@@ -250,8 +253,12 @@ const handleCalDateEnd = (value: any) => {
   width: auto;
 }
 
-#StatusTypeFilter {
+#StatusList {
   width: 170px;
+  li.p-listbox-option {
+    display: none;
+      padding: 8px 10px 10px 8px !important;
+    }
 }
 
 #CalDateEnd,
@@ -267,4 +274,5 @@ const handleCalDateEnd = (value: any) => {
     }
   }
 }
+
 </style>

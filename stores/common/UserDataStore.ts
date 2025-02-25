@@ -6,6 +6,7 @@ import type {
   CalibrationJobListItem,
   ValidationJobsList,
   UserCalibrationRunData,
+  StatusRecord
 } from "@/composables/NextGenModel";
 
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -36,7 +37,9 @@ export const useUserDataStore = defineStore(
 
     // Used for Calibration Job Filter
     const modulesFilterList = ref<string[]>([]);
-    const statusTypeFilter = ref<string>("");
+
+    const statusTypeFilterList = ref<string[]>([]);
+
     const calDateStart = ref<any>(new Date("Jan 01 2025"));
     const calDateEnd = ref<any>(new Date());
     const earliestTime = ref<Date>();
@@ -360,7 +363,7 @@ export const useUserDataStore = defineStore(
       accessToken,
       refreshToken,
       modulesFilterList,
-      statusTypeFilter,
+      statusTypeFilterList,
       calDateStart,
       calDateEnd,
       earliestTime,

@@ -760,3 +760,8 @@ export type BestIterationData = {
 export interface ToastRecord extends ToastMessageOptions {
   datetime: string;
 }
+
+export type StatusRecord = {
+  status: string;
+  filterValue: string;
+}

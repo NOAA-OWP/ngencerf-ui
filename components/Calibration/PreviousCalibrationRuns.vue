@@ -155,8 +155,6 @@ import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "
 import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
-import { StatusTypes } from "@/composables/NextgenEnums";
-
 const { loadGageTabStaticData } = useGageStore();
 const { fetchFormulationModuleOptions } = useFormulationStore();
 
@@ -169,7 +167,7 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
-  statusTypeFilter, calDateStart, calDateEnd, earliestTime, latestTime, useDateRange } = storeToRefs(useUserDataStore());
+  statusTypeFilterList, calDateStart, calDateEnd, earliestTime, latestTime, useDateRange } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -236,9 +234,8 @@ const filteredData = computed(() => {
       newCalJobList = updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
     }
 
-    // Filter Status
-    if (statusTypeFilter.value && statusTypeFilter.value !== "Any") {
-      newCalJobList = newCalJobList?.filter((row) => (row as CalibrationJobListItem).status === statusTypeFilter.value);
+    if (statusTypeFilterList.value.length > 0) {
+      newCalJobList = newCalJobList.filter((job) => statusTypeFilterList.value.includes(job.status));
     }
 
     if (useDateRange.value) {
