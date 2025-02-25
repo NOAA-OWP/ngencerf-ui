@@ -13,11 +13,6 @@
           </p>
         </div>
 
-        <!-- Filters -->
-        <div id="FilterButton" class="text-center mb-1 w-full"><Button class="filter-link" @click="toggleShowFilters">{{
-          showFilters ? 'Hide' : 'Show' }}
-            Filters</Button>
-        </div>
 
 
 
@@ -35,6 +30,13 @@
         <!-- Table -->
         <div class="">
           <div id="CalTable" class="w-max mx-auto">
+            <!-- Filters -->
+            <div id="FilterButton" class="text-left mb-1 w-full"><Button class="filter-link"
+                @click="toggleShowFilters">{{
+                  showFilters ? 'Hide' : 'Show' }}
+                Filters</Button>
+            </div>
+
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
@@ -118,7 +120,7 @@
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
 
-    <JobFilterDialog v-show="true" @ModulesFilterDialogClosing="showFilters = false"
+    <JobFilterDialog v-show="showFilters" @ModulesFilterDialogClosing="showFilters = false"
       :calJobs="updatedUserCalibrationJobsListData" />
 
   </client-only>
@@ -166,7 +168,8 @@ const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
-const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList, statusTypeFilter, calDateStart, calDateEnd, earliestTime, latestTime } = storeToRefs(useUserDataStore());
+const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
+  statusTypeFilter, calDateStart, calDateEnd, earliestTime, latestTime, useDateRange } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -181,8 +184,6 @@ const { isLoading } = storeToRefs(gstore);
 const showArchivedJobsOnly = ref<boolean>(false);
 
 const showFilters = ref<boolean>(false);
-const useDateRange = ref<boolean>(false);
-
 
 const moduleFilterSelectVisible = ref<boolean>(false);
 

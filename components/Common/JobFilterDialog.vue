@@ -1,7 +1,7 @@
 <template>
-  <div id="JobFilterDialog">
+  <div id="JobFilterDialog" ref="draggableDiv" :class="isDragging ? 'cursor-move' : ''">
     <div id="Header" class="w-full h-8 mb-2">
-      <div class="mb-2 pt-1 ml-3 font-bold text-base text-white">Select Modules</div>
+      <div class="mb-2 pt-1 ml-3 font-bold text-base text-white">Calibration Job Filters</div>
     </div>
     <div id="ModuleDialog">
       <div class="mb-3">
@@ -35,7 +35,7 @@
               <div class="col-span-4">
                 <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark" v-model="calDateEnd"
                   time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
-                  @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
+                  @update:model-value="handleCalDateEnd" aria-label="aria-label" title="title" />
               </div>
             </div>
           </div>
@@ -45,7 +45,7 @@
       <div class="row-span-1">
         <div class="grid grid-cols-3">
           <div class="col-span-1">
-            <label for="ModuleList">Modules</label>
+            <label for="ModuleList" class="text-center">Modules</label>
             <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
               optionLabel="name" optionValue="name" class="h-60">
               <template #option="slotProps">
@@ -69,8 +69,8 @@
       </div>
 
       <div id="ButtonArea" class="flex justify-end gap-5">
-        <Button class="ngenButtonDiv" label="Reset" severity="secondary" @click="sendClose()"></Button>
-        <Button class="ngenButtonDiv" label="Close"></Button>
+        <Button class="ngenButtonDiv" label="Reset" severiay="primary"></Button>
+        <Button class="ngenButtonDiv" label="Close" severity="secondary" @click="sendClose()"></Button>
       </div>
 
     </div>
@@ -91,14 +91,18 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 const userStore = useUserDataStore();
-const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilter, calDateStart, calDateEnd, earliestTime, latestTime } = storeToRefs(useUserDataStore());
+const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilter, 
+  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange } = storeToRefs(useUserDataStore());
 
 import { defineEmits } from "vue";
 const emit = defineEmits(["ModulesFilterDialogClosing"]);
 
-const useDateRange = ref<boolean>(false);
-
 const showArchivedJobsOnly = ref<boolean>(false);
+
+const draggableDiv = ref<HTMLDivElement | null>(null);
+const isDragging = ref<boolean>(false);
+let offsetX = 0;
+let offsetY = 0;
 
 const props = defineProps<{
   calJobs: CalibrationJobListItem[];
@@ -109,6 +113,32 @@ onMounted(() => {
   console.log(uiGageId, calibrationRunGageList);
   nextTick(() => {
     setTimeout(() => {
+      if (draggableDiv.value) {
+        draggableDiv.value.addEventListener('mousedown', (e: MouseEvent) => {
+          isDragging.value = true;
+          offsetX = e.clientX - draggableDiv.value!.offsetLeft;
+          offsetY = e.clientY - draggableDiv.value!.offsetTop;
+        });
+
+        document.addEventListener('mousemove', (e: MouseEvent) => {
+          if (!isDragging.value) return;
+          if (draggableDiv.value) {
+            const newX = e.clientX - offsetX;
+            const newY = e.clientY - offsetY;
+
+            // Keep div within window bounds
+            const maxX = window.innerWidth - draggableDiv.value.offsetWidth + (draggableDiv.value.offsetWidth / 2);
+            const maxY = window.innerHeight - draggableDiv.value.offsetHeight + (draggableDiv.value.offsetHeight / 2);
+
+            draggableDiv.value.style.left = Math.min(Math.max(0, newX), maxX) + 'px';
+            draggableDiv.value.style.top = Math.min(Math.max(0, newY), maxY) + 'px';
+          }
+        });
+
+        document.addEventListener('mouseup', () => {
+          isDragging.value = false;
+        });
+      }
       findEarliestAndLatest(props.calJobs);
     }, 0)
   });
@@ -153,6 +183,15 @@ const archivedTemplate = (rowData: any) => {
 const handleCalDateStart = (value: any) => {
   if (typeof value === 'string') {
     calDateStart.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+};
+/**
+ * Save filter end date
+ * @param e 
+ */
+const handleCalDateEnd = (value: any) => {
+  if (typeof value === 'string') {
+    calDateEnd.value = DateTime.fromISO(value, { zone: 'utc' });
   }
 };
 
@@ -203,12 +242,12 @@ const handleCalDateStart = (value: any) => {
   padding: 0 4px;
   width: 100%;
 
-  :first-child {
-    > :first-child {
-      > :first-child {
-        font-size: 1em;
-      }
-    }
-  }
+  // :first-child {
+  //   > :first-child {
+  //     > :first-child {
+  //       font-size: 1em;
+  //     }
+  //   }
+  // }
 }
 </style>

@@ -34,12 +34,14 @@ export const useUserDataStore = defineStore(
     const userSelectedCalibrationIterationId = ref<number | null>(null);
     const uiGageId = ref<string>("");
 
+    // Used for Calibration Job Filter
     const modulesFilterList = ref<string[]>([]);
     const statusTypeFilter = ref<string>("");
     const calDateStart = ref<any>(new Date("Jan 01 2025"));
     const calDateEnd = ref<any>(new Date());
     const earliestTime = ref<Date>();
     const latestTime = ref<Date>();
+    const useDateRange = ref<boolean>(false);
 
     /**
      * Checks if user is logged in
@@ -363,6 +365,7 @@ export const useUserDataStore = defineStore(
       calDateEnd,
       earliestTime,
       latestTime,
+      useDateRange
     };
   },
   {
