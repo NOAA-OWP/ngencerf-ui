@@ -144,6 +144,13 @@
               Output Variable:</span>
             {{ calData?.output_variable_to_calibrate?.name }}</div>
         </div>
+        <div class="col-span-2">
+          <div v-if="resultsPathname"
+            :aria-label="'Results Pathname ' + resultsPathname"
+            :title="'Results Pathname ' + resultsPathname"><span class="font-medium">
+              Results Pathname:</span>
+            {{ resultsPathname }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -155,6 +162,7 @@ import { storeToRefs } from 'pinia';
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useTuningStore } from "@/stores/calibration/TuningStore";
+import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
@@ -163,6 +171,8 @@ const { userCalibrationRunData } = storeToRefs(calRunStore);
 const calData = ref(userCalibrationRunData);
 const tuningStore = useTuningStore();
 const { userSelectedCalibrationTuningParameters } = storeToRefs(tuningStore);
+const runStatusStore = useRunStatusStore();
+const { resultsPathname } = storeToRefs(runStatusStore);
 
 const componentProps = withDefaults(defineProps<{
   title?: string

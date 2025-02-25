@@ -9,100 +9,113 @@
     </div>
   </Transition>
   <div id="EvaluatePage">
-
-    <div class="grid grid-rows-3 gap-y-0">
-      <div class="row-span-1 mt-3">
-        <div class="grid grid-cols-2">
-
-          <div class="col-span-1 pl-8">
-            <label for="DisplayOptions">Display </label>
-            <div class="inline-block w-2/3">
-              <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-                optionLabel="name" optionValue="name" :disabled="!plotList" aria-label="Select display"
-                title="Select display">
-              </Select>
-            </div>
-          </div>
-          <div class="col-span-1 pr-8">
-            <div class="text-right">
-              <Button id="NewValidationBtn" class="ngenButtonDiv" @click="gotoSelectAlternateIteration"
-                aria-label="New Validation Button" title="New Validation Button">New Validation</Button>
-            </div>
+    <div class="pl-6 pr-2 pt-2">
+      <div class="flex mt-3">
+        <div class="w-1/2">
+          <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+          <div class="inline-block w-2/3">
+            <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
+              optionLabel="name" optionValue="name" :disabled="!plotList">
+            </Select>
           </div>
 
+          <div class="layout__table mt-2" style="width:100%">
+            <div class="layout__row">
+              <div class="text-left" style="width: 150px;font-size:0.9em;">
+                <label for="calibrationJobId">Calibration Job ID </label>
+                {{ calibrationJobId }}
+              </div>
+              <div class="text-left pl-3" style="font-size:0.9em;">
+                <label for="validationJobId">Validation Job ID </label>
+                {{ evaluateValidationRunId }}
+              </div>
+            </div>
+          </div>            
         </div>
-      </div>
-
-      <div class="row-span-1 mt-3">
-        <div class="grid grid-cols-4">
-
-          <div class="col-span-2">
-            <div class="text-left pt9em pl-8">
-              <label for="calibrationJobId" class="text-bold" :aria-label="'Calibration Job ID ' + calibrationJobId"
-                :title="'Calibration Job ID ' + calibrationJobId">Calibration Job ID </label>{{ calibrationJobId }}
-              <div class="inline-block ml-16">
-                <label for="evaluateValidationRunId" class="text-bold"
-                  :aria-label="'Validation Job ID ' + calibrationJobId"
-                  :title="'Validation Job ID ' + calibrationJobId">Validation Job ID</label> {{
-                    evaluateValidationRunId }}
+        <div>
+          <div id="CustomizePlotWindow" v-if="showCustomizePlot">
+            <div class="text-right sticky top-0">
+              <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+                class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
+            </div>
+            <h2 class="mt-5" aria-label="Customize Interactive Plot" title="Customize Interactive Plot">
+              Customize Interactive Time Series Viewer
+            </h2>
+            <div v-if="plotGraphLines.length > 0">
+              <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
+                <div class="label150">
+                  <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
+                </div>
+                <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color" :options="plotGraphColorList" 
+                  optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+                </Select>
+                <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol" :options="plotGraphSymbolList" 
+                  optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+                </Select>
               </div>
             </div>
           </div>
-
-          <div class="col-span-1">&nbsp;</div>
-          <div class="col-span-1 text-right pr-8">
-            <a v-if="userCalibrationRunData" href="#" class="c-blue text-sm underline mt-1 text-right"
-              @click="toggleMessagesGroup" aria-label="Show Calibration Details Button"
-              title="Show Calibration Details Button">Show
-              Calibration Details</a>
+          <div v-if="selectedPlotName == 'Hydrograph evolution'">
+            <div v-if="!showPlotGraph">
+              <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
+                Show Interactive Time Series Viewer</a>
+            </div>
+            <div v-else>
+              <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
+                Hide Interactive Time Series Viewer</a>
+              <div v-if="plotGraphLines.length > 0" class="columns-2">
+                <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
+                  <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`" v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();">
+                  <div class="label150">
+                    <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="row-span-1">
-        <div class="grid grid-cols-4">
-          <div class="col-span-2 pl-8 flex items-center space-x-2 w-full"
-            :aria-label="'Results Pathname is ' + resultsPathname" :title="'Results Pathname is ' + resultsPathname">
-            <label for="resultsPathname" class="text-xs whitespace-nowrap font-bold">Results Pathname</label>
-            <span class="flex-grow">
-              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled
-                class="w-full" />
-            </span>
-          </div>
+        <div class="pl-4 ml-auto text-nowrap">
+          <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
+              @click="gotoSelectAlternateIteration">New Validation</button></span>
+          <br />
+          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">
+            Show Calibration Details</a>
+          <br />
+          <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleCustomizePlot">
+            Customize Interactive Time Series Viewer</a>
         </div>
       </div>
     </div>
-
-
-    <div class="grid grid-cols-2">
+    <div v-if="!showPlotGraph" class="grid grid-cols-2">
       <div class="text-center">
         <div id="GraphArea" class="p-2" v-if="selectedPlotName && selectedPlotFileUrl">
           <img :src="selectedPlotFileUrl" :alt="selectedPlotName" />
         </div>
       </div>
       <div>
-
-        <div class="text-center"
-          v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0 && selectedLogCategory == ''">
-          <div class="grid place-items-center" style="height: 45vh;">
-            <div>
-              {{ plotTableErrorMessage }}
+        
+        <div class="text-center" v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0 && selectedLogCategory == ''">
+            <div class="grid place-items-center" style="height: 45vh;">
+                <div>
+                    {{ plotTableErrorMessage }}
+                </div>
             </div>
-          </div>
         </div>
 
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
           <div v-if="plotTableList && plotTableList.length > 1">
             <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
-            <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable" :options="plotTableList"
-              optionLabel="name" optionValue="name">
+            <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable"
+              :options="plotTableList" optionLabel="name" optionValue="name">
             </Select>
           </div>
           <div class="pt-6 pb-2">
             <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0" class="pagination-box">
-              <div class="pagination-rows">Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{
-                plotTableTotalSize }}</div>
-              <Paging v-model:currentPage="plotTableCurrentPage" :totalPages=plotTableTotalPages />
+              <div class="pagination-rows">Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{ plotTableTotalSize }}</div>
+              <Paging
+                v-model:currentPage="plotTableCurrentPage"
+                :totalPages=plotTableTotalPages
+              />
             </div>
             <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true scrollable scroll-height="500px"
               :multi-sort="true">
@@ -113,40 +126,69 @@
         </div>
       </div>
     </div>
-    <div id="SupplementalTableArea" class="p-2" v-if="selectedSupplementalTable">
-      <DataTable :value="iterationMetricsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true"
-        v-if="iterationMetricsData && selectedSupplementalTable === 1">
-        <Column v-for="(col, colIndex) in iterationMetricsColumns" :key="colIndex" :header="col.header"
-          :field="col.field" sortable></Column>
-      </DataTable>
-      <DataTable :value="iterationParamsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true"
-        v-if="iterationParamsData && selectedSupplementalTable === 2">
-        <Column v-for="(col, colIndex) in iterationParamsColumns" :key="colIndex" :header="col.header"
-          :field="col.field" sortable></Column>
-      </DataTable>
-      <DataTable :value="performanceMetricsData" fixedHeader=true
-        v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable === 3">
-        <Column v-for="(col, colIndex) in performanceMetricsColumns" :key="colIndex" :header="col.header"
-          :field="col.field"></Column>
-      </DataTable>
+    <div id="PlotGraphArea" ref="plotGraphArea" v-if="showPlotGraph && plotGraphData">
+      <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
+      <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
+        <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange" 
+          @mouseup="sliderDragEnd" @mouseleave="sliderDragCancel">
+          <div id="PlotGraphSliderBox" ref="plotGraphSliderBox"></div>
+        </div>
+      </div>
+      <div id="PlotGraphSliderDateRange">
+        <div class="flex flex-row justify-center">
+          {{ formatDateString(plotGraphDateRange.start) }} - {{ formatDateString(plotGraphDateRange.end) }}
+          <!-- From:
+          <input type="date" class="select150" v-model="plotGraphDateRange.start" :min="plotGraphDateLimits.start" :max="plotGraphDateLimits.end" @change="updatePlotGraphDates"/>
+          To:
+          <input type="date" class="select150" v-model="plotGraphDateRange.end" :min="plotGraphDateLimits.start" :max="plotGraphDateLimits.end" @change="updatePlotGraphDates"/> -->
+        </div>
+      </div>
+      <div id="PlotGraphSliderHelp">
+        <div class="flex flex-row justify-center">
+          {{ plotGraphSliderHelpDisplay }}
+        </div>
+      </div>
     </div>
-    <div id="LogDisplayArea" class="p-2"
-      v-if="selectedLogCategory != '' && selectedLogList && selectedLogList.length > 0">
+    <div id="SupplementalTableArea" v-if="selectedSupplementalTable">
+      <div id="SupplementalTableArea" class="p-2">
+        <div v-if="iterationMetricsData && selectedSupplementalTable === 1">
+          <DataTable :value="iterationMetricsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
+            <Column v-for="( col, colIndex ) in iterationMetricsColumns" :key="colIndex" :header="col.header"
+              :field="col.field" sortable></Column>
+          </DataTable>
+        </div>
+        <div v-if="iterationParamsData && selectedSupplementalTable === 2">
+          <DataTable :value="iterationParamsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
+            <Column v-for="( col, colIndex ) in iterationParamsColumns" :key="colIndex" :header="col.header"
+              :field="col.field" sortable></Column>
+          </DataTable>
+        </div>
+        <div v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable === 3">
+          <DataTable :value="performanceMetricsData" fixedHeader=true>
+            <Column v-for="( col, colIndex ) in performanceMetricsColumns" :key="colIndex" :header="col.header"
+              :field="col.field"></Column>
+          </DataTable>
+        </div>
+      </div>
+    </div>
+    <div id="LogDisplayArea" class="p-2" v-if="selectedLogCategory != '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
         <div v-if="selectedLogList.length > 1">
           <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
-          <Select id="selectedLogOptions" class="p-select" v-model="selectedLogName" :options="selectedLogList"
-            optionLabel="name" optionValue="name">
+          <Select id="selectedLogOptions" class="p-select"  
+            v-model="selectedLogName" :options="selectedLogList" optionLabel="name" optionValue="name">
           </Select>
         </div>
-        <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b
-            style="width:160px; display:inline-block;">Log File Name</b> {{ selectedLogName }}</div>
+        <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b style="width:160px; display:inline-block;">Log File Name</b> {{ selectedLogName }}</div>
 
         <div class="flex justify-end" style="margin-top:-23px;">
-          <div class="ml-auto">
-            <div>Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
-            <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
-          </div>
+            <div class="ml-auto">
+                <div>Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
+                <Paging
+                v-model:currentPage="selectedLogCurrentPage"
+                :totalPages=selectedLogTotalPages
+                />
+            </div>
         </div>
 
         <div id="selectedLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
@@ -201,6 +243,7 @@
 </template>
 
 <script setup lang="ts">
+import { nextTick } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import VueDatePicker from "@vuepic/vue-datepicker";
 
@@ -235,9 +278,7 @@ const ptColumn = ref({
   bodyCell: { style: { "text-align": "right", "padding-right": "10px !important" } }
 });
 
-const {
-  resultsPathname
-} = storeToRefs(runStatusStore);
+
 const {
   plotList,
   plotNames,
@@ -278,15 +319,34 @@ const plotTableTotalPages = ref<number>(1);
 const plotTableStartRow = ref<number>(1);
 const plotTableEndRow = ref<number>(plotTablePageSize.value);
 const plotTableErrorMessage = ref<string>('');
+const plotGraphArea = ref(null);
+const plotGraphSVG = ref(null);
+const plotGraphDataRaw = ref<any[]>([]);
+const plotGraphData = ref<any[]>([]);
+const plotGraphOptions = ref<DynamicObject>({});
+const plotGraphLines = ref<any[]>([]);
+const plotGraphDateLimits = ref<DynamicObject>({});
+const plotGraphDateRange = ref<DynamicObject>({});
+const plotGraphSlider = ref(null);
+const plotGraphSliderData = ref<any[]>([]);
+const plotGraphSliderOptions = ref<DynamicObject>({});
+const plotGraphSliderBox = ref(null);
+const plotGraphSliderCursor = ref<string>('cursor-grab');
+const plotGraphSliderHelpDisplay = ref<string>('');
+const sliderBoxPosition = ref<DynamicObject>({});
+const sliderDragPosition = ref<DynamicObject>({});
+const sliderDragType = ref<string>('');
+const showPlotGraph = ref<Boolean>(false);
+const showCustomizePlot = ref<Boolean>(false);
+const selectedSupplementalTable = ref<number>( 0 );
 const iterations = ref<APIResponse>({});
 const iterationMetricsData = ref<any[]>([]);
-const iterationParamsData = ref<any[]>([]);
 const iterationMetricsColumns = ref<any[]>([]);
+const iterationParamsData = ref<any[]>([]);
 const iterationParamsColumns = ref<any[]>([]);
-const selectedSupplementalTable = ref<number>(0);
 const performanceMetrics = ref<APIResponse>({});
 const performanceMetricsData = ref<any[]>([]);
-const performanceMetricsColumns = [{ header: 'Metric', field: 'metric' }];
+const performanceMetricsColumns = ref<any[]>([{ header: 'Metric', field: 'metric' }]);
 const logs = ref<APIResponse>({});
 const logDataPageSize = ref<number>(1000);
 const logLists = ref<DynamicObject>({});
@@ -304,14 +364,31 @@ const supplementalTableOptions = [
   'Iteration Parameters Table',
   'Performance Metrics Table'
 ]
+const plotGraphColors = ['grey', 'blue', 'gold', 'green', 'black', 'orange', 'pink', 'red', 'yellow'];
+const plotGraphColorList = [];
+for (let c = 0; c < plotGraphColors.toSorted().length; c++) {
+  plotGraphColorList.push({name: plotGraphColors.toSorted()[c]});
+}
+const plotGraphSymbols = ['line', 'circle', 'cross', 'diamond', 'square', 'star', 'triangle', 'wye'];
+const plotGraphSymbolList = [];
+for (let s = 0; s < plotGraphSymbols.toSorted().length; s++) {
+  plotGraphSymbolList.push({name: plotGraphSymbols.toSorted()[s]});
+}
+const plotGraphSliderHelpText = [
+  'Click and drag within the slider to change the date range.',
+  'Drag left or right to change the Start Date.',
+  'Drag left or right to change the End Date.',
+  'Drag left or right to move the Start and End Dates.',
+  'Click inside the highlighted date range or on its edges to make changes.'
+]
 const gridDisplayOptions = [
   "Snow Water Equivalent",
-] 
+]
 
-onMounted(() => {
-  nextTick(async () => {
+onMounted( () => {
+  nextTick( async () => {
     hilightTab(EvaluationTabs.tab_evaluate);
-
+    
     // make sure page loads with no plots/tables selected
     selectedPlotName.value = null;
     selectedPlotFilename.value = null;
@@ -340,7 +417,7 @@ onMounted(() => {
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-
+    
     // Add Supplemental Table Options to the dropdown
     for (let t = 0; t < supplementalTableOptions.length; t++) {
       if (!plotList.value.some(item => item.name === supplementalTableOptions[t])) {
@@ -358,12 +435,12 @@ onMounted(() => {
         Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
           let logList = [];
           for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-            logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+            logList.push({'name': logs.value?._data?.log_names[l][key][n]});
           }
           logLists.value[key] = logList;
         });
       }
-
+      
       // Add Log Options to the dropdown
       Object.keys(logLists.value).forEach(key => {
         let optionName = capitalCase(key) + ' Logs';
@@ -391,6 +468,8 @@ watch(selectedPlotName, async () => {
   if (selectedPlotName.value && supplementalTableOptions.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
+    plotGraphData.value = [];
+    plotGraphLines.value = [];
     selectedSupplementalTable.value = supplementalTableOptions.indexOf(selectedPlotName.value) + 1;
     if (selectedSupplementalTable.value === 1) {
       // Get Iteration Data
@@ -422,7 +501,7 @@ watch(selectedPlotName, async () => {
         }
       }
       //console.log('iterationMetricsData:', iterationMetricsData.value);
-      //console.log('iterationMetricsColumns:', iterationMetricsColumns);
+      //console.log('iterationMetricsColumns:', iterationMetricsColumns.value);
       if (!iterationMetricsData.value.length) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: ToastTimeout.timeout5000 };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -457,7 +536,7 @@ watch(selectedPlotName, async () => {
         }
       }
       //console.log('iterationParamsData:', iterationParamsData.value);
-      //console.log('iterationParamsColumns:', iterationParamsColumns);
+      //console.log('iterationParamsColumns:', iterationParamsColumns.value);
       if (!iterationParamsData.value.length) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: ToastTimeout.timeout5000 };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -473,7 +552,7 @@ watch(selectedPlotName, async () => {
         //console.log('performanceMetrics:', performanceMetrics.value?._data);
         if (performanceMetrics.value?._data?.performance_metrics) {
           // First add the metric names and the values from our Calibration run
-          performanceMetricsColumns.push({ header: 'Calibration Job ID ' + calibrationJobId.value, field: 'calibration_job_id_' + calibrationJobId.value });
+          performanceMetricsColumns.value.push({ header: 'Calibration Job ID ' + calibrationJobId.value, field: 'calibration_job_id_' + calibrationJobId.value });
           Object.keys(performanceMetrics.value?._data.performance_metrics).forEach(key => {
             performanceMetricsData.value.push({ 'metric': key });
             performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = performanceMetrics.value?._data?.performance_metrics[key];
@@ -496,7 +575,7 @@ watch(selectedPlotName, async () => {
                 }
                 validation_type += ' ' + performanceMetrics.value?._data?.validations[v].iteration_num;
               }
-              performanceMetricsColumns.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id });
+              performanceMetricsColumns.value.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id});
               if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
                 Object.keys(performanceMetrics.value?._data?.validations[v].performance_metrics).forEach(key => {
                   // Loop through our existing rows and see if we have this metric already
@@ -529,7 +608,7 @@ watch(selectedPlotName, async () => {
           }
         }
         //console.log('performanceMetricsData:', performanceMetricsData.value);
-        //console.log('performanceMetricsColumns:', performanceMetricsColumns);
+        //console.log('performanceMetricsColumns:', performanceMetricsColumns.value);
       }
       if (!performanceMetricsData.value.length) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: ToastTimeout.timeout5000 };
@@ -547,6 +626,8 @@ watch(selectedPlotName, async () => {
     selectedPlotFileUrl.value = null;
     plotTableData.value = [];
     plotTableColumns.value = [];
+    plotGraphData.value = [];
+    plotGraphLines.value = [];
     selectedSupplementalTable.value = 0;
     selectedLogName.value = '';
     selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
@@ -559,6 +640,8 @@ watch(selectedPlotName, async () => {
     plotTableErrorMessage.value = '';
     plotTableData.value = [];
     plotTableColumns.value = [];
+    plotGraphData.value = [];
+    plotGraphLines.value = [];
     selectedSupplementalTable.value = 0;
     selectedLogCategory.value = '';
     selectedLogList.value = [];
@@ -567,11 +650,13 @@ watch(selectedPlotName, async () => {
 
 
   } else if (selectedPlotName.value) {
+    plotGraphData.value = [];
+    plotGraphLines.value = [];
     selectedSupplementalTable.value = 0;
     selectedLogCategory.value = '';
     selectedLogList.value = [];
     plotTableCurrentPage.value = 1;
-
+    
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(
       selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
@@ -720,11 +805,11 @@ function adjustPlotTableColumns() {
 
 // Watch for page number changes in plot table
 watch(plotTableCurrentPage, async () => {
-  if (plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value / plotTablePageSize.value)) {
+  if (plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value/plotTablePageSize.value)) {
     console.log('ERROR: Page number ' + plotTableCurrentPage.value + ' out of bounds');
   } else {
-    plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value - 1)) + 1;
-    plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value - 1), plotTableTotalSize.value);
+    plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value-1)) + 1;
+    plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value-1),plotTableTotalSize.value);
     console.log('Loading rows ' + plotTableStartRow.value + '-' + plotTableEndRow.value + ' from the ' + plotTableTotalSize.value + ' total stored in the backend');
     const response: any = await queryGetPlot(
       selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
@@ -732,7 +817,7 @@ watch(plotTableCurrentPage, async () => {
       false, // force_include_plot
       (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      plotTableStartRow.value - 1, // start
+      plotTableStartRow.value-1, // start
       plotTablePageSize.value // limit
     );
     if (response?._data?.plot_data) {
@@ -741,14 +826,394 @@ watch(plotTableCurrentPage, async () => {
   }
 });
 
+// Handle plotGraphData changes
+watch(plotGraphData, async () => {
+  if (plotGraphData.value.length > 0) {
+    if (plotGraphLines.value.length == 0) {
+      for (let c = 1; c < plotTableColumns.value.length; c++) {
+        let strokeColor = c < plotGraphColors.length ? plotGraphColors[c-1] : plotGraphColors[0];
+        plotGraphLines.value.push({
+          id: c,
+          name: plotTableColumns.value[c].header, 
+          color: strokeColor, 
+          symbol: 'line',
+          checked: true
+        });
+      }
+      //console.log('plotGraphLines: ', plotGraphLines.value);
+    }
+    nextTick(() => {
+      drawInteractivePlot();
+    })
+  } else {
+    showPlotGraph.value = false;
+  }
+});
+
+const togglePlotGraph = async() => {
+  if (showPlotGraph.value) {
+    showPlotGraph.value = false;
+  } else {
+    if (!plotGraphData.value || plotGraphData.value.length == 0) {
+      console.log('Loading all rows from the ' + plotTableTotalSize.value + ' total stored in the backend');
+      const response: any = await queryGetPlot(
+        selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
+        true, // include_data
+        false, // force_include_plot
+        (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
+        (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+        24, // start - ignore first 24 data records for plotting purposes
+        plotTableTotalSize.value // limit
+      );
+      if (response?._data?.plot_data) {
+        plotGraphDataRaw.value = response?._data?.plot_data;
+      }
+      // setting min/max dates will trigger the date filter below
+      plotGraphDateLimits.value = {
+        start: new Date(plotGraphDataRaw.value[0][plotTableColumns.value[0].value]).toISOString().split('T')[0],
+        end: new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length-1][plotTableColumns.value[0].value]).toISOString().split('T')[0],
+        span: Math.ceil((new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length-1][plotTableColumns.value[0].value]).getTime() - new Date(plotGraphDataRaw.value[0][plotTableColumns.value[0].value]).getTime())/ (1000 * 3600 * 24))
+      }
+      console.log('plotGraphDateLimits: ', plotGraphDateLimits.value);
+      plotGraphDateRange.value = {
+        start: plotGraphDateLimits.value.start,
+        end: plotGraphDateLimits.value.end,
+      };
+      console.log('plotGraphDateRange: ', plotGraphDateRange.value);
+      showPlotGraph.value = true;
+      nextTick(() => {
+        drawInteractiveSlider();
+      })
+    } else {
+      showPlotGraph.value = true;
+      nextTick(() => {
+        drawInteractivePlot();
+        drawInteractiveSlider();
+      })
+    }
+  }
+}
+
+// draw interactive plot when plot graph data is first loaded, and also when checkboxes are clicked
+const drawInteractivePlot = () => {
+  console.log('Drawing interactive plot');
+  plotGraphOptions.value = {x: {grid: true}, y: {grid: true}, marks: [], width: plotGraphArea.value.offsetWidth - 200};
+  let plotLineData = [];
+  let plotDotData = [];
+  for (let c = 1; c < plotTableColumns.value.length; c++) {
+    if (document?.getElementById('plotGraphCheckbox-' + c)?.checked) {
+      for (let d = 0; d < plotGraphData.value.length; d++) {
+        if (plotGraphLines.value[c-1].symbol == 'line') {
+          plotLineData.push({
+            'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value]),
+            'flow': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]), 
+            'color': plotGraphLines.value[c-1].color,
+            'name': plotGraphLines.value[c-1].name
+          });
+        } else {
+          plotDotData.push({
+            'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value]),
+            'flow': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]), 
+            'color': plotGraphLines.value[c-1].color,
+            'symbol': plotGraphLines.value[c-1].symbol,
+            'name': plotGraphLines.value[c-1].name
+          });
+        }
+      }
+    }
+  }
+  //console.log('plotLineData: ', plotLineData);
+  //console.log('plotDotData: ', plotDotData);
+  plotGraphOptions.value.marks.push(Plot.ruleX([new Date(plotGraphDateRange.value.start)]));
+  plotGraphOptions.value.marks.push(Plot.ruleY([0]));
+  if (plotLineData.length > 0) {
+    plotGraphOptions.value.marks.push(
+      Plot.lineY(plotLineData, {
+        x: {value: 'time', label: 'Time'},
+        y: {value: 'flow', label: 'Flow (cm/s)'}, 
+        stroke: 'color'
+      })
+    );
+    plotGraphOptions.value.marks.push(
+      Plot.tip(plotLineData, Plot.pointer({
+          x: {value: 'time', label: 'Time'},
+          y: {value: 'flow', label: 'Flow'}, 
+          title: (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0,2).join(":")}\nFlow: ${d.flow} cm/s`,
+          fontSize: 14
+        })
+      )
+    );
+  }
+  if (plotDotData.length > 0) {
+    plotGraphOptions.value.marks.push(
+      Plot.dot(plotDotData, {
+        x: {value: 'time', label: 'Time'},
+        y: {value: 'flow', label: 'Flow'}, 
+        stroke: 'color', 
+        symbol: 'symbol'
+      })
+    );
+    plotGraphOptions.value.marks.push(
+      Plot.tip(plotDotData, Plot.pointer({
+          x: {value: 'time', label: 'Time'},
+          y: {value: 'flow', label: 'Flow'}, 
+          title: (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0,2).join(":")}\nFlow: ${d.flow} cm/s`,
+          fontSize: 14
+        })
+      )
+    );
+  }
+  //console.log('plotGraphOptions: ', plotGraphOptions.value);
+  plotGraphSVG.value.innerHTML = '';
+  plotGraphSVG.value.append(Plot.plot(plotGraphOptions.value));
+  nextTick(() => {
+    if (plotGraphArea.value) {
+      plotGraphOptions.value.width = plotGraphArea.value.offsetWidth - 200;
+      plotGraphSliderOptions.value.width = plotGraphArea.value.offsetWidth - 250;
+      console.log('setting plot graph width to: ', plotGraphArea.value.offsetWidth - 200);
+    };
+  })
+}
+
+const getSliderWidth = () => {
+  return document.getElementById('PlotGraphSlider').getBoundingClientRect().right - document.getElementById('PlotGraphSlider').getBoundingClientRect().left;
+}
+
+// Create slider as a mini-plot of just the first plot line
+const drawInteractiveSlider = () => {
+  console.log('Drawing interactive slider');
+  plotGraphSliderData.value = [];
+  let rowSkip = plotGraphDataRaw.value.length/1000;
+  for (let c = 1; c < plotTableColumns.value.length; c++) {
+    if (document?.getElementById('plotGraphCheckbox-' + c)?.checked) {
+      for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
+        plotGraphSliderData.value.push({
+          'time': new Date(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[0].value]),
+          'flow': parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[c].value])
+        });
+      }
+      break;
+    }
+  }
+  plotGraphSliderOptions.value = {
+    x: {tickSize: 0, inset: 0}, 
+    y: {axis: null}, 
+    marks: [
+      Plot.lineY(plotGraphSliderData.value, {
+        x: 'time',
+        y: 'flow',
+      })
+    ], 
+    width: plotGraphArea.value.offsetWidth - 250,
+    height: 100,
+    marginLeft: 0,
+    marginRight: 0
+  };
+  while (plotGraphSlider.value.children.length > 1) {
+    plotGraphSlider.value.removeChild(plotGraphSlider.value.children[1]);
+  }
+  plotGraphSlider.value.append(Plot.plot(plotGraphSliderOptions.value));
+  document.getElementById('PlotGraphSliderBox').style.left = sliderBoxPosition.value.start + 'px';
+  document.getElementById('PlotGraphSliderBox').style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
+  plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
+}
+
+// Filter interactive plot when date range is changed
+const updatePlotGraphDates = () => {
+  interactivePlotDateFilter();
+}
+
+watch(plotGraphDateRange, async () => {
+  if (plotGraphDataRaw.value) {
+    //console.log('plotGraphDateRange: ', plotGraphDateRange.value);
+    interactivePlotDateFilter();
+  }
+});
+
+const interactivePlotDateFilter = () => {
+  let tempPlotGraphData = [];
+  //console.log('plotGraphDataRaw.length', plotGraphDataRaw.value.length);
+  //console.log('plotGraphDateLimits', plotGraphDateLimits.value);
+  //console.log('plotGraphDateRange', plotGraphDateRange.value);
+  if (plotGraphDateRange.value.start > plotGraphDateRange.value.end) {
+    plotGraphDateRange.value = {
+      start: plotGraphDateRange.value.end,
+      end: plotGraphDateRange.value.start
+    }
+  }
+  if (plotGraphDateRange.value.start < plotGraphDateLimits.value.start) {
+    plotGraphDateRange.value.start = plotGraphDateLimits.value.start;
+  }
+  if (plotGraphDateRange.value.end > plotGraphDateLimits.value.end) {
+    plotGraphDateRange.value.end = plotGraphDateLimits.value.end;
+  }
+  let startDate = new Date(plotGraphDateRange.value.start);
+  let endDate = new Date(plotGraphDateRange.value.end);
+  startDate.setHours(0);
+  startDate.setMinutes(0);
+  endDate.setHours(23);
+  endDate.setMinutes(59);
+  for (let r = 0; r < plotGraphDataRaw.value.length; r++) {
+    let currentDate = new Date(plotGraphDataRaw.value[r][plotTableColumns.value[0].value]);
+    if (currentDate >= startDate && currentDate <= endDate) {
+      tempPlotGraphData.push(plotGraphDataRaw.value[r]);
+    }
+  }
+  //console.log('tempPlotGraphData.length', tempPlotGraphData.length);
+  let tempPlotGraphDataFiltered = [];
+  if (tempPlotGraphData.length > 1000) {
+    // only plot 1,000 data points at a time
+    let rowSkip = tempPlotGraphData.length/1000;
+    for (let r = 0; r < tempPlotGraphData.length; r += rowSkip) {
+      if (tempPlotGraphDataFiltered.length < 1000) {
+        tempPlotGraphDataFiltered.push(tempPlotGraphData[Math.floor(r)]);
+      }
+    }
+    //console.log('tempPlotGraphDataFiltered.length', tempPlotGraphDataFiltered.length);
+    plotGraphData.value = tempPlotGraphDataFiltered;
+  } else {
+    plotGraphData.value = tempPlotGraphData;
+  }
+}
+
+const sliderDragStart = (event) => {
+  const x = event.clientX - document.getElementById('PlotGraphSlider').getBoundingClientRect().left;
+  sliderDragPosition.value.start = x;
+  sliderDragPosition.value.current = x;
+  sliderBoxPosition.value = {
+    start: document.getElementById('PlotGraphSliderBox').getBoundingClientRect().left - document.getElementById('PlotGraphSlider').getBoundingClientRect().left,
+    end: document.getElementById('PlotGraphSliderBox').getBoundingClientRect().right - document.getElementById('PlotGraphSlider').getBoundingClientRect().left
+  }
+  plotGraphSliderCursor.value = 'cursor-ew-resize';
+  if (Math.abs(sliderBoxPosition.value.start - sliderDragPosition.value.start) <= 10) {
+    sliderDragType.value = 'left';
+    plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[1];
+  } else if (Math.abs(sliderBoxPosition.value.end - sliderDragPosition.value.start) <= 10) {
+    sliderDragType.value = 'right';
+    plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[2];
+  } else if (sliderBoxPosition.value.start < sliderDragPosition.value.start && sliderDragPosition.value.start < sliderBoxPosition.value.end) {
+    sliderDragType.value = 'middle';
+    plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[3];
+    plotGraphSliderCursor.value = 'cursor-grabbing';
+  } else {
+    sliderDragType.value = '';
+    plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[4];
+    plotGraphSliderCursor.value = 'cursor-not-allowed';
+  }
+}
+
+const sliderDragChange = (event) => {
+  const x = event.clientX - document.getElementById('PlotGraphSlider').getBoundingClientRect().left;
+  if (!sliderBoxPosition.value || !sliderBoxPosition.value.length) {
+    sliderBoxPosition.value = {
+      start: document.getElementById('PlotGraphSliderBox').getBoundingClientRect().left - document.getElementById('PlotGraphSlider').getBoundingClientRect().left,
+      end: document.getElementById('PlotGraphSliderBox').getBoundingClientRect().right - document.getElementById('PlotGraphSlider').getBoundingClientRect().left
+    }
+  }
+  if (!sliderDragType.value) {
+    if (Math.abs(sliderBoxPosition.value.start - x) <= 10) {
+      plotGraphSliderCursor.value = 'cursor-ew-resize';
+      plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[1];
+    } else if (Math.abs(sliderBoxPosition.value.end - x) <= 10) {
+      plotGraphSliderCursor.value = 'cursor-ew-resize';
+      plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[2];
+    } else if (sliderBoxPosition.value.start < x && x < sliderBoxPosition.value.end) {
+      plotGraphSliderCursor.value = 'cursor-grab';
+      plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[3];
+    } else {
+      plotGraphSliderCursor.value = 'cursor-not-allowed';
+      plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[4];
+    }
+  } else {
+    switch(sliderDragType.value) {
+      // imitate "dragging" of the box, but don't reset the plot dates yet
+      case 'left':
+        // only drag the left side of the box
+        document.getElementById('PlotGraphSliderBox').style.left = x + 'px';
+        break;
+      case 'right':
+        // only drag the right side of the box
+        document.getElementById('PlotGraphSliderBox').style.right = (getSliderWidth() - x) + 'px';
+        break;
+      case 'middle':
+        // drag both ends of the box by the same distance
+        let xd = x - sliderDragPosition.value.current;
+        document.getElementById('PlotGraphSliderBox').style.left = (sliderBoxPosition.value.start + xd) + 'px';
+        document.getElementById('PlotGraphSliderBox').style.right = (getSliderWidth() - (sliderBoxPosition.value.end + xd)) + 'px';
+    }
+  }
+  // have to keep track of the previous drag position every time this is triggered
+  // (otherwise dragging the whole box by a relative distance doesn't work properly)
+  sliderDragPosition.value.current = x;
+}
+
+const sliderDragCancel = (event) => {
+  plotGraphSliderCursor.value = 'cursor-grab';
+  plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
+  if (sliderDragType.value) {
+    sliderDragEnd(event);
+  }
+}
+
+const sliderDragEnd = (event) => {
+  const x = event.clientX - document.getElementById('PlotGraphSlider').getBoundingClientRect().left;
+  sliderDragPosition.value.end = x;
+  setSliderDateRange();
+  sliderDragType.value = '';
+  plotGraphSliderCursor.value = 'cursor-grab';
+  plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
+}
+
+const setSliderDateRange = () => {
+  if (sliderBoxPosition.value.start < 0) {
+    sliderBoxPosition.value.start = 0;
+  }
+  if (sliderBoxPosition.value.end > getSliderWidth()) {
+    sliderBoxPosition.value.end = getSliderWidth();
+  }
+  if (sliderBoxPosition.value.start > sliderBoxPosition.value.end) {
+    sliderBoxPosition.value = {
+      start: sliderBoxPosition.value.end,
+      end: sliderBoxPosition.value.start
+    };
+  }
+
+  let daysFromStart = Math.ceil(sliderBoxPosition.value.start * (plotGraphDateLimits.value.span / getSliderWidth()));
+  console.log('daysFromStart:', daysFromStart);
+  let newStartDate = new Date(plotGraphDateLimits.value.start);
+  newStartDate.setDate(newStartDate.getDate() + daysFromStart);
+  console.log('newStartDate:', newStartDate);
+
+  let daysFromEnd = Math.ceil((getSliderWidth() - sliderBoxPosition.value.end) * (plotGraphDateLimits.value.span / getSliderWidth()));
+  console.log('daysFromEnd:', daysFromEnd);
+  let newEndDate = new Date(plotGraphDateLimits.value.end);
+  newEndDate.setDate(newEndDate.getDate() - daysFromEnd);
+  console.log('newEndDate:', newEndDate);
+
+  document.getElementById('PlotGraphSliderBox').style.left = sliderBoxPosition.value.start + 'px';
+  plotGraphDateRange.value.start = newStartDate.toISOString().split('T')[0];
+  document.getElementById('PlotGraphSliderBox').style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
+  plotGraphDateRange.value.end = newEndDate.toISOString().split('T')[0];
+  updatePlotGraphDates();
+  console.log('plotGraphDateRange:', plotGraphDateRange.value);
+}
+
+const toggleCustomizePlot = async() => {
+  if (showCustomizePlot.value) {
+    showCustomizePlot.value = false;
+  } else {
+    showCustomizePlot.value = true;
+  }
+}
+
 // Handle selectedLogCategory changes
 watch(selectedLogCategory, async () => {
   selectedLogList.value = logLists.value[selectedLogCategory.value];
   // start with the first log
   selectedLogName.value = selectedLogList.value[0].name;
-  console.log('selectedLogCategory: ', selectedLogCategory.value);
-  console.log('selectedLogList: ', selectedLogList.value);
-  console.log('selectedLogName: ', selectedLogName.value);
+  //console.log('selectedLogCategory: ', selectedLogCategory.value);
+  //console.log('selectedLogList: ', selectedLogList.value);
+  //console.log('selectedLogName: ', selectedLogName.value);
   if (!selectedLogList.value.length) {
     const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeout5000 };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -775,7 +1240,7 @@ watch(selectedLogName, async () => {
       selectedLogTotalSize.value = response?._data?.pagination_metadata?.count;
       selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
       selectedLogStartRow.value = 1;
-      if (selectedLogTotalPages.value === 1) {
+      if (selectedLogTotalPages.value === 1 ) {
         selectedLogEndRow.value = selectedLogTotalSize.value;
       } else {
         selectedLogEndRow.value = logDataPageSize.value;
@@ -793,8 +1258,8 @@ watch(selectedLogCurrentPage, async () => {
   if (selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
     console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
   } else {
-    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
-    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
+    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value-1)) + 1;
+    if (selectedLogCurrentPage.value === selectedLogTotalPages.value ) {
       selectedLogEndRow.value = selectedLogTotalSize.value;
     } else {
       selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
@@ -803,7 +1268,7 @@ watch(selectedLogCurrentPage, async () => {
       selectedLogCategory.value, // log_category,
       selectedLogName.value, // log_name
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      selectedLogStartRow.value - 1, // start
+      selectedLogStartRow.value-1, // start
       logDataPageSize.value // limit
     );
     if (response?._data) {
@@ -824,6 +1289,11 @@ watch(selectedGridType, () => {
 
 function capitalCase(str: string) {
   return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+function formatDateString(str: string) {
+  let date = new Date(str);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 const gotoSelectAlternateIteration = () => {
@@ -867,20 +1337,64 @@ onUnmounted(() => {
   margin-left: 0px;
 }
 
-#CalibrationLogOptions {
-  width: 268px;
+#CalibrationLogOptions{
+    width: 268px;
 }
-
 #validationLogOptions {
-  width: 275px;
+    width: 275px;
 }
 
 #GraphArea img {
   margin: 20px auto;
 }
 
+#PlotGraphArea label {
+  padding-left: 12px;
+}
+
+#PlotGraphSVG {
+  width: 100%;
+}
+
+#PlotGraphSliderContainer {
+  position: relative;
+  user-select: none;
+}
+
+#PlotGraphSlider {
+  position: absolute;
+  background-color: #cccccc;
+  padding: 0;
+  margin: 0;
+  height: 75px;
+}
+
+#PlotGraphSliderBox {
+  position: absolute;
+  border: 1px solid #000000;
+  background-color: #ffffff;
+  opacity: 0.5;
+  z-index: 2;
+  left: 0px;
+  right: 0px;
+  height: 100%;
+}
+
+#PlotGraphSliderDateRange {
+  position: relative;
+  top: 95px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+#PlotGraphSliderHelp {
+  position: relative;
+  top: 100px;
+  font-size: 12px;
+}
+
 #MessagesGroupWindow {
-  z-index: 999;
+  z-index: 100;
   border: 1px solid black;
   position: absolute;
   right: 2%;
@@ -888,6 +1402,31 @@ onUnmounted(() => {
   width: 48%;
   background-color: white;
   overflow: auto;
+}
+
+#CustomizePlotWindow {
+  z-index: 98;
+  border: 1px solid black;
+  position: absolute;
+  left: 50%;
+  top: 161px;
+  background-color: white;
+  overflow: auto;
+  padding-left: 16px;
+  padding-bottom: 16px;
+}
+
+#CustomizePlotWindow h2 {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+#CustomizePlotWindow .label150 {
+  margin: 4px;
+}
+
+#CustomizePlotWindow .select150 {
+  z-index: 99;
 }
 
 #selectedLogDisplay,
@@ -939,7 +1478,6 @@ onUnmounted(() => {
   position: relative;
   display: block;
 }
-
 .layout__row {
   display: flex;
 }
@@ -952,5 +1490,4 @@ onUnmounted(() => {
   display: flex;
   align-items: center
 }
-
 </style>
