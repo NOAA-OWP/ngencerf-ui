@@ -15,19 +15,20 @@
 
         <!-- Filters -->
         <div id="FilterButton" class="text-center mb-1 w-full"><Button class="filter-link" @click="toggleShowFilters">{{
-            showFilters ? 'Hide' : 'Show' }}
+          showFilters ? 'Hide' : 'Show' }}
             Filters</Button>
         </div>
 
 
-        <Transition>
+
+        <!-- <Transition>
           <div v-show="showFilters" class="mb-5">
             <div id="FilterGroup" class="grid grid-cols-8 mb-1 pt-1 pb-1 -z-9999">
               <div class="col-span-1 text-right">
                 <label for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
                 <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
                   :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
-                  aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
+                  aria-label="Headwater Basin Gage Filter SelmodulesFilterListect" title="Headwater Basin Gage Filter Select">
                 </Select>
               </div>
 
@@ -80,31 +81,7 @@
               </div>
             </div>
           </div>
-        </Transition> 
-       
-
-
-        <Dialog v-model:visible="moduleFilterSelectVisible" modal header="Select Modules" :style="{ width: '25rem' }">
-          <div class="pt-4 mb-1 font-bold text-base">Select Modules</div>
-          <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
-            optionLabel="name" optionValue="name" class="h-60" @change="true === true">
-            <template #option="slotProps">
-              <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
-                <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
-                  :title="slotProps.option.name">
-                  {{ slotProps.option.name }}</div>
-              </div>
-
-            </template>
-          </Listbox>
-          <div class="flex justify-end gap-2">
-            <Button type="button" label="Cancel" severity="secondary"
-              @click="moduleFilterSelectVisible = false"></Button>
-            <Button type="button" label="Ok" @click="moduleFilterSelectVisible = false"></Button>
-          </div>
-        </Dialog>
-        
-
+        </Transition> -->
 
         <!-- Table -->
         <div class="">
@@ -113,9 +90,10 @@
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
             <DataTable id="cr-list" :value="filteredData" sortField="calibration_run_id" :sortOrder="-1" scrollable
-              scroll-height="400px" table-style="min-width: 50rem;" v-model:selection="selectedCalibrationRun"
-              selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
-              @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
+              scroll-height="400px" table-style="min-width: 50rem; z-index: 1"
+              v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
+              v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
+              :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
               <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable> <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_run_id"
                     :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
@@ -190,6 +168,10 @@
     <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
+
+    <JobFilterDialog v-show="true" @ModulesFilterDialogClosing="showFilters = false"
+      :calJobs="updatedUserCalibrationJobsListData" />
+
   </client-only>
 </template>
 
@@ -202,6 +184,8 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 import Checkbox from 'primevue/checkbox';
 import MultiSelect from 'primevue/multiselect';
+
+import JobFilterDialog from "../Common/JobFilterDialog.vue";
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -220,8 +204,6 @@ import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "
 import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
-import JobFilterDialog from "../Common/JobFilterDialog.vue";
-
 import { StatusTypes } from "@/composables/NextgenEnums";
 
 const { loadGageTabStaticData } = useGageStore();
@@ -229,14 +211,13 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 
 const { selectedModuleValues } = storeToRefs(useFormulationStore());
 
-
 const { loadOptimizationTabStaticData } = useOptimizationStore();
 const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
-const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList } = storeToRefs(useUserDataStore());
+const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, calibrationRunGageList, modulesFilterList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -264,11 +245,11 @@ const latestTime = ref<Date>();
 
 const moduleFilterSelectVisible = ref<boolean>(false);
 
-const modulesFilterList = ref<string[]>([]);
-
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 
-const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>();
+const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
+
+const currentJobsList = ref<CalibrationJobListItem[]>();
 
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
@@ -322,13 +303,11 @@ const filteredData = computed(() => {
       newCalJobList = filterByDateRange(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
     }
 
-    let test = ""
     if (modulesFilterList.value.length) {
       newCalJobList = newCalJobList?.filter(job =>
         job.modules.some(module => modulesFilterList.value.includes(module))
       );
     }
-    //modulesFilterList
     return newCalJobList;
   }
 });
@@ -567,8 +546,8 @@ const updateUserCalibrationJobsListData = async (): Promise<void> => {
  * 
  */
 const toggleShowFilters = () => {
+  currentJobsList.value = updatedUserCalibrationJobsListData.value;
   showFilters.value = !showFilters.value;
-  console.log(showFilters.value)
 }
 
 
@@ -667,10 +646,9 @@ small-label,
 #ModuleFilter {
   height: 37px;
   background-color: #f3f3f3;
+
   p-multiselect-label-container {
     margin-top: -6px;
   }
 }
-
-
 </style>

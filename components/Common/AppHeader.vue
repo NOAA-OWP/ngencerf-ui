@@ -149,8 +149,6 @@ import { generalStore } from "@/stores/common/GeneralStore";
 
 import { useLogout, useLogoutListen } from "@/composables/UseEventBus";
 
-const LazyUserAccount = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
-
 const LazyHelpLandingPageHelp = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
 const LazyCalibrationHelpPreviousRunsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/PreviousRunsHelp.vue"))
 const LazyCalibrationHelpHeadwaterBasinGageHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/HeadwaterBasinGageHelp.vue"))
@@ -172,6 +170,7 @@ const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/compon
 const LazyForecastResultesHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
 const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
 const LazyForecastStatusRunHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/StatusRunHelp.vue"));
+const LazyUserAccount = defineAsyncComponent(() => import("@/components/Common/UserAccount.vue"))
 
 const gstore = generalStore();
 const { popupActive } = storeToRefs(gstore);
