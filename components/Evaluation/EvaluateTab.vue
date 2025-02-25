@@ -30,7 +30,7 @@
                 {{ evaluateValidationRunId }}
               </div>
             </div>
-          </div>            
+          </div>
         </div>
         <div>
           <div id="CustomizePlotWindow" v-if="showCustomizePlot">
@@ -46,11 +46,11 @@
                 <div class="label150">
                   <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
                 </div>
-                <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color" :options="plotGraphColorList" 
-                  optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+                <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
+                  :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
                 </Select>
-                <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol" :options="plotGraphSymbolList" 
-                  optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+                <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol"
+                  :options="plotGraphSymbolList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
                 </Select>
               </div>
             </div>
@@ -65,7 +65,8 @@
                 Hide Interactive Time Series Viewer</a>
               <div v-if="plotGraphLines.length > 0" class="columns-2">
                 <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
-                  <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`" v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();">
+                  <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
+                    v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();">
                   <div class="label150">
                     <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
                   </div>
@@ -78,10 +79,12 @@
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
               @click="gotoSelectAlternateIteration">New Validation</button></span>
           <br />
-          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleMessagesGroup">
+          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue text-sm underline mt-1"
+            @click="toggleMessagesGroup">
             Show Calibration Details</a>
           <br />
-          <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue text-sm underline mt-1" @click="toggleCustomizePlot">
+          <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue text-sm underline mt-1"
+            @click="toggleCustomizePlot">
             Customize Interactive Time Series Viewer</a>
         </div>
       </div>
@@ -93,29 +96,28 @@
         </div>
       </div>
       <div>
-        
-        <div class="text-center" v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0 && selectedLogCategory == ''">
-            <div class="grid place-items-center" style="height: 45vh;">
-                <div>
-                    {{ plotTableErrorMessage }}
-                </div>
+
+        <div class="text-center"
+          v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0 && selectedLogCategory == ''">
+          <div class="grid place-items-center" style="height: 45vh;">
+            <div>
+              {{ plotTableErrorMessage }}
             </div>
+          </div>
         </div>
 
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
           <div v-if="plotTableList && plotTableList.length > 1">
             <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
-            <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable"
-              :options="plotTableList" optionLabel="name" optionValue="name">
+            <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable" :options="plotTableList"
+              optionLabel="name" optionValue="name">
             </Select>
           </div>
           <div class="pt-6 pb-2">
             <div v-if="plotTableData.length > 0 && plotTableTotalSize > 0" class="pagination-box">
-              <div class="pagination-rows">Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{ plotTableTotalSize }}</div>
-              <Paging
-                v-model:currentPage="plotTableCurrentPage"
-                :totalPages=plotTableTotalPages
-              />
+              <div class="pagination-rows">Rows {{ plotTableStartRow }} to {{ plotTableEndRow }} of {{
+                plotTableTotalSize }}</div>
+              <Paging v-model:currentPage="plotTableCurrentPage" :totalPages=plotTableTotalPages />
             </div>
             <DataTable id="plotTableHTML" :value="plotTableData" fixedHeader=true scrollable scroll-height="500px"
               :multi-sort="true">
@@ -129,7 +131,7 @@
     <div id="PlotGraphArea" ref="plotGraphArea" v-if="showPlotGraph && plotGraphData">
       <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
       <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
-        <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange" 
+        <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
           @mouseup="sliderDragEnd" @mouseleave="sliderDragCancel">
           <div id="PlotGraphSliderBox" ref="plotGraphSliderBox"></div>
         </div>
@@ -153,42 +155,41 @@
       <div id="SupplementalTableArea" class="p-2">
         <div v-if="iterationMetricsData && selectedSupplementalTable === 1">
           <DataTable :value="iterationMetricsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
-            <Column v-for="( col, colIndex ) in iterationMetricsColumns" :key="colIndex" :header="col.header"
+            <Column v-for="(col, colIndex) in iterationMetricsColumns" :key="colIndex" :header="col.header"
               :field="col.field" sortable></Column>
           </DataTable>
         </div>
         <div v-if="iterationParamsData && selectedSupplementalTable === 2">
           <DataTable :value="iterationParamsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
-            <Column v-for="( col, colIndex ) in iterationParamsColumns" :key="colIndex" :header="col.header"
+            <Column v-for="(col, colIndex) in iterationParamsColumns" :key="colIndex" :header="col.header"
               :field="col.field" sortable></Column>
           </DataTable>
         </div>
         <div v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable === 3">
           <DataTable :value="performanceMetricsData" fixedHeader=true>
-            <Column v-for="( col, colIndex ) in performanceMetricsColumns" :key="colIndex" :header="col.header"
+            <Column v-for="(col, colIndex) in performanceMetricsColumns" :key="colIndex" :header="col.header"
               :field="col.field"></Column>
           </DataTable>
         </div>
       </div>
     </div>
-    <div id="LogDisplayArea" class="p-2" v-if="selectedLogCategory != '' && selectedLogList && selectedLogList.length > 0">
+    <div id="LogDisplayArea" class="p-2"
+      v-if="selectedLogCategory != '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
         <div v-if="selectedLogList.length > 1">
           <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
-          <Select id="selectedLogOptions" class="p-select"  
-            v-model="selectedLogName" :options="selectedLogList" optionLabel="name" optionValue="name">
+          <Select id="selectedLogOptions" class="p-select" v-model="selectedLogName" :options="selectedLogList"
+            optionLabel="name" optionValue="name">
           </Select>
         </div>
-        <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b style="width:160px; display:inline-block;">Log File Name</b> {{ selectedLogName }}</div>
+        <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b
+            style="width:160px; display:inline-block;">Log File Name</b> {{ selectedLogName }}</div>
 
         <div class="flex justify-end" style="margin-top:-23px;">
-            <div class="ml-auto">
-                <div>Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
-                <Paging
-                v-model:currentPage="selectedLogCurrentPage"
-                :totalPages=selectedLogTotalPages
-                />
-            </div>
+          <div class="ml-auto">
+            <div>Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
+            <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
+          </div>
         </div>
 
         <div id="selectedLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
@@ -209,8 +210,10 @@
             <RadioButton v-model="selectedGridType" inputId="gridType2" value="catchment" name="gridType" />
             <label for="gridType2">Catchment Means</label>
           </div>
-          <p v-if="selectedGridType === 'gridded'" class="text-[12px] text-gray-600 text-center">Snow Water Equivalent (SWE) - Raw Values</p>
-          <p v-if="selectedGridType === 'catchment'" class="text-[12px] text-gray-600 text-center">Snow Water Equivalent (SWE) - Catchment Means</p>
+          <p v-if="selectedGridType === 'gridded'" class="text-[12px] text-gray-600 text-center">Snow Water Equivalent
+            (SWE) - Raw Values</p>
+          <p v-if="selectedGridType === 'catchment'" class="text-[12px] text-gray-600 text-center">Snow Water Equivalent
+            (SWE) - Catchment Means</p>
         </div>
         <div class="flex flex-col items-center p-2">
           <h1 class="text-xl font-bold">Simulated</h1>
@@ -221,19 +224,20 @@
           <Select v-model="selectedSimulatedSource" :options="simulatedSources" inputId="simulatedSources"
             class="w-full mt-1" placeholder="Select" />
           <div class="flex justify-end">
-            <a class="c-blue text-sm underline mt-6 ml-auto" href="#" >Show SWE Time Series</a>
+            <a class="c-blue text-sm underline mt-6 ml-auto" href="#">Show SWE Time Series</a>
           </div>
           <div class="text-sm font-semibold text-blue-800 mt-3">
             <p>Ranges:</p>
-            <p v-if="selectedSimulatedSource" ><span class="font-bold">{{ selectedSimulatedSourceTimeRange }}</span></p>
+            <p v-if="selectedSimulatedSource"><span class="font-bold">{{ selectedSimulatedSourceTimeRange }}</span></p>
           </div>
 
           <div class="mt-3 relative z-10">
-            <VueDatePicker v-model="selectedEvaluateDate" class="dp__theme_dark" text-input
-              format="yyyy-MM-dd" :enable-time-picker="false" :teleport="true" />
+            <VueDatePicker v-model="selectedEvaluateDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+              :enable-time-picker="false" :teleport="true" />
           </div>
           <div class="flex justify-end mt-3">
-            <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plot" aria-label="Get Spatial Plot"/>
+            <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plot"
+              aria-label="Get Spatial Plot" />
           </div>
         </div>
       </div>
@@ -338,7 +342,7 @@ const sliderDragPosition = ref<DynamicObject>({});
 const sliderDragType = ref<string>('');
 const showPlotGraph = ref<Boolean>(false);
 const showCustomizePlot = ref<Boolean>(false);
-const selectedSupplementalTable = ref<number>( 0 );
+const selectedSupplementalTable = ref<number>(0);
 const iterations = ref<APIResponse>({});
 const iterationMetricsData = ref<any[]>([]);
 const iterationMetricsColumns = ref<any[]>([]);
@@ -367,12 +371,12 @@ const supplementalTableOptions = [
 const plotGraphColors = ['grey', 'blue', 'gold', 'green', 'black', 'orange', 'pink', 'red', 'yellow'];
 const plotGraphColorList = [];
 for (let c = 0; c < plotGraphColors.toSorted().length; c++) {
-  plotGraphColorList.push({name: plotGraphColors.toSorted()[c]});
+  plotGraphColorList.push({ name: plotGraphColors.toSorted()[c] });
 }
 const plotGraphSymbols = ['line', 'circle', 'cross', 'diamond', 'square', 'star', 'triangle', 'wye'];
 const plotGraphSymbolList = [];
 for (let s = 0; s < plotGraphSymbols.toSorted().length; s++) {
-  plotGraphSymbolList.push({name: plotGraphSymbols.toSorted()[s]});
+  plotGraphSymbolList.push({ name: plotGraphSymbols.toSorted()[s] });
 }
 const plotGraphSliderHelpText = [
   'Click and drag within the slider to change the date range.',
@@ -385,10 +389,10 @@ const gridDisplayOptions = [
   "Snow Water Equivalent",
 ]
 
-onMounted( () => {
-  nextTick( async () => {
+onMounted(() => {
+  nextTick(async () => {
     hilightTab(EvaluationTabs.tab_evaluate);
-    
+
     // make sure page loads with no plots/tables selected
     selectedPlotName.value = null;
     selectedPlotFilename.value = null;
@@ -417,7 +421,7 @@ onMounted( () => {
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-    
+
     // Add Supplemental Table Options to the dropdown
     for (let t = 0; t < supplementalTableOptions.length; t++) {
       if (!plotList.value.some(item => item.name === supplementalTableOptions[t])) {
@@ -435,12 +439,12 @@ onMounted( () => {
         Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
           let logList = [];
           for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-            logList.push({'name': logs.value?._data?.log_names[l][key][n]});
+            logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
           }
           logLists.value[key] = logList;
         });
       }
-      
+
       // Add Log Options to the dropdown
       Object.keys(logLists.value).forEach(key => {
         let optionName = capitalCase(key) + ' Logs';
@@ -575,7 +579,7 @@ watch(selectedPlotName, async () => {
                 }
                 validation_type += ' ' + performanceMetrics.value?._data?.validations[v].iteration_num;
               }
-              performanceMetricsColumns.value.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id});
+              performanceMetricsColumns.value.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id });
               if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
                 Object.keys(performanceMetrics.value?._data?.validations[v].performance_metrics).forEach(key => {
                   // Loop through our existing rows and see if we have this metric already
@@ -656,7 +660,7 @@ watch(selectedPlotName, async () => {
     selectedLogCategory.value = '';
     selectedLogList.value = [];
     plotTableCurrentPage.value = 1;
-    
+
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(
       selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
@@ -805,11 +809,11 @@ function adjustPlotTableColumns() {
 
 // Watch for page number changes in plot table
 watch(plotTableCurrentPage, async () => {
-  if (plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value/plotTablePageSize.value)) {
+  if (plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value / plotTablePageSize.value)) {
     console.log('ERROR: Page number ' + plotTableCurrentPage.value + ' out of bounds');
   } else {
-    plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value-1)) + 1;
-    plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value-1),plotTableTotalSize.value);
+    plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value - 1)) + 1;
+    plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value - 1), plotTableTotalSize.value);
     console.log('Loading rows ' + plotTableStartRow.value + '-' + plotTableEndRow.value + ' from the ' + plotTableTotalSize.value + ' total stored in the backend');
     const response: any = await queryGetPlot(
       selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
@@ -817,7 +821,7 @@ watch(plotTableCurrentPage, async () => {
       false, // force_include_plot
       (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      plotTableStartRow.value-1, // start
+      plotTableStartRow.value - 1, // start
       plotTablePageSize.value // limit
     );
     if (response?._data?.plot_data) {
@@ -831,11 +835,11 @@ watch(plotGraphData, async () => {
   if (plotGraphData.value.length > 0) {
     if (plotGraphLines.value.length == 0) {
       for (let c = 1; c < plotTableColumns.value.length; c++) {
-        let strokeColor = c < plotGraphColors.length ? plotGraphColors[c-1] : plotGraphColors[0];
+        let strokeColor = c < plotGraphColors.length ? plotGraphColors[c - 1] : plotGraphColors[0];
         plotGraphLines.value.push({
           id: c,
-          name: plotTableColumns.value[c].header, 
-          color: strokeColor, 
+          name: plotTableColumns.value[c].header,
+          color: strokeColor,
           symbol: 'line',
           checked: true
         });
@@ -850,7 +854,7 @@ watch(plotGraphData, async () => {
   }
 });
 
-const togglePlotGraph = async() => {
+const togglePlotGraph = async () => {
   if (showPlotGraph.value) {
     showPlotGraph.value = false;
   } else {
@@ -871,8 +875,8 @@ const togglePlotGraph = async() => {
       // setting min/max dates will trigger the date filter below
       plotGraphDateLimits.value = {
         start: new Date(plotGraphDataRaw.value[0][plotTableColumns.value[0].value]).toISOString().split('T')[0],
-        end: new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length-1][plotTableColumns.value[0].value]).toISOString().split('T')[0],
-        span: Math.ceil((new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length-1][plotTableColumns.value[0].value]).getTime() - new Date(plotGraphDataRaw.value[0][plotTableColumns.value[0].value]).getTime())/ (1000 * 3600 * 24))
+        end: new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotTableColumns.value[0].value]).toISOString().split('T')[0],
+        span: Math.ceil((new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotTableColumns.value[0].value]).getTime() - new Date(plotGraphDataRaw.value[0][plotTableColumns.value[0].value]).getTime()) / (1000 * 3600 * 24))
       }
       console.log('plotGraphDateLimits: ', plotGraphDateLimits.value);
       plotGraphDateRange.value = {
@@ -897,26 +901,26 @@ const togglePlotGraph = async() => {
 // draw interactive plot when plot graph data is first loaded, and also when checkboxes are clicked
 const drawInteractivePlot = () => {
   console.log('Drawing interactive plot');
-  plotGraphOptions.value = {x: {grid: true}, y: {grid: true}, marks: [], width: plotGraphArea.value.offsetWidth - 200};
+  plotGraphOptions.value = { x: { grid: true }, y: { grid: true }, marks: [], width: plotGraphArea.value.offsetWidth - 200 };
   let plotLineData = [];
   let plotDotData = [];
   for (let c = 1; c < plotTableColumns.value.length; c++) {
     if (document?.getElementById('plotGraphCheckbox-' + c)?.checked) {
       for (let d = 0; d < plotGraphData.value.length; d++) {
-        if (plotGraphLines.value[c-1].symbol == 'line') {
+        if (plotGraphLines.value[c - 1].symbol == 'line') {
           plotLineData.push({
             'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value]),
-            'flow': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]), 
-            'color': plotGraphLines.value[c-1].color,
-            'name': plotGraphLines.value[c-1].name
+            'flow': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]),
+            'color': plotGraphLines.value[c - 1].color,
+            'name': plotGraphLines.value[c - 1].name
           });
         } else {
           plotDotData.push({
             'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value]),
-            'flow': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]), 
-            'color': plotGraphLines.value[c-1].color,
-            'symbol': plotGraphLines.value[c-1].symbol,
-            'name': plotGraphLines.value[c-1].name
+            'flow': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]),
+            'color': plotGraphLines.value[c - 1].color,
+            'symbol': plotGraphLines.value[c - 1].symbol,
+            'name': plotGraphLines.value[c - 1].name
           });
         }
       }
@@ -929,37 +933,37 @@ const drawInteractivePlot = () => {
   if (plotLineData.length > 0) {
     plotGraphOptions.value.marks.push(
       Plot.lineY(plotLineData, {
-        x: {value: 'time', label: 'Time'},
-        y: {value: 'flow', label: 'Flow (cm/s)'}, 
+        x: { value: 'time', label: 'Time' },
+        y: { value: 'flow', label: 'Flow (cm/s)' },
         stroke: 'color'
       })
     );
     plotGraphOptions.value.marks.push(
       Plot.tip(plotLineData, Plot.pointer({
-          x: {value: 'time', label: 'Time'},
-          y: {value: 'flow', label: 'Flow'}, 
-          title: (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0,2).join(":")}\nFlow: ${d.flow} cm/s`,
-          fontSize: 14
-        })
+        x: { value: 'time', label: 'Time' },
+        y: { value: 'flow', label: 'Flow' },
+        title: (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nFlow: ${d.flow} cm/s`,
+        fontSize: 14
+      })
       )
     );
   }
   if (plotDotData.length > 0) {
     plotGraphOptions.value.marks.push(
       Plot.dot(plotDotData, {
-        x: {value: 'time', label: 'Time'},
-        y: {value: 'flow', label: 'Flow'}, 
-        stroke: 'color', 
+        x: { value: 'time', label: 'Time' },
+        y: { value: 'flow', label: 'Flow' },
+        stroke: 'color',
         symbol: 'symbol'
       })
     );
     plotGraphOptions.value.marks.push(
       Plot.tip(plotDotData, Plot.pointer({
-          x: {value: 'time', label: 'Time'},
-          y: {value: 'flow', label: 'Flow'}, 
-          title: (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0,2).join(":")}\nFlow: ${d.flow} cm/s`,
-          fontSize: 14
-        })
+        x: { value: 'time', label: 'Time' },
+        y: { value: 'flow', label: 'Flow' },
+        title: (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nFlow: ${d.flow} cm/s`,
+        fontSize: 14
+      })
       )
     );
   }
@@ -983,7 +987,7 @@ const getSliderWidth = () => {
 const drawInteractiveSlider = () => {
   console.log('Drawing interactive slider');
   plotGraphSliderData.value = [];
-  let rowSkip = plotGraphDataRaw.value.length/1000;
+  let rowSkip = plotGraphDataRaw.value.length / 1000;
   for (let c = 1; c < plotTableColumns.value.length; c++) {
     if (document?.getElementById('plotGraphCheckbox-' + c)?.checked) {
       for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
@@ -996,14 +1000,14 @@ const drawInteractiveSlider = () => {
     }
   }
   plotGraphSliderOptions.value = {
-    x: {tickSize: 0, inset: 0}, 
-    y: {axis: null}, 
+    x: { tickSize: 0, inset: 0 },
+    y: { axis: null },
     marks: [
       Plot.lineY(plotGraphSliderData.value, {
         x: 'time',
         y: 'flow',
       })
-    ], 
+    ],
     width: plotGraphArea.value.offsetWidth - 250,
     height: 100,
     marginLeft: 0,
@@ -1063,7 +1067,7 @@ const interactivePlotDateFilter = () => {
   let tempPlotGraphDataFiltered = [];
   if (tempPlotGraphData.length > 1000) {
     // only plot 1,000 data points at a time
-    let rowSkip = tempPlotGraphData.length/1000;
+    let rowSkip = tempPlotGraphData.length / 1000;
     for (let r = 0; r < tempPlotGraphData.length; r += rowSkip) {
       if (tempPlotGraphDataFiltered.length < 1000) {
         tempPlotGraphDataFiltered.push(tempPlotGraphData[Math.floor(r)]);
@@ -1125,7 +1129,7 @@ const sliderDragChange = (event) => {
       plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[4];
     }
   } else {
-    switch(sliderDragType.value) {
+    switch (sliderDragType.value) {
       // imitate "dragging" of the box, but don't reset the plot dates yet
       case 'left':
         // only drag the left side of the box
@@ -1198,7 +1202,7 @@ const setSliderDateRange = () => {
   console.log('plotGraphDateRange:', plotGraphDateRange.value);
 }
 
-const toggleCustomizePlot = async() => {
+const toggleCustomizePlot = async () => {
   if (showCustomizePlot.value) {
     showCustomizePlot.value = false;
   } else {
@@ -1240,7 +1244,7 @@ watch(selectedLogName, async () => {
       selectedLogTotalSize.value = response?._data?.pagination_metadata?.count;
       selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
       selectedLogStartRow.value = 1;
-      if (selectedLogTotalPages.value === 1 ) {
+      if (selectedLogTotalPages.value === 1) {
         selectedLogEndRow.value = selectedLogTotalSize.value;
       } else {
         selectedLogEndRow.value = logDataPageSize.value;
@@ -1258,8 +1262,8 @@ watch(selectedLogCurrentPage, async () => {
   if (selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
     console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
   } else {
-    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value-1)) + 1;
-    if (selectedLogCurrentPage.value === selectedLogTotalPages.value ) {
+    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
+    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
       selectedLogEndRow.value = selectedLogTotalSize.value;
     } else {
       selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
@@ -1268,7 +1272,7 @@ watch(selectedLogCurrentPage, async () => {
       selectedLogCategory.value, // log_category,
       selectedLogName.value, // log_name
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      selectedLogStartRow.value-1, // start
+      selectedLogStartRow.value - 1, // start
       logDataPageSize.value // limit
     );
     if (response?._data) {
@@ -1337,11 +1341,12 @@ onUnmounted(() => {
   margin-left: 0px;
 }
 
-#CalibrationLogOptions{
-    width: 268px;
+#CalibrationLogOptions {
+  width: 268px;
 }
+
 #validationLogOptions {
-    width: 275px;
+  width: 275px;
 }
 
 #GraphArea img {
@@ -1478,6 +1483,7 @@ onUnmounted(() => {
   position: relative;
   display: block;
 }
+
 .layout__row {
   display: flex;
 }
