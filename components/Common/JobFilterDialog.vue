@@ -69,8 +69,8 @@
       </div>
 
       <div id="ButtonArea" class="flex justify-end gap-5">
-        <Button class="ngenButtonDiv" label="Reset" severiay="primary"></Button>
-        <Button class="ngenButtonDiv" label="Close" severity="secondary" @click="sendClose()"></Button>
+        <Button class="ngenButtonDiv" label="Reset" @click="resetFilters()" :disabled="enableReset"></Button>
+        <Button class="ngenButtonDiv" label="Close" @click="sendClose()"></Button>
       </div>
 
     </div>
@@ -115,6 +115,10 @@ onMounted(() => {
     setTimeout(() => {
       if (draggableDiv.value) {
         draggableDiv.value.addEventListener('mousedown', (e: MouseEvent) => {
+          if( e && e.target ) {
+            if( (e.target as HTMLElement).tagName === "LI")
+            return;
+          }
           isDragging.value = true;
           offsetX = e.clientX - draggableDiv.value!.offsetLeft;
           offsetY = e.clientY - draggableDiv.value!.offsetTop;
@@ -148,9 +152,22 @@ const sendClose = () => {
   emit("ModulesFilterDialogClosing");
 };
 
+const resetFilters = () => {
+  uiGageId.value = 'All';
+  modulesFilterList.value = [];
+  statusTypeFilter.value = "Any";
+  nextTick( () => {
+    findEarliestAndLatest(props.calJobs);
+  })
+}
+
+const enableReset = computed(() => {
+  return (uiGageId.value !== 'All' && modulesFilterList.value.length > 0
+       && statusTypeFilter.value !== "Any" && useDateRange.value === false) === true;
+})
 
 const findEarliestAndLatest = (items: CalibrationJobListItem[]) => {
-  if (!items.length) return null;
+  if (!items.length) return null
 
   let earliest = items[0].created_at;
   let latest = items[0].created_at;
@@ -225,7 +242,7 @@ const handleCalDateEnd = (value: any) => {
 
 #ButtonArea {
   position: fixed;
-  margin-left: 350px;
+  margin-left: 586px;
   margin-top: -36px;
 }
 
@@ -242,12 +259,12 @@ const handleCalDateEnd = (value: any) => {
   padding: 0 4px;
   width: 100%;
 
-  // :first-child {
-  //   > :first-child {
-  //     > :first-child {
-  //       font-size: 1em;
-  //     }
-  //   }
-  // }
+  :first-child {
+    > :first-child {
+      > :first-child {
+        font-size: 1.2em;
+      }
+    }
+  }
 }
 </style>
