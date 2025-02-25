@@ -185,12 +185,13 @@ const selectedForecastJob = ref<ForecastJob>();
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
   const crRowData = event.data as ForecastJob;
+  console.log(`crRowData: ${JSON.stringify(crRowData)}`);
 
   if (selectedForecastJob && selectedForecastJob.value?.forecast_run_id == crRowData.forecast_run_id) {
     crContextMenu.value.show(event.originalEvent);
     //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
-    if (crRowData.forecast_status.toUpperCase() !== 'RUNNING') {
+    if (crRowData.forecast_status !== 'Running') {
       cmCalibrationRun.value.push({ label: 'View Results', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastResults() });
     } else {
       cmCalibrationRun.value.push({ label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() });

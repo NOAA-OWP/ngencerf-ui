@@ -403,12 +403,21 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     elapsedTime.value =  undefined;
     submitTimeDate.value = undefined;
     submitTime.value =  undefined;
-    elapsedTimeIntervalId.value =  undefined;
-    forecastJobStatusIntervalId.value =  undefined;
     resultsPathname.value =  undefined;
     forecastPlotName.value =  undefined;
     forecastPlot.value = undefined;
     calibrationRunForForecast.value =  undefined;
+
+    if (elapsedTimeIntervalId.value) {
+      clearInterval(elapsedTimeIntervalId.value);
+      elapsedTimeIntervalId.value =  undefined; 
+    }
+
+    if (forecastJobStatusIntervalId.value) {
+      clearInterval(forecastJobStatusIntervalId.value);
+      forecastJobStatusIntervalId.value =  undefined; 
+    }
+
     clearUserCalibrationRunData();
   }
 
