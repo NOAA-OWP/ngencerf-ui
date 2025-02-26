@@ -23,7 +23,6 @@
       </div>
 
       <div id="calibrationRunList">
-        <div>
           <div id="CalTable">
             <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
               <div class="col-span-1">
@@ -54,7 +53,6 @@
               <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable></Column>
             </DataTable>
           </div>
-        </div>
       </div>
 
     </div>
@@ -76,6 +74,7 @@ import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { generalStore } from "~/stores/common/GeneralStore";
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
@@ -103,7 +102,9 @@ const crContextMenu = ref(); //calibration run context menu
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRunForForecast>();
 
-const isLoading = ref(true);
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
+
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];

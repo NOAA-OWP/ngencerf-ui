@@ -40,61 +40,6 @@ export const useFormulationStore = defineStore(
 
     const saveFormulationPayload = ref<SaveFormulationTabPayload>({});
 
-    // Restore state from sessionStorage if available
-    if (typeof window !== "undefined") {
-      let ls;
-      ls = sessionStorage.getItem("slothParameterInputs");
-      if (ls !== "undefined") {
-        slothParameterInputs.value = ls ? JSON.parse(ls) : [];
-      }
-      ls = sessionStorage.getItem("selectedModuleValues");
-      if (ls !== "undefined") {
-        selectedModuleValues.value = ls ? JSON.parse(ls) : [];
-      }
-      ls = sessionStorage.getItem("formulationTabData");
-      if (ls !== "undefined") {
-        formulationTabData.value = JSON.parse(ls as string);
-      }
-
-      filterGroup.value = sessionStorage.getItem("filterGroup") as string;
-      formulationNameInput.value = sessionStorage.getItem(
-        "formulationNameInput"
-      ) as string;
-      useSlothParameters.value =
-        (sessionStorage.getItem("useSlothParameters") as string) === "true";
-    }
-
-    watch(slothParameterInputs, (slothParameterInputs) => {
-      sessionStorage.setItem(
-        "slothParameterInputs",
-        JSON.stringify(slothParameterInputs)
-      );
-    });
-    watch(selectedModuleValues, (selectedModuleValues) => {
-      sessionStorage.setItem(
-        "selectedModuleValues",
-        JSON.stringify(selectedModuleValues)
-      );
-    });
-    watch(formulationTabData, (formulationTabData) => {
-      sessionStorage.setItem(
-        "formulationTabData",
-        JSON.stringify(formulationTabData)
-      );
-    });
-    watch(filterGroup, (filterGroup) => {
-      sessionStorage.setItem("filterGroup", filterGroup);
-    });
-    watch(formulationNameInput, (formulationNameInput) => {
-      sessionStorage.setItem("formulationNameInput", formulationNameInput);
-    });
-    watch(useSlothParameters, (useSlothParameters) => {
-      sessionStorage.setItem(
-        "useSlothParameters",
-        JSON.stringify(useSlothParameters)
-      );
-    });
-
     /**
      * load forumlation tab data and init ref data
      * @returns {void}

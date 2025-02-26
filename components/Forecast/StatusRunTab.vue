@@ -12,7 +12,12 @@
     <div class="grid grid-cols-2">
       <div class="col-span-1">
         <table>
-          <caption style="text-align: left;">Forecast Job Run Time</caption>
+          <caption style="text-align: center;font-size:1.1em;font-weight:bold;margin-bottom:3px;">Forecast Job Run Time</caption>
+          <thead>
+            <tr height="25px">
+              <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+            </tr>
+          </thead>
           <tbody>
             <tr height="40px">
               <th scope="row" class="text-right font-bold">
@@ -44,7 +49,12 @@
 
       <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
         <table>
-          <caption>Forecast Job Status</caption>
+          <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Forecast Job Status</caption>
+          <thead>
+            <tr height="25px">
+              <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+            </tr>
+          </thead>
           <tbody>
             <tr height="40px">
               <th scope="row" class="text-right font-bold">
@@ -79,15 +89,15 @@
       <div class="row-span-1">
         <div class="grid grid-cols-8">
           <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
-            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-              <button class="font-normal" title="Run Button" aria-label="Run Button" @click="startForecastRun()">
+            <div class="col-span-1 ngenButtonDiv-green mr-6 h-8" @click="startForecastRun()">
+              <Button class="font-normal" title="Run Button" aria-label="Run Button">
                 Run
               </button>
             </div>
           </span>
           <span v-if="forcingDownloadStatus === 'Running' || forecastJobStatus === 'Running'">
             <div class="col-span-1 mr-3">
-              <button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelForecastRun()"
+              <Button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelForecastRun()"
                 aria-label="Cancel Button">
                 Cancel
               </button>
@@ -95,7 +105,7 @@
           </span>
           <span v-if="overallForcingDownloadForecastStatus === 'Done'">
             <div class="col-span-1 mr-3">
-              <button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button"
+              <Button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button"
                 @click="goToResultsTab()" aria-label="View Results Button">
                 View Results
               </button>
@@ -113,12 +123,16 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
 
+import { generalStore } from '~/stores/common/GeneralStore';
+
 import { hilightTab } from '@/composables/TabHilight';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { isValidDate } from '@/utils/CommonHelpers';
 import { calculateElapsedTime, formatElapsedTime } from '@/utils/TimeHelpers';
 
-const isLoading = ref<boolean>(false); // loading indicator
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
+
 const toast = useToast();
 
 const {

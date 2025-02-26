@@ -10,11 +10,20 @@ export default {
     "./error.vue",
   ],
   theme: {
+    zIndex: {
+      '25': 25,
+      '50': 50,
+      '75': 75,
+      '100': 100,
+      '1000': 1000,
+      '9999': 9999
+    },
     extend: {
       colors: {
-        buttonBackground: "$ngwcp_primary1", 
+        buttonBackground: "$ngwcp_primary1",
       },
     },
+
   },
   plugins: [require('tailwindcss-primeui')],
 };

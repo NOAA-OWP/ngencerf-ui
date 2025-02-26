@@ -3,26 +3,25 @@
     <div class="mx-auto px-8 text-center overflow-auto">
       <div class="width-full">
         <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs</h1>
-        <span class="ngenButtonDiv-alt bg-blue4 ml-8" @click="createNewCalibration"><button>New</button>
-        </span>
+        <Button class="ngenButtonDiv ml-8" @click="createNewCalibration">New</button>
         <br />
         <p class="prompt-txt mb-6" style="margin-top:-10px;">
-              Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
+          Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
         </p>
         <div id="CalTable" class="w-max mx-auto">
           <div class="grid grid-cols-1 mb-5 mt-2">
             <div class="col-span-1 text-left">
               <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter float-left" v-model="uiGageId" :options="calibrationRunGageList" filter
-                optionLabel="name" optionValue="name" placeholder="All">                
+              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter float-left" v-model="uiGageId"
+                :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All">
               </Select>
             </div>
           </div>
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white boxed" ref="crContextMenu"
             :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-          <DataTable id="cr-list" :value="filteredData" sortField="calibration_run_id" :sortOrder="-1"
-            scrollable scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
+          <DataTable id="cr-list" :value="filteredData" sortField="calibration_run_id" :sortOrder="-1" scrollable
+            scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
             @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
             <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable></Column>
@@ -71,7 +70,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 
-import { useUserDataStore } from "@/stores/common/UserDataStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { useGageStore } from "@/stores/calibration/GageStore";
@@ -88,6 +87,7 @@ const { loadGageTabStaticData } = useGageStore();
 const { loadFormulationTabStaticData } = useFormulationStore();
 const { loadOptimizationTabStaticData } = useOptimizationStore();
 const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
+
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex } = generalStore();
 
@@ -99,7 +99,10 @@ import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
-const isLoading = ref(true);
+
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
+
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>();
 const cmCalibrationRun = ref([
@@ -119,6 +122,7 @@ const ptColumn = ref({
 onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
     hilightTab(CalibrationTabs.tab_calibrationRuns);
+
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
@@ -132,12 +136,12 @@ onMounted(async () => {
 
 // Computed filtered data for DataTables
 const filteredData = computed(() => {
-      if (!uiGageId.value || uiGageId.value === "All") {
-        return updatedUserCalibrationJobsListData?.value;
-      } else {
-        return updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
-      }
-    });
+  if (!uiGageId.value || uiGageId.value === "All") {
+    return updatedUserCalibrationJobsListData?.value;
+  } else {
+    return updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
+  }
+});
 
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
@@ -163,7 +167,7 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
 
 const loadEntireRun = () => {
   isLoading.value = true;
-  nextTick( async () => {
+  nextTick(async () => {
     await loadGageTabStaticData();
     await loadFormulationTabStaticData();
     isLoading.value = true;
@@ -212,11 +216,11 @@ const createNewCalibration = async () => {
 }
 
 const gotoHeadwaterBasinGage = () => {
-  nextTick(() => {
-    loadGageTabStaticData();
-    loadFormulationTabStaticData();
-    loadTuningTabStaticData();
-    loadOptimizationTabStaticData();
+  nextTick(async () => {
+    await loadGageTabStaticData();
+    await loadFormulationTabStaticData();
+    await loadTuningTabStaticData();
+    await loadOptimizationTabStaticData();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
     e.click();
@@ -285,35 +289,35 @@ const acceptDelete = (selectedRunId: number) => {
 /**
  * Populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
  */
-const updateUserCalibrationJobsListData = async (): Promise<void>  => {
+const updateUserCalibrationJobsListData = async (): Promise<void> => {
   // set updatedUserCalibrationJobsListData to userCalibrationJobsListData, but with the updated status for the job to include the validation status
   updatedUserCalibrationJobsListData.value = await Promise.all(
     userCalibrationJobsListData.value
-    .map(async (calibrationJob: CalibrationJobListItem) => {
-      // if Calibration job is done, get validation statuses and update the overall status
-      if (calibrationJob.status === 'Done') {
-        const validationControlJobStatus: string | undefined  = calibrationJob.validations?.find((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_control')?.status;
+      .map(async (calibrationJob: CalibrationJobListItem) => {
+        // if Calibration job is done, get validation statuses and update the overall status
+        if (calibrationJob.status === 'Done') {
+          const validationControlJobStatus: string | undefined = calibrationJob.validations?.find((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_control')?.status;
 
-        const validationBestJobStatus: string | undefined = calibrationJob.validations?.find
-        ((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_best')?.status;
+          const validationBestJobStatus: string | undefined = calibrationJob.validations?.find
+            ((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_best')?.status;
 
-        // get the overall calibration/validation status
-        const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
-          calibrationJob.status,
-          validationControlJobStatus,
-          validationBestJobStatus
-        );
-          
-        // save userCalibrationJobsListData with the updated status for the job
-        return {
-          ...calibrationJob,
-          status: overallCalibrationValidationStatus
-        };
-      } else {
-        // Calibration is not done, so just return the job data with the status as is
-        return calibrationJob;
-      }
-    })
+          // get the overall calibration/validation status
+          const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
+            calibrationJob.status,
+            validationControlJobStatus,
+            validationBestJobStatus
+          );
+
+          // save userCalibrationJobsListData with the updated status for the job
+          return {
+            ...calibrationJob,
+            status: overallCalibrationValidationStatus
+          };
+        } else {
+          // Calibration is not done, so just return the job data with the status as is
+          return calibrationJob;
+        }
+      })
   );
 };
 

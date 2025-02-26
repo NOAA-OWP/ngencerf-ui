@@ -46,96 +46,6 @@ export const useGageStore = defineStore(
 
     const gagePayload = ref(<SaveGageTabPayload>{});
 
-    // Restore state from sessionStorage if available
-    if (typeof window !== "undefined") {
-      let ls;
-      ls = sessionStorage.getItem("domainOptionsList");
-      if (ls !== "undefined") {
-        domainOptionsList.value = ls ? JSON.parse(ls) : [];
-      }
-      ls = sessionStorage.getItem("gageOptionsList");
-      if (ls !== "undefined") {
-        gageOptionsList.value = ls ? JSON.parse(ls) : [];
-      }
-      ls = sessionStorage.getItem("gageTabData");
-      if (ls !== "undefined") {
-        gageTabData.value = JSON.parse(ls as string);
-      }
-      ls = sessionStorage.getItem("gageData");
-      if (ls !== "undefined") {
-        gageData.value = JSON.parse(ls as string);
-      }
-
-      geopackageImageUrl.value = sessionStorage.getItem(
-        "geopackageImageUrl"
-      ) as string;
-      selectedDomainValue.value = sessionStorage.getItem(
-        "formulatselectedDomainValueionNameInput"
-      ) as string;
-      selectedGageValue.value = sessionStorage.getItem(
-        "selectedGageValue"
-      ) as string;
-      selectedForcingValue.value = sessionStorage.getItem(
-        "formuselectedForcingValuelationNameInput"
-      ) as string;
-      selectedObservationalValue.value = sessionStorage.getItem(
-        "selectedObservationalValue"
-      ) as string;
-      selectedGeopackageValue.value = sessionStorage.getItem(
-        "selectedGeopackageValue"
-      ) as string;
-
-      isNWMv3.value = (sessionStorage.getItem("isNWMv3") as string) === "true";
-      gageStore_data_loading.value =
-        (sessionStorage.getItem("gageStore_data_loading") as string) === "true";
-    }
-
-    watch(domainOptionsList, (domainOptionsList) => {
-      sessionStorage.setItem(
-        "domainOptionsList",
-        JSON.stringify(domainOptionsList)
-      );
-    });
-    watch(gageOptionsList, (gageOptionsList) => {
-      sessionStorage.setItem(
-        "gageOptionsList",
-        JSON.stringify(gageOptionsList)
-      );
-    });
-    watch(gageTabData, (gageTabData) => {
-      sessionStorage.setItem("gageTabData", JSON.stringify(gageTabData));
-    });
-    watch(gageData, (gageData) => {
-      sessionStorage.setItem("gageData", JSON.stringify(gageData));
-    });
-    watch(geopackageImageUrl, (geopackageImageUrl) => {
-      sessionStorage.setItem("geopackageImageUrl", geopackageImageUrl);
-    });
-    watch(selectedDomainValue, (selectedDomainValue) => {
-      sessionStorage.setItem("selectedDomainValue", selectedDomainValue);
-    });
-    watch(selectedGageValue, (selectedGageValue) => {
-      sessionStorage.setItem("selectedGageValue", selectedGageValue);
-    });
-    watch(selectedForcingValue, (selectedForcingValue) => {
-      sessionStorage.setItem("selectedForcingValue", selectedForcingValue);
-    });
-    watch(selectedObservationalValue, (selectedObservationalValue) => {
-      sessionStorage.setItem(
-        "selectedObservationalValue",
-        selectedObservationalValue
-      );
-    });
-    watch(isNWMv3, (isNWMv3) => {
-      sessionStorage.setItem("isNWMv3", JSON.stringify(isNWMv3));
-    });
-    watch(gageStore_data_loading, (gageStore_data_loading) => {
-      sessionStorage.setItem(
-        "gageStore_data_loading",
-        JSON.stringify(gageStore_data_loading)
-      );
-    });
-
     const loadGageTabStaticData = () => {
       gageStore_data_loading.value = true;
       makeProtectedApiCall<GageTabData>(
@@ -206,7 +116,7 @@ export const useGageStore = defineStore(
           selectedDomainValue.value === "" ||
           gage_value.domain === selectedDomainValue.value
         ) {
-          if (gage_value.nwm_v3_calibration) {
+          if (gage_value.headwater_calibration) {
             gageOptionsList.value.push({
               name: gage_value.gage_id,
               description: gage_value.gage_id,

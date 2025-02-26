@@ -21,7 +21,7 @@
           </h1>
         </div>
         <div class="ml-auto mt-2">
-          <div id="NewButton" class=""><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
+          <div id="NewButton"><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
               v-if="forecastJobId && forecastJobId > 0"
               @click="navigateToSetupForecast">New Forecast</Button></div>
         </div>
@@ -84,6 +84,7 @@ import { useToast } from "primevue/usetoast";
 import type { CalibrationRun, DataTableContextMenuOption, ForecastJob } from "@/composables/NextGenModel";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
+import { generalStore } from "~/stores/common/GeneralStore";
 
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -98,7 +99,10 @@ const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 const contextMenuJob = ref<number>()
-const isLoading = ref(true);
+
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
+
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 
 const ptColumn = ref({
