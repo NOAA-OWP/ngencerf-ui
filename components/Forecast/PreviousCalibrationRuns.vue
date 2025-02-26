@@ -60,9 +60,9 @@
             </Column>
             <Column field="submit_date" header="Run Date" sortable>
               <template #body="slotProps">
-                <span :aria-label="'Run Date ' + formatDateForDisplay(slotProps.data.submit_date)"
-                  :title="'Run Date ' + formatDateForDisplay(slotProps.data.submit_date)">
-                  {{ formatDateForDisplay(slotProps.data.submit_date) }}
+                <span :aria-label="'Run Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
+                  :title="'Run Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
                 </span>
               </template>
             </Column>

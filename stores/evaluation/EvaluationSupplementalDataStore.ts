@@ -46,13 +46,13 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     let selectedSimulatedSourceEndDate: string = '';
 
     if (selectedSimulatedSource?.value?.includes('Calibration')) {
-    selectedSimulatedSourceStartDate = `Calibration: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_start_time as string)}`;
-    selectedSimulatedSourceEndDate = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_end_time as string);
+      selectedSimulatedSourceStartDate = `Calibration: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_start_time as string)}`;
+      selectedSimulatedSourceEndDate = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_end_time as string);
     }
 
     else if (selectedSimulatedSource?.value?.includes('Validation')) {
-    selectedSimulatedSourceStartDate = `Validation: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string)}`;
-    selectedSimulatedSourceEndDate = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_end_time as string);
+      selectedSimulatedSourceStartDate = `Validation: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string)}`;
+      selectedSimulatedSourceEndDate = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_end_time as string);
     }
 
     return `${selectedSimulatedSourceStartDate} to ${selectedSimulatedSourceEndDate}`;
@@ -63,7 +63,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * @return {any}
    */
   const queryGetIterations = async (): Promise<any> => {
-    if(!calibrationJobId.value) {
+    if (!calibrationJobId.value) {
       return null;
     }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_calibration_data_by_iteration/`, {
@@ -72,7 +72,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({calibration_run_id: calibrationJobId.value})
+      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     });
   };
 
@@ -81,9 +81,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   * @return {any}
   */
   const queryGetPerformanceMetrics = async (): Promise<any> => {
-    if(!calibrationJobId.value) {
+    if (!calibrationJobId.value) {
       return null;
-    }   
+    }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_status/`, {
       method: "POST",
       headers: {
@@ -103,7 +103,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * Get Calibration/Validation Log Names
    * @return {any}
    */
-  const queryGetLogNames = async (validation_run_id: number=0): Promise<any> => {
+  const queryGetLogNames = async (validation_run_id: number = 0): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
       method: "POST",
       headers: {
@@ -123,7 +123,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const queryGetLogData = async (
     log_category: string,
     log_name: string,
-    validation_run_id: number=0,
+    validation_run_id: number = 0,
     start?: number,
     limit?: number
   ): Promise<any> => {

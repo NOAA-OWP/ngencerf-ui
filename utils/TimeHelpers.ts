@@ -31,7 +31,7 @@ export const formatISOStringOrDateToYYYYMMDDHHMM = ( d: string | Date ): string 
   // convert string or Date object to Luxon DateTime in UTC
   dateTime = convertISOStringOrDateToDateTime(d);
 
-  // Return the formatted date in 'yyyy-MM-dd HH:mm' fformatDateForDisplayormat
+  // Return the formatted date in 'yyyy-MM-dd HH:mm' format
   return dateTime.toFormat('yyyy-MM-dd HH:mm');
 };
 

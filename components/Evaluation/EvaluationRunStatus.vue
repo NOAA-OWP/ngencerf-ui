@@ -14,8 +14,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr height="38px" :aria-label="'Submit Time ' + formatDateForDisplay(startTime)"
-                    :title="'Submit Time ' + formatDateForDisplay(startTime)">
+                  <tr height="38px" :aria-label="'Submit Time ' + formatISOStringOrDateToYYYYMMDDHHMM(startTime)"
+                    :title="'Submit Time ' + formatISOStringOrDateToYYYYMMDDHHMM(startTime)">
                     <th scope="row" class="text-right font-bold">Submit Time</th>
                     <td class="pl-5">{{ startTime ? formatISOStringOrDateToYYYYMMDDHHMM(startTime) : '-'.repeat(30) }}</td>
                   </tr>
