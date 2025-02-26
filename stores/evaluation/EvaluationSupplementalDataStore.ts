@@ -46,7 +46,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const selectedSnodasRawMapUrl = ref<string>();
   const selectedSnodasSimMapUrl = ref<string>();
 
-
   /**
    * Computes the selected simulated source time range depending on the selected simulated source
    */

@@ -678,8 +678,6 @@ watch(selectedPlotName, async () => {
     // default to 'Validation Best Run' for simulated source
     selectedSimulatedSource.value = 'Validation Best Run';
 
-
-
   } else if (selectedPlotName.value) {
     plotGraphData.value = [];
     plotGraphLines.value = [];
