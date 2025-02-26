@@ -60,9 +60,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
       selectedSimulatedSourceEndDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_end_time as string);
     }
 
-    // default selectedEvaluateDate to selectedSimulateSourceStartDate
+    // default selectedEvaluateDate to selectedSimulateSourceStartDate (hard code to 2020-04-02 to display 2020-04-01 for demo)
     // in order to have a default value for the date picker
-    selectedEvaluateDate.value = selectedSimulatedSourceStartDate.value;
+    selectedEvaluateDate.value = formatISOStringOrDateToYYYYMMDD('2020-04-02T00:00:00.000Z')
 
     return `${selectedSimulatedSourceStartDate.value} to ${selectedSimulatedSourceEndDate.value}`;
   });
