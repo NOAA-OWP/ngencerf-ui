@@ -1,7 +1,17 @@
 <template>
   <div id="JobFilterDialog" ref="draggableDiv" :class="isDragging ? 'cursor-move' : ''">
     <div id="Header" class="w-full h-8 mb-2">
-      <div class="mb-2 pt-1 ml-3 font-bold text-base text-white">Calibration Job Filters</div>
+      <div class="grid grid-cols-2">
+        <div class="col-span-1">
+          <div class="mb-2 pt-1 ml-3 font-bold text-base text-white">Calibration Job Filters</div>
+        </div>
+        <div class="col-span-1">
+          <!-- <div class="mr-5 mt-[3px] nomove text-right">
+            <ToggleSwitch v-model="autoEffect"></ToggleSwitch>&nbsp; <div
+              class="text-white text-bold inline-block">Auto Change</div>
+          </div> -->
+        </div>
+      </div>
     </div>
     <div id="FilterDialog">
       <div class="grid grid-cols-3 gap-2">
@@ -66,8 +76,7 @@
       </div>
 
       <div id="ButtonArea" class="flex justify-end gap-5 nomove">
-        <Button class="ngenButtonDiv nomove" label="Reset" @click="resetFilters($event)"
-          :disabled="enableReset">
+        <Button class="ngenButtonDiv nomove" label="Reset" @click="resetFilters($event)" :disabled="enableReset">
         </Button>
         <Button class="ngenButtonDiv nomove" label="Close" @click="sendClose($event)"></Button>
       </div>
@@ -82,6 +91,7 @@ import Button from "primevue/button";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 import Checkbox from 'primevue/checkbox';
+import ToggleSwitch from 'primevue/toggleswitch';
 
 import type { CalibrationJobListItem } from "@/composables/NextGenModel"
 import { findEarliestAndLatest } from "@/utils/CommonHelpers";
@@ -96,6 +106,8 @@ const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterLis
   calDateStart, calDateEnd, earliestTime, latestTime, useDateRange } = storeToRefs(useUserDataStore());
 
 const emit = defineEmits(["ModulesFilterDialogClosing"]);
+
+const autoEffect = ref<boolean>(false);
 
 const showArchivedJobsOnly = ref<boolean>(false);
 
@@ -152,7 +164,7 @@ onMounted(() => {
           latestTime.value = calDateEnd.value = trange.latest;
         }
       }
-      
+
     }, 0)
   });
 })
