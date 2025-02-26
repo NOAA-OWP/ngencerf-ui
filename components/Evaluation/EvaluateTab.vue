@@ -672,6 +672,12 @@ watch(selectedPlotName, async () => {
     // load the SNODAS map
     loadSnodasMap(evaluateValidationRunId.value);
 
+    // default to SNODAS catchment map
+    selectedGridType.value = 'catchment';
+
+    // default to 'Validation Best Run' for simulated source
+    selectedSimulatedSource.value = 'Validation Best Run';
+
 
 
   } else if (selectedPlotName.value) {

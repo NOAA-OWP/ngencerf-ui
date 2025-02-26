@@ -31,6 +31,10 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     'Validation Alt Iteration X Run'
   ]);
   const selectedSimulatedSource = ref<string>();
+  const selectedSimulatedSourceStartDate = ref<string>();
+  const selectedSimulatedSourceEndDate = ref<string>();
+
+
   const gridTypes = ref<string[]>([
     'Gridded',
     'Catchment Means'
@@ -47,20 +51,21 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * Computes the selected simulated source time range depending on the selected simulated source
    */
   const selectedSimulatedSourceTimeRange = computed(() => {
-    let selectedSimulatedSourceStartDate: string = '';
-    let selectedSimulatedSourceEndDate: string = '';
-
     if (selectedSimulatedSource?.value?.includes('Calibration')) {
-      selectedSimulatedSourceStartDate = `Calibration: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_start_time as string)}`;
-      selectedSimulatedSourceEndDate = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_end_time as string);
+      selectedSimulatedSourceStartDate.value = `Calibration: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_start_time as string)}`;
+      selectedSimulatedSourceEndDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_end_time as string);
     }
 
     else if (selectedSimulatedSource?.value?.includes('Validation')) {
-      selectedSimulatedSourceStartDate = `Validation: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string)}`;
-      selectedSimulatedSourceEndDate = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_end_time as string);
+      selectedSimulatedSourceStartDate.value = `Validation: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string)}`;
+      selectedSimulatedSourceEndDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_end_time as string);
     }
 
-    return `${selectedSimulatedSourceStartDate} to ${selectedSimulatedSourceEndDate}`;
+    // default selectedEvaluateDate to selectedSimulateSourceStartDate
+    // in order to have a default value for the date picker
+    selectedEvaluateDate.value = selectedSimulatedSourceStartDate.value;
+
+    return `${selectedSimulatedSourceStartDate.value} to ${selectedSimulatedSourceEndDate.value}`;
   });
 
   /**
