@@ -55,7 +55,7 @@
               </div>
             </div>
           </div>
-          <div v-if="selectedPlotName == 'Hydrograph evolution'">
+          <div v-if="selectedPlotName === 'Hydrograph evolution'">
             <div v-if="!showPlotGraph">
               <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
                 Show Interactive Time Series Viewer</a>
@@ -214,10 +214,21 @@
             (SWE) - Raw Values</p>
           <p v-if="selectedGridType === 'catchment'" class="text-[12px] text-gray-600 text-center">Snow Water Equivalent
             (SWE) - Catchment Means</p>
+          <div>
+            <div v-if="selectedGridType === 'gridded' && selectedSnodasRawMapUrl" id="GraphArea" class="p-2">
+              <img :src="selectedSnodasRawMapUrl" alt="Selected SNODAS" />
+            </div>
+            <div v-if="selectedGridType === 'catchment' && selectedSnodasSimMapUrl" id="GraphArea" class="p-2">
+              <img :src="selectedSnodasSimMapUrl" alt="Selected SNODAS" />
+            </div>
+          </div>
         </div>
         <div class="flex flex-col items-center p-2">
           <h1 class="text-xl font-bold">Simulated</h1>
           <p class="text-[12px] text-gray-600 mt-9">Snow Water Equivalent (SWE) - Catchment Means</p>
+          <div v-if="selectedSnodasLumpedMapUrl" id="GraphArea" class="p-2">
+            <img :src="selectedSnodasLumpedMapUrl" alt="Selected SNODAS" />
+          </div>
         </div>
         <div class="p-2 relative overflow-visible">
           <label for="simulatedSources" class="block text-sm font-medium text-gray-700">Select Simulated Source</label>
@@ -294,7 +305,10 @@ const {
   gridTypes,
   selectedGridType,
   selectedEvaluateDate,
-  selectedSimulatedSourceTimeRange
+  selectedSimulatedSourceTimeRange,
+  selectedSnodasLumpedMapUrl,
+  selectedSnodasRawMapUrl,
+  selectedSnodasSimMapUrl
 } = storeToRefs(EvaluationSupplementalDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -309,6 +323,7 @@ const {
   queryGetPerformanceMetrics,
   queryGetLogNames,
   queryGetLogData,
+  loadSnodasMap
 } = EvaluationSupplementalDataStore;
 
 const plotTables = ref<DynamicObject>({});
@@ -402,10 +417,10 @@ onMounted(() => {
     // Load Run Status Store to load resultsPathname
     await loadRunStatusStore();
 
-    console.log('userCalibrationRunData initial', userCalibrationRunData.value);
+    // console.log('userCalibrationRunData initial', userCalibrationRunData.value);
     if (!userCalibrationRunData.value) {
       await fetchUserCalibrationRunData();
-      console.log('userCalibrationRunData after fetch', userCalibrationRunData.value);
+      // console.log('userCalibrationRunData after fetch', userCalibrationRunData.value);
     }
 
     // Get Plot Names
@@ -468,7 +483,8 @@ onMounted(() => {
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   // is the selected option a plot or iteration table?
-  // console.log('selectedPlotName: ', selectedPlotName.value);
+  console.log('inside watch selectedPlotName: ', selectedPlotName.value);
+
   if (selectedPlotName.value && supplementalTableOptions.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
@@ -650,6 +666,11 @@ watch(selectedPlotName, async () => {
     selectedLogCategory.value = '';
     selectedLogList.value = [];
     selectedLogName.value = '';
+
+    console.log('inside grid display option');
+
+    // load the SNODAS map
+    loadSnodasMap(evaluateValidationRunId.value);
 
 
 
