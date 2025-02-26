@@ -84,6 +84,7 @@ import { DateTime } from "luxon";
 import Checkbox from 'primevue/checkbox';
 
 import type { CalibrationJobListItem } from "@/composables/NextGenModel"
+import { findEarliestAndLatest } from "@/utils/CommonHelpers";
 import { StatusTypes } from "@/composables/NextgenEnums";
 
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
@@ -144,6 +145,14 @@ onMounted(() => {
         });
       }
       findEarliestAndLatest(props.calJobs);
+      if (props.calJobs) {
+        const trange = findEarliestAndLatest(props.calJobs);
+        if (trange) {
+          earliestTime.value = calDateStart.value = trange.earliest;
+          latestTime.value = calDateEnd.value = trange.latest;
+        }
+      }
+      
     }, 0)
   });
 })
@@ -170,27 +179,6 @@ const enableReset = computed(() => {
   // return (uiGageId.value !== 'All' || modulesFilterList.value.length > 0
   //      || statusTypeFilterList.value.length > 0 || useDateRange.value === false) === true;
 })
-
-const findEarliestAndLatest = (items: CalibrationJobListItem[]) => {
-  if (!items.length) return null
-
-  let earliest = items[0].created_at;
-  let latest = items[0].created_at;
-
-  for (const item of items) {
-    if (new Date(item.created_at) < new Date(earliest)) {
-      earliest = item.created_at;
-    }
-    if (new Date(item.created_at) > new Date(latest)) {
-      latest = item.created_at;
-    }
-  }
-
-  earliestTime.value = calDateStart.value = earliest;
-  latestTime.value = calDateEnd.value = latest;
-
-};
-
 
 // Template for the "Archived" column (Yes/No display)
 const archivedTemplate = (rowData: any) => {

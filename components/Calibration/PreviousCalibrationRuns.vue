@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div class="mx-auto px-8 text-center overflow-x">
+    <div class="mx-auto px-8 text-center overflow-auto">
       <div>
         <!-- Page top -->
         <div>
@@ -138,7 +138,7 @@ import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
-import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
+import { getOverallCalibrationValidationStatus, filterByDateRange } from "@/utils/CommonHelpers";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData } = useGageStore();
@@ -168,8 +168,6 @@ const { isLoading } = storeToRefs(gstore);
 const showArchivedJobsOnly = ref<boolean>(false);
 
 const showFilters = ref<boolean>(false);
-
-const moduleFilterSelectVisible = ref<boolean>(false);
 
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 
@@ -203,10 +201,6 @@ onMounted(async () => {
     await fetchUserCalibrationJobsListData();
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     await updateUserCalibrationJobsListData();
-
-    if (updatedUserCalibrationJobsListData.value) {
-      findEarliestAndLatest(updatedUserCalibrationJobsListData.value);
-    }
   }
 })
 
@@ -237,50 +231,10 @@ const filteredData = computed(() => {
   }
 });
 
-const filterByDateRange = (data: any[], calDateStart: string, calDateEnd: string) => {
-  const startDate = new Date(calDateStart).getTime();
-  const endDate = new Date(calDateEnd).getTime();
-
-  return data.filter((item) => {
-    const itemDate = new Date(item.created_at).getTime();
-    return itemDate >= startDate && itemDate <= endDate;
-  });
-}
-
-
-const findEarliestAndLatest = (items: CalibrationJobListItem[]) => {
-  if (!items.length) return null;
-
-  let earliest = items[0].created_at;
-  let latest = items[0].created_at;
-
-  for (const item of items) {
-    if (new Date(item.created_at) < new Date(earliest)) {
-      earliest = item.created_at;
-    }
-    if (new Date(item.created_at) > new Date(latest)) {
-      latest = item.created_at;
-    }
-  }
-
-  earliestTime.value = calDateStart.value = earliest;
-  latestTime.value = calDateEnd.value = latest;
-
-};
 
 // Template for the "Archived" column (Yes/No display)
 const archivedTemplate = (rowData: any) => {
   return rowData.archived ? 'Yes' : 'No';
-};
-
-/**
- * Save filter start date
- * @param e 
- */
-const handleCalDateStart = (value: any) => {
-  if (typeof value === 'string') {
-    calDateStart.value = DateTime.fromISO(value, { zone: 'utc' });
-  }
 };
 
 const onRowDblClick = (e: any) => {

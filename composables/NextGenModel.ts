@@ -765,3 +765,8 @@ export type StatusRecord = {
   status: string;
   filterValue: string;
 }
+
+export type FilterTimeRange = {
+  earliest: Date;
+  latest: Date;
+}

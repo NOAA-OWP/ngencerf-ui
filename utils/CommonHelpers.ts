@@ -214,3 +214,42 @@ export const arraysEqual = (arr1: any, arr2: any) => {
   return true;
 }
 
+
+/**
+ * Filter the list by date range
+ * @param CalibrationJobListItem[]
+ * @param string
+ * @param string
+ * @returns FilterTimeRange
+ */
+export const filterByDateRange = (data: any[], calDateStart: string, calDateEnd: string) => {
+  const startDate = new Date(calDateStart).getTime();
+  const endDate = new Date(calDateEnd).getTime();
+
+  return data.filter((item) => {
+    const itemDate = new Date(item.created_at).getTime();
+    return itemDate >= startDate && itemDate <= endDate;
+  });
+}
+
+/**
+ * Find the earlist and latest times from the cal job list
+ * @param CalibrationJobListItem[]
+ * @returns FilterTimeRange
+ */
+export const findEarliestAndLatest = (items: CalibrationJobListItem[]) => {
+  if (!items.length) return null;
+
+  let timeRange: FilterTimeRange;
+  timeRange = { earliest: items[0].created_at, latest: items[0].created_at };
+
+  for (const item of items) {
+    if (new Date(item.created_at) < new Date(timeRange.earliest)) {
+      timeRange.earliest = item.created_at;
+    }
+    if (new Date(item.created_at) > new Date(timeRange.latest)) {
+      timeRange.latest = item.created_at;
+    }
+  }
+  return timeRange;
+};
