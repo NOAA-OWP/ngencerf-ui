@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div class="mx-auto px-8 text-center overflow-auto">
+    <div class="mx-auto px-8 text-center overflow-x">
       <div>
         <!-- Page top -->
         <div>
@@ -12,20 +12,6 @@
             Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
           </p>
         </div>
-
-
-
-
-        <!-- <Transition>
-              <div class="col-span-1 text-center pt-5  pl-1">
-                <Checkbox v-model="showArchivedJobsOnly" inputId="archived" name="archived" value="info" binary />
-                <label class="ml-3" for="showArchivedJobsOnly">Archived only</label>
-              </div>
-              <div class="col-span-1 text-center  pl-1 pt-3 align-middle"><Button class="ngenButtonDiv">Reset</Button>
-              </div>
-            </div>
-          </div>
-        </Transition> -->
 
         <!-- Table -->
         <div class="">

@@ -614,4 +614,23 @@ h1 {
   text-align: right;
   width: 120px;
 }
+
+/* Listbox select (for Tuning Tab) */
+.p-listbox {
+  border-radius: 0px;
+}
+.p-listbox-list {
+  padding: 0px !important;
+}
+.p-listbox-list-container {
+  margin-top: 7px;
+}
+.p-listbox-option-selected {
+  background-color: global.$ngwcp_green_lt !important; 
+}
+.p-listbox-option {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
 </style>

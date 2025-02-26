@@ -352,11 +352,6 @@ select option {
 .dp--clear-btn, .dp__input_icon {
   top: 16px !important;
 }
-.p-listbox-option {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
 // DataTables
 .p-datatable-header-cell {
   padding: 5px 8px !important;
@@ -552,19 +547,6 @@ table.cols-bordered {
   border: 2px solid;
 }
 
-/* Listbox select (for Tuning Tab) */
-.p-listbox {
-  border-radius: 0px;
-}
-.p-listbox-list {
-  padding: 0px !important;
-}
-.p-listbox-list-container {
-  margin-top: 7px;
-}
-.p-listbox-option-selected {
-  background-color: global.$ngwcp_green_lt !important; 
-}
 #MainLeftDataArea .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected {
   color: var(--p-listbox-option-color); 
   font-weight: 500;
@@ -604,6 +586,3 @@ table.cols-bordered {
   }
 }
 
-.basin-gage-filter { 
- // width: 166px !important;
-}

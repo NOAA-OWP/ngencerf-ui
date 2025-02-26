@@ -3,75 +3,73 @@
     <div id="Header" class="w-full h-8 mb-2">
       <div class="mb-2 pt-1 ml-3 font-bold text-base text-white">Calibration Job Filters</div>
     </div>
-    <div id="ModuleDialog">
-      <div class="mb-3">
-        <div class="grid grid-cols-4">
-
-          <!-- Gage Select -->
-          <div class="col-span-1 text-center">
-            <label class="text-center" for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
-            <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
+    <div id="FilterDialog">
+      <div class="grid grid-cols-3 gap-2">
+        <div class="col-span-1">
+          <div class="nomove">
+            <label class="text-center nomove" for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
+            <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center nomove" v-model="uiGageId"
               :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
               aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
             </Select>
           </div>
-
-          <!-- Date Range -->
-          <div class="col-span-3">
-            <div class="grid grid-cols-3 text-center align-top">
-              <div class="col-span-1 small-label">From</div>
-              <div class="col-span-1 small-label font-bold">Date Range</div>
-              <div class="col-span-1 small-label">To</div>
-            </div>
-            <div class="grid grid-cols-9">
-              <div class="col-span-4">
-                <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
-                  time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
-                  @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
-              </div>
-              <div class="col-span-1 text-center">
-                <Checkbox v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
-              </div>
-              <div class="col-span-4">
-                <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark" v-model="calDateEnd"
-                  time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
-                  @update:model-value="handleCalDateEnd" aria-label="aria-label" title="title" />
-              </div>
-            </div>
+          <div class="mt-5 nomove">
+            From:
+            <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark nomove" v-model="calDateStart"
+              time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
+              @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
+          </div>
+          <div class="nomove">
+            To:
+            <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark nomove" v-model="calDateEnd"
+              time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
+              @update:model-value="handleCalDateEnd" aria-label="aria-label" title="title" />
+          </div>
+          <div class="mt-3 nomove">
+            <Checkbox class="nomove" v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
+            Enable From/To Filter
           </div>
         </div>
-      </div>
 
-      <div class="row-span-1">
-        <div class="grid grid-cols-3">
-          <div class="col-span-1">
-            <label for="ModuleList" class="text-center">Modules</label>
-            <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="h-60">
+        <div class="col-span-1 text-left ml-6">
+          <div class="nomove">
+            <label class="nomove" for="StatusList">Status</label><br>
+            <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
+              optionValue="filterValue" multiple class="nomove">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-2'">
-                  <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
+                  <div class="font-ui leading-none nomove" :aria-label="slotProps.option.filterValue"
+                    :title="slotProps.option.filterValue">
+                    {{ slotProps.option.filterValue }}</div>
+                </div>
+              </template>
+            </Listbox>
+          </div>
+        </div>
+
+        <div class="col-span-1">
+          <div class="nomove">
+            <label for="ModuleList" class="text-center nomove">Modules</label>
+            <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
+              optionLabel="name" optionValue="name" class="h-60 nomove">
+              <template #option="slotProps">
+                <div class="nomove"
+                  v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-2'">
+                  <div class="font-ui pl-2 leading-none nomove" :aria-label="slotProps.option.name"
                     :title="slotProps.option.name">
                     {{ slotProps.option.name }}</div>
                 </div>
               </template>
             </Listbox>
           </div>
-          <div class="col-span-1 text-left ml-6">
-            <label for="StatusList">Status</label><br>
-            <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-              optionValue="filterValue" multiple>
-            </Listbox>
-          </div>
-
-          <div class="col-span-1">&nbsp;</div>
         </div>
-
       </div>
 
-      <div id="ButtonArea" class="flex justify-end gap-5">
-        <Button class="ngenButtonDiv" label="Reset" @click="resetFilters()" :disabled="enableReset"></Button>
-        <Button class="ngenButtonDiv" label="Close" @click="sendClose()"></Button>
+      <div id="ButtonArea" class="flex justify-end gap-5 nomove">
+        <Button class="ngenButtonDiv nomove" label="Reset" @click="resetFilters($event)"
+          :disabled="enableReset">
+        </Button>
+        <Button class="ngenButtonDiv nomove" label="Close" @click="sendClose($event)"></Button>
       </div>
 
     </div>
@@ -93,10 +91,9 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 const userStore = useUserDataStore();
-const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList, 
+const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList,
   calDateStart, calDateEnd, earliestTime, latestTime, useDateRange } = storeToRefs(useUserDataStore());
 
-import { defineEmits } from "vue";
 const emit = defineEmits(["ModulesFilterDialogClosing"]);
 
 const showArchivedJobsOnly = ref<boolean>(false);
@@ -117,9 +114,10 @@ onMounted(() => {
     setTimeout(() => {
       if (draggableDiv.value) {
         draggableDiv.value.addEventListener('mousedown', (e: MouseEvent) => {
-          if( e && e.target ) {
-            if( (e.target as HTMLElement).tagName === "LI")
-            return;
+          if (e && e.target) {
+            if ((e.target as HTMLElement).classList.contains('nomove')) {
+              return;
+            }
           }
           isDragging.value = true;
           offsetX = e.clientX - draggableDiv.value!.offsetLeft;
@@ -150,15 +148,19 @@ onMounted(() => {
   });
 })
 
-const sendClose = () => {
+const sendClose = (e: MouseEvent) => {
+  e.stopPropagation();
+  e.stopImmediatePropagation();
   emit("ModulesFilterDialogClosing");
 };
 
-const resetFilters = () => {
+const resetFilters = (e: MouseEvent) => {
+  e.stopPropagation();
+  e.stopImmediatePropagation();
   uiGageId.value = 'All';
   modulesFilterList.value = [];
   statusTypeFilterList.value = [];
-  nextTick( () => {
+  nextTick(() => {
     findEarliestAndLatest(props.calJobs);
   })
 }
@@ -222,12 +224,37 @@ const handleCalDateEnd = (value: any) => {
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
 
+#ModuleList,
+#StatusList {
+  .p-listbox {
+    border-radius: 0px;
+  }
+
+  .p-listbox-list {
+    padding: 0px !important;
+  }
+
+  .p-listbox-list-container {
+    margin-top: 7px;
+  }
+
+  .p-listbox-option-selected {
+    background-color: global.$ngwcp_green_lt !important;
+  }
+
+  --p-listbox-option-padding,
+  .p-listbox-option {
+    padding: 0 !important;
+  }
+}
+
 #Header {
   background-color: global.$ngwcp_primary3;
 }
+
 #JobFilterDialog {
-  width: 750;
-  height: 500px;
+  width: 750px;
+  height: 435px;
   position: absolute;
   top: 20%;
   left: 30%;
@@ -236,17 +263,41 @@ const handleCalDateEnd = (value: any) => {
   z-index: 99;
 }
 
-#ModuleDialog {
+#FilterDialog {
   padding: 0 15px;
 }
+
+.p-listbox {
+  border-radius: 0px;
+}
+
+.p-listbox-list {
+  padding: 0px !important;
+}
+
+.p-listbox-list-container {
+  margin-top: 7px;
+}
+
+.p-listbox-option-selected {
+  background-color: global.$ngwcp_green_lt !important;
+}
+
+.p-listbox-option {
+  padding: 0 !important;
+}
+
+
 #ModuleList {
   border: 1px solid #888888;
+  width: 230px;
 }
+
 
 #ButtonArea {
   position: fixed;
-  margin-left: 586px;
-  margin-top: -36px;
+  margin-left: 20px;
+  margin-top: -6px;
 }
 
 #HeadwaterBasinGage {
@@ -254,25 +305,22 @@ const handleCalDateEnd = (value: any) => {
 }
 
 #StatusList {
-  width: 170px;
-  li.p-listbox-option {
-    display: none;
-      padding: 8px 10px 10px 8px !important;
-    }
+  width: 145px;
+  border: 1px solid #888888;
 }
+
 
 #CalDateEnd,
 #CalDateStart {
   padding: 0 4px;
-  width: 100%;
+  width: auto;
 
   :first-child {
     > :first-child {
       > :first-child {
-        font-size: 1.2em;
+        font-size: 1em;
       }
     }
   }
 }
-
 </style>
