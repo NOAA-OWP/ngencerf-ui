@@ -218,16 +218,16 @@
             <div v-if="selectedGridType === 'gridded' && selectedSnodasRawMapUrl" id="GraphArea" class="p-2">
               <img :src="selectedSnodasRawMapUrl" alt="Selected SNODAS" />
             </div>
-            <div v-if="selectedGridType === 'catchment' && selectedSnodasSimMapUrl" id="GraphArea" class="p-2">
-              <img :src="selectedSnodasSimMapUrl" alt="Selected SNODAS" />
+            <div v-if="selectedGridType === 'catchment' && selectedSnodasLumpedMapUrl" id="GraphArea" class="p-2">
+              <img :src="selectedSnodasLumpedMapUrl" alt="Selected SNODAS" />
             </div>
           </div>
         </div>
         <div class="flex flex-col items-center p-2">
           <h1 class="text-xl font-bold">Simulated</h1>
           <p class="text-[12px] text-gray-600 mt-9">Snow Water Equivalent (SWE) - Catchment Means</p>
-          <div v-if="selectedSnodasLumpedMapUrl" id="GraphArea" class="p-2">
-            <img :src="selectedSnodasLumpedMapUrl" alt="Selected SNODAS" />
+          <div v-if="selectedSnodasSimMapUrl" id="GraphArea" class="p-2">
+            <img :src="selectedSnodasSimMapUrl" alt="Selected SNODAS" />
           </div>
         </div>
         <div class="p-2 relative overflow-visible">
