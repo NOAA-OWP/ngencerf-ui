@@ -72,7 +72,8 @@
               </Column>
               <Column field="submit_date" header="Submit Date" sortable>
                 <template #body="slotProps">
-                  <span v-if="slotProps.data.submit_date" :aria-label="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)"
+                  <span v-if="slotProps.data.submit_date"
+                    :aria-label="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)"
                     :title="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)">
                     {{ formatDateForDisplay(slotProps.data.submit_date) }}
                   </span>
@@ -139,23 +140,24 @@ import type { DataTableRowClickEvent } from "primevue/datatable";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const forecastStore = useForecastStore();
-const { 
-  forecastRunGageList, 
-  forecastJobId, 
+const {
+  forecastRunGageList,
+  forecastJobId,
   forecastJobStatus,
   uiGageId,
   calibrationRunForForecast,
   calibrationRunsForForecast,
-  forecastRuns, 
+  forecastRuns,
+  selectedForecastJob,
   forecastCycles } = storeToRefs(forecastStore);
-const { 
-  setSelectedForecastRunId, 
+const {
+  setSelectedForecastRunId,
   resetSelectedForecastRunId,
   loadSetupForecastTabData,
   loadForecastStatusRunTabData,
   loadForecastResultsTabData,
-  loadSelectedCalibrationRun, 
-  setSelectedForecastRowData, 
+  loadSelectedCalibrationRun,
+  setSelectedForecastRowData,
   getForecastJobs,
   getCalibrationJobsForForecast,
   resetUserSelectedForecastCalibrationRun } = useForecastStore();
@@ -178,9 +180,6 @@ const ptColumn = ref({
 const { clearUserCalibrationRunData } = useUserDataStore();
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-
-//this model is for highlighting purpose
-const selectedForecastJob = ref<ForecastJob>();
 
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];

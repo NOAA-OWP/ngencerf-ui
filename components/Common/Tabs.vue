@@ -87,7 +87,7 @@
             Setup Forecast
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-if="calibrationJobId && forecastCycle" data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status/Run tab"
+          <div v-if="calibrationJobId && (forecastCycle) || selectedForecastJob?.cycle)" data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status/Run tab"
             title="Status/Run Tab">
             Status/Run
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
@@ -135,7 +135,7 @@ import { useForecastStore } from "@/stores/forecast/ForecastStore";
 //import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
 
 const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
-const { forecastJobId, forecastJobStatus, forecastCycle } = storeToRefs(useForecastStore());
+const { forecastJobId, forecastCycle, selectedForecastJob } = storeToRefs(useForecastStore());
 const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());

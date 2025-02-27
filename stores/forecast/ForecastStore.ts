@@ -35,6 +35,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const uiGageId = ref<string>("");
 
   const forecastRuns = ref<ForecastJob[]>([]);
+  const selectedForecastJob = ref<ForecastJob>();
 
   /**
    * Compute Overall Forcing Download and Forecast status
@@ -442,6 +443,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationRunForForecast,
     uiGageId,
     forecastRuns,
+    selectedForecastJob,
     overallForcingDownloadForecastStatus,
     getForecastJobs,
     loadSetupForecastTabData,
