@@ -149,7 +149,7 @@
       <div class="grid grid-cols-2 pb-3">
 
         <div class="col-span-2">
-          <div class="mt-6 mb-3 hr"></div>
+          <!-- <div class="mt-6 mb-3 hr"></div>
           <div class="mb-2 font-bold">Output Variable To Calibrate</div>
           <div class="mt-2 text-sm">
             <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable" :options="outputVariables"
@@ -157,7 +157,7 @@
               title=">Output Variable To Calibrate"
               :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
             </Select>
-          </div>
+          </div> -->
         </div>
 
         <div class="col-span-2 mt-5 mb-3 hr"></div>
@@ -480,6 +480,18 @@ onMounted(async () => {
     toast.add(tMsg); addToastRecord(tMsg);
   }
 
+/********* NGWPC-5653 Remove Output Variable Selection UI Element ****************/
+  // Automatically selects "channel_exit_water_x-section__volume_flow_rate (T-Route)" for output var to calculate
+  nextTick(() => {
+    if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
+      const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
+      const targetOutput = "channel_exit_water_x-section__volume_flow_rate (T-Route)";
+      const foundVariable = outputVariables.value.find(variable => variable.output === targetOutput) || null;
+      userOutputVariableToCalibrate.value.name = foundVariable.name;
+      userOutputVariableToCalibrate.value.module = foundVariable.module;
+      selectedOutputVariable.value = `${name} (${module})`;
+    }
+  })
   isLoading.value = false;
 });
 
@@ -1109,7 +1121,7 @@ const saveTuningData = () => {
                 if (Object.keys(err).length) {
                   (err as any as NonFieldError).non_field_errors.forEach(er => {
                     const tMsg: ToastMessageOptions = {
-                      severity: 'error', 
+                      severity: 'error',
                       summary: `Error Saving Tuning Data`,
                       detail: er,
                       life: ToastTimeout.timeout10000,
@@ -1221,11 +1233,11 @@ const validateTab = () => {
   }
 
   /* selectedOutputVariable */
-  if (selectedOutputVariable.value !== null &&
-    selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
-    error = true;
-    text.push("Output Variable to Calibrate has changed");
-  }
+  // if (selectedOutputVariable.value !== null &&
+  //   selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
+  //   error = true;
+  //   text.push("Output Variable to Calibrate has changed");
+  // }
 
   return { error: error, text: text }
 }

@@ -138,11 +138,12 @@
             {{ calData?.save_plot_iteration_frequency }}</div>
         </div>
         <div class="col-span-2">
-          <div v-if="calData?.output_variable_to_calibrate?.name"
+          <!-- <div v-if="calData?.output_variable_to_calibrate?.name"
             :aria-label="'Cal Output Variable ' + calData?.output_variable_to_calibrate?.name"
             :title="'Cal Output Variable ' + calData?.output_variable_to_calibrate?.name"><span class="font-medium">Cal
               Output Variable:</span>
-            {{ calData?.output_variable_to_calibrate?.name }}</div>
+            {{ calData?.output_variable_to_calibrate?.name }}
+          </div> -->
         </div>
       </div>
     </div>

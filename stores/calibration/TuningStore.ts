@@ -130,8 +130,6 @@ export const useTuningStore = defineStore(
             }))
           ) || [];
       }
-      // }
-
       return loadTuningTabData.value;
     }
 
