@@ -269,17 +269,20 @@ export const filterBySubmitDate = (
   });
 };
 
-export const filterByCalibrationSpan = (items: CalibrationJobListItem[], itemDate: string): CalibrationJobListItem[] => {
-  const dateToCheck = new Date(itemDate);
+
+export const filterByCalibrationSpan = (items: CalibrationJobListItem[], earlyDate: string, lateDate: string): CalibrationJobListItem[] => {
+  const startRange = new Date(earlyDate);
+  const endRange = new Date(lateDate);
   return items.filter((item) => {
     if (!item.calibration_start_period || !item.calibration_end_period) {
       return false;
     }
     const startDate = new Date(item.calibration_start_period);
     const endDate = new Date(item.calibration_end_period);
-    return dateToCheck >= startDate && dateToCheck <= endDate;
+    return (startDate <= endRange && endDate >= startRange);
   });
 };
+
 
 /**
  * Find the earlist and latest times from the cal job list for creation_date

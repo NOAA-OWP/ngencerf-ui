@@ -70,7 +70,7 @@
             <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
               optionValue="filterValue" multiple class="nomove">
               <template #option="slotProps">
-                <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-2'">
+                <div v-bind:class="(slotProps.option.selected === true) ? 'font-bold' : 'pl-2'">
                   <div class="font-ui leading-none nomove" :aria-label="slotProps.option.filterValue"
                     :title="slotProps.option.filterValue">
                     {{ slotProps.option.filterValue }}</div>
@@ -329,6 +329,7 @@ const handleCalDateEnd = (value: any) => {
 
 .p-listbox-option {
   padding: 0 !important;
+  display: none !important;
 }
 
 

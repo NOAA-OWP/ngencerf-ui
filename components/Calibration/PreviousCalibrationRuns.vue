@@ -138,7 +138,7 @@ import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
-import { getOverallCalibrationValidationStatus, filterByCreationDate, filterByCalibrationSpan } from "@/utils/CommonHelpers";
+import { getOverallCalibrationValidationStatus, filterByCreationDate, filterBySubmitDate, filterByCalibrationSpan } from "@/utils/CommonHelpers";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData } = useGageStore();
