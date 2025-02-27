@@ -154,7 +154,6 @@ export interface UserCalibrationRunData {
   time_range: UserCalibrationRunTimeRangeData;
   calibration_times: UserCalibrationRunCalibrationTimesData;
   validation_times: UserCalibrationRunValidationTimesData;
-  output_variable_to_calibrate: UserCalibrationRunOutputVariableToCalibrateData;
   parameters_selected: boolean;
   parameters: UserCalibrationRunParametersData[];
   objective_function: string;
@@ -202,11 +201,6 @@ export interface UserCalibrationRunValidationTimesData {
   validation_end_time: string;
   simulation_start_time: string;
   simulation_end_time: string;
-}
-
-export interface UserCalibrationRunOutputVariableToCalibrateData {
-  name: string;
-  module: string;
 }
 
 export interface UserCalibrationRunParametersData {

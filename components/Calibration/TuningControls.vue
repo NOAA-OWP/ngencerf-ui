@@ -148,22 +148,9 @@
     <div class="text-left">
       <div class="grid grid-cols-2 pb-3">
 
-        <div class="col-span-2">
-          <!-- <div class="mt-6 mb-3 hr"></div>
-          <div class="mb-2 font-bold">Output Variable To Calibrate</div>
-          <div class="mt-2 text-sm">
-            <Select id="OutVar" class="varInputs" v-model="selectedOutputVariable" :options="outputVariables"
-              optionLabel="output" optionValue="output" aria-label=">Output Variable To Calibrate"
-              title=">Output Variable To Calibrate"
-              :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
-            </Select>
-          </div> -->
-        </div>
-
+        <div class="col-span-2">&nbsp;</div>
         <div class="col-span-2 mt-5 mb-3 hr"></div>
-
         <div class="col-span-2">
-
 
           <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
           <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
@@ -380,9 +367,6 @@ const {
   calEndTime,
   calibrationTuningParameters,
   userSelectedCalibrationTuningParameters,
-  userOutputVariableToCalibrate,
-  selectedOutputVariable,
-  outputVariables,
   automatic_validation,
   avSimStartTime,
   avSimEndTime,
@@ -465,33 +449,12 @@ onMounted(async () => {
       }
     };
 
-    // set output variable to calibrate
-    if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
-      const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
-      // if (selectedOutputVariable.value) {
-      userOutputVariableToCalibrate.value.name = name;
-      userOutputVariableToCalibrate.value.module = module;
-      selectedOutputVariable.value = `${name} (${module})`;
-      // }
-    };
     isInitialSetupDone.value = true; // set to true after initial setup
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No Calibration Job ID', detail: 'No calibration job ID found. Please go back to the Calibration Runs tab and select a job.' };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 
-/********* NGWPC-5653 Remove Output Variable Selection UI Element ****************/
-  // Automatically selects "channel_exit_water_x-section__volume_flow_rate (T-Route)" for output var to calculate
-  nextTick(() => {
-    if (userCalibrationRunData?.value?.output_variable_to_calibrate) {
-      const { name, module } = userCalibrationRunData.value.output_variable_to_calibrate;
-      const targetOutput = "channel_exit_water_x-section__volume_flow_rate (T-Route)";
-      const foundVariable = outputVariables.value.find(variable => variable.output === targetOutput) || null;
-      userOutputVariableToCalibrate.value.name = foundVariable.name;
-      userOutputVariableToCalibrate.value.module = foundVariable.module;
-      selectedOutputVariable.value = `${name} (${module})`;
-    }
-  })
   isLoading.value = false;
 });
 
@@ -525,14 +488,6 @@ const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Calibration Tuning Controls are disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.' };
-    toast.add(tMsg); addToastRecord(tMsg);
-  }
-};
-
-const handleOutputVariablesParametersClick = (event: Event) => {
-  if (!isFormulationDataSaved()) {
-    event.preventDefault(); // Prevent any default action
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Output Variables and Parameters are disabled', detail: 'You cannot interact with output variables or parameters because Formulation data has not been saved.' };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
@@ -585,17 +540,6 @@ const handleAvCalEndUpdate = (value: any) => {
   }
 };
 
-// watch for changes to selected output variable
-watch(selectedOutputVariable, () => {
-  // get output variable object from newly-selected output variable
-  const outputVariable = outputVariables?.value?.find((outputVar: any) => outputVar?.output === selectedOutputVariable?.value);
-
-  // set userOutputVariableToCalibrate with newly-selected output variable
-  userOutputVariableToCalibrate.value = {
-    name: outputVariable?.name,
-    module: outputVariable?.module,
-  }
-});
 
 // watch for changes to simStartTime. If simStartTime is set, set calStartTime to one year after simStartTime if not already set
 watch(simStartTime, () => {
@@ -870,10 +814,6 @@ const validateAndBuildRequestBody = (): boolean => {
     }
   }
 
-  if (userOutputVariableToCalibrate.value && userOutputVariableToCalibrate.value.name) {
-    saveTuningTabRequestBody.value.output_variable_to_calibrate = userOutputVariableToCalibrate.value;
-  }
-
   saveTuningTabRequestBody.value.automatic_validation = automatic_validation.value;
 
   if (areTuningParametersSet()) {
@@ -1081,18 +1021,6 @@ const areTuningParametersSet = (): boolean => {
 };
 
 /**
- * Check if Output Variable to Calibrate is set
- * @returns boolean
- */
-const isOutputVariableSet = (): boolean => {
-  // check if Output Variable to Calibrate is set
-  if (userOutputVariableToCalibrate.value.name && userOutputVariableToCalibrate.value.module) {
-    return true;
-  }
-  return false;
-};
-
-/**
   * Save Tuning Tab data
   */
 const saveTuningData = () => {
@@ -1232,13 +1160,6 @@ const validateTab = () => {
     text.push("Validation End has changed");
   }
 
-  /* selectedOutputVariable */
-  // if (selectedOutputVariable.value !== null &&
-  //   selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
-  //   error = true;
-  //   text.push("Output Variable to Calibrate has changed");
-  // }
-
   return { error: error, text: text }
 }
 
@@ -1272,9 +1193,7 @@ const restorePage = async () => {
     avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
   };
 
-  // if (selectedOutputVariable.value !== null &&
-  //   selectedOutputVariable.value.indexOf(userCalibrationRunData?.value?.output_variable_to_calibrate.name) === -1) {
-  // }
+
 }
 
 const gotoNext = () => {

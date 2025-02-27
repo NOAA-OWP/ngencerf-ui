@@ -31,14 +31,7 @@ export const useTuningStore = defineStore(
     const calibrationTuningModules = ref<any>();
     const calibrationTuningParameters = ref<any[]>([]);
     const userSelectedCalibrationTuningParameters = ref<any[]>([]);
-    const userOutputVariableToCalibrate = ref<{
-      name: string;
-      module: string | null;
-    }>({
-      name: "",
-      module: null,
-    });
-    const outputVariables = ref<any[]>([]);
+
     const automatic_validation = ref<boolean>(true);
 
     const avSimStartTime = ref<any>("");
@@ -52,8 +45,7 @@ export const useTuningStore = defineStore(
     const tuningStore_data_loading = ref(true);
     const saveTuningTabRequestBody = ref<any>({});
 
-    const selectedOutputVariable = ref<any>(null);
-    
+   
     /**
      * Load Tuning Tab data
      * @returns {Promise<any>}
@@ -118,18 +110,6 @@ export const useTuningStore = defineStore(
             })) || [];
       }
 
-      // set output variables if not already set
-      if (!outputVariables.value || outputVariables.value.length === 0) {
-        outputVariables.value =
-          calibrationTuningModules?.value?.flatMap((module: any) =>
-            module?.output_variables?.map((outputVar: any) => ({
-              name: outputVar.name,
-              description: outputVar.description,
-              module: module.name,
-              output: `${outputVar.name} (${module.name})`,
-            }))
-          ) || [];
-      }
       return loadTuningTabData.value;
     }
 
@@ -189,8 +169,6 @@ export const useTuningStore = defineStore(
       calibrationTuningModules.value = null;
       calibrationTuningParameters.value = [];
       userSelectedCalibrationTuningParameters.value = [];
-      userOutputVariableToCalibrate.value = { name: "", module: "" };      
-      outputVariables.value = [];
       automatic_validation.value = true;
       avSimStartTime.value = "";
       avSimEndTime.value = "";
@@ -211,9 +189,6 @@ export const useTuningStore = defineStore(
       calEndTime,
       calibrationTuningParameters,
       userSelectedCalibrationTuningParameters,
-      userOutputVariableToCalibrate,
-      selectedOutputVariable,
-      outputVariables,
       automatic_validation,
       avSimStartTime,
       avSimEndTime,
