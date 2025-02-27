@@ -19,9 +19,14 @@
             <!-- Filters -->
             <div id="FilterButton" class="text-left mb-1 w-full"><Button class="filter-link"
                 @click="toggleShowFilters">{{
-                  showFilters ? 'Hide' : 'Show' }}
+                showFilters ? 'Hide' : 'Show' }}
                 Filters</Button>
             </div>
+            <!-- <div id="FilterEnable" class="text-left mb-1 w-full"><Button class="filter-link"
+                @click="toggleEnableFilters">{{
+                  enableFilters ? 'Hide' : 'Show' }}
+                Filters</Button>
+            </div> -->
 
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"

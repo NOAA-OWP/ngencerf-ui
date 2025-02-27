@@ -1,9 +1,10 @@
 <template>
-  <div id="JobFilterDialog" ref="draggableDiv" :class="isDragging ? 'cursor-move' : ''">
-    <div id="Header" class="w-full h-8 mb-2">
+  <div id="JobFilterDialog" ref="draggableDiv" class="mb-2 top-[20%] left-[30%] absolute z-100 w-[750px] h-[450px]"
+    :class="isDragging ? 'cursor-move' : ''">
+    <div id="Header" class="mb-2">
       <div class="grid grid-cols-2">
         <div class="col-span-1">
-          <div class="mb-2 pt-1 ml-3 font-bold text-base text-white">Calibration Job Filters</div>
+          <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white">Calibration Job Filters</div>
         </div>
         <div class="col-span-1">
           <!-- <div class="mr-5 mt-[3px] nomove text-right">
@@ -25,24 +26,24 @@
           </div>
           <hr class="bg-gray-950 nomove" />
           <div class="mt-2 nomove">
-            <label for="DateFilterButtons">Date Filters *</label>
+            <label class="nomove" for=" DateFilterButtons">Date Filters *</label>
             <div id="DateFilterButtons" class="flex flex-column gap-2 text-center nomove">
               <div>
                 <RadioButton inputId="inputId1" name="inputName" v-model="whichDatesToFilter" :value="0"
-                  checked="checked" @change="handleRadioClick(0)" />
+                  checked="checked" @change="handleRadioClick(0)" class="nomove" />
                 <label for="inputId1" class="text-sm font-light text-center">Creation Date</label>
               </div>
 
               <div>
                 <RadioButton inputId="inputId2" name="inputName" v-model="whichDatesToFilter" :value="1"
-                  @change="handleRadioClick(1)" />
-                <label for="inputId2" class="text-sm font-light text-center">Submit Date</label>
+                  @change="handleRadioClick(1)" class="nomove" />
+                <label for="inputId2" class="text-sm font-light text-center nomove">Submit Date</label>
               </div>
 
               <div>
                 <RadioButton inputId="inputId3" name="inputName" v-model="whichDatesToFilter" :value="2"
-                  @change="handleRadioClick(2)" />
-                <label for="inputId3" class="text-sm font-light text-center">Calibration Period</label>
+                  @change="handleRadioClick(2)" class="nomove" />
+                <label for="inputId3" class="text-sm font-light text-center nomove">Calibration Period</label>
               </div>
             </div>
           </div>
@@ -71,7 +72,7 @@
             <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
               optionValue="filterValue" multiple class="nomove">
               <template #option="slotProps">
-                <div v-bind:class="(slotProps.option.selected === true) ? 'font-bold' : 'pl-2'">
+                <div v-bind:class="(slotProps.option.selected === true) ? 'font-bold' : ''">
                   <div class="font-ui leading-none nomove" :aria-label="slotProps.option.filterValue"
                     :title="slotProps.option.filterValue">
                     {{ slotProps.option.filterValue }}</div>
@@ -87,8 +88,7 @@
             <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
               optionLabel="name" optionValue="name" class="h-60 nomove">
               <template #option="slotProps">
-                <div class="nomove"
-                  v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-2'">
+                <div class="nomove" v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : ''">
                   <div class="font-ui pl-2 leading-none nomove" :aria-label="slotProps.option.name"
                     :title="slotProps.option.name">
                     {{ slotProps.option.name }}</div>
@@ -269,42 +269,13 @@ const handleCalDateEnd = (value: any) => {
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
 
-#ModuleList,
-#StatusList {
-  .p-listbox {
-    border-radius: 0px;
-  }
-
-  .p-listbox-list {
-    padding: 0px !important;
-  }
-
-  .p-listbox-list-container {
-    margin-top: 7px;
-  }
-
-  .p-listbox-option-selected {
-    background-color: global.$ngwcp_green_lt !important;
-  }
-
-  .p-listbox-option {
-    padding: 0 !important;
-  }
-}
-
 #Header {
   background-color: global.$ngwcp_primary3;
 }
 
 #JobFilterDialog {
-  width: 750px;
-  height: 450px;
-  position: absolute;
-  top: 20%;
-  left: 30%;
   background-color: white;
   border: 2px solid #666666;
-  z-index: 99;
 }
 
 #FilterDialog {
@@ -332,19 +303,8 @@ const handleCalDateEnd = (value: any) => {
   display: none !important;
 }
 
-
-#ModuleList {
-  border: 1px solid #888888;
-  width: 230px;
-}
-
-
-#HeadwaterBasinGage {
-  width: auto;
-}
-
+#ModuleLis,
 #StatusList {
-  width: 145px;
   border: 1px solid #888888;
 }
 
