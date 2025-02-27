@@ -483,13 +483,13 @@ onMounted(() => {
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   // is the selected option a plot or iteration table?
-  console.log('inside watch selectedPlotName: ', selectedPlotName.value);
-
+  // console.log('selectedPlotName: ', selectedPlotName.value);
   if (selectedPlotName.value && supplementalTableOptions.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
     plotGraphData.value = [];
     plotGraphLines.value = [];
+    sliderBoxPosition.value = {};
     selectedSupplementalTable.value = supplementalTableOptions.indexOf(selectedPlotName.value) + 1;
     if (selectedSupplementalTable.value === 1) {
       // Get Iteration Data
@@ -648,6 +648,7 @@ watch(selectedPlotName, async () => {
     plotTableColumns.value = [];
     plotGraphData.value = [];
     plotGraphLines.value = [];
+    sliderBoxPosition.value = {};
     selectedSupplementalTable.value = 0;
     selectedLogName.value = '';
     selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
@@ -662,6 +663,7 @@ watch(selectedPlotName, async () => {
     plotTableColumns.value = [];
     plotGraphData.value = [];
     plotGraphLines.value = [];
+    sliderBoxPosition.value = {};
     selectedSupplementalTable.value = 0;
     selectedLogCategory.value = '';
     selectedLogList.value = [];
@@ -681,6 +683,7 @@ watch(selectedPlotName, async () => {
   } else if (selectedPlotName.value) {
     plotGraphData.value = [];
     plotGraphLines.value = [];
+    sliderBoxPosition.value = {};
     selectedSupplementalTable.value = 0;
     selectedLogCategory.value = '';
     selectedLogList.value = [];
@@ -926,7 +929,13 @@ const togglePlotGraph = async () => {
 // draw interactive plot when plot graph data is first loaded, and also when checkboxes are clicked
 const drawInteractivePlot = () => {
   console.log('Drawing interactive plot');
-  plotGraphOptions.value = { x: { grid: true }, y: { grid: true }, marks: [], width: plotGraphArea.value.offsetWidth - 200 };
+  plotGraphOptions.value = {
+    x: {grid: true}, 
+    y: {grid: true, label: 'Flow (cm/s)'}, 
+    marks: [], 
+    width: plotGraphArea.value.offsetWidth - 200,
+    height: (document.getElementById('MainLeftDataParent').getBoundingClientRect().bottom - document.getElementById('PlotGraphArea').getBoundingClientRect().top) - 150
+  };
   let plotLineData = [];
   let plotDotData = [];
   for (let c = 1; c < plotTableColumns.value.length; c++) {
@@ -1042,8 +1051,18 @@ const drawInteractiveSlider = () => {
     plotGraphSlider.value.removeChild(plotGraphSlider.value.children[1]);
   }
   plotGraphSlider.value.append(Plot.plot(plotGraphSliderOptions.value));
+  console.log('Previous slider box position: ', sliderBoxPosition.value);
+  if (!sliderBoxPosition.value || Object.keys(sliderBoxPosition.value).length != 2) {
+    console.log('Resetting sliderBoxPosition')
+    // we don't have a previous position to remember - start with the middle third of the available range
+    sliderBoxPosition.value = {
+      start: getSliderWidth() / 3,
+      end: getSliderWidth() * 2 / 3
+    }
+  }
   document.getElementById('PlotGraphSliderBox').style.left = sliderBoxPosition.value.start + 'px';
   document.getElementById('PlotGraphSliderBox').style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
+  setSliderDateRange();
   plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
 }
 
@@ -1133,11 +1152,9 @@ const sliderDragStart = (event) => {
 
 const sliderDragChange = (event) => {
   const x = event.clientX - document.getElementById('PlotGraphSlider').getBoundingClientRect().left;
-  if (!sliderBoxPosition.value || !sliderBoxPosition.value.length) {
-    sliderBoxPosition.value = {
-      start: document.getElementById('PlotGraphSliderBox').getBoundingClientRect().left - document.getElementById('PlotGraphSlider').getBoundingClientRect().left,
-      end: document.getElementById('PlotGraphSliderBox').getBoundingClientRect().right - document.getElementById('PlotGraphSlider').getBoundingClientRect().left
-    }
+  sliderBoxPosition.value = {
+    start: document.getElementById('PlotGraphSliderBox').getBoundingClientRect().left - document.getElementById('PlotGraphSlider').getBoundingClientRect().left,
+    end: document.getElementById('PlotGraphSliderBox').getBoundingClientRect().right - document.getElementById('PlotGraphSlider').getBoundingClientRect().left
   }
   if (!sliderDragType.value) {
     if (Math.abs(sliderBoxPosition.value.start - x) <= 10) {
@@ -1440,6 +1457,7 @@ onUnmounted(() => {
   position: absolute;
   left: 50%;
   top: 161px;
+  min-width: 530px;
   background-color: white;
   overflow: auto;
   padding-left: 16px;
