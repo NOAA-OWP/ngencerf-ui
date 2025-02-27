@@ -246,7 +246,7 @@ export const filterByCreationDate = (
 };
 
 /**
- * Filter the list by creation_date range
+ * Filter the list by submit date
  * @param CalibrationJobListItem[]
  * @param string
  * @param string
@@ -270,7 +270,13 @@ export const filterBySubmitDate = (
 };
 
 
-export const filterByCalibrationSpan = (items: CalibrationJobListItem[], earlyDate: string, lateDate: string): CalibrationJobListItem[] => {
+/**
+ * Filter the list by calibration_period
+ * @param CalibrationJobListItem[]
+ * @param string
+ * @param string
+ * @returns FilterTimeRange
+ */export const filterByCalibrationSpan = (items: CalibrationJobListItem[], earlyDate: string, lateDate: string): CalibrationJobListItem[] => {
   const startRange = new Date(earlyDate);
   const endRange = new Date(lateDate);
   return items.filter((item) => {

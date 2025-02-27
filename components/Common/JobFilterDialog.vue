@@ -25,7 +25,8 @@
           </div>
           <hr class="bg-gray-950 nomove" />
           <div class="mt-2 nomove">
-            <div class="flex flex-column gap-2 text-center nomove">
+            <label for="DateFilterButtons">Date Filters *</label>
+            <div id="DateFilterButtons" class="flex flex-column gap-2 text-center nomove">
               <div>
                 <RadioButton inputId="inputId1" name="inputName" v-model="whichDatesToFilter" :value="0"
                   checked="checked" @change="handleRadioClick(0)" />
@@ -60,7 +61,7 @@
           </div>
           <div class="mt-3 ml-3 nomove">
             <Checkbox class="nomove" v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
-            Enable From/To Filter
+            Enable Date Filters *
           </div>
         </div>
 
@@ -286,7 +287,6 @@ const handleCalDateEnd = (value: any) => {
     background-color: global.$ngwcp_green_lt !important;
   }
 
-  --p-listbox-option-padding,
   .p-listbox-option {
     padding: 0 !important;
   }
