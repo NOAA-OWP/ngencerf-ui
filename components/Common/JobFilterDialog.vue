@@ -122,9 +122,9 @@ const props = defineProps<{
 
 
 onMounted(() => {
-  console.log(uiGageId, calibrationRunGageList);
   nextTick(() => {
     setTimeout(() => {
+      glpat - CAyV3ZqyRes8gzdgBtJ5
       if (draggableDiv.value) {
         draggableDiv.value.addEventListener('mousedown', (e: MouseEvent) => {
           if (e && e.target) {
