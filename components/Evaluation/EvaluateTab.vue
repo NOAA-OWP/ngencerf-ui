@@ -30,6 +30,16 @@
                 {{ evaluateValidationRunId }}
               </div>
             </div>
+            <div class="layout__row">
+              <div class="text-left" style="width: 150px;font-size:0.9em;">
+                <label for="calibrationJobId">Gage </label>
+                {{ calData?.gage?.gage_id }}
+              </div>
+              <div class="text-left pl-3" style="font-size:0.9em;">
+                <label for="validationJobId">Station Name </label>
+                {{ calData?.gage?.station_name }}
+              </div>
+            </div>
           </div>
         </div>
         <div>
@@ -312,6 +322,7 @@ const {
 } = storeToRefs(EvaluationSupplementalDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
+const calData = ref(userCalibrationRunData);
 const { fetchUserCalibrationRunData } = userDataStore;
 const {
   loadRunStatusStore,
@@ -931,7 +942,7 @@ const drawInteractivePlot = () => {
   console.log('Drawing interactive plot');
   plotGraphOptions.value = {
     x: {grid: true}, 
-    y: {grid: true, label: 'Flow (cm/s)'}, 
+    y: {grid: true, label: 'Streamflow (cm/s)', labelAnchor: 'center', labelArrow: 'none'}, 
     marks: [], 
     width: plotGraphArea.value.offsetWidth - 200,
     height: (document.getElementById('MainLeftDataParent').getBoundingClientRect().bottom - document.getElementById('PlotGraphArea').getBoundingClientRect().top) - 150
@@ -962,9 +973,9 @@ const drawInteractivePlot = () => {
   }
   //console.log('plotLineData: ', plotLineData);
   //console.log('plotDotData: ', plotDotData);
-  plotGraphOptions.value.marks.push(Plot.ruleX([new Date(plotGraphDateRange.value.start)]));
-  plotGraphOptions.value.marks.push(Plot.ruleY([0]));
+  let ruleXposition = new Date(plotGraphDateRange.value.start);
   if (plotLineData.length > 0) {
+    ruleXposition = new Date(plotLineData[0].time);
     plotGraphOptions.value.marks.push(
       Plot.lineY(plotLineData, {
         x: { value: 'time', label: 'Time' },
@@ -976,13 +987,14 @@ const drawInteractivePlot = () => {
       Plot.tip(plotLineData, Plot.pointer({
         x: { value: 'time', label: 'Time' },
         y: { value: 'flow', label: 'Flow' },
-        title: (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nFlow: ${d.flow} cm/s`,
+        title: (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.flow} cm/s`,
         fontSize: 14
       })
       )
     );
   }
   if (plotDotData.length > 0) {
+    ruleXposition = new Date(plotDotData[0].time);
     plotGraphOptions.value.marks.push(
       Plot.dot(plotDotData, {
         x: { value: 'time', label: 'Time' },
@@ -995,12 +1007,14 @@ const drawInteractivePlot = () => {
       Plot.tip(plotDotData, Plot.pointer({
         x: { value: 'time', label: 'Time' },
         y: { value: 'flow', label: 'Flow' },
-        title: (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nFlow: ${d.flow} cm/s`,
+        title: (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.flow} cm/s`,
         fontSize: 14
       })
       )
     );
   }
+  plotGraphOptions.value.marks.push(Plot.ruleX([ruleXposition]));
+  plotGraphOptions.value.marks.push(Plot.ruleY([0]));
   //console.log('plotGraphOptions: ', plotGraphOptions.value);
   plotGraphSVG.value.innerHTML = '';
   plotGraphSVG.value.append(Plot.plot(plotGraphOptions.value));
