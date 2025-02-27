@@ -16,14 +16,37 @@
     <div id="FilterDialog">
       <div class="grid grid-cols-3 gap-2">
         <div class="col-span-1">
-          <div class="nomove">
+          <div class="nomove mb-2">
             <label class="text-center nomove" for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
             <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center nomove" v-model="uiGageId"
               :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
               aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
             </Select>
           </div>
-          <div class="mt-5 nomove">
+          <hr class="bg-gray-950 nomove" />
+          <div class="mt-2 nomove">
+            <div class="flex flex-column gap-2 text-center nomove">
+              <div>
+                <RadioButton inputId="inputId1" name="inputName" v-model="whichDatesToFilter" :value="0"
+                  checked="checked" @change="handleRadioClick(0)" />
+                <label for="inputId1" class="text-sm font-light text-center">Creation Date</label>
+              </div>
+
+              <div>
+                <RadioButton inputId="inputId2" name="inputName" v-model="whichDatesToFilter" :value="1"
+                  @change="handleRadioClick(1)" />
+                <label for="inputId2" class="text-sm font-light text-center">Submit Date</label>
+              </div>
+
+              <div>
+                <RadioButton inputId="inputId3" name="inputName" v-model="whichDatesToFilter" :value="2"
+                  @change="handleRadioClick(2)" />
+                <label for="inputId3" class="text-sm font-light text-center">Calibration Period</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 nomove">
             From:
             <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark nomove" v-model="calDateStart"
               time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
@@ -35,13 +58,13 @@
               time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
               @update:model-value="handleCalDateEnd" aria-label="aria-label" title="title" />
           </div>
-          <div class="mt-3 nomove">
+          <div class="mt-3 ml-3 nomove">
             <Checkbox class="nomove" v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
             Enable From/To Filter
           </div>
         </div>
 
-        <div class="col-span-1 text-left ml-6">
+        <div class="col-span-1 text-left ml-6 nomove">
           <div class="nomove">
             <label class="nomove" for="StatusList">Status</label><br>
             <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
@@ -72,15 +95,13 @@
               </template>
             </Listbox>
           </div>
+          <div id="ButtonArea" class="flex mt-3 nomove text-center">
+            <Button class="ngenButtonDiv nomove" label="Reset" @click="resetFilters($event)" :disabled="enableReset">
+            </Button>
+            <Button class="ngenButtonDiv nomove ml-6" label="Close" @click="sendClose($event)"></Button>
+          </div>
         </div>
       </div>
-
-      <div id="ButtonArea" class="flex justify-end gap-5 nomove">
-        <Button class="ngenButtonDiv nomove" label="Reset" @click="resetFilters($event)" :disabled="enableReset">
-        </Button>
-        <Button class="ngenButtonDiv nomove" label="Close" @click="sendClose($event)"></Button>
-      </div>
-
     </div>
   </div>
 </template>
@@ -91,10 +112,11 @@ import Button from "primevue/button";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 import Checkbox from 'primevue/checkbox';
+import RadioButton from "primevue/radiobutton";
 import ToggleSwitch from 'primevue/toggleswitch';
 
 import type { CalibrationJobListItem } from "@/composables/NextGenModel"
-import { findEarliestAndLatest } from "@/utils/CommonHelpers";
+import { getCreationDateSpan } from "@/utils/CommonHelpers";
 import { StatusTypes } from "@/composables/NextgenEnums";
 
 import { useFormulationStore } from "~/stores/calibration/FormulationStore";
@@ -103,7 +125,7 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 const userStore = useUserDataStore();
 const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList,
-  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange } = storeToRefs(useUserDataStore());
+  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter } = storeToRefs(useUserDataStore());
 
 const emit = defineEmits(["ModulesFilterDialogClosing"]);
 
@@ -119,7 +141,6 @@ let offsetY = 0;
 const props = defineProps<{
   calJobs: CalibrationJobListItem[];
 }>();
-
 
 onMounted(() => {
   nextTick(() => {
@@ -155,18 +176,41 @@ onMounted(() => {
           isDragging.value = false;
         });
       }
-      findEarliestAndLatest(props.calJobs);
-      if (props.calJobs) {
-        const trange = findEarliestAndLatest(props.calJobs);
-        if (trange) {
-          earliestTime.value = calDateStart.value = trange.earliest;
-          latestTime.value = calDateEnd.value = trange.latest;
-        }
-      }
+      setFilterDateRange();
 
     }, 0)
   });
 })
+
+const handleRadioClick = (btn: number) => {
+  setFilterDateRange();
+}
+
+const setFilterDateRange = () => {
+  if (props.calJobs) {
+    let trange: FilterTimeRange;
+    if (whichDatesToFilter.value === 0) {
+      trange = getCreationDateSpan(props.calJobs) as FilterTimeRange;
+      if (trange) {
+        earliestTime.value = calDateStart.value = trange.earliest;
+        latestTime.value = calDateEnd.value = trange.latest;
+      }
+    } else if (whichDatesToFilter.value === 1) {
+      trange = getSubmitDateSpan(props.calJobs) as FilterTimeRange;
+      if (trange) {
+        earliestTime.value = calDateStart.value = trange.earliest;
+        latestTime.value = calDateEnd.value = trange.latest;
+      }
+    } else if (whichDatesToFilter.value === 2) {
+      trange = getCalibrationDateSpan(props.calJobs) as FilterTimeRange;
+      if (trange) {
+        earliestTime.value = calDateStart.value = trange.earliest;
+        latestTime.value = calDateEnd.value = trange.latest;
+      }
+    }
+  }
+}
+
 
 const sendClose = (e: MouseEvent) => {
   e.stopPropagation();
@@ -180,8 +224,9 @@ const resetFilters = (e: MouseEvent) => {
   uiGageId.value = 'All';
   modulesFilterList.value = [];
   statusTypeFilterList.value = [];
+  whichDatesToFilter.value = 0;
   nextTick(() => {
-    findEarliestAndLatest(props.calJobs);
+    getCreationDateSpan(props.calJobs);
   })
 }
 
@@ -253,7 +298,7 @@ const handleCalDateEnd = (value: any) => {
 
 #JobFilterDialog {
   width: 750px;
-  height: 435px;
+  height: 450px;
   position: absolute;
   top: 20%;
   left: 30%;
@@ -292,12 +337,6 @@ const handleCalDateEnd = (value: any) => {
   width: 230px;
 }
 
-
-#ButtonArea {
-  position: fixed;
-  margin-left: 20px;
-  margin-top: -6px;
-}
 
 #HeadwaterBasinGage {
   width: auto;

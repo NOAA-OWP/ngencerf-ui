@@ -94,12 +94,14 @@ export const getOverallCalibrationValidationStatus = (
   ) {
     return `Calibration Done, Validation Best Running`;
   } else if (
-    calibrationStatus === 'Done' &&
-    validationControlStatus && validationControlStatus === 'Done' &&
-    validationBestStatus && validationBestStatus === 'Done'
-    ) {
-    return 'Done';
-  } else if (calibrationStatus === 'Done' && validationControlStatus) {
+    calibrationStatus === "Done" &&
+    validationControlStatus &&
+    validationControlStatus === "Done" &&
+    validationBestStatus &&
+    validationBestStatus === "Done"
+  ) {
+    return "Done";
+  } else if (calibrationStatus === "Done" && validationControlStatus) {
     // get the overall status of validation control and validation best
     const validationControlBestStatus = getValidControlAndValidBestStatus(
       validationControlStatus,
@@ -116,30 +118,35 @@ export const getOverallCalibrationValidationStatus = (
  * @param validBest
  * @returns {string}
  */
-export const getValidControlAndValidBestStatus = (validControlStatus: string, validBestStatus?: string): string => {
-  if (validControlStatus === 'Saved' || validBestStatus === 'Saved') {
-    return 'Saved';
-  }
-  else if (validControlStatus === 'Ready' || validBestStatus === 'Ready') {
-    return 'Ready';
-  }
-  else if (validControlStatus === 'Running' || validBestStatus === 'Running') {
-    return 'Running';
-  }
-  else if (validControlStatus === 'Cancelled' || validBestStatus === 'Cancelled') {
-    return 'Cancelled';
-  }
-  else if (validControlStatus === 'Failed' || validBestStatus === 'Failed') {
-    return 'Failed';
-  }
-  else if (validControlStatus === 'Server Error' || validBestStatus === 'Server Error') {
-    return 'Server Error';
-  }
-  else if (validControlStatus === 'Done' && validBestStatus === 'Done') {
-    return 'Done';
-  }
-  else {
-    return 'Unknown';
+export const getValidControlAndValidBestStatus = (
+  validControlStatus: string,
+  validBestStatus?: string
+): string => {
+  if (validControlStatus === "Saved" || validBestStatus === "Saved") {
+    return "Saved";
+  } else if (validControlStatus === "Ready" || validBestStatus === "Ready") {
+    return "Ready";
+  } else if (
+    validControlStatus === "Running" ||
+    validBestStatus === "Running"
+  ) {
+    return "Running";
+  } else if (
+    validControlStatus === "Cancelled" ||
+    validBestStatus === "Cancelled"
+  ) {
+    return "Cancelled";
+  } else if (validControlStatus === "Failed" || validBestStatus === "Failed") {
+    return "Failed";
+  } else if (
+    validControlStatus === "Server Error" ||
+    validBestStatus === "Server Error"
+  ) {
+    return "Server Error";
+  } else if (validControlStatus === "Done" && validBestStatus === "Done") {
+    return "Done";
+  } else {
+    return "Unknown";
   }
 };
 
@@ -212,36 +219,78 @@ export const arraysEqual = (arr1: any, arr2: any) => {
   }
   // If all elements are equal, return true
   return true;
-}
-
+};
 
 /**
- * Filter the list by date range
+ * Filter the list by creation_date range
  * @param CalibrationJobListItem[]
  * @param string
  * @param string
  * @returns FilterTimeRange
  */
-export const filterByDateRange = (data: any[], calDateStart: string, calDateEnd: string) => {
+export const filterByCreationDate = (
+  data: any[],
+  calDateStart: string,
+  calDateEnd: string
+) => {
   const startDate = new Date(calDateStart).getTime();
   const endDate = new Date(calDateEnd).getTime();
 
   return data.filter((item) => {
+    if (!item?.created_at) {
+      return false; // Skip null or empty items
+    }
     const itemDate = new Date(item.created_at).getTime();
     return itemDate >= startDate && itemDate <= endDate;
   });
-}
+};
 
 /**
- * Find the earlist and latest times from the cal job list
+ * Filter the list by creation_date range
+ * @param CalibrationJobListItem[]
+ * @param string
+ * @param string
+ * @returns FilterTimeRange
+ */
+export const filterBySubmitDate = (
+  data: any[],
+  calDateStart: string,
+  calDateEnd: string
+) => {
+  const startDate = new Date(calDateStart).getTime();
+  const endDate = new Date(calDateEnd).getTime();
+
+  return data.filter((item) => {
+    if (!item?.submit_date) {
+      return false; // Skip null or empty items
+    }
+    const itemDate = new Date(item.submit_date).getTime();
+    return itemDate >= startDate && itemDate <= endDate;
+  });
+};
+
+export const filterByCalibrationSpan = (items: CalibrationJobListItem[], itemDate: string): CalibrationJobListItem[] => {
+  const dateToCheck = new Date(itemDate);
+  return items.filter((item) => {
+    if (!item.calibration_start_period || !item.calibration_end_period) {
+      return false;
+    }
+    const startDate = new Date(item.calibration_start_period);
+    const endDate = new Date(item.calibration_end_period);
+    return dateToCheck >= startDate && dateToCheck <= endDate;
+  });
+};
+
+/**
+ * Find the earlist and latest times from the cal job list for creation_date
  * @param CalibrationJobListItem[]
  * @returns FilterTimeRange
  */
-export const findEarliestAndLatest = (items: CalibrationJobListItem[]) => {
+export const getCreationDateSpan = (items: CalibrationJobListItem[]) => {
   if (!items.length) return null;
 
   let timeRange: FilterTimeRange;
-  timeRange = { earliest: items[0].created_at, latest: items[0].created_at };
+  timeRange = { earliest: new Date(), latest: new Date() };
 
   for (const item of items) {
     if (new Date(item.created_at) < new Date(timeRange.earliest)) {
@@ -254,3 +303,56 @@ export const findEarliestAndLatest = (items: CalibrationJobListItem[]) => {
   return timeRange;
 };
 
+/**
+ * Find the earlist and latest times from the cal job list for submit_date
+ * @param CalibrationJobListItem[]
+ * @returns FilterTimeRange
+ */
+export const getSubmitDateSpan = (items: CalibrationJobListItem[]) => {
+  if (!items.length) return null;
+  let timeRange: FilterTimeRange;
+   timeRange = { earliest: new Date(), latest: new Date() };
+  for (const item of items) {
+    if (item.submit_date) {
+      if (new Date(item.submit_date) < new Date(timeRange.earliest)) {
+        timeRange.earliest = item.submit_date;
+      }
+      if (new Date(item.submit_date) > new Date(timeRange.latest)) {
+        timeRange.latest = item.submit_date;
+      }
+    }
+  }
+  return timeRange;
+};
+
+export const getCalibrationDateSpan = (
+  data: CalibrationJobListItem[]
+): FilterTimeRange | null => {
+  // Filter out invalid entries
+  const validItems = data.filter(
+    (item) =>
+      item.calibration_start_period !== null &&
+      item.calibration_end_period !== null
+  );
+
+  if (validItems.length === 0) return null;
+
+  // Extract the earliest start period and latest end period
+  const earliest = new Date(
+    Math.min(
+      ...validItems.map((item) =>
+        new Date(String(item.calibration_start_period)).getTime()
+      )
+    )
+  );
+
+  const latest = new Date(
+    Math.max(
+      ...validItems.map((item) =>
+        new Date(String(item.calibration_end_period)).getTime()
+      )
+    )
+  );
+
+  return { earliest, latest };
+};

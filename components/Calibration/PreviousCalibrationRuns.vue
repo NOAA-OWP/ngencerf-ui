@@ -106,7 +106,7 @@
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
 
-    <JobFilterDialog v-show="showFilters" @ModulesFilterDialogClosing="showFilters = false"
+    <LazyJobFilterDialog v-show="showFilters" @ModulesFilterDialogClosing="showFilters = false"
       :calJobs="updatedUserCalibrationJobsListData" />
 
   </client-only>
@@ -122,7 +122,7 @@ import { DateTime } from "luxon";
 import Checkbox from 'primevue/checkbox';
 import MultiSelect from 'primevue/multiselect';
 
-import JobFilterDialog from "../Common/JobFilterDialog.vue";
+const LazyJobFilterDialog = defineAsyncComponent(() => import("@/components/Common/JobFilterDialog.vue"));
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -138,7 +138,7 @@ import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
-import { getOverallCalibrationValidationStatus, filterByDateRange } from "@/utils/CommonHelpers";
+import { getOverallCalibrationValidationStatus, filterByCreationDate, filterByCalibrationSpan } from "@/utils/CommonHelpers";
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData } = useGageStore();
@@ -153,7 +153,7 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
-  statusTypeFilterList, calDateStart, calDateEnd, earliestTime, latestTime, useDateRange } = storeToRefs(useUserDataStore());
+  statusTypeFilterList, calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -219,7 +219,13 @@ const filteredData = computed(() => {
     }
 
     if (useDateRange.value) {
-      newCalJobList = filterByDateRange(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
+      if (whichDatesToFilter.value === 0) {
+        newCalJobList = filterByCreationDate(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
+      } else if (whichDatesToFilter.value === 1 ) {
+        newCalJobList = filterBySubmitDate(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
+      } else {
+        newCalJobList = filterByCalibrationSpan(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
+      }
     }
 
     if (modulesFilterList.value.length) {
