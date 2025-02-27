@@ -124,7 +124,6 @@ const props = defineProps<{
 onMounted(() => {
   nextTick(() => {
     setTimeout(() => {
-      glpat - CAyV3ZqyRes8gzdgBtJ5
       if (draggableDiv.value) {
         draggableDiv.value.addEventListener('mousedown', (e: MouseEvent) => {
           if (e && e.target) {
