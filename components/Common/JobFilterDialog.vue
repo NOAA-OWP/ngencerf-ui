@@ -10,7 +10,7 @@
         <div class="col-span-1">
           <div class="grid grid-cols-2">
             <div class="col-span-1">
-              <div class="mr-5 mt-[3px] nomove text-right">
+              <div class="mr-5 mt-[3px] text-right">
                 <ToggleSwitch v-model="calFilterEnabled"></ToggleSwitch>
               </div>
             </div>
@@ -154,14 +154,12 @@ onMounted(() => {
     setTimeout(() => {
       if (draggableDiv.value) {
         draggableDiv.value.addEventListener('mousedown', (e: MouseEvent) => {
-          if (e && e.target) {
-            if ((e.target as HTMLElement).classList.contains('nomove')) {
-              return;
-            }
+          const target = e.target as HTMLElement | null;
+          if (target && target.closest("#Header") !== null) {
+            isDragging.value = true;
+            offsetX = e.clientX - draggableDiv.value!.offsetLeft;
+            offsetY = e.clientY - draggableDiv.value!.offsetTop;
           }
-          isDragging.value = true;
-          offsetX = e.clientX - draggableDiv.value!.offsetLeft;
-          offsetY = e.clientY - draggableDiv.value!.offsetTop;
         });
 
         document.addEventListener('mousemove', (e: MouseEvent) => {
