@@ -205,8 +205,6 @@ import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 
 const { clearCalibratableParameters } = useTuningStore();
 
-const { selectedOutputVariable, userOutputVariableToCalibrate } = storeToRefs(useTuningStore());
-
 const { addToastRecord } = generalStore();
 
 const dialog = useDialog();
@@ -352,7 +350,6 @@ const saveFormulationData = () => {
     var valOK = validateModules();
     if (!valOK) {
       modulesHaveChanged.value = false;
-      selectedOutputVariable.value = "";
       const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate and then Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000};
       toast.add(tMsg); addToastRecord(tMsg);
       clearCalibratableParameters();
