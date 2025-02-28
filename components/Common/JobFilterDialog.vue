@@ -1,19 +1,27 @@
 <template>
   <div id="JobFilterDialog" ref="draggableDiv" class="mb-2 top-[20%] left-[30%] absolute z-100 w-[750px] h-[450px]"
     :class="isDragging ? 'cursor-move' : ''">
+
     <div id="Header" class="mb-2">
-      <div class="grid grid-cols-2">
-        <div class="col-span-1">
+      <div class="grid grid-cols-4">
+        <div class="col-span-3">
           <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white">Calibration Job Filters</div>
         </div>
         <div class="col-span-1">
-          <!-- <div class="mr-5 mt-[3px] nomove text-right">
-            <ToggleSwitch v-model="autoEffect"></ToggleSwitch>&nbsp; <div
-              class="text-white text-bold inline-block">Auto Change</div>
-          </div> -->
+          <div class="grid grid-cols-2">
+            <div class="col-span-1">
+              <div class="mr-5 mt-[3px] nomove text-right">
+                <ToggleSwitch v-model="calFilterEnabled"></ToggleSwitch>
+              </div>
+            </div>
+            <div class="col-span-1">
+              <div class="text-white text-bold inline-block pt-1">On/Off</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
     <div id="FilterDialog">
       <div class="grid grid-cols-3 gap-2">
         <div class="col-span-1">
@@ -126,11 +134,9 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 const userStore = useUserDataStore();
 const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList,
-  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter } = storeToRefs(useUserDataStore());
+  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter, calFilterEnabled } = storeToRefs(useUserDataStore());
 
 const emit = defineEmits(["ModulesFilterDialogClosing"]);
-
-const autoEffect = ref<boolean>(false);
 
 const showArchivedJobsOnly = ref<boolean>(false);
 

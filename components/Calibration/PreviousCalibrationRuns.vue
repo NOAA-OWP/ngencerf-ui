@@ -147,9 +147,6 @@ import { getOverallCalibrationValidationStatus, filterByCreationDate, filterBySu
 import { formatDateForDisplay } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData } = useGageStore();
-const { fetchFormulationModuleOptions } = useFormulationStore();
-
-const { selectedModuleValues } = storeToRefs(useFormulationStore());
 
 const { loadOptimizationTabStaticData } = useOptimizationStore();
 const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
@@ -158,7 +155,7 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
-  statusTypeFilterList, calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter } = storeToRefs(useUserDataStore());
+  statusTypeFilterList, calDateStart, calDateEnd,useDateRange, whichDatesToFilter, calFilterEnabled } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -169,8 +166,6 @@ const crContextMenu = ref(); //calibration run context menu
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
-
-const showArchivedJobsOnly = ref<boolean>(false);
 
 const showFilters = ref<boolean>(false);
 
@@ -212,6 +207,9 @@ onMounted(async () => {
 // Computed filtered data based on multiple filters
 const filteredData = computed(() => {
   let newCalJobList = updatedUserCalibrationJobsListData?.value;
+  if (!calFilterEnabled.value) {
+    return newCalJobList;
+  }
 
   if (newCalJobList) {
     // Filter Headwater Basin Gage
