@@ -70,23 +70,33 @@
           </div>
           <div class="mt-3 ml-3">
             <Checkbox v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
-            <span class="cursor-default">Enable Date Filters *</span>
+            <span class="cursor-default">&nbsp;Enable Date Filters *</span>
           </div>
         </div>
 
+
         <div class="col-span-1 text-left ml-6">
-          <div class="nomove">
-            <label class="nomove" for="StatusList">Status</label><br>
-            <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-              optionValue="filterValue" multiple class="nomove">
-              <template #option="slotProps">
-                <div v-bind:class="(slotProps.option.selected === true) ? 'font-bold' : ''">
-                  <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
-                    :title="slotProps.option.filterValue">
-                    {{ slotProps.option.filterValue }}</div>
-                </div>
-              </template>
-            </Listbox>
+          <div class="grid grid-rows-2">
+            <div class="row-span-1">
+              <label class="nomove" for="StatusList">Status</label><br>
+              <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
+                optionValue="filterValue" multiple class="nomove">
+                <template #option="slotProps">
+                  <div v-bind:class="(slotProps.option.selected === true) ? 'font-bold' : ''">
+                    <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
+                      :title="slotProps.option.filterValue">
+                      {{ slotProps.option.filterValue }}</div>
+                  </div>
+                </template>
+              </Listbox>
+            </div>
+
+            <div class="row-span-1">
+              <Checkbox v-model="showArchivedJobsOnly" class="mt-[90px]" inputId="showArchivedJobsOnly" name="showArchivedJobsOnly"
+                binary>
+              </Checkbox>
+              <span class="cursor-default">&nbsp;Show Archived Only</span>
+            </div>
           </div>
         </div>
 
@@ -105,7 +115,7 @@
             </Listbox>
           </div>
           <div id="ButtonArea" class="flex mt-3 text-center">
-            <Button class="ngenButtonDiv" label="Reset" @click="resetFilters($event)" :disabled="enableReset">
+            <Button class="ngenButtonDiv" label="Reset" @click="resetFilters($event)">
             </Button>
             <Button class="ngenButtonDiv ml-6" label="Close" @click="sendClose($event)"></Button>
           </div>
@@ -235,17 +245,10 @@ const resetFilters = (e: MouseEvent) => {
   })
 }
 
-const enableReset = computed(() => {
-  return false;
-  // return (uiGageId.value !== 'All' || modulesFilterList.value.length > 0
-  //      || statusTypeFilterList.value.length > 0 || useDateRange.value === false) === true;
-})
-
 // Template for the "Archived" column (Yes/No display)
 const archivedTemplate = (rowData: any) => {
   return rowData.archived ? 'Yes' : 'No';
 };
-
 
 /**
  * Save filter start date
