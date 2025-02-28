@@ -17,11 +17,34 @@
         <div class="">
           <div id="CalTable" class="w-max mx-auto">
             <!-- Filters -->
-            <div id="FilterButton" class="text-left mb-1 w-full"><Button class="filter-link"
-                @click="toggleShowFilters">{{
-                showFilters ? 'Hide' : 'Show' }}
-                Filters</Button>
+
+            <div class="grid grid-cols-4">
+              <div class="col-span-1">
+                <div class="grid grid-cols-3">
+                  <div class="col-span-1">
+                    <div id="FilterButton" class="text-left mt-2 mb-1"><Button class="filter-link"
+                        @click="toggleShowFilters">{{
+                        showFilters ? 'Hide' : 'Show' }}
+                        Filters</Button>
+                    </div>
+                  </div>
+                  <div class="col-span-2">
+                    <div class="grid grid-cols-3">
+                      <div class="col-span-1">
+                        <div class="ml-2 mt-[19px] nomove text-left">
+                          <ToggleSwitch class="toggle-switch" v-model="calFilterEnabled"></ToggleSwitch>
+                        </div>
+                      </div>
+                      <div class="col-span-2 ml-2">
+                        <div class="text-bold pt-1 mt-[14px] text-left">Filters On/Off</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+
+
             <!-- <div id="FilterEnable" class="text-left mb-1 w-full"><Button class="filter-link"
                 @click="toggleEnableFilters">{{
                   enableFilters ? 'Hide' : 'Show' }}
@@ -155,7 +178,7 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
-  statusTypeFilterList, calDateStart, calDateEnd,useDateRange, whichDatesToFilter, calFilterEnabled } = storeToRefs(useUserDataStore());
+  statusTypeFilterList, calDateStart, calDateEnd, useDateRange, whichDatesToFilter, calFilterEnabled } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -224,7 +247,7 @@ const filteredData = computed(() => {
     if (useDateRange.value) {
       if (whichDatesToFilter.value === 0) {
         newCalJobList = filterByCreationDate(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
-      } else if (whichDatesToFilter.value === 1 ) {
+      } else if (whichDatesToFilter.value === 1) {
         newCalJobList = filterBySubmitDate(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
       } else {
         newCalJobList = filterByCalibrationSpan(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
@@ -538,5 +561,20 @@ small-label,
   p-multiselect-label-container {
     margin-top: -6px;
   }
+}
+
+.toggle-switch {
+  height: 1.5em;
+  width: 3em;
+}
+
+.toggle-switch::before {
+  display: block;
+  height: 1.25em;
+  left: 0.125em;
+  position: absolute;
+  top: 0.125em;
+  transition: left 150ms;
+  width: 1.25em;
 }
 </style>
