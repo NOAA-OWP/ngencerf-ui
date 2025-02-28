@@ -5,7 +5,7 @@
     <div id="Header" class="mb-2">
       <div class="grid grid-cols-4">
         <div class="col-span-3">
-          <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white">Calibration Job Filters</div>
+          <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white cursor-move">Calibration Job Filters</div>
         </div>
         <div class="col-span-1">
           <div class="grid grid-cols-2">
@@ -15,7 +15,7 @@
               </div>
             </div>
             <div class="col-span-1">
-              <div class="text-white text-bold inline-block pt-1">On/Off</div>
+              <div class="text-white text-bold inline-block pt-1 cursor-move">On/Off</div>
             </div>
           </div>
         </div>
@@ -26,16 +26,16 @@
       <div class="grid grid-cols-3 gap-2">
         <div class="col-span-1">
           <div class="nomove mb-2">
-            <label class="text-center nomove" for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
-            <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center nomove" v-model="uiGageId"
+            <label class="text-center" for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
+            <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
               :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
               aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
             </Select>
           </div>
-          <hr class="bg-gray-950 nomove" />
-          <div class="mt-2 nomove">
+          <hr class="bg-gray-950" />
+          <div class="mt-2">
             <label class="nomove" for=" DateFilterButtons">Date Filters *</label>
-            <div id="DateFilterButtons" class="flex flex-column gap-2 text-center nomove">
+            <div id="DateFilterButtons" class="flex flex-column gap-2 text-center">
               <div>
                 <RadioButton inputId="inputId1" name="inputName" v-model="whichDatesToFilter" :value="0"
                   checked="checked" @change="handleRadioClick(0)" class="nomove" />
@@ -45,43 +45,43 @@
               <div>
                 <RadioButton inputId="inputId2" name="inputName" v-model="whichDatesToFilter" :value="1"
                   @change="handleRadioClick(1)" class="nomove" />
-                <label for="inputId2" class="text-sm font-light text-center nomove">Submit Date</label>
+                <label for="inputId2" class="text-sm font-light text-center">Submit Date</label>
               </div>
 
               <div>
                 <RadioButton inputId="inputId3" name="inputName" v-model="whichDatesToFilter" :value="2"
                   @change="handleRadioClick(2)" class="nomove" />
-                <label for="inputId3" class="text-sm font-light text-center nomove">Calibration Period</label>
+                <label for="inputId3" class="text-sm font-light text-center">Calibration Period</label>
               </div>
             </div>
           </div>
 
-          <div class="mt-3 nomove">
-            From:
-            <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark nomove" v-model="calDateStart"
+          <div class="mt-3">
+            <span class="cursor-default">From:</span>
+            <VueDatePicker id=" CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
               time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
               @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
           </div>
-          <div class="nomove">
-            To:
-            <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark nomove" v-model="calDateEnd"
-              time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
+          <div>
+            <span class="cursor-default">To:</span>
+            <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark" v-model="calDateEnd" time-picker-inline
+              text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
               @update:model-value="handleCalDateEnd" aria-label="aria-label" title="title" />
           </div>
-          <div class="mt-3 ml-3 nomove">
-            <Checkbox class="nomove" v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
-            Enable Date Filters *
+          <div class="mt-3 ml-3">
+            <Checkbox v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
+            <span class="cursor-default">Enable Date Filters *</span>
           </div>
         </div>
 
-        <div class="col-span-1 text-left ml-6 nomove">
+        <div class="col-span-1 text-left ml-6">
           <div class="nomove">
             <label class="nomove" for="StatusList">Status</label><br>
             <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
               optionValue="filterValue" multiple class="nomove">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'font-bold' : ''">
-                  <div class="font-ui leading-none nomove" :aria-label="slotProps.option.filterValue"
+                  <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
                     :title="slotProps.option.filterValue">
                     {{ slotProps.option.filterValue }}</div>
                 </div>
@@ -92,22 +92,22 @@
 
         <div class="col-span-1">
           <div class="nomove">
-            <label for="ModuleList" class="text-center nomove">Modules</label>
+            <label for="ModuleList" class="text-center">Modules</label>
             <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="h-60 nomove">
+              optionLabel="name" optionValue="name" class="h-60">
               <template #option="slotProps">
                 <div class="nomove" v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : ''">
-                  <div class="font-ui pl-2 leading-none nomove" :aria-label="slotProps.option.name"
+                  <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
                     :title="slotProps.option.name">
                     {{ slotProps.option.name }}</div>
                 </div>
               </template>
             </Listbox>
           </div>
-          <div id="ButtonArea" class="flex mt-3 nomove text-center">
-            <Button class="ngenButtonDiv nomove" label="Reset" @click="resetFilters($event)" :disabled="enableReset">
+          <div id="ButtonArea" class="flex mt-3 text-center">
+            <Button class="ngenButtonDiv" label="Reset" @click="resetFilters($event)" :disabled="enableReset">
             </Button>
-            <Button class="ngenButtonDiv nomove ml-6" label="Close" @click="sendClose($event)"></Button>
+            <Button class="ngenButtonDiv ml-6" label="Close" @click="sendClose($event)"></Button>
           </div>
         </div>
       </div>
