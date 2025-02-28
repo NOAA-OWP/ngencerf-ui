@@ -23,10 +23,13 @@
                   Filters</Button>
               </div>
               <div class="ml-2 mt-[19px] text-left inline-block">
-                <Button class="filter-link" @click="clearCalibrationFilters">Clear Filters</Button>
+                <Button class="filter-link" @click="clearCalibrationFilters">
+                  <span :class="calFilterEnabled ? 'filterEnabled' : ''">
+                    Reset Filters
+                  </span>
+                </Button>
               </div>
             </div>
-
 
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -151,7 +154,7 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
-  statusTypeFilterList, calDateStart, calDateEnd, useDateRange, whichDatesToFilter } = storeToRefs(useUserDataStore());
+  statusTypeFilterList, calDateStart, calDateEnd, useDateRange, whichDatesToFilter, calFilterEnabled } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -231,6 +234,7 @@ const filteredData = computed(() => {
         job.modules.some(module => modulesFilterList.value.includes(module))
       );
     }
+    calFilterEnabled.value = newCalJobList.length !== updatedUserCalibrationJobsListData?.value.length
     return newCalJobList;
   }
 });
@@ -557,5 +561,9 @@ small-label,
   top: 0.125em;
   transition: left 150ms;
   width: 1.25em;
+}
+
+.filterEnabled {
+  color: red;
 }
 </style>

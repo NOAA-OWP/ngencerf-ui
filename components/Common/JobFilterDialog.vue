@@ -117,7 +117,6 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 import Checkbox from 'primevue/checkbox';
 import RadioButton from "primevue/radiobutton";
-import ToggleSwitch from 'primevue/toggleswitch';
 
 import type { CalibrationJobListItem } from "@/composables/NextGenModel"
 import { getCreationDateSpan } from "@/utils/CommonHelpers";
