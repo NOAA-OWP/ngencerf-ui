@@ -17,45 +17,22 @@
         <div class="">
           <div id="CalTable" class="w-max mx-auto">
             <!-- Filters -->
-
-            <div class="grid grid-cols-4">
-              <div class="col-span-1">
-                <div class="grid grid-cols-3">
-                  <div class="col-span-1">
-                    <div id="FilterButton" class="text-left mt-2 mb-1"><Button class="filter-link"
-                        @click="toggleShowFilters">{{
-                        showFilters ? 'Hide' : 'Show' }}
-                        Filters</Button>
-                    </div>
-                  </div>
-                  <div class="col-span-2">
-                    <div class="grid grid-cols-3">
-                      <div class="col-span-1">
-                        <div class="ml-2 mt-[19px] nomove text-left">
-                          <ToggleSwitch class="toggle-switch" v-model="calFilterEnabled"></ToggleSwitch>
-                        </div>
-                      </div>
-                      <div class="col-span-2 ml-2">
-                        <div class="text-bold pt-1 mt-[14px] text-left">Filters On/Off</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div class="text-left">
+              <div id="FilterButton" class="text-left mt-2 mb-1 inline-block">
+                <Button class="filter-link" @click="toggleShowFilters">{{ showFilters ? 'Hide' : 'Show' }}
+                  Filters</Button>
+              </div>
+              <div class="ml-2 mt-[19px] text-left inline-block">
+                <Button class="filter-link" @click="clearCalibrationFilters">Clear Filters</Button>
               </div>
             </div>
 
 
-            <!-- <div id="FilterEnable" class="text-left mb-1 w-full"><Button class="filter-link"
-                @click="toggleEnableFilters">{{
-                  enableFilters ? 'Hide' : 'Show' }}
-                Filters</Button>
-            </div> -->
-
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-            <DataTable id="cr-list" :value="filteredData" sortField="calibration_run_id" :sortOrder="-1" scrollable
-              scroll-height="400px" table-style="min-width: 50rem; z-index: 1"
+            <DataTable id="Datatable" :value="filteredData" sortField="calibration_run_id" :sortOrder="-1" scrollable
+              scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
@@ -135,7 +112,7 @@
     </div>
 
     <LazyJobFilterDialog v-show="showFilters" @ModulesFilterDialogClosing="showFilters = false"
-      :calJobs="updatedUserCalibrationJobsListData" />
+      :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
 
   </client-only>
 </template>
@@ -145,12 +122,9 @@ import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import VueDatePicker from "@vuepic/vue-datepicker";
-import { DateTime } from "luxon";
-import Checkbox from 'primevue/checkbox';
-import MultiSelect from 'primevue/multiselect';
 
-const LazyJobFilterDialog = defineAsyncComponent(() => import("@/components/Common/JobFilterDialog.vue"));
+//const LazyJobFilterDialog = defineAsyncComponent(() => import("@/components/Common/JobFilterDialog.vue"));
+import LazyJobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -160,7 +134,6 @@ import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { useGageStore } from "@/stores/calibration/GageStore";
-import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
@@ -178,7 +151,7 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
-  statusTypeFilterList, calDateStart, calDateEnd, useDateRange, whichDatesToFilter, calFilterEnabled } = storeToRefs(useUserDataStore());
+  statusTypeFilterList, calDateStart, calDateEnd, useDateRange, whichDatesToFilter } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -197,6 +170,8 @@ const selectedCalibrationRun = ref<CalibrationJobListItem>();
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
 const currentJobsList = ref<CalibrationJobListItem[]>();
+
+const jobFilterDialog = ref<InstanceType<typeof LazyJobFilterDialog> | null>(null);
 
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
@@ -230,9 +205,6 @@ onMounted(async () => {
 // Computed filtered data based on multiple filters
 const filteredData = computed(() => {
   let newCalJobList = updatedUserCalibrationJobsListData?.value;
-  if (!calFilterEnabled.value) {
-    return newCalJobList;
-  }
 
   if (newCalJobList) {
     // Filter Headwater Basin Gage
@@ -263,6 +235,11 @@ const filteredData = computed(() => {
   }
 });
 
+const clearCalibrationFilters = () => {
+  if (jobFilterDialog.value) {
+    jobFilterDialog.value.externalResetFilters();
+  }
+};
 
 // Template for the "Archived" column (Yes/No display)
 const archivedTemplate = (rowData: any) => {
@@ -561,6 +538,10 @@ small-label,
   p-multiselect-label-container {
     margin-top: -6px;
   }
+}
+
+#Datatable {
+  width: 1150px !important;
 }
 
 .toggle-switch {

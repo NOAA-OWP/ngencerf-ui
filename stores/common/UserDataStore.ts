@@ -43,8 +43,7 @@ export const useUserDataStore = defineStore(
     const latestTime = ref<Date>();
     const useDateRange = ref<boolean>(false);
     const whichDatesToFilter = ref<number>(0);
-    const calFilterEnabled = ref<boolean>(true);
-    const showArchivedJobsOnly = ref<boolean>(false);
+       const showArchivedJobsOnly = ref<boolean>(false);
 
     /**
      * Checks if user is logged in
@@ -370,7 +369,6 @@ export const useUserDataStore = defineStore(
       latestTime,
       useDateRange,
       whichDatesToFilter,
-      calFilterEnabled,
       showArchivedJobsOnly
     };
   },

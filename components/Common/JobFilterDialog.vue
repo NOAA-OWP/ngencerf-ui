@@ -3,22 +3,7 @@
     :class="isDragging ? 'cursor-move' : ''">
 
     <div id="Header" class="mb-2">
-      <div class="grid grid-cols-4">
-        <div class="col-span-3">
-          <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white cursor-move">Calibration Job Filters</div>
-        </div>
-        <div class="col-span-1">
-          <div class="grid grid-cols-2">
-            <div class="col-span-1">
-              <div class="mr-5 mt-[3px] text-right">
-                <ToggleSwitch v-model="calFilterEnabled"></ToggleSwitch>
-              </div>
-            </div>
-            <div class="col-span-1">
-              <div class="text-white text-bold inline-block pt-1 cursor-move">On/Off</div>
-            </div>
-          </div>
-        </div>
+      <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white cursor-[grabbing] ">Calibration Job Filters
       </div>
     </div>
 
@@ -92,8 +77,8 @@
             </div>
 
             <div class="row-span-1">
-              <Checkbox v-model="showArchivedJobsOnly" class="mt-[90px]" inputId="showArchivedJobsOnly" name="showArchivedJobsOnly"
-                binary>
+              <Checkbox v-model="showArchivedJobsOnly" class="mt-[90px]" inputId="showArchivedJobsOnly"
+                name="showArchivedJobsOnly" binary>
               </Checkbox>
               <span class="cursor-default">&nbsp;Show Archived Only</span>
             </div>
@@ -117,7 +102,7 @@
           <div id="ButtonArea" class="flex mt-3 text-center">
             <Button class="ngenButtonDiv" label="Reset" @click="resetFilters($event)">
             </Button>
-            <Button class="ngenButtonDiv ml-6" label="Close" @click="sendClose($event)"></Button>
+            <Button class="ngenButtonDiv ml-6" label="Apply" @click="sendClose($event)"></Button>
           </div>
         </div>
       </div>
@@ -144,9 +129,11 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 const userStore = useUserDataStore();
 const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList,
-  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter, calFilterEnabled } = storeToRefs(useUserDataStore());
+  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter } = storeToRefs(useUserDataStore());
 
 const emit = defineEmits(["ModulesFilterDialogClosing"]);
+
+const message = ref("Initial message");
 
 const showArchivedJobsOnly = ref<boolean>(false);
 
@@ -232,6 +219,22 @@ const sendClose = (e: MouseEvent) => {
   e.stopImmediatePropagation();
   emit("ModulesFilterDialogClosing");
 };
+
+
+// Define a method to be called by the parent
+const externalResetFilters = () => {
+  const mouseEvent = new MouseEvent('click', {
+    'view': window,
+    'bubbles': true,
+    'cancelable': true,
+  });
+  resetFilters(mouseEvent);
+};
+
+// Expose the method to the parent
+defineExpose({
+  externalResetFilters
+});
 
 const resetFilters = (e: MouseEvent) => {
   e.stopPropagation();
