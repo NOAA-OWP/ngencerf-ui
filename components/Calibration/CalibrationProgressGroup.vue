@@ -38,7 +38,7 @@
           @click="tabClicked">
           Start and End Times</td>
       </tr>
-      <tr>
+      <tr class="hidden">
         <td><i v-if="userCalibrationRunData && Object.keys(userCalibrationRunData.output_variable_to_calibrate).length" 
           class="pi pi-check font-bold checkMark"></i>
         </td>

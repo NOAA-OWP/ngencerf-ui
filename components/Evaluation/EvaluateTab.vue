@@ -21,21 +21,15 @@
 
           <div class="layout__table mt-2" style="width:100%">
             <div class="layout__row">
-              <div class="text-left" style="width: 150px;font-size:0.9em;">
+              <div class="text-left text-nowrap" style="font-size:0.9em;">
                 <label for="calibrationJobId">Calibration Job ID </label>
-                {{ calibrationJobId }}
-              </div>
-              <div class="text-left pl-3" style="font-size:0.9em;">
-                <label for="validationJobId">Validation Job ID </label>
-                {{ evaluateValidationRunId }}
-              </div>
-            </div>
-            <div class="layout__row">
-              <div class="text-left" style="width: 150px;font-size:0.9em;">
+                {{ calibrationJobId }}<br/>
                 <label for="calibrationJobId">Gage </label>
                 {{ calData?.gage?.gage_id }}
               </div>
-              <div class="text-left pl-3" style="font-size:0.9em;">
+              <div class="text-left pl-3 text-nowrap" style="font-size:0.9em;">
+                <label for="validationJobId">Validation Job ID </label>
+                {{ evaluateValidationRunId }}<br/>
                 <label for="validationJobId">Station Name </label>
                 {{ calData?.gage?.station_name }}
               </div>
@@ -65,7 +59,7 @@
               </div>
             </div>
           </div>
-          <div v-if="selectedPlotName === 'Hydrograph evolution'">
+          <div v-if="selectedPlotHasTimeseries">
             <div v-if="!showPlotGraph">
               <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
                 Show Interactive Time Series Viewer</a>
@@ -99,8 +93,8 @@
         </div>
       </div>
     </div>
-    <div v-if="!showPlotGraph" class="grid grid-cols-2">
-      <div class="text-center">
+    <div v-if="!showPlotGraph" :class="{ 'grid grid-cols-2': !expandPlotTable }">
+      <div class="text-center" v-if="!expandPlotTable">
         <div id="GraphArea" class="p-2" v-if="selectedPlotName && selectedPlotFileUrl">
           <img :src="selectedPlotFileUrl" :alt="selectedPlotName" />
         </div>
@@ -117,6 +111,10 @@
         </div>
 
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
+          <a v-if="!expandPlotTable && plotTableColumns.length > 5" href="#" class="p-1 c-blue font-bold underline mt-1" @click="toggleExpandPlotTable">
+            &lt; Expand Plot Table (Hide Graph)</a>
+          <a v-if="expandPlotTable" href="#" class="p-1 c-blue font-bold underline mt-1" @click="toggleExpandPlotTable">
+            Reduce Plot Table (Show Graph) &gt;</a>
           <div v-if="plotTableList && plotTableList.length > 1">
             <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
             <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable" :options="plotTableList"
@@ -337,6 +335,7 @@ const {
   loadSnodasMap
 } = EvaluationSupplementalDataStore;
 
+const expandPlotTable = ref<Boolean>(false);
 const plotTables = ref<DynamicObject>({});
 const plotTableList = ref<any[]>([]);
 const selectedPlotTable = ref<string>('');
@@ -349,6 +348,7 @@ const plotTableTotalPages = ref<number>(1);
 const plotTableStartRow = ref<number>(1);
 const plotTableEndRow = ref<number>(plotTablePageSize.value);
 const plotTableErrorMessage = ref<string>('');
+const selectedPlotHasTimeseries = ref<Boolean>(false);
 const plotGraphArea = ref(null);
 const plotGraphSVG = ref(null);
 const plotGraphDataRaw = ref<any[]>([]);
@@ -389,12 +389,13 @@ const selectedLogCurrentPage = ref<number>(1);
 const selectedLogTotalPages = ref<number>(1);
 const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
-const supplementalTableOptions = [
+const supplementalTableOptions = []
+/* const supplementalTableOptions = [
   'Iteration Metrics Table',
   'Iteration Parameters Table',
   'Performance Metrics Table'
-]
-const plotGraphColors = ['grey', 'blue', 'gold', 'green', 'black', 'orange', 'pink', 'red', 'yellow'];
+] */
+const plotGraphColors = ['grey', 'blue', 'gold', 'green', 'teal', 'black', 'orange', 'pink', 'purple', 'red', 'yellow'];
 const plotGraphColorList = [];
 for (let c = 0; c < plotGraphColors.toSorted().length; c++) {
   plotGraphColorList.push({ name: plotGraphColors.toSorted()[c] });
@@ -423,6 +424,7 @@ onMounted(() => {
     selectedPlotName.value = null;
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
+    selectedPlotHasTimeseries.value = false;
     selectedSupplementalTable.value = 0;
 
     // Load Run Status Store to load resultsPathname
@@ -435,13 +437,14 @@ onMounted(() => {
     }
 
     // Get Plot Names
-    if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
+    //if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
       plotNames.value = await queryGetPlotNames();
-    }
+    //}
 
     if (plotNames.value?._data?.plot_names) {
       // setting plotList will populate the dropdown
       plotList.value = plotNames?.value?._data?.plot_names;
+      console.log('plotList: ', plotList.value);
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
@@ -498,6 +501,7 @@ watch(selectedPlotName, async () => {
   if (selectedPlotName.value && supplementalTableOptions.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
+    selectedPlotHasTimeseries.value = false;
     plotGraphData.value = [];
     plotGraphLines.value = [];
     sliderBoxPosition.value = {};
@@ -655,6 +659,7 @@ watch(selectedPlotName, async () => {
   else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
+    selectedPlotHasTimeseries.value = false;
     plotTableData.value = [];
     plotTableColumns.value = [];
     plotGraphData.value = [];
@@ -669,6 +674,7 @@ watch(selectedPlotName, async () => {
     // clear out previous Display data
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
+    selectedPlotHasTimeseries.value = false;
     plotTableErrorMessage.value = '';
     plotTableData.value = [];
     plotTableColumns.value = [];
@@ -694,6 +700,7 @@ watch(selectedPlotName, async () => {
   } else if (selectedPlotName.value) {
     plotGraphData.value = [];
     plotGraphLines.value = [];
+    expandPlotTable.value = false;
     sliderBoxPosition.value = {};
     selectedSupplementalTable.value = 0;
     selectedLogCategory.value = '';
@@ -715,9 +722,16 @@ watch(selectedPlotName, async () => {
       if (response?._data?.plot_file_path && response?._data?.plot_url) {
         selectedPlotFilename.value = response?._data?.plot_file_path;
         selectedPlotFileUrl.value = response?._data?.plot_url;
+        for (let p = 0; p < plotList.value.length; p++) {
+          if (plotList.value[p].name == selectedPlotName.value) {
+            selectedPlotHasTimeseries.value = plotList.value[p].timeseries_available;
+          }
+        }
+        console.log('selectedPlotHasTimeseries: ', selectedPlotHasTimeseries.value);
       } else {
         selectedPlotFilename.value = null;
         selectedPlotFileUrl.value = null;
+        selectedPlotHasTimeseries.value = false;
         toast.removeAllGroups();
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: ToastTimeout.timeout5000 };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -794,6 +808,7 @@ watch(selectedPlotName, async () => {
     } else {
       selectedPlotFilename.value = null;
       selectedPlotFileUrl.value = null;
+      selectedPlotHasTimeseries.value = false;
       plotTableData.value = [];
       plotTableColumns.value = [];
       toast.removeAllGroups();
@@ -973,9 +988,10 @@ const drawInteractivePlot = () => {
   }
   //console.log('plotLineData: ', plotLineData);
   //console.log('plotDotData: ', plotDotData);
-  let ruleXposition = new Date(plotGraphDateRange.value.start);
+  let plotGraphLeftEdge = new Date(plotGraphDateRange.value.start);
+  let plotGraphRightEdge = new Date(plotGraphDateRange.value.end);
   if (plotLineData.length > 0) {
-    ruleXposition = new Date(plotLineData[0].time);
+    plotGraphLeftEdge = new Date(plotLineData[0].time);
     plotGraphOptions.value.marks.push(
       Plot.lineY(plotLineData, {
         x: { value: 'time', label: 'Time' },
@@ -994,7 +1010,7 @@ const drawInteractivePlot = () => {
     );
   }
   if (plotDotData.length > 0) {
-    ruleXposition = new Date(plotDotData[0].time);
+    plotGraphLeftEdge = new Date(plotDotData[0].time);
     plotGraphOptions.value.marks.push(
       Plot.dot(plotDotData, {
         x: { value: 'time', label: 'Time' },
@@ -1013,8 +1029,49 @@ const drawInteractivePlot = () => {
       )
     );
   }
-  plotGraphOptions.value.marks.push(Plot.ruleX([ruleXposition]));
+  plotGraphOptions.value.marks.push(Plot.ruleX([plotGraphLeftEdge]));
   plotGraphOptions.value.marks.push(Plot.ruleY([0]));
+  if (calData?.value?.validation_times) {
+    // create dashed vertical lines for Sim Start, Val Start, Val End
+    if (calData?.value?.validation_times.simulation_start_time) {
+      let simStartTime = new Date(calData?.value?.validation_times.simulation_start_time);
+      if (simStartTime < new Date(plotGraphDateLimits.value.start)) {
+        // Don't plot Sim Start Time outside of the range of our usable data
+        simStartTime = new Date(plotGraphDateLimits.value.start);
+      }
+      console.log('simStartTime: ', simStartTime);
+      if (simStartTime >= plotGraphLeftEdge && simStartTime <= plotGraphRightEdge) {
+        plotGraphOptions.value.marks.push(Plot.ruleX([simStartTime], {stroke: 'grey', strokeWidth: 2, strokeDasharray: 10}));
+        plotGraphOptions.value.marks.push(Plot.text([" Sim Start Time "], {x: [simStartTime], frameAnchor: 'top', textAnchor: 'start'}));
+        console.log('Marking simStartTime on interactive plot');
+      }
+      console.log('Marking simStartTime on slider');
+    }
+    if (calData?.value?.validation_times.validation_start_time) {
+      let valStartTime = new Date(calData?.value?.validation_times.validation_start_time);
+      console.log('valStartTime: ', valStartTime);
+      if (valStartTime >= plotGraphLeftEdge && valStartTime <= plotGraphRightEdge) {
+        plotGraphOptions.value.marks.push(Plot.ruleX([valStartTime], {stroke: 'grey', strokeWidth: 2, strokeDasharray: 10}));
+        plotGraphOptions.value.marks.push(Plot.text([" Val Start Time "], {x: [valStartTime], frameAnchor: 'top'}));
+        console.log('Marking valStartTime on interactive plot');
+      }
+      console.log('Marking valStartTime on slider');
+    }
+    if (calData?.value?.validation_times.validation_end_time) {
+      let valEndTime = new Date(calData?.value?.validation_times.validation_end_time);
+      if (valEndTime > new Date(plotGraphDateLimits.value.end)) {
+        // Don't plot Sim Start Time outside of the range of our usable data
+        valEndTime = new Date(plotGraphDateLimits.value.end);
+      }
+      console.log('valEndTime: ', valEndTime);
+      if (valEndTime >= plotGraphLeftEdge && valEndTime <= plotGraphRightEdge) {
+        plotGraphOptions.value.marks.push(Plot.ruleX([valEndTime], {stroke: 'grey', strokeWidth: 2, strokeDasharray: 10}));
+        plotGraphOptions.value.marks.push(Plot.text([" Val End Time "], {x: [valEndTime], frameAnchor: 'top', textAnchor: 'end'}));
+        console.log('Marking valEndTime on interactive plot');
+      }
+      console.log('Marking valEndTime on slider');
+    }
+  }
   //console.log('plotGraphOptions: ', plotGraphOptions.value);
   plotGraphSVG.value.innerHTML = '';
   plotGraphSVG.value.append(Plot.plot(plotGraphOptions.value));
@@ -1377,11 +1434,21 @@ const toggleMessagesGroup = async () => {
   }
 }
 
+const toggleExpandPlotTable = async () => {
+  if (expandPlotTable.value) {
+    expandPlotTable.value = false;
+  } else {
+    expandPlotTable.value = true;
+  }
+}
+
+
 onUnmounted(() => {
   // make sure page clears all selected plots/tables when the user leaves
   selectedPlotName.value = null;
   selectedPlotFilename.value = null;
   selectedPlotFileUrl.value = null;
+  selectedPlotHasTimeseries.value = false;
   selectedSupplementalTable.value = 0;
   selectedLogName.value = '';
   selectedLogList.value = [];
