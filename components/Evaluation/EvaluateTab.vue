@@ -254,16 +254,20 @@
 
           <div class="mt-3 relative z-10">
             <VueDatePicker v-model="selectedEvaluateDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-            @update:model-value="handleSelectedEvaluateDateUpdate" :enable-time-picker="false" :teleport="true" utc='preserve' />
+              @update:model-value="convertSelectedEvaluateDateStringToDateObject" :enable-time-picker="false"
+              :teleport="true" utc='preserve' />
           </div>
           <div class="flex justify-end mt-3">
             <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plot"
-              aria-label="Get Spatial Plot" @click="getSpatialPlot"/>
+              aria-label="Get Spatial Plot" @click="getSpatialPlot" />
           </div>
         </div>
       </div>
     </div>
 
+  </div>
+  <div class="waitgif" v-if="isEvaluationLoading ">
+    <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
 
@@ -319,7 +323,8 @@ const {
   selectedSimulatedSourceTimeRange,
   selectedSnodasLumpedMapUrl,
   selectedSnodasRawMapUrl,
-  selectedSnodasSimMapUrl
+  selectedSnodasSimMapUrl,
+  isEvaluationLoading
 } = storeToRefs(EvaluationSupplementalDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -417,6 +422,7 @@ const gridDisplayOptions = [
 ]
 
 onMounted(() => {
+  isEvaluationLoading.value = true;
   nextTick(async () => {
     hilightTab(EvaluationTabs.tab_evaluate);
 
@@ -490,6 +496,7 @@ onMounted(() => {
       }
     });
   })
+  isEvaluationLoading.value = false;
 });
 
 // Handle selectedPlotName changes
@@ -808,20 +815,21 @@ watch(selectedPlotTable, async () => {
   }
 });
 
-// Handle selectedEvaluateDate changes from VueDatePicker
+// Convert selectedEvaluateDate string to Date object
 // VueDatePicker sets selectedEvaluateDate to a string, so we need to convert it to a Date object
-const handleSelectedEvaluateDateUpdate = (value: string) => {
+const convertSelectedEvaluateDateStringToDateObject = (value: string) => {
   selectedEvaluateDate.value = new Date(value);
 }
 
 // Handle selectedEvaluateDate changes
+// if selectedEvaluateDate is a string, convert it to a Date object
 watch(selectedEvaluateDate, async () => {
   if (typeof selectedEvaluateDate.value === 'string') {
-    selectedEvaluateDate.value = new Date(selectedEvaluateDate.value);
+    convertSelectedEvaluateDateStringToDateObject(selectedEvaluateDate.value);
   }
 
-  console.log('isValidDate(selectedEvaluateDate.value): ', isValidDate(selectedEvaluateDate.value));
-  console.log('selectedEvaluateDate: ', (selectedEvaluateDate.value as Date).toUTCString());
+  // console.log('isValidDate(selectedEvaluateDate.value): ', isValidDate(selectedEvaluateDate.value));
+  // console.log('selectedEvaluateDate: ', (selectedEvaluateDate.value as Date).toUTCString());
 });
 
 // Watch for page number changes in plot table
@@ -1041,9 +1049,9 @@ const togglePlotGraph = async () => {
 const drawInteractivePlot = () => {
   console.log('Drawing interactive plot');
   plotGraphOptions.value = {
-    x: {grid: true}, 
-    y: {grid: true, label: 'Streamflow (cm/s)', labelAnchor: 'center', labelArrow: 'none'}, 
-    marks: [], 
+    x: { grid: true },
+    y: { grid: true, label: 'Streamflow (cm/s)', labelAnchor: 'center', labelArrow: 'none' },
+    marks: [],
     width: plotGraphArea.value.offsetWidth - 200,
     height: (document.getElementById('MainLeftDataParent').getBoundingClientRect().bottom - document.getElementById('PlotGraphArea').getBoundingClientRect().top) - 150
   };
@@ -1391,10 +1399,12 @@ const toggleMessagesGroup = async () => {
 
 // call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
 const getSpatialPlot = async () => {
+  isEvaluationLoading.value = true;
   if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
     // load the SWE images
-    loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value));
+    await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value as Date));
   }
+  isEvaluationLoading.value = false;
 }
 
 onUnmounted(() => {

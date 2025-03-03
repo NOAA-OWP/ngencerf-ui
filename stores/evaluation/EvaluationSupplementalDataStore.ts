@@ -40,11 +40,13 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     'Catchment Means'
   ]);
   const selectedGridType = ref<string>();
-  const selectedEvaluateDate = ref<any>();
+  const selectedEvaluateDate = ref<Date | string>();
 
   const selectedSnodasLumpedMapUrl = ref<string>();
   const selectedSnodasRawMapUrl = ref<string>();
   const selectedSnodasSimMapUrl = ref<string>();
+
+  const isEvaluationLoading = ref<boolean>(false);
 
   /**
    * Computes the selected simulated source time range depending on the selected simulated source
@@ -219,6 +221,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedSnodasLumpedMapUrl,
     selectedSnodasRawMapUrl,
     selectedSnodasSimMapUrl,
+    isEvaluationLoading,
     queryGetIterations,
     queryGetPerformanceMetrics,
     queryGetLogNames,
