@@ -39,13 +39,6 @@
           Start and End Times</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData && Object.keys(userCalibrationRunData.output_variable_to_calibrate).length" 
-          class="pi pi-check font-bold checkMark"></i>
-        </td>
-        <td data-tab="4" title="Calibration Output Variable"
-          aria-label="Calibration Output Variable" @click="tabClicked">Calibration Output Variable</td>
-      </tr>
-      <tr>
         <td><i v-if="userCalibrationRunData?.parameters_selected" class="pi pi-check font-bold checkMark"></i></td>
         <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters"
           @click="tabClicked">Tuning Parameters</td>
