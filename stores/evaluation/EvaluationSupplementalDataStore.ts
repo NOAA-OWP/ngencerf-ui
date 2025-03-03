@@ -60,23 +60,22 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
       selectedSimulatedSourceEndDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_end_time as string);
     }
 
-    // default selectedEvaluateDate to selectedSimulateSourceStartDate (hard code to 2020-04-02 to display 2020-04-01 for demo)
-    // in order to have a default value for the date picker
-    selectedEvaluateDate.value = formatISOStringOrDateToYYYYMMDD('2020-04-02T00:00:00.000Z')
+    // default selectedEvaluateDate to validation_start_time in order to have a default value for the date picker
+    selectedEvaluateDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string);
 
     return `${selectedSimulatedSourceStartDate.value} to ${selectedSimulatedSourceEndDate.value}`;
   });
 
   /**
-   * Load SNODAS image
+   * Load SWE image
    */
-  const loadSnodasMap = async (validation_run_id: number, date: string) => {
-    const getSnodasImagesResponse = await getSnodasImages(validation_run_id, date);
-    console.log('getSnodasImagesResponse', getSnodasImagesResponse);
-    if (getSnodasImagesResponse._data) {
-      selectedSnodasLumpedMapUrl.value = getSnodasImagesResponse?._data?.lumped_map;
-      selectedSnodasRawMapUrl.value = getSnodasImagesResponse?._data?.raw_map;
-      selectedSnodasSimMapUrl.value = getSnodasImagesResponse?._data?.sim_map;
+  const loadSweImages = async (validation_run_id: number, date: string) => {
+    const getSweImagesResponse = await getSweImagesByDate(validation_run_id, date);
+    console.log('getSweImagesResponse', getSweImagesResponse);
+    if (getSweImagesResponse._data) {
+      selectedSnodasLumpedMapUrl.value = getSweImagesResponse?._data?.lumped_map;
+      selectedSnodasRawMapUrl.value = getSweImagesResponse?._data?.raw_map;
+      selectedSnodasSimMapUrl.value = getSweImagesResponse?._data?.sim_map;
     }
   };
 
@@ -171,8 +170,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * @param {string} date
    * @return {any}
    */
-  const getSnodasImages = async (validation_run_id: number, date: string): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_snodas_images/`, {
+  const getSweImagesByDate = async (validation_run_id: number, date: string): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_swe_images_by_date/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -225,8 +224,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     queryGetLogNames,
     queryGetLogData,
     runSwe,
-    getSnodasImages,
-    loadSnodasMap
+    getSweImagesByDate,
+    loadSweImages
   };
 });
 

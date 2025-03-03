@@ -254,11 +254,11 @@
 
           <div class="mt-3 relative z-10">
             <VueDatePicker v-model="selectedEvaluateDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-              :enable-time-picker="false" :teleport="true" />
+            @update:model-value="handleSelectedEvaluateDateUpdate" :enable-time-picker="false" :teleport="true" utc='preserve' />
           </div>
           <div class="flex justify-end mt-3">
             <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plot"
-              aria-label="Get Spatial Plot" />
+              aria-label="Get Spatial Plot" @click="getSpatialPlot"/>
           </div>
         </div>
       </div>
@@ -272,6 +272,7 @@ import { nextTick } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import VueDatePicker from "@vuepic/vue-datepicker";
 
+import { isValidDate, isValidDateTime } from '@/utils/CommonHelpers';
 import type { DynamicObject } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
@@ -334,7 +335,7 @@ const {
   queryGetPerformanceMetrics,
   queryGetLogNames,
   queryGetLogData,
-  loadSnodasMap
+  loadSweImages
 } = EvaluationSupplementalDataStore;
 
 const plotTables = ref<DynamicObject>({});
@@ -680,12 +681,7 @@ watch(selectedPlotName, async () => {
     selectedLogList.value = [];
     selectedLogName.value = '';
 
-    console.log('inside grid display option');
-
-    // load the SNODAS map
-    loadSnodasMap(evaluateValidationRunId.value, selectedEvaluateDate.value);
-
-    // default to SNODAS catchment map
+    // default SNODAS image to SWE catchment map
     selectedGridType.value = 'catchment';
 
     // default to 'Validation Best Run' for simulated source
@@ -812,39 +808,21 @@ watch(selectedPlotTable, async () => {
   }
 });
 
-// set plotTableColumns whenever plotTableData is changed
-function adjustPlotTableColumns() {
-  //console.log('adjusting plotTableColumns');
-  plotTableErrorMessage.value = '';
-  plotTableColumns.value = [];
-  if (plotTableData.value.length > 0) {
-    Object.keys(plotTableData.value[0]).forEach(key => {
-      let column_header_words = key.split("_");
-      for (let w = 0; w < column_header_words.length; w++) {
-        let word = column_header_words[w]
-        column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
-      }
-      let column_header = column_header_words.join(" ");
-      plotTableColumns.value.push({ header: column_header, value: key });
-    });
-    for (let d = 0; d < plotTableData.value.length; d++) {
-      Object.keys(plotTableData.value[d]).forEach(key => {
-        if (plotTableData.value[d][key] && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
-          plotTableData.value[d][key] = 'N/A';
-        } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
-          // attempt to round to 5 digits - just display as is if there are any problems doing this
-          try {
-            plotTableData.value[d][key] = Number(plotTableData.value[d][key]).toFixed(5);
-          } catch (error) {
-            console.error('Error rounding value ' + plotTableData.value[d][key] + ': ', error);
-          }
-        }
-      });
-    }
-    //console.log('plotTableData: ', plotTableData.value);
-    //console.log('plotTableColumns: ', plotTableColumns.value);
-  }
+// Handle selectedEvaluateDate changes from VueDatePicker
+// VueDatePicker sets selectedEvaluateDate to a string, so we need to convert it to a Date object
+const handleSelectedEvaluateDateUpdate = (value: string) => {
+  selectedEvaluateDate.value = new Date(value);
 }
+
+// Handle selectedEvaluateDate changes
+watch(selectedEvaluateDate, async () => {
+  if (typeof selectedEvaluateDate.value === 'string') {
+    selectedEvaluateDate.value = new Date(selectedEvaluateDate.value);
+  }
+
+  console.log('isValidDate(selectedEvaluateDate.value): ', isValidDate(selectedEvaluateDate.value));
+  console.log('selectedEvaluateDate: ', (selectedEvaluateDate.value as Date).toUTCString());
+});
 
 // Watch for page number changes in plot table
 watch(plotTableCurrentPage, async () => {
@@ -892,6 +870,128 @@ watch(plotGraphData, async () => {
     showPlotGraph.value = false;
   }
 });
+
+watch(plotGraphDateRange, async () => {
+  if (plotGraphDataRaw.value) {
+    //console.log('plotGraphDateRange: ', plotGraphDateRange.value);
+    interactivePlotDateFilter();
+  }
+});
+
+// Handle selectedLogCategory changes
+watch(selectedLogCategory, async () => {
+  selectedLogList.value = logLists.value[selectedLogCategory.value];
+  // start with the first log
+  selectedLogName.value = selectedLogList.value[0].name;
+  //console.log('selectedLogCategory: ', selectedLogCategory.value);
+  //console.log('selectedLogList: ', selectedLogList.value);
+  //console.log('selectedLogName: ', selectedLogName.value);
+  if (!selectedLogList.value.length) {
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeout5000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+});
+
+// Handle selectedLogName changes
+watch(selectedLogName, async () => {
+  if (selectedLogName.value !== '') {
+    selectedLogCurrentPage.value = 1;
+    const response: any = await queryGetLogData(
+      selectedLogCategory.value, // log_category,
+      selectedLogName.value, // log_name
+      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+      0, // start
+      logDataPageSize.value // limit
+    );
+    if (response?._data) {
+      let logText = '';
+      for (let t = 0; t < response?._data?.log_data.length; t++) {
+        logText += response?._data?.log_data[t] + '<br/>\n';
+      }
+      selectedLogDisplay.value = logText;
+      selectedLogTotalSize.value = response?._data?.pagination_metadata?.count;
+      selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
+      selectedLogStartRow.value = 1;
+      if (selectedLogTotalPages.value === 1) {
+        selectedLogEndRow.value = selectedLogTotalSize.value;
+      } else {
+        selectedLogEndRow.value = logDataPageSize.value;
+      }
+      console.log('Loading rows ' + selectedLogStartRow.value + '-' + selectedLogEndRow.value + ' from the ' + selectedLogTotalSize.value + ' total stored in the backend');
+    }
+    plotTables.value = {};
+    plotTableList.value = [];
+    plotTableData.value = [];
+  }
+});
+
+// Watch for page number changes in logs
+watch(selectedLogCurrentPage, async () => {
+  if (selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
+    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
+  } else {
+    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
+    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
+      selectedLogEndRow.value = selectedLogTotalSize.value;
+    } else {
+      selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
+    }
+    const response: any = await queryGetLogData(
+      selectedLogCategory.value, // log_category,
+      selectedLogName.value, // log_name
+      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+      selectedLogStartRow.value - 1, // start
+      logDataPageSize.value // limit
+    );
+    if (response?._data) {
+      let logText = '';
+      for (let t = 0; t < response?._data?.log_data.length; t++) {
+        logText += response?._data?.log_data[t] + '<br/>\n';
+      }
+      selectedLogDisplay.value = logText;
+    }
+    console.log('Loading rows ' + selectedLogStartRow.value + '-' + selectedLogEndRow.value + ' from the ' + selectedLogTotalSize.value + ' total stored in the backend');
+  }
+});
+
+// watch for changes in selectedGridType
+watch(selectedGridType, () => {
+  console.log('selectedGridType: ', selectedGridType.value);
+});
+
+// set plotTableColumns whenever plotTableData is changed
+function adjustPlotTableColumns() {
+  //console.log('adjusting plotTableColumns');
+  plotTableErrorMessage.value = '';
+  plotTableColumns.value = [];
+  if (plotTableData.value.length > 0) {
+    Object.keys(plotTableData.value[0]).forEach(key => {
+      let column_header_words = key.split("_");
+      for (let w = 0; w < column_header_words.length; w++) {
+        let word = column_header_words[w]
+        column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+      }
+      let column_header = column_header_words.join(" ");
+      plotTableColumns.value.push({ header: column_header, value: key });
+    });
+    for (let d = 0; d < plotTableData.value.length; d++) {
+      Object.keys(plotTableData.value[d]).forEach(key => {
+        if (plotTableData.value[d][key] && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
+          plotTableData.value[d][key] = 'N/A';
+        } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
+          // attempt to round to 5 digits - just display as is if there are any problems doing this
+          try {
+            plotTableData.value[d][key] = Number(plotTableData.value[d][key]).toFixed(5);
+          } catch (error) {
+            console.error('Error rounding value ' + plotTableData.value[d][key] + ': ', error);
+          }
+        }
+      });
+    }
+    //console.log('plotTableData: ', plotTableData.value);
+    //console.log('plotTableColumns: ', plotTableColumns.value);
+  }
+}
 
 const togglePlotGraph = async () => {
   if (showPlotGraph.value) {
@@ -1085,13 +1185,6 @@ const updatePlotGraphDates = () => {
   interactivePlotDateFilter();
 }
 
-watch(plotGraphDateRange, async () => {
-  if (plotGraphDataRaw.value) {
-    //console.log('plotGraphDateRange: ', plotGraphDateRange.value);
-    interactivePlotDateFilter();
-  }
-});
-
 const interactivePlotDateFilter = () => {
   let tempPlotGraphData = [];
   //console.log('plotGraphDataRaw.length', plotGraphDataRaw.value.length);
@@ -1266,87 +1359,6 @@ const toggleCustomizePlot = async () => {
   }
 }
 
-// Handle selectedLogCategory changes
-watch(selectedLogCategory, async () => {
-  selectedLogList.value = logLists.value[selectedLogCategory.value];
-  // start with the first log
-  selectedLogName.value = selectedLogList.value[0].name;
-  //console.log('selectedLogCategory: ', selectedLogCategory.value);
-  //console.log('selectedLogList: ', selectedLogList.value);
-  //console.log('selectedLogName: ', selectedLogName.value);
-  if (!selectedLogList.value.length) {
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeout5000 };
-    toast.add(tMsg); addToastRecord(tMsg);
-  }
-});
-
-// Handle selectedLogName changes
-watch(selectedLogName, async () => {
-  if (selectedLogName.value !== '') {
-    selectedLogCurrentPage.value = 1;
-    const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
-      selectedLogName.value, // log_name
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      0, // start
-      logDataPageSize.value // limit
-    );
-    if (response?._data) {
-      let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
-      }
-      selectedLogDisplay.value = logText;
-      selectedLogTotalSize.value = response?._data?.pagination_metadata?.count;
-      selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
-      selectedLogStartRow.value = 1;
-      if (selectedLogTotalPages.value === 1) {
-        selectedLogEndRow.value = selectedLogTotalSize.value;
-      } else {
-        selectedLogEndRow.value = logDataPageSize.value;
-      }
-      console.log('Loading rows ' + selectedLogStartRow.value + '-' + selectedLogEndRow.value + ' from the ' + selectedLogTotalSize.value + ' total stored in the backend');
-    }
-    plotTables.value = {};
-    plotTableList.value = [];
-    plotTableData.value = [];
-  }
-});
-
-// Watch for page number changes in logs
-watch(selectedLogCurrentPage, async () => {
-  if (selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
-    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
-  } else {
-    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
-    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
-      selectedLogEndRow.value = selectedLogTotalSize.value;
-    } else {
-      selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
-    }
-    const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
-      selectedLogName.value, // log_name
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      selectedLogStartRow.value - 1, // start
-      logDataPageSize.value // limit
-    );
-    if (response?._data) {
-      let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
-      }
-      selectedLogDisplay.value = logText;
-    }
-    console.log('Loading rows ' + selectedLogStartRow.value + '-' + selectedLogEndRow.value + ' from the ' + selectedLogTotalSize.value + ' total stored in the backend');
-  }
-});
-
-// watch for changes in selectedGridType
-watch(selectedGridType, () => {
-  console.log('selectedGridType: ', selectedGridType.value);
-});
-
 function capitalCase(str: string) {
   return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -1374,6 +1386,14 @@ const toggleMessagesGroup = async () => {
     showMessagesGroup.value = false;
   } else {
     showMessagesGroup.value = true;
+  }
+}
+
+// 
+const getSpatialPlot = async () => {
+  if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
+    // load the SWE images
+    loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value));
   }
 }
 
