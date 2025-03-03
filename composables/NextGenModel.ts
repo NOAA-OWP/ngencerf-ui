@@ -338,11 +338,6 @@ export interface tuning_load {
 export interface tuning_save {
   calibration_run_id: number;
   automatic_valiation: boolean;
-  output_variable_to_calibrate: {
-    name: string;
-    module: string;
-  };
-  module_output_variables: name_description_type[];
   parameters: module_params[];
   calibration_times: {
     calibration_start_time: string;
@@ -372,7 +367,6 @@ export interface module_data {
   name: string;
   groups: string[];
   parameters: module_params[];
-  module_output_variables: module_params[];
 }
 
 export interface module_params {
