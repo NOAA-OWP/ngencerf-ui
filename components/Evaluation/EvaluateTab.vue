@@ -1389,7 +1389,7 @@ const toggleMessagesGroup = async () => {
   }
 }
 
-// 
+// call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
 const getSpatialPlot = async () => {
   if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
     // load the SWE images
