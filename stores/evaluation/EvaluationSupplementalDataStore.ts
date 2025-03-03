@@ -186,26 +186,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     });
   };
 
-  /**
-   * run_swe endpoint
-   * @param {number} validation_run_id
-   * @param {string} date
-   * @return {any}
-   */
-  const runSwe = async (validation_run_id: number, date: string): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/run_swe/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({
-        validation_run_id: validation_run_id,
-        date: date
-      })
-    });
-  };
-
   return {
     plotNames,
     plotList,
@@ -226,7 +206,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     queryGetPerformanceMetrics,
     queryGetLogNames,
     queryGetLogData,
-    runSwe,
     getSweImagesByDate,
     loadSweImages
   };
