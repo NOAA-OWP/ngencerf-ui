@@ -155,7 +155,7 @@ const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
-const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
+const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList, includeValidationRuns,
   statusTypeFilterList, calDateStart, calDateEnd, useDateRange, whichDatesToFilter, calFilterEnabled } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
@@ -219,6 +219,13 @@ const filteredData = computed(() => {
 
     if (statusTypeFilterList.value.length > 0) {
       newCalJobList = newCalJobList.filter((job) => statusTypeFilterList.value.includes(job.status));
+    }
+
+    if (includeValidationRuns.value === true) {
+      newCalJobList = (newCalJobList as CalibrationJobListItem[]).filter(job =>
+        job.validations.length > 0 &&
+        job.validations.some(validation => statusTypeFilterList.value.includes(validation.status))
+      );
     }
 
     if (useDateRange.value) {

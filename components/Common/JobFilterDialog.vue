@@ -77,10 +77,10 @@
             </div>
 
             <div class="row-span-1">
-              <Checkbox v-model="showArchivedJobsOnly" class="mt-[90px]" inputId="showArchivedJobsOnly"
-                name="showArchivedJobsOnly" binary>
+              <Checkbox v-model="includeValidationRuns" class="mt-[7px]" inputId="includeValidationRuns"
+                name="includeValidationRuns" binary>
               </Checkbox>
-              <span class="cursor-default">&nbsp;Show Archived Only</span>
+              <span class="cursor-default">&nbsp;Include Validation Runs</span>
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 const userStore = useUserDataStore();
 const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList,
-  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter } = storeToRefs(useUserDataStore());
+  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter, includeValidationRuns } = storeToRefs(useUserDataStore());
 
 const emit = defineEmits(["ModulesFilterDialogClosing"]);
 
