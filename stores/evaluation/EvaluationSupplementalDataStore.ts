@@ -70,8 +70,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   /**
    * Load SNODAS image
    */
-  const loadSnodasMap = async (validation_run_id: number) => {
-    const getSnodasImagesResponse = await getSnodasImages(validation_run_id);
+  const loadSnodasMap = async (validation_run_id: number, date: string) => {
+    const getSnodasImagesResponse = await getSnodasImages(validation_run_id, date);
     console.log('getSnodasImagesResponse', getSnodasImagesResponse);
     if (getSnodasImagesResponse._data) {
       selectedSnodasLumpedMapUrl.value = getSnodasImagesResponse?._data?.lumped_map;
@@ -168,9 +168,10 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   /**
    * get_snodas_images endpoint
    * @param {number} validation_run_id
+   * @param {string} date
    * @return {any}
    */
-  const getSnodasImages = async (validation_run_id: number): Promise<any> => {
+  const getSnodasImages = async (validation_run_id: number, date: string): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_snodas_images/`, {
       method: "POST",
       headers: {
@@ -178,7 +179,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        validation_run_id: validation_run_id
+        validation_run_id: validation_run_id,
+        date: date
       })
     });
   };

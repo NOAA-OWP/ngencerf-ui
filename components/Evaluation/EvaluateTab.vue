@@ -683,7 +683,7 @@ watch(selectedPlotName, async () => {
     console.log('inside grid display option');
 
     // load the SNODAS map
-    loadSnodasMap(evaluateValidationRunId.value);
+    loadSnodasMap(evaluateValidationRunId.value, selectedEvaluateDate.value);
 
     // default to SNODAS catchment map
     selectedGridType.value = 'catchment';
