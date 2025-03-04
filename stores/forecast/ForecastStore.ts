@@ -310,12 +310,21 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobId.value = forecast_job_id;
   }
 
-  const setSelectedForecastRowData = ( forecast_row_data: ForecastJob ): void => {
+  const setSelectedForecastRowData = async ( forecast_row_data: ForecastJob ): void => {
     setSelectedForecastRunId( forecast_row_data.forecast_run_id );
     setSelectedCalibrationRunId( forecast_row_data.calibration_run_id );
+
+    /// load forecastCycles
+    await loadSetupForecastTabData();
+
+    console.log('forecast_row_data', forecast_row_data);
+    console.log('forecastCycles.value', forecastCycles.value);
+
     forecastCycle.value = forecastCycles.value?.find( (forecast_cycle_data : ForecastCycle ) =>
       forecast_cycle_data.name === forecast_row_data.cycle
     );
+    console.log('forecastCycle set in setSelectedForecastRowData', forecastCycle.value);
+
     /*
      * the follow is hack to get around the fact that we are using calibrationRunForForecast to check for calibration_run_id, but it's only set on calibration run tab
      * user should be able to go straight to forecast runs and view results so this is a easy way to provide it.
@@ -324,7 +333,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobStatus.value = forecast_row_data.status;
   }
 
-  const resetSelectedForecastRunId = (): void => {
+  const resetSelectedForecastRunData = (): void => {
     forecastJobId.value = undefined;
     forecastJobStatus.value = undefined;
     forecastCycle.value = undefined;
@@ -464,7 +473,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     getForecastPlot,
     getJobDataDirectory,
     setSelectedForecastRunId,
-    resetSelectedForecastRunId,
+    resetSelectedForecastRunData,
     setSelectedForecastRowData
   };
 });

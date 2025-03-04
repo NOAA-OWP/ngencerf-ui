@@ -152,7 +152,7 @@ const {
   forecastCycles } = storeToRefs(forecastStore);
 const {
   setSelectedForecastRunId,
-  resetSelectedForecastRunId,
+  resetSelectedForecastRunData,
   loadSetupForecastTabData,
   loadForecastStatusRunTabData,
   loadForecastResultsTabData,
@@ -226,7 +226,7 @@ const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
 }
 
 const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
-  resetSelectedForecastRunId();
+  resetSelectedForecastRunData();
 }
 
 const viewCalibrationDetails = async (calibration_run_id: number) => {
@@ -272,8 +272,11 @@ const navigateToSetupForecast = () => {
 }
 
 const navigateToForecastRunStatus = () => {
-  nextTick(() => {
+  nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Status/Run Tab"]');
+
+    // load status/run tab data
+    await loadForecastStatusRunTabData();
 
     if (e) {
       e.click();
@@ -283,9 +286,12 @@ const navigateToForecastRunStatus = () => {
   });
 }
 
-const navigateToForecastResults = async () => {
-  nextTick(() => {
+const navigateToForecastResults = () => {
+  nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results tab"]');
+
+    // load results tab data
+    await loadForecastResultsTabData();
 
     if (e) {
       e.click();

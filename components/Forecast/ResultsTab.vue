@@ -6,12 +6,12 @@
 
     <table aria-describedby="tab-title">
       <tbody>
-        <tr height="38px" :aria-label="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id"
-          :title="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id">
+        <tr height="38px" :aria-label="'Calibration Job ID is ' + calibrationJobId"
+          :title="'Calibration Job ID is ' + calibrationJobId">
           <th scope="row" class="text-right font-bold">
             <div style="width: 140px;">Calibration Job ID</div>
           </th>
-          <td class="pl-5">{{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(30) }}</td>
+          <td class="pl-5">{{ calibrationJobId ?? '-'.repeat(30) }}</td>
         </tr>
         <tr height="38px" :aria-label="'Forecast Job ID is ' + forecastJobId"
           :title="'Forecast Job ID is ' + forecastJobId">
@@ -60,6 +60,7 @@ import { generalStore } from '~/stores/common/GeneralStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 
+const { calibrationJobId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const {

@@ -87,7 +87,7 @@
             Setup Forecast
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-if="calibrationJobId && (forecastCycle) || selectedForecastJob?.cycle)" data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status/Run tab"
+          <div v-if="calibrationJobId && (forecastCycle || selectedForecastJob?.cycle)" data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status/Run tab"
             title="Status/Run Tab">
             Status/Run
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
