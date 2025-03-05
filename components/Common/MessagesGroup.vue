@@ -137,10 +137,10 @@
               class="font-medium">Plot Generation Frequency:</span>
             {{ calData?.save_plot_iteration_frequency }}</div>
         </div>
-	<div class="col-span-2">
+	      <div class="col-span-2">
           <div v-if="resultsPathname"
             :aria-label="'Results Pathname ' + resultsPathname"
-            :title="'Results Pathname ' + resultsPathname"><span class="font-medium">
+            :title="'Results Pathname ' + resultsPathname"><br /><span class="font-medium">
               Results Pathname:</span>
             {{ resultsPathname }}</div>
         </div>
