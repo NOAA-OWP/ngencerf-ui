@@ -43,7 +43,7 @@
 
           <div class="mt-3">
             <span class="cursor-default">From:</span>
-            <VueDatePicker id=" CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
+            <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
               time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
               @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
           </div>
