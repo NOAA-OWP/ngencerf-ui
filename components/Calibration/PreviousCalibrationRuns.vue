@@ -57,29 +57,29 @@
 
             <Column field="created_at" header="Creation Date" sortable>Column
               <template #body="slotProps">
-                <span :aria-label="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)"
-                  :title="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)">
-                  {{ formatDateForDisplay(slotProps.data.created_at) }}
+                <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
+                  :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
                 </span>
               </template>
             </Column>
             <Column field="submit_date" header="Submit Date" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.submit_date"
-                  :aria-label="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)"
-                  :title="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)">
-                  {{ formatDateForDisplay(slotProps.data.submit_date) }}
+                  :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
+                  :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
                 </span>
               </template>
             </Column>
             <Column header="Calibration Period" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period"
-                  :aria-label="'Calibration Period ' + formatDateForDisplay(slotProps.data.calibration_start_period) + ' to ' + formatDateForDisplay(slotProps.data.calibration_end_period)"
-                  :title="'Calibration Period ' + formatDateForDisplay(slotProps.data.calibration_start_period) + ' to ' + formatDateForDisplay(slotProps.data.calibration_end_period)">
-                  {{ formatDateForDisplay(slotProps.data.calibration_start_period) }} <span
+                  :aria-label="'Calibration Period ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_end_period)"
+                  :title="'Calibration Period ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_end_period)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_start_period) }} <span
                     v-if="slotProps.data.calibration_end_period">to</span>
-                  {{ formatDateForDisplay(slotProps.data.calibration_end_period) }}
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_end_period) }}
                 </span>
               </template>
             </Column>
@@ -122,7 +122,7 @@ import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
-import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData } = useGageStore();
 const { loadFormulationTabStaticData } = useFormulationStore();

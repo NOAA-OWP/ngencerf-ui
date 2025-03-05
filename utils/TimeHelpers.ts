@@ -2,11 +2,24 @@ import { DateTime, Duration } from "luxon";
 
 
 /**
+ * Converts a string in ISO format or a Date object to a DateTime object
+ * @param d
+ * @returns {DateTime} DateTime object
+ */
+export const convertISOStringOrDateToDateTime = (d: string | Date): any => {
+  if (typeof d === 'string') {
+    return DateTime.fromISO(d, { zone: 'utc' });
+  } else {
+    return DateTime.fromJSDate(d, { zone: 'utc' });
+  }
+};
+
+/**
  * Converts a string in ISO format or a Date object to a string in the format "yyyy-MM-dd HH:mm"
  * @param d 
  * @returns {string} string in the format "yyyy-MM-dd HH:mm"
  */
-export const formatDateForDisplay = ( d: string | Date ): string => {
+export const formatISOStringOrDateToYYYYMMDDHHMM = ( d: string | Date ): string => {
   let dateTime;
 
   // Check if the input is already in 'yyyy-MM-dd HH:mm' format
@@ -15,17 +28,32 @@ export const formatDateForDisplay = ( d: string | Date ): string => {
     return d;
   }
 
-  // Handle ISO format strings or Date objects
-  if (typeof d === 'string') {
-    // Check if the string is in ISO format and parse it
-    dateTime = DateTime.fromISO(d, { zone: 'utc' });
-  } else {
-    // Convert Date object to Luxon DateTime in UTC
-    dateTime = DateTime.fromJSDate(d, { zone: 'utc' });
+  // convert string or Date object to Luxon DateTime in UTC
+  dateTime = convertISOStringOrDateToDateTime(d);
+
+  // Return the formatted date in 'yyyy-MM-dd HH:mm' format
+  return dateTime.toFormat('yyyy-MM-dd HH:mm');
+};
+
+/**
+ * Converts a string in ISO format or a Date object to a string in the format "yyyy-MM-dd"
+ * @param d 
+ * @returns {string} string in the format "yyyy-MM-dd"
+ */
+export const formatISOStringOrDateToYYYYMMDD = ( d: string | Date ): string => {
+  let dateTime;
+
+  // Check if the input is already in 'yyyy-MM-dd' format
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    // If it's already in 'yyyy-MM-dd' format, return it directly
+    return d;
   }
 
-  // Return the formatted date in 'yyyy-MM-dd HH:mm' fformatDateForDisplayormat
-  return dateTime.toFormat('yyyy-MM-dd HH:mm');
+  // convert string or Date object to Luxon DateTime in UTC
+  dateTime = convertISOStringOrDateToDateTime(d);
+
+  // Return the formatted date in 'yyyy-MM-dd' format
+  return dateTime.toFormat('yyyy-MM-dd');
 };
 
 /**
@@ -169,7 +197,6 @@ export function sumAndFormatElapsedTimes(elapsedTimesArray: string[]): string {
   // return the formatted sum of durations as 'hh:mm:ss' or 'd 'Days,' hh:mm:ss' format
   return formatDuration(durationsSum);
 };
-
 
 /**
  * Format Duration object to a string in 'hh:mm:ss' or 'd 'Days,' hh:mm:ss' format
