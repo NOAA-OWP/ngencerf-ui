@@ -322,7 +322,7 @@ import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { isCalibrationJobStatusSavedOrReady, isValidDateTime, isNotNullOrUndefined } from "@/utils/CommonHelpers";
-import { formatDateForDisplay } from "@/utils/TimeHelpers";
+import { formatISOStringOrDateToYYYYMMDDHHMM } from "@/utils/TimeHelpers";
 import { makeProtectedApiCall } from '@/composables/UserAuth';
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { ifEDSErrorsExist } from "@/utils/TuningControlsHelpers";
@@ -337,7 +337,7 @@ import { errorMessages } from "vue/compiler-sfc";
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
 
-const format = formatDateForDisplay;
+const format = formatISOStringOrDateToYYYYMMDDHHMM;
 
 const gstore = generalStore();
 const { addToastRecord } = generalStore();

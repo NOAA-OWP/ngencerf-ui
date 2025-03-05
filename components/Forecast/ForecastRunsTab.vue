@@ -72,10 +72,9 @@
               </Column>
               <Column field="submit_date" header="Submit Date" sortable>
                 <template #body="slotProps">
-                  <span v-if="slotProps.data.submit_date"
-                    :aria-label="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)"
-                    :title="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)">
-                    {{ formatDateForDisplay(slotProps.data.submit_date) }}
+                  <span v-if="slotProps.data.submit_date" :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
+                    :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
+                    {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
                   </span>
                 </template>
               </Column>
@@ -133,7 +132,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 
-import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 
 import type { DataTableRowClickEvent } from "primevue/datatable";
