@@ -241,17 +241,12 @@
           </div>
         </div>
         <div class="p-2 relative overflow-visible">
-          <label for="simulatedSources" class="block text-sm font-medium text-gray-700">Select Simulated Source</label>
-          <Select v-model="selectedSimulatedSource" :options="simulatedSources" inputId="simulatedSources"
-            class="w-full mt-1" placeholder="Select" />
           <div class="flex justify-end">
             <a class="c-blue text-sm underline mt-6 ml-auto" href="#">Show SWE Time Series</a>
           </div>
-          <div class="text-sm font-semibold text-blue-800 mt-3">
-            <p>Ranges:</p>
-            <p v-if="selectedSimulatedSource"><span class="font-bold">{{ selectedSimulatedSourceTimeRange }}</span></p>
+          <div class="text-sm font-semibold mt-3">
+            <p v-if="selectedSimulatedSource"><span class="font-bold">Range: {{ selectedSimulatedSourceTimeRange }}</span></p>
           </div>
-
           <div class="mt-3 relative z-10">
             <VueDatePicker v-model="selectedEvaluateDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
               @update:model-value="convertSelectedEvaluateDateStringToDateObject" :enable-time-picker="false"
@@ -1402,7 +1397,13 @@ const getSpatialPlot = async () => {
   isEvaluationLoading.value = true;
   if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
     // load the SWE images
-    await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value as Date));
+    const loadSweImagesErrors = await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value as Date));
+    if (loadSweImagesErrors) {
+      loadSweImagesErrors.forEach((errorMessage) => {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
   }
   isEvaluationLoading.value = false;
 }

@@ -5,6 +5,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import { formatISOStringOrDateToYYYYMMDD } from '@/utils/TimeHelpers';
 
 export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplementalDataStore', () => {
@@ -53,12 +54,12 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    */
   const selectedSimulatedSourceTimeRange = computed(() => {
     if (selectedSimulatedSource?.value?.includes('Calibration')) {
-      selectedSimulatedSourceStartDate.value = `Calibration: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_start_time as string)}`;
+      selectedSimulatedSourceStartDate.value = `${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_start_time as string)}`;
       selectedSimulatedSourceEndDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_end_time as string);
     }
 
     else if (selectedSimulatedSource?.value?.includes('Validation')) {
-      selectedSimulatedSourceStartDate.value = `Validation: ${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string)}`;
+      selectedSimulatedSourceStartDate.value = `${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string)}`;
       selectedSimulatedSourceEndDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_end_time as string);
     }
 
@@ -69,15 +70,22 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   });
 
   /**
-   * Load SWE image
+   * Load SWE images
    */
-  const loadSweImages = async (validation_run_id: number, date: string) => {
+  const loadSweImages = async (validation_run_id: number, date: string): Promise<string[]> => {
     const getSweImagesResponse = await getSweImagesByDate(validation_run_id, date);
-    console.log('getSweImagesResponse', getSweImagesResponse);
-    if (getSweImagesResponse._data) {
-      selectedSnodasLumpedMapUrl.value = getSweImagesResponse?._data?.lumped_map;
-      selectedSnodasRawMapUrl.value = getSweImagesResponse?._data?.raw_map;
-      selectedSnodasSimMapUrl.value = getSweImagesResponse?._data?.sim_map;
+
+    if (getSweImagesResponse.status >= 200 || getSweImagesResponse.status < 300) {
+      if (getSweImagesResponse._data) {
+        selectedSnodasLumpedMapUrl.value = getSweImagesResponse?._data?.lumped_map;
+        selectedSnodasRawMapUrl.value = getSweImagesResponse?._data?.raw_map;
+        selectedSnodasSimMapUrl.value = getSweImagesResponse?._data?.sim_map;
+        return [];
+      } else {
+        return ['No data from get_swe_images_by_date endpoint'];
+      }
+    } else {
+      return useApiErrorResponsePreprocess(getSweImagesResponse);
     }
   };
 
