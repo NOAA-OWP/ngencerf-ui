@@ -239,30 +239,29 @@
           </div>
         </div>
         <div class="p-2 relative overflow-visible">
-          <label for="simulatedSources" class="block text-sm font-medium text-gray-700">Select Simulated Source</label>
-          <Select v-model="selectedSimulatedSource" :options="simulatedSources" inputId="simulatedSources"
-            class="w-full mt-1" placeholder="Select" />
           <div class="flex justify-end">
             <a class="c-blue text-sm underline mt-6 ml-auto" href="#">Show SWE Time Series</a>
           </div>
-          <div class="text-sm font-semibold text-blue-800 mt-3">
-            <p>Ranges:</p>
-            <p v-if="selectedSimulatedSource"><span class="font-bold">{{ selectedSimulatedSourceTimeRange }}</span></p>
+          <div class="text-sm font-semibold mt-3">
+            <p v-if="selectedSimulatedSource"><span class="font-bold">Range: {{ selectedSimulatedSourceTimeRange
+                }}</span></p>
           </div>
-
           <div class="mt-3 relative z-10">
             <VueDatePicker v-model="selectedEvaluateDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
               @update:model-value="convertSelectedEvaluateDateStringToDateObject" :enable-time-picker="false"
               :teleport="true" utc='preserve' />
           </div>
           <div class="flex justify-end mt-3">
-            <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plot"
-              aria-label="Get Spatial Plot" />
+            <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plots"
+              aria-label="Get Spatial Plots" @click="getSpatialPlots" />
           </div>
         </div>
       </div>
     </div>
 
+  </div>
+  <div class="waitgif" v-if="isEvaluationLoading">
+    <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
 
@@ -271,6 +270,7 @@ import { nextTick } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import VueDatePicker from "@vuepic/vue-datepicker";
 
+import { isValidDate, isValidDateTime } from '@/utils/CommonHelpers';
 import type { DynamicObject } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
@@ -317,7 +317,8 @@ const {
   selectedSimulatedSourceTimeRange,
   selectedSnodasLumpedMapUrl,
   selectedSnodasRawMapUrl,
-  selectedSnodasSimMapUrl
+  selectedSnodasSimMapUrl,
+  isEvaluationLoading
 } = storeToRefs(EvaluationSupplementalDataStore);
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -419,6 +420,7 @@ const gridDisplayOptions = [
 ]
 
 onMounted(() => {
+  isEvaluationLoading.value = true;
   nextTick(async () => {
     hilightTab(EvaluationTabs.tab_evaluate);
 
@@ -453,6 +455,13 @@ onMounted(() => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
 
+    // add grid display options to the dropdown if not added already
+    gridDisplayOptions.forEach(option => {
+      if (!plotList.value.some(item => item.name === option)) {
+        plotList.value.push({ name: option, description: '' });
+      }
+    });
+
     // Add Supplemental Table Options to the dropdown
     for (let t = 0; t < supplementalTableOptions.length; t++) {
       if (!plotList.value.some(item => item.name === supplementalTableOptions[t])) {
@@ -486,14 +495,8 @@ onMounted(() => {
 
       //console.log('logLists: ', logLists.value);
     }
-
-    // add grid display options to the dropdown if not added already
-    gridDisplayOptions.forEach(option => {
-      if (!plotList.value.some(item => item.name === option)) {
-        plotList.value.push({ name: option, description: '' });
-      }
-    });
   })
+  isEvaluationLoading.value = false;
 });
 
 // Handle selectedPlotName changes
@@ -688,8 +691,6 @@ watch(selectedPlotName, async () => {
     selectedLogList.value = [];
     selectedLogName.value = '';
 
-    console.log('inside grid display option');
-
     // default SNODAS image to SWE catchment map
     selectedGridType.value = 'catchment';
 
@@ -823,6 +824,23 @@ watch(selectedPlotTable, async () => {
     plotTableData.value = plotTables.value[selectedPlotTable.value];
     adjustPlotTableColumns();
   }
+});
+
+// Convert selectedEvaluateDate string to Date object
+// VueDatePicker sets selectedEvaluateDate to a string, so we need to convert it to a Date object
+const convertSelectedEvaluateDateStringToDateObject = (value: string) => {
+  selectedEvaluateDate.value = new Date(value);
+}
+
+// Handle selectedEvaluateDate changes
+// if selectedEvaluateDate is a string, convert it to a Date object
+watch(selectedEvaluateDate, async () => {
+  if (typeof selectedEvaluateDate.value === 'string') {
+    convertSelectedEvaluateDateStringToDateObject(selectedEvaluateDate.value);
+  }
+
+  // console.log('isValidDate(selectedEvaluateDate.value): ', isValidDate(selectedEvaluateDate.value));
+  // console.log('selectedEvaluateDate: ', (selectedEvaluateDate.value as Date).toUTCString());
 });
 
 // set plotTableColumns whenever plotTableData is changed
@@ -1497,11 +1515,21 @@ const toggleExpandPlotTable = async () => {
   }
 }
 
-const convertSelectedEvaluateDateStringToDateObject = async () => {
-  // dummy function for now to avoid console errors due to this not being defined yet
-  console.log('convertSelectedEvaluateDateStringToDateObject function called');
+// call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
+const getSpatialPlots = async () => {
+  isEvaluationLoading.value = true;
+  if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
+    // load the SWE images
+    const loadSweImagesErrors = await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value as Date));
+    if (loadSweImagesErrors) {
+      loadSweImagesErrors.forEach((errorMessage) => {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
+  }
+  isEvaluationLoading.value = false;
 }
-
 
 onUnmounted(() => {
   // make sure page clears all selected plots/tables when the user leaves
