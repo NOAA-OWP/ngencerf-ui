@@ -120,7 +120,6 @@ onMounted(async () => {
     if (!forecastCycles.value || forecastCycles.value.length === 0) {
       await loadSetupForecastTabData();
     }
-    console.log('forecastCycles', forecastCycles.value);
   });
 });
 

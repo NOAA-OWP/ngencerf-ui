@@ -118,7 +118,7 @@
               <LazyForecastStatusRunHelp />
             </span>
             <span v-if="getForecastTabIndex() === 5">
-              <LazyForecastResultesHelp />
+              <LazyForecastResultsHelp />
             </span>
           </div>
 
@@ -169,7 +169,7 @@ const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/Erro
 
 const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
 const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
-const LazyForecastResultesHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
+const LazyForecastResultsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
 const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
 const LazyForecastStatusRunHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/StatusRunHelp.vue"));
 
