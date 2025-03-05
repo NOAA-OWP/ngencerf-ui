@@ -693,13 +693,17 @@ export type CalibrationRunForForecast = {
   submit_date: string;
   objective_function: string;
   optimization_algorithm: string;
+  validations: CalibrationJobValidationItem[];
 };
 
-export interface ForecastJob extends CalibrationRunForForecast {
+export interface ForecastJob {
+  calibration_run_id: number;
   forecast_run_id: number;
   cycle: string;
+  gage_id: string;
   forecast_status: string;
   forcing_download_status: string;
+  submit_date: string;
 }
 
 export type ForecastJobs = {

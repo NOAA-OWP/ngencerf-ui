@@ -200,13 +200,15 @@ onMounted(async () => {
   hilightTab(ForecastTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
-  //forecastJobId.value = 0;
-  resetSelectedCalibrationRunId();
-  //clear calibration data if user were on calibration tab and clear evaluation previous run data user may have selected
-  resetUserSelectedEvalCalibrationRun();
-  resetUserSelectedForecastCalibrationRun();
-  await getCalibrationJobsForForecast();
-  isLoading.value = false;
+
+  nextTick(async () => {
+    resetSelectedCalibrationRunId();
+    //clear calibration data if user were on calibration tab and clear evaluation previous run data user may have selected
+    resetUserSelectedEvalCalibrationRun();
+    resetUserSelectedForecastCalibrationRun();
+    await getCalibrationJobsForForecast();
+    isLoading.value = false;
+  });
 });
 
 // Computed filtered data for DataTables
