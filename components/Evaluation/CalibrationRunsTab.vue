@@ -108,17 +108,17 @@
             </Column>
             <Column :pt="ptColumn" field="created_at" header="Creation Date" sortable>
               <template #body="slotProps">
-                <span :aria-label="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)"
-                  :title="'Creation Date ' + formatDateForDisplay(slotProps.data.created_at)">
-                  {{ formatDateForDisplay(slotProps.data.created_at) }}
+                <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
+                  :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
                 </span>
               </template>
             </Column>
             <Column field="submit_date" header="Submit Date" sortable>
               <template #body="slotProps">
-                <span :aria-label="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)"
-                  :title="'Submit Date ' + formatDateForDisplay(slotProps.data.submit_date)">
-                  {{ formatDateForDisplay(slotProps.data.submit_date) }} 
+                <span :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
+                  :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }} 
                 </span>
               </template>
             </Column>
@@ -178,7 +178,7 @@ import { generalStore } from "@/stores/common/GeneralStore"
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
-import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 import { EvaluationTabs } from "@/composables/NextgenEnums";
 

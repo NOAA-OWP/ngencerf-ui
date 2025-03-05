@@ -14,10 +14,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr height="38px" :aria-label="'Submit Time ' + formatDateForDisplay(startTime)"
-                    :title="'Submit Time ' + formatDateForDisplay(startTime)">
+                  <tr height="38px" :aria-label="'Submit Time ' + formatISOStringOrDateToYYYYMMDDHHMM(startTime)"
+                    :title="'Submit Time ' + formatISOStringOrDateToYYYYMMDDHHMM(startTime)">
                     <th scope="row" class="text-right font-bold">Submit Time</th>
-                    <td class="pl-5">{{ startTime ? formatDateForDisplay(startTime) : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ startTime ? formatISOStringOrDateToYYYYMMDDHHMM(startTime) : '-'.repeat(30) }}</td>
                   </tr>
                   <tr height="38px" :aria-label="'Elapsed Time ' + runningTime" :title="'Elapsed Time ' + runningTime">
                     <th scope="row" class="text-right font-bold">Elapsed Time</th>
@@ -135,7 +135,7 @@ import { ToastTimeout } from "@/composables/NextgenEnums";
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 
-import { formatDateForDisplay } from '@/utils/TimeHelpers';
+import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
