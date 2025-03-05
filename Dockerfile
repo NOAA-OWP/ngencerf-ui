@@ -39,7 +39,7 @@ RUN set -eux; \
     npm run build
 
 # Extract Git information and write it to the file specified by $GIT_INFO_PATH
-ENV GIT_INFO_PATH=assets/git_info.json
+ARG GIT_INFO_PATH=assets/git_info.json
 
 # Extract Git information and write it to a JSON file at $GIT_INFO_PATH
 COPY .git .git
