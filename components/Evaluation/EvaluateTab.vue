@@ -253,8 +253,8 @@
               :teleport="true" utc='preserve' />
           </div>
           <div class="flex justify-end mt-3">
-            <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plot"
-              aria-label="Get Spatial Plot" @click="getSpatialPlot" />
+            <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plots"
+              aria-label="Get Spatial Plots" @click="getSpatialPlots" />
           </div>
         </div>
       </div>
@@ -1393,7 +1393,7 @@ const toggleMessagesGroup = async () => {
 }
 
 // call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
-const getSpatialPlot = async () => {
+const getSpatialPlots = async () => {
   isEvaluationLoading.value = true;
   if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
     // load the SWE images
