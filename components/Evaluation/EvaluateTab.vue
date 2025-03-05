@@ -245,7 +245,8 @@
             <a class="c-blue text-sm underline mt-6 ml-auto" href="#">Show SWE Time Series</a>
           </div>
           <div class="text-sm font-semibold mt-3">
-            <p v-if="selectedSimulatedSource"><span class="font-bold">Range: {{ selectedSimulatedSourceTimeRange }}</span></p>
+            <p v-if="selectedSimulatedSource"><span class="font-bold">Range: {{ selectedSimulatedSourceTimeRange
+                }}</span></p>
           </div>
           <div class="mt-3 relative z-10">
             <VueDatePicker v-model="selectedEvaluateDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
@@ -261,7 +262,7 @@
     </div>
 
   </div>
-  <div class="waitgif" v-if="isEvaluationLoading ">
+  <div class="waitgif" v-if="isEvaluationLoading">
     <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
@@ -450,6 +451,13 @@ onMounted(() => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
 
+    // add grid display options to the dropdown if not added already
+    gridDisplayOptions.forEach(option => {
+      if (!plotList.value.some(item => item.name === option)) {
+        plotList.value.push({ name: option, description: '' });
+      }
+    });
+
     // Add Supplemental Table Options to the dropdown
     for (let t = 0; t < supplementalTableOptions.length; t++) {
       if (!plotList.value.some(item => item.name === supplementalTableOptions[t])) {
@@ -483,13 +491,6 @@ onMounted(() => {
 
       //console.log('logLists: ', logLists.value);
     }
-
-    // add grid display options to the dropdown if not added already
-    gridDisplayOptions.forEach(option => {
-      if (!plotList.value.some(item => item.name === option)) {
-        plotList.value.push({ name: option, description: '' });
-      }
-    });
   })
   isEvaluationLoading.value = false;
 });
