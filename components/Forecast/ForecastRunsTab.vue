@@ -202,6 +202,11 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
 
   nextTick(async () => {
+    // clear previously selected forecast job
+    if (selectedForecastJob.value) {
+      selectedForecastJob.value = undefined;
+    }
+
     // clear all user-selected forecast and calibration data
     resetUserSelectedForecastCalibrationRun();
 
