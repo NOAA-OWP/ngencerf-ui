@@ -201,6 +201,7 @@ const onRowContextMenu = (event: any) => {
 
 onMounted(async () => {
   isForecastLoading.value = true;
+
   hilightTab(ForecastTabs.tab_forecastRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
@@ -251,11 +252,10 @@ const clearDataAndNavigateToSetupForecast = () => {
 
     // set userCalibrationRunData
     await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+    isForecastLoading.value = false;
 
     navigateToSetupForecast();
   });
-
-  isForecastLoading.value = false;
 };
 
 const navigateToSetupForecast = () => {
