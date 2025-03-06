@@ -55,7 +55,7 @@ RUN jq -n \
     --arg commit_date "$(date -u -d @$(git log -1 --pretty=format:'%ct') +'%Y-%m-%d %H:%M:%S UTC')" \
     --arg message "$(git log -1 --pretty=format:'%s' | tr '\n' ';')" \
     --arg build_date "$(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
-    '{"ngen-cal": {commit_hash: $commit_hash, branch: $branch, tags: $tags, author: $author, commit_date: $commit_date, message: $message, build_date: $build_date}}' \
+    '{"ngencerf-ui": {commit_hash: $commit_hash, branch: $branch, tags: $tags, author: $author, commit_date: $commit_date, message: $message, build_date: $build_date}}' \
     > $GIT_INFO_PATH
 
 RUN rm -rf .git
