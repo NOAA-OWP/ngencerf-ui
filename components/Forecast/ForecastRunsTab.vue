@@ -38,9 +38,9 @@
 
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmCalibrationRun"></ContextMenu>
+              :model="cmForecastRun"></ContextMenu>
             <DataTable id="cr-list" :value="forecastRuns" scrollable scroll-height="400px"
-              sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
+              sortField="forecast_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
               @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
               class="boxed">
@@ -113,8 +113,7 @@
       </div>
 
     </div>
-    gage_id
-    <div class="waitgif" v-if="isLoading">
+    <div class="waitgif" v-if="isForecastLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
@@ -148,6 +147,7 @@ const {
   calibrationRunsForForecast,
   forecastRuns,
   selectedForecastJob,
+  isForecastLoading,
   forecastCycles } = storeToRefs(forecastStore);
 const {
   setSelectedForecastRunId,
@@ -166,22 +166,17 @@ const crContextMenu = ref(); //calibration run context menu
 const contextMenuJob = ref<number>()
 
 const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
 const { addToastRecord } = generalStore();
 
-const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
+const cmForecastRun = ref<DataTableContextMenuOption[]>([]);
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   bodyCell: { style: { "text-align": "center" } }
 });
 
-const { clearUserCalibrationRunData } = useUserDataStore();
-
-const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-
 const onRowContextMenu = (event: any) => {
-  cmCalibrationRun.value = [];
+  cmForecastRun.value = [];
   const crRowData = event.data as ForecastJob;
   console.log(`crRowData: ${JSON.stringify(crRowData)}`);
 
@@ -190,22 +185,28 @@ const onRowContextMenu = (event: any) => {
     //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
     if (crRowData.forecast_status !== 'Running') {
-      cmCalibrationRun.value.push({ label: 'View Results', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastResults() });
+      cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastResults() });
     } else {
-      cmCalibrationRun.value.push({ label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() });
+      cmForecastRun.value.push({ label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() });
     }
-    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => clearDataAndNavigateToSetupForecast() });
-    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => clearDataAndNavigateToSetupForecast() });
+    cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
   }
 };
 
 onMounted(async () => {
-  isLoading.value = true;
+  isForecastLoading.value = true;
+
   hilightTab(ForecastTabs.tab_forecastRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
   nextTick(async () => {
+    // clear previously selected forecast job
+    if (selectedForecastJob.value) {
+      selectedForecastJob.value = undefined;
+    }
+
     // clear all user-selected forecast and calibration data
     resetUserSelectedForecastCalibrationRun();
 
@@ -216,7 +217,7 @@ onMounted(async () => {
     await getCalibrationJobsForForecast();
   });
 
-  isLoading.value = false;
+  isForecastLoading.value = false;
 });
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
@@ -229,16 +230,16 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
 }
 
 const viewCalibrationDetails = async (calibration_run_id: number) => {
-  isLoading.value = true;
+  isForecastLoading.value = true;
   nextTick(async () => {
     await loadSelectedCalibrationRun(calibration_run_id);
-    isLoading.value = false;
+    isForecastLoading.value = false;
     showMessagesGroup.value = true;
   })
 }
 
 const clearDataAndNavigateToSetupForecast = () => {
-  isLoading.value = true;
+  isForecastLoading.value = true;
 
   nextTick(async () => {
     // clear all user-selected forecast data
@@ -251,11 +252,10 @@ const clearDataAndNavigateToSetupForecast = () => {
 
     // set userCalibrationRunData
     await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+    isForecastLoading.value = false;
 
     navigateToSetupForecast();
   });
-
-  isLoading.value = false;
 };
 
 const navigateToSetupForecast = () => {
@@ -271,11 +271,13 @@ const navigateToSetupForecast = () => {
 }
 
 const navigateToForecastRunStatus = () => {
+  isForecastLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Status/Run Tab"]');
 
     // load status/run tab data
     await loadForecastStatusRunTabData();
+    isForecastLoading.value = false;
 
     if (e) {
       e.click();
@@ -286,11 +288,13 @@ const navigateToForecastRunStatus = () => {
 }
 
 const navigateToForecastResults = () => {
+  isForecastLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results tab"]');
 
     // load results tab data
     await loadForecastResultsTabData();
+    isForecastLoading.value = false;
 
     if (e) {
       e.click();

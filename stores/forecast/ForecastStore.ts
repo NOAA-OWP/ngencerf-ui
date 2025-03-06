@@ -37,6 +37,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const forecastRuns = ref<ForecastJob[]>([]);
   const selectedForecastJob = ref<ForecastJob>();
 
+  const isForecastLoading = ref<boolean>(false);
+
   /**
    * Compute Overall Forcing Download and Forecast status
    */
@@ -427,6 +429,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       clearInterval(forecastJobStatusIntervalId.value);
       forecastJobStatusIntervalId.value =  undefined; 
     }
+    isForecastLoading.value =  false;
 
     clearUserCalibrationRunData();
   }
@@ -453,6 +456,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     uiGageId,
     forecastRuns,
     selectedForecastJob,
+    isForecastLoading,
     overallForcingDownloadForecastStatus,
     getForecastJobs,
     loadSetupForecastTabData,

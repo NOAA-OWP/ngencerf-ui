@@ -149,10 +149,6 @@
       <div id="PlotGraphSliderDateRange">
         <div class="flex flex-row justify-center">
           {{ formatDateString(plotGraphDateRange.start) }} - {{ formatDateString(plotGraphDateRange.end) }}
-          <!-- From:
-          <input type="date" class="select150" v-model="plotGraphDateRange.start" :min="plotGraphDateLimits.start" :max="plotGraphDateLimits.end" @change="updatePlotGraphDates"/>
-          To:
-          <input type="date" class="select150" v-model="plotGraphDateRange.end" :min="plotGraphDateLimits.start" :max="plotGraphDateLimits.end" @change="updatePlotGraphDates"/> -->
         </div>
       </div>
       <div id="PlotGraphSliderHelp">
@@ -272,7 +268,6 @@ import { nextTick } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import VueDatePicker from "@vuepic/vue-datepicker";
 
-import { isValidDate, isValidDateTime } from '@/utils/CommonHelpers';
 import type { DynamicObject } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
@@ -470,7 +465,6 @@ onMounted(() => {
       logs.value = await queryGetLogNames(
         (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
       );
-      //console.log('logs: ', logs.value);
       for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
         Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
           let logList = [];
@@ -488,8 +482,6 @@ onMounted(() => {
           plotList.value.push({ name: optionName, description: '' });
         }
       });
-
-      //console.log('logLists: ', logLists.value);
     }
   })
   isEvaluationLoading.value = false;
@@ -498,7 +490,6 @@ onMounted(() => {
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   // is the selected option a plot or iteration table?
-  // console.log('selectedPlotName: ', selectedPlotName.value);
   if (selectedPlotName.value && supplementalTableOptions.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
@@ -511,7 +502,6 @@ watch(selectedPlotName, async () => {
       if (!iterations.value?._data || !iterations.value?._data?.length) {
         iterations.value = await queryGetIterations();
       }
-      //console.log('iterations:', iterations.value?._data);
 
       // set up array for iterationMetricsData
       iterationMetricsData.value = [];
@@ -535,8 +525,7 @@ watch(selectedPlotName, async () => {
           iterationMetricsData.value.push(iterationMetricsRecord);
         }
       }
-      //console.log('iterationMetricsData:', iterationMetricsData.value);
-      //console.log('iterationMetricsColumns:', iterationMetricsColumns.value);
+
       if (!iterationMetricsData.value.length) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: ToastTimeout.timeout5000 };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -546,7 +535,6 @@ watch(selectedPlotName, async () => {
       if (!iterations.value?._data || !iterations.value?._data?.length) {
         iterations.value = await queryGetIterations();
       }
-      //console.log('iterations:', iterations.value?._data);
 
       // set up array for iterationParamsData
       iterationParamsData.value = [];
@@ -570,8 +558,7 @@ watch(selectedPlotName, async () => {
           iterationParamsData.value.push(iterationParamsRecord);
         }
       }
-      //console.log('iterationParamsData:', iterationParamsData.value);
-      //console.log('iterationParamsColumns:', iterationParamsColumns.value);
+
       if (!iterationParamsData.value.length) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: ToastTimeout.timeout5000 };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -584,7 +571,6 @@ watch(selectedPlotName, async () => {
 
       performanceMetricsData.value = [];
       if (performanceMetrics.value?._data) {
-        //console.log('performanceMetrics:', performanceMetrics.value?._data);
         if (performanceMetrics.value?._data?.performance_metrics) {
           // First add the metric names and the values from our Calibration run
           performanceMetricsColumns.value.push({ header: 'Calibration Job ID ' + calibrationJobId.value, field: 'calibration_job_id_' + calibrationJobId.value });
@@ -642,8 +628,6 @@ watch(selectedPlotName, async () => {
             }
           }
         }
-        //console.log('performanceMetricsData:', performanceMetricsData.value);
-        //console.log('performanceMetricsColumns:', performanceMetricsColumns.value);
       }
       if (!performanceMetricsData.value.length) {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: ToastTimeout.timeout5000 };
@@ -804,7 +788,6 @@ watch(selectedPlotName, async () => {
 
 // Handle selectedPlotTable changes
 watch(selectedPlotTable, async () => {
-  //console.log('selectedPlotName changed');
   if (selectedPlotTable.value !== '') {
     plotTableData.value = plotTables.value[selectedPlotTable.value];
     adjustPlotTableColumns();
@@ -823,9 +806,6 @@ watch(selectedEvaluateDate, async () => {
   if (typeof selectedEvaluateDate.value === 'string') {
     convertSelectedEvaluateDateStringToDateObject(selectedEvaluateDate.value);
   }
-
-  // console.log('isValidDate(selectedEvaluateDate.value): ', isValidDate(selectedEvaluateDate.value));
-  // console.log('selectedEvaluateDate: ', (selectedEvaluateDate.value as Date).toUTCString());
 });
 
 // Watch for page number changes in plot table
@@ -865,7 +845,6 @@ watch(plotGraphData, async () => {
           checked: true
         });
       }
-      //console.log('plotGraphLines: ', plotGraphLines.value);
     }
     nextTick(() => {
       drawInteractivePlot();
@@ -877,7 +856,6 @@ watch(plotGraphData, async () => {
 
 watch(plotGraphDateRange, async () => {
   if (plotGraphDataRaw.value) {
-    //console.log('plotGraphDateRange: ', plotGraphDateRange.value);
     interactivePlotDateFilter();
   }
 });
@@ -887,9 +865,7 @@ watch(selectedLogCategory, async () => {
   selectedLogList.value = logLists.value[selectedLogCategory.value];
   // start with the first log
   selectedLogName.value = selectedLogList.value[0].name;
-  //console.log('selectedLogCategory: ', selectedLogCategory.value);
-  //console.log('selectedLogList: ', selectedLogList.value);
-  //console.log('selectedLogName: ', selectedLogName.value);
+  
   if (!selectedLogList.value.length) {
     const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeout5000 };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -965,7 +941,6 @@ watch(selectedGridType, () => {
 
 // set plotTableColumns whenever plotTableData is changed
 function adjustPlotTableColumns() {
-  //console.log('adjusting plotTableColumns');
   plotTableErrorMessage.value = '';
   plotTableColumns.value = [];
   if (plotTableData.value.length > 0) {
@@ -992,8 +967,6 @@ function adjustPlotTableColumns() {
         }
       });
     }
-    //console.log('plotTableData: ', plotTableData.value);
-    //console.log('plotTableColumns: ', plotTableColumns.value);
   }
 }
 
@@ -1075,8 +1048,7 @@ const drawInteractivePlot = () => {
       }
     }
   }
-  //console.log('plotLineData: ', plotLineData);
-  //console.log('plotDotData: ', plotDotData);
+
   let ruleXposition = new Date(plotGraphDateRange.value.start);
   if (plotLineData.length > 0) {
     ruleXposition = new Date(plotLineData[0].time);
@@ -1119,7 +1091,6 @@ const drawInteractivePlot = () => {
   }
   plotGraphOptions.value.marks.push(Plot.ruleX([ruleXposition]));
   plotGraphOptions.value.marks.push(Plot.ruleY([0]));
-  //console.log('plotGraphOptions: ', plotGraphOptions.value);
   plotGraphSVG.value.innerHTML = '';
   plotGraphSVG.value.append(Plot.plot(plotGraphOptions.value));
   nextTick(() => {
@@ -1191,9 +1162,7 @@ const updatePlotGraphDates = () => {
 
 const interactivePlotDateFilter = () => {
   let tempPlotGraphData = [];
-  //console.log('plotGraphDataRaw.length', plotGraphDataRaw.value.length);
-  //console.log('plotGraphDateLimits', plotGraphDateLimits.value);
-  //console.log('plotGraphDateRange', plotGraphDateRange.value);
+
   if (plotGraphDateRange.value.start > plotGraphDateRange.value.end) {
     plotGraphDateRange.value = {
       start: plotGraphDateRange.value.end,
@@ -1218,7 +1187,6 @@ const interactivePlotDateFilter = () => {
       tempPlotGraphData.push(plotGraphDataRaw.value[r]);
     }
   }
-  //console.log('tempPlotGraphData.length', tempPlotGraphData.length);
   let tempPlotGraphDataFiltered = [];
   if (tempPlotGraphData.length > 1000) {
     // only plot 1,000 data points at a time
@@ -1228,7 +1196,6 @@ const interactivePlotDateFilter = () => {
         tempPlotGraphDataFiltered.push(tempPlotGraphData[Math.floor(r)]);
       }
     }
-    //console.log('tempPlotGraphDataFiltered.length', tempPlotGraphDataFiltered.length);
     plotGraphData.value = tempPlotGraphDataFiltered;
   } else {
     plotGraphData.value = tempPlotGraphData;
