@@ -75,7 +75,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const loadSweImages = async (validation_run_id: number, date: string): Promise<string[]> => {
     const getSweImagesResponse = await getSweImagesByDate(validation_run_id, date);
 
-    if (getSweImagesResponse.status >= 200 || getSweImagesResponse.status < 300) {
+    if (getSweImagesResponse.status >= 200 && getSweImagesResponse.status < 300) {
       if (getSweImagesResponse._data) {
         selectedSnodasLumpedMapUrl.value = getSweImagesResponse?._data?.lumped_map;
         selectedSnodasRawMapUrl.value = getSweImagesResponse?._data?.raw_map;

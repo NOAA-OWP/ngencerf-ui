@@ -114,7 +114,7 @@
 
     </div>
     gage_id
-    <div class="waitgif" v-if="isLoading">
+    <div class="waitgif" v-if="isForecastLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
@@ -148,6 +148,7 @@ const {
   calibrationRunsForForecast,
   forecastRuns,
   selectedForecastJob,
+  isForecastLoading,
   forecastCycles } = storeToRefs(forecastStore);
 const {
   setSelectedForecastRunId,
@@ -166,7 +167,6 @@ const crContextMenu = ref(); //calibration run context menu
 const contextMenuJob = ref<number>()
 
 const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
 const { addToastRecord } = generalStore();
 
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
@@ -200,7 +200,7 @@ const onRowContextMenu = (event: any) => {
 };
 
 onMounted(async () => {
-  isLoading.value = true;
+  isForecastLoading.value = true;
   hilightTab(ForecastTabs.tab_forecastRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
@@ -216,7 +216,7 @@ onMounted(async () => {
     await getCalibrationJobsForForecast();
   });
 
-  isLoading.value = false;
+  isForecastLoading.value = false;
 });
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
@@ -229,16 +229,16 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
 }
 
 const viewCalibrationDetails = async (calibration_run_id: number) => {
-  isLoading.value = true;
+  isForecastLoading.value = true;
   nextTick(async () => {
     await loadSelectedCalibrationRun(calibration_run_id);
-    isLoading.value = false;
+    isForecastLoading.value = false;
     showMessagesGroup.value = true;
   })
 }
 
 const clearDataAndNavigateToSetupForecast = () => {
-  isLoading.value = true;
+  isForecastLoading.value = true;
 
   nextTick(async () => {
     // clear all user-selected forecast data
@@ -255,7 +255,7 @@ const clearDataAndNavigateToSetupForecast = () => {
     navigateToSetupForecast();
   });
 
-  isLoading.value = false;
+  isForecastLoading.value = false;
 };
 
 const navigateToSetupForecast = () => {
@@ -271,11 +271,13 @@ const navigateToSetupForecast = () => {
 }
 
 const navigateToForecastRunStatus = () => {
+  isForecastLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Status/Run Tab"]');
 
     // load status/run tab data
     await loadForecastStatusRunTabData();
+    isForecastLoading.value = false;
 
     if (e) {
       e.click();
@@ -286,11 +288,13 @@ const navigateToForecastRunStatus = () => {
 }
 
 const navigateToForecastResults = () => {
+  isForecastLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results tab"]');
 
     // load results tab data
     await loadForecastResultsTabData();
+    isForecastLoading.value = false;
 
     if (e) {
       e.click();
