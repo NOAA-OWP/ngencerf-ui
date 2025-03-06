@@ -62,11 +62,15 @@
           <div v-if="selectedPlotHasTimeseries">
             <div v-if="!showPlotGraph">
               <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
-                Show Interactive Time Series Viewer</a>
+                <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">Show SWE Time Series</span>
+                <span v-else>Show Interactive Time Series Viewer</span>
+              </a>
             </div>
             <div v-else>
               <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
-                Hide Interactive Time Series Viewer</a>
+                <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">Hide SWE Time Series</span>
+                <span v-else>Hide Interactive Time Series Viewer</span>
+              </a>
               <div v-if="plotGraphLines.length > 0" class="columns-2">
                 <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
                   <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
@@ -239,9 +243,6 @@
           </div>
         </div>
         <div class="p-2 relative overflow-visible">
-          <div class="flex justify-end">
-            <a class="c-blue text-sm underline mt-6 ml-auto" href="#">Show SWE Time Series</a>
-          </div>
           <div class="text-sm font-semibold mt-3">
             <p v-if="selectedSimulatedSource"><span class="font-bold">Range: {{ selectedSimulatedSourceTimeRange
                 }}</span></p>
