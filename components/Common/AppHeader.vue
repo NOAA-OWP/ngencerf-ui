@@ -60,67 +60,75 @@
             <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
               class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
           </div>
-          <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
-            <LazyHelpLandingPageHelp />
-          </div>
-          <div v-if="location.name === 'Calibration'" class="py-10 px-1">
-            <div v-if="getMenuIndex() === 1">
-              <span v-if="getCalibrationTabIndex() === 1">
-                <LazyCalibrationHelpPreviousRunsHelp />
+
+          <span v-if="filterIsVisible()">
+            <JobFilterHelp />
+          </span>
+
+          <span v-else>
+            <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
+              <LazyHelpLandingPageHelp />
+            </div>
+
+            <div v-if="location.name === 'Calibration'" class="py-10 px-1">
+              <div v-if="getMenuIndex() === 1">
+                <span v-if="getCalibrationTabIndex() === 1">
+                  <LazyCalibrationHelpPreviousRunsHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 2">
+                  <LazyCalibrationHelpHeadwaterBasinGageHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 3">
+                  <LazyCalibrationHelpFormulationHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 4">
+                  <LazyCalibrationHelpTuningControlsHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 5">
+                  <LazyCalibrationHelpOptimizationMetricsHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 6">
+                  <LazyCalibrationHelpRunStatusHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 7">
+                  <LazyCalibrationHelpResultsHelp />
+                </span>
+              </div>
+            </div>
+
+            <div v-else-if="getMenuIndex() === 2">
+              <span v-if="getEvaluationTabIndex() === 1">
+                <LazyEvaluationCalibrationRunsHelp />
               </span>
-              <span v-else-if="getCalibrationTabIndex() === 2">
-                <LazyCalibrationHelpHeadwaterBasinGageHelp />
+              <span v-if="getEvaluationTabIndex() === 2">
+                <LazyEvaluationEvaluatesHelp />
               </span>
-              <span v-else-if="getCalibrationTabIndex() === 3">
-                <LazyCalibrationHelpFormulationHelp />
+              <span v-if="getEvaluationTabIndex() === 3">
+                <LazyEvaluationCalibrationSelectAltInterationssHelp />
               </span>
-              <span v-else-if="getCalibrationTabIndex() === 4">
-                <LazyCalibrationHelpTuningControlsHelp />
-              </span>
-              <span v-else-if="getCalibrationTabIndex() === 5">
-                <LazyCalibrationHelpOptimizationMetricsHelp />
-              </span>
-              <span v-else-if="getCalibrationTabIndex() === 6">
-                <LazyCalibrationHelpRunStatusHelp />
-              </span>
-              <span v-else-if="getCalibrationTabIndex() === 7">
-                <LazyCalibrationHelpResultsHelp />
+              <span v-if="getEvaluationTabIndex() === 4">
+                <LazyEvaluationRunStatusHelp />
               </span>
             </div>
-          </div>
 
-          <div v-else-if="getMenuIndex() === 2">
-            <span v-if="getEvaluationTabIndex() === 1">
-              <LazyEvaluationCalibrationRunsHelp />
-            </span>
-            <span v-if="getEvaluationTabIndex() === 2">
-              <LazyEvaluationEvaluatesHelp />
-            </span>
-            <span v-if="getEvaluationTabIndex() === 3">
-              <LazyEvaluationCalibrationSelectAltInterationssHelp />
-            </span>
-            <span v-if="getEvaluationTabIndex() === 4">
-              <LazyEvaluationRunStatusHelp />
-            </span>
-          </div>
-
-          <div v-else-if="getMenuIndex() === 3">
-            <span v-if="getForecastTabIndex() === 1">
-              <LazyForecastCalibrationRunsHelp />
-            </span>
-            <span v-if="getForecastTabIndex() === 2">
-              <LazyForecastForecastRunsHelp />
-            </span>
-            <span v-if="getForecastTabIndex() === 3">
-              <LazyForecastSetupForecastHelp />
-            </span>
-            <span v-if="getForecastTabIndex() === 4">
-              <LazyForecastStatusRunHelp />
-            </span>
-            <span v-if="getForecastTabIndex() === 5">
-              <LazyForecastResultsHelp />
-            </span>
-          </div>
+            <div v-else-if="getMenuIndex() === 3">
+              <span v-if="getForecastTabIndex() === 1">
+                <LazyForecastCalibrationRunsHelp />
+              </span>
+              <span v-if="getForecastTabIndex() === 2">
+                <LazyForecastForecastRunsHelp />
+              </span>
+              <span v-if="getForecastTabIndex() === 3">
+                <LazyForecastSetupForecastHelp />
+              </span>
+              <span v-if="getForecastTabIndex() === 4">
+                <LazyForecastStatusRunHelp />
+              </span>
+              <span v-if="getForecastTabIndex() === 5">
+                <LazyForecastResultsHelp />
+              </span>
+            </div>
+          </span>
 
         </div>
       </Transition>
@@ -148,6 +156,8 @@ import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 
 import { useLogout, useLogoutListen } from "@/composables/UseEventBus";
+
+import JobFilterHelp from "@/components/Help/JobFilterHelp.vue"
 
 const LazyHelpLandingPageHelp = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
 const LazyCalibrationHelpPreviousRunsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/PreviousRunsHelp.vue"))
@@ -185,6 +195,9 @@ const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabInde
 
 const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
+const userStore = useUserDataStore();
+
+
 const location = useRoute();
 
 const userInitials = ref<string>('');
@@ -216,7 +229,7 @@ onMounted(() => {
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
     sizeLogWindow();
-  });  
+  });
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 });
 
@@ -224,8 +237,17 @@ onUnmounted(() => {
   window.removeEventListener('resize', function (event) {
     sizeHelpWindow();
     sizeLogWindow();
-  }); 
+  });
 });
+
+
+const filterIsVisible =  () => {
+  let el = document.getElementById('JobFilterDialog');
+  if (!el || el?.style.display === 'none') {
+    return false;
+  }
+  return true;
+}
 
 
 // Handle submitTimeDate changes
@@ -250,8 +272,8 @@ const sizeLogWindow = () => {
   if (footerTop && headerHeight) {
     let h = (footerTop - headerHeight) - 20;
     let ele = document.getElementById("ErrorLog");
-    if (ele) { ele.style.height = h + 'px'; } 
- };
+    if (ele) { ele.style.height = h + 'px'; }
+  };
 };
 
 /**
@@ -279,7 +301,7 @@ const errorLog = async () => {
 useAccountEventListen('accountEvent', () => {
   const ele = document.getElementById('UserAccountOverlay') as HTMLElement;
   ele.style.display = "none";
-  popupActive.value = false;  
+  popupActive.value = false;
 })
 
 useAccountEventListen('aboutBoxEvent', () => {
@@ -296,7 +318,7 @@ useAccountEventListen('errorLogEvent', () => {
 
 useLogoutListen('logoutEvent', (evStr: string) => {
   if (evStr === "token" && !getIsTokenExpired()) {
-    popupActive.value = false;  
+    popupActive.value = false;
     setIsTokenExpired();
     alert("Your session has expired. Please log in again.");
     useLogout("logoutEvent", "logout");

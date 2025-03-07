@@ -376,7 +376,7 @@ export const useUserDataStore = defineStore(
       showArchivedJobsOnly,
       filterCalibrations,
       filterEvaluations,
-    };
+          };
   },
   {
     persist: {

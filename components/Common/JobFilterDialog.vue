@@ -3,19 +3,8 @@
     :class="isDragging ? 'cursor-move' : ''">
 
     <div id="Header" class="mb-2">
-      <div class="grid grid-cols-12">
-        <div class="col-span-11">
-          <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white cursor-[grabbing] ">Calibration Job Filters
-          </div>
-        </div>
-        <div class="col-span-1">
-          <Button  class="float-left" style="padding-top:0px"
-            id="HelpCircle" title="Help for current tab" aria-label="Help for current tab"
-            @click="displayFilterHelp">?</Button>
-        </div>
+      <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white cursor-[grabbing] ">Calibration Job Filters
       </div>
-
-
     </div>
 
     <div id="FilterDialog">
@@ -97,13 +86,13 @@
                 <div id="CalValSelect" class="flex flex-column gap-2 text-center">
                   <div>
                     <Checkbox inputId="FilterCalibrations" name="FilterCalibrations" v-model="filterCalibrations"
-                      :checked="true" binary />
+                        :checked="true" binary />
                     <label for="FilterCalibrations" class="text-sm font-light text-center">Calibrations</label>
                   </div>
                   <div>
                     <Checkbox CalValId="FilterEvaluations" name="FilterEvaluations" v-model="filterEvaluations"
-                      binary />
-
+                       binary />
+    
                     <label for="FilterEvaluationsFilterEvaluations"
                       class="text-sm font-light text-center">Validations</label>
                   </div>
@@ -210,17 +199,12 @@ onMounted(() => {
         });
       }
       setFilterDateRange();
-
     }, 0)
   });
 })
 
 const handleRadioClick = (btn: number) => {
   setFilterDateRange();
-}
-
-const displayFilterHelp = () => {
-//
 }
 
 const setFilterDateRange = () => {
@@ -327,25 +311,6 @@ const handleCalDateEnd = (value: any) => {
   padding: 0 15px;
 }
 
-#HelpCircle {
-  height: 36px;
-  width: 36px;
-  margin-top: 2px;
-  background-color: global.$ngwcp_primary2;
-  color: white;
-  border-radius: 50%;
-  font-size: 24px;
-  border: 1px solid #000;
-  cursor: pointer;
-}
-
-#UserCircle:hover {
-  background-color: global.$ngwcp_primary2;
-}
-
-#HelpCircle:hover {
-  background-color: global.$ngwcp_primary3;
-}
 .p-listbox {
   border-radius: 0px;
 }

@@ -4,11 +4,11 @@
       <div>
         <!-- Page top -->
         <div>
-          <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">Calibration Jobs</h1>
+          <h1 class="mt-10 mb-6 text-3xl font-bold inline-block">Calibration Jobs</h1>
           <Button class="ngenButtonDiv ml-8" @click="createNewCalibration" aria-label="New Calibration Job"
             title="New Calibration Job">New</Button>
           <br />
-          <p class="prompt-txt mb-6" style="margin-top:-10px;">
+          <p class="prompt-txt mb-2" style="margin-top:-10px;">
             Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
           </p>
         </div>
@@ -18,7 +18,7 @@
           <div id="CalTable" class="w-max mx-auto">
             <!-- Filters -->
             <div class="text-left">
-              <div id="FilterButton" class="text-left mt-2 mb-1 inline-block">
+              <div id="FilterButton" class="text-left mb-1 inline-block">
                 <Button class="filter-link" @click="toggleShowFilters">Filters</Button>
               </div>
               <div class="ml-2 mt-[19px] text-left inline-block">
