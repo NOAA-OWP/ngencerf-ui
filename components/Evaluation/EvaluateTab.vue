@@ -240,13 +240,16 @@
         </div>
         <div class="p-2 relative overflow-visible">
           <div class="text-sm font-semibold mt-3">
-            <p v-if="selectedSimulatedSource"><span class="font-bold">Range: {{ selectedSimulatedSourceTimeRange
-                }}</span></p>
+            <p>
+              <span class="font-bold">
+                {{ sweTimeRange }}
+              </span>
+            </p>
           </div>
           <div class="mt-3 relative z-10">
-            <VueDatePicker v-model="selectedEvaluateDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-              @update:model-value="convertSelectedEvaluateDateStringToDateObject" :enable-time-picker="false"
-              :teleport="true" utc='preserve' />
+            <VueDatePicker v-model="selectedSweDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+              @update:model-value="convertSelectedSweDateStringToDateObject" :enable-time-picker="false"
+              :min-date="sweStartDate" :max-date="swEndDate" :teleport="true" utc='preserve' />
           </div>
           <div class="flex justify-end mt-3">
             <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plots"
@@ -270,6 +273,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import type { DynamicObject } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
+import { formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
@@ -306,11 +310,12 @@ const {
   selectedPlotFilename,
   selectedPlotFileUrl,
   simulatedSources,
-  selectedSimulatedSource,
   gridTypes,
   selectedGridType,
-  selectedEvaluateDate,
-  selectedSimulatedSourceTimeRange,
+  sweStartDate,
+  swEndDate,
+  sweTimeRange,
+  selectedSweDate,
   selectedSnodasLumpedMapUrl,
   selectedSnodasRawMapUrl,
   selectedSnodasSimMapUrl,
@@ -444,7 +449,6 @@ onMounted(() => {
     if (plotNames.value?._data?.plot_names) {
       // setting plotList will populate the dropdown
       plotList.value = plotNames?.value?._data?.plot_names;
-      console.log('plotList: ', plotList.value);
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
@@ -678,10 +682,6 @@ watch(selectedPlotName, async () => {
 
     // default SNODAS image to SWE catchment map
     selectedGridType.value = 'catchment';
-
-    // default to 'Validation Best Run' for simulated source
-    selectedSimulatedSource.value = 'Validation Best Run';
-
   } else if (selectedPlotName.value) {
     plotGraphData.value = [];
     plotGraphLines.value = [];
@@ -810,17 +810,17 @@ watch(selectedPlotTable, async () => {
   }
 });
 
-// Convert selectedEvaluateDate string to Date object
-// VueDatePicker sets selectedEvaluateDate to a string, so we need to convert it to a Date object
-const convertSelectedEvaluateDateStringToDateObject = (value: string) => {
-  selectedEvaluateDate.value = new Date(value);
+// Convert selectedSweDate string to Date object
+// VueDatePicker sets selectedSweDate to a string, so we need to convert it to a Date object
+const convertSelectedSweDateStringToDateObject = (value: string) => {
+  selectedSweDate.value = new Date(value);
 }
 
-// Handle selectedEvaluateDate changes
-// if selectedEvaluateDate is a string, convert it to a Date object
-watch(selectedEvaluateDate, async () => {
-  if (typeof selectedEvaluateDate.value === 'string') {
-    convertSelectedEvaluateDateStringToDateObject(selectedEvaluateDate.value);
+// Handle selectedSweDate changes
+// if selectedSweDate is a string, convert it to a Date object
+watch(selectedSweDate, async () => {
+  if (typeof selectedSweDate.value === 'string') {
+    convertSelectedSweDateStringToDateObject(selectedSweDate.value);
   }
 });
 
@@ -1439,11 +1439,6 @@ watch(selectedLogCurrentPage, async () => {
   }
 });
 
-// watch for changes in selectedGridType
-watch(selectedGridType, () => {
-  console.log('selectedGridType: ', selectedGridType.value);
-});
-
 function capitalCase(str: string) {
   return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -1479,7 +1474,7 @@ const getSpatialPlot = async () => {
   isEvaluationLoading.value = true;
   if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
     // load the SWE images
-    await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value as Date));
+    await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedSweDate.value as Date));
   }
   isEvaluationLoading.value = false;
 }
@@ -1497,7 +1492,7 @@ const getSpatialPlots = async () => {
   isEvaluationLoading.value = true;
   if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
     // load the SWE images
-    const loadSweImagesErrors = await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value as Date));
+    const loadSweImagesErrors = await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedSweDate.value as Date));
     if (loadSweImagesErrors) {
       loadSweImagesErrors.forEach((errorMessage) => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage };

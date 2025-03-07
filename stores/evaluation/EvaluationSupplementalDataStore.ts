@@ -31,9 +31,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     'Validation Best Run',
     'Validation Alt Iteration X Run'
   ]);
-  const selectedSimulatedSource = ref<string>();
-  const selectedSimulatedSourceStartDate = ref<string>();
-  const selectedSimulatedSourceEndDate = ref<string>();
+  const sweStartDate = ref<string>();
+  const swEndDate = ref<string>();
 
 
   const gridTypes = ref<string[]>([
@@ -41,7 +40,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     'Catchment Means'
   ]);
   const selectedGridType = ref<string>();
-  const selectedEvaluateDate = ref<Date | string>();
+  const selectedSweDate = ref<Date | string>();
 
   const selectedSnodasLumpedMapUrl = ref<string>();
   const selectedSnodasRawMapUrl = ref<string>();
@@ -50,23 +49,16 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const isEvaluationLoading = ref<boolean>(false);
 
   /**
-   * Computes the selected simulated source time range depending on the selected simulated source
+   * set sweStartDate, swEndDate, and selectedSweDate
    */
-  const selectedSimulatedSourceTimeRange = computed(() => {
-    if (selectedSimulatedSource?.value?.includes('Calibration')) {
-      selectedSimulatedSourceStartDate.value = `${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_start_time as string)}`;
-      selectedSimulatedSourceEndDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_end_time as string);
-    }
+  const sweTimeRange = computed((): string => {
+    sweStartDate.value = userCalibrationRunData?.value?.validation_times?.validation_start_time;
+    swEndDate.value = userCalibrationRunData?.value?.validation_times?.validation_end_time;
 
-    else if (selectedSimulatedSource?.value?.includes('Validation')) {
-      selectedSimulatedSourceStartDate.value = `${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string)}`;
-      selectedSimulatedSourceEndDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_end_time as string);
-    }
+    // default selectedSweDate to validation_start_time in order to have a default value for the date picker
+    selectedSweDate.value = userCalibrationRunData?.value?.validation_times?.validation_start_time;
 
-    // default selectedEvaluateDate to validation_start_time in order to have a default value for the date picker
-    selectedEvaluateDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string);
-
-    return `${selectedSimulatedSourceStartDate.value} to ${selectedSimulatedSourceEndDate.value}`;
+    return `Range: ${formatISOStringOrDateToYYYYMMDD(sweStartDate.value as string)} to ${formatISOStringOrDateToYYYYMMDD(swEndDate.value as string)}`;
   });
 
   /**
@@ -219,11 +211,12 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedPlotFilename,
     selectedPlotFileUrl,
     simulatedSources,
-    selectedSimulatedSource,
     gridTypes,
     selectedGridType,
-    selectedEvaluateDate,
-    selectedSimulatedSourceTimeRange,
+    sweStartDate,
+    swEndDate,
+    selectedSweDate,
+    sweTimeRange,
     selectedSnodasLumpedMapUrl,
     selectedSnodasRawMapUrl,
     selectedSnodasSimMapUrl,
