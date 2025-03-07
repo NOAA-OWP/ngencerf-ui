@@ -45,7 +45,8 @@ export const useUserDataStore = defineStore(
     const whichDatesToFilter = ref<number>(0);
     const calFilterEnabled = ref<boolean>(false);
     const showArchivedJobsOnly = ref<boolean>(false);
-    const includeValidationRuns = ref<boolean>(true);
+    const filterCalibrations = ref<boolean>(true);
+    const filterEvaluations = ref<boolean>(false);
 
     /**
      * Checks if user is logged in
@@ -373,7 +374,8 @@ export const useUserDataStore = defineStore(
       whichDatesToFilter,
       calFilterEnabled,
       showArchivedJobsOnly,
-      includeValidationRuns
+      filterCalibrations,
+      filterEvaluations,
     };
   },
   {

@@ -77,10 +77,28 @@
             </div>
 
             <div class="row-span-1">
-              <Checkbox v-model="includeValidationRuns" class="mt-[7px]" inputId="includeValidationRuns"
-                name="includeValidationRuns" binary>
+              <!-- <Checkbox v-model="showCalOrVal" class="mt-[7px]" inputId="showCalOrVal"
+                name="showCalOrVal" binary>
               </Checkbox>
-              <span class="cursor-default">&nbsp;Include Validation Runs</span>
+              <span class="cursor-default">&nbsp;Include Validation Runs</span> -->
+
+              <div class="mt-2">
+                <div id="CalValSelect" class="flex flex-column gap-2 text-center">
+                  <div>
+                    <Checkbox inputId="FilterCalibrations" name="FilterCalibrations" v-model="filterCalibrations"
+                        :checked="true" binary />
+                    <label for="FilterCalibrations" class="text-sm font-light text-center">Calibrations</label>
+                  </div>
+                  <div>
+                    <Checkbox CalValId="FilterEvaluations" name="FilterEvaluations" v-model="filterEvaluations"
+                       binary />
+    
+                    <label for="FilterEvaluationsFilterEvaluations"
+                      class="text-sm font-light text-center">Validations</label>
+                  </div>
+
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -128,7 +146,7 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 import { useUserDataStore } from "~/stores/common/UserDataStore";
 const userStore = useUserDataStore();
 const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList,
-  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter, includeValidationRuns } = storeToRefs(useUserDataStore());
+  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter, filterCalibrations, filterEvaluations } = storeToRefs(useUserDataStore());
 
 const emit = defineEmits(["ModulesFilterDialogClosing"]);
 
