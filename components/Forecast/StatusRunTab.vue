@@ -139,7 +139,7 @@ import { useForecastStore } from '@/stores/forecast/ForecastStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 import { isValidDate } from '@/utils/CommonHelpers';
-import { calculateElapsedTime, formatElapsedTime } from '@/utils/TimeHelpers';
+import { calculateElapsedTime, formatElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
@@ -222,16 +222,6 @@ const createForcingDownloadAndForecastStatusInterval = () => {
       // update forcingDownloadStatus and forecastJobStatus
       forecastJobStatus.value = forecast.status;
       forcingDownloadStatus.value = forecast.forcing_download.status;
-
-      // if overallForcingDownloadForecastStatus is Done, set elapsedTime to Forecast job's elapsed_time
-      if (overallForcingDownloadForecastStatus.value === 'Done') {
-        if (forecast.elapsed_time) {
-          elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
-        } else {
-          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` };
-          toast.add(tMsg); addToastRecord(tMsg);
-        }
-      }
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -332,8 +322,9 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
     }
   }
 
-  // when overallForcingDownloadForecastStatus changes to Done, look for elapsedTime from server
-  // if interval incrementing elapsedTime every second is no longer running
+  // when overallForcingDownloadForecastStatus changes to Done, look for Forcing Download and Forecast 
+  // elapsedTimes from server and set elapsedTime to the sum of those durations
+  //  if interval incrementing elapsedTime every second is no longer running
   if (forcingDownloadStatus.value === 'Done' || forecastJobStatus.value === 'Done') {
     // if forecastJobStatusIntervalId is not set, that means elapsedTime is no longer incrementing every second
     // so we need to get elapsed_time from the server
@@ -343,8 +334,12 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
       const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
       if (forecast) {
-        if (forecast.elapsed_time) {
-          elapsedTime.value = formatElapsedTime(forecast.elapsed_time);
+        if (forecast.elapsed_time && forecast.forcing_download.elapsed_time) {
+          let elapsedTimeArray: string[] = [];
+          elapsedTimeArray.push(forecast.elapsed_time);
+          elapsedTimeArray.push(forecast.forcing_download.elapsed_time);
+
+          elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
         } else {
           const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` };
           toast.add(tMsg); addToastRecord(tMsg);

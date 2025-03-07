@@ -20,12 +20,6 @@
             </span>
           </h1>
         </div>
-        <div class="ml-auto mt-2">
-          <div id="NewButton"><Button id="btn-new-validation" class="ngenButtonDiv-alt bg-blue4"
-              v-if="forecastJobId && forecastJobId > 0" aria-label="New Forecast Button" title="New Forecast Button"
-              @click="navigateToSetupForecast">New
-              Forecast</Button></div>
-        </div>
       </div>
 
       <div id="calibrationRunList">
@@ -44,9 +38,9 @@
 
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmCalibrationRun"></ContextMenu>
+              :model="cmForecastRun"></ContextMenu>
             <DataTable id="cr-list" :value="forecastRuns" scrollable scroll-height="400px"
-              sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
+              sortField="forecast_run_id" :sortOrder="-1" table-style="min-width: 50rem"
               v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
               @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
               class="boxed">
@@ -119,8 +113,7 @@
       </div>
 
     </div>
-    gage_id
-    <div class="waitgif" v-if="isLoading">
+    <div class="waitgif" v-if="isForecastLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
@@ -130,7 +123,7 @@
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun, DataTableContextMenuOption, ForecastJob } from "@/composables/NextGenModel";
+import type { CalibrationRun, CalibrationRunForForecast, DataTableContextMenuOption, ForecastJob } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 
@@ -145,69 +138,87 @@ import type { DataTableRowClickEvent } from "primevue/datatable";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const forecastStore = useForecastStore();
-const { forecastRunGageList, forecastJobId, uiGageId, forecastRuns, forecastCycles } = storeToRefs(forecastStore);
-const { setSelectedForecastRunId, resetSelectedForecastRunId, loadSelectedCalibrationRun, setSelectedForecastRowData, fetchForecastJobsListData, resetSelectedCalibrationRunId, loadSetupForecastTabData } = useForecastStore();
+const {
+  forecastRunGageList,
+  forecastJobId,
+  forecastJobStatus,
+  uiGageId,
+  calibrationRunForForecast,
+  calibrationRunsForForecast,
+  forecastRuns,
+  selectedForecastJob,
+  isForecastLoading,
+  forecastCycles } = storeToRefs(forecastStore);
+const {
+  setSelectedForecastRunId,
+  resetSelectedForecastRunData,
+  loadSetupForecastTabData,
+  loadForecastStatusRunTabData,
+  loadForecastResultsTabData,
+  loadSelectedCalibrationRun,
+  setSelectedForecastRowData,
+  getForecastJobs,
+  getCalibrationJobsForForecast,
+  resetUserSelectedForecastCalibrationRun } = useForecastStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 const contextMenuJob = ref<number>()
 
 const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
 const { addToastRecord } = generalStore();
 
-const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
+const cmForecastRun = ref<DataTableContextMenuOption[]>([]);
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   bodyCell: { style: { "text-align": "center" } }
 });
 
-const { clearUserCalibrationRunData } = useUserDataStore();
-
-const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-
-//this model is for highlighting purpose
-const selectedForecastJob = ref<ForecastJob>();
-
 const onRowContextMenu = (event: any) => {
-  cmCalibrationRun.value = [];
+  cmForecastRun.value = [];
   const crRowData = event.data as ForecastJob;
+  console.log(`crRowData: ${JSON.stringify(crRowData)}`);
 
   if (selectedForecastJob && selectedForecastJob.value?.forecast_run_id == crRowData.forecast_run_id) {
     crContextMenu.value.show(event.originalEvent);
     //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
-    if (crRowData.forecast_status.toUpperCase() !== 'RUNNING') {
-      cmCalibrationRun.value.push({ label: 'View Results', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastResults() });
+    if (crRowData.forecast_status !== 'Running') {
+      cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastResults() });
     } else {
-      cmCalibrationRun.value.push({ label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() });
+      cmForecastRun.value.push({ label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() });
     }
-    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => navigateToSetupForecast() });
-    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
-    //cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() } );
-    //cmCalibrationRun.value.push( { label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onCalibrationRunForForecastRowSelect() } );    
+    cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => clearDataAndNavigateToSetupForecast() });
+    cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
   }
 };
 
 onMounted(async () => {
-  isLoading.value = true;
+  isForecastLoading.value = true;
+
   hilightTab(ForecastTabs.tab_forecastRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
-  await fetchForecastJobsListData();
-  if (!forecastCycles.value || forecastCycles.value.length === 0) {
-    await loadSetupForecastTabData();
-  }
-  isLoading.value = false;
-  resetSelectedForecastRunId();
-});
 
-const onRowDblClick = (event: any) => {
-  const rowData = event.data;
-  contextMenuJob.value = rowData.calibration_run_id;
-  openSelectedCalibrationRun();
-}
+  nextTick(async () => {
+    // clear previously selected forecast job
+    if (selectedForecastJob.value) {
+      selectedForecastJob.value = undefined;
+    }
+
+    // clear all user-selected forecast and calibration data
+    resetUserSelectedForecastCalibrationRun();
+
+    // load forecastRuns
+    await getForecastJobs();
+
+    // load calibrationRunsForForecast
+    await getCalibrationJobsForForecast();
+  });
+
+  isForecastLoading.value = false;
+});
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
   const rowData = event.data as ForecastJob;
@@ -215,50 +226,82 @@ const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
 }
 
 const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
-  resetSelectedForecastRunId();
+  resetSelectedForecastRunData();
 }
 
 const viewCalibrationDetails = async (calibration_run_id: number) => {
-  isLoading.value = true;
+  isForecastLoading.value = true;
   nextTick(async () => {
     await loadSelectedCalibrationRun(calibration_run_id);
-    isLoading.value = false;
+    isForecastLoading.value = false;
     showMessagesGroup.value = true;
   })
 }
 
-const openSelectedCalibrationRun = () => {
-  isLoading.value = true;
-  // resetUserSelectedEvalValidationRun();
+const clearDataAndNavigateToSetupForecast = () => {
+  isForecastLoading.value = true;
+
   nextTick(async () => {
-    // await loadSelectedCalibrationRun(contextMenuJob.value as number);
-    // await fetchUserSelectedCalibrationValidationRunList();
+    // clear all user-selected forecast data
+    resetUserSelectedForecastCalibrationRun();
+
+    // set calibrationRunForForecast based on selectedForecastJob
+    calibrationRunForForecast.value = calibrationRunsForForecast.value.find((calibrationRun: CalibrationRunForForecast) => {
+      return calibrationRun.calibration_run_id === selectedForecastJob.value?.calibration_run_id;
+    }) as CalibrationRunForForecast;
+
+    // set userCalibrationRunData
+    await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+    isForecastLoading.value = false;
+
     navigateToSetupForecast();
-    isLoading.value = false;
-  })
-}
+  });
+};
 
 const navigateToSetupForecast = () => {
-  if (true) {
-    const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
-    e.click();
-  } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeout6000 };
-    toast.add(tMsg); addToastRecord(tMsg);
-  }
+  nextTick(() => {
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast tab"]');
+
+    if (e) {
+      e.click();
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast tab not found' } as ToastMessageOptions);
+    }
+  });
 }
 
 const navigateToForecastRunStatus = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[ForecastTabs.tab_statusRun];
-  e.click();
+  isForecastLoading.value = true;
+  nextTick(async () => {
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Status/Run Tab"]');
+
+    // load status/run tab data
+    await loadForecastStatusRunTabData();
+    isForecastLoading.value = false;
+
+    if (e) {
+      e.click();
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Status/Run tab not found' } as ToastMessageOptions);
+    }
+  });
 }
 
 const navigateToForecastResults = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[ForecastTabs.tab_results];
-  e.click();
+  isForecastLoading.value = true;
+  nextTick(async () => {
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Results tab"]');
+
+    // load results tab data
+    await loadForecastResultsTabData();
+    isForecastLoading.value = false;
+
+    if (e) {
+      e.click();
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found' } as ToastMessageOptions);
+    }
+  });
 }
 
 const rowStyle = (data: any) => {
