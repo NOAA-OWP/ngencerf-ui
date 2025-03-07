@@ -7,18 +7,20 @@
     <div class="ml-10 mt-3">
       <p>Filters are applied in this manner:</p>
       <ul class="mt-4">
-        <li>The base collection of jobs is determined by the Headwater Basic Gage dropdown, which allows the job list
-          to be filtered for a specific gage, or "All" to display all jobs returnd by the server.
+        <li>The base collection of jobs is determined by the value of the Headwater Basic Gage dropdown, which allows
+          the job list
+          to be filtered for a specific gage, or "All" to display all jobs returned by the server.
         </li>
-        <li>If enabled by checking the "Enable Data Filters" checkbox, any of three date filters can be used to further
+        <li>If enabled by checking the "Enable Date Filters" checkbox, any of three date filters can be used to further
           filter the job list.
         </li>
-        <li>Next, if no Status has been selected, no further jobs will be filtered from the list, but the user can
-          select one or more status items to use to further filter the job list. Using the checkboxes, below the Status
-          items,
-          the user can select to apply the Status filter to either Calibration runs, Validation runs, or both.
+        <li>After the job list is optionally filtered by the two previous filters, one or more Status selections can be made to further filter the job list.
+          If there are no Status items selected, the filter will be bypassed.<br />
+          The two checkboxes, "Calibrations" and "Validations" selects whether Calibrations with or without Validations should be affected by the filters.
+          If both boxes are checked, or both boxes are unchecked, then the filters is applied to both.
+          Otherwise, the filter will be applied to one or the other checked item.
         </li>
-        <li>Lastly, if no Modules are slected, no further jobs will be filtered from the list, but the usewr can select
+        <li>Lastly, if no Modules are slected, no further jobs will be filtered from the list, but the user may select
           one or more Modules to further filter the job list.
         </li>
       </ul>
