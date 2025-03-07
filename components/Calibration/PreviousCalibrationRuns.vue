@@ -281,13 +281,11 @@ const filteredData = computed(() => {
     }
 
     // Are both cal and val called for?
-    if (filterEvaluations.value === true && filterCalibrations.value === true && statusTypeFilterList.value.length > 0) {
+    if (filterEvaluations.value === filterCalibrations.value && statusTypeFilterList.value.length > 0) {
       // Get calibrations
       let listcals: CalibrationJobListItem[];
-      listcals = fullJobList.filter(job =>
-        job.validations.length > 0 &&
-        job.validations.some(validation => statusTypeFilterList.value.includes(validation.status))
-      );
+      listcals = fullJobList.filter((job) => statusTypeFilterList.value.includes(job.status));
+
       // Get evaluations
       list = fullJobList.filter(job =>
         job.validations.length > 0 &&
@@ -296,7 +294,6 @@ const filteredData = computed(() => {
       // Combine lists
       fullJobList = [...listcals, ...list];
     } else {
-
       if (filterEvaluations.value) {
         if (statusTypeFilterList.value.length > 0) {
           list = fullJobList.filter(job =>
@@ -324,8 +321,11 @@ const filteredData = computed(() => {
       fullJobList = list;
     }
 
-    //calFilterEnabled.value = newCalJobList.length !== updatedUserCalibrationJobsListData?.value.length
-    return fullJobList;
+    return fullJobList.filter((job, index, self) =>
+      index === self.findIndex(j => j.calibration_run_id === job.calibration_run_id)
+    );
+
+    
   }
 });
 
