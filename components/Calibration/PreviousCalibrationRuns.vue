@@ -19,12 +19,11 @@
             <!-- Filters -->
             <div class="text-left">
               <div id="FilterButton" class="text-left mt-2 mb-1 inline-block">
-                <Button class="filter-link" @click="toggleShowFilters">{{ showFilters ? 'Hide' : 'Show' }}
-                  Filters</Button>
+                <Button class="filter-link" @click="toggleShowFilters">Filters</Button>
               </div>
               <div class="ml-2 mt-[19px] text-left inline-block">
                 <Button class="filter-link" @click="clearCalibrationFilters" :disabled="!calFilterEnabled">
-                  Reset Filters
+                  Clear Filters
                 </Button>
               </div>
             </div>
@@ -37,40 +36,47 @@
               v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
-              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable> <template #body="slotProps">
+              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable>
+                <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_run_id"
                     :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
                     :title="'Job ID ' + slotProps.data.calibration_run_id">
                     {{ slotProps.data.calibration_run_id }}
                   </span>
-                </template></Column>
-              <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable> <template #body="slotProps">
+                </template>
+              </Column>
+              <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable>
+                <template #body="slotProps">
                   <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
                     :title="'Job Genesis ' + slotProps.data.job_genesis">
                     {{ slotProps.data.job_genesis }}
                   </span>
-                </template></Column>
-              <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable> <template
-                  #body="slotProps">
+                </template>
+              </Column>
+              <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable>
+                <template #body="slotProps">
                   <span v-if="slotProps.data.formulation_name"
                     :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
                     :title="'Formulation Name ' + slotProps.data.formulation_name">
                     {{ slotProps.data.formulation_name }}
                   </span>
-                </template></Column>
-              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable> <template
-                  #body="slotProps">
+                </template>
+              </Column>
+              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
+                <template #body="slotProps">
                   <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
                     :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
                     {{ slotProps.data.gage_id }}
                   </span>
-                </template></Column>
+                </template>
+              </Column>
 
 
               <Column field="created_at" header="Creation Date" sortable>Column
                 <template #body="slotProps">
                   <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
-                    :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
+                    :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
+                    class="nowrap">
                     {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
                   </span>
                 </template>
@@ -79,7 +85,8 @@
                 <template #body="slotProps">
                   <span v-if="slotProps.data.submit_date"
                     :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
-                    :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
+                    :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
+                    class="nowrap">
                     {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
                   </span>
                 </template>
@@ -88,7 +95,8 @@
                 <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period"
                     :aria-label="'Calibration Period ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_end_period)"
-                    :title="'Calibration Period ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_end_period)">
+                    :title="'Calibration Period ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_end_period)"
+                    class="nowrap">
                     {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_start_period) }} <span
                       v-if="slotProps.data.calibration_end_period">to</span>
                     {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_end_period) }}
@@ -286,7 +294,7 @@ const filteredData = computed(() => {
         job.validations.some(validation => statusTypeFilterList.value.includes(validation.status))
       );
       // Combine lists
-      fullJobList = [ ...listcals, ...list];
+      fullJobList = [...listcals, ...list];
     } else {
 
       if (filterEvaluations.value) {
@@ -297,7 +305,7 @@ const filteredData = computed(() => {
           );
         }
         fullJobList = list;
-      }  
+      }
 
       if (filterCalibrations.value) {
         if (statusTypeFilterList.value.length !== 0) {
@@ -628,7 +636,7 @@ small-label,
 }
 
 #Datatable {
-  width: 1150px !important;
+  width: 1225px !important;
 }
 
 .toggle-switch {
@@ -644,5 +652,9 @@ small-label,
   top: 0.125em;
   transition: left 150ms;
   width: 1.25em;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 </style>
