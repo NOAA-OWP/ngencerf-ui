@@ -49,7 +49,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const isEvaluationLoading = ref<boolean>(false);
 
   /**
-   * set sweStartDate, swEndDate, and selectedSweDate
+   * Compute sweTimeRange and set sweStartDate, swEndDate, and selectedSweDate
    */
   const sweTimeRange = computed((): string => {
     sweStartDate.value = userCalibrationRunData?.value?.validation_times?.validation_start_time;
