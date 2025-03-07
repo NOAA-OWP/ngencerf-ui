@@ -25,7 +25,7 @@
           <th scope="row" class="text-right font-bold" style="width: 140px;">
             <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
           </th>
-          <td class="pl-5" :aria-label="'Job Data Directory is ' + resultsPathname"
+          <td class="pl-5" style="width: 100%;" :aria-label="'Job Data Directory is ' + resultsPathname"
             :title="'Job Data Directory is ' + resultsPathname">
             <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
           </td>
@@ -86,6 +86,7 @@ onMounted(async () => {
 
   // load Results tab data
   await loadForecastResultsTabData();
+
 });
 </script>
 
