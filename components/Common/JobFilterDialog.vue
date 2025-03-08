@@ -6,7 +6,7 @@
       <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white cursor-[grabbing] ">Calibration Job Filters</div>
     </div>
 
-    <div id="FilterDialog">
+    <div id="FilterDialog" class="px-5 py-0">
       <div class="grid grid-cols-3 gap-2">
         <div class="col-span-1">
           <div class="mb-2">
@@ -185,10 +185,10 @@ onMounted(() => {
             const newY = e.clientY - offsetY;
 
             // Keep div within window bounds
-            const maxX = window.innerWidth - draggableDiv.value.offsetWidth + (draggableDiv.value.offsetWidth / 2);
-            const maxY = window.innerHeight - draggableDiv.value.offsetHeight + (draggableDiv.value.offsetHeight / 2);
+            const maxX = window.innerWidth - draggableDiv.value.offsetWidth + (draggableDiv.value.offsetWidth );
+            const maxY = window.innerHeight - draggableDiv.value.offsetHeight + (draggableDiv.value.offsetHeight);
 
-            draggableDiv.value.style.left = Math.min(Math.max(0, newX), maxX) + 'px';
+            draggableDiv.value.style.left = Math.min(Math.max(-400, newX), maxX) + 'px';
             draggableDiv.value.style.top = Math.min(Math.max(0, newY), maxY) + 'px';
           }
         });
@@ -316,32 +316,8 @@ const handleCalDateEnd = (value: any) => {
   border: 2px solid #666666;
 }
 
-#FilterDialog {
-  padding: 0 15px;
-}
 
-.p-listbox {
-  border-radius: 0px;
-}
-
-.p-listbox-list {
-  padding: 0px !important;
-}
-
-.p-listbox-list-container {
-  margin-top: 7px;
-}
-
-.p-listbox-option-selected {
-  background-color: global.$ngwcp_green_lt !important;
-}
-
-.p-listbox-option {
-  padding: 0 !important;
-  display: none !important;
-}
-
-#ModuleLis,
+#ModuleList,
 #StatusList {
   border: 1px solid #888888;
 }
@@ -351,7 +327,6 @@ const handleCalDateEnd = (value: any) => {
 #CalDateStart {
   padding: 0 4px;
   width: auto;
-
   :first-child {
     > :first-child {
       > :first-child {
