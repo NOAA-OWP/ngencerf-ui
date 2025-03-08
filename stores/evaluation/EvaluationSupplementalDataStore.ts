@@ -33,7 +33,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     'Validation Alt Iteration X Run'
   ]);
   const sweStartDate = ref<any>();
+  const minSweDate = ref<any>();
   const swEndDate = ref<any>();
+  const maxSweDate = ref<any>();
 
 
   const gridTypes = ref<string[]>([
@@ -56,10 +58,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    */
   const setSweStartDate = (): void => {
     sweStartDate.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.validation_start_time, { zone: 'utc' });
-    sweStartDate.value = sweStartDate.value.setZone(userTimeZone, { keepLocalTime: true });
-
-    console.log('sweStartDate', sweStartDate.value);
-    console.log('sweStartDate.value.toJSDate()', sweStartDate.value.toJSDate());
+    
+    // this is used to set the min date for the date picker correctly
+    minSweDate.value = sweStartDate.value.setZone(userTimeZone, { keepLocalTime: true });
   };
 
   /**
@@ -67,10 +68,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    */
   const setSweEndDate = (): void => {
     swEndDate.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.validation_end_time, { zone: 'utc' });
-    swEndDate.value = swEndDate.value.setZone(userTimeZone, { keepLocalTime: true });
-
-    console.log('swEndDate', swEndDate.value);
-    console.log('swEndDate.value.toJSDate)', swEndDate.value.toJSDate());
+    
+    // this is used to set the max date for the date picker correctly
+    maxSweDate.value = swEndDate.value.setZone(userTimeZone, { keepLocalTime: true });
   };
 
   /**
@@ -233,6 +233,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     gridTypes,
     selectedGridType,
     sweStartDate,
+    minSweDate,
+    maxSweDate,
     swEndDate,
     selectedSweDate,
     selectedSnodasLumpedMapUrl,

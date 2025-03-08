@@ -253,7 +253,7 @@
           <div class="mt-3 relative z-10">
             <VueDatePicker v-model="selectedSweDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
               @update:model-value="convertSelectedSweDateStringToDateObject" :enable-time-picker="false"
-              :min-date="sweStartDate.toISO()" :max-date="swEndDate.toISO()" :teleport="true" utc='preserve' />
+              :min-date="minSweDate.toISO()" :max-date="maxSweDate.toISO()" :teleport="true" utc='preserve' />
           </div>
           <div class="flex justify-end mt-3">
             <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plots"
@@ -320,7 +320,9 @@ const {
   gridTypes,
   selectedGridType,
   sweStartDate,
+  minSweDate,
   swEndDate,
+  maxSweDate,
   selectedSweDate,
   selectedSnodasLumpedMapUrl,
   selectedSnodasRawMapUrl,
