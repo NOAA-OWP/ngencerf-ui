@@ -3,8 +3,7 @@
     :class="isDragging ? 'cursor-move' : ''">
 
     <div id="Header" class="mb-2">
-      <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white cursor-[grabbing] ">Calibration Job Filters
-      </div>
+      <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white cursor-[grabbing] ">Calibration Job Filters</div>
     </div>
 
     <div id="FilterDialog">
@@ -95,7 +94,6 @@
                     <label for="FilterEvaluationsFilterEvaluations"
                       class="text-sm font-light text-center">Validations</label>
                   </div>
-
                 </div>
               </div>
             </div>
@@ -149,7 +147,7 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 const userStore = useUserDataStore();
 
 const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList,
-  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter, 
+  calDateStart, calDateEnd, earliestTime, latestTime, useDateRange, whichDatesToFilter,
   filterCalibrations, filterEvaluations } = storeToRefs(useUserDataStore());
 
 const emit = defineEmits(["ModulesFilterDialogClosing"]);
@@ -204,10 +202,13 @@ onMounted(() => {
   });
 })
 
+/**
+ * Set the filter's date range when Date Filter type changes.
+ * @param btn: number
+ */
 const handleRadioClick = (btn: number) => {
   setFilterDateRange();
 }
-
 const setFilterDateRange = () => {
   if (props.calJobs) {
     let trange: FilterTimeRange;
@@ -233,15 +234,20 @@ const setFilterDateRange = () => {
   }
 }
 
-
+/**
+ * Let the caller close the dialog
+ * @param: MouseEvent
+ */
 const sendClose = (e: MouseEvent) => {
   e.stopPropagation();
   e.stopImmediatePropagation();
   emit("ModulesFilterDialogClosing");
 };
 
-
-// Define a method to be called by the parent
+/**
+ * Define a method to be called by the parent
+ * to reset the filters
+ */
 const externalResetFilters = () => {
   const mouseEvent = new MouseEvent('click', {
     'view': window,
@@ -250,12 +256,14 @@ const externalResetFilters = () => {
   });
   resetFilters(mouseEvent);
 };
-
 // Expose the method to the parent
 defineExpose({
   externalResetFilters
 });
 
+/**
+ * Reset filters
+ */
 const resetFilters = (e: MouseEvent) => {
   e.stopPropagation();
   e.stopImmediatePropagation();
