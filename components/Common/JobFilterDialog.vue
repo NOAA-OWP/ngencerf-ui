@@ -23,19 +23,22 @@
             <div id="DateFilterButtons" class="flex flex-column gap-2 text-center">
               <div>
                 <RadioButton inputId="inputId1" name="inputName" v-model="whichDatesToFilter" :value="0"
-                  checked="checked" @change="handleRadioClick(0)" class="nomove" />
+                  checked="checked" @change="handleRadioClick(0)" class="nomove" aria-label="Filter with creation dates"
+                  title="Filter with creation dates" />
                 <label for="inputId1" class="text-sm font-light text-center">Creation Date</label>
               </div>
 
               <div>
                 <RadioButton inputId="inputId2" name="inputName" v-model="whichDatesToFilter" :value="1"
-                  @change="handleRadioClick(1)" class="nomove" />
+                  @change="handleRadioClick(1)" class="nomove" aria-label="Filter with submit dates"
+                  title="Filter with submit dates" />
                 <label for="inputId2" class="text-sm font-light text-center">Submit Date</label>
               </div>
 
               <div>
                 <RadioButton inputId="inputId3" name="inputName" v-model="whichDatesToFilter" :value="2"
-                  @change="handleRadioClick(2)" class="nomove" />
+                  @change="handleRadioClick(2)" class="nomove" aria-label="Filter with calibration periods"
+                  title="Filter with calibration periods" />
                 <label for="inputId3" class="text-sm font-light text-center">Calibration Period</label>
               </div>
             </div>
@@ -45,16 +48,17 @@
             <span class="cursor-default">From:</span>
             <VueDatePicker id="CalDateStart" class="datePickers dp__theme_dark" v-model="calDateStart"
               time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
-              @update:model-value="handleCalDateStart" aria-label="aria-label" title="title" />
+              @update:model-value="handleCalDateStart" aria-label="From Date" title="From Date" />
           </div>
           <div>
             <span class="cursor-default">To:</span>
             <VueDatePicker id="CalDateEnd" class="datePickers dp__theme_dark" v-model="calDateEnd" time-picker-inline
               text-input utc='preserve' format="yyyy-MM-dd HH:00" :disabled="!useDateRange"
-              @update:model-value="handleCalDateEnd" aria-label="aria-label" title="title" />
+              @update:model-value="handleCalDateEnd" aria-label="To date" title="To date" />
           </div>
           <div class="mt-3 ml-3">
-            <Checkbox v-model="useDateRange" inputId="daterange" name="daterange" binary></Checkbox>
+            <Checkbox v-model="useDateRange" inputId="daterange" name="daterange" binary
+              aria-label="Enable Date Filters" title="Enable Date Filters"></Checkbox>
             <span class="cursor-default">&nbsp;Enable Date Filters *</span>
           </div>
         </div>
@@ -77,22 +81,17 @@
             </div>
 
             <div class="row-span-1">
-              <!-- <Checkbox v-model="showCalOrVal" class="mt-[7px]" inputId="showCalOrVal"
-                name="showCalOrVal" binary>
-              </Checkbox>
-              <span class="cursor-default">&nbsp;Include Validation Runs</span> -->
-
               <div class="mt-2">
                 <div id="CalValSelect" class="flex flex-column gap-2 text-center">
                   <div>
                     <Checkbox inputId="FilterCalibrations" name="FilterCalibrations" v-model="filterCalibrations"
-                        :checked="true" binary />
+                      :checked="true" binary aria-label="Filter calibration checkbox"
+                      title="Filter calibration checkbox" />
                     <label for="FilterCalibrations" class="text-sm font-light text-center">Calibrations</label>
                   </div>
                   <div>
-                    <Checkbox CalValId="FilterEvaluations" name="FilterEvaluations" v-model="filterEvaluations"
-                       binary />
-    
+                    <Checkbox CalValId="FilterEvaluations" name="FilterEvaluations" v-model="filterEvaluations" binary
+                      aria-label="Filter evaluations checkbox" title="Filter evaluations checkbox" />
                     <label for="FilterEvaluationsFilterEvaluations"
                       class="text-sm font-light text-center">Validations</label>
                   </div>
@@ -118,9 +117,11 @@
             </Listbox>
           </div>
           <div id="ButtonArea" class="flex mt-3 text-center">
-            <Button class="ngenButtonDiv" label="Reset" @click="resetFilters($event)">
+            <Button class="ngenButtonDiv" label="Reset" @click="resetFilters($event)" aria-label="Reset filters"
+              title="Reset filters">
             </Button>
-            <Button class="ngenButtonDiv ml-6" label="Apply" @click="sendClose($event)"></Button>
+            <Button class="ngenButtonDiv ml-6" label="Apply" @click="sendClose($event)" aria-label="Apply and close"
+              title="Apply and close"></Button>
           </div>
         </div>
       </div>
