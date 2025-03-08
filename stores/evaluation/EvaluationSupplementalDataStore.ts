@@ -1,6 +1,7 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
+import { DateTime } from "luxon";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
@@ -31,8 +32,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     'Validation Best Run',
     'Validation Alt Iteration X Run'
   ]);
-  const sweStartDate = ref<string>();
-  const swEndDate = ref<string>();
+  const sweStartDate = ref<any>();
+  const swEndDate = ref<any>();
 
 
   const gridTypes = ref<string[]>([
@@ -48,18 +49,36 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
 
   const isEvaluationLoading = ref<boolean>(false);
 
+  const userTimeZone = DateTime.local().zoneName;
+
   /**
-   * Compute sweTimeRange and set sweStartDate, swEndDate, and selectedSweDate
+   * set sweStartDate
    */
-  const sweTimeRange = computed((): string => {
-    sweStartDate.value = userCalibrationRunData?.value?.validation_times?.validation_start_time;
-    swEndDate.value = userCalibrationRunData?.value?.validation_times?.validation_end_time;
+  const setSweStartDate = (): void => {
+    sweStartDate.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.validation_start_time, { zone: 'utc' });
+    sweStartDate.value = sweStartDate.value.setZone(userTimeZone, { keepLocalTime: true });
 
-    // default selectedSweDate to validation_start_time in order to have a default value for the date picker
-    selectedSweDate.value = userCalibrationRunData?.value?.validation_times?.validation_start_time;
+    console.log('sweStartDate', sweStartDate.value);
+    console.log('sweStartDate.value.toJSDate()', sweStartDate.value.toJSDate());
+  };
 
-    return `Range: ${formatISOStringOrDateToYYYYMMDD(sweStartDate.value as string)} to ${formatISOStringOrDateToYYYYMMDD(swEndDate.value as string)}`;
-  });
+  /**
+   * set swEndDate
+   */
+  const setSweEndDate = (): void => {
+    swEndDate.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.validation_end_time, { zone: 'utc' });
+    swEndDate.value = swEndDate.value.setZone(userTimeZone, { keepLocalTime: true });
+
+    console.log('swEndDate', swEndDate.value);
+    console.log('swEndDate.value.toJSDate)', swEndDate.value.toJSDate());
+  };
+
+  /**
+   * get sweTimeRange
+   */
+  const getSweTimeRange = (): string => {
+    return `Range: ${formatISOStringOrDateToYYYYMMDD(sweStartDate.value.toJSDate())} to ${formatISOStringOrDateToYYYYMMDD(swEndDate.value.toJSDate())}`;
+  };
 
   /**
    * Load SWE images
@@ -216,11 +235,13 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     sweStartDate,
     swEndDate,
     selectedSweDate,
-    sweTimeRange,
     selectedSnodasLumpedMapUrl,
     selectedSnodasRawMapUrl,
     selectedSnodasSimMapUrl,
     isEvaluationLoading,
+    setSweStartDate,
+    setSweEndDate,
+    getSweTimeRange,
     queryGetIterations,
     queryGetPerformanceMetrics,
     queryGetLogNames,
