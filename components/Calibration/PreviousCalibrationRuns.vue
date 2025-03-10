@@ -26,19 +26,24 @@
             scroll-height="400px" table-style="min-width: 50rem" v-model:selection="selectedCalibrationRun"
             selectionMode="single" contextMenu v-model:contextMenuSelection="selectedCalibrationRun"
             @rowContextmenu="onRowContextMenu" :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
+
             <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable> <template #body="slotProps">
                 <span v-if="slotProps.data.calibration_run_id"
                   :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
                   :title="'Job ID ' + slotProps.data.calibration_run_id">
                   {{ slotProps.data.calibration_run_id }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable> <template #body="slotProps">
-                <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
-                  :title="'Job Genesis ' + slotProps.data.job_genesis">
-                  {{ slotProps.data.job_genesis }}
+              </template>
+            </Column>
+
+            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable> <template #body="slotProps">
+                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
+                  :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
+                  {{ slotProps.data.gage_id }}
                 </span>
-              </template></Column>
+              </template>
+            </Column>
+
             <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable> <template
                 #body="slotProps">
                 <span v-if="slotProps.data.formulation_name"
@@ -46,14 +51,16 @@
                   :title="'Formulation Name ' + slotProps.data.formulation_name">
                   {{ slotProps.data.formulation_name }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable> <template #body="slotProps">
-                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
-                  :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
-                  {{ slotProps.data.gage_id }}
-                </span>
-              </template></Column>
+              </template>
+            </Column>
 
+            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable> <template #body="slotProps">
+                <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
+                  :title="'Job Genesis ' + slotProps.data.job_genesis">
+                  {{ slotProps.data.job_genesis }}
+                </span>
+              </template>
+            </Column>
 
             <Column field="created_at" header="Creation Date" sortable>Column
               <template #body="slotProps">
@@ -63,6 +70,7 @@
                 </span>
               </template>
             </Column>
+
             <Column field="submit_date" header="Submit Date" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.submit_date"
@@ -72,6 +80,7 @@
                 </span>
               </template>
             </Column>
+
             <Column header="Calibration Period" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period"
@@ -83,12 +92,15 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="status" header="Status" sortable> <template #body="slotProps">
+
+            <Column :pt="ptColumn" field="status" header="Status" sortable> 
+              <template #body="slotProps">
                 <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
                   :title="'Status ' + slotProps.data.status">
                   {{ slotProps.data.status }}
                 </span>
-              </template></Column>
+              </template>
+            </Column>
           </DataTable>
         </div>
 
