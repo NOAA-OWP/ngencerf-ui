@@ -198,7 +198,7 @@ onMounted(() => {
         });
       }
       setFilterDateRange();
-    }, 0)
+    }, 250)
   });
 })
 

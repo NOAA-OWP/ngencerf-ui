@@ -211,47 +211,6 @@ onMounted(async () => {
   }
 })
 
-// Computed filtered data based on multiple filters
-// const filteredData = computed(() => {
-//   let newCalJobList = updatedUserCalibrationJobsListData?.value;
-
-//   if (newCalJobList) {
-//     // Filter Headwater Basin Gage
-//     if (uiGageId.value && uiGageId.value !== "All") {
-//       newCalJobList = updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
-//     }
-
-//     if (statusTypeFilterList.value.length > 0) {
-//       newCalJobList = newCalJobList.filter((job) => statusTypeFilterList.value.includes(job.status));
-//     }
-
-//     if (filterEvaluations.value === true) {
-//       newCalJobList = (newCalJobList as CalibrationJobListItem[]).filter(job =>
-//         job.validations.length > 0 &&
-//         job.validations.some(validation => statusTypeFilterList.value.includes(validation.status))
-//       );
-//     }
-
-//     if (useDateRange.value) {
-//       if (whichDatesToFilter.value === 0) {
-//         newCalJobList = filterByCreationDate(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
-//       } else if (whichDatesToFilter.value === 1) {
-//         newCalJobList = filterBySubmitDate(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
-//       } else {
-//         newCalJobList = filterByCalibrationSpan(newCalJobList as CalibrationJobListItem[], calDateStart.value, calDateEnd.value);
-//       }
-//     }
-
-//     if (modulesFilterList.value.length) {
-//       newCalJobList = newCalJobList?.filter(job =>
-//         job.modules.some(module => modulesFilterList.value.includes(module))
-//       );
-//     }
-//     calFilterEnabled.value = newCalJobList.length !== updatedUserCalibrationJobsListData?.value.length
-//     return newCalJobList;
-//   }
-// });
-
 let newCalJobList: CalibrationJobListItem[];
 let fullJobList: CalibrationJobListItem[];
 let list: CalibrationJobListItem[];
