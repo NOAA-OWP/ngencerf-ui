@@ -57,7 +57,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * set sweStartDateTime
    */
   const setSweStartDateTime = (): void => {
-    sweStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.time_range?.start_time, { zone: 'utc' });
+    sweStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time, { zone: 'utc' });
     
     // this is used to set the min date for the date picker correctly
     minSweDateTime.value = sweStartDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
@@ -67,7 +67,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * set swEndDateTime
    */
   const setSweEndDateTime = (): void => {
-    swEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.time_range?.end_time, { zone: 'utc' });
+    swEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time, { zone: 'utc' });
     
     // this is used to set the max date for the date picker correctly
     maxSweDateTime.value = swEndDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
