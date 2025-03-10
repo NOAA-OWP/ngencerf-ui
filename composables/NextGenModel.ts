@@ -25,8 +25,8 @@ export interface ComponentPropsTitle {
 // response interface
 export interface GeneralApiSaveResponse {
   message: string;
-  calibration_run_id: number;
   status: string;
+  calibration_run_id: number;
 }
 
 export interface GeneralErrorResponse {
@@ -154,6 +154,7 @@ export interface UserCalibrationRunData {
   time_range: UserCalibrationRunTimeRangeData;
   calibration_times: UserCalibrationRunCalibrationTimesData;
   validation_times: UserCalibrationRunValidationTimesData;
+  num_catchments: number | null;
   parameters_selected: boolean;
   parameters: UserCalibrationRunParametersData[];
   objective_function: string;
@@ -291,6 +292,8 @@ export interface NameAndDescription {
 
 export interface SaveGageTabResponse extends GeneralApiSaveResponse {
   geopackage_image: string;
+  eds_errors: edsError[];
+  num_catchments: number | null;
 }
 
 /**
