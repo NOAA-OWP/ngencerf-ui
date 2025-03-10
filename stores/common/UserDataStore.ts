@@ -37,16 +37,7 @@ export const useUserDataStore = defineStore(
     // Used for Calibration Job Filter
     const modulesFilterList = ref<string[]>([]);
     const statusTypeFilterList = ref<string[]>([]);
-    const calDateStart = ref<any>(new Date());
-    const calDateEnd = ref<any>(new Date());
-    const earliestTime = ref<Date>();
-    const latestTime = ref<Date>();
-    const useDateRange = ref<boolean>(false);
-    const whichDatesToFilter = ref<number>(0);
-    const calFilterEnabled = ref<boolean>(false);
     const showArchivedJobsOnly = ref<boolean>(false);
-    const filterCalibrations = ref<boolean>(true);
-    const filterEvaluations = ref<boolean>(false);
 
     /**
      * Checks if user is logged in
@@ -218,7 +209,7 @@ export const useUserDataStore = defineStore(
     });
 
     /**
-     * fetch user created calibration job list data
+     * fetch user created calibration job list datauser created calibration
      * @return {void}
      */
     async function fetchUserCalibrationJobsListData() {
@@ -366,17 +357,8 @@ export const useUserDataStore = defineStore(
       refreshToken,
       modulesFilterList,
       statusTypeFilterList,
-      calDateStart,
-      calDateEnd,
-      earliestTime,
-      latestTime,
-      useDateRange,
-      whichDatesToFilter,
-      calFilterEnabled,
       showArchivedJobsOnly,
-      filterCalibrations,
-      filterEvaluations,
-          };
+    };
   },
   {
     persist: {

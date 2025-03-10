@@ -22,7 +22,7 @@
                 <Button class="filter-link" @click="toggleShowFilters">Filters</Button>
               </div>
               <div class="ml-2 mt-[19px] text-left inline-block">
-                <Button class="filter-link" @click="clearCalibrationFilters" :disabled="!calFilterEnabled">
+                <Button class="filter-link" @click="clearCalibrationFilters">
                   Clear Filters
                 </Button>
               </div>
@@ -31,8 +31,8 @@
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
-            <DataTable id="Datatable" :value="filteredData" sortField="calibration_run_id" :sortOrder="-1" scrollable
-              scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
+            <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id"
+              :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
@@ -121,7 +121,7 @@
     </div>
 
     <LazyJobFilterDialog v-show="showFilters" @ModulesFilterDialogClosing="showFilters = false"
-      :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
+      @ApplyJobFilters="applyJobFilters()" :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
 
   </client-only>
 </template>
@@ -148,7 +148,7 @@ import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
-import { getOverallCalibrationValidationStatus, filterByCreationDate, filterBySubmitDate, filterByCalibrationSpan } from "@/utils/CommonHelpers";
+import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData } = useGageStore();
@@ -159,8 +159,8 @@ const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
-const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList, filterCalibrations, filterEvaluations,
-  statusTypeFilterList, calDateStart, calDateEnd, useDateRange, whichDatesToFilter, calFilterEnabled } = storeToRefs(useUserDataStore());
+const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
+  statusTypeFilterList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -211,11 +211,14 @@ onMounted(async () => {
   }
 })
 
-let newCalJobList: CalibrationJobListItem[];
-let fullJobList: CalibrationJobListItem[];
-let list: CalibrationJobListItem[];
-const filteredData = computed(() => {
-  newCalJobList = [];
+
+
+let listcals: CalibrationJobListItem[];
+const applyJobFilters = async () => {
+  let newCalJobList: CalibrationJobListItem[];
+  let fullJobList: CalibrationJobListItem[];
+  let list: CalibrationJobListItem[];
+  await updateUserCalibrationJobsListData();
 
   if (updatedUserCalibrationJobsListData?.value) {
 
@@ -226,52 +229,16 @@ const filteredData = computed(() => {
       fullJobList = updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
     }
 
-    // Narrow down the list by date range, if necessary
-    if (useDateRange.value) {
-      let list: CalibrationJobListItem[];
-      if (whichDatesToFilter.value === 0) {
-        list = filterByCreationDate(fullJobList, calDateStart.value, calDateEnd.value);
-      } else if (whichDatesToFilter.value === 1) {
-        list = filterBySubmitDate(fullJobList, calDateStart.value, calDateEnd.value);
-      } else {
-        list = filterByCalibrationSpan(fullJobList, calDateStart.value, calDateEnd.value);
-      }
-      fullJobList = list;
-    }
+    // Get calibrations
+    listcals = (statusTypeFilterList.value.length > 0) ? fullJobList.filter((job) => statusTypeFilterList.value.includes(job.status)) : fullJobList;
 
-    // Are both cal and val called for?
-    if (filterEvaluations.value === filterCalibrations.value && statusTypeFilterList.value.length > 0) {
-      // Get calibrations
-      let listcals: CalibrationJobListItem[];
-      listcals = fullJobList.filter((job) => statusTypeFilterList.value.includes(job.status));
-
-      // Get evaluations
-      list = fullJobList.filter(job =>
-        job.validations.length > 0 &&
-        job.validations.some(validation => statusTypeFilterList.value.includes(validation.status))
-      );
-      // Combine lists
-      fullJobList = [...listcals, ...list];
-    } else {
-      if (filterEvaluations.value) {
-        if (statusTypeFilterList.value.length > 0) {
-          list = fullJobList.filter(job =>
-            job.validations.length > 0 &&
-            job.validations.some(validation => statusTypeFilterList.value.includes(validation.status))
-          );
-        }
-        fullJobList = list;
-      }
-
-      if (filterCalibrations.value) {
-        if (statusTypeFilterList.value.length !== 0) {
-          list = fullJobList.filter((job) => statusTypeFilterList.value.includes(job.status));
-        } else {
-          list = fullJobList;
-        }
-        fullJobList = list;
-      }
-    }
+    // Get evaluations
+    list = fullJobList.filter(job =>
+      job.validations.length > 0 &&
+      job.validations.some(validation => statusTypeFilterList.value.includes(validation.status))
+    );
+    // Combine lists
+    fullJobList = [...listcals, ...list];
 
     if (modulesFilterList.value.length) {
       list = fullJobList.filter(job =>
@@ -280,13 +247,11 @@ const filteredData = computed(() => {
       fullJobList = list;
     }
 
-    return fullJobList.filter((job, index, self) =>
+    updatedUserCalibrationJobsListData.value = fullJobList.filter((job, index, self) =>
       index === self.findIndex(j => j.calibration_run_id === job.calibration_run_id)
     );
-
-    
   }
-});
+};
 
 
 const clearCalibrationFilters = () => {
