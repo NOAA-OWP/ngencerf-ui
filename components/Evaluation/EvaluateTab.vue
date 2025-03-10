@@ -21,21 +21,15 @@
 
           <div class="layout__table mt-2" style="width:100%">
             <div class="layout__row">
-              <div class="text-left" style="width: 150px;font-size:0.9em;">
+              <div class="text-left text-nowrap" style="font-size:0.9em;">
                 <label for="calibrationJobId">Calibration Job ID </label>
-                {{ calibrationJobId }}
-              </div>
-              <div class="text-left pl-3" style="font-size:0.9em;">
-                <label for="validationJobId">Validation Job ID </label>
-                {{ evaluateValidationRunId }}
-              </div>
-            </div>
-            <div class="layout__row">
-              <div class="text-left" style="width: 150px;font-size:0.9em;">
+                {{ calibrationJobId }}<br/>
                 <label for="calibrationJobId">Gage </label>
                 {{ calData?.gage?.gage_id }}
               </div>
-              <div class="text-left pl-3" style="font-size:0.9em;">
+              <div class="text-left pl-3 text-nowrap" style="font-size:0.9em;">
+                <label for="validationJobId">Validation Job ID </label>
+                {{ evaluateValidationRunId }}<br/>
                 <label for="validationJobId">Station Name </label>
                 {{ calData?.gage?.station_name }}
               </div>
@@ -65,14 +59,18 @@
               </div>
             </div>
           </div>
-          <div v-if="selectedPlotName === 'Hydrograph evolution'">
+          <div v-if="selectedPlotHasTimeseries">
             <div v-if="!showPlotGraph">
               <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
-                Show Interactive Time Series Viewer</a>
+                <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">Show SWE Time Series</span>
+                <span v-else>Show Interactive Time Series Viewer</span>
+              </a>
             </div>
             <div v-else>
               <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
-                Hide Interactive Time Series Viewer</a>
+                <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">Hide SWE Time Series</span>
+                <span v-else>Hide Interactive Time Series Viewer</span>
+              </a>
               <div v-if="plotGraphLines.length > 0" class="columns-2">
                 <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
                   <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
@@ -99,8 +97,8 @@
         </div>
       </div>
     </div>
-    <div v-if="!showPlotGraph" class="grid grid-cols-2">
-      <div class="text-center">
+    <div v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName)) && !showPlotGraph" :class="{ 'grid grid-cols-2': !expandPlotTable }">
+      <div class="text-center" v-if="!expandPlotTable">
         <div id="GraphArea" class="p-2" v-if="selectedPlotName && selectedPlotFileUrl">
           <img :src="selectedPlotFileUrl" :alt="selectedPlotName" />
         </div>
@@ -117,6 +115,10 @@
         </div>
 
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
+          <a v-if="!expandPlotTable && plotTableColumns.length > 5" href="#" class="p-1 c-blue font-bold underline mt-1" @click="toggleExpandPlotTable">
+            &lt; Expand Plot Table (Hide Graph)</a>
+          <a v-if="expandPlotTable" href="#" class="p-1 c-blue font-bold underline mt-1" @click="toggleExpandPlotTable">
+            Reduce Plot Table (Show Graph) &gt;</a>
           <div v-if="plotTableList && plotTableList.length > 1">
             <label for="PlotTableOptions" class="pr-2 pt-3">Select Simulation Time Period Data Table </label>
             <Select id="PlotTableOptions" class="p-select" v-model="selectedPlotTable" :options="plotTableList"
@@ -205,7 +207,7 @@
     </div>
 
     <!-- Grid Data -->
-    <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)"
+    <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName) && !showPlotGraph"
       class="p-4 min-h-screen overflow-visible">
       <div class="grid grid-cols-3 gap-4 mt-4 p-2">
         <div class="flex flex-col items-center p-2">
@@ -237,9 +239,6 @@
           </div>
         </div>
         <div class="p-2 relative overflow-visible">
-          <div class="flex justify-end">
-            <a class="c-blue text-sm underline mt-6 ml-auto" href="#">Show SWE Time Series</a>
-          </div>
           <div class="text-sm font-semibold mt-3">
             <p v-if="selectedSimulatedSource"><span class="font-bold">Range: {{ selectedSimulatedSourceTimeRange
                 }}</span></p>
@@ -331,9 +330,11 @@ const {
   queryGetPerformanceMetrics,
   queryGetLogNames,
   queryGetLogData,
-  loadSweImages
+  loadSweImages,
+  queryGetSWETimeseriesData
 } = EvaluationSupplementalDataStore;
 
+const expandPlotTable = ref<Boolean>(false);
 const plotTables = ref<DynamicObject>({});
 const plotTableList = ref<any[]>([]);
 const selectedPlotTable = ref<string>('');
@@ -346,6 +347,7 @@ const plotTableTotalPages = ref<number>(1);
 const plotTableStartRow = ref<number>(1);
 const plotTableEndRow = ref<number>(plotTablePageSize.value);
 const plotTableErrorMessage = ref<string>('');
+const selectedPlotHasTimeseries = ref<Boolean>(false);
 const plotGraphArea = ref(null);
 const plotGraphSVG = ref(null);
 const plotGraphDataRaw = ref<any[]>([]);
@@ -386,12 +388,13 @@ const selectedLogCurrentPage = ref<number>(1);
 const selectedLogTotalPages = ref<number>(1);
 const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
-const supplementalTableOptions = [
+const supplementalTableOptions = []
+/* const supplementalTableOptions = [
   'Iteration Metrics Table',
   'Iteration Parameters Table',
   'Performance Metrics Table'
-]
-const plotGraphColors = ['grey', 'blue', 'gold', 'green', 'black', 'orange', 'pink', 'red', 'yellow'];
+] */
+const plotGraphColors = ['grey', 'blue', 'gold', 'green', 'teal', 'black', 'orange', 'pink', 'purple', 'red', 'yellow'];
 const plotGraphColorList = [];
 for (let c = 0; c < plotGraphColors.toSorted().length; c++) {
   plotGraphColorList.push({ name: plotGraphColors.toSorted()[c] });
@@ -421,6 +424,7 @@ onMounted(() => {
     selectedPlotName.value = null;
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
+    selectedPlotHasTimeseries.value = false;
     selectedSupplementalTable.value = 0;
 
     // Load Run Status Store to load resultsPathname
@@ -433,13 +437,14 @@ onMounted(() => {
     }
 
     // Get Plot Names
-    if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
+    //if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
       plotNames.value = await queryGetPlotNames();
-    }
+    //}
 
     if (plotNames.value?._data?.plot_names) {
       // setting plotList will populate the dropdown
       plotList.value = plotNames?.value?._data?.plot_names;
+      console.log('plotList: ', plotList.value);
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
@@ -493,6 +498,7 @@ watch(selectedPlotName, async () => {
   if (selectedPlotName.value && supplementalTableOptions.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
+    selectedPlotHasTimeseries.value = false;
     plotGraphData.value = [];
     plotGraphLines.value = [];
     sliderBoxPosition.value = {};
@@ -643,6 +649,7 @@ watch(selectedPlotName, async () => {
   else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
+    selectedPlotHasTimeseries.value = false;
     plotTableData.value = [];
     plotTableColumns.value = [];
     plotGraphData.value = [];
@@ -657,6 +664,7 @@ watch(selectedPlotName, async () => {
     // clear out previous Display data
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
+    selectedPlotHasTimeseries.value = true;
     plotTableErrorMessage.value = '';
     plotTableData.value = [];
     plotTableColumns.value = [];
@@ -677,6 +685,7 @@ watch(selectedPlotName, async () => {
   } else if (selectedPlotName.value) {
     plotGraphData.value = [];
     plotGraphLines.value = [];
+    expandPlotTable.value = false;
     sliderBoxPosition.value = {};
     selectedSupplementalTable.value = 0;
     selectedLogCategory.value = '';
@@ -698,9 +707,15 @@ watch(selectedPlotName, async () => {
       if (response?._data?.plot_file_path && response?._data?.plot_url) {
         selectedPlotFilename.value = response?._data?.plot_file_path;
         selectedPlotFileUrl.value = response?._data?.plot_url;
+        for (let p = 0; p < plotList.value.length; p++) {
+          if (plotList.value[p].name == selectedPlotName.value) {
+            selectedPlotHasTimeseries.value = plotList.value[p].timeseries_available;
+          }
+        }
       } else {
         selectedPlotFilename.value = null;
         selectedPlotFileUrl.value = null;
+        selectedPlotHasTimeseries.value = false;
         toast.removeAllGroups();
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: ToastTimeout.timeout5000 };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -777,6 +792,7 @@ watch(selectedPlotName, async () => {
     } else {
       selectedPlotFilename.value = null;
       selectedPlotFileUrl.value = null;
+      selectedPlotHasTimeseries.value = false;
       plotTableData.value = [];
       plotTableColumns.value = [];
       toast.removeAllGroups();
@@ -807,6 +823,40 @@ watch(selectedEvaluateDate, async () => {
     convertSelectedEvaluateDateStringToDateObject(selectedEvaluateDate.value);
   }
 });
+
+// set plotTableColumns whenever plotTableData is changed
+function adjustPlotTableColumns() {
+  //console.log('adjusting plotTableColumns');
+  plotTableErrorMessage.value = '';
+  plotTableColumns.value = [];
+  if (plotTableData.value.length > 0) {
+    Object.keys(plotTableData.value[0]).forEach(key => {
+      let column_header_words = key.split("_");
+      for (let w = 0; w < column_header_words.length; w++) {
+        let word = column_header_words[w]
+        column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+      }
+      let column_header = column_header_words.join(" ");
+      plotTableColumns.value.push({ header: column_header, value: key });
+    });
+    for (let d = 0; d < plotTableData.value.length; d++) {
+      Object.keys(plotTableData.value[d]).forEach(key => {
+        if (plotTableData.value[d][key] && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
+          plotTableData.value[d][key] = 'N/A';
+        } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
+          // attempt to round to 5 digits - just display as is if there are any problems doing this
+          try {
+            plotTableData.value[d][key] = Number(plotTableData.value[d][key]).toFixed(5);
+          } catch (error) {
+            console.error('Error rounding value ' + plotTableData.value[d][key] + ': ', error);
+          }
+        }
+      });
+    }
+    //console.log('plotTableData: ', plotTableData.value);
+    console.log('plotTableColumns: ', plotTableColumns.value);
+  }
+}
 
 // Watch for page number changes in plot table
 watch(plotTableCurrentPage, async () => {
@@ -854,139 +904,44 @@ watch(plotGraphData, async () => {
   }
 });
 
-watch(plotGraphDateRange, async () => {
-  if (plotGraphDataRaw.value) {
-    interactivePlotDateFilter();
-  }
-});
-
-// Handle selectedLogCategory changes
-watch(selectedLogCategory, async () => {
-  selectedLogList.value = logLists.value[selectedLogCategory.value];
-  // start with the first log
-  selectedLogName.value = selectedLogList.value[0].name;
-  
-  if (!selectedLogList.value.length) {
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeout5000 };
-    toast.add(tMsg); addToastRecord(tMsg);
-  }
-});
-
-// Handle selectedLogName changes
-watch(selectedLogName, async () => {
-  if (selectedLogName.value !== '') {
-    selectedLogCurrentPage.value = 1;
-    const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
-      selectedLogName.value, // log_name
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      0, // start
-      logDataPageSize.value // limit
-    );
-    if (response?._data) {
-      let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
-      }
-      selectedLogDisplay.value = logText;
-      selectedLogTotalSize.value = response?._data?.pagination_metadata?.count;
-      selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
-      selectedLogStartRow.value = 1;
-      if (selectedLogTotalPages.value === 1) {
-        selectedLogEndRow.value = selectedLogTotalSize.value;
-      } else {
-        selectedLogEndRow.value = logDataPageSize.value;
-      }
-      console.log('Loading rows ' + selectedLogStartRow.value + '-' + selectedLogEndRow.value + ' from the ' + selectedLogTotalSize.value + ' total stored in the backend');
-    }
-    plotTables.value = {};
-    plotTableList.value = [];
-    plotTableData.value = [];
-  }
-});
-
-// Watch for page number changes in logs
-watch(selectedLogCurrentPage, async () => {
-  if (selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
-    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
-  } else {
-    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
-    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
-      selectedLogEndRow.value = selectedLogTotalSize.value;
-    } else {
-      selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
-    }
-    const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
-      selectedLogName.value, // log_name
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      selectedLogStartRow.value - 1, // start
-      logDataPageSize.value // limit
-    );
-    if (response?._data) {
-      let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
-      }
-      selectedLogDisplay.value = logText;
-    }
-    console.log('Loading rows ' + selectedLogStartRow.value + '-' + selectedLogEndRow.value + ' from the ' + selectedLogTotalSize.value + ' total stored in the backend');
-  }
-});
-
-// watch for changes in selectedGridType
-watch(selectedGridType, () => {
-  console.log('selectedGridType: ', selectedGridType.value);
-});
-
-// set plotTableColumns whenever plotTableData is changed
-function adjustPlotTableColumns() {
-  plotTableErrorMessage.value = '';
-  plotTableColumns.value = [];
-  if (plotTableData.value.length > 0) {
-    Object.keys(plotTableData.value[0]).forEach(key => {
-      let column_header_words = key.split("_");
-      for (let w = 0; w < column_header_words.length; w++) {
-        let word = column_header_words[w]
-        column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
-      }
-      let column_header = column_header_words.join(" ");
-      plotTableColumns.value.push({ header: column_header, value: key });
-    });
-    for (let d = 0; d < plotTableData.value.length; d++) {
-      Object.keys(plotTableData.value[d]).forEach(key => {
-        if (plotTableData.value[d][key] && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
-          plotTableData.value[d][key] = 'N/A';
-        } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
-          // attempt to round to 5 digits - just display as is if there are any problems doing this
-          try {
-            plotTableData.value[d][key] = Number(plotTableData.value[d][key]).toFixed(5);
-          } catch (error) {
-            console.error('Error rounding value ' + plotTableData.value[d][key] + ': ', error);
-          }
-        }
-      });
-    }
-  }
-}
-
 const togglePlotGraph = async () => {
   if (showPlotGraph.value) {
     showPlotGraph.value = false;
   } else {
     if (!plotGraphData.value || plotGraphData.value.length == 0) {
-      console.log('Loading all rows from the ' + plotTableTotalSize.value + ' total stored in the backend');
-      const response: any = await queryGetPlot(
-        selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
-        true, // include_data
-        false, // force_include_plot
-        (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
-        (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-        24, // start - ignore first 24 data records for plotting purposes
-        plotTableTotalSize.value // limit
-      );
-      if (response?._data?.plot_data) {
-        plotGraphDataRaw.value = response?._data?.plot_data;
+      if (gridDisplayOptions.includes(selectedPlotName.value)) {
+        // special case for SWE time series
+        console.log('Loading all SWE time series data from the backend');
+        const response: any = await queryGetSWETimeseriesData(
+          (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+        );
+        if (response?._data?.swe_timeseries_data) {
+          // get time series data from server
+          plotGraphDataRaw.value = response?._data?.swe_timeseries_data;
+          console.log('plotGraphDataRaw: ', plotGraphDataRaw.value);
+          plotTableData.value = plotGraphDataRaw.value;
+          adjustPlotTableColumns();
+        } else {
+          selectedPlotHasTimeseries.value = false;
+          toast.removeAllGroups();
+          const tMsg: ToastMessageOptions = { severity: 'info', summary: 'SWE time series data is currently unavailable', life: ToastTimeout.timeout5000 };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
+      } else {
+        // standard interactive plot logic
+        console.log('Loading all rows from the ' + plotTableTotalSize.value + ' total stored in the backend');
+        const response: any = await queryGetPlot(
+          selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
+          true, // include_data
+          false, // force_include_plot
+          (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
+          (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+          24, // start - ignore first 24 data records for plotting purposes
+          plotTableTotalSize.value // limit
+        );
+        if (response?._data?.plot_data) {
+          plotGraphDataRaw.value = response?._data?.plot_data;
+        }
       }
       // setting min/max dates will trigger the date filter below
       plotGraphDateLimits.value = {
@@ -1018,12 +973,19 @@ const togglePlotGraph = async () => {
 const drawInteractivePlot = () => {
   console.log('Drawing interactive plot');
   plotGraphOptions.value = {
-    x: { grid: true },
-    y: { grid: true, label: 'Streamflow (cm/s)', labelAnchor: 'center', labelArrow: 'none' },
-    marks: [],
+    x: {grid: true}, 
+    y: {grid: true, labelAnchor: 'center', labelArrow: 'none'}, 
+    marks: [], 
     width: plotGraphArea.value.offsetWidth - 200,
     height: (document.getElementById('MainLeftDataParent').getBoundingClientRect().bottom - document.getElementById('PlotGraphArea').getBoundingClientRect().top) - 150
   };
+  if (gridDisplayOptions.includes(selectedPlotName.value)) {
+    plotGraphOptions.value.y.label = 'Depth (m)';
+    plotGraphOptions.value.y.labelOffset = -10;
+    plotGraphOptions.value.marginLeft = 50;
+  } else {
+    plotGraphOptions.value.y.label = 'Streamflow (cm/s)';
+  }
   let plotLineData = [];
   let plotDotData = [];
   for (let c = 1; c < plotTableColumns.value.length; c++) {
@@ -1032,14 +994,14 @@ const drawInteractivePlot = () => {
         if (plotGraphLines.value[c - 1].symbol == 'line') {
           plotLineData.push({
             'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value]),
-            'flow': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]),
+            'measurement': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]),
             'color': plotGraphLines.value[c - 1].color,
             'name': plotGraphLines.value[c - 1].name
           });
         } else {
           plotDotData.push({
             'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value]),
-            'flow': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]),
+            'measurement': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]),
             'color': plotGraphLines.value[c - 1].color,
             'symbol': plotGraphLines.value[c - 1].symbol,
             'name': plotGraphLines.value[c - 1].name
@@ -1048,49 +1010,111 @@ const drawInteractivePlot = () => {
       }
     }
   }
-
-  let ruleXposition = new Date(plotGraphDateRange.value.start);
+  
+  //console.log('plotLineData: ', plotLineData);
+  //console.log('plotDotData: ', plotDotData);
+  let plotGraphLeftEdge = new Date(plotGraphDateRange.value.start);
+  let plotGraphRightEdge = new Date(plotGraphDateRange.value.end);
+    let lineOptions = {
+      x: { value: 'time', label: 'Time' },
+      y: { value: 'measurement', label: 'Measurement' },
+      stroke: 'color'
+    }
+    let lineTipOptions = {
+      x: { value: 'time', label: 'Time' },
+      y: { value: 'measurement', label: 'Measurement' },
+      title: (d) => `${d.name} (${d.color})`,
+      fontSize: 14
+    }
+    let dotOptions = {
+      x: { value: 'time', label: 'Time' },
+      y: { value: 'measurement', label: 'Measurement' },
+      stroke: 'color',
+      symbol: 'symbol'
+    }
+    let dotTipOptions = {
+      x: { value: 'time', label: 'Time' },
+      y: { value: 'measurement', label: 'Measurement'},
+      title: (d) => `${d.name} (${d.color} ${d.symbol})`,
+      fontSize: 14
+    }
+    if (gridDisplayOptions.includes(selectedPlotName.value)) {
+      lineOptions.y.label = 'Depth (cm/s)';
+      lineTipOptions.y.label = 'Depth' ;
+      lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s`
+      dotOptions.y.label = 'Depth (cm/s)';
+      dotTipOptions.y.label = 'Depth';
+      dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s`
+    } else {
+      lineOptions.y.label = 'Flow (cm/s)';
+      lineTipOptions.y.label = 'Flow';
+      lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} cm/s`;
+      dotOptions.y.label = 'Flow (cm/s)';
+      dotTipOptions.y.label = 'Flow';
+      dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} cm/s`;
+    }
   if (plotLineData.length > 0) {
-    ruleXposition = new Date(plotLineData[0].time);
+    plotGraphLeftEdge = new Date(plotLineData[0].time);
     plotGraphOptions.value.marks.push(
-      Plot.lineY(plotLineData, {
-        x: { value: 'time', label: 'Time' },
-        y: { value: 'flow', label: 'Flow (cm/s)' },
-        stroke: 'color'
-      })
+      Plot.lineY(plotLineData, lineOptions)
     );
     plotGraphOptions.value.marks.push(
-      Plot.tip(plotLineData, Plot.pointer({
-        x: { value: 'time', label: 'Time' },
-        y: { value: 'flow', label: 'Flow' },
-        title: (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.flow} cm/s`,
-        fontSize: 14
-      })
-      )
+      Plot.tip(plotLineData, Plot.pointer(lineTipOptions))
     );
   }
   if (plotDotData.length > 0) {
-    ruleXposition = new Date(plotDotData[0].time);
+    plotGraphLeftEdge = new Date(plotDotData[0].time);
     plotGraphOptions.value.marks.push(
-      Plot.dot(plotDotData, {
-        x: { value: 'time', label: 'Time' },
-        y: { value: 'flow', label: 'Flow' },
-        stroke: 'color',
-        symbol: 'symbol'
-      })
+      Plot.dot(plotDotData, dotOptions)
     );
     plotGraphOptions.value.marks.push(
-      Plot.tip(plotDotData, Plot.pointer({
-        x: { value: 'time', label: 'Time' },
-        y: { value: 'flow', label: 'Flow' },
-        title: (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.flow} cm/s`,
-        fontSize: 14
-      })
-      )
+      Plot.tip(plotDotData, Plot.pointer(dotTipOptions))
     );
   }
-  plotGraphOptions.value.marks.push(Plot.ruleX([ruleXposition]));
+  plotGraphOptions.value.marks.push(Plot.ruleX([plotGraphLeftEdge]));
   plotGraphOptions.value.marks.push(Plot.ruleY([0]));
+  if (calData?.value?.validation_times) {
+    // create dashed vertical lines for Sim Start, Val Start, Val End
+    if (calData?.value?.validation_times.simulation_start_time) {
+      let simStartTime = new Date(calData?.value?.validation_times.simulation_start_time);
+      if (simStartTime < new Date(plotGraphDateLimits.value.start)) {
+        // Don't plot Sim Start Time outside of the range of our usable data
+        simStartTime = new Date(plotGraphDateLimits.value.start);
+      }
+      console.log('simStartTime: ', simStartTime);
+      if (simStartTime >= plotGraphLeftEdge && simStartTime <= plotGraphRightEdge) {
+        plotGraphOptions.value.marks.push(Plot.ruleX([simStartTime], {stroke: 'grey', strokeWidth: 2, strokeDasharray: 10}));
+        plotGraphOptions.value.marks.push(Plot.text([" Sim Start Time "], {x: [simStartTime], frameAnchor: 'top', textAnchor: 'start'}));
+        console.log('Marking simStartTime on interactive plot');
+      }
+      console.log('Marking simStartTime on slider');
+    }
+    if (calData?.value?.validation_times.validation_start_time) {
+      let valStartTime = new Date(calData?.value?.validation_times.validation_start_time);
+      console.log('valStartTime: ', valStartTime);
+      if (valStartTime >= plotGraphLeftEdge && valStartTime <= plotGraphRightEdge) {
+        plotGraphOptions.value.marks.push(Plot.ruleX([valStartTime], {stroke: 'grey', strokeWidth: 2, strokeDasharray: 10}));
+        plotGraphOptions.value.marks.push(Plot.text([" Val Start Time "], {x: [valStartTime], frameAnchor: 'top'}));
+        console.log('Marking valStartTime on interactive plot');
+      }
+      console.log('Marking valStartTime on slider');
+    }
+    if (calData?.value?.validation_times.validation_end_time) {
+      let valEndTime = new Date(calData?.value?.validation_times.validation_end_time);
+      if (valEndTime > new Date(plotGraphDateLimits.value.end)) {
+        // Don't plot Sim Start Time outside of the range of our usable data
+        valEndTime = new Date(plotGraphDateLimits.value.end);
+      }
+      console.log('valEndTime: ', valEndTime);
+      if (valEndTime >= plotGraphLeftEdge && valEndTime <= plotGraphRightEdge) {
+        plotGraphOptions.value.marks.push(Plot.ruleX([valEndTime], {stroke: 'grey', strokeWidth: 2, strokeDasharray: 10}));
+        plotGraphOptions.value.marks.push(Plot.text([" Val End Time "], {x: [valEndTime], frameAnchor: 'top', textAnchor: 'end'}));
+        console.log('Marking valEndTime on interactive plot');
+      }
+      console.log('Marking valEndTime on slider');
+    }
+  }
+  //console.log('plotGraphOptions: ', plotGraphOptions.value);
   plotGraphSVG.value.innerHTML = '';
   plotGraphSVG.value.append(Plot.plot(plotGraphOptions.value));
   nextTick(() => {
@@ -1114,22 +1138,24 @@ const drawInteractiveSlider = () => {
   for (let c = 1; c < plotTableColumns.value.length; c++) {
     if (document?.getElementById('plotGraphCheckbox-' + c)?.checked) {
       for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
-        plotGraphSliderData.value.push({
-          'time': new Date(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[0].value]),
-          'flow': parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[c].value])
-        });
+        let dataPoint = {
+          time: new Date(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[0].value]),
+          measurement: parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[c].value])
+        };
+        plotGraphSliderData.value.push(dataPoint);
       }
       break;
     }
+  }
+  let lineOptions = {
+    x: 'time',
+    y: 'measurement'
   }
   plotGraphSliderOptions.value = {
     x: { tickSize: 0, inset: 0 },
     y: { axis: null },
     marks: [
-      Plot.lineY(plotGraphSliderData.value, {
-        x: 'time',
-        y: 'flow',
-      })
+      Plot.lineY(plotGraphSliderData.value, lineOptions)
     ],
     width: plotGraphArea.value.offsetWidth - 250,
     height: 100,
@@ -1159,6 +1185,13 @@ const drawInteractiveSlider = () => {
 const updatePlotGraphDates = () => {
   interactivePlotDateFilter();
 }
+
+watch(plotGraphDateRange, async () => {
+  if (plotGraphDataRaw.value) {
+    //console.log('plotGraphDateRange: ', plotGraphDateRange.value);
+    interactivePlotDateFilter();
+  }
+});
 
 const interactivePlotDateFilter = () => {
   let tempPlotGraphData = [];
@@ -1330,6 +1363,87 @@ const toggleCustomizePlot = async () => {
   }
 }
 
+// Handle selectedLogCategory changes
+watch(selectedLogCategory, async () => {
+  selectedLogList.value = logLists.value[selectedLogCategory.value];
+  // start with the first log
+  selectedLogName.value = selectedLogList.value[0].name;
+  //console.log('selectedLogCategory: ', selectedLogCategory.value);
+  //console.log('selectedLogList: ', selectedLogList.value);
+  //console.log('selectedLogName: ', selectedLogName.value);
+  if (!selectedLogList.value.length) {
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeout5000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+});
+
+// Handle selectedLogName changes
+watch(selectedLogName, async () => {
+  if (selectedLogName.value !== '') {
+    selectedLogCurrentPage.value = 1;
+    const response: any = await queryGetLogData(
+      selectedLogCategory.value, // log_category,
+      selectedLogName.value, // log_name
+      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+      0, // start
+      logDataPageSize.value // limit
+    );
+    if (response?._data) {
+      let logText = '';
+      for (let t = 0; t < response?._data?.log_data.length; t++) {
+        logText += response?._data?.log_data[t] + '<br/>\n';
+      }
+      selectedLogDisplay.value = logText;
+      selectedLogTotalSize.value = response?._data?.pagination_metadata?.count;
+      selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
+      selectedLogStartRow.value = 1;
+      if (selectedLogTotalPages.value === 1) {
+        selectedLogEndRow.value = selectedLogTotalSize.value;
+      } else {
+        selectedLogEndRow.value = logDataPageSize.value;
+      }
+      console.log('Loading rows ' + selectedLogStartRow.value + '-' + selectedLogEndRow.value + ' from the ' + selectedLogTotalSize.value + ' total stored in the backend');
+    }
+    plotTables.value = {};
+    plotTableList.value = [];
+    plotTableData.value = [];
+  }
+});
+
+// Watch for page number changes in logs
+watch(selectedLogCurrentPage, async () => {
+  if (selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
+    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
+  } else {
+    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
+    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
+      selectedLogEndRow.value = selectedLogTotalSize.value;
+    } else {
+      selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
+    }
+    const response: any = await queryGetLogData(
+      selectedLogCategory.value, // log_category,
+      selectedLogName.value, // log_name
+      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+      selectedLogStartRow.value - 1, // start
+      logDataPageSize.value // limit
+    );
+    if (response?._data) {
+      let logText = '';
+      for (let t = 0; t < response?._data?.log_data.length; t++) {
+        logText += response?._data?.log_data[t] + '<br/>\n';
+      }
+      selectedLogDisplay.value = logText;
+    }
+    console.log('Loading rows ' + selectedLogStartRow.value + '-' + selectedLogEndRow.value + ' from the ' + selectedLogTotalSize.value + ' total stored in the backend');
+  }
+});
+
+// watch for changes in selectedGridType
+watch(selectedGridType, () => {
+  console.log('selectedGridType: ', selectedGridType.value);
+});
+
 function capitalCase(str: string) {
   return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -1361,6 +1475,24 @@ const toggleMessagesGroup = async () => {
 }
 
 // call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
+const getSpatialPlot = async () => {
+  isEvaluationLoading.value = true;
+  if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
+    // load the SWE images
+    await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value as Date));
+  }
+  isEvaluationLoading.value = false;
+}
+
+const toggleExpandPlotTable = async () => {
+  if (expandPlotTable.value) {
+    expandPlotTable.value = false;
+  } else {
+    expandPlotTable.value = true;
+  }
+}
+
+// call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
 const getSpatialPlots = async () => {
   isEvaluationLoading.value = true;
   if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
@@ -1381,6 +1513,7 @@ onUnmounted(() => {
   selectedPlotName.value = null;
   selectedPlotFilename.value = null;
   selectedPlotFileUrl.value = null;
+  selectedPlotHasTimeseries.value = false;
   selectedSupplementalTable.value = 0;
   selectedLogName.value = '';
   selectedLogList.value = [];

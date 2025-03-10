@@ -194,6 +194,24 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     });
   };
 
+  /**
+   * run_swe endpoint
+   * @param {number} validation_run_id
+   * @return {any}
+   */
+  const queryGetSWETimeseriesData = async (validation_run_id: number): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_swe_timeseries_data/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        validation_run_id: validation_run_id
+      })
+    });
+  };
+
   return {
     plotNames,
     plotList,
@@ -215,7 +233,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     queryGetLogNames,
     queryGetLogData,
     getSweImagesByDate,
-    loadSweImages
+    loadSweImages,
+    queryGetSWETimeseriesData,
   };
 });
 
