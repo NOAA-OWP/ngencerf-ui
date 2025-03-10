@@ -251,9 +251,9 @@
             </p>
           </div>
           <div class="mt-3 relative z-10">
-            <VueDatePicker v-model="selectedSweDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-              @update:model-value="convertSelectedSweDateStringToDateObject" :enable-time-picker="false"
-              :min-date="minSweDate.toISO()" :max-date="maxSweDate.toISO()" :teleport="true" utc='preserve' />
+            <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+              @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
+              :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true" utc='preserve' />
           </div>
           <div class="flex justify-end mt-3">
             <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plots"
@@ -280,7 +280,7 @@ import type { DynamicObject } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 import { formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
-import { isValidDateTime } from "@/utils/CommonHelpers";
+import { isValidDate, isValidDateTime } from "@/utils/CommonHelpers";
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
@@ -319,11 +319,11 @@ const {
   simulatedSources,
   gridTypes,
   selectedGridType,
-  sweStartDate,
-  minSweDate,
-  swEndDate,
-  maxSweDate,
-  selectedSweDate,
+  sweStartDateTime,
+  minSweDateTime,
+  swEndDateTime,
+  maxSweDateTime,
+  selectedSweDateTime,
   selectedSnodasLumpedMapUrl,
   selectedSnodasRawMapUrl,
   selectedSnodasSimMapUrl,
@@ -339,8 +339,8 @@ const {
   queryGetPlot,
 } = runStatusStore;
 const {
-  setSweStartDate,
-  setSweEndDate,
+  setSweStartDateTime,
+  setSweEndDateTime,
   getSweTimeRange,
   queryGetIterations,
   queryGetPerformanceMetrics,
@@ -696,15 +696,15 @@ watch(selectedPlotName, async () => {
       selectedGridType.value = 'catchment';
     }
 
-    // set sweStartDate and swEndDate if not already set
-    if (!sweStartDate.value || !swEndDate.value) {
-      setSweStartDate();
-      setSweEndDate();
+    // set sweStartDateTime and swEndDateTime if not already set
+    if (!sweStartDateTime.value || !swEndDateTime.value) {
+      setSweStartDateTime();
+      setSweEndDateTime();
     }
 
-    // set selectedSweDate to sweStartDate if not already set
-    if (!selectedSweDate.value) {
-      selectedSweDate.value = sweStartDate.value;
+    // set selectedSweDateTime to sweStartDateTime if not already set
+    if (!selectedSweDateTime.value) {
+      selectedSweDateTime.value = sweStartDateTime.value;
     }
 
   } else if (selectedPlotName.value) {
@@ -835,24 +835,18 @@ watch(selectedPlotTable, async () => {
   }
 });
 
-// Convert selectedSweDate string to Date object
-// VueDatePicker sets selectedSweDate to a string, so we need to convert it to a Date object
-const convertSelectedSweDateStringToDateObject = (value: string) => {
-  selectedSweDate.value = DateTime.fromISO(value, { zone: 'utc' });
+// Convert selectedSweDateTime string to Date object
+// VueDatePicker sets selectedSweDateTime to a string, so we need to convert it to a Date object
+const convertSelectedSweDateStringToDateTimeObject = (value: string) => {
+  selectedSweDateTime.value = DateTime.fromISO(value, { zone: 'utc' });
 }
 
-// Handle selectedSweDate changes
-// if selectedSweDate is a string, convert it to a Date object
-watch(selectedSweDate, async () => {
-  console.log('isValidDateTime(selectedSweDate.value): ', isValidDateTime(selectedSweDate.value));
-  console.log('selectedSweDate before conversion: ', selectedSweDate.value, '\n');
-
-  if (typeof selectedSweDate.value === 'string') {
-    convertSelectedSweDateStringToDateObject(selectedSweDate.value);
+// Handle selectedSweDateTime changes
+// if selectedSweDateTime is a string, convert it to a Date object
+watch(selectedSweDateTime, async () => {
+  if (typeof selectedSweDateTime.value === 'string') {
+    convertSelectedSweDateStringToDateTimeObject(selectedSweDateTime.value);
   }
-
-  console.log('isValidDateTime(selectedSweDate.value): ', isValidDateTime(selectedSweDate.value));
-  console.log('selectedSweDate after conversion: ', selectedSweDate.value, '\n');
 });
 
 // set plotTableColumns whenever plotTableData is changed
@@ -1501,13 +1495,32 @@ const toggleMessagesGroup = async () => {
 }
 
 // call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
-const getSpatialPlot = async () => {
+const getSpatialPlots = async () => {
   isEvaluationLoading.value = true;
   if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
     // load the SWE images
-    await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedSweDate.value as Date));
+    if (selectedSweDateTime.value && isValidDateTime(selectedSweDateTime.value)) {
+      const selectedSweDate: Date = selectedSweDateTime.value.toJSDate();
+      if (isValidDate(selectedSweDate)) {
+        // load the SWE images
+        const loadSweImagesErrors = await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedSweDate as Date));
+
+        if (loadSweImagesErrors) {
+          loadSweImagesErrors.forEach((errorMessage) => {
+            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage };
+            toast.add(tMsg); addToastRecord(tMsg);
+          });
+        }
+      } else {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'selected SWE date is not in Date format' };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'selected SWE date is not in DateTime format' };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+    isEvaluationLoading.value = false;
   }
-  isEvaluationLoading.value = false;
 }
 
 const toggleExpandPlotTable = async () => {
@@ -1516,22 +1529,6 @@ const toggleExpandPlotTable = async () => {
   } else {
     expandPlotTable.value = true;
   }
-}
-
-// call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
-const getSpatialPlots = async () => {
-  isEvaluationLoading.value = true;
-  if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
-    // load the SWE images
-    const loadSweImagesErrors = await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedSweDate.value as Date));
-    if (loadSweImagesErrors) {
-      loadSweImagesErrors.forEach((errorMessage) => {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage };
-        toast.add(tMsg); addToastRecord(tMsg);
-      });
-    }
-  }
-  isEvaluationLoading.value = false;
 }
 
 onUnmounted(() => {
