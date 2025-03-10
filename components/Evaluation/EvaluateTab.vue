@@ -23,13 +23,13 @@
             <div class="layout__row">
               <div class="text-left text-nowrap" style="font-size:0.9em;">
                 <label for="calibrationJobId">Calibration Job ID </label>
-                {{ calibrationJobId }}<br/>
+                {{ calibrationJobId }}<br />
                 <label for="calibrationJobId">Gage </label>
                 {{ calData?.gage?.gage_id }}
               </div>
               <div class="text-left pl-3 text-nowrap" style="font-size:0.9em;">
                 <label for="validationJobId">Validation Job ID </label>
-                {{ evaluateValidationRunId }}<br/>
+                {{ evaluateValidationRunId }}<br />
                 <label for="validationJobId">Station Name </label>
                 {{ calData?.gage?.station_name }}
               </div>
@@ -62,13 +62,15 @@
           <div v-if="selectedPlotHasTimeseries">
             <div v-if="!showPlotGraph">
               <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
-                <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">Show SWE Time Series</span>
+                <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">Show SWE Time
+                  Series</span>
                 <span v-else>Show Interactive Time Series Viewer</span>
               </a>
             </div>
             <div v-else>
               <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
-                <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">Hide SWE Time Series</span>
+                <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">Hide SWE Time
+                  Series</span>
                 <span v-else>Hide Interactive Time Series Viewer</span>
               </a>
               <div v-if="plotGraphLines.length > 0" class="columns-2">
@@ -97,7 +99,8 @@
         </div>
       </div>
     </div>
-    <div v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName)) && !showPlotGraph" :class="{ 'grid grid-cols-2': !expandPlotTable }">
+    <div v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName)) && !showPlotGraph"
+      :class="{ 'grid grid-cols-2': !expandPlotTable }">
       <div class="text-center" v-if="!expandPlotTable">
         <div id="GraphArea" class="p-2" v-if="selectedPlotName && selectedPlotFileUrl">
           <img :src="selectedPlotFileUrl" :alt="selectedPlotName" />
@@ -115,7 +118,8 @@
         </div>
 
         <div id="PlotTableArea" class="p-2" v-if="plotTableData.length > 0">
-          <a v-if="!expandPlotTable && plotTableColumns.length > 5" href="#" class="p-1 c-blue font-bold underline mt-1" @click="toggleExpandPlotTable">
+          <a v-if="!expandPlotTable && plotTableColumns.length > 5" href="#" class="p-1 c-blue font-bold underline mt-1"
+            @click="toggleExpandPlotTable">
             &lt; Expand Plot Table (Hide Graph)</a>
           <a v-if="expandPlotTable" href="#" class="p-1 c-blue font-bold underline mt-1" @click="toggleExpandPlotTable">
             Reduce Plot Table (Show Graph) &gt;</a>
@@ -240,13 +244,16 @@
         </div>
         <div class="p-2 relative overflow-visible">
           <div class="text-sm font-semibold mt-3">
-            <p v-if="selectedSimulatedSource"><span class="font-bold">Range: {{ selectedSimulatedSourceTimeRange
-                }}</span></p>
+            <p>
+              <span class="font-bold">
+                {{ getSweTimeRange() }}
+              </span>
+            </p>
           </div>
           <div class="mt-3 relative z-10">
-            <VueDatePicker v-model="selectedEvaluateDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-              @update:model-value="convertSelectedEvaluateDateStringToDateObject" :enable-time-picker="false"
-              :teleport="true" utc='preserve' />
+            <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+              @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
+              :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true" utc='preserve' />
           </div>
           <div class="flex justify-end mt-3">
             <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plots"
@@ -266,10 +273,14 @@
 import { nextTick } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import VueDatePicker from "@vuepic/vue-datepicker";
+import { DateTime } from "luxon";
+
 
 import type { DynamicObject } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
+import { formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
+import { isValidDate, isValidDateTime } from "@/utils/CommonHelpers";
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
@@ -306,11 +317,13 @@ const {
   selectedPlotFilename,
   selectedPlotFileUrl,
   simulatedSources,
-  selectedSimulatedSource,
   gridTypes,
   selectedGridType,
-  selectedEvaluateDate,
-  selectedSimulatedSourceTimeRange,
+  sweStartDateTime,
+  minSweDateTime,
+  swEndDateTime,
+  maxSweDateTime,
+  selectedSweDateTime,
   selectedSnodasLumpedMapUrl,
   selectedSnodasRawMapUrl,
   selectedSnodasSimMapUrl,
@@ -326,6 +339,9 @@ const {
   queryGetPlot,
 } = runStatusStore;
 const {
+  setSweStartDateTime,
+  setSweEndDateTime,
+  getSweTimeRange,
   queryGetIterations,
   queryGetPerformanceMetrics,
   queryGetLogNames,
@@ -388,7 +404,7 @@ const selectedLogCurrentPage = ref<number>(1);
 const selectedLogTotalPages = ref<number>(1);
 const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
-const supplementalTableOptions = []
+const supplementalTableOptions = [];
 /* const supplementalTableOptions = [
   'Iteration Metrics Table',
   'Iteration Parameters Table',
@@ -438,13 +454,12 @@ onMounted(() => {
 
     // Get Plot Names
     //if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
-      plotNames.value = await queryGetPlotNames();
+    plotNames.value = await queryGetPlotNames();
     //}
 
     if (plotNames.value?._data?.plot_names) {
       // setting plotList will populate the dropdown
       plotList.value = plotNames?.value?._data?.plot_names;
-      console.log('plotList: ', plotList.value);
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
@@ -676,11 +691,21 @@ watch(selectedPlotName, async () => {
     selectedLogList.value = [];
     selectedLogName.value = '';
 
-    // default SNODAS image to SWE catchment map
-    selectedGridType.value = 'catchment';
+    // set selectedGridType to 'catchment' by default if not already set
+    if (!selectedGridType.value) {
+      selectedGridType.value = 'catchment';
+    }
 
-    // default to 'Validation Best Run' for simulated source
-    selectedSimulatedSource.value = 'Validation Best Run';
+    // set sweStartDateTime and swEndDateTime if not already set
+    if (!sweStartDateTime.value || !swEndDateTime.value) {
+      setSweStartDateTime();
+      setSweEndDateTime();
+    }
+
+    // set selectedSweDateTime to sweStartDateTime if not already set
+    if (!selectedSweDateTime.value) {
+      selectedSweDateTime.value = sweStartDateTime.value;
+    }
 
   } else if (selectedPlotName.value) {
     plotGraphData.value = [];
@@ -810,17 +835,17 @@ watch(selectedPlotTable, async () => {
   }
 });
 
-// Convert selectedEvaluateDate string to Date object
-// VueDatePicker sets selectedEvaluateDate to a string, so we need to convert it to a Date object
-const convertSelectedEvaluateDateStringToDateObject = (value: string) => {
-  selectedEvaluateDate.value = new Date(value);
+// Convert selectedSweDateTime string to Date object
+// VueDatePicker sets selectedSweDateTime to a string, so we need to convert it to a Date object
+const convertSelectedSweDateStringToDateTimeObject = (value: string) => {
+  selectedSweDateTime.value = DateTime.fromISO(value, { zone: 'utc' });
 }
 
-// Handle selectedEvaluateDate changes
-// if selectedEvaluateDate is a string, convert it to a Date object
-watch(selectedEvaluateDate, async () => {
-  if (typeof selectedEvaluateDate.value === 'string') {
-    convertSelectedEvaluateDateStringToDateObject(selectedEvaluateDate.value);
+// Handle selectedSweDateTime changes
+// if selectedSweDateTime is a string, convert it to a Date object
+watch(selectedSweDateTime, async () => {
+  if (typeof selectedSweDateTime.value === 'string') {
+    convertSelectedSweDateStringToDateTimeObject(selectedSweDateTime.value);
   }
 });
 
@@ -973,9 +998,9 @@ const togglePlotGraph = async () => {
 const drawInteractivePlot = () => {
   console.log('Drawing interactive plot');
   plotGraphOptions.value = {
-    x: {grid: true}, 
-    y: {grid: true, labelAnchor: 'center', labelArrow: 'none'}, 
-    marks: [], 
+    x: { grid: true },
+    y: { grid: true, labelAnchor: 'center', labelArrow: 'none' },
+    marks: [],
     width: plotGraphArea.value.offsetWidth - 200,
     height: (document.getElementById('MainLeftDataParent').getBoundingClientRect().bottom - document.getElementById('PlotGraphArea').getBoundingClientRect().top) - 150
   };
@@ -1010,49 +1035,49 @@ const drawInteractivePlot = () => {
       }
     }
   }
-  
+
   //console.log('plotLineData: ', plotLineData);
   //console.log('plotDotData: ', plotDotData);
   let plotGraphLeftEdge = new Date(plotGraphDateRange.value.start);
   let plotGraphRightEdge = new Date(plotGraphDateRange.value.end);
-    let lineOptions = {
-      x: { value: 'time', label: 'Time' },
-      y: { value: 'measurement', label: 'Measurement' },
-      stroke: 'color'
-    }
-    let lineTipOptions = {
-      x: { value: 'time', label: 'Time' },
-      y: { value: 'measurement', label: 'Measurement' },
-      title: (d) => `${d.name} (${d.color})`,
-      fontSize: 14
-    }
-    let dotOptions = {
-      x: { value: 'time', label: 'Time' },
-      y: { value: 'measurement', label: 'Measurement' },
-      stroke: 'color',
-      symbol: 'symbol'
-    }
-    let dotTipOptions = {
-      x: { value: 'time', label: 'Time' },
-      y: { value: 'measurement', label: 'Measurement'},
-      title: (d) => `${d.name} (${d.color} ${d.symbol})`,
-      fontSize: 14
-    }
-    if (gridDisplayOptions.includes(selectedPlotName.value)) {
-      lineOptions.y.label = 'Depth (cm/s)';
-      lineTipOptions.y.label = 'Depth' ;
-      lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s`
-      dotOptions.y.label = 'Depth (cm/s)';
-      dotTipOptions.y.label = 'Depth';
-      dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s`
-    } else {
-      lineOptions.y.label = 'Flow (cm/s)';
-      lineTipOptions.y.label = 'Flow';
-      lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} cm/s`;
-      dotOptions.y.label = 'Flow (cm/s)';
-      dotTipOptions.y.label = 'Flow';
-      dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} cm/s`;
-    }
+  let lineOptions = {
+    x: { value: 'time', label: 'Time' },
+    y: { value: 'measurement', label: 'Measurement' },
+    stroke: 'color'
+  }
+  let lineTipOptions = {
+    x: { value: 'time', label: 'Time' },
+    y: { value: 'measurement', label: 'Measurement' },
+    title: (d) => `${d.name} (${d.color})`,
+    fontSize: 14
+  }
+  let dotOptions = {
+    x: { value: 'time', label: 'Time' },
+    y: { value: 'measurement', label: 'Measurement' },
+    stroke: 'color',
+    symbol: 'symbol'
+  }
+  let dotTipOptions = {
+    x: { value: 'time', label: 'Time' },
+    y: { value: 'measurement', label: 'Measurement' },
+    title: (d) => `${d.name} (${d.color} ${d.symbol})`,
+    fontSize: 14
+  }
+  if (gridDisplayOptions.includes(selectedPlotName.value)) {
+    lineOptions.y.label = 'Depth (cm/s)';
+    lineTipOptions.y.label = 'Depth';
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s`
+    dotOptions.y.label = 'Depth (cm/s)';
+    dotTipOptions.y.label = 'Depth';
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s`
+  } else {
+    lineOptions.y.label = 'Flow (cm/s)';
+    lineTipOptions.y.label = 'Flow';
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} cm/s`;
+    dotOptions.y.label = 'Flow (cm/s)';
+    dotTipOptions.y.label = 'Flow';
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} cm/s`;
+  }
   if (plotLineData.length > 0) {
     plotGraphLeftEdge = new Date(plotLineData[0].time);
     plotGraphOptions.value.marks.push(
@@ -1083,8 +1108,8 @@ const drawInteractivePlot = () => {
       }
       console.log('simStartTime: ', simStartTime);
       if (simStartTime >= plotGraphLeftEdge && simStartTime <= plotGraphRightEdge) {
-        plotGraphOptions.value.marks.push(Plot.ruleX([simStartTime], {stroke: 'grey', strokeWidth: 2, strokeDasharray: 10}));
-        plotGraphOptions.value.marks.push(Plot.text([" Sim Start Time "], {x: [simStartTime], frameAnchor: 'top', textAnchor: 'start'}));
+        plotGraphOptions.value.marks.push(Plot.ruleX([simStartTime], { stroke: 'grey', strokeWidth: 2, strokeDasharray: 10 }));
+        plotGraphOptions.value.marks.push(Plot.text([" Sim Start Time "], { x: [simStartTime], frameAnchor: 'top', textAnchor: 'start' }));
         console.log('Marking simStartTime on interactive plot');
       }
       console.log('Marking simStartTime on slider');
@@ -1093,8 +1118,8 @@ const drawInteractivePlot = () => {
       let valStartTime = new Date(calData?.value?.validation_times.validation_start_time);
       console.log('valStartTime: ', valStartTime);
       if (valStartTime >= plotGraphLeftEdge && valStartTime <= plotGraphRightEdge) {
-        plotGraphOptions.value.marks.push(Plot.ruleX([valStartTime], {stroke: 'grey', strokeWidth: 2, strokeDasharray: 10}));
-        plotGraphOptions.value.marks.push(Plot.text([" Val Start Time "], {x: [valStartTime], frameAnchor: 'top'}));
+        plotGraphOptions.value.marks.push(Plot.ruleX([valStartTime], { stroke: 'grey', strokeWidth: 2, strokeDasharray: 10 }));
+        plotGraphOptions.value.marks.push(Plot.text([" Val Start Time "], { x: [valStartTime], frameAnchor: 'top' }));
         console.log('Marking valStartTime on interactive plot');
       }
       console.log('Marking valStartTime on slider');
@@ -1107,8 +1132,8 @@ const drawInteractivePlot = () => {
       }
       console.log('valEndTime: ', valEndTime);
       if (valEndTime >= plotGraphLeftEdge && valEndTime <= plotGraphRightEdge) {
-        plotGraphOptions.value.marks.push(Plot.ruleX([valEndTime], {stroke: 'grey', strokeWidth: 2, strokeDasharray: 10}));
-        plotGraphOptions.value.marks.push(Plot.text([" Val End Time "], {x: [valEndTime], frameAnchor: 'top', textAnchor: 'end'}));
+        plotGraphOptions.value.marks.push(Plot.ruleX([valEndTime], { stroke: 'grey', strokeWidth: 2, strokeDasharray: 10 }));
+        plotGraphOptions.value.marks.push(Plot.text([" Val End Time "], { x: [valEndTime], frameAnchor: 'top', textAnchor: 'end' }));
         console.log('Marking valEndTime on interactive plot');
       }
       console.log('Marking valEndTime on slider');
@@ -1439,11 +1464,6 @@ watch(selectedLogCurrentPage, async () => {
   }
 });
 
-// watch for changes in selectedGridType
-watch(selectedGridType, () => {
-  console.log('selectedGridType: ', selectedGridType.value);
-});
-
 function capitalCase(str: string) {
   return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -1475,13 +1495,32 @@ const toggleMessagesGroup = async () => {
 }
 
 // call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
-const getSpatialPlot = async () => {
+const getSpatialPlots = async () => {
   isEvaluationLoading.value = true;
   if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
     // load the SWE images
-    await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value as Date));
+    if (selectedSweDateTime.value && isValidDateTime(selectedSweDateTime.value)) {
+      const selectedSweDate: Date = selectedSweDateTime.value.toJSDate();
+      if (isValidDate(selectedSweDate)) {
+        // load the SWE images
+        const loadSweImagesErrors = await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedSweDate as Date));
+
+        if (loadSweImagesErrors) {
+          loadSweImagesErrors.forEach((errorMessage) => {
+            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage };
+            toast.add(tMsg); addToastRecord(tMsg);
+          });
+        }
+      } else {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'selected SWE date is not in Date format' };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'selected SWE date is not in DateTime format' };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+    isEvaluationLoading.value = false;
   }
-  isEvaluationLoading.value = false;
 }
 
 const toggleExpandPlotTable = async () => {
@@ -1490,22 +1529,6 @@ const toggleExpandPlotTable = async () => {
   } else {
     expandPlotTable.value = true;
   }
-}
-
-// call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
-const getSpatialPlots = async () => {
-  isEvaluationLoading.value = true;
-  if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
-    // load the SWE images
-    const loadSweImagesErrors = await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedEvaluateDate.value as Date));
-    if (loadSweImagesErrors) {
-      loadSweImagesErrors.forEach((errorMessage) => {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage };
-        toast.add(tMsg); addToastRecord(tMsg);
-      });
-    }
-  }
-  isEvaluationLoading.value = false;
 }
 
 onUnmounted(() => {

@@ -45,11 +45,11 @@
                   </span>
                 </template>
               </Column>
-              <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable>
+              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
                 <template #body="slotProps">
-                  <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
-                    :title="'Job Genesis ' + slotProps.data.job_genesis">
-                    {{ slotProps.data.job_genesis }}
+                  <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
+                    :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
+                    {{ slotProps.data.gage_id }}
                   </span>
                 </template>
               </Column>
@@ -62,16 +62,14 @@
                   </span>
                 </template>
               </Column>
-              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
+              <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable>
                 <template #body="slotProps">
-                  <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
-                    :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
-                    {{ slotProps.data.gage_id }}
+                  <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
+                    :title="'Job Genesis ' + slotProps.data.job_genesis">
+                    {{ slotProps.data.job_genesis }}
                   </span>
                 </template>
               </Column>
-
-
               <Column field="created_at" header="Creation Date" sortable>Column
                 <template #body="slotProps">
                   <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
