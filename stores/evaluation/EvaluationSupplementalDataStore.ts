@@ -1,6 +1,7 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
+import { DateTime } from "luxon";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
@@ -31,9 +32,10 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     'Validation Best Run',
     'Validation Alt Iteration X Run'
   ]);
-  const selectedSimulatedSource = ref<string>();
-  const selectedSimulatedSourceStartDate = ref<string>();
-  const selectedSimulatedSourceEndDate = ref<string>();
+  const sweStartDateTime = ref<any>();
+  const minSweDateTime = ref<any>();
+  const swEndDateTime = ref<any>();
+  const maxSweDateTime = ref<any>();
 
 
   const gridTypes = ref<string[]>([
@@ -41,7 +43,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     'Catchment Means'
   ]);
   const selectedGridType = ref<string>();
-  const selectedEvaluateDate = ref<Date | string>();
+  const selectedSweDateTime = ref<any>();
 
   const selectedSnodasLumpedMapUrl = ref<string>();
   const selectedSnodasRawMapUrl = ref<string>();
@@ -49,25 +51,34 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
 
   const isEvaluationLoading = ref<boolean>(false);
 
+  const userTimeZone = DateTime.local().zoneName;
+
   /**
-   * Computes the selected simulated source time range depending on the selected simulated source
+   * set sweStartDateTime
    */
-  const selectedSimulatedSourceTimeRange = computed(() => {
-    if (selectedSimulatedSource?.value?.includes('Calibration')) {
-      selectedSimulatedSourceStartDate.value = `${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_start_time as string)}`;
-      selectedSimulatedSourceEndDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.calibration_times?.calibration_end_time as string);
-    }
+  const setSweStartDateTime = (): void => {
+    sweStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time, { zone: 'utc' });
+    
+    // this is used to set the min date for the date picker correctly
+    minSweDateTime.value = sweStartDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
+  };
 
-    else if (selectedSimulatedSource?.value?.includes('Validation')) {
-      selectedSimulatedSourceStartDate.value = `${formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string)}`;
-      selectedSimulatedSourceEndDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_end_time as string);
-    }
+  /**
+   * set swEndDateTime
+   */
+  const setSweEndDateTime = (): void => {
+    swEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time, { zone: 'utc' });
+    
+    // this is used to set the max date for the date picker correctly
+    maxSweDateTime.value = swEndDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
+  };
 
-    // default selectedEvaluateDate to validation_start_time in order to have a default value for the date picker
-    selectedEvaluateDate.value = formatISOStringOrDateToYYYYMMDD(userCalibrationRunData?.value?.validation_times?.validation_start_time as string);
-
-    return `${selectedSimulatedSourceStartDate.value} to ${selectedSimulatedSourceEndDate.value}`;
-  });
+  /**
+   * get sweTimeRange
+   */
+  const getSweTimeRange = (): string => {
+    return `Range: ${formatISOStringOrDateToYYYYMMDD(sweStartDateTime.value.toJSDate())} to ${formatISOStringOrDateToYYYYMMDD(swEndDateTime.value.toJSDate())}`;
+  };
 
   /**
    * Load SWE images
@@ -219,15 +230,20 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedPlotFilename,
     selectedPlotFileUrl,
     simulatedSources,
-    selectedSimulatedSource,
     gridTypes,
     selectedGridType,
-    selectedEvaluateDate,
-    selectedSimulatedSourceTimeRange,
+    sweStartDateTime,
+    minSweDateTime,
+    maxSweDateTime,
+    swEndDateTime,
+    selectedSweDateTime,
     selectedSnodasLumpedMapUrl,
     selectedSnodasRawMapUrl,
     selectedSnodasSimMapUrl,
     isEvaluationLoading,
+    setSweStartDateTime,
+    setSweEndDateTime,
+    getSweTimeRange,
     queryGetIterations,
     queryGetPerformanceMetrics,
     queryGetLogNames,
