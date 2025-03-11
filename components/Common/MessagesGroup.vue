@@ -11,6 +11,10 @@
             :title="'Gage ' + calData?.gage?.gage_id"><span class="font-medium">Gage:</span>
             {{ calData?.gage?.gage_id }}</div>
 
+            <div v-if="calData?.num_catchments" :aria-label="'Catchments ' + calData?.num_catchments"
+            :title="'Gage ' + calData?.num_catchments"><span class="font-medium">Catchments:</span>
+            {{ calData?.num_catchments }}</div>
+
           <div v-if="calData?.forcing_source" :aria-label="'Forcing Data ' + calData?.forcing_source"
             :title="'Forcing Data ' + calData?.forcing_source"><span class="font-medium">Forcing Data:</span>
             {{ calData?.forcing_source }}
