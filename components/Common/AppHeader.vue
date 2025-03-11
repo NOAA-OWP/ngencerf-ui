@@ -26,7 +26,7 @@
           </li>
           <li aria-label="Verification" title="Verification">
             <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
-              to="verification" data-menu='4' @click="" class="disabled">Verification</NuxtLink>
+              to="verification" data-menu='4' @click="" >Verification</NuxtLink>
           </li>
         </ul>
 
@@ -104,7 +104,7 @@
             </span>
           </div>
 
-          <div v-else-if="getMenuIndex() === 3">
+          <!-- <div v-else-if="getMenuIndex() === 3">
             <span v-if="getForecastTabIndex() === 1">
               <LazyForecastCalibrationRunsHelp />
             </span>
@@ -120,7 +120,7 @@
             <span v-if="getForecastTabIndex() === 5">
               <LazyForecastResultsHelp />
             </span>
-          </div>
+          </div> -->
 
         </div>
       </Transition>
@@ -166,12 +166,6 @@ const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(
 const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/RunStatusHelp.vue"))
 const AboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
-
-const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
-const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
-const LazyForecastResultsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
-const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
-const LazyForecastStatusRunHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/StatusRunHelp.vue"));
 
 const gstore = generalStore();
 const { popupActive } = storeToRefs(gstore);
