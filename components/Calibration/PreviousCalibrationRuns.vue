@@ -22,7 +22,7 @@
                 <Button class="filter-link" @click="toggleShowFilters">Filters</Button>
               </div>
               <div class="ml-2 mt-[19px] text-left inline-block">
-                <Button class="filter-link" @click="clearCalibrationFilters">
+                <Button class="filter-link" @click="clearCalibrationFilters" :disabled="!filtersExist" >
                   Clear Filters
                 </Button>
               </div>
@@ -257,6 +257,10 @@ const clearCalibrationFilters = () => {
     jobFilterDialog.value.externalResetFilters();
   }
 };
+
+const filtersExist = computed(() => {
+  return (modulesFilterList.value.length !== 0 || statusTypeFilterList.value.length !== 0 || uiGageId.value != "All")
+});
 
 // Template for the "Archived" column (Yes/No display)
 const archivedTemplate = (rowData: any) => {

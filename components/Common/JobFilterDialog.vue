@@ -1,5 +1,5 @@
 <template>
-  <div id="JobFilterDialog" ref="draggableDiv" class="mb-2 top-[20%] left-[30%] absolute z-100 w-[505px] h-[454px]"
+  <div id="JobFilterDialog" ref="draggableDiv" class="mb-2 top-[20%] left-[30%] absolute z-100 w-[606px] h-[440px]"
     :class="isDragging ? 'cursor-move' : ''">
 
     <div id="Header" class="mb-2">
@@ -13,18 +13,21 @@
     </div>
 
     <div id="FilterDialog" class="px-5 py-0">
-      <div class="grid grid-cols-10 gap-2">
-        <div class="col-span-4">
+      <div class="grid grid-cols-3 gap-2">
+        <div class="col-span-1">
           <div class="mb-2">
-            <label class="text-center" for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
+            <label class="block text-center" for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
             <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
               :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
               aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
             </Select>
           </div>
-          <label for="StatusList">Status</label><br>
+
+        </div>
+        <div class="col-span-1">
+          <label class="block text-center mb-1" for="StatusList">Status</label>
           <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-            optionValue="filterValue" multiple>
+            optionValue="filterValue" multiple class="h-[284px]">
             <template #option="slotProps">
               <div v-bind:class="(slotProps.option.selected === true) ? 'font-bold' : ''">
                 <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
@@ -35,11 +38,11 @@
           </Listbox>
         </div>
 
-        <div class="col-span-6">
+        <div class="col-span-1">
           <div>
-            <label for="ModuleList" class="ml-[100px]">Modules</label>
+            <label for="ModuleList" class="block text-center mb-1">Modules</label>
             <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="h-60">
+              optionLabel="name" optionValue="name" class="h-[283px]">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : ''">
                   <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
@@ -49,14 +52,17 @@
               </template>
             </Listbox>
           </div>
-          <div id="ButtonArea" class="flex mt-3 ml-[24px]">
-            <Button class="ngenButtonDiv" label="Clear" @click="resetFilters($event)" aria-label="Clear filters"
-              title="Clear filters">
-            </Button>
-            <Button class="ngenButtonDiv ml-6" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
-              title="Apply"></Button>
-          </div>
+
         </div>
+      </div>
+
+      <div id="ButtonArea" class="flex mt-3 float-right w-[220px]">
+        <Button class="ngenButtonDiv" label="Clear" @click="resetFilters($event)" aria-label="Clear filters"
+          title="Clear filters">
+        </Button>
+        <Button class="ngenButtonDiv ml-6" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
+          title="Apply">
+        </Button>
       </div>
     </div>
   </div>
@@ -180,6 +186,7 @@ const archivedTemplate = (rowData: any) => {
   return rowData.archived ? 'Yes' : 'No';
 };
 
+
 </script>
 
 <style lang="scss" scoped>
@@ -195,10 +202,12 @@ const archivedTemplate = (rowData: any) => {
   border: 2px solid #666666;
 }
 
+#CloseX:hover {
+  color: global.$ngwcp_primary2;
+}
 
 #ModuleList,
 #StatusList {
   border: 1px solid #888888;
 }
-
 </style>
