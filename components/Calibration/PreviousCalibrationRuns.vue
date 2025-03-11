@@ -22,7 +22,7 @@
                 <Button class="filter-link" @click="toggleShowFilters">Filters</Button>
               </div>
               <div class="ml-2 mt-[19px] text-left inline-block">
-                <Button class="filter-link" @click="clearCalibrationFilters" :disabled="!filtersExist" >
+                <Button class="filter-link" :class="!filtersExist ? 'grayedout' : ''" @click="clearCalibrationFilters" :disabled="!filtersExist" >
                   Clear Filters
                 </Button>
               </div>
@@ -582,5 +582,9 @@ small-label,
 
 .nowrap {
   white-space: nowrap;
+}
+
+.grayedout {
+  color: #555 !important;
 }
 </style>

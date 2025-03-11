@@ -56,12 +56,12 @@
         </div>
       </div>
 
-      <div id="ButtonArea" class="flex mt-3 float-right w-[333px]">
+      <div id="ButtonArea" class="flex mt-3 float-right w-[226px]">
         <Button class="ngenButtonDiv" label="Clear" @click="resetFilters($event)" aria-label="Clear filters"
           title="Clear filters">
         </Button>
-        <Button class="ngenButtonDiv ml-6" label="Apply and Close" @click="sendApply($event)"
-          aria-label="Apply and close and close" title="Apply and close">
+        <Button class="ngenButtonDiv ml-6" label="Apply" @click="sendApply($event)"
+          aria-label="Apply and close" title="Apply and close">
         </Button>
       </div>
     </div>
