@@ -1,3 +1,4 @@
+import { ServerCodes } from '@/composables/NextgenEnums';
 import { DateTime } from "luxon";
 
 /**
@@ -220,4 +221,9 @@ export const arraysEqual = (arr1: any, arr2: any) => {
   // If all elements are equal, return true
   return true;
 };
+
+export function getErrorTextFromStatus(status: number): string {
+  const result = ServerCodes.find(codeEntry => codeEntry.code === status);
+  return result ? result.error : "Unknown error code";
+}
 

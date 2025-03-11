@@ -56,12 +56,12 @@
         </div>
       </div>
 
-      <div id="ButtonArea" class="flex mt-3 float-right w-[220px]">
+      <div id="ButtonArea" class="flex mt-3 float-right w-[333px]">
         <Button class="ngenButtonDiv" label="Clear" @click="resetFilters($event)" aria-label="Clear filters"
           title="Clear filters">
         </Button>
-        <Button class="ngenButtonDiv ml-6" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
-          title="Apply">
+        <Button class="ngenButtonDiv ml-6" label="Apply and Close" @click="sendApply($event)"
+          aria-label="Apply and close and close" title="Apply and close">
         </Button>
       </div>
     </div>
@@ -128,6 +128,7 @@ onMounted(() => {
           isDragging.value = false;
         });
       }
+      externalResetFilters();
     }, 250) // Necessary to make sure that data has been retreived.
   });
 })
@@ -149,6 +150,7 @@ const sendApply = (e: MouseEvent) => {
   e.stopPropagation();
   e.stopImmediatePropagation();
   emit("ApplyJobFilters");
+  sendClose(e);
 };
 
 /**

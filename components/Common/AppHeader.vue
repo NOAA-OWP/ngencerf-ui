@@ -157,7 +157,8 @@ import { generalStore } from "@/stores/common/GeneralStore";
 
 import { useLogout, useLogoutListen } from "@/composables/UseEventBus";
 
-import JobFilterHelp from "@/components/Help/JobFilterHelp.vue"
+import JobFilterHelp from "@/components/Help/JobFilterHelp.vue";
+import { getErrorTextFromStatus } from "@/utils/CommonHelpers";
 
 const LazyHelpLandingPageHelp = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
 const LazyCalibrationHelpPreviousRunsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/PreviousRunsHelp.vue"))
@@ -183,6 +184,7 @@ const LazyForecastStatusRunHelp = defineAsyncComponent(() => import("@/component
 const LazyUserAccount = defineAsyncComponent(() => import("@/components/Common/UserAccount.vue"))
 
 const gstore = generalStore();
+
 const { popupActive } = storeToRefs(gstore);
 
 const emit = defineEmits(["logoutEvent"]);
@@ -196,6 +198,7 @@ const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabInde
 const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
 const userStore = useUserDataStore();
+const { lastServerError } = storeToRefs(userStore);
 
 
 const location = useRoute();
@@ -241,7 +244,7 @@ onUnmounted(() => {
 });
 
 
-const filterIsVisible =  () => {
+const filterIsVisible = () => {
   let el = document.getElementById('JobFilterDialog');
   if (!el || el?.style.display === 'none') {
     return false;
@@ -320,9 +323,12 @@ useLogoutListen('logoutEvent', (evStr: string) => {
   if (evStr === "token" && !getIsTokenExpired()) {
     popupActive.value = false;
     setIsTokenExpired();
-    alert("Your session has expired. Please log in again.");
+    let err = (lastServerError?.value) ? getErrorTextFromStatus(lastServerError?.value?.status) + ' ' : '';
     useLogout("logoutEvent", "logout");
     navigateTo('login');
+    setTimeout(() => {
+      alert(err + "Your session has expired. Please log in again.");
+    }, 250);
   }
 })
 

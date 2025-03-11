@@ -6,6 +6,7 @@ import type {
   CalibrationJobListItem,
   ValidationJobsList,
   UserCalibrationRunData,
+  ServerStatus
 } from "@/composables/NextGenModel";
 
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -38,6 +39,8 @@ export const useUserDataStore = defineStore(
     const modulesFilterList = ref<string[]>([]);
     const statusTypeFilterList = ref<string[]>([]);
     const showArchivedJobsOnly = ref<boolean>(false);
+
+    const lastServerError = ref<ServerStatus>();
 
     /**
      * Checks if user is logged in
@@ -358,6 +361,7 @@ export const useUserDataStore = defineStore(
       modulesFilterList,
       statusTypeFilterList,
       showArchivedJobsOnly,
+      lastServerError
     };
   },
   {

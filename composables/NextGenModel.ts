@@ -765,3 +765,8 @@ export type FilterTimeRange = {
   earliest: Date;
   latest: Date;
 }
+
+export type ServerStatus = {
+  status: number;
+  ok: boolean;
+}
