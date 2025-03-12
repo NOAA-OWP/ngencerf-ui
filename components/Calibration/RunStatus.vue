@@ -317,12 +317,7 @@ const startRun = async () => {
 
     if (runCalibrationResponse.status >= 200 && runCalibrationResponse.status < 300) {
       if (runCalibrationResponse?._data?.status) {
-        if (userCalibrationRunData.value) {
-          userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
-        } else {
-          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'userCalibrationRunData not set' };
-          toast.add(tMsg); addToastRecord(tMsg);
-        }
+        userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
       } else {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server' };
         toast.add(tMsg); addToastRecord(tMsg);
