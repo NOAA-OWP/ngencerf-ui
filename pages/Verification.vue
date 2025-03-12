@@ -69,7 +69,7 @@ a {
 
 .container {
   height: 800px;
-  width: 100%;.section-title {}
+  width: 100%;
   overflow-x: hidden;
   overflow-y: auto;
 }
