@@ -92,32 +92,90 @@
             <div class="layout__cell td2">
               <a class="hlink" :href="'mailto:' + serverInfo?.contact_email">{{ serverInfo?.contact_email }}</a>
             </div>
-          </div>          
-        </div>        
+          </div>
+        </div>
       </div>
     </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Repository</th>
+          <th>Release</th>
+          <th>Build Date</th>
+          <th>Commit Hash</th>
+          <th>Commit Date</th>
+          <th>Author</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
   </div>
 
 </template>
 
 <script setup lang="ts">
-import type { ServerInfo } from "@/composables/NextGenModel";
+import type { ServerInfo, GitData } from "@/composables/NextGenModel";
 import json from "@/assets/version.json";
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getServerInfo } = generalStore();
+import { useUserDataStore } from '@/stores/common/UserDataStore';
+
+const { getAccessToken } = useUserDataStore();
+
+const { ngencerfBaseUrl } = useBackendConfig();
 
 const { popupActive } = storeToRefs(generalStore());
 
 const info = json;
 const serverInfo = ref<ServerInfo>();
 
+const gitInf = ref<any>();
+
+
 onMounted(async () => {
   serverInfo.value = getServerInfo();
+  getGitInformation();
+  console.log("Git Infor: ", gitInf.value)
 })
+
+// Get footer infongenCERF
+const getGitInformation = () => {
+  makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_git_info/`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${getAccessToken()}`,
+      "Content-Type": 'application/json'
+    },
+    body: ""
+  }).then((result) => {
+    debugger;
+    gitInf.value = transformGitInfo(result._data);
+    //gitInf.value = result._data;
+    console.log(gitInf.value);
+  })
+}
+
+/**
+ * Transforms a git_info record into an array.
+ * Each element is an object with the original key mapping to its corresponding data.
+ */
+function transformGitInfo<T>(gitInfo: Record<string, T>): Array<{ [key: string]: T }> {
+  return Object.entries(gitInfo).map(([key, value]) => ({ [key]: value }));
+}
+
 
 const closeAboutBox = () => {
   useAccountEvent("aboutBoxEvent", "");
-   popupActive.value = false;
+  popupActive.value = false;
 }
 
 </script>
@@ -150,12 +208,15 @@ const closeAboutBox = () => {
     position: relative;
     display: block;
   }
+
   .layout__row {
     display: flex;
   }
+
   .layout__row.spacer {
     padding-bottom: 20px;
   }
+
   .layout__cell.td1 {
     width: 150px;
   }
@@ -187,3 +248,4 @@ const closeAboutBox = () => {
   }
 }
 </style>
+
