@@ -6,9 +6,10 @@
           <AppHeader />
         </div>
       </div>
-
+      <a class="absolute inset-x-[200px] inset-y-[90px] text-white" target="_blank"
+        href="https://confluence.nextgenwaterprediction.com/x/poNtAg">Link to the Confluence Page</a>
       <div class="grid row-span-10 gap-2">
-        <iframe title="pdf" :src="pdfUrl" width="100%" height="100%"></iframe>
+        <iframe class="inline" title="pdf" :src="pdfUrl" width="100%" height="100%"></iframe>
 
       </div>
 
@@ -43,6 +44,7 @@ a {
 #Verification {
   padding: 40px;
 }
+
 .section-title {
   font-size: 1.3em;
 }
@@ -78,6 +80,4 @@ a {
 .section {
   margin-bottom: 30px;
 }
-
-
 </style>
