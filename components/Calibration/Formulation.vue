@@ -350,7 +350,7 @@ const saveFormulationData = () => {
     var valOK = validateModules();
     if (!valOK) {
       modulesHaveChanged.value = false;
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate and then Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000};
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000};
       toast.add(tMsg); addToastRecord(tMsg);
       clearCalibratableParameters();
     }
