@@ -6,7 +6,7 @@
           <AppHeader />
         </div>
       </div>
-      <a class="absolute inset-x-[200px] inset-y-[90px] text-white" target="_blank"
+      <a class="absolute inset-x-[240px] inset-y-[97px] text-white" target="_blank"
         href="https://confluence.nextgenwaterprediction.com/x/poNtAg">Link to the Confluence Page</a>
       <div class="grid row-span-10 gap-2">
         <iframe class="inline" title="pdf" :src="pdfUrl" width="100%" height="100%"></iframe>
