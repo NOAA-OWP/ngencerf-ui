@@ -155,20 +155,11 @@ const getGitInformation = () => {
   })
 }
 
-const cleanAdditionalInfo = () => {
-  const validKeys = ["commit_hash", "build_date", "commit_date", "author", "message"];
-  Object.keys(addedGitInfo.ngencerf_ui).forEach(key => {
-    if (!validKeys.includes(key)) {
-      delete addedGitInfo.ngencerf_ui[key];
-    }
-  });
-};
-
 const gitInfoArray = computed(() => {
   const infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
-  cleanAdditionalInfo();
   return [...infoArray, { repository: 'ngencerf_ui', ...addedGitInfo.ngencerf_ui }];
 });
+
 const formatDate = (dateString: string) => {
   return dateString ? new Date(dateString).toLocaleString() : 'N/A';
 };
