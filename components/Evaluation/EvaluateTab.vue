@@ -67,14 +67,18 @@
             @click="toggleMessagesGroup">
             Show Calibration Details</a>
           <br />
-          <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue font-bold underline mt-1" 
-            @click="togglePlotGraph">
-            <span v-if="!showPlotGraph">Show </span> 
-            <span v-else>Hide </span> 
-            <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">SWE </span>
-            <span v-else>Interactive </span>
-            Time Series
-          </a>
+          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName) && !showPlotGraph">
+            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue font-bold underline mt-1" 
+              @click="togglePlotGraph">Show SWE Time Series</a>
+          </span>
+          <span v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName))">
+            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue font-bold underline mt-1" 
+              @click="togglePlotGraph">
+              <span v-if="!showPlotGraph">Show </span> 
+              <span v-else>Hide </span> 
+              Interactive Time Series
+            </a>
+          </span>
         </div>
       </div>
     </div>
@@ -143,21 +147,16 @@
           </div>
         </div>
       </div>
-      <div id="PlotGraphControls" class="pl-4 ml-auto">
-        <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue text-sm underline mt-1"
+      <div id="PlotGraphControls">
+        <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue text-sm underline mt-1 pb-2"
           @click="toggleCustomizePlot">
-          Customize
-          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">SWE</span>
-          <span v-else>Interactive</span>
-          Time Series Viewer
+          Customize Viewer
         </a>
         <div v-if="plotGraphLines.length > 0">
           <div v-for="item in plotGraphLines" :key="item.id">
             <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
               v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
-            <div class="label150">
-              <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
-            </div>
+            <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
           </div>
         </div>
         <div v-if="plotGraphCheckboxesEmpty()">
@@ -168,13 +167,13 @@
             <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
               class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
           </div>
-          <h2 class="mt-5" aria-label="Customize Interactive Time Series Viewer" title="Customize Interactive Time Series Viewer">
-            Customize Interactive Time Series Viewer
+          <h2 class="mt-5" aria-label="Customize Viewer" title="Customize Viewer">
+            Customize Viewer
           </h2>
           <div v-if="plotGraphLines.length > 0">
             <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
               <div>
-                <label class="label150" :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
+                <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
               </div>
               <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
                 :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
@@ -709,9 +708,9 @@ watch(selectedPlotName, async () => {
       setSweEndDateTime();
     }
     // set selectedSweDateTime to sweStartDateTime if not already set
-    if (!selectedSweDateTime.value) {
+    /* if (!selectedSweDateTime.value) {
       selectedSweDateTime.value = sweStartDateTime.value;
-    }
+    } */
 
     // pre-load SWE Timeseries Data so that we know our date range
     if (!sweTimeSeriesData.value || sweTimeSeriesData.value.length == 0) {
@@ -1204,24 +1203,26 @@ const drawInteractiveSlider = () => {
       // we don't have a previous position to remember
       if (gridDisplayOptions.includes(selectedPlotName.value)) {
         // find our highest SNODAS measurement and start there
-        let snodas_column_name = '';
-        let snodas_max_value = 0;
-        let snodas_max_date = null;
+        let snodasColumnName = '';
+        let snodasMaxValue = 0;
+        let snodasMaxDate = null;
         Object.keys(plotGraphData.value[0]).forEach(key => {
           if (key.toLowerCase().indexOf('snodas') >= 0) {
-            snodas_column_name = key;
+            snodasColumnName = key;
           }
         });
         for (let d = 0; d < plotGraphData.value.length; d++) {
-          if (plotGraphData.value[d][snodas_column_name] > snodas_max_value) {
-            snodas_max_value = plotGraphData.value[d][snodas_column_name];
-            snodas_max_date = new Date(plotGraphData.value[d]['timestamp'])
+          if (plotGraphData.value[d][snodasColumnName] > snodasMaxValue) {
+            snodasMaxValue = plotGraphData.value[d][snodasColumnName];
+            snodasMaxDate = new Date(plotGraphData.value[d]['timestamp'])
           }
         }
+        // override the default date for SWE
+        selectedSweDateTime.value = snodasMaxDate.toISOString().split('T')[0];
         // start with a 4-month range around our highest measurement
-        let daysFromStart = Math.round(snodas_max_date.getTime() - (new Date(plotGraphDateRange.value.start)).getTime()) / (1000 * 3600 * 24);
-        let sliderBoxStart = Math.ceil((daysFromStart - 60) * (getSliderWidth() / plotGraphDateLimits.value.span));
-        let sliderBoxEnd = Math.ceil((daysFromStart + 60) * (getSliderWidth() / plotGraphDateLimits.value.span));
+        let daysFromStart = Math.round(snodasMaxDate.getTime() - (new Date(plotGraphDateRange.value.start)).getTime()) / (1000 * 3600 * 24);
+        let sliderBoxStart = Math.ceil((daysFromStart - 150) * (getSliderWidth() / plotGraphDateLimits.value.span));
+        let sliderBoxEnd = Math.ceil((daysFromStart + 90) * (getSliderWidth() / plotGraphDateLimits.value.span));
         sliderBoxPosition.value = {
           start: sliderBoxStart,
           end: sliderBoxEnd
@@ -1367,15 +1368,15 @@ const sliderDragCancel = (event) => {
   plotGraphSliderCursor.value = 'cursor-grab';
   plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
   const x = event.clientX - document.getElementById('PlotGraphSlider').getBoundingClientRect().left;
-  console.log('Dragged outside of slider box at position ' + x);
-  if (x < 0) {
-    document.getElementById('PlotGraphSliderBox').style.left = '0px';
-    sliderBoxPosition.value.start = 0;
-  } else if (x > getSliderWidth()) {
-    document.getElementById('PlotGraphSliderBox').style.right = '0px';
-    sliderBoxPosition.value.end = getSliderWidth();
-  }
   if (sliderDragType.value) {
+    console.log('Dragged outside of slider box at position ' + x);
+    if (x < 0) {
+      document.getElementById('PlotGraphSliderBox').style.left = '0px';
+      sliderBoxPosition.value.start = 0;
+    } else if (x > getSliderWidth()) {
+      document.getElementById('PlotGraphSliderBox').style.right = '0px';
+      sliderBoxPosition.value.end = getSliderWidth();
+    }
     sliderDragEnd(event);
   }
 }
@@ -1665,8 +1666,17 @@ onUnmounted(() => {
   overflow: auto;
 }
 
+#PlotGraphControls {
+  min-width: 225px;
+}
+
 #PlotGraphControls input[type='checkbox'] {
   margin-top: 4px;
+}
+
+#PlotGraphControls label, #CustomizePlotWindow label {
+  margin: 0 4px 4px 4px !important;
+  display: inline-block;
 }
 
 #CustomizePlotWindow {
