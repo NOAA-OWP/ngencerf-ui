@@ -15,7 +15,7 @@
       <div id="FooterData" class="pt-[15px] pl-[15px] leading-6">
 
         <div class="grid grid-cols-12">
-          <div class="col-span-10">
+          <div class="col-span-11">
             <div class="relative block text-left">
               <div class="flex">
                 <div class="w-[150px]">ngenCERF Version:</div>
@@ -34,9 +34,10 @@
               </div>
             </div>
           </div>
-          <div class="col-span-2 mt-5"><Button class="nobg" @click="copyGitInfoToClipboard()">Copy to Clipboard</Button>
+          <div class="col-span-1 mt-5 text-center">
             <img class="inline cursor-pointer" alt="Copy Table Data" src="@/assets/styles/img/copy.png"
-              @click="copyGitInfoToClipboard()" />
+              @click="copyGitInfoToClipboard()" /> <br />
+            <Button class="nobg" @click="copyGitInfoToClipboard()">Copy </Button>
           </div>
         </div>
 
