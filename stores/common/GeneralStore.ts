@@ -5,7 +5,7 @@
  */
 import { defineStore } from "pinia";
 
-import type { ServerInfo, ToastRecord } from "@/composables/NextGenModel";
+import type { CombinedVerstionInfo, ToastRecord } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
 
 export const generalStore = defineStore(
@@ -33,7 +33,7 @@ export const generalStore = defineStore(
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
 
-    const serverInfo = ref<ServerInfo>();
+    const serverInfo = ref<CombinedVerstionInfo>();
 
     const isLoading = ref<boolean>(false);
 
@@ -61,7 +61,7 @@ export const generalStore = defineStore(
       return serverInfo.value;
     }
 
-    function setServerInfo(si: ServerInfo) {
+    function setServerInfo(si: CombinedVerstionInfo) {
       serverInfo.value = si;
     }
 

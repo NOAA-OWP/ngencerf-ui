@@ -665,7 +665,7 @@ export type AccountEvent = {
   errorLogEvent: string;
 };
 
-export type ServerInfo = {
+export type CombinedVerstionInfo = {
   version: string;
   date: string;
   contact_email: string;

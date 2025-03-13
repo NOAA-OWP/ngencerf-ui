@@ -1,76 +1,39 @@
 <template>
   <!-- About Box -->
-  <div id="AboutBox" ref="aboutBox">
+  <div id="AboutBox" ref="aboutBox" class="absolute h-auto">
     <div class="text-right sticky top-0">
       <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
         class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeAboutBox" />
     </div>
 
     <div id="BoxContent">
-      <div id="PgmName">
+      <div id="PgmName" class="inline-block font-bold ml-4 mt-3 text-lg">
         About
       </div>
       <hr class="mt-2" />
 
-      <div id="FooterData">
-
-        <div class="layout__table">
-          <div class="grid grid-cols-4">
-            <div class="row-span-1">
-              <div class="layout__row">
-                <div class="layout__cell td1">ngenCERF Version:</div>
-                <div class="layout__cell td2"> {{ serverInfo?.ngenCerf_version }} </div>
-              </div>
-              <div class="layout__row">
-                <div class="layout__cell td1"> ngenCERF Date: </div>
-                <div class="layout__cell td2"> {{ serverInfo?.ngenCerf_date }} </div>
-              </div>
-              <div class="layout__row">
-                <div class="layout__cell"> </div>
-                <div class="layout__cell"> </div>
-              </div>
-              <div class="layout__row">
-                <div class="layout__cell td1"> UI Version: </div>
-                <div class="layout__cell td2"> {{ info.release_info.version }} </div>
-              </div>
-              <div class="layout__row">
-                <div class="layout__cell td1"> UI Date: </div>
-                <div class="layout__cell td2"> {{ info.release_info.date }} </div>
-              </div>
-              <div class="layout__row">
-                <div class="layout__cell td1"> UI Commit: </div>
-                <div class="layout__cell td2"> {{ info.release_info.commit.substring(0, 8) }} </div>
-              </div>
+      <div id="FooterData" class="pt-[15px] pl-[15px] leading-6">
+        <div class="relative block text-left">
+          <div class="flex">
+            <div class="w-[150px]">ngenCERF Version:</div>
+            <div class="w-[150px]"> {{ combinedVersionInfo?.ngenCerf_version }} </div>
+          </div>
+          <div class="flex">
+            <div class="w-[150px]"> ngenCERF Date: </div>
+            <div class=" w-[150px]"> {{ combinedVersionInfo?.ngenCerf_date }} </div>
+          </div>
+          <div class="flex">
+            <div class="w-[150px]"> Support Email: </div>
+            <div class="w-[150px]">
+              <a class="hlink" :href="'mailto:' + combinedVersionInfo?.contact_email">{{
+                combinedVersionInfo?.contact_email }}</a>
             </div>
-
-            <div class="row-span-1">
-              <div class="layout__row">
-                <div class="layout__cell td1"> Server Version: </div>
-                <div class="layout__cell td2"> {{ serverInfo?.version }} </div>
-              </div>
-              <div class="layout__row">
-                <div class="layout__cell td1"> Server Date: </div>
-                <div class="layout__cell td2"> {{ serverInfo?.date }} </div>
-              </div>
-              <div class="layout__row">
-                <div class="layout__cell td1"> Server Commit: </div>
-                <div class="layout__cell td2"> {{ serverInfo?.commit_hash.substring(0, 8) }} </div>
-              </div>
-              <div class="layout__row spacer"></div>
-              <div class="layout__row">
-                <div class="layout__cell td1"> Support Email: </div>
-                <div class="layout__cell td2">
-                  <a class="hlink" :href="'mailto:' + serverInfo?.contact_email">{{ serverInfo?.contact_email }}</a>
-                </div>
-              </div>
-            </div>
-            <div class="row-span-2">&nbsp;</div>
           </div>
         </div>
       </div>
 
       <div class="p-4">
-        <DataTable :value="gitInfoArray" class="p-datatable-sm">
+        <DataTable :value="gitInfoArray" class="p-datatable-sm" scrollable scroll-height="400px">
           <Column field="repository" header="Repository"></Column>
           <Column field="release" header="Release"></Column>
           <Column field="build_date" header="Build Date">
@@ -100,8 +63,8 @@
 <script setup lang="ts">
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import type { ServerInfo } from "@/composables/NextGenModel";
-import json from "@/assets/version.json";
+import type { CombinedVerstionInfo } from "@/composables/NextGenModel";
+import additionalGitInfo from "@/assets/git_info.json";
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getServerInfo } = generalStore();
 import { useUserDataStore } from '@/stores/common/UserDataStore';
@@ -112,8 +75,8 @@ const { ngencerfBaseUrl } = useBackendConfig();
 
 const { popupActive } = storeToRefs(generalStore());
 
-const info = json;
-const serverInfo = ref<ServerInfo>();
+const addedGitInfo = additionalGitInfo;
+const combinedVersionInfo = ref<CombinedVerstionInfo>();
 
 const gitInfo = ref<Record<string, GitInfo>>({});
 
@@ -133,9 +96,9 @@ interface GitInfo {
 
 
 onMounted(async () => {
-  serverInfo.value = getServerInfo();
+  combinedVersionInfo.value = getServerInfo();
 
-    getGitInformation();
+  getGitInformation();
 
   if (aboutBox.value) {
     observer = new IntersectionObserver(
@@ -176,7 +139,7 @@ const resizeNotifications = () => {
 
 // Get footer infongenCERF
 const getGitInformation = () => {
-  if (!isUserLoggedIn() ) {
+  if (!isUserLoggedIn()) {
     return null;
   }
   makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_git_info/`, {
@@ -192,10 +155,20 @@ const getGitInformation = () => {
   })
 }
 
-const gitInfoArray = computed(() =>
-  Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }))
-);
+const cleanAdditionalInfo = () => {
+  const validKeys = ["commit_hash", "build_date", "commit_date", "author", "message"];
+  Object.keys(addedGitInfo.ngencerf_ui).forEach(key => {
+    if (!validKeys.includes(key)) {
+      delete addedGitInfo.ngencerf_ui[key];
+    }
+  });
+};
 
+const gitInfoArray = computed(() => {
+  const infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
+  cleanAdditionalInfo();
+  return [...infoArray, { repository: 'ngencerf_ui', ...addedGitInfo.ngencerf_ui }];
+});
 const formatDate = (dateString: string) => {
   return dateString ? new Date(dateString).toLocaleString() : 'N/A';
 };
@@ -212,68 +185,23 @@ const closeAboutBox = () => {
 @use "@/assets/styles/styles.scss";
 
 #AboutBox {
-  position: absolute;
   right: 5px;
   top: 90px;
   border: 5px solid #ccc;
   z-index: 9999;
   width: 1600px;
-  height: auto;
   background-color: white;
-
-
-  #FooterData {
-    padding: 15px;
-    line-height: 1.5em;
-  }
 
   hr {
     height: 2px;
     background-color: black;
   }
 
-  .layout__table {
-    position: relative;
-    display: block;
-  }
-
-  .layout__row {
-    display: flex;
-  }
-
-  .layout__row.spacer {
-    padding-bottom: 20px;
-  }
-
-  .layout__cell.td1 {
-    width: 150px;
-  }
-
-  .td1 {
-    text-align: right;
-    padding-right: 10px;
-  }
-
-  .td2 {
-    margin-left: 10px;
-  }
-
-  .commit-hash {
-    padding: 3px !important;
-  }
-
   .hlink {
     text-decoration: underline;
     color: blue;
   }
-
-  #PgmName {
-    display: inline-block;
-    font: 20px "NeueFrutigerWorld-Bold", sans-serif;
-    font-weight: bold;
-    margin-left: 20px;
-    margin-top: 15px;
-  }
+ 
 }
 
 table {
