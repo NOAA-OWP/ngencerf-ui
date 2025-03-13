@@ -1,11 +1,11 @@
 {
   "ngencerf_ui": {
-    "commit_hash": "409e6cf96760f4bc2e1f5829b06ecf31935f089d",
-    "branch": "strassner-5752-add-git-info-to-about",
+    "commit_hash": "fc8fb6482ef5cf96a102d69dde8d25bff033ed63",
+    "branch": "strassner-allow-copying-of-about-table-data",
     "tags": "",
     "author": "norman.strassner",
-    "commit_date": "2025-03-13 19:46:10 UTC",
-    "message": "Fixed conflict in runUi.sh",
-    "build_date": "2025-03-13 19:49:49 UTC"
+    "commit_date": "2025-03-13 20:54:56 UTC",
+    "message": "Forgot to add the copy icon",
+    "build_date": "2025-03-13 21:11:00 UTC"
   }
 }

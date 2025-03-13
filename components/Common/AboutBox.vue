@@ -2,8 +2,6 @@
   <!-- About Box -->
   <div id="AboutBox" ref="aboutBox" class="absolute h-auto">
     <div class="text-right sticky top-0">
-      <img class="absolute cursor-pointer right-10 mt-1 mr-2 w-[55px]" alt="Copy Table Data"
-        src="@/assets/styles/img/copy.png" @click="copyGitInfoToClipboard()" />
       <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
         class="absolute cursor-pointer right-0 boxed mt-2 mr-2" @click="closeAboutBox" />
     </div>
@@ -15,23 +13,33 @@
       <hr class="mt-2" />
 
       <div id="FooterData" class="pt-[15px] pl-[15px] leading-6">
-        <div class="relative block text-left">
-          <div class="flex">
-            <div class="w-[150px]">ngenCERF Version:</div>
-            <div class="w-[150px]"> {{ combinedVersionInfo?.ngenCerf_version }} </div>
-          </div>
-          <div class="flex">
-            <div class="w-[150px]"> ngenCERF Date: </div>
-            <div class=" w-[150px]"> {{ combinedVersionInfo?.ngenCerf_date }} </div>
-          </div>
-          <div class="flex">
-            <div class="w-[150px]"> Support Email: </div>
-            <div class="w-[150px]">
-              <a class="hlink" :href="'mailto:' + combinedVersionInfo?.contact_email">{{
-                combinedVersionInfo?.contact_email }}</a>
+
+        <div class="grid grid-cols-12">
+          <div class="col-span-10">
+            <div class="relative block text-left">
+              <div class="flex">
+                <div class="w-[150px]">ngenCERF Version:</div>
+                <div class="w-[150px]"> {{ combinedVersionInfo?.ngenCerf_version }} </div>
+              </div>
+              <div class="flex">
+                <div class="w-[150px]"> ngenCERF Date: </div>
+                <div class=" w-[150px]"> {{ combinedVersionInfo?.ngenCerf_date }} </div>
+              </div>
+              <div class="flex">
+                <div class="w-[150px]"> Support Email: </div>
+                <div class="w-[150px]">
+                  <a class="hlink" :href="'mailto:' + combinedVersionInfo?.contact_email">{{
+                    combinedVersionInfo?.contact_email }}</a>
+                </div>
+              </div>
             </div>
           </div>
+          <div class="col-span-2 mt-5"><Button class="nobg" @click="copyGitInfoToClipboard()">Copy to Clipboard</Button>
+            <img class="inline cursor-pointer" alt="Copy Table Data" src="@/assets/styles/img/copy.png"
+              @click="copyGitInfoToClipboard()" />
+          </div>
         </div>
+
       </div>
 
       <div class="p-4">
@@ -76,7 +84,7 @@ import { useUserDataStore } from '@/stores/common/UserDataStore';
 
 const toast = useToast();
 const { addToastRecord } = generalStore();
-const { getServerInfo } = generalStore(); 
+const { getServerInfo } = generalStore();
 const { getAccessToken, isUserLoggedIn } = useUserDataStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -144,12 +152,12 @@ const resizeNotifications = () => {
   let box = document.getElementById("AboutBox")?.clientHeight ?? 0;
   let row1 = document.getElementById("FooterData")?.clientHeight ?? 0;
   let h = box - row1 - 100;
-  if( h <= 100) {
+  if (h <= 100) {
     h = 100;
   }
   scrollHeight.value = h + "px";
 
- }
+}
 
 // Get footer infongenCERF
 const getGitInformation = () => {
@@ -236,7 +244,7 @@ const copyGitInfoToClipboard = () => {
     text-decoration: underline;
     color: blue;
   }
- 
+
 }
 
 table {
@@ -253,5 +261,11 @@ td {
 
 th {
   background-color: #f4f4f4;
+}
+
+.nobg:hover {
+  background-color: transparent !important;
+  border: none;
+  color: black;
 }
 </style>
