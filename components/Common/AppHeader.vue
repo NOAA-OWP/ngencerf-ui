@@ -217,6 +217,7 @@ onMounted(() => {
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
     sizeLogWindow();
+    sizeAboutWindow();
   });  
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 });
@@ -225,6 +226,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', function (event) {
     sizeHelpWindow();
     sizeLogWindow();
+    sizeAboutWindow();
   }); 
 });
 
@@ -253,6 +255,17 @@ const sizeLogWindow = () => {
     let ele = document.getElementById("ErrorLog");
     if (ele) { ele.style.height = h + 'px'; } 
  };
+};
+
+
+const sizeAboutWindow = () => {
+  let headerHeight = document.getElementById('Header')?.clientHeight;
+  let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
+  if (footerTop && headerHeight) {
+    let h = (footerTop - headerHeight) - 20;
+    let ele = document.getElementById("AboutBox");
+    if (ele) { ele.style.height = h + 'px'; }
+  };
 };
 
 /**

@@ -33,7 +33,8 @@
       </div>
 
       <div class="p-4">
-        <DataTable :value="gitInfoArray" class="p-datatable-sm" scrollable scroll-height="400px">
+        <DataTable :value="gitInfoArray" class="p-datatable-sm" scrollable :scroll-height="scrollHeight"
+          scroller="true">
           <Column field="repository" header="Repository"></Column>
           <Column field="release" header="Release"></Column>
           <Column field="build_date" header="Build Date">
@@ -50,8 +51,6 @@
 
         </DataTable>
       </div>
-
-
     </div>
 
 
@@ -132,10 +131,21 @@ onUnmounted(() => {
   });
 })
 
+// const resizeNotifications = () => {
+//   let box = document.getElementById("AboutBox")?.clientHeight ?? 0;
+//   scrollHeight.value = box + "px";
+// }
+
 const resizeNotifications = () => {
-  let box = document.getElementById("aboutBox")?.clientHeight ?? 0;
-  scrollHeight.value = box + "px";
-}
+  let box = document.getElementById("AboutBox")?.clientHeight ?? 0;
+  let row1 = document.getElementById("FooterData")?.clientHeight ?? 0;
+  let h = box - row1 - 100;
+  if( h <= 100) {
+    h === 100;
+  }
+  scrollHeight.value = h + "px";
+
+ }
 
 // Get footer infongenCERF
 const getGitInformation = () => {
@@ -151,7 +161,6 @@ const getGitInformation = () => {
     body: ""
   }).then((result) => {
     gitInfo.value = result._data.git_info;
-    console.log(gitInfo.value);
   })
 }
 
