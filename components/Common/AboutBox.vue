@@ -1,6 +1,6 @@
 <template>
   <!-- About Box -->
-  <div id="AboutBox">
+  <div id="AboutBox" ref="aboutBox">
     <div class="text-right sticky top-0">
       <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
         class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeAboutBox" />
@@ -65,37 +65,35 @@
               </div>
             </div>
             <div class="row-span-2">&nbsp;</div>
-            </div>
           </div>
         </div>
+      </div>
 
-        <div class="p-4">
-          <DataTable :value="gitInfoArray" class="p-datatable-sm">
-            <Column field="repository" header="Repository"></Column>
-            <Column field="release" header="Release"></Column>
-            <Column field="build_date" header="Build Date">
-              <template #body="{ data }">{{ formatDate(data.build_date) }}</template>
-            </Column>
-            <Column field="commit_hash" header="Commit Hash">
-              <template #body="{ data }">{{ data.commit_hash.substring(0, 8) }}</template>
-            </Column>
-            <Column field="commit_date" header="Commit Date">
-              <template #body="{ data }">{{ formatDate(data.commit_date) }}</template>
-            </Column>
-            <Column field="author" header="Author"></Column>
-            <Column field="message" header="Message"></Column>
-            <Column field="modules" header="Modules">
-              <template #body="{ data }">{{ formatModules(data.modules) }}</template>
-            </Column>
-          </DataTable>
-        </div>
+      <div class="p-4">
+        <DataTable :value="gitInfoArray" class="p-datatable-sm">
+          <Column field="repository" header="Repository"></Column>
+          <Column field="release" header="Release"></Column>
+          <Column field="build_date" header="Build Date">
+            <template #body="{ data }">{{ formatDate(data.build_date) }}</template>
+          </Column>
+          <Column field="commit_hash" header="Commit Hash">
+            <template #body="{ data }">{{ data.commit_hash.substring(0, 8) }}</template>
+          </Column>
+          <Column field="commit_date" header="Commit Date">
+            <template #body="{ data }">{{ formatDate(data.commit_date) }}</template>
+          </Column>
+          <Column field="author" header="Author"></Column>
+          <Column field="message" header="Message"></Column>
 
-
+        </DataTable>
       </div>
 
 
-
     </div>
+
+
+
+  </div>
 
 </template>
 
@@ -108,7 +106,7 @@ import { generalStore } from "@/stores/common/GeneralStore";
 const { getServerInfo } = generalStore();
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 
-const { getAccessToken } = useUserDataStore();
+const { getAccessToken, isUserLoggedIn } = useUserDataStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
 
@@ -119,6 +117,10 @@ const serverInfo = ref<ServerInfo>();
 
 const gitInfo = ref<Record<string, GitInfo>>({});
 
+const scrollHeight = ref<string>(); // Default height
+
+const aboutBox = ref<HTMLElement | null>(null);
+let observer: IntersectionObserver | null = null;
 
 interface GitInfo {
   release: string;
@@ -132,12 +134,51 @@ interface GitInfo {
 
 onMounted(async () => {
   serverInfo.value = getServerInfo();
-  getGitInformation();
-  console.log("Git Info: ", gitInfo.value)
+
+    getGitInformation();
+
+  if (aboutBox.value) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Resize when visible
+            resizeNotifications();
+          }
+        });
+      },
+      { threshold: 0.5 } // Triggers when at least 50% of the div is visible
+    );
+    observer.observe(aboutBox.value);
+  }
+
+  window.addEventListener('resize', function (event) {
+    resizeNotifications();
+  });
+
+  setTimeout(() => {
+    const resizeEvent = new Event('resize');
+    window.dispatchEvent(resizeEvent);
+  }, 1000);
+
 })
+
+onUnmounted(() => {
+  window.removeEventListener('resize', function (event) {
+    //
+  });
+})
+
+const resizeNotifications = () => {
+  let box = document.getElementById("aboutBox")?.clientHeight ?? 0;
+  scrollHeight.value = box + "px";
+}
 
 // Get footer infongenCERF
 const getGitInformation = () => {
+  if (!isUserLoggedIn() ) {
+    return null;
+  }
   makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_git_info/`, {
     method: "POST",
     headers: {
@@ -159,12 +200,6 @@ const formatDate = (dateString: string) => {
   return dateString ? new Date(dateString).toLocaleString() : 'N/A';
 };
 
-const formatModules = (modules?: Record<string, GitInfo>[]) => {
-  if (!modules || modules.length === 0) return '';
-  return modules.map(moduleObj => Object.keys(moduleObj)[0]).join(', ');
-};
-
-
 const closeAboutBox = () => {
   useAccountEvent("aboutBoxEvent", "");
   popupActive.value = false;
@@ -181,7 +216,7 @@ const closeAboutBox = () => {
   right: 5px;
   top: 90px;
   border: 5px solid #ccc;
-  z-index: 999;
+  z-index: 9999;
   width: 1600px;
   height: auto;
   background-color: white;

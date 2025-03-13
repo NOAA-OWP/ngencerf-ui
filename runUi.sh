@@ -25,13 +25,8 @@ generate_git_info() {
 generate_git_info
 echo
 
-echo 'npm install...'
-npm install
-echo
 
 echo 'building...'
-npm run build
-echo
+#npm run dev
 
-echo 'running...'
-node .output/server/index.mjs
+
