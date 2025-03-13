@@ -35,7 +35,7 @@
             </div>
           </div>
           <div class="col-span-1 mt-5 text-center">
-            <img class="inline w-[48px]" alt="Copy Table Data" src="@/assets/styles/img/copy.png"
+            <img class="inline cursor-pointer w-[48px]" alt="Copy Table Data" src="@/assets/styles/img/copy.png"
               @click="copyGitInfoToClipboard()" /> <br />
             <Button class="nobg" @click="copyGitInfoToClipboard()">Copy </Button>
           </div>
