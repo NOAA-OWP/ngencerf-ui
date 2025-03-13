@@ -1,13 +1,16 @@
 #! /bin/bash
 
 ngencerf_ui="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-echo $ngencerf_ui
 
 
 # Function to generate git_info.properties
 # Should parallel similar functionality in the Dockerfile
 generate_git_info() {
   GIT_INFO_PATH=$ngencerf_ui/assets/git_info.json
+    repo_url=$(git config --get remote.origin.url)
+    # Extract the repo name (everything after the last slash) and remove any trailing .git
+    key=${repo_url##*/}
+    key=${key%.git}
     echo "Generating git_info.json..."
     jq -n \
         --arg commit_hash "$(git rev-parse HEAD)" \
@@ -17,7 +20,7 @@ generate_git_info() {
         --arg commit_date "$(date -u -d @"$(git log -1 --pretty=format:'%ct')" +'%Y-%m-%d %H:%M:%S UTC')" \
         --arg message "$(git log -1 --pretty=format:'%s' | tr '\n' ';')" \
         --arg build_date "$(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
-        '{"ngencerf_ui": {commit_hash: $commit_hash, branch: $branch, tags: $tags, author: $author, commit_date: $commit_date, message: $message, build_date: $build_date}}' \
+        "{\"${key}\": {commit_hash: \$commit_hash, branch: \$branch, tags: \$tags, author: \$author, commit_date: \$commit_date, message: \$message, build_date: \$build_date}}" \
         > "$GIT_INFO_PATH"
     echo "git_info.json created at $GIT_INFO_PATH"
 }
