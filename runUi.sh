@@ -29,13 +29,7 @@ generate_git_info
 echo
 
 
-<<<<<<< HEAD
-echo 'building...'
-#npm run dev
-
-=======
 echo 'running...'
 npm run dev
 echo
->>>>>>> development
 
