@@ -121,7 +121,7 @@ onMounted(async () => {
   setTimeout(() => {
     const resizeEvent = new Event('resize');
     window.dispatchEvent(resizeEvent);
-  }, 1000);
+  }, 250);
 
 })
 
