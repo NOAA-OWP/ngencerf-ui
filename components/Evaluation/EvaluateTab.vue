@@ -63,16 +63,16 @@
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
               @click="gotoSelectAlternateIteration">New Validation</button></span>
           <br />
-          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue font-bold underline mt-1"
+          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue underline mt-1"
             @click="toggleMessagesGroup">
             Show Calibration Details</a>
           <br />
           <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName) && !showPlotGraph">
-            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue font-bold underline mt-1" 
+            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" 
               @click="togglePlotGraph">Show SWE Time Series</a>
           </span>
           <span v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName))">
-            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue font-bold underline mt-1" 
+            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" 
               @click="togglePlotGraph">
               <span v-if="!showPlotGraph">Show </span> 
               <span v-else>Hide </span> 
@@ -148,7 +148,7 @@
         </div>
       </div>
       <div id="PlotGraphControls">
-        <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue text-sm underline mt-1 pb-2"
+        <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue underline mt-1 pb-2"
           @click="toggleCustomizePlot">
           Customize Viewer
         </a>
@@ -1167,7 +1167,9 @@ const drawInteractiveSlider = () => {
     plotGraphSliderData.value = [];
     let rowSkip = plotGraphDataRaw.value.length / 1000;
     for (let c = 1; c < plotTableColumns.value.length; c++) {
-      if (document?.getElementById('plotGraphCheckbox-' + c)?.checked) {
+      console.log('Column name: ', plotTableColumns.value[c].value);
+      if ((gridDisplayOptions.includes(selectedPlotName.value) && plotTableColumns.value[c].value.toLowerCase().indexOf('snodas') >= 0) || 
+        (!gridDisplayOptions.includes(selectedPlotName.value) && document?.getElementById('plotGraphCheckbox-' + c)?.checked)) {
         for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
           let dataPoint = {
             time: new Date(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[0].value]),
@@ -1175,6 +1177,7 @@ const drawInteractiveSlider = () => {
           };
           plotGraphSliderData.value.push(dataPoint);
         }
+        console.log('Using column ' + plotTableColumns.value[c].value + ' to draw slider');
         break;
       }
     }
