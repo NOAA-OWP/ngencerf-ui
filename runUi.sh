@@ -28,9 +28,6 @@ generate_git_info() {
 generate_git_info
 echo
 
-echo 'npm install...'
-npm install
-echo
 
 echo 'running...'
 npm run dev

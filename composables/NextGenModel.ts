@@ -665,7 +665,7 @@ export type AccountEvent = {
   errorLogEvent: string;
 };
 
-export type ServerInfo = {
+export type CombinedVerstionInfo = {
   version: string;
   date: string;
   contact_email: string;
@@ -753,4 +753,14 @@ export type BestIterationData = {
 
 export interface ToastRecord extends ToastMessageOptions {
   datetime: string;
+}
+
+
+export interface GitData {
+  release: string;
+  build_date: string;
+  commit_hash: string;
+  commit_date: string;
+  author: string;
+  message: string;
 }
