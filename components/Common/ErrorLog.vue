@@ -131,7 +131,7 @@ onUnmounted(() => {
 const resizeNotifications = () => {
   let box = document.getElementById("ErrorLog")?.clientHeight ?? 0;
   let row1 = document.getElementById("Row1")?.clientHeight ?? 0;
-  let row2 = document.getElementById("Row1")?.clientHeight ?? 0;
+  let row2 = document.getElementById("Row2")?.clientHeight ?? 0;
   let h = box - row1 - row2;
   scrollHeight.value = h + "px";
 }
