@@ -11,119 +11,98 @@
         About
       </div>
       <hr class="mt-2" />
+
       <div id="FooterData">
+
         <div class="layout__table">
-          <div class="layout__row">
-            <div class="layout__cell td1">
-              ngenCERF Version:
+          <div class="grid grid-cols-4">
+            <div class="row-span-1">
+              <div class="layout__row">
+                <div class="layout__cell td1">ngenCERF Version:</div>
+                <div class="layout__cell td2"> {{ serverInfo?.ngenCerf_version }} </div>
+              </div>
+              <div class="layout__row">
+                <div class="layout__cell td1"> ngenCERF Date: </div>
+                <div class="layout__cell td2"> {{ serverInfo?.ngenCerf_date }} </div>
+              </div>
+              <div class="layout__row">
+                <div class="layout__cell"> </div>
+                <div class="layout__cell"> </div>
+              </div>
+              <div class="layout__row">
+                <div class="layout__cell td1"> UI Version: </div>
+                <div class="layout__cell td2"> {{ info.release_info.version }} </div>
+              </div>
+              <div class="layout__row">
+                <div class="layout__cell td1"> UI Date: </div>
+                <div class="layout__cell td2"> {{ info.release_info.date }} </div>
+              </div>
+              <div class="layout__row">
+                <div class="layout__cell td1"> UI Commit: </div>
+                <div class="layout__cell td2"> {{ info.release_info.commit.substring(0, 8) }} </div>
+              </div>
             </div>
-            <div class="layout__cell td2">
-              {{ serverInfo?.ngenCerf_version }}
+
+            <div class="row-span-1">
+              <div class="layout__row">
+                <div class="layout__cell td1"> Server Version: </div>
+                <div class="layout__cell td2"> {{ serverInfo?.version }} </div>
+              </div>
+              <div class="layout__row">
+                <div class="layout__cell td1"> Server Date: </div>
+                <div class="layout__cell td2"> {{ serverInfo?.date }} </div>
+              </div>
+              <div class="layout__row">
+                <div class="layout__cell td1"> Server Commit: </div>
+                <div class="layout__cell td2"> {{ serverInfo?.commit_hash.substring(0, 8) }} </div>
+              </div>
+              <div class="layout__row spacer"></div>
+              <div class="layout__row">
+                <div class="layout__cell td1"> Support Email: </div>
+                <div class="layout__cell td2">
+                  <a class="hlink" :href="'mailto:' + serverInfo?.contact_email">{{ serverInfo?.contact_email }}</a>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="layout__row">
-            <div class="layout__cell td1">
-              ngenCERF Date:
-            </div>
-            <div class="layout__cell td2">
-              {{ serverInfo?.ngenCerf_date }}
-            </div>
-          </div>
-          <div class="layout__row">
-            <div class="layout__cell">
-            </div>
-            <div class="layout__cell">
-            </div>
-          </div>
-          <div class="layout__row">
-            <div class="layout__cell td1">
-              UI Version:
-            </div>
-            <div class="layout__cell td2">
-              {{ info.release_info.version }}
-            </div>
-          </div>
-          <div class="layout__row">
-            <div class="layout__cell td1">
-              UI Date:
-            </div>
-            <div class="layout__cell td2">
-              {{ info.release_info.date }}
-            </div>
-          </div>
-          <div class="layout__row">
-            <div class="layout__cell td1">
-              UI Commit:
-            </div>
-            <div class="layout__cell td2">
-              {{ info.release_info.commit }}
-            </div>
-          </div>
-          <div class="layout__row spacer"></div>
-          <div class="layout__row">
-            <div class="layout__cell td1">
-              Server Version:
-            </div>
-            <div class="layout__cell td2">
-              {{ serverInfo?.version }}
-            </div>
-          </div>
-          <div class="layout__row">
-            <div class="layout__cell td1">
-              Server Date:
-            </div>
-            <div class="layout__cell td2">
-              {{ serverInfo?.date }}
-            </div>
-          </div>
-          <div class="layout__row">
-            <div class="layout__cell td1">
-              Server Commit:
-            </div>
-            <div class="layout__cell td2">
-              {{ serverInfo?.commit_hash }}
-            </div>
-          </div>
-          <div class="layout__row spacer"></div>
-          <div class="layout__row">
-            <div class="layout__cell td1">
-              Support Email:
-            </div>
-            <div class="layout__cell td2">
-              <a class="hlink" :href="'mailto:' + serverInfo?.contact_email">{{ serverInfo?.contact_email }}</a>
+            <div class="row-span-2">&nbsp;</div>
             </div>
           </div>
         </div>
+
+        <div class="p-4">
+          <DataTable :value="gitInfoArray" class="p-datatable-sm">
+            <Column field="repository" header="Repository"></Column>
+            <Column field="release" header="Release"></Column>
+            <Column field="build_date" header="Build Date">
+              <template #body="{ data }">{{ formatDate(data.build_date) }}</template>
+            </Column>
+            <Column field="commit_hash" header="Commit Hash">
+              <template #body="{ data }">{{ data.commit_hash.substring(0, 8) }}</template>
+            </Column>
+            <Column field="commit_date" header="Commit Date">
+              <template #body="{ data }">{{ formatDate(data.commit_date) }}</template>
+            </Column>
+            <Column field="author" header="Author"></Column>
+            <Column field="message" header="Message"></Column>
+            <Column field="modules" header="Modules">
+              <template #body="{ data }">{{ formatModules(data.modules) }}</template>
+            </Column>
+          </DataTable>
+        </div>
+
+
       </div>
+
+
+
     </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Repository</th>
-          <th>Release</th>
-          <th>Build Date</th>
-          <th>Commit Hash</th>
-          <th>Commit Date</th>
-          <th>Author</th>
-          <th>Message</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-  </div>
 
 </template>
 
 <script setup lang="ts">
-import type { ServerInfo, GitData } from "@/composables/NextGenModel";
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import type { ServerInfo } from "@/composables/NextGenModel";
 import json from "@/assets/version.json";
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getServerInfo } = generalStore();
@@ -138,13 +117,23 @@ const { popupActive } = storeToRefs(generalStore());
 const info = json;
 const serverInfo = ref<ServerInfo>();
 
-const gitInf = ref<any>();
+const gitInfo = ref<Record<string, GitInfo>>({});
+
+
+interface GitInfo {
+  release: string;
+  build_date: string;
+  commit_hash: string;
+  commit_date: string;
+  author: string;
+  message: string;
+}
 
 
 onMounted(async () => {
   serverInfo.value = getServerInfo();
   getGitInformation();
-  console.log("Git Infor: ", gitInf.value)
+  console.log("Git Info: ", gitInfo.value)
 })
 
 // Get footer infongenCERF
@@ -157,20 +146,23 @@ const getGitInformation = () => {
     },
     body: ""
   }).then((result) => {
-    debugger;
-    gitInf.value = transformGitInfo(result._data);
-    //gitInf.value = result._data;
-    console.log(gitInf.value);
+    gitInfo.value = result._data.git_info;
+    console.log(gitInfo.value);
   })
 }
 
-/**
- * Transforms a git_info record into an array.
- * Each element is an object with the original key mapping to its corresponding data.
- */
-function transformGitInfo<T>(gitInfo: Record<string, T>): Array<{ [key: string]: T }> {
-  return Object.entries(gitInfo).map(([key, value]) => ({ [key]: value }));
-}
+const gitInfoArray = computed(() =>
+  Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }))
+);
+
+const formatDate = (dateString: string) => {
+  return dateString ? new Date(dateString).toLocaleString() : 'N/A';
+};
+
+const formatModules = (modules?: Record<string, GitInfo>[]) => {
+  if (!modules || modules.length === 0) return '';
+  return modules.map(moduleObj => Object.keys(moduleObj)[0]).join(', ');
+};
 
 
 const closeAboutBox = () => {
@@ -179,6 +171,7 @@ const closeAboutBox = () => {
 }
 
 </script>
+
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
@@ -189,8 +182,8 @@ const closeAboutBox = () => {
   top: 90px;
   border: 5px solid #ccc;
   z-index: 999;
-  width: 550px;
-  height: 363px;
+  width: 1600px;
+  height: auto;
   background-color: white;
 
 
@@ -247,5 +240,20 @@ const closeAboutBox = () => {
     margin-top: 15px;
   }
 }
-</style>
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+</style>
