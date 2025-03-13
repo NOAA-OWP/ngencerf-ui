@@ -2,8 +2,10 @@
   <!-- About Box -->
   <div id="AboutBox" ref="aboutBox" class="absolute h-auto">
     <div class="text-right sticky top-0">
+      <img class="absolute cursor-pointer right-10 mt-1 mr-2 w-[55px]" alt="Copy Table Data"
+        src="@/assets/styles/img/copy.png" @click="copyGitInfoToClipboard()" />
       <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-        class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeAboutBox" />
+        class="absolute cursor-pointer right-0 boxed mt-2 mr-2" @click="closeAboutBox" />
     </div>
 
     <div id="BoxContent">
@@ -62,12 +64,19 @@
 <script setup lang="ts">
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import { useToast } from "primevue/usetoast";
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
+
 import type { CombinedVerstionInfo } from "@/composables/NextGenModel";
 import additionalGitInfo from "@/assets/git_info.json";
+
 import { generalStore } from "@/stores/common/GeneralStore";
-const { getServerInfo } = generalStore();
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 
+const toast = useToast();
+const { addToastRecord } = generalStore();
+const { getServerInfo } = generalStore(); 
 const { getAccessToken, isUserLoggedIn } = useUserDataStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -131,17 +140,12 @@ onUnmounted(() => {
   });
 })
 
-// const resizeNotifications = () => {
-//   let box = document.getElementById("AboutBox")?.clientHeight ?? 0;
-//   scrollHeight.value = box + "px";
-// }
-
 const resizeNotifications = () => {
   let box = document.getElementById("AboutBox")?.clientHeight ?? 0;
   let row1 = document.getElementById("FooterData")?.clientHeight ?? 0;
   let h = box - row1 - 100;
   if( h <= 100) {
-    h === 100;
+    h = 100;
   }
   scrollHeight.value = h + "px";
 
@@ -178,6 +182,37 @@ const closeAboutBox = () => {
   popupActive.value = false;
 }
 
+
+const useClipboard = () => {
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Clipboard', detail: 'CSV copied to clipboard', life: ToastTimeout.timeout5000 };
+      toast.add(tMsg); addToastRecord(tMsg);
+    } catch (err) {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Clipboard Error', detail: err, life: ToastTimeout.timeout5000 };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+  };
+  return { copyToClipboard };
+};
+
+const convertToCSV = (dataArray: any[]) => {
+  if (!dataArray.length) return '';
+  const headers = Object.keys(dataArray[0]).join(',');
+  const rows = dataArray.map(item =>
+    Object.values(item).map(value => `"${(value as string).replace(/"/g, '""')}"`).join(',')
+  );
+  return [headers, ...rows].join('\n');
+};
+
+const { copyToClipboard } = useClipboard();
+
+const copyGitInfoToClipboard = () => {
+  const csvData = convertToCSV(gitInfoArray.value);
+  copyToClipboard(csvData);
+};
+
 </script>
 
 <style lang="scss" scoped>
@@ -188,8 +223,8 @@ const closeAboutBox = () => {
   right: 5px;
   top: 90px;
   border: 5px solid #ccc;
-  z-index: 9999;
-  width: 1600px;
+  z-index: 99;
+  width: 1400px;
   background-color: white;
 
   hr {
