@@ -34,8 +34,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   ]);
   const sweStartDateTime = ref<any>();
   const minSweDateTime = ref<any>();
-  const swEndDateTime = ref<any>();
+  const sweEndDateTime = ref<any>();
   const maxSweDateTime = ref<any>();
+  const sweTimeSeriesData = ref<any[]>([]);
 
 
   const gridTypes = ref<string[]>([
@@ -57,27 +58,35 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * set sweStartDateTime
    */
   const setSweStartDateTime = (): void => {
-    sweStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time, { zone: 'utc' });
+    if (sweTimeSeriesData.value.length > 0) {
+      sweStartDateTime.value = DateTime.fromISO(sweTimeSeriesData.value[0].timestamp, { zone: 'utc' });
+    } else {
+      sweStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time, { zone: 'utc' });
+    }
     
     // this is used to set the min date for the date picker correctly
     minSweDateTime.value = sweStartDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
   };
 
   /**
-   * set swEndDateTime
+   * set sweEndDateTime
    */
   const setSweEndDateTime = (): void => {
-    swEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time, { zone: 'utc' });
+    if (sweTimeSeriesData.value.length > 0) {
+      sweEndDateTime.value = DateTime.fromISO(sweTimeSeriesData.value[sweTimeSeriesData.value.length - 1].timestamp, { zone: 'utc' });
+    } else {
+      sweEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time, { zone: 'utc' });
+    }
     
     // this is used to set the max date for the date picker correctly
-    maxSweDateTime.value = swEndDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
+    maxSweDateTime.value = sweEndDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
   };
 
   /**
    * get sweTimeRange
    */
   const getSweTimeRange = (): string => {
-    return `Range: ${formatISOStringOrDateToYYYYMMDD(sweStartDateTime.value.toJSDate())} to ${formatISOStringOrDateToYYYYMMDD(swEndDateTime.value.toJSDate())}`;
+    return `Range: ${formatISOStringOrDateToYYYYMMDD(sweStartDateTime.value.toJSDate())} to ${formatISOStringOrDateToYYYYMMDD(sweEndDateTime.value.toJSDate())}`;
   };
 
   /**
@@ -235,11 +244,12 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     sweStartDateTime,
     minSweDateTime,
     maxSweDateTime,
-    swEndDateTime,
+    sweEndDateTime,
     selectedSweDateTime,
     selectedSnodasLumpedMapUrl,
     selectedSnodasRawMapUrl,
     selectedSnodasSimMapUrl,
+    sweTimeSeriesData,
     isEvaluationLoading,
     setSweStartDateTime,
     setSweEndDateTime,

@@ -2,7 +2,6 @@
 
 ngencerf_ui="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 
-
 # Function to generate git_info.properties
 # Should parallel similar functionality in the Dockerfile
 generate_git_info() {
@@ -27,15 +26,3 @@ generate_git_info() {
 
 generate_git_info
 echo
-
-
-<<<<<<< HEAD
-echo 'building...'
-#npm run dev
-
-=======
-echo 'running...'
-npm run dev
-echo
->>>>>>> development
-

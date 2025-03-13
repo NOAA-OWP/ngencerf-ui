@@ -158,6 +158,7 @@ import { onMounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
 import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
@@ -311,28 +312,24 @@ const startRun = async () => {
   validationBestAchieved.value.isBest = false;
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Preparing Job Data';
-  }
-  try {
+
     const runCalibrationResponse = await runCalibrationJob();
 
-    if (runCalibrationResponse._data) {
-      if (runCalibrationResponse._data.status) {
-        if (userCalibrationRunData.value) {
-          userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
-        } else {
-          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'load_calibration_run from server failed' };
-          toast.add(tMsg); addToastRecord(tMsg);
-        }
+    if (runCalibrationResponse.status >= 200 && runCalibrationResponse.status < 300) {
+      if (runCalibrationResponse?._data?.status) {
+        userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
       } else {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server' };
         toast.add(tMsg); addToastRecord(tMsg);
       }
 
       if (runCalibrationResponse._data.submit_date) {
-        // set submitTimeDate to submit_date from server as a Date object. watch function for submitTimeDate will set submitTime, which shows the time in local time format
+        // set submitTimeDate to submit_date from server as a Date object. 
+        // watch function for submitTimeDate will validate that it is a valid Date object and set submitTime, 
+        // which shows the time in local time format
         submitTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration submit date from server' };
         toast.add(tMsg); addToastRecord(tMsg);
       }
 
@@ -342,11 +339,16 @@ const startRun = async () => {
       }
       fetchUserCalibrationRunData();
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'run_calibration from server failed' };
-      toast.add(tMsg); addToastRecord(tMsg);
+      userCalibrationRunData.value.status = 'Failed';
+      const errorMessages: string[] = useApiErrorResponsePreprocess(runCalibrationResponse);
+      errorMessages.forEach((msg: string) => {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
     }
-  } catch (error) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error running Calibration' };
+  } else {
+    // userCalibrationRunData should always be set before getting to this point, but hey just in case
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'userCalibrationRunData not set' };
     toast.add(tMsg); addToastRecord(tMsg);
   }
   isLoading.value = false;
