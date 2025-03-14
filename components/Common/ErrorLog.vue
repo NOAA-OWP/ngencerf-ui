@@ -1,5 +1,5 @@
 <template>
-  <div id="ErrorLog" ref="errorLog">
+  <div id="ErrorLog" ref="errorLog" class="rounded-lg">
     <div class="grid grid-rows-12">
       <div id="Row1" class="row-span-1 h-[48px] mt-2">
         <div class="grid grid-cols-4">

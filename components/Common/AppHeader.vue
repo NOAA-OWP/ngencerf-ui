@@ -502,7 +502,8 @@ const MenuChanged = (e: MouseEvent) => {
 
 #HelpWindow {
   z-index: 999;
-  border: 1px solid black;
+  border: 5px solid #ccc;
+  border-radius: 8px;
   position: absolute;
   right: 2%;
   top: 84px;

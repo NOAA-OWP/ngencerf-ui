@@ -1,6 +1,6 @@
 <template>
   <!-- About Box -->
-  <div id="AboutBox" ref="aboutBox" class="absolute h-auto">
+  <div id="AboutBox" ref="aboutBox" class="absolute h-auto rounded-lg">
     <div class="text-right sticky top-0">
       <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
         class="absolute cursor-pointer right-0 boxed mt-2 mr-2" @click="closeAboutBox" />
