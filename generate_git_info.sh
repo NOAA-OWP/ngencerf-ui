@@ -5,7 +5,7 @@ ngencerf_ui="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 # Function to generate git_info.properties
 # Should parallel similar functionality in the Dockerfile
 generate_git_info() {
-  GIT_INFO_PATH=$ngencerf_ui/assets/git_info.json
+  GIT_INFO_PATH=$ngencerf_ui/public/git_info.json
     repo_url=$(git config --get remote.origin.url)
     # Extract the repo name (everything after the last slash) and remove any trailing .git
     key=${repo_url##*/}
