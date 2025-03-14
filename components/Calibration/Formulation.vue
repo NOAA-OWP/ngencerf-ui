@@ -368,14 +368,16 @@ const saveFormulationData = () => {
         if (response?._data?.nwm_warning === true) {
           let warnings = "";
           let l = useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).length;
-          useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach( (warning, index) => {
-            warnings += warning;
-            if (index !== l - 1) {
-              warnings += " ---- ";
-            }
-          });
-          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Accepted with Notices', detail: warnings, life: ToastTimeout.timeout10000 };
-          toast.add(tMsg); addToastRecord(tMsg);
+          if (l > 0) {
+            useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach((warning, index) => {
+              warnings += warning;
+              if (index !== l - 1) {
+                warnings += " ---- ";
+              }
+            });
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Accepted with Notices', detail: warnings, life: ToastTimeout.timeout10000 };
+            toast.add(tMsg); addToastRecord(tMsg);
+          }
         }
         formulationStore_data_loading.value = false;
         updateJobData();
