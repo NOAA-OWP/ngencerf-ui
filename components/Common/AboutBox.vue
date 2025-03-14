@@ -126,7 +126,7 @@ onMounted(async () => {
       return response.json();
     })
     .then(data => {
-      addedGitInfo.value = data;
+      addedGitInfo.value = transformComponent(data) ;      
     })
     .catch(err => {
       console.warn('Optional git_info.json not loaded:', err);
@@ -198,8 +198,11 @@ const getGitInformation = () => {
 const gitInfoArray = computed(() => {
   const infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
   // Append additional git info if it was loaded
-  if (addedGitInfo.value && addedGitInfo.value.ngencerf_ui) {
-    return [...infoArray, { repository: 'ngencerf_ui', ...addedGitInfo.value.ngencerf_ui }];
+  if (infoArray.length && Object.keys(addedGitInfo.value).length > 0) {
+    addedGitInfo.value.repository = 'ngencerf_ui';
+    infoArray.push(addedGitInfo.value)
+    return infoArray; //[...infoArray, ...addedGitInfo.value ];
+    //return [...infoArray, { repository: 'ngencerf_ui', ...addedGitInfo.value.ngencerf_ui }];
   }
   return infoArray;
 });
@@ -212,7 +215,6 @@ const closeAboutBox = () => {
   useAccountEvent("aboutBoxEvent", "");
   popupActive.value = false;
 }
-
 
 const useClipboard = () => {
   const copyToClipboard = async (text: string) => {
@@ -244,6 +246,34 @@ const copyGitInfoToClipboard = () => {
   copyToClipboard(csvData);
 };
 
+function transformComponent(componentGitInfo: any) {
+  // Ensure we have a string for tags
+  const tags = (componentGitInfo.ngencerf_ui.tags || "").trim();
+  const newComp = { release: "", build_date: "", commit_hash: "", commit_date: "", author: "", message: "" };
+  // If tags is empty, set release to "dev (<branch>)", otherwise use tags.
+  if (tags === "") {
+    const branch = `dev (${componentGitInfo.ngencerf_ui.branch || "<unknown>"})`;
+    newComp.release = branch;
+  } else {
+    newComp.release = tags;
+  }
+  // Insert keys in the desired order: build_date, then commit_hash.
+  newComp.build_date = componentGitInfo.ngencerf_ui.build_date || "";
+  newComp.commit_hash = componentGitInfo.ngencerf_ui.commit_hash || "";
+  // If tags is empty, add commit_date, author, and message if they exist.
+  if (tags === "") {
+    if ("commit_date" in componentGitInfo) {
+      newComp.commit_date = componentGitInfo.ngencerf_ui.commit_date || "";
+    }
+    if ("author" in componentGitInfo) {
+      newComp.author = componentGitInfo.ngencerf_ui.author || "";
+    }
+    if ("message" in componentGitInfo) {
+      newComp.message = componentGitInfo.ngencerf_ui.message || "";
+    }
+  }
+  return newComp;
+}
 </script>
 
 <style lang="scss" scoped>
