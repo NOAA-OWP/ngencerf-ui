@@ -78,7 +78,8 @@ import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import type { CombinedVerstionInfo } from "@/composables/NextGenModel";
-import additionalGitInfo from "@/assets/git_info.json";
+// Removed static import of git_info.json
+// import additionalGitInfo from "@/assets/git_info.json";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from '@/stores/common/UserDataStore';
@@ -92,10 +93,11 @@ const { ngencerfBaseUrl } = useBackendConfig();
 
 const { popupActive } = storeToRefs(generalStore());
 
-const addedGitInfo = additionalGitInfo;
 const combinedVersionInfo = ref<CombinedVerstionInfo>();
 
 const gitInfo = ref<Record<string, GitInfo>>({});
+// Added reactive variable to store optional git_info.json data loaded at runtime
+const addedGitInfo = ref<any>(null);
 
 const scrollHeight = ref<string>(); // Default height
 
@@ -114,6 +116,22 @@ interface GitInfo {
 
 onMounted(async () => {
   combinedVersionInfo.value = getServerInfo();
+
+  // Dynamically load git_info.json from the public directory
+  fetch('/git_info.json')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Not found');
+      }
+      return response.json();
+    })
+    .then(data => {
+      addedGitInfo.value = data;
+    })
+    .catch(err => {
+      console.warn('Optional git_info.json not loaded:', err);
+      addedGitInfo.value = {};
+    });
 
   getGitInformation();
 
@@ -179,7 +197,11 @@ const getGitInformation = () => {
 
 const gitInfoArray = computed(() => {
   const infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
-  return [...infoArray, { repository: 'ngencerf_ui', ...addedGitInfo.ngencerf_ui }];
+  // Append additional git info if it was loaded
+  if (addedGitInfo.value && addedGitInfo.value.ngencerf_ui) {
+    return [...infoArray, { repository: 'ngencerf_ui', ...addedGitInfo.value.ngencerf_ui }];
+  }
+  return infoArray;
 });
 
 const formatDate = (dateString: string) => {
