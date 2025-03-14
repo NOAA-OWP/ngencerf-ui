@@ -30,11 +30,11 @@
               optionLabel="name" optionValue="name" class="h-60" @change="moduleListChanged"
               :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               <template #option="slotProps">
-                  <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
-                    <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
-                  :title="slotProps.option.name">
+                <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
+                  <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
+                    :title="slotProps.option.name">
                     {{ slotProps.option.name }}</div>
-                  </div>
+                </div>
 
               </template>
             </Listbox>
@@ -350,7 +350,7 @@ const saveFormulationData = () => {
     var valOK = validateModules();
     if (!valOK) {
       modulesHaveChanged.value = false;
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000};
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000 };
       toast.add(tMsg); addToastRecord(tMsg);
       clearCalibratableParameters();
     }
@@ -359,17 +359,23 @@ const saveFormulationData = () => {
       if (response.status === 200) {
         if (response._data.eds_errors) {
           response._data.eds_errors.forEach((err: any) => {
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeout6000 };
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeout10000 };
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeout3000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeout10000 };
         toast.add(tMsg); addToastRecord(tMsg);
         if (response?._data?.nwm_warning === true) {
-          useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
-            const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: ToastTimeout.timeout6000 };
-            toast.add(tMsg); addToastRecord(tMsg);
+          let warnings = "";
+          let l = useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).length;
+          useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach( (warning, index) => {
+            warnings += warning;
+            if (index !== l - 1) {
+              warnings += " ---- ";
+            }
           });
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Accepted with Notices', detail: warnings, life: ToastTimeout.timeout10000 };
+          toast.add(tMsg); addToastRecord(tMsg);
         }
         formulationStore_data_loading.value = false;
         updateJobData();
