@@ -764,3 +764,4 @@ export interface GitData {
   author: string;
   message: string;
 }
+

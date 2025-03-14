@@ -77,9 +77,7 @@ import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 
-import type { CombinedVerstionInfo } from "@/composables/NextGenModel";
-// Removed static import of git_info.json
-// import additionalGitInfo from "@/assets/git_info.json";
+import type { CombinedVerstionInfo, GitData } from "@/composables/NextGenModel";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from '@/stores/common/UserDataStore';
@@ -95,7 +93,7 @@ const { popupActive } = storeToRefs(generalStore());
 
 const combinedVersionInfo = ref<CombinedVerstionInfo>();
 
-const gitInfo = ref<Record<string, GitInfo>>({});
+const gitInfo = ref<Record<string, GitData>>({});
 // Added reactive variable to store optional git_info.json data loaded at runtime
 const addedGitInfo = ref<any>(null);
 
@@ -104,14 +102,7 @@ const scrollHeight = ref<string>(); // Default height
 const aboutBox = ref<HTMLElement | null>(null);
 let observer: IntersectionObserver | null = null;
 
-interface GitInfo {
-  release: string;
-  build_date: string;
-  commit_hash: string;
-  commit_date: string;
-  author: string;
-  message: string;
-}
+const foundFields = ref<string[]>();
 
 
 onMounted(async () => {
@@ -192,7 +183,44 @@ const getGitInformation = () => {
     body: ""
   }).then((result) => {
     gitInfo.value = result._data.git_info;
+    getUniqueFields(gitInfo.value as any);
   })
+}
+
+/**
+ * Returns an array of unique field names from an array of objects or an object of objects.
+ * @param arr - The input array of objects or an object of objects.
+ * @returns A string array containing unique field names.
+ */
+function getUniqueFields(arr: unknown): string[] {
+  const uniqueFields = new Set<string>();
+  let data: unknown[] = [];
+
+  // If arr is already an array, use it directly.
+  if (Array.isArray(arr)) {
+    data = arr;
+  }
+  // If arr is an object (but not an array), convert its values to an array.
+  else if (arr && typeof arr === 'object') {
+    data = Object.values(arr);
+  } else {
+    console.error('Input is not an array or an object of objects');
+    return [];
+  }
+
+  // Iterate over each item in the data array.
+  data.forEach(item => {
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      Object.keys(item).forEach(key => uniqueFields.add(key));
+    } else {
+      console.warn('Skipping non-object item:', item);
+    }
+  });
+  
+  console.log("Found Fields", Array.from(uniqueFields));
+  return Array.from(uniqueFields);
+  
+  
 }
 
 const gitInfoArray = computed(() => {
@@ -201,8 +229,7 @@ const gitInfoArray = computed(() => {
   if (infoArray.length && Object.keys(addedGitInfo.value).length > 0) {
     addedGitInfo.value.repository = 'ngencerf_ui';
     infoArray.push(addedGitInfo.value)
-    return infoArray; //[...infoArray, ...addedGitInfo.value ];
-    //return [...infoArray, { repository: 'ngencerf_ui', ...addedGitInfo.value.ngencerf_ui }];
+    return infoArray;
   }
   return infoArray;
 });
