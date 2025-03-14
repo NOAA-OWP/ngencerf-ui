@@ -8,19 +8,22 @@
             <div class="col-span-1">
               <table>
                 <tbody>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Submit Time ' + submitTime " :title="'Submit Time ' + submitTime">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Submit Time</div>
                     </th>
                     <td class="pl-5">{{ submitTime ? submitTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="32px">
+                  <tr height="32px" :aria-label="'Elapsed Time ' + calibrationElapsedTime"
+                    :title="'Elapsed Time ' + calibrationElapsedTime">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Elapsed Time</div>
                     </th>
                     <td class="pl-5">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="32px">
+                  <tr height="32px" :aria-label="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration : 
+                    'Interation ' + iteration" :title="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
+                      'Interation ' + iteration">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">{{ validationBestAchieved.isBest ? 'Best ' : '' }} Iteration</div>
                     </th>
@@ -34,7 +37,8 @@
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
                 <tbody>
-                  <tr height="38px">
+                  <tr height="38px" :aria-label="'Status ' + overallCalibrationValidationStatus"
+                    :title="'Status ' + overallCalibrationValidationStatus">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
                     <td class="pl-5">
                       <span id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md"
@@ -43,9 +47,9 @@
                       </span>
                     </td>
                   </tr>
-                  <tr height="32px">
+                  <tr height="32px" aria-label="Select Plot Name" title="Select Plot Name">
                     <th scope="row" class="text-right"><label for="DisplayOptions">{{ iteration && iteration >= 1 ?
-                      'Display' : '' }}</label></th>
+                        'Display' : '' }}</label></th>
                     <td class="pl-5" v-show='iteration && iteration >= 1'>
                       <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
                         optionLabel="name" optionValue="name">
@@ -58,28 +62,18 @@
                       <!--BUTTONS - START-->
                       <div v-if="overallCalibrationValidationStatus === 'Done'"
                         style="margin-top:4px;margin-bottom:-4px;">
-                        <div class="ngenButtonDiv" @click="gotoEvaluation">
-                          <Button class="font-normal">Go to Evaluation</button>
-                        </div>
+                        <Button class="ngenButtonDiv font-normal" @click="gotoEvaluation" aria-label="Go to
+                          Evaluation" title="Go to Evaluation">Go to Evaluation</Button>
                       </div>
 
                       <div v-if="calibrationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
                         <span v-if="calibrationStatus === 'Ready'">
-                          <div class="h-8">
-                            <Button class="font-normal ngenButtonDiv-green" title="Run Button" aria-label="Run Button"
-                              @click="startRun()">
-                              Run
-                            </button>
-                          </div>
+                          <Button class="font-normal ngenButtonDiv-green h-8" title="Run Button" aria-label="Run Button"
+                            @click="startRun()">Run</Button>
                         </span>
-
                         <span v-if="calibrationStatus === 'Running'">
-                          <div class="mr-3">
-                            <Button class="ngenButtonDiv-red h-8" title="Cancel Button" @click="cancelRun()"
-                              aria-label="Cancel Button">
-                              Cancel
-                            </button>
-                          </div>
+                          <Button class="ngenButtonDiv-red h-8 mr-3" title="Cancel Button" @click="cancelRun()"
+                            aria-label="Cancel Button">Cancel</Button>
                         </span>
                       </div>
                       <!--BUTTONS - END-->
@@ -91,7 +85,8 @@
             </div>
 
             <div class="col-span-2">
-              <div style="display:flex; margin-top: 1em;">
+              <div style="display:flex; margin-top: 1em;" :aria-label="'Results Pathname ' + resultsPathname"
+                :title="'Results Pathname ' + resultsPathname">
                 <div class="text-right font-bold" style="width: 170px;">
                   <label class="text-right" for="resultsPathname" style="width: 170px;">Results Pathname</label>
                 </div>
@@ -124,7 +119,7 @@
               <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
                 <Button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
                   Run
-                </button>
+                </Button>
               </div>
             </span>
             <span v-else>
@@ -135,7 +130,7 @@
                 <Button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelRun()"
                   aria-label="Cancel Button">
                   Cancel
-                </button>
+                </Button>
               </div>
             </span>
             <span v-else>
@@ -163,6 +158,8 @@ import { onMounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
 import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
+import type { ToastMessageOptions } from "primevue/toast";
 
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
@@ -218,6 +215,7 @@ const {
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+const { addToastRecord } = generalStore();
 
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 const plotNamesToExclude = [
@@ -314,37 +312,44 @@ const startRun = async () => {
   validationBestAchieved.value.isBest = false;
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Preparing Job Data';
-  }
-  try {
+
     const runCalibrationResponse = await runCalibrationJob();
 
-    if (runCalibrationResponse._data) {
-      if (runCalibrationResponse._data.status) {
-        if (userCalibrationRunData.value) {
-          userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
-        } else {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'load_calibration_run from server failed' });
-        }
+    if (runCalibrationResponse.status >= 200 && runCalibrationResponse.status < 300) {
+      if (runCalibrationResponse?._data?.status) {
+        userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server' };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
 
       if (runCalibrationResponse._data.submit_date) {
-        // set submitTimeDate to submit_date from server as a Date object. watch function for submitTimeDate will set submitTime, which shows the time in local time format
+        // set submitTimeDate to submit_date from server as a Date object. 
+        // watch function for submitTimeDate will validate that it is a valid Date object and set submitTime, 
+        // which shows the time in local time format
         submitTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration submit date from server' };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
 
       if (userCalibrationRunData?.value?.status !== 'Running') {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
       fetchUserCalibrationRunData();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'run_calibration from server failed' });
+      userCalibrationRunData.value.status = 'Failed';
+      const errorMessages: string[] = useApiErrorResponsePreprocess(runCalibrationResponse);
+      errorMessages.forEach((msg: string) => {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
     }
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Error running Calibration' });
+  } else {
+    // userCalibrationRunData should always be set before getting to this point, but hey just in case
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'userCalibrationRunData not set' };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
   isLoading.value = false;
 };
@@ -360,17 +365,21 @@ const cancelRun = async () => {
           userCalibrationRunData.value.status = cancelCalibrationResponse?._data.status;
         }
         if (userCalibrationRunData?.value?.status !== 'Cancelled') {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' });
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' };
+          toast.add(tMsg); addToastRecord(tMsg);
         }
         fetchUserCalibrationRunData();
       } else {
-        toast.add({ severity: 'error', summary: 'Error cancelling Calibration', detail: 'Cannot get Calibration status' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error cancelling Calibration', detail: 'Cannot get Calibration status' };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
     } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run' });
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run' };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
-    toast.add({ severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration' });
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration' };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 };
 
@@ -426,7 +435,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           }
         }
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
 
       // get job data directory
@@ -436,7 +446,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         if (getJobDataDirectoryResponse?._data.data_dir) {
           resultsPathname.value = getJobDataDirectoryResponse._data.data_dir;
         } else {
-          toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Job Data Directory' });
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Job Data Directory' };
+          toast.add(tMsg); addToastRecord(tMsg);
         }
       }
 
@@ -451,7 +462,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           (plot: any) => !plotNamesToExclude.includes(plot.name)
         );
       } else {
-        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' });
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
+        toast.add(tMsg); addToastRecord(tMsg);
       }
     }
 
@@ -470,7 +482,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
               }
             }
           } else {
-            toast.add({ severity: 'warn', summary: 'Unable to get Calibration Job Status' });
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status' };
+            toast.add(tMsg); addToastRecord(tMsg);
           }
 
           // check if iteration changes
@@ -601,12 +614,14 @@ watch(selectedPlotName, async () => {
       toast.removeAllGroups();
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage });
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
     selectedPlotFilename.value = "";
     selectedPlotFileUrl.value = "";
-    toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage });
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 });
 
@@ -615,7 +630,8 @@ watch(submitTimeDate, () => {
   if (isValidDate(submitTimeDate.value)) {
     submitTime.value = convertTimeZone(submitTimeDate.value as Date);
   } else {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' });
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 });
 
@@ -637,7 +653,8 @@ watch(iteration, async () => {
     } else {
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      toast.add({ severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage });
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 });

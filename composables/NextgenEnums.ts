@@ -1,4 +1,3 @@
-
 export const CalibrationTabs =  {
   tab_calibrationRuns: 0,
   tab_headwaterBasinGage: 1,
@@ -53,3 +52,10 @@ export const ValidationPlotNames = [
   'Hydrograph Validation',
   'Streamflow Validation Precipitation'
 ]
+
+export const ToastTimeout = {
+  timeout3000: 3000,
+  timeout5000: 5000,
+  timeout6000: 6000,
+  timeout10000: 10000
+}

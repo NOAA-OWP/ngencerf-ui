@@ -17,6 +17,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const forecastJobId = ref<number>();
   const forecastCycles = ref<ForecastCycle[]>();
   const forecastCycle = ref<ForecastCycle>();
+  const forecastCycleName = ref<string>();
   const forecastJobStatus = ref<string>();
   const forcingDownloadStatus = ref<string>();
   const elapsedTime = ref<string>();
@@ -28,12 +29,15 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const forecastPlotName = ref<any>(); // TODO: create forecastPlotName interface
   const forecastPlot = ref<any>(); // TODO: create forecastPlot interface
 
-  const calibrationRunsForForecast = ref<CalibrationRunsForForecast[]>([]);
+  const calibrationRunsForForecast = ref<CalibrationRunsForForecast>([]);
   const calibrationRunForForecast = ref<CalibrationRunForForecast>();
 
   const uiGageId = ref<string>("");
 
   const forecastRuns = ref<ForecastJob[]>([]);
+  const selectedForecastJob = ref<ForecastJob>();
+
+  const isForecastLoading = ref<boolean>(false);
 
   /**
    * Compute Overall Forcing Download and Forecast status
@@ -73,10 +77,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   });
   
   /**
-   * fetch user created forecast job list data
+   * fetch get_forecast_jobs
    * @return {void}
    */
-  const fetchForecastJobsListData = async (): Promise<any> => {
+  const getForecastJobs = async (): Promise<any> => {
     forecastRuns.value = [];
     const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs/`, {
       method: "POST",
@@ -132,17 +136,18 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const loadForecastStatusRunTabData = async (): Promise<void> => {
     // get forecast job data
     if (forecastJobId?.value) {
-      // get forecast status
+      // query get_status endpoint
       const getStatusResponse: any = await getStatus();
 
       // TODO: create forecastJob interface
       const forecastJob: any  = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
 
-      // set forecastJobStatus, elapsedTime, submitTime, and resultsPathname
-      forecastJobStatus.value = forecastJob.status;
-      forcingDownloadStatus.value = forecastJob.forcing_download.status;
-      elapsedTime.value = forecastJob.elapsed_time;
-      submitTimeDate.value = new Date(forecastJob.submit_date as string);
+      // set forecastCycle, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
+      forecastCycleName.value = forecastJob?.cycle;
+      forecastJobStatus.value = forecastJob?.status;
+      forcingDownloadStatus.value = forecastJob?.forcing_download?.status;
+      elapsedTime.value = forecastJob?.elapsed_time;
+      submitTimeDate.value = new Date(forecastJob?.submit_date as string);
       if (isValidDate(submitTimeDate.value)) {
         submitTime.value = convertTimeZone(submitTimeDate.value);
       }
@@ -154,13 +159,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   /**
    * Load Forecast Results tab data
    */
-  const loadForecastResultsTabData = async (): Promise<string[]> => {
-    const results = await Promise.all([
-      setResultsPathname(), // set resultsPathname
-      setForecastPlot(), // set forecastPlot
-    ]);
-  
-    return results.flat(); // combine results from both function calls
+  const loadForecastResultsTabData = async (): Promise<void> => {
+    await loadForecastStatusRunTabData() // load forecast status/run tab data
+    await setForecastPlot() // set forecastPlot  
   };
 
   /**
@@ -311,12 +312,21 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobId.value = forecast_job_id;
   }
 
-  const setSelectedForecastRowData = ( forecast_row_data: ForecastJob ): void => {
+  const setSelectedForecastRowData = async ( forecast_row_data: ForecastJob ): void => {
     setSelectedForecastRunId( forecast_row_data.forecast_run_id );
     setSelectedCalibrationRunId( forecast_row_data.calibration_run_id );
+
+    /// load forecastCycles
+    await loadSetupForecastTabData();
+
+    console.log('forecast_row_data', forecast_row_data);
+    console.log('forecastCycles.value', forecastCycles.value);
+
     forecastCycle.value = forecastCycles.value?.find( (forecast_cycle_data : ForecastCycle ) =>
       forecast_cycle_data.name === forecast_row_data.cycle
     );
+    console.log('forecastCycle set in setSelectedForecastRowData', forecastCycle.value);
+
     /*
      * the follow is hack to get around the fact that we are using calibrationRunForForecast to check for calibration_run_id, but it's only set on calibration run tab
      * user should be able to go straight to forecast runs and view results so this is a easy way to provide it.
@@ -325,7 +335,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobStatus.value = forecast_row_data.status;
   }
 
-  const resetSelectedForecastRunId = (): void => {
+  const resetSelectedForecastRunData = (): void => {
     forecastJobId.value = undefined;
     forecastJobStatus.value = undefined;
     forecastCycle.value = undefined;
@@ -391,29 +401,36 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     }
   };
 
-  /**
-   * Hard Reset Forecast Store
-   */
-  const hardResetForecastStore = (): void => {
-      
-  };
 
+  /**
+   * reset user-selected forecast data
+   */
   const resetUserSelectedForecastCalibrationRun = (): void => {
     forecastJobId.value =  undefined;
     forecastCycles.value =  [];
     forecastCycle.value =  undefined;
+    forecastCycleName.value =  undefined;
     forecastJobStatus.value =  undefined;
     forcingDownloadStatus.value =  undefined;
     elapsedTime.value =  undefined;
     submitTimeDate.value = undefined;
     submitTime.value =  undefined;
-    elapsedTimeIntervalId.value =  undefined;
-    forecastJobStatusIntervalId.value =  undefined;
     resultsPathname.value =  undefined;
     forecastPlotName.value =  undefined;
     forecastPlot.value = undefined;
-    calibrationRunsForForecast.value = [];
-    calibrationRunForForecast.value = undefined;
+    calibrationRunForForecast.value =  undefined;
+
+    if (elapsedTimeIntervalId.value) {
+      clearInterval(elapsedTimeIntervalId.value);
+      elapsedTimeIntervalId.value =  undefined; 
+    }
+
+    if (forecastJobStatusIntervalId.value) {
+      clearInterval(forecastJobStatusIntervalId.value);
+      forecastJobStatusIntervalId.value =  undefined; 
+    }
+    isForecastLoading.value =  false;
+
     clearUserCalibrationRunData();
   }
 
@@ -422,6 +439,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobId,
     forecastCycles,
     forecastCycle,
+    forecastCycleName,
     forecastJobStatus,
     forcingDownloadStatus,
     elapsedTime,
@@ -437,8 +455,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationRunForForecast,
     uiGageId,
     forecastRuns,
+    selectedForecastJob,
+    isForecastLoading,
     overallForcingDownloadForecastStatus,
-    fetchForecastJobsListData,
+    getForecastJobs,
     loadSetupForecastTabData,
     loadForecastStatusRunTabData,
     loadForecastResultsTabData,
@@ -456,9 +476,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     getForecastPlotNames,
     getForecastPlot,
     getJobDataDirectory,
-    hardResetForecastStore,
     setSelectedForecastRunId,
-    resetSelectedForecastRunId,
+    resetSelectedForecastRunData,
     setSelectedForecastRowData
   };
 });

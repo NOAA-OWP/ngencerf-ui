@@ -312,7 +312,7 @@ export const useFormulationStore = defineStore(
       } else {
         return Promise.resolve({
           _data: {
-            message: "No formulation tab data to save.",
+            message: "No formulation data to save.",
             validation_errors: {
               "Missing Data": ["Please update at least 1 field before saving."],
             },
