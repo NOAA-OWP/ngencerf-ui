@@ -37,53 +37,24 @@
           </div>
         </div>
         <div>
-          <div id="CustomizePlotWindow" v-if="showCustomizePlot">
-            <div class="text-right sticky top-0">
-              <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-                class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
-            </div>
-            <h2 class="mt-5" aria-label="Customize Interactive Plot" title="Customize Interactive Plot">
-              Customize Interactive Time Series Viewer
-            </h2>
-            <div v-if="plotGraphLines.length > 0">
-              <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
-                <div class="label150">
-                  <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
-                </div>
-                <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
-                  :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
-                </Select>
-                <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol"
-                  :options="plotGraphSymbolList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
-                </Select>
+          <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)" class="p-2 relative overflow-visible">
+            <div class="grid grid-cols-3 gap-4">
+              <div class="text-nowrap text-right font-bold">
+                Select Date 
               </div>
-            </div>
-          </div>
-          <div v-if="selectedPlotHasTimeseries">
-            <div v-if="!showPlotGraph">
-              <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
-                <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">Show SWE Time
-                  Series</span>
-                <span v-else>Show Interactive Time Series Viewer</span>
-              </a>
-            </div>
-            <div v-else>
-              <a href="#" class="p-1 c-blue font-bold underline mt-1" @click="togglePlotGraph">
-                <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">Hide SWE Time
-                  Series</span>
-                <span v-else>Hide Interactive Time Series Viewer</span>
-              </a>
-              <div v-if="plotGraphLines.length > 0" class="columns-2">
-                <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
-                  <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
-                    v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();">
-                  <div class="label150">
-                    <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
-                  </div>
-                </div>
+              <div class="text-nowrap">
+                <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+                  @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
+                  :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true" utc='preserve' /> 
               </div>
-              <div v-if="plotGraphCheckboxesEmpty()">
-                Check at least one box to generate an interactive plot.
+              <div class="text-nowrap">
+                <Button class="font-normal ngenButtonDiv-green ml-auto text-nowrap" label="Get Spatial Plots"
+                  aria-label="Get Spatial Plots" @click="getSpatialPlots" />
+              </div>
+              <div class="text-sm font-semibold col-span-3 text-nowrap text-center">
+                <p class="font-bold">
+                  {{ getSweTimeRange() }}
+                </p>
               </div>
             </div>
           </div>
@@ -92,13 +63,22 @@
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
               @click="gotoSelectAlternateIteration">New Validation</button></span>
           <br />
-          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue text-sm underline mt-1"
+          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue underline mt-1"
             @click="toggleMessagesGroup">
             Show Calibration Details</a>
           <br />
-          <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue text-sm underline mt-1"
-            @click="toggleCustomizePlot">
-            Customize Interactive Time Series Viewer</a>
+          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName) && !showPlotGraph">
+            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" 
+              @click="togglePlotGraph">Show SWE Time Series</a>
+          </span>
+          <span v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName))">
+            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" 
+              @click="togglePlotGraph">
+              <span v-if="!showPlotGraph">Show </span> 
+              <span v-else>Hide </span> 
+              Interactive Time Series
+            </a>
+          </span>
         </div>
       </div>
     </div>
@@ -147,40 +127,62 @@
         </div>
       </div>
     </div>
-    <div id="PlotGraphArea" ref="plotGraphArea" v-if="showPlotGraph && plotGraphData && !plotGraphCheckboxesEmpty()">
-      <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)" class="flex flex-row justify-center mt-3">
-        <div class="p-2">
-          <p>
-            <span class="font-bold">
-              {{ getSweTimeRange() }}
-            </span>
-          </p>
+    <div class="flex mt-2" v-if="showPlotGraph && plotGraphData">
+      <div id="PlotGraphArea" ref="plotGraphArea" v-if="!plotGraphCheckboxesEmpty()">
+        <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
+        <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
+          <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
+            @mouseup="sliderDragEnd" @mouseleave="sliderDragCancel">
+            <div id="PlotGraphSliderBox" ref="plotGraphSliderBox"></div>
+          </div>
         </div>
-        <div class="p-2">
-          <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-            @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
-            :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true" utc='preserve' />
+        <div id="PlotGraphSliderDateRange">
+          <div class="flex flex-row justify-center">
+            {{ formatDateString(plotGraphDateRange.start) }} - {{ formatDateString(plotGraphDateRange.end) }}
+          </div>
         </div>
-        <div class="p-2">
-          <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plots"
-            aria-label="Get Spatial Plots" @click="getSpatialPlots" />
-        </div>
-      </div>
-      <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
-      <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
-        <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
-          @mouseup="sliderDragEnd" @mouseleave="sliderDragCancel">
-          <div id="PlotGraphSliderBox" ref="plotGraphSliderBox"></div>
+        <div id="PlotGraphSliderHelp">
+          <div class="flex flex-row justify-center">
+            {{ plotGraphSliderHelpDisplay }}
+          </div>
         </div>
       </div>
-      <div id="PlotGraphSliderDateRange">
-        <div class="flex flex-row justify-center">
-          {{ formatDateString(plotGraphDateRange.start) }} - {{ formatDateString(plotGraphDateRange.end) }}
+      <div id="PlotGraphControls">
+        <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue underline mt-1 pb-2"
+          @click="toggleCustomizePlot">
+          Customize Viewer
+        </a>
+        <div v-if="plotGraphLines.length > 0">
+          <div v-for="item in plotGraphLines" :key="item.id">
+            <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
+              v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
+            <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
+          </div>
         </div>
-      </div>
-      <div id="PlotGraphSliderHelp">
-        <div class="flex flex-row justify-center">
-          {{ plotGraphSliderHelpDisplay }}
+        <div v-if="plotGraphCheckboxesEmpty()">
+          Check at least one box to generate an interactive plot.
+        </div>
+        <div id="CustomizePlotWindow" v-if="showCustomizePlot">
+          <div class="text-right sticky top-0">
+            <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+              class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
+          </div>
+          <h2 class="mt-5" aria-label="Customize Viewer" title="Customize Viewer">
+            Customize Viewer
+          </h2>
+          <div v-if="plotGraphLines.length > 0">
+            <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
+              <div>
+                <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
+              </div>
+              <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
+                :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+              </Select>
+              <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol"
+                :options="plotGraphSymbolList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+              </Select>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -261,24 +263,6 @@
           <p class="text-[12px] text-gray-600 mt-9">Snow Water Equivalent (SWE) - Catchment Means</p>
           <div v-if="selectedSnodasSimMapUrl" id="GraphArea" class="p-2">
             <img :src="selectedSnodasSimMapUrl" alt="Selected SNODAS" />
-          </div>
-        </div>
-        <div class="p-2 relative overflow-visible">
-          <div class="text-sm font-semibold mt-3">
-            <p>
-              <span class="font-bold">
-                {{ getSweTimeRange() }}
-              </span>
-            </p>
-          </div>
-          <div class="mt-3 relative z-10">
-            <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-              @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
-              :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true" utc='preserve' />
-          </div>
-          <div class="flex justify-end mt-3">
-            <Button class="font-normal ngenButtonDiv-green ml-auto" label="Get Spatial Plots"
-              aria-label="Get Spatial Plots" @click="getSpatialPlots" />
           </div>
         </div>
       </div>
@@ -724,9 +708,9 @@ watch(selectedPlotName, async () => {
       setSweEndDateTime();
     }
     // set selectedSweDateTime to sweStartDateTime if not already set
-    if (!selectedSweDateTime.value) {
+    /* if (!selectedSweDateTime.value) {
       selectedSweDateTime.value = sweStartDateTime.value;
-    }
+    } */
 
     // pre-load SWE Timeseries Data so that we know our date range
     if (!sweTimeSeriesData.value || sweTimeSeriesData.value.length == 0) {
@@ -1020,9 +1004,10 @@ const drawInteractivePlot = () => {
       x: { grid: true },
       y: { grid: true, labelAnchor: 'center', labelArrow: 'none' },
       marks: [],
-      width: plotGraphArea.value.offsetWidth - 200,
+      width: plotGraphArea.value.offsetWidth - 50,
       height: (document.getElementById('MainLeftDataParent').getBoundingClientRect().bottom - document.getElementById('PlotGraphArea').getBoundingClientRect().top) - 150
     };
+    console.log('plotGraphOptions: ', plotGraphOptions.value);
     if (gridDisplayOptions.includes(selectedPlotName.value)) {
       plotGraphOptions.value.y.label = 'Depth (m)';
       plotGraphOptions.value.y.labelOffset = -10;
@@ -1151,8 +1136,8 @@ const drawInteractivePlot = () => {
     plotGraphSVG.value.append(Plot.plot(plotGraphOptions.value));
     nextTick(() => {
       if (plotGraphArea.value) {
-        plotGraphOptions.value.width = plotGraphArea.value.offsetWidth - 200;
-        plotGraphSliderOptions.value.width = plotGraphArea.value.offsetWidth - 250;
+        plotGraphOptions.value.width = plotGraphArea.value.offsetWidth - 50;
+        plotGraphSliderOptions.value.width = plotGraphArea.value.offsetWidth - 100;
       };
     })
   }
@@ -1182,7 +1167,9 @@ const drawInteractiveSlider = () => {
     plotGraphSliderData.value = [];
     let rowSkip = plotGraphDataRaw.value.length / 1000;
     for (let c = 1; c < plotTableColumns.value.length; c++) {
-      if (document?.getElementById('plotGraphCheckbox-' + c)?.checked) {
+      console.log('Column name: ', plotTableColumns.value[c].value);
+      if ((gridDisplayOptions.includes(selectedPlotName.value) && plotTableColumns.value[c].value.toLowerCase().indexOf('snodas') >= 0) || 
+        (!gridDisplayOptions.includes(selectedPlotName.value) && document?.getElementById('plotGraphCheckbox-' + c)?.checked)) {
         for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
           let dataPoint = {
             time: new Date(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[0].value]),
@@ -1190,6 +1177,7 @@ const drawInteractiveSlider = () => {
           };
           plotGraphSliderData.value.push(dataPoint);
         }
+        console.log('Using column ' + plotTableColumns.value[c].value + ' to draw slider');
         break;
       }
     }
@@ -1203,7 +1191,7 @@ const drawInteractiveSlider = () => {
       marks: [
         Plot.lineY(plotGraphSliderData.value, lineOptions)
       ],
-      width: plotGraphArea.value.offsetWidth - 250,
+      width: plotGraphArea.value.offsetWidth - 100,
       height: 100,
       marginLeft: 0,
       marginRight: 0
@@ -1215,10 +1203,39 @@ const drawInteractiveSlider = () => {
     console.log('Previous slider box position: ', sliderBoxPosition.value);
     if (!sliderBoxPosition.value || Object.keys(sliderBoxPosition.value).length != 2) {
       console.log('Resetting sliderBoxPosition')
-      // we don't have a previous position to remember - start with the middle third of the available range
-      sliderBoxPosition.value = {
-        start: getSliderWidth() / 3,
-        end: getSliderWidth() * 2 / 3
+      // we don't have a previous position to remember
+      if (gridDisplayOptions.includes(selectedPlotName.value)) {
+        // find our highest SNODAS measurement and start there
+        let snodasColumnName = '';
+        let snodasMaxValue = 0;
+        let snodasMaxDate = null;
+        Object.keys(plotGraphData.value[0]).forEach(key => {
+          if (key.toLowerCase().indexOf('snodas') >= 0) {
+            snodasColumnName = key;
+          }
+        });
+        for (let d = 0; d < plotGraphData.value.length; d++) {
+          if (plotGraphData.value[d][snodasColumnName] > snodasMaxValue) {
+            snodasMaxValue = plotGraphData.value[d][snodasColumnName];
+            snodasMaxDate = new Date(plotGraphData.value[d]['timestamp'])
+          }
+        }
+        // override the default date for SWE
+        selectedSweDateTime.value = snodasMaxDate.toISOString().split('T')[0];
+        // start with a 4-month range around our highest measurement
+        let daysFromStart = Math.round(snodasMaxDate.getTime() - (new Date(plotGraphDateRange.value.start)).getTime()) / (1000 * 3600 * 24);
+        let sliderBoxStart = Math.ceil((daysFromStart - 150) * (getSliderWidth() / plotGraphDateLimits.value.span));
+        let sliderBoxEnd = Math.ceil((daysFromStart + 90) * (getSliderWidth() / plotGraphDateLimits.value.span));
+        sliderBoxPosition.value = {
+          start: sliderBoxStart,
+          end: sliderBoxEnd
+        }
+      } else {
+        // for other plots, start with the middle third of the available range
+        sliderBoxPosition.value = {
+          start: getSliderWidth() / 3,
+          end: getSliderWidth() * 2 / 3
+        }
       }
     }
     document.getElementById('PlotGraphSliderBox').style.left = sliderBoxPosition.value.start + 'px';
@@ -1354,15 +1371,15 @@ const sliderDragCancel = (event) => {
   plotGraphSliderCursor.value = 'cursor-grab';
   plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
   const x = event.clientX - document.getElementById('PlotGraphSlider').getBoundingClientRect().left;
-  console.log('Dragged outside of slider box at position ' + x);
-  if (x < 0) {
-    document.getElementById('PlotGraphSliderBox').style.left = '0px';
-    sliderBoxPosition.value.start = 0;
-  } else if (x > getSliderWidth()) {
-    document.getElementById('PlotGraphSliderBox').style.right = '0px';
-    sliderBoxPosition.value.end = getSliderWidth();
-  }
   if (sliderDragType.value) {
+    console.log('Dragged outside of slider box at position ' + x);
+    if (x < 0) {
+      document.getElementById('PlotGraphSliderBox').style.left = '0px';
+      sliderBoxPosition.value.start = 0;
+    } else if (x > getSliderWidth()) {
+      document.getElementById('PlotGraphSliderBox').style.right = '0px';
+      sliderBoxPosition.value.end = getSliderWidth();
+    }
     sliderDragEnd(event);
   }
 }
@@ -1592,6 +1609,10 @@ onUnmounted(() => {
   margin: 20px auto;
 }
 
+#PlotGraphArea {
+  width: 100%;
+}
+
 #PlotGraphArea label {
   padding-left: 12px;
 }
@@ -1648,15 +1669,26 @@ onUnmounted(() => {
   overflow: auto;
 }
 
+#PlotGraphControls {
+  min-width: 225px;
+}
+
+#PlotGraphControls input[type='checkbox'] {
+  margin-top: 4px;
+}
+
+#PlotGraphControls label, #CustomizePlotWindow label {
+  margin: 0 4px 4px 4px !important;
+  display: inline-block;
+}
+
 #CustomizePlotWindow {
   z-index: 98;
   border: 1px solid black;
   position: absolute;
-  left: 50%;
-  top: 161px;
-  min-width: 530px;
+  right: 2%;
+  top: 266px;
   background-color: white;
-  overflow: auto;
   padding-left: 16px;
   padding-bottom: 16px;
 }
@@ -1664,10 +1696,6 @@ onUnmounted(() => {
 #CustomizePlotWindow h2 {
   margin-top: 12px;
   margin-bottom: 12px;
-}
-
-#CustomizePlotWindow .label150 {
-  margin: 4px;
 }
 
 #CustomizePlotWindow .select150 {
