@@ -37,7 +37,7 @@
           <div class="col-span-1 mt-5 text-center">
             <img class="inline cursor-pointer w-[48px]" alt="Copy Table Data" src="@/assets/styles/img/copy.png"
               @click="copyGitInfoToClipboard()" /> <br />
-            <Button class="nobg" @click="copyGitInfoToClipboard()">Copy </Button>
+            <div class="nobg cursor-default">Copy</div>
           </div>
         </div>
 
@@ -47,7 +47,11 @@
         <DataTable :value="gitInfoArray" class="p-datatable-sm" scrollable :scroll-height="scrollHeight"
           scroller="true">
           <Column v-for="(item, index) in Array.from(uniqueFields)" :key="item" :field="item" ,
-            :header="Array.from(uniqueHeaders)[index]"></Column>
+            :header="Array.from(uniqueHeaders)[index]">
+            <template #body="{ data }">
+              {{ formatTableOutput(data, item) }}
+            </template>
+          </Column>
         </DataTable>
       </div>
     </div>
@@ -178,11 +182,8 @@ const getGitInformation = () => {
  * @param arr - The input array of objects or an object of objects.
  * @returns A string array containing unique field names.
  */
-
 function getUniqueFields(arr: unknown): string[] {
-
   let data: unknown[] = [];
-
   // If arr is already an array, use it directly.
   if (Array.isArray(arr)) {
     data = arr;
@@ -198,25 +199,25 @@ function getUniqueFields(arr: unknown): string[] {
   // Iterate over each item in the data array.
   data.forEach(item => {
     if (item && typeof item === 'object' && !Array.isArray(item)) {
-      Object.keys(item).forEach(key => { 
+      Object.keys(item).forEach(key => {
         uniqueFields.add(key);
         let s = key.split('_')
           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
           .join(' ');
         uniqueHeaders.add(s);
-       });
+      });
     } else {
       console.warn('Skipping non-object item:', item);
     }
   });
-
-  console.log("Found Fields", Array.from(uniqueFields));
-  console.log("Found Names", Array.from(uniqueHeaders));
   return Array.from(uniqueFields);
-
-
 }
 
+const formatTableOutput = (field: Record<string, string>, item: string) => {
+  if (item.indexOf("_hash") !== -1) { return field[item].substring(0, 8) }
+  if (item.indexOf("_date") !== -1) { return formatDate(field[item]) }
+  return field[item]; 
+}
 
 const gitInfoArray = computed(() => {
   let infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
@@ -296,6 +297,8 @@ function transformComponent(componentGitInfo: any) {
   }
   return newComp;
 }
+
+
 </script>
 
 <style lang="scss" scoped>
