@@ -46,26 +46,11 @@
       <div class="p-4">
         <DataTable :value="gitInfoArray" class="p-datatable-sm" scrollable :scroll-height="scrollHeight"
           scroller="true">
-          <Column field="repository" header="Repository"></Column>
-          <Column field="release" header="Release"></Column>
-          <Column field="build_date" header="Build Date">
-            <template #body="{ data }">{{ formatDate(data.build_date) }}</template>
-          </Column>
-          <Column field="commit_hash" header="Commit Hash">
-            <template #body="{ data }">{{ data.commit_hash.substring(0, 8) }}</template>
-          </Column>
-          <Column field="commit_date" header="Commit Date">
-            <template #body="{ data }">{{ formatDate(data.commit_date) }}</template>
-          </Column>
-          <Column field="author" header="Author"></Column>
-          <Column field="message" header="Message"></Column>
-
+          <Column v-for="(item, index) in Array.from(uniqueFields)" :key="item" :field="item" ,
+            :header="Array.from(uniqueHeaders)[index]"></Column>
         </DataTable>
       </div>
     </div>
-
-
-
   </div>
 
 </template>
@@ -104,6 +89,8 @@ let observer: IntersectionObserver | null = null;
 
 const foundFields = ref<string[]>();
 
+const uniqueFields = new Set<string>();
+const uniqueHeaders = new Set<string>();
 
 onMounted(async () => {
   combinedVersionInfo.value = getServerInfo();
@@ -124,8 +111,6 @@ onMounted(async () => {
       addedGitInfo.value = {};
     });
 
-  getGitInformation();
-
   if (aboutBox.value) {
     observer = new IntersectionObserver(
       (entries) => {
@@ -144,6 +129,8 @@ onMounted(async () => {
   window.addEventListener('resize', function (event) {
     resizeNotifications();
   });
+
+  await getGitInformation();
 
   setTimeout(() => {
     const resizeEvent = new Event('resize');
@@ -191,8 +178,6 @@ const getGitInformation = () => {
  * @param arr - The input array of objects or an object of objects.
  * @returns A string array containing unique field names.
  */
-const uniqueFields = new Set<string>();
-const uniqueHeaders = new Set<string>();
 
 function getUniqueFields(arr: unknown): string[] {
 
@@ -234,7 +219,7 @@ function getUniqueFields(arr: unknown): string[] {
 
 
 const gitInfoArray = computed(() => {
-  const infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
+  let infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
   // Append additional git info if it was loaded
   if (infoArray.length && Object.keys(addedGitInfo.value).length > 0) {
     addedGitInfo.value.repository = 'ngencerf_ui';
