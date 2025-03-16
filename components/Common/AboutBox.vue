@@ -117,7 +117,7 @@ onMounted(async () => {
       return response.json();
     })
     .then(data => {
-      addedGitInfo.value = transformComponent(data) ;      
+      addedGitInfo.value = transformComponent(data);
     })
     .catch(err => {
       console.warn('Optional git_info.json not loaded:', err);
@@ -183,7 +183,6 @@ const getGitInformation = () => {
     body: ""
   }).then((result) => {
     gitInfo.value = result._data.git_info;
-    getUniqueFields(gitInfo.value as any);
   })
 }
 
@@ -192,8 +191,11 @@ const getGitInformation = () => {
  * @param arr - The input array of objects or an object of objects.
  * @returns A string array containing unique field names.
  */
+const uniqueFields = new Set<string>();
+const uniqueHeaders = new Set<string>();
+
 function getUniqueFields(arr: unknown): string[] {
-  const uniqueFields = new Set<string>();
+
   let data: unknown[] = [];
 
   // If arr is already an array, use it directly.
@@ -211,26 +213,34 @@ function getUniqueFields(arr: unknown): string[] {
   // Iterate over each item in the data array.
   data.forEach(item => {
     if (item && typeof item === 'object' && !Array.isArray(item)) {
-      Object.keys(item).forEach(key => uniqueFields.add(key));
+      Object.keys(item).forEach(key => { 
+        uniqueFields.add(key);
+        let s = key.split('_')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        uniqueHeaders.add(s);
+       });
     } else {
       console.warn('Skipping non-object item:', item);
     }
   });
-  
+
   console.log("Found Fields", Array.from(uniqueFields));
+  console.log("Found Names", Array.from(uniqueHeaders));
   return Array.from(uniqueFields);
-  
-  
+
+
 }
+
 
 const gitInfoArray = computed(() => {
   const infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
   // Append additional git info if it was loaded
   if (infoArray.length && Object.keys(addedGitInfo.value).length > 0) {
     addedGitInfo.value.repository = 'ngencerf_ui';
-    infoArray.push(addedGitInfo.value)
-    return infoArray;
+    infoArray.push(addedGitInfo.value);
   }
+  getUniqueFields(infoArray);
   return infoArray;
 });
 
