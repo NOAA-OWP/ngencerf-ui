@@ -231,7 +231,7 @@ const gitInfoArray = computed(() => {
 });
 
 const formatDate = (dateString: string) => {
-  return dateString ? new Date(dateString).toLocaleString() : 'N/A';
+  return dateString ? new Date(dateString).toLocaleString() : '';
 };
 
 const closeAboutBox = () => {
@@ -285,13 +285,13 @@ function transformComponent(componentGitInfo: any) {
   newComp.commit_hash = componentGitInfo.ngencerf_ui.commit_hash || "";
   // If tags is empty, add commit_date, author, and message if they exist.
   if (tags === "") {
-    if ("commit_date" in componentGitInfo) {
+    if ("commit_date" in componentGitInfo.ngencerf_ui) {
       newComp.commit_date = componentGitInfo.ngencerf_ui.commit_date || "";
     }
-    if ("author" in componentGitInfo) {
+    if ("author" in componentGitInfo.ngencerf_ui) {
       newComp.author = componentGitInfo.ngencerf_ui.author || "";
     }
-    if ("message" in componentGitInfo) {
+    if ("message" in componentGitInfo.ngencerf_ui) {
       newComp.message = componentGitInfo.ngencerf_ui.message || "";
     }
   }
