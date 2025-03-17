@@ -1,7 +1,7 @@
 <template>
   <!-- User Page -->
 
-  <div id="UserBox" class="bg-white mx-auto px-16 pt-10 pb-16 rounded-[10px] max-w-screen-md">
+  <div id="UserBox" class="bg-white mx-auto px-16 pt-10 pb-16 rounded-lg max-w-screen-md">
 
     <div class="grid grid-cols-2 gap-3">
       <div class="col-span-2">

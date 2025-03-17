@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
 
-import type { ServerInfo } from "@/composables/NextGenModel";
+import type { CombinedVerstionInfo } from "@/composables/NextGenModel";
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import jsonData from '@/assets/version.json';
@@ -26,7 +26,7 @@ import jsonData from '@/assets/version.json';
 const { getServerInfo, setServerInfo } = generalStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
-const serverInfo = ref<ServerInfo>();
+const serverInfo = ref<CombinedVerstionInfo>();
 
 onMounted( async () => {
   serverInfo.value = getServerInfo();

@@ -26,7 +26,7 @@
           </li>
           <li aria-label="Verification" title="Verification">
             <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
-              to="verification" data-menu='4' @click="" class="disabled">Verification</NuxtLink>
+              to="verification" data-menu='4' @click="" >Verification</NuxtLink>
           </li>
         </ul>
 
@@ -157,7 +157,6 @@ const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(
 const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/RunStatusHelp.vue"))
 const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
-
 const LazyUserAccount = defineAsyncComponent(() => import("@/components/Common/UserAccount.vue"))
 
 const gstore = generalStore();
@@ -215,8 +214,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', function (event) {
-    sizeHelpWindow();
-    sizeLogWindow();
+//
   });
 });
 
@@ -252,6 +250,17 @@ const sizeLogWindow = () => {
   if (footerTop && headerHeight) {
     let h = (footerTop - headerHeight) - 20;
     let ele = document.getElementById("ErrorLog");
+    if (ele) { ele.style.height = h + 'px'; }
+  };
+};
+
+
+const sizeAboutWindow = () => {
+  let headerHeight = document.getElementById('Header')?.clientHeight;
+  let footerTop = document.getElementById('Footer')?.getBoundingClientRect().top;
+  if (footerTop && headerHeight) {
+    let h = (footerTop - headerHeight) - 20;
+    let ele = document.getElementById("AboutBox");
     if (ele) { ele.style.height = h + 'px'; }
   };
 };
@@ -499,7 +508,8 @@ const MenuChanged = (e: MouseEvent) => {
 
 #HelpWindow {
   z-index: 999;
-  border: 1px solid black;
+  border: 5px solid #ccc;
+  border-radius: 8px;
   position: absolute;
   right: 2%;
   top: 84px;

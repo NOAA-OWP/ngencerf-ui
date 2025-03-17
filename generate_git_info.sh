@@ -26,9 +26,3 @@ generate_git_info() {
 
 generate_git_info
 echo
-
-
-echo 'running...'
-npm run dev
-echo
-

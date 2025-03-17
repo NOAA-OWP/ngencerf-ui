@@ -1,5 +1,5 @@
 <template>
-  <div id="ErrorLog" ref="errorLog">
+  <div id="ErrorLog" ref="errorLog" class="rounded-lg">
     <div class="grid grid-rows-12">
       <div id="Row1" class="row-span-1 h-[48px] mt-2">
         <div class="grid grid-cols-4">
@@ -131,7 +131,7 @@ onUnmounted(() => {
 const resizeNotifications = () => {
   let box = document.getElementById("ErrorLog")?.clientHeight ?? 0;
   let row1 = document.getElementById("Row1")?.clientHeight ?? 0;
-  let row2 = document.getElementById("Row1")?.clientHeight ?? 0;
+  let row2 = document.getElementById("Row2")?.clientHeight ?? 0;
   let h = box - row1 - row2;
   scrollHeight.value = h + "px";
 }
