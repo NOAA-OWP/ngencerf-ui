@@ -50,8 +50,8 @@
           <Button class="ngenButtonDiv text-xs" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
             title="Apply and close">
           </Button>
-          <Button class="ngenButtonDiv ml-6 text-xs" label="Clear" @click="resetFilters($event)"
-            aria-label="Clear filters" title="Clear filters">
+          <Button id="CleareFiltersButton" class="ml-6 text-xs" label="Clear Filters" @click="resetFilters($event)"
+            aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
           </Button>
         </div>
 
@@ -97,13 +97,17 @@ onMounted(() => {
   });
 })
 
+const filterActive = computed (() => {
+  return (modulesFilterList.value, length === 0 && statusTypeFilterList.value.length === 0 && uiGageId.value === 'All')
+});
+
+
 /** Let the caller close the dialog
  * @param: MouseEvent
  */
 const sendClose = (e: MouseEvent) => {
   e.stopPropagation();
   e.stopImmediatePropagation();
-  // emit("ModulesFilterDialogClosing");
 };
 
 /**
@@ -167,14 +171,20 @@ const archivedTemplate = (rowData: any) => {
   background-color: white;
   padding-bottom: 5px;
 }
-
-#CloseX:hover {
-  color: global.$ngwcp_primary2;
-}
-
 #ModuleList,
 #StatusList {
   border: 1px solid #888888;
 }
 
+#CleareFiltersButton {
+  color: blue;
+  text-decoration: underline;
+  font-weight: normal;
+}
+
+#CleareFiltersButton:hover {
+  background-color: transparent;
+  border: none;
+  font-weight: bold;
+}
 </style>
