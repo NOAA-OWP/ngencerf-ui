@@ -309,7 +309,8 @@ const confirmDelte = useConfirm();
 const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const confirm_delete = ref(false)
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
-  let confirmMessage = "Are you sure you want to delete this run?"
+  const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '"  + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
+  let confirmMessage = "Are you sure you want to delete calibration run " + selectedRunId + selectedRunName;
   if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
 
   confirmDelte.require({
