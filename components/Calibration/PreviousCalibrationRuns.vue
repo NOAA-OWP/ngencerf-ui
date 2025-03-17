@@ -13,21 +13,14 @@
           </p>
         </div>
 
+
+
         <!-- Table -->
         <div class="">
-          <div id="CalTable" class="w-max mx-auto">
-            <!-- Filters -->
-            <div class="text-left">
-              <div id="FilterButton" class="text-left mb-1 inline-block">
-                <Button class="filter-link" @click="toggleShowFilters">Filters</Button>
-              </div>
-              <div class="ml-2 mt-[19px] text-left inline-block">
-                <Button class="filter-link" :class="!filtersExist ? 'grayedout' : ''" @click="clearCalibrationFilters" :disabled="!filtersExist" >
-                  Clear Filters
-                </Button>
-              </div>
-            </div>
 
+          <div id="CalTable" class="w-max mx-auto">
+            <JobFilterDialog @ApplyJobFilters="applyJobFilters()" :calJobs="updatedUserCalibrationJobsListData"
+              ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
@@ -118,9 +111,6 @@
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
 
-    <LazyJobFilterDialog v-show="showFilters" @ModulesFilterDialogClosing="showFilters = false"
-      @ApplyJobFilters="applyJobFilters()" :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
-
   </client-only>
 </template>
 
@@ -131,7 +121,7 @@ import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
 //const LazyJobFilterDialog = defineAsyncComponent(() => import("@/components/Common/JobFilterDialog.vue"));
-import LazyJobFilterDialog from "@/components/Common/JobFilterDialog.vue"
+import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -177,8 +167,6 @@ const selectedCalibrationRun = ref<CalibrationJobListItem>();
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
 const currentJobsList = ref<CalibrationJobListItem[]>();
-
-const jobFilterDialog = ref<InstanceType<typeof LazyJobFilterDialog> | null>(null);
 
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
@@ -252,11 +240,11 @@ const applyJobFilters = async () => {
 };
 
 
-const clearCalibrationFilters = () => {
-  if (jobFilterDialog.value) {
-    jobFilterDialog.value.externalResetFilters();
-  }
-};
+// const clearCalibrationFilters = () => {
+//   if (jobFilterDialog.value) {
+//     jobFilterDialog.value.externalResetFilters();
+//   }
+// };
 
 const filtersExist = computed(() => {
   return (modulesFilterList.value.length !== 0 || statusTypeFilterList.value.length !== 0 || uiGageId.value != "All")

@@ -1,20 +1,10 @@
 <template>
-  <div id="JobFilterDialog" ref="draggableDiv" class="mb-2 top-[20%] left-[30%] absolute z-100 w-[606px] h-[440px]"
-    :class="isDragging ? 'cursor-move' : ''">
+  <div id="JobFilterDialog" class="mb-2">
 
-    <div id="Header" class="mb-2">
-      <div class="grid grid-cols-12 boxed">
-        <div class="col-span-11">
-          <div class="mb-2 pt-1 ml-3 font-bold text-sm text-white cursor-[grabbing] ">Calibration Job Filters</div>
-        </div>
-        <div id="CloseX" class="col-span-1 font-bold text-lg text-white text-center w-full cursor-pointer"
-          @click="sendClose($event)"> X </div>
-      </div>
-    </div>
+    <div id="FilterDialog" class="">
 
-    <div id="FilterDialog" class="px-5 py-0">
-      <div class="grid grid-cols-3 gap-2">
-        <div class="col-span-1">
+      <div class="grid grid-cols-12 gap-2">
+        <div class="col-span-3 boxed">
           <div class="mb-2">
             <label class="block text-center" for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
             <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
@@ -24,10 +14,10 @@
           </div>
 
         </div>
-        <div class="col-span-1">
+        <div class="col-span-3 boxed">
           <label class="block text-center mb-1" for="StatusList">Status</label>
-          <Listbox id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-            optionValue="filterValue" multiple class="h-[284px]">
+          <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
+            optionValue="filterValue" checkmark :maxSelectedLabels="3" showClear>
             <template #option="slotProps">
               <div v-bind:class="(slotProps.option.selected === true) ? 'font-bold' : ''">
                 <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
@@ -35,14 +25,14 @@
                   {{ slotProps.option.filterValue }}</div>
               </div>
             </template>
-          </Listbox>
+          </MultiSelect>
         </div>
 
-        <div class="col-span-1">
+        <div class="col-span-3 boxed">
           <div>
             <label for="ModuleList" class="block text-center mb-1">Modules</label>
-            <Listbox id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="h-[283px]">
+            <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
+              optionLabel="name" optionValue="name" checkmark :maxSelectedLabels="3" showClear>
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : ''">
                   <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
@@ -50,27 +40,29 @@
                     {{ slotProps.option.name }}</div>
                 </div>
               </template>
-            </Listbox>
+            </MultiSelect>
           </div>
 
         </div>
-      </div>
 
-      <div id="ButtonArea" class="flex mt-3 float-right w-[226px]">
-        <Button class="ngenButtonDiv" label="Clear" @click="resetFilters($event)" aria-label="Clear filters"
-          title="Clear filters">
-        </Button>
-        <Button class="ngenButtonDiv ml-6" label="Apply" @click="sendApply($event)"
-          aria-label="Apply and close" title="Apply and close">
-        </Button>
+        <div class="col-span-3 boxed align-middle">
+          <Button class="ngenButtonDiv" label="Clear" @click="resetFilters($event)" aria-label="Clear filters"
+            title="Clear filters">
+          </Button>
+          <Button class="ngenButtonDiv ml-6" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
+            title="Apply and close">
+          </Button>
+        </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import Listbox from "primevue/listbox";
 import Button from "primevue/button";
+import MultiSelect from 'primevue/multiselect';
+import Select from "primevue/select";
 
 import type { CalibrationJobListItem } from "@/composables/NextGenModel"
 import { StatusTypes } from "@/composables/NextgenEnums";
@@ -139,7 +131,7 @@ onMounted(() => {
 const sendClose = (e: MouseEvent) => {
   e.stopPropagation();
   e.stopImmediatePropagation();
-  emit("ModulesFilterDialogClosing");
+ // emit("ModulesFilterDialogClosing");
 };
 
 /**

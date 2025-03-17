@@ -110,24 +110,6 @@
                 <LazyEvaluationRunStatusHelp />
               </span>
             </div>
-
-            <div v-else-if="getMenuIndex() === 3">
-              <span v-if="getForecastTabIndex() === 1">
-                <LazyForecastCalibrationRunsHelp />
-              </span>
-              <span v-if="getForecastTabIndex() === 2">
-                <LazyForecastForecastRunsHelp />
-              </span>
-              <span v-if="getForecastTabIndex() === 3">
-                <LazyForecastSetupForecastHelp />
-              </span>
-              <span v-if="getForecastTabIndex() === 4">
-                <LazyForecastStatusRunHelp />
-              </span>
-              <span v-if="getForecastTabIndex() === 5">
-                <LazyForecastResultsHelp />
-              </span>
-            </div>
           </span>
 
         </div>
@@ -176,11 +158,6 @@ const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/compone
 const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
 
-const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
-const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
-const LazyForecastResultsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
-const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
-const LazyForecastStatusRunHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/StatusRunHelp.vue"));
 const LazyUserAccount = defineAsyncComponent(() => import("@/components/Common/UserAccount.vue"))
 
 const gstore = generalStore();
