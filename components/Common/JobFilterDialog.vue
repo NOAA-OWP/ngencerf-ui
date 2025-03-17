@@ -6,7 +6,7 @@
       <div class="grid grid-cols-12 gap-2">
         <div class="col-span-3 boxed">
           <div class="mb-2">
-            <label class="block text-center" for="HeadwaterBasinGage">Headwater Basin Gage</label><br>
+            <label class="block text-center" for="HeadwaterBasinGage">Headwater Basin Gage</label>
             <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
               :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
               aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
@@ -17,14 +17,14 @@
         <div class="col-span-3 boxed">
           <label class="block text-center mb-1" for="StatusList">Status</label>
           <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-            optionValue="filterValue" checkmark :maxSelectedLabels="3" showClear>
-            <template #option="slotProps">
+            optionValue="filterValue" :maxSelectedLabels="3" showClear class="w-full">
+            <!-- <template #option="slotProps">
               <div v-bind:class="(slotProps.option.selected === true) ? 'font-bold' : ''">
                 <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
                   :title="slotProps.option.filterValue">
                   {{ slotProps.option.filterValue }}</div>
               </div>
-            </template>
+            </template> -->
           </MultiSelect>
         </div>
 
@@ -32,14 +32,14 @@
           <div>
             <label for="ModuleList" class="block text-center mb-1">Modules</label>
             <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
-              optionLabel="name" optionValue="name" checkmark :maxSelectedLabels="3" showClear>
-              <template #option="slotProps">
+              optionLabel="name" optionValue="name" :maxSelectedLabels="3" showClear class="w-full">
+              <!-- <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : ''">
                   <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
                     :title="slotProps.option.name">
                     {{ slotProps.option.name }}</div>
                 </div>
-              </template>
+              </template> -->
             </MultiSelect>
           </div>
 

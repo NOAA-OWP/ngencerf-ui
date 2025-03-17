@@ -19,7 +19,7 @@
         <div class="">
 
           <div id="CalTable" class="w-max mx-auto">
-            <JobFilterDialog @ApplyJobFilters="applyJobFilters()" :calJobs="updatedUserCalibrationJobsListData"
+            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()" :calJobs="updatedUserCalibrationJobsListData"
               ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -549,7 +549,7 @@ small-label,
   }
 }
 
-#Datatable {
+#Datatable, #JobFilterDialog {
   width: 1225px !important;
 }
 
