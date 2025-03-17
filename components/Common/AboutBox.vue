@@ -37,7 +37,7 @@
           <div class="col-span-1 mt-5 text-center">
             <img class="inline cursor-pointer w-[48px]" alt="Copy Table Data" src="@/assets/styles/img/copy.png"
               @click="copyGitInfoToClipboard()" /> <br />
-            <Button class="nobg" @click="copyGitInfoToClipboard()">Copy </Button>
+            <div class="nobg cursor-default">Copy</div>
           </div>
         </div>
 
@@ -46,26 +46,15 @@
       <div class="p-4">
         <DataTable :value="gitInfoArray" class="p-datatable-sm" scrollable :scroll-height="scrollHeight"
           scroller="true">
-          <Column field="repository" header="Repository"></Column>
-          <Column field="release" header="Release"></Column>
-          <Column field="build_date" header="Build Date">
-            <template #body="{ data }">{{ formatDate(data.build_date) }}</template>
+          <Column v-for="(item, index) in Array.from(uniqueFields)" :key="item" :field="item"
+            :sortable="index === 0 ? true : false" :header="Array.from(uniqueHeaders)[index]">
+            <template #body="{ data }">
+              {{ formatTableOutput(data, item) }}
+            </template>
           </Column>
-          <Column field="commit_hash" header="Commit Hash">
-            <template #body="{ data }">{{ data.commit_hash.substring(0, 8) }}</template>
-          </Column>
-          <Column field="commit_date" header="Commit Date">
-            <template #body="{ data }">{{ formatDate(data.commit_date) }}</template>
-          </Column>
-          <Column field="author" header="Author"></Column>
-          <Column field="message" header="Message"></Column>
-
         </DataTable>
       </div>
     </div>
-
-
-
   </div>
 
 </template>
@@ -77,9 +66,7 @@ import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 
-import type { CombinedVerstionInfo } from "@/composables/NextGenModel";
-// Removed static import of git_info.json
-// import additionalGitInfo from "@/assets/git_info.json";
+import type { CombinedVerstionInfo, GitData } from "@/composables/NextGenModel";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from '@/stores/common/UserDataStore';
@@ -95,7 +82,7 @@ const { popupActive } = storeToRefs(generalStore());
 
 const combinedVersionInfo = ref<CombinedVerstionInfo>();
 
-const gitInfo = ref<Record<string, GitInfo>>({});
+const gitInfo = ref<Record<string, GitData>>({});
 // Added reactive variable to store optional git_info.json data loaded at runtime
 const addedGitInfo = ref<any>(null);
 
@@ -104,15 +91,10 @@ const scrollHeight = ref<string>(); // Default height
 const aboutBox = ref<HTMLElement | null>(null);
 let observer: IntersectionObserver | null = null;
 
-interface GitInfo {
-  release: string;
-  build_date: string;
-  commit_hash: string;
-  commit_date: string;
-  author: string;
-  message: string;
-}
+const foundFields = ref<string[]>();
 
+const uniqueFields = new Set<string>();
+const uniqueHeaders = new Set<string>();
 
 onMounted(async () => {
   combinedVersionInfo.value = getServerInfo();
@@ -126,14 +108,12 @@ onMounted(async () => {
       return response.json();
     })
     .then(data => {
-      addedGitInfo.value = data;
+      addedGitInfo.value = transformComponent(data);
     })
     .catch(err => {
       console.warn('Optional git_info.json not loaded:', err);
       addedGitInfo.value = {};
     });
-
-  getGitInformation();
 
   if (aboutBox.value) {
     observer = new IntersectionObserver(
@@ -153,6 +133,8 @@ onMounted(async () => {
   window.addEventListener('resize', function (event) {
     resizeNotifications();
   });
+
+  await getGitInformation();
 
   setTimeout(() => {
     const resizeEvent = new Event('resize');
@@ -195,24 +177,67 @@ const getGitInformation = () => {
   })
 }
 
-const gitInfoArray = computed(() => {
-  const infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
-  // Append additional git info if it was loaded
-  if (addedGitInfo.value && addedGitInfo.value.ngencerf_ui) {
-    return [...infoArray, { repository: 'ngencerf_ui', ...addedGitInfo.value.ngencerf_ui }];
+/**
+ * Returns an array of unique field names from an array of objects or an object of objects.
+ * @param arr - The input array of objects or an object of objects.
+ * @returns A string array containing unique field names.
+ */
+function getUniqueFields(arr: unknown): string[] {
+  let data: unknown[] = [];
+  // If arr is already an array, use it directly.
+  if (Array.isArray(arr)) {
+    data = arr;
   }
+  // If arr is an object (but not an array), convert its values to an array.
+  else if (arr && typeof arr === 'object') {
+    data = Object.values(arr);
+  } else {
+    console.error('Input is not an array or an object of objects');
+    return [];
+  }
+
+  // Iterate over each item in the data array.
+  data.forEach(item => {
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      Object.keys(item).forEach(key => {
+        uniqueFields.add(key);
+        let s = key.split('_')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        uniqueHeaders.add(s);
+      });
+    } else {
+      console.warn('Skipping non-object item:', item);
+    }
+  });
+  return Array.from(uniqueFields);
+}
+
+const formatTableOutput = (field: Record<string, string>, item: string) => {
+  if (item.indexOf("_hash") !== -1) { return field[item].substring(0, 8) }
+  if (item.indexOf("_date") !== -1) { return formatDate(field[item]) }
+  return field[item];
+}
+
+const gitInfoArray = computed(() => {
+  let infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
+  // Append additional git info if it was loaded
+  if (infoArray.length && Object.keys(addedGitInfo.value).length > 0) {
+    addedGitInfo.value.repository = 'ngencerf_ui';
+    infoArray.push(addedGitInfo.value);
+  }
+  getUniqueFields(infoArray);
   return infoArray;
 });
 
 const formatDate = (dateString: string) => {
-  return dateString ? new Date(dateString).toLocaleString() : 'N/A';
+  return dateString ? new Date(dateString).toLocaleString() : '';
 };
 
 const closeAboutBox = () => {
   useAccountEvent("aboutBoxEvent", "");
   popupActive.value = false;
 }
-
 
 const useClipboard = () => {
   const copyToClipboard = async (text: string) => {
@@ -243,6 +268,36 @@ const copyGitInfoToClipboard = () => {
   const csvData = convertToCSV(gitInfoArray.value);
   copyToClipboard(csvData);
 };
+
+function transformComponent(componentGitInfo: any) {
+  // Ensure we have a string for tags
+  const tags = (componentGitInfo.ngencerf_ui.tags || "").trim();
+  const newComp = { release: "", build_date: "", commit_hash: "", commit_date: "", author: "", message: "" };
+  // If tags is empty, set release to "dev (<branch>)", otherwise use tags.
+  if (tags === "") {
+    const branch = `dev (${componentGitInfo.ngencerf_ui.branch || "<unknown>"})`;
+    newComp.release = branch;
+  } else {
+    newComp.release = tags;
+  }
+  // Insert keys in the desired order: build_date, then commit_hash.
+  newComp.build_date = componentGitInfo.ngencerf_ui.build_date || "";
+  newComp.commit_hash = componentGitInfo.ngencerf_ui.commit_hash || "";
+  // If tags is empty, add commit_date, author, and message if they exist.
+  if (tags === "") {
+    if ("commit_date" in componentGitInfo.ngencerf_ui) {
+      newComp.commit_date = componentGitInfo.ngencerf_ui.commit_date || "";
+    }
+    if ("author" in componentGitInfo.ngencerf_ui) {
+      newComp.author = componentGitInfo.ngencerf_ui.author || "";
+    }
+    if ("message" in componentGitInfo.ngencerf_ui) {
+      newComp.message = componentGitInfo.ngencerf_ui.message || "";
+    }
+  }
+  return newComp;
+}
+
 
 </script>
 
