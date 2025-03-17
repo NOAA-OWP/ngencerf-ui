@@ -58,7 +58,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
         body: "",
       }
     ).then((formulationTabDataResult) => {
-      formulationTabData.value = formulationTabDataResult?._data ?? undefined;
+      formulationTabData.value = formulationTabDataResult?._data;
       isLoading.value = false;
     });
   };

@@ -119,9 +119,9 @@ export const makeProtectedApiCall = async <T>(
     // Client bad requests, except for Unauthorized, which is handled above
     if (!myResponse.ok && myResponse.status === 400 || (myResponse.status > 401 && myResponse.status < 500)) {
       responseData = {
-        _data: await response.json(),
-        status: response.status,
-        ok: response.ok,
+        _data: null,
+        status: myResponse.status,
+        ok: myResponse.ok,
       };
       return responseData;     
     }

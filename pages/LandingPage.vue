@@ -38,8 +38,13 @@ import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
-
 import { generalStore } from "~/stores/common/GeneralStore";
+
+import { useToast } from "primevue/usetoast";
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
+const toast = useToast();
+
 const gstore = generalStore();
 const { popupActive } = storeToRefs(gstore);
 
@@ -48,21 +53,30 @@ const { resetFormulationStore, loadFormulationModels } = useFormulationStore();
 const { resetOptimizationStore } = useOptimizationStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
 const { hardResetTuningStore } = useTuningStore();
+const { addToastRecord } = generalStore();
+
+const formulationStore = useFormulationStore;
+const { formulationTabData } = storeToRefs(formulationStore())
 
 const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs(useCalibrationJobStore());
-const { fetchUserCalibrationJobsListData, getUserName, getUserFullName} = useUserDataStore()
+const { fetchUserCalibrationJobsListData, getUserFullName } = useUserDataStore()
 
 onMounted(() => {
   popupActive.value = false;
-  nextTick( async () => {
+  nextTick(async () => {
     resetGageStore();
     resetFormulationStore();
     resetOptimizationStore();
     hardResetRunStatusStore();
-    hardResetTuningStore(); 
+    hardResetTuningStore();
     await fetchUserCalibrationJobsListData();
     await loadFormulationModels();
-  })
+    if (!formulationTabData.value) {
+      debugger;
+      const tMsg: ToastMessageOptions = { severity: "error", summary: 'Server Error', detail: "Unable to Retrieve Module List", life: ToastTimeout.timeout10000 };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+  });
 })
 
 </script>
