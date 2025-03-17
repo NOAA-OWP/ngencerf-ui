@@ -1,56 +1,57 @@
 <template>
-  <div id="JobFilterDialog" class="mb-2">
+  <div id="JobFilterDialog" class="mb-2 mt-4">
 
-    <div id="FilterDialog" class="">
+    <div id="FilterDialog">
 
-      <div class="grid grid-cols-12 gap-2">
-        <div class="col-span-3 boxed">
-          <div class="mb-2">
-            <label class="block text-center" for="HeadwaterBasinGage">Headwater Basin Gage</label>
-            <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter text-center" v-model="uiGageId"
-              :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
-              aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
-            </Select>
-          </div>
-
+      <div class="grid grid-cols-12 gap-2 text-sx">
+        <div class="col-span-3">
+          <label class="block text-left" for="HeadwaterBasinGage">Headwater Basin Gage</label>
+          <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter" v-model="uiGageId"
+            :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
+            aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
+          </Select>
         </div>
-        <div class="col-span-3 boxed">
-          <label class="block text-center mb-1" for="StatusList">Status</label>
+
+        <div class="col-span-3">
+          <label class="block text-left mb-1" for="StatusList">Status</label>
           <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
             optionValue="filterValue" :maxSelectedLabels="3" showClear class="w-full">
-            <!-- <template #option="slotProps">
-              <div v-bind:class="(slotProps.option.selected === true) ? 'font-bold' : ''">
-                <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
-                  :title="slotProps.option.filterValue">
-                  {{ slotProps.option.filterValue }}</div>
+            <template #header>
+              <div class="absolute cursor-pointer top-3 left-10">&nbsp; Select All Items</div>
+            </template>
+            <template #option="slotProps">
+              <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
+                :title="slotProps.option.filterValue">
+                {{ slotProps.option.filterValue }}
               </div>
-            </template> -->
+            </template>
           </MultiSelect>
         </div>
 
-        <div class="col-span-3 boxed">
+        <div class="col-span-3">
           <div>
-            <label for="ModuleList" class="block text-center mb-1">Modules</label>
+            <label for="ModuleList" class="block text-left mb-1">Modules</label>
             <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
               optionLabel="name" optionValue="name" :maxSelectedLabels="3" showClear class="w-full">
-              <!-- <template #option="slotProps">
-                <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : ''">
-                  <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
-                    :title="slotProps.option.name">
-                    {{ slotProps.option.name }}</div>
+              <template #header>
+                <div class="absolute cursor-pointer top-3 left-10">&nbsp; Select All Items</div>
+              </template>
+              <template #option="slotProps">
+                <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
+                  :title="slotProps.option.name">
+                  {{ slotProps.option.name }}&nbsp;
                 </div>
-              </template> -->
+              </template>
             </MultiSelect>
           </div>
-
         </div>
 
-        <div class="col-span-3 boxed align-middle">
-          <Button class="ngenButtonDiv" label="Clear" @click="resetFilters($event)" aria-label="Clear filters"
-            title="Clear filters">
-          </Button>
-          <Button class="ngenButtonDiv ml-6" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
+        <div class="col-span-3 mt-8 mr-3">
+          <Button class="ngenButtonDiv text-xs" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
             title="Apply and close">
+          </Button>
+          <Button class="ngenButtonDiv ml-6 text-xs" label="Clear" @click="resetFilters($event)"
+            aria-label="Clear filters" title="Clear filters">
           </Button>
         </div>
 
@@ -91,35 +92,6 @@ const props = defineProps<{
 onMounted(() => {
   nextTick(() => {
     setTimeout(() => {
-
-      // Setup for window isDragging
-      if (draggableDiv.value) {
-        draggableDiv.value.addEventListener('mousedown', (e: MouseEvent) => {
-          const target = e.target as HTMLElement | null;
-          if (target && target.closest("#Header") !== null && target.id !== "CloseX") {
-            isDragging.value = true;
-            offsetX = e.clientX - draggableDiv.value!.offsetLeft;
-            offsetY = e.clientY - draggableDiv.value!.offsetTop;
-          }
-        });
-
-        document.addEventListener('mousemove', (e: MouseEvent) => {
-          if (!isDragging.value) return;
-          if (draggableDiv.value) {
-            const newX = e.clientX - offsetX;
-            const newY = e.clientY - offsetY;
-            // Keep div within window bounds, but allow it to be some of it off the screen
-            const maxX = window.innerWidth - draggableDiv.value.offsetWidth + (draggableDiv.value.offsetWidth);
-            const maxY = window.innerHeight - draggableDiv.value.offsetHeight + (draggableDiv.value.offsetHeight);
-            draggableDiv.value.style.left = Math.min(Math.max(-300, newX), maxX) + 'px';
-            draggableDiv.value.style.top = Math.min(Math.max(0, newY), maxY - 50) + 'px';
-          }
-        });
-
-        document.addEventListener('mouseup', () => {
-          isDragging.value = false;
-        });
-      }
       externalResetFilters();
     }, 250) // Necessary to make sure that data has been retreived.
   });
@@ -131,7 +103,7 @@ onMounted(() => {
 const sendClose = (e: MouseEvent) => {
   e.stopPropagation();
   e.stopImmediatePropagation();
- // emit("ModulesFilterDialogClosing");
+  // emit("ModulesFilterDialogClosing");
 };
 
 /**
@@ -193,7 +165,7 @@ const archivedTemplate = (rowData: any) => {
 
 #JobFilterDialog {
   background-color: white;
-  border: 2px solid #666666;
+  padding-bottom: 5px;
 }
 
 #CloseX:hover {
@@ -204,4 +176,5 @@ const archivedTemplate = (rowData: any) => {
 #StatusList {
   border: 1px solid #888888;
 }
+
 </style>
