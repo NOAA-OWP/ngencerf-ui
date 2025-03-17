@@ -46,8 +46,8 @@
       <div class="p-4">
         <DataTable :value="gitInfoArray" class="p-datatable-sm" scrollable :scroll-height="scrollHeight"
           scroller="true">
-          <Column v-for="(item, index) in Array.from(uniqueFields)" :key="item" :field="item" ,
-            :header="Array.from(uniqueHeaders)[index]">
+          <Column v-for="(item, index) in Array.from(uniqueFields)" :key="item" :field="item"
+            :sortable="index === 0 ? true : false" :header="Array.from(uniqueHeaders)[index]">
             <template #body="{ data }">
               {{ formatTableOutput(data, item) }}
             </template>
@@ -216,7 +216,7 @@ function getUniqueFields(arr: unknown): string[] {
 const formatTableOutput = (field: Record<string, string>, item: string) => {
   if (item.indexOf("_hash") !== -1) { return field[item].substring(0, 8) }
   if (item.indexOf("_date") !== -1) { return formatDate(field[item]) }
-  return field[item]; 
+  return field[item];
 }
 
 const gitInfoArray = computed(() => {
