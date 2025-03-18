@@ -61,21 +61,19 @@ const { formulationTabData } = storeToRefs(formulationStore())
 const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs(useCalibrationJobStore());
 const { fetchUserCalibrationJobsListData, getUserFullName } = useUserDataStore()
 
-onMounted(() => {
+onMounted(async () => {
   popupActive.value = false;
-  nextTick(async () => {
-    resetGageStore();
-    resetFormulationStore();
-    resetOptimizationStore();
-    hardResetRunStatusStore();
-    hardResetTuningStore();
-    await fetchUserCalibrationJobsListData();
-    await loadFormulationModels();
+  resetGageStore();
+  resetFormulationStore();
+  resetOptimizationStore();
+  hardResetRunStatusStore();
+  hardResetTuningStore();
+  await loadFormulationModels();
+  await fetchUserCalibrationJobsListData();
     if (!formulationTabData.value) {
       const tMsg: ToastMessageOptions = { severity: "error", summary: 'Server Error', detail: "Unable to Retrieve Module List", life: ToastTimeout.timeout10000 };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-  });
 })
 
 </script>
