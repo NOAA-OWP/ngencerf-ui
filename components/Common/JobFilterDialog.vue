@@ -6,7 +6,7 @@
       <div class="grid grid-cols-12 gap-2 text-sx">
         <div class="col-span-3">
           <label class="block text-left" for="HeadwaterBasinGage">Headwater Basin Gage</label>
-          <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter" v-model="uiGageId"
+          <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
             :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
             aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
           </Select>
