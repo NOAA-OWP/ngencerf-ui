@@ -175,7 +175,7 @@
       </div>
       <DynamicDialog />
     </div>
-    <div class="waitgif" v-if="formulationStore_data_loading">
+    <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
@@ -207,6 +207,9 @@ const { clearCalibratableParameters } = useTuningStore();
 
 const { addToastRecord } = generalStore();
 
+const gstore = generalStore();
+const { isLoading } = storeToRefs(gstore);
+
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
 import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
@@ -228,7 +231,6 @@ const onRowContextMenu = (event: any) => {
   slothParamContextMenu.value.show(event.originalEvent)
 }
 const {
-  formulationStore_data_loading,
   filterGroup,
   useSlothParameters,
   selectedModuleValues,
@@ -243,7 +245,7 @@ const {
   saveFormulationPayload
 } = storeToRefs(useFormulationStore());
 
-const { loadFormulationTabStaticData, addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable } = useFormulationStore()
+const { addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable, setUserSelection } = useFormulationStore()
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -266,6 +268,7 @@ onMounted(() => {
     mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
     modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+    setUserSelection();
   })
 });
 
@@ -275,11 +278,6 @@ const addSlothOnEnter = (e: KeyboardEvent) => {
     addSlothVariable();
   }
 };
-
-
-const resetForumulationTab = () => {
-  loadFormulationTabStaticData();
-}
 
 /**
  * add sloth variable entry to table and reset name field
@@ -379,11 +377,10 @@ const saveFormulationData = () => {
             toast.add(tMsg); addToastRecord(tMsg);
           }
         }
-        formulationStore_data_loading.value = false;
+        isLoading.value = false;
         updateJobData();
-        // fetchUserCalibrationRunData();
       } else {
-        formulationStore_data_loading.value = false;
+        isLoading.value = false;
         useApiErrorResponsePreprocess(response).forEach(message => {
           const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Data Failed.', detail: message, life: ToastTimeout.timeout10000 };
           toast.add(tMsg); addToastRecord(tMsg);
@@ -622,4 +619,23 @@ h1 {
   text-align: right;
   width: 120px;
 }
+
+/* Listbox select (for Tuning Tab) */
+.p-listbox {
+  border-radius: 0px;
+}
+.p-listbox-list {
+  padding: 0px !important;
+}
+.p-listbox-list-container {
+  margin-top: 7px;
+}
+.p-listbox-option-selected {
+  background-color: global.$ngwcp_green_lt !important; 
+}
+.p-listbox-option {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
 </style>

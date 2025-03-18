@@ -95,6 +95,7 @@ export interface CalibrationJobListItem {
   objective_function: string;
   optimization_algorithm: string;
   validations: CalibrationJobValidationItem[];
+  modules: string[];
 }
 
 /**
@@ -755,6 +756,20 @@ export interface ToastRecord extends ToastMessageOptions {
   datetime: string;
 }
 
+export type StatusRecord = {
+  status: string;
+  filterValue: string;
+}
+
+export type FilterTimeRange = {
+  earliest: Date;
+  latest: Date;
+}
+
+export type ServerStatus = {
+  status: number;
+  ok: boolean;
+}
 
 export interface GitData {
   release: string;

@@ -16,6 +16,7 @@ export const refreshAccessToken = async (
   ngencerfBaseUrl: string
 ): Promise<boolean> => {
   const userDataStore = useUserDataStore();
+
   const refreshToken = userDataStore.getRefreshToken();
 
   // If no refresh token is present, return false
@@ -61,6 +62,9 @@ export const makeProtectedApiCall = async <T>(
 ): Promise<any> => {
   const gstore = generalStore();
   const { isLoading } = storeToRefs(gstore);
+  const ustore = useUserDataStore();
+  const {lastServerError }= storeToRefs(ustore);
+
   // Save the call data in case we need to refresh.
   rqstUrl = url;
   rqstUserOptions = userOptions;
@@ -71,7 +75,7 @@ export const makeProtectedApiCall = async <T>(
     const response = await fetch(url, {
       ...userOptions,
       async onRequest({ request, options }: { request: any; options: any }) {
-        // stringify body if it is an object
+        // stringify body if it is an objectuseUserDataStore()
         if (
           options.body &&
           typeof options.body === "object" &&
@@ -83,7 +87,7 @@ export const makeProtectedApiCall = async <T>(
       },
     });
 
-    let myResponse = { ok: response.ok, status: response.status };
+    let myResponse =  lastServerError.value = { ok: response.ok, status: response.status };  
 
     // Success
     if (myResponse.ok && myResponse.status >= 200 && myResponse.status < 300) {
@@ -112,13 +116,12 @@ export const makeProtectedApiCall = async <T>(
       return makeProtectedApiCall(rqstUrl, rqstUserOptions);
     }
 
-
     // Client bad requests, except for Unauthorized, which is handled above
     if (!myResponse.ok && myResponse.status === 400 || (myResponse.status > 401 && myResponse.status < 500)) {
       responseData = {
-        _data: await response.json(),
-        status: response.status,
-        ok: response.ok,
+        _data: null,
+        status: myResponse.status,
+        ok: myResponse.ok,
       };
       return responseData;     
     }
