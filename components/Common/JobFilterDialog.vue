@@ -15,7 +15,7 @@
         <div class="col-span-3">
           <label class="block text-left mb-1" for="StatusList">Status</label>
           <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-            optionValue="filterValue" :maxSelectedLabels="3" showClear class="w-full">
+            optionValue="filterValue" :maxSelectedLabels="3" class="w-full" showClear>
             <template #header>
               <div class="absolute cursor-pointer top-3 left-10">&nbsp; Select All Items</div>
             </template>
@@ -32,7 +32,7 @@
           <div>
             <label for="ModuleList" class="block text-left mb-1">Modules</label>
             <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
-              optionLabel="name" optionValue="name" :maxSelectedLabels="3" showClear class="w-full">
+              optionLabel="name" optionValue="name" :maxSelectedLabels="3" class="w-full" showClear>
               <template #header>
                 <div class="absolute cursor-pointer top-3 left-10">&nbsp; Select All Items</div>
               </template>
@@ -98,7 +98,7 @@ onMounted(() => {
 })
 
 const filterActive = computed (() => {
-  return (modulesFilterList.value.length === 0 && statusTypeFilterList.value.length === 0 && uiGageId.value === 'All')
+  return (modulesFilterList.value.length === 0 && (statusTypeFilterList.value === null || statusTypeFilterList.value.length === 0) && uiGageId.value === 'All')
 });
 
 
