@@ -70,10 +70,10 @@ onMounted(async () => {
   hardResetTuningStore();
   await loadFormulationModels();
   await fetchUserCalibrationJobsListData();
-    if (!formulationTabData.value) {
-      const tMsg: ToastMessageOptions = { severity: "error", summary: 'Server Error', detail: "Unable to Retrieve Module List", life: ToastTimeout.timeout10000 };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
+  if (!formulationTabData.value) {
+    const tMsg: ToastMessageOptions = { severity: "error", summary: 'Server Error', detail: "Unable to Retrieve Module List", life: ToastTimeout.timeout10000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
 })
 
 </script>
