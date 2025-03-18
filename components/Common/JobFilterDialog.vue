@@ -98,7 +98,7 @@ onMounted(() => {
 })
 
 const filterActive = computed (() => {
-  return (modulesFilterList.value, length === 0 && statusTypeFilterList.value.length === 0 && uiGageId.value === 'All')
+  return (modulesFilterList.value.length === 0 && statusTypeFilterList.value.length === 0 && uiGageId.value === 'All')
 });
 
 
