@@ -100,10 +100,11 @@ onMounted(async () => {
   combinedVersionInfo.value = getServerInfo();
 
   // Dynamically load git_info.json from the public directory
-  fetch('/git_info.json')
+  const git_info_file = '/ngencerf_ui_git_info.json'
+  fetch(git_info_file)
     .then(response => {
       if (!response.ok) {
-        throw new Error('Not found');
+        throw new Error(git_info_file + ' not found');
       }
       return response.json();
     })
@@ -111,7 +112,7 @@ onMounted(async () => {
       addedGitInfo.value = transformComponent(data);
     })
     .catch(err => {
-      console.warn('Optional git_info.json not loaded:', err);
+      console.warn('Optional ' + git_info_file + ' not loaded:', err);
       addedGitInfo.value = {};
     });
 
