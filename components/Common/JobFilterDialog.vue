@@ -18,7 +18,7 @@
             optionValue="filterValue" :maxSelectedLabels="3" class="w-full">
             <template #header>
               <div class="absolute cursor-pointer top-2 left-[48px]">&nbsp; Select All Items</div>
-            </template>
+            </template>Headw
             <template #option="slotProps">
               <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
                 :title="slotProps.option.filterValue">
@@ -186,5 +186,9 @@ const archivedTemplate = (rowData: any) => {
   background-color: transparent;
   border: none;
   font-weight: bold;
+}
+
+#CleareFiltersButton:disabled {
+  color: #555;
 }
 </style>
