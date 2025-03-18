@@ -15,9 +15,9 @@
         <div class="col-span-3">
           <label class="block text-left mb-1" for="StatusList">Status</label>
           <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-            optionValue="filterValue" :maxSelectedLabels="3" class="w-full" showClear>
+            optionValue="filterValue" :maxSelectedLabels="3" class="w-full">
             <template #header>
-              <div class="absolute cursor-pointer top-3 left-10">&nbsp; Select All Items</div>
+              <div class="absolute cursor-pointer top-3 left-16">&nbsp; Select All Items</div>
             </template>
             <template #option="slotProps">
               <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
@@ -34,7 +34,7 @@
             <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
               optionLabel="name" optionValue="name" :maxSelectedLabels="3" class="w-full" showClear>
               <template #header>
-                <div class="absolute cursor-pointer top-3 left-10">&nbsp; Select All Items</div>
+                <div class="absolute cursor-pointer top-3 left-16">&nbsp; Select All Items</div>
               </template>
               <template #option="slotProps">
                 <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
