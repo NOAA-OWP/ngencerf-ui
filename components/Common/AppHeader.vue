@@ -208,6 +208,7 @@ onMounted(() => {
   window.addEventListener('resize', function (event) {
     sizeHelpWindow();
     sizeLogWindow();
+    sizeAboutWindow();
   });
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 });
