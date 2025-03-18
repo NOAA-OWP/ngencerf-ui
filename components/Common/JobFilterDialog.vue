@@ -50,7 +50,7 @@
           <Button class="ngenButtonDiv text-xs" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
             title="Apply and close">
           </Button>
-          <Button id="CleareFiltersButton" class="ml-6 text-xs" label="Clear Filters" @click="resetFilters($event)"
+          <Button id="CleareFiltersButton" class="ml-6 text-lg" label="Clear Filters" @click="resetFilters($event)"
             aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
           </Button>
         </div>
