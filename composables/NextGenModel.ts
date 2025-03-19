@@ -1,3 +1,5 @@
+import type { ToastMessageOptions } from "primevue/toast"
+
 export interface User {
   uid: number;
   first_name: string;
@@ -23,8 +25,8 @@ export interface ComponentPropsTitle {
 // response interface
 export interface GeneralApiSaveResponse {
   message: string;
-  calibration_run_id: number;
   status: string;
+  calibration_run_id: number;
 }
 
 export interface GeneralErrorResponse {
@@ -37,6 +39,9 @@ export interface ValidationErrorObject {
   [key: string]: string;
 }
 
+export interface NonFieldError {
+  non_field_errors: string[];
+}
 export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
   geopackage_image_url?: string | null;
   eds_errors: edsError[];
@@ -149,7 +154,7 @@ export interface UserCalibrationRunData {
   time_range: UserCalibrationRunTimeRangeData;
   calibration_times: UserCalibrationRunCalibrationTimesData;
   validation_times: UserCalibrationRunValidationTimesData;
-  output_variable_to_calibrate: UserCalibrationRunOutputVariableToCalibrateData;
+  num_catchments: number | null;
   parameters_selected: boolean;
   parameters: UserCalibrationRunParametersData[];
   objective_function: string;
@@ -197,11 +202,6 @@ export interface UserCalibrationRunValidationTimesData {
   validation_end_time: string;
   simulation_start_time: string;
   simulation_end_time: string;
-}
-
-export interface UserCalibrationRunOutputVariableToCalibrateData {
-  name: string;
-  module: string;
 }
 
 export interface UserCalibrationRunParametersData {
@@ -292,6 +292,8 @@ export interface NameAndDescription {
 
 export interface SaveGageTabResponse extends GeneralApiSaveResponse {
   geopackage_image: string;
+  eds_errors: edsError[];
+  num_catchments: number | null;
 }
 
 /**
@@ -339,11 +341,6 @@ export interface tuning_load {
 export interface tuning_save {
   calibration_run_id: number;
   automatic_valiation: boolean;
-  output_variable_to_calibrate: {
-    name: string;
-    module: string;
-  };
-  module_output_variables: name_description_type[];
   parameters: module_params[];
   calibration_times: {
     calibration_start_time: string;
@@ -373,7 +370,6 @@ export interface module_data {
   name: string;
   groups: string[];
   parameters: module_params[];
-  module_output_variables: module_params[];
 }
 
 export interface module_params {
@@ -666,9 +662,10 @@ export type LogoutEvent = {
 export type AccountEvent = {
   accountEvent: string;
   aboutBoxEvent: string;
+  errorLogEvent: string;
 };
 
-export type ServerInfo = {
+export type CombinedVerstionInfo = {
   version: string;
   date: string;
   contact_email: string;
@@ -698,13 +695,17 @@ export type CalibrationRunForForecast = {
   submit_date: string;
   objective_function: string;
   optimization_algorithm: string;
+  validations: CalibrationJobValidationItem[];
 };
 
-export interface ForecastJob extends CalibrationRunForForecast {
+export interface ForecastJob {
+  calibration_run_id: number;
   forecast_run_id: number;
   cycle: string;
+  gage_id: string;
   forecast_status: string;
   forcing_download_status: string;
+  submit_date: string;
 }
 
 export type ForecastJobs = {
@@ -733,7 +734,7 @@ export type PlotNames = {
   status: string;
 };
 
-export type GageResetData  = {
+export type GageResetData = {
   external_data_status: {
     observational: boolean;
     forcing: boolean;
@@ -749,3 +750,18 @@ export type BestIterationData = {
   iteration: number;
   isBest: boolean;
 }
+
+export interface ToastRecord extends ToastMessageOptions {
+  datetime: string;
+}
+
+
+export interface GitData {
+  release: string;
+  build_date: string;
+  commit_hash: string;
+  commit_date: string;
+  author: string;
+  message: string;
+}
+

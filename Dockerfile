@@ -11,7 +11,8 @@ RUN set -eux; \
         git \
         openssl openssl-devel \
         which \
-        xz \ 
+        xz \
+        jq \
     ; \
     dnf clean all
 
@@ -36,6 +37,30 @@ COPY . .
 
 RUN set -eux; \
     npm run build
+
+# Extract Git information and write it to a JSON file at $GIT_INFO_PATH
+COPY .git .git
+
+RUN set -eux; \
+    # Get the remote URL from Git configuration
+    repo_url=$(git config --get remote.origin.url); \
+    # Extract the repo name (everything after the last slash) and remove any trailing .git
+    key=${repo_url##*/}; \
+    key=${key%.git}; \
+    # Construct the file path using the derived key
+    GIT_INFO_PATH="public/${key}_git_info.json"; \
+    jq -n \
+      --arg commit_hash "$(git rev-parse HEAD)" \
+      --arg branch "$(git rev-parse --abbrev-ref HEAD)" \
+      --arg tags "$(git tag --points-at HEAD | tr '\n' ' ')" \
+      --arg author "$(git log -1 --pretty=format:'%an')" \
+      --arg commit_date "$(date -u -d @$(git log -1 --pretty=format:'%ct') +'%Y-%m-%d %H:%M:%S UTC')" \
+      --arg message "$(git log -1 --pretty=format:'%s' | tr '\n' ';')" \
+      --arg build_date "$(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
+      "{\"$key\": {commit_hash: \$commit_hash, branch: \$branch, tags: \$tags, author: \$author, commit_date: \$commit_date, message: \$message, build_date: \$build_date}}" \
+      > $GIT_INFO_PATH
+
+RUN rm --recursive --force .git
 
 ENV NUXT_HOST=0.0.0.0
 ENV NUXT_PORT=3000

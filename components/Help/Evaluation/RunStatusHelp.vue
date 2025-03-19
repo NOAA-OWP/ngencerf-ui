@@ -5,11 +5,13 @@
     <p class="text-center" style="color:#cc5500;font-size:0.8em;">
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
- 
+
     <table class="_help-table" aria-label="Evaluation Run/Status Help Table">
       <thead>
-        <th>Item</th>
-        <th>Description</th>
+        <tr>
+          <th>Item</th>
+          <th>Description</th>
+        </tr>
       </thead>
       <tbody>
         <tr>
@@ -44,7 +46,8 @@
         </tr>
         <tr>
           <td class="td1">Go To Evaluation Button</td>
-          <td class="td2">View details about the validation run, including plots, plot data, performance metrics and logs. Appears once the job is done.</td>
+          <td class="td2">View details about the validation run, including plots, plot data, performance metrics and
+            logs. Appears once the job is done.</td>
         </tr>
 
       </tbody>

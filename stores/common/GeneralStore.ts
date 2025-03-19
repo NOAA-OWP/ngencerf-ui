@@ -5,7 +5,8 @@
  */
 import { defineStore } from "pinia";
 
-import type { ServerInfo } from "@/composables/NextGenModel";
+import type { CombinedVerstionInfo, ToastRecord } from "@/composables/NextGenModel";
+import type { ToastMessageOptions } from "primevue/toast";
 
 export const generalStore = defineStore(
   "generalStore",
@@ -25,28 +26,42 @@ export const generalStore = defineStore(
     // running validation run id from selected iteration
     const iterationValidationRunId = ref<number>(0);
     // user selected validation run status
-    const evaluateValidationRunStatus = ref<string>('');
+    const evaluateValidationRunStatus = ref<string>("");
     // user seleted iteration run number for display only
-    const evaluateDisplayIterationNumber = ref<number>( 0 );
+    const evaluateDisplayIterationNumber = ref<number>(0);
 
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
 
-    const serverInfo = ref<ServerInfo>();
+    const serverInfo = ref<CombinedVerstionInfo>();
 
     const isLoading = ref<boolean>(false);
+
+    // This is set if the user changes the gage.  Resets when saved.toastRecord
+    const popupActive = ref<boolean>(false);
 
     // This is set if the user changes the gage.  Resets when saved.
     const gageHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
 
- 
+    const toastRecords = ref<ToastRecord[]>([]);
+
+    function addToastRecord(rec: ToastMessageOptions) {
+      let dt = { datetime: Date().toString().substring(4, 24) };
+      let newRec = { ...rec, ...dt };
+      toastRecords.value.push(newRec as ToastRecord);
+    }
+
+    function clearToastRecords() {
+      toastRecords.value = [];
+    }
+
     function getServerInfo() {
       return serverInfo.value;
     }
 
-    function setServerInfo(si: ServerInfo) {
+    function setServerInfo(si: CombinedVerstionInfo) {
       serverInfo.value = si;
     }
 
@@ -101,6 +116,7 @@ export const generalStore = defineStore(
 
     function resetGeneralStore() {
       calibrationJobId.value = 0;
+      popupActive.value = false;
     }
 
     return {
@@ -134,16 +150,19 @@ export const generalStore = defineStore(
       verificationTabIndex,
       menuIndex,
       evaluationRunSelected,
-      isLoading
+      isLoading,
+      toastRecords,
+      addToastRecord,
+      clearToastRecords,
+      popupActive
     };
   },
   {
-      persist: {
-    storage: piniaPluginPersistedstate.localStorage(),
-  },
+    persist: {
+      storage: piniaPluginPersistedstate.localStorage(),
+    },
   }
 );
-
 
 /* Pinia supports Hot Module replacement so you can edit your stores
    and interact with them directly in your app without reloading the page,

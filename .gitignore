@@ -34,4 +34,6 @@ package-lock.json
 nuxt.config.ts
 ToDo.txt
 
+public/*git_info.json
+
 

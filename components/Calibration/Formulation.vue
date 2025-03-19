@@ -31,8 +31,11 @@
               :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
-                  <div class="font-ui pl-2 leading-none">{{ slotProps.option.name }}</div>
+                  <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
+                    :title="slotProps.option.name">
+                    {{ slotProps.option.name }}</div>
                 </div>
+
               </template>
             </Listbox>
           </div>
@@ -44,9 +47,13 @@
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
                 optionValue="name" scrollHeight="18rem" class="border-0">
                 <template #option="slotProps">
-                  <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'"><span
-                      class="font-ui pl-2">{{ slotProps.option.name }}</span></div>
+                  <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'"
+                    :aria-label="slotProps.option.name + ' is ' + (slotProps.option.selected === true ? 'Checked' : 'Not Checked')"
+                    :title="slotProps.option.name + ' is ' + (slotProps.option.selected === true ? 'Checked' : 'Not Checked')">
+                    <span class="font-ui pl-2">{{ slotProps.option.name }}</span>
+                  </div>
                 </template>
+
               </Listbox>
             </div>
           </div>
@@ -69,7 +76,7 @@
             <input class="inline-block w-auto" id="SlothName" type="text" v-model="new_sloth_variable_name"
               @keypress="addSlothOnEnter($event)">
             <div class="ngenButtonDiv ml-3 inline-block">
-              <Button id="SlothAddBtn" @click="addSlothVariable">Add</button>
+              <Button id="SlothAddBtn" @click="addSlothVariable">Add</Button>
             </div>
           </span>
         </div>
@@ -136,7 +143,7 @@
           <div class="col-span-1 mr-6 h-8" @click="saveFormulationData()">
             <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button">
               Save
-            </button>
+            </Button>
           </div>
         </span>
         <span v-else>
@@ -148,23 +155,21 @@
         <span v-if="modulesHaveChanged">
           <div class="col-span-1 mr-3">
             <Button class="ngenButtonDiv-yellow" title="Revert Gage" @click="resetModuleList()"
-              aria-label="Revert Gage">Revert</button>
+              aria-label="Revert Gage">Revert</Button>
           </div>
         </span>
         <span v-else>
-          <div class="col-span-1 mr-3">
-            &nbsp;
-          </div>
+          <div class="col-span-1 mr-3">&nbsp;</div>
         </span>
 
         <div class="col-span-4">&nbsp;</div>
         <div class="col-span-1">
-          <div><Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-              aria-label="Previous Tab Button" @click="goPrevTab()">Prev</button></div>
+          <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
+            aria-label="Previous Tab Button" @click="goPrevTab()">Prev</Button>
         </div>
         <div class="col-span-1 mr-4">
-          <div><Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
-              @click="goNextTab()">Next</button></div>
+          <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
+            @click="goNextTab()">Next</Button>
         </div>
 
       </div>
@@ -183,6 +188,8 @@ import { useDialog } from "primevue/usedialog";
 import { useToast } from "primevue/usetoast";
 
 import type { SlothParameterData } from '@/composables/NextGenModel';
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -198,7 +205,7 @@ import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 
 const { clearCalibratableParameters } = useTuningStore();
 
-const { selectedOutputVariable, userOutputVariableToCalibrate } = storeToRefs(useTuningStore());
+const { addToastRecord } = generalStore();
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -336,14 +343,15 @@ const checkValidCharacters = (e: KeyboardEvent) => {
 */
 const saveFormulationData = () => {
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    toast.add({ severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' });
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
     var valOK = validateModules();
     if (!valOK) {
       modulesHaveChanged.value = false;
-      selectedOutputVariable.value = "";
-      toast.add({ severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Ouptut Variable to Calculate and then Tuning Paramters on the Tuning Control tab" });
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000 };
+      toast.add(tMsg); addToastRecord(tMsg);
       clearCalibratableParameters();
     }
 
@@ -351,14 +359,25 @@ const saveFormulationData = () => {
       if (response.status === 200) {
         if (response._data.eds_errors) {
           response._data.eds_errors.forEach((err: any) => {
-            toast.add({ severity: 'warn', summary: 'External Formulation Error', detail: err.message });
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeout10000 };
+            toast.add(tMsg); addToastRecord(tMsg);
           });
         }
-        toast.add({ severity: 'info', summary: 'Formulation Tab Data Saved', detail: response?._data?.message, life: 3000 });
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
         if (response?._data?.nwm_warning === true) {
-          useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach(warning => {
-            toast.add({ severity: 'info', summary: 'Formulation Accepted with Notice', detail: warning, life: 10000 });
-          });
+          let warnings = "";
+          let l = useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).length;
+          if (l > 0) {
+            useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach((warning, index) => {
+              warnings += warning;
+              if (index !== l - 1) {
+                warnings += " ---- ";
+              }
+            });
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Accepted with Notices', detail: warnings, life: ToastTimeout.timeout10000 };
+            toast.add(tMsg); addToastRecord(tMsg);
+          }
         }
         formulationStore_data_loading.value = false;
         updateJobData();
@@ -366,7 +385,8 @@ const saveFormulationData = () => {
       } else {
         formulationStore_data_loading.value = false;
         useApiErrorResponsePreprocess(response).forEach(message => {
-          toast.add({ severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Tab Data Failed.', detail: message });
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Data Failed.', detail: message, life: ToastTimeout.timeout10000 };
+          toast.add(tMsg); addToastRecord(tMsg);
         });
       }
     });
@@ -375,7 +395,7 @@ const saveFormulationData = () => {
 
 const updateJobData = () => {
   if (userCalibrationRunData.value) {
-    userCalibrationRunData.value.formulation_name =  saveFormulationPayload.value.formulation_name ?? '';
+    userCalibrationRunData.value.formulation_name = saveFormulationPayload.value.formulation_name ?? '';
     userCalibrationRunData.value.modules = saveFormulationPayload.value.modules as string[];
     userCalibrationRunData.value.sloth_parameters = saveFormulationPayload.value.sloth_parameters as [];
     userCalibrationRunData.value.use_sloth = saveFormulationPayload.value.use_sloth as boolean;
