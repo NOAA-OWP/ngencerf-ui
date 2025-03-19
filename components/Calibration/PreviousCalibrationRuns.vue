@@ -193,7 +193,6 @@ onMounted(async () => {
     hilightTab(CalibrationTabs.tab_calibrationRuns);
 
     isLoading.value = false;
-    includeArchivedJobs.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
     hardResetTuningStore();
@@ -204,8 +203,9 @@ onMounted(async () => {
   }
 })
 
-
-
+/**
+ * Applies the job filters
+ */
 let listcals: CalibrationJobListItem[];
 const applyJobFilters = async () => {
   let newCalJobList: CalibrationJobListItem[];

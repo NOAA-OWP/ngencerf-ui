@@ -315,6 +315,7 @@ export const useUserDataStore = defineStore(
       userCalibrationJobsListData.value = [];
       userCalibrationRunData.value = undefined;
       uiGageId.value = "";
+      includeArchivedJobs.value = false;
     };
 
     /**
