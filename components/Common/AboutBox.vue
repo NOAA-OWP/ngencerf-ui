@@ -94,7 +94,7 @@ let observer: IntersectionObserver | null = null;
 const foundFields = ref<string[]>();
 
 const uniqueFields = new Set<string>();
-const uniqueHeaders = new Set<string>();
+const uniqueHeaders = new Set<string>(); //NOSONAR (Removes erronious message that this variable is not used. It is.)
 
 onMounted(async () => {
   combinedVersionInfo.value = getServerInfo();
