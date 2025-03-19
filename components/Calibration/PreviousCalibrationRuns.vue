@@ -167,8 +167,6 @@ const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
 const currentJobsList = ref<CalibrationJobListItem[]>();
 
-const archivedJobAlert = "Operation not allowed for archived jobs.<br />You must un-archive it first."
-
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
@@ -267,7 +265,7 @@ const onRowDblClick = (e: any) => {
   if (data.value.is_archived) {
     Swal.fire({
       width: 500,
-      html: archivedJobAlert,
+      html: "Operation not allowed for archived jobs.<br />You must un-archive it first.",
       title: 'Cannot open job ' + data.value.calibration_run_id,
       icon: 'info',
       confirmButtonText: 'Close'
@@ -292,7 +290,6 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   queryUserCalibrationRunData().then(queryResponse => {
     userCalibrationRunData.value = queryResponse?._data;
     loadEntireRun();
-
   });
 }
 
