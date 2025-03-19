@@ -416,7 +416,6 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
     accept: () =>{
       if (archiveRun === JobStatusAction.delete)
       { acceptDelete(selectedRunId)
-
       }
       else if (archiveRun === JobStatusAction.archive) {
         acceptArchive(selectedRunId, true)

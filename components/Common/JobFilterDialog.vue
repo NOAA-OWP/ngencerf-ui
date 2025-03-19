@@ -5,7 +5,8 @@
 
       <div class="grid grid-cols-12 gap-6 text-sx">
         <div class="col-span-2">
-          <label class="block text-left" for="HeadwaterBasinGage">Headwater Basin Gage</label>
+          <label class="block text-left" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
+            title="Headwater Basin Gage">Headwater Basin Gage</label>
           <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
             :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
             aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
@@ -13,9 +14,11 @@
         </div>
 
         <div class="col-span-2">
-          <label class="block text-left mb-1" for="StatusList">Status</label>
+          <label class="block text-left mb-1" for="StatusList" aria-label="Status Filter"
+            title="Status Filter">Status</label>
           <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-            optionValue="filterValue" :maxSelectedLabels="3" class="w-full">
+            optionValue="filterValue" :maxSelectedLabels="3" class="w-full" aria-label="Status Filter"
+            title="Status Filter">
             <template #header>
               <div class="absolute cursor-pointer top-2 left-[48px]">&nbsp; Select All Items</div>
             </template>Headw
@@ -30,9 +33,11 @@
 
         <div class="col-span-2">
           <div>
-            <label for="ModuleList" class="block text-left mb-1">Modules</label>
+            <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
+              title="Module Filter">Modules</label>
             <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
-              optionLabel="name" optionValue="name" :maxSelectedLabels="3" class="w-full" showClear>
+              optionLabel="name" optionValue="name" :maxSelectedLabels="3" class="w-full" aria-label="Module Filter"
+              title="Module Filter">
               <template #header>
                 <div class="absolute cursor-pointer top-2 left-[58px]">&nbsp; Select All Items</div>
               </template>
@@ -60,7 +65,8 @@
             aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
             @change="archivedJobsToggle()" :pt="ptCheckbox">
           </Checkbox>
-          <label class="pl-4" for="ShowArchiveToggle">Include Archived</label>
+          <label class="pl-4 cursor-pointer" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
+            title="Include Archived Jobs">Include Archived</label>
         </div>
       </div>
     </div>
@@ -212,5 +218,9 @@ const archivedTemplate = (rowData: any) => {
 
 #CleareFiltersButton:disabled {
   color: #555;
+}
+
+label {
+  cursor:default;
 }
 </style>
