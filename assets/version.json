@@ -1,14 +1,8 @@
 {
   "release_info": {
-<<<<<<< HEAD
-    "version": "1.2.0-rc5",
-    "date": "2025-03-19",
-    "commit": "37e6d6d2ec947770ac63d4f137a5a86a4e432c24",
-=======
     "version": "1.2.0",
     "date": "2025-03-19",
     "commit": "f8607a3d1a184a6b9a00f507b35d2ab801dfe976",
->>>>>>> main
     "copyright": "© 2024-2025, RTX"
   }
 }
