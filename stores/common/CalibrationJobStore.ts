@@ -75,6 +75,21 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
   }
 
   /**
+  * Archive or Un-archive a job
+  * If unarchive, set unArchive to true
+  */
+  async function archiveCalibrationRun(runId: number, unArchive:  boolean = false) {
+    return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/archive_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: runId, archive: !unArchive })
+    })
+  }
+
+  /**
  * Clone a job
  */
   async function cloneCalibrationRun(runId: number) {
@@ -95,7 +110,8 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
     runningCalibrationJobs,
     fetchNewCalibrationRunId,
     cloneCalibrationRun,
-    deleteCalibrationRun
+    deleteCalibrationRun,
+    archiveCalibrationRun
   }
 },
 {

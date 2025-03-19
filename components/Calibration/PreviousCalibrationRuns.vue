@@ -13,14 +13,12 @@
           </p>
         </div>
 
-
-
         <!-- Table -->
         <div class="">
 
           <div id="CalTable" class="w-max mx-auto">
-            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()" :calJobs="updatedUserCalibrationJobsListData"
-              ref="jobFilterDialog" />
+            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()"
+              :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
               :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
@@ -150,7 +148,7 @@ const { getMenuIndex, addToastRecord } = generalStore();
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
   statusTypeFilterList } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
-const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
+const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -168,11 +166,18 @@ const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
 const currentJobsList = ref<CalibrationJobListItem[]>();
 
+
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun) }
+  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, false) },
+  { label: 'Archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, true) }
 ]);
+
+const cmArchiveRun = ref([
+  { label: 'Un-archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, true) }
+]);
+
 const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent);
 };
@@ -363,11 +368,10 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 };
 
 const confirmDelte = useConfirm();
-const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  const confirm_delete = ref(false)
+const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: boolean) => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
-  const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '"  + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
-  let confirmMessage = "Are you sure you want to delete calibration run " + selectedRunId + selectedRunName;
+  const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '" + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
+  let confirmMessage = "Are you sure you want to " + ((archiveRun) ? "archive" : "delete") + " calibration run " + selectedRunId + selectedRunName;
   if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
 
   confirmDelte.require({
@@ -380,9 +384,9 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
       outlined: true
     },
     acceptProps: {
-      label: 'DELETE RUN',
+      label: ((archiveRun) ? "ARCHIVE" : "DELETE"),
     },
-    accept: () => acceptDelete(selectedRunId),
+    accept: () => (archiveRun) ? acceptDelete(selectedRunId) : acceptArchive(selectedRunId),
     reject: () => {
       //do nothing
     }
@@ -404,6 +408,21 @@ const acceptDelete = (selectedRunId: number) => {
   selectedCalibrationRun.value = undefined;
 }
 
+const acceptArchive = (selectedRunId: number) => {
+  archiveCalibrationRun(selectedRunId).then(async (response) => {
+    if (response.status == 200) {
+      await fetchUserCalibrationJobsListData();
+      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
+      await updateUserCalibrationJobsListData();
+    } else {
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Archive Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
+  });
+  selectedCalibrationRun.value = undefined;
+}
 /**
  * Populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
  */
@@ -550,7 +569,8 @@ small-label,
   }
 }
 
-#Datatable, #JobFilterDialog {
+#Datatable,
+#JobFilterDialog {
   width: 1225px !important;
 }
 

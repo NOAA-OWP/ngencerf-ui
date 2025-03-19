@@ -3,8 +3,8 @@
 
     <div id="FilterDialog">
 
-      <div class="grid grid-cols-12 gap-2 text-sx">
-        <div class="col-span-3">
+      <div class="grid grid-cols-12 gap-4 text-sx">
+        <div class="col-span-2">
           <label class="block text-left" for="HeadwaterBasinGage">Headwater Basin Gage</label>
           <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
             :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
@@ -12,7 +12,7 @@
           </Select>
         </div>
 
-        <div class="col-span-3">
+        <div class="col-span-2">
           <label class="block text-left mb-1" for="StatusList">Status</label>
           <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
             optionValue="filterValue" :maxSelectedLabels="3" class="w-full">
@@ -28,7 +28,7 @@
           </MultiSelect>
         </div>
 
-        <div class="col-span-3">
+        <div class="col-span-2">
           <div>
             <label for="ModuleList" class="block text-left mb-1">Modules</label>
             <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
@@ -46,15 +46,21 @@
           </div>
         </div>
 
-        <div class="col-span-3 mt-8 mr-3">
+        <div class="col-span-3 mt-8">
           <Button class="ngenButtonDiv text-xs" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
             title="Apply and close">
           </Button>
-          <Button id="CleareFiltersButton" class="ml-6 text-lg" label="Clear Filters" @click="resetFilters($event)"
+          <Button id="CleareFiltersButton" class="ml-8 text-lg" label="Clear Filters" @click="resetFilters($event)"
             aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
           </Button>
         </div>
 
+        <div class="col-span-3">
+          <Checkbox v-model="showArchivedJobsOnly" inputId="ShowArchiveToggle" class="text-xs mt-[48px]"
+            aria-label="Show Archived Only" title="Show Archived Only" binary>
+          </Checkbox>
+          <label class="pl-4" for="ShowArchiveToggle">Show Archived Only</label>
+        </div>
       </div>
     </div>
   </div>
@@ -64,6 +70,7 @@
 import Button from "primevue/button";
 import MultiSelect from 'primevue/multiselect';
 import Select from "primevue/select";
+
 
 import type { CalibrationJobListItem } from "@/composables/NextGenModel"
 import { StatusTypes } from "@/composables/NextgenEnums";
@@ -97,7 +104,7 @@ onMounted(() => {
   });
 })
 
-const filterActive = computed (() => {
+const filterActive = computed(() => {
   return (modulesFilterList.value.length === 0 && (statusTypeFilterList.value === null || statusTypeFilterList.value.length === 0) && uiGageId.value === 'All')
 });
 
@@ -171,6 +178,7 @@ const archivedTemplate = (rowData: any) => {
   background-color: white;
   padding-bottom: 5px;
 }
+
 #ModuleList,
 #StatusList {
   border: 1px solid #888888;
