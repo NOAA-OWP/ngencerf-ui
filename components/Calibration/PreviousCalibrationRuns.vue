@@ -123,7 +123,7 @@ import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout, JobStatusAction } from "@/composables/NextgenEnums";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -166,17 +166,18 @@ const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
 const currentJobsList = ref<CalibrationJobListItem[]>();
 
+const archivedJobAlert = "Operation not allowed for archived jobs. You must un-archive it first."
 
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, false) },
-  { label: 'Archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, true) }
+  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.delete) },
+  { label: 'Archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.archive) }
 ]);
 
-const cmArchiveRun = ref([
-  { label: 'Un-archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, true) }
-]);
+// const cmArchiveRun = ref([
+//   { label: 'Un-archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, true) }
+// ]);
 
 const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent);
@@ -246,12 +247,6 @@ const applyJobFilters = async () => {
 };
 
 
-// const clearCalibrationFilters = () => {
-//   if (jobFilterDialog.value) {
-//     jobFilterDialog.value.externalResetFilters();
-//   }
-// };
-
 const filtersExist = computed(() => {
   return (modulesFilterList.value.length !== 0 || statusTypeFilterList.value.length !== 0 || uiGageId.value != "All")
 });
@@ -264,8 +259,8 @@ const archivedTemplate = (rowData: any) => {
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
   data.value = e.data;
-  if( data.value.is_archived ) {
-    alert("You cannot open an archived job. You must un-archive it first.")
+  if (data.value.is_archived) {
+    alert(archivedJobAlert);
     return;
   }
   openSelectedCalibrationRun(data)
@@ -282,11 +277,16 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: ToastTimeout.timeout3000 };
     toast.add(tMsg); addToastRecord(tMsg);
   */
+  if (selectedCalibrationRun.value.is_archived) {
+    isLoading.value = false;
+    alert(archivedJobAlert)
+    return;
+  }
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
   queryUserCalibrationRunData().then(queryResponse => {
     userCalibrationRunData.value = queryResponse?._data;
     loadEntireRun();
-    isLoading.value = false;
+
   });
 }
 
@@ -357,6 +357,10 @@ const gotoHeadwaterBasinGage = () => {
  * following section require backend api before them can be implemented
  */
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
+  if (selectedCalibrationRun.value.is_archived) {
+    alert(archivedJobAlert)
+    return;
+  }
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   cloneCalibrationRun(selectedRunId).then(async (response) => {
     if (response.status == 200) {
@@ -372,14 +376,27 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   });
 };
 
-const confirmDelte = useConfirm();
-const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: boolean) => {
+const confirmDelete = useConfirm();
+const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: number) => {
+  if (selectedCalibrationRun.value.is_archived) {
+    isLoading.value = false;
+    alert(archivedJobAlert)
+    return;
+  }
+  let ty = "";
+  if (archiveRun === JobStatusAction.delete) {
+    ty = "delete"
+  } else if (archiveRun === JobStatusAction.archive) {
+    ty = "archive"
+  } else {
+    ty = "unarchive (restore)"
+  }
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '" + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
-  let confirmMessage = "Are you sure you want to " + ((archiveRun) ? "archive" : "delete") + " calibration run " + selectedRunId + selectedRunName;
+  let confirmMessage = "Are you sure you want to " + ty + " calibration run " + selectedRunId + selectedRunName;
   if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
 
-  confirmDelte.require({
+  confirmDelete.require({
     message: confirmMessage,
     header: 'Confirm Delete',
     icon: 'pi pi-exclamation-triangle',

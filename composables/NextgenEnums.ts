@@ -131,3 +131,8 @@ export const ServerCodes = [
   { "code": 511, "error": "Network Authentication Required" }
 ]
 
+export const JobStatusAction = {
+  delete: 1,
+  archive: 2,
+  unarchive: 3
+};
