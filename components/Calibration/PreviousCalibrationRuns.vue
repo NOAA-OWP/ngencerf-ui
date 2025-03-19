@@ -20,7 +20,7 @@
             <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()"
               :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
-            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[144px]" ref="crContextMenu"
               :model="whichContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
             <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id"
               :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
@@ -117,7 +117,7 @@ import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
 //const LazyJobFilterDialog = defineAsyncComponent(() => import("@/components/Common/JobFilterDialog.vue"));
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
@@ -170,14 +170,14 @@ const currentJobsList = ref<CalibrationJobListItem[]>();
 const archivedJobAlert = "Operation not allowed for archived jobs.<br />You must un-archive it first."
 
 const cmCalibrationRun = ref([
-  { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.delete) },
-  { label: 'Archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.archive) }
+  { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
+  { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
+  { label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.delete) },
+  { label: 'Archive', icon: 'pi pi-folder', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.archive) }
 ]);
 
 const cmArchiveRun = ref([
-  { label: 'Un-archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.unarchive) }
+  { label: 'Un-archive', icon: 'pi pi-unlock', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.unarchive) }
 ]);
 
 const onRowContextMenu = (event: any) => {
@@ -269,7 +269,7 @@ const onRowDblClick = (e: any) => {
       width: 500,
       html: archivedJobAlert,
       title: 'Cannot open job ' + data.value.calibration_run_id,
-      icon: 'error',
+      icon: 'info',
       confirmButtonText: 'Close'
     })
     return;
@@ -362,10 +362,6 @@ const gotoHeadwaterBasinGage = () => {
  * following section require backend api before them can be implemented
  */
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  if (selectedCalibrationRun.value.is_archived) {
-    alert(archivedJobAlert)
-    return;
-  }
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   cloneCalibrationRun(selectedRunId).then(async (response) => {
     if (response.status == 200) {

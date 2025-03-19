@@ -133,6 +133,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import ContextMenu from 'primevue/contextmenu';
+import Swal from 'sweetalert2';
 
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -314,7 +315,13 @@ useLogoutListen('logoutEvent', (evStr: string) => {
     useLogout("logoutEvent", "logout");
     navigateTo('login');
     setTimeout(() => {
-      alert(err + "Your session has expired. Please log in again.");
+      Swal.fire({
+        width: 500,
+        html: err + "Please log in again.",
+        title: 'Your session has expired.',
+        icon: 'info',
+        confirmButtonText: 'Close'
+      })
     }, 250);
   }
 })
