@@ -95,7 +95,7 @@
               <Column :pt="ptColumn" field="status" header="Status" sortable> <template #body="slotProps">
                   <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
                     :title="'Status ' + slotProps.data.status">
-                    {{ slotProps.data.status }}
+                    {{ (slotProps.data.is_archived ? "Archived/" : "") + slotProps.data.status }}
                   </span>
                 </template></Column>
             </DataTable>
@@ -146,7 +146,7 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
-  statusTypeFilterList } = storeToRefs(useUserDataStore());
+  statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun } = useCalibrationJobStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
@@ -192,6 +192,7 @@ onMounted(async () => {
     hilightTab(CalibrationTabs.tab_calibrationRuns);
 
     isLoading.value = false;
+    includeArchivedJobs.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
     hardResetTuningStore();
@@ -263,6 +264,10 @@ const archivedTemplate = (rowData: any) => {
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
   data.value = e.data;
+  if( data.value.is_archived ) {
+    alert("You cannot open an archived job. You must un-archive it first.")
+    return;
+  }
   openSelectedCalibrationRun(data)
 }
 

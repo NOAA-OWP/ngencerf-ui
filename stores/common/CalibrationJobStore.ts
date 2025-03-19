@@ -12,7 +12,7 @@ import type { CalibrationJobListItem } from "@/composables/NextGenModel";
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore()
-  const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
+  const { userCalibrationJobsListData, includeArchivedJobs } = storeToRefs( useUserDataStore() )
   const { calibrationJobId } = storeToRefs( generalStore() )
 
   /**

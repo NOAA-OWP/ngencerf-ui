@@ -3,7 +3,7 @@
 
     <div id="FilterDialog">
 
-      <div class="grid grid-cols-12 gap-4 text-sx">
+      <div class="grid grid-cols-12 gap-2 text-sx">
         <div class="col-span-2">
           <label class="block text-left" for="HeadwaterBasinGage">Headwater Basin Gage</label>
           <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
@@ -46,20 +46,21 @@
           </div>
         </div>
 
-        <div class="col-span-3 mt-8">
-          <Button class="ngenButtonDiv text-xs" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
-            title="Apply and close">
+        <div class="col-span-4 mt-8">
+          <Button class="ngenButtonDiv text-xs ml-[2.5rem] " label="Apply" @click="sendApply($event)"
+            aria-label="Apply and close" title="Apply and close">
           </Button>
-          <Button id="CleareFiltersButton" class="ml-8 text-lg" label="Clear Filters" @click="resetFilters($event)"
-            aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
+          <Button id="CleareFiltersButton" class="ml-[3.5rem] text-lg" label="Clear Filters"
+            @click="resetFilters($event)" aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
           </Button>
         </div>
 
-        <div class="col-span-3">
-          <Checkbox v-model="showArchivedJobsOnly" inputId="ShowArchiveToggle" class="text-xs mt-[48px]"
-            aria-label="Show Archived Only" title="Show Archived Only" binary>
+        <div class="col-span-2">
+          <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[48px]"
+            aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
+            @change="archivedJobsToggle()">
           </Checkbox>
-          <label class="pl-4" for="ShowArchiveToggle">Show Archived Only</label>
+          <label class="pl-4" for="ShowArchiveToggle">Include Archived</label>
         </div>
       </div>
     </div>
@@ -75,17 +76,17 @@ import Select from "primevue/select";
 import type { CalibrationJobListItem } from "@/composables/NextGenModel"
 import { StatusTypes } from "@/composables/NextgenEnums";
 
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+
+const {fetchUserCalibrationJobsListData} = useUserDataStore()
 
 const { fetchFormulationModuleOptions } = useFormulationStore();
 
 const userStore = useUserDataStore();
-const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList } = storeToRefs(userStore);
+const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList, includeArchivedJobs } = storeToRefs(userStore);
 
 const emit = defineEmits(["ModulesFilterDialogClosing", "ApplyJobFilters"]);
-
-const showArchivedJobsOnly = ref<boolean>(false);
 
 const draggableDiv = ref<HTMLDivElement | null>(null);
 const isDragging = ref<boolean>(false);
@@ -145,6 +146,14 @@ const externalResetFilters = () => {
 defineExpose({
   externalResetFilters
 });
+
+/**
+ * Update the job list when applyJobFilters changes
+ */;
+const archivedJobsToggle = async () => {
+  await fetchUserCalibrationJobsListData()
+  emit("ApplyJobFilters");
+}
 
 /**
  * Reset filters

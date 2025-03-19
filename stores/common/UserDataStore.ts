@@ -38,7 +38,7 @@ export const useUserDataStore = defineStore(
     // Used for Calibration Job Filter
     const modulesFilterList = ref<string[]>([]);
     const statusTypeFilterList = ref<string[]>([]);
-    const showArchivedJobsOnly = ref<boolean>(false);
+    const includeArchivedJobs = ref<boolean>(false);
 
     const lastServerError = ref<ServerStatus>();
 
@@ -225,6 +225,7 @@ export const useUserDataStore = defineStore(
               Authorization: `Bearer ${getAccessToken()}`,
               "Content-Type": "application/json",
             },
+            body: JSON.stringify({ include_archived: includeArchivedJobs.value }),
           }
         );
 
@@ -360,7 +361,7 @@ export const useUserDataStore = defineStore(
       refreshToken,
       modulesFilterList,
       statusTypeFilterList,
-      showArchivedJobsOnly,
+      includeArchivedJobs,
       lastServerError
     };
   },
