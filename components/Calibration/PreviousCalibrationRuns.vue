@@ -21,7 +21,7 @@
               :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+              :model="whichContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
             <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id"
               :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
@@ -175,13 +175,21 @@ const cmCalibrationRun = ref([
   { label: 'Archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.archive) }
 ]);
 
-// const cmArchiveRun = ref([
-//   { label: 'Un-archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, true) }
-// ]);
+const cmArchiveRun = ref([
+  { label: 'Un-archive', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.unarchive) }
+]);
 
 const onRowContextMenu = (event: any) => {
+ // const jobNumber = event.originalEvent.srcElement.closest('tr').children[0].children[0].innerHTML;
   crContextMenu.value.show(event.originalEvent);
 };
+
+const whichContextMenu = computed(() => {
+  if(selectedCalibrationRun?.value?.is_archived) {
+    return cmArchiveRun.value;
+  }
+  return cmCalibrationRun.value;
+});
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
@@ -194,10 +202,7 @@ onMounted(async () => {
 
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-    if (ele) { ele.scrollTo(0, 0); }
-    hardResetTuningStore();
-    hardResetRunStatusStore();
-    await fetchUserCalibrationJobsListData();
+    if (ele) { ele.scrollTo(0, 0); } includeArchivedJobs.value = false;;
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     await updateUserCalibrationJobsListData();
   }
@@ -378,19 +383,19 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 
 const confirmDelete = useConfirm();
 const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: number) => {
-  if (selectedCalibrationRun.value.is_archived) {
-    isLoading.value = false;
-    alert(archivedJobAlert)
-    return;
-  }
   let ty = "";
+  let label = "";
   if (archiveRun === JobStatusAction.delete) {
     ty = "delete"
+    label="DELETE"
   } else if (archiveRun === JobStatusAction.archive) {
     ty = "archive"
+    label="ARCHIVE"
   } else {
     ty = "unarchive (restore)"
+    label="Unarchive (restore)"
   }
+
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '" + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
   let confirmMessage = "Are you sure you want to " + ty + " calibration run " + selectedRunId + selectedRunName;
@@ -406,9 +411,18 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
       outlined: true
     },
     acceptProps: {
-      label: ((archiveRun) ? "ARCHIVE" : "DELETE"),
+      label: label
     },
-    accept: () => (archiveRun) ? acceptDelete(selectedRunId) : acceptArchive(selectedRunId),
+    accept: () =>{
+      if (archiveRun === JobStatusAction.delete)
+      { acceptDelete(selectedRunId)
+
+      }
+      else if (archiveRun === JobStatusAction.archive) {
+        acceptArchive(selectedRunId, true)
+      }
+      else acceptArchive(selectedRunId, false);
+    },
     reject: () => {
       //do nothing
     }
@@ -430,8 +444,8 @@ const acceptDelete = (selectedRunId: number) => {
   selectedCalibrationRun.value = undefined;
 }
 
-const acceptArchive = (selectedRunId: number) => {
-  archiveCalibrationRun(selectedRunId).then(async (response) => {
+const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
+  archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
     if (response.status == 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status

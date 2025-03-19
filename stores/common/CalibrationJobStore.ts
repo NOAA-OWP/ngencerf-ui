@@ -78,14 +78,14 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
   * Archive or Un-archive a job
   * If unarchive, set unArchive to true
   */
-  async function archiveCalibrationRun(runId: number, unArchive:  boolean = false) {
+  async function archiveCalibrationRun(runId: number, unArchive:  boolean) {
     return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/archive_job/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: runId, archive: !unArchive })
+      body: JSON.stringify({ calibration_run_id: runId, archive: unArchive })
     })
   }
 
