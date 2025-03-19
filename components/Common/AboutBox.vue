@@ -223,7 +223,7 @@ const formatTableOutput = (field: Record<string, string>, item: string) => {
 const gitInfoArray = computed(() => {
   let infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
   // Append additional git info if it was loaded
-  if (infoArray.length && Object.keys(addedGitInfo.value).length > 0) {
+  if (infoArray.length && addedGitInfo.value && Object.keys(addedGitInfo.value).length > 0) {
     addedGitInfo.value.repository = 'ngencerf_ui';
     infoArray.push(addedGitInfo.value);
   }

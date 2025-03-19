@@ -3,7 +3,7 @@
 
     <div id="FilterDialog">
 
-      <div class="grid grid-cols-12 gap-2 text-sx">
+      <div class="grid grid-cols-12 gap-6 text-sx">
         <div class="col-span-2">
           <label class="block text-left" for="HeadwaterBasinGage">Headwater Basin Gage</label>
           <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
@@ -47,7 +47,7 @@
         </div>
 
         <div class="col-span-4 mt-8">
-          <Button class="ngenButtonDiv text-xs ml-[2.5rem] " label="Apply" @click="sendApply($event)"
+          <Button class="ngenButtonDiv text-xs ml-[0.5rem] " label="Apply" @click="sendApply($event)"
             aria-label="Apply and close" title="Apply and close">
           </Button>
           <Button id="CleareFiltersButton" class="ml-[3.5rem] text-lg" label="Clear Filters"
@@ -58,7 +58,7 @@
         <div class="col-span-2">
           <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[48px]"
             aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
-            @change="archivedJobsToggle()">
+            @change="archivedJobsToggle()" :pt="ptCheckbox">
           </Checkbox>
           <label class="pl-4" for="ShowArchiveToggle">Include Archived</label>
         </div>
@@ -92,6 +92,11 @@ const draggableDiv = ref<HTMLDivElement | null>(null);
 const isDragging = ref<boolean>(false);
 let offsetX = 0;
 let offsetY = 0;
+
+
+const ptCheckbox = ref({
+  box: { style: { "border": "2px solid #0c5274" } },
+});
 
 const props = defineProps<{
   calJobs: CalibrationJobListItem[];

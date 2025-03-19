@@ -95,7 +95,7 @@
               <Column :pt="ptColumn" field="status" header="Status" sortable> <template #body="slotProps">
                   <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
                     :title="'Status ' + slotProps.data.status">
-                    {{ (slotProps.data.is_archived ? "Archived/" : "") + slotProps.data.status }}
+                    {{ slotProps.data.status + (slotProps.data.is_archived ? "/Archived" : "") }}
                   </span>
                 </template></Column>
             </DataTable>
@@ -600,5 +600,9 @@ small-label,
 
 .grayedout {
   color: #555 !important;
+}
+
+.p-checkbox-box {
+  border: 2px;
 }
 </style>
