@@ -117,6 +117,7 @@ import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
+import Swal from 'sweetalert2'
 
 //const LazyJobFilterDialog = defineAsyncComponent(() => import("@/components/Common/JobFilterDialog.vue"));
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
@@ -166,7 +167,7 @@ const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
 const currentJobsList = ref<CalibrationJobListItem[]>();
 
-const archivedJobAlert = "Operation not allowed for archived jobs. You must un-archive it first."
+const archivedJobAlert = "Operation not allowed for archived jobs.<br />You must un-archive it first."
 
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
@@ -180,12 +181,11 @@ const cmArchiveRun = ref([
 ]);
 
 const onRowContextMenu = (event: any) => {
- // const jobNumber = event.originalEvent.srcElement.closest('tr').children[0].children[0].innerHTML;
   crContextMenu.value.show(event.originalEvent);
 };
 
 const whichContextMenu = computed(() => {
-  if(selectedCalibrationRun?.value?.is_archived) {
+  if (selectedCalibrationRun?.value?.is_archived) {
     return cmArchiveRun.value;
   }
   return cmCalibrationRun.value;
@@ -265,7 +265,13 @@ const onRowDblClick = (e: any) => {
   const data = ref<any>();
   data.value = e.data;
   if (data.value.is_archived) {
-    alert(archivedJobAlert);
+    Swal.fire({
+      width: 500,
+      html: archivedJobAlert,
+      title: 'Cannot open job ' + data.value.calibration_run_id,
+      icon: 'error',
+      confirmButtonText: 'Close'
+    })
     return;
   }
   openSelectedCalibrationRun(data)
@@ -282,11 +288,6 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   if( ['Running'].includes( selectedCalibrationRun.value.status ) ) const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Run ID ' + selectedCalibrationRun.value.calibration_run_id + ' will open Run/Status tab', life: ToastTimeout.timeout3000 };
     toast.add(tMsg); addToastRecord(tMsg);
   */
-  if (selectedCalibrationRun.value.is_archived) {
-    isLoading.value = false;
-    alert(archivedJobAlert)
-    return;
-  }
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
   queryUserCalibrationRunData().then(queryResponse => {
     userCalibrationRunData.value = queryResponse?._data;
@@ -315,7 +316,6 @@ const gotoRunStatusTab = () => {
 
 const rowStyle = (data: any) => {
   if (!['Saved', 'Ready'].includes(data.status)) {
-    //return { backgroundColor: 'gainsboro' };
     return { backgroundColor: 'white' };
   }
 }
@@ -387,13 +387,13 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
   let label = "";
   if (archiveRun === JobStatusAction.delete) {
     ty = "delete"
-    label="DELETE"
+    label = "DELETE"
   } else if (archiveRun === JobStatusAction.archive) {
     ty = "archive"
-    label="ARCHIVE"
+    label = "ARCHIVE"
   } else {
     ty = "unarchive (restore)"
-    label="Unarchive (restore)"
+    label = "Unarchive (restore)"
   }
 
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
@@ -413,9 +413,9 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
     acceptProps: {
       label: label
     },
-    accept: () =>{
-      if (archiveRun === JobStatusAction.delete)
-      { acceptDelete(selectedRunId)
+    accept: () => {
+      if (archiveRun === JobStatusAction.delete) {
+        acceptDelete(selectedRunId)
       }
       else if (archiveRun === JobStatusAction.archive) {
         acceptArchive(selectedRunId, true)
