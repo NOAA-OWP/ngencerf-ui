@@ -5,7 +5,7 @@
 
       <div class="grid grid-cols-12 gap-2 text-sx">
         <div class="col-span-2">
-          <label class="block text-left" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
+          <label class="block text-left ml-[20px] w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
           <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
             :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
@@ -50,26 +50,25 @@
             </MultiSelect>
           </div>
         </div>
-
-        <div class="col-span-2 pl-3">
-          <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[45px]"
-            aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
-            :pt="ptCheckbox">
-          </Checkbox>
-          <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
-            title="Include Archived Jobs">Include Archived</label>
-        </div>
-
-        <div class="col-span-4 mt-[18px]">
-          <div class="grid grid-cols-2">
-            <div class="col-span-1">
-              <Button class="ngenButtonDiv mt-[21px] ml-2" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
-                title="Apply and close">
-              </Button>
+        <div class="col-span-6">
+          <div class="grid grid-cols-12">
+            <div class="col-span-5 align-center">
+              <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[45px]"
+                aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
+                :pt="ptCheckbox">
+              </Checkbox>
+              <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
+                title="Include Archived Jobs">Include Archived</label>
             </div>
-
-            <div class="col-span-1">
-              <Button id="CleareFiltersButton" class="pt-[4px]" label="Clear Filters" @click="resetFilters($event)"
+            <div class="col-span-3">
+              <div class="col-span-1">
+                <Button class="ngenButtonDiv mt-[41px] ml-[7px] align-center" label="Apply" @click="sendApply($event)"
+                  aria-label="Apply and close" title="Apply and close">
+                </Button>
+              </div>
+            </div>
+            <div class="col-span-4 align-center">
+              <Button id="CleareFiltersButton" class="mt-[22px]" label="Clear Filters" @click="resetFilters($event)"
                 aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
               </Button><br />
               <Button id="RefreshJobList" class="mt-[5px]" label="Refresh List" @click="refreshJobList()"
@@ -77,7 +76,6 @@
               </Button>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -133,7 +131,6 @@ const filterActive = computed(() => {
     && uiGageId.value === 'All'
     && includeArchivedJobs.value === false);
 });
-
 
 const refreshJobList = () => {
   emit("RefreshJobList");
@@ -201,8 +198,6 @@ const resetFilters = (e: MouseEvent) => {
 const archivedTemplate = (rowData: any) => {
   return rowData.archived ? 'Yes' : 'No';
 };
-
-
 </script>
 
 <style lang="scss" scoped>

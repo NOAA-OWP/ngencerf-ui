@@ -370,7 +370,7 @@ const gotoRunStatusTab = () => {
 
 const rowStyle = (data: any) => {
   if (data.is_archived === true) {
-    return { backgroundColor: '#ddd' };
+    return { backgroundColor: '#ebebeb' };
   }
   if (!['Saved', 'Ready'].includes(data.status)) {
     return { backgroundColor: 'white' };
