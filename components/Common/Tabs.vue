@@ -50,7 +50,8 @@
           </span>
           <span v-show="calibrationJobId > 0">
             <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Evaluate Tab"
-              v-show="evaluateValidationRunId > 0 && ( evaluateValidationRunStatus && evaluateValidationRunStatus !== 'Running' )" title=" Evaluate tab">
+              v-show="evaluateValidationRunId > 0 && (evaluateValidationRunStatus && evaluateValidationRunStatus !== 'Running')"
+              title=" Evaluate tab">
               Evaluate
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
@@ -59,7 +60,8 @@
               Select Alternate Iteration
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
-            <span v-show="( evaluateIterationRunId && evaluateIterationRunId > 0 ) || ( evaluateValidationRunId && evaluateValidationRunId > 0 )">
+            <span
+              v-show="(evaluateIterationRunId && evaluateIterationRunId > 0) || (evaluateValidationRunId && evaluateValidationRunId > 0)">
               <div data-tab="4" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
                 aria-label="Run Validation tab" title="Run Validation tab">
                 Run / Status
@@ -82,18 +84,18 @@
             Forecast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-if="calibrationJobId" data-tab="3" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast Tab"
-            title="Setup Forecast tab">
+          <div v-if="calibrationJobId" data-tab="3" class="tabs prevent-select" v-on:click="tabClicked"
+            aria-label="Setup Forecast Tab" title="Setup Forecast tab">
             Setup Forecast
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-if="calibrationJobId && (forecastCycle || selectedForecastJob?.cycle)" data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status/Run tab"
-            title="Status/Run Tab">
+          <div v-if="calibrationJobId && (forecastCycle || selectedForecastJob?.cycle)" data-tab="4"
+            class="tabs prevent-select" v-on:click="tabClicked" aria-label="Status/Run tab" title="Status/Run Tab">
             Status/Run
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-if="forecastJobId" data-tab="5" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
-            title="Results tab">
+          <div v-if="forecastJobId" data-tab="5" class="tabs prevent-select" v-on:click="tabClicked"
+            aria-label="Results tab" title="Results tab">
             Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
@@ -116,8 +118,8 @@
             Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div id="results-tab" data-tab="4" class="tabs prevent-select" v-on:click="tabClicked" aria-label="Results tab"
-            title="Results tab">
+          <div id="results-tab" data-tab="4" class="tabs prevent-select" v-on:click="tabClicked"
+            aria-label="Results tab" title="Results tab">
             Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
@@ -129,20 +131,33 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import { useToast } from "primevue/usetoast";
+import type { ToastMessageOptions } from "primevue/toast";
+
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
-//import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore"
+import { ToastTimeout } from "@/composables/NextgenEnums";
 
 const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
 const { forecastJobId, forecastCycle, selectedForecastJob } = storeToRefs(useForecastStore());
-const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex } = generalStore();
+const { getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex, getMenuIndex, addToastRecord } = generalStore();
+const {
+  calibrationRunsForForecast,
+  calibrationRunForForecast,
+} = storeToRefs(useForecastStore());
+const {
+  resetUserSelectedForecastCalibrationRun,
+  loadSelectedCalibrationRun,
+} = useForecastStore();
+
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 const currentEvaluationTab = ref(getEvaluationTabIndex());
 const currentForecastTab = ref(getForecastTabIndex());
 const currentVerificationTab = ref(getVerificationTabIndex());
 const currentMenu = ref(getMenuIndex());
+const toast = useToast();
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
@@ -150,23 +165,57 @@ const tabNotCompleted = ref(false);
 const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele = event.currentTarget as HTMLElement;
-  nextTick(() => {
-    // Send the selected tab info to the active tab set with emit
-    if (currentMenu.value === 1) {
-      currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
-      emit("tabNumber", currentCalibrationTab.value);
-    } else if (currentMenu.value === 2) {
-      currentEvaluationTab.value = Number(ele.getAttribute("data-tab"));
-      emit("tabNumber", currentEvaluationTab.value);
-    } else if (currentMenu.value === 3) {
-      currentForecastTab.value = Number(ele.getAttribute("data-tab"));
-      emit("tabNumber", currentForecastTab.value);
-    } else if (currentMenu.value === 4) {
-      currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
-      emit("tabNumber", currentVerificationTab.value);
+  const tabTitle = ele.getAttribute("title");
+
+  // this is to check if a user has selected a Forecast row from the Forecast Runs tab and clicks on the Setup Forecast tab
+  // this will check if the user has selected a Forecast row. if not, it will show a warning message and prevent the user from navigating to the Setup Forecast tab
+  // if the user has selected a Forecast row, it will clear previous Forecast data to start a setting up a new Forecast
+  if (currentMenu.value === 3 && tabTitle === "Setup Forecast tab") {
+    console.log('in tabClicked and clicked on Setup Forecast tab');
+    if (!selectedForecastJob.value) {
+      event.preventDefault();
+
+      const tMsg: ToastMessageOptions = {
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please select a Forecast Run first',
+        life: ToastTimeout.timeout10000,
+      };
+      toast.add(tMsg); addToastRecord(tMsg);
+      return; // don't proceed to navigate to the tab
+    } else {
+      nextTick(async () => {
+        // clear all user-selected forecast data
+        resetUserSelectedForecastCalibrationRun();
+
+        // set calibrationRunForForecast based on selectedForecastJob
+        calibrationRunForForecast.value = calibrationRunsForForecast.value.find((calibrationRun: CalibrationRunForForecast) => {
+          return calibrationRun.calibration_run_id === selectedForecastJob.value?.calibration_run_id;
+        }) as CalibrationRunForForecast;
+
+        // set userCalibrationRunData
+        await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+      });
     }
-  })
-}
+  }
+
+  nextTick(() => {
+        // Send the selected tab info to the active tab set with emit
+        if (currentMenu.value === 1) {
+          currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
+          emit("tabNumber", currentCalibrationTab.value);
+        } else if (currentMenu.value === 2) {
+          currentEvaluationTab.value = Number(ele.getAttribute("data-tab"));
+          emit("tabNumber", currentEvaluationTab.value);
+        } else if (currentMenu.value === 3) {
+          currentForecastTab.value = Number(ele.getAttribute("data-tab"));
+          emit("tabNumber", currentForecastTab.value);
+        } else if (currentMenu.value === 4) {
+          currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
+          emit("tabNumber", currentVerificationTab.value);
+        }
+      })
+    }
 </script>
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
