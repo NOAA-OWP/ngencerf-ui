@@ -382,17 +382,18 @@ const colStyle = (data: any) => {
     return { backgroundColor: 'red' };
   }
   else if (data.status.indexOf('Done') !== -1) {
-    return { backgroundColor: 'green' };
+    return { backgroundColor: 'blue' };
   }
    else if (data.status.indexOf('Saved') !== -1) {
     return { backgroundColor: 'yellow' };
   } 
   else if (data.status.indexOf('Ready') !== -1) {
-    return { backgroundColor: 'blue' };
+    return { backgroundColor: 'green' };
+  }
+   else if (data.status.indexOf('Cancelled') !== -1) {
+    return { backgroundColor: 'orange' };
   }
 }
-
-
 
 const createNewCalibration = async () => {
   // Clear out old data
