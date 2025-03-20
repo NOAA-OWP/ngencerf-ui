@@ -57,7 +57,7 @@
                   <span v-if="slotProps.data.calibration_run_id"
                     :aria-label="slotProps.data.is_archived ? 'Archived' : ''"
                     :title="slotProps.data.is_archived ? 'Archived' : ''">
-                    {{ slotProps.data.is_archived ? 'Yes' : '' }}
+                    {{ slotProps.data.is_archived ? 'Yes' : 'No' }}
                   </span>
                 </template>
               </Column>

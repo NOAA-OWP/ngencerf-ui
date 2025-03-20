@@ -58,25 +58,26 @@
           </Checkbox>
           <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
             title="Include Archived Jobs">Include Archived</label>
-
         </div>
+
         <div class="col-span-4 mt-[18px]">
           <div class="grid grid-cols-2">
             <div class="col-span-1">
-              <Button class="ngenButtonDiv" label="Apply" @click="sendApply($event)"
-                aria-label="Apply and close" title="Apply and close">
-              </Button><br />
-              <Button id="CleareFiltersButton" class="mt-2" label="Clear Filters" @click="resetFilters($event)"
-                aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
+              <Button class="ngenButtonDiv mt-[21px] ml-2" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
+                title="Apply and close">
               </Button>
             </div>
 
-            <div class="col-span-1 bed">
-              <Button id="RefreshJobList" class="mt-[50px]" label="Refresh List" @click="refreshJobList()"
+            <div class="col-span-1">
+              <Button id="CleareFiltersButton" class="pt-[4px]" label="Clear Filters" @click="resetFilters($event)"
+                aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
+              </Button><br />
+              <Button id="RefreshJobList" class="mt-[5px]" label="Refresh List" @click="refreshJobList()"
                 aria-label="Refresh Job List" title="Refresh Job List">
-              </Button> 
+              </Button>
             </div>
           </div>
+
         </div>
       </div>
     </div>
