@@ -3,7 +3,7 @@
 
     <div id="FilterDialog">
 
-      <div class="grid grid-cols-12 gap-6 text-sx">
+      <div class="grid grid-cols-12 gap-2 text-sx">
         <div class="col-span-2">
           <label class="block text-left" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
@@ -51,25 +51,33 @@
           </div>
         </div>
 
-        <div class="col-span-4 mt-8">
-          <Button class="ngenButtonDiv text-xs ml-[0.5rem] " label="Apply" @click="sendApply($event)"
-            aria-label="Apply and close" title="Apply and close">
-          </Button>
-          <Button id="CleareFiltersButton" class="ml-[3.5rem] text-lg" label="Clear Filters"
-            @click="resetFilters($event)" aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
-          </Button>
-        </div>
-
-        <div class="col-span-2">
-          <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[14px]"
+        <div class="col-span-1">
+          <label class="cursor-pointer align-center p-0 m-0" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
+            title="Include Archived Jobs">Include<br />Archived</label><br />
+          <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs p-0 m-0"
             aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
             :pt="ptCheckbox">
           </Checkbox>
-          <label class="pl-4 cursor-pointer" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
-            title="Include Archived Jobs">Include Archived</label><br />
-          <Button id="RefreshJobList" class="ml-[0.5rem] mt-2" label="Refresh Job List" @click="refreshJobList()"
-            aria-label="Refresh" title="Refresh">
-          </Button>
+
+        </div>
+        <div class="col-span-5 mt-8">
+          <div class="grid grid-cols-3">
+            <div class="col-span-1">
+              <Button class="ngenButtonDiv text-xs align-left" label="Apply" @click="sendApply($event)"
+                aria-label="Apply and close" title="Apply and close">
+              </Button>
+            </div>
+            <div class="col-span-1">
+              <Button id="CleareFiltersButton" class="text-lg" label="Clear Filters" @click="resetFilters($event)"
+                aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
+              </Button>
+            </div>
+            <div id="RefreshListButton" class="col-span-1"> 
+              <Button id="RefreshJobList" class="text-lg" label="Refresh List" @click="refreshJobList()" 
+              aria-label="Refresh Job List" title="Refresh Job List">
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -88,7 +96,7 @@ import { StatusTypes } from "@/composables/NextgenEnums";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
-const {fetchUserCalibrationJobsListData} = useUserDataStore()
+const { fetchUserCalibrationJobsListData } = useUserDataStore()
 
 const { fetchFormulationModuleOptions } = useFormulationStore();
 
@@ -120,8 +128,8 @@ onMounted(() => {
 })
 
 const filterActive = computed(() => {
-  return (modulesFilterList.value.length === 0 && (statusTypeFilterList.value === null 
-    || statusTypeFilterList.value.length === 0) 
+  return (modulesFilterList.value.length === 0 && (statusTypeFilterList.value === null
+    || statusTypeFilterList.value.length === 0)
     && uiGageId.value === 'All'
     && includeArchivedJobs.value === false);
 });
@@ -216,12 +224,14 @@ const archivedTemplate = (rowData: any) => {
 }
 
 #RefreshJobList,
+#RefreshListButton,
 #CleareFiltersButton {
   color: blue;
   text-decoration: underline;
   font-weight: normal;
 }
 
+#RefreshListButton,
 #RefreshJobList,
 #CleareFiltersButton:hover {
   background-color: transparent;
@@ -229,11 +239,12 @@ const archivedTemplate = (rowData: any) => {
   font-weight: bold;
 }
 
+#RefreshListButton,
 #CleareFiltersButton:disabled {
   color: #555;
 }
 
 label {
-  cursor:default;
+  cursor: default;
 }
 </style>

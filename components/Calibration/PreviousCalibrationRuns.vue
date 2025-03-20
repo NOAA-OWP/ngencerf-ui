@@ -28,8 +28,8 @@
               :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
-              :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
-              calibration_run_id
+              :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)" reorderableColumns>
+
               <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top;">
                 <template #body="slotProps">
                   <div v-if="slotProps.data.status.indexOf('Running') === -1" :style="colStyle(slotProps.data)">
@@ -52,7 +52,7 @@
               </Column>
 
               <Column v-if="checkArchived" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
-                 header="Archived" :sortable="true">
+                header="Archived" :sortable="true">
                 <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_run_id"
                     :aria-label="slotProps.data.is_archived ? 'Archived' : ''"
@@ -369,9 +369,9 @@ const gotoRunStatusTab = () => {
 }
 
 const rowStyle = (data: any) => {
-  // if (data.is_archived === true) {
-  //   return { backgroundColor: '#ccc' };
-  // }
+  if (data.is_archived === true) {
+    return { backgroundColor: '#ddd' };
+  }
   if (!['Saved', 'Ready'].includes(data.status)) {
     return { backgroundColor: 'white' };
   }
