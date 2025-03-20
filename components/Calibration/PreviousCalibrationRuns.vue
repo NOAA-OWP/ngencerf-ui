@@ -676,7 +676,7 @@ small-label,
 
 #Datatable,
 #JobFilterDialog {
-  width: 1225px !important;
+  width: 1240px !important;
 }
 
 .toggle-switch {
