@@ -4,18 +4,21 @@
     <div id="FilterDialog">
 
       <div class="grid grid-cols-12 gap-2 text-sx">
-        <div class="col-span-3">
-          <label class="block text-left" for="HeadwaterBasinGage">Headwater Basin Gage</label>
+        <div class="col-span-2">
+          <label class="block text-left ml-[20px] w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
+            title="Headwater Basin Gage">Headwater Basin Gage</label>
           <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
             :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
             aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select">
           </Select>
         </div>
 
-        <div class="col-span-3">
-          <label class="block text-left mb-1" for="StatusList">Status</label>
+        <div class="col-span-2">
+          <label class="block text-left mb-1" for="StatusList" aria-label="Status Filter"
+            title="Status Filter">Status</label>
           <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-            optionValue="filterValue" :maxSelectedLabels="3" class="w-full">
+            optionValue="filterValue" :maxSelectedLabels="3" class="w-full" aria-label="Status Filter"
+            title="Status Filter">
             <template #header>
               <div class="absolute cursor-pointer top-2 left-[48px]">&nbsp; Select All Items</div>
             </template>Headw
@@ -28,11 +31,13 @@
           </MultiSelect>
         </div>
 
-        <div class="col-span-3">
+        <div class="col-span-2">
           <div>
-            <label for="ModuleList" class="block text-left mb-1">Modules</label>
+            <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
+              title="Module Filter">Modules</label>
             <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
-              optionLabel="name" optionValue="name" :maxSelectedLabels="3" class="w-full" showClear>
+              optionLabel="name" optionValue="name" :maxSelectedLabels="3" class="w-full" aria-label="Module Filter"
+              title="Module Filter">
               <template #header>
                 <div class="absolute cursor-pointer top-2 left-[58px]">&nbsp; Select All Items</div>
               </template>
@@ -45,16 +50,33 @@
             </MultiSelect>
           </div>
         </div>
-
-        <div class="col-span-3 mt-8 mr-3">
-          <Button class="ngenButtonDiv text-xs" label="Apply" @click="sendApply($event)" aria-label="Apply and close"
-            title="Apply and close">
-          </Button>
-          <Button id="CleareFiltersButton" class="ml-6 text-lg" label="Clear Filters" @click="resetFilters($event)"
-            aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
-          </Button>
+        <div class="col-span-6">
+          <div class="grid grid-cols-12">
+            <div class="col-span-4">
+              <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[45px] ml-[28px]"
+                aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
+                :pt="ptCheckbox">
+              </Checkbox>
+              <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
+                title="Include Archived Jobs">Include Archived</label>
+            </div>
+            <div class="col-span-4">
+              <div class="col-span-1">
+                <Button class="ngenButtonDiv mt-[41px] ml-[9px] align-center" label="Apply Filters" @click="sendApply($event)"
+                  aria-label="Apply and close" title="Apply and close">
+                </Button>
+              </div>
+            </div>
+            <div class="col-span-4 align-center">
+              <Button id="CleareFiltersButton" class="mt-[22px]" label="Clear Filters" @click="resetFilters($event)"
+                aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
+              </Button><br />
+              <Button id="RefreshJobList" class="mt-[5px]" label="Refresh List" @click="refreshJobList()"
+                aria-label="Refresh Job List" title="Refresh Job List">
+              </Button>
+            </div>
+          </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -65,25 +87,31 @@ import Button from "primevue/button";
 import MultiSelect from 'primevue/multiselect';
 import Select from "primevue/select";
 
+
 import type { CalibrationJobListItem } from "@/composables/NextGenModel"
 import { StatusTypes } from "@/composables/NextgenEnums";
 
-import { useFormulationStore } from "~/stores/calibration/FormulationStore";
-import { useUserDataStore } from "~/stores/common/UserDataStore";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
+
+const { fetchUserCalibrationJobsListData } = useUserDataStore()
 
 const { fetchFormulationModuleOptions } = useFormulationStore();
 
 const userStore = useUserDataStore();
-const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList } = storeToRefs(userStore);
+const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList, includeArchivedJobs } = storeToRefs(userStore);
 
-const emit = defineEmits(["ModulesFilterDialogClosing", "ApplyJobFilters"]);
-
-const showArchivedJobsOnly = ref<boolean>(false);
+const emit = defineEmits(["ModulesFilterDialogClosing", "ApplyJobFilters", "RefreshJobList"]);
 
 const draggableDiv = ref<HTMLDivElement | null>(null);
 const isDragging = ref<boolean>(false);
 let offsetX = 0;
 let offsetY = 0;
+
+
+const ptCheckbox = ref({
+  box: { style: { "border": "2px solid #0c5274" } },
+});
 
 const props = defineProps<{
   calJobs: CalibrationJobListItem[];
@@ -97,10 +125,16 @@ onMounted(() => {
   });
 })
 
-const filterActive = computed (() => {
-  return (modulesFilterList.value.length === 0 && (statusTypeFilterList.value === null || statusTypeFilterList.value.length === 0) && uiGageId.value === 'All')
+const filterActive = computed(() => {
+  return (modulesFilterList.value.length === 0 && (statusTypeFilterList.value === null
+    || statusTypeFilterList.value.length === 0)
+    && uiGageId.value === 'All'
+    && includeArchivedJobs.value === false);
 });
 
+const refreshJobList = () => {
+  emit("RefreshJobList");
+}
 
 /** Let the caller close the dialog
  * @param: MouseEvent
@@ -140,6 +174,14 @@ defineExpose({
 });
 
 /**
+ * Update the job list when applyJobFilters changes
+ */;
+// const archivedJobsToggle = async () => {
+//   await fetchUserCalibrationJobsListData()
+//   emit("ApplyJobFilters");
+// }
+
+/**
  * Reset filters
  */
 const resetFilters = (e: MouseEvent) => {
@@ -148,6 +190,7 @@ const resetFilters = (e: MouseEvent) => {
   uiGageId.value = 'All';
   modulesFilterList.value = [];
   statusTypeFilterList.value = [];
+  includeArchivedJobs.value = false;
   emit("ApplyJobFilters");
 }
 
@@ -155,8 +198,6 @@ const resetFilters = (e: MouseEvent) => {
 const archivedTemplate = (rowData: any) => {
   return rowData.archived ? 'Yes' : 'No';
 };
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -171,24 +212,32 @@ const archivedTemplate = (rowData: any) => {
   background-color: white;
   padding-bottom: 5px;
 }
+
 #ModuleList,
 #StatusList {
   border: 1px solid #888888;
 }
 
+#RefreshJobList,
 #CleareFiltersButton {
   color: blue;
   text-decoration: underline;
   font-weight: normal;
 }
 
+#RefreshJobList:hover,
 #CleareFiltersButton:hover {
   background-color: transparent;
   border: none;
   font-weight: bold;
 }
 
+#RefreshJobList:disabled,
 #CleareFiltersButton:disabled {
   color: #555;
+}
+
+label {
+  cursor: default;
 }
 </style>

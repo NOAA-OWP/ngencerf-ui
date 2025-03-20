@@ -446,11 +446,11 @@ const returnCalibrationJobList = (event: any) => {
   clearUserCalibrationRunData();
 }
 
-const confirmDelte = useConfirm();
+const confirmDelete = useConfirm();
 const deleteSelectedCalibrationRun = () => {
   const selectedRunId = contextMenuJob.value as number;
   let confirmMessage = "Are you sure you want to delete this calibration run? All associated validation job will also be deleted."
-  confirmDelte.require({
+  confirmDelete.require({
     message: confirmMessage,
     header: 'Confirm Delete',
     icon: 'pi pi-exclamation-triangle',
