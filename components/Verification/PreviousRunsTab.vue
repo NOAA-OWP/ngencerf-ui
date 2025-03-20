@@ -92,14 +92,14 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
     toast.add(tMsg); addToastRecord(tMsg);
 }
 
-const confirmDelte = useConfirm();
+const confirmDelete = useConfirm();
 
 const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
     const selectedRunId = selectedCalibrationRun.value.runId
     let confirmMessage = "Are you sure you want to delete?"
     if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
 
-    confirmDelte.require({
+    confirmDelete.require({
         message: confirmMessage,
         header: 'Confirm Delete',
         icon: 'pi pi-exclamation-triangle',

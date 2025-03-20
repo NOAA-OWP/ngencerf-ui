@@ -13,23 +13,35 @@
           </p>
         </div>
 
-
-
         <!-- Table -->
         <div class="">
 
           <div id="CalTable" class="w-max mx-auto">
-            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()" :calJobs="updatedUserCalibrationJobsListData"
-              ref="jobFilterDialog" />
+            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()"
+              @RefreshJobList="refreshJobList()" :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
-            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmCalibrationRun" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+
+            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[144px]" ref="crContextMenu"
+              :model="whichContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+
             <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id"
               :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
-              :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
-              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable>
+              :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)" reorderableColumns>
+
+              <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top;">
+                <template #body="slotProps">
+                  <div v-if="slotProps.data.status.indexOf('Running') === -1" :style="colStyle(slotProps.data)">
+                    &nbsp;
+                  </div>
+                  <div v-else :style="{ backgroundColor: runningColor }">
+                    &nbsp;
+                  </div>
+                </template>
+              </Column>
+
+              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID">
                 <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_run_id"
                     :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
@@ -38,6 +50,18 @@
                   </span>
                 </template>
               </Column>
+
+              <Column v-if="checkArchived" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
+                header="Archived" :sortable="true">
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.calibration_run_id"
+                    :aria-label="slotProps.data.is_archived ? 'Archived' : ''"
+                    :title="slotProps.data.is_archived ? 'Archived' : ''">
+                    {{ slotProps.data.is_archived ? 'Yes' : 'No' }}
+                  </span>
+                </template>
+              </Column>
+
               <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
@@ -119,13 +143,14 @@ import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
+import Swal from 'sweetalert2';
 
 //const LazyJobFilterDialog = defineAsyncComponent(() => import("@/components/Common/JobFilterDialog.vue"));
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout, JobStatusAction } from "@/composables/NextgenEnums";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -148,11 +173,12 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
-  statusTypeFilterList } = storeToRefs(useUserDataStore());
+  statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
-const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun } = useCalibrationJobStore();
-const { hardResetRunStatusStore } = useRunStatusStore();
+const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun } = useCalibrationJobStore();
+
 import { hilightTab } from '@/composables/TabHilight';
+import { sassFalse } from "sass";
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -168,14 +194,30 @@ const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
 const currentJobsList = ref<CalibrationJobListItem[]>();
 
+let interval: number | undefined;
+const runningColor = ref<string>('white');
+
 const cmCalibrationRun = ref([
-  { label: 'Open', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Clone', icon: 'pi pi-fw-pisearch', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Delete', icon: 'pi pi-fw-times', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun) }
+  { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
+  { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
+  { label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.delete) },
+  { label: 'Archive', icon: 'pi pi-folder', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.archive) }
 ]);
+
+const cmArchiveRun = ref([
+  { label: 'Un-archive', icon: 'pi pi-unlock', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.unarchive) }
+]);
+
 const onRowContextMenu = (event: any) => {
   crContextMenu.value.show(event.originalEvent);
 };
+
+const whichContextMenu = computed(() => {
+  if (selectedCalibrationRun?.value?.is_archived) {
+    return cmArchiveRun.value;
+  }
+  return cmCalibrationRun.value;
+});
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
@@ -188,26 +230,51 @@ onMounted(async () => {
 
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-    if (ele) { ele.scrollTo(0, 0); }
-    hardResetTuningStore();
-    hardResetRunStatusStore();
-    await fetchUserCalibrationJobsListData();
+    if (ele) { ele.scrollTo(0, 0); } includeArchivedJobs.value = false;;
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     await updateUserCalibrationJobsListData();
+    interval = window.setInterval(toggleColor, 500); // Toggle every 500ms (0.5s)
   }
 })
 
+onBeforeUnmount(() => {
+  if (interval) {
+    clearInterval(interval); // Clean up the interval when the component is destroyed
+  }
+});
 
+const refreshJobList = async () => {
+  isLoading.value = true;
+  await fetchUserCalibrationJobsListData();
+  isLoading.value = false;
+}
 
+// Function to toggle the color between 'red' and 'blue'
+const toggleColor = () => {
+  runningColor.value = runningColor.value === 'white' ? 'green' : 'white';
+};
+
+const checkArchived = computed(() => {
+  return updatedUserCalibrationJobsListData?.value.some(item => item.is_archived === true)
+});
+
+// A method to convert the binary value (boolean) to a sortable format
+const binaryValueBodyTemplate = (rowData: any) => {
+  return rowData.is_archived ? 'Yes' : 'No'; // Or return 1/0 as string or number
+};
+
+/**
+ * Applies the job filters
+ */
 let listcals: CalibrationJobListItem[];
 const applyJobFilters = async () => {
-  let newCalJobList: CalibrationJobListItem[];
+  isLoading.value = true;
+  await fetchUserCalibrationJobsListData();
   let fullJobList: CalibrationJobListItem[];
   let list: CalibrationJobListItem[];
   await updateUserCalibrationJobsListData();
 
   if (updatedUserCalibrationJobsListData?.value) {
-
     // Filter Headwater Basin Gage for the initial whole list
     if (!uiGageId.value || uiGageId.value === "All") {
       fullJobList = updatedUserCalibrationJobsListData?.value;
@@ -236,15 +303,10 @@ const applyJobFilters = async () => {
     updatedUserCalibrationJobsListData.value = fullJobList.filter((job, index, self) =>
       index === self.findIndex(j => j.calibration_run_id === job.calibration_run_id)
     );
+    isLoading.value = false;
   }
 };
 
-
-// const clearCalibrationFilters = () => {
-//   if (jobFilterDialog.value) {
-//     jobFilterDialog.value.externalResetFilters();
-//   }
-// };
 
 const filtersExist = computed(() => {
   return (modulesFilterList.value.length !== 0 || statusTypeFilterList.value.length !== 0 || uiGageId.value != "All")
@@ -258,6 +320,15 @@ const archivedTemplate = (rowData: any) => {
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
   data.value = e.data;
+  if (data.value.is_archived) {
+    Swal.fire({
+      width: 500,
+      html: "Operation not allowed for archived jobs.<br />You must un-archive it first.",
+      title: 'Cannot open job ' + data.value.calibration_run_id,
+      confirmButtonText: 'Close',
+    })
+    return;
+  }
   openSelectedCalibrationRun(data)
 }
 
@@ -276,7 +347,6 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   queryUserCalibrationRunData().then(queryResponse => {
     userCalibrationRunData.value = queryResponse?._data;
     loadEntireRun();
-    isLoading.value = false;
   });
 }
 
@@ -299,9 +369,29 @@ const gotoRunStatusTab = () => {
 }
 
 const rowStyle = (data: any) => {
+  if (data.is_archived === true) {
+    return { backgroundColor: '#ebebeb' };
+  }
   if (!['Saved', 'Ready'].includes(data.status)) {
-    //return { backgroundColor: 'gainsboro' };
     return { backgroundColor: 'white' };
+  }
+}
+
+const colStyle = (data: any) => {
+  if (data.status.indexOf('Failed') !== -1) {
+    return { backgroundColor: 'red' };
+  }
+  else if (data.status.indexOf('Done') !== -1) {
+    return { backgroundColor: 'blue' };
+  }
+   else if (data.status.indexOf('Saved') !== -1) {
+    return { backgroundColor: 'yellow' };
+  } 
+  else if (data.status.indexOf('Ready') !== -1) {
+    return { backgroundColor: 'green' };
+  }
+   else if (data.status.indexOf('Cancelled') !== -1) {
+    return { backgroundColor: 'orange' };
   }
 }
 
@@ -362,15 +452,27 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   });
 };
 
-const confirmDelte = useConfirm();
-const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  const confirm_delete = ref(false)
+const confirmDelete = useConfirm();
+const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: number) => {
+  let ty = "";
+  let label = "";
+  if (archiveRun === JobStatusAction.delete) {
+    ty = "delete"
+    label = "DELETE"
+  } else if (archiveRun === JobStatusAction.archive) {
+    ty = "archive"
+    label = "ARCHIVE"
+  } else {
+    ty = "unarchive (restore)"
+    label = "Unarchive (restore)"
+  }
+
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
-  const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '"  + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
-  let confirmMessage = "Are you sure you want to delete calibration run " + selectedRunId + selectedRunName;
+  const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '" + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
+  let confirmMessage = "Are you sure you want to " + ty + " calibration run " + selectedRunId + selectedRunName;
   if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
 
-  confirmDelte.require({
+  confirmDelete.require({
     message: confirmMessage,
     header: 'Confirm Delete',
     icon: 'pi pi-exclamation-triangle',
@@ -380,9 +482,17 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
       outlined: true
     },
     acceptProps: {
-      label: 'DELETE RUN',
+      label: label
     },
-    accept: () => acceptDelete(selectedRunId),
+    accept: () => {
+      if (archiveRun === JobStatusAction.delete) {
+        acceptDelete(selectedRunId)
+      }
+      else if (archiveRun === JobStatusAction.archive) {
+        acceptArchive(selectedRunId, true)
+      }
+      else acceptArchive(selectedRunId, false);
+    },
     reject: () => {
       //do nothing
     }
@@ -404,6 +514,21 @@ const acceptDelete = (selectedRunId: number) => {
   selectedCalibrationRun.value = undefined;
 }
 
+const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
+  archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
+    if (response.status == 200) {
+      await fetchUserCalibrationJobsListData();
+      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
+      await updateUserCalibrationJobsListData();
+    } else {
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Archive Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
+  });
+  selectedCalibrationRun.value = undefined;
+}
 /**
  * Populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
  */
@@ -550,8 +675,9 @@ small-label,
   }
 }
 
-#Datatable, #JobFilterDialog {
-  width: 1225px !important;
+#Datatable,
+#JobFilterDialog {
+  width: 1240px !important;
 }
 
 .toggle-switch {
@@ -575,5 +701,13 @@ small-label,
 
 .grayedout {
   color: #555 !important;
+}
+
+.p-checkbox-box {
+  border: 2px;
+}
+
+.archivedBackground {
+  background-color: blue;
 }
 </style>

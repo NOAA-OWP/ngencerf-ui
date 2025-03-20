@@ -94,6 +94,7 @@ export interface CalibrationJobListItem {
   submit_date: Date;
   objective_function: string;
   optimization_algorithm: string;
+  is_archived: boolean;
   validations: CalibrationJobValidationItem[];
   modules: string[];
 }
