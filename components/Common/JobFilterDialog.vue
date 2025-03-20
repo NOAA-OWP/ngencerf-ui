@@ -51,31 +51,30 @@
           </div>
         </div>
 
-        <div class="col-span-1">
-          <label class="cursor-pointer align-center p-0 m-0" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
-            title="Include Archived Jobs">Include<br />Archived</label><br />
-          <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs p-0 m-0"
+        <div class="col-span-2 pl-3">
+          <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[45px]"
             aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
             :pt="ptCheckbox">
           </Checkbox>
+          <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
+            title="Include Archived Jobs">Include Archived</label>
 
         </div>
-        <div class="col-span-5 mt-8">
-          <div class="grid grid-cols-3">
+        <div class="col-span-4 mt-[18px]">
+          <div class="grid grid-cols-2">
             <div class="col-span-1">
-              <Button class="ngenButtonDiv text-xs align-left" label="Apply" @click="sendApply($event)"
+              <Button class="ngenButtonDiv" label="Apply" @click="sendApply($event)"
                 aria-label="Apply and close" title="Apply and close">
-              </Button>
-            </div>
-            <div class="col-span-1">
-              <Button id="CleareFiltersButton" class="text-lg" label="Clear Filters" @click="resetFilters($event)"
+              </Button><br />
+              <Button id="CleareFiltersButton" class="mt-2" label="Clear Filters" @click="resetFilters($event)"
                 aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
               </Button>
             </div>
-            <div id="RefreshListButton" class="col-span-1"> 
-              <Button id="RefreshJobList" class="text-lg" label="Refresh List" @click="refreshJobList()" 
-              aria-label="Refresh Job List" title="Refresh Job List">
-              </Button>
+
+            <div class="col-span-1 bed">
+              <Button id="RefreshJobList" class="mt-[50px]" label="Refresh List" @click="refreshJobList()"
+                aria-label="Refresh Job List" title="Refresh Job List">
+              </Button> 
             </div>
           </div>
         </div>
@@ -224,22 +223,20 @@ const archivedTemplate = (rowData: any) => {
 }
 
 #RefreshJobList,
-#RefreshListButton,
 #CleareFiltersButton {
   color: blue;
   text-decoration: underline;
   font-weight: normal;
 }
 
-#RefreshListButton,
-#RefreshJobList,
+#RefreshJobList:hover,
 #CleareFiltersButton:hover {
   background-color: transparent;
   border: none;
   font-weight: bold;
 }
 
-#RefreshListButton,
+#RefreshJobList:disabled,
 #CleareFiltersButton:disabled {
   color: #555;
 }
