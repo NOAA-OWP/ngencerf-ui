@@ -20,19 +20,43 @@
             <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()"
               :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
+
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[144px]" ref="crContextMenu"
               :model="whichContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+
             <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id"
               :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
+
+              <!-- <Column :pt="ptColumn" header="" style="width: 30px; text-align:center; vertical-align: top;">
+                <template #body="slotProps">
+
+                  <span v-if="slotProps.data.validations && slotProps.data.validations.length === 1">
+                    <div v-if="(slotProps.data.validations[0] && slotProps.data.validations[0].status === 'Failed')
+                         || (slotProps.data.validations[1] && slotProps.data.validations[1].status === 'Failed')"
+                      style="background-color: 'red'">&nbsp;
+                    </div>
+                  </span>
+
+                  <span v-else>
+                    <div v-if="slotProps.data.status === 'Done'" style="background-color: green">&nbsp;</div>
+                    <div v-else-if="slotProps.data.status === 'Running'"> <img alt="Running..."
+                        src="@/assets/styles/img/wait.gif" /></div>
+                    <div v-else-if="slotProps.data.status === 'Failed'" style="background-color: red">&nbsp;</div>
+                    <div v-else-if="slotProps.data.status === 'Saved'" style="background-color: yellow">&nbsp;</div>
+                  </span>
+                </template>
+              </Column> -->
+
               <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_run_id"
                     :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
                     :title="'Job ID ' + slotProps.data.calibration_run_id">
                     {{ slotProps.data.calibration_run_id }}
+
                   </span>
                 </template>
               </Column>
@@ -95,7 +119,7 @@
               <Column :pt="ptColumn" field="status" header="Status" sortable> <template #body="slotProps">
                   <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
                     :title="'Status ' + slotProps.data.status">
-                    {{ slotProps.data.status + (slotProps.data.is_archived ? "/Archived" : "") }}
+                    {{ slotProps.data.status }}
                   </span>
                 </template></Column>
             </DataTable>
@@ -267,8 +291,7 @@ const onRowDblClick = (e: any) => {
       width: 500,
       html: "Operation not allowed for archived jobs.<br />You must un-archive it first.",
       title: 'Cannot open job ' + data.value.calibration_run_id,
-      icon: 'info',
-      confirmButtonText: 'Close'
+      confirmButtonText: 'Close',
     })
     return;
   }
@@ -312,10 +335,14 @@ const gotoRunStatusTab = () => {
 }
 
 const rowStyle = (data: any) => {
+  if (data.is_archived === true) {
+    return { backgroundColor: '#ccc' };
+  }
   if (!['Saved', 'Ready'].includes(data.status)) {
     return { backgroundColor: 'white' };
   }
 }
+
 
 const createNewCalibration = async () => {
   // Clear out old data
@@ -627,5 +654,9 @@ small-label,
 
 .p-checkbox-box {
   border: 2px;
+}
+
+.archivedBackground {
+  background-color: blue;
 }
 </style>
