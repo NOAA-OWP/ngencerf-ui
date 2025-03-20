@@ -17,8 +17,8 @@
         <div class="">
 
           <div id="CalTable" class="w-max mx-auto">
-            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()" @RefreshJobList="refreshJobList()"
-              :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
+            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()"
+              @RefreshJobList="refreshJobList()" :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
 
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[144px]" ref="crContextMenu"
@@ -29,7 +29,7 @@
               v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
-
+              calibration_run_id
               <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top;">
                 <template #body="slotProps">
                   <div v-if="slotProps.data.status.indexOf('Running') === -1" :style="colStyle(slotProps.data)">
@@ -41,16 +41,27 @@
                 </template>
               </Column>
 
-              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable>
+              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID">
                 <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_run_id"
                     :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
                     :title="'Job ID ' + slotProps.data.calibration_run_id">
                     {{ slotProps.data.calibration_run_id }}
-
                   </span>
                 </template>
               </Column>
+
+              <Column v-if="checkArchived" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
+                 header="Archived" :sortable="true">
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.calibration_run_id"
+                    :aria-label="slotProps.data.is_archived ? 'Archived' : ''"
+                    :title="slotProps.data.is_archived ? 'Archived' : ''">
+                    {{ slotProps.data.is_archived ? 'Yes' : '' }}
+                  </span>
+                </template>
+              </Column>
+
               <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
@@ -243,18 +254,27 @@ const toggleColor = () => {
   runningColor.value = runningColor.value === 'white' ? 'green' : 'white';
 };
 
+const checkArchived = computed(() => {
+  return updatedUserCalibrationJobsListData?.value.some(item => item.is_archived === true)
+});
+
+// A method to convert the binary value (boolean) to a sortable format
+const binaryValueBodyTemplate = (rowData: any) => {
+  return rowData.is_archived ? 'Yes' : 'No'; // Or return 1/0 as string or number
+};
+
 /**
  * Applies the job filters
  */
 let listcals: CalibrationJobListItem[];
 const applyJobFilters = async () => {
-  let newCalJobList: CalibrationJobListItem[];
+  isLoading.value = true;
+  await fetchUserCalibrationJobsListData();
   let fullJobList: CalibrationJobListItem[];
   let list: CalibrationJobListItem[];
   await updateUserCalibrationJobsListData();
 
   if (updatedUserCalibrationJobsListData?.value) {
-
     // Filter Headwater Basin Gage for the initial whole list
     if (!uiGageId.value || uiGageId.value === "All") {
       fullJobList = updatedUserCalibrationJobsListData?.value;
@@ -283,6 +303,7 @@ const applyJobFilters = async () => {
     updatedUserCalibrationJobsListData.value = fullJobList.filter((job, index, self) =>
       index === self.findIndex(j => j.calibration_run_id === job.calibration_run_id)
     );
+    isLoading.value = false;
   }
 };
 
@@ -348,9 +369,9 @@ const gotoRunStatusTab = () => {
 }
 
 const rowStyle = (data: any) => {
-  if (data.is_archived === true) {
-    return { backgroundColor: '#ccc' };
-  }
+  // if (data.is_archived === true) {
+  //   return { backgroundColor: '#ccc' };
+  // }
   if (!['Saved', 'Ready'].includes(data.status)) {
     return { backgroundColor: 'white' };
   }

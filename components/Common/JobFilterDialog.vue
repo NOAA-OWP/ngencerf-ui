@@ -63,7 +63,7 @@
         <div class="col-span-2">
           <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[14px]"
             aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
-            @change="archivedJobsToggle()" :pt="ptCheckbox">
+            :pt="ptCheckbox">
           </Checkbox>
           <label class="pl-4 cursor-pointer" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
             title="Include Archived Jobs">Include Archived</label><br />
@@ -120,7 +120,10 @@ onMounted(() => {
 })
 
 const filterActive = computed(() => {
-  return (modulesFilterList.value.length === 0 && (statusTypeFilterList.value === null || statusTypeFilterList.value.length === 0) && uiGageId.value === 'All')
+  return (modulesFilterList.value.length === 0 && (statusTypeFilterList.value === null 
+    || statusTypeFilterList.value.length === 0) 
+    && uiGageId.value === 'All'
+    && includeArchivedJobs.value === false);
 });
 
 
@@ -168,10 +171,10 @@ defineExpose({
 /**
  * Update the job list when applyJobFilters changes
  */;
-const archivedJobsToggle = async () => {
-  await fetchUserCalibrationJobsListData()
-  emit("ApplyJobFilters");
-}
+// const archivedJobsToggle = async () => {
+//   await fetchUserCalibrationJobsListData()
+//   emit("ApplyJobFilters");
+// }
 
 /**
  * Reset filters
@@ -182,6 +185,7 @@ const resetFilters = (e: MouseEvent) => {
   uiGageId.value = 'All';
   modulesFilterList.value = [];
   statusTypeFilterList.value = [];
+  includeArchivedJobs.value = false;
   emit("ApplyJobFilters");
 }
 
