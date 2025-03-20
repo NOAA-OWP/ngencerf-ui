@@ -17,7 +17,7 @@
         <div class="">
 
           <div id="CalTable" class="w-max mx-auto">
-            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()"
+            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()" @RefreshJobList="refreshJobList()"
               :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
 
@@ -30,7 +30,6 @@
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
 
-
               <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top;">
                 <template #body="slotProps">
                   <div v-if="slotProps.data.status.indexOf('Running') === -1" :style="colStyle(slotProps.data)">
@@ -39,8 +38,6 @@
                   <div v-else :style="{ backgroundColor: runningColor }">
                     &nbsp;
                   </div>
-
-
                 </template>
               </Column>
 
@@ -168,8 +165,9 @@ const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFi
   statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun } = useCalibrationJobStore();
-const { hardResetRunStatusStore } = useRunStatusStore();
+
 import { hilightTab } from '@/composables/TabHilight';
+import { sassFalse } from "sass";
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -234,9 +232,15 @@ onBeforeUnmount(() => {
   }
 });
 
+const refreshJobList = async () => {
+  isLoading.value = true;
+  await fetchUserCalibrationJobsListData();
+  isLoading.value = false;
+}
+
 // Function to toggle the color between 'red' and 'blue'
 const toggleColor = () => {
-  runningColor.value = runningColor.value === 'white' ? 'blue' : 'white';
+  runningColor.value = runningColor.value === 'white' ? 'green' : 'white';
 };
 
 /**
@@ -362,7 +366,7 @@ const colStyle = (data: any) => {
    else if (data.status.indexOf('Saved') !== -1) {
     return { backgroundColor: 'yellow' };
   } 
-  else if (data.status.indexOf('Saved') !== -1) {
+  else if (data.status.indexOf('Ready') !== -1) {
     return { backgroundColor: 'blue' };
   }
 }

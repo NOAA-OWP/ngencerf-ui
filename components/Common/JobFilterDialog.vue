@@ -61,12 +61,15 @@
         </div>
 
         <div class="col-span-2">
-          <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[48px]"
+          <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[14px]"
             aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
             @change="archivedJobsToggle()" :pt="ptCheckbox">
           </Checkbox>
           <label class="pl-4 cursor-pointer" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
-            title="Include Archived Jobs">Include Archived</label>
+            title="Include Archived Jobs">Include Archived</label><br />
+          <Button id="RefreshJobList" class="ml-[0.5rem] mt-2" label="Refresh Job List" @click="refreshJobList()"
+            aria-label="Refresh" title="Refresh">
+          </Button>
         </div>
       </div>
     </div>
@@ -92,7 +95,7 @@ const { fetchFormulationModuleOptions } = useFormulationStore();
 const userStore = useUserDataStore();
 const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList, includeArchivedJobs } = storeToRefs(userStore);
 
-const emit = defineEmits(["ModulesFilterDialogClosing", "ApplyJobFilters"]);
+const emit = defineEmits(["ModulesFilterDialogClosing", "ApplyJobFilters", "RefreshJobList"]);
 
 const draggableDiv = ref<HTMLDivElement | null>(null);
 const isDragging = ref<boolean>(false);
@@ -120,6 +123,10 @@ const filterActive = computed(() => {
   return (modulesFilterList.value.length === 0 && (statusTypeFilterList.value === null || statusTypeFilterList.value.length === 0) && uiGageId.value === 'All')
 });
 
+
+const refreshJobList = () => {
+  emit("RefreshJobList");
+}
 
 /** Let the caller close the dialog
  * @param: MouseEvent
@@ -204,12 +211,14 @@ const archivedTemplate = (rowData: any) => {
   border: 1px solid #888888;
 }
 
+#RefreshJobList,
 #CleareFiltersButton {
   color: blue;
   text-decoration: underline;
   font-weight: normal;
 }
 
+#RefreshJobList,
 #CleareFiltersButton:hover {
   background-color: transparent;
   border: none;
