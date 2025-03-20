@@ -30,25 +30,19 @@
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
 
-              <!-- <Column :pt="ptColumn" header="" style="width: 30px; text-align:center; vertical-align: top;">
+
+              <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top;">
                 <template #body="slotProps">
+                  <div v-if="slotProps.data.status.indexOf('Running') === -1" :style="colStyle(slotProps.data)">
+                    &nbsp;
+                  </div>
+                  <div v-else :style="{ backgroundColor: runningColor }">
+                    &nbsp;
+                  </div>
 
-                  <span v-if="slotProps.data.validations && slotProps.data.validations.length === 1">
-                    <div v-if="(slotProps.data.validations[0] && slotProps.data.validations[0].status === 'Failed')
-                         || (slotProps.data.validations[1] && slotProps.data.validations[1].status === 'Failed')"
-                      style="background-color: 'red'">&nbsp;
-                    </div>
-                  </span>
 
-                  <span v-else>
-                    <div v-if="slotProps.data.status === 'Done'" style="background-color: green">&nbsp;</div>
-                    <div v-else-if="slotProps.data.status === 'Running'"> <img alt="Running..."
-                        src="@/assets/styles/img/wait.gif" /></div>
-                    <div v-else-if="slotProps.data.status === 'Failed'" style="background-color: red">&nbsp;</div>
-                    <div v-else-if="slotProps.data.status === 'Saved'" style="background-color: yellow">&nbsp;</div>
-                  </span>
                 </template>
-              </Column> -->
+              </Column>
 
               <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable>
                 <template #body="slotProps">
@@ -191,6 +185,9 @@ const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
 const currentJobsList = ref<CalibrationJobListItem[]>();
 
+let interval: number | undefined;
+const runningColor = ref<string>('white');
+
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
@@ -227,8 +224,20 @@ onMounted(async () => {
     if (ele) { ele.scrollTo(0, 0); } includeArchivedJobs.value = false;;
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     await updateUserCalibrationJobsListData();
+    interval = window.setInterval(toggleColor, 500); // Toggle every 500ms (0.5s)
   }
 })
+
+onBeforeUnmount(() => {
+  if (interval) {
+    clearInterval(interval); // Clean up the interval when the component is destroyed
+  }
+});
+
+// Function to toggle the color between 'red' and 'blue'
+const toggleColor = () => {
+  runningColor.value = runningColor.value === 'white' ? 'blue' : 'white';
+};
 
 /**
  * Applies the job filters
@@ -342,6 +351,22 @@ const rowStyle = (data: any) => {
     return { backgroundColor: 'white' };
   }
 }
+
+const colStyle = (data: any) => {
+  if (data.status.indexOf('Failed') !== -1) {
+    return { backgroundColor: 'red' };
+  }
+  else if (data.status.indexOf('Done') !== -1) {
+    return { backgroundColor: 'green' };
+  }
+   else if (data.status.indexOf('Saved') !== -1) {
+    return { backgroundColor: 'yellow' };
+  } 
+  else if (data.status.indexOf('Saved') !== -1) {
+    return { backgroundColor: 'blue' };
+  }
+}
+
 
 
 const createNewCalibration = async () => {
