@@ -71,6 +71,8 @@ import type { CombinedVerstionInfo, GitData } from "@/composables/NextGenModel";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 
+import { formatISOStringOrDateToYYYYMMDDHHMM } from "@/utils/TimeHelpers";
+
 const toast = useToast();
 const { addToastRecord } = generalStore();
 const { getServerInfo } = generalStore();
@@ -216,7 +218,7 @@ function getUniqueFields(arr: unknown): string[] {
 
 const formatTableOutput = (field: Record<string, string>, item: string) => {
   if (item.indexOf("_hash") !== -1) { return field[item].substring(0, 8) }
-  if (item.indexOf("_date") !== -1) { return formatDate(field[item]) }
+  if (item.indexOf("_date") !== -1) { return formatISOStringOrDateToYYYYMMDDHHMM(field[item]) }
   return field[item];
 }
 
@@ -230,10 +232,6 @@ const gitInfoArray = computed(() => {
   getUniqueFields(infoArray);
   return infoArray;
 });
-
-const formatDate = (dateString: string) => {
-  return dateString ? new Date(dateString).toLocaleString() : '';
-};
 
 const closeAboutBox = () => {
   useAccountEvent("aboutBoxEvent", "");
@@ -311,7 +309,8 @@ function transformComponent(componentGitInfo: any) {
   top: 90px;
   border: 5px solid #ccc;
   z-index: 99;
-  width: 1400px;
+  width: auto;
+  max-width: 1150px;
   background-color: white;
 
   hr {
