@@ -41,7 +41,7 @@
                 </template>
               </Column>
 
-              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID">
+              <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_run_id"
                     :aria-label="'Job ID ' + slotProps.data.calibration_run_id"

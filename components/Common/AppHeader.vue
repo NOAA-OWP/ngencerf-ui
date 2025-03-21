@@ -26,7 +26,7 @@
           </li>
           <li aria-label="Verification" title="Verification">
             <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
-              to="verification" data-menu='4' @click="" >Verification</NuxtLink>
+              to="verification" data-menu='4' @click="">Verification</NuxtLink>
           </li>
         </ul>
 
@@ -34,6 +34,11 @@
 
       <div id="Circles" class="col-span-2">
         <div id="UserGroup" class="grid grid-cols-2">
+          <div class="col-span-1">
+            <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'"
+              class="pt-0" id="HelpCircle" title="Help for current tab"
+              aria-label="Help for current tab" @click="displayHelp">?</Button>
+          </div>
 
           <div class="col-span-1">
             <div v-show="!uMenu && userLoggedIn && location.name !== 'Login'" id="UserCircle"
@@ -42,12 +47,6 @@
               {{ userInitials }}<i class="pi pi-angle-down"></i>
               <ContextMenu ref="userContextMenu" :model="userItems" :autoZIndex="true" />
             </div>
-
-          </div>
-          <div class="col-span-1">
-            <Button v-if="userLoggedIn && location.name !== 'Login'" class="float-left" style="padding-top:0px"
-              id="HelpCircle" title="Help for current tab" aria-label="Help for current tab"
-              @click="displayHelp">?</Button>
           </div>
 
         </div>
@@ -55,63 +54,64 @@
 
       <Transition name="slide-fade">
 
-        <div v-if="showHelp" id="HelpWindow">
-          <div class="text-right sticky top-0">
-            <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-              class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
-          </div>
-
-          <span v-if="filterIsVisible()">
-            <JobFilterHelp />
-          </span>
-
-          <span v-else>
-            <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
-              <LazyHelpLandingPageHelp />
+        <div v-show="showHelp" id="HelpWindow" ref="helpWindow">
+          <div id="HelpContent">
+            <div class="text-right sticky top-0">
+              <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+                class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
             </div>
 
-            <div v-if="location.name === 'Calibration'" class="py-10 px-1">
-              <div v-if="getMenuIndex() === 1">
-                <span v-if="getCalibrationTabIndex() === 1">
-                  <LazyCalibrationHelpPreviousRunsHelp />
+            <span v-if="filterIsVisible()">
+              <JobFilterHelp />
+            </span>
+
+            <span v-else>
+              <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
+                <LazyHelpLandingPageHelp />
+              </div>
+
+              <div v-if="location.name === 'Calibration'" class="py-10 px-1">
+                <div v-if="getMenuIndex() === 1">
+                  <span v-if="getCalibrationTabIndex() === 1">
+                    <LazyCalibrationHelpPreviousRunsHelp />
+                  </span>
+                  <span v-else-if="getCalibrationTabIndex() === 2">
+                    <LazyCalibrationHelpHeadwaterBasinGageHelp />
+                  </span>
+                  <span v-else-if="getCalibrationTabIndex() === 3">
+                    <LazyCalibrationHelpFormulationHelp />
+                  </span>
+                  <span v-else-if="getCalibrationTabIndex() === 4">
+                    <LazyCalibrationHelpTuningControlsHelp />
+                  </span>
+                  <span v-else-if="getCalibrationTabIndex() === 5">
+                    <LazyCalibrationHelpOptimizationMetricsHelp />
+                  </span>
+                  <span v-else-if="getCalibrationTabIndex() === 6">
+                    <LazyCalibrationHelpRunStatusHelp />
+                  </span>
+                  <span v-else-if="getCalibrationTabIndex() === 7">
+                    <LazyCalibrationHelpResultsHelp />
+                  </span>
+                </div>
+              </div>
+
+              <div v-else-if="getMenuIndex() === 2">
+                <span v-if="getEvaluationTabIndex() === 1">
+                  <LazyEvaluationCalibrationRunsHelp />
                 </span>
-                <span v-else-if="getCalibrationTabIndex() === 2">
-                  <LazyCalibrationHelpHeadwaterBasinGageHelp />
+                <span v-if="getEvaluationTabIndex() === 2">
+                  <LazyEvaluationEvaluatesHelp />
                 </span>
-                <span v-else-if="getCalibrationTabIndex() === 3">
-                  <LazyCalibrationHelpFormulationHelp />
+                <span v-if="getEvaluationTabIndex() === 3">
+                  <LazyEvaluationCalibrationSelectAltInterationssHelp />
                 </span>
-                <span v-else-if="getCalibrationTabIndex() === 4">
-                  <LazyCalibrationHelpTuningControlsHelp />
-                </span>
-                <span v-else-if="getCalibrationTabIndex() === 5">
-                  <LazyCalibrationHelpOptimizationMetricsHelp />
-                </span>
-                <span v-else-if="getCalibrationTabIndex() === 6">
-                  <LazyCalibrationHelpRunStatusHelp />
-                </span>
-                <span v-else-if="getCalibrationTabIndex() === 7">
-                  <LazyCalibrationHelpResultsHelp />
+                <span v-if="getEvaluationTabIndex() === 4">
+                  <LazyEvaluationRunStatusHelp />
                 </span>
               </div>
-            </div>
-
-            <div v-else-if="getMenuIndex() === 2">
-              <span v-if="getEvaluationTabIndex() === 1">
-                <LazyEvaluationCalibrationRunsHelp />
-              </span>
-              <span v-if="getEvaluationTabIndex() === 2">
-                <LazyEvaluationEvaluatesHelp />
-              </span>
-              <span v-if="getEvaluationTabIndex() === 3">
-                <LazyEvaluationCalibrationSelectAltInterationssHelp />
-              </span>
-              <span v-if="getEvaluationTabIndex() === 4">
-                <LazyEvaluationRunStatusHelp />
-              </span>
-            </div>
-          </span>
-
+            </span>
+          </div>
         </div>
       </Transition>
 
@@ -196,6 +196,8 @@ const showHelp = ref(false);
 let observer = null;
 const isOnDiv = ref(false);
 
+const helpWindow = ref<HTMLDivElement | null>(null);
+
 const onImageRightClick = (event: any) => {
   if (!popupActive.value) {
     userContextMenu.value.show(event)
@@ -212,11 +214,21 @@ onMounted(() => {
     sizeAboutWindow();
   });
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
+
+  setTimeout ( () => {
+    if (helpWindow.value) {
+      const el = helpWindow.value
+      if (!el.style.width) {
+        el.style.width = '600px' // Initial width
+      }
+    }
+  }, 0)
+
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', function (event) {
-//
+    //
   });
 });
 
@@ -460,18 +472,6 @@ const MenuChanged = (e: MouseEvent) => {
   text-align: center;
 }
 
-#UserCircle {
-  display: inline-block;
-  height: 70px;
-  width: 70px;
-  margin-top: 10px;
-  background-color: global.$ngwcp_neutral_gray_md;
-  border-radius: 50%;
-  font-size: 30px;
-  padding-top: 20px;
-  margin-right: 10px;
-}
-
 #HelpCircle {
   display: inline-block;
   height: 50px;
@@ -481,8 +481,20 @@ const MenuChanged = (e: MouseEvent) => {
   color: white;
   border-radius: 50%;
   font-size: 38px;
-  padding-top: 12px;
   border: 1px solid #000;
+  margin-left: 37px;
+}
+
+#UserCircle {
+  display: inline-block;
+  height: 70px;
+  width: 70px;
+  margin-top: 10px;
+  background-color: global.$ngwcp_neutral_gray_md;
+  border-radius: 50%;
+  font-size: 30px;
+  padding-top: 20px;
+  margin-right: 40px;
 }
 
 #UserCircle:hover {
@@ -521,9 +533,17 @@ const MenuChanged = (e: MouseEvent) => {
   position: absolute;
   right: 2%;
   top: 84px;
-  width: 50%;
+  width: auto;
   background-color: white;
+  resize: both;
   overflow: auto;
+  direction: rtl;
+  min-width: 400px;
+  min-height: 200px;
+}
+
+#HelpContent {
+  direction: ltr;
 }
 
 #ErrorLogOverlay {

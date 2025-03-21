@@ -1,62 +1,63 @@
 <template>
   <!-- About Box -->
   <div id="AboutBox" ref="aboutBox" class="absolute h-auto rounded-lg">
-    <div class="text-right sticky top-0">
-      <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-        class="absolute cursor-pointer right-0 boxed mt-2 mr-2" @click="closeAboutBox" />
-    </div>
-
-    <div id="BoxContent">
-      <div id="PgmName" class="inline-block font-bold ml-4 mt-3 text-lg">
-        About
+    <div id="AboutBoxContents" style="direction: ltr">
+      <div class="text-right sticky top-0">
+        <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+          class="absolute cursor-pointer right-0 boxed mt-2 mr-2" @click="closeAboutBox" />
       </div>
-      <hr class="mt-2" />
 
-      <div id="FooterData" class="pt-[15px] pl-[15px] leading-6">
+      <div id="BoxContent">
+        <div id="PgmName" class="inline-block font-bold ml-4 mt-3 text-lg">
+          About
+        </div>
+        <hr class="mt-2" />
 
-        <div class="grid grid-cols-12">
-          <div class="col-span-11">
-            <div class="relative block text-left">
-              <div class="flex">
-                <div class="w-[150px]">ngenCERF Version:</div>
-                <div class="w-[150px]"> {{ combinedVersionInfo?.ngenCerf_version }} </div>
-              </div>
-              <div class="flex">
-                <div class="w-[150px]"> ngenCERF Date: </div>
-                <div class=" w-[150px]"> {{ combinedVersionInfo?.ngenCerf_date }} </div>
-              </div>
-              <div class="flex">
-                <div class="w-[150px]"> Support Email: </div>
-                <div class="w-[150px]">
-                  <a class="hlink" :href="'mailto:' + combinedVersionInfo?.contact_email">{{
-                    combinedVersionInfo?.contact_email }}</a>
+        <div id="FooterData" class="pt-[15px] pl-[15px] leading-6">
+
+          <div class="grid grid-cols-12">
+            <div class="col-span-11">
+              <div class="relative block text-left">
+                <div class="flex">
+                  <div class="w-[150px]">ngenCERF Version:</div>
+                  <div class="w-[150px]"> {{ combinedVersionInfo?.ngenCerf_version }} </div>
+                </div>
+                <div class="flex">
+                  <div class="w-[150px]"> ngenCERF Date: </div>
+                  <div class=" w-[150px]"> {{ combinedVersionInfo?.ngenCerf_date }} </div>
+                </div>
+                <div class="flex">
+                  <div class="w-[150px]"> Support Email: </div>
+                  <div class="w-[150px]">
+                    <a class="hlink" :href="'mailto:' + combinedVersionInfo?.contact_email">{{
+                      combinedVersionInfo?.contact_email }}</a>
+                  </div>
                 </div>
               </div>
             </div>
+            <div class="col-span-1 mt-5 text-center">
+              <img class="inline cursor-pointer w-[48px]" alt="Copy Table Data" src="@/assets/styles/img/copy.png"
+                @click="copyGitInfoToClipboard()" /> <br />
+              <div class="nobg cursor-default">Copy</div>
+            </div>
           </div>
-          <div class="col-span-1 mt-5 text-center">
-            <img class="inline cursor-pointer w-[48px]" alt="Copy Table Data" src="@/assets/styles/img/copy.png"
-              @click="copyGitInfoToClipboard()" /> <br />
-            <div class="nobg cursor-default">Copy</div>
-          </div>
+
         </div>
 
-      </div>
-
-      <div class="p-4">
-        <DataTable :value="gitInfoArray" class="p-datatable-sm" scrollable :scroll-height="scrollHeight"
-          scroller="true">
-          <Column v-for="(item, index) in Array.from(uniqueFields)" :key="item" :field="item"
-            :sortable="index === 0 ? true : false" :header="Array.from(uniqueHeaders)[index]">
-            <template #body="{ data }">
-              {{ formatTableOutput(data, item) }}
-            </template>
-          </Column>
-        </DataTable>
+        <div class="p-4">
+          <DataTable :value="gitInfoArray" class="p-datatable-sm text-sm" scrollable :scroll-height="scrollHeight"
+            scroller="true">
+            <Column v-for="(item, index) in Array.from(uniqueFields)" :key="item" :field="item"
+              :sortable="index === 0 ? true : false" :header="Array.from(uniqueHeaders)[index]">
+              <template #body="{ data }">
+                {{ formatTableOutput(data, item) }}
+              </template>
+            </Column>
+          </DataTable>
+        </div>
       </div>
     </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -70,6 +71,8 @@ import type { CombinedVerstionInfo, GitData } from "@/composables/NextGenModel";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from '@/stores/common/UserDataStore';
+
+import { formatISOStringOrDateToYYYYMMDDHHMM } from "@/utils/TimeHelpers";
 
 const toast = useToast();
 const { addToastRecord } = generalStore();
@@ -90,6 +93,7 @@ const scrollHeight = ref<string>(); // Default height
 
 const aboutBox = ref<HTMLElement | null>(null);
 let observer: IntersectionObserver | null = null;
+let resizeObserver: ResizeObserver | null = null;
 
 const foundFields = ref<string[]>();
 
@@ -131,9 +135,14 @@ onMounted(async () => {
     observer.observe(aboutBox.value);
   }
 
-  window.addEventListener('resize', function (event) {
-    resizeNotifications();
-  });
+  if (aboutBox.value) {
+    // Initialize ResizeObserver to listen for changes.
+    resizeObserver = new ResizeObserver((entries) => {
+      resizeNotifications();
+    });
+    // Start observing the element.
+    resizeObserver.observe(aboutBox.value);
+  }
 
   await getGitInformation();
 
@@ -141,13 +150,10 @@ onMounted(async () => {
     const resizeEvent = new Event('resize');
     window.dispatchEvent(resizeEvent);
   }, 250);
-
 })
 
-onUnmounted(() => {
-  window.removeEventListener('resize', function (event) {
-    //
-  });
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect();
 })
 
 const resizeNotifications = () => {
@@ -216,7 +222,7 @@ function getUniqueFields(arr: unknown): string[] {
 
 const formatTableOutput = (field: Record<string, string>, item: string) => {
   if (item.indexOf("_hash") !== -1) { return field[item].substring(0, 8) }
-  if (item.indexOf("_date") !== -1) { return formatDate(field[item]) }
+  if (item.indexOf("_date") !== -1) { return formatISOStringOrDateToYYYYMMDDHHMM(field[item]) }
   return field[item];
 }
 
@@ -230,10 +236,6 @@ const gitInfoArray = computed(() => {
   getUniqueFields(infoArray);
   return infoArray;
 });
-
-const formatDate = (dateString: string) => {
-  return dateString ? new Date(dateString).toLocaleString() : '';
-};
 
 const closeAboutBox = () => {
   useAccountEvent("aboutBoxEvent", "");
@@ -311,8 +313,15 @@ function transformComponent(componentGitInfo: any) {
   top: 90px;
   border: 5px solid #ccc;
   z-index: 99;
-  width: 1400px;
+  width: auto;
+  max-width: 90%;
   background-color: white;
+  resize: both;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  direction: rtl;
+  min-width: 400px;
+  min-height: 200px;
 
   hr {
     height: 2px;
