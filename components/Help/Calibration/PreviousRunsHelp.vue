@@ -8,8 +8,10 @@
 
     <table class="_help-table">
       <thead>
-        <th>Item</th>
-        <th>Description</th>
+        <tr>
+          <th>Item</th>
+          <th>Description</th>
+        </tr>
       </thead>
       <tbody>
         <tr>
@@ -30,7 +32,8 @@
         </tr>
         <tr>
           <td class="td1">Double Click</td>
-          <td class="td2">Loads the selected calibration job. User will be taken to the Run/Status tab. (Same as right click/Open)</td>
+          <td class="td2">Loads the selected calibration job. User will be taken to the Run/Status tab. (Same as right
+            click/Open)</td>
         </tr>
         <tr>
           <td class="td1">&nbsp;</td>
@@ -50,7 +53,8 @@
         </tr>
         <tr>
           <td class="td1" style="font-weight:normal;">Running</td>
-          <td class="td2">When Running is in the status, indicates the Calibration/Validation phase currently running.</td>
+          <td class="td2">When Running is in the status, indicates the Calibration/Validation phase currently running.
+          </td>
         </tr>
         <tr>
           <td class="td1" style="font-weight:normal;">Done</td>
@@ -87,12 +91,13 @@
         </tr>
         <tr>
           <td class="td1" style="font-weight:normal;">Clone</td>
-          <td class="td2">Use the data from the selected calibration job as a baseline for a new calibration that 
+          <td class="td2">Use the data from the selected calibration job as a baseline for a new calibration that
             will be added at the top of the table. User will remain on this page.</td>
         </tr>
         <tr>
           <td class="td1" style="font-weight:normal;">Delete</td>
-          <td class="td2">Delete the selected calibration job and all it's associated validation jobs. User will remain on this page.</td>
+          <td class="td2">Delete the selected calibration job and all it's associated validation jobs. User will remain
+            on this page.</td>
         </tr>
       </tbody>
     </table>

@@ -36,7 +36,7 @@
         <div id="UserGroup" class="grid grid-cols-2">
           <div class="col-span-1">
             <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'"
-              class="" style="padding-top:0px" id="HelpCircle" title="Help for current tab"
+              class="pt-0" id="HelpCircle" title="Help for current tab"
               aria-label="Help for current tab" @click="displayHelp">?</Button>
           </div>
 
@@ -481,8 +481,8 @@ const MenuChanged = (e: MouseEvent) => {
   color: white;
   border-radius: 50%;
   font-size: 38px;
-  padding-top: 12px;
   border: 1px solid #000;
+  margin-left: 37px;
 }
 
 #UserCircle {
