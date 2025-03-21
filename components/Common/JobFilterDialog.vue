@@ -5,7 +5,7 @@
 
       <div class="grid grid-cols-12 gap-2 text-sx">
         <div class="col-span-2">
-          <label class="block text-left ml-[20px] w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
+          <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
           <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
             :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
@@ -172,14 +172,6 @@ const externalResetFilters = () => {
 defineExpose({
   externalResetFilters
 });
-
-/**
- * Update the job list when applyJobFilters changes
- */;
-// const archivedJobsToggle = async () => {
-//   await fetchUserCalibrationJobsListData()
-//   emit("ApplyJobFilters");
-// }
 
 /**
  * Reset filters
