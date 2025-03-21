@@ -32,7 +32,7 @@
 
               <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top;">
                 <template #body="slotProps">
-                  <div v-if="slotProps.data.status.indexOf('Running') === -1" :style="'li has > tr:' + colStyle(slotProps.data)">
+                  <div v-if="slotProps.data.status.indexOf('Running') === -1" :style="colStyle(slotProps.data)">
                     &nbsp;
                   </div>
                   <div v-else :style="{ backgroundColor: runningColor }">
