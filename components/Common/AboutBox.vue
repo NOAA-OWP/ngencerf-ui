@@ -150,7 +150,6 @@ onMounted(async () => {
     const resizeEvent = new Event('resize');
     window.dispatchEvent(resizeEvent);
   }, 250);
-
 })
 
 onBeforeUnmount(() => {
