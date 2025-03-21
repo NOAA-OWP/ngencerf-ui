@@ -174,14 +174,6 @@ defineExpose({
 });
 
 /**
- * Update the job list when applyJobFilters changes
- */;
-// const archivedJobsToggle = async () => {
-//   await fetchUserCalibrationJobsListData()
-//   emit("ApplyJobFilters");
-// }
-
-/**
  * Reset filters
  */
 const resetFilters = (e: MouseEvent) => {

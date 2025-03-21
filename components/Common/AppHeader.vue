@@ -34,6 +34,11 @@
 
       <div id="Circles" class="col-span-2">
         <div id="UserGroup" class="grid grid-cols-2">
+          <div class="col-span-1">
+            <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'"
+              class="" style="padding-top:0px" id="HelpCircle" title="Help for current tab"
+              aria-label="Help for current tab" @click="displayHelp">?</Button>
+          </div>
 
           <div class="col-span-1">
             <div v-show="!uMenu && userLoggedIn && location.name !== 'Login'" id="UserCircle"
@@ -42,12 +47,6 @@
               {{ userInitials }}<i class="pi pi-angle-down"></i>
               <ContextMenu ref="userContextMenu" :model="userItems" :autoZIndex="true" />
             </div>
-
-          </div>
-          <div class="col-span-1">
-            <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'" class="float-left" style="padding-top:0px"
-              id="HelpCircle" title="Help for current tab" aria-label="Help for current tab"
-              @click="displayHelp">?</Button>
           </div>
 
         </div>
@@ -473,18 +472,6 @@ const MenuChanged = (e: MouseEvent) => {
   text-align: center;
 }
 
-#UserCircle {
-  display: inline-block;
-  height: 70px;
-  width: 70px;
-  margin-top: 10px;
-  background-color: global.$ngwcp_neutral_gray_md;
-  border-radius: 50%;
-  font-size: 30px;
-  padding-top: 20px;
-  margin-right: 10px;
-}
-
 #HelpCircle {
   display: inline-block;
   height: 50px;
@@ -496,6 +483,18 @@ const MenuChanged = (e: MouseEvent) => {
   font-size: 38px;
   padding-top: 12px;
   border: 1px solid #000;
+}
+
+#UserCircle {
+  display: inline-block;
+  height: 70px;
+  width: 70px;
+  margin-top: 10px;
+  background-color: global.$ngwcp_neutral_gray_md;
+  border-radius: 50%;
+  font-size: 30px;
+  padding-top: 20px;
+  margin-right: 40px;
 }
 
 #UserCircle:hover {
