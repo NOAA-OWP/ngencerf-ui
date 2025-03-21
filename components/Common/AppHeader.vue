@@ -35,9 +35,9 @@
       <div id="Circles" class="col-span-2">
         <div id="UserGroup" class="grid grid-cols-2">
           <div class="col-span-1">
-            <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'"
-              class="pt-0" id="HelpCircle" title="Help for current tab"
-              aria-label="Help for current tab" @click="displayHelp">?</Button>
+            <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'" class="pt-0"
+              id="HelpCircle" title="Help for current tab" aria-label="Help for current tab"
+              @click="displayHelp">?</Button>
           </div>
 
           <div class="col-span-1">
@@ -186,8 +186,8 @@ const userLoggedIn = ref<boolean>();
 const userItems = ref([
   { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
   { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
-  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() },
-  { label: 'Notifications', icon: 'pi pi-fw-times', command: () => errorLog() }
+  { label: 'Notifications', icon: 'pi pi-fw-times', command: () => errorLog() },
+  { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
 ])
 
 const userContextMenu = ref();
@@ -215,7 +215,7 @@ onMounted(() => {
   });
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 
-  setTimeout ( () => {
+  setTimeout(() => {
     if (helpWindow.value) {
       const el = helpWindow.value
       if (!el.style.width) {
