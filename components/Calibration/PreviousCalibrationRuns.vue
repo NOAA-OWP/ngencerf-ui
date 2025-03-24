@@ -398,6 +398,7 @@ const colStyle = (data: any) => {
 const createNewCalibration = async () => {
   // Clear out old data
   useGageStore().resetGageStore();
+  hardResetTuningStore();
   clearUserCalibrationRunData();
 
   fetchNewCalibrationRunId().then(response => {
