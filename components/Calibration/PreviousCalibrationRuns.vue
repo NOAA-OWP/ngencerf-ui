@@ -169,6 +169,8 @@ const { loadGageTabStaticData, resetGageStore } = useGageStore();
 const { loadOptimizationTabStaticData } = useOptimizationStore();
 const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 
+const { hardResetRunStatusStore } = useRunStatusStore();
+
 const { calibrationJobId } = storeToRefs(generalStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
@@ -234,6 +236,7 @@ onMounted(async () => {
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     resetGageStore();
     hardResetTuningStore();
+    hardResetRunStatusStore();
     clearUserCalibrationRunData();
     await updateUserCalibrationJobsListData();
     interval = window.setInterval(toggleColor, 500); // Toggle every 500ms (0.5s)
