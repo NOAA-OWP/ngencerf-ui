@@ -9,8 +9,8 @@ generate_git_info() {
     # Extract the repo name (everything after the last slash) and remove any trailing .git
     key=${repo_url##*/}
     key=${key%.git}
-    GIT_INFO_PATH=$ngencerf_ui/public/${key}_git_info.json
-    echo "Generating " + GIT_INFO_PATH + "..."
+    GIT_INFO_PATH=$ngencerf_ui/${key}_git_info.json
+    echo "Generating ${GIT_INFO_PATH}..."
     jq -n \
         --arg commit_hash "$(git rev-parse HEAD)" \
         --arg branch "$(git rev-parse --abbrev-ref HEAD)" \
@@ -21,8 +21,15 @@ generate_git_info() {
         --arg build_date "$(date -u +'%Y-%m-%d %H:%M:%S UTC')" \
         "{\"${key}\": {commit_hash: \$commit_hash, branch: \$branch, tags: \$tags, author: \$author, commit_date: \$commit_date, message: \$message, build_date: \$build_date}}" \
         > "$GIT_INFO_PATH"
-    echo "git_info.json created at $GIT_INFO_PATH"
+    echo "Generated $GIT_INFO_PATH"
 }
 
-generate_git_info
-echo
+# Check if the script is being sourced or run directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    # Script is being run directly, call the function
+    generate_git_info
+    echo
+else
+    # Script is being sourced, print message
+    echo "generate_git_info function sourced successfully!"
+fi
