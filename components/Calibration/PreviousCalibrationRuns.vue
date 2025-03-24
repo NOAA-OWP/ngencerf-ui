@@ -28,7 +28,7 @@
               :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
-              :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)" reorderableColumns>
+              :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
 
               <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top;">
                 <template #body="slotProps">
@@ -164,7 +164,7 @@ import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "
 import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
-const { loadGageTabStaticData } = useGageStore();
+const { loadGageTabStaticData, resetGageStore } = useGageStore();
 
 const { loadOptimizationTabStaticData } = useOptimizationStore();
 const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
@@ -232,6 +232,9 @@ onMounted(async () => {
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); } includeArchivedJobs.value = false;;
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
+    resetGageStore();
+    hardResetTuningStore();
+    clearUserCalibrationRunData();
     await updateUserCalibrationJobsListData();
     interval = window.setInterval(toggleColor, 500); // Toggle every 500ms (0.5s)
   }
@@ -397,7 +400,7 @@ const colStyle = (data: any) => {
 
 const createNewCalibration = async () => {
   // Clear out old data
-  useGageStore().resetGageStore();
+  resetGageStore();
   hardResetTuningStore();
   clearUserCalibrationRunData();
 
