@@ -77,8 +77,10 @@
 
     <table class="_help-table">
       <thead>
-        <th>Menu Item</th>
-        <th>Description</th>
+        <tr>
+          <th>Menu Item</th>
+          <th>Description</th>
+        </tr>
       </thead>
       <tbody>
         <tr>
