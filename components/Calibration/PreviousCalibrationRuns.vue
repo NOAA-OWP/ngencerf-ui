@@ -444,7 +444,8 @@ const gotoHeadwaterBasinGage = () => {
  * following section require backend api before them can be implemented
  */
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  const selectedRunId = selectedCalibrationRun.value.calibration_run_id
+  isLoading.value = true;
+  const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
   cloneCalibrationRun(selectedRunId).then(async (response) => {
     if (response.status == 200) {
       await fetchUserCalibrationJobsListData();
@@ -457,6 +458,7 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
       });
     }
   });
+  isLoading.value = false;
 };
 
 const confirmDelete = useConfirm();
