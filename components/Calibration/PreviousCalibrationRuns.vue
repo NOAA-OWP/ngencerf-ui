@@ -26,9 +26,10 @@
 
             <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id"
               :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
-              v-model:selection="selectedCalibrationRun" selectionMode="single" contextMenu
+              v-model:selection="selectedCalibrationRun" selectionMode="multiple" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
-              :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
+              :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)" @row-select="dtRowSelected($event)"
+              @row-unselect="dtRowUnselect($event)">
 
               <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top;">
                 <template #body="slotProps">
@@ -128,6 +129,11 @@
           </div>
         </div>
 
+        <div id="MultJobOpsDlg" v-if="showHideMultOps">
+          <MultipleJobOperations :cal-jobs="selectedMultipleCalibrationRun" @DeleteSelectedJobs="deleteSelectedJobs()"
+            @ArchiveSelectedJobs="archiveSelectedJobs()" @CloseMultJobWindow="closeMultJobsWindow" />
+        </div>
+
       </div>
     </div>
 
@@ -139,7 +145,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, computed, getCurrentInstance } from "vue";
 import { storeToRefs } from "pinia";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
@@ -147,6 +153,7 @@ import Swal from 'sweetalert2';
 
 //const LazyJobFilterDialog = defineAsyncComponent(() => import("@/components/Common/JobFilterDialog.vue"));
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
+import MultipleJobOperations from "@/components/Common/MultipleJobOperations.vue"
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -192,12 +199,17 @@ const showFilters = ref<boolean>(false);
 
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 
+const selectedMultipleCalibrationRun = ref<CalibrationJobListItem[]>([]);
+
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
 const currentJobsList = ref<CalibrationJobListItem[]>();
 
 let interval: number | undefined;
 const runningColor = ref<string>('white');
+
+const showHideMultOps = ref<boolean>(false);
+const systemContextMenu = ref<boolean>(false);
 
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
@@ -210,21 +222,6 @@ const cmArchiveRun = ref([
   { label: 'Un-archive', icon: 'pi pi-unlock', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.unarchive) }
 ]);
 
-const onRowContextMenu = (event: any) => {
-  crContextMenu.value.show(event.originalEvent);
-};
-
-const whichContextMenu = computed(() => {
-  if (selectedCalibrationRun?.value?.is_archived) {
-    return cmArchiveRun.value;
-  }
-  return cmCalibrationRun.value;
-});
-
-const ptColumn = ref({
-  columnHeaderContent: { style: { "justify-content": "center" } },
-  bodyCell: { style: { "text-align": "center" } }
-});
 
 onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
@@ -244,10 +241,117 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  selectedCalibrationRun.value = undefined;
   if (interval) {
     clearInterval(interval); // Clean up the interval when the component is destroyed
   }
 });
+
+const onRowContextMenu = (event: any) => {
+  if (selectedMultipleCalibrationRun.value.length <= 1) {
+    crContextMenu.value.show(event.originalEvent);
+  }
+  else {
+    showHideMultOps.value = true;
+    window.addEventListener(`click`, handleContextMenu);
+  }
+};
+
+const dtRowSelected = (e: any) => {
+  addCalibrationRun(e.data);
+  console.log("Added: ", selectedMultipleCalibrationRun.value)
+}
+
+const dtRowUnselect = (e: any) => {
+  selectedMultipleCalibrationRun.value
+  deleteCalibrationRunById(e.data);
+  console.log("Removed: ", selectedMultipleCalibrationRun.value)
+}
+
+/**
+ * Adds a calibration run object if one with the same `calibration_run_id` doesn't exist.
+ * @param newRun - The new calibration run to be added.
+ */
+function addCalibrationRun(calRun: CalibrationJobListItem): void {
+  const exists = selectedMultipleCalibrationRun.value.some(
+    run => run.calibration_run_id === calRun.calibration_run_id
+  );
+  if (!exists) {
+    selectedMultipleCalibrationRun.value.push(calRun);
+  }
+}
+
+watch(selectedCalibrationRun, () => {
+  if (selectedMultipleCalibrationRun.value.length === 0) {
+    if (systemContextMenu.value) {
+      window.removeEventListener(`contextmenu`, handleContextMenu);
+      systemContextMenu.value = false;
+    }
+  } else if (!systemContextMenu.value) {
+      window.addEventListener(`contextmenu`, handleContextMenu);
+      systemContextMenu.value = true;
+    };
+});
+
+const handleContextMenu = (event: MouseEvent) => {
+  event.preventDefault(); // Prevent the default context menu
+}
+
+/**
+ * Deletes all selected jobs
+ * 
+ */
+const deleteSelectedJobs = () => {
+  console.log("Deleting jobs...")
+  return;
+}
+
+/**
+ * Archives all selected jobs
+ * 
+ */
+const archiveSelectedJobs = () => {
+  console.log("Archiving  jobs...")
+  return;
+}
+
+/**
+ * Close Mult Jobs Window
+ * 
+ */
+const closeMultJobsWindow = () => {
+  selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRun.value = [];
+  showHideMultOps.value = false;
+  window.removeEventListener(`click`, handleContextMenu);
+}
+
+
+/**
+ * Deletes calibration run(s) with a specific `calibration_run_id`.
+ * In this example, it will remove any calibration run with id equal to 1.
+ * @param id - The calibration run id to delete (default is 1).
+ */
+function deleteCalibrationRunById(calRun: CalibrationJobListItem): void {
+  selectedMultipleCalibrationRun.value = selectedMultipleCalibrationRun.value.filter(
+    run => run.calibration_run_id !== calRun.calibration_run_id
+  );
+}
+
+const whichContextMenu = computed(() => {
+  if (selectedCalibrationRun?.value?.is_archived) {
+    return cmArchiveRun.value;
+  }
+  return cmCalibrationRun.value;
+});
+
+const ptColumn = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "center" } }
+});
+
+/************************************************************/
+
 
 const refreshJobList = async () => {
   isLoading.value = true;
@@ -390,13 +494,13 @@ const colStyle = (data: any) => {
   else if (data.status.indexOf('Done') !== -1) {
     return { backgroundColor: 'blue' };
   }
-   else if (data.status.indexOf('Saved') !== -1) {
+  else if (data.status.indexOf('Saved') !== -1) {
     return { backgroundColor: 'yellow' };
-  } 
+  }
   else if (data.status.indexOf('Ready') !== -1) {
     return { backgroundColor: 'green' };
   }
-   else if (data.status.indexOf('Cancelled') !== -1) {
+  else if (data.status.indexOf('Cancelled') !== -1) {
     return { backgroundColor: 'orange' };
   }
 }
@@ -687,6 +791,13 @@ small-label,
 #Datatable,
 #JobFilterDialog {
   width: 1240px !important;
+}
+
+#MultJobOpsDlg {
+  position: fixed;
+  top: 33%;
+  z-index: 10;
+  left: 40%;
 }
 
 .toggle-switch {
