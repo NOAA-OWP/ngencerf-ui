@@ -9,8 +9,7 @@
           <span @mouseenter="showServerInfo" @mouseleave="hideServerInfo">Version:
             {{ serverInfo?.ngenCerf_version }}</span>
         </div>
-        // TODO Need to get this from the server
-        <div class="copyright">Copyright {{ jsonData.release_info.copyright}}</div>
+        <div class="copyright">Copyright {{ serverInfo?.ngenCerf_copyright}}</div>
       </div>
     </div>
   </div>
@@ -19,15 +18,14 @@
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
 
-import type { CombinedVerstionInfo } from "@/composables/NextGenModel";
+import type { CombinedVersionInfo, DynamicObject } from "@/composables/NextGenModel";
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
-// import jsonData from '@/assets/version.json';
 
 const { getServerInfo, setServerInfo } = generalStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
-const serverInfo = ref<CombinedVerstionInfo>();
+const serverInfo = ref<CombinedVersionInfo>();
 
 onMounted( async () => {
   serverInfo.value = getServerInfo();
