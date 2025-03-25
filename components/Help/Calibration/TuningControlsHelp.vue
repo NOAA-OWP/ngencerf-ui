@@ -66,9 +66,11 @@
   </p>
   <table class="_help-table">
     <thead>
+      <tr>
         <th>Item</th>
         <th>Description</th>
-      </thead>
+      </tr>
+    </thead>
     <tbody>
         <tr>
           <td class="td1">Entering Times</td>
