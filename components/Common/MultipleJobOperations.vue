@@ -11,8 +11,7 @@
 
       <div>
         <span v-for="(item, index) of calJobs">
-          <!-- {{  item.calibration_run_id }} {{ index === calJobs.length - 2 ? ', and ' : '' }} {{ index < calJobs.length - 1 ? ', ' : ''  }} -->
-          {{ item.calibration_run_id }} {{ index < calJobs.length - 1 ? ', ' : '' }} {{ index===calJobs.length - 2
+          {{ item }}{{ index < calJobs.length - 1 ? ', ' : '' }} {{ index===calJobs.length - 2
             ? ' and ' : '' }} </span>
       </div>
 
@@ -30,10 +29,8 @@
 import { onMounted, ref } from "vue";//NOSONAR
 import Button from "primevue/button";
 
-import type { CalibrationJobListItem } from "@/composables/NextGenModel"
-
 const props = defineProps<{
-  calJobs: CalibrationJobListItem[];
+  calJobs: number[];
 }>();
 
 const emit = defineEmits(["DeleteSelectedJobs", "ArchiveSelectedJobs", "CloseMultJobWindow"]);

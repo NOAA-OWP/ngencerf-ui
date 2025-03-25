@@ -17,7 +17,7 @@
         <div class="">
 
           <div id="CalTable" class="w-max mx-auto">
-            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()"
+            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="disableFilters"
               @RefreshJobList="refreshJobList()" :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
 
@@ -130,8 +130,8 @@
         </div>
 
         <div id="MultJobOpsDlg" v-if="showHideMultOps">
-          <MultipleJobOperations :cal-jobs="selectedMultipleCalibrationRun" @DeleteSelectedJobs="deleteSelectedJobs()"
-            @ArchiveSelectedJobs="archiveSelectedJobs()" @CloseMultJobWindow="closeMultJobsWindow" />
+          <MultipleJobOperations :cal-jobs="selectedMultipleCalibrationRun" @DeleteSelectedJobs="acceptMultipleDelete()"
+            @ArchiveSelectedJobs="acceptMultpleArchive(true)" @CloseMultJobWindow="closeMultJobsWindow" />
         </div>
 
       </div>
@@ -199,7 +199,7 @@ const showFilters = ref<boolean>(false);
 
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 
-const selectedMultipleCalibrationRun = ref<CalibrationJobListItem[]>([]);
+const selectedMultipleCalibrationRun = ref<number[]>([]);
 
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
@@ -259,13 +259,13 @@ const onRowContextMenu = (event: any) => {
 
 const dtRowSelected = (e: any) => {
   addCalibrationRun(e.data);
-  console.log("Added: ", selectedMultipleCalibrationRun.value)
+  console.log("Added Job Number: ", selectedMultipleCalibrationRun.value)
 }
 
 const dtRowUnselect = (e: any) => {
   selectedMultipleCalibrationRun.value
   deleteCalibrationRunById(e.data);
-  console.log("Removed: ", selectedMultipleCalibrationRun.value)
+  console.log("Removed Job Number: ", selectedMultipleCalibrationRun.value)
 }
 
 /**
@@ -274,11 +274,22 @@ const dtRowUnselect = (e: any) => {
  */
 function addCalibrationRun(calRun: CalibrationJobListItem): void {
   const exists = selectedMultipleCalibrationRun.value.some(
-    run => run.calibration_run_id === calRun.calibration_run_id
+    run => run === calRun.calibration_run_id
   );
   if (!exists) {
-    selectedMultipleCalibrationRun.value.push(calRun);
+    selectedMultipleCalibrationRun.value.push(calRun.calibration_run_id);
   }
+}
+
+/**
+ * Deletes calibration run(s) with a specific `calibration_run_id`.
+ * In this example, it will remove any calibration run with id equal to 1.
+ * @param id - The calibration run id to delete (default is 1).
+ */
+function deleteCalibrationRunById(calRun: CalibrationJobListItem): void {
+  selectedMultipleCalibrationRun.value = selectedMultipleCalibrationRun.value.filter(
+    run => run !== calRun.calibration_run_id
+  );
 }
 
 watch(selectedCalibrationRun, () => {
@@ -288,31 +299,18 @@ watch(selectedCalibrationRun, () => {
       systemContextMenu.value = false;
     }
   } else if (!systemContextMenu.value) {
-      window.addEventListener(`contextmenu`, handleContextMenu);
-      systemContextMenu.value = true;
-    };
+    window.addEventListener(`contextmenu`, handleContextMenu);
+    systemContextMenu.value = true;
+  };
 });
+
+const disableFilters = computed(() => {
+  return (selectedMultipleCalibrationRun.value.length > 1);
+});
+
 
 const handleContextMenu = (event: MouseEvent) => {
   event.preventDefault(); // Prevent the default context menu
-}
-
-/**
- * Deletes all selected jobs
- * 
- */
-const deleteSelectedJobs = () => {
-  console.log("Deleting jobs...")
-  return;
-}
-
-/**
- * Archives all selected jobs
- * 
- */
-const archiveSelectedJobs = () => {
-  console.log("Archiving  jobs...")
-  return;
 }
 
 /**
@@ -324,18 +322,6 @@ const closeMultJobsWindow = () => {
   selectedMultipleCalibrationRun.value = [];
   showHideMultOps.value = false;
   window.removeEventListener(`click`, handleContextMenu);
-}
-
-
-/**
- * Deletes calibration run(s) with a specific `calibration_run_id`.
- * In this example, it will remove any calibration run with id equal to 1.
- * @param id - The calibration run id to delete (default is 1).
- */
-function deleteCalibrationRunById(calRun: CalibrationJobListItem): void {
-  selectedMultipleCalibrationRun.value = selectedMultipleCalibrationRun.value.filter(
-    run => run.calibration_run_id !== calRun.calibration_run_id
-  );
 }
 
 const whichContextMenu = computed(() => {
@@ -611,6 +597,10 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
     }
   })
 }
+
+/**
+ * Aceept the deletion of a single job
+ */
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(async (response) => {
     if (response.status == 200) {
@@ -627,6 +617,29 @@ const acceptDelete = (selectedRunId: number) => {
   selectedCalibrationRun.value = undefined;
 }
 
+/**
+ * Aceept the deletion of a single job
+ */
+const acceptMultipleDelete = () => {
+  deleteCalibrationRun(selectedMultipleCalibrationRun.value).then(async (response) => {
+    if (response.status == 200) {
+      await fetchUserCalibrationJobsListData();
+      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
+      await updateUserCalibrationJobsListData();
+    } else {
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Jobs Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
+  });
+  selectedCalibrationRun.value = undefined;
+}
+
+
+/**
+ * Aceept archiving of a single job
+ */
 const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
   archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
     if (response.status == 200) {
@@ -642,6 +655,27 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
   });
   selectedCalibrationRun.value = undefined;
 }
+
+/**
+ * Aceept archiving of a muiltiple jobs
+ */
+const acceptMultpleArchive = (archiveJob: boolean) => {
+  archiveCalibrationRun(selectedMultipleCalibrationRun.value, archiveJob).then(async (response) => {
+    if (response.status == 200) {
+      await fetchUserCalibrationJobsListData();
+      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
+      await updateUserCalibrationJobsListData();
+    } else {
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Archive Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
+  });
+  selectedCalibrationRun.value = undefined;
+}
+
+
 /**
  * Populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
  */
