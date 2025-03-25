@@ -9,8 +9,10 @@
 
     <table class="_help-table">
       <thead>
-        <th>Item</th>
-        <th>Description</th>
+        <tr>
+          <th>Item</th>
+          <th>Description</th>
+        </tr>
       </thead>
       <tbody>
         <tr>
