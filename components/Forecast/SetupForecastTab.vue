@@ -83,7 +83,6 @@ const {
 
 const {
   loadSetupForecastTabData,
-  hardResetForecastStore
 } = useForecastStore();
 
 /**

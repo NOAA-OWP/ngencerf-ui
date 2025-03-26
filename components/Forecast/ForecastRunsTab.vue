@@ -178,7 +178,6 @@ const ptColumn = ref({
 const onRowContextMenu = (event: any) => {
   cmForecastRun.value = [];
   const crRowData = event.data as ForecastJob;
-  console.log(`crRowData: ${JSON.stringify(crRowData)}`);
 
   if (selectedForecastJob && selectedForecastJob.value?.forecast_run_id == crRowData.forecast_run_id) {
     crContextMenu.value.show(event.originalEvent);

@@ -147,9 +147,12 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       forecastJobStatus.value = forecastJob?.status;
       forcingDownloadStatus.value = forecastJob?.forcing_download?.status;
       elapsedTime.value = forecastJob?.elapsed_time;
-      submitTimeDate.value = new Date(forecastJob?.submit_date as string);
-      if (isValidDate(submitTimeDate.value)) {
-        submitTime.value = convertTimeZone(submitTimeDate.value);
+
+      if (forecastJob?.submit_date) {
+        submitTimeDate.value = new Date(forecastJob?.submit_date as string);
+        if (isValidDate(submitTimeDate.value)) {
+          submitTime.value = convertTimeZone(submitTimeDate.value);
+        }
       }
     }
     // set resultsPathname
@@ -319,13 +322,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     /// load forecastCycles
     await loadSetupForecastTabData();
 
-    console.log('forecast_row_data', forecast_row_data);
-    console.log('forecastCycles.value', forecastCycles.value);
-
     forecastCycle.value = forecastCycles.value?.find( (forecast_cycle_data : ForecastCycle ) =>
       forecast_cycle_data.name === forecast_row_data.cycle
     );
-    console.log('forecastCycle set in setSelectedForecastRowData', forecastCycle.value);
 
     /*
      * the follow is hack to get around the fact that we are using calibrationRunForForecast to check for calibration_run_id, but it's only set on calibration run tab
