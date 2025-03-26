@@ -54,7 +54,7 @@ const disableArchiveBtn = computed(() => {
     return false
   } else {
     // There is a mixture of both true and false values.
-    return true
+    return false
   }
 })
 

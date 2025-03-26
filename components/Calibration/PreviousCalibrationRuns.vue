@@ -189,7 +189,6 @@ const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUser
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun } = useCalibrationJobStore();
 
 import { hilightTab } from '@/composables/TabHilight';
-import { sassFalse } from "sass";
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -262,13 +261,10 @@ const onRowContextMenu = (event: any) => {
 
 const dtRowSelected = (e: any) => {
   addCalibrationRun(e.data);
-  console.log("Added Job Number: ", selectedMultipleCalibrationRuns.value)
 }
 
 const dtRowUnselect = (e: any) => {
-  selectedMultipleCalibrationRuns.value
   deleteCalibrationRunById(e.data);
-  console.log("Removed Job Number: ", selectedMultipleCalibrationRuns.value)
 }
 
 /**
@@ -832,7 +828,7 @@ small-label,
 
 #Datatable,
 #JobFilterDialog {
-  width: 1240px !important;
+  width: auto !important;
 }
 
 #MultJobOpsDlg {
