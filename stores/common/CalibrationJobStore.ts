@@ -62,30 +62,46 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
 
   /**
   * Delete a job
+  * If a single job comes in, make sure we put it into an array.
+  * Otherwise, it is an array.
   */
-  async function deleteCalibrationRun(runId: number) {
-    return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/delete_job/`, {
+  async function deleteCalibrationRun(runIds: any) {
+    let toDelete: number[];
+    if( !Array.isArray(runIds) ) {
+      toDelete = [runIds];
+    } else {
+      toDelete = runIds;
+    }
+    return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/delete_jobs/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: runId })
+      body: JSON.stringify({ calibration_run_ids: toDelete })
     })
   }
 
   /**
   * Archive or Un-archive a job
   * If unarchive, set unArchive to true
+  * If a single job comes in, make sure we put it into an array.
+  * Otherwise, it is an array.
   */
-  async function archiveCalibrationRun(runId: number, unArchive:  boolean) {
-    return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/archive_job/`, {
+  async function archiveCalibrationRun(runIds: any, unArchive:  boolean) {
+        let toDelete: number[];
+    if( !Array.isArray(runIds) ) {
+      toDelete = [runIds];
+    } else {
+      toDelete = runIds;
+    }
+    return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/archive_jobs/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: runId, archive: unArchive })
+      body: JSON.stringify({ calibration_run_ids: toDelete, archive: unArchive })
     })
   }
 
