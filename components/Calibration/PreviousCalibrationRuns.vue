@@ -30,7 +30,7 @@
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
 
-              <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top;">
+              <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top; padding: 0px !important">
                 <template #body="slotProps">
                   <div v-if="slotProps.data.status.indexOf('Running') === -1" :style="colStyle(slotProps.data)">
                     &nbsp;
