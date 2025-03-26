@@ -11,7 +11,7 @@
 
       <div>
         <span v-for="(item, index) of calJobs">
-          {{ item }}{{ index < calJobs.length - 1 ? ', ' : '' }} {{ index===calJobs.length - 2 ? ' and ' : '' }} </span>
+          {{ item }}{{ index < calJobs.length - 1 && calJobs.length > 2 ? ', ' : '' }} {{ index===calJobs.length - 2 ? ' and ' : '' }} </span>
       </div>
 
       <Button class="ngenButtonDiv mt-3" @click.stop="sendDelete" aria-label="Delete selected jobs"
