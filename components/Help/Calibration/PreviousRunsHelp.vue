@@ -110,7 +110,7 @@
       <thead>
         <tr class="text-left">
           <th>&nbsp;</th>
-          <th>&nbsp;</th>
+          <th>&nbsp;&nbsp;</th>
           <th>Color</th>
           <th>Job Status</th>
         </tr>
