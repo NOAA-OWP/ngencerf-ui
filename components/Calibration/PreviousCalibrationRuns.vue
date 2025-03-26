@@ -130,8 +130,10 @@
         </div>
 
         <div id="MultJobOpsDlg" v-if="showHideMultOps">
-          <MultipleJobOperations :cal-jobs="selectedMultipleCalibrationRun" @DeleteSelectedJobs="acceptMultipleDelete()"
-            @ArchiveSelectedJobs="acceptMultpleArchive(true)" @CloseMultJobWindow="closeMultJobsWindow" />
+          <MultipleJobOperations :cal-jobs="selectedMultipleCalibrationRuns"
+            :cal-job-list="selectedMultipleCalibrationRunData" @DeleteSelectedJobs="acceptMultipleDelete()"
+            @ArchiveSelectedJobs="acceptMultpleArchive(true)" @UnarchiveSelectedJobs="acceptMultpleArchive(false)"
+            @CloseMultJobWindow="closeMultJobsWindow" />
         </div>
 
       </div>
@@ -199,7 +201,8 @@ const showFilters = ref<boolean>(false);
 
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 
-const selectedMultipleCalibrationRun = ref<number[]>([]);
+const selectedMultipleCalibrationRuns = ref<number[]>([]);
+const selectedMultipleCalibrationRunData = ref<CalibrationJobListItem[]>([]);
 
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
@@ -248,7 +251,7 @@ onBeforeUnmount(() => {
 });
 
 const onRowContextMenu = (event: any) => {
-  if (selectedMultipleCalibrationRun.value.length <= 1) {
+  if (selectedMultipleCalibrationRuns.value.length <= 1) {
     crContextMenu.value.show(event.originalEvent);
   }
   else {
@@ -259,13 +262,13 @@ const onRowContextMenu = (event: any) => {
 
 const dtRowSelected = (e: any) => {
   addCalibrationRun(e.data);
-  console.log("Added Job Number: ", selectedMultipleCalibrationRun.value)
+  console.log("Added Job Number: ", selectedMultipleCalibrationRuns.value)
 }
 
 const dtRowUnselect = (e: any) => {
-  selectedMultipleCalibrationRun.value
+  selectedMultipleCalibrationRuns.value
   deleteCalibrationRunById(e.data);
-  console.log("Removed Job Number: ", selectedMultipleCalibrationRun.value)
+  console.log("Removed Job Number: ", selectedMultipleCalibrationRuns.value)
 }
 
 /**
@@ -273,11 +276,12 @@ const dtRowUnselect = (e: any) => {
  * @param newRun - The new calibration run to be added.
  */
 function addCalibrationRun(calRun: CalibrationJobListItem): void {
-  const exists = selectedMultipleCalibrationRun.value.some(
+  const exists = selectedMultipleCalibrationRuns.value.some(
     run => run === calRun.calibration_run_id
   );
   if (!exists) {
-    selectedMultipleCalibrationRun.value.push(calRun.calibration_run_id);
+    selectedMultipleCalibrationRuns.value.push(calRun.calibration_run_id);
+    selectedMultipleCalibrationRunData.value.push(calRun);
   }
 }
 
@@ -287,13 +291,16 @@ function addCalibrationRun(calRun: CalibrationJobListItem): void {
  * @param id - The calibration run id to delete (default is 1).
  */
 function deleteCalibrationRunById(calRun: CalibrationJobListItem): void {
-  selectedMultipleCalibrationRun.value = selectedMultipleCalibrationRun.value.filter(
+  selectedMultipleCalibrationRuns.value = selectedMultipleCalibrationRuns.value.filter(
     run => run !== calRun.calibration_run_id
+  );
+  selectedMultipleCalibrationRunData.value = selectedMultipleCalibrationRunData.value.filter(
+    run => run.calibration_run_id !== calRun.calibration_run_id
   );
 }
 
 watch(selectedCalibrationRun, () => {
-  if (selectedMultipleCalibrationRun.value.length === 0) {
+  if (selectedMultipleCalibrationRuns.value.length === 0) {
     if (systemContextMenu.value) {
       window.removeEventListener(`contextmenu`, handleContextMenu);
       systemContextMenu.value = false;
@@ -305,7 +312,7 @@ watch(selectedCalibrationRun, () => {
 });
 
 const disableFilters = computed(() => {
-  return (selectedMultipleCalibrationRun.value.length > 1);
+  return (selectedMultipleCalibrationRuns.value.length > 1);
 });
 
 
@@ -319,7 +326,8 @@ const handleContextMenu = (event: MouseEvent) => {
  */
 const closeMultJobsWindow = () => {
   selectedCalibrationRun.value = undefined;
-  selectedMultipleCalibrationRun.value = [];
+  selectedMultipleCalibrationRuns.value = [];
+  selectedMultipleCalibrationRunData.value = [];
   showHideMultOps.value = false;
   window.removeEventListener(`click`, handleContextMenu);
 }
@@ -621,7 +629,7 @@ const acceptDelete = (selectedRunId: number) => {
  * Aceept the deletion of a single job
  */
 const acceptMultipleDelete = () => {
-  deleteCalibrationRun(selectedMultipleCalibrationRun.value).then(async (response) => {
+  deleteCalibrationRun(selectedMultipleCalibrationRuns.value).then(async (response) => {
     if (response.status == 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
@@ -660,7 +668,7 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
  * Aceept archiving of a muiltiple jobs
  */
 const acceptMultpleArchive = (archiveJob: boolean) => {
-  archiveCalibrationRun(selectedMultipleCalibrationRun.value, archiveJob).then(async (response) => {
+  archiveCalibrationRun(selectedMultipleCalibrationRuns.value, archiveJob).then(async (response) => {
     if (response.status == 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
