@@ -36,8 +36,8 @@
                 <template #body="slotProps">
                   <div v-if="slotProps.data.status.indexOf('Running') === -1"
                     :style="{ 'backgroundColor': colStyle(slotProps.data) }"
-                    :aria-label="colStyle(slotProps.data) + ' indicates job status is ' + slotProps.data.status"
-                    :title="colStyle(slotProps.data) + ' indicates job status is ' + slotProps.data.status">
+                    :aria-label="slotProps.data.status"
+                    :title="colStyle(slotProps.data)">
                     &nbsp;
                   </div>
                   <div v-else :style="{ backgroundColor: runningColor }"

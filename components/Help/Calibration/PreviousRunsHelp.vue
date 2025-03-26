@@ -112,6 +112,7 @@
           <th>&nbsp;</th>
           <th>&nbsp;&nbsp;</th>
           <th>Color</th>
+          <th>&nbsp;&nbsp;</th>
           <th>Job Status</th>
         </tr>
       </thead>
@@ -120,36 +121,42 @@
           <td style="background-color: green" class="pr-1">&nbsp;</td>
           <td>&nbsp;</td>
           <td>Green</td>
+          <td>&nbsp;</td>
           <td>Ready</td>
         </tr>
         <tr class="leading-8">
           <td style="background-color: yellow" class="pr-1">&nbsp;</td>
           <td>&nbsp;</td>
           <td>Yellow</td>
+          <td>&nbsp;</td>
           <td>Saved</td>
         </tr>
         <tr class="leading-8">
           <td style="background-color: blue" class="pr-1">&nbsp;</td>
           <td>&nbsp;</td>
           <td>Blue</td>
+          <td>&nbsp;</td>
           <td>Done</td>
         </tr>
         <tr class="leading-8">
           <td style="background-color: orange" class="pr-1">&nbsp;</td>
           <td>&nbsp;</td>
           <td>Orange</td>
+          <td>&nbsp;</td>
           <td>Cancelled</td>
         </tr>
         <tr class="leading-8">
           <td style="background-color: red" class="pr-1">&nbsp;</td>
           <td>&nbsp;</td>
           <td>Red</td>
+          <td>&nbsp;</td>
           <td>Failed</td>
         </tr>
         <tr class="leading-8">
-          <td style="background-color: blue" class="pr-1">&nbsp;</td>
+          <td style="background-color: green" class="pr-1">&nbsp;</td>
           <td>&nbsp;</td>
-          <td>Flashing Blue</td>
+          <td>Flashing Green</td>
+          <td>&nbsp;</td>
           <td>Running</td>
         </tr>
       </tbody>
