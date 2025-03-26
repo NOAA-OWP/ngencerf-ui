@@ -30,12 +30,18 @@
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)">
 
-              <Column :pt="ptColumn" header="" style="width: 10px; text-align:center; vertical-align: top; padding: 0px !important">
+              <Column :pt="ptColumn" header=""
+                style="width: 10px; text-align:center; vertical-align: top; padding: 0px !important">
                 <template #body="slotProps">
-                  <div v-if="slotProps.data.status.indexOf('Running') === -1" :style="colStyle(slotProps.data)">
+                  <div v-if="slotProps.data.status.indexOf('Running') === -1"
+                    :style="{ 'backgroundColor': colStyle(slotProps.data) }"
+                    :aria-label="colStyle(slotProps.data) + ' indicates job status is ' + slotProps.data.status"
+                    :title="colStyle(slotProps.data) + ' indicates job status is ' + slotProps.data.status">
                     &nbsp;
                   </div>
-                  <div v-else :style="{ backgroundColor: runningColor }">
+                  <div v-else :style="{ backgroundColor: runningColor }"
+                    aria-label="Blinking green indicates job is currently running"
+                    title="Blinking green indicates job is currently running">
                     &nbsp;
                   </div>
                 </template>
@@ -385,19 +391,19 @@ const rowStyle = (data: any) => {
 
 const colStyle = (data: any) => {
   if (data.status.indexOf('Failed') !== -1) {
-    return { backgroundColor: 'red' };
+    return 'Red';
   }
   else if (data.status.indexOf('Done') !== -1) {
-    return { backgroundColor: 'blue' };
+    return 'Blue';
   }
-   else if (data.status.indexOf('Saved') !== -1) {
-    return { backgroundColor: 'yellow' };
-  } 
+  else if (data.status.indexOf('Saved') !== -1) {
+    return 'Yellow';
+  }
   else if (data.status.indexOf('Ready') !== -1) {
-    return { backgroundColor: 'green' };
+    return 'Green';
   }
-   else if (data.status.indexOf('Cancelled') !== -1) {
-    return { backgroundColor: 'orange' };
+  else if (data.status.indexOf('Cancelled') !== -1) {
+    return 'Orange';
   }
 }
 

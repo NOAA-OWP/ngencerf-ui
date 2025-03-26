@@ -35,9 +35,9 @@
       <div id="Circles" class="col-span-2">
         <div id="UserGroup" class="grid grid-cols-2">
           <div class="col-span-1">
-            <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'"
-              class="pt-0" id="HelpCircle" title="Help for current tab"
-              aria-label="Help for current tab" @click="displayHelp">?</Button>
+            <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'" class="pt-0"
+              id="HelpCircle" title="Help for current tab" aria-label="Help for current tab"
+              @click="displayHelp">?</Button>
           </div>
 
           <div class="col-span-1">
@@ -61,56 +61,50 @@
                 class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
             </div>
 
-            <span v-if="filterIsVisible()">
-              <JobFilterHelp />
-            </span>
+            <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
+              <LazyHelpLandingPageHelp />
+            </div>
 
-            <span v-else>
-              <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
-                <LazyHelpLandingPageHelp />
-              </div>
-
-              <div v-if="location.name === 'Calibration'" class="py-10 px-1">
-                <div v-if="getMenuIndex() === 1">
-                  <span v-if="getCalibrationTabIndex() === 1">
-                    <LazyCalibrationHelpPreviousRunsHelp />
-                  </span>
-                  <span v-else-if="getCalibrationTabIndex() === 2">
-                    <LazyCalibrationHelpHeadwaterBasinGageHelp />
-                  </span>
-                  <span v-else-if="getCalibrationTabIndex() === 3">
-                    <LazyCalibrationHelpFormulationHelp />
-                  </span>
-                  <span v-else-if="getCalibrationTabIndex() === 4">
-                    <LazyCalibrationHelpTuningControlsHelp />
-                  </span>
-                  <span v-else-if="getCalibrationTabIndex() === 5">
-                    <LazyCalibrationHelpOptimizationMetricsHelp />
-                  </span>
-                  <span v-else-if="getCalibrationTabIndex() === 6">
-                    <LazyCalibrationHelpRunStatusHelp />
-                  </span>
-                  <span v-else-if="getCalibrationTabIndex() === 7">
-                    <LazyCalibrationHelpResultsHelp />
-                  </span>
-                </div>
-              </div>
-
-              <div v-else-if="getMenuIndex() === 2">
-                <span v-if="getEvaluationTabIndex() === 1">
-                  <LazyEvaluationCalibrationRunsHelp />
+            <div v-if="location.name === 'Calibration'" class="py-10 px-1">
+              <div v-if="getMenuIndex() === 1">
+                <span v-if="getCalibrationTabIndex() === 1">
+                  <LazyCalibrationHelpPreviousRunsHelp />
                 </span>
-                <span v-if="getEvaluationTabIndex() === 2">
-                  <LazyEvaluationEvaluatesHelp />
+                <span v-else-if="getCalibrationTabIndex() === 2">
+                  <LazyCalibrationHelpHeadwaterBasinGageHelp />
                 </span>
-                <span v-if="getEvaluationTabIndex() === 3">
-                  <LazyEvaluationCalibrationSelectAltInterationssHelp />
+                <span v-else-if="getCalibrationTabIndex() === 3">
+                  <LazyCalibrationHelpFormulationHelp />
                 </span>
-                <span v-if="getEvaluationTabIndex() === 4">
-                  <LazyEvaluationRunStatusHelp />
+                <span v-else-if="getCalibrationTabIndex() === 4">
+                  <LazyCalibrationHelpTuningControlsHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 5">
+                  <LazyCalibrationHelpOptimizationMetricsHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 6">
+                  <LazyCalibrationHelpRunStatusHelp />
+                </span>
+                <span v-else-if="getCalibrationTabIndex() === 7">
+                  <LazyCalibrationHelpResultsHelp />
                 </span>
               </div>
-            </span>
+            </div>
+
+            <div v-else-if="getMenuIndex() === 2">
+              <span v-if="getEvaluationTabIndex() === 1">
+                <LazyEvaluationCalibrationRunsHelp />
+              </span>
+              <span v-if="getEvaluationTabIndex() === 2">
+                <LazyEvaluationEvaluatesHelp />
+              </span>
+              <span v-if="getEvaluationTabIndex() === 3">
+                <LazyEvaluationCalibrationSelectAltInterationssHelp />
+              </span>
+              <span v-if="getEvaluationTabIndex() === 4">
+                <LazyEvaluationRunStatusHelp />
+              </span>
+            </div>
           </div>
         </div>
       </Transition>
@@ -139,8 +133,6 @@ import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
 
 import { useLogout, useLogoutListen } from "@/composables/UseEventBus";
-
-import JobFilterHelp from "@/components/Help/JobFilterHelp.vue";
 import { getErrorTextFromStatus } from "@/utils/CommonHelpers";
 
 const LazyHelpLandingPageHelp = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
@@ -215,7 +207,7 @@ onMounted(() => {
   });
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 
-  setTimeout ( () => {
+  setTimeout(() => {
     if (helpWindow.value) {
       const el = helpWindow.value
       if (!el.style.width) {
@@ -231,16 +223,6 @@ onUnmounted(() => {
     //
   });
 });
-
-
-const filterIsVisible = () => {
-  let el = document.getElementById('JobFilterDialog');
-  if (!el || el?.style.display === 'none') {
-    return false;
-  }
-  return true;
-}
-
 
 // Handle submitTimeDate changes
 watch(userLoggedIn, () => {
