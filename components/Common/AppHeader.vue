@@ -35,9 +35,9 @@
       <div id="Circles" class="col-span-2">
         <div id="UserGroup" class="grid grid-cols-2">
           <div class="col-span-1">
-            <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'"
-              class="pt-0" id="HelpCircle" title="Help for current tab"
-              aria-label="Help for current tab" @click="displayHelp">?</Button>
+            <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'" class="pt-0"
+              id="HelpCircle" title="Help for current tab" aria-label="Help for current tab"
+              @click="displayHelp">?</Button>
           </div>
 
           <div class="col-span-1">
@@ -215,7 +215,7 @@ onMounted(() => {
   });
   document.getElementById("userMenu")?.addEventListener("mouseout", function () { hideUserMenu() });
 
-  setTimeout ( () => {
+  setTimeout(() => {
     if (helpWindow.value) {
       const el = helpWindow.value
       if (!el.style.width) {
