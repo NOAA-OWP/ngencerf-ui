@@ -10,8 +10,10 @@
  
     <table class="_help-table" aria-label="Forecast Run/Status Help Table">
       <thead>
-        <th>Item</th>
-        <th>Description</th>
+        <tr>
+          <th>Item</th>
+          <th>Description</th>
+        </tr>
       </thead>
       <tbody>
         <tr>
