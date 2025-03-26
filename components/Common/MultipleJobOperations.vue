@@ -59,11 +59,12 @@ const disableArchiveBtn = computed(() => {
 })
 
 /**
- * Let the caller Apply the dialog
+ * gLet the caller Apply the dialog
  * @param: MouseEvent
  */
 const sendDelete = () => {
   emit("DeleteSelectedJobs");
+  sendClose();
 };
 
 /**
@@ -72,6 +73,7 @@ const sendDelete = () => {
  */
 const sendArchive = () => {
   emit("ArchiveSelectedJobs");
+  sendClose();
 };
 
 /**
@@ -80,6 +82,7 @@ const sendArchive = () => {
  */
 const sendUnarchive = () => {
   emit("UnarchiveSelectedJobs");
+  sendClose();
 };
 
 /**
