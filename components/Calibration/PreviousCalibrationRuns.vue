@@ -35,14 +35,12 @@
                 style="width: 10px; text-align:center; vertical-align: top; padding: 0px !important">
                 <template #body="slotProps">
                   <div v-if="slotProps.data.status.indexOf('Running') === -1"
-                    :style="{ 'backgroundColor': colStyle(slotProps.data) }"
-                    :aria-label="slotProps.data.status"
-                    :title="colStyle(slotProps.data)">
+                    :style="{ 'backgroundColor': colStyle(slotProps.data) }" :aria-label="slotProps.data.status"
+                    :title="slotProps.data.status">
                     &nbsp;
                   </div>
-                  <div v-else :style="{ backgroundColor: runningColor }"
-                    aria-label="Blinking green indicates job is currently running"
-                    title="Blinking green indicates job is currently running">
+                  <div v-else :style="{ backgroundColor: runningColor }" :aria-label="slotProps.data.status"
+                    :title="slotProps.data.status">
                     &nbsp;
                   </div>
                 </template>
