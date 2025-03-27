@@ -48,7 +48,7 @@ RUN set -eux; \
     key=${repo_url##*/}; \
     key=${key%.git}; \
     # Construct the file path using the derived key
-    GIT_INFO_PATH="public/${key}_git_info.json"; \
+    GIT_INFO_PATH="${key}_git_info.json"; \
     jq -n \
       --arg commit_hash "$(git rev-parse HEAD)" \
       --arg branch "$(git rev-parse --abbrev-ref HEAD)" \

@@ -26,7 +26,7 @@
                   <div class="w-[150px]"> ngenCERF Date: </div>
                   <div class=" w-[150px]"> {{ combinedVersionInfo?.ngenCerf_date }} </div>
                 </div>
-                <div class="flex">
+                <div v-if="combinedVersionInfo?.contact_email" class="flex">
                   <div class="w-[150px]"> Support Email: </div>
                   <div class="w-[150px]">
                     <a class="hlink" :href="'mailto:' + combinedVersionInfo?.contact_email">{{
@@ -67,7 +67,7 @@ import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 
-import type { CombinedVerstionInfo, GitData } from "@/composables/NextGenModel";
+import type { CombinedVersionInfo, GitData } from "@/composables/NextGenModel";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from '@/stores/common/UserDataStore';
@@ -83,7 +83,7 @@ const { ngencerfBaseUrl } = useBackendConfig();
 
 const { popupActive } = storeToRefs(generalStore());
 
-const combinedVersionInfo = ref<CombinedVerstionInfo>();
+const combinedVersionInfo = ref<CombinedVersionInfo>();
 
 const gitInfo = ref<Record<string, GitData>>({});
 // Added reactive variable to store optional git_info.json data loaded at runtime
@@ -102,23 +102,6 @@ const uniqueHeaders = new Set<string>(); //NOSONAR (Removes erronious message th
 
 onMounted(async () => {
   combinedVersionInfo.value = getServerInfo();
-
-  // Dynamically load git_info.json from the public directory
-  const git_info_file = '/ngencerf_ui_git_info.json'
-  fetch(git_info_file)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(git_info_file + ' not found');
-      }
-      return response.json();
-    })
-    .then(data => {
-      addedGitInfo.value = transformComponent(data);
-    })
-    .catch(err => {
-      console.warn('Optional ' + git_info_file + ' not loaded:', err);
-      addedGitInfo.value = {};
-    });
 
   if (aboutBox.value) {
     observer = new IntersectionObserver(
@@ -271,36 +254,6 @@ const copyGitInfoToClipboard = () => {
   const csvData = convertToCSV(gitInfoArray.value);
   copyToClipboard(csvData);
 };
-
-function transformComponent(componentGitInfo: any) {
-  // Ensure we have a string for tags
-  const tags = (componentGitInfo.ngencerf_ui.tags || "").trim();
-  const newComp = { release: "", build_date: "", commit_hash: "", commit_date: "", author: "", message: "" };
-  // If tags is empty, set release to "dev (<branch>)", otherwise use tags.
-  if (tags === "") {
-    const branch = `dev (${componentGitInfo.ngencerf_ui.branch || "<unknown>"})`;
-    newComp.release = branch;
-  } else {
-    newComp.release = tags;
-  }
-  // Insert keys in the desired order: build_date, then commit_hash.
-  newComp.build_date = componentGitInfo.ngencerf_ui.build_date || "";
-  newComp.commit_hash = componentGitInfo.ngencerf_ui.commit_hash || "";
-  // If tags is empty, add commit_date, author, and message if they exist.
-  if (tags === "") {
-    if ("commit_date" in componentGitInfo.ngencerf_ui) {
-      newComp.commit_date = componentGitInfo.ngencerf_ui.commit_date || "";
-    }
-    if ("author" in componentGitInfo.ngencerf_ui) {
-      newComp.author = componentGitInfo.ngencerf_ui.author || "";
-    }
-    if ("message" in componentGitInfo.ngencerf_ui) {
-      newComp.message = componentGitInfo.ngencerf_ui.message || "";
-    }
-  }
-  return newComp;
-}
-
 
 </script>
 
