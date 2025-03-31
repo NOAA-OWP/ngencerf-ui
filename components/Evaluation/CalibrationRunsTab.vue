@@ -228,6 +228,7 @@ const {
   clearUserCalibrationRunData,
   setSelectedCalibrationRunId,
   fetchValidationRunListByCalibrationRun,
+  getCalibrationJobZip
 } = evaluationCalibrationRunStore;
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
@@ -274,6 +275,7 @@ const onRowContextMenu = (event: any) => {
     if (crRowData.validation_runs === 1) {
       cmCalibrationRun.value.push({ label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => viewValidationRunStatus(crRowData.calibration_run_id) })
     }
+    cmCalibrationRun.value.push({ label: 'Download Calibration Data', icon: 'pi pi-fw-pisearch', command: () => downloadSelectedCalibrationData() });
     cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() });
   }
 };
@@ -482,6 +484,17 @@ const acceptDelete = (selectedRunId: number) => {
   });
   //selectedCalibrationRun.value = undefined;
 
+}
+
+const downloadSelectedCalibrationData = async () => {
+  const selectedRunId = contextMenuJob.value as number;
+  console.log('Download Context Menu Option Clicked');
+  isLoading.value = true;
+  nextTick(async () => {
+    await getCalibrationJobZip(selectedRunId);
+    console.log('Download Completed');
+    isLoading.value = false;
+  })
 }
 
 const toggleMessagesGroup = () => {
