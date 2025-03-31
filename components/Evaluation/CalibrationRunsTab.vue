@@ -488,11 +488,18 @@ const acceptDelete = (selectedRunId: number) => {
 
 const downloadSelectedCalibrationData = async () => {
   const selectedRunId = contextMenuJob.value as number;
-  console.log('Download Context Menu Option Clicked');
   isLoading.value = true;
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Downloading your calibration data to a zip file. This will take several seconds.', life: ToastTimeout.timeout5000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   nextTick(async () => {
-    await getCalibrationJobZip(selectedRunId);
-    console.log('Download Completed');
+    try {
+      await getCalibrationJobZip(selectedRunId);
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + selectedRunId, detail: 'Your calibration data download was successful!', life: ToastTimeout.timeout5000 };
+      toast.add(tMsg); addToastRecord(tMsg);
+    } catch (error) {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeout5000 };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
     isLoading.value = false;
   })
 }

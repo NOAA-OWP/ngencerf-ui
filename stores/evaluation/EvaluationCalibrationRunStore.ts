@@ -202,8 +202,8 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     evaluateValidationRunStatus.value = '';
   }
 
-  const getCalibrationJobZip = async (calibration_run_id: number,) => {
-    fetch(`${ngencerfBaseUrl}/calibration/get_calibration_job_zip/`, {
+  const getCalibrationJobZip = async (calibration_run_id: number) => {
+    await fetch(`${ngencerfBaseUrl}/calibration/get_calibration_job_zip/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -213,13 +213,13 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     })
     .then(response => {
       if (!response.ok) {
-        console.log(`HTTP error! status: ${response.status}`);
+        const message = `Error: ${response.status} ${response.statusText}`;
+        throw new Error(message);
       }
       // Extract the filename from the Content-Disposition header if available
       const contentDisposition = response.headers.get("Content-Disposition");
       let file_user_name = getUserName().split("@")[0];
       let file_name = `${calibration_run_id}_${file_user_name}.zip`; // default filename
-      console.log('Default file name for download: ', file_name);
       if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
         // Parse filename, handling quotes if necessary
         const file_name_regex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
@@ -241,7 +241,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       URL.revokeObjectURL(url);
     })
     .catch(error => {
-      console.log('There was a problem with the fetch operation:', error);
+      throw error;
     });
   }
 
