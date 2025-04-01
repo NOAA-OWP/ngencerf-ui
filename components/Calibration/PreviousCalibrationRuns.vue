@@ -719,31 +719,7 @@ const updateUserCalibrationJobsListData = async (): Promise<void> => {
   );
 };
 
-/**
- * Toggle filters on/off
- * 
- */
-const toggleShowFilters = () => {
-  currentJobsList.value = updatedUserCalibrationJobsListData.value;
-  showFilters.value = !showFilters.value;
-}
 
-
-/**
- * Create a comma separated list of module names
- * 
- * returns string array
- */
-const getModuleFilterList = () => {
-  let l = "";
-  modulesFilterList.value.forEach((e, idx) => {
-    l += e;
-    if (idx !== modulesFilterList.value.length - 1) {
-      l += ", ";
-    }
-  });
-  return l;
-}
 </script>
 
 <style lang="scss" scoped>

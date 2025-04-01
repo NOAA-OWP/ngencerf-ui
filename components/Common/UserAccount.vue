@@ -25,7 +25,6 @@
       <div class="col-span-1">
         <form @submit.prevent="changePassword" @cancel="closeAccountBox" v-if="showForm === 'changePassword'">
           <div class="passwordBox grid row-auto">
-
             <label for="OldPass">Old password</label>
             <div class="mb-2">
               <Password id="OldPass" type="password" name="password" autocomplete="current-password" v-model="oldpass"
