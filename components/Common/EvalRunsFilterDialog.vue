@@ -3,7 +3,7 @@
 
     <div id="FilterDialog">
 
-      <div class="grid grid-cols-12 gap-2 text-sx">
+      <div class="grid grid-cols-10 gap-2 text-sx">
         <div class="col-span-2">
           <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
@@ -12,24 +12,6 @@
             aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
             :disabled="disableAll">
           </Select>
-        </div>
-
-        <div class="col-span-2">
-          <!-- <label class="block text-left mb-1" for="StatusList" aria-label="Status Filter"
-            title="Status Filter">Status</label>
-          <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-            optionValue="filterValue" :maxSelectedLabels="3" class="w-full" aria-label="Status Filter"
-            title="Status Filter" :disabled="disableAll">
-            <template #header>
-              <div class="absolute cursor-pointer top-2 left-[48px]">&nbsp; Select All Items</div>
-            </template>Headw
-<template #option="slotProps">
-              <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
-                :title="slotProps.option.filterValue">
-                {{ slotProps.option.filterValue }}
-              </div>
-            </template>
-</MultiSelect> -->
         </div>
 
         <div class="col-span-2">
