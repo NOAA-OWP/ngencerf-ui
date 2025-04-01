@@ -235,7 +235,8 @@ onMounted(async () => {
 
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-    if (ele) { ele.scrollTo(0, 0); } includeArchivedJobs.value = false;;
+    if (ele) { ele.scrollTo(0, 0); } 
+    includeArchivedJobs.value = false;
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     resetGageStore();
     hardResetTuningStore();
@@ -411,15 +412,6 @@ const applyJobFilters = async () => {
   }
 };
 
-
-const filtersExist = computed(() => {
-  return (modulesFilterList.value.length !== 0 || statusTypeFilterList.value.length !== 0 || uiGageId.value != "All")
-});
-
-// Template for the "Archived" column (Yes/No display)
-const archivedTemplate = (rowData: any) => {
-  return rowData.archived ? 'Yes' : 'No';
-};
 
 const onRowDblClick = (e: any) => {
   const data = ref<any>();

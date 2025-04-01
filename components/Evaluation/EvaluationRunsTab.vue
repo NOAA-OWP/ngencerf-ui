@@ -32,9 +32,10 @@
       <div id="calibrationRunList"
         v-if="userEvaluationCalibrationRunListData.length > 0 && computedCalibrationValidationRunList.length <= 1">
 
-        <div id="CalTable">
-          <EvalRunsFilterDialog class="mb-2" id="EvalRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
-            @RefreshJobList="null" :calJobs="updatedUserEvaluationJobsListData" ref="evalRunsFilterDialog" />
+        <div id="CalTable" class="w-max mx-auto">
+          <EvalRunsFilterDialog id="EvalRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
+            @RefreshJobList="refreshJobList()" :calJobs="updatedUserEvaluationJobsListData"
+            ref="evalRunsFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -53,6 +54,18 @@
                   {{ slotProps.data.calibration_run_id }}
                 </span>
               </template></Column>
+
+            <Column v-if="checkArchived" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
+              header="Archived" :sortable="true">
+              <template #body="slotProps">
+                <span v-if="slotProps.data.calibration_run_id"
+                  :aria-label="slotProps.data.is_archived ? 'Archived' : ''"
+                  :title="slotProps.data.is_archived ? 'Archived' : ''">
+                  {{ slotProps.data.is_archived ? 'Yes' : 'No' }}
+                </span>
+              </template>
+            </Column>
+
             <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable> <template
                 #body="slotProps">
                 <span v-if="slotProps.data.formulation_name"
@@ -201,8 +214,6 @@ const ptValColumns = ref({
   bodyCell: { style: { "text-align": "right", "padding-right": "10px" } }
 });
 
-
-ptValColumns
 const {
   uiGageId,
   evaluationCalibrationRunGageList,
@@ -226,7 +237,7 @@ const {
   fetchValidationRunListByCalibrationRun,
 } = evaluationCalibrationRunStore;
 
-const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, modulesFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
@@ -239,6 +250,7 @@ const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
 onMounted(() => {
   hilightTab(EvaluationTabs.tab_calibrationRuns);
+  includeArchivedJobs.value = false;
   //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
   resetUserSelectedEvalCalibrationRun();
   fetchUserValidatedCalibrationJobsListData();
@@ -246,14 +258,22 @@ onMounted(() => {
   isLoading.value = false;
 });
 
-// Computed filtered data for DataTables
-const filteredData = computed(() => {
-  if (!uiGageId.value || uiGageId.value === "All") {
-    return userEvaluationCalibrationRunListData?.value;
-  } else {
-    return userEvaluationCalibrationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
-  }
+
+const refreshJobList = async () => {
+  isLoading.value = true;
+  await fetchUserValidatedCalibrationJobsListData();
+  updatedUserEvaluationJobsListData.value = userEvaluationCalibrationRunListData?.value;
+  isLoading.value = false;
+}
+
+const checkArchived = computed(() => {
+  return userEvaluationCalibrationRunListData?.value.some(item => item.is_archived === true)
 });
+
+// A method to convert the binary value (boolean) to a sortable format
+const binaryValueBodyTemplate = (rowData: any) => {
+  return rowData.is_archived ? 'Yes' : 'No'; // Or return 1/0 as string or number
+};
 
 
 /**
@@ -297,7 +317,7 @@ const updateUserEvaluationJobsListData = async (): Promise<void> => {
 let listcals: CalibrationJobListItem[];
 const applyJobFilters = async () => {
   isLoading.value = true;
-  //await fetchUserValidatedCalibrationJobsListData();
+  await fetchUserValidatedCalibrationJobsListData();
   let fullJobList: CalibrationJobListItem[];
   let list: CalibrationJobListItem[];
   await updateUserEvaluationJobsListData();
@@ -310,23 +330,12 @@ const applyJobFilters = async () => {
       fullJobList = updatedUserEvaluationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
     }
 
-    // // Get calibrations
-    // listcals = (statusTypeFilterList.value.length > 0) ? fullJobList.filter((job) => statusTypeFilterList.value.includes(job.status)) : fullJobList;
-
-    // // Get evaluations
-    // list = fullJobList.filter(job =>
-    //   job.validations.length > 0 &&
-    //   job.validations.some(validation => statusTypeFilterList.value.includes(validation.status))
-    // );
-    // // Combine lists
-    // fullJobList = [...listcals, ...list];
-
-    // if (modulesFilterList.value.length) {
-    //   list = fullJobList.filter(job =>
-    //     job.modules.some(module => modulesFilterList.value.includes(module))
-    //   );
-    //   fullJobList = list;
-    // }
+    if (modulesFilterList.value.length) {
+      list = fullJobList.filter(job =>
+        job.modules.some(module => modulesFilterList.value.includes(module))
+      );
+      fullJobList = list;
+    }
 
     updatedUserEvaluationJobsListData.value = fullJobList.filter((job, index, self) =>
       index === self.findIndex(j => j.calibration_run_id === job.calibration_run_id)
@@ -598,7 +607,6 @@ const rowStyle = (data: any) => {
 #EvalRunTable,
 #EvalRunsFilterDialog {
   width: 1400px;
-  margin: 0 auto;
 }
 
 #MessagesGroupWindow {

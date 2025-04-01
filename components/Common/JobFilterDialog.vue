@@ -70,10 +70,10 @@
               </div>
             </div>
             <div class="col-span-4 align-center">
-              <Button id="CleareFiltersButton" class="mt-[22px]" label="Clear Filters" @click="resetFilters($event)"
-                aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
+              <Button id="CleareFiltersButton" class="filterButton mt-[22px]" label="Clear Filters"
+                @click="resetFilters($event)" aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
               </Button><br />
-              <Button id=" RefreshJobList" class="mt-[5px]" label="Refresh List" @click="refreshJobList()"
+              <Button id="RefreshJobList" class="filterButton mt-[5px]" label="Refresh List" @click="refreshJobList()"
                 aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
               </Button>
             </div>
@@ -134,6 +134,7 @@ const filterActive = computed(() => {
     && includeArchivedJobs.value === false);
 });
 
+
 const refreshJobList = () => {
   emit("RefreshJobList");
 }
@@ -188,10 +189,6 @@ const resetFilters = (e: MouseEvent) => {
   emit("ApplyJobFilters");
 }
 
-// Template for the "Archived" column (Yes/No display)
-const archivedTemplate = (rowData: any) => {
-  return rowData.archived ? 'Yes' : 'No';
-};
 </script>
 
 <style lang="scss" scoped>
@@ -216,14 +213,14 @@ const archivedTemplate = (rowData: any) => {
 #CleareFiltersButton {
   color: blue;
   text-decoration: underline;
-  font-weight: normal;
+  font-weight: normal !important;
 }
 
 #RefreshJobList:hover,
-#CleareFiltersButton:hover {
+#CleareFiltersButton:hover:not([disabled]) {
   background-color: transparent;
   border: none;
-  font-weight: bold;
+  font-weight: bold !important;
 }
 
 #RefreshJobList:disabled,
