@@ -3,7 +3,7 @@
 
     <div id="FilterDialog">
 
-      <div class="grid grid-cols-10 gap-2 text-sx">
+      <div class="grid grid-cols-12 gap-2 text-sx">
         <div class="col-span-2">
           <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
@@ -51,15 +51,17 @@
                 </Button>
               </div>
             </div>
-            <div class="col-span-4 align-center">
-              <Button id="CleareFiltersButton" class="c-blue mt-[22px]" label="Clear Filters" @click="resetFilters($event)"
-                aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
-              </Button><br />
-              <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="refreshJobList()"
-                aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
-              </Button>
-            </div>
           </div>
+        </div>
+
+
+        <div class="col-span-2 text-right mr-3">
+          <Button id="CleareFiltersButton" class="c-blue mt-[22px]" label="Clear Filters" @click="resetFilters($event)"
+            aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
+          </Button><br />
+          <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="refreshJobList()"
+            aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
+          </Button>
         </div>
       </div>
     </div>
