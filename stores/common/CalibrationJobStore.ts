@@ -11,7 +11,7 @@ import type { CalibrationJobListItem } from "@/composables/NextGenModel";
 
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken } = useUserDataStore()
+  const { getAccessToken, getUserName } = useUserDataStore()
   const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
   const { calibrationJobId } = storeToRefs( generalStore() )
 
@@ -118,6 +118,52 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
       body: JSON.stringify({ calibration_run_id: runId })
     })
   }
+  
+  /**
+ * Get calibration data as zip file
+ */
+  const getCalibrationJobZip = async (calibration_run_id: number) => {
+    await fetch(`${ngencerfBaseUrl}/calibration/get_calibration_job_zip/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibration_run_id })
+    })
+    .then(response => {
+      if (!response.ok) {
+        const message = `Error: ${response.status} ${response.statusText}`;
+        throw new Error(message);
+      }
+      // Extract the filename from the Content-Disposition header if available
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let file_user_name = getUserName().split("@")[0];
+      let file_name = `${calibration_run_id}_${file_user_name}.zip`; // default filename
+      if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
+        // Parse filename, handling quotes if necessary
+        const file_name_regex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = file_name_regex.exec(contentDisposition);
+        if (matches != null && matches[1]) {
+          file_name = matches[1].replace(/['"]/g, "");
+        }
+      }
+      return response.blob().then(blob => ({ blob, file_name }));
+    })
+    .then(({ blob, file_name }) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file_name; // Use the filename from the response header
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    })
+    .catch(error => {
+      throw error;
+    });
+  }
 
   return {
     fetchJobsListData,
@@ -127,7 +173,8 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
     fetchNewCalibrationRunId,
     cloneCalibrationRun,
     deleteCalibrationRun,
-    archiveCalibrationRun
+    archiveCalibrationRun,
+    getCalibrationJobZip
   }
 },
 {

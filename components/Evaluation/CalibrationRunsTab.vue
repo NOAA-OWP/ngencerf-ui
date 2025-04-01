@@ -182,7 +182,7 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 import { EvaluationTabs } from "@/composables/NextgenEnums";
 
-const { deleteCalibrationRun } = useCalibrationJobStore();
+const { deleteCalibrationRun, getCalibrationJobZip } = useCalibrationJobStore();
 const showMessagesGroup = ref<boolean>(false);
 
 const crContextMenu = ref(); //calibration run context menu
@@ -228,7 +228,6 @@ const {
   clearUserCalibrationRunData,
   setSelectedCalibrationRunId,
   fetchValidationRunListByCalibrationRun,
-  getCalibrationJobZip
 } = evaluationCalibrationRunStore;
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
@@ -486,22 +485,30 @@ const acceptDelete = (selectedRunId: number) => {
 
 }
 
+/**
+ * Download all files in user's calibration job folder to a zip file
+ */
 const downloadSelectedCalibrationData = async () => {
   const selectedRunId = contextMenuJob.value as number;
-  isLoading.value = true;
+  //if (contextMenuJob.value?.status == 'Done') {
+    isLoading.value = true;
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Downloading your calibration data to a zip file. This will take several seconds.', life: ToastTimeout.timeout5000 };
     toast.add(tMsg); addToastRecord(tMsg);
-  nextTick(async () => {
-    try {
-      await getCalibrationJobZip(selectedRunId);
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + selectedRunId, detail: 'Your calibration data download was successful!', life: ToastTimeout.timeout5000 };
-      toast.add(tMsg); addToastRecord(tMsg);
-    } catch (error) {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeout5000 };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
-    isLoading.value = false;
-  })
+    nextTick(async () => {
+      try {
+        await getCalibrationJobZip(selectedRunId);
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + selectedRunId, detail: 'Your calibration data download was successful!', life: ToastTimeout.timeout5000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+      } catch (error) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeout5000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      isLoading.value = false;
+    })
+  /* } else {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: 'Data cannot be downloaded for a Calibration Job that is not Done.', life: ToastTimeout.timeout5000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  } */
 }
 
 const toggleMessagesGroup = () => {
