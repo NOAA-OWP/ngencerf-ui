@@ -70,10 +70,10 @@
               </div>
             </div>
             <div class="col-span-4 align-center">
-              <Button id="CleareFiltersButton" class="mt-[22px]" label="Clear Filters" @click="resetFilters($event)"
+              <Button id="CleareFiltersButton" class="c-blue mt-[22px]" label="Clear Filters" @click="resetFilters($event)"
                 aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
               </Button><br />
-              <Button id="RefreshJobList" class="mt-[5px]" label="Refresh List" @click="refreshJobList()"
+              <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="refreshJobList()"
                 aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
               </Button>
             </div>
@@ -194,30 +194,22 @@ const resetFilters = (e: MouseEvent) => {
   border: 1px solid #888888;
 }
 
-
-.p-button-label {
-  font-weight: normal !important;
-}
-
-#RefreshJobList,
-#CleareFiltersButton {
-  color: blue;
+.c-blue {
   text-decoration: underline;
+  color: blue;
   font-weight: normal !important;
 }
 
-#RefreshJobList:hover,
-#CleareFiltersButton:hover:not([disabled]) {
+.c-blue:hover {
+  color: blue !important;
   background-color: transparent;
+  font-weight: bold;
   border: none;
-  font-weight: bold !important;
 }
 
-#RefreshJobList:disabled,
-#CleareFiltersButton:disabled {
-  color: #555;
+.c-blue:disabled {
+  color: #555 !important;
 }
-
 
 label {
   cursor: default;
