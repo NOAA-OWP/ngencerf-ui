@@ -18,20 +18,15 @@
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
 
-import type { CombinedVersionInfo, DynamicObject } from "@/composables/NextGenModel";
-
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 
-const { getServerInfo, setServerInfo } = generalStore();
+const { serverInfo } = generalStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
-const serverInfo = ref<CombinedVersionInfo>();
+
 
 onMounted( async () => {
-  serverInfo.value = getServerInfo();
-  if( !serverInfo.value || !serverInfo.value.version )  {
-    await getFooterInformation();
-  }
+
 })
 
 const showServerInfo = () => {
@@ -44,21 +39,6 @@ const hideServerInfo = () => {
   (e as HTMLElement).style.display = "none"
 }
 
-// Get footer infongenCERF
-const getFooterInformation = () => {
-  makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": 'application/json'
-    },
-    body: ""
-  }).then((result) => {
-    serverInfo.value = result._data;
-    if(serverInfo.value) {
-      setServerInfo(serverInfo.value);
-    }    
-  })
-}
 
 </script>
 

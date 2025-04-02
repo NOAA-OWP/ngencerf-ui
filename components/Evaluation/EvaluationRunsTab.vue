@@ -32,23 +32,17 @@
       <div id="calibrationRunList"
         v-if="userEvaluationCalibrationRunListData.length > 0 && computedCalibrationValidationRunList.length <= 1">
 
-        <div id="CalTable">
-          <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
-            <div class="col-span-1">
-              <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                :options="evaluationCalibrationRunGageList" filter optionLabel="name" optionValue="name"
-                placeholder="All" aria-label="Headwater Basin Gage Filter Select"
-                title="Headwater Basin Gage Filter Select"></Select>
-            </div>
-          </div>
+        <div id="CalTable" class="w-max mx-auto">
+          <EvalRunsFilterDialog id="EvalRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
+            @RefreshJobList="refreshJobList()" :calJobs="updatedUserEvaluationJobsListData"
+            ref="evalRunsFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
 
 
-          <DataTable id="EvalRunTable" :value="filteredData" scrollable scroll-height="400px"
+          <DataTable id="EvalRunTable" :value="updatedUserEvaluationJobsListData" scrollable scroll-height="400px"
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
             v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
@@ -60,45 +54,98 @@
                   {{ slotProps.data.calibration_run_id }}
                 </span>
               </template></Column>
-            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable> <template
-                #body="slotProps">
+
+            <Column v-if="checkArchived" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
+              :sortable="true">
+              <template #header>
+                <div class="column-header">
+                  <span>Archived?</span>
+                </div>
+              </template> 
+              <template #body="slotProps">
+                <span v-if="slotProps.data.calibration_run_id"
+                  :aria-label="slotProps.data.is_archived ? 'Archived' : ''"
+                  :title="slotProps.data.is_archived ? 'Archived' : ''">
+                  {{ slotProps.data.is_archived ? 'Yes' : 'No' }}
+                </span>
+              </template>
+            </Column>
+
+            <Column :pt="ptColumn" field="formulation_name" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Formulation</span><br /><span>Name</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.formulation_name"
-                  :aria-label="'ormulation Name ' + slotProps.data.formulation_name"
-                  :title="'ormulation Name ' + slotProps.data.formulation_name">
+                  :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
+                  :title="'Formulation Name ' + slotProps.data.formulation_name">
                   {{ slotProps.data.formulation_name }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="validation_runs" header="Validation Runs" sortable> <template
-                #body="slotProps">
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="validation_runs" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Validation</span><br /><span>Runs</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.validation_runs"
                   :aria-label="'Validation Run ' + slotProps.data.validation_runs"
                   :title="'Validation Run ' + slotProps.data.validation_runs">
                   {{ slotProps.data.validation_runs }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable> <template #body="slotProps">
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="gage_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Headwater</span><br /><span>Basin Gage</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
                   :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
                   {{ slotProps.data.gage_id }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable> <template
-                #body="slotProps">
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="objective_function" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Objective</span><br /><span>Function</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.objective_function"
                   :aria-label="'Objective Function ' + slotProps.data.objective_function"
                   :title="'Objective Function ' + slotProps.data.objective_function">
                   {{ slotProps.data.objective_function }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable> <template
-                #body="slotProps">
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="optimization_algorithm" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Optimization</span><br /><span>Algorithm</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.optimization_algorithm"
                   :aria-label="'Optimization Algorithm ' + slotProps.data.optimization_algorithm"
                   :title="'Optimization Algorithm ' + slotProps.data.optimization_algorithm">
                   {{ slotProps.data.optimization_algorithm }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="job_genesis" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Job</span><br /><span>Genesis</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
                   :title="'Job Genesis ' + slotProps.data.job_genesis">
@@ -106,7 +153,12 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="created_at" header="Creation Date" sortable>
+            <Column :pt="ptColumn" field="created_at" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Creation</span><br /><span>Date</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
                   :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
@@ -114,11 +166,16 @@
                 </span>
               </template>
             </Column>
-            <Column field="submit_date" header="Submit Date" sortable>
+            <Column field="submit_date" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Submit</span><br /><span>Date</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
                   :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }} 
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
                 </span>
               </template>
             </Column>
@@ -177,6 +234,7 @@ import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { generalStore } from "@/stores/common/GeneralStore"
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import EvalRunsFilterDialog from "@/components/Common/EvalRunsFilterDialog.vue"
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -195,6 +253,8 @@ const cmValidationRun = ref<DataTableContextMenuOption[]>([]);
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
+const updatedUserEvaluationJobsListData = ref<CalibrationJobListItem[]>([]);
+
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   bodyCell: { style: { "text-align": "center" } }
@@ -205,8 +265,6 @@ const ptValColumns = ref({
   bodyCell: { style: { "text-align": "right", "padding-right": "10px" } }
 });
 
-
-ptValColumns
 const {
   uiGageId,
   evaluationCalibrationRunGageList,
@@ -230,7 +288,7 @@ const {
   fetchValidationRunListByCalibrationRun,
 } = evaluationCalibrationRunStore;
 
-const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, modulesFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
@@ -241,22 +299,124 @@ const toast = useToast();
 const selectedCalibrationRun = ref<ValidatedCalibrationRunListItem>();
 const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
+const formulationName = "Formulation Name";
+
 onMounted(() => {
   hilightTab(EvaluationTabs.tab_calibrationRuns);
+  includeArchivedJobs.value = false;
   //clear calibration data if user were on calibraiton tab and clear evaludation previous run data user may have selected
   resetUserSelectedEvalCalibrationRun();
   fetchUserValidatedCalibrationJobsListData();
+  updatedUserEvaluationJobsListData.value = userEvaluationCalibrationRunListData?.value;
   isLoading.value = false;
 });
 
-// Computed filtered data for DataTables
-const filteredData = computed(() => {
-  if (!uiGageId.value || uiGageId.value === "All") {
-    return userEvaluationCalibrationRunListData?.value;
-  } else {
-    return userEvaluationCalibrationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
+/**
+ * Splits a header string into two parts:
+ * - `first`: all words except the last (or the entire header if only one word)
+ * - `second`: the last word (or an empty string if only one word)
+ */
+function splitHeader(header: string): { first: string; second: string } {
+  const words = header.split(' ');
+  if (words.length > 1) {
+    return {
+      first: words.slice(0, words.length - 1).join(' '),
+      second: words[words.length - 1]
+    };
   }
+  return { first: header, second: '' };
+}
+
+const refreshJobList = async () => {
+  isLoading.value = true;
+  await fetchUserValidatedCalibrationJobsListData();
+  updatedUserEvaluationJobsListData.value = userEvaluationCalibrationRunListData?.value;
+  isLoading.value = false;
+}
+
+const checkArchived = computed(() => {
+  return userEvaluationCalibrationRunListData?.value.some(item => item.is_archived === true)
 });
+
+// A method to convert the binary value (boolean) to a sortable format
+const binaryValueBodyTemplate = (rowData: any) => {
+  return rowData.is_archived ? 'Yes' : 'No'; // Or return 1/0 as string or number
+};
+
+
+/**
+ * Populate updatedUserEvaluationJobsListData with the job statuses to include the validation status
+ */
+const updateUserEvaluationJobsListData = async (): Promise<void> => {
+  // set updatedUserEvaluationJobsListData to userCalibrationJobsListData, but with the updated status for the job to include the validation status
+  updatedUserEvaluationJobsListData.value = await Promise.all(
+    userEvaluationCalibrationRunListData.value
+      .map(async (calibrationJob: CalibrationJobListItem) => {
+        // if Calibration job is done, get validation statuses and update the overall status
+        if (calibrationJob.status === 'Done') {
+          const validationControlJobStatus: string | undefined = calibrationJob.validations?.find((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_control')?.status;
+
+          const validationBestJobStatus: string | undefined = calibrationJob.validations?.find
+            ((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_best')?.status;
+
+          // get the overall calibration/validation status
+          const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
+            calibrationJob.status,
+            validationControlJobStatus,
+            validationBestJobStatus
+          );
+
+          // save userCalibrationJobsListData with the updated status for the job
+          return {
+            ...calibrationJob,
+            status: overallCalibrationValidationStatus
+          };
+        } else {
+          // Calibration is not done, so just return the job data with the status as is
+          return calibrationJob;
+        }
+      })
+  );
+};
+
+/**
+ * Applies the job filters
+ */
+let listcals: CalibrationJobListItem[];
+const applyJobFilters = async () => {
+  isLoading.value = true;
+  await fetchUserValidatedCalibrationJobsListData();
+  let fullJobList: CalibrationJobListItem[];
+  let list: CalibrationJobListItem[];
+  await updateUserEvaluationJobsListData();
+
+  if (updatedUserEvaluationJobsListData?.value) {
+    // Filter Headwater Basin Gage for the initial whole list
+    if (!uiGageId.value || uiGageId.value === "All") {
+      fullJobList = updatedUserEvaluationJobsListData?.value;
+    } else {
+      fullJobList = updatedUserEvaluationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
+    }
+
+    if (modulesFilterList.value.length) {
+      list = fullJobList.filter(job =>
+        job.modules.some(module => modulesFilterList.value.includes(module))
+      );
+      fullJobList = list;
+    }
+
+    updatedUserEvaluationJobsListData.value = fullJobList.filter((job, index, self) =>
+      index === self.findIndex(j => j.calibration_run_id === job.calibration_run_id)
+    );
+    isLoading.value = false;
+  }
+};
+
+
+
+
+
+
 
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
@@ -513,13 +673,8 @@ const rowStyle = (data: any) => {
 }
 
 #EvalRunTable,
-.gage-filter-wrapper {
-  width: 1400px;
-  margin: 0 auto;
-}
-
-.gage-filter-wrapper {
-  margin-bottom: 1rem;
+#EvalRunsFilterDialog {
+  width: 1200px;
 }
 
 #MessagesGroupWindow {
@@ -531,5 +686,12 @@ const rowStyle = (data: any) => {
   width: 48%;
   background-color: white;
   overflow: auto;
+}
+
+.column-header {
+  font-size: 0.8em;
+  font-weight: bold;
+  line-height: 1.4em;
+  text-align: center;
 }
 </style>

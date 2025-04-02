@@ -121,7 +121,7 @@
             <!--REVIVING LOST CONTENT HERE-->
             <div id="CalibrationStopCriteria" class="bordered">
               <label for="StopCriteria">Calibration Stop Criteria</label><br>
-              <InputNumber id="StopCriteria" inputId="stopCriteria" v-model="uiStopCriteria" showButtons :min="0"
+              <InputNumber id="StopCriteria" inputId="stopCriteria" v-model="uiStopCriteria" showButtons :min="2"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="Calibration Stop Criteria" title="Calibration Stop Criteria">
               </InputNumber>
@@ -132,7 +132,7 @@
             <div id="PlotGenFreq" class="bordered">
               <label for="PlotFrequency">Plot Generation Frequency (0 = off)</label><br>
               Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency"
-                v-model="uiPlotFrequency" showButtons :min="0" aria-label="Plot Generation Frequency, zero equals off"
+                v-model="uiPlotFrequency" showButtons :min="1" aria-label="Plot Generation Frequency, zero equals off"
                 title="Plot Generation Frequency, zero equals off"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber>
               &nbsp;&nbsp;Iterations
