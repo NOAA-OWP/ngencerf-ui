@@ -688,10 +688,4 @@ const rowStyle = (data: any) => {
   overflow: auto;
 }
 
-.column-header {
-  font-size: 0.8em;
-  font-weight: bold;
-  line-height: 1.4em;
-  text-align: center;
-}
 </style>
