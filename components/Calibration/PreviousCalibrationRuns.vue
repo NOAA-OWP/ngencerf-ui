@@ -115,7 +115,7 @@
               <Column field="created_at" sortable>Column
                 <template #header>
                   <div class="column-header">
-                    <span>Creation</span><br /><span>Date</span>
+                    <span>Creation Date</span>
                   </div>
                 </template>
                 <template #body="slotProps">
@@ -129,7 +129,7 @@
               <Column field="submit_date" sortable>
                 <template #header>
                   <div class="column-header">
-                    <span>Submit</span><br /><span>Date</span>
+                    <span>Submit Date</span>
                   </div>
                 </template>
                 <template #body="slotProps">

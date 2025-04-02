@@ -11,132 +11,126 @@
   <client-only>
     <div class="pr-2">
       <div id="calibrationRunList">
-          <div id="CalTable" class="w-[1200px] mx-auto">
-            <div class="flex mt-2">
-                <h1 class="pt-3 mb-8 text-3xl font-bold inline-block text-center w-[1200px]">
-                  <span>Forecast Runs</span><br />
-                  <span style="font-size: 12px;font-weight: normal;padding-left: 5px;">
-                    Right click on a row for options.
-                  </span>
-                </h1>
-            </div>
-            <div class="grid grid-cols-2 mb-5">
-              <div class="col-span-1">
-                <div class="inline ">
-                  <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-                  <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                    :options="forecastRunGageList" filter optionLabel="name" optionValue="name" placeholder=""
-                    aria-label="Select Headwater Basin Gage Filter" title="Select Headwater Basin Gage Filter"></Select>
-                </div>
+        <div id="CalTable" class="w-[1200px] mx-auto">
+          <div class="flex mt-2">
+            <h1 class="pt-3 mb-8 text-3xl font-bold inline-block text-center w-[1200px]">
+              <span>Forecast Runs</span><br />
+              <span style="font-size: 12px;font-weight: normal;padding-left: 5px;">
+                Right click on a row for options.
+              </span>
+            </h1>
+          </div>
+          <div class="grid grid-cols-2 mb-5">
+            <div class="col-span-1">
+              <div class="inline ">
+                <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
+                <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
+                  :options="forecastRunGageList" filter optionLabel="name" optionValue="name" placeholder=""
+                  aria-label="Select Headwater Basin Gage Filter" title="Select Headwater Basin Gage Filter"></Select>
               </div>
             </div>
-
-            <ConfirmDialog></ConfirmDialog>
-            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
-              :model="cmForecastRun"></ContextMenu>
-            <DataTable id="ForecastRuns" :value="forecastRuns" scrollable scroll-height="400px"
-              sortField="forecast_run_id" :sortOrder="-1" table-style="min-width: 50rem"
-              v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
-              @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
-              class="boxed">
-              <Column :pt="ptColumn" field="forecast_run_id" sortable>
-                <template #header>
-                  <div class="column-header">
-                    <span>Forecast</span><br /><span>ID</span>
-                  </div>
-                </template>
-                <template #body="slotProps">
-                  <span v-if="slotProps.data.forecast_run_id"
-                    :aria-label="'Forecast Job ID ' + slotProps.data.forecast_run_id"
-                    :title="'Forecast Job ID ' + slotProps.data.forecast_run_id">
-                    {{ slotProps.data.forecast_run_id }}
-                  </span>
-                </template>
-              </Column>
-              <Column :pt="ptColumn" field="cycle" sortable>
-                <template #header>
-                  <div class="column-header">
-                    <span>Forecast</span><br /><span>Cycle</span>
-                  </div>
-                </template>
-                <template #body="slotProps">
-                  <span v-if="slotProps.data.cycle" :aria-label="'Forecast Cycle ' + slotProps.data.cycle"
-                    :title="'Forecast Cycle ' + slotProps.data.cycle">
-                    {{ slotProps.data.cycle }}
-                  </span>
-                </template>
-              </Column>
-              <Column :pt="ptColumn" field="forecast_status" sortable>
-                <template #header>
-                  <div class="column-header">
-                    <span>Job</span><br /><span>Status</span>
-                  </div>
-                </template>
-                <template #body="slotProps">
-                  <span v-if="slotProps.data.forecast_status"
-                    :aria-label="'Job Status ' + slotProps.data.forecast_status"
-                    :title="'Job Status ' + slotProps.data.forecast_status">
-                    {{ slotProps.data.forecast_status }}
-                  </span>
-                </template>
-              </Column>
-              <Column field="submit_date" sortable>
-                <template #header>
-                  <div class="column-header">
-                    <span>Submit</span><br /><span>Date</span>
-                  </div>
-                </template>
-                <template #body="slotProps">
-                  <span v-if="slotProps.data.submit_date"
-                    :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
-                    :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
-                    {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
-                  </span>
-                </template>
-              </Column>
-              <Column :pt="ptColumn" field="gage_id" sortable>
-                <template #header>
-                  <div class="column-header">
-                    <span>Headwater</span><br /><span>Basin Gage</span>
-                  </div>
-                </template>
-                <template #body="slotProps">
-                  <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
-                    :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
-                    {{ slotProps.data.gage_id }}
-                  </span>
-                </template>
-              </Column>
-              <Column :pt="ptColumn" field="calibration_run_id" sortable>
-                <template #header>
-                  <div class="column-header">
-                    <span>Calibration</span><br /><span>Job ID</span>
-                  </div>
-                </template>
-                <template #body="slotProps">
-                  <span v-if="slotProps.data.calibration_run_id"
-                    :aria-label="'Calibration Job ID ' + slotProps.data.calibration_run_id"
-                    :title="'Calibration Job ID ' + slotProps.data.calibration_run_id">
-                    {{ slotProps.data.calibration_run_id }}
-                  </span>
-                </template>
-              </Column>
-              <Column :pt="ptColumn" field="forcing_download_status" sortable>
-                <template #header>
-                  <div class="column-header">
-                    <span>Forcing</span><br /><span>Download Status</span>
-                  </div>
-                </template>
-                <template #body="slotProps">
-                  <span v-if="slotProps.data.forcing_download_status"
-                    :aria-label="'Forcing Download Status ' + slotProps.data.forcing_download_status"
-                    :title="'Forcing Download Status ' + slotProps.data.forcing_download_status">
-                    {{ slotProps.data.forcing_download_status }}
-                  </span>
-                </template>
-              </Column>
-            </DataTable>
           </div>
+
+          <ConfirmDialog></ConfirmDialog>
+          <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
+            :model="cmForecastRun"></ContextMenu>
+          <DataTable id="ForecastRuns" :value="forecastRuns" scrollable scroll-height="400px"
+            sortField="forecast_run_id" :sortOrder="-1" table-style="min-width: 50rem"
+            v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
+            @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
+            class="boxed">
+            <Column :pt="ptColumn" field="forecast_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Forecast</span><br /><span>ID</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.forecast_run_id"
+                  :aria-label="'Forecast Job ID ' + slotProps.data.forecast_run_id"
+                  :title="'Forecast Job ID ' + slotProps.data.forecast_run_id">
+                  {{ slotProps.data.forecast_run_id }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="cycle" header="Forecast Cycle" sortable>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.cycle" :aria-label="'Forecast Cycle ' + slotProps.data.cycle"
+                  :title="'Forecast Cycle ' + slotProps.data.cycle">
+                  {{ slotProps.data.cycle }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="forecast_status" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Job Status</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.forecast_status" :aria-label="'Job Status ' + slotProps.data.forecast_status"
+                  :title="'Job Status ' + slotProps.data.forecast_status">
+                  {{ slotProps.data.forecast_status }}
+                </span>
+              </template>
+            </Column>
+            <Column field="submit_date" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Submit Date</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <div v-if="slotProps.data.submit_date" class="text-center"
+                  :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
+                  :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
+                </div>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="gage_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Headwater</span><br /><span>Basin Gage</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
+                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
+                  {{ slotProps.data.gage_id }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="calibration_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Calibration</span><br /><span>Job ID</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.calibration_run_id"
+                  :aria-label="'Calibration Job ID ' + slotProps.data.calibration_run_id"
+                  :title="'Calibration Job ID ' + slotProps.data.calibration_run_id">
+                  {{ slotProps.data.calibration_run_id }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="forcing_download_status" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Forcing</span><br /><span>Download Status</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.forcing_download_status"
+                  :aria-label="'Forcing Download Status ' + slotProps.data.forcing_download_status"
+                  :title="'Forcing Download Status ' + slotProps.data.forcing_download_status">
+                  {{ slotProps.data.forcing_download_status }}
+                </span>
+              </template>
+            </Column>
+          </DataTable>
+        </div>
       </div>
 
     </div>
