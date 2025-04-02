@@ -83,21 +83,6 @@
                 </tbody>
               </table>
             </div>
-
-            <div class="col-span-2">
-              <div style="display:flex; margin-top: 1em;" :aria-label="'Results Pathname ' + resultsPathname"
-                :title="'Results Pathname ' + resultsPathname">
-                <div class="text-right font-bold" style="width: 170px;">
-                  <label class="text-right" for="resultsPathname" style="width: 170px;">Results Pathname</label>
-                </div>
-                <div class="pl-5" style="width: 100%; margin-top: -5px;">
-                  <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
-                </div>
-              </div>
-
-
-            </div>
-
           </div>
         </div>
       </div>
