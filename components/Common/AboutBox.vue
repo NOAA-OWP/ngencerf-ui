@@ -81,11 +81,10 @@ const { getAccessToken, isUserLoggedIn } = useUserDataStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
 
-const { popupActive } = storeToRefs(generalStore());
+const { popupActive, gitInfo } = storeToRefs(generalStore());
 
 const combinedVersionInfo = ref<CombinedVersionInfo>();
 
-const gitInfo = ref<Record<string, GitData>>({});
 // Added reactive variable to store optional git_info.json data loaded at runtime
 const addedGitInfo = ref<any>(null);
 
@@ -152,8 +151,8 @@ const resizeNotifications = () => {
 
 // Get footer infongenCERF
 const getGitInformation = () => {
-  if (!isUserLoggedIn()) {
-    return null;
+  if (Object.keys(gitInfo.value ).length !== 0 || !isUserLoggedIn()) {
+    return;
   }
   makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_git_info/`, {
     method: "POST",
