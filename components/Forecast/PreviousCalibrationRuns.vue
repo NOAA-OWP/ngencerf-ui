@@ -9,8 +9,7 @@
     </div>
   </Transition>
   <client-only>
-    <div class="h-screen-inner pr-2">
-
+    <div class="pr-2">
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">

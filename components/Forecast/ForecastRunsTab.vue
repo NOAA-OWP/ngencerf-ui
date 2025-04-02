@@ -9,7 +9,7 @@
     </div>
   </Transition>
   <client-only>
-    <div class="h-screen-inner pr-2">
+    <div class="pr-2">
       <div id="calibrationRunList">
           <div id="CalTable" class="w-[1200px] mx-auto">
             <div class="flex mt-2">
@@ -137,7 +137,6 @@
               </Column>
             </DataTable>
           </div>
-
       </div>
 
     </div>
