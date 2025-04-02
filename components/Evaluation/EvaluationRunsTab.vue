@@ -74,7 +74,7 @@
             <Column :pt="ptColumn" field="formulation_name" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Formulation</span><br /><span>Name</span>
+                  <span>Formulation Name</span>
                 </div>
               </template>
               <template #body="slotProps">
