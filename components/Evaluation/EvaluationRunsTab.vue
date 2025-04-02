@@ -56,7 +56,12 @@
               </template></Column>
 
             <Column v-if="checkArchived" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
-              header="Archived" :sortable="true">
+              :sortable="true">
+              <template #header>
+                <div class="column-header">
+                  <span>Archived?</span>
+                </div>
+              </template> 
               <template #body="slotProps">
                 <span v-if="slotProps.data.calibration_run_id"
                   :aria-label="slotProps.data.is_archived ? 'Archived' : ''"
@@ -66,45 +71,81 @@
               </template>
             </Column>
 
-            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable> <template
-                #body="slotProps">
+            <Column :pt="ptColumn" field="formulation_name" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Formulation</span><br /><span>Name</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.formulation_name"
-                  :aria-label="'ormulation Name ' + slotProps.data.formulation_name"
-                  :title="'ormulation Name ' + slotProps.data.formulation_name">
+                  :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
+                  :title="'Formulation Name ' + slotProps.data.formulation_name">
                   {{ slotProps.data.formulation_name }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="validation_runs" header="Validation Runs" sortable> <template
-                #body="slotProps">
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="validation_runs" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Validation</span><br /><span>Runs</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.validation_runs"
                   :aria-label="'Validation Run ' + slotProps.data.validation_runs"
                   :title="'Validation Run ' + slotProps.data.validation_runs">
                   {{ slotProps.data.validation_runs }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable> <template #body="slotProps">
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="gage_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Headwater</span><br /><span>Basin Gage</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
                   :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
                   {{ slotProps.data.gage_id }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable> <template
-                #body="slotProps">
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="objective_function" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Objective</span><br /><span>Function</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.objective_function"
                   :aria-label="'Objective Function ' + slotProps.data.objective_function"
                   :title="'Objective Function ' + slotProps.data.objective_function">
                   {{ slotProps.data.objective_function }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable> <template
-                #body="slotProps">
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="optimization_algorithm" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Optimization</span><br /><span>Algorithm</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.optimization_algorithm"
                   :aria-label="'Optimization Algorithm ' + slotProps.data.optimization_algorithm"
                   :title="'Optimization Algorithm ' + slotProps.data.optimization_algorithm">
                   {{ slotProps.data.optimization_algorithm }}
                 </span>
-              </template></Column>
-            <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="job_genesis" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Job</span><br /><span>Genesis</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
                   :title="'Job Genesis ' + slotProps.data.job_genesis">
@@ -112,7 +153,12 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="created_at" header="Creation Date" sortable>
+            <Column :pt="ptColumn" field="created_at" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Creation</span><br /><span>Date</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
                   :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
@@ -120,7 +166,12 @@
                 </span>
               </template>
             </Column>
-            <Column field="submit_date" header="Submit Date" sortable>
+            <Column field="submit_date" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Submit</span><br /><span>Date</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
                   :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
@@ -248,6 +299,8 @@ const toast = useToast();
 const selectedCalibrationRun = ref<ValidatedCalibrationRunListItem>();
 const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
+const formulationName = "Formulation Name";
+
 onMounted(() => {
   hilightTab(EvaluationTabs.tab_calibrationRuns);
   includeArchivedJobs.value = false;
@@ -258,6 +311,21 @@ onMounted(() => {
   isLoading.value = false;
 });
 
+/**
+ * Splits a header string into two parts:
+ * - `first`: all words except the last (or the entire header if only one word)
+ * - `second`: the last word (or an empty string if only one word)
+ */
+function splitHeader(header: string): { first: string; second: string } {
+  const words = header.split(' ');
+  if (words.length > 1) {
+    return {
+      first: words.slice(0, words.length - 1).join(' '),
+      second: words[words.length - 1]
+    };
+  }
+  return { first: header, second: '' };
+}
 
 const refreshJobList = async () => {
   isLoading.value = true;
@@ -606,7 +674,7 @@ const rowStyle = (data: any) => {
 
 #EvalRunTable,
 #EvalRunsFilterDialog {
-  width: 1400px;
+  width: 1200px;
 }
 
 #MessagesGroupWindow {
@@ -618,5 +686,12 @@ const rowStyle = (data: any) => {
   width: 48%;
   background-color: white;
   overflow: auto;
+}
+
+.column-header {
+  font-size: 0.8em;
+  font-weight: bold;
+  line-height: 1.4em;
+  text-align: center;
 }
 </style>

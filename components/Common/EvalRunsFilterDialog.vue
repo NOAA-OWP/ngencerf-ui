@@ -74,7 +74,6 @@ import MultiSelect from 'primevue/multiselect';
 import Select from "primevue/select";
 
 import type { CalibrationJobListItem } from "@/composables/NextGenModel"
-//import { StatusTypes } from "@/composables/NextgenEnums";
 
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
@@ -101,13 +100,6 @@ const props = defineProps<{
   disableAll: boolean;
 }>();
 
-onMounted(() => {
-  // nextTick(() => {
-  //   setTimeout(() => {
-  //     externalResetFilters();
-  //   }, 250) // Necessary to make sure that data has been retreived.
-  // });
-})
 
 const filterActive = computed(() => {
   return (modulesFilterList.value.length === 0 && (uiGageId.value === 'All' || uiGageId.value === '') && includeArchivedJobs.value === false);
