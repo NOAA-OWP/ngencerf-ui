@@ -410,21 +410,24 @@ const selectedLogCurrentPage = ref<number>(1);
 const selectedLogTotalPages = ref<number>(1);
 const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
-const supplementalTableOptions = [];
-/* const supplementalTableOptions = [
+const supplementalTableOptions = ref<any[]>([
   'Iteration Metrics Table',
   'Iteration Parameters Table',
   'Performance Metrics Table'
-] */
-const plotGraphColors = ['grey', 'blue', 'gold', 'green', 'teal', 'black', 'orange', 'pink', 'purple', 'red', 'yellow'];
-const plotGraphColorList = [];
-for (let c = 0; c < plotGraphColors.toSorted().length; c++) {
-  plotGraphColorList.push({ name: plotGraphColors.toSorted()[c] });
+]);
+const plotGraphColors = ref<any[]>([
+  'grey', 'blue', 'gold', 'green', 'teal', 'black', 'orange', 'pink', 'purple', 'red', 'yellow'
+]);
+const plotGraphColorList = ref<any[]>([]);
+for (let c = 0; c < plotGraphColors.value.toSorted().length; c++) {
+  plotGraphColorList.value.push({ name: plotGraphColors.value.toSorted()[c] });
 }
-const plotGraphSymbols = ['line', 'circle', 'cross', 'diamond', 'square', 'star', 'triangle', 'wye'];
-const plotGraphSymbolList = [];
-for (let s = 0; s < plotGraphSymbols.toSorted().length; s++) {
-  plotGraphSymbolList.push({ name: plotGraphSymbols.toSorted()[s] });
+const plotGraphSymbols = ref<any[]>([
+  'line', 'circle', 'cross', 'diamond', 'square', 'star', 'triangle', 'wye'
+]);
+const plotGraphSymbolList = ref<any[]>([]);;
+for (let s = 0; s < plotGraphSymbols.value.toSorted().length; s++) {
+  plotGraphSymbolList.value.push({ name: plotGraphSymbols.value.toSorted()[s] });
 }
 const plotGraphSliderHelpText = [
   'Click and drag within the slider to change the date range.',
@@ -478,9 +481,9 @@ onMounted(() => {
     });
 
     // Add Supplemental Table Options to the dropdown
-    for (let t = 0; t < supplementalTableOptions.length; t++) {
-      if (!plotList.value.some(item => item.name === supplementalTableOptions[t])) {
-        plotList.value.push({ name: supplementalTableOptions[t], description: '' });
+    for (let t = 0; t < supplementalTableOptions.value.length; t++) {
+      if (!plotList.value.some(item => item.name === supplementalTableOptions.value[t])) {
+        plotList.value.push({ name: supplementalTableOptions.value[t], description: '' });
       }
     }
 
@@ -489,23 +492,29 @@ onMounted(() => {
       logs.value = await queryGetLogNames(
         (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
       );
-      for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-          let logList = [];
-          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-            logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
-          }
-          logLists.value[key] = logList;
-        });
-      }
-
-      // Add Log Options to the dropdown
-      Object.keys(logLists.value).forEach(key => {
-        let optionName = capitalCase(key) + ' Logs';
-        if (!plotList.value.some(item => item.name === optionName)) {
-          plotList.value.push({ name: optionName, description: '' });
+      if (logs.value?._data) {
+        for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+          Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+            let logList = [];
+            for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+              logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+            }
+            logLists.value[key] = logList;
+          });
         }
-      });
+        
+        // Add Log Options to the dropdown
+        Object.keys(logLists.value).forEach(key => {
+          let optionName = capitalCase(key) + ' Logs';
+          if (!plotList.value.some(item => item.name === optionName)) {
+            plotList.value.push({ name: optionName, description: '' });
+          }
+        });
+      } else {
+        toast.removeAllGroups();
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
     }
   })
   isEvaluationLoading.value = false;
@@ -514,14 +523,14 @@ onMounted(() => {
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   // is the selected option a plot or iteration table?
-  if (selectedPlotName.value && supplementalTableOptions.includes(selectedPlotName.value)) {
+  if (selectedPlotName.value && supplementalTableOptions.value.includes(selectedPlotName.value)) {
     selectedPlotFilename.value = null;
     selectedPlotFileUrl.value = null;
     selectedPlotHasTimeseries.value = false;
     plotGraphData.value = [];
     plotGraphLines.value = [];
     sliderBoxPosition.value = {};
-    selectedSupplementalTable.value = supplementalTableOptions.indexOf(selectedPlotName.value) + 1;
+    selectedSupplementalTable.value = supplementalTableOptions.value.indexOf(selectedPlotName.value) + 1;
     if (selectedSupplementalTable.value === 1) {
       // Get Iteration Data
       if (!iterations.value?._data || !iterations.value?._data?.length) {
@@ -704,6 +713,7 @@ watch(selectedPlotName, async () => {
 
     // set sweStartDateTime and sweEndDateTime if not already set
     if (!sweStartDateTime.value || !sweEndDateTime.value) {
+      console.log('Setting SWE Start/End Dates');
       setSweStartDateTime();
       setSweEndDateTime();
     }
@@ -930,7 +940,7 @@ watch(plotGraphData, async () => {
   if (plotGraphData.value.length > 0) {
     if (plotGraphLines.value.length == 0) {
       for (let c = 1; c < plotTableColumns.value.length; c++) {
-        let strokeColor = c < plotGraphColors.length ? plotGraphColors[c - 1] : plotGraphColors[0];
+        let strokeColor = c < plotGraphColors.value.length ? plotGraphColors.value[c - 1] : plotGraphColors.value[0];
         plotGraphLines.value.push({
           id: c,
           name: plotTableColumns.value[c].header,
@@ -1472,6 +1482,10 @@ watch(selectedLogName, async () => {
       } else {
         selectedLogEndRow.value = logDataPageSize.value;
       }
+    } else {
+      toast.removeAllGroups();
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
     plotTables.value = {};
     plotTableList.value = [];
@@ -1503,6 +1517,10 @@ watch(selectedLogCurrentPage, async () => {
         logText += response?._data?.log_data[t] + '<br/>\n';
       }
       selectedLogDisplay.value = logText;
+    } else {
+      toast.removeAllGroups();
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 });
@@ -1585,6 +1603,8 @@ onUnmounted(() => {
   selectedLogName.value = '';
   selectedLogList.value = [];
   sweTimeSeriesData.value = [];
+  sweStartDateTime.value = null;
+  sweEndDateTime.value = null;
 })
 </script>
 
