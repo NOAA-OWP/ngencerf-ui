@@ -207,8 +207,7 @@ const { clearCalibratableParameters } = useTuningStore();
 
 const { addToastRecord } = generalStore();
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);

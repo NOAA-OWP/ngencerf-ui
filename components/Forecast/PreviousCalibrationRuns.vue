@@ -156,8 +156,7 @@ const crContextMenu = ref(); //calibration run context menu
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRunForForecast>();
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
 
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {

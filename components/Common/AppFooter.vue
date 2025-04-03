@@ -18,16 +18,7 @@
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
 
-import { useBackendConfig } from "@/composables/UseBackendConfig";
-
 const { serverInfo } = generalStore();
-
-const { ngencerfBaseUrl } = useBackendConfig();
-
-
-onMounted( async () => {
-
-})
 
 const showServerInfo = () => {
   const e = document.getElementById('FloatingInfo');

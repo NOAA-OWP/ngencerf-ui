@@ -25,7 +25,7 @@
   </client-only>
 </template>
 <script setup lang="ts">
-import { onMounted, nextTick } from "vue";
+import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 
 import AppHeader from '@/components/Common/AppHeader.vue';
@@ -45,8 +45,7 @@ import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 const toast = useToast();
 
-const gstore = generalStore();
-const { popupActive } = storeToRefs(gstore);
+const { popupActive } = storeToRefs(generalStore());
 
 const { resetGageStore } = useGageStore();
 const { resetFormulationStore, loadFormulationModels } = useFormulationStore();

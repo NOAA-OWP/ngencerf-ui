@@ -86,41 +86,6 @@
         </div>
       </div>
     </div>
-
-    <!--
-    <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
-      <div class="row-span-1">
-        <span v-if="validationStatus === 'Done'">
-          <div id="ResultsArea" class="ngenButtonDiv row-span-1">
-            <Button class="font-normal" @click.stop="navigateToEvaluation">Go to Evaluation</Button>
-          </div>
-          <div class="col-span-7">&nbsp;</div>
-        </span>
-
-
-        <span v-else>
-          <div id="StausRunBottomButtons" class="grid grid-cols-6">
-          
-              <div v-if="!isStartHidden()" class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <Button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
-                  Run
-                </Button>
-              </div>
-            
-              <div v-else class="col-span-1 mr-6 h-8">&nbsp;</div>
-           
-              <div class="col-span-1 ngenButtonDiv-red mr-6 h-8 hidden" v-if="!isCancelHidden()">
-                <Button class="font-normal" title="Cancel Button" @click="cancelRun()" 
-                  aria-label="Cancel Button">Cancel</Button>
-              </div>
-              <div class="col-span-2">&nbsp;</div>
-              <div class="col-span-1 mr-4">
-              </div>
-          </div>
-        </span>
-      </div>
-    </div>
--->
   </div>
 </template>
 

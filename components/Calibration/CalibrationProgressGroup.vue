@@ -75,9 +75,9 @@
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
-const userDataStore = useUserDataStore();
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
-const { userCalibrationRunData } = storeToRefs(userDataStore);
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 
 const emit = defineEmits(["tabNumber"]);

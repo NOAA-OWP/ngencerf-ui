@@ -22,27 +22,18 @@ export const useEvaluationAltIterationStore = defineStore(
   () => {
     const { ngencerfBaseUrl } = useBackendConfig();
     const { getAccessToken } = useUserDataStore();
-    const { userSelectedCalibrationIterationId } = storeToRefs(
-      useUserDataStore()
+    const { userSelectedCalibrationIterationId } = storeToRefs(useUserDataStore()
     );
     const { calibrationJobId } = storeToRefs(generalStore());
 
-    const calibrationRunDetailDataList = ref<
-      AlternativeIterationCalibrationRunData[]
-    >([]);
-    const tuningParametersDataList = ref<
-      AlternativeIterationTuningParameters[]
-    >([]);
+    const calibrationRunDetailDataList = ref<AlternativeIterationCalibrationRunData[]>([]);
+    const tuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
     const calibrationRunDetailDataListHeaders = ref<any[]>([]);
     const tuningParametersDataListHeaders = ref<any[]>([]);
     const calibrationRunDetailTableColumn = ref<DynamicTableColumn[]>([]);
     const tuningParametersTableColumn = ref<DynamicTableColumn[]>([]);
-    const computedCalibrationRunDetailDataList = ref<
-      AlternativeIterationCalibrationRunData[]
-    >([]);
-    const computedtuningParametersDataList = ref<
-      AlternativeIterationTuningParameters[]
-    >([]);
+    const computedCalibrationRunDetailDataList = ref<AlternativeIterationCalibrationRunData[]>([]);
+    const computedtuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
 
     const fetchCalibrationDataByIterationDataList = async () => {
       let headerRow = <DynamicTableColumnHeader[]>[];
