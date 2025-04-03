@@ -140,11 +140,12 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
       const contentDisposition = response.headers.get("Content-Disposition");
       let file_user_name = getUserName().split("@")[0];
       let file_name = `${calibration_run_id}_${file_user_name}.zip`; // default filename
-      if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
+
+      if (contentDisposition && contentDisposition.includes("filename=")) {
         // Parse filename, handling quotes if necessary
         const file_name_regex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
         const matches = file_name_regex.exec(contentDisposition);
-        if (matches != null && matches[1]) {
+        if (matches?.[1]) {
           file_name = matches[1].replace(/['"]/g, "");
         }
       }
@@ -161,6 +162,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
       URL.revokeObjectURL(url);
     })
     .catch(error => {
+    console.error(`Download error for file "${file_name}":`, error);
       throw error;
     });
   }
