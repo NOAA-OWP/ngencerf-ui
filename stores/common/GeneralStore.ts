@@ -11,6 +11,9 @@ import type { ToastMessageOptions } from "primevue/toast";
 export const generalStore = defineStore(
   "generalStore",
   () => {
+
+    const gitInfo = ref<Record<string, GitData>>({});
+
     const calibrationTabIndex = ref("1");
     const evaluationTabIndex = ref("1");
     const forecastTabIndex = ref("1");
@@ -120,6 +123,7 @@ export const generalStore = defineStore(
     }
 
     return {
+      gitInfo,
       getMenuIndex,
       setMenuIndex,
       getCalibrationTabIndex,

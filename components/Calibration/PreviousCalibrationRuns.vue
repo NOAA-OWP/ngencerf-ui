@@ -57,7 +57,12 @@
               </Column>
 
               <Column v-if="checkArchived" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
-                header="Archived" :sortable="true">
+                :sortable="true">
+                <template #header>
+                  <div class="column-header">
+                    <span>Archived?</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_run_id"
                     :aria-label="slotProps.data.is_archived ? 'Archived' : ''"
@@ -67,7 +72,12 @@
                 </template>
               </Column>
 
-              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
+              <Column :pt="ptColumn" field="gage_id" sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Headwater</span><br /><span>Basin Gage</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
                     :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
@@ -75,7 +85,12 @@
                   </span>
                 </template>
               </Column>
-              <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable>
+              <Column :pt="ptColumn" field="formulation_name" sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Formulation Name</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.formulation_name"
                     :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
@@ -84,7 +99,12 @@
                   </span>
                 </template>
               </Column>
-              <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable>
+              <Column :pt="ptColumn" field="job_genesis" sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Job</span><br /><span>Genesis</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
                     :title="'Job Genesis ' + slotProps.data.job_genesis">
@@ -92,7 +112,12 @@
                   </span>
                 </template>
               </Column>
-              <Column field="created_at" header="Creation Date" sortable>Column
+              <Column field="created_at" sortable>Column
+                <template #header>
+                  <div class="column-header">
+                    <span>Creation Date</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
                     :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
@@ -101,7 +126,12 @@
                   </span>
                 </template>
               </Column>
-              <Column field="submit_date" header="Submit Date" sortable>
+              <Column field="submit_date" sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Submit Date</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.submit_date"
                     :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
@@ -111,7 +141,12 @@
                   </span>
                 </template>
               </Column>
-              <Column header="Calibration Period" sortable>
+              <Column  sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Calibration Period</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period"
                     :aria-label="'Calibration Period ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_end_period)"
@@ -236,7 +271,8 @@ onMounted(async () => {
 
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-    if (ele) { ele.scrollTo(0, 0); } includeArchivedJobs.value = false;;
+    if (ele) { ele.scrollTo(0, 0); } 
+    includeArchivedJobs.value = false;
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     resetGageStore();
     hardResetTuningStore();
@@ -412,15 +448,6 @@ const applyJobFilters = async () => {
   }
 };
 
-
-const filtersExist = computed(() => {
-  return (modulesFilterList.value.length !== 0 || statusTypeFilterList.value.length !== 0 || uiGageId.value != "All")
-});
-
-// Template for the "Archived" column (Yes/No display)
-const archivedTemplate = (rowData: any) => {
-  return rowData.archived ? 'Yes' : 'No';
-};
 
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
@@ -726,8 +753,8 @@ const updateUserCalibrationJobsListData = async (): Promise<void> => {
 const downloadSelectedCalibrationData = async (selectedCalibrationRun: any) => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
   if (selectedCalibrationRun.value.status == 'Done') {
-    isLoading.value = true;
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Downloading your calibration data to a zip file. This will take several seconds.', life: ToastTimeout.timeout5000 };
+    //isLoading.value = true;
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Downloading your calibration data to a zip file. This could take a while. Feel free to do something else while you\'re waiting, and you\'ll be prompted to save the file when it\'s ready.', life: ToastTimeout.timeout5000 };
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {
@@ -738,7 +765,7 @@ const downloadSelectedCalibrationData = async (selectedCalibrationRun: any) => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeout5000 };
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      isLoading.value = false;
+      //isLoading.value = false;
     })
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: 'Data cannot be downloaded for a Calibration Job that is not Done.', life: ToastTimeout.timeout5000 };
@@ -746,31 +773,6 @@ const downloadSelectedCalibrationData = async (selectedCalibrationRun: any) => {
   }
 }
 
-/**
- * Toggle filters on/off
- * 
- */
-const toggleShowFilters = () => {
-  currentJobsList.value = updatedUserCalibrationJobsListData.value;
-  showFilters.value = !showFilters.value;
-}
-
-
-/**
- * Create a comma separated list of module names
- * 
- * returns string array
- */
-const getModuleFilterList = () => {
-  let l = "";
-  modulesFilterList.value.forEach((e, idx) => {
-    l += e;
-    if (idx !== modulesFilterList.value.length - 1) {
-      l += ", ";
-    }
-  });
-  return l;
-}
 </script>
 
 <style lang="scss" scoped>
@@ -790,12 +792,11 @@ small-label,
 #FilterGroup {
   color: black;
   font-weight: 600;
-  width: 1350px;
   margin: 0 auto;
 }
 
 #CalTable {
-  min-height: 400px
+  min-height: 400px;
 }
 
 #CalDateEnd,
@@ -859,7 +860,7 @@ small-label,
 
 #Datatable,
 #JobFilterDialog {
-  width: auto !important;
+  width: 1325px !important;
 }
 
 #MultJobOpsDlg {

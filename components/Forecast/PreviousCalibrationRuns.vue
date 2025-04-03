@@ -9,8 +9,7 @@
     </div>
   </Transition>
   <client-only>
-    <div class="h-screen-inner pr-2">
-
+    <div class="pr-2">
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
@@ -58,7 +57,12 @@
                 </span>
               </template>
             </Column>
-            <Column field="submit_date" header="Run Date" sortable>
+            <Column :pt="ptColumn" field="submit_date" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Run Date</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span :aria-label="'Run Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
                   :title="'Run Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
@@ -66,7 +70,12 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable>
+            <Column :pt="ptColumn" field="formulation_name" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Formulation Name</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.formulation_name"
                   :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
@@ -75,7 +84,12 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
+            <Column :pt="ptColumn" field="gage_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Headwater</span><br /><span>Basin Gage</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
                   :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
@@ -83,7 +97,12 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable>
+            <Column :pt="ptColumn" field="objective_function" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Objective</span><br /><span>Function</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.objective_function"
                   :aria-label="'Objective Function ' + slotProps.data.objective_function"
@@ -92,7 +111,12 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable>
+            <Column :pt="ptColumn" field="optimization_algorithm" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Optimization</span><br /><span>Algorithm</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.optimization_algorithm"
                   :aria-label="'Optimization Algorithm ' + slotProps.data.optimization_algorithm"
@@ -329,8 +353,8 @@ const acceptDelete = (selectedRunId: number) => {
  const downloadSelectedCalibrationData = async () => {
   const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
   if (calibrationRunForForecast.value?.status == 'Done') {
-    isLoading.value = true;
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Downloading your calibration data to a zip file. This will take several seconds.', life: ToastTimeout.timeout5000 };
+    //isLoading.value = true;
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Downloading your calibration data to a zip file. This could take a while. Feel free to do something else while you\'re waiting, and you\'ll be prompted to save the file when it\'s ready.', life: ToastTimeout.timeout5000 };
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {
@@ -341,7 +365,7 @@ const acceptDelete = (selectedRunId: number) => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeout5000 };
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      isLoading.value = false;
+      //isLoading.value = false;
     })
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: 'Data cannot be downloaded for a Calibration Job that is not Done.', life: ToastTimeout.timeout5000 };
@@ -373,7 +397,7 @@ const toggleMessagesGroup = () => {
 
 #CalibrationRunForForecastTable,
 .gage-filter-wrapper {
-  width: 1270px;
+  width: 1200px;
   margin: 0 auto;
 }
 

@@ -67,25 +67,20 @@ import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NextgenEnums";
 
-import type { CombinedVersionInfo, GitData } from "@/composables/NextGenModel";
+import type { CombinedVersionInfo } from "@/composables/NextGenModel";
 
 import { generalStore } from "@/stores/common/GeneralStore";
-import { useUserDataStore } from '@/stores/common/UserDataStore';
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from "@/utils/TimeHelpers";
 
 const toast = useToast();
 const { addToastRecord } = generalStore();
 const { getServerInfo } = generalStore();
-const { getAccessToken, isUserLoggedIn } = useUserDataStore();
 
-const { ngencerfBaseUrl } = useBackendConfig();
-
-const { popupActive } = storeToRefs(generalStore());
+const { popupActive, gitInfo } = storeToRefs(generalStore());
 
 const combinedVersionInfo = ref<CombinedVersionInfo>();
 
-const gitInfo = ref<Record<string, GitData>>({});
 // Added reactive variable to store optional git_info.json data loaded at runtime
 const addedGitInfo = ref<any>(null);
 
@@ -127,8 +122,6 @@ onMounted(async () => {
     resizeObserver.observe(aboutBox.value);
   }
 
-  await getGitInformation();
-
   setTimeout(() => {
     const resizeEvent = new Event('resize');
     window.dispatchEvent(resizeEvent);
@@ -148,23 +141,6 @@ const resizeNotifications = () => {
   }
   scrollHeight.value = h + "px";
 
-}
-
-// Get footer infongenCERF
-const getGitInformation = () => {
-  if (!isUserLoggedIn()) {
-    return null;
-  }
-  makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_git_info/`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${getAccessToken()}`,
-      "Content-Type": 'application/json'
-    },
-    body: ""
-  }).then((result) => {
-    gitInfo.value = result._data.git_info;
-  })
 }
 
 /**
