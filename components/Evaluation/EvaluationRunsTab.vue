@@ -74,7 +74,7 @@
             <Column :pt="ptColumn" field="formulation_name" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Formulation</span><br /><span>Name</span>
+                  <span>Formulation Name</span>
                 </div>
               </template>
               <template #body="slotProps">
@@ -687,10 +687,4 @@ const rowStyle = (data: any) => {
   overflow: auto;
 }
 
-.column-header {
-  font-size: 0.8em;
-  font-weight: bold;
-  line-height: 1.4em;
-  text-align: center;
-}
 </style>
