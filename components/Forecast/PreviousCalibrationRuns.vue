@@ -182,6 +182,7 @@ const selectedCalibrationRun = ref<CalibrationRunForForecast>();
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
+const { calibrationDownloadFileName } = storeToRefs(useCalibrationJobStore());
 
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {
@@ -354,12 +355,12 @@ const acceptDelete = (selectedRunId: number) => {
   const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
   if (calibrationRunForForecast.value?.status == 'Done') {
     //isLoading.value = true;
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Downloading your calibration data to a zip file. This could take a while. Feel free to do something else while you\'re waiting, and you\'ll be prompted to save the file when it\'s ready.', life: ToastTimeout.timeout5000 };
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and will be prompted to save when the file is ready.', life: ToastTimeout.timeout10000 };
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {
         await getCalibrationJobZip(selectedRunId);
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + selectedRunId, detail: 'Your calibration data download was successful!', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + selectedRunId, detail: 'Your calibration data download "' + calibrationDownloadFileName.value + '" was successful!', life: ToastTimeout.timeout10000 };
         toast.add(tMsg); addToastRecord(tMsg);
       } catch (error) {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeout5000 };

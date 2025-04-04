@@ -14,6 +14,8 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
   const { getAccessToken, getUserName } = useUserDataStore()
   const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
   const { calibrationJobId } = storeToRefs( generalStore() )
+  
+  const calibrationDownloadFileName = ref<string | null>(null);
 
   /**
  * returns list of calibration job data from server
@@ -137,18 +139,19 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
         throw new Error(message);
       }
       // Extract the filename from the Content-Disposition header if available
-      const contentDisposition = response.headers.get("Content-Disposition");
+      const contentDisposition = response.headers.get('Content-Disposition');
       let file_user_name = getUserName().split("@")[0];
       let file_name = `${calibration_run_id}_${file_user_name}.zip`; // default filename
-
-      if (contentDisposition && contentDisposition.includes("filename=")) {
+      if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
         // Parse filename, handling quotes if necessary
         const file_name_regex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
         const matches = file_name_regex.exec(contentDisposition);
-        if (matches?.[1]) {
+        if (matches != null && matches[1]) {
           file_name = matches[1].replace(/['"]/g, "");
         }
       }
+      // Update ref with the file name so that we can access it outside of the store
+      calibrationDownloadFileName.value = file_name;
       return response.blob().then(blob => ({ blob, file_name }));
     })
     .then(({ blob, file_name }) => {
@@ -162,7 +165,6 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
       URL.revokeObjectURL(url);
     })
     .catch(error => {
-    console.error(`Download error for file "${file_name}":`, error);
       throw error;
     });
   }
@@ -240,6 +242,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
     calibrationJobId,
     savedCalibrationJobs,
     runningCalibrationJobs,
+    calibrationDownloadFileName,
     fetchNewCalibrationRunId,
     cloneCalibrationRun,
     deleteCalibrationRun,
