@@ -195,7 +195,7 @@ const onRowContextMenu = (event: any) => {
   const crRowData = event.data as ForecastJob;
   console.log(`crRowData: ${JSON.stringify(crRowData)}`);
 
-  if (selectedForecastJob && selectedForecastJob.value?.forecast_run_id == crRowData.forecast_run_id) {
+  if (selectedForecastJob && selectedForecastJob.value?.forecast_run_id === crRowData.forecast_run_id) {
     crContextMenu.value.show(event.originalEvent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
     if (crRowData.forecast_status !== 'Running') {

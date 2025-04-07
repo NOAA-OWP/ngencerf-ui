@@ -92,7 +92,7 @@
       <div>
 
         <div class="text-center"
-          v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0 && selectedLogCategory == ''">
+          v-if="plotTableErrorMessage !== '' && selectedSupplementalTable === 0 && selectedLogCategory === ''">
           <div class="grid place-items-center" style="height: 45vh;">
             <div>
               {{ plotTableErrorMessage }}
@@ -608,11 +608,11 @@ watch(selectedPlotName, async () => {
             for (let v = 0; v < performanceMetrics.value?._data?.validations.length; v++) {
               let validation_run_id = performanceMetrics.value?._data?.validations[v].validation_run_id;
               let validation_type = performanceMetrics.value?._data?.validations[v].validation_type;
-              if (validation_type == 'valid_iteration') {
+              if (validation_type === 'valid_iteration') {
                 validation_type = 'Iter';
-              } else if (validation_type == 'valid_control') {
+              } else if (validation_type === 'valid_control') {
                 validation_type = 'Control';
-              } else if (validation_type == 'valid_best') {
+              } else if (validation_type === 'valid_best') {
                 validation_type = 'Best';
               }
               if (performanceMetrics.value?._data?.validations[v].iteration_num !== null) {
@@ -713,7 +713,7 @@ watch(selectedPlotName, async () => {
     } */
 
     // pre-load SWE Timeseries Data so that we know our date range
-    if (!sweTimeSeriesData.value || sweTimeSeriesData.value.length == 0) {
+    if (!sweTimeSeriesData.value || sweTimeSeriesData.value.length === 0) {
       const response: any = await queryGetSWETimeseriesData(
         (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
       );
@@ -756,7 +756,7 @@ watch(selectedPlotName, async () => {
         selectedPlotFilename.value = response?._data?.plot_file_path;
         selectedPlotFileUrl.value = response?._data?.plot_url;
         for (let p = 0; p < plotList.value.length; p++) {
-          if (plotList.value[p].name == selectedPlotName.value) {
+          if (plotList.value[p].name === selectedPlotName.value) {
             selectedPlotHasTimeseries.value = plotList.value[p].timeseries_available;
           }
         }
@@ -928,7 +928,7 @@ watch(plotTableCurrentPage, async () => {
 // Handle plotGraphData changes
 watch(plotGraphData, async () => {
   if (plotGraphData.value.length > 0) {
-    if (plotGraphLines.value.length == 0) {
+    if (plotGraphLines.value.length === 0) {
       for (let c = 1; c < plotTableColumns.value.length; c++) {
         let strokeColor = c < plotGraphColors.length ? plotGraphColors[c - 1] : plotGraphColors[0];
         plotGraphLines.value.push({
@@ -952,7 +952,7 @@ const togglePlotGraph = async () => {
   if (showPlotGraph.value) {
     showPlotGraph.value = false;
   } else {
-    if (!plotGraphData.value || plotGraphData.value.length == 0) {
+    if (!plotGraphData.value || plotGraphData.value.length === 0) {
       if (gridDisplayOptions.includes(selectedPlotName.value)) {
         // special case for SWE time series
         plotGraphDataRaw.value = sweTimeSeriesData.value;
@@ -1020,7 +1020,7 @@ const drawInteractivePlot = () => {
     for (let c = 1; c < plotTableColumns.value.length; c++) {
       if (document?.getElementById('plotGraphCheckbox-' + c)?.checked) {
         for (let d = 0; d < plotGraphData.value.length; d++) {
-          if (plotGraphLines.value[c - 1].symbol == 'line') {
+          if (plotGraphLines.value[c - 1].symbol === 'line') {
             plotLineData.push({
               'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value]),
               'measurement': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]),

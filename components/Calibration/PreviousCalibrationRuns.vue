@@ -533,7 +533,7 @@ const createNewCalibration = async () => {
   clearUserCalibrationRunData();
 
   fetchNewCalibrationRunId().then(response => {
-    if (response.status == 201) {
+    if (response.status === 201) {
       if (response?._data && response?._data?.calibration_run_id && response?._data?.calibration_run_id > 0) {
         calibrationJobId.value = response?._data?.calibration_run_id;
         queryUserCalibrationRunData().then(queryResponse => {
@@ -572,7 +572,7 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   isLoading.value = true;
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
   cloneCalibrationRun(selectedRunId).then(async (response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -604,7 +604,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '" + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
   let confirmMessage = "Are you sure you want to " + ty + " calibration run " + selectedRunId + selectedRunName;
-  if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
+  if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
 
   confirmDelete.require({
     message: confirmMessage,
@@ -638,7 +638,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
  */
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(async (response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -657,7 +657,7 @@ const acceptDelete = (selectedRunId: number) => {
  */
 const acceptMultipleDelete = () => {
   deleteCalibrationRun(selectedMultipleCalibrationRuns.value).then(async (response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -677,7 +677,7 @@ const acceptMultipleDelete = () => {
  */
 const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
   archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -696,7 +696,7 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
  */
 const acceptMultpleArchive = (archiveJob: boolean) => {
   archiveCalibrationRun(selectedMultipleCalibrationRuns.value, archiveJob).then(async (response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
