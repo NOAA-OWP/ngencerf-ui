@@ -64,27 +64,18 @@ import { generalStore } from '~/stores/common/GeneralStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
 const {
   calibrationRunForForecast,
-  forecastJobId,
   forecastCycles,
   forecastCycle,
-  forecastJobStatus,
-  elapsedTime,
-  submitTimeDate,
-  submitTime
 } = storeToRefs(useForecastStore());
 
-const {
-  loadSetupForecastTabData,
-  hardResetForecastStore
-} = useForecastStore();
+const { loadSetupForecastTabData } = useForecastStore();
 
 /**
  * Disable row if forecast cycle is not active

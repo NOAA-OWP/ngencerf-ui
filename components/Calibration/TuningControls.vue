@@ -331,19 +331,17 @@ import { hilightTab } from '@/composables/TabHilight';
 
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 
-import "@vuepic/vue-datepicker/dist/main.css";
-import { errorMessages } from "vue/compiler-sfc";
+
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
 
 const format = formatISOStringOrDateToYYYYMMDDHHMM;
 
-const gstore = generalStore();
 const { addToastRecord } = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
 
-const { calibrationJobId, toastRecords } = storeToRefs(generalStore());
+const { calibrationJobId } = storeToRefs(generalStore());
 const { ngencerfBaseUrl } = useBackendConfig();
 const userDataStore = useUserDataStore();
 const tuningStore = useTuningStore();
@@ -357,7 +355,7 @@ const {
 
 const { getAccessToken } = userDataStore;
 const { userCalibrationRunData } = storeToRefs(userDataStore);
-const { loadTuningTabStaticData, saveTuningTabData, hardResetTuningStore } = tuningStore;
+const { loadTuningTabStaticData, saveTuningTabData } = tuningStore;
 const {
   tuningStore_data_loading,
   loadTuningTabData,

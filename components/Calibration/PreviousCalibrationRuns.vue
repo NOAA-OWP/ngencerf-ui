@@ -232,10 +232,7 @@ import { hilightTab } from '@/composables/TabHilight';
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
-
-const showFilters = ref<boolean>(false);
+const { isLoading } = storeToRefs(generalStore());
 
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 
@@ -243,8 +240,6 @@ const selectedMultipleCalibrationRuns = ref<number[]>([]);
 const selectedMultipleCalibrationRunData = ref<CalibrationJobListItem[]>([]);
 
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
-
-const currentJobsList = ref<CalibrationJobListItem[]>();
 
 let interval: number | undefined;
 const runningColor = ref<string>('white');
@@ -576,14 +571,15 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
+      isLoading.value = false;
     } else {
+      isLoading.value = false;
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Clone Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }
-  });
-  isLoading.value = false;
+  });  
 };
 
 const confirmDelete = useConfirm();

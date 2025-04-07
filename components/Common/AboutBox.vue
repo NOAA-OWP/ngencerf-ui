@@ -65,8 +65,8 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
 
+import { ToastTimeout } from "@/composables/NextgenEnums";
 import type { CombinedVersionInfo } from "@/composables/NextGenModel";
 
 import { generalStore } from "@/stores/common/GeneralStore";

@@ -141,8 +141,7 @@ import { hilightTab } from '@/composables/TabHilight';
 import { isValidDate } from '@/utils/CommonHelpers';
 import { calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const toast = useToast();
@@ -167,7 +166,6 @@ const {
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
-  getJobDataDirectory,
   setResultsPathname
 } = useForecastStore();
 
