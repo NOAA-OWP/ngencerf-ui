@@ -28,12 +28,9 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";//NOSONAR
 import Button from "primevue/button";
-import type { CalibrationJobListItem } from "@/composables/NextGenModel";
 
-import { useUserDataStore } from "@/stores/common/UserDataStore"
-const { includeArchivedJobs } = storeToRefs(useUserDataStore());
+import type { CalibrationJobListItem } from "@/composables/NextGenModel";
 
 const props = defineProps<{
   calJobs: number[];

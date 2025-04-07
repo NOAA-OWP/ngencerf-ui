@@ -156,7 +156,6 @@ import { convertTimeZone, calculateElapsedTime, sumAndFormatElapsedTimes } from 
 
 import { hilightTab } from '@/composables/TabHilight';
 
-const runStatusStore = useRunStatusStore();
 const userDataStore = useUserDataStore();
 
 const toast = useToast();
@@ -182,7 +181,7 @@ const {
   resultsPathname,
   overallCalibrationValidationStatus,
   validationBestAchieved
-} = storeToRefs(runStatusStore);
+} = storeToRefs(useRunStatusStore());
 
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
@@ -196,10 +195,9 @@ const {
   queryGetIteration,
   queryGetJobDataDirectory,
   cancelCalibrationJob,
-} = runStatusStore;
+} = useRunStatusStore();
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);

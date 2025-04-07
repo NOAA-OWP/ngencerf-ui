@@ -74,15 +74,14 @@
       </div>
     </div>
   </div>
-</template>ingredient
+</template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import Checkbox from 'primevue/checkbox';
 import { generalStore } from '~/stores/common/GeneralStore';
 
-const gstore = generalStore();
-const { toastRecords } = storeToRefs(gstore);
+const { toastRecords } = storeToRefs(generalStore());
 
 const infoToast = ref<boolean>(true);
 const warnToast = ref<boolean>(true);

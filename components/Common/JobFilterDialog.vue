@@ -69,7 +69,7 @@
                 </Button>
               </div>
             </div>
-            <div class="col-span-4 align-center">
+            <div class="col-span-4 text-right mr-[16px]">
               <Button id="CleareFiltersButton" class="c-blue mt-[22px]" label="Clear Filters"
                 @click="resetFilters($event)" aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
               </Button><br />
@@ -96,19 +96,11 @@ import { StatusTypes } from "@/composables/NextgenEnums";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
-const { fetchUserCalibrationJobsListData } = useUserDataStore()
-
 const { fetchFormulationModuleOptions } = useFormulationStore();
 
-const userStore = useUserDataStore();
-const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList, includeArchivedJobs } = storeToRefs(userStore);
+const { uiGageId, calibrationRunGageList, modulesFilterList, statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
 const emit = defineEmits(["ModulesFilterDialogClosing", "ApplyJobFilters", "RefreshJobList"]);
-
-const draggableDiv = ref<HTMLDivElement | null>(null);
-const isDragging = ref<boolean>(false);
-let offsetX = 0;
-let offsetY = 0;
 
 const ptCheckbox = ref({
   box: { style: { "border": "2px solid #0c5274" } },

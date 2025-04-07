@@ -176,8 +176,7 @@ import {
   useApiResponseToastSeverityCode
 } from "@/composables/ValidationHandlers";
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const { hardResetTuningTimeConrols } = useTuningStore();
