@@ -209,7 +209,7 @@
       </div>
     </div>
     <div id="LogDisplayArea" class="p-2"
-      v-if="selectedLogCategory != '' && selectedLogList && selectedLogList.length > 0">
+      v-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
         <div v-if="selectedLogList.length > 1">
           <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
@@ -616,7 +616,7 @@ watch(selectedPlotName, async () => {
                 validation_type = 'Best';
               }
               if (performanceMetrics.value?._data?.validations[v].iteration_num !== null) {
-                if (validation_type != 'Iter') {
+                if (validation_type !== 'Iter') {
                   validation_type += ': Iter';
                 }
                 validation_type += ' ' + performanceMetrics.value?._data?.validations[v].iteration_num;
@@ -1191,7 +1191,7 @@ const drawInteractiveSlider = () => {
       marks: [
         Plot.lineY(plotGraphSliderData.value, lineOptions)
       ],
-      width: plotGraphArea.value.offsetWidth - 100,
+      width: plotGraphArea?.value.offsetWidth - 100,
       height: 100,
       marginLeft: 0,
       marginRight: 0
@@ -1201,7 +1201,7 @@ const drawInteractiveSlider = () => {
     }
     plotGraphSlider.value.append(Plot.plot(plotGraphSliderOptions.value));
     console.log('Previous slider box position: ', sliderBoxPosition.value);
-    if (!sliderBoxPosition.value || Object.keys(sliderBoxPosition.value).length != 2) {
+    if (!sliderBoxPosition.value || Object.keys(sliderBoxPosition.value).length !== 2) {
       console.log('Resetting sliderBoxPosition')
       // we don't have a previous position to remember
       if (gridDisplayOptions.includes(selectedPlotName.value)) {

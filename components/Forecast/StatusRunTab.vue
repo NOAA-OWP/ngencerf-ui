@@ -139,7 +139,7 @@ import { useForecastStore } from '@/stores/forecast/ForecastStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 import { isValidDate } from '@/utils/CommonHelpers';
-import { calculateElapsedTime, formatElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
+import { calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
 
 const gstore = generalStore();
 const { isLoading } = storeToRefs(gstore);
@@ -215,7 +215,7 @@ const createForcingDownloadAndForecastStatusInterval = () => {
 
     if (forecast) {
       // if forcing download and forecast job is not running, clear the interval
-      if (forecast.forcing_download.status != 'Running' && forecast.status !== 'Running') {
+      if (forecast.forcing_download.status !== 'Running' && forecast.status !== 'Running') {
         clearInterval(forecastJobStatusIntervalId.value);
         forecastJobStatusIntervalId.value = undefined;
       }
