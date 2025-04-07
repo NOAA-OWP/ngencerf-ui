@@ -8,6 +8,7 @@ import { generalStore } from "@/stores/common/GeneralStore";
 
 import { makeProtectedApiCall } from "#imports";
 import type { CalibrationJobListItem } from "@/composables/NextGenModel";
+import { EventSourcePolyfill } from 'event-source-polyfill';
 
 export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -15,6 +16,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
   const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
   const { calibrationJobId } = storeToRefs( generalStore() )
   
+  const calibrationDownloadJobID = ref<number | null>(null);
   const calibrationDownloadFileName = ref<string | null>(null);
 
   /**
@@ -125,51 +127,6 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
  * Get calibration data as zip file
  */
   const getCalibrationJobZip = async (calibration_run_id: number) => {
-    await fetch(`${ngencerfBaseUrl}/calibration/get_calibration_job_zip/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({ calibration_run_id: calibration_run_id })
-    })
-    .then(response => {
-      if (!response.ok) {
-        const message = `Error: ${response.status} ${response.statusText}`;
-        throw new Error(message);
-      }
-      // Extract the filename from the Content-Disposition header if available
-      const contentDisposition = response.headers.get('Content-Disposition');
-      let file_user_name = getUserName().split("@")[0];
-      let file_name = `${calibration_run_id}_${file_user_name}.zip`; // default filename
-      if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
-        // Parse filename, handling quotes if necessary
-        const file_name_regex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-        const matches = file_name_regex.exec(contentDisposition);
-        if (matches != null && matches[1]) {
-          file_name = matches[1].replace(/['"]/g, "");
-        }
-      }
-      // Update ref with the file name so that we can access it outside of the store
-      calibrationDownloadFileName.value = file_name;
-      return response.blob().then(blob => ({ blob, file_name }));
-    })
-    .then(({ blob, file_name }) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = file_name; // Use the filename from the response header
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    })
-    .catch(error => {
-      throw error;
-    });
-  }
-
-  /* const getCalibrationJobZip = async (calibration_run_id: number) => {
     await fetch(`${ngencerfBaseUrl}/calibration/start_zip_for_calibration_job/`, {
       method: "POST",
       headers: {
@@ -183,10 +140,18 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
         const message = `Error: ${response.status} ${response.statusText}`;
         throw new Error(message);
       }
-    })
-
-    // Listen for SSE update
-    const source = new EventSource(`${ngencerfBaseUrl}/calibration/get_zip_status/${calibration_run_id}`);
+    });
+    
+    // Use the EventSource polyfill to support sending Authorization header
+    const source = new EventSourcePolyfill(
+      `${ngencerfBaseUrl}/calibration/get_zip_status/${calibration_run_id}/`,
+      {
+        headers: {
+          "Authorization": `Bearer ${getAccessToken()}`
+        }
+      }
+    );
+    
     source.onmessage = async (event) => {
       const data = JSON.parse(event.data);
       if (data.status === "done") {
@@ -207,7 +172,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
             throw new Error(message);
           }
           // Extract the filename from the Content-Disposition header if available
-          const contentDisposition = response.headers.get("Content-Disposition");
+          const contentDisposition = response.headers.get('Content-Disposition');
           let file_user_name = getUserName().split("@")[0];
           let file_name = `${calibration_run_id}_${file_user_name}.zip`; // default filename
           if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
@@ -225,6 +190,11 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
           const a = document.createElement("a");
           a.href = url;
           a.download = file_name; // Use the filename from the response header
+          
+          // Update refs with the Job ID and file name so that we can access them outside of the store
+          calibrationDownloadJobID.value = calibration_run_id;
+          calibrationDownloadFileName.value = file_name;
+          
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -235,13 +205,14 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
         });
       }
     }
-  } */
+  }
 
   return {
     fetchJobsListData,
     calibrationJobId,
     savedCalibrationJobs,
     runningCalibrationJobs,
+    calibrationDownloadJobID,
     calibrationDownloadFileName,
     fetchNewCalibrationRunId,
     cloneCalibrationRun,
