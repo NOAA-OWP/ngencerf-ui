@@ -420,7 +420,7 @@ const applyJobFilters = async () => {
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
   const crRowData = event.data as ValidatedCalibrationRunListItem;
-  if (selectedCalibrationRun && selectedCalibrationRun.value?.calibration_run_id == crRowData.calibration_run_id) {
+  if (selectedCalibrationRun && selectedCalibrationRun.value?.calibration_run_id === crRowData.calibration_run_id) {
     crContextMenu.value.show(event.originalEvent);
     contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     if (crRowData.validation_runs > 1) {

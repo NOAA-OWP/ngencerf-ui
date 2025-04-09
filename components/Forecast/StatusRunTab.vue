@@ -213,7 +213,7 @@ const createForcingDownloadAndForecastStatusInterval = () => {
 
     if (forecast) {
       // if forcing download and forecast job is not running, clear the interval
-      if (forecast.forcing_download.status != 'Running' && forecast.status !== 'Running') {
+      if (forecast.forcing_download.status !== 'Running' && forecast.status !== 'Running') {
         clearInterval(forecastJobStatusIntervalId.value);
         forecastJobStatusIntervalId.value = undefined;
       }

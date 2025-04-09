@@ -186,7 +186,7 @@ const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
   const crRowData = event.data as CalibrationRunForForecast;
-  if (calibrationRunForForecast && calibrationRunForForecast.value?.calibration_run_id == crRowData.calibration_run_id) {
+  if (calibrationRunForForecast && calibrationRunForForecast.value?.calibration_run_id === crRowData.calibration_run_id) {
     crContextMenu.value.show(event.originalEvent);
     //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     setSelectedCalibrationRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
