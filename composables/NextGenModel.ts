@@ -667,13 +667,14 @@ export type AccountEvent = {
   errorLogEvent: string;
 };
 
-export type CombinedVerstionInfo = {
+export type CombinedVersionInfo = {
   version: string;
   date: string;
   contact_email: string;
   commit_hash: string;
   ngenCerf_version: string;
   ngenCerf_date: string;
+  ngenCerf_copyright: string;
 };
 
 export type ForecastCycle = {

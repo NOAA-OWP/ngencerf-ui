@@ -60,10 +60,8 @@ export const makeProtectedApiCall = async <T>(
   url: string,
   userOptions: any = {}
 ): Promise<any> => {
-  const gstore = generalStore();
-  const { isLoading } = storeToRefs(gstore);
-  const ustore = useUserDataStore();
-  const {lastServerError }= storeToRefs(ustore);
+  const { isLoading } = storeToRefs(generalStore());
+  const { lastServerError } = storeToRefs(useUserDataStore());
 
   // Save the call data in case we need to refresh.
   rqstUrl = url;
@@ -87,7 +85,10 @@ export const makeProtectedApiCall = async <T>(
       },
     });
 
-    let myResponse =  lastServerError.value = { ok: response.ok, status: response.status };  
+    let myResponse = (lastServerError.value = {
+      ok: response.ok,
+      status: response.status,
+    });
 
     // Success
     if (myResponse.ok && myResponse.status >= 200 && myResponse.status < 300) {
@@ -117,13 +118,16 @@ export const makeProtectedApiCall = async <T>(
     }
 
     // Client bad requests, except for Unauthorized, which is handled above
-    if (!myResponse.ok && myResponse.status === 400 || (myResponse.status > 401 && myResponse.status < 500)) {
+    if (
+      (!myResponse.ok && myResponse.status === 400) ||
+      (myResponse.status > 401 && myResponse.status < 500)
+    ) {
       responseData = {
         _data: null,
         status: myResponse.status,
         ok: myResponse.ok,
       };
-      return responseData;     
+      return responseData;
     }
 
     // server Errors

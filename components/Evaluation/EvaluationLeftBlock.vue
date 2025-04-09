@@ -4,7 +4,7 @@
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
       <span v-if="activeTab === 1">
-        <CalibrationRunsTab />
+        <EvaluationRunsTab />
       </span>
       <span v-else-if="activeTab === 2">
         <EvaluateTab />
@@ -25,7 +25,7 @@ import { generalStore } from "@/stores/common/GeneralStore";
 import Tabs from '@/components/Common/Tabs.vue'
 import EvaluateTab from './EvaluateTab.vue';
 import SelectAltIterationTab from './SelectAltIterationTab.vue';
-import CalibrationRunsTab from './CalibrationRunsTab.vue';
+import EvaluationRunsTab from './EvaluationRunsTab.vue';
 import RunStatus from './EvaluationRunStatus.vue';
 
 const { getEvaluationTabIndex, setEvaluationTabIndex } = generalStore();

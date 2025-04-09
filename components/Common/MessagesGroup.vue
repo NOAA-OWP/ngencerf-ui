@@ -161,13 +161,10 @@ import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
-const calRunStore = useUserDataStore();
-const { userCalibrationRunData } = storeToRefs(calRunStore);
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const calData = ref(userCalibrationRunData);
-const tuningStore = useTuningStore();
-const { userSelectedCalibrationTuningParameters } = storeToRefs(tuningStore);
-const runStatusStore = useRunStatusStore();
-const { resultsPathname } = storeToRefs(runStatusStore);
+const { userSelectedCalibrationTuningParameters } = storeToRefs(useTuningStore());
+const { resultsPathname } = storeToRefs(useRunStatusStore());
 
 const componentProps = withDefaults(defineProps<{
   title?: string

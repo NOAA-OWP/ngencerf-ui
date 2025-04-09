@@ -13,14 +13,16 @@ import { fixFloatToFivePlaces } from "@/utils/CommonHelpers";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {
   const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
-  const { fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
+  const { fetchUserCalibrationRunData, clearUserCalibrationRunData, getAccessToken } = useUserDataStore();
   const calibrationRunList = ref<any[]>([]);
   const userSelectedEvalCalibrationRunId = ref<number>(0);
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken } = useUserDataStore();
+
   const uiGageId = ref<string>("");
   const userSelectedEvalCalibrationRun = ref<any>();
   const loadCalibrationDataComplete = ref<boolean>(false);
+
+  const { includeArchivedJobs } = storeToRefs(useUserDataStore());
 
   /**
    * list of calibration jobs with validation data
@@ -69,7 +71,8 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
-      }
+      },
+      body: JSON.stringify({ include_archived: includeArchivedJobs.value }),
     });
 
     if (runListDataResult?._data?.jobs.length > 0) {
