@@ -158,7 +158,7 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 import { ForecastTabs } from "@/composables/NextgenEnums";
 
-const { deleteCalibrationRun } = useCalibrationJobStore();
+const { deleteCalibrationRun, getCalibrationJobZip } = useCalibrationJobStore();
 
 const { addToastRecord } = generalStore();
 
@@ -181,6 +181,7 @@ const crContextMenu = ref(); //calibration run context menu
 const selectedCalibrationRun = ref<CalibrationRunForForecast>();
 
 const { isLoading } = storeToRefs(generalStore());
+const { calibrationDownloadJobID, calibrationDownloadFileName } = storeToRefs(useCalibrationJobStore());
 
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {
@@ -193,7 +194,10 @@ const onRowContextMenu = (event: any) => {
     cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => navigateToSetupForecast() });
     cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
     //cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() } );
-    //cmCalibrationRun.value.push( { label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onCalibrationRunForForecastRowSelect() } );    
+    //cmCalibrationRun.value.push( { label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onCalibrationRunForForecastRowSelect() } );
+    if (calibrationRunForForecast.value?.is_downloadable) {
+      cmCalibrationRun.value.push({ label: 'Download Calibration Data', icon: 'pi pi-fw-pisearch', command: () => downloadSelectedCalibrationData() });
+    }
     cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() });
   }
 };
@@ -344,6 +348,46 @@ const acceptDelete = (selectedRunId: number) => {
   });
   calibrationRunForForecast.value = undefined;
 };
+
+/**
+ * Download all files in user's calibration job folder to a zip file
+ */
+ const downloadSelectedCalibrationData = async () => {
+  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
+  if (calibrationRunForForecast.value?.is_downloadable) {
+    //isLoading.value = true;
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and will be prompted to save when the file is ready.', life: ToastTimeout.timeout10000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+    nextTick(async () => {
+      try {
+        // If successful, this job will update calibrationDownloadFileName, and watch function will trigger a Toast message
+        await getCalibrationJobZip(selectedRunId);
+      } catch (error) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeout5000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      //isLoading.value = false;
+    })
+  } else {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: 'Data cannot be downloaded for Calibration Job + ' + selectedRunId + '.', life: ToastTimeout.timeout5000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+}
+
+watch(calibrationDownloadJobID, () => {
+  if (calibrationDownloadJobID.value) {
+    // Display Toast message saying download was successful and then clear the Job ID/filename refs
+    // to avoid interfering with next download
+    let tDetail = 'Your calibration data download was successful!'
+    if (calibrationDownloadFileName.value) {
+      tDetail = 'Your calibration data download "' + calibrationDownloadFileName.value + '" was successful!'
+    }
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + calibrationDownloadJobID.value, detail: tDetail, life: ToastTimeout.timeout10000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+    calibrationDownloadJobID.value = null;
+    calibrationDownloadFileName.value = null;
+  }
+});
 
 const toggleMessagesGroup = () => {
   if (showMessagesGroup.value) {

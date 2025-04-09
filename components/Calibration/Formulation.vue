@@ -266,6 +266,14 @@ onMounted(() => {
     toast.removeAllGroups();
     mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
+    // Force T-Route to always be included
+    if (!userCalibrationRunData?.value?.modules.some(item => item.toLowerCase() === 't-route')) {
+      userCalibrationRunData?.value?.modules.push('T-Route');
+    }
+    // If LSTM is selected, de-select everything else except for T-Route
+    if (userCalibrationRunData?.value?.modules.some(item => item.toLowerCase() === 'lstm')) {
+      userCalibrationRunData.value.modules = ['LSTM','T-Route'];
+    }
     modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
     setUserSelection();
   })
@@ -314,13 +322,31 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 }
 
 const moduleListChanged = (e: ListboxChangeEvent) => {
+  if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
+    selectedModuleValues.value.push('T-Route');
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'T-Route must be included', detail: 'All Calibration Formulations are required to use T-Route at a minimum.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+  if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
+    selectedModuleValues.value = ['LSTM','T-Route'];
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
   modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }
 
 const resetModuleList = () => {
   if (selectedModuleValues.value && userCalibrationRunData?.value?.modules) {
     selectedModuleValues.value = userCalibrationRunData?.value?.modules
-    modulesHaveChanged.value = false;
+    if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
+      selectedModuleValues.value = ['LSTM','T-Route'];
+      modulesHaveChanged.value = true;
+    } else if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
+      selectedModuleValues.value.push('T-Route');
+      modulesHaveChanged.value = true;
+    } else {
+      modulesHaveChanged.value = false;
+    }
   }
 }
 
@@ -348,6 +374,18 @@ const saveFormulationData = () => {
     if (!valOK) {
       modulesHaveChanged.value = false;
       const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000 };
+      toast.add(tMsg); addToastRecord(tMsg);
+      clearCalibratableParameters();
+    }
+    if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
+      modulesHaveChanged.value = false;
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'T-Route must be included', detail: "All Calibration Formulations are required to use T-Route at a minimum.", life: ToastTimeout.timeout6000 };
+      toast.add(tMsg); addToastRecord(tMsg);
+      clearCalibratableParameters();
+    }
+    if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
+      selectedModuleValues.value = ['LSTM','T-Route'];
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeout6000 };
       toast.add(tMsg); addToastRecord(tMsg);
       clearCalibratableParameters();
     }
@@ -437,6 +475,16 @@ const validateTab = () => {
         return false;
       }
     })
+  }
+  /* Has user included T-Route? */
+  if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
+    error = true;
+    text.push("T-Route must be included");
+  }
+  /* Has user included LSTM? (De-select everything else but T-route) */
+  if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
+    selectedModuleValues.value = ['LSTM','T-Route'];
+    text.push("LSTM can only be paired with T-Route");
   }
   /* Has user checked/unchecked Add SLoTH output variables? */
   if (useSlothParameters.value !== userCalibrationRunData?.value?.use_sloth) {

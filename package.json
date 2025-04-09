@@ -36,6 +36,7 @@
     "eslint-plugin-nuxt": "^4.0.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-vue": "^9.27.0",
+    "event-source-polyfill": "^1.0.31",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "lodash": "^4.17.21",

@@ -95,6 +95,7 @@ export interface CalibrationJobListItem {
   objective_function: string;
   optimization_algorithm: string;
   is_archived: boolean;
+  is_downloadable: boolean;
   validations: CalibrationJobValidationItem[];
   modules: string[];
 }
