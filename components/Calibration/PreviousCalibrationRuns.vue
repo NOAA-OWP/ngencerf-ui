@@ -57,7 +57,12 @@
               </Column>
 
               <Column v-if="checkArchived" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
-                header="Archived" :sortable="true">
+                :sortable="true">
+                <template #header>
+                  <div class="column-header">
+                    <span>Archived?</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_run_id"
                     :aria-label="slotProps.data.is_archived ? 'Archived' : ''"
@@ -67,7 +72,12 @@
                 </template>
               </Column>
 
-              <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
+              <Column :pt="ptColumn" field="gage_id" sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Headwater</span><br /><span>Basin Gage</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
                     :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
@@ -75,7 +85,12 @@
                   </span>
                 </template>
               </Column>
-              <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable>
+              <Column :pt="ptColumn" field="formulation_name" sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Formulation Name</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.formulation_name"
                     :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
@@ -84,7 +99,12 @@
                   </span>
                 </template>
               </Column>
-              <Column :pt="ptColumn" field="job_genesis" header="Job Genesis" sortable>
+              <Column :pt="ptColumn" field="job_genesis" sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Job</span><br /><span>Genesis</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.job_genesis" :aria-label="'Job Genesis ' + slotProps.data.job_genesis"
                     :title="'Job Genesis ' + slotProps.data.job_genesis">
@@ -92,7 +112,12 @@
                   </span>
                 </template>
               </Column>
-              <Column field="created_at" header="Creation Date" sortable>Column
+              <Column field="created_at" sortable>Column
+                <template #header>
+                  <div class="column-header">
+                    <span>Creation Date</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
                     :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
@@ -101,7 +126,12 @@
                   </span>
                 </template>
               </Column>
-              <Column field="submit_date" header="Submit Date" sortable>
+              <Column field="submit_date" sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Submit Date</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.submit_date"
                     :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
@@ -111,7 +141,12 @@
                   </span>
                 </template>
               </Column>
-              <Column header="Calibration Period" sortable>
+              <Column  sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Calibration Period</span>
+                  </div>
+                </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.calibration_start_period || slotProps.data.calibration_end_period"
                     :aria-label="'Calibration Period ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.calibration_end_period)"
@@ -197,10 +232,7 @@ import { hilightTab } from '@/composables/TabHilight';
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
-
-const showFilters = ref<boolean>(false);
+const { isLoading } = storeToRefs(generalStore());
 
 const selectedCalibrationRun = ref<CalibrationJobListItem>();
 
@@ -208,8 +240,6 @@ const selectedMultipleCalibrationRuns = ref<number[]>([]);
 const selectedMultipleCalibrationRunData = ref<CalibrationJobListItem[]>([]);
 
 const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
-
-const currentJobsList = ref<CalibrationJobListItem[]>();
 
 let interval: number | undefined;
 const runningColor = ref<string>('white');
@@ -235,7 +265,8 @@ onMounted(async () => {
 
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-    if (ele) { ele.scrollTo(0, 0); } includeArchivedJobs.value = false;;
+    if (ele) { ele.scrollTo(0, 0); } 
+    includeArchivedJobs.value = false;
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     resetGageStore();
     hardResetTuningStore();
@@ -412,15 +443,6 @@ const applyJobFilters = async () => {
 };
 
 
-const filtersExist = computed(() => {
-  return (modulesFilterList.value.length !== 0 || statusTypeFilterList.value.length !== 0 || uiGageId.value != "All")
-});
-
-// Template for the "Archived" column (Yes/No display)
-const archivedTemplate = (rowData: any) => {
-  return rowData.archived ? 'Yes' : 'No';
-};
-
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
   data.value = e.data;
@@ -506,7 +528,7 @@ const createNewCalibration = async () => {
   clearUserCalibrationRunData();
 
   fetchNewCalibrationRunId().then(response => {
-    if (response.status == 201) {
+    if (response.status === 201) {
       if (response?._data && response?._data?.calibration_run_id && response?._data?.calibration_run_id > 0) {
         calibrationJobId.value = response?._data?.calibration_run_id;
         queryUserCalibrationRunData().then(queryResponse => {
@@ -545,18 +567,19 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   isLoading.value = true;
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
   cloneCalibrationRun(selectedRunId).then(async (response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
+      isLoading.value = false;
     } else {
+      isLoading.value = false;
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Clone Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }
-  });
-  isLoading.value = false;
+  });  
 };
 
 const confirmDelete = useConfirm();
@@ -577,7 +600,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
   const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '" + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
   let confirmMessage = "Are you sure you want to " + ty + " calibration run " + selectedRunId + selectedRunName;
-  if (selectedCalibrationRun.value.status == "Running") confirmMessage += " The running calibration will be aborted."
+  if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
 
   confirmDelete.require({
     message: confirmMessage,
@@ -611,7 +634,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
  */
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(async (response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -630,7 +653,7 @@ const acceptDelete = (selectedRunId: number) => {
  */
 const acceptMultipleDelete = () => {
   deleteCalibrationRun(selectedMultipleCalibrationRuns.value).then(async (response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -650,7 +673,7 @@ const acceptMultipleDelete = () => {
  */
 const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
   archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -669,7 +692,7 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
  */
 const acceptMultpleArchive = (archiveJob: boolean) => {
   archiveCalibrationRun(selectedMultipleCalibrationRuns.value, archiveJob).then(async (response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -719,31 +742,7 @@ const updateUserCalibrationJobsListData = async (): Promise<void> => {
   );
 };
 
-/**
- * Toggle filters on/off
- * 
- */
-const toggleShowFilters = () => {
-  currentJobsList.value = updatedUserCalibrationJobsListData.value;
-  showFilters.value = !showFilters.value;
-}
 
-
-/**
- * Create a comma separated list of module names
- * 
- * returns string array
- */
-const getModuleFilterList = () => {
-  let l = "";
-  modulesFilterList.value.forEach((e, idx) => {
-    l += e;
-    if (idx !== modulesFilterList.value.length - 1) {
-      l += ", ";
-    }
-  });
-  return l;
-}
 </script>
 
 <style lang="scss" scoped>
@@ -763,12 +762,11 @@ small-label,
 #FilterGroup {
   color: black;
   font-weight: 600;
-  width: 1350px;
   margin: 0 auto;
 }
 
 #CalTable {
-  min-height: 400px
+  min-height: 400px;
 }
 
 #CalDateEnd,
@@ -832,7 +830,7 @@ small-label,
 
 #Datatable,
 #JobFilterDialog {
-  width: auto !important;
+  width: 1325px !important;
 }
 
 #MultJobOpsDlg {

@@ -62,8 +62,8 @@
       <tr>
         <td><i v-if="userCalibrationRunData?.save_plot_iteration_frequency" class="pi pi-check font-bold checkMark"></i>
         </td>
-        <td data-tab="5" title="Metrics and Plot Inteval"
-          aria-label="Metrics and Plot Inteval" @click="tabClicked">Metrics / Plot Inteval</td>
+        <td data-tab="5" title="Metrics and Plot Interval"
+          aria-label="Metrics and Plot Interval" @click="tabClicked">Metrics / Plot Interval</td>
       </tr>
     </tbody>
   </table>
@@ -75,9 +75,9 @@
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
-const userDataStore = useUserDataStore();
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
-const { userCalibrationRunData } = storeToRefs(userDataStore);
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 
 const emit = defineEmits(["tabNumber"]);

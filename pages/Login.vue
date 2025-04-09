@@ -128,13 +128,14 @@ import AppHeader from "@/components/Common/AppHeader.vue";
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 
-const gstore = generalStore();
-const { popupActive } = storeToRefs(gstore);
+const { serverInfo, gitInfo } = storeToRefs(generalStore());
+
+const { popupActive } = storeToRefs(generalStore());
 
 const { calibrationJobId } = storeToRefs(generalStore());
 
-const { logUserIn, setUserName, hardResetUserDataStore } = useUserDataStore();
-const { resetGeneralStore, clearToastRecords, addToastRecord } = generalStore();
+const { logUserIn, setUserName, hardResetUserDataStore, isUserLoggedIn, getAccessToken } = useUserDataStore();
+const { resetGeneralStore, clearToastRecords, addToastRecord, getServerInfo, setServerInfo } = generalStore();
 
 const { ngencerfBaseUrl } = useBackendConfig();
 
@@ -156,15 +157,47 @@ const cancelCreateAccountLinkClasses = ref<string[]>(['c-blue'])
 
 onMounted(() => {
   popupActive.value = false;
-  nextTick(() => {
+  nextTick(async () => {
     sessionStorage.clear();
     localStorage.clear();
     clearToastRecords();
     calibrationJobId.value = 0;
     hardResetUserDataStore();
     resetGeneralStore();
-  })
+    await getFooterInformation();
+  });
 });
+
+
+// Get footer infongenCERF
+const getFooterInformation = () => {
+  makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_footer/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": 'application/json'
+    },
+    body: ""
+  }).then((result) => {
+    serverInfo.value = result._data;
+    if (serverInfo.value) {
+      setServerInfo(serverInfo.value);
+    }
+  })
+}
+
+// Get footer infongenCERF
+const getGitInformation = () => {
+  makeProtectedApiCall<FormulationTabData>(`${ngencerfBaseUrl}/calibration/get_git_info/`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${getAccessToken()}`,
+      "Content-Type": 'application/json'
+    },
+    body: ""
+  }).then((result) => {
+    gitInfo.value = result._data.git_info;
+  })
+}
 
 const openDialog = () => {
   showDialog.value = true;
@@ -213,6 +246,7 @@ const SubmitLoginForm = async (e: Event) => {
       // store user name in UserDataStore
       userDataStore.setFirstName(response.first_name);
       userDataStore.setLastName(response.last_name);
+      GetExternalInfo();
       logUserIn();
       GoToLanding();
     }
@@ -232,6 +266,12 @@ const SubmitLoginForm = async (e: Event) => {
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
+
+const GetExternalInfo = async () => {
+  await getGitInformation();
+  serverInfo.value = getServerInfo();
+}
+
 
 const SubmitNewAccountForm = async () => {
   if (newPassword.value !== confirmPassword.value) {

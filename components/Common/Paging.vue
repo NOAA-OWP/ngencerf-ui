@@ -9,7 +9,7 @@
             </span>
             <span v-for="p in Array.from({ length: totalPages }, (_, i) => i + 1)" :key="p">
                 <!-- Current page -->
-                <span v-if="p == currentPage"
+                <span v-if="p === currentPage"
                 class="pagingLink active">
                 {{ p }}
                 </span>
@@ -25,8 +25,8 @@
                 </span>
                 
                 <!-- Show "..." in gaps where page numbers are not sequential - this should only happen if current page +/-2 doesn't fit the above criteria -->
-                <span v-else-if="p == (currentPage-2) ||
-                    p == (currentPage+2)" class="pagingLink">
+                <span v-else-if="p === (currentPage-2) ||
+                    p === (currentPage+2)" class="pagingLink">
                 ...
                 </span>
             </span>

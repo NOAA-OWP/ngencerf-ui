@@ -152,9 +152,7 @@ const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/Abou
 const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
 const LazyUserAccount = defineAsyncComponent(() => import("@/components/Common/UserAccount.vue"))
 
-const gstore = generalStore();
-
-const { popupActive } = storeToRefs(gstore);
+const { popupActive } = storeToRefs(generalStore());
 
 const emit = defineEmits(["logoutEvent"]);
 
@@ -166,9 +164,7 @@ const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabInde
 
 const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
-const userStore = useUserDataStore();
-const { lastServerError } = storeToRefs(userStore);
-
+const { lastServerError } = storeToRefs(useUserDataStore());
 
 const location = useRoute();
 
