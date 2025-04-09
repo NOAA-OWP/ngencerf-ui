@@ -485,7 +485,10 @@ const saveTabData = () => {
     }
 
     saveGageTabData().then(response => {
-      if (response.status === 200) {
+      if (response.status === 400) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Save Gage Data Failed.', detail: response._data.message };
+        toast.add(tMsg); addToastRecord(tMsg);
+      } else if (response.status === 200) {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
           toast.add(toastMessage); addToastRecord(toastMessage);
         })
