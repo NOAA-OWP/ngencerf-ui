@@ -521,6 +521,8 @@ const updateJobData = async (response: any) => {
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
     userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
 
+    userCalibrationRunData.value.num_catchments = response?._data.num_catchments;
+
     userCalibrationRunData.value.external_data_status.forcing = !(userCalibrationRunData.value.forcing_source === "");
     userCalibrationRunData.value.external_data_status.observational = !(userCalibrationRunData.value.observational_source === "");
     userCalibrationRunData.value.external_data_status.geopackage = !(userCalibrationRunData.value.geopackage_source === "");
