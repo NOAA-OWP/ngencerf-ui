@@ -519,6 +519,9 @@ const colStyle = (data: any) => {
   else if (data.status.indexOf('Cancelled') !== -1) {
     return 'Orange';
   }
+  else if (data.status.indexOf('Server error') !== -1) {
+    return 'Black';
+  }
 }
 
 const createNewCalibration = async () => {
@@ -659,7 +662,7 @@ const acceptMultipleDelete = () => {
   deleteCalibrationRun(selectedMultipleCalibrationRuns.value).then(async (response) => {
     if (response.status === 200) {
      const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
-        summary: 'Deleted Multiple Jobs', detail: 'Jobs ' + sortedNumbers + ' deleted', life: ToastTimeout.timeout3000};
+      summary: 'Deleted Multiple Jobs', detail: 'Jobs ' + sortedNumbers + ' deleted', life: ToastTimeout.timeout3000};
       toast.add(tMsg); addToastRecord(tMsg);     
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
