@@ -219,13 +219,11 @@ const {
 } = storeToRefs(optimizationStore);
 
 const { saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
-const userDataStore = useUserDataStore();
-const { userCalibrationRunData } = storeToRefs(userDataStore);
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const cbCategoricalDisabled = ref<boolean>(false);

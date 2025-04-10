@@ -130,8 +130,7 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 
 const { serverInfo, gitInfo } = storeToRefs(generalStore());
 
-const gstore = generalStore();
-const { popupActive } = storeToRefs(gstore);
+const { popupActive } = storeToRefs(generalStore());
 
 const { calibrationJobId } = storeToRefs(generalStore());
 

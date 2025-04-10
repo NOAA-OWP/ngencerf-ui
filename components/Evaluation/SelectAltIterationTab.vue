@@ -103,11 +103,6 @@ const selectedCalibrationByIterationParameterRow = ref<any>();
 const calibrationRunDetailTable = ref<HTMLTableElement>();
 const tuningParametersTable = ref<HTMLTableElement>();
 
-const ptColumn = ref({
-  columnHeaderContent: { style: { "justify-content": "center" } },
-  bodyCell: { style: { "text-align": "right" } }
-});
-
 onMounted(() => {
   hilightTab(EvaluationTabs.tab_selectAltIteration);
 

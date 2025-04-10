@@ -61,7 +61,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     if (sweTimeSeriesData.value.length > 0) {
       sweStartDateTime.value = DateTime.fromISO(sweTimeSeriesData.value[0].timestamp, { zone: 'utc' });
     } else {
-      sweStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time, { zone: 'utc' });
+      sweStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time as string, { zone: 'utc' });
     }
     
     // this is used to set the min date for the date picker correctly
@@ -75,7 +75,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     if (sweTimeSeriesData.value.length > 0) {
       sweEndDateTime.value = DateTime.fromISO(sweTimeSeriesData.value[sweTimeSeriesData.value.length - 1].timestamp, { zone: 'utc' });
     } else {
-      sweEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time, { zone: 'utc' });
+      sweEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time as string, { zone: 'utc' });
     }
     
     // this is used to set the max date for the date picker correctly

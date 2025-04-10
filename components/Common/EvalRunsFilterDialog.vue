@@ -81,13 +81,9 @@ import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/Evaluation
 
 const { fetchFormulationModuleOptions } = useFormulationStore();
 
-const userStore = useUserDataStore()
-const { modulesFilterList, statusTypeFilterList, includeArchivedJobs } = storeToRefs(userStore);
+const { modulesFilterList, statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
-const {
-  uiGageId,
-  evaluationCalibrationRunGageList,
-} = storeToRefs(useEvaluationCalibrationRunStore());
+const { uiGageId, evaluationCalibrationRunGageList } = storeToRefs(useEvaluationCalibrationRunStore());
 
 const emit = defineEmits(["ApplyJobFilters", "RefreshJobList"]);
 

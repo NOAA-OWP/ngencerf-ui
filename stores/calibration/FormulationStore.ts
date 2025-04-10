@@ -17,8 +17,6 @@ import type {
 } from "@/composables/NextGenModel";
 import { useCalibrationFormulationTabSaveValidate } from "@/composables/ValidationHandlers";
 
-const gstore = generalStore();
-
 export const useFormulationStore = defineStore("FormulationStore", () => {
   /**
    * define ref
@@ -39,7 +37,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
 
   const saveFormulationPayload = ref<SaveFormulationTabPayload>({});
 
-  const { isLoading } = storeToRefs(gstore);
+  const { isLoading } = storeToRefs(generalStore());
 
   /**
    * load forumlation tab data and init ref data
@@ -338,7 +336,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
    */
   const resetFormulationStore = (): void => {
     formulationNameInput.value = "";
-    selectedModuleValues.value = [];
+    selectedModuleValues.value = [''];
     useSlothParameters.value = false;
     slothParameterInputs.value = [];
   };
