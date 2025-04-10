@@ -95,6 +95,7 @@ export interface CalibrationJobListItem {
   objective_function: string;
   optimization_algorithm: string;
   is_archived: boolean;
+  is_downloadable: boolean;
   validations: CalibrationJobValidationItem[];
   modules: string[];
 }
@@ -699,6 +700,7 @@ export type CalibrationRunForForecast = {
   objective_function: string;
   optimization_algorithm: string;
   validations: CalibrationJobValidationItem[];
+  is_downloadable: boolean;
 };
 
 export interface ForecastJob {
