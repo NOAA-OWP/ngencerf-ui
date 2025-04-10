@@ -483,8 +483,19 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   */
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
   queryUserCalibrationRunData().then(queryResponse => {
-    userCalibrationRunData.value = queryResponse?._data;
-    loadEntireRun();
+    console.log('queryResponse: ', queryResponse);
+    if (queryResponse?.status === 200) {
+      userCalibrationRunData.value = queryResponse?._data;
+      loadEntireRun();
+    } else {
+      isLoading.value = false;
+      let tDetail = "Unable to Retrieve Calibration Job Data";
+      if (queryResponse?._data?.message) {
+        tDetail = queryResponse._data.message;
+      }
+      const tMsg: ToastMessageOptions = { severity: "error", summary: 'Load Calibration Job Failed.', detail: tDetail, life: ToastTimeout.timeout6000 };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   });
 }
 
