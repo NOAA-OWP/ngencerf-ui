@@ -338,6 +338,9 @@ const deleteSelectedCalibrationRun = () => {
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
     if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
+      summary: 'Delete Calibration Run', detail: 'Job ' + selectedRunId + ' deleted', life: ToastTimeout.timeout3000};
+      toast.add(tMsg); addToastRecord(tMsg);   
       fetchUserValidatedCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
