@@ -11,7 +11,7 @@
   <client-only>
     <div class="pr-2">
       <div id="calibrationRunList">
-        <div id="CalTable" class="w-[1200px] mx-auto">
+        <div id="ForecastTable" class="w-[1200px] mx-auto">
           <div class="flex mt-2">
             <h1 class="pt-3 mb-8 text-3xl font-bold inline-block text-center w-[1200px]">
               <span>Forecast Runs</span><br />
@@ -20,16 +20,10 @@
               </span>
             </h1>
           </div>
-          <div class="grid grid-cols-2 mb-5">
-            <div class="col-span-1">
-              <div class="inline ">
-                <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-                <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                  :options="forecastRunGageList" filter optionLabel="name" optionValue="name" placeholder=""
-                  aria-label="Select Headwater Basin Gage Filter" title="Select Headwater Basin Gage Filter"></Select>
-              </div>
-            </div>
-          </div>
+
+          <ForecastRunsDialog id="ForecastRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
+            @RefreshJobList="refreshJobList()" :forecastJobs="forecastRuns"
+            ref="forecastRunsFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -154,6 +148,7 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 
 import type { DataTableRowClickEvent } from "primevue/datatable";
+import ForecastRunsDialog from "@/components/Forecast/ForecastRunsFilterDialog.vue";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const forecastStore = useForecastStore();
@@ -329,6 +324,31 @@ const toggleMessagesGroup = () => {
   } else {
     showMessagesGroup.value = true;
   }
+}
+
+/**
+ * Apply Forecast Jobs Filters
+ */
+const applyJobFilters = async () => {
+  isForecastLoading.value = true;
+  // await getForecastJobs(); // set forecastRuns
+
+  if (forecastRuns?.value && forecastRuns?.value.length > 0) {
+    if (!uiGageId.value || uiGageId.value === 'All') {
+      forecastRuns.value = forecastRuns?.value?.filter((forecastRun: ForecastJob) => forecastRun.gage_id === uiGageId.value);
+    }
+  }
+
+  isForecastLoading.value = false;
+};
+
+/**
+ * Refresh Forecast Jobs Table
+ */
+const refreshJobList = async () => {
+  isForecastLoading.value = true;
+  await getForecastJobs();
+  isForecastLoading.value = false;
 }
 
 </script>
