@@ -336,7 +336,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
    */
   const resetFormulationStore = (): void => {
     formulationNameInput.value = "";
-    selectedModuleValues.value = [];
+    selectedModuleValues.value = [''];
     useSlothParameters.value = false;
     slothParameterInputs.value = [];
   };

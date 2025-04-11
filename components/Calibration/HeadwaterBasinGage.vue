@@ -485,7 +485,10 @@ const saveTabData = () => {
     }
 
     saveGageTabData().then(response => {
-      if (response.status === 200) {
+      if (response.status === 400) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Save Gage Data Failed.', detail: response._data.message };
+        toast.add(tMsg); addToastRecord(tMsg);
+      } else if (response.status === 200) {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
           toast.add(toastMessage); addToastRecord(toastMessage);
         })
@@ -517,6 +520,8 @@ const updateJobData = async (response: any) => {
     userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
     userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
+
+    userCalibrationRunData.value.num_catchments = response?._data.num_catchments;
 
     userCalibrationRunData.value.external_data_status.forcing = !(userCalibrationRunData.value.forcing_source === "");
     userCalibrationRunData.value.external_data_status.observational = !(userCalibrationRunData.value.observational_source === "");

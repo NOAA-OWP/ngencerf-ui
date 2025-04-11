@@ -154,7 +154,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * Get Calibration/Validation Log Names
    * @return {any}
    */
-  const queryGetLogNames = async (validation_run_id: number = 0): Promise<any> => {
+  const queryGetLogNames = async (validation_run_id: number): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
       method: "POST",
       headers: {
@@ -174,7 +174,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const queryGetLogData = async (
     log_category: string,
     log_name: string,
-    validation_run_id: number = 0,
+    validation_run_id: number,
     start?: number,
     limit?: number
   ): Promise<any> => {

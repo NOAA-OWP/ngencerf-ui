@@ -227,3 +227,19 @@ export function getErrorTextFromStatus(status: number): string {
   return result ? result.error : "Unknown error code";
 }
 
+// Helper function that creates a comma-separated string from the array.
+// - If the array is empty, it returns an empty string.
+// - If there's one element, it returns that element as a string.
+// - If there are exactly 2 elements, it joins them with "and".
+// - If there are more than 2 elements, all but the last element are comma-separated,
+//   and the last element is preceded by "and" (without a trailing comma).
+export function formatMultJobNumbers(nums: number[]): string {
+  if (nums.length === 0) return '';
+  if (nums.length === 1) return `${nums[0]}`;
+  if (nums.length === 2) return `${nums[0]} and ${nums[1]}`;
+
+  // For more than 2 elements:
+  // Join all elements except the last with a comma followed by a space.
+  const allButLast = nums.slice(0, -1).join(', ');
+  return `${allButLast} and ${nums[nums.length - 1]}`;
+}

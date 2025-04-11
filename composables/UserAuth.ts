@@ -123,7 +123,7 @@ export const makeProtectedApiCall = async <T>(
       (myResponse.status > 401 && myResponse.status < 500)
     ) {
       responseData = {
-        _data: null,
+       _data: await response.json(),
         status: myResponse.status,
         ok: myResponse.ok,
       };

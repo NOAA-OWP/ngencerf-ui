@@ -209,7 +209,7 @@ import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
-import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
+import { getOverallCalibrationValidationStatus, formatMultJobNumbers } from "@/utils/CommonHelpers";
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData, resetGageStore } = useGageStore();
@@ -220,12 +220,13 @@ const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
 
 const { calibrationJobId } = storeToRefs(generalStore());
+const { calibrationDownloadJobID, calibrationDownloadFileName } = storeToRefs(useCalibrationJobStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
   statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
-const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun } = useCalibrationJobStore();
+const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun, getCalibrationJobZip } = useCalibrationJobStore();
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -250,6 +251,14 @@ const systemContextMenu = ref<boolean>(false);
 const cmCalibrationRun = ref([
   { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
   { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
+  { label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.delete) },
+  { label: 'Archive', icon: 'pi pi-folder', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.archive) }
+]);
+
+const cmDownloadRun = ref([
+  { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
+  { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
+  { label: 'Download', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData(selectedCalibrationRun) },
   { label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.delete) },
   { label: 'Archive', icon: 'pi pi-folder', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.archive) }
 ]);
@@ -366,8 +375,11 @@ const closeMultJobsWindow = () => {
 const whichContextMenu = computed(() => {
   if (selectedCalibrationRun?.value?.is_archived) {
     return cmArchiveRun.value;
+  } else if (selectedCalibrationRun?.value?.is_downloadable) {
+    return cmDownloadRun.value;
+  } else {
+    return cmCalibrationRun.value;
   }
-  return cmCalibrationRun.value;
 });
 
 const ptColumn = ref({
@@ -519,6 +531,9 @@ const colStyle = (data: any) => {
   else if (data.status.indexOf('Cancelled') !== -1) {
     return 'Orange';
   }
+  else if (data.status.indexOf('Server error') !== -1) {
+    return 'Black';
+  }
 }
 
 const createNewCalibration = async () => {
@@ -635,6 +650,9 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(async (response) => {
     if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: 'success', 
+        summary: 'Calibration Job Deleted', detail: 'Job ' + selectedRunId + ' deleted', life: ToastTimeout.timeout3000 };
+      toast.add(tMsg); addToastRecord(tMsg);
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -652,8 +670,12 @@ const acceptDelete = (selectedRunId: number) => {
  * Aceept the deletion of a single job
  */
 const acceptMultipleDelete = () => {
+  const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
   deleteCalibrationRun(selectedMultipleCalibrationRuns.value).then(async (response) => {
     if (response.status === 200) {
+     const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
+      summary: 'Deleted Multiple Jobs', detail: 'Jobs ' + sortedNumbers + ' deleted', life: ToastTimeout.timeout3000};
+      toast.add(tMsg); addToastRecord(tMsg);     
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -667,13 +689,15 @@ const acceptMultipleDelete = () => {
   selectedCalibrationRun.value = undefined;
 }
 
-
 /**
  * Aceept archiving of a single job
  */
 const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
   archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
     if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: 'success', 
+        summary: 'Calibration Job Archived', detail: 'Job ' + selectedRunId + ' archived', life: ToastTimeout.timeout3000 };
+      toast.add(tMsg); addToastRecord(tMsg);
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -691,8 +715,13 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
  * Aceept archiving of a muiltiple jobs
  */
 const acceptMultpleArchive = (archiveJob: boolean) => {
+  const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
   archiveCalibrationRun(selectedMultipleCalibrationRuns.value, archiveJob).then(async (response) => {
     if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
+          summary: 'Archive Multiple Jobs', detail: 'Jobs ' + sortedNumbers + (archiveJob ? ' archived' : ' unarchived'), 
+          life: ToastTimeout.timeout3000};
+      toast.add(tMsg); addToastRecord(tMsg);     
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -742,6 +771,45 @@ const updateUserCalibrationJobsListData = async (): Promise<void> => {
   );
 };
 
+/**
+ * Download all files in user's calibration job folder to a zip file
+ */
+const downloadSelectedCalibrationData = async (selectedCalibrationRun: any) => {
+  const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
+  if (selectedCalibrationRun.value.is_downloadable) {
+    //isLoading.value = true;
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and will be prompted to save when the file is ready.', life: ToastTimeout.timeout10000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+    nextTick(async () => {
+      try {
+        // If successful, this job will update calibrationDownloadFileName, and watch function will trigger a Toast message
+        await getCalibrationJobZip(selectedRunId);
+      } catch (error) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeout5000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      //isLoading.value = false;
+    })
+  } else {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: 'Data cannot be downloaded for Calibration Job ' + selectedRunId + '.', life: ToastTimeout.timeout5000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+}
+
+watch(calibrationDownloadJobID, () => {
+  if (calibrationDownloadJobID.value) {
+    // Display Toast message saying download was successful and then clear the Job ID/filename refs
+    // to avoid interfering with next download
+    let tDetail = 'Download zip file successfully created.'
+    if (calibrationDownloadFileName.value) {
+      tDetail = 'Download zip file "' + calibrationDownloadFileName.value + '" successfully created.'
+    }
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + calibrationDownloadJobID.value, detail: tDetail, life: ToastTimeout.timeout10000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+    calibrationDownloadJobID.value = null;
+    calibrationDownloadFileName.value = null;
+  }
+});
 
 </script>
 
