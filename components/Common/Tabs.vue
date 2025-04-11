@@ -169,9 +169,8 @@ const tabClicked = (event: Event) => {
 
   // this is to check if a user has selected a Forecast row from the Forecast Runs tab and clicks on the Setup Forecast tab
   // this will check if the user has selected a Forecast row. if not, it will show a warning message and prevent the user from navigating to the Setup Forecast tab
-  // if the user has selected a Forecast row, it will clear previous Forecast data to start a setting up a new Forecast
+  // if the user has selected a Forecast row, it will clear previous Forecast data to start setting up a new Forecast
   if (currentMenu.value === 3 && tabTitle === "Setup Forecast tab") {
-    console.log('in tabClicked and clicked on Setup Forecast tab');
     if (!selectedForecastJob.value) {
       event.preventDefault();
 
@@ -200,22 +199,22 @@ const tabClicked = (event: Event) => {
   }
 
   nextTick(() => {
-        // Send the selected tab info to the active tab set with emit
-        if (currentMenu.value === 1) {
-          currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
-          emit("tabNumber", currentCalibrationTab.value);
-        } else if (currentMenu.value === 2) {
-          currentEvaluationTab.value = Number(ele.getAttribute("data-tab"));
-          emit("tabNumber", currentEvaluationTab.value);
-        } else if (currentMenu.value === 3) {
-          currentForecastTab.value = Number(ele.getAttribute("data-tab"));
-          emit("tabNumber", currentForecastTab.value);
-        } else if (currentMenu.value === 4) {
-          currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
-          emit("tabNumber", currentVerificationTab.value);
-        }
-      })
+    // Send the selected tab info to the active tab set with emit
+    if (currentMenu.value === 1) {
+      currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentCalibrationTab.value);
+    } else if (currentMenu.value === 2) {
+      currentEvaluationTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentEvaluationTab.value);
+    } else if (currentMenu.value === 3) {
+      currentForecastTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentForecastTab.value);
+    } else if (currentMenu.value === 4) {
+      currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentVerificationTab.value);
     }
+  })
+}
 </script>
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
