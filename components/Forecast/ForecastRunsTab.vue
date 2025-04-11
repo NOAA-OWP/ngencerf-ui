@@ -22,13 +22,13 @@
           </div>
 
           <ForecastRunsDialog id="ForecastRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
-            @RefreshJobList="refreshJobList()" :forecastJobs="forecastRuns"
+            @ResetJobFilters="resetJobFilters()" @RefreshJobList="refreshJobList()" :forecastJobs="filteredForecastRuns"
             ref="forecastRunsFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmForecastRun"></ContextMenu>
-          <DataTable id="ForecastRuns" :value="forecastRuns" scrollable scroll-height="400px"
+          <DataTable id="ForecastRuns" :value="filteredForecastRuns" scrollable scroll-height="400px"
             sortField="forecast_run_id" :sortOrder="-1" table-style="min-width: 50rem"
             v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
@@ -158,6 +158,7 @@ const {
   calibrationRunForForecast,
   calibrationRunsForForecast,
   forecastRuns,
+  filteredForecastRuns,
   selectedForecastJob,
   isForecastLoading
 } = storeToRefs(forecastStore);
@@ -331,11 +332,12 @@ const toggleMessagesGroup = () => {
  */
 const applyJobFilters = async () => {
   isForecastLoading.value = true;
-  // await getForecastJobs(); // set forecastRuns
 
-  if (forecastRuns?.value && forecastRuns?.value.length > 0) {
-    if (!uiGageId.value || uiGageId.value === 'All') {
-      forecastRuns.value = forecastRuns?.value?.filter((forecastRun: ForecastJob) => forecastRun.gage_id === uiGageId.value);
+  if (filteredForecastRuns?.value && filteredForecastRuns?.value.length > 0) {
+    if (uiGageId.value && uiGageId.value !== 'All') {
+      filteredForecastRuns.value = forecastRuns?.value?.filter((forecastRun: ForecastJob) => forecastRun.gage_id === uiGageId.value);
+    } else {
+      await resetJobFilters();
     }
   }
 
@@ -343,11 +345,25 @@ const applyJobFilters = async () => {
 };
 
 /**
+ * Reset Forecast Jobs Filters
+ */
+const resetJobFilters = async () => {
+  isForecastLoading.value = true;
+
+  if (forecastRuns?.value && forecastRuns?.value.length > 0) {
+    filteredForecastRuns.value = [...forecastRuns.value];
+  }
+
+  isForecastLoading.value = false;
+}
+
+/**
  * Refresh Forecast Jobs Table
  */
 const refreshJobList = async () => {
   isForecastLoading.value = true;
   await getForecastJobs();
+  await applyJobFilters();
   isForecastLoading.value = false;
 }
 

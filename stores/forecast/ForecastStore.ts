@@ -35,6 +35,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const uiGageId = ref<string>("");
 
   const forecastRuns = ref<ForecastJob[]>([]);
+  const filteredForecastRuns = ref<ForecastJob[]>([]);
   const selectedForecastJob = ref<ForecastJob>();
 
   const isForecastLoading = ref<boolean>(false);
@@ -94,6 +95,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       runListDataResult?._data?.forecast_jobs.forEach((jobItem: ForecastJob) => {
         forecastRuns.value.push(jobItem);
       });
+      // maintain an original forecastRuns so we can revert to it when we clear the Forecast Runs filter
+      filteredForecastRuns.value = [...forecastRuns.value];
     }
   }
 
@@ -454,6 +457,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationRunForForecast,
     uiGageId,
     forecastRuns,
+    filteredForecastRuns,
     selectedForecastJob,
     isForecastLoading,
     overallForcingDownloadForecastStatus,

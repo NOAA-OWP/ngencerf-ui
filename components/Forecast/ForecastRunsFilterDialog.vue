@@ -51,7 +51,7 @@ import { useForecastStore } from "@/stores/forecast/ForecastStore";
 
 const { uiGageId, forecastRunGageList } = storeToRefs(useForecastStore());
 
-const emit = defineEmits(["ApplyJobFilters", "RefreshJobList"]);
+const emit = defineEmits(["ApplyJobFilters", "ResetJobFilters", "RefreshJobList"]);
 
 const props = defineProps<{
   forecastJobs: ForecastJob[];
@@ -102,7 +102,7 @@ const resetFilters = (e: MouseEvent) => {
   e.stopPropagation();
   e.stopImmediatePropagation();
   uiGageId.value = 'All';
-  emit("ApplyJobFilters");
+  emit("ResetJobFilters");
 }
 
 </script>
