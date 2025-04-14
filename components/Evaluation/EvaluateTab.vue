@@ -1031,8 +1031,7 @@ const drawInteractivePlot = () => {
     }
 
     for (let c = 1; c < plotTableColumns.value.length; c++) {
-      const e = document?.getElementById('plotGraphCheckbox-' + c) as HTMLElement;
-      if (e.getAttribute('checked') === 'true')
+      if ((document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
         for (let d = 0; d < plotGraphData.value.length; d++) {
           if (plotGraphLines.value[c - 1].symbol === 'line') {
             plotLineData.push({
@@ -1051,6 +1050,7 @@ const drawInteractivePlot = () => {
             });
           }
         }
+      }
     }
   }
 
