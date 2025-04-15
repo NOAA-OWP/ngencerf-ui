@@ -164,14 +164,16 @@ const tabNotCompleted = ref(false);
 
 const tabClicked = (event: Event) => {
   event.preventDefault();
-  const ele = event.currentTarget as HTMLElement;
-  const tabTitle = ele.getAttribute("title");
+  const ele: HTMLElement = event.currentTarget as HTMLElement;
+  const tabTitle: string | null = ele.getAttribute("title");
+  const clickedFrom: string | null = ele.getAttribute("data-tab-triggered-from");
 
   // this is to check if a user has selected a Forecast row from the Forecast Runs tab and clicks on the Setup Forecast tab
   // this will check if the user has selected a Forecast row. if not, it will show a warning message and prevent the user from navigating to the Setup Forecast tab
   // if the user has selected a Forecast row, it will clear previous Forecast data to start setting up a new Forecast
-  if (currentMenu.value === 3 && tabTitle === "Setup Forecast tab") {
-    if (!selectedForecastJob.value) {
+  // TODO: add a check to see if the user has selected a Forecast row from the Forecast Runs tab
+  if (currentMenu.value === 3 && tabTitle === "Setup Forecast tab" && clickedFrom === 'Forecast-ForecastRunsTab') {
+    if ( !selectedForecastJob.value) {
       event.preventDefault();
 
       const tMsg: ToastMessageOptions = {

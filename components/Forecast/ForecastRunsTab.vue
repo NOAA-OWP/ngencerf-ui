@@ -271,6 +271,9 @@ const navigateToSetupForecast = () => {
   nextTick(() => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast tab"]');
 
+    // set an attribute to indicate which tab this event was triggered from
+    (e as HTMLElement).setAttribute("data-tab-triggered-from", "Forecast-ForecastRunsTab");
+
     if (e) {
       e.click();
     } else {
