@@ -37,8 +37,7 @@
     </DataTable>
   </div>
   <div class="text-normal mt-2 mx-auto text-center">
-    Cycles in <span class="text-gray-500">grey</span>
-    cycles.
+    Cycles in <span class="text-gray-500">grey</span> are unavailable.
   </div>
   <div>
     <span v-if="forecastCycle && forecastCycle.is_active">
