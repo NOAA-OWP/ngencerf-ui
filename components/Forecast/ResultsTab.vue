@@ -27,6 +27,12 @@
           </th>
           <td class="pl-5">{{ overallForcingDownloadForecastStatus }}</td>
         </tr>
+        <tr height="38px" :aria-label="'Elapsed Time ' + elapsedTime" :title="'Elapsed Time ' + elapsedTime">
+          <th scope="row" class="text-right font-bold">
+            <div style="width: 140px;">Elapsed Time</div>
+          </th>
+          <td class="pl-5">{{ elapsedTime ?? '-'.repeat(30) }}</td>
+        </tr>
         <tr height="38px" :aria-label="'Results Pathname is ' + resultsPathname"
           :title="'Results Pathname is ' + resultsPathname">
           <th scope="row" class="text-right font-bold" style="width: 140px;">
@@ -75,6 +81,7 @@ const {
   forecastCycleName,
   resultsPathname,
   forecastPlot,
+  elapsedTime,
   overallForcingDownloadForecastStatus
 } = storeToRefs(useForecastStore());
 

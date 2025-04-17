@@ -268,6 +268,7 @@ const clearDataAndNavigateToSetupForecast = () => {
 };
 
 const navigateToSetupForecast = () => {
+  console.log("Navigating to Setup Forecast tab");
   nextTick(() => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast tab"]');
 

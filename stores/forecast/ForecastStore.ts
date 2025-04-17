@@ -167,6 +167,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     }
     // set resultsPathname
     let setResultsErrorMessages: string[] = await setResultsPathname();
+    // if setResultsErrorMessages has any errors, return them along with errorMessages
     if (setResultsErrorMessages.length > 0) {
       return [...errorMessages, ...setResultsErrorMessages];
     } else {
