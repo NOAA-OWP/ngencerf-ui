@@ -1021,7 +1021,6 @@ const drawInteractivePlot = () => {
       height: ((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
         - (document.getElementById('PlotGraphArea') as HTMLElement).getBoundingClientRect().top) - 150
     };
-    console.log('plotGraphOptions: ', plotGraphOptions.value);
     if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
       plotGraphOptions.value.y.label = 'Depth (m)';
       plotGraphOptions.value.y.labelOffset = -10;
@@ -1091,10 +1090,10 @@ const drawInteractivePlot = () => {
   if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
     lineOptions.y.label = 'Depth (cm/s)';
     lineTipOptions.y.label = 'Depth';
-    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s`
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s\nClick to select this date`
     dotOptions.y.label = 'Depth (cm/s)';
     dotTipOptions.y.label = 'Depth';
-    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s`
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s\nClick to select this date`
   } else {
     lineOptions.y.label = 'Flow (cm/s)';
     lineTipOptions.y.label = 'Flow';
@@ -1156,7 +1155,16 @@ const drawInteractivePlot = () => {
     }
   }
   (plotGraphSVG.value as HTMLElement).innerHTML = '';
-  (plotGraphSVG.value as HTMLElement).append(Plot.plot(plotGraphOptions.value));
+  const plot = Plot.plot(plotGraphOptions.value);
+  (plotGraphSVG.value as HTMLElement).append(plot);
+  if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
+    plot.addEventListener("click", e => {
+      if (plot.value?.time) {
+        // Update SWE date picker
+        selectedSweDateTime.value = (new Date(plot.value.time)).toISOString().split('T')[0];
+      }
+    });
+  }
   nextTick(() => {
     if (plotGraphArea.value) {
       plotGraphOptions.value.width = plotGraphArea.value.offsetWidth - 50;
@@ -1191,7 +1199,6 @@ const drawInteractiveSlider = () => {
     plotGraphSliderData.value = [];
     let rowSkip = plotGraphDataRaw.value.length / 1000;
     for (let c = 1; c < plotTableColumns.value.length; c++) {
-      console.log('Column name: ', plotTableColumns.value[c].value);
       if ((gridDisplayOptions.includes(selectedPlotName.value as string) && plotTableColumns.value[c].value.toLowerCase().indexOf('snodas') >= 0) ||
         (!gridDisplayOptions.includes(selectedPlotName.value as string) && (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked)) {
         for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
@@ -1226,9 +1233,7 @@ const drawInteractiveSlider = () => {
 
     plotGraphSlider?.value?.append(Plot.plot(plotGraphSliderOptions.value));
 
-    console.log('Previous slider box position: ', sliderBoxPosition.value);
     if (!sliderBoxPosition.value || Object.keys(sliderBoxPosition.value).length !== 2) {
-      console.log('Resetting sliderBoxPosition')
       // we don't have a previous position to remember
       if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
         // find our highest SNODAS measurement and start there
@@ -1398,7 +1403,6 @@ const sliderDragCancel = (event: MouseEvent) => {
   plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
   const x = event.clientX - (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().left;
   if (sliderDragType.value) {
-    console.log('Dragged outside of slider box at position ' + x);
     if (x < 0) {
       (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = '0px';
       sliderBoxPosition.value.start = 0;
@@ -1411,7 +1415,6 @@ const sliderDragCancel = (event: MouseEvent) => {
 }
 
 const sliderDragEnd = (event: MouseEvent) => {
-  console.log('sliderDragEnd event:', event);
   const x = event.clientX - (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().left;
   sliderDragPosition.value.end = x;
   setSliderDateRange();
@@ -1435,23 +1438,18 @@ const setSliderDateRange = () => {
   }
 
   let daysFromStart = Math.ceil(sliderBoxPosition.value.start * (plotGraphDateLimits.value.span / getSliderWidth()));
-  console.log('daysFromStart:', daysFromStart);
   let newStartDate = new Date(plotGraphDateLimits.value.start);
   newStartDate.setDate(newStartDate.getDate() + daysFromStart);
-  console.log('newStartDate:', newStartDate);
-
+  
   let daysFromEnd = Math.ceil((getSliderWidth() - sliderBoxPosition.value.end) * (plotGraphDateLimits.value.span / getSliderWidth()));
-  console.log('daysFromEnd:', daysFromEnd);
   let newEndDate = new Date(plotGraphDateLimits.value.end);
   newEndDate.setDate(newEndDate.getDate() - daysFromEnd);
-  console.log('newEndDate:', newEndDate);
-
+  
   (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
   plotGraphDateRange.value.start = newStartDate.toISOString().split('T')[0];
   (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
   plotGraphDateRange.value.end = newEndDate.toISOString().split('T')[0];
   updatePlotGraphDates();
-  console.log('plotGraphDateRange:', plotGraphDateRange.value);
 }
 
 const toggleCustomizePlot = async () => {
@@ -1585,16 +1583,16 @@ const getSpatialPlots = async () => {
 
         if (loadSweImagesErrors) {
           loadSweImagesErrors.forEach((errorMessage) => {
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage };
+            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage, life: ToastTimeout.timeout5000 };
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'selected SWE date is not in Date format' };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in Date format', life: ToastTimeout.timeout5000 };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'selected SWE date is not in DateTime format' };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in DateTime format', life: ToastTimeout.timeout5000 };
       toast.add(tMsg); addToastRecord(tMsg);
     }
     isEvaluationLoading.value = false;
