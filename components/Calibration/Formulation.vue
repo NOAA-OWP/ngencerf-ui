@@ -322,7 +322,7 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 }
 
 const moduleListChanged = (e: ListboxChangeEvent) => {
-  if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
+  /* if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
     selectedModuleValues.value.push('T-Route');
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'T-Route must be included', detail: 'All Calibration Formulations are required to use T-Route and one other module at a minimum.', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -334,7 +334,7 @@ const moduleListChanged = (e: ListboxChangeEvent) => {
     selectedModuleValues.value = ['LSTM','T-Route'];
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
-  }
+  } */
   modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }
 
