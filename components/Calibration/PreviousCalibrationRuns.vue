@@ -209,7 +209,7 @@ import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 
 import { useApiResponseToastSeverityCode, useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
-import { getOverallCalibrationValidationStatus } from "@/utils/CommonHelpers";
+import { getOverallCalibrationValidationStatus, formatMultJobNumbers } from "@/utils/CommonHelpers";
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
 const { loadGageTabStaticData, resetGageStore } = useGageStore();
@@ -483,8 +483,19 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   */
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
   queryUserCalibrationRunData().then(queryResponse => {
-    userCalibrationRunData.value = queryResponse?._data;
-    loadEntireRun();
+    console.log('queryResponse: ', queryResponse);
+    if (queryResponse?.status === 200) {
+      userCalibrationRunData.value = queryResponse?._data;
+      loadEntireRun();
+    } else {
+      isLoading.value = false;
+      let tDetail = "Unable to Retrieve Calibration Job Data";
+      if (queryResponse?._data?.message) {
+        tDetail = queryResponse._data.message;
+      }
+      const tMsg: ToastMessageOptions = { severity: "error", summary: 'Load Calibration Job Failed.', detail: tDetail, life: ToastTimeout.timeout6000 };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   });
 }
 
@@ -530,6 +541,9 @@ const colStyle = (data: any) => {
   }
   else if (data.status.indexOf('Cancelled') !== -1) {
     return 'Orange';
+  }
+  else if (data.status.indexOf('Server error') !== -1) {
+    return 'Black';
   }
 }
 
@@ -647,6 +661,9 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any, archiveRun: n
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(async (response) => {
     if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: 'success', 
+        summary: 'Calibration Job Deleted', detail: 'Job ' + selectedRunId + ' deleted', life: ToastTimeout.timeout3000 };
+      toast.add(tMsg); addToastRecord(tMsg);
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -664,8 +681,12 @@ const acceptDelete = (selectedRunId: number) => {
  * Aceept the deletion of a single job
  */
 const acceptMultipleDelete = () => {
+  const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
   deleteCalibrationRun(selectedMultipleCalibrationRuns.value).then(async (response) => {
     if (response.status === 200) {
+     const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
+      summary: 'Deleted Multiple Jobs', detail: 'Jobs ' + sortedNumbers + ' deleted', life: ToastTimeout.timeout3000};
+      toast.add(tMsg); addToastRecord(tMsg);     
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -679,13 +700,15 @@ const acceptMultipleDelete = () => {
   selectedCalibrationRun.value = undefined;
 }
 
-
 /**
  * Aceept archiving of a single job
  */
 const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
   archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
     if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: 'success', 
+        summary: 'Calibration Job Archived', detail: 'Job ' + selectedRunId + ' archived', life: ToastTimeout.timeout3000 };
+      toast.add(tMsg); addToastRecord(tMsg);
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -703,8 +726,13 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
  * Aceept archiving of a muiltiple jobs
  */
 const acceptMultpleArchive = (archiveJob: boolean) => {
+  const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
   archiveCalibrationRun(selectedMultipleCalibrationRuns.value, archiveJob).then(async (response) => {
     if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
+          summary: 'Archive Multiple Jobs', detail: 'Jobs ' + sortedNumbers + (archiveJob ? ' archived' : ' unarchived'), 
+          life: ToastTimeout.timeout3000};
+      toast.add(tMsg); addToastRecord(tMsg);     
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -783,9 +811,9 @@ watch(calibrationDownloadJobID, () => {
   if (calibrationDownloadJobID.value) {
     // Display Toast message saying download was successful and then clear the Job ID/filename refs
     // to avoid interfering with next download
-    let tDetail = 'Your calibration data download was successful!'
+    let tDetail = 'Download zip file successfully created.'
     if (calibrationDownloadFileName.value) {
-      tDetail = 'Your calibration data download "' + calibrationDownloadFileName.value + '" was successful!'
+      tDetail = 'Download zip file "' + calibrationDownloadFileName.value + '" successfully created.'
     }
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + calibrationDownloadJobID.value, detail: tDetail, life: ToastTimeout.timeout10000 };
     toast.add(tMsg); addToastRecord(tMsg);

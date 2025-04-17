@@ -159,6 +159,13 @@
           <td>&nbsp;</td>
           <td>Running</td>
         </tr>
+          <tr class="leading-8">
+          <td style="background-color: black" class="pr-1">&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>Black</td>
+          <td>&nbsp;</td>
+          <td>Server error</td>
+        </tr>
       </tbody>
     </table>
 

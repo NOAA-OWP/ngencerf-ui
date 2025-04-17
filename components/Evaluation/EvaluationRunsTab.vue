@@ -635,6 +635,9 @@ const deleteSelectedCalibrationRun = () => {
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
     if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
+      summary: 'Delete Calibration Run', detail: 'Job ' + selectedRunId + ' deleted', life: ToastTimeout.timeout3000};
+      toast.add(tMsg); addToastRecord(tMsg);   
       fetchUserValidatedCalibrationJobsListData();
       resetUserSelectedEvalValidationRun();
     } else {
@@ -677,9 +680,9 @@ watch(calibrationDownloadJobID, () => {
   if (calibrationDownloadJobID.value) {
     // Display Toast message saying download was successful and then clear the Job ID/filename refs
     // to avoid interfering with next download
-    let tDetail = 'Your calibration data download was successful!'
+    let tDetail = 'Download zip file successfully created.'
     if (calibrationDownloadFileName.value) {
-      tDetail = 'Your calibration data download "' + calibrationDownloadFileName.value + '" was successful!'
+      tDetail = 'Download zip file "' + calibrationDownloadFileName.value + '" successfully created.'
     }
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + calibrationDownloadJobID.value, detail: tDetail, life: ToastTimeout.timeout10000 };
     toast.add(tMsg); addToastRecord(tMsg);
