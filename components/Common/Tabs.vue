@@ -132,13 +132,9 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { useToast } from "primevue/usetoast";
-import type { ToastMessageOptions } from "primevue/toast";
-
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
-import { ToastTimeout } from "@/composables/NextgenEnums";
 
 const {
   calibrationJobId,
@@ -152,20 +148,11 @@ const {
   getForecastTabIndex,
   getVerificationTabIndex,
   getMenuIndex,
-  addToastRecord
 } = generalStore();
+
 const {
-  forecastJobId,
-  forecastCycle,
-  selectedForecastJob,
-  calibrationRunsForForecast,
-  calibrationRunForForecast,
   overallForcingDownloadForecastStatus
 } = storeToRefs(useForecastStore());
-const {
-  resetUserSelectedForecastCalibrationRun,
-  loadSelectedCalibrationRun,
-} = useForecastStore();
 
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
@@ -173,59 +160,13 @@ const currentEvaluationTab = ref(getEvaluationTabIndex());
 const currentForecastTab = ref(getForecastTabIndex());
 const currentVerificationTab = ref(getVerificationTabIndex());
 const currentMenu = ref(getMenuIndex());
-const toast = useToast();
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
 
 const tabClicked = (event: Event) => {
-  console.log("tabClicked");
-  const activeTab = document.querySelector('.tabs.activeTab') as HTMLElement | null;
-  if (activeTab) {
-    // the active tab before clicking on a new tab
-    console.log('activeTab: ', activeTab.getAttribute("title"));
-  }
   event.preventDefault();
   const ele: HTMLElement = event.currentTarget as HTMLElement;
-  const tabTitle: string | null = ele.getAttribute("title");
-  const clickedFrom: string | null = ele.getAttribute("data-tab-triggered-from");
-  console.log("clickedFrom: ", clickedFrom);
-
-  // this is to check if a user has selected a Forecast row from the Forecast Runs tab and clicks on the Setup Forecast tab
-  // this will check if the user has selected a Forecast row. if not, it will show a warning message and prevent the user from navigating to the Setup Forecast tab
-  // if the user has selected a Forecast row, it will clear previous Forecast data to start setting up a new Forecast
-  // TODO: add a check to see if the user has selected a Forecast row from the Forecast Runs tab
-  if (currentMenu.value === 3 && tabTitle === "Setup Forecast tab") {
-    console.log('selectedForecastJob: ', selectedForecastJob.value);
-    if (!selectedForecastJob.value && clickedFrom === 'Forecast-ForecastRunsTab') {
-      event.preventDefault();
-
-      const tMsg: ToastMessageOptions = {
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'Please select a Forecast Run first',
-        life: ToastTimeout.timeout10000,
-      };
-      toast.add(tMsg); addToastRecord(tMsg);
-      return; // don't proceed to navigate to the tab
-    } else {
-      console.log('clearing out previous Forecast data and setting up calibrationRunForForecast based on selectedForecastJob');
-      nextTick(async () => {
-        // clear all user-selected forecast data
-        resetUserSelectedForecastCalibrationRun();
-
-        // set calibrationRunForForecast based on selectedForecastJob
-        calibrationRunForForecast.value = calibrationRunsForForecast.value.find((calibrationRun: CalibrationRunForForecast) => {
-          return calibrationRun.calibration_run_id === selectedForecastJob.value?.calibration_run_id;
-        }) as CalibrationRunForForecast;
-        console.log('calibrationRunForForecast: ', calibrationRunForForecast.value);
-
-        // set userCalibrationRunData
-        await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
-        console.log('userCalibrationRunData: ', calibrationRunForForecast.value);
-      });
-    }
-  }
 
   nextTick(() => {
     // Send the selected tab info to the active tab set with emit

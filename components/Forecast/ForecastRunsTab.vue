@@ -193,9 +193,9 @@ const onRowContextMenu = (event: any) => {
   if (selectedForecastJob && selectedForecastJob.value?.forecast_run_id === crRowData.forecast_run_id) {
     crContextMenu.value.show(event.originalEvent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
-    if (crRowData.forecast_status !== 'Running') {
+    if (crRowData.forecast_status === 'Done') {
       cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastResults() });
-    } else {
+    } else if (crRowData.forcing_download_status === 'Running' || crRowData.forecast_status === 'Running') {
       cmForecastRun.value.push({ label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() });
     }
     cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => clearDataAndNavigateToSetupForecast() });
@@ -268,13 +268,8 @@ const clearDataAndNavigateToSetupForecast = () => {
 };
 
 const navigateToSetupForecast = () => {
-  console.log("Navigating to Setup Forecast tab");
   nextTick(() => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast tab"]');
-
-    // set an attribute to indicate which tab this event was triggered from
-    (e as HTMLElement).setAttribute("data-tab-triggered-from", "Forecast-ForecastRunsTab");
-
     if (e) {
       e.click();
     } else {

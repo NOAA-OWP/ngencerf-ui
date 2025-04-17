@@ -1,4 +1,7 @@
 import { defineStore, storeToRefs } from "pinia";
+import { Duration } from "luxon";
+
+
 import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastCycle, ForecastJob, ForecastJobs } from "@/composables/NextGenModel";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -7,7 +10,7 @@ import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import { isValidDate } from '@/utils/CommonHelpers';
-import { convertTimeZone } from '@/utils/TimeHelpers';
+import { formatElapsedTime, convertTimeZone } from '@/utils/TimeHelpers';
 
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -147,11 +150,16 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         // TODO: create forecastJob interface
         const forecastJob: any = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
 
+        if (!forecastJob) {
+          return ['No forecast job found'];
+        }
+
         // set forecastCycle, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
         forecastCycleName.value = forecastJob?.cycle;
         forecastJobStatus.value = forecastJob?.status;
         forcingDownloadStatus.value = forecastJob?.forcing_download?.status;
-        elapsedTime.value = forecastJob?.elapsed_time;
+        // set elapsedTime
+        setElapsedTime(forecastJob);
 
         if (forecastJob?.submit_date) {
           submitTimeDate.value = new Date(forecastJob?.submit_date as string);
@@ -173,6 +181,26 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     } else {
       return errorMessages;
     }
+  };
+  
+  /**
+   * Set elapsedTime
+   */
+  const setElapsedTime = (forecastJob: any): void => {
+    if (forecastJob?.forcing_download?.elapsed_time) {
+      if (forecastJob?.elapsed_time) {
+        const elapsedTimeArray: string[] = [];
+        elapsedTimeArray.push(forecastJob?.forcing_download?.elapsed_time);
+        elapsedTimeArray.push(forecastJob?.elapsed_time);
+
+        // sume and format forecast and forcing download elapsed times
+        elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
+      } else {
+        // format the forcing download elapsed time to a string in 'hh:mm:ss' or 'd 'Days,' hh:mm:ss' format
+        elapsedTime.value = formatElapsedTime(forecastJob?.forcing_download?.elapsed_time);
+      }
+    }
+
   };
 
   /**
@@ -343,7 +371,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobId.value = forecast_job_id;
   }
 
-  const setSelectedForecastRowData = async (forecast_row_data: ForecastJob): void => {
+  const setSelectedForecastRowData = async (forecast_row_data: ForecastJob): Promise<void> => {
     setSelectedForecastRunId(forecast_row_data.forecast_run_id);
     setSelectedCalibrationRunId(forecast_row_data.calibration_run_id);
 
@@ -359,7 +387,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
      * user should be able to go straight to forecast runs and view results so this is a easy way to provide it.
      */
     calibrationRunForForecast.value = (forecast_row_data as any as CalibrationRunForForecast);
-    forecastJobStatus.value = forecast_row_data.status;
+    forecastJobStatus.value = (forecast_row_data as any as CalibrationRunForForecast).status;
   }
 
   const resetSelectedForecastRunData = (): void => {
@@ -504,6 +532,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     resetSelectedCalibrationRunId,
     setResultsPathname,
     setForecastPlot,
+    setElapsedTime,
     getStatus,
     getForecastPlotNames,
     getForecastPlot,

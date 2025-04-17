@@ -296,13 +296,13 @@ const openSelectedCalibrationRun = async () => {
 
 const navigateToSetupForecast = () => {
   if (calibrationRunForForecast?.value?.calibration_run_id && calibrationRunForForecast.value.calibration_run_id > 0) {
-    const tabs = document.getElementsByClassName("tabs");
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast tab"]');
-    
-    // set an attribute to indicate which tab this event was triggered from
-    (e as HTMLElement).setAttribute("data-tab-triggered-from", "Forecast-PreviousCalibrationRuns");
-
-    (e as HTMLElement).click();
+    if (e) {
+      e.click();
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Setup Forecast tab not found'};
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);

@@ -166,7 +166,8 @@ const {
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
-  setResultsPathname
+  setResultsPathname,
+  setElapsedTime
 } = useForecastStore();
 
 onMounted(async () => {
@@ -341,14 +342,11 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
       const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
       if (forecast) {
-        if (forecast.elapsed_time && forecast.forcing_download.elapsed_time) {
-          let elapsedTimeArray: string[] = [];
-          elapsedTimeArray.push(forecast.elapsed_time);
-          elapsedTimeArray.push(forecast.forcing_download.elapsed_time);
+        // set elapsedTime
+        setElapsedTime(forecast);
 
-          elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
-        } else {
-          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` };
+        if (!elapsedTime.value) {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Elapsed time not set from server' };
           toast.add(tMsg); addToastRecord(tMsg);
         }
       } else {
