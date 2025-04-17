@@ -3,8 +3,7 @@
     <tbody>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold  checkMark"></i></td>
-        <td data-tab="1" title="Calibration Run" aria-label="Calibration Run"
-          @click="tabClicked">
+        <td data-tab="1" title="Calibration Run" aria-label="Calibration Run" @click="tabClicked">
           Calibration Run</td>
       </tr>
       <tr>
@@ -14,19 +13,16 @@
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="3" title="Run Type" aria-label="Run Type"
-          @click="tabClicked">
+        <td data-tab="3" title="Run Type" aria-label="Run Type" @click="tabClicked">
           Run Type</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="3" title="Forcing Source"
-          aria-label="Forcing Source" @click="tabClicked">Forcing Source</td>
+        <td data-tab="3" title="Forcing Source" aria-label="Forcing Source" @click="tabClicked">Forcing Source</td>
       </tr>
       <tr>
         <td><i v-if="false" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="3" title="Time Period" aria-label="Time Period"
-          @click="tabClicked">Time Period</td>
+        <td data-tab="3" title="Time Period" aria-label="Time Period" @click="tabClicked">Time Period</td>
       </tr>
     </tbody>
   </table>
@@ -53,5 +49,3 @@ const tabClicked = (event: Event) => {
   }
 }
 </script>
-
-
