@@ -371,29 +371,21 @@ const saveFormulationData = () => {
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
+  } else if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'T-Route must be included', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  } else if (selectedModuleValues.value.length < 2) {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Another module must be selected with T-Route.', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  } else if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
+     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeout6000 };
+    toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
     var valOK = validateModules();
     if (!valOK) {
       modulesHaveChanged.value = false;
       const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000 };
-      toast.add(tMsg); addToastRecord(tMsg);
-      clearCalibratableParameters();
-    }
-    if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
-      modulesHaveChanged.value = false;
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'T-Route must be included', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeout6000 };
-      toast.add(tMsg); addToastRecord(tMsg);
-      clearCalibratableParameters();
-    } else if (selectedModuleValues.value.length < 2) {
-      modulesHaveChanged.value = false;
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Another module must be selected with T-Route.', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeout6000 };
-      toast.add(tMsg); addToastRecord(tMsg);
-      clearCalibratableParameters();
-    }
-    if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
-      selectedModuleValues.value = ['LSTM','T-Route'];
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeout6000 };
       toast.add(tMsg); addToastRecord(tMsg);
       clearCalibratableParameters();
     }
