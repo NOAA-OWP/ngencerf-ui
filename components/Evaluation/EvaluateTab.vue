@@ -411,6 +411,10 @@ const selectedLogCurrentPage = ref<number>(1);
 const selectedLogTotalPages = ref<number>(1);
 const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
+
+// track exceptions that we might not want to clear in specific circumstances
+const refListToClearExceptions = ref<any[]>([]);
+
 const supplementalTableOptions = ref<any[]>([
   'Iteration Metrics Table',
   'Iteration Parameters Table',
@@ -447,11 +451,7 @@ onMounted(() => {
     hilightTab(EvaluationTabs.tab_evaluate);
 
     // make sure page loads with no plots/tables selected
-    selectedPlotName.value = null;
-    selectedPlotFilename.value = null;
-    selectedPlotFileUrl.value = null;
-    selectedPlotHasTimeseries.value = false;
-    selectedSupplementalTable.value = 0;
+    resetUserPlotRefs([]);
 
     // Load Run Status Store to load resultsPathname
     await loadRunStatusStore();
@@ -525,13 +525,9 @@ onMounted(() => {
 watch(selectedPlotName, async () => {
   // is the selected option a plot or iteration table?
   if (selectedPlotName.value && (supplementalTableOptions.value as any).includes(selectedPlotName.value)) {
-    selectedPlotFilename.value = null;
-    selectedPlotFileUrl.value = null;
-    selectedPlotHasTimeseries.value = false;
-    plotGraphData.value = [];
-    plotGraphLines.value = [];
-    sliderBoxPosition.value = {};
     selectedSupplementalTable.value = (supplementalTableOptions.value as any).indexOf(selectedPlotName.value) + 1;
+    // reset all of our plot refs by selectedPlotName and selectedSupplementalTable
+    resetUserPlotRefs(['selectedPlotName','selectedSupplementalTable']);
     if (selectedSupplementalTable.value === 1) {
       // Get Iteration Data
       if (!iterations.value?._data || !iterations.value?._data?.length) {
@@ -539,7 +535,6 @@ watch(selectedPlotName, async () => {
       }
 
       // set up array for iterationMetricsData
-      iterationMetricsData.value = [];
       iterationMetricsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
       if (iterations.value?._data?.iteration_data) {
         for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
@@ -572,7 +567,6 @@ watch(selectedPlotName, async () => {
       }
 
       // set up array for iterationParamsData
-      iterationParamsData.value = [];
       iterationParamsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
       if (iterations.value?._data?.iteration_data) {
         for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
@@ -604,7 +598,6 @@ watch(selectedPlotName, async () => {
         performanceMetrics.value = await queryGetPerformanceMetrics();
       }
 
-      performanceMetricsData.value = [];
       if (performanceMetrics.value?._data) {
         if (performanceMetrics.value?._data?.performance_metrics) {
           // First add the metric names and the values from our Calibration run
@@ -669,44 +662,17 @@ watch(selectedPlotName, async () => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
-    plotTableData.value = [];
-    plotTableColumns.value = [];
-    selectedLogCategory.value = '';
-    selectedLogList.value = [];
   }
   // selectedPlotName is a log 
   else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
-    selectedPlotFilename.value = null;
-    selectedPlotFileUrl.value = null;
-    selectedPlotHasTimeseries.value = false;
-    plotTableData.value = [];
-    plotTableColumns.value = [];
-    plotGraphData.value = [];
-    plotGraphLines.value = [];
-    sliderBoxPosition.value = {};
-    selectedSupplementalTable.value = 0;
-    selectedLogName.value = '';
+    // reset all of our plot refs except for selectedPlotName
+    resetUserPlotRefs(['selectedPlotName']);
     selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
-    sweTimeSeriesData.value = [];
   }
   // selectedPlotName is a grid display option
   else if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
-    // clear out previous Display data
-    selectedPlotFilename.value = null;
-    selectedPlotFileUrl.value = null;
-    selectedPlotHasTimeseries.value = true;
-    plotTableErrorMessage.value = '';
-    plotTableData.value = [];
-    plotTableColumns.value = [];
-    plotGraphData.value = [];
-    plotGraphLines.value = [];
-    sliderBoxPosition.value = {};
-    selectedSupplementalTable.value = 0;
-    selectedLogCategory.value = '';
-    selectedLogList.value = [];
-    selectedLogName.value = '';
-    sweTimeSeriesData.value = [];
-
+    // reset all of our plot refs except for selectedPlotName
+    resetUserPlotRefs(['selectedPlotName']);
     // set selectedGridType to 'catchment' by default if not already set
     if (!selectedGridType.value) {
       selectedGridType.value = 'catchment';
@@ -742,15 +708,9 @@ watch(selectedPlotName, async () => {
     // Start with SWE timeseries already displayed
     togglePlotGraph();
   } else if (selectedPlotName.value) {
-    plotGraphData.value = [];
-    plotGraphLines.value = [];
-    expandPlotTable.value = false;
-    sliderBoxPosition.value = {};
-    selectedSupplementalTable.value = 0;
-    selectedLogCategory.value = '';
-    selectedLogList.value = [];
-    plotTableCurrentPage.value = 1;
-
+    // reset all of our plot refs except for selectedPlotName
+    resetUserPlotRefs(['selectedPlotName']);
+    
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(
       selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
@@ -849,17 +809,98 @@ watch(selectedPlotName, async () => {
         plotTableErrorMessage.value = 'Data internally calculated by program and unavailable for table display.';
       }
     } else {
-      selectedPlotFilename.value = null;
-      selectedPlotFileUrl.value = null;
-      selectedPlotHasTimeseries.value = false;
-      plotTableData.value = [];
-      plotTableColumns.value = [];
+      // reset all of our plot refs except for selectedPlotName
+      resetUserPlotRefs(['selectedPlotName']);
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot', life: ToastTimeout.timeout5000 };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 });
+
+// Reset refs when selectedPlotTable changes
+const resetUserPlotRefs = (exceptions: any): void => {
+  if( !Array.isArray(exceptions) ) {
+    exceptions = [];
+  }
+
+  // plot file refs
+  if (!exceptions.includes('selectedPlotName')) {
+    selectedPlotName.value = null;
+  }
+  selectedPlotFilename.value = null;
+  selectedPlotFileUrl.value = null;
+
+  // plot table refs
+  expandPlotTable.value = false;
+  plotTables.value = {};
+  plotTableList.value = [];
+  selectedPlotTable.value = '';
+  plotTableData.value = [];
+  plotTableErrorMessage.value = '';
+  plotTableTotalSize.value = 0;
+  plotTableCurrentPage.value = 1;
+  plotTableTotalPages.value = 0;
+  plotTableStartRow.value = 1;
+  plotTableEndRow.value = plotTablePageSize.value;
+  plotTableColumns.value = [];
+
+  // plot graph refs
+  selectedPlotHasTimeseries.value = false;
+  // plotGraphArea.value = null;
+  // plotGraphSVG.value = null;
+  plotGraphDataRaw.value = [];
+  plotGraphData.value = [];
+  plotGraphOptions.value = [];
+  plotGraphLines.value = [];
+  plotGraphDateLimits.value = {};
+  plotGraphDateRange.value = {};
+  // plotGraphSlider.value = null;
+  plotGraphSliderData.value = [];
+  plotGraphSliderOptions.value = [];
+  plotGraphSliderBox.value = null;
+  plotGraphSliderCursor.value = 'cursor-grab';
+  plotGraphSliderHelpDisplay.value = '';
+  sliderBoxPosition.value = {};
+  sliderDragPosition.value = {};
+  sliderDragType.value = '';
+  showPlotGraph.value = false;
+  showCustomizePlot.value = false;
+
+  // supplemental table refs (iterations/metrics/logs)
+  if (!exceptions.includes('selectedSupplementalTable')) {
+    selectedSupplementalTable.value = 0;
+  }
+  iterations.value = {};
+  iterationMetricsData.value = [];
+  iterationMetricsColumns.value = [];
+  iterationParamsData.value = [];
+  iterationParamsColumns.value = [];
+  performanceMetrics.value = {};
+  performanceMetricsData.value = [];
+  performanceMetricsColumns.value = [];
+  selectedLogCategory.value = '';
+  selectedLogList.value = [];
+  selectedLogName.value = '';
+  selectedLogDisplay.value = '';
+  selectedLogTotalSize.value = 0;
+  selectedLogCurrentPage.value = 1;
+  selectedLogTotalPages.value = 0;
+  selectedLogStartRow.value = 1;
+  selectedLogEndRow.value = logDataPageSize.value;
+
+  // SWE refs
+  selectedGridType.value = '';
+  sweStartDateTime.value = null;
+  minSweDateTime.value = null;
+  sweEndDateTime.value = null;
+  maxSweDateTime.value = null;
+  selectedSweDateTime.value = null;
+  selectedSnodasLumpedMapUrl.value = '';
+  selectedSnodasRawMapUrl.value = '';
+  selectedSnodasSimMapUrl.value = '';
+  sweTimeSeriesData.value = [];
+}
 
 // Handle selectedPlotTable changes
 watch(selectedPlotTable, async () => {
@@ -885,8 +926,6 @@ watch(selectedSweDateTime, async () => {
 
 // set plotTableColumns whenever plotTableData is changed
 function adjustPlotTableColumns() {
-  plotTableErrorMessage.value = '';
-  plotTableColumns.value = [];
   if (plotTableData.value.length > 0) {
     Object.keys(plotTableData.value[0]).forEach(key => {
       let column_header_words = key.split("_");
@@ -1501,9 +1540,6 @@ watch(selectedLogName, async () => {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-    plotTables.value = {};
-    plotTableList.value = [];
-    plotTableData.value = [];
   }
 });
 
@@ -1609,16 +1645,7 @@ const toggleExpandPlotTable = async () => {
 
 onUnmounted(() => {
   // make sure page clears all selected plots/tables when the user leaves
-  selectedPlotName.value = null;
-  selectedPlotFilename.value = null;
-  selectedPlotFileUrl.value = null;
-  selectedPlotHasTimeseries.value = false;
-  selectedSupplementalTable.value = 0;
-  selectedLogName.value = '';
-  selectedLogList.value = [];
-  sweTimeSeriesData.value = [];
-  sweStartDateTime.value = null;
-  sweEndDateTime.value = null;
+  resetUserPlotRefs([]);
 })
 </script>
 
