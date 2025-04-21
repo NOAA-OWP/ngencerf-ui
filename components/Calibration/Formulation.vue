@@ -382,12 +382,15 @@ const saveFormulationData = () => {
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
-    var valOK = validateModules();
-    if (!valOK) {
-      modulesHaveChanged.value = false;
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000 };
-      toast.add(tMsg); addToastRecord(tMsg);
-      clearCalibratableParameters();
+    // Only validate changes if this isn't a new configuration
+    if (userCalibrationRunData?.value?.modules && userCalibrationRunData?.value?.modules.length > 1) {
+      var valOK = validateModules();
+      if (!valOK) {
+        modulesHaveChanged.value = false;
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeout6000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+        clearCalibratableParameters();
+      }
     }
 
     saveFormulationTabData().then(response => {
