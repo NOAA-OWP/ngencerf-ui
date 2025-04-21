@@ -6,7 +6,7 @@
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
 
-    <table class="_help-table">
+    <table class="_help-table" aria-label="Calibration Runs Tab Help Table">
       <thead>
         <tr>
           <th>Item</th>
@@ -75,7 +75,7 @@
       </tbody>
     </table>
     <hr />
-    <table class="_help-table">
+    <table class="_help-table" aria-label="Calibration Runs Tab Menu Item Help Table">
       <thead>
         <tr>
           <th>Menu Item</th>
@@ -106,7 +106,7 @@
     <hr class="mt-3" style="height: 2px; background-color: black" />
     <div class="mt-3 text-center font-bold text-xl">Table Color Coding</div>
     <p class="font-bold">The leftmost column is color coded by the status of the job</p>
-    <table class="ml-28 w-auto">
+    <table class="ml-28 w-auto" aria-label="Table Color Coding">
       <thead>
         <tr class="text-left">
           <th>&nbsp;</th>

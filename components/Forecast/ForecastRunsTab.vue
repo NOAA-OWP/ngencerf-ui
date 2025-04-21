@@ -11,7 +11,7 @@
   <client-only>
     <div class="pr-2">
       <div id="calibrationRunList">
-        <div id="CalTable" class="w-[1200px] mx-auto">
+        <div id="ForecastTable" class="w-[1200px] mx-auto">
           <div class="flex mt-2">
             <h1 class="pt-3 mb-8 text-3xl font-bold inline-block text-center w-[1200px]">
               <span>Forecast Runs</span><br />
@@ -20,21 +20,15 @@
               </span>
             </h1>
           </div>
-          <div class="grid grid-cols-2 mb-5">
-            <div class="col-span-1">
-              <div class="inline ">
-                <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-                <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                  :options="forecastRunGageList" filter optionLabel="name" optionValue="name" placeholder=""
-                  aria-label="Select Headwater Basin Gage Filter" title="Select Headwater Basin Gage Filter"></Select>
-              </div>
-            </div>
-          </div>
+
+          <ForecastRunsDialog id="ForecastRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
+            @ResetJobFilters="resetJobFilters()" @RefreshJobList="refreshJobList()" :forecastJobs="filteredForecastRuns"
+            ref="forecastRunsFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmForecastRun"></ContextMenu>
-          <DataTable id="ForecastRuns" :value="forecastRuns" scrollable scroll-height="400px"
+          <DataTable id="ForecastRuns" :value="filteredForecastRuns" scrollable scroll-height="400px"
             sortField="forecast_run_id" :sortOrder="-1" table-style="min-width: 50rem"
             v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
@@ -154,6 +148,7 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 
 import type { DataTableRowClickEvent } from "primevue/datatable";
+import ForecastRunsDialog from "@/components/Forecast/ForecastRunsFilterDialog.vue";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const forecastStore = useForecastStore();
@@ -163,6 +158,7 @@ const {
   calibrationRunForForecast,
   calibrationRunsForForecast,
   forecastRuns,
+  filteredForecastRuns,
   selectedForecastJob,
   isForecastLoading
 } = storeToRefs(forecastStore);
@@ -193,14 +189,13 @@ const ptColumn = ref({
 const onRowContextMenu = (event: any) => {
   cmForecastRun.value = [];
   const crRowData = event.data as ForecastJob;
-  console.log(`crRowData: ${JSON.stringify(crRowData)}`);
 
   if (selectedForecastJob && selectedForecastJob.value?.forecast_run_id === crRowData.forecast_run_id) {
     crContextMenu.value.show(event.originalEvent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
-    if (crRowData.forecast_status !== 'Running') {
+    if (crRowData.forecast_status === 'Done') {
       cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastResults() });
-    } else {
+    } else if (crRowData.forcing_download_status === 'Running' || crRowData.forecast_status === 'Running') {
       cmForecastRun.value.push({ label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() });
     }
     cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => clearDataAndNavigateToSetupForecast() });
@@ -275,7 +270,6 @@ const clearDataAndNavigateToSetupForecast = () => {
 const navigateToSetupForecast = () => {
   nextTick(() => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast tab"]');
-
     if (e) {
       e.click();
     } else {
@@ -330,6 +324,46 @@ const toggleMessagesGroup = () => {
   } else {
     showMessagesGroup.value = true;
   }
+}
+
+/**
+ * Apply Forecast Jobs Filters
+ */
+const applyJobFilters = async () => {
+  isForecastLoading.value = true;
+
+  if (filteredForecastRuns?.value && filteredForecastRuns?.value.length > 0) {
+    if (uiGageId.value && uiGageId.value !== 'All') {
+      filteredForecastRuns.value = forecastRuns?.value?.filter((forecastRun: ForecastJob) => forecastRun.gage_id === uiGageId.value);
+    } else {
+      await resetJobFilters();
+    }
+  }
+
+  isForecastLoading.value = false;
+};
+
+/**
+ * Reset Forecast Jobs Filters
+ */
+const resetJobFilters = async () => {
+  isForecastLoading.value = true;
+
+  if (forecastRuns?.value && forecastRuns?.value.length > 0) {
+    filteredForecastRuns.value = [...forecastRuns.value];
+  }
+
+  isForecastLoading.value = false;
+}
+
+/**
+ * Refresh Forecast Jobs Table
+ */
+const refreshJobList = async () => {
+  isForecastLoading.value = true;
+  await getForecastJobs();
+  await applyJobFilters();
+  isForecastLoading.value = false;
 }
 
 </script>

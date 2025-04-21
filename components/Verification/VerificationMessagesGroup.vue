@@ -79,10 +79,11 @@ Plot Generation Frequency: 5 -->
 
 <style lang="scss" scoped>
 #Messages {
-    padding: 15px;
-    font-size: 1.2em;
+  padding: 15px;
+  font-size: 1.2em;
 }
+
 p {
-    line-height: 1.4em;
+  line-height: 1.4em;
 }
 </style>

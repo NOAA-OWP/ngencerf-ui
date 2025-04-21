@@ -272,7 +272,7 @@ onMounted(() => {
     }
     // If LSTM is selected, de-select everything else except for T-Route
     if (userCalibrationRunData?.value?.modules.some(item => item.toLowerCase() === 'lstm')) {
-      userCalibrationRunData.value.modules = ['LSTM','T-Route'];
+      userCalibrationRunData.value.modules = ['LSTM', 'T-Route'];
     }
     modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
     setUserSelection();
@@ -322,7 +322,7 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 }
 
 const moduleListChanged = (e: ListboxChangeEvent) => {
-  if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
+  /* if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
     selectedModuleValues.value.push('T-Route');
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'T-Route must be included', detail: 'All Calibration Formulations are required to use T-Route and one other module at a minimum.', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -334,7 +334,7 @@ const moduleListChanged = (e: ListboxChangeEvent) => {
     selectedModuleValues.value = ['LSTM','T-Route'];
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
-  }
+  } */
   modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }
 
@@ -342,7 +342,7 @@ const resetModuleList = () => {
   if (selectedModuleValues.value && userCalibrationRunData?.value?.modules) {
     selectedModuleValues.value = userCalibrationRunData?.value?.modules
     if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
-      selectedModuleValues.value = ['LSTM','T-Route'];
+      selectedModuleValues.value = ['LSTM', 'T-Route'];
       modulesHaveChanged.value = true;
     } else if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
       selectedModuleValues.value.push('T-Route');
@@ -378,7 +378,7 @@ const saveFormulationData = () => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Another module must be selected with T-Route.', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
   } else if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
-     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
@@ -486,7 +486,7 @@ const validateTab = () => {
   }
   /* Has user included LSTM? (De-select everything else but T-route) */
   if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
-    selectedModuleValues.value = ['LSTM','T-Route'];
+    selectedModuleValues.value = ['LSTM', 'T-Route'];
     text.push("LSTM can only be paired with T-Route");
   }
   /* Has user checked/unchecked Add SLoTH output variables? */
@@ -674,18 +674,21 @@ h1 {
 .p-listbox {
   border-radius: 0px;
 }
+
 .p-listbox-list {
   padding: 0px !important;
 }
+
 .p-listbox-list-container {
   margin-top: 7px;
 }
+
 .p-listbox-option-selected {
-  background-color: global.$ngwcp_green_lt !important; 
+  background-color: global.$ngwcp_green_lt !important;
 }
+
 .p-listbox-option {
   padding-top: 4px;
   padding-bottom: 4px;
 }
-
 </style>

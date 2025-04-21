@@ -166,7 +166,8 @@ const {
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
-  setResultsPathname
+  setResultsPathname,
+  setElapsedTime
 } = useForecastStore();
 
 onMounted(async () => {
@@ -220,6 +221,15 @@ const createForcingDownloadAndForecastStatusInterval = () => {
       // update forcingDownloadStatus and forecastJobStatus
       forecastJobStatus.value = forecast.status;
       forcingDownloadStatus.value = forecast.forcing_download.status;
+
+      // set submitTime if not already set
+      if (!submitTime.value && forecast?.submit_date) {
+        submitTimeDate.value = new Date(forecast?.submit_date as string);
+
+        if (isValidDate(submitTimeDate.value)) {
+          submitTime.value = convertTimeZone(submitTimeDate.value);
+        }
+      }
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response` };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -299,7 +309,7 @@ const goToResultsTab = () => {
  * overallForcingDownloadForecastStatus is a computed value based on forcingDownloadStatus and forecastJobStatus
  * so we're essentially watching both forcingDownloadStatus and forecastJobStatus for changes
  */
-watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newForecastJobStatus, onCleanup) => {
+watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newForecastJobStatus) => {
   // set resultsPathname if not already set
   if (!resultsPathname.value) {
     await setResultsPathname();
@@ -309,8 +319,8 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
   // overallForcingDownloadForecastStatus changes to Done, Cancelled, Failed, or Server Error
   if (forcingDownloadStatus.value === 'Running' || forecastJobStatus.value === 'Running') {
     // create elapsedTimeIntervalId to update elapsedTime every second while overallForcingDownloadForecastStatus 
-    // is Running if not already created
-    if (!elapsedTimeIntervalId.value) {
+    // is Running if not already created and submit_time is set
+    if (!elapsedTimeIntervalId.value && submitTimeDate.value) {
       createElapsedTimeInterval();
     }
     // create forecastJobStatusIntervalId to update forcingDownloadStatus and forecastJobStatus every 10 seconds
@@ -332,14 +342,11 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
       const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
       if (forecast) {
-        if (forecast.elapsed_time && forecast.forcing_download.elapsed_time) {
-          let elapsedTimeArray: string[] = [];
-          elapsedTimeArray.push(forecast.elapsed_time);
-          elapsedTimeArray.push(forecast.forcing_download.elapsed_time);
+        // set elapsedTime
+        setElapsedTime(forecast);
 
-          elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
-        } else {
-          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: `Could not find elapsed_time for Forecast job ${forecastJobId.value} in server response` };
+        if (!elapsedTime.value) {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Elapsed time not set from server' };
           toast.add(tMsg); addToastRecord(tMsg);
         }
       } else {
@@ -348,11 +355,8 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
       }
     }
   }
-
-  onCleanup(() => {
-    console.log('cleanup');
-  });
-}, { immediate: true });
+}, 
+{ immediate: true });
 </script>
 
 <style lang="scss" scoped>
