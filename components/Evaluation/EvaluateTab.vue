@@ -219,7 +219,10 @@
           </Select>
         </div>
         <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b
-            style="width:160px; display:inline-block;">Log File Name</b> {{ selectedLogName }}</div>
+            style="width:160px; display:inline-block;">Log Name</b> {{ selectedLogName }}</div>
+        
+        <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;"><b
+            style="width:160px; display:inline-block;">Log File Path</b> {{ selectedLogFilePath }}</div>
 
         <div class="flex justify-end" style="margin-top:-23px;">
           <div class="ml-auto">
@@ -411,6 +414,7 @@ const selectedLogCurrentPage = ref<number>(1);
 const selectedLogTotalPages = ref<number>(1);
 const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
+const selectedLogFilePath = ref<string>('');
 
 // track exceptions that we might not want to clear in specific circumstances
 const refListToClearExceptions = ref<any[]>([]);
@@ -888,6 +892,7 @@ const resetUserPlotRefs = (exceptions: any): void => {
   selectedLogTotalPages.value = 0;
   selectedLogStartRow.value = 1;
   selectedLogEndRow.value = logDataPageSize.value;
+  selectedLogFilePath.value = '';
 
   // SWE refs
   selectedGridType.value = '';
@@ -1535,6 +1540,7 @@ watch(selectedLogName, async () => {
       } else {
         selectedLogEndRow.value = logDataPageSize.value;
       }
+      selectedLogFilePath.value = response?._data?.log_path;
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
