@@ -79,8 +79,8 @@
                   </div>
                 </template>
                 <template #body="slotProps">
-                  <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gag ' + slotProps.data.gage_id"
-                    :title="'Headwater Basin Gag ' + slotProps.data.gage_id">
+                  <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
+                    :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
                     {{ slotProps.data.gage_id }}
                   </span>
                 </template>
@@ -171,7 +171,7 @@
         <div id="MultJobOpsDlg" v-if="showHideMultOps">
           <MultipleJobOperations :cal-jobs="selectedMultipleCalibrationRuns"
             :cal-job-list="selectedMultipleCalibrationRunData" @DeleteSelectedJobs="acceptMultipleDelete()"
-            @ArchiveSelectedJobs="acceptMultpleArchive(true)" @UnarchiveSelectedJobs="acceptMultpleArchive(false)"
+            @ArchiveSelectedJobs="acceptMultipleArchive(true)" @UnarchiveSelectedJobs="acceptMultipleArchive(false)"
             @CloseMultJobWindow="closeMultJobsWindow" />
         </div>
 
@@ -301,14 +301,34 @@ const onRowContextMenu = (event: any) => {
     showHideMultOps.value = true;
     window.addEventListener(`click`, handleContextMenu);
   }
+  nextTick(async () => {
+    highlightSelectedRows();
+  })
 };
 
 const dtRowSelected = (e: any) => {
+  //console.log('Row selected: ', e.data);
   addCalibrationRun(e.data);
 }
 
 const dtRowUnselect = (e: any) => {
+  //console.log('Row unselected: ', e.data);
   deleteCalibrationRunById(e.data);
+}
+
+const highlightSelectedRows = () => {
+  //console.log('selectedMultipleCalibrationRunData: ', selectedMultipleCalibrationRunData.value);
+  let dtRows = document.querySelector('#Datatable').querySelector('.p-datatable-tbody').children;
+  for (let r = 0; r < dtRows.length; r++) {
+    //console.log('Job ID for row ' + r + ': ' + updatedUserCalibrationJobsListData.value[r].calibration_run_id);
+    if (selectedMultipleCalibrationRunData.value.includes(updatedUserCalibrationJobsListData.value[r])) {
+      //console.log('Row ' + r + ' is selected');
+      dtRows[r].classList.add('p-datatable-row-selected');
+    } else {
+      //console.log('Row ' + r + ' is not selected');
+      dtRows[r].classList.remove('p-datatable-row-selected');
+    }
+  }
 }
 
 /**
@@ -370,6 +390,9 @@ const closeMultJobsWindow = () => {
   selectedMultipleCalibrationRunData.value = [];
   showHideMultOps.value = false;
   window.removeEventListener(`click`, handleContextMenu);
+  nextTick(async () => {
+    highlightSelectedRows();
+  })
 }
 
 const whichContextMenu = computed(() => {
@@ -675,18 +698,22 @@ const acceptDelete = (selectedRunId: number) => {
     }
   });
   selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
 }
 
 /**
- * Aceept the deletion of a single job
+ * Aceept the deletion of multiple jobs
  */
 const acceptMultipleDelete = () => {
   const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
   deleteCalibrationRun(selectedMultipleCalibrationRuns.value).then(async (response) => {
     if (response.status === 200) {
-     const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
-      summary: 'Deleted Multiple Jobs', detail: 'Jobs ' + sortedNumbers + ' deleted', life: ToastTimeout.timeout3000};
-      toast.add(tMsg); addToastRecord(tMsg);     
+      response._data?.jobs.forEach(job => {
+        const tMsg: ToastMessageOptions = { severity: job.success ? 'info' : 'error', 
+          summary: 'Archive Multiple Jobs', detail: job.message, 
+          life: job.success ? ToastTimeout.timeout3000 : ToastTimeout.timeout10000};
+        toast.add(tMsg); addToastRecord(tMsg);  
+      });    
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -698,6 +725,7 @@ const acceptMultipleDelete = () => {
     }
   });
   selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
 }
 
 /**
@@ -720,19 +748,22 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
     }
   });
   selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
 }
 
 /**
- * Aceept archiving of a muiltiple jobs
+ * Accept archiving of muiltiple jobs
  */
-const acceptMultpleArchive = (archiveJob: boolean) => {
+const acceptMultipleArchive = (archiveJob: boolean) => {
   const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
   archiveCalibrationRun(selectedMultipleCalibrationRuns.value, archiveJob).then(async (response) => {
     if (response.status === 200) {
-      const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
-          summary: 'Archive Multiple Jobs', detail: 'Jobs ' + sortedNumbers + (archiveJob ? ' archived' : ' unarchived'), 
-          life: ToastTimeout.timeout3000};
-      toast.add(tMsg); addToastRecord(tMsg);     
+      response._data?.jobs.forEach(job => {
+        const tMsg: ToastMessageOptions = { severity: job.success ? 'info' : 'error', 
+          summary: 'Archive Multiple Jobs', detail: job.message, 
+          life: job.success ? ToastTimeout.timeout3000 : ToastTimeout.timeout10000};
+        toast.add(tMsg); addToastRecord(tMsg);  
+      });
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -744,6 +775,7 @@ const acceptMultpleArchive = (archiveJob: boolean) => {
     }
   });
   selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
 }
 
 
