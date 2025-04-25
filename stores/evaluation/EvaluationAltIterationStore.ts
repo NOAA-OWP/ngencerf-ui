@@ -64,10 +64,13 @@ export const useEvaluationAltIterationStore = defineStore(
             });
             retro_data.data.forEach(
               (data: CalibrationRunIterationMetricData) => {
-                headerRow.push({
+                let headerCell = {
                   header: `${Number(data.metric_value).toFixed(4)}`,
                   colspan: 1,
-                });
+                  metric_name: data.metric_name,
+                  styles: []
+                }
+                headerRow.push(headerCell);
               }
             );
             calibrationRunDetailDataListHeaders.value.push(headerRow);
@@ -128,18 +131,25 @@ export const useEvaluationAltIterationStore = defineStore(
                     field: metric.metric_name,
                     header: metric_header_label,
                   };
+                  let headerCell = {
+                    header: `${Number(metric.metric_value).toFixed(4)}`,
+                    colspan: 1,
+                    metric_name: metric.metric_name,
+                    styles: [],
+                  }
                   if (
                     metric.metric_name ===
                     runListDataResult._data.objective_function_metric
                   ) {
                     headerColumn["styles"] = ["bg-objective-function-col"];
+                    headerColumn["header"] += '*';
+                    headerCell["styles"] = ["bg-objective-function-col"];
+                    // hack - make sure the Objective Function cell in the first and second header row are styled consistently
+                    calibrationRunDetailDataListHeaders.value[0][headerRow.length-2]["styles"] = ["bg-objective-function-col"];
                   }
                   calibrationRunDetailTableColumn.value.push(headerColumn);
 
-                  headerRow.push({
-                    header: `${Number(metric.metric_value).toFixed(4)}`,
-                    colspan: 1,
-                  });
+                  headerRow.push(headerCell);
                 }
               );
 
