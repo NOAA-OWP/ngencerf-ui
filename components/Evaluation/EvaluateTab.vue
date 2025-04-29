@@ -878,7 +878,7 @@ const resetUserPlotRefs = (exceptions: any): void => {
   iterationParamsColumns.value = [];
   performanceMetrics.value = {};
   performanceMetricsData.value = [];
-  performanceMetricsColumns.value = [];
+  performanceMetricsColumns.value = [{ header: 'Metric', field: 'metric' }];
   selectedLogCategory.value = '';
   selectedLogList.value = [];
   selectedLogName.value = '';
