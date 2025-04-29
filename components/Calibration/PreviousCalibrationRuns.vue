@@ -317,15 +317,17 @@ const dtRowUnselect = (e: any) => {
 }
 
 const highlightSelectedRows = () => {
-  //console.log('selectedMultipleCalibrationRunData: ', selectedMultipleCalibrationRunData.value);
   let dtRows = document.querySelector('#Datatable').querySelector('.p-datatable-tbody').children;
   for (let r = 0; r < dtRows.length; r++) {
-    //console.log('Job ID for row ' + r + ': ' + updatedUserCalibrationJobsListData.value[r].calibration_run_id);
-    if (selectedMultipleCalibrationRunData.value.includes(updatedUserCalibrationJobsListData.value[r])) {
-      //console.log('Row ' + r + ' is selected');
-      dtRows[r].classList.add('p-datatable-row-selected');
-    } else {
-      //console.log('Row ' + r + ' is not selected');
+    // We don't seem to have an easy way to reference the DataTable object itself
+    // Hack for now: look at the second column and see if the value there matches a selected job ID
+    try {
+      if (selectedMultipleCalibrationRuns.value.includes(parseInt(dtRows[r].children[1].querySelector('span').innerHTML))) {
+        dtRows[r].classList.add('p-datatable-row-selected');
+      } else {
+        dtRows[r].classList.remove('p-datatable-row-selected');
+      }
+    } catch(e) {
       dtRows[r].classList.remove('p-datatable-row-selected');
     }
   }
