@@ -226,21 +226,25 @@
             style="width:160px; display:inline-block;">Log File Path</b> {{ selectedLogFilePath }}</div>
         -->
 
-        <table width="100%">
-          <tr v-if="selectedLogList.length > 1">
-            <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
-            <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
-            optionLabel="name" optionValue="name">
-          </Select></td>
-          </tr>
-          <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
-            <td class="pr-2 pt-3"><b>Log Name</b></td>
-            <td class="pt-3">{{ selectedLogName }}</td>
-          </tr>
-          <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
-            <td class="pr-2 pt-3"><b>Log File Path</b></td>
-            <td class="pt-3">{{ selectedLogFilePath }}</td>
-          </tr>
+        <table width="100%" summary="Calibration Log Options and File Path">
+          <caption class="sr-only">Calibration Log Options and File Path table</caption>  
+          <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
+          <tbody>  
+            <tr v-if="selectedLogList.length > 1">
+              <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
+              <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
+              optionLabel="name" optionValue="name">
+            </Select></td>
+            </tr>
+            <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
+              <td class="pr-2 pt-3"><b>Log Name</b></td>
+              <td class="pt-3">{{ selectedLogName }}</td>
+            </tr>
+            <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
+              <td class="pr-2 pt-3"><b>Log File Path</b></td>
+              <td class="pt-3">{{ selectedLogFilePath }}</td>
+            </tr>
+          </tbody>
         </table>
 
         <div class="pt-4">
