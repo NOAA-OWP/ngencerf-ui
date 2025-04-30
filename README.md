@@ -42,7 +42,7 @@ Start the development server on `http://localhost:3000`:
 
 ```bash
 # npm
-npm run dev
+source ./runUI.sh
 ```
 
 ### Adding Authenticated API Calls to ngencerf-server
