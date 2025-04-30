@@ -219,13 +219,15 @@
           </Select>
         </div>
         <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b
-            style="width:160px; display:inline-block;">Log File Name</b> {{ selectedLogName }}</div>
-
-        <div class="flex justify-end" style="margin-top:-23px;">
-          <div class="ml-auto">
-            <div>Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
-            <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
-          </div>
+            style="width:160px; display:inline-block;">Log Name</b> {{ selectedLogName }}</div>
+        
+        <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em; padding-bottom: 12px;"><b
+            style="width:160px; display:inline-block;">Log File Path</b> {{ selectedLogFilePath }}</div>
+        
+        <div class="pagination-box">
+          <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{
+            selectedLogTotalSize }}</div>
+          <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
         </div>
 
         <div id="selectedLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
@@ -411,9 +413,7 @@ const selectedLogCurrentPage = ref<number>(1);
 const selectedLogTotalPages = ref<number>(1);
 const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
-
-// track exceptions that we might not want to clear in specific circumstances
-const refListToClearExceptions = ref<any[]>([]);
+const selectedLogFilePath = ref<string>('');
 
 const supplementalTableOptions = ref<any[]>([
   'Iteration Metrics Table',
@@ -888,6 +888,7 @@ const resetUserPlotRefs = (exceptions: any): void => {
   selectedLogTotalPages.value = 0;
   selectedLogStartRow.value = 1;
   selectedLogEndRow.value = logDataPageSize.value;
+  selectedLogFilePath.value = '';
 
   // SWE refs
   selectedGridType.value = '';
@@ -1535,6 +1536,7 @@ watch(selectedLogName, async () => {
       } else {
         selectedLogEndRow.value = logDataPageSize.value;
       }
+      selectedLogFilePath.value = response?._data?.log_path;
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };

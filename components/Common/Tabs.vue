@@ -55,14 +55,23 @@
               Evaluate
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
-            <div data-tab="3" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
+          </span>
+          <span v-show="selectedCalibrationCompareRuns.length >= 2">
+            <div data-tab="3" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Compare Permutations Tab"
+              title="Compare Permutations Tab">
+              Compare Permutations
+              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+            </div>
+          </span>
+          <span v-show="calibrationJobId > 0">
+            <div data-tab="4" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
               aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
               Select Alternate Iteration
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
             <span
               v-show="(evaluateIterationRunId && evaluateIterationRunId > 0) || (evaluateValidationRunId && evaluateValidationRunId > 0)">
-              <div data-tab="4" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
+              <div data-tab="5" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
                 aria-label="Run Validation tab" title="Run Validation tab">
                 Run / Status
                 <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
@@ -134,6 +143,7 @@
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 
 const {
@@ -149,6 +159,10 @@ const {
   getVerificationTabIndex,
   getMenuIndex,
 } = generalStore();
+
+const {
+  selectedCalibrationCompareRuns
+} = storeToRefs(useEvaluationCalibrationRunStore());
 
 const {
   overallForcingDownloadForecastStatus
