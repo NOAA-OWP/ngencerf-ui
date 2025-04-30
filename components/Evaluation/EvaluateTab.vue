@@ -212,6 +212,7 @@
     <div id="LogDisplayArea" class="p-2"
       v-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
+        <!--
         <div v-if="selectedLogList.length > 1">
           <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
           <Select id="selectedLogOptions" class="p-select" v-model="selectedLogName" :options="selectedLogList"
@@ -223,15 +224,33 @@
         
         <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;"><b
             style="width:160px; display:inline-block;">Log File Path</b> {{ selectedLogFilePath }}</div>
+        -->
 
-        <div class="flex justify-end" style="margin-top:-23px;">
-          <div class="ml-auto">
-            <div>Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
+        <table width="100%">
+          <tr v-if="selectedLogList.length > 1">
+            <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
+            <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
+            optionLabel="name" optionValue="name">
+          </Select></td>
+          </tr>
+          <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
+            <td class="pr-2 pt-3"><b>Log Name</b></td>
+            <td class="pt-3">{{ selectedLogName }}</td>
+          </tr>
+          <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
+            <td class="pr-2 pt-3"><b>Log File Path</b></td>
+            <td class="pt-3">{{ selectedLogFilePath }}</td>
+          </tr>
+        </table>
+
+        <div class="pt-4">
+          <div class="pagination-box">
+            <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
             <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
           </div>
         </div>
 
-        <div id="selectedLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
+        <div id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
           <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
