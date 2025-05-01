@@ -266,6 +266,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     stopCriteriaMet.value = false;
     validControlAndValidBestStatus.value = undefined;
     resultsPathname.value = undefined;
+    validationBestAchieved.value = { iteration: 0, isBest: false};
 
     if (elapsedTimeIntervalId.value) {
       clearInterval(elapsedTimeIntervalId.value);

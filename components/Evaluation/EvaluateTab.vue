@@ -212,6 +212,7 @@
     <div id="LogDisplayArea" class="p-2"
       v-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
+        <!--
         <div v-if="selectedLogList.length > 1">
           <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
           <Select id="selectedLogOptions" class="p-select" v-model="selectedLogName" :options="selectedLogList"
@@ -219,16 +220,41 @@
           </Select>
         </div>
         <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b
-            style="width:160px; display:inline-block;">Log File Name</b> {{ selectedLogName }}</div>
+            style="width:160px; display:inline-block;">Log Name</b> {{ selectedLogName }}</div>
+        
+        <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;"><b
+            style="width:160px; display:inline-block;">Log File Path</b> {{ selectedLogFilePath }}</div>
+        -->
 
-        <div class="flex justify-end" style="margin-top:-23px;">
-          <div class="ml-auto">
-            <div>Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
+        <table width="100%" summary="Calibration Log Options and File Path">
+          <caption class="sr-only">Calibration Log Options and File Path table</caption>  
+          <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
+          <tbody>  
+            <tr v-if="selectedLogList.length > 1">
+              <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
+              <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
+              optionLabel="name" optionValue="name">
+            </Select></td>
+            </tr>
+            <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
+              <td class="pr-2 pt-3"><b>Log Name</b></td>
+              <td class="pt-3">{{ selectedLogName }}</td>
+            </tr>
+            <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
+              <td class="pr-2 pt-3"><b>Log File Path</b></td>
+              <td class="pt-3">{{ selectedLogFilePath }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="pt-4">
+          <div class="pagination-box">
+            <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
             <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
           </div>
         </div>
 
-        <div id="selectedLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
+        <div id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
           <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
@@ -411,6 +437,7 @@ const selectedLogCurrentPage = ref<number>(1);
 const selectedLogTotalPages = ref<number>(1);
 const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
+const selectedLogFilePath = ref<string>('');
 
 // track exceptions that we might not want to clear in specific circumstances
 const refListToClearExceptions = ref<any[]>([]);
@@ -888,6 +915,7 @@ const resetUserPlotRefs = (exceptions: any): void => {
   selectedLogTotalPages.value = 0;
   selectedLogStartRow.value = 1;
   selectedLogEndRow.value = logDataPageSize.value;
+  selectedLogFilePath.value = '';
 
   // SWE refs
   selectedGridType.value = '';
@@ -1535,6 +1563,7 @@ watch(selectedLogName, async () => {
       } else {
         selectedLogEndRow.value = logDataPageSize.value;
       }
+      selectedLogFilePath.value = response?._data?.log_path;
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
