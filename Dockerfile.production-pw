@@ -1,4 +1,4 @@
-FROM registry.sh.nextgenwaterprediction.com/infrastructure/rockylinux/rockylinux:latest
+FROM registry.sh.nextgenwaterprediction.com/infrastructure/rockylinux/rockylinux:9.3
 
 
 # runtime dependencies
@@ -16,15 +16,22 @@ RUN set -eux; \
     ; \
     dnf clean all
 
-ARG NODE_TAR_URL="https://nodejs.org/dist/v22.13.1/node-v22.13.1-linux-x64.tar.xz"
+# set node and npm versions
+ARG NODE_VERSION=22.15.0
+ARG NPM_VERSION=11.3.0
+ARG NODE_TAR_URL="https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
 
-# install Node.js
+# install node
 RUN curl --fail --silent --show-error --location "$NODE_TAR_URL" | \
     tar --extract --xz --directory=/usr/local --strip-components=1
 
-# add Node.js binaries to PATH
+# add node binaries to PATH
 ENV PATH="/usr/local/bin:${PATH}"
 
+# update npm version
+RUN npm install -g npm@${NPM_VERSION} && npm cache clean --force
+
+# create and set working directory
 RUN mkdir --parents /var/www/ngencerf/nuxt-app
 WORKDIR /var/www/ngencerf/nuxt-app
 
@@ -35,7 +42,7 @@ RUN set -eux; \
 
 COPY . .
 
-# override NGENCERF URL to facilitate ParallelWorks sessions sharing
+# override NGENCERF URL to facilitate Parallel Works sessions sharing
 ARG NGENCERF_BASE_URL
 ENV NGENCERF_BASE_URL=${NGENCERF_BASE_URL}
 
