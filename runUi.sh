@@ -59,7 +59,7 @@ fi
 
 # check if node_modules or package-lock.json is missing
 if [ ! -d "$ngencerf_ui/node_modules" ] || [ ! -f "$ngencerf_ui/package-lock.json" ]; then
-    echo "node_modules or package-lock.json not found. installing dependencies..."
+    echo -e "\nnode_modules or package-lock.json not found. installing dependencies..."
     cd "$ngencerf_ui"
     npm install
 fi
