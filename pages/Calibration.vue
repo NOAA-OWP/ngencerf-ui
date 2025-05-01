@@ -1,15 +1,15 @@
 <!-- Calibration.vue -->
 <template>
   <client-only>
-    <NextgenLayout>
+    <NgencerfLayout>
       <slot />
-    </NextgenLayout>
+    </NgencerfLayout>
   </client-only>
 </template>
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-import NextgenLayout from "@/layouts/CalibrationLayout.vue";
+import NgencerfLayout from "@/layouts/CalibrationLayout.vue";
 
 import { generalStore } from "~/stores/common/GeneralStore";
 const { popupActive } = storeToRefs(generalStore());

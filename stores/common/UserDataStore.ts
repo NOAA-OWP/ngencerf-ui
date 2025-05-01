@@ -7,7 +7,7 @@ import type {
   ValidationJobsList,
   UserCalibrationRunData,
   ServerStatus
-} from "@/composables/NextGenModel";
+} from "~/composables/NgencerfModels";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 

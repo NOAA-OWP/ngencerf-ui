@@ -110,7 +110,7 @@ import Password from 'primevue/password';
 import { useToast } from "primevue/usetoast";
 
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 

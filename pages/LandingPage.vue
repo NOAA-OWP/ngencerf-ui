@@ -42,7 +42,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 
 import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 const toast = useToast();
 
 const { popupActive } = storeToRefs(generalStore());

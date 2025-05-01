@@ -27,7 +27,7 @@ export const VerificationTabs = {
   tab_results: 1,
 };
 
-export const NextgenPages = {
+export const NgencerfPages = {
   page_calibration: 1,
   page_evaluation: 2,
   page_forecast: 3,

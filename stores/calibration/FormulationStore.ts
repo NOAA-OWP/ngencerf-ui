@@ -14,7 +14,7 @@ import type {
   SlothParameterData,
   GeneralApiSaveResponse,
   SaveFormulationTabPayload,
-} from "@/composables/NextGenModel";
+} from "~/composables/NgencerfModels";
 import { useCalibrationFormulationTabSaveValidate } from "@/composables/ValidationHandlers";
 
 export const useFormulationStore = defineStore("FormulationStore", () => {

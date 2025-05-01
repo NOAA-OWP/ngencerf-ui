@@ -143,8 +143,8 @@ import { useToast } from "primevue/usetoast";
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
-import type { CalibrationRunForForecast, DataTableContextMenuOption } from "@/composables/NextGenModel";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import type { CalibrationRunForForecast, DataTableContextMenuOption } from "~/composables/NgencerfModels";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
@@ -156,7 +156,7 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
-import { ForecastTabs } from "@/composables/NextgenEnums";
+import { ForecastTabs } from "@/composables/NgencerfEnums";
 
 const { deleteCalibrationRun, getCalibrationJobZip } = useCalibrationJobStore();
 

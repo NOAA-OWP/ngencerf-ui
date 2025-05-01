@@ -39,7 +39,7 @@
 <script lang="ts" setup>
 import Button from "primevue/button";
 
-import type { CalibrationJobListItem } from "@/composables/NextGenModel";
+import type { CalibrationJobListItem } from "~/composables/NgencerfModels";
 
 const props = defineProps<{
   calJobs: number[];

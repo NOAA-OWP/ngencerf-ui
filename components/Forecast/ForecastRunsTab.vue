@@ -138,7 +138,7 @@
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRunForForecast, DataTableContextMenuOption, ForecastJob } from "@/composables/NextGenModel";
+import type { CalibrationRunForForecast, DataTableContextMenuOption, ForecastJob } from "~/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";

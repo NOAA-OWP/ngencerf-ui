@@ -2,7 +2,7 @@
 
 import { defineStore, storeToRefs } from "pinia";
 
-import type { CalibrationStatus, CalibrationPlotListNamesData, BestIterationData } from "@/composables/NextGenModel";
+import type { CalibrationStatus, CalibrationPlotListNamesData, BestIterationData } from "~/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -39,8 +39,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validationBestStatus = ref<string>();
   const validControlAndValidBestStatus = ref<string>();
   const resultsPathname = ref<string>();
-  const validationBestAchieved = ref<BestIterationData>({ iteration: 0, isBest: false});
-;
+  const validationBestAchieved = ref<BestIterationData>({ iteration: 0, isBest: false });
+  ;
   /**
    * Compute Overall Calibration Validation Status
    */
@@ -63,9 +63,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     return '';
   });
 
-   /** 
-   * Load RunStatusStore
-   */
+  /** 
+  * Load RunStatusStore
+  */
   const loadRunStatusStore = async (): Promise<void> => {
     // load stopCriteria, submitTimeDate, and submitTime from load_calibration_run
     stopCriteria.value = userCalibrationRunData?.value?.stop_criteria;
@@ -84,7 +84,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     const validations = getStatusResponse?._data?.validations;
     const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
     const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
-    
+
     if (validControl?.status) {
       validationControlStatus.value = validControl.status;
     }
@@ -133,7 +133,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @return {any}
    */
   const queryGetPlotNames = async (): Promise<any> => {
-    if(!calibrationJobId.value) {
+    if (!calibrationJobId.value) {
       return null;
     }
     return makeProtectedApiCall<CalibrationPlotListNamesData>(`${ngencerfBaseUrl}/calibration/get_plot_names/`, {
@@ -203,7 +203,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @returns {any}
    */
   const queryGetIteration = async (): Promise<any> => {
-    if(!calibrationJobId.value) {
+    if (!calibrationJobId.value) {
       return null;
     }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_iteration/`, {
@@ -236,7 +236,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @returns {any}
    */
   const queryGetJobDataDirectory = async (): Promise<any> => {
-    if(!calibrationJobId.value) {
+    if (!calibrationJobId.value) {
       return null;
     }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_job_data_dir/`, {
@@ -266,7 +266,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     stopCriteriaMet.value = false;
     validControlAndValidBestStatus.value = undefined;
     resultsPathname.value = undefined;
-    validationBestAchieved.value = { iteration: 0, isBest: false};
+    validationBestAchieved.value = { iteration: 0, isBest: false };
 
     if (elapsedTimeIntervalId.value) {
       clearInterval(elapsedTimeIntervalId.value);
