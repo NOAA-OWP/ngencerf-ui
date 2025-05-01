@@ -712,7 +712,7 @@ const acceptMultipleDelete = () => {
     if (response.status === 200) {
       response._data?.jobs.forEach(job => {
         const tMsg: ToastMessageOptions = { severity: job.success ? 'info' : 'error', 
-          summary: 'Archive Multiple Jobs', detail: job.message, 
+          summary: 'Delete Multiple Jobs', detail: job.message, 
           life: job.success ? ToastTimeout.timeout3000 : ToastTimeout.timeout10000};
         toast.add(tMsg); addToastRecord(tMsg);  
       });    
@@ -762,7 +762,7 @@ const acceptMultipleArchive = (archiveJob: boolean) => {
     if (response.status === 200) {
       response._data?.jobs.forEach(job => {
         const tMsg: ToastMessageOptions = { severity: job.success ? 'info' : 'error', 
-          summary: 'Archive Multiple Jobs', detail: job.message, 
+          summary: archiveJob ? 'Archive' : 'Un-Archive' + ' Multiple Jobs', detail: job.message, 
           life: job.success ? ToastTimeout.timeout3000 : ToastTimeout.timeout10000};
         toast.add(tMsg); addToastRecord(tMsg);  
       });
