@@ -51,7 +51,8 @@ if [[ "$CURRENT_NODE_VERSION" != "$REQUIRED_NODE_VERSION" ]]; then
     npm install
 
     echo -e "\nNode version temporarily switched to ${REQUIRED_NODE_VERSION}"
-    echo "To make this Node version the default for all future shells, we recommend running:"
+    echo -e "To avoid re-instsalling this Node version for subsequent runs of runUi.sh, " \
+        "issue the following commands from your terminal:"
     echo -e "  nvm install ${REQUIRED_NODE_VERSION}\n  nvm alias default ${REQUIRED_NODE_VERSION}\n"
 
 fi
