@@ -20,34 +20,40 @@ CURRENT_NODE_VERSION=$(node -v | sed 's/v//')
 
 # check if current node version is the same as required node version
 if [[ "$CURRENT_NODE_VERSION" != "$REQUIRED_NODE_VERSION" ]]; then
-    echo "Current Node version: $CURRENT_NODE_VERSION"
+    echo -e "\nCurrent Node version: $CURRENT_NODE_VERSION"
     echo "Required Node version: $REQUIRED_NODE_VERSION"
 
     # if $NVM_DIR is not set, try to set it
     if [ -z "$NVM_DIR" ]; then
         echo "NVM_DIR is not set. Attempting to load nvm..."
         export NVM_DIR="$HOME/.nvm"
-    fi
 
-    # check if nvm is installed
-    if [ ! -s "$NVM_DIR/nvm.sh" ]; then
-        echo "nvm is not installed. Please install nvm to use the correct Node version."
-        exit 1
+        # check if nvm is installed
+        if [ ! -s "$NVM_DIR/nvm.sh" ]; then
+            echo -e "nvm is not installed. Follow instructions here: " \
+                "https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating"
+            exit 1
+        fi
     fi
 
     # load nvm
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
-    echo "Switching Node version with nvm..."
+    echo -e "\nTemporarily switching Node version to ${REQUIRED_NODE_VERSION} with nvm..."
     nvm install "$REQUIRED_NODE_VERSION"
 
-    echo "Cleaning up old dependencies if any..."
+    echo -e "\nCleaning up old dependencies if any..."
     rm -rf "$ngencerf_ui/node_modules" "$ngencerf_ui/package-lock.json"
 
-    echo "(Re)installing dependencies..."
+    echo -e "\n(Re)installing dependencies..."
     cd "$ngencerf_ui"
     npm install
+
+    echo -e "\nNode version temporarily switched to ${REQUIRED_NODE_VERSION}"
+    echo "To make this Node version the default for all future shells, we recommend running:"
+    echo -e "  nvm install ${REQUIRED_NODE_VERSION}\n  nvm alias default ${REQUIRED_NODE_VERSION}\n"
+
 fi
 
 # check if node_modules or package-lock.json is missing
@@ -60,6 +66,6 @@ fi
 generate_git_info
 echo
 
-echo 'running...'
+echo 'running ngencerf_ui in dev mode...'
 npm run dev
 echo
