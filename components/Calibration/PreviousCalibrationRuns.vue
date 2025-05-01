@@ -710,12 +710,27 @@ const acceptMultipleDelete = () => {
   const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
   deleteCalibrationRun(selectedMultipleCalibrationRuns.value).then(async (response) => {
     if (response.status === 200) {
+      let successMessages: string[] = [];
+      let failureMessages: string[] = [];
       response._data?.jobs.forEach(job => {
-        const tMsg: ToastMessageOptions = { severity: job.success ? 'info' : 'error', 
-          summary: 'Delete Multiple Jobs', detail: job.message, 
-          life: job.success ? ToastTimeout.timeout3000 : ToastTimeout.timeout10000};
-        toast.add(tMsg); addToastRecord(tMsg);  
-      });    
+        if (job.success) {
+          successMessages.push(job.message);
+        } else {
+          failureMessages.push(job.message);
+        }
+      });
+      if (successMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'success', 
+          summary: 'Delete Multiple Jobs', detail: successMessages.join('\n'), 
+          life: ToastTimeout.timeout10000};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (failureMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'error', 
+          summary: 'Delete Multiple Jobs', detail: failureMessages.join('\n'), 
+          life: ToastTimeout.timeout10000};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -760,12 +775,27 @@ const acceptMultipleArchive = (archiveJob: boolean) => {
   const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
   archiveCalibrationRun(selectedMultipleCalibrationRuns.value, archiveJob).then(async (response) => {
     if (response.status === 200) {
+      let successMessages: string[] = [];
+      let failureMessages: string[] = [];
       response._data?.jobs.forEach(job => {
-        const tMsg: ToastMessageOptions = { severity: job.success ? 'info' : 'error', 
-          summary: archiveJob ? 'Archive' : 'Un-Archive' + ' Multiple Jobs', detail: job.message, 
-          life: job.success ? ToastTimeout.timeout3000 : ToastTimeout.timeout10000};
-        toast.add(tMsg); addToastRecord(tMsg);  
+        if (job.success) {
+          successMessages.push(job.message);
+        } else {
+          failureMessages.push(job.message);
+        }
       });
+      if (successMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'success', 
+          summary: archiveJob ? 'Archive' : 'Un-Archive' + ' Multiple Jobs', detail: successMessages.join('\n'), 
+          life: ToastTimeout.timeout10000};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (failureMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'error', 
+          summary: archiveJob ? 'Archive' : 'Un-Archive' + ' Multiple Jobs', detail: failureMessages.join('\n'), 
+          life: ToastTimeout.timeout10000};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
