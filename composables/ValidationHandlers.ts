@@ -3,7 +3,7 @@ import type { ToastMessageOptions } from "primevue/toast";
 
 import type { SlothParameterData, SaveFormulationTabPayload, FormulationTabSaveWarning, GageBasinApiSavedResponse, edsError } from "./NgencerfModels";
 
-import { ValidationFormFields } from "./NgencerfModels";
+import { ValidationFormFields } from "./NgencerfEnums";
 
 /**
  * @param requiredFields 

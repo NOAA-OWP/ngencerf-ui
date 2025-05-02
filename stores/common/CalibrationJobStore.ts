@@ -7,8 +7,11 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "@/stores/common/GeneralStore";
 
 import { makeProtectedApiCall } from "#imports";
-import type { CalibrationJobListItem } from "~/composables/NgencerfModels";
+import { Modules } from "@/composables/NgencerfEnums";
 import { EventSourcePolyfill } from 'event-source-polyfill';
+
+import type { LogLevel,ModuleName } from "@/composables/NgencerfEnums";
+import type { CalibrationJobListItem } from "@/composables/NgencerfModels";
 
 export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();

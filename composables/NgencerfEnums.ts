@@ -136,3 +136,37 @@ export const JobStatusAction = {
   archive: 2,
   unarchive: 3
 };
+
+export const ValidationFormFields = {
+  formulation_name: "Formulation Name",
+  modules: "Formulation Modules",
+  sloth_parameters: "Sloth Parameters",
+  maps_to_module: "Sloth Parameter For Module",
+  maps_to_variable_name: "Sloth Parameter Module Param",
+  param_type: "Sloth Parameter Type",
+  param_units: "Sloth Parameter Units",
+  stop_criteria: "Stop Criteria",
+  save_plot_iteration_frequency: "Plot Generation Frequency",
+  streamflow_threshold: "Flow Threshold",
+  peak_flow_threshold: "Peak Flow Threshold",
+  objective_function: "Objective Function",
+  optimization: "Optimization Algorithm",
+};
+
+export type LogLevel = "DEBUG" | "INFO" | "WARNING" | "SEVERE" | "FATAL";
+
+export const Modules = [
+  "T-Route",
+  "CFE-S",
+  "CFE-X",
+  "LASAM",
+  "Noah-OWP-Modular",
+  "Sac-SMA",
+  "SFTM",
+  "SMT",
+  "Snow-17",
+  "TopModel",
+  "UEB",
+]
+
+export type ModuleName = typeof Modules[number];
