@@ -1,6 +1,6 @@
 <template>
-  <div v-if="userCalibrationRunData?.geopackage_image_url" @click="showImageModal = true" style="cursor: pointer;">
-    <img alt="Gage Cutout" class="max-w-full max-h-[400px] object-contain" id="GageCutoutImage"
+  <div v-if="userCalibrationRunData?.geopackage_image_url" class="cursor-pointer" @click="showImageModal = true">
+    <img alt="Gage Cutout" class="w-auto h-auto max-w-full max-h-[400px] object-contain" id="GageCutoutImage"
       :src="userCalibrationRunData?.geopackage_image_url" />
   </div>
 
