@@ -7,21 +7,55 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "@/stores/common/GeneralStore";
 
 import { makeProtectedApiCall } from "#imports";
-import { Modules } from "@/composables/NgencerfEnums";
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
-import type { LogLevel,ModuleName } from "@/composables/NgencerfEnums";
+import type { LogLevel } from "@/composables/NgencerfModels";
 import type { CalibrationJobListItem } from "@/composables/NgencerfModels";
 
 export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken, getUserName } = useUserDataStore();
-  const { userCalibrationJobsListData } = storeToRefs(useUserDataStore());
+  const { userCalibrationRunData, userCalibrationJobsListData } = storeToRefs(useUserDataStore());
   const { calibrationJobId } = storeToRefs(generalStore());
 
   const calibrationDownloadJobID = ref<number | null>(null);
   const calibrationDownloadFileName = ref<string | null>(null);
   const calibrationJobNgenGlobalLogging = ref<"ENABLED" | "DISABLED">("ENABLED");
+
+  // stores the log level for each module
+  const logLevels: Record<string, Ref<LogLevel>> = reactive({});
+
+  // updated logLevels when the modules change
+  watch(() => userCalibrationRunData.value?.modules, (newModules) => {
+    // if newModules is undefined or empty, delete all modules from logLevels
+    if (!newModules || newModules.length === 0) {
+      for (const module in logLevels) {
+        delete logLevels[module];
+      }
+      return;
+    }
+
+    // track the modules that we should be using
+    const validModules = new Set<string>();
+
+    // add new modules to logLevels and set log level to INFO
+    for (const module of newModules) {
+      validModules.add(module);
+      if (!logLevels[module]) {
+        logLevels[module] = ref<LogLevel>("INFO");
+      }
+    }
+
+    // remove deleted modules from logLevels
+    for (const module in logLevels) {
+      if (!validModules.has(module)) {
+        delete logLevels[module];
+      }
+    }
+  },
+    { immediate: true }
+  );
+
 
   /**
  * returns list of calibration job data from server

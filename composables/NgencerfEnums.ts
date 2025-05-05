@@ -153,20 +153,4 @@ export const ValidationFormFields = {
   optimization: "Optimization Algorithm",
 };
 
-export type LogLevel = "DEBUG" | "INFO" | "WARNING" | "SEVERE" | "FATAL";
 
-export const Modules = [
-  "T-Route",
-  "CFE-S",
-  "CFE-X",
-  "LASAM",
-  "Noah-OWP-Modular",
-  "Sac-SMA",
-  "SFTM",
-  "SMT",
-  "Snow-17",
-  "TopModel",
-  "UEB",
-]
-
-export type ModuleName = typeof Modules[number];

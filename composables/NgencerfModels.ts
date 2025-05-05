@@ -1,4 +1,4 @@
-import type { ToastMessageOptions } from "primevue/toast"
+import type { ToastMessageOptions } from "primevue/toast";
 
 export interface User {
   uid: number;
@@ -768,3 +768,4 @@ export interface GitData {
   message: string;
 }
 
+export type LogLevel = "DEBUG" | "INFO" | "WARNING" | "SEVERE" | "FATAL";
