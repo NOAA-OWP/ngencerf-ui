@@ -3,7 +3,7 @@
     <div id="MultipeJobOps" class="modal-overlay p-4 w-[400px] h-auto bg-[#eee] border border-black rounded-xl">
       <h2>Multiple Job Operations</h2>
 
-      <div class="absolute right-1 top-1 font-bold text-xl border border-solid border-black pl-1 pr-1" title="Close"
+      <div class="absolute right-1 top-1 font-bold text-xl pl-1 pr-1" title="Close"
         aria-label="Close"><img alt="Close" class="w-5 cursor-pointer" aria-label="Close"
           src="@/assets/styles/img/xclose.png" @click="sendClose()"></div>
       <hr />

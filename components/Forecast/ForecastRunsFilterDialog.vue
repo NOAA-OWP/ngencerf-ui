@@ -1,5 +1,5 @@
 <template>
-  <div id="ForecastRunsFilterDialog" class="mb-2 mt-4">
+  <div id="ForecastRunsFilterDialog" class="JobsFilterBox mb-2 mt-4">
 
     <div id="FilterDialog">
 
@@ -7,7 +7,7 @@
         <div class="col-span-2">
           <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
-          <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
+          <Select id="HeadwaterBasinGage" class="mt-1 basin-gage-filter text-left" v-model="uiGageId"
             :options="forecastRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
             aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
             :disabled="disableAll">

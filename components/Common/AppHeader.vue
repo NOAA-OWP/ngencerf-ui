@@ -58,7 +58,7 @@
           <div id="HelpContent">
             <div class="text-right sticky top-0">
               <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-                class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="closeHelp" />
+                class="absolute cursor-pointer right-0 mt-1 mr-1" @click="closeHelp" />
             </div>
 
             <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
