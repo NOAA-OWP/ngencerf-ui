@@ -37,8 +37,10 @@ if [[ "$CURRENT_NODE_VERSION" != "$REQUIRED_NODE_VERSION" ]]; then
     fi
 
     # load nvm
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+    # load nvm bash_completion
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
     echo -e "\nTemporarily switching Node version to ${REQUIRED_NODE_VERSION} with nvm..."
     nvm install "$REQUIRED_NODE_VERSION"
@@ -54,7 +56,6 @@ if [[ "$CURRENT_NODE_VERSION" != "$REQUIRED_NODE_VERSION" ]]; then
     echo -e "To avoid re-instsalling this Node version for subsequent runs of runUi.sh, " \
         "issue the following commands from your terminal:"
     echo -e "  nvm install ${REQUIRED_NODE_VERSION}\n  nvm alias default ${REQUIRED_NODE_VERSION}\n"
-
 fi
 
 # check if node_modules or package-lock.json is missing
