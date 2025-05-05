@@ -1,14 +1,14 @@
 <template>
   <div>
-    <h1 class="mt-10 mb-8 text-3xl font-bold inline-block">
-      Forecast Cycle Selection
-    </h1>
-    <div style="font-size: 12px;font-weight: normal;margin-top:-20px;"
+    <div style="font-size: 12px;font-weight: normal;margin-top:15px;"
       aria-label="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id"
       title="'Calibration Job ID is  ' + calibrationRunForForecast?.calibration_run_id">
       <h2>Calibration Job ID: {{ calibrationRunForForecast?.calibration_run_id }}</h2>
     </div>
-    <p style="font-size: 12px;font-weight: normal;">Select a cycle then click Next.</p>
+    <h1 class="mb-6 text-3xl font-bold text-center relative">
+      Forecast Cycle Selection
+    </h1>
+    <p class="prompt-txt mt-2 text-center">Select a cycle then click Next.</p>
     <br />
   </div>
   <div>
@@ -56,7 +56,7 @@
 import { useToast } from 'primevue/usetoast';
 
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { generalStore } from '~/stores/common/GeneralStore';
@@ -117,8 +117,8 @@ onMounted(async () => {
  * On DataTable row selection
  */
 const onRowSelect = (e: any) => {
-  console.log('onRowSelect', e);
-  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeout3000 };
+  // console.log('onRowSelect', e);
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeoutInfo };
   toast.add(tMsg); addToastRecord(tMsg);
 };
 
@@ -126,7 +126,7 @@ const onRowSelect = (e: any) => {
  * Go to the Status Run tab
  */
 const goToStatusRunTab = () => {
-  console.log('startForecastRun');
+  // console.log('startForecastRun');
   const allTabs = document.getElementsByClassName("tabs");
   const e = allTabs[ForecastTabs.tab_statusRun] as HTMLElement;
   e.click();

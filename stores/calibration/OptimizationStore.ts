@@ -8,7 +8,7 @@ import type {
   UserCalibrationRunOptimizationInputData,
   GeneralApiSaveResponse,
   SaveOptimizationPayload,
-} from "@/composables/NextGenModel";
+} from "@/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";

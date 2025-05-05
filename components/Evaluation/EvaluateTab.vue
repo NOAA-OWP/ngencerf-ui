@@ -3,20 +3,50 @@
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
         <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
+          class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
     </div>
   </Transition>
   <div id="EvaluatePage">
     <div class="pl-6 pr-2 pt-2">
-      <div class="flex mt-3">
-        <div class="w-1/2">
-          <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
-          <div class="inline-block w-2/3">
-            <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-              optionLabel="name" optionValue="name" :disabled="!plotList">
-            </Select>
+      <div class="flex mt-3">        
+        <div class="w-5/6 relative">
+
+          <div class="inline-block">
+            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <div class="inline-block w-2/3">
+              <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
+                optionLabel="name" optionValue="name" :disabled="!plotList">
+              </Select>
+            </div>
+          </div>
+
+
+          <div class="absolute" style="top:0px;right:0px;">
+            <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)"
+              class="p-0 relative overflow-visible">
+              <div class="grid grid-cols-3 gap-4">
+                <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+                  Select Date
+                </div>
+                <div class="text-nowrap">
+                  <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+                    @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
+                    :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true"
+                    utc='preserve' />
+                </div>
+                <div class="text-nowrap">
+                  <Button class="font-normal ngenButtonDiv-green ml-auto text-nowrap" label="Get Spatial Plots"
+                    aria-label="Get Spatial Plots" @click="getSpatialPlots" />
+                </div>
+                <div class="text-sm font-semibold col-span-3 text-nowrap text-center">
+                  <p class="font-bold">
+                    {{ getSweTimeRange() }}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="layout__table mt-2" style="width:100%">
@@ -36,32 +66,8 @@
             </div>
           </div>
         </div>
-        <div>
-          <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)"
-            class="p-2 relative overflow-visible">
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-nowrap text-right font-bold">
-                Select Date
-              </div>
-              <div class="text-nowrap">
-                <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-                  @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
-                  :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true"
-                  utc='preserve' />
-              </div>
-              <div class="text-nowrap">
-                <Button class="font-normal ngenButtonDiv-green ml-auto text-nowrap" label="Get Spatial Plots"
-                  aria-label="Get Spatial Plots" @click="getSpatialPlots" />
-              </div>
-              <div class="text-sm font-semibold col-span-3 text-nowrap text-center">
-                <p class="font-bold">
-                  {{ getSweTimeRange() }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="pl-4 ml-auto text-nowrap">
+
+        <div class="pl-4 ml-auto text-nowrap text-right">
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
               @click="gotoSelectAlternateIteration">New Validation</button></span>
           <br />
@@ -69,11 +75,11 @@
             @click="toggleMessagesGroup">
             Show Calibration Details</a>
           <br />
-          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName) && !showPlotGraph">
-            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">Show
+          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">
+            <a v-if="selectedPlotHasTimeseries && !showPlotGraph" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">Show
               SWE Time Series</a>
           </span>
-          <span v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName))">
+          <span v-else>
             <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">
               <span v-if="!showPlotGraph">Show </span>
               <span v-else>Hide </span>
@@ -166,7 +172,7 @@
         <div id="CustomizePlotWindow" v-if="showCustomizePlot">
           <div class="text-right sticky top-0">
             <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-              class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
+              class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
           </div>
           <h2 class="mt-5" aria-label="Customize Viewer" title="Customize Viewer">
             Customize Viewer
@@ -212,20 +218,6 @@
     <div id="LogDisplayArea" class="p-2"
       v-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
-        <!--
-        <div v-if="selectedLogList.length > 1">
-          <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
-          <Select id="selectedLogOptions" class="p-select" v-model="selectedLogName" :options="selectedLogList"
-            optionLabel="name" optionValue="name">
-          </Select>
-        </div>
-        <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b
-            style="width:160px; display:inline-block;">Log Name</b> {{ selectedLogName }}</div>
-        
-        <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;"><b
-            style="width:160px; display:inline-block;">Log File Path</b> {{ selectedLogFilePath }}</div>
-        -->
-
         <table width="100%" summary="Calibration Log Options and File Path">
           <caption class="sr-only">Calibration Log Options and File Path table</caption>  
           <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
@@ -308,9 +300,9 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 
 
-import type { DynamicObject } from "@/composables/NextGenModel";
+import type { DynamicObject } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 import { formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
 import { isValidDate, isValidDateTime } from "@/utils/CommonHelpers";
 
@@ -439,9 +431,6 @@ const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
 const selectedLogFilePath = ref<string>('');
 
-// track exceptions that we might not want to clear in specific circumstances
-const refListToClearExceptions = ref<any[]>([]);
-
 const supplementalTableOptions = ref<any[]>([
   'Iteration Metrics Table',
   'Iteration Parameters Table',
@@ -488,16 +477,16 @@ onMounted(() => {
     }
 
     // Get Plot Names
-    //if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
-    plotNames.value = await queryGetPlotNames();
-    //}
+    if (calibrationJobId.value && calibrationJobId.value > 0) {
+      plotNames.value = await queryGetPlotNames();
+    }
 
     if (plotNames.value?._data?.plot_names) {
       // setting plotList will populate the dropdown
       plotList.value = plotNames?.value?._data?.plot_names;
     } else {
       toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names', life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
 
@@ -516,7 +505,7 @@ onMounted(() => {
     }
 
     // Get Names of ALL Logs
-    if (!logs.value?._data || !logs.value?._data?.length) {
+    if (evaluateValidationRunId.value > 0 && (!logs.value?._data || !logs.value?._data?.length)) {
       logs.value = await queryGetLogNames(
         (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
       );
@@ -540,7 +529,7 @@ onMounted(() => {
         });
       } else {
         toast.removeAllGroups();
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
@@ -550,7 +539,7 @@ onMounted(() => {
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  // is the selected option a plot or iteration table?
+  // is the selected option a plot or supplemental table?
   if (selectedPlotName.value && (supplementalTableOptions.value as any).includes(selectedPlotName.value)) {
     selectedSupplementalTable.value = (supplementalTableOptions.value as any).indexOf(selectedPlotName.value) + 1;
     // reset all of our plot refs by selectedPlotName and selectedSupplementalTable
@@ -584,7 +573,7 @@ watch(selectedPlotName, async () => {
       }
 
       if (!iterationMetricsData.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } else if (selectedSupplementalTable.value === 2) {
@@ -616,7 +605,7 @@ watch(selectedPlotName, async () => {
       }
 
       if (!iterationParamsData.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } else if (selectedSupplementalTable.value === 3) {
@@ -645,7 +634,7 @@ watch(selectedPlotName, async () => {
               } else if (validation_type === 'valid_best') {
                 validation_type = 'Best';
               }
-              if (performanceMetrics.value?._data?.validations[v].iteration_num !== null) {
+              if (performanceMetrics.value?._data?.validations[v]?.iteration_num !== null) {
                 if (validation_type !== 'Iter') {
                   validation_type += ': Iter';
                 }
@@ -685,13 +674,13 @@ watch(selectedPlotName, async () => {
         }
       }
       if (!performanceMetricsData.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
   }
-  // selectedPlotName is a log 
   else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
+    // selectedPlotName is a log 
     // reset all of our plot refs except for selectedPlotName
     resetUserPlotRefs(['selectedPlotName']);
     selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
@@ -707,7 +696,6 @@ watch(selectedPlotName, async () => {
 
     // set sweStartDateTime and sweEndDateTime if not already set
     if (!sweStartDateTime.value || !sweEndDateTime.value) {
-      console.log('Setting SWE Start/End Dates');
       setSweStartDateTime();
       setSweEndDateTime();
     }
@@ -724,16 +712,16 @@ watch(selectedPlotName, async () => {
       if (response?._data?.swe_timeseries_data) {
         // get time series data from server
         sweTimeSeriesData.value = response?._data?.swe_timeseries_data;
+        selectedPlotHasTimeseries.value = true;
+        // Start with SWE timeseries already displayed
+        togglePlotGraph();
       } else {
         selectedPlotHasTimeseries.value = false;
         toast.removeAllGroups();
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'SWE time series data is currently unavailable', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'SWE time series data is currently unavailable', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
-
-    // Start with SWE timeseries already displayed
-    togglePlotGraph();
   } else if (selectedPlotName.value) {
     // reset all of our plot refs except for selectedPlotName
     resetUserPlotRefs(['selectedPlotName']);
@@ -763,7 +751,7 @@ watch(selectedPlotName, async () => {
         selectedPlotFileUrl.value = null;
         selectedPlotHasTimeseries.value = false;
         toast.removeAllGroups();
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
 
@@ -839,13 +827,13 @@ watch(selectedPlotName, async () => {
       // reset all of our plot refs except for selectedPlotName
       resetUserPlotRefs(['selectedPlotName']);
       toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 });
 
-// Reset refs when selectedPlotTable changes
+// Reset refs when selectedPlotName changes
 const resetUserPlotRefs = (exceptions: any): void => {
   if( !Array.isArray(exceptions) ) {
     exceptions = [];
@@ -983,22 +971,41 @@ function adjustPlotTableColumns() {
 
 // Watch for page number changes in plot table
 watch(plotTableCurrentPage, async () => {
-  if (isNaN(plotTableCurrentPage.value) || plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value / plotTablePageSize.value)) {
-    console.log('ERROR: Page number ' + plotTableCurrentPage.value + ' out of bounds');
-  } else {
-    plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value - 1)) + 1;
-    plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value - 1), plotTableTotalSize.value);
-    const response: any = await queryGetPlot(
-      selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
-      true, // include_data
-      false, // force_include_plot
-      (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      plotTableStartRow.value - 1, // start
-      plotTablePageSize.value // limit
-    );
-    if (response?._data?.plot_data) {
-      plotTableData.value = response?._data?.plot_data;
+  if (selectedPlotName.value) {
+    if (isNaN(plotTableCurrentPage.value) || plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value / plotTablePageSize.value)) {
+      console.log('ERROR: Page number ' + plotTableCurrentPage.value + ' out of bounds');
+    } else {
+      plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value - 1)) + 1;
+      plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value - 1), plotTableTotalSize.value);
+      const response: any = await queryGetPlot(
+        selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
+        true, // include_data
+        false, // force_include_plot
+        (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
+        (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+        plotTableStartRow.value - 1, // start
+        plotTablePageSize.value // limit
+      );
+      if (response?._data?.plot_data) {
+        plotTables.value = { default_table: [] };
+        for (let d = 0; d < response?._data?.plot_data.length; d++) {
+          let data_row = response?._data?.plot_data[d];
+          if ("metrics" in data_row) {
+            for (let d = 0; d < data_row.metrics.length; d++) {
+              data_row[data_row.metrics[d].name] = data_row.metrics[d].value;
+            }
+            delete data_row.metrics;
+          }
+          if ("parameters" in data_row) {
+            for (let d = 0; d < data_row.parameters.length; d++) {
+              data_row[data_row.parameters[d].name] = data_row.parameters[d].value;
+            }
+            delete data_row.parameters;
+          }
+          plotTables.value.default_table.push(data_row);
+        }
+        plotTableData.value = plotTables.value.default_table;
+      }
     }
   }
 });
@@ -1155,12 +1162,12 @@ const drawInteractivePlot = () => {
     fontSize: 14
   }
   if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
-    lineOptions.y.label = 'Depth (cm/s)';
+    lineOptions.y.label = 'Depth (m)';
     lineTipOptions.y.label = 'Depth';
-    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s\nClick to select this date`
-    dotOptions.y.label = 'Depth (cm/s)';
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
+    dotOptions.y.label = 'Depth (m)';
     dotTipOptions.y.label = 'Depth';
-    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s\nClick to select this date`
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
   } else {
     lineOptions.y.label = 'Flow (cm/s)';
     lineTipOptions.y.label = 'Flow';
@@ -1275,7 +1282,7 @@ const drawInteractiveSlider = () => {
           };
           plotGraphSliderData.value.push(dataPoint);
         }
-        console.log('Using column ' + plotTableColumns.value[c].value + ' to draw slider');
+        // console.log('Using column ' + plotTableColumns.value[c].value + ' to draw slider');
         break;
       }
     }
@@ -1533,7 +1540,7 @@ watch(selectedLogCategory, async () => {
   // start with the first log
   selectedLogName.value = selectedLogList.value[0].name;
   if (!selectedLogList.value.length) {
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeout5000 };
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 });
@@ -1566,7 +1573,7 @@ watch(selectedLogName, async () => {
       selectedLogFilePath.value = response?._data?.log_path;
     } else {
       toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
@@ -1598,7 +1605,7 @@ watch(selectedLogCurrentPage, async () => {
       selectedLogDisplay.value = logText;
     } else {
       toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
@@ -1648,16 +1655,16 @@ const getSpatialPlots = async () => {
 
         if (loadSweImagesErrors) {
           loadSweImagesErrors.forEach((errorMessage) => {
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage, life: ToastTimeout.timeout5000 };
+            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage, life: ToastTimeout.timeoutError };
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in Date format', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in Date format', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in DateTime format', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in DateTime format', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
     isEvaluationLoading.value = false;
@@ -1683,7 +1690,9 @@ onUnmounted(() => {
 @use "@/assets/styles/styles.scss";
 
 #DisplayOptions {
-  width: 375px;
+  width:100%;
+  min-width: 300px;
+  max-width: 375px;
   margin-left: 0px;
 }
 
@@ -1793,8 +1802,7 @@ onUnmounted(() => {
   z-index: 99;
 }
 
-#selectedLogDisplay,
-#ValidationLogDisplay {
+#selectedLogDisplay {
   max-height: 400px;
 }
 

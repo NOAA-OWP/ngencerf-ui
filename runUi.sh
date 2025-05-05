@@ -37,31 +37,32 @@ if [[ "$CURRENT_NODE_VERSION" != "$REQUIRED_NODE_VERSION" ]]; then
     fi
 
     # load nvm
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+    # load nvm bash_completion
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
     echo -e "\nTemporarily switching Node version to ${REQUIRED_NODE_VERSION} with nvm..."
     nvm install "$REQUIRED_NODE_VERSION"
 
     echo -e "\nCleaning up old dependencies if any..."
-    rm -rf "$ngencerf_ui/node_modules" "$ngencerf_ui/package-lock.json"
+    rm -rf "$ngencerf_ui/node_modules"
 
     echo -e "\n(Re)installing dependencies..."
     cd "$ngencerf_ui"
-    npm install
+    npm ci
 
     echo -e "\nNode version temporarily switched to ${REQUIRED_NODE_VERSION}"
     echo -e "To avoid re-instsalling this Node version for subsequent runs of runUi.sh, " \
         "issue the following commands from your terminal:"
     echo -e "  nvm install ${REQUIRED_NODE_VERSION}\n  nvm alias default ${REQUIRED_NODE_VERSION}\n"
-
 fi
 
-# check if node_modules or package-lock.json is missing
-if [ ! -d "$ngencerf_ui/node_modules" ] || [ ! -f "$ngencerf_ui/package-lock.json" ]; then
-    echo "node_modules or package-lock.json not found. installing dependencies..."
+# check if node_modules is missing
+if [ ! -d "$ngencerf_ui/node_modules" ]; then
+    echo -e "\nnode_modules not found. installing dependencies..."
     cd "$ngencerf_ui"
-    npm install
+    npm ci
 fi
 
 generate_git_info

@@ -6,8 +6,9 @@ import type {
   CalibrationJobListItem,
   ValidationJobsList,
   UserCalibrationRunData,
-  ServerStatus
-} from "@/composables/NextGenModel";
+  ServerStatus,
+  LogLevel,
+} from "@/composables/NgencerfModels";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 
@@ -31,6 +32,7 @@ export const useUserDataStore = defineStore(
 
     const userCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
     const userCalibrationRunData = ref<UserCalibrationRunData>();
+    const gotoCalibrationRunId = ref<number>();
 
     const userSelectedCalibrationIterationId = ref<number | null>(null);
     const uiGageId = ref<string>("");
@@ -41,6 +43,58 @@ export const useUserDataStore = defineStore(
     const includeArchivedJobs = ref<boolean>(false);
 
     const lastServerError = ref<ServerStatus>();
+
+    // sets value for global logging
+    const calibrationJobNgenGlobalLogging = ref<boolean>(true);
+
+    // set ngen log level
+    const ngenLogLevel = ref<LogLevel>("info");
+
+    // stores the log level for each module
+    const logLevels: Record<string, Ref<LogLevel>> = reactive({});
+
+    /**
+     * watch for changes in userCalibrationRunData.modules
+     * and update logLevels accordingly
+     * if newModules is undefined or empty, delete all modules from logLevels
+     * if newModules is not undefined or empty, add new modules to logLevels
+     * and set log level to info
+     * NOTE: in CalibrationJobStore, access logLevels WITHOUT .value
+     * because logLevels is a reactive object. It is changed into a ref
+     * when it is passed to a component.
+     * https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive
+     */
+    watch(() => userCalibrationRunData.value?.modules, (newModules) => {
+      // if newModules is undefined or empty, delete all modules from logLevels
+      if (!newModules || newModules.length === 0) {
+        for (const module in logLevels) {
+          delete logLevels[module];
+        }
+        return;
+      }
+
+      // track the modules that we should be using
+      const validModules = new Set<string>();
+
+      // add new modules to logLevels and set log level to info
+      for (const module of newModules) {
+        validModules.add(module);
+
+        // if the module is not already in logLevels, add it with a default log level
+        if (!logLevels[module]) {
+          logLevels[module] = ref<LogLevel>("info");
+        }
+      }
+
+      // remove deleted modules from logLevels
+      for (const module in logLevels) {
+        if (!validModules.has(module)) {
+          delete logLevels[module];
+        }
+      }
+    },
+      { immediate: true }
+    );
 
     /**
      * Checks if user is logged in
@@ -323,9 +377,35 @@ export const useUserDataStore = defineStore(
      */
     const clearUserCalibrationRunData = () => {
       userCalibrationRunData.value = undefined;
+      calibrationJobNgenGlobalLogging.value = true;
+      ngenLogLevel.value = "info";
+
+      // clear all log levels
+      for (const module in logLevels) {
+        delete logLevels[module];
+      }
     };
 
     return {
+      userSelectedCalibrationIterationId,
+      calibrationRunGageList,
+      uiGageId,
+      isLoggedIn,
+      userName,
+      firstName,
+      lastName,
+      accessToken,
+      refreshToken,
+      modulesFilterList,
+      statusTypeFilterList,
+      includeArchivedJobs,
+      lastServerError,
+      userCalibrationJobsListData,
+      userCalibrationRunData,
+      gotoCalibrationRunId,
+      calibrationJobNgenGlobalLogging,
+      ngenLogLevel,
+      logLevels,
       isUserLoggedIn,
       logUserIn,
       logUserOut,
@@ -345,25 +425,10 @@ export const useUserDataStore = defineStore(
       getRefreshToken,
       fetchUserCalibrationJobsListData,
       getValidationJobs,
-      userCalibrationJobsListData,
-      userCalibrationRunData,
       queryUserCalibrationRunData,
       fetchUserCalibrationRunData,
       hardResetUserDataStore,
       clearUserCalibrationRunData,
-      userSelectedCalibrationIterationId,
-      calibrationRunGageList,
-      uiGageId,
-      isLoggedIn,
-      userName,
-      firstName,
-      lastName,
-      accessToken,
-      refreshToken,
-      modulesFilterList,
-      statusTypeFilterList,
-      includeArchivedJobs,
-      lastServerError
     };
   },
   {

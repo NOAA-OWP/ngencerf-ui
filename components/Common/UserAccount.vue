@@ -110,7 +110,7 @@ import Password from 'primevue/password';
 import { useToast } from "primevue/usetoast";
 
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 
@@ -202,20 +202,19 @@ const changePassword = async () => {
       if (!e) {
         e = "Cannot reach server. Error code: " + error.value.statusCode;
       }
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: ToastTimeout.timeout3000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
       console.error("Error during user creation:", error.value?.message, error.value?.data);
       return;
     }
-    console.log("changePassword", data);
     // Clear out the inputs and report success
     oldpass.value = "";
     newpass.value = "";
     confirmNewpass.value = "";
-    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Password Change Successful', detail: "You have successfully changed your password", life: ToastTimeout.timeout3000 };
+    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Password Change Successful', detail: "You have successfully changed your password", life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: "Password was not changed", life: ToastTimeout.timeout3000 };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: "Password was not changed", life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -243,19 +242,18 @@ const updateName = async () => {
       if (!e) {
         e = "Cannot reach server. Error code: " + error.value.statusCode;
       }
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: ToastTimeout.timeout3000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
       console.error("Error during user update:", error.value?.message, error.value?.data);
       return;
     }
-    console.log("UpdateNameData", data);
     // Clear out the inputs and report success
     setFirstName(updateNameData.first_name);
     setLastName(updateNameData.last_name);
-    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Name Change Successful', detail: "You have successfully changed your name", life: ToastTimeout.timeout3000 };
+    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Name Change Successful', detail: "You have successfully changed your name", life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: "Name was not changed", life: ToastTimeout.timeout3000 };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: "Name was not changed", life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }

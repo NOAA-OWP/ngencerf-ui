@@ -10,8 +10,9 @@ export const CalibrationTabs = {
 export const EvaluationTabs = {
   tab_calibrationRuns: 0,
   tab_evaluate: 1,
-  tab_selectAltIteration: 2,
-  tab_runStatus: 3,
+  tab_compare: 2,
+  tab_selectAltIteration: 3,
+  tab_runStatus: 4,
 };
 
 export const ForecastTabs = {
@@ -27,7 +28,7 @@ export const VerificationTabs = {
   tab_results: 1,
 };
 
-export const NextgenPages = {
+export const NgencerfPages = {
   page_calibration: 1,
   page_evaluation: 2,
   page_forecast: 3,
@@ -54,10 +55,10 @@ export const ValidationPlotNames = [
 ];
 
 export const ToastTimeout = {
-  timeout3000: 3000,
-  timeout5000: 5000,
-  timeout6000: 6000,
-  timeout10000: 10000,
+  timeoutSuccess: 5000,
+  timeoutInfo: 10000,
+  timeoutWarn: 15000,
+  timeoutError: 20000,
 };
 
 export const StatusTypes = [
@@ -136,3 +137,21 @@ export const JobStatusAction = {
   archive: 2,
   unarchive: 3
 };
+
+export const ValidationFormFields = {
+  formulation_name: "Formulation Name",
+  modules: "Formulation Modules",
+  sloth_parameters: "Sloth Parameters",
+  maps_to_module: "Sloth Parameter For Module",
+  maps_to_variable_name: "Sloth Parameter Module Param",
+  param_type: "Sloth Parameter Type",
+  param_units: "Sloth Parameter Units",
+  stop_criteria: "Stop Criteria",
+  save_plot_iteration_frequency: "Plot Generation Frequency",
+  streamflow_threshold: "Flow Threshold",
+  peak_flow_threshold: "Peak Flow Threshold",
+  objective_function: "Objective Function",
+  optimization: "Optimization Algorithm",
+};
+
+

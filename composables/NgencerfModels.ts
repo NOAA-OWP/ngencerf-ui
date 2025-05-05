@@ -1,4 +1,4 @@
-import type { ToastMessageOptions } from "primevue/toast"
+import type { ToastMessageOptions } from "primevue/toast";
 
 export interface User {
   uid: number;
@@ -136,6 +136,7 @@ export interface ValidationJobParameter {
  */
 export interface UserCalibrationRunData {
   calibration_run_id: number;
+  job_data_dir: string;
   submit_date: string; // e.g. "2024-09-13T05:50:22.334Z"
   gage: GageData;
   forcing_source: string;
@@ -717,22 +718,6 @@ export type ForecastJobs = {
   forecast_jobs: ForecastJob[];
 }
 
-export const ValidationFormFields = {
-  formulation_name: "Formulation Name",
-  modules: "Formulation Modules",
-  sloth_parameters: "Sloth Parameters",
-  maps_to_module: "Sloth Parameter For Module",
-  maps_to_variable_name: "Sloth Parameter Module Param",
-  param_type: "Sloth Parameter Type",
-  param_units: "Sloth Parameter Units",
-  stop_criteria: "Stop Criteria",
-  save_plot_iteration_frequency: "Plot Generation Frequency",
-  streamflow_threshold: "Flow Threshold",
-  peak_flow_threshold: "Peak Flow Threshold",
-  objective_function: "Objective Function",
-  optimization: "Optimization Algorithm",
-};
-
 export type PlotNames = {
   calibration_run_id: number;
   plot_names: NameAndDescription[];
@@ -784,3 +769,4 @@ export interface GitData {
   message: string;
 }
 
+export type LogLevel = "debug" | "info" | "warn" | "severe" | "fatal";

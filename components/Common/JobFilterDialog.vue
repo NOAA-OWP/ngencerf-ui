@@ -1,5 +1,5 @@
 <template>
-  <div id="JobFilterDialog" class="mb-2 mt-4">
+  <div id="JobFilterDialog" class="JobsFilterBox mb-2 mt-4">
 
     <div id="FilterDialog">
 
@@ -7,7 +7,7 @@
         <div class="col-span-2">
           <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
-          <Select id="HeadwaterBasinGage" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
+          <Select id="HeadwaterBasinGage" class="mt-1 basin-gage-filter text-left" v-model="uiGageId"
             :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
             aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
             :disabled="disableAll">
@@ -18,10 +18,10 @@
           <label class="block text-left mb-1" for="StatusList" aria-label="Status Filter"
             title="Status Filter">Status</label>
           <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-            optionValue="filterValue" :maxSelectedLabels="3" class="w-full" aria-label="Status Filter"
+            optionValue="filterValue" :maxSelectedLabels="3" class="JobsFilterSelect w-full" aria-label="Status Filter"
             title="Status Filter" :disabled="disableAll">
             <template #header>
-              <div class="absolute cursor-pointer top-2 left-[48px]">&nbsp; Select All Items</div>
+              <div class="absolute cursor-pointer top-2 left-[38px]">&nbsp; Select All Items</div>
             </template>Headw
             <template #option="slotProps">
               <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
@@ -37,10 +37,10 @@
             <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
               title="Module Filter">Modules</label>
             <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
-              optionLabel="name" optionValue="name" :maxSelectedLabels="3" class="w-full" aria-label="Module Filter"
+              optionLabel="name" optionValue="name" :maxSelectedLabels="3" class="JobsFilterSelect w-full" aria-label="Module Filter"
               title="Module Filter" :disabled="disableAll">
               <template #header>
-                <div class="absolute cursor-pointer top-2 left-[58px]">&nbsp; Select All Items</div>
+                <div class="absolute cursor-pointer top-2 left-[38px]">&nbsp; Select All Items</div>
               </template>
               <template #option="slotProps">
                 <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
@@ -54,7 +54,7 @@
         <div class="col-span-6">
           <div class="grid grid-cols-12">
             <div class="col-span-4">
-              <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[45px] ml-[28px]"
+              <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[30px] ml-[28px]"
                 aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
                 :pt="ptCheckbox" :disabled="disableAll">
               </Checkbox>
@@ -63,7 +63,7 @@
             </div>
             <div class="col-span-4">
               <div class="col-span-1">
-                <Button class="ngenButtonDiv mt-[41px] ml-[9px] align-center" label="Apply Filters"
+                <Button class="ngenButtonDiv mt-[25px] ml-[9px] align-center" label="Apply Filters"
                   @click="sendApply($event)" aria-label="Apply and close" title="Apply and close"
                   :disabled="disableAll">
                 </Button>
@@ -90,8 +90,8 @@ import MultiSelect from 'primevue/multiselect';
 import Select from "primevue/select";
 
 
-import type { CalibrationJobListItem } from "@/composables/NextGenModel"
-import { StatusTypes } from "@/composables/NextgenEnums";
+import type { CalibrationJobListItem } from "@/composables/NgencerfModels"
+import { StatusTypes } from "@/composables/NgencerfEnums";
 
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";

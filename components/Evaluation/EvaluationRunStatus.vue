@@ -3,14 +3,15 @@
     <div class="grid grid-rows-7 pr-3">
       <div class="row-span-2">
         <div id="ResultsDisplay">
-          <div class="grid grid-cols-2">
-            <div class="col-span-1">
-              <table>
-                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Run Time & Iteration
-                </caption>
+          <div class="grid grid-cols-5">
+            <div class="col-span-2">
+              <table aria-describedby="Validation Run Time & Iteration">
                 <thead>
-                  <tr height="25px">
-                    <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                  <tr height="35px">
+                    <th scope="row" class="text-center border-b-[3px]" colspan="2" style="border-color: #d9d9d9;">Validation Run Time & Iteration</th>
+                  </tr>
+                  <tr height="35px">
+                    <th scope="row" class="text-center border-t-[3px]" colspan="2" style="border-color: #d9d9d9;"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -34,12 +35,18 @@
               </table>
             </div>
 
-            <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
-              <table>
-                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Evaluation Status</caption>
+            <div class="col-span-1">
+                <div class="vertical-separator"></div>
+            </div>
+
+            <div class="col-span-2">
+              <table aria-describedby="Validation Run Status">
                 <thead>
-                  <tr height="25px">
-                    <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                  <tr height="35px">
+                    <th scope="row" class="text-center border-b-[3px]" colspan="2" style="border-color: #d9d9d9;">Validation Run Status</th>
+                  </tr>
+                  <tr height="35px">
+                    <th scope="row" class="text-center border-t-[3px]" colspan="2" style="border-color: #d9d9d9;"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -57,12 +64,12 @@
                     </td>
                   </tr>
                   <tr height="38px">
-                    <td class="pl-5" colspan="2">
+                    <td class="pl-5 text-right pr-4" colspan="2">
 
                       <!--BUTTONS - START-->
                       <span v-if="validationStatus === 'Done'">
                         <Button id="ResultsArea" class="ngenButtonDiv" @click.stop="navigateToEvaluation"
-                          aria-label="Go to Evaluation Button" title="Go to Evaluation Button">Go to Evaluation</Button>
+                          aria-label="Go to Evaluation Button" title="Go to Evaluation Button">Evaluate</Button>
                       </span>
 
                       <span v-else>
@@ -93,9 +100,9 @@
 import { onMounted, onUnmounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
-import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+import type { CalibrationGetStatusValidationItem } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
@@ -158,7 +165,7 @@ const startRun = async () => {
       startTime.value = response?._data?.submit_date;
       validationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation' };
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation', life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   });
@@ -211,7 +218,7 @@ const navigateToEvaluation = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Pleasea select a validation job first.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Please select a validation job first.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -229,7 +236,9 @@ const navigateToEvaluation = (event: any) => {
   height: 100px;
   border: 0px solid global.$ngwcp_neutral_gray_md;
   min-width: 750px;
-
+}
+#ResultsDisplay table {
+  width: 100%;
 }
 
 #GraphArea {

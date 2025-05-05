@@ -4,7 +4,7 @@
     <div id="AboutBoxContents" style="direction: ltr">
       <div class="text-right sticky top-0">
         <img alt="Close" title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-          class="absolute cursor-pointer right-0 boxed mt-2 mr-2" @click="closeAboutBox" />
+          class="absolute cursor-pointer right-0 mt-2 mr-2" @click="closeAboutBox" />
       </div>
 
       <div id="BoxContent">
@@ -35,10 +35,10 @@
                 </div>
               </div>
             </div>
-            <div class="col-span-1 mt-5 text-center">
-              <img class="inline cursor-pointer w-[48px]" alt="Copy Table Data" src="@/assets/styles/img/copy.png"
-                @click="copyGitInfoToClipboard()" /> <br />
-              <div class="nobg cursor-default">Copy</div>
+            <div class="col-span-1 text-center">
+              <img class="inline cursor-pointer w-[48px]" style="margin-top:-10px" alt="Copy Table Data" src="@/assets/styles/img/copy.png"
+                @click="copyGitInfoToClipboard()" /><br />
+              <div class="nobg cursor-default" style="margin-top:-5px">Copy</div>
             </div>
           </div>
 
@@ -66,8 +66,8 @@ import Column from 'primevue/column';
 import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
 
-import { ToastTimeout } from "@/composables/NextgenEnums";
-import type { CombinedVersionInfo } from "@/composables/NextGenModel";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
+import type { CombinedVersionInfo } from "@/composables/NgencerfModels";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 
@@ -205,10 +205,10 @@ const useClipboard = () => {
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Clipboard', detail: 'CSV copied to clipboard', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Clipboard', detail: 'CSV copied to clipboard', life: ToastTimeout.timeoutSuccess };
       toast.add(tMsg); addToastRecord(tMsg);
     } catch (err) {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Clipboard Error', detail: err, life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Clipboard Error', detail: err, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   };

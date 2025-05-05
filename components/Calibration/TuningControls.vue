@@ -8,7 +8,6 @@
       </div>
     </div>
     <div class="grid grid-cols-2">
-
       <div class="col-span-2">
         <div id="BoxLeft" class="text-left">
           <div id="BoxTopLeft" class="pt-2">
@@ -19,7 +18,6 @@
           </div>
           <div id="BoxBottomLeft" class="pt-2">
             <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
-
               <table class="table-auto border-collapse ml-0">
                 <tbody>
                   <tr>
@@ -68,7 +66,6 @@
                   </tr>
                 </tbody>
               </table>
-
             </div>
           </div>
 
@@ -79,7 +76,6 @@
             <div v-if="!automatic_validation" class="tabTitles">
               Check the box above to enable Automatic Validation
             </div>
-
             <div v-else>
               <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
                 <table class="table-auto border-collapse ml-0">
@@ -142,121 +138,119 @@
     </div>
   </div>
 
-
   <div class="pr-2">
-
     <div class="text-left">
-      <div class="grid grid-cols-2 pb-3">
-
-        <div class="col-span-2">&nbsp;</div>
-        <div class="col-span-2 mt-5 mb-3 hr"></div>
-        <div class="col-span-2">
-
-          <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
-          <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
-            <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-            <Button class="ngenButtonDiv-alt"
-              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
-              aria-label="Load Parameters File optional" title="Load Parameters File optional">
-              Load Parameters File (optional)</Button>
-            <div v-if="!isFormulationDataSaved()" class="overlay"></div>
-          </div>
-        </div>
-
-        <div class="col-span-1 mt-2">
-          <div class="text-left mt-2">
-            <div class="font-bold">Calibratable Parameters</div>
-            <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
-              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
-              :options="calibrationTuningParameters" optionLabel="output" optionValue="output"
-              aria-label="Select Calibratable Parameters" title="Select Calibratable Parameters">
-              <template #option="slotProps">
-                <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
-              </template>
-            </Select>
-            <div id="UploadParams" class="inline ml-3" @click="addCalibrationTuningParameter">
-              <Button class="ngenButtonDiv-alt" aria-label="Add Selected Calibratable Parameter Button"
-                title="Add Selected Calibratable Parameter Button"
-                :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</Button>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="col-span-1 mt-2 relative">
-          <Button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
-            @click="clearUserSelectedCalibrationTuningParameters()" aria-label="Clear Calibratable Parameters"
-            title="Clear Calibratable Parameters"
-            :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</Button>
-        </div>
-
+      <div class="hr my-3"></div>
+      <div>
+        <div class="font-bold">Output Variable To Calibrate</div>
+        <Select id="OutputVariable" class="varInputs mt-1" aria-label="Output Variable To Calibrate"
+          title="Output Variable To Calibrate" v-model="selectedOutputVariableToCalibrate" :options="['Streamflow']" />
       </div>
     </div>
 
-    <div id="TuningDataList" class="mt-2 mb-10 overflow-auto max-h-[200px]" style="position: relative;">
+    <div class="hr my-3"></div>
 
-      <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
-        :model="cmTuningParameterData"></ContextMenu>
-      <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
-        v-model:selection="selectedTuningParameterData" selectionMode="single" contextMenu
-        v-model:contextMenuSelection="selectedTuningParameterData" @rowContextmenu="onRowContextMenu"
-        :rowClass="rowClass" :rowStyle="rowStyle">
+    <div class="grid grid-cols-2 pb-3">
+      <div class="col-span-2">
+        <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
+        <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
+          <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+          <Button class="ngenButtonDiv-alt"
+            :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+            aria-label="Load Parameters File optional" title="Load Parameters File optional">
+            Load Parameters File (optional)</Button>
+          <div v-if="!isFormulationDataSaved()" class="overlay"></div>
+        </div>
+      </div>
 
-        <!-- parameter column, uneditable -->
-        <Column field="parameter" header="Parameter" sortable>
-          <template #body="slotProps">
-            <span style="background-color: lightgrey; padding: 4px; display: block;"
-              :aria-label="'Parameter name is ' + slotProps.data.name"
-              :title="'Parameter name is' + slotProps.data.name">
-              {{ slotProps.data.name }} </span>
-          </template>
-        </Column>
+      <div class="col-span-1 mt-2">
+        <div class="text-left mt-2">
+          <div class="font-bold">Calibratable Parameters</div>
+          <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
+            :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+            :options="calibrationTuningParameters" optionLabel="output" optionValue="output"
+            aria-label="Select Calibratable Parameters" title="Select Calibratable Parameters">
+            <template #option="slotProps">
+              <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
+            </template>
+          </Select>
+          <div id="UploadParams" class="inline-block ml-3 mt-3" @click="addCalibrationTuningParameter">
+            <Button class="ngenButtonDiv-alt" aria-label="Add Selected Calibratable Parameter Button"
+              title="Add Selected Calibratable Parameter Button"
+              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</Button>
+          </div>
+        </div>
+      </div>
 
-        <!-- module column, uneditable -->
-        <Column field="module" header="Module" sortable>
-          <template #body="slotProps">
-            <span style="background-color: lightgrey; padding: 4px; display: inline-block; white-space: nowrap;"
-              :aria-label="'Module name is ' + slotProps.data.module"
-              :title="'Module name is ' + slotProps.data.module">
-              {{ slotProps.data.module }}
-            </span>
-          </template>
-        </Column>
-
-        <!-- min column, editable -->
-        <Column field="min" header="Min" sortable>
-          <template #body="slotProps">
-            <input type="text" v-model="slotProps.data.minimum"
-              @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;"
-              :aria-label="'Minimum value is ' + slotProps.data.minimum"
-              :title="'Minimum value is ' + slotProps.data.minimum" />
-          </template>
-        </Column>
-
-        <!-- max column, editable -->
-        <Column field="max" header="Max" sortable>
-          <template #body="slotProps">
-            <input type="text" v-model="slotProps.data.maximum"
-              @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;"
-              :aria-label="'Maximum value is ' + slotProps.data.maximum"
-              :title="'Maximum value is ' + slotProps.data.maximum" />
-          </template>
-        </Column>
-
-        <!-- initValue column, editable -->
-        <Column field="initValue" header="Initial Value" sortable>
-          <template #body="slotProps">
-            <input type="text" v-model="slotProps.data.initial_value"
-              @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)" style="width: 100%;"
-              slotProps.data.maximum :aria-label="'Initial value is ' + slotProps.data.initial_value"
-              :title="'Initial value is ' + slotProps.data.initial_value" />
-          </template>
-        </Column>
-      </DataTable>
+      <div class="col-span-1 mt-2 relative">
+        <Button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
+          @click="clearUserSelectedCalibrationTuningParameters()" aria-label="Clear Calibratable Parameters"
+          title="Clear Calibratable Parameters"
+          :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</Button>
+      </div>
     </div>
   </div>
 
-  <div class="grid grid-rows-1 mt-8 ActionButtonsBox" id="Tuningbuttons">
+  <div id="TuningDataList" class="mt-2 mb-10 overflow-auto max-h-[200px]" style="position: relative;">
+    <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
+      :model="cmTuningParameterData"></ContextMenu>
+    <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
+      v-model:selection="selectedTuningParameterData" selectionMode="single" contextMenu
+      v-model:contextMenuSelection="selectedTuningParameterData" @rowContextmenu="onRowContextMenu" :rowClass="rowClass"
+      :rowStyle="rowStyle">
+
+      <!-- parameter column, uneditable -->
+      <Column field="parameter" header="Parameter" sortable>
+        <template #body="slotProps">
+          <span style="background-color: lightgrey; padding: 4px; display: block;"
+            :aria-label="'Parameter name is ' + slotProps.data.name" :title="'Parameter name is' + slotProps.data.name">
+            {{ slotProps.data.name }} </span>
+        </template>
+      </Column>
+
+      <!-- module column, uneditable -->
+      <Column field="module" header="Module" sortable>
+        <template #body="slotProps">
+          <span style="background-color: lightgrey; padding: 4px; display: inline-block; white-space: nowrap;"
+            :aria-label="'Module name is ' + slotProps.data.module" :title="'Module name is ' + slotProps.data.module">
+            {{ slotProps.data.module }}
+          </span>
+        </template>
+      </Column>
+
+      <!-- min column, editable -->
+      <Column field="min" header="Tuning Range Min" sortable>
+        <template #body="slotProps">
+          <input type="text" v-model="slotProps.data.minimum"
+            @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;"
+            :aria-label="'Minimum value is ' + slotProps.data.minimum"
+            :title="'Minimum value is ' + slotProps.data.minimum" />
+        </template>
+      </Column>
+
+      <!-- max column, editable -->
+      <Column field="max" header="Tuning Range Max" sortable>
+        <template #body="slotProps">
+          <input type="text" v-model="slotProps.data.maximum"
+            @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;"
+            :aria-label="'Maximum value is ' + slotProps.data.maximum"
+            :title="'Maximum value is ' + slotProps.data.maximum" />
+        </template>
+      </Column>
+
+      <!-- initValue column, editable -->
+      <Column field="initValue" header="Initial Run Value" sortable>
+        <template #body="slotProps">
+          <input type="text" v-model="slotProps.data.initial_value"
+            @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)" style="width: 100%;"
+            slotProps.data.maximum :aria-label="'Initial value is ' + slotProps.data.initial_value"
+            :title="'Initial value is ' + slotProps.data.initial_value" />
+        </template>
+      </Column>
+    </DataTable>
+  </div>
+
+  <div class="grid grid-rows-1 mt-8 mb-4 ActionButtonsBox" id="Tuningbuttons">
     <div id="TuningBottomButtons" class="grid grid-cols-8">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-6 h-8" @click="saveTuningData()">
@@ -270,18 +264,15 @@
           Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
         </div>
       </span>
-
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-3">
           <!--<Button class="c-blue font-normal text-xl underline pt-1" title="Revert Button" @click="resetTuningData()"
             aria-label="Revert Button">Revert</Button>-->
         </div>
       </span>
-
       <span v-else>
         <div class="col-span-1 mr-3">&nbsp;</div>
       </span>
-
       <div class="col-span-4">&nbsp;</div>
       <div class="col-span-1">
         <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
@@ -291,7 +282,6 @@
         <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
           @click="goNextTab()">Next</Button>
       </div>
-
     </div>
   </div>
   <DynamicDialog />
@@ -302,18 +292,17 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 import Select from "primevue/select";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 
-import type { GeneralErrorResponse, ValidationErrorObject, NonFieldError } from "@/composables/NextGenModel"
+import type { GeneralErrorResponse, NonFieldError } from "@/composables/NgencerfModels";
 
 import type { DatePickerProps } from "primevue/datepicker";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
@@ -330,8 +319,6 @@ import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
 
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
-
-
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -363,6 +350,7 @@ const {
   simEndTime,
   calStartTime,
   calEndTime,
+  selectedOutputVariableToCalibrate,
   calibrationTuningParameters,
   userSelectedCalibrationTuningParameters,
   automatic_validation,
@@ -415,7 +403,7 @@ onMounted(async () => {
     // check if EDS errors exist
     const edsErrorMessage = loadTuningTabData.value ? ifEDSErrorsExist(loadTuningTabData.value._data) : '';
     if (edsErrorMessage) {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'EDS Error', detail: edsErrorMessage };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'EDS Error', detail: edsErrorMessage, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
 
@@ -449,7 +437,7 @@ onMounted(async () => {
 
     isInitialSetupDone.value = true; // set to true after initial setup
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No Calibration Job ID', detail: 'No calibration job ID found. Please go back to the Calibration Runs tab and select a job.' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No Calibration Job ID', detail: 'No calibration job ID found. Please go back to the Calibration Runs tab and select a job.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 
@@ -485,7 +473,7 @@ const isFormulationDataSaved = (): boolean => {
 const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Calibration Tuning Controls are disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Calibration Tuning Controls are disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
@@ -660,7 +648,7 @@ const handleFileUpload = async (event: Event) => {
             }
           } else {
             errorMessage = response._data?.message;
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Invalid data in parameter file', detail: errorMessage };
+            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Invalid data in parameter file', detail: errorMessage, life: ToastTimeout.timeoutError };
             toast.add(tMsg); addToastRecord(tMsg);
           }
         });
@@ -669,20 +657,20 @@ const handleFileUpload = async (event: Event) => {
         scrollToBottom();
 
         if (invalidParameters.length > 0) {
-          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters in the uploaded file were not imported because they are not calibratable:\n ${invalidParameters.join(', ')}` };
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters in the uploaded file were not imported because they are not calibratable:\n ${invalidParameters.join(', ')}`, life: ToastTimeout.timeoutWarn };
           toast.add(tMsg); addToastRecord(tMsg);
         }
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No data in parameter file' };
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No data in parameter file', life: ToastTimeout.timeoutWarn };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } catch (error) {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'File upload failed' };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'File upload failed', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
       console.error('File upload failed:', error);
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No file selected' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No file selected', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     console.error('No file selected');
   }
@@ -819,7 +807,7 @@ const validateAndBuildRequestBody = (): boolean => {
   }
 
   if (Object.keys(saveTuningTabRequestBody.value).length === 0) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'No data to save', detail: 'No valid data has been entered to save' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'No data to save', detail: 'No valid data has been entered to save', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -850,7 +838,7 @@ const areValidationTimesSet = (): boolean => {
 const areCalibrationTimesValidated = (): boolean => {
   // check if time_range is not set
   if (!rangeDateFrom.value || !rangeDateTo.value) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'time_range must be set' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'time_range must be set', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -870,7 +858,7 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if time_range and calibration_times are null after converted to Date objects
   if (!rangeStartDate || !rangeEndDate || !simStartDate || !simEndDate || !calStartDate || !calEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'time_range and/or calibration_times cannot be converted to Date objects' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'time_range and/or calibration_times cannot be converted to Date objects', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -883,28 +871,28 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'calibrationtimes must be within time_range. Was not saved.' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'calibrationtimes must be within time_range. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if simulation_end_time is not after simulation_start_time
   if (simStartDate >= simEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Simulation time problem', detail: 'simulation_end_time must be after simulation_start_time. Was not saved.' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Simulation time problem', detail: 'simulation_end_time must be after simulation_start_time. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
   if (calStartDate <= simStartDate || calStartDate > simEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time. Was not saved.' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time. Was not saved.' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -937,7 +925,7 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if Date objects are valid
   if (!avSimStartDate || !avSimEndDate || !avCalStartDate || !avCalEndDate || !rangeStartDate || !rangeEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'time_range and/or validation_times cannot be converted to Date objects for validation' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'time_range and/or validation_times cannot be converted to Date objects for validation', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -960,7 +948,7 @@ const areValidationTimesValidated = (): boolean => {
 
     // check if validation simulation times do not encompass both calibration and validation times
     if (isAvSimStartAfterCalStart || isAvSimEndBeforeCalEnd || isAvSimStartAfterAvCalStart || isAvSimEndBeforeAvCalEnd) {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Validation Simulation times must encompass both Calibration and Validation times' };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Validation Simulation times must encompass both Calibration and Validation times', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
       return false;
     }
@@ -971,7 +959,7 @@ const areValidationTimesValidated = (): boolean => {
 
     // check if calibration times and validation times overlap
     if (isAvCalStartBeforeOrEqualToCalEnd && isAvCalEndAfterOrEqualToCalStart) {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Overlapping Times', detail: 'Calibration and Validation times must not overlap' };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Overlapping Times', detail: 'Calibration and Validation times must not overlap', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
       return false;
     }
@@ -979,21 +967,21 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if avSimEndDate is not after avSimStartDate
   if (avSimStartDate >= avSimEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Simulation End must be after Simulation Start' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Simulation End must be after Simulation Start', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if avCalStartDate is not within avSimStartDate and avSimEndDate
   if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Calibration Start must be within Simulation Start and End' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Calibration Start must be within Simulation Start and End', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
   if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -1025,13 +1013,14 @@ const saveTuningData = () => {
   // handle saving Tuning Tab data
   toast.removeAllGroups();
   tuningStore_data_loading.value = true;
+
   const handleSaveTuningTab = async () => {
     const saveTuningTabResponse = await saveTuningTabData();
     if (saveTuningTabResponse?.ok) {
       const tMsg: ToastMessageOptions = {
         severity: 'success', summary: `Success`,
         detail: "Saved Tuning data",
-        life: ToastTimeout.timeout3000
+        life: ToastTimeout.timeoutSuccess
       };
       toast.add(tMsg); addToastRecord(tMsg);
       updateJobData();
@@ -1050,7 +1039,7 @@ const saveTuningData = () => {
                       severity: 'error',
                       summary: `Error Saving Tuning Data`,
                       detail: er,
-                      life: ToastTimeout.timeout10000,
+                      life: ToastTimeout.timeoutError,
                     };
                     toast.add(tMsg); addToastRecord(tMsg);
                   });
@@ -1065,7 +1054,7 @@ const saveTuningData = () => {
           severity: 'error',
           summary: `Error Saving Tuning Data`,
           detail: errorMessage,
-          life: ToastTimeout.timeout10000,
+          life: ToastTimeout.timeoutError,
         };
         toast.add(tMsg); addToastRecord(tMsg);
       }
@@ -1104,7 +1093,7 @@ const saveTuningData = () => {
   };
 
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     // check if Tuning Tab data is validated before saving

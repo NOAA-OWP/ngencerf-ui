@@ -139,8 +139,17 @@ export const makeProtectedApiCall = async <T>(
       };
       return responseData;
     }
-  } catch {
-    sendUserToLogin();
+  } catch(error: any) {
+    responseData = {
+      _data: {
+        "message": error.message,
+        "response_type": "error",
+      },
+      status: 404,
+      ok: false,
+    };
+    return responseData;
+    //sendUserToLogin();
   }
 };
 

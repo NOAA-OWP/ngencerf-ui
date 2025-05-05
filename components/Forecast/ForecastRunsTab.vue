@@ -3,7 +3,7 @@
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
         <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
-          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
+          class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
     </div>
@@ -138,7 +138,7 @@
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRunForForecast, DataTableContextMenuOption, ForecastJob } from "@/composables/NextGenModel";
+import type { CalibrationRunForForecast, DataTableContextMenuOption, ForecastJob } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
@@ -194,12 +194,12 @@ const onRowContextMenu = (event: any) => {
     crContextMenu.value.show(event.originalEvent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
     if (crRowData.forecast_status === 'Done') {
-      cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastResults() });
+      cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToForecastResults() });
     } else if (crRowData.forcing_download_status === 'Running' || crRowData.forecast_status === 'Running') {
-      cmForecastRun.value.push({ label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() });
+      cmForecastRun.value.push({ label: 'View Running Status', icon: 'pi pi-gauge', command: () => navigateToForecastRunStatus() });
     }
-    cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => clearDataAndNavigateToSetupForecast() });
-    cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
+    cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
   }
 };
 
@@ -273,7 +273,7 @@ const navigateToSetupForecast = () => {
     if (e) {
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast tab not found' } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
   });
 }
@@ -283,15 +283,13 @@ const navigateToForecastRunStatus = () => {
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Status/Run Tab"]');
 
-    // load status/run tab data
-    await loadForecastStatusRunTabData();
-    isForecastLoading.value = false;
-
     if (e) {
+      await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Status/Run tab not found' } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Status/Run tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
+    isForecastLoading.value = false;
   });
 }
 
@@ -300,15 +298,13 @@ const navigateToForecastResults = () => {
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results tab"]');
 
-    // load results tab data
-    await loadForecastResultsTabData();
-    isForecastLoading.value = false;
-
     if (e) {
+      await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found' } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
+    isForecastLoading.value = false;
   });
 }
 
