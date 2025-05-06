@@ -161,16 +161,15 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
      * Get Calibration Plot Names for Comparison
      * @return {any}
      */
-    /* const queryGetPlotNamesForComparison = async (): Promise<any> => {
+    const queryGetPlotNamesForComparison = async (): Promise<any> => {
       return makeProtectedApiCall<CalibrationPlotListNamesData>(`${ngencerfBaseUrl}/calibration/get_plot_names_for_comparison/`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${getAccessToken()}`,
           "Content-Type": 'application/json'
         },
-        body: JSON.stringify({ calibration_run_ids: selectedCalibrationCompareRuns.value })
       });
-    }; */
+    };
 
   /**
    * Get Calibration Plots for Comparison
@@ -182,7 +181,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     start?: number,
     limit?: number
   ) => {
-    console.log('calibration_run_ids: ', selectedCalibrationCompareRuns.value.map(run => run.calibration_run_id));
     const plotDataResult = await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plots_for_comparison/`, {
       method: "POST",
       headers: {
@@ -197,7 +195,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         limit: limit !== undefined ? limit : 100
       })
     });
-    console.log('plotDataResult: ', plotDataResult);
     return plotDataResult;
   };
 
@@ -296,7 +293,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     setSelectedCalibrationRunId,
     loadSelectedCalibrationRun,
     fetchUserValidatedCalibrationJobsListData,
-    //queryGetPlotNamesForComparison,
+    queryGetPlotNamesForComparison,
     queryGetPlotsForComparison,
     resetUserSelectedEvalCalibrationRun,
     getReferenceDataSetOptions,

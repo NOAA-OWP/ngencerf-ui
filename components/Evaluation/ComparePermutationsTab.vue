@@ -79,7 +79,7 @@ const {
   selectedCalibrationCompareRuns
 } = storeToRefs(evaluationCalibrationRunStore);
 const {
-    //queryGetPlotNamesForComparison,
+    queryGetPlotNamesForComparison,
     queryGetPlotsForComparison
 } = evaluationCalibrationRunStore;
 
@@ -105,14 +105,8 @@ onMounted(() => {
     nextTick(async () => {
         hilightTab(EvaluationTabs.tab_compare);
 
-        // Hard-coding plotList for now since we only allow one plot type
-        plotList.value = [{
-            "name": "Bar Chart Metrics",
-            "description": "Bar chart comparing metrics from best and control validation runs for each evaluation period of the best global, local and best cost values at each iteration",
-            "timeseries_available": false
-        }]
-        //plotNames.value = await queryGetPlotNamesForComparison();
-        //plotList.value = ((plotNames?.value as any)?._data as PlotNames)?.plot_names;
+        plotNames.value = await queryGetPlotNamesForComparison();
+        plotList.value = ((plotNames?.value as any)?._data as PlotNames)?.plot_names;
         if (plotList.value.length === 1) {
             selectedPlotName.value = plotList.value[0].name
             getPlotTableData();
@@ -185,7 +179,6 @@ const getPlotTableData = async () => {
                     });
                 }
             }
-            console.log('plotTables: ', plotTables.value);
         } else {
             toast.removeAllGroups();
             const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeout5000 };
