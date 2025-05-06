@@ -3,7 +3,7 @@
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
         <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
+          class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
     </div>
@@ -166,7 +166,7 @@
         <div id="CustomizePlotWindow" v-if="showCustomizePlot">
           <div class="text-right sticky top-0">
             <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-              class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
+              class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
           </div>
           <h2 class="mt-5" aria-label="Customize Viewer" title="Customize Viewer">
             Customize Viewer
@@ -212,6 +212,7 @@
     <div id="LogDisplayArea" class="p-2"
       v-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
+        <!--
         <div v-if="selectedLogList.length > 1">
           <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
           <Select id="selectedLogOptions" class="p-select" v-model="selectedLogName" :options="selectedLogList"
@@ -221,16 +222,39 @@
         <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b
             style="width:160px; display:inline-block;">Log Name</b> {{ selectedLogName }}</div>
         
-        <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em; padding-bottom: 12px;"><b
+        <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;"><b
             style="width:160px; display:inline-block;">Log File Path</b> {{ selectedLogFilePath }}</div>
-        
-        <div class="pagination-box">
-          <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{
-            selectedLogTotalSize }}</div>
-          <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
+        -->
+
+        <table width="100%" summary="Calibration Log Options and File Path">
+          <caption class="sr-only">Calibration Log Options and File Path table</caption>  
+          <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
+          <tbody>  
+            <tr v-if="selectedLogList.length > 1">
+              <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
+              <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
+              optionLabel="name" optionValue="name">
+            </Select></td>
+            </tr>
+            <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
+              <td class="pr-2 pt-3"><b>Log Name</b></td>
+              <td class="pt-3">{{ selectedLogName }}</td>
+            </tr>
+            <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
+              <td class="pr-2 pt-3"><b>Log File Path</b></td>
+              <td class="pt-3">{{ selectedLogFilePath }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="pt-4">
+          <div class="pagination-box">
+            <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
+            <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
+          </div>
         </div>
 
-        <div id="selectedLogDisplay" class="p-2 gray-border mt-2 h-600 overflow-scroll">
+        <div id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
           <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>

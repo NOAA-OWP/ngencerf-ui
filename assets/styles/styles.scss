@@ -401,13 +401,16 @@ select option {
 
 .pagination-box {
   display: grid;
-  grid-template-columns: 35% 65%;
-  gap: 10px;
+  /*grid-template-columns: 35% 65%;
+  gap: 10px;*/
+  grid-template-columns: 23% 75%;
+  gap: 2%;
 }
 .pagination-rows, .pagination-go-to-page, .pagination-pages {margin-bottom: 4px; font-weight: normal; font-size: 13px;}
 .pagination-go-to-page input {width:70px; display: inline-block; padding: 2px 3px;font-size: 13px;}
 .pagination-go-to-page, .pagination-pages {display:inline-block; margin-top:-10px;}
-.pagination-go-to-page {width:30%;text-align: center;}
+.pagination-go-to-page {width:30%;text-align: right; padding-right: 0px;}
+#PlotTableArea .pagination-go-to-page {padding-right: 14px;}
 .pagination-pages {width:70%;}
 
 // default color ovewrites
@@ -600,3 +603,19 @@ table.cols-bordered {
   }
 }
 
+.JobsFilterBox {
+  .JobsFilterSelect  {
+    background-color: #f3f3f3;
+    border: 0px solid #d9d9d9 !important;    
+    padding-top: 4px;
+    padding-bottom: 4px;  
+
+    .p-multiselect-label {
+      padding: 0px;
+    }
+
+    .p-multiselect-dropdown {
+      color:#000000;
+    }
+  }
+}
