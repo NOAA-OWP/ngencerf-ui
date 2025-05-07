@@ -159,7 +159,7 @@ const navigateToEvaluateStatus = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Iteration ID', detail: 'Pleasea select a iteration job first.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Iteration ID', detail: 'Please select a iteration job first.', life: ToastTimeout.timeout6000 };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }

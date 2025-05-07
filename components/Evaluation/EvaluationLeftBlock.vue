@@ -10,9 +10,12 @@
         <EvaluateTab />
       </span>
       <span v-else-if="activeTab === 3">
-        <SelectAltIterationTab />
+        <ComparePermutationsTab />
       </span>
       <span v-else-if="activeTab === 4">
+        <SelectAltIterationTab />
+      </span>
+      <span v-else-if="activeTab === 5">
         <RunStatus />
       </span>
     </div>
@@ -24,6 +27,7 @@ import { generalStore } from "@/stores/common/GeneralStore";
 
 import Tabs from '@/components/Common/Tabs.vue'
 import EvaluateTab from './EvaluateTab.vue';
+import ComparePermutationsTab from './ComparePermutationsTab.vue';
 import SelectAltIterationTab from './SelectAltIterationTab.vue';
 import EvaluationRunsTab from './EvaluationRunsTab.vue';
 import RunStatus from './EvaluationRunStatus.vue';
