@@ -48,7 +48,7 @@
             Calibration Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
-          <span v-show="calibrationJobId > 0">
+          <span v-show="calibrationJobId > 0 && selectedCalibrationCompareRuns.length === 0">
             <div data-tab="2" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked" aria-label="Evaluate Tab"
               v-show="evaluateValidationRunId > 0 && (evaluateValidationRunStatus && evaluateValidationRunStatus !== 'Running')"
               title=" Evaluate tab">
@@ -63,7 +63,7 @@
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
           </span>
-          <span v-show="calibrationJobId > 0">
+          <span v-show="calibrationJobId > 0 && selectedCalibrationCompareRuns.length === 0">
             <div data-tab="4" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
               aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
               Select Alternate Iteration
