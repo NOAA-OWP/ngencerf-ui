@@ -138,12 +138,14 @@
         <div class="inline-flex flex-col items-center">
           <p class="font-semibold mb-2">Global Logging</p>
           <div class="flex gap-6">
-            <label v-for="level in ['ENABLED', 'DISABLED']" :key="level" class="flex items-center gap-1">
-              <input type="radio" :value="level" v-model="calibrationJobNgenGlobalLogging" />
-              <span>{{ level.charAt(0) + level.slice(1).toLowerCase() }}</span>
+            <label v-for="[label, val] in [['Enabled', true], ['Disabled', false]]" :key="label as string"
+              class="flex items-center gap-1">
+              <input type="radio" :value="val" v-model="calibrationJobNgenGlobalLogging" />
+              <span>{{ label }}</span>
             </label>
           </div>
         </div>
+
       </div>
 
       <div class="mb-4">
@@ -152,15 +154,15 @@
           <thead>
             <tr>
               <th class="pr-4">Module</th>
-              <th v-for="level in ['DEBUG', 'INFO', 'WARNING', 'SEVERE', 'FATAL']" :key="level" class="px-2">
-                {{ level.charAt(0) + level.slice(1).toLowerCase() }}
+              <th v-for="level in ['Debug', 'Info', 'Warning', 'Severe', 'Fatal']" :key="level" class="px-2">
+                {{ level }}
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(refValue, module) in logLevels" :key="module">
+            <tr v-for="(_, module) in logLevels" :key="module">
               <td class="pr-4">{{ module }}</td>
-              <td v-for="level in ['DEBUG', 'INFO', 'WARNING', 'SEVERE', 'FATAL']" :key="level" class="px-2">
+              <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="level" class="px-2">
                 <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]" />
               </td>
             </tr>
@@ -339,7 +341,7 @@ const startRun = async () => {
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Preparing Job Data';
 
-    const runCalibrationResponse = await runCalibrationJob(calibrationJobNgenGlobalLogging.value, logLevels.value);
+    const runCalibrationResponse = await runCalibrationJob();
 
     if (runCalibrationResponse.status >= 200 && runCalibrationResponse.status < 300) {
       if (runCalibrationResponse?._data?.status) {
