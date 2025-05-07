@@ -980,22 +980,41 @@ function adjustPlotTableColumns() {
 
 // Watch for page number changes in plot table
 watch(plotTableCurrentPage, async () => {
-  if (isNaN(plotTableCurrentPage.value) || plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value / plotTablePageSize.value)) {
-    console.log('ERROR: Page number ' + plotTableCurrentPage.value + ' out of bounds');
-  } else {
-    plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value - 1)) + 1;
-    plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value - 1), plotTableTotalSize.value);
-    const response: any = await queryGetPlot(
-      selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
-      true, // include_data
-      false, // force_include_plot
-      (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      plotTableStartRow.value - 1, // start
-      plotTablePageSize.value // limit
-    );
-    if (response?._data?.plot_data) {
-      plotTableData.value = response?._data?.plot_data;
+  if (selectedPlotName.value) {
+    if (isNaN(plotTableCurrentPage.value) || plotTableCurrentPage.value < 1 || plotTableCurrentPage.value > Math.ceil(plotTableTotalSize.value / plotTablePageSize.value)) {
+      console.log('ERROR: Page number ' + plotTableCurrentPage.value + ' out of bounds');
+    } else {
+      plotTableStartRow.value = (plotTablePageSize.value * (plotTableCurrentPage.value - 1)) + 1;
+      plotTableEndRow.value = Math.min(plotTableStartRow.value + (plotTablePageSize.value - 1), plotTableTotalSize.value);
+      const response: any = await queryGetPlot(
+        selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
+        true, // include_data
+        false, // force_include_plot
+        (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
+        (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+        plotTableStartRow.value - 1, // start
+        plotTablePageSize.value // limit
+      );
+      if (response?._data?.plot_data) {
+        plotTables.value = { default_table: [] };
+        for (let d = 0; d < response?._data?.plot_data.length; d++) {
+          let data_row = response?._data?.plot_data[d];
+          if ("metrics" in data_row) {
+            for (let d = 0; d < data_row.metrics.length; d++) {
+              data_row[data_row.metrics[d].name] = data_row.metrics[d].value;
+            }
+            delete data_row.metrics;
+          }
+          if ("parameters" in data_row) {
+            for (let d = 0; d < data_row.parameters.length; d++) {
+              data_row[data_row.parameters[d].name] = data_row.parameters[d].value;
+            }
+            delete data_row.parameters;
+          }
+          plotTables.value.default_table.push(data_row);
+        }
+        plotTableData.value = plotTables.value.default_table;
+      }
     }
   }
 });
