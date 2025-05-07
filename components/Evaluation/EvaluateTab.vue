@@ -439,9 +439,6 @@ const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
 const selectedLogFilePath = ref<string>('');
 
-// track exceptions that we might not want to clear in specific circumstances
-const refListToClearExceptions = ref<any[]>([]);
-
 const supplementalTableOptions = ref<any[]>([
   'Iteration Metrics Table',
   'Iteration Parameters Table',
