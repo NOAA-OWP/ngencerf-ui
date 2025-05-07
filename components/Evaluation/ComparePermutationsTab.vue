@@ -25,9 +25,6 @@
               :model="cmCompareRun"></ContextMenu>
             <div v-for="(table, index) in plotTables">
                 <h2 class="mt-2 mb-1">{{ table.title }}</h2>
-                <Button id="btn-evaluate" class="ngenButtonDiv" @click="togglePlotGraph(index, 'Corr')">
-                  Plot
-                </Button>
                 <DataTable :id="'plotTableHTML-' + index " :value="table.data" fixedHeader=true 
                     scrollable scroll-height="500px" :multi-sort="true" selectionMode="single"
                     v-model:selection="selectedDataRow" @rowContextmenu="onRowCpContextMenu">
@@ -116,6 +113,7 @@ ptColumnId.value.bodyCell.style['text-align'] = 'center';
 
 onMounted(() => {
     isComparePermutationsLoading.value = true;
+    selectedPlotName.value = '';
     nextTick(async () => {
         hilightTab(EvaluationTabs.tab_compare);
 
@@ -123,7 +121,6 @@ onMounted(() => {
         plotList.value = ((plotNames?.value as any)?._data as PlotNames)?.plot_names;
         if (plotList.value.length === 1) {
             selectedPlotName.value = plotList.value[0].name
-            getPlotTableData();
         }
     })
     isComparePermutationsLoading.value = false;
