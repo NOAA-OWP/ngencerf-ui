@@ -3,12 +3,12 @@
     <div class="pr-3">
       <div>
         <div id="ResultsDisplay">
-          <div class="grid grid-cols-2">
 
+          <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
                 <tbody>
-                  <tr height="38px" :aria-label="'Submit Time ' + submitTime " :title="'Submit Time ' + submitTime">
+                  <tr height="38px" :aria-label="'Submit Time ' + submitTime" :title="'Submit Time ' + submitTime">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Submit Time</div>
                     </th>
@@ -21,7 +21,7 @@
                     </th>
                     <td class="pl-5">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(30) }}</td>
                   </tr>
-                  <tr height="32px" :aria-label="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration : 
+                  <tr height="32px" :aria-label="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
                     'Interation ' + iteration" :title="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
                       'Interation ' + iteration">
                     <th scope="row" class="text-right font-bold">
@@ -49,7 +49,7 @@
                   </tr>
                   <tr height="32px" aria-label="Select Plot Name" title="Select Plot Name">
                     <th scope="row" class="text-right"><label for="DisplayOptions">{{ iteration && iteration >= 1 ?
-                        'Display' : '' }}</label></th>
+                      'Display' : '' }}</label></th>
                     <td class="pl-5" v-show='iteration && iteration >= 1'>
                       <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
                         optionLabel="name" optionValue="name">
@@ -132,6 +132,43 @@
 
     </span>
   -->
+
+    <div id="LoggingSection" v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'">
+      <div class="mb-4">
+        <div class="inline-flex flex-col items-center">
+          <p class="font-semibold mb-2">Global Logging</p>
+          <div class="flex gap-6">
+            <label v-for="level in ['ENABLED', 'DISABLED']" :key="level" class="flex items-center gap-1">
+              <input type="radio" :value="level" v-model="calibrationJobNgenGlobalLogging" />
+              <span>{{ level.charAt(0) + level.slice(1).toLowerCase() }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <p class="font-semibold mb-2">Module Logging Levels</p>
+        <table class="table-auto text-left border-collapse">
+          <thead>
+            <tr>
+              <th class="pr-4">Module</th>
+              <th v-for="level in ['DEBUG', 'INFO', 'WARNING', 'SEVERE', 'FATAL']" :key="level" class="px-2">
+                {{ level.charAt(0) + level.slice(1).toLowerCase() }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(refValue, module) in logLevels" :key="module">
+              <td class="pr-4">{{ module }}</td>
+              <td v-for="level in ['DEBUG', 'INFO', 'WARNING', 'SEVERE', 'FATAL']" :key="level" class="px-2">
+                <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
@@ -146,6 +183,7 @@ import type { CalibrationGetStatusValidationItem } from "~/composables/NgencerfM
 import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import type { ToastMessageOptions } from "primevue/toast";
 
+import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { generalStore } from "~/stores/common/GeneralStore";
@@ -159,6 +197,11 @@ import { hilightTab } from '@/composables/TabHilight';
 const userDataStore = useUserDataStore();
 
 const toast = useToast();
+
+const {
+  calibrationJobNgenGlobalLogging,
+  logLevels,
+} = storeToRefs(useCalibrationJobStore());
 
 const {
   submitTimeDate,
@@ -296,7 +339,7 @@ const startRun = async () => {
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Preparing Job Data';
 
-    const runCalibrationResponse = await runCalibrationJob();
+    const runCalibrationResponse = await runCalibrationJob(calibrationJobNgenGlobalLogging.value, logLevels.value);
 
     if (runCalibrationResponse.status >= 200 && runCalibrationResponse.status < 300) {
       if (runCalibrationResponse?._data?.status) {

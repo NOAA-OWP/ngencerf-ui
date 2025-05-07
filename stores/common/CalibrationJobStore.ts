@@ -20,13 +20,20 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
 
   const calibrationDownloadJobID = ref<number | null>(null);
   const calibrationDownloadFileName = ref<string | null>(null);
-  const calibrationJobNgenGlobalLogging = ref<"ENABLED" | "DISABLED">("ENABLED");
+  const calibrationJobNgenGlobalLogging = ref<boolean>(true);
 
   // stores the log level for each module
   const logLevels: Record<string, Ref<LogLevel>> = reactive({});
 
+  watch(calibrationJobNgenGlobalLogging, (newValue) => {
+    console.log("calibrationJobNgenGlobalLogging:", newValue);
+  },
+    { immediate: true }
+  );
+
   // updated logLevels when the modules change
   watch(() => userCalibrationRunData.value?.modules, (newModules) => {
+    console.log("userCalibrationRunData.modules changed:", newModules);
     // if newModules is undefined or empty, delete all modules from logLevels
     if (!newModules || newModules.length === 0) {
       for (const module in logLevels) {
@@ -38,11 +45,11 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     // track the modules that we should be using
     const validModules = new Set<string>();
 
-    // add new modules to logLevels and set log level to INFO
+    // add new modules to logLevels and set log level to info
     for (const module of newModules) {
       validModules.add(module);
       if (!logLevels[module]) {
-        logLevels[module] = ref<LogLevel>("INFO");
+        logLevels[module] = ref<LogLevel>("info");
       }
     }
 
@@ -52,9 +59,16 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
         delete logLevels[module];
       }
     }
+    console.log("logLevels updated:", logLevels);
   },
     { immediate: true }
   );
+
+  watchEffect(() => {
+    for (const [module, levelRef] of Object.entries(logLevels)) {
+      console.log(`logLevels[${module}] = ${levelRef}`);
+    }
+  });
 
 
   /**
@@ -253,6 +267,7 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     calibrationDownloadJobID,
     calibrationDownloadFileName,
     calibrationJobNgenGlobalLogging,
+    logLevels,
     fetchNewCalibrationRunId,
     cloneCalibrationRun,
     deleteCalibrationRun,

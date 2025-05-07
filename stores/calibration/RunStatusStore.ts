@@ -2,14 +2,23 @@
 
 import { defineStore, storeToRefs } from "pinia";
 
-import type { CalibrationStatus, CalibrationPlotListNamesData, BestIterationData } from "~/composables/NgencerfModels";
+import type {
+  CalibrationStatus,
+  CalibrationPlotListNamesData,
+  BestIterationData,
+  LogLevel
+} from "~/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
-import { isValidDate, isCalibrationJobFinished, getValidControlAndValidBestStatus } from '@/utils/CommonHelpers';
+import {
+  isValidDate,
+  isCalibrationJobFinished,
+  getValidControlAndValidBestStatus
+} from '@/utils/CommonHelpers';
 import { convertTimeZone } from '@/utils/TimeHelpers';
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
@@ -185,16 +194,41 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
   /**
    * Run Calibration
+   * @param {boolean} [logging_enabled] - Boolean value to enable/disable logging
+   * @param {Record<string, Ref<LogLevel>>} [modules] - k,v pairs of module names and their log levels
    * @return {any}
    */
-  const runCalibrationJob = async (): Promise<any> => {
+  const runCalibrationJob = async (
+    logging_enabled?: boolean,
+    modules?: Record<string, Ref<LogLevel>>
+  ): Promise<any> => {
+    // transform module ref values to their actual values to be sent to the backend
+    const serializedModules =
+      modules && Object.keys(modules).length > 0
+        ? Object.fromEntries(
+          Object.entries(modules).map(([key, refVal]) => [key, refVal.value])
+        )
+        : undefined;
+
+    // store the payload body
+    const bodyData: {
+      calibration_run_id: number;
+      logging_enabled?: boolean;
+      modules?: Record<string, string>;
+    } = {
+      calibration_run_id: calibrationJobId.value,
+      ...(logging_enabled !== undefined && { logging_enabled }),
+      ...(serializedModules && { modules: serializedModules }),
+    };
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/run_calibration/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({
+        calibration_run_id: calibrationJobId.value
+      })
     });
   }
 
