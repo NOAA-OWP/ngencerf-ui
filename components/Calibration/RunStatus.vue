@@ -166,6 +166,7 @@
                 <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]" />
               </td>
             </tr>
+
           </tbody>
         </table>
       </div>

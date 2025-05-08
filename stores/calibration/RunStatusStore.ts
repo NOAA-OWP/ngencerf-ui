@@ -203,14 +203,19 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    */
   const runCalibrationJob = async (): Promise<any> => {
     console.log('calibrationJobNgenGlobalLogging:', calibrationJobNgenGlobalLogging.value);
-    console.log("logLevels:", logLevels);
+    console.log(
+      'logLevels (all, unwrapped):',
+      Object.fromEntries(
+        Object.entries(logLevels).map(([key, refVal]) => [key, refVal?.value])
+      )
+    );
 
     // transform module ref values to their actual values to be sent to the backend
-    const serializedModules =
+    const serializedModules: Record<string, LogLevel> | undefined =
       logLevels && Object.keys(logLevels).length > 0
         ? Object.fromEntries(
           Object.entries(logLevels).map(([key, refVal]) => [key, refVal.value])
-        )
+        ) as Record<string, LogLevel>
         : undefined;
 
     console.log("Serialized modules:", serializedModules);
@@ -219,11 +224,11 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     const bodyData: {
       calibration_run_id: number;
       logging_enabled?: boolean;
-      modules?: Record<string, string>;
+      modules?: Record<string, LogLevel>;
     } = {
       calibration_run_id: calibrationJobId.value,
       ...(calibrationJobNgenGlobalLogging.value !== undefined && {
-        loggin_enabled: calibrationJobNgenGlobalLogging.value 
+        logging_enabled: calibrationJobNgenGlobalLogging.value
       }),
       ...(serializedModules && {
         modules: serializedModules

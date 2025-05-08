@@ -25,7 +25,7 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   const logLevels: Record<string, Ref<LogLevel>> = reactive({});
 
   watch(calibrationJobNgenGlobalLogging, (newValue) => {
-    console.log("calibrationJobNgenGlobalLogging:", newValue);
+    console.log("calibrationJobNgenGlobalLogging:", calibrationJobNgenGlobalLogging.value);
   },
     { immediate: true }
   );
@@ -35,6 +35,7 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     console.log("userCalibrationRunData.modules changed:", newModules);
     // if newModules is undefined or empty, delete all modules from logLevels
     if (!newModules || newModules.length === 0) {
+      console.log("No modules found, deleting all logLevels");
       for (const module in logLevels) {
         delete logLevels[module];
       }
@@ -46,27 +47,40 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
 
     // add new modules to logLevels and set log level to info
     for (const module of newModules) {
+      console.log("Adding module to validModules:", module);
       validModules.add(module);
+
+      // if the module is not already in logLevels, add it with a default log level
       if (!logLevels[module]) {
+        console.log("Adding new module to logLevels:", module);
         logLevels[module] = ref<LogLevel>("info");
+        console.log("logLevels after adding new module:", logLevels);
       }
     }
 
     // remove deleted modules from logLevels
     for (const module in logLevels) {
       if (!validModules.has(module)) {
+        console.log("Removing module from logLevels:", module);
         delete logLevels[module];
+        console.log("logLevels after removing module:", logLevels);
       }
     }
     console.log("logLevels updated:", logLevels);
+    console.log("logLevels (all):");
+    for (const [key, refVal] of Object.entries(logLevels)) {
+      console.log(`${key}:`, refVal);
+    };
   },
     { immediate: true }
   );
 
   watchEffect(() => {
-    for (const [module, levelRef] of Object.entries(logLevels)) {
-      console.log(`logLevels[${module}] = ${levelRef}`);
-    }
+    // loop over loglevels and print key and value
+    console.log("logLevels (all):");
+    for (const [key, refVal] of Object.entries(logLevels)) {
+      console.log(`${key}:`, refVal);
+    };
   });
 
 
