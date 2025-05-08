@@ -21,12 +21,15 @@
         </div>
         <h1 class="mt-4 mb-4">Compare Calibration Jobs for Gage {{ uiGageId }}</h1>
         <div v-if="plotTables.length > 0">
+            <ContextMenu :pt="{ root: { id: ' cp-context-menu-' } }" class="bg-white" ref="cpContextMenu"
+              :model="cmCompareRun"></ContextMenu>
             <div v-for="(table, index) in plotTables">
                 <h2 class="mt-2 mb-1">{{ table.title }}</h2>
-                <DataTable id="plotTableHTML{{ index }}" :value="table.data" fixedHeader=true 
-                    scrollable scroll-height="500px" :multi-sort="true">
+                <DataTable :id="'plotTableHTML-' + index " :value="table.data" fixedHeader=true 
+                    scrollable scroll-height="500px" :multi-sort="true" selectionMode="single"
+                    v-model:selection="selectedDataRow" @rowContextmenu="onRowCpContextMenu">
                     <Column v-for="col of table.columns" :key="col.value" :field="col.value" :header="col.header"
-                        :sortable="true" :pt="ptColumn"></Column>
+                        :sortable="true" :pt="col.value === 'formulation_name' ? ptColumnText : (col.value === 'calibration_run_id' ? ptColumnId : ptColumn)"></Column>
                 </DataTable>
             </div>
         </div>
@@ -42,7 +45,7 @@ import { useToast } from 'primevue/usetoast';
 import { DateTime } from "luxon";
 
 
-import type { DynamicObject } from "@/composables/NgencerfModels";
+import type { DynamicObject, DataTableContextMenuOption } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 import { formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
@@ -76,18 +79,22 @@ const {
 } = storeToRefs(runStatusStore);
 const {
   uiGageId,
-  selectedCalibrationCompareRuns
+  selectedCalibrationCompareRuns,
 } = storeToRefs(evaluationCalibrationRunStore);
 const {
     queryGetPlotNamesForComparison,
-    queryGetPlotsForComparison
+    queryGetPlotsForComparison,
+    loadSelectedCalibrationRun
 } = evaluationCalibrationRunStore;
 
 const isComparePermutationsLoading = ref<boolean>(false);
 
-const expandPlotTable = ref<Boolean>(false);
 const plotTables = ref<DynamicObject>({});
-const plotTableErrorMessage = ref<string>('');
+const plotTableData = ref<any[]>([]);
+//this model is for highlighting purpose
+const selectedDataRow = ref<DynamicObject>();
+const cpContextMenu = ref(); //compare run context menu
+const cmCompareRun = ref<DataTableContextMenuOption[]>([]);
 
 const initTablesBarChartMetrics = [
     {'name': 'calib', 'title': 'Calibration Period Best Run Metrics', data: [], columns: []},
@@ -99,9 +106,14 @@ const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   bodyCell: { style: { "text-align": "right", "padding-right": "10px !important", "white-space": "nowrap" } }
 });
+const ptColumnText = ref(JSON.parse(JSON.stringify(toRaw(ptColumn.value))));
+ptColumnText.value.bodyCell.style['text-align'] = 'left';
+const ptColumnId = ref(JSON.parse(JSON.stringify(toRaw(ptColumn.value))));
+ptColumnId.value.bodyCell.style['text-align'] = 'center';
 
 onMounted(() => {
     isComparePermutationsLoading.value = true;
+    selectedPlotName.value = '';
     nextTick(async () => {
         hilightTab(EvaluationTabs.tab_compare);
 
@@ -109,11 +121,29 @@ onMounted(() => {
         plotList.value = ((plotNames?.value as any)?._data as PlotNames)?.plot_names;
         if (plotList.value.length === 1) {
             selectedPlotName.value = plotList.value[0].name
-            getPlotTableData();
         }
     })
     isComparePermutationsLoading.value = false;
 });
+
+const viewCalibrationDetails = async (calibration_run_id: number) => {
+  isComparePermutationsLoading.value = true;
+  nextTick(async () => {
+    await loadSelectedCalibrationRun(calibration_run_id);
+    isComparePermutationsLoading.value = false;
+    showMessagesGroup.value = true;
+  })
+}
+
+const onRowCpContextMenu = (event: any) => {
+  console.log('Context menu triggered');
+  cmCompareRun.value = [];
+  const cpRowData = event.data as DynamicObject;
+  console.log('event.data: ', event.data);
+  console.log('cpContextMenu: ', cpContextMenu.value);
+  cpContextMenu.value.show(event.originalEvent);
+  cmCompareRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(cpRowData.calibration_run_id) })
+}
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
@@ -204,4 +234,14 @@ const toggleMessagesGroup = async () => {
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
 
+#MessagesGroupWindow {
+  z-index: 999;
+  border: 1px solid black;
+  position: absolute;
+  right: 2%;
+  top: 161px;
+  width: 48%;
+  background-color: white;
+  overflow: auto;
+}
 </style>
