@@ -73,13 +73,16 @@
           <Select id="HeadwaterBasinGageCompare" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
             :options="compareCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
             aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
-            @change="viewSelectedGageCalibrationRuns(uiGageId);">
+            @change="viewSelectedGageCalibrationRuns(0, uiGageId);">
           </Select>
         </div>
         <div id="evaluationCalibrationList">
+          <ContextMenu :pt="{ root: { id: ' cp-context-menu' } }" class="bg-white" ref="cpContextMenu"
+            :model="cmCompareRun"></ContextMenu>
           <DataTable id="compare-list" :value="computedGageCalibrationRunList" scrollable scroll-height="400px"
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="multiple"
-            v-model:selection="selectedCalibrationCompareRuns" :rowStyle="rowStyle" class="boxed">
+            v-model:selection="selectedCalibrationCompareRuns" :rowStyle="rowStyle" class="boxed"
+            @rowContextmenu="onRowCpContextMenu">
             <Column :pt="ptValColumns" v-for="(col, colIndex) in gageCalibrationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field" sortable>
             </Column>
@@ -286,11 +289,13 @@ const showMessagesGroup = ref<boolean>(false);
 
 const crContextMenu = ref(); //calibration run context menu
 const vrContextMenu = ref(); //validation run context menu
+const cpContextMenu = ref(); //compare run context menu
 
 const contextMenuJob = ref<number>();
 
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const cmValidationRun = ref<DataTableContextMenuOption[]>([]);
+const cmCompareRun = ref<DataTableContextMenuOption[]>([]);
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
@@ -457,7 +462,7 @@ const onRowContextMenu = (event: any) => {
     } if (crRowData.validation_runs === 1) {
       cmCalibrationRun.value.push({ label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJobFromCalibration(crRowData.calibration_run_id) })
     }
-    cmCalibrationRun.value.push({ label: 'Compare Permutations', icon: 'pi pi-fw-pisearch', command: () => viewSelectedGageCalibrationRuns(crRowData.gage_id) });
+    cmCalibrationRun.value.push({ label: 'Compare Permutations', icon: 'pi pi-fw-pisearch', command: () => viewSelectedGageCalibrationRuns(crRowData.calibration_run_id, crRowData.gage_id) });
     cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
     cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
     if (crRowData.validation_runs === 1) {
@@ -485,6 +490,14 @@ const onRowVrContextMenu = (event: any) => {
       cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
     }
   }
+}
+
+const onRowCpContextMenu = (event: any) => {
+  cmCompareRun.value = [];
+  const cpRowData = event.data as ValidatedCalibrationRunListItem;
+  console.log('cpContextMenu: ', cpContextMenu.value);
+  cpContextMenu.value.show(event.originalEvent);
+  cmCompareRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(cpRowData.calibration_run_id) })
 }
 
 const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
@@ -556,7 +569,7 @@ const viewSelectedCalibrationValidationRuns = async (calibration_run_id: number)
   })
 }
 
-const viewSelectedGageCalibrationRuns = async (gage_id: string) => {
+const viewSelectedGageCalibrationRuns = async (calibration_run_id: number, gage_id: string) => {
   isLoading.value = true;
   userSelectedEvalCalibrationRunId.value = calibrationJobId.value = 0;
   computedGageCalibrationRunList.value = [];
@@ -577,6 +590,10 @@ const viewSelectedGageCalibrationRuns = async (gage_id: string) => {
         rowData['objective_function'] = calibration_job.objective_function;
         rowData['optimization_algorithm'] = calibration_job.optimization_algorithm;
         computedGageCalibrationRunList.value.push(rowData);
+        if (calibration_job.calibration_run_id == calibration_run_id) {
+          // start with the job that the user picked already highlighted
+          selectedCalibrationCompareRuns.value = [rowData];
+        }
       });
     } else {
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Not Enough Calibration Jobs', detail: 'You can only Compare Permutations for gages for which you have completed at least 2 calibration jobs.', life: ToastTimeout.timeout6000 };
