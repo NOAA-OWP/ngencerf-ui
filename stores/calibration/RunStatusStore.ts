@@ -200,24 +200,28 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   /**
    * Run Calibration
    * @return {any}
+   * NOTE: outside CalibrationJobStore, access logLevels WITH .value
+   * when a reactive property is imported into a different file,
+   * it becomes a ref object, so you need to access the value with .value
+   * https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive
    */
   const runCalibrationJob = async (): Promise<any> => {
+    console.log("runCalibrationJob");
     console.log('calibrationJobNgenGlobalLogging:', calibrationJobNgenGlobalLogging.value);
-    console.log(
-      'logLevels (all, unwrapped):',
-      Object.fromEntries(
-        Object.entries(logLevels).map(([key, refVal]) => [key, refVal?.value])
-      )
-    );
+    console.log('logLevels from runCalibrationJob:', logLevels.value);
+    console.log("typeof logLevels:", typeof logLevels.value);
+    const rawLogLevels = toRaw(logLevels.value);
+    console.log("rawLogLevels:", rawLogLevels);
+    console.log("typeof rawLogLevels:", typeof rawLogLevels);
 
     // transform module ref values to their actual values to be sent to the backend
     const serializedModules: Record<string, LogLevel> | undefined =
-      logLevels && Object.keys(logLevels).length > 0
-        ? Object.fromEntries(
-          Object.entries(logLevels).map(([key, refVal]) => [key, refVal.value])
-        ) as Record<string, LogLevel>
-        : undefined;
-
+      Object.entries(rawLogLevels).reduce((acc, [key, value]) => {
+        if (value && typeof value === 'object' && 'value' in value) {
+          acc[key] = value.value;
+        }
+        return acc;
+      }, {} as Record<string, LogLevel>);
     console.log("Serialized modules:", serializedModules);
 
     // store the payload body

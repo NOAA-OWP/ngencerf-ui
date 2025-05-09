@@ -30,7 +30,17 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     { immediate: true }
   );
 
-  // updated logLevels when the modules change
+  /**
+   * watch for changes in userCalibrationRunData.modules
+   * and update logLevels accordingly
+   * if newModules is undefined or empty, delete all modules from logLevels
+   * if newModules is not undefined or empty, add new modules to logLevels
+   * and set log level to info
+   * NOTE: in CalibrationJobStore, access logLevels WITHOUT .value
+   * because logLevels is a reactive object. It is changed into a ref
+   * when it is passed to a component.
+   * https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive
+   */
   watch(() => userCalibrationRunData.value?.modules, (newModules) => {
     console.log("userCalibrationRunData.modules changed:", newModules);
     // if newModules is undefined or empty, delete all modules from logLevels
@@ -66,21 +76,26 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
         console.log("logLevels after removing module:", logLevels);
       }
     }
-    console.log("logLevels updated:", logLevels);
-    console.log("logLevels (all):");
-    for (const [key, refVal] of Object.entries(logLevels)) {
-      console.log(`${key}:`, refVal);
-    };
+    console.log("logLevels from watch userCalibrationRunData.value.modules:", logLevels);
+    console.log("typeof logLevels:", typeof logLevels);
+    const rawLogLevels = toRaw(logLevels);
+    console.log("rawLogLevels:", rawLogLevels);
+    console.log("typeof rawLogLevels:", typeof rawLogLevels);
+    for (const [key, refVal] of Object.entries(rawLogLevels)) {
+      console.log(`${key}:`, refVal.value);
+    }
+
+
   },
     { immediate: true }
   );
 
   watchEffect(() => {
-    // loop over loglevels and print key and value
-    console.log("logLevels (all):");
+    console.log("logLevels from watchEffect:", logLevels);
+    console.log("typeof logLevels:", typeof logLevels);
     for (const [key, refVal] of Object.entries(logLevels)) {
       console.log(`${key}:`, refVal);
-    };
+    }
   });
 
 
