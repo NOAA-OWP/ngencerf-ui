@@ -87,88 +87,50 @@
         </div>
       </div>
       <div>
-        <div v-if="selectedPlotFileUrl" id="GraphArea" class="p-2">
+        <!--LOGGING SECTION-->
+        <div v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'" id="LoggingSection" class="p-2">
+          <div class="mb-4">
+            <div class="inline-flex flex-col items-center">
+              <p class="font-semibold mb-2">Global Logging</p>
+              <div class="flex gap-6">
+                <label v-for="[label, val] in [['Enabled', true], ['Disabled', false]]" :key="label as string"
+                  class="flex items-center gap-1">
+                  <input type="radio" :value="val" v-model="calibrationJobNgenGlobalLogging" />
+                  <span>{{ label }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <p class="font-semibold mb-2">Module Logging Levels</p>
+            <table class="table-auto text-left border-collapse">
+              <thead>
+                <tr>
+                  <th class="pr-4">Module</th>
+                  <th v-for="level in ['Debug', 'Info', 'Warning', 'Severe', 'Fatal']" :key="level" class="px-2">
+                    {{ level }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(_, module) in logLevels" :key="module">
+                  <td class="pr-4">{{ module }}</td>
+                  <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="level" class="px-2">
+                    <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]" />
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div v-else-if="selectedPlotFileUrl" id="GraphArea" class="p-2">
           <img :src="selectedPlotFileUrl" alt="Selected Plot" />
         </div>
         <div v-else id="GraphArea" class="p-2">
           <!--Data Display-->
         </div>
-      </div>
-    </div>
-    <!--
-    <span v-if="calibrationStatus !== 'Done'">
-      <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
-        <div class="row-span-1">
-          <div id="StatusRunBottomButtons" class="grid grid-cols-8">
-            <span v-if="calibrationStatus === 'Ready'">
-              <div class="col-span-1 ngenButtonDiv-green mr-6 h-8">
-                <Button class="font-normal" title="Run Button" aria-label="Run Button" @click="startRun()">
-                  Run
-                </Button>
-              </div>
-            </span>
-            <span v-else>
-              <div class="col-span-1 mr-6 h-8 whitespace-nowrap">&nbsp;</div>
-            </span>
-            <span v-if="calibrationStatus === 'Running'">
-              <div class="col-span-1 mr-3">
-                <Button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelRun()"
-                  aria-label="Cancel Button">
-                  Cancel
-                </Button>
-              </div>
-            </span>
-            <span v-else>
-              <div class="col-span-1 mr-3">&nbsp;</div>
-            </span>
-            <div class="col-span-4">&nbsp;</div>
-            <div class="col-span-1">&nbsp;</div>
-            <div class="col-span-1 mr-4">
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </span>
-  -->
-
-    <div id="LoggingSection" v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'">
-      <div class="mb-4">
-        <div class="inline-flex flex-col items-center">
-          <p class="font-semibold mb-2">Global Logging</p>
-          <div class="flex gap-6">
-            <label v-for="[label, val] in [['Enabled', true], ['Disabled', false]]" :key="label as string"
-              class="flex items-center gap-1">
-              <input type="radio" :value="val" v-model="calibrationJobNgenGlobalLogging" />
-              <span>{{ label }}</span>
-            </label>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="mb-4">
-        <p class="font-semibold mb-2">Module Logging Levels</p>
-        <table class="table-auto text-left border-collapse">
-          <thead>
-            <tr>
-              <th class="pr-4">Module</th>
-              <th v-for="level in ['Debug', 'Info', 'Warning', 'Severe', 'Fatal']" :key="level" class="px-2">
-                {{ level }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(_, module) in logLevels" :key="module">
-              <td class="pr-4">{{ module }}</td>
-              <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="level" class="px-2">
-                <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]" />
-              </td>
-            </tr>
-
-          </tbody>
-        </table>
       </div>
     </div>
 
