@@ -34,7 +34,7 @@
               </table>
             </div>
 
-            <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
+            <div class="col-span-1 pl-5 border-l border-[#d9d9d9]">
               <table>
                 <tbody>
                   <tr height="38px" :aria-label="'Status ' + overallCalibrationValidationStatus"
@@ -88,7 +88,7 @@
       </div>
       <div>
         <!--LOGGING SECTION-->
-        <div v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'" id="LoggingSection" class="p-2">
+        <div v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'" id="LoggingSection" class="p-2 border-t border-[#d9d9d9]">
           <div class="mb-4">
             <div class="inline-flex flex-col items-center">
               <p class="font-semibold mb-2">Global Logging</p>
