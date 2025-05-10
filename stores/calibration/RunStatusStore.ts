@@ -7,7 +7,7 @@ import type {
   CalibrationPlotListNamesData,
   BestIterationData,
   LogLevel
-} from "~/composables/NgencerfModels";
+} from "@/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";

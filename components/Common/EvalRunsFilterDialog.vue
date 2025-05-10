@@ -73,7 +73,7 @@ import Button from "primevue/button";
 import MultiSelect from 'primevue/multiselect';
 import Select from "primevue/select";
 
-import type { CalibrationJobListItem } from "~/composables/NgencerfModels"
+import type { CalibrationJobListItem } from "@/composables/NgencerfModels"
 
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";

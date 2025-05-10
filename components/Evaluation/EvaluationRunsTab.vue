@@ -269,7 +269,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
-import type { CalibrationValidationJobData, DataTableContextMenuOption } from "~/composables/NgencerfModels";
+import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NgencerfModels";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";

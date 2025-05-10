@@ -93,7 +93,7 @@
 import { onMounted, onUnmounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
-import type { CalibrationGetStatusValidationItem } from "~/composables/NgencerfModels";
+import type { CalibrationGetStatusValidationItem } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 

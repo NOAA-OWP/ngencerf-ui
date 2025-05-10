@@ -35,7 +35,7 @@
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRun } from "~/composables/NgencerfModels";
+import type { CalibrationRun } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 

@@ -156,7 +156,7 @@ import { useDialog } from "primevue/usedialog";
 
 import type { SelectChangeEvent } from "primevue/select";
 import type { ToastMessageOptions } from "primevue/toast";
-import type { GageResetData } from "~/composables/NgencerfModels"
+import type { GageResetData } from "@/composables/NgencerfModels"
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useGageStore } from "@/stores/calibration/GageStore";

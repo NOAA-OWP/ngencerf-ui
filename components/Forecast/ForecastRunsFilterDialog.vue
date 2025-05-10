@@ -45,7 +45,7 @@
 import Button from "primevue/button";
 import Select from "primevue/select";
 
-import type { ForecastJob } from "~/composables/NgencerfModels"
+import type { ForecastJob } from "@/composables/NgencerfModels"
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 

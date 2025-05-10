@@ -67,7 +67,7 @@ import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { ToastTimeout } from "@/composables/NgencerfEnums";
-import type { CombinedVersionInfo } from "~/composables/NgencerfModels";
+import type { CombinedVersionInfo } from "@/composables/NgencerfModels";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 

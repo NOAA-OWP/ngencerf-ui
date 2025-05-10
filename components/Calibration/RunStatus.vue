@@ -88,7 +88,8 @@
       </div>
       <div>
         <!--LOGGING SECTION-->
-        <div v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'" id="LoggingSection" class="p-2 border-t border-[#d9d9d9]">
+        <div v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'" id="LoggingSection"
+          class="p-2 border-t border-[#d9d9d9]">
           <div class="mb-4">
             <div class="inline-flex flex-col items-center">
               <p class="font-semibold mb-2">Global Logging</p>
@@ -120,7 +121,6 @@
                     <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]" />
                   </td>
                 </tr>
-
               </tbody>
             </table>
           </div>
@@ -144,7 +144,7 @@
 import { onMounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
-import type { CalibrationGetStatusValidationItem } from "~/composables/NgencerfModels";
+import type { CalibrationGetStatusValidationItem } from "@/composables/NgencerfModels";
 import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import type { ToastMessageOptions } from "primevue/toast";
 

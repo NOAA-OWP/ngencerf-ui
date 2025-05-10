@@ -9,7 +9,7 @@ import type {
   DynamicTableColumn,
   CalibrationRunIterationMetricData,
   CalibrationRunByIterationRetrospectiveData,
-} from "~/composables/NgencerfModels";
+} from "@/composables/NgencerfModels";
 
 import { generalStore } from "../common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";

@@ -15,7 +15,7 @@ import type {
   GeneralErrorResponse,
   SaveGageTabResponse,
   SaveGageTabPayload,
-} from "~/composables/NgencerfModels";
+} from "@/composables/NgencerfModels";
 
 export const useGageStore = defineStore(
   "GageStore",

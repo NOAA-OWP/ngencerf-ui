@@ -8,7 +8,7 @@ import type {
   UserCalibrationRunData,
   ServerStatus,
   LogLevel,
-} from "~/composables/NgencerfModels";
+} from "@/composables/NgencerfModels";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 

@@ -308,7 +308,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 
 
-import type { DynamicObject } from "~/composables/NgencerfModels";
+import type { DynamicObject } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 import { formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";

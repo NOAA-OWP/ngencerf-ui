@@ -5,7 +5,7 @@
  */
 import { defineStore } from "pinia";
 
-import type { CombinedVersionInfo, ToastRecord } from "~/composables/NgencerfModels";
+import type { CombinedVersionInfo, ToastRecord } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 
 export const generalStore = defineStore(

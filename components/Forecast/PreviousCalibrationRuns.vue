@@ -143,7 +143,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
-import type { CalibrationRunForForecast, DataTableContextMenuOption } from "~/composables/NgencerfModels";
+import type { CalibrationRunForForecast, DataTableContextMenuOption } from "@/composables/NgencerfModels";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";

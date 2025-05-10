@@ -309,7 +309,7 @@ import Select from "primevue/select";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 
-import type { GeneralErrorResponse, ValidationErrorObject, NonFieldError } from "~/composables/NgencerfModels"
+import type { GeneralErrorResponse, ValidationErrorObject, NonFieldError } from "@/composables/NgencerfModels"
 
 import type { DatePickerProps } from "primevue/datepicker";
 import type { ToastMessageOptions } from "primevue/toast";
