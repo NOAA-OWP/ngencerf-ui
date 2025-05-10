@@ -6,10 +6,10 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "@/stores/common/GeneralStore";
 
-import { makeProtectedApiCall } from "#imports";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
-import type { CalibrationJobListItem, LogLevel } from "@/composables/NgencerfModels";
+import type { CalibrationJobListItem } from "@/composables/NgencerfModels";
 
 export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
@@ -19,85 +19,6 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
 
   const calibrationDownloadJobID = ref<number | null>(null);
   const calibrationDownloadFileName = ref<string | null>(null);
-  const calibrationJobNgenGlobalLogging = ref<boolean>(true);
-
-  // stores the log level for each module
-  const logLevels: Record<string, Ref<LogLevel>> = reactive({});
-
-  watch(calibrationJobNgenGlobalLogging, (newValue) => {
-    console.log("calibrationJobNgenGlobalLogging:", calibrationJobNgenGlobalLogging.value);
-  },
-    { immediate: true }
-  );
-
-  /**
-   * watch for changes in userCalibrationRunData.modules
-   * and update logLevels accordingly
-   * if newModules is undefined or empty, delete all modules from logLevels
-   * if newModules is not undefined or empty, add new modules to logLevels
-   * and set log level to info
-   * NOTE: in CalibrationJobStore, access logLevels WITHOUT .value
-   * because logLevels is a reactive object. It is changed into a ref
-   * when it is passed to a component.
-   * https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive
-   */
-  watch(() => userCalibrationRunData.value?.modules, (newModules) => {
-    console.log("userCalibrationRunData.modules changed:", newModules);
-    // if newModules is undefined or empty, delete all modules from logLevels
-    if (!newModules || newModules.length === 0) {
-      console.log("No modules found, deleting all logLevels");
-      for (const module in logLevels) {
-        delete logLevels[module];
-      }
-      return;
-    }
-
-    // track the modules that we should be using
-    const validModules = new Set<string>();
-
-    // add new modules to logLevels and set log level to info
-    for (const module of newModules) {
-      console.log("Adding module to validModules:", module);
-      validModules.add(module);
-
-      // if the module is not already in logLevels, add it with a default log level
-      if (!logLevels[module]) {
-        console.log("Adding new module to logLevels:", module);
-        logLevels[module] = ref<LogLevel>("info");
-        console.log("logLevels after adding new module:", logLevels);
-      }
-    }
-
-    // remove deleted modules from logLevels
-    for (const module in logLevels) {
-      if (!validModules.has(module)) {
-        console.log("Removing module from logLevels:", module);
-        delete logLevels[module];
-        console.log("logLevels after removing module:", logLevels);
-      }
-    }
-    console.log("logLevels from watch userCalibrationRunData.value.modules:", logLevels);
-    console.log("typeof logLevels:", typeof logLevels);
-    const rawLogLevels = toRaw(logLevels);
-    console.log("rawLogLevels:", rawLogLevels);
-    console.log("typeof rawLogLevels:", typeof rawLogLevels);
-    for (const [key, refVal] of Object.entries(rawLogLevels)) {
-      console.log(`${key}:`, refVal.value);
-    }
-
-
-  },
-    { immediate: true }
-  );
-
-  watchEffect(() => {
-    console.log("logLevels from watchEffect:", logLevels);
-    console.log("typeof logLevels:", typeof logLevels);
-    for (const [key, refVal] of Object.entries(logLevels)) {
-      console.log(`${key}:`, refVal);
-    }
-  });
-
 
   /**
  * returns list of calibration job data from server
@@ -294,8 +215,6 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     runningCalibrationJobs,
     calibrationDownloadJobID,
     calibrationDownloadFileName,
-    calibrationJobNgenGlobalLogging,
-    logLevels,
     fetchNewCalibrationRunId,
     cloneCalibrationRun,
     deleteCalibrationRun,

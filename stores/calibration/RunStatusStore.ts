@@ -9,7 +9,6 @@ import type {
   LogLevel
 } from "~/composables/NgencerfModels";
 
-import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
@@ -23,14 +22,13 @@ import {
 import { convertTimeZone } from '@/utils/TimeHelpers';
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
-  const {
-    calibrationJobNgenGlobalLogging,
-    logLevels
-  } = storeToRefs(useCalibrationJobStore());
   const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
-  const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+  const { userCalibrationRunData,
+    calibrationJobNgenGlobalLogging,
+    logLevels,
+   } = storeToRefs(useUserDataStore());
 
   // refs
   const calibrationElapsedTime = ref<string>();
@@ -216,9 +214,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
     // transform module ref values to their actual values to be sent to the backend
     const serializedModules: Record<string, LogLevel> | undefined =
-      Object.entries(rawLogLevels).reduce((acc, [key, value]) => {
-        if (value && typeof value === 'object' && 'value' in value) {
-          acc[key] = value.value;
+      Object.entries(rawLogLevels).reduce((acc, [key, val]) => {
+        if (val && typeof val === 'object' && 'value' in val) {
+          acc[key] = val.value;
         }
         return acc;
       }, {} as Record<string, LogLevel>);

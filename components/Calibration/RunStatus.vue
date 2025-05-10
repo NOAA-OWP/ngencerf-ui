@@ -186,7 +186,6 @@ import type { CalibrationGetStatusValidationItem } from "~/composables/NgencerfM
 import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import type { ToastMessageOptions } from "primevue/toast";
 
-import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { generalStore } from "~/stores/common/GeneralStore";
@@ -200,11 +199,6 @@ import { hilightTab } from '@/composables/TabHilight';
 const userDataStore = useUserDataStore();
 
 const toast = useToast();
-
-const {
-  calibrationJobNgenGlobalLogging,
-  logLevels,
-} = storeToRefs(useCalibrationJobStore());
 
 const {
   submitTimeDate,
@@ -229,7 +223,11 @@ const {
   validationBestAchieved
 } = storeToRefs(useRunStatusStore());
 
-const { userCalibrationRunData } = storeToRefs(userDataStore);
+const {
+  userCalibrationRunData,
+  calibrationJobNgenGlobalLogging,
+  logLevels,
+} = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
 
 const {
