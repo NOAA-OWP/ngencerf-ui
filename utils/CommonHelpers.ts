@@ -1,4 +1,4 @@
-import { ServerCodes } from '@/composables/NextgenEnums';
+import { ServerCodes } from '@/composables/NgencerfEnums';
 import { DateTime } from "luxon";
 
 /**

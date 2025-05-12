@@ -90,8 +90,8 @@ import MultiSelect from 'primevue/multiselect';
 import Select from "primevue/select";
 
 
-import type { CalibrationJobListItem } from "@/composables/NextGenModel"
-import { StatusTypes } from "@/composables/NextgenEnums";
+import type { CalibrationJobListItem } from "@/composables/NgencerfModels"
+import { StatusTypes } from "@/composables/NgencerfEnums";
 
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";

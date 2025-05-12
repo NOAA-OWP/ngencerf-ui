@@ -1,9 +1,9 @@
 import { ref } from "vue"
 import type { ToastMessageOptions } from "primevue/toast";
 
-import type { SlothParameterData, SaveFormulationTabPayload, FormulationTabSaveWarning, GageBasinApiSavedResponse, edsError } from "./NextGenModel";
+import type { SlothParameterData, SaveFormulationTabPayload, FormulationTabSaveWarning, GageBasinApiSavedResponse, edsError } from "./NgencerfModels";
 
-import { ValidationFormFields } from "./NextGenModel";
+import { ValidationFormFields } from "./NgencerfEnums";
 
 /**
  * @param requiredFields 

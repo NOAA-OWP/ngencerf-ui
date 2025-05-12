@@ -93,9 +93,9 @@
 import { onMounted, onUnmounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
-import type { CalibrationGetStatusValidationItem } from "@/composables/NextGenModel";
+import type { CalibrationGetStatusValidationItem } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';

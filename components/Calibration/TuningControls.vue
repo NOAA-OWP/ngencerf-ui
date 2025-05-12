@@ -309,11 +309,11 @@ import Select from "primevue/select";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 
-import type { GeneralErrorResponse, ValidationErrorObject, NonFieldError } from "@/composables/NextGenModel"
+import type { GeneralErrorResponse, ValidationErrorObject, NonFieldError } from "@/composables/NgencerfModels"
 
 import type { DatePickerProps } from "primevue/datepicker";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";

@@ -269,8 +269,8 @@ import { useToast } from "primevue/usetoast";
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
-import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NextGenModel";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NgencerfModels";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
@@ -282,7 +282,7 @@ import EvalRunsFilterDialog from "@/components/Common/EvalRunsFilterDialog.vue"
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
-import { EvaluationTabs } from "@/composables/NextgenEnums";
+import { EvaluationTabs } from "@/composables/NgencerfEnums";
 
 const { deleteCalibrationRun, getCalibrationJobZip } = useCalibrationJobStore();
 const showMessagesGroup = ref<boolean>(false);

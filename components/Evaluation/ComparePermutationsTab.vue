@@ -45,9 +45,9 @@ import { useToast } from 'primevue/usetoast';
 import { DateTime } from "luxon";
 
 
-import type { DynamicObject, DataTableContextMenuOption } from "@/composables/NextGenModel";
+import type { DynamicObject, DataTableContextMenuOption } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 import { formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
 import { isValidDate, isValidDateTime } from "@/utils/CommonHelpers";
 

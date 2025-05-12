@@ -196,9 +196,9 @@ import Swal from 'sweetalert2';
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import MultipleJobOperations from "@/components/Common/MultipleJobOperations.vue"
 
-import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NextGenModel";
+import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout, JobStatusAction } from "@/composables/NextgenEnums";
+import { ToastTimeout, JobStatusAction } from "@/composables/NgencerfEnums";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { generalStore } from "@/stores/common/GeneralStore";
