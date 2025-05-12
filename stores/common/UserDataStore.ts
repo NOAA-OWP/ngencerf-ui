@@ -43,6 +43,7 @@ export const useUserDataStore = defineStore(
 
     const lastServerError = ref<ServerStatus>();
 
+    // sets value for global logging
     const calibrationJobNgenGlobalLogging = ref<boolean>(true);
 
     // stores the log level for each module

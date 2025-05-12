@@ -145,6 +145,12 @@
               Results Pathname:</span>
             {{ resultsPathname }}</div>
         </div>
+        <div class="col-span-2">
+          <div :aria-label="'NGEN Global Logging ' + calibrationJobNgenGlobalLogging"
+            :title="'NGEN Global Logging ' + calibrationJobNgenGlobalLogging"><span class="font-medium">
+              NGen Global Logging:</span>
+            {{ calibrationJobNgenGlobalLogging ? 'ENABLED' : 'DISABLED' }}</div>
+        </div>
         <div class="col-span-2">&nbsp;</div>
       </div>
     </div>
@@ -161,7 +167,7 @@ import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
-const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, calibrationJobNgenGlobalLogging } = storeToRefs(useUserDataStore());
 const calData = ref(userCalibrationRunData);
 const { userSelectedCalibrationTuningParameters } = storeToRefs(useTuningStore());
 const { resultsPathname } = storeToRefs(useRunStatusStore());
