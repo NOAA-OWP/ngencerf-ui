@@ -207,7 +207,6 @@ const changePassword = async () => {
       console.error("Error during user creation:", error.value?.message, error.value?.data);
       return;
     }
-    console.log("changePassword", data);
     // Clear out the inputs and report success
     oldpass.value = "";
     newpass.value = "";
@@ -248,7 +247,6 @@ const updateName = async () => {
       console.error("Error during user update:", error.value?.message, error.value?.data);
       return;
     }
-    console.log("UpdateNameData", data);
     // Clear out the inputs and report success
     setFirstName(updateNameData.first_name);
     setLastName(updateNameData.last_name);

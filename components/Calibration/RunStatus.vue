@@ -109,7 +109,7 @@
               'overflow-x-auto',
               { 'opacity-50 pointer-events-none': !calibrationJobNgenGlobalLogging }
             ]">
-              <table class="table-auto text-left border-collapse mx-auto">
+              <table class="table-auto text-left border-collapse mx-auto" aria-label="Module Logging Levels">
                 <thead>
                   <tr>
                     <th class="pr-4">Module</th>

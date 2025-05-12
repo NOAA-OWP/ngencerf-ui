@@ -117,7 +117,7 @@ onMounted(async () => {
  * On DataTable row selection
  */
 const onRowSelect = (e: any) => {
-  console.log('onRowSelect', e);
+  // console.log('onRowSelect', e);
   const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeout3000 };
   toast.add(tMsg); addToastRecord(tMsg);
 };
@@ -126,7 +126,7 @@ const onRowSelect = (e: any) => {
  * Go to the Status Run tab
  */
 const goToStatusRunTab = () => {
-  console.log('startForecastRun');
+  // console.log('startForecastRun');
   const allTabs = document.getElementsByClassName("tabs");
   const e = allTabs[ForecastTabs.tab_statusRun] as HTMLElement;
   e.click();

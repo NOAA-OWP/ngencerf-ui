@@ -508,7 +508,7 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   */
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
   queryUserCalibrationRunData().then(queryResponse => {
-    console.log('queryResponse: ', queryResponse);
+    // console.log('queryResponse: ', queryResponse);
     if (queryResponse?.status === 200) {
       userCalibrationRunData.value = queryResponse?._data;
       loadEntireRun();
