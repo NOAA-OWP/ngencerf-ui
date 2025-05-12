@@ -136,11 +136,8 @@ const viewCalibrationDetails = async (calibration_run_id: number) => {
 }
 
 const onRowCpContextMenu = (event: any) => {
-  console.log('Context menu triggered');
   cmCompareRun.value = [];
   const cpRowData = event.data as DynamicObject;
-  console.log('event.data: ', event.data);
-  console.log('cpContextMenu: ', cpContextMenu.value);
   cpContextMenu.value.show(event.originalEvent);
   cmCompareRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(cpRowData.calibration_run_id) })
 }

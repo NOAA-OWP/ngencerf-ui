@@ -704,7 +704,6 @@ watch(selectedPlotName, async () => {
 
     // set sweStartDateTime and sweEndDateTime if not already set
     if (!sweStartDateTime.value || !sweEndDateTime.value) {
-      console.log('Setting SWE Start/End Dates');
       setSweStartDateTime();
       setSweEndDateTime();
     }
@@ -1291,7 +1290,7 @@ const drawInteractiveSlider = () => {
           };
           plotGraphSliderData.value.push(dataPoint);
         }
-        console.log('Using column ' + plotTableColumns.value[c].value + ' to draw slider');
+        // console.log('Using column ' + plotTableColumns.value[c].value + ' to draw slider');
         break;
       }
     }

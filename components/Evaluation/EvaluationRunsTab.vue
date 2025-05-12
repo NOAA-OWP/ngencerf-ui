@@ -495,7 +495,7 @@ const onRowVrContextMenu = (event: any) => {
 const onRowCpContextMenu = (event: any) => {
   cmCompareRun.value = [];
   const cpRowData = event.data as ValidatedCalibrationRunListItem;
-  console.log('cpContextMenu: ', cpContextMenu.value);
+  // console.log('cpContextMenu: ', cpContextMenu.value);
   cpContextMenu.value.show(event.originalEvent);
   cmCompareRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(cpRowData.calibration_run_id) })
 }

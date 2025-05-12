@@ -89,7 +89,7 @@
       <div>
         <!--LOGGING SECTION-->
         <div v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'" id="LoggingSection"
-          class="p-2 border-t border-[#d9d9d9]">
+          class="p-2 border-t border-[#d9d9d9] flex flex-col items-center">
           <div class="mb-4">
             <div class="inline-flex flex-col items-center">
               <p class="font-semibold mb-2">Global Logging</p>
@@ -104,25 +104,31 @@
           </div>
 
           <div class="mb-4">
-            <p class="font-semibold mb-2">Module Logging Levels</p>
-            <table class="table-auto text-left border-collapse">
-              <thead>
-                <tr>
-                  <th class="pr-4">Module</th>
-                  <th v-for="level in ['Debug', 'Info', 'Warning', 'Severe', 'Fatal']" :key="level" class="px-2">
-                    {{ level }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(_, module) in logLevels" :key="module">
-                  <td class="pr-4">{{ module }}</td>
-                  <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="level" class="px-2">
-                    <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <p class="font-semibold mb-2 text-center">Module Logging Levels</p>
+            <div :class="[
+              'overflow-x-auto',
+              { 'opacity-50 pointer-events-none': !calibrationJobNgenGlobalLogging }
+            ]">
+              <table class="table-auto text-left border-collapse mx-auto" aria-label="Module Logging Levels">
+                <thead>
+                  <tr>
+                    <th class="pr-4">Module</th>
+                    <th v-for="level in ['Debug', 'Info', 'Warning', 'Severe', 'Fatal']" :key="level" class="px-2">
+                      {{ level }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(_, module) in logLevels" :key="module">
+                    <td class="pr-4">{{ module }}</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="level" class="px-2">
+                      <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]"
+                        :disabled="!calibrationJobNgenGlobalLogging" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
         <div v-else-if="selectedPlotFileUrl" id="GraphArea" class="p-2">

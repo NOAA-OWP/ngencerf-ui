@@ -86,8 +86,8 @@ const openSelectedCalibrationRun = (selectedCalibrationRun: any) => {
 }
 
 const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
-  console.log('clone')
-  console.log(selectedCalibrationRun.value.runId)
+  // console.log('clone')
+  // console.log(selectedCalibrationRun.value.runId)
   const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Open', detail: 'Will go to Calibration\' Headwater Basin Gage tab with new ID', life: ToastTimeout.timeout3000 };
   toast.add(tMsg); addToastRecord(tMsg);
 }

@@ -204,13 +204,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive
    */
   const runCalibrationJob = async (): Promise<any> => {
-    console.log("runCalibrationJob");
-    console.log('calibrationJobNgenGlobalLogging:', calibrationJobNgenGlobalLogging.value);
-    console.log('logLevels from runCalibrationJob:', logLevels.value);
-    console.log("typeof logLevels:", typeof logLevels.value);
     const rawLogLevels = toRaw(logLevels.value);
-    console.log("rawLogLevels:", rawLogLevels);
-    console.log("typeof rawLogLevels:", typeof rawLogLevels);
 
     // transform module ref values to their actual values to be sent to the backend
     const serializedModules: Record<string, LogLevel> | undefined =
@@ -220,7 +214,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         }
         return acc;
       }, {} as Record<string, LogLevel>);
-    console.log("Serialized modules:", serializedModules);
 
     // store the payload body
     const bodyData: {
@@ -236,8 +229,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         modules: serializedModules
       }),
     };
-
-    console.log("bodyData:", bodyData);
 
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/run_calibration/`, {
       method: "POST",

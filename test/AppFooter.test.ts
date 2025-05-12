@@ -34,7 +34,7 @@ describe("Test Footer component", () => {
     it('is a Vue instance',async () => {
       const wrapper = mount(AppFooter)
       await wrapper.vm.$forceUpdate();
-      console.log(wrapper.vm)
+      // console.log(wrapper.vm)
     })
   })
 
