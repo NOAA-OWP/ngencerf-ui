@@ -8,7 +8,6 @@
       </div>
     </div>
     <div class="grid grid-cols-2">
-
       <div class="col-span-2">
         <div id="BoxLeft" class="text-left">
           <div id="BoxTopLeft" class="pt-2">
@@ -19,7 +18,6 @@
           </div>
           <div id="BoxBottomLeft" class="pt-2">
             <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
-
               <table class="table-auto border-collapse ml-0">
                 <tbody>
                   <tr>
@@ -68,7 +66,6 @@
                   </tr>
                 </tbody>
               </table>
-
             </div>
           </div>
 
@@ -79,7 +76,6 @@
             <div v-if="!automatic_validation" class="tabTitles">
               Check the box above to enable Automatic Validation
             </div>
-
             <div v-else>
               <div class="timeBlocks datepicker-wrapper w-[695px]" @click="handleCalibrationTimeControlsClick">
                 <table class="table-auto border-collapse ml-0">
@@ -142,118 +138,117 @@
     </div>
   </div>
 
-
   <div class="pr-2">
-
     <div class="text-left">
-      <div class="grid grid-cols-2 pb-3">
-
-        <div class="col-span-2">&nbsp;</div>
-        <div class="col-span-2 mt-5 mb-3 hr"></div>
-        <div class="col-span-2">
-
-          <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
-          <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
-            <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
-            <Button class="ngenButtonDiv-alt"
-              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
-              aria-label="Load Parameters File optional" title="Load Parameters File optional">
-              Load Parameters File (optional)</Button>
-            <div v-if="!isFormulationDataSaved()" class="overlay"></div>
-          </div>
-        </div>
-
-        <div class="col-span-1 mt-2">
-          <div class="text-left mt-2">
-            <div class="font-bold">Calibratable Parameters</div>
-            <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
-              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
-              :options="calibrationTuningParameters" optionLabel="output" optionValue="output"
-              aria-label="Select Calibratable Parameters" title="Select Calibratable Parameters">
-              <template #option="slotProps">
-                <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
-              </template>
-            </Select>
-            <div id="UploadParams" class="inline ml-3" @click="addCalibrationTuningParameter">
-              <Button class="ngenButtonDiv-alt" aria-label="Add Selected Calibratable Parameter Button"
-                title="Add Selected Calibratable Parameter Button"
-                :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</Button>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="col-span-1 mt-2 relative">
-          <Button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
-            @click="clearUserSelectedCalibrationTuningParameters()" aria-label="Clear Calibratable Parameters"
-            title="Clear Calibratable Parameters"
-            :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</Button>
-        </div>
-
+      <div class="hr my-3"></div>
+      <div>
+        <div class="font-bold">Output Variable To Calibrate</div>
+        <Select id="OutputVariable" class="varInputs mt-1" aria-label="Output Variable To Calibrate"
+          title="Output Variable To Calibrate" v-model="selectedOutputVariableToCalibrate" :options="['Streamflow']">
+        </Select>
       </div>
     </div>
 
-    <div id="TuningDataList" class="mt-2 mb-10 overflow-auto max-h-[200px]" style="position: relative;">
+    <div class="hr my-3"></div>
 
-      <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
-        :model="cmTuningParameterData"></ContextMenu>
-      <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
-        v-model:selection="selectedTuningParameterData" selectionMode="single" contextMenu
-        v-model:contextMenuSelection="selectedTuningParameterData" @rowContextmenu="onRowContextMenu"
-        :rowClass="rowClass" :rowStyle="rowStyle">
+    <div class="grid grid-cols-2 pb-3">
+      <div class="col-span-2">
+        <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
+        <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
+          <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+          <Button class="ngenButtonDiv-alt"
+            :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+            aria-label="Load Parameters File optional" title="Load Parameters File optional">
+            Load Parameters File (optional)</Button>
+          <div v-if="!isFormulationDataSaved()" class="overlay"></div>
+        </div>
+      </div>
 
-        <!-- parameter column, uneditable -->
-        <Column field="parameter" header="Parameter" sortable>
-          <template #body="slotProps">
-            <span style="background-color: lightgrey; padding: 4px; display: block;"
-              :aria-label="'Parameter name is ' + slotProps.data.name"
-              :title="'Parameter name is' + slotProps.data.name">
-              {{ slotProps.data.name }} </span>
-          </template>
-        </Column>
+      <div class="col-span-1 mt-2">
+        <div class="text-left mt-2">
+          <div class="font-bold">Calibratable Parameters</div>
+          <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
+            :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+            :options="calibrationTuningParameters" optionLabel="output" optionValue="output"
+            aria-label="Select Calibratable Parameters" title="Select Calibratable Parameters">
+            <template #option="slotProps">
+              <div>{{ slotProps.option.name }} &nbsp; ({{ slotProps.option.module }})</div>
+            </template>
+          </Select>
+          <div id="UploadParams" class="inline-block ml-3 mt-3" @click="addCalibrationTuningParameter">
+            <Button class="ngenButtonDiv-alt" aria-label="Add Selected Calibratable Parameter Button"
+              title="Add Selected Calibratable Parameter Button"
+              :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</Button>
+          </div>
+        </div>
+      </div>
 
-        <!-- module column, uneditable -->
-        <Column field="module" header="Module" sortable>
-          <template #body="slotProps">
-            <span style="background-color: lightgrey; padding: 4px; display: inline-block; white-space: nowrap;"
-              :aria-label="'Module name is ' + slotProps.data.module"
-              :title="'Module name is ' + slotProps.data.module">
-              {{ slotProps.data.module }}
-            </span>
-          </template>
-        </Column>
-
-        <!-- min column, editable -->
-        <Column field="min" header="Min" sortable>
-          <template #body="slotProps">
-            <input type="text" v-model="slotProps.data.minimum"
-              @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;"
-              :aria-label="'Minimum value is ' + slotProps.data.minimum"
-              :title="'Minimum value is ' + slotProps.data.minimum" />
-          </template>
-        </Column>
-
-        <!-- max column, editable -->
-        <Column field="max" header="Max" sortable>
-          <template #body="slotProps">
-            <input type="text" v-model="slotProps.data.maximum"
-              @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;"
-              :aria-label="'Maximum value is ' + slotProps.data.maximum"
-              :title="'Maximum value is ' + slotProps.data.maximum" />
-          </template>
-        </Column>
-
-        <!-- initValue column, editable -->
-        <Column field="initValue" header="Initial Value" sortable>
-          <template #body="slotProps">
-            <input type="text" v-model="slotProps.data.initial_value"
-              @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)" style="width: 100%;"
-              slotProps.data.maximum :aria-label="'Initial value is ' + slotProps.data.initial_value"
-              :title="'Initial value is ' + slotProps.data.initial_value" />
-          </template>
-        </Column>
-      </DataTable>
+      <div class="col-span-1 mt-2 relative">
+        <Button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
+          @click="clearUserSelectedCalibrationTuningParameters()" aria-label="Clear Calibratable Parameters"
+          title="Clear Calibratable Parameters"
+          :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</Button>
+      </div>
     </div>
+  </div>
+
+  <div id="TuningDataList" class="mt-2 mb-10 overflow-auto max-h-[200px]" style="position: relative;">
+    <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
+      :model="cmTuningParameterData"></ContextMenu>
+    <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"
+      v-model:selection="selectedTuningParameterData" selectionMode="single" contextMenu
+      v-model:contextMenuSelection="selectedTuningParameterData" @rowContextmenu="onRowContextMenu" :rowClass="rowClass"
+      :rowStyle="rowStyle">
+
+      <!-- parameter column, uneditable -->
+      <Column field="parameter" header="Parameter" sortable>
+        <template #body="slotProps">
+          <span style="background-color: lightgrey; padding: 4px; display: block;"
+            :aria-label="'Parameter name is ' + slotProps.data.name" :title="'Parameter name is' + slotProps.data.name">
+            {{ slotProps.data.name }} </span>
+        </template>
+      </Column>
+
+      <!-- module column, uneditable -->
+      <Column field="module" header="Module" sortable>
+        <template #body="slotProps">
+          <span style="background-color: lightgrey; padding: 4px; display: inline-block; white-space: nowrap;"
+            :aria-label="'Module name is ' + slotProps.data.module" :title="'Module name is ' + slotProps.data.module">
+            {{ slotProps.data.module }}
+          </span>
+        </template>
+      </Column>
+
+      <!-- min column, editable -->
+      <Column field="min" header="Min" sortable>
+        <template #body="slotProps">
+          <input type="text" v-model="slotProps.data.minimum"
+            @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;"
+            :aria-label="'Minimum value is ' + slotProps.data.minimum"
+            :title="'Minimum value is ' + slotProps.data.minimum" />
+        </template>
+      </Column>
+
+      <!-- max column, editable -->
+      <Column field="max" header="Max" sortable>
+        <template #body="slotProps">
+          <input type="text" v-model="slotProps.data.maximum"
+            @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;"
+            :aria-label="'Maximum value is ' + slotProps.data.maximum"
+            :title="'Maximum value is ' + slotProps.data.maximum" />
+        </template>
+      </Column>
+
+      <!-- initValue column, editable -->
+      <Column field="initValue" header="Initial Value" sortable>
+        <template #body="slotProps">
+          <input type="text" v-model="slotProps.data.initial_value"
+            @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)" style="width: 100%;"
+            slotProps.data.maximum :aria-label="'Initial value is ' + slotProps.data.initial_value"
+            :title="'Initial value is ' + slotProps.data.initial_value" />
+        </template>
+      </Column>
+    </DataTable>
   </div>
 
   <div class="grid grid-rows-1 mt-8 ActionButtonsBox" id="Tuningbuttons">
@@ -270,18 +265,15 @@
           Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
         </div>
       </span>
-
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-3">
           <!--<Button class="c-blue font-normal text-xl underline pt-1" title="Revert Button" @click="resetTuningData()"
             aria-label="Revert Button">Revert</Button>-->
         </div>
       </span>
-
       <span v-else>
         <div class="col-span-1 mr-3">&nbsp;</div>
       </span>
-
       <div class="col-span-4">&nbsp;</div>
       <div class="col-span-1">
         <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
@@ -291,7 +283,6 @@
         <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
           @click="goNextTab()">Next</Button>
       </div>
-
     </div>
   </div>
   <DynamicDialog />
@@ -302,14 +293,13 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 import Select from "primevue/select";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
 
-import type { GeneralErrorResponse, ValidationErrorObject, NonFieldError } from "@/composables/NgencerfModels"
+import type { GeneralErrorResponse, NonFieldError } from "@/composables/NgencerfModels"
 
 import type { DatePickerProps } from "primevue/datepicker";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -330,8 +320,6 @@ import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
 
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
-
-
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -363,6 +351,7 @@ const {
   simEndTime,
   calStartTime,
   calEndTime,
+  selectedOutputVariableToCalibrate,
   calibrationTuningParameters,
   userSelectedCalibrationTuningParameters,
   automatic_validation,

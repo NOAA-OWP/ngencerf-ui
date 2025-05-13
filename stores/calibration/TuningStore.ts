@@ -28,6 +28,7 @@ export const useTuningStore = defineStore(
     const calStartTime = ref<any>("");
     const calEndTime = ref<any>("");
 
+    const selectedOutputVariableToCalibrate = ref<string>("Streamflow");
     const calibrationTuningModules = ref<any>();
     const calibrationTuningParameters = ref<any[]>([]);
     const userSelectedCalibrationTuningParameters = ref<any[]>([]);
@@ -187,6 +188,7 @@ export const useTuningStore = defineStore(
       simEndTime,
       calStartTime,
       calEndTime,
+      selectedOutputVariableToCalibrate,
       calibrationTuningParameters,
       userSelectedCalibrationTuningParameters,
       automatic_validation,
