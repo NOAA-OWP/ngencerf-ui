@@ -20,7 +20,17 @@
             </div>
         </div>
         <h1 class="mt-4 mb-4">Compare Calibration Jobs for Gage {{ uiGageId }}</h1>
-        <div v-if="plotTables.length > 0">
+        <div id="SupplementalTableArea" v-if="selectedSupplementalTable">
+          <div id="SupplementalTableArea" class="p-2">
+            <div v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable === 1">
+              <DataTable :value="performanceMetricsData" fixedHeader=true>
+                <Column v-for="(col, colIndex) in performanceMetricsColumns" :key="colIndex" :header="col.header"
+                  :field="col.field"></Column>
+              </DataTable>
+            </div>
+          </div>
+        </div>
+        <div v-if="plotTables.length > 0 && !showPlotGraph && selectedSupplementalTable === 0">
             <ContextMenu :pt="{ root: { id: ' cp-context-menu-' } }" class="bg-white" ref="cpContextMenu"
               :model="cmCompareRun"></ContextMenu>
             <div v-for="(table, index) in plotTables">
@@ -52,6 +62,7 @@ import { formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
 import { isValidDate, isValidDateTime } from "@/utils/CommonHelpers";
 
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
+import { useEvaluationSupplementalDataStore } from "@/stores/evaluation/EvaluationSupplementalDataStore";
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
@@ -63,11 +74,12 @@ import { hilightTab } from '@/composables/TabHilight';
 import * as Plot from "@observablehq/plot";
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
+const evaluationSupplementalDataStore = useEvaluationSupplementalDataStore();
 const runStatusStore = useRunStatusStore();
 const userDataStore = useUserDataStore();
 const toast = useToast();
 
-const showMessagesGroup = ref<Boolean>(false);
+const showMessagesGroup = ref<boolean>(false);
 
 const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -86,6 +98,9 @@ const {
     queryGetPlotsForComparison,
     loadSelectedCalibrationRun
 } = evaluationCalibrationRunStore;
+const {
+  queryGetPerformanceMetricsForComparison
+} = evaluationSupplementalDataStore;
 
 const isComparePermutationsLoading = ref<boolean>(false);
 
@@ -102,6 +117,17 @@ const initTablesBarChartMetrics = [
     {'name': 'full', 'title': 'Full Period Best Run Metrics', data: [], columns: []},
 ]
 
+const selectedSupplementalTable = ref<number>(0);
+const supplementalTableOptions = ref<any[]>([
+  'Performance Metrics Table'
+]);
+const performanceMetrics = ref<APIResponse>({});
+const performanceMetricsData = ref<any[]>([]);
+const performanceMetricsColumns = ref<any[]>([{ header: 'Metric', field: 'metric' }]);
+
+// Display our runs in numeric order
+selectedCalibrationCompareRuns.value.sort((a, b) => a['calibration_run_id'] - b['calibration_run_id']);
+
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   bodyCell: { style: { "text-align": "right", "padding-right": "10px !important", "white-space": "nowrap" } }
@@ -117,10 +143,26 @@ onMounted(() => {
     nextTick(async () => {
         hilightTab(EvaluationTabs.tab_compare);
 
-        plotNames.value = await queryGetPlotNamesForComparison();
-        plotList.value = ((plotNames?.value as any)?._data as PlotNames)?.plot_names;
-        if (plotList.value.length === 1) {
-            selectedPlotName.value = plotList.value[0].name
+        const response = await queryGetPlotNamesForComparison();
+        if (response.ok) {
+          plotNames.value = response;
+          plotList.value = ((plotNames?.value as any)?._data as PlotNames)?.plot_names;
+
+          // Add Supplemental Table Options to the dropdown
+          for (let t = 0; t < supplementalTableOptions.value.length; t++) {
+            if (!plotList.value.some(item => item.name === supplementalTableOptions.value[t])) {
+              plotList.value.push({ name: supplementalTableOptions.value[t], description: '' });
+            }
+          }
+
+          // If we only have one plot option, hide the dropdown and just default to that option
+          if (plotList.value.length === 1) {
+              selectedPlotName.value = plotList.value[0].name
+          }
+        } else {
+          toast.removeAllGroups();
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot names', life: ToastTimeout.timeout5000 };
+          toast.add(tMsg); addToastRecord(tMsg);
         }
     })
     isComparePermutationsLoading.value = false;
@@ -142,11 +184,85 @@ const onRowCpContextMenu = (event: any) => {
   cmCompareRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(cpRowData.calibration_run_id) })
 }
 
+// Reset refs when selectedPlotTable changes
+const resetUserPlotRefs = (exceptions: any): void => {
+  if( !Array.isArray(exceptions) ) {
+    exceptions = [];
+  }
+
+  // plot file refs
+  if (!exceptions.includes('selectedPlotName')) {
+    selectedPlotName.value = null;
+  }
+
+  // plot table refs
+  plotTables.value = {};
+  plotTableData.value = [];
+
+  // plot graph refs
+  plotGraphDataRaw.value = [];
+  plotGraphData.value = [];
+  plotGraphOptions.value = [];
+  showPlotGraph.value = false;
+
+  // supplemental table refs (metrics)
+  if (!exceptions.includes('selectedSupplementalTable')) {
+    selectedSupplementalTable.value = 0;
+  }
+  performanceMetrics.value = {};
+  performanceMetricsData.value = [];
+  performanceMetricsColumns.value = [{ header: 'Metric', field: 'metric' }];
+}
+
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-    if (selectedPlotName.value) {
-        getPlotTableData();
+  // is the selected option a plot or supplemental table?
+  if (selectedPlotName.value && (supplementalTableOptions.value as any).includes(selectedPlotName.value)) {
+    selectedSupplementalTable.value = (supplementalTableOptions.value as any).indexOf(selectedPlotName.value) + 1;
+    // reset all of our plot refs by selectedPlotName and selectedSupplementalTable
+    resetUserPlotRefs(['selectedPlotName','selectedSupplementalTable']);
+    if (selectedSupplementalTable.value === 1) {
+      // Get Performance Metrics - put each one into the table as its own row
+      performanceMetrics.value = await queryGetPerformanceMetricsForComparison();
+
+      if (performanceMetrics.value?._data) {
+        for (let s = 0; s < performanceMetrics.value?._data?.statuses.length; s++) {
+          // First add the metric names and the values from our Calibration run
+          let current_job_id = performanceMetrics.value?._data?.statuses[s].calibration_run_id;
+          performanceMetricsColumns.value.push({ header: 'Calibration Job ID ' + current_job_id, field: 'calibration_job_id_' + current_job_id });
+          if (performanceMetrics.value?._data?.statuses[s].performance_metrics) {
+            Object.keys(performanceMetrics.value?._data.statuses[s].performance_metrics).forEach(key => {
+              let metric_row = performanceMetricsData.value.findIndex(row => row['metric'] === key);
+              if (metric_row > -1) {
+                performanceMetricsData.value[metric_row]['calibration_job_id_' + current_job_id] = performanceMetrics.value?._data?.statuses[s].performance_metrics[key];
+              } else {
+                performanceMetricsData.value.push({ 'metric': key });
+                performanceMetricsData.value.at(-1)['calibration_job_id_' + current_job_id] = performanceMetrics.value?._data?.statuses[s].performance_metrics[key];
+              }
+            });
+          }
+        }
+        // Now clean up our metric names so that they display nicely
+        for (let m = 0; m < performanceMetricsData.value.length; m++) {
+          let column_header_words = performanceMetricsData.value[m].metric.split("_");
+          for (let w = 0; w < column_header_words.length; w++) {
+            let word = column_header_words[w]
+            column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+          }
+          let column_header = column_header_words.join(" ");
+          performanceMetricsData.value[m].metric = column_header;
+        }
+      }
+      if (!performanceMetricsData.value.length) {
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Performance Metrics data is not available', life: ToastTimeout.timeout5000 };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
     }
+  } else if (selectedPlotName.value) {
+    // reset all of our plot refs except for selectedPlotName
+    resetUserPlotRefs(['selectedPlotName']);
+    getPlotTableData();
+  }
 });
 
 const getPlotTableData = async () => {
@@ -207,9 +323,9 @@ const getPlotTableData = async () => {
                 }
             }
         } else {
-            toast.removeAllGroups();
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeout5000 };
-            toast.add(tMsg); addToastRecord(tMsg);
+          toast.removeAllGroups();
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeout5000 };
+          toast.add(tMsg); addToastRecord(tMsg);
         }
     } else {
       toast.removeAllGroups();
