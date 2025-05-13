@@ -30,7 +30,7 @@
             </div>
           </div>
         </div>
-        <div v-if="plotTables.length > 0 && !showPlotGraph && selectedSupplementalTable === 0">
+        <div v-if="plotTables.length > 0 && selectedSupplementalTable === 0">
             <ContextMenu :pt="{ root: { id: ' cp-context-menu-' } }" class="bg-white" ref="cpContextMenu"
               :model="cmCompareRun"></ContextMenu>
             <div v-for="(table, index) in plotTables">
@@ -198,12 +198,6 @@ const resetUserPlotRefs = (exceptions: any): void => {
   // plot table refs
   plotTables.value = {};
   plotTableData.value = [];
-
-  // plot graph refs
-  plotGraphDataRaw.value = [];
-  plotGraphData.value = [];
-  plotGraphOptions.value = [];
-  showPlotGraph.value = false;
 
   // supplemental table refs (metrics)
   if (!exceptions.includes('selectedSupplementalTable')) {
