@@ -23,7 +23,11 @@
         <div id="SupplementalTableArea" v-if="selectedSupplementalTable">
           <div id="SupplementalTableArea" class="p-2">
             <div v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable === 1">
-              <DataTable :value="performanceMetricsData" fixedHeader=true>
+              <ContextMenu :pt="{ root: { id: ' cp-context-menu' } }" class="bg-white" ref="cpContextMenu"
+                :model="cmCompareRun"></ContextMenu>
+              <DataTable id="performanceMetricsTable" :value="performanceMetricsData" fixedHeader=true 
+                  scrollable scroll-height="500px" :multi-sort="true" selectionMode="single"
+                  v-model:selection="selectedDataRow" @rowContextmenu="onRowCpContextMenu">
                 <Column v-for="(col, colIndex) in performanceMetricsColumns" :key="colIndex" :header="col.header"
                   :field="col.field"></Column>
               </DataTable>
@@ -123,7 +127,7 @@ const supplementalTableOptions = ref<any[]>([
 ]);
 const performanceMetrics = ref<APIResponse>({});
 const performanceMetricsData = ref<any[]>([]);
-const performanceMetricsColumns = ref<any[]>([{ header: 'Metric', field: 'metric' }]);
+const performanceMetricsColumns = ref<any[]>([]);
 
 // Display our runs in numeric order
 selectedCalibrationCompareRuns.value.sort((a, b) => a['calibration_run_id'] - b['calibration_run_id']);
@@ -205,7 +209,7 @@ const resetUserPlotRefs = (exceptions: any): void => {
   }
   performanceMetrics.value = {};
   performanceMetricsData.value = [];
-  performanceMetricsColumns.value = [{ header: 'Metric', field: 'metric' }];
+  performanceMetricsColumns.value = [];
 }
 
 // Handle selectedPlotName changes
@@ -218,33 +222,33 @@ watch(selectedPlotName, async () => {
     if (selectedSupplementalTable.value === 1) {
       // Get Performance Metrics - put each one into the table as its own row
       performanceMetrics.value = await queryGetPerformanceMetricsForComparison();
+      performanceMetricsColumns.value = [
+        { header: 'Job ID', field: 'calibration_run_id' }, 
+        { header: 'Formulation Name', field: 'formulation_name' }
+      ];
 
       if (performanceMetrics.value?._data) {
         for (let s = 0; s < performanceMetrics.value?._data?.statuses.length; s++) {
           // First add the metric names and the values from our Calibration run
-          let current_job_id = performanceMetrics.value?._data?.statuses[s].calibration_run_id;
-          performanceMetricsColumns.value.push({ header: 'Calibration Job ID ' + current_job_id, field: 'calibration_job_id_' + current_job_id });
+          let row_data = {
+            'calibration_run_id': performanceMetrics.value?._data?.statuses[s].calibration_run_id, 
+            'formulation_name': performanceMetrics.value?._data?.statuses[s].formulation_name
+          };
           if (performanceMetrics.value?._data?.statuses[s].performance_metrics) {
             Object.keys(performanceMetrics.value?._data.statuses[s].performance_metrics).forEach(key => {
-              let metric_row = performanceMetricsData.value.findIndex(row => row['metric'] === key);
-              if (metric_row > -1) {
-                performanceMetricsData.value[metric_row]['calibration_job_id_' + current_job_id] = performanceMetrics.value?._data?.statuses[s].performance_metrics[key];
-              } else {
-                performanceMetricsData.value.push({ 'metric': key });
-                performanceMetricsData.value.at(-1)['calibration_job_id_' + current_job_id] = performanceMetrics.value?._data?.statuses[s].performance_metrics[key];
+              if(performanceMetricsColumns.value.findIndex(col => col['field'] === key) === -1) {
+                let column_header_words = key.split("_");
+                for (let w = 0; w < column_header_words.length; w++) {
+                  let word = column_header_words[w]
+                  column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+                }
+                let column_header = column_header_words.join(" ");
+                performanceMetricsColumns.value.push({ header: column_header, field: key });
               }
+              row_data[key] = performanceMetrics.value?._data?.statuses[s].performance_metrics[key];
             });
           }
-        }
-        // Now clean up our metric names so that they display nicely
-        for (let m = 0; m < performanceMetricsData.value.length; m++) {
-          let column_header_words = performanceMetricsData.value[m].metric.split("_");
-          for (let w = 0; w < column_header_words.length; w++) {
-            let word = column_header_words[w]
-            column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
-          }
-          let column_header = column_header_words.join(" ");
-          performanceMetricsData.value[m].metric = column_header;
+          performanceMetricsData.value.push(row_data);
         }
       }
       if (!performanceMetricsData.value.length) {

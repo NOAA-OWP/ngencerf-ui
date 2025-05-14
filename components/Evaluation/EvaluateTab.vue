@@ -547,7 +547,7 @@ onMounted(() => {
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  // is the selected option a plot or iteration table?
+  // is the selected option a plot or supplemental table?
   if (selectedPlotName.value && (supplementalTableOptions.value as any).includes(selectedPlotName.value)) {
     selectedSupplementalTable.value = (supplementalTableOptions.value as any).indexOf(selectedPlotName.value) + 1;
     // reset all of our plot refs by selectedPlotName and selectedSupplementalTable
