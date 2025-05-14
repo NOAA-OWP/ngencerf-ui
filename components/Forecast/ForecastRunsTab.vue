@@ -283,14 +283,13 @@ const navigateToForecastRunStatus = () => {
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Status/Run Tab"]');
 
-    isForecastLoading.value = false;
-
     if (e) {
       await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Status/Run tab not found' } as ToastMessageOptions);
     }
+    isForecastLoading.value = false;
   });
 }
 
