@@ -283,11 +283,10 @@ const navigateToForecastRunStatus = () => {
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Status/Run Tab"]');
 
-    // load status/run tab data
-    await loadForecastStatusRunTabData();
     isForecastLoading.value = false;
 
     if (e) {
+      await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Status/Run tab not found' } as ToastMessageOptions);
@@ -300,15 +299,13 @@ const navigateToForecastResults = () => {
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results tab"]');
 
-    // load results tab data
-    await loadForecastResultsTabData();
-    isForecastLoading.value = false;
-
     if (e) {
+      await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found' } as ToastMessageOptions);
     }
+    isForecastLoading.value = false;
   });
 }
 

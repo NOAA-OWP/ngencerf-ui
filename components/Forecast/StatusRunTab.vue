@@ -166,7 +166,6 @@ const {
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
-  setResultsPathname,
   setElapsedTime
 } = useForecastStore();
 
@@ -260,10 +259,6 @@ const startForecastRun = async () => {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-
-    // set resultsPathname
-    await setResultsPathname();
-
   } catch (error) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error running Forecast job' };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -310,11 +305,6 @@ const goToResultsTab = () => {
  * so we're essentially watching both forcingDownloadStatus and forecastJobStatus for changes
  */
 watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newForecastJobStatus) => {
-  // set resultsPathname if not already set
-  if (!resultsPathname.value) {
-    await setResultsPathname();
-  }
-
   // when overallForcingDownloadForecastStatus first changes to Running, start incrementing elapsedTime every second until
   // overallForcingDownloadForecastStatus changes to Done, Cancelled, Failed, or Server Error
   if (forcingDownloadStatus.value === 'Running' || forecastJobStatus.value === 'Running') {
