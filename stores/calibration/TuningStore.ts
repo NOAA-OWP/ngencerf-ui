@@ -28,7 +28,6 @@ export const useTuningStore = defineStore(
     const calStartTime = ref<any>("");
     const calEndTime = ref<any>("");
 
-    const selectedOutputVariableToCalibrate = ref<string>("Streamflow");
     const calibrationTuningModules = ref<any>();
     const calibrationTuningParameters = ref<any[]>([]);
     const userSelectedCalibrationTuningParameters = ref<any[]>([]);
@@ -46,7 +45,19 @@ export const useTuningStore = defineStore(
     const tuningStore_data_loading = ref(true);
     const saveTuningTabRequestBody = ref<any>({});
 
-   
+    /**
+     * Computer selectedOutputVariableToCalibrate
+     */
+    const selectedOutputVariableToCalibrate = computed(() => {
+      // if userCalibrationRunData.value.parameters_selected is set, 
+      // set selectedOutputVariableToCalibrate to 'Streamflow'
+      if (userCalibrationRunData.value?.parameters_selected) {
+        return "Streamflow";
+      } else {
+        return "";
+      }
+    });
+
     /**
      * Load Tuning Tab data
      * @returns {Promise<any>}
