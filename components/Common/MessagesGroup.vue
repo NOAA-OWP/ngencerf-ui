@@ -11,7 +11,7 @@
             :title="'Gage ' + calData?.gage?.gage_id"><span class="font-medium">Gage:</span>
             {{ calData?.gage?.gage_id }}</div>
 
-            <div v-if="calData?.num_catchments" :aria-label="'Catchments ' + calData?.num_catchments"
+          <div v-if="calData?.num_catchments" :aria-label="'Catchments ' + calData?.num_catchments"
             :title="'Gage ' + calData?.num_catchments"><span class="font-medium">Catchments:</span>
             {{ calData?.num_catchments }}</div>
 
@@ -91,8 +91,8 @@
           <div v-if="calData?.save_plot_iteration_frequency"
             :aria-label="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"
             :title="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"><span
-            class="font-medium">Plot Generation Frequency:</span>
-          {{ calData?.save_plot_iteration_frequency }}</div>
+              class="font-medium">Plot Generation Frequency:</span>
+            {{ calData?.save_plot_iteration_frequency }}</div>
         </div>
         <div class="col-span-1">
           <div v-if="calData?.validation_times?.simulation_start_time"><span class="font-medium">Validation Run</span>
@@ -138,13 +138,13 @@
             {{ calData?.stop_criteria }}</div>
         </div>
         <div class="line-spacer">&nbsp;</div>
-	      <div class="col-span-2">
-          <div v-if="resultsPathname"
-            :aria-label="'Results Pathname ' + resultsPathname"
+        <div class="col-span-2">
+          <div v-if="resultsPathname" :aria-label="'Results Pathname ' + resultsPathname"
             :title="'Results Pathname ' + resultsPathname"><span class="font-medium">
               Results Pathname:</span>
             {{ resultsPathname }}</div>
         </div>
+        <div class="line-spacer">&nbsp;</div>
         <div class="col-span-2">
           <div :aria-label="'NGEN Global Logging ' + calibrationJobNgenGlobalLogging"
             :title="'NGEN Global Logging ' + calibrationJobNgenGlobalLogging"><span class="font-medium">
