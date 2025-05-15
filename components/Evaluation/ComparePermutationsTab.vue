@@ -38,13 +38,13 @@
             <ContextMenu :pt="{ root: { id: ' cp-context-menu-' } }" class="bg-white" ref="cpContextMenu"
               :model="cmCompareRun"></ContextMenu>
             <div v-for="(table, index) in plotTables">
-                <h2 class="mt-2 mb-1">{{ table.title }}</h2>
-                <DataTable :id="'plotTableHTML-' + index " :value="table.data" fixedHeader=true 
-                    scrollable scroll-height="500px" :multi-sort="true" selectionMode="single"
-                    v-model:selection="selectedDataRow" @rowContextmenu="onRowCpContextMenu">
-                    <Column v-for="col of table.columns" :key="col.value" :field="col.value" :header="col.header"
-                        :sortable="true" :pt="col.value === 'formulation_name' ? ptColumnText : (col.value === 'calibration_run_id' ? ptColumnId : ptColumn)"></Column>
-                </DataTable>
+              <h2 v-if="table.title" class="mt-2 mb-1 float-left">{{ table.title }}</h2>
+              <DataTable class="clear-both" :id="'plotTableHTML-' + index " :value="table.table_data" fixedHeader=true 
+                  scrollable scroll-height="500px" :multi-sort="true" selectionMode="single"
+                  v-model:selection="selectedDataRow" @rowContextmenu="onRowCpContextMenu">
+                  <Column v-for="col of table.columns" :key="col.value" :field="col.value" :header="col.header"
+                      :sortable="true" :pt="col.value === 'formulation_name' ? ptColumnText : (col.value === 'calibration_run_id' ? ptColumnId : ptColumn)"></Column>
+              </DataTable>
             </div>
         </div>
     </div>
@@ -323,8 +323,6 @@ const getPlotTableData = async () => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeout5000 };
     toast.add(tMsg); addToastRecord(tMsg);
   }
-}
-    }
 }
 
 const toggleMessagesGroup = async () => {
