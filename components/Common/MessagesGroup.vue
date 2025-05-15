@@ -157,14 +157,12 @@
               Results Pathname:</span>
             {{ resultsPathname }}</div>
         </div>
-        <div class="line-spacer">&nbsp;</div>
         <div class="col-span-2">
           <div :aria-label="'NGEN Global Logging ' + calibrationJobNgenGlobalLogging"
             :title="'NGEN Global Logging ' + calibrationJobNgenGlobalLogging"><span class="font-medium">
               NGen Global Logging:</span>
             {{ calibrationJobNgenGlobalLogging ? 'ENABLED' : 'DISABLED' }}</div>
         </div>
-        <div class="col-span-2">&nbsp;</div>
       </div>
     </div>
   </div>
