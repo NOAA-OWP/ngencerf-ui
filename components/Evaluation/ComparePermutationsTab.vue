@@ -108,18 +108,12 @@ const {
 
 const isComparePermutationsLoading = ref<boolean>(false);
 
-const plotTables = ref<DynamicObject>({});
-const plotTableData = ref<any[]>([]);
+const plotTables = ref<any[]>([]);
+
 //this model is for highlighting purpose
 const selectedDataRow = ref<DynamicObject>();
 const cpContextMenu = ref(); //compare run context menu
 const cmCompareRun = ref<DataTableContextMenuOption[]>([]);
-
-const initTablesBarChartMetrics = [
-    {'name': 'calib', 'title': 'Calibration Period Best Run Metrics', data: [], columns: []},
-    {'name': 'valid', 'title': 'Validation Period Best Run Metrics', data: [], columns: []},
-    {'name': 'full', 'title': 'Full Period Best Run Metrics', data: [], columns: []},
-]
 
 const selectedSupplementalTable = ref<number>(0);
 const supplementalTableOptions = ref<any[]>([
@@ -200,8 +194,7 @@ const resetUserPlotRefs = (exceptions: any): void => {
   }
 
   // plot table refs
-  plotTables.value = {};
-  plotTableData.value = [];
+  plotTables.value = [];
 
   // supplemental table refs (metrics)
   if (!exceptions.includes('selectedSupplementalTable')) {
@@ -264,71 +257,73 @@ watch(selectedPlotName, async () => {
 });
 
 const getPlotTableData = async () => {
-    if (selectedPlotName.value === 'Bar Chart Metrics') {
-        // special case for Bar Chart Metrics - initialize data with three distinct tables for each period 
-        plotTables.value = initTablesBarChartMetrics;
-        // get selected plot file name and url from server
-        const response: any = await queryGetPlotsForComparison(
-            selectedPlotName.value, // plotName
-            uiGageId.value, // gage_id
-        );
-        if (response?._data?.plots) {
-            // Loop through each plot and assign the data to individual tables for calib/valid/full
-            for (let p = 0; p < response?._data?.plots.length; p++) {
-                for (let i = 0; i < response?._data?.plots[p].plot_data?.length; i++) {
-                    let t = plotTables.value.findIndex(table => table.name === response?._data?.plots[p].plot_data[i].period)
-                    if (t >= 0) {
-                        plotTables.value[t].data.push(response?._data?.plots[p].plot_data[i]);
-                    }
-                }
-            }
-            // Now create the column list for each table, and round all numeric values to 5 digits max
-            for (let t = 0; t < plotTables.value.length; t++) {
-                Object.keys(plotTables.value[t].data[0]).forEach(key => {
-                    let header = key;
-                    switch(key) {
-                        case 'calibration_run_id':
-                            header = 'Run ID';
-                            break;
-                        case 'formulation_name':
-                            header = 'Formulation Name';
-                            break;
-                        case 'run_date':
-                            header = 'Run Date';
-                            break;
-                        case 'run':
-                        case 'period':
-                            header = '';
-                            break;
-                    }
-                    if (header != '') {
-                        plotTables.value[t].columns.push({ header: header, value: key })
-                    }
-                })
-                for (let r = 0; r < plotTables.value[t].data.length; r++) {
-                    Object.keys(plotTables.value[t].data[r]).forEach(key => {
-                        if (plotTables.value[t].data[r][key] === null || plotTables.value[t].data[r][key] === '') {
-                            plotTables.value[t].data[r][key] = 'N/A';
-                        } else if (!isNaN(parseFloat(plotTables.value[t].data[r][key])) && isFinite(plotTables.value[t].data[r][key]) && plotTables.value[t].data[r][key].toString().indexOf('.') > 0) {
-                            // attempt to round to 5 digits - just display as is if there are any problems doing this
-                            try {
-                                plotTables.value[t].data[r][key] = Number(plotTables.value[t].data[r][key]).toFixed(5);
-                            } catch (error) {
-                                console.error('Error rounding value ' + plotTables.value[t].data[r][key] + ': ', error);
-                            }
-                        }
-                    });
-                }
-            }
+  if (selectedPlotName.value) {
+    // get selected plot file name and url from server
+    const response: any = await queryGetPlotsForComparison(
+      selectedPlotName.value, // plotName
+      uiGageId.value, // gage_id
+    );
+    if (response?._data?.plots) {
+      // Loop through each plot and assign the data to individual tables for calib/valid/full
+      for (let p = 0; p < response?._data?.plots.length; p++) {
+        if (response?._data?.plots[p].plot_data[0].table_data) {
+          // special case - we are dealing with an array of multiple tables, instead of a single table
+          plotTables.value = response?._data?.plots[p].plot_data;
         } else {
-          toast.removeAllGroups();
-          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeout5000 };
-          toast.add(tMsg); addToastRecord(tMsg);
+          // plot_data is just a list of rows, not tables
+          plotTables.value = [{'name': 'default', 'table_data:': response?._data?.plots[p].plot_data }];
         }
+      }
+      // Now create the column list for each table, and round all numeric values to 5 digits max
+      for (let t = 0; t < plotTables.value.length; t++) {
+        plotTables.value[t].columns = [];
+        Object.keys(plotTables.value[t].table_data[0]).forEach(key => {
+          let header = key;
+          switch(key) {
+            case 'calibration_run_id':
+              header = 'Run ID';
+              break;
+            case 'formulation_name':
+              header = 'Formulation Name';
+              break;
+            case 'run_date':
+              header = 'Run Date';
+              break;
+            case 'run':
+            case 'period':
+              header = '';
+              break;
+          }
+          if (header != '') {
+            plotTables.value[t].columns.push({ header: header, value: key })
+          }
+        });
+        for (let r = 0; r < plotTables.value[t].table_data.length; r++) {
+          Object.keys(plotTables.value[t].table_data[r]).forEach(key => {
+            if (plotTables.value[t].table_data[r][key] === null || plotTables.value[t].table_data[r][key] === '') {
+              plotTables.value[t].table_data[r][key] = 'N/A';
+            } else if (!isNaN(parseFloat(plotTables.value[t].table_data[r][key])) && isFinite(plotTables.value[t].table_data[r][key]) && plotTables.value[t].table_data[r][key].toString().indexOf('.') > 0) {
+              // attempt to round to 5 digits - just display as is if there are any problems doing this
+              try {
+                plotTables.value[t].table_data[r][key] = Number(plotTables.value[t].table_data[r][key]).toFixed(5);
+              } catch (error) {
+                console.error('Error rounding value ' + plotTables.value[t].table_data[r][key] + ': ', error);
+              }
+            }
+          });
+        }
+      }
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeout5000 };
       toast.add(tMsg); addToastRecord(tMsg);
+    }
+  } else {
+    toast.removeAllGroups();
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeout5000 };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+}
     }
 }
 
