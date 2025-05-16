@@ -6,11 +6,13 @@
           <div class="grid grid-cols-2">
             <div class="col-span-1">
               <table>
-                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Validation Run Time & Iteration
-                </caption>
+
                 <thead>
-                  <tr height="25px">
-                    <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                  <tr height="35px">
+                    <th scope="row" class="text-center border-b-[3px]" colspan="2" style="border-color: #d9d9d9;">Validation Run Time & Iteration</th>
+                  </tr>
+                  <tr height="35px">
+                    <th scope="row" class="text-center border-t-[3px]" colspan="2" style="border-color: #d9d9d9;"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -36,10 +38,12 @@
 
             <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
               <table>
-                <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;">Validation Run Status</caption>
                 <thead>
-                  <tr height="25px">
-                    <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+                  <tr height="35px">
+                    <th scope="row" class="text-center border-b-[3px]" colspan="2" style="border-color: #d9d9d9;">Validation Run Status</th>
+                  </tr>
+                  <tr height="35px">
+                    <th scope="row" class="text-center border-t-[3px]" colspan="2" style="border-color: #d9d9d9;"></th>
                   </tr>
                 </thead>
                 <tbody>
