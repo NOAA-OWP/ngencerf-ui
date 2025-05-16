@@ -458,20 +458,21 @@ const onRowContextMenu = (event: any) => {
     crContextMenu.value.show(event.originalEvent);
     contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     if (crRowData.validation_runs > 1) {
-      cmCalibrationRun.value.push({ label: 'Select Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns(crRowData.calibration_run_id) })
-    } if (crRowData.validation_runs === 1) {
-      cmCalibrationRun.value.push({ label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJobFromCalibration(crRowData.calibration_run_id) })
+      cmCalibrationRun.value.push({ label: 'Select Validation Run', icon: 'pi pi-search', command: () => viewSelectedCalibrationValidationRuns(crRowData.calibration_run_id) })
+    } 
+    if (crRowData.validation_runs <= 1) {
+      cmCalibrationRun.value.push({ label: 'Evaluate', icon: 'pi pi-chart-scatter', command: () => evaluateValidationJobFromCalibration(crRowData.calibration_run_id) })
     }
-    cmCalibrationRun.value.push({ label: 'Compare Permutations', icon: 'pi pi-fw-pisearch', command: () => viewSelectedGageCalibrationRuns(crRowData.calibration_run_id, crRowData.gage_id) });
-    cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
-    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
-    if (crRowData.validation_runs === 1) {
-      cmCalibrationRun.value.push({ label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => viewValidationRunStatus(crRowData.calibration_run_id) })
+    cmCalibrationRun.value.push({ label: 'Compare Permutations', icon: 'pi pi-arrows-h', command: () => viewSelectedGageCalibrationRuns(crRowData.calibration_run_id, crRowData.gage_id) });
+    cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
+    if (crRowData.validation_runs <= 1) {
+      cmCalibrationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => viewValidationRunStatus(crRowData.calibration_run_id) })
     }
     if (selectedCalibrationRun.value?.is_downloadable) {
-      cmCalibrationRun.value.push({ label: 'Download Calibration Data', icon: 'pi pi-fw-pisearch', command: () => downloadSelectedCalibrationData() });
+        cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+        cmCalibrationRun.value.push({ label: 'Download', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
     }
-    cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() });
+    cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
   }
 };
 
@@ -481,13 +482,13 @@ const onRowVrContextMenu = (event: any) => {
   if (selectedCalibrationValidationRun && selectedCalibrationValidationRun.value?.validation_run_id === vrRowData.validation_run_id) {
     vrContextMenu.value.show(event.originalEvent);
     if (vrRowData.status.toLocaleUpperCase() !== 'RUNNING') {
-      cmValidationRun.value.push({ label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJob(vrRowData.validation_run_id, vrRowData.status) });
+      cmValidationRun.value.push({ label: 'Evaluate', icon: 'pi pi-chart-scatter', command: () => evaluateValidationJob(vrRowData.validation_run_id, vrRowData.status) });
     }
-    cmValidationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) });
-    cmValidationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(userSelectedEvalCalibrationRunId.value) });
-    cmValidationRun.value.push({ label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
+    cmValidationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) });
+    cmValidationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(userSelectedEvalCalibrationRunId.value) });
+    cmValidationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
     if (vrRowData.status.toLocaleUpperCase() === 'RUNNING') {
-      cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
+      cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-ban', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
     }
   }
 }
@@ -497,7 +498,7 @@ const onRowCpContextMenu = (event: any) => {
   const cpRowData = event.data as ValidatedCalibrationRunListItem;
   // console.log('cpContextMenu: ', cpContextMenu.value);
   cpContextMenu.value.show(event.originalEvent);
-  cmCompareRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(cpRowData.calibration_run_id) })
+  cmCompareRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(cpRowData.calibration_run_id) })
 }
 
 const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
