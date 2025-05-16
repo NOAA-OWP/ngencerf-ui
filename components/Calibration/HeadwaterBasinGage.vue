@@ -314,7 +314,8 @@ const clearDataDueToGageChange = () => {
 
       const tMsg: ToastMessageOptions = {
         severity: 'info', summary: `Gage Changed`,
-        detail: "Calibration and Validation times must be set on the Tuning Controls tab"
+        detail: "Calibration and Validation times must be set on the Tuning Controls tab", 
+        life: ToastTimeout.timeoutInfo
       };
       toast.add(tMsg); addToastRecord(tMsg);
 
@@ -376,16 +377,16 @@ const handleDialogClose = (opt: any) => {
 
   if (opt && opt.data) {
     if (opt.data.saveFileResponseResult.status === 200) {
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: ToastTimeout.timeoutInfo };
       toast.add(tMsg); addToastRecord(tMsg);
     } else {
       useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Data Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Data Failed.', detail: message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: ToastTimeout.timeout10000 };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
   }
   fileUploadDialogOpened.value = false
@@ -473,7 +474,7 @@ const toggle_isNWMv3 = () => {
 const saveTabData = () => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeout10000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarning };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();

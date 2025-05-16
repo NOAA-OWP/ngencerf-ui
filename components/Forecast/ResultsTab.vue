@@ -101,7 +101,7 @@ onMounted(async () => {
   // load Results tab data
   const errorMessages: string[] = await loadForecastResultsTabData();
   errorMessages.forEach((msg: string) => {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   });
 

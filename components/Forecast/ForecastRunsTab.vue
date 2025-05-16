@@ -273,7 +273,7 @@ const navigateToSetupForecast = () => {
     if (e) {
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast tab not found' } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
   });
 }
@@ -290,7 +290,7 @@ const navigateToForecastRunStatus = () => {
     if (e) {
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Status/Run tab not found' } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Status/Run tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
   });
 }
@@ -307,7 +307,7 @@ const navigateToForecastResults = () => {
     if (e) {
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found' } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
   });
 }

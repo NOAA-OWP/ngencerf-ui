@@ -55,10 +55,10 @@ export const ValidationPlotNames = [
 ];
 
 export const ToastTimeout = {
-  timeout3000: 3000,
-  timeout5000: 5000,
-  timeout6000: 6000,
-  timeout10000: 10000,
+  timeoutSuccess: 5000,
+  timeoutInfo: 6000,
+  timeoutWarning: 10000,
+  timeoutError: 20000,
 };
 
 export const StatusTypes = [

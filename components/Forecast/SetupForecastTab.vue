@@ -118,7 +118,7 @@ onMounted(async () => {
  */
 const onRowSelect = (e: any) => {
   // console.log('onRowSelect', e);
-  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeout3000 };
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeoutInfo };
   toast.add(tMsg); addToastRecord(tMsg);
 };
 

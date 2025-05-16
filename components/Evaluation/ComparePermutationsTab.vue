@@ -171,7 +171,7 @@ onMounted(() => {
           }
         } else {
           toast.removeAllGroups();
-          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot names', life: ToastTimeout.timeout5000 };
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot names', life: ToastTimeout.timeoutError };
           toast.add(tMsg); addToastRecord(tMsg);
         }
     })
@@ -261,7 +261,7 @@ watch(selectedPlotName, async () => {
         }
       }
       if (!performanceMetricsData.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Performance Metrics data is not available', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Performance Metrics data is not available', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
@@ -336,12 +336,12 @@ const getPlotTableData = async () => {
       }
     } else {
       toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
     toast.removeAllGroups();
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeout5000 };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plots', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }

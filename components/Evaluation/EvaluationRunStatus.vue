@@ -158,7 +158,7 @@ const startRun = async () => {
       startTime.value = response?._data?.submit_date;
       validationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation' };
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation', life: ToastTimeout.timeoutWarning };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   });
@@ -211,7 +211,7 @@ const navigateToEvaluation = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Please select a validation job first.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Please select a validation job first.', life: ToastTimeout.timeoutWarning };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
