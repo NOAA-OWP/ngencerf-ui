@@ -66,7 +66,7 @@
                       <!--BUTTONS - START-->
                       <span v-if="validationStatus === 'Done'">
                         <Button id="ResultsArea" class="ngenButtonDiv" @click.stop="navigateToEvaluation"
-                          aria-label="Go to Evaluation Button" title="Go to Evaluation Button">Go to Evaluation</Button>
+                          aria-label="Go to Evaluation Button" title="Go to Evaluation Button">Evaluate</Button>
                       </span>
 
                       <span v-else>
