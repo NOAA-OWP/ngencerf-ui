@@ -8,31 +8,26 @@
         <MessagesGroup />
       </div>
     </Transition>
+    <div>
+    </div>
     <div id="ComparePermutationsPage">
         <div v-if="plotList && plotList.length >= 2" class="pl-2 pr-2 pt-2">
+            <p class="pr-2 pt-3 mb-[10px] font-bold">Select Comparison Display for Gage {{ uiGageId }}</p>
             <div class="flex mt-3">
-                <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
-                <div class="inline-block w-2/3">
+                <label for="DisplayOptions" class="pr-2 pt-1">Display </label>
+                <div class="inline-block w-1/6">
                     <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
                         optionLabel="name" optionValue="name">
                     </Select>
                 </div>
             </div>
         </div>
-        <div class="layout__table mt-2" style="width:100%">
-          <div class="layout__row">
-            <div class="text-left text-nowrap pl-2">
-              <label for="uiGageId" class="pr-2 pt-3">Gage </label>
-              {{ uiGageId }}
-            </div>
-          </div>
-        </div>
         <div id="SupplementalTableArea" v-if="selectedSupplementalTable">
           <div id="SupplementalTableArea" class="pl-2 pt-2">
             <div v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable === 1">
               <ContextMenu :pt="{ root: { id: ' cp-context-menu' } }" class="bg-white" ref="cpContextMenu"
                 :model="cmCompareRun"></ContextMenu>
-              <DataTable id="performanceMetricsTable" :value="performanceMetricsData" fixedHeader=true 
+              <DataTable id="performanceMetricsTable" class="pt-2" :value="performanceMetricsData" fixedHeader=true 
                   scrollable scroll-height="500px" :multi-sort="true" selectionMode="single"
                   v-model:selection="selectedDataRow" @rowContextmenu="onRowCpContextMenu">
                 <Column v-for="(col, colIndex) in performanceMetricsColumns" :key="colIndex" :header="col.header"
