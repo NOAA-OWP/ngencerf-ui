@@ -5,6 +5,7 @@ import { DateTime } from "luxon";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import { formatISOStringOrDateToYYYYMMDD } from '@/utils/TimeHelpers';
@@ -13,6 +14,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+  const { selectedCalibrationCompareRuns } = storeToRefs(useEvaluationCalibrationRunStore());
   const { getAccessToken } = useUserDataStore();
 
 
@@ -150,6 +152,26 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     });
   };
 
+
+  /**
+  * Get Performance Metrics for Comparison
+  * @return {any}
+  */
+  const queryGetPerformanceMetricsForComparison = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_status_for_comparison/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          calibration_run_ids: selectedCalibrationCompareRuns.value.map(run => run.calibration_run_id)
+        }
+      )
+    });
+  };
+
   /**
    * Get Calibration/Validation Log Names
    * @return {any}
@@ -256,6 +278,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     getSweTimeRange,
     queryGetIterations,
     queryGetPerformanceMetrics,
+    queryGetPerformanceMetricsForComparison,
     queryGetLogNames,
     queryGetLogData,
     getSweImagesByDate,
