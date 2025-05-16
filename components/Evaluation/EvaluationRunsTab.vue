@@ -70,11 +70,13 @@
         <div id="FilterDialog">
           <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
-          <Select id="HeadwaterBasinGageCompare" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
-            :options="compareCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
-            aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
-            @change="viewSelectedGageCalibrationRuns(0, uiGageId);">
-          </Select>
+            <div class="inline-block w-1/6 pb-3">
+                <Select id="HeadwaterBasinGageCompare" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
+                    :options="compareCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
+                    aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
+                    @change="viewSelectedGageCalibrationRuns(0, uiGageId);">
+                </Select>
+            </div>
         </div>
         <div id="evaluationCalibrationList">
           <ContextMenu :pt="{ root: { id: ' cp-context-menu' } }" class="bg-white" ref="cpContextMenu"
