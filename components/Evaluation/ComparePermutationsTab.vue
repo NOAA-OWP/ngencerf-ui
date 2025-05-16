@@ -9,7 +9,7 @@
       </div>
     </Transition>
     <div id="ComparePermutationsPage">
-        <div v-if="plotList && plotList.length >= 2" class="pl-6 pr-2 pt-2">
+        <div v-if="plotList && plotList.length >= 2" class="pl-2 pr-2 pt-2">
             <div class="flex mt-3">
                 <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
                 <div class="inline-block w-2/3">
@@ -19,9 +19,16 @@
                 </div>
             </div>
         </div>
-        <h1 class="mt-4 mb-4">Compare Calibration Jobs for Gage {{ uiGageId }}</h1>
+        <div class="layout__table mt-2" style="width:100%">
+          <div class="layout__row">
+            <div class="text-left text-nowrap pl-2">
+              <label for="uiGageId" class="pr-2 pt-3">Gage </label>
+              {{ uiGageId }}
+            </div>
+          </div>
+        </div>
         <div id="SupplementalTableArea" v-if="selectedSupplementalTable">
-          <div id="SupplementalTableArea" class="p-2">
+          <div id="SupplementalTableArea" class="pl-2 pt-2">
             <div v-if="performanceMetricsData && performanceMetricsData.length > 0 && selectedSupplementalTable === 1">
               <ContextMenu :pt="{ root: { id: ' cp-context-menu' } }" class="bg-white" ref="cpContextMenu"
                 :model="cmCompareRun"></ContextMenu>
@@ -34,11 +41,14 @@
             </div>
           </div>
         </div>
-        <div v-if="plotTables.length > 0 && selectedSupplementalTable === 0">
-            <ContextMenu :pt="{ root: { id: ' cp-context-menu-' } }" class="bg-white" ref="cpContextMenu"
+        <div v-if="plotTables.length > 0 && !showPlotGraph && selectedSupplementalTable === 0">
+            <ContextMenu :pt="{ root: { id: ' cp-context-menu' } }" class="bg-white" ref="cpContextMenu"
               :model="cmCompareRun"></ContextMenu>
-            <div v-for="(table, index) in plotTables">
-              <h2 v-if="table.title" class="mt-2 mb-1 float-left">{{ table.title }}</h2>
+            <div v-for="(table, index) in plotTables" class="pl-2">
+              <Button v-if="selectedPlotHasTimeseries" id="'button-timeseries-' + index " class="ngenButtonDiv float-right" @click="togglePlotGraph(index, 'Corr')">
+                Plot
+              </Button>
+              <div v-if="table.title" class="mt-2 mb-1 float-left tableTitle font-bold">{{ table.title }}</div>
               <DataTable class="clear-both" :id="'plotTableHTML-' + index " :value="table.table_data" fixedHeader=true 
                   scrollable scroll-height="500px" :multi-sort="true" selectionMode="single"
                   v-model:selection="selectedDataRow" @rowContextmenu="onRowCpContextMenu">
@@ -109,6 +119,8 @@ const {
 const isComparePermutationsLoading = ref<boolean>(false);
 
 const plotTables = ref<any[]>([]);
+const selectedPlotHasTimeseries = ref<boolean>(false);
+const showPlotGraph = ref<boolean>(false);
 
 //this model is for highlighting purpose
 const selectedDataRow = ref<DynamicObject>();
@@ -196,6 +208,10 @@ const resetUserPlotRefs = (exceptions: any): void => {
   // plot table refs
   plotTables.value = [];
 
+  // plot graph refs
+  selectedPlotHasTimeseries.value = false;
+  showPlotGraph.value = false;
+
   // supplemental table refs (metrics)
   if (!exceptions.includes('selectedSupplementalTable')) {
     selectedSupplementalTable.value = 0;
@@ -264,6 +280,11 @@ const getPlotTableData = async () => {
       uiGageId.value, // gage_id
     );
     if (response?._data?.plots) {
+      for (let p = 0; p < plotList.value.length; p++) {
+        if (plotList.value[p].name === selectedPlotName.value) {
+          selectedPlotHasTimeseries.value = plotList.value[p].timeseries_available;
+        }
+      }
       // Loop through each plot and assign the data to individual tables for calib/valid/full
       for (let p = 0; p < response?._data?.plots.length; p++) {
         if (response?._data?.plots[p].plot_data[0].table_data) {
