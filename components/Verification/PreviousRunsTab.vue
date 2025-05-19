@@ -118,7 +118,7 @@ const deleteSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   })
 }
 const acceptDelete = (selectedRunId: number) => {
-  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: ToastTimeout.timeoutInfo, life: ToastTimeout.timeoutInfo };
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Confirmed', detail: 'Run ID ' + selectedRunId + ' deleted', life: ToastTimeout.timeoutInfo };
   toast.add(tMsg); addToastRecord(tMsg);
   // const reduced_calibration_job_list = calibration_jobs_list.value.filter( ( cr ) => cr.calibration_run_id !== selectedRunId )
   // calibration_jobs_list.value = reduced_calibration_job_list

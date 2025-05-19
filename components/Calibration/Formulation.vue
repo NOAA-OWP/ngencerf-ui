@@ -211,7 +211,7 @@ const { isLoading } = storeToRefs(generalStore());
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
-import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess, useApiResponseToastSeverityCode } from "@/composables/ValidationHandlers";
+import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess,useApiResponseToastSeverityLife } from "@/composables/ValidationHandlers";
 import type { ListboxChangeEvent } from "primevue/listbox";
 
 const new_sloth_variable_name = ref<string>("")
@@ -324,10 +324,10 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 const moduleListChanged = (e: ListboxChangeEvent) => {
   /* if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
     selectedModuleValues.value.push('T-Route');
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'T-Route must be included', detail: 'All Calibration Formulations are required to use T-Route and one other module at a minimum.', life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'T-Route must be included', detail: 'All Calibration Formulations are required to use T-Route and one other module at a minimum.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   } else if (selectedModuleValues.value.length < 2) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Another module must be selected with T-Route.', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Another module must be selected with T-Route.', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
   if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
@@ -369,16 +369,16 @@ const checkValidCharacters = (e: KeyboardEvent) => {
 */
 const saveFormulationData = () => {
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   } else if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'T-Route must be included', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeoutInfo };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'T-Route must be included', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   } else if (selectedModuleValues.value.length < 2) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Another module must be selected with T-Route.', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeoutInfo };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Another module must be selected with T-Route.', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   } else if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
@@ -397,7 +397,7 @@ const saveFormulationData = () => {
       if (response.status === 200) {
         if (response._data.eds_errors) {
           response._data.eds_errors.forEach((err: any) => {
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeoutWarning };
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeoutWarn };
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
@@ -413,7 +413,7 @@ const saveFormulationData = () => {
                 warnings += " ---- ";
               }
             });
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Accepted with Notices', detail: warnings, life: ToastTimeout.timeoutWarning };
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Accepted with Notices', detail: warnings, life: ToastTimeout.timeoutWarn };
             toast.add(tMsg); addToastRecord(tMsg);
           }
         }
@@ -422,7 +422,19 @@ const saveFormulationData = () => {
       } else {
         isLoading.value = false;
         useApiErrorResponsePreprocess(response).forEach(message => {
-          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Formulation Data Failed.', detail: message, life: ToastTimeout.timeoutInfo };
+          let msgSummary = '';
+          switch(useApiResponseToastSeverityCode(response?.status)) {
+            case 'error':
+              msgSummary = 'Save Formulation Data Failed';
+              break;
+            case 'warn':
+              msgSummary = 'Formulation Accepted with Notices';
+              break;
+            case 'success':
+              msgSummary = 'Formulation Accepted';
+              break;
+          }
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: msgSummary, detail: message, life: useApiResponseToastSeverityLife(response?.status) };
           toast.add(tMsg); addToastRecord(tMsg);
         });
       }

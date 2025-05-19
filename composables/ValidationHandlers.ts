@@ -49,7 +49,7 @@ export const useProcessCalibrationGageSavedResponse = ( savedResponse: GageBasin
         severity: 'warn',
         summary: 'EDS Error',
         detail: eds_error.message,
-        life: ToastTimeout.timeoutInfo
+        life: ToastTimeout.timeoutWarn
       });
     })
   }
@@ -156,5 +156,17 @@ export const useApiResponseToastSeverityCode = ( status: number ) => {
       return "error";
     default:
       return "warn";
+  }
+}
+
+export const useApiResponseToastSeverityLife = ( status: number ) => {
+  switch ( status ) {
+    case 200:
+      return ToastTimeout.timeoutSuccess;
+    case 400:
+    case 500:
+      return ToastTimeout.timeoutError;
+    default:
+      return ToastTimeout.timeoutWarn;
   }
 }

@@ -449,7 +449,7 @@ onMounted(async () => {
 
     isInitialSetupDone.value = true; // set to true after initial setup
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No Calibration Job ID', detail: 'No calibration job ID found. Please go back to the Calibration Runs tab and select a job.', life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No Calibration Job ID', detail: 'No calibration job ID found. Please go back to the Calibration Runs tab and select a job.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 
@@ -485,7 +485,7 @@ const isFormulationDataSaved = (): boolean => {
 const handleCalibrationTimeControlsClick = (event: Event) => {
   if (!isTimeRangeSet()) {
     event.preventDefault(); // Prevent any default action if time_range is not set
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Calibration Tuning Controls are disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.', life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Calibration Tuning Controls are disabled', detail: 'You cannot interact with time controls because Forcing and Observational data is not set.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
@@ -669,11 +669,11 @@ const handleFileUpload = async (event: Event) => {
         scrollToBottom();
 
         if (invalidParameters.length > 0) {
-          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters in the uploaded file were not imported because they are not calibratable:\n ${invalidParameters.join(', ')}` };
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Invalid parameters in parameter file', detail: `The following parameters in the uploaded file were not imported because they are not calibratable:\n ${invalidParameters.join(', ')}`, life: ToastTimeout.timeoutWarn };
           toast.add(tMsg); addToastRecord(tMsg);
         }
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No data in parameter file', life: ToastTimeout.timeoutWarning };
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No data in parameter file', life: ToastTimeout.timeoutWarn };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } catch (error) {
@@ -682,7 +682,7 @@ const handleFileUpload = async (event: Event) => {
       console.error('File upload failed:', error);
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No file selected', life: ToastTimeout.timeoutWarning, life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No file selected', life: ToastTimeout.timeoutWarn};
     toast.add(tMsg); addToastRecord(tMsg);
     console.error('No file selected');
   }
@@ -883,28 +883,28 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'calibrationtimes must be within time_range. Was not saved.' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'calibrationtimes must be within time_range. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if simulation_end_time is not after simulation_start_time
   if (simStartDate >= simEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Simulation time problem', detail: 'simulation_end_time must be after simulation_start_time. Was not saved.', life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Simulation time problem', detail: 'simulation_end_time must be after simulation_start_time. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
   if (calStartDate <= simStartDate || calStartDate > simEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time. Was not saved.', life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if calibration_end_time is not after calibration_start_time and within simulation_end_time
   if (calEndDate <= calStartDate || calEndDate > simEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time. Was not saved.', life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_end_time must be after calibration_start_time and within simulation_end_time. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -1104,7 +1104,7 @@ const saveTuningData = () => {
   };
 
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarning };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     // check if Tuning Tab data is validated before saving

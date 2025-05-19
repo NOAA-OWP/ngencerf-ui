@@ -56,8 +56,8 @@ export const ValidationPlotNames = [
 
 export const ToastTimeout = {
   timeoutSuccess: 5000,
-  timeoutInfo: 6000,
-  timeoutWarning: 10000,
+  timeoutInfo: 10000,
+  timeoutWarn: 15000,
   timeoutError: 20000,
 };
 
