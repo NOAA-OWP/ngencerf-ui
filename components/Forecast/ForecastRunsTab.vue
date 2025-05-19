@@ -194,12 +194,12 @@ const onRowContextMenu = (event: any) => {
     crContextMenu.value.show(event.originalEvent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
     if (crRowData.forecast_status === 'Done') {
-      cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastResults() });
+      cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToForecastResults() });
     } else if (crRowData.forcing_download_status === 'Running' || crRowData.forecast_status === 'Running') {
-      cmForecastRun.value.push({ label: 'View Forecast Run Status', icon: 'pi pi-fw-pisearch', command: () => navigateToForecastRunStatus() });
+      cmForecastRun.value.push({ label: 'View Running Status', icon: 'pi pi-gauge', command: () => navigateToForecastRunStatus() });
     }
-    cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => clearDataAndNavigateToSetupForecast() });
-    cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
+    cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
   }
 };
 

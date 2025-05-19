@@ -191,14 +191,14 @@ const onRowContextMenu = (event: any) => {
     crContextMenu.value.show(event.originalEvent);
     //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     setSelectedCalibrationRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
-    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => navigateToSetupForecast() });
-    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
-    //cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() } );
-    //cmCalibrationRun.value.push( { label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onCalibrationRunForForecastRowSelect() } );
+    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => navigateToSetupForecast() });
+    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    //cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-chart-scatter', command: () => openSelectedCalibrationRun() } );
+    //cmCalibrationRun.value.push( { label: 'Show Setup', icon: 'pi pi-list', command: () => onCalibrationRunForForecastRowSelect() } );
     if (calibrationRunForForecast.value?.is_downloadable) {
-      cmCalibrationRun.value.push({ label: 'Download Calibration Data', icon: 'pi pi-fw-pisearch', command: () => downloadSelectedCalibrationData() });
+      cmCalibrationRun.value.push({ label: 'Download Calibration Data', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
     }
-    cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() });
+    cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
   }
 };
 
