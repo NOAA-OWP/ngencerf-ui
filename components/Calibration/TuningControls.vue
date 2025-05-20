@@ -144,8 +144,7 @@
       <div>
         <div class="font-bold">Output Variable To Calibrate</div>
         <Select id="OutputVariable" class="varInputs mt-1" aria-label="Output Variable To Calibrate"
-          title="Output Variable To Calibrate" v-model="selectedOutputVariableToCalibrate" :options="['Streamflow']">
-        </Select>
+          title="Output Variable To Calibrate" v-model="selectedOutputVariableToCalibrate" :options="['Streamflow']" />
       </div>
     </div>
 
@@ -671,7 +670,7 @@ const handleFileUpload = async (event: Event) => {
       console.error('File upload failed:', error);
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No file selected', life: ToastTimeout.timeoutWarn};
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No file selected', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     console.error('No file selected');
   }

@@ -81,7 +81,7 @@
           </div>
           <div class="line-spacer">&nbsp;</div>
 
-          <div v-if="selectedOutputVariableToCalibrate && selectedOutputVariableToCalibrate.trim() !== ''"
+          <div v-if="userCalibrationRunData?.parameters_selected"
             :aria-label="'Output Variable ' + selectedOutputVariableToCalibrate"
             :title="'Output Variable ' + selectedOutputVariableToCalibrate">
             <span class="font-medium">

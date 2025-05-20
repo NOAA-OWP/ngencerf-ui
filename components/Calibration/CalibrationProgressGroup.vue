@@ -38,9 +38,7 @@
       </tr>
       <tr>
         <td>
-          <i v-if="selectedOutputVariableToCalibrate && selectedOutputVariableToCalibrate.trim() !== ''"
-            class="pi pi-check font-bold checkMark">
-          </i>
+          <i v-if="userCalibrationRunData?.parameters_selected" class="pi pi-check font-bold checkMark"></i>
         </td>
         <td data-tab="4" title="Output Variable to Calibrate" aria-label="Output Variable to Calibrate"
           @click="tabClicked">Output Variable to Calibrate</td>
@@ -79,12 +77,10 @@
 <script lang="ts" setup>
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-const { selectedOutputVariableToCalibrate } = storeToRefs(useTuningStore());
 
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 
