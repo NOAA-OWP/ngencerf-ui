@@ -46,8 +46,8 @@ If you need to make authenticated API calls to `ngencerf-server`, use the `makeP
 Here is an example of how to use `makeProtectedApiCall`:
 
 ```typescript
-import { makeProtectedApiCall } from "~/composables/UserAuth";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const { ngencerfBaseUrl } = useBackendConfig();

@@ -1,7 +1,7 @@
 // @ts-check
 import { defineStore, storeToRefs } from "pinia";
 
-import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NextGenModel";
+import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";

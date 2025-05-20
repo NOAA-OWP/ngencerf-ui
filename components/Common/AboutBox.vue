@@ -66,8 +66,8 @@ import Column from 'primevue/column';
 import { useToast } from "primevue/usetoast";
 import type { ToastMessageOptions } from "primevue/toast";
 
-import { ToastTimeout } from "@/composables/NextgenEnums";
-import type { CombinedVersionInfo } from "@/composables/NextGenModel";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
+import type { CombinedVersionInfo } from "@/composables/NgencerfModels";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 
@@ -205,10 +205,10 @@ const useClipboard = () => {
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Clipboard', detail: 'CSV copied to clipboard', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Clipboard', detail: 'CSV copied to clipboard', life: ToastTimeout.timeoutSuccess };
       toast.add(tMsg); addToastRecord(tMsg);
     } catch (err) {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Clipboard Error', detail: err, life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Clipboard Error', detail: err, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   };

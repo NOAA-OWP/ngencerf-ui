@@ -308,9 +308,9 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 
 
-import type { DynamicObject } from "@/composables/NextGenModel";
+import type { DynamicObject } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 import { formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
 import { isValidDate, isValidDateTime } from "@/utils/CommonHelpers";
 
@@ -494,7 +494,7 @@ onMounted(() => {
       plotList.value = plotNames?.value?._data?.plot_names;
     } else {
       toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names', life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
 
@@ -537,7 +537,7 @@ onMounted(() => {
         });
       } else {
         toast.removeAllGroups();
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
@@ -547,7 +547,7 @@ onMounted(() => {
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  // is the selected option a plot or iteration table?
+  // is the selected option a plot or supplemental table?
   if (selectedPlotName.value && (supplementalTableOptions.value as any).includes(selectedPlotName.value)) {
     selectedSupplementalTable.value = (supplementalTableOptions.value as any).indexOf(selectedPlotName.value) + 1;
     // reset all of our plot refs by selectedPlotName and selectedSupplementalTable
@@ -581,7 +581,7 @@ watch(selectedPlotName, async () => {
       }
 
       if (!iterationMetricsData.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } else if (selectedSupplementalTable.value === 2) {
@@ -613,7 +613,7 @@ watch(selectedPlotName, async () => {
       }
 
       if (!iterationParamsData.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } else if (selectedSupplementalTable.value === 3) {
@@ -682,7 +682,7 @@ watch(selectedPlotName, async () => {
         }
       }
       if (!performanceMetricsData.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
@@ -704,7 +704,6 @@ watch(selectedPlotName, async () => {
 
     // set sweStartDateTime and sweEndDateTime if not already set
     if (!sweStartDateTime.value || !sweEndDateTime.value) {
-      console.log('Setting SWE Start/End Dates');
       setSweStartDateTime();
       setSweEndDateTime();
     }
@@ -724,7 +723,7 @@ watch(selectedPlotName, async () => {
       } else {
         selectedPlotHasTimeseries.value = false;
         toast.removeAllGroups();
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'SWE time series data is currently unavailable', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'SWE time series data is currently unavailable', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
@@ -760,7 +759,7 @@ watch(selectedPlotName, async () => {
         selectedPlotFileUrl.value = null;
         selectedPlotHasTimeseries.value = false;
         toast.removeAllGroups();
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
 
@@ -836,7 +835,7 @@ watch(selectedPlotName, async () => {
       // reset all of our plot refs except for selectedPlotName
       resetUserPlotRefs(['selectedPlotName']);
       toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
@@ -1291,7 +1290,7 @@ const drawInteractiveSlider = () => {
           };
           plotGraphSliderData.value.push(dataPoint);
         }
-        console.log('Using column ' + plotTableColumns.value[c].value + ' to draw slider');
+        // console.log('Using column ' + plotTableColumns.value[c].value + ' to draw slider');
         break;
       }
     }
@@ -1549,7 +1548,7 @@ watch(selectedLogCategory, async () => {
   // start with the first log
   selectedLogName.value = selectedLogList.value[0].name;
   if (!selectedLogList.value.length) {
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeout5000 };
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 });
@@ -1582,7 +1581,7 @@ watch(selectedLogName, async () => {
       selectedLogFilePath.value = response?._data?.log_path;
     } else {
       toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
@@ -1614,7 +1613,7 @@ watch(selectedLogCurrentPage, async () => {
       selectedLogDisplay.value = logText;
     } else {
       toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
@@ -1664,16 +1663,16 @@ const getSpatialPlots = async () => {
 
         if (loadSweImagesErrors) {
           loadSweImagesErrors.forEach((errorMessage) => {
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage, life: ToastTimeout.timeout5000 };
+            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage, life: ToastTimeout.timeoutError };
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in Date format', life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in Date format', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in DateTime format', life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in DateTime format', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
     isEvaluationLoading.value = false;

@@ -6,16 +6,17 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { generalStore } from "@/stores/common/GeneralStore";
 
-import { makeProtectedApiCall } from "#imports";
-import type { CalibrationJobListItem } from "@/composables/NextGenModel";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
-export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => {
+import type { CalibrationJobListItem } from "@/composables/NgencerfModels";
+
+export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken, getUserName } = useUserDataStore()
-  const { userCalibrationJobsListData } = storeToRefs( useUserDataStore() )
-  const { calibrationJobId } = storeToRefs( generalStore() )
-  
+  const { getAccessToken, getUserName } = useUserDataStore();
+  const { userCalibrationRunData, userCalibrationJobsListData } = storeToRefs(useUserDataStore());
+  const { calibrationJobId } = storeToRefs(generalStore());
+
   const calibrationDownloadJobID = ref<number | null>(null);
   const calibrationDownloadFileName = ref<string | null>(null);
 
@@ -23,30 +24,30 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
  * returns list of calibration job data from server
  * @returns {CalibrationJobListItem[]}
  */
-  const fetchJobsListData = computed( () => {
-    return userCalibrationJobsListData.value ?? []
+  const fetchJobsListData = computed(() => {
+    return userCalibrationJobsListData.value ?? [];
   })
 
   /**
  * based on the current user's list of calibration job return number of job with status of "saved"
  * @returns {number}
  */
-  const savedCalibrationJobs = computed( () => {
-    return userCalibrationJobsListData.value?.reduce( ( total_saved_jobs: number, job: CalibrationJobListItem  ) => {
-        if( job.status.toLowerCase() === 'saved' ) total_saved_jobs += 1;
-        return total_saved_jobs;
-    }, 0 )
+  const savedCalibrationJobs = computed(() => {
+    return userCalibrationJobsListData.value?.reduce((total_saved_jobs: number, job: CalibrationJobListItem) => {
+      if (job.status.toLowerCase() === 'saved') total_saved_jobs += 1;
+      return total_saved_jobs;
+    }, 0)
   })
 
   /**
  * based on the current user's list of calibration job return number of job with status of "running"
  * @returns {number}
  */
-  const runningCalibrationJobs = computed( () => {
-    return userCalibrationJobsListData.value?.reduce( ( total_running_jobs: number, job: CalibrationJobListItem  ) => {
-        if( job.status.toLowerCase() === 'running' ) total_running_jobs += 1;
-        return total_running_jobs;
-    }, 0 )
+  const runningCalibrationJobs = computed(() => {
+    return userCalibrationJobsListData.value?.reduce((total_running_jobs: number, job: CalibrationJobListItem) => {
+      if (job.status.toLowerCase() === 'running') total_running_jobs += 1;
+      return total_running_jobs;
+    }, 0)
   })
 
   /**
@@ -54,13 +55,13 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
  * @returns {CreatedCalibrationRun}
  */
   async function fetchNewCalibrationRunId() {
-    return await makeProtectedApiCall<CreatedCalibrationRun>( `${ngencerfBaseUrl}/calibration/create_calibration_run/`, {
-        method: "POST",
-        headers: { 
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        }
-    } );
+    return await makeProtectedApiCall<CreatedCalibrationRun>(`${ngencerfBaseUrl}/calibration/create_calibration_run/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      }
+    });
   }
 
 
@@ -71,7 +72,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
   */
   async function deleteCalibrationRun(runIds: any) {
     let toDelete: number[];
-    if( !Array.isArray(runIds) ) {
+    if (!Array.isArray(runIds)) {
       toDelete = [runIds];
     } else {
       toDelete = runIds;
@@ -83,8 +84,8 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({ calibration_run_ids: toDelete })
-    })
-  }
+    });
+  };
 
   /**
   * Archive or Un-archive a job
@@ -92,9 +93,9 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
   * If a single job comes in, make sure we put it into an array.
   * Otherwise, it is an array.
   */
-  async function archiveCalibrationRun(runIds: any, unArchive:  boolean) {
-        let toDelete: number[];
-    if( !Array.isArray(runIds) ) {
+  async function archiveCalibrationRun(runIds: any, unArchive: boolean) {
+    let toDelete: number[];
+    if (!Array.isArray(runIds)) {
       toDelete = [runIds];
     } else {
       toDelete = runIds;
@@ -122,7 +123,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
       body: JSON.stringify({ calibration_run_id: runId })
     })
   }
-  
+
   /**
  * Get calibration data as zip file
  */
@@ -135,13 +136,13 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
       },
       body: JSON.stringify({ calibration_run_id: calibration_run_id })
     })
-    .then(response => {
-      if (!response.ok) {
-        const message = `Error: ${response.status} ${response.statusText}`;
-        throw new Error(message);
-      }
-    });
-    
+      .then(response => {
+        if (!response.ok) {
+          const message = `Error: ${response.status} ${response.statusText}`;
+          throw new Error(message);
+        }
+      });
+
     // Use the EventSource polyfill to support sending Authorization header
     const source = new EventSourcePolyfill(
       `${ngencerfBaseUrl}/calibration/get_zip_status/${calibration_run_id}/`,
@@ -151,7 +152,7 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
         }
       }
     );
-    
+
     source.onmessage = async (event) => {
       const data = JSON.parse(event.data);
       if (data.status === "done") {
@@ -166,43 +167,43 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
           },
           body: JSON.stringify({ calibration_run_id: calibration_run_id })
         })
-        .then(response => {
-          if (!response.ok) {
-            const message = `Error: ${response.status} ${response.statusText}`;
-            throw new Error(message);
-          }
-          // Extract the filename from the Content-Disposition header if available
-          const contentDisposition = response.headers.get('Content-Disposition');
-          let file_user_name = getUserName().split("@")[0];
-          let file_name = `${calibration_run_id}_${file_user_name}.zip`; // default filename
-          if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
-            // Parse filename, handling quotes if necessary
-            const file_name_regex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-            const matches = file_name_regex.exec(contentDisposition);
-            if (matches != null && matches[1]) {
-              file_name = matches[1].replace(/['"]/g, "");
+          .then(response => {
+            if (!response.ok) {
+              const message = `Error: ${response.status} ${response.statusText}`;
+              throw new Error(message);
             }
-          }
-          return response.blob().then(blob => ({ blob, file_name }));
-        })
-        .then(({ blob, file_name }) => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = file_name; // Use the filename from the response header
-          
-          // Update refs with the Job ID and file name so that we can access them outside of the store
-          calibrationDownloadJobID.value = calibration_run_id;
-          calibrationDownloadFileName.value = file_name;
-          
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        })
-        .catch(error => {
-          throw error;
-        });
+            // Extract the filename from the Content-Disposition header if available
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let file_user_name = getUserName().split("@")[0];
+            let file_name = `${calibration_run_id}_${file_user_name}.zip`; // default filename
+            if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
+              // Parse filename, handling quotes if necessary
+              const file_name_regex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+              const matches = file_name_regex.exec(contentDisposition);
+              if (matches != null && matches[1]) {
+                file_name = matches[1].replace(/['"]/g, "");
+              }
+            }
+            return response.blob().then(blob => ({ blob, file_name }));
+          })
+          .then(({ blob, file_name }) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = file_name; // Use the filename from the response header
+
+            // Update refs with the Job ID and file name so that we can access them outside of the store
+            calibrationDownloadJobID.value = calibration_run_id;
+            calibrationDownloadFileName.value = file_name;
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          })
+          .catch(error => {
+            throw error;
+          });
       }
     }
   }
@@ -221,11 +222,11 @@ export const useCalibrationJobStore = defineStore( 'CalibrationJobStore', () => 
     getCalibrationJobZip
   }
 },
-{
+  {
     persist: {
-    storage: piniaPluginPersistedstate.localStorage(),
-  },
-})
+      storage: piniaPluginPersistedstate.localStorage(),
+    },
+  })
 
 /* Pinia supports Hot Module replacement so you can edit your stores
   and interact with them directly in your app without reloading the page,

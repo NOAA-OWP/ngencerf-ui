@@ -70,16 +70,21 @@
         <div id="FilterDialog">
           <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
-          <Select id="HeadwaterBasinGageCompare" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
-            :options="compareCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
-            aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
-            @change="viewSelectedGageCalibrationRuns(uiGageId);">
-          </Select>
+            <div class="inline-block w-1/6 pb-3">
+                <Select id="HeadwaterBasinGageCompare" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
+                    :options="compareCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
+                    aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
+                    @change="viewSelectedGageCalibrationRuns(0, uiGageId);">
+                </Select>
+            </div>
         </div>
         <div id="evaluationCalibrationList">
+          <ContextMenu :pt="{ root: { id: ' cp-context-menu' } }" class="bg-white" ref="cpContextMenu"
+            :model="cmCompareRun"></ContextMenu>
           <DataTable id="compare-list" :value="computedGageCalibrationRunList" scrollable scroll-height="400px"
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="multiple"
-            v-model:selection="selectedCalibrationCompareRuns" :rowStyle="rowStyle" class="boxed">
+            v-model:selection="selectedCalibrationCompareRuns" :rowStyle="rowStyle" class="boxed"
+            @rowContextmenu="onRowCpContextMenu">
             <Column :pt="ptValColumns" v-for="(col, colIndex) in gageCalibrationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field" sortable>
             </Column>
@@ -266,8 +271,8 @@ import { useToast } from "primevue/usetoast";
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
-import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NextGenModel";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@/composables/NgencerfModels";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
@@ -279,18 +284,20 @@ import EvalRunsFilterDialog from "@/components/Common/EvalRunsFilterDialog.vue"
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
-import { EvaluationTabs } from "@/composables/NextgenEnums";
+import { EvaluationTabs } from "@/composables/NgencerfEnums";
 
 const { deleteCalibrationRun, getCalibrationJobZip } = useCalibrationJobStore();
 const showMessagesGroup = ref<boolean>(false);
 
 const crContextMenu = ref(); //calibration run context menu
 const vrContextMenu = ref(); //validation run context menu
+const cpContextMenu = ref(); //compare run context menu
 
 const contextMenuJob = ref<number>();
 
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const cmValidationRun = ref<DataTableContextMenuOption[]>([]);
+const cmCompareRun = ref<DataTableContextMenuOption[]>([]);
 
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
@@ -453,20 +460,21 @@ const onRowContextMenu = (event: any) => {
     crContextMenu.value.show(event.originalEvent);
     contextMenuJob.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     if (crRowData.validation_runs > 1) {
-      cmCalibrationRun.value.push({ label: 'Select Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectedCalibrationValidationRuns(crRowData.calibration_run_id) })
-    } if (crRowData.validation_runs === 1) {
-      cmCalibrationRun.value.push({ label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJobFromCalibration(crRowData.calibration_run_id) })
+      cmCalibrationRun.value.push({ label: 'Select Validation Run', icon: 'pi pi-search', command: () => viewSelectedCalibrationValidationRuns(crRowData.calibration_run_id) })
+    } 
+    if (crRowData.validation_runs <= 1) {
+      cmCalibrationRun.value.push({ label: 'Evaluate', icon: 'pi pi-chart-scatter', command: () => evaluateValidationJobFromCalibration(crRowData.calibration_run_id) })
     }
-    cmCalibrationRun.value.push({ label: 'Compare Permutations', icon: 'pi pi-fw-pisearch', command: () => viewSelectedGageCalibrationRuns(crRowData.gage_id) });
-    cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
-    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
-    if (crRowData.validation_runs === 1) {
-      cmCalibrationRun.value.push({ label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => viewValidationRunStatus(crRowData.calibration_run_id) })
+    cmCalibrationRun.value.push({ label: 'Compare Permutations', icon: 'pi pi-arrows-h', command: () => viewSelectedGageCalibrationRuns(crRowData.calibration_run_id, crRowData.gage_id) });
+    cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
+    if (crRowData.validation_runs <= 1) {
+      cmCalibrationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => viewValidationRunStatus(crRowData.calibration_run_id) })
     }
     if (selectedCalibrationRun.value?.is_downloadable) {
-      cmCalibrationRun.value.push({ label: 'Download Calibration Data', icon: 'pi pi-fw-pisearch', command: () => downloadSelectedCalibrationData() });
+        cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+        cmCalibrationRun.value.push({ label: 'Download', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
     }
-    cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() });
+    cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
   }
 };
 
@@ -476,15 +484,23 @@ const onRowVrContextMenu = (event: any) => {
   if (selectedCalibrationValidationRun && selectedCalibrationValidationRun.value?.validation_run_id === vrRowData.validation_run_id) {
     vrContextMenu.value.show(event.originalEvent);
     if (vrRowData.status.toLocaleUpperCase() !== 'RUNNING') {
-      cmValidationRun.value.push({ label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => evaluateValidationJob(vrRowData.validation_run_id, vrRowData.status) });
+      cmValidationRun.value.push({ label: 'Evaluate', icon: 'pi pi-chart-scatter', command: () => evaluateValidationJob(vrRowData.validation_run_id, vrRowData.status) });
     }
-    cmValidationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-fw-pisearch', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) });
-    cmValidationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(userSelectedEvalCalibrationRunId.value) });
-    cmValidationRun.value.push({ label: 'View Validation Run Status', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
+    cmValidationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) });
+    cmValidationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(userSelectedEvalCalibrationRunId.value) });
+    cmValidationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
     if (vrRowData.status.toLocaleUpperCase() === 'RUNNING') {
-      cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-fw-pisearch', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
+      cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-ban', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
     }
   }
+}
+
+const onRowCpContextMenu = (event: any) => {
+  cmCompareRun.value = [];
+  const cpRowData = event.data as ValidatedCalibrationRunListItem;
+  // console.log('cpContextMenu: ', cpContextMenu.value);
+  cpContextMenu.value.show(event.originalEvent);
+  cmCompareRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(cpRowData.calibration_run_id) })
 }
 
 const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
@@ -556,7 +572,7 @@ const viewSelectedCalibrationValidationRuns = async (calibration_run_id: number)
   })
 }
 
-const viewSelectedGageCalibrationRuns = async (gage_id: string) => {
+const viewSelectedGageCalibrationRuns = async (calibration_run_id: number, gage_id: string) => {
   isLoading.value = true;
   userSelectedEvalCalibrationRunId.value = calibrationJobId.value = 0;
   computedGageCalibrationRunList.value = [];
@@ -577,9 +593,13 @@ const viewSelectedGageCalibrationRuns = async (gage_id: string) => {
         rowData['objective_function'] = calibration_job.objective_function;
         rowData['optimization_algorithm'] = calibration_job.optimization_algorithm;
         computedGageCalibrationRunList.value.push(rowData);
+        if (calibration_job.calibration_run_id == calibration_run_id) {
+          // start with the job that the user picked already highlighted
+          selectedCalibrationCompareRuns.value = [rowData];
+        }
       });
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Not Enough Calibration Jobs', detail: 'You can only Compare Permutations for gages for which you have completed at least 2 calibration jobs.', life: ToastTimeout.timeout6000 };
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Not Enough Calibration Jobs', detail: 'You can only Compare Permutations for gages for which you have completed at least 2 calibration jobs.', life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
     isLoading.value = false;
@@ -601,7 +621,7 @@ const viewSelectAlternateIteration = async (calibration_run_id: number) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -612,7 +632,7 @@ const navigateToAlternateIteration = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_selectAltIteration];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -645,7 +665,7 @@ const compareSelectedCalibrationJobs = async (): Promise<void> => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_compare];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Not Enough Calibration Jobs Selected', detail: 'Please select at least two calibration jobs to compare.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Not Enough Calibration Jobs Selected', detail: 'Please select at least two calibration jobs to compare.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -668,7 +688,7 @@ const navigateToEvaluation = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_evaluate];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Please select a validation job first.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Validation Job', detail: 'Please select a validation job first.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -707,13 +727,13 @@ const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
     if (response.status === 200) {
       const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
-      summary: 'Delete Calibration Run', detail: 'Job ' + selectedRunId + ' deleted', life: ToastTimeout.timeout3000};
+      summary: 'Delete Calibration Run', detail: 'Job ' + selectedRunId + ' deleted', life: useApiResponseToastSeverityLife(response?.status)};
       toast.add(tMsg); addToastRecord(tMsg);   
       fetchUserValidatedCalibrationJobsListData();
       resetUserSelectedEvalValidationRun();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }
@@ -729,20 +749,20 @@ const downloadSelectedCalibrationData = async () => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
   if (selectedCalibrationRun.value.is_downloadable) {
     //isLoading.value = true;
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and will be prompted to save when the file is ready.', life: ToastTimeout.timeout10000 };
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and will be prompted to save when the file is ready.', life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {
         // If successful, this job will update calibrationDownloadFileName, and watch function will trigger a Toast message
         await getCalibrationJobZip(selectedRunId);
       } catch (error) {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeout5000 };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
       //isLoading.value = false;
     })
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: 'Data cannot be downloaded for Calibration Job ' + selectedRunId + '.', life: ToastTimeout.timeout5000 };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: 'Data cannot be downloaded for Calibration Job ' + selectedRunId + '.', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -755,7 +775,7 @@ watch(calibrationDownloadJobID, () => {
     if (calibrationDownloadFileName.value) {
       tDetail = 'Download zip file "' + calibrationDownloadFileName.value + '" successfully created.'
     }
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + calibrationDownloadJobID.value, detail: tDetail, life: ToastTimeout.timeout10000 };
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + calibrationDownloadJobID.value, detail: tDetail, life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
     calibrationDownloadJobID.value = null;
     calibrationDownloadFileName.value = null;
