@@ -346,17 +346,17 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
 const saveOptMetData = () => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
     saveOptimizationTabData().then(response => {
       if (response.status === 200) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Optimization Metrics Data Saved', detail: response?._data?.message };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Optimization Metrics Data Saved', detail: response?._data?.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
-          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Data Failed.', detail: message };
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Data Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status)};
           toast.add(tMsg); addToastRecord(tMsg);
         });
       }

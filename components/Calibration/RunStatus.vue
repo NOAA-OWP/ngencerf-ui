@@ -312,7 +312,7 @@ const startRun = async () => {
       if (runCalibrationResponse?._data?.status) {
         userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server' };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
 
@@ -322,12 +322,12 @@ const startRun = async () => {
         // which shows the time in local time format
         submitTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration submit date from server' };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration submit date from server', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
 
       if (userCalibrationRunData?.value?.status !== 'Running') {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START' };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
       fetchUserCalibrationRunData();
@@ -335,13 +335,13 @@ const startRun = async () => {
       userCalibrationRunData.value.status = 'Failed';
       const errorMessages: string[] = useApiErrorResponsePreprocess(runCalibrationResponse);
       errorMessages.forEach((msg: string) => {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   } else {
     // userCalibrationRunData should always be set before getting to this point, but hey just in case
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'userCalibrationRunData not set' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'userCalibrationRunData not set', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
   isLoading.value = false;
@@ -358,20 +358,20 @@ const cancelRun = async () => {
           userCalibrationRunData.value.status = cancelCalibrationResponse?._data.status;
         }
         if (userCalibrationRunData?.value?.status !== 'Cancelled') {
-          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL' };
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };
           toast.add(tMsg); addToastRecord(tMsg);
         }
         fetchUserCalibrationRunData();
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error cancelling Calibration', detail: 'Cannot get Calibration status' };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error cancelling Calibration', detail: 'Cannot get Calibration status', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } catch (error) {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run' };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
@@ -428,7 +428,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           }
         }
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
 
@@ -443,7 +443,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           (plot: any) => !plotNamesToExclude.includes(plot.name)
         );
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names' };
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names', life: ToastTimeout.timeoutWarn };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
@@ -463,7 +463,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
               }
             }
           } else {
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status' };
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
             toast.add(tMsg); addToastRecord(tMsg);
           }
 
@@ -595,13 +595,13 @@ watch(selectedPlotName, async () => {
       toast.removeAllGroups();
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
     selectedPlotFilename.value = "";
     selectedPlotFileUrl.value = "";
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 });
@@ -611,7 +611,7 @@ watch(submitTimeDate, () => {
   if (isValidDate(submitTimeDate.value)) {
     submitTime.value = convertTimeZone(submitTimeDate.value as Date);
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object' };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 });
@@ -634,7 +634,7 @@ watch(iteration, async () => {
     } else {
       selectedPlotFilename.value = "";
       selectedPlotFileUrl.value = "";
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage };
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
