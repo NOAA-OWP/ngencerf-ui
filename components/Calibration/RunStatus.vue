@@ -186,7 +186,6 @@ const {
   validControlAndValidBestStatus,
   validationControlStatus,
   validationBestStatus,
-  resultsPathname,
   overallCalibrationValidationStatus,
   validationBestAchieved
 } = storeToRefs(useRunStatusStore());
@@ -205,7 +204,6 @@ const {
   queryGetPlot,
   runCalibrationJob,
   queryGetIteration,
-  queryGetJobDataDirectory,
   cancelCalibrationJob,
 } = useRunStatusStore();
 
@@ -432,18 +430,6 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       } else {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
-      }
-
-      // get job data directory
-      if (!resultsPathname.value) {
-        const getJobDataDirectoryResponse = await queryGetJobDataDirectory();
-
-        if (getJobDataDirectoryResponse?._data.data_dir) {
-          resultsPathname.value = getJobDataDirectoryResponse._data.data_dir;
-        } else {
-          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Job Data Directory', life: ToastTimeout.timeoutWarn };
-          toast.add(tMsg); addToastRecord(tMsg);
-        }
       }
 
       // Get Plot Names
@@ -698,14 +684,6 @@ const gotoEvaluation = () => {
   padding-right: 20px;
 }
 
-#resultsPathname {
-  background-color: #fff;
-  border: 0px solid #fff;
-  border-left: 0;
-  border-right: 0;
-  color: black;
-  box-shadow: none;
-}
 </style>
 
 <style>
