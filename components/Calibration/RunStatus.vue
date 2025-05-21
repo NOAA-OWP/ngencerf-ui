@@ -651,5 +651,42 @@ const gotoEvaluation = () => {
   width: 50vw;
   min-width: 720px;
   margin: 5px auto;
+  padding: 6px 10px 6px 20px;
+  border-radius: 10px;
+  border: 0px solid var(--ngwcp-neutral-gray-md);
+}
+
+#GraphArea {
+  min-height: 40vh;
+  width: 70%;
+  margin: 0px auto 0 auto;
+}
+
+#RunStatus,
+#DisplayOptions {
+  width: 250px;
+  margin-left: 0px;
+}
+
+.p-progressbar {
+  background-color: yellow;
+  vertical-align: text-bottom;
+  margin-left: 10px;
+  width: 200px;
+  display: inline-block;
+  height: 25px;
+}
+.p-progressbar-value {
+  color: black;
+  background-color: green;
+}
+.p-progressbar-label {
+  color: white;
+}
+
+.leftSideText {
+  width: 135px;
+  text-align: right;
+  padding-right: 20px;
 }
 </style>
