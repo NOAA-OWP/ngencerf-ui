@@ -38,9 +38,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
   const plotNames = ref({});
   const plotList = ref<any[]>([]);
-  const selectedPlotName = ref<string>();
-  const selectedPlotFilename = ref<string>();
-  const selectedPlotFileUrl = ref<string>();
+  const selectedPlotName = ref<string | null>(null);
+  const selectedPlotFilename = ref<string | null>(null);
+  const selectedPlotFileUrl = ref<string | null>(null);
   const iteration = ref<number>();
 
   const stopCriteria = ref<number>();
@@ -279,6 +279,50 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     });
   };
+  
+  /**
+    * Get Calibration Log Names
+    * @return {any}
+    */
+  const queryGetLogNames = async (calibration_run_id: number): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        calibration_run_id: calibration_run_id
+      })
+    });
+  };
+
+  /**
+    * Get Calibration Log Data
+    * @return {any}
+    */
+  const queryGetLogData = async (
+    log_category: string,
+    log_name: string,
+    calibration_run_id: number,
+    start?: number,
+    limit?: number
+  ): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        calibration_run_id: calibration_run_id,
+        log_category: log_category,
+        log_name: log_name,
+        start: start !== undefined ? start.toString() : '',
+        limit: limit !== undefined ? limit.toString() : ''
+      })
+    });
+  };
 
   /**
    * Hard Reset Run/Status Store
@@ -289,9 +333,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     submitTime.value = "";
     plotNames.value = {};
     plotList.value = [];
-    selectedPlotName.value = "";
-    selectedPlotFilename.value = "";
-    selectedPlotFileUrl.value = "";
+    selectedPlotName.value = null;
+    selectedPlotFilename.value = null;
+    selectedPlotFileUrl.value = null;
     iteration.value = undefined;
     stopCriteria.value = undefined;
     stopCriteriaMet.value = false;
@@ -342,6 +386,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     runCalibrationJob,
     queryGetIteration,
     cancelCalibrationJob,
+    queryGetLogNames,
+    queryGetLogData,
     hardResetRunStatusStore,
     validationBestAchieved
   };

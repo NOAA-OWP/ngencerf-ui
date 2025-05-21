@@ -212,20 +212,6 @@
     <div id="LogDisplayArea" class="p-2"
       v-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
-        <!--
-        <div v-if="selectedLogList.length > 1">
-          <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
-          <Select id="selectedLogOptions" class="p-select" v-model="selectedLogName" :options="selectedLogList"
-            optionLabel="name" optionValue="name">
-          </Select>
-        </div>
-        <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b
-            style="width:160px; display:inline-block;">Log Name</b> {{ selectedLogName }}</div>
-        
-        <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;"><b
-            style="width:160px; display:inline-block;">Log File Path</b> {{ selectedLogFilePath }}</div>
-        -->
-
         <table width="100%" summary="Calibration Log Options and File Path">
           <caption class="sr-only">Calibration Log Options and File Path table</caption>  
           <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
@@ -687,8 +673,8 @@ watch(selectedPlotName, async () => {
       }
     }
   }
-  // selectedPlotName is a log 
   else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
+    // selectedPlotName is a log 
     // reset all of our plot refs except for selectedPlotName
     resetUserPlotRefs(['selectedPlotName']);
     selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
@@ -841,7 +827,7 @@ watch(selectedPlotName, async () => {
   }
 });
 
-// Reset refs when selectedPlotTable changes
+// Reset refs when selectedPlotName changes
 const resetUserPlotRefs = (exceptions: any): void => {
   if( !Array.isArray(exceptions) ) {
     exceptions = [];

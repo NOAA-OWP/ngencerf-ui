@@ -134,8 +134,40 @@
         <div v-else-if="selectedPlotFileUrl" id="GraphArea" class="p-2">
           <img :src="selectedPlotFileUrl" alt="Selected Plot" />
         </div>
-        <div v-else id="GraphArea" class="p-2">
-          <!--Data Display-->
+        <div v-else-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0" id="LogDisplayArea" class="p-2">
+          <div class="pl-4">
+            <table width="100%" summary="Calibration Log Options and File Path">
+              <caption class="sr-only">Calibration Log Options and File Path table</caption>  
+              <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
+              <tbody>  
+                <tr v-if="selectedLogList.length > 1">
+                  <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
+                  <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
+                  optionLabel="name" optionValue="name">
+                </Select></td>
+                </tr>
+                <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
+                  <td class="pr-2 pt-3"><b>Log Name</b></td>
+                  <td class="pt-3">{{ selectedLogName }}</td>
+                </tr>
+                <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
+                  <td class="pr-2 pt-3"><b>Log File Path</b></td>
+                  <td class="pt-3">{{ selectedLogFilePath }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="pt-4">
+              <div class="pagination-box">
+                <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
+                <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
+              </div>
+            </div>
+
+            <div id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
+              <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -161,6 +193,8 @@ import { generalStore } from "~/stores/common/GeneralStore";
 import { ValidationPlotNames } from "@/composables/NgencerfEnums";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
 import { convertTimeZone, calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
+
+import Paging from "../Common/Paging.vue";
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -205,6 +239,8 @@ const {
   runCalibrationJob,
   queryGetIteration,
   cancelCalibrationJob,
+  queryGetLogNames,
+  queryGetLogData,
 } = useRunStatusStore();
 
 const { isLoading } = storeToRefs(generalStore());
@@ -216,6 +252,20 @@ const plotNamesToExclude = [
   "Iteration Parameters Table",
   "Performance Metrics Table",
 ];
+
+const logs = ref<APIResponse>({});
+const logDataPageSize = ref<number>(1000);
+const logLists = ref<DynamicObject>({});
+const selectedLogCategory = ref<string>('');
+const selectedLogList = ref<any[]>([]);
+const selectedLogName = ref<string>('');
+const selectedLogDisplay = ref<string>('');
+const selectedLogTotalSize = ref<number>(0);
+const selectedLogCurrentPage = ref<number>(1);
+const selectedLogTotalPages = ref<number>(1);
+const selectedLogStartRow = ref<number>(1);
+const selectedLogEndRow = ref<number>(logDataPageSize.value);
+const selectedLogFilePath = ref<string>('');
 
 onMounted(async () => {
   toast.removeAllGroups();
@@ -446,6 +496,36 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names', life: ToastTimeout.timeoutWarn };
         toast.add(tMsg); addToastRecord(tMsg);
       }
+
+      // Get Names of ALL Logs
+      if (!logs.value?._data || !logs.value?._data?.length) {
+        logs.value = await queryGetLogNames(
+          (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
+        );
+        if (logs.value?._data) {
+          for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+            Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+              let logList = [];
+              for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+                logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+              }
+              logLists.value[key] = logList;
+            });
+          }
+          
+          // Add Log Options to the dropdown
+          Object.keys(logLists.value).forEach(key => {
+            let optionName = capitalCase(key) + ' Logs';
+            if (!plotList.value.some(item => item.name === optionName)) {
+              plotList.value.push({ name: optionName, description: '' });
+            }
+          });
+        } else {
+          toast.removeAllGroups();
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
+      }
     }
 
     if (calibrationStatus.value === 'Running') {
@@ -584,7 +664,12 @@ watch(selectedPlotName, async () => {
     plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
   }
 
-  if (iteration.value && iteration.value >= 1) {
+  if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
+    // selectedPlotName is a log 
+    // reset all of our plot refs except for selectedPlotName
+    resetUserPlotRefs(['selectedPlotName']);
+    selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
+  } else if (iteration.value && iteration.value >= 1) {
     // get selected plot file name and url from server
     const response: any = await queryGetPlot(selectedPlotName.value as string); // store this in RunStatusStore
 
@@ -640,6 +725,113 @@ watch(iteration, async () => {
   }
 });
 
+// Reset refs when selectedPlotName changes
+const resetUserPlotRefs = (exceptions: any): void => {
+  if( !Array.isArray(exceptions) ) {
+    exceptions = [];
+  }
+
+  // plot file refs
+  if (!exceptions.includes('selectedPlotName')) {
+    selectedPlotName.value = null;
+  }
+  selectedPlotFilename.value = null;
+  selectedPlotFileUrl.value = null;
+
+  // log refs
+  selectedLogCategory.value = '';
+  selectedLogList.value = [];
+  selectedLogName.value = '';
+  selectedLogDisplay.value = '';
+  selectedLogTotalSize.value = 0;
+  selectedLogCurrentPage.value = 1;
+  selectedLogTotalPages.value = 0;
+  selectedLogStartRow.value = 1;
+  selectedLogEndRow.value = logDataPageSize.value;
+  selectedLogFilePath.value = '';
+}
+
+// Handle selectedLogCategory changes
+watch(selectedLogCategory, async () => {
+  selectedLogList.value = logLists.value[selectedLogCategory.value];
+  // start with the first log
+  selectedLogName.value = selectedLogList.value[0].name;
+  if (!selectedLogList.value.length) {
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+});
+
+// Handle selectedLogName changes
+watch(selectedLogName, async () => {
+  if (selectedLogName.value !== '') {
+    selectedLogCurrentPage.value = 1;
+    const response: any = await queryGetLogData(
+      selectedLogCategory.value, // log_category,
+      selectedLogName.value, // log_name
+      (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // validation_run_id
+      0, // start
+      logDataPageSize.value // limit
+    );
+    if (response?._data) {
+      let logText = '';
+      for (let t = 0; t < response?._data?.log_data.length; t++) {
+        logText += response?._data?.log_data[t] + '<br/>\n';
+      }
+      selectedLogDisplay.value = logText;
+      selectedLogTotalSize.value = response?._data?.pagination_metadata?.count;
+      selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
+      selectedLogStartRow.value = 1;
+      if (selectedLogTotalPages.value === 1) {
+        selectedLogEndRow.value = selectedLogTotalSize.value;
+      } else {
+        selectedLogEndRow.value = logDataPageSize.value;
+      }
+      selectedLogFilePath.value = response?._data?.log_path;
+    } else {
+      toast.removeAllGroups();
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+  }
+});
+
+// Watch for page number changes in logs
+watch(selectedLogCurrentPage, async () => {
+  if (isNaN(selectedLogCurrentPage.value) || selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
+    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
+  } else {
+    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
+    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
+      selectedLogEndRow.value = selectedLogTotalSize.value;
+    } else {
+      selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
+    }
+    const response: any = await queryGetLogData(
+      selectedLogCategory.value, // log_category,
+      selectedLogName.value, // log_name
+      (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // calibration_run_id
+      selectedLogStartRow.value - 1, // start
+      logDataPageSize.value // limit
+    );
+    if (response?._data) {
+      let logText = '';
+      for (let t = 0; t < response?._data?.log_data.length; t++) {
+        logText += response?._data?.log_data[t] + '<br/>\n';
+      }
+      selectedLogDisplay.value = logText;
+    } else {
+      toast.removeAllGroups();
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+  }
+});
+
+function capitalCase(str: string) {
+  return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
 const gotoEvaluation = () => {
   const ele = document.getElementById("MainMenuEvaluation");
   ele?.click();
@@ -684,6 +876,14 @@ const gotoEvaluation = () => {
   padding-right: 20px;
 }
 
+#resultsPathname {
+  background-color: #fff;
+  border: 0px solid #fff;
+  border-left: 0;
+  border-right: 0;
+  color: black;
+  box-shadow: none;
+}
 </style>
 
 <style>
