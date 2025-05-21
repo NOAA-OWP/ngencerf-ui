@@ -559,6 +559,102 @@ grayedout {
   background: transparent !important;
 }
 
+/* TimeDatePicker styles (from legacy SCSS) */
+.dp__input {
+  height: 35px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  padding-left: 50px;
+  font-family: 'Courier New', Courier, monospace !important;
+  text-align: center;
+  vertical-align: middle;
+}
+.dp__input_icons {
+  padding: 10px 12px !important;
+}
+.dp--clear-btn, .dp__input_icon {
+  top: 16px !important;
+}
+
+/* DataTable header/cell styles (from legacy SCSS) */
+.p-datatable-header-cell {
+  padding: 5px 8px !important;
+}
+.p-datatable-tbody > tr > td {
+  padding: 5px !important;
+  border-color: #BBBBBF !important;
+  font-size: .9em;
+}
+.p-datatable-tbody {
+  border-right: 1px solid #BBBBBF;
+  border-left: 1px solid #BBBBBF;
+}
+.p-datatable-thead tr th {
+  background-color: #003D64;
+  color: white;
+  border-left: 1px solid white;
+}
+.p-datatable-thead tr th:first-child {
+  border-left: 1px solid #003D64;
+}
+.p-datatable-thead tr th:hover {
+  background-color: var(--ngwcp-primary3) !important;
+  color: white !important;
+}
+.p-datatable-sort-icon {
+  color: white !important;
+}
+.p-datatable-column-title {
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+#MainLeftDataArea .p-datatable-tbody > tr.p-datatable-row-selected {
+  background-color: #D8FFD8 !important;
+  color: black;
+}
+#MainLeftDataArea .p-datatable-selectable-row:hover {
+  background-color: whitesmoke !important;
+}
+
+#EvaluatePage #TableArea .p-datatable-table {
+  width: auto;
+  min-width: 450px;
+  max-width: 100%;
+}
+
+#EvaluatePage #TableArea .p-datatable-table td {
+  font-size: 13px;
+  padding: 4px !important;
+}
+
+#EvaluatePage #TableArea .p-datatable-table th {
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+}
+
+#EvaluatePage #TableArea .p-datatable-table th .p-datatable-column-header-content {
+  gap: 0.3rem;
+}
+
+#EvaluatePage #TableArea .p-datatable-table .p-datatable-sort-icon {
+  zoom: 0.8;
+}
+
+.JobsFilterBox .JobsFilterSelect {
+  background-color: #f3f3f3;
+  border: 0px solid #d9d9d9 !important;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.JobsFilterBox .JobsFilterSelect .p-multiselect-label {
+  padding: 0px;
+}
+
+.JobsFilterBox .JobsFilterSelect .p-multiselect-dropdown {
+  color: #000000;
+}
+
 @layer utilities {
   .z-25 {
     z-index: 25;

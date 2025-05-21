@@ -962,10 +962,10 @@ small-label,
 #ModuleFilter {
   height: 37px;
   background-color: #f3f3f3;
+}
 
-  p-multiselect-label-container {
-    margin-top: -6px;
-  }
+#ModuleFilter p-multiselect-label-container {
+  margin-top: -6px;
 }
 
 #Datatable,

@@ -1284,4 +1284,41 @@ const rowStyle = () => {
 #AddUpdateBtn {
   height: 40px;
 }
+
+.mup30 {
+  margin-top: -140px;
+}
+
+.timeBlocks {
+  font-size: 0.8em;
+}
+
+.datePickers {
+  width: 230px !important;
+  display: inline-block !important;
+  text-align: center !important;
+}
+
+.mmiInputs {
+  width: 100px;
+}
+
+.varInputs {
+  width: 400px;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0);
+  cursor: not-allowed;
+  z-index: 10;
+}
+
+.p-select-width {
+  width: 100%;
+}
 </style>
