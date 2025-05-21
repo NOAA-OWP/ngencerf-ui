@@ -216,5 +216,27 @@ const tabClicked = (event: Event) => {
   font-weight: bold;
   text-align: center;
   padding-top: 13px;
+  padding-left: 10px;
+  cursor: pointer;
+}
+#MainTabs .tabs:hover {
+  color: var(--ngwcp-primary1);
+}
+#MainTabs .activeTab {
+  border-bottom: 5px solid var(--ngwcp-primary1);
+}
+#MainTabs .errorDot {
+  display: inline-block;
+  background-color: black;
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+}
+#MainTabs .noErrorDot {
+  display: inline-block;
+  background-color: transparent;
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
 }
 </style>
