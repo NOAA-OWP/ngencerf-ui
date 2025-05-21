@@ -660,70 +660,10 @@ const gotoEvaluation = () => {
 }
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #ResultsDisplay {
   width: 50vw;
   min-width: 720px;
   margin: 5px auto;
-  padding: 6px 10px 6px 20px;
-  border-radius: 10px;
-  border: 0px solid global.$ngwcp_neutral_gray_md;
-
-}
-
-#GraphArea {
-  min-height: 40vh;
-  width: 70%;
-  margin: 0px auto 0 auto;
-}
-
-#RunStatus,
-#DisplayOptions {
-  width: 250px;
-  margin-left: 0px;
-}
-
-.p-progressbar {
-  display: inline-block;
-  width: 200px;
-  height: 25px;
-}
-
-.leftSideText {
-  width: 135px;
-  text-align: right;
-  padding-right: 20px;
-}
-
-#resultsPathname {
-  background-color: #fff;
-  border: 0px solid #fff;
-  border-left: 0;
-  border-right: 0;
-  color: black;
-  box-shadow: none;
-}
-</style>
-
-<style>
-:root {
-  .p-progressbar {
-    background-color: yellow;
-    vertical-align: text-bottom;
-    margin-left: 10px;
-    width: 80%;
-  }
-
-  .p-progressbar-value {
-    color: black;
-    background-color: green;
-  }
-
-  .p-progressbar-label {
-    color: white;
-  }
 }
 </style>

@@ -507,27 +507,11 @@ const handleNextPrevDialogClose = (opt: any) => {
 }
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #ObjectiveFunction_list,
 .p-select-list-container {
   position: relative;
   z-index: 2;
   max-height: 8rem !important;
-}
-
-#OptMetBottomButtons {
-  z-index: 9999;
-}
-
-#ClrBtn {
-  font-weight: bold;
-}
-#ClrBtn:hover {
-  background-color: transparent;
-  border: none;
-  color: global.$ngwcp_primary3 !important;
 }
 </style>

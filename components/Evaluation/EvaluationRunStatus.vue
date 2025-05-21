@@ -217,26 +217,22 @@ const navigateToEvaluation = (event: any) => {
 }
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #ResultsDisplay {
   width: 50vw;
   margin: 20px auto;
   padding: 10px 10px 10px 20px;
   border-radius: 10px;
   height: 100px;
-  border: 0px solid global.$ngwcp_neutral_gray_md;
+  border: 0px solid #d9d9d9; /* replaced global.$ngwcp_neutral_gray_md */
   min-width: 750px;
-
 }
 
 #GraphArea {
   height: 40vh;
   width: 100%;
   margin: 8px auto 0 auto;
-  border: 1px solid global.$ngwcp_neutral_gray_md;
+  border: 1px solid #d9d9d9; /* replaced global.$ngwcp_neutral_gray_md */
 }
 
 #RunStatus,

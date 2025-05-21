@@ -798,10 +798,7 @@ const rowStyle = (data: any) => {
 }
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #calibrationRunList {
   height: 80%;
 }
@@ -825,5 +822,4 @@ const rowStyle = (data: any) => {
   background-color: white;
   overflow: auto;
 }
-
 </style>

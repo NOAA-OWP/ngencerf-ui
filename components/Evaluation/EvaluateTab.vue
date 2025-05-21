@@ -642,7 +642,7 @@ watch(selectedPlotName, async () => {
               } else if (validation_type === 'valid_best') {
                 validation_type = 'Best';
               }
-              if (performanceMetrics.value?._data?.validations[v].iteration_num !== null) {
+              if (performanceMetrics.value?._data?.validations[v]?.iteration_num !== null) {
                 if (validation_type !== 'Iter') {
                   validation_type += ': Iter';
                 }
@@ -1693,10 +1693,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #DisplayOptions {
   width: 375px;
   margin-left: 0px;

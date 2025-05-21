@@ -32,7 +32,7 @@ import MessagesGroup from "../Common/MessagesGroup.vue";
 import GageCutout from "../Common/GageCutout.vue";
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 #CalibrationRightBlock {
   min-width: 500px;
 }

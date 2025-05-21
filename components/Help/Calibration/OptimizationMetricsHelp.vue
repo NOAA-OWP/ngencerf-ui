@@ -85,7 +85,6 @@
 import image1 from "@/assets/styles/img/OptimizationMetricsTable.png"
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
+<style scoped>
+/* No custom styles, SCSS references removed */
 </style>

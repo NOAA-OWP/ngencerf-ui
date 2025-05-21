@@ -594,47 +594,14 @@ const handleNextPrevDialogClose = (opt: any) => {
 }
 
 </script>
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
 
-#GageReport {
-  table {
-    border: 1px solid #ccc;
-    width: auto;
-    margin: 0 auto;
-
-    tr {
-      line-height: 27px;
-
-      th {
-        padding: 4px 15px;
-        cursor: default;
-        border-bottom: 1px solid #ccc;
-        background-color: global.$ngwcp_neutral_gray_lt;
-      }
-
-      td {
-        padding: 4px 15px;
-        cursor: default;
-        border-bottom: 1px solid #ccc;
-        background-color: global.$ngwcp_neutral_gray_lt;
-      }
-
-      .td1 {
-        text-align: right;
-        width: 20%;
-      }
-
-      .td2 {
-        font-weight: 600;
-      }
-    }
-  }
+<style scoped>
+#GageReport table {
+  border: 1px solid #ccc;
+  width: auto;
+  margin: 0 auto;
 }
-
-#HBCbuttons {
-  height: 54px;
-  width: 100%;
+#GageReport table tr {
+  line-height: 27px;
 }
 </style>

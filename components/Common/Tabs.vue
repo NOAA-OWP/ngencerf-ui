@@ -200,50 +200,21 @@ const tabClicked = (event: Event) => {
   })
 }
 </script>
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
 
+<style scoped>
 #MainTabs {
   overflow-x: hidden;
   border-bottom: 3px solid #d9d9d9;
   z-index: 11;
-
-  .tabs {
-    font-size: 16px;
-    display: inline-block;
-    vertical-align: bottom;
-    height: 43px;
-    color: black;
-    font-weight: bold;
-    text-align: center;
-    padding-top: 13px;
-    padding-left: 10px;
-    cursor: pointer;
-  }
-
-  .tabs:hover {
-    color: global.$ngwcp_primary1;
-  }
-
-  .errorDot {
-    display: inline-block;
-    background-color: black;
-    width: 10px;
-    height: 10px;
-    border-radius: 100%;
-  }
-
-  .noErrorDot {
-    display: inline-block;
-    background-color: transparent;
-    width: 10px;
-    height: 10px;
-    border-radius: 100%;
-  }
-
-  .activeTab {
-    border-bottom: 5px solid global.$ngwcp_primary1;
-  }
+}
+#MainTabs .tabs {
+  font-size: 16px;
+  display: inline-block;
+  vertical-align: bottom;
+  height: 43px;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  padding-top: 13px;
 }
 </style>

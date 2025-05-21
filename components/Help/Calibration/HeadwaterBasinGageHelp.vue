@@ -98,10 +98,7 @@ import image2 from "@/assets/styles/img/calworkhelp.png"
 import image3 from "@/assets/styles/img/observationalexample.png"
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 ._help-table .td1 {
   width: 150px;
 }
