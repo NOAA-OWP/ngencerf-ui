@@ -25,10 +25,11 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
-  const { userCalibrationRunData,
+  const {
+    userCalibrationRunData,
     calibrationJobNgenGlobalLogging,
     logLevels,
-   } = storeToRefs(useUserDataStore());
+  } = storeToRefs(useUserDataStore());
 
   // refs
   const calibrationElapsedTime = ref<string>();
@@ -50,9 +51,19 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validationControlStatus = ref<string>();
   const validationBestStatus = ref<string>();
   const validControlAndValidBestStatus = ref<string>();
-  const resultsPathname = ref<string>();
   const validationBestAchieved = ref<BestIterationData>({ iteration: 0, isBest: false });
-  ;
+
+  /**
+   * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
+   */
+  const resultsPathname = computed<string>(() => {
+    if (userCalibrationRunData?.value?.job_data_dir) {
+      return userCalibrationRunData.value.job_data_dir;
+    } else {
+      return "";
+    }
+  });
+
   /**
    * Compute Overall Calibration Validation Status
    */
@@ -119,10 +130,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     // load iteration from get_iteration.
     const getIterationResponse = await queryGetIteration();
     iteration.value = getIterationResponse?._data?.iteration;
-
-    // load resultsPathname from get_job_data_dir. Calibration must be Done, Running, or Failed to get resultsPathname
-    const getJobDataDirectoryResponse = await queryGetJobDataDirectory();
-    resultsPathname.value = getJobDataDirectoryResponse?._data?.data_dir;
   };
 
   /**
@@ -274,24 +281,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   /**
-   * Get Job Data Directory
-   * @returns {any}
-   */
-  const queryGetJobDataDirectory = async (): Promise<any> => {
-    if (!calibrationJobId.value) {
-      return null;
-    }
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_job_data_dir/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
-    });
-  };
-
-  /**
    * Hard Reset Run/Status Store
    */
   const hardResetRunStatusStore = (): void => {
@@ -307,7 +296,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     stopCriteria.value = undefined;
     stopCriteriaMet.value = false;
     validControlAndValidBestStatus.value = undefined;
-    resultsPathname.value = undefined;
     validationBestAchieved.value = { iteration: 0, isBest: false };
 
     if (elapsedTimeIntervalId.value) {
@@ -353,7 +341,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     queryGetPlot,
     runCalibrationJob,
     queryGetIteration,
-    queryGetJobDataDirectory,
     cancelCalibrationJob,
     hardResetRunStatusStore,
     validationBestAchieved

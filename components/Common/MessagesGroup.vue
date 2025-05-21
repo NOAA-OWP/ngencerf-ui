@@ -11,7 +11,7 @@
             :title="'Gage ' + calData?.gage?.gage_id"><span class="font-medium">Gage:</span>
             {{ calData?.gage?.gage_id }}</div>
 
-            <div v-if="calData?.num_catchments" :aria-label="'Catchments ' + calData?.num_catchments"
+          <div v-if="calData?.num_catchments" :aria-label="'Catchments ' + calData?.num_catchments"
             :title="'Gage ' + calData?.num_catchments"><span class="font-medium">Catchments:</span>
             {{ calData?.num_catchments }}</div>
 
@@ -80,20 +80,27 @@
               {{ formatDate(calData?.calibration_times?.calibration_end_time) }}</div>
           </div>
           <div class="line-spacer">&nbsp;</div>
+
+          <div v-if="userCalibrationRunData?.parameters_selected"
+            :aria-label="'Output Variable ' + selectedOutputVariableToCalibrate"
+            :title="'Output Variable ' + selectedOutputVariableToCalibrate">
+            <span class="font-medium">
+              Output Var:
+            </span>
+            {{ selectedOutputVariableToCalibrate }}
+          </div>
+
           <div v-if="calData?.optimization"><span class="font-medium"
               :aria-label="'Optimization Algorithm ' + calData?.optimization"
               :title="'Optimization Algorithm ' + calData?.optimization">Optimization Algorithm:</span>
             {{ calData?.optimization }}</div>
-          <div v-if="calData?.objective_function" :aria-label="'Objective Function ' + calData?.objective_function"
-            :title="'Objective Function ' + calData?.objective_function"><span class="font-medium">Objective
-              Function:</span>
-            {{ calData?.objective_function }}</div>
-          <div v-if="calData?.save_plot_iteration_frequency"
-            :aria-label="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"
-            :title="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"><span
-            class="font-medium">Plot Generation Frequency:</span>
-          {{ calData?.save_plot_iteration_frequency }}</div>
+
+          <div v-if="calData?.stop_criteria"><span class="font-medium"
+              :aria-label="'Calibration Stop Criteria ' + calData?.stop_criteria"
+              :title="'Calibration Stop Criteria ' + calData?.stop_criteria">Calibration Stop Criteria:</span>
+            {{ calData?.stop_criteria }}</div>
         </div>
+
         <div class="col-span-1">
           <div v-if="calData?.validation_times?.simulation_start_time"><span class="font-medium">Validation Run</span>
           </div>
@@ -132,15 +139,20 @@
             <span class="font-medium">Tuning Parameters:</span>
             {{ userSelectedCalibrationTuningParameters.length }}
           </div>
-          <div v-if="calData?.stop_criteria"><span class="font-medium"
-              :aria-label="'Calibration Stop Criteria ' + calData?.stop_criteria"
-              :title="'Calibration Stop Criteria ' + calData?.stop_criteria">Calibration Stop Criteria:</span>
-            {{ calData?.stop_criteria }}</div>
+          <div v-if="calData?.objective_function" :aria-label="'Objective Function ' + calData?.objective_function"
+            :title="'Objective Function ' + calData?.objective_function"><span class="font-medium">Objective
+              Function:</span>
+            {{ calData?.objective_function }}</div>
+          <div v-if="calData?.save_plot_iteration_frequency"
+            :aria-label="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"
+            :title="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"><span
+              class="font-medium">Plot Generation Frequency:</span>
+            {{ calData?.save_plot_iteration_frequency }}</div>
         </div>
+
         <div class="line-spacer">&nbsp;</div>
-	      <div class="col-span-2">
-          <div v-if="resultsPathname"
-            :aria-label="'Results Pathname ' + resultsPathname"
+        <div class="col-span-2">
+          <div v-if="resultsPathname" :aria-label="'Results Pathname ' + resultsPathname"
             :title="'Results Pathname ' + resultsPathname"><span class="font-medium">
               Results Pathname:</span>
             {{ resultsPathname }}</div>
@@ -151,7 +163,6 @@
               NGen Global Logging:</span>
             {{ calibrationJobNgenGlobalLogging ? 'ENABLED' : 'DISABLED' }}</div>
         </div>
-        <div class="col-span-2">&nbsp;</div>
       </div>
     </div>
   </div>
@@ -169,7 +180,10 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
 const { userCalibrationRunData, calibrationJobNgenGlobalLogging } = storeToRefs(useUserDataStore());
 const calData = ref(userCalibrationRunData);
-const { userSelectedCalibrationTuningParameters } = storeToRefs(useTuningStore());
+const {
+  userSelectedCalibrationTuningParameters,
+  selectedOutputVariableToCalibrate,
+} = storeToRefs(useTuningStore());
 const { resultsPathname } = storeToRefs(useRunStatusStore());
 
 const componentProps = withDefaults(defineProps<{
