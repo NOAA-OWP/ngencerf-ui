@@ -10,13 +10,43 @@
   </Transition>
   <div id="EvaluatePage">
     <div class="pl-6 pr-2 pt-2">
-      <div class="flex mt-3">
-        <div class="w-1/2">
-          <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
-          <div class="inline-block w-2/3">
-            <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-              optionLabel="name" optionValue="name" :disabled="!plotList">
-            </Select>
+      <div class="flex mt-3">        
+        <div class="w-5/6 relative">
+
+          <div class="inline-block">
+            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <div class="inline-block w-2/3">
+              <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
+                optionLabel="name" optionValue="name" :disabled="!plotList">
+              </Select>
+            </div>
+          </div>
+
+
+          <div class="absolute t-0 r-0">
+            <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)"
+              class="p-0 relative overflow-visible">
+              <div class="grid grid-cols-3 gap-4">
+                <div class="text-nowrap text-right font-bold">
+                  Select Date
+                </div>
+                <div class="text-nowrap">
+                  <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+                    @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
+                    :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true"
+                    utc='preserve' />
+                </div>
+                <div class="text-nowrap">
+                  <Button class="font-normal ngenButtonDiv-green ml-auto text-nowrap" label="Get Spatial Plots"
+                    aria-label="Get Spatial Plots" @click="getSpatialPlots" />
+                </div>
+                <div class="text-sm font-semibold col-span-3 text-nowrap text-center">
+                  <p class="font-bold">
+                    {{ getSweTimeRange() }}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="layout__table mt-2" style="width:100%">
@@ -36,31 +66,7 @@
             </div>
           </div>
         </div>
-        <div>
-          <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)"
-            class="p-2 relative overflow-visible">
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-nowrap text-right font-bold">
-                Select Date
-              </div>
-              <div class="text-nowrap">
-                <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-                  @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
-                  :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true"
-                  utc='preserve' />
-              </div>
-              <div class="text-nowrap">
-                <Button class="font-normal ngenButtonDiv-green ml-auto text-nowrap" label="Get Spatial Plots"
-                  aria-label="Get Spatial Plots" @click="getSpatialPlots" />
-              </div>
-              <div class="text-sm font-semibold col-span-3 text-nowrap text-center">
-                <p class="font-bold">
-                  {{ getSweTimeRange() }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+
         <div class="pl-4 ml-auto text-nowrap">
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
               @click="gotoSelectAlternateIteration">New Validation</button></span>
@@ -1695,7 +1701,9 @@ onUnmounted(() => {
 
 <style scoped>
 #DisplayOptions {
-  width: 375px;
+  width:100%;
+  min-width: 300px;
+  max-width: 375px;
   margin-left: 0px;
 }
 
