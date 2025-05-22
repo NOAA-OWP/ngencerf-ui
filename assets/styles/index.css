@@ -701,4 +701,6 @@ grayedout {
 #LoginBox .signupButton .p-button.c-blue {font-size:16px !important;}
 #LoginBox button.p-button:not(:disabled):hover {
   border-width: 0px !important;
+  background-color: transparent;
+  /*padding: 0px;*/
 }
