@@ -97,7 +97,6 @@ input:not([type='checkbox']),
 .p-password-input {
   padding: 5px 10px !important;
 }
-input:not([type='checkbox']),
 .p-select {
   padding: 0px 0px !important;
 }
@@ -514,10 +513,6 @@ select option {
 
 .nowrap {
   white-space: nowrap;
-}
-
-grayedout {
-  color: #555 !important;
 }
 
 /* PrimeVue DataTable header row override - deep blue background, white text, compact padding */
