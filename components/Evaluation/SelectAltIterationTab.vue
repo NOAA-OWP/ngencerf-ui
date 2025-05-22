@@ -165,7 +165,7 @@ const navigateToEvaluateStatus = (event: any) => {
 }
 </script>
 
-<style scoped>
+<style>
 #RunDetailsTbl .p-datatable-thead>tr:nth-child(2) th,
 #RunDetailsTbl .p-datatable-thead>tr:nth-child(2) th:hover {
   background-color: #8BE3ED !important; /* replaced global.$ngwcp_blue_md */
@@ -221,8 +221,8 @@ table#cr-detail-list2 th {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
 }
 
-th.p-datatable-header-cell.bg-objective-function-col,
-th.p-datatable-header-cell.bg-objective-function-col:hover {
+.p-datatable-thead th.p-datatable-header-cell.bg-objective-function-col,
+.p-datatable-thead th.p-datatable-header-cell.bg-objective-function-col:hover {
   background-color: rgb(204, 85, 0) !important;
 }
 
