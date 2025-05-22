@@ -690,3 +690,15 @@ grayedout {
     color: var(--ngwcp-primary1);
   }
 }
+
+.max-w-screen-md {
+  max-width: 768px;
+}
+.block {
+  display: block;
+}
+
+#LoginBox .signupButton .p-button.c-blue {font-size:16px !important;}
+#LoginBox button.p-button:not(:disabled):hover {
+  border-width: 0px !important;
+}
