@@ -702,5 +702,9 @@ grayedout {
 #LoginBox button.p-button:not(:disabled):hover {
   border-width: 0px !important;
   background-color: transparent;
-  /*padding: 0px;*/
+}
+#LoginBox .ngenButtonDiv button.p-button:not(:disabled) {
+  border-width: 0px !important;
+  background-color: transparent;
+  padding: 0px;
 }
