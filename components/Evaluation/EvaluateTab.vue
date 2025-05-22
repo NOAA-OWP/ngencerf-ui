@@ -23,11 +23,11 @@
           </div>
 
 
-          <div class="absolute t-0 r-0">
+          <div class="absolute" style="top:0px;right:0px;">
             <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)"
               class="p-0 relative overflow-visible">
               <div class="grid grid-cols-3 gap-4">
-                <div class="text-nowrap text-right font-bold">
+                <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
                   Select Date
                 </div>
                 <div class="text-nowrap">
