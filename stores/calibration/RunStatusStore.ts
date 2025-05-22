@@ -315,11 +315,34 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        calibration_run_id: calibration_run_id,
         log_category: log_category,
         log_name: log_name,
+        calibration_run_id: calibration_run_id,
         start: start !== undefined ? start.toString() : '',
         limit: limit !== undefined ? limit.toString() : ''
+      })
+    });
+  };
+
+  /** 
+   * Get Calibration Log Status
+   * @return {any}
+   */
+  const queryGetLogStatus = async (
+    calibration_run_id: number,
+    log_path: string,
+    byte_offset: number
+  ): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_status/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        calibration_run_id: calibration_run_id,
+        log_path: log_path,
+        byte_offset: byte_offset,
       })
     });
   };
@@ -388,6 +411,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     cancelCalibrationJob,
     queryGetLogNames,
     queryGetLogData,
+    queryGetLogStatus,
     hardResetRunStatusStore,
     validationBestAchieved
   };

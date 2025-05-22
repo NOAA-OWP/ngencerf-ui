@@ -241,6 +241,7 @@ const {
   cancelCalibrationJob,
   queryGetLogNames,
   queryGetLogData,
+  queryGetLogStatus
 } = useRunStatusStore();
 
 const { isLoading } = storeToRefs(generalStore());
@@ -266,6 +267,9 @@ const selectedLogTotalPages = ref<number>(1);
 const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
 const selectedLogFilePath = ref<string>('');
+const selectedLogByteOffset = ref<number>(0);
+const selectedLogStatus = ref<DynamicObject>({});
+let logTimeout;
 
 onMounted(async () => {
   toast.removeAllGroups();
@@ -657,37 +661,39 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available.';
+  if (selectedPlotName.value) {
+    let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available.';
 
-  // provide custom message if missing selected plot is a validation plot
-  if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
-    plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
-  }
+    // provide custom message if missing selected plot is a validation plot
+    if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
+      plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
+    }
 
-  if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
-    // selectedPlotName is a log 
-    // reset all of our plot refs except for selectedPlotName
-    resetUserPlotRefs(['selectedPlotName']);
-    selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
-  } else if (iteration.value && iteration.value >= 1) {
-    // get selected plot file name and url from server
-    const response: any = await queryGetPlot(selectedPlotName.value as string); // store this in RunStatusStore
+    if (selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
+      // selectedPlotName is a log 
+      // reset all of our plot refs except for selectedPlotName
+      resetUserPlotRefs(['selectedPlotName']);
+      selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
+    } else if (iteration.value && iteration.value >= 1) {
+      // get selected plot file name and url from server
+      const response: any = await queryGetPlot(selectedPlotName.value as string); // store this in RunStatusStore
 
-    if (response?._data?.plot_file_path && response?._data?.plot_url) {
-      selectedPlotFilename.value = response?._data?.plot_file_path;
-      selectedPlotFileUrl.value = response?._data?.plot_url;
+      if (response?._data?.plot_file_path && response?._data?.plot_url) {
+        selectedPlotFilename.value = response?._data?.plot_file_path;
+        selectedPlotFileUrl.value = response?._data?.plot_url;
+      } else {
+        toast.removeAllGroups();
+        selectedPlotFilename.value = null;
+        selectedPlotFileUrl.value = null;
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
     } else {
-      toast.removeAllGroups();
-      selectedPlotFilename.value = "";
-      selectedPlotFileUrl.value = "";
+      selectedPlotFilename.value = null;
+      selectedPlotFileUrl.value = null;
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-  } else {
-    selectedPlotFilename.value = "";
-    selectedPlotFileUrl.value = "";
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
-    toast.add(tMsg); addToastRecord(tMsg);
   }
 });
 
@@ -749,6 +755,9 @@ const resetUserPlotRefs = (exceptions: any): void => {
   selectedLogStartRow.value = 1;
   selectedLogEndRow.value = logDataPageSize.value;
   selectedLogFilePath.value = '';
+  selectedLogByteOffset.value = 0;
+  selectedLogStatus.value = {};
+  clearTimeout(logTimeout);
 }
 
 // Handle selectedLogCategory changes
@@ -762,53 +771,10 @@ watch(selectedLogCategory, async () => {
   }
 });
 
-// Handle selectedLogName changes
-watch(selectedLogName, async () => {
-  if (selectedLogName.value !== '') {
-    selectedLogCurrentPage.value = 1;
+const updateLogRefs = async(getLogData: boolean) => {
+  if (getLogData) {
     const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
-      selectedLogName.value, // log_name
-      (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // validation_run_id
-      0, // start
-      logDataPageSize.value // limit
-    );
-    if (response?._data) {
-      let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
-      }
-      selectedLogDisplay.value = logText;
-      selectedLogTotalSize.value = response?._data?.pagination_metadata?.count;
-      selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
-      selectedLogStartRow.value = 1;
-      if (selectedLogTotalPages.value === 1) {
-        selectedLogEndRow.value = selectedLogTotalSize.value;
-      } else {
-        selectedLogEndRow.value = logDataPageSize.value;
-      }
-      selectedLogFilePath.value = response?._data?.log_path;
-    } else {
-      toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
-  }
-});
-
-// Watch for page number changes in logs
-watch(selectedLogCurrentPage, async () => {
-  if (isNaN(selectedLogCurrentPage.value) || selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
-    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
-  } else {
-    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
-    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
-      selectedLogEndRow.value = selectedLogTotalSize.value;
-    } else {
-      selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
-    }
-    const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
+      selectedLogCategory.value, // log_category
       selectedLogName.value, // log_name
       (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // calibration_run_id
       selectedLogStartRow.value - 1, // start
@@ -816,15 +782,63 @@ watch(selectedLogCurrentPage, async () => {
     );
     if (response?._data) {
       let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
+      for (let t = 0; t < response?._data.log_data.length; t++) {
+        logText += response?._data.log_data[t] + '<br/>\n';
       }
       selectedLogDisplay.value = logText;
-    } else {
-      toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
+      selectedLogTotalSize.value = response?._data.pagination_metadata?.count;
+      selectedLogTotalPages.value = Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
+      if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
+        selectedLogEndRow.value = selectedLogTotalSize.value;
+      } else {
+        selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
+      }
+      selectedLogFilePath.value = response?._data.log_path;
+      selectedLogByteOffset.value = response?._data?.byte_offset;
     }
+  }
+  if (userCalibrationRunData.value.status === 'Running') {
+    // watch status every 10 seconds to see if log file changes
+    clearTimeout(logTimeout);
+    logTimeout = setTimeout(async() => {
+      const status_response: any = await queryGetLogStatus(
+        (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // calibration_run_id
+        selectedLogFilePath.value, // log_path
+        selectedLogByteOffset.value // byte_offset
+      )
+      if (status_response._data) {
+        selectedLogStatus.value = status_response._data;
+      }
+    }, 10000);
+  } else {
+    toast.removeAllGroups();
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+}
+
+// Handle selectedLogName changes
+watch(selectedLogName, async () => {
+  if (selectedLogName.value !== '') {
+    selectedLogCurrentPage.value = 1;
+    selectedLogStartRow.value = 1;
+    updateLogRefs(true);
+  }
+});
+
+// Watch for page number changes in logs
+watch(selectedLogCurrentPage, async () => {
+  if (isNaN(selectedLogCurrentPage.value) || selectedLogCurrentPage.value < 0 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
+    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
+  } else if (selectedLogCurrentPage.value > 0) {
+    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
+    updateLogRefs(true);
+  }
+});
+
+watch(selectedLogStatus, async () => {
+  if (selectedLogStatus.value !== {}) {
+    updateLogRefs(selectedLogStatus.value?.file_updated);
   }
 });
 
@@ -836,6 +850,11 @@ const gotoEvaluation = () => {
   const ele = document.getElementById("MainMenuEvaluation");
   ele?.click();
 }
+
+onUnmounted(() => {
+  // make sure page clears all selected plots/tables when the user leaves
+  resetUserPlotRefs([]);
+})
 </script>
 
 <style lang="scss" scoped>
