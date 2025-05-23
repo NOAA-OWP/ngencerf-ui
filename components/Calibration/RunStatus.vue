@@ -161,7 +161,7 @@
               Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}<br/>
               NOTE: Only up to the last {{ logDataPageSize }} rows of the log file are displayed, 
               newest to oldest.
-              <span v-if="userCalibrationRunData.value?.status === 'Running'">
+              <span v-if="calibrationStatus === 'Running'">
                 The full logs will be viewable on the Evaluate tab once the job has finished running.
               </span>
               <span v-else>
@@ -618,46 +618,44 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 }, { immediate: true });
 
 const populatePlotListOptions = async() => {
-  let plotListOptions = [];
-  let logListOptions = [];
-  
-  // TO DO: Don't add plots to the list if we're not at the first valid iteration yet
-  // Get Plot Names
-  plotNames.value = await queryGetPlotNames();
+  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Preparing Job Data'].includes(userCalibrationRunData?.value?.status))) {
+    let plotListOptions = [];
+    let logListOptions = [];
+    
+    // TO DO: Don't add plots to the list if we're not at the first valid iteration yet
+    // Get Plot Names
+    plotNames.value = await queryGetPlotNames();
 
-  if ((plotNames.value as any)?._data.plot_names) {
-    // setting plotList will populate the dropdown
-    plotListOptions = (plotNames.value as any)?._data?.plot_names
-  }
-
-  // Get Names of available Logs
-  logs.value = await queryGetLogNames(
-    (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
-  );
-  if (logs.value?._data) {
-    for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-      Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-        let logList = [];
-        for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-          logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
-        }
-        logLists.value[key] = logList;
-      });
+    if ((plotNames.value as any)?._data?.plot_names) {
+      // setting plotList will populate the dropdown
+      plotListOptions = (plotNames.value as any)?._data?.plot_names
     }
-  } else {
-    toast.removeAllGroups();
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
-    toast.add(tMsg); addToastRecord(tMsg);
-  }
-  
-  // Add Log Options to the dropdown
-  Object.keys(logLists.value).forEach(key => {
-    let optionName = capitalCase(key) + ' Logs';
-    logListOptions.push({ name: optionName, description: '' });
-  });
 
-  // Combine available plot and log options
-  plotList.value = plotListOptions.concat(logListOptions);
+    // Get Names of available Logs
+    logs.value = await queryGetLogNames(
+      (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
+    );
+    if (logs.value?._data?.log_names) {
+      for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+          let logList = [];
+          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+            logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+          }
+          logLists.value[key] = logList;
+        });
+      }
+    }
+    
+    // Add Log Options to the dropdown
+    Object.keys(logLists.value).forEach(key => {
+      let optionName = capitalCase(key) + ' Logs';
+      logListOptions.push({ name: optionName, description: '' });
+    });
+
+    // Combine available plot and log options
+    plotList.value = plotListOptions.concat(logListOptions);
+  }
 }
 
 // Handle selectedPlotName changes
@@ -763,12 +761,14 @@ const resetUserPlotRefs = (exceptions: any): void => {
 
 // Handle selectedLogCategory changes
 watch(selectedLogCategory, async () => {
+  if (selectedLogCategory.value != '') {
   selectedLogList.value = logLists.value[selectedLogCategory.value];
-  // start with the first log
-  selectedLogName.value = selectedLogList.value[0].name;
-  if (!selectedLogList.value.length) {
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
-    toast.add(tMsg); addToastRecord(tMsg);
+    // start with the first log
+    selectedLogName.value = selectedLogList.value[0].name;
+    if (!selectedLogList.value.length) {
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   }
 });
 
