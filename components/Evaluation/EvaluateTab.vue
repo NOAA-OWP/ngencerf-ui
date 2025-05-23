@@ -1794,8 +1794,7 @@ onUnmounted(() => {
   z-index: 99;
 }
 
-#selectedLogDisplay,
-#ValidationLogDisplay {
+#selectedLogDisplay {
   max-height: 400px;
 }
 

@@ -32,6 +32,7 @@ export const useUserDataStore = defineStore(
 
     const userCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
     const userCalibrationRunData = ref<UserCalibrationRunData>();
+    const gotoCalibrationRunId = ref<number>();
 
     const userSelectedCalibrationIterationId = ref<number | null>(null);
     const uiGageId = ref<string>("");
@@ -397,6 +398,7 @@ export const useUserDataStore = defineStore(
       lastServerError,
       userCalibrationJobsListData,
       userCalibrationRunData,
+      gotoCalibrationRunId,
       calibrationJobNgenGlobalLogging,
       logLevels,
       isUserLoggedIn,
