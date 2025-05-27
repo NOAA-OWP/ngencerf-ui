@@ -1,5 +1,5 @@
 <template>
-  <div id="OptimizationMetrics" class="mt-4">
+  <div id="OptimizationMetrics" class="mt-4 relative">
     <div class="grid grid-rows-12 gap-1">
       <div class="row-span-3">
         <div class="grid grid-cols-2 pt-3 gap-10">
