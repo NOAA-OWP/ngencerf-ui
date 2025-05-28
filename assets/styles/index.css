@@ -725,5 +725,17 @@ select option {
   font-size: 17px;
 }
 
-#TopRightBlock {padding: 10px 0px 0 15px;}
+#TopRightBlock {padding: 10px 15px 0 15px;}
 #GageCutout {margin-top:-40px;}
+
+#GageReport table {
+  background-color: var(--ngwcp-neutral-gray-lt);
+}
+#GageReport table th, #GageReport table td {
+  padding: 2px 15px;
+  border-bottom: 1px solid #ccc;
+}
+#GageReport .dataName.td1 {
+  text-align: right;
+  padding-right:5px !important;
+}
