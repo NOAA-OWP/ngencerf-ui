@@ -1,5 +1,5 @@
 <template>
-  <div id="ForecastRunsFilterDialog" class="JobsFilterBox mb-2 mt-4">
+  <div id="ForecastRunsFilterDialog" class="JobsFilterBox mb-1 mt-4">
 
     <div id="FilterDialog">
 
@@ -29,10 +29,10 @@
 
 
         <div class="col-span-2 text-right mr-3">
-          <Button id="CleareFiltersButton" class="c-blue mt-[22px]" label="Clear Filters" @click="resetFilters($event)"
+          <Button id="CleareFiltersButton" class="c-blue mt-[2px]" label="Clear Filters" @click="resetFilters($event)"
             aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
           </Button><br />
-          <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="refreshJobList()"
+          <Button id="RefreshJobList" class="c-blue mt-[2px]" label="Refresh List" @click="refreshJobList()"
             aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
           </Button>
         </div>

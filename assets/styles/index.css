@@ -469,8 +469,9 @@ select option {
   border: none;
 }
 
-.c-blue:disabled {
-  color: #b3b3b3 !important;
+.c-blue:disabled,
+.p-button.c-blue:disabled {
+  color: #555 !important;
 }
 
 .c-blue-primary1 {
@@ -714,4 +715,9 @@ select option {
   border-width: 0px !important;
   background-color: transparent;
   padding: 0px;
+}
+
+#CleareFiltersButton .p-button-label, 
+#RefreshJobList .p-button-label {
+  font-size: 17px;
 }
