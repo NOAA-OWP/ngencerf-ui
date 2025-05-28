@@ -21,7 +21,7 @@
                 <div class="flex mt-2">
                   <div class="text-left font-bold">Algorithm Parameter(s)</div>
                   <div id="ClearTableBtn" class="ml-auto">
-                    <Button id="ClrBtn" @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2"
+                    <Button id="ClrBtn" @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2" style="font-size: 14px !important;"
                       :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                       aria-label="Algorithm Parameters" title="Algorithm Parameter">Clear</Button>
                   </div>
