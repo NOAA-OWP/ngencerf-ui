@@ -219,7 +219,7 @@
       </Column>
 
       <!-- min column, editable -->
-      <Column field="min" header="Min" sortable>
+      <Column field="min" header="Tuning Range Min" sortable>
         <template #body="slotProps">
           <input type="text" v-model="slotProps.data.minimum"
             @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;"
@@ -229,7 +229,7 @@
       </Column>
 
       <!-- max column, editable -->
-      <Column field="max" header="Max" sortable>
+      <Column field="max" header="Tuning Range Max" sortable>
         <template #body="slotProps">
           <input type="text" v-model="slotProps.data.maximum"
             @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;"
@@ -239,7 +239,7 @@
       </Column>
 
       <!-- initValue column, editable -->
-      <Column field="initValue" header="Initial Value" sortable>
+      <Column field="initValue" header="Initial Run Value" sortable>
         <template #body="slotProps">
           <input type="text" v-model="slotProps.data.initial_value"
             @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)" style="width: 100%;"
