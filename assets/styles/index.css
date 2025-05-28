@@ -446,13 +446,16 @@ select option {
   background-color: var(--ngwcp-neutral-gray-md);
 }
 
+.progressTable {
+  font-size: 14px;
+}
 .progressTable td:nth-child(2) {
   /* ptype, whitespace-nowrap, c-blue, underline */
   white-space: nowrap;
   color: #0077ff;
   text-decoration: underline;
+  padding: 3px 0 3px 4px;
 }
-
 .progressTable td:nth-child(2):hover {
   color: var(--ngwcp-primary1);
   cursor: pointer;
@@ -721,3 +724,6 @@ select option {
 #RefreshJobList .p-button-label {
   font-size: 17px;
 }
+
+#TopRightBlock {padding: 10px 0px 0 15px;}
+#GageCutout {margin-top:-40px;}
