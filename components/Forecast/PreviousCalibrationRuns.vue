@@ -418,7 +418,7 @@ const toggleMessagesGroup = () => {
 
 #CalibrationRunForForecastTable,
 .gage-filter-wrapper {
-  width: 1200px;
+  width: 1325px;
   margin: 0 auto;
 }
 

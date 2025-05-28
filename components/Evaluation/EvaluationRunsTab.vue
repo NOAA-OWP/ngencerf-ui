@@ -809,7 +809,7 @@ const rowStyle = (data: any) => {
 
 #EvalRunTable,
 #EvalRunsFilterDialog {
-  width: 1200px;
+  width: 1325px;
 }
 
 #MessagesGroupWindow {

@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div class="mx-auto px-8 text-center overflow-auto">
+    <div class="mx-auto px-0 text-center overflow-auto">
       <div class="pt-5">
         <!-- Page top -->
         <div>
