@@ -447,7 +447,7 @@ select option {
 }
 
 .progressTable {
-  font-size: 14px;
+  font-size: 97%;
 }
 .progressTable td:nth-child(2) {
   /* ptype, whitespace-nowrap, c-blue, underline */
