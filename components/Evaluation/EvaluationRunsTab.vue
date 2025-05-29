@@ -9,10 +9,10 @@
     </div>
   </Transition>
   <client-only>
-    <div class="pr-2">
+    <div class="pr-2 relative">
       <div class="flex mt-2">
         <div class="w-full">
-          <h1 class="pt-3 mb-6 text-3xl font-bold text-center">
+          <h1 class="pt-3 mb-6 text-3xl font-bold text-center relative">
             <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
               userSelectedEvalCalibrationRunId }}<br />
               <span class="prompt-txt">
@@ -20,7 +20,7 @@
               </span>
             </span>
             <span v-else-if="computedGageCalibrationRunList.length > 1">Select Calibration Runs to Compare
-              <Button v-if="selectedCalibrationCompareRuns.length >= 2" id="btn-compare" class="ngenButtonDiv" 
+              <Button v-if="selectedCalibrationCompareRuns.length >= 2" id="btn-compare" class="ngenButtonDiv" style="position: absolute; right:0px;top:78px;" 
                 @click.stop="compareSelectedCalibrationJobs">
                 Compare
               </Button>
@@ -54,11 +54,11 @@
             * Iteration containing best parameter set determined during calibration.
           </div>
         </div>
-        <div class="flex mt-2">
+        <div class="flex mt-2 absolute -top-1 right-0">
           <div class="ml-auto mt-4">
             <div id="NewButton">
-              <Button id="btn-evaluate" class="ngenButtonDiv" @click.stop="returnCalibrationJobList">
-                Return to Calibration Jobs
+              <Button id="btn-evaluate" class="p-button p-component c-blue font-normal pt-0" style="font-size: 16px !important;" @click.stop="returnCalibrationJobList">
+                Back to Calibration Runs
               </Button>
             </div>
           </div>
@@ -90,11 +90,11 @@
             </Column>
           </DataTable>
         </div>
-        <div class="flex mt-2">
+        <div class="flex mt-2 absolute -top-1 right-0">
           <div class="ml-auto mt-4">
             <div id="NewButton">
-              <Button id="btn-evaluate" class="ngenButtonDiv" @click.stop="returnCalibrationJobList">
-                Return to All Calibration Jobs
+              <Button id="btn-evaluate" class="p-button p-component c-blue font-normal" style="font-size: 16px !important;" @click.stop="returnCalibrationJobList">
+                Back to Calibration Runs
               </Button>
             </div>
           </div>
