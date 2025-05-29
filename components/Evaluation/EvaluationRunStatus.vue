@@ -3,8 +3,8 @@
     <div class="grid grid-rows-7 pr-3">
       <div class="row-span-2">
         <div id="ResultsDisplay">
-          <div class="grid grid-cols-2">
-            <div class="col-span-1">
+          <div class="grid grid-cols-5">
+            <div class="col-span-2">
               <table>
 
                 <thead>
@@ -36,7 +36,11 @@
               </table>
             </div>
 
-            <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
+            <div class="col-span-1">
+                <div class="vertical-separator"></div>
+            </div>
+
+            <div class="col-span-2">
               <table>
                 <thead>
                   <tr height="35px">
@@ -61,7 +65,7 @@
                     </td>
                   </tr>
                   <tr height="38px">
-                    <td class="pl-5" colspan="2">
+                    <td class="pl-5 text-right pr-4" colspan="2">
 
                       <!--BUTTONS - START-->
                       <span v-if="validationStatus === 'Done'">
@@ -230,6 +234,9 @@ const navigateToEvaluation = (event: any) => {
   height: 100px;
   border: 0px solid #d9d9d9; /* replaced global.$ngwcp_neutral_gray_md */
   min-width: 750px;
+}
+#ResultsDisplay table {
+  width: 100%;
 }
 
 #GraphArea {
