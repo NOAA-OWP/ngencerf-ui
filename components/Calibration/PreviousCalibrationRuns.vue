@@ -1000,16 +1000,4 @@ small-label,
 .archivedBackground {
   background-color: blue;
 }
-
-/* Override text size for text-like buttons in this component */
-:deep(.p-button.text-button),
-:deep(.p-button.text),
-:deep(.p-button.p-button-text),
-:deep(.p-button-link),
-:deep(.p-button.p-button-link),
-:deep(.p-button.c-blue),
-:deep(.p-button.c-blue.underline),
-:deep(.p-button.c-blue.underline.text-xs) {
-  font-size: 16px !important;
-}
 </style>

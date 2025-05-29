@@ -5,8 +5,7 @@
         <div id="ResultsDisplay">
           <div class="grid grid-cols-5">
             <div class="col-span-2">
-              <table>
-
+              <table aria-describedby="Validation Run Time & Iteration">
                 <thead>
                   <tr height="35px">
                     <th scope="row" class="text-center border-b-[3px]" colspan="2" style="border-color: #d9d9d9;">Validation Run Time & Iteration</th>
@@ -41,7 +40,7 @@
             </div>
 
             <div class="col-span-2">
-              <table>
+              <table aria-describedby="Validation Run Status">
                 <thead>
                   <tr height="35px">
                     <th scope="row" class="text-center border-b-[3px]" colspan="2" style="border-color: #d9d9d9;">Validation Run Status</th>
