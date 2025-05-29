@@ -739,3 +739,13 @@ select option {
   text-align: right;
   padding-right:5px !important;
 }
+
+#EvaluatePage #PlotTableArea .p-datatable-table td:first-child {
+  border-left: 1px solid rgb(187, 187, 191);
+}
+#EvaluatePage #PlotTableArea .p-datatable-table td:last-child {
+  border-right: 1px solid rgb(187, 187, 191);
+}
+#EvaluatePage .c-blue:hover {
+  font-weight: normal;
+}

@@ -67,7 +67,7 @@
           </div>
         </div>
 
-        <div class="pl-4 ml-auto text-nowrap">
+        <div class="pl-4 ml-auto text-nowrap text-right">
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
               @click="gotoSelectAlternateIteration">New Validation</button></span>
           <br />
