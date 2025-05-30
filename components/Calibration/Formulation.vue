@@ -45,7 +45,7 @@
               <div class="mt-5 mb-2 pl-4 text-lg" aria-label="List of groups covered by selection"
                 title="List of groups covered by selection"><strong>Groups Covered By Selections</strong></div>
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
-                optionValue="name" scrollHeight="18rem" class="border-0">
+                optionValue="name" scrollHeight="18rem">
                 <template #option="slotProps">
                   <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'"
                     :aria-label="slotProps.option.name + ' is ' + (slotProps.option.selected === true ? 'Checked' : 'Not Checked')"
@@ -602,5 +602,16 @@ const handleNextPrevDialogClose = (opt: any) => {
 
 #Formulation {
   width: auto;
+}
+
+#CoveredBy {
+  border-width: 0px;
+  box-shadow: none;
+}
+.pi.font-bold {
+  font-weight: bold;
+}
+#CoveredBy .p-listbox-option:hover {
+  background: none !important;
 }
 </style>

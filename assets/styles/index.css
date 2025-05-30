@@ -452,12 +452,15 @@ select option {
 .progressTable {
   font-size: 97%;
 }
+.progressTable .pi {
+  font-weight: bold;
+}
 .progressTable td:nth-child(2) {
   /* ptype, whitespace-nowrap, c-blue, underline */
   white-space: nowrap;
   color: #0077ff;
   text-decoration: underline;
-  padding: 3px 0 3px 4px;
+  padding: 2px 0 3px 4px;
 }
 .progressTable td:nth-child(2):hover {
   color: var(--ngwcp-primary1);
@@ -755,4 +758,8 @@ select option {
 
 .vertical-separator {
   width:1px; height: 100%; background-color: #d9d9d9; position: relative; display: block; margin-left: auto; margin-right: auto;
+}
+
+#CoveredBy .p-listbox-option:hover {
+  background: none !important;
 }
