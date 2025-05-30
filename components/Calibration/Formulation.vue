@@ -615,7 +615,10 @@ const handleNextPrevDialogClose = (opt: any) => {
 
 
 <style>
-#CoveredBy .p-listbox-option:hover {
+#CoveredBy .p-listbox-option:hover,
+#CoveredBy .p-listbox-option.p-listbox-option-selected {
   background: none !important;
+  color: var(--p-listbox-option-color) !important;
+  cursor: auto !important;
 }
 </style>
