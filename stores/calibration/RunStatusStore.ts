@@ -28,6 +28,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const {
     userCalibrationRunData,
     calibrationJobNgenGlobalLogging,
+    ngenLogLevel,
     logLevels,
   } = storeToRefs(useUserDataStore());
 
@@ -225,17 +226,27 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     // store the payload body
     const bodyData: {
       calibration_run_id: number;
-      logging_enabled?: boolean;
-      modules?: Record<string, LogLevel>;
+      logging_config?: {
+        logging_enabled?: boolean;
+        modules?: Record<string, LogLevel>;
+      }
     } = {
       calibration_run_id: calibrationJobId.value,
       ...(calibrationJobNgenGlobalLogging.value !== undefined && {
-        logging_enabled: calibrationJobNgenGlobalLogging.value
-      }),
-      ...(serializedModules && {
-        modules: serializedModules
-      }),
+        logging_config: {
+          logging_enabled: calibrationJobNgenGlobalLogging.value,
+          ...(serializedModules && {
+            // add ngenLogLevel to beginning of the object
+            modules: {
+              ngen: ngenLogLevel.value,
+              ...serializedModules
+            }
+          })
+        },
+      })
     };
+
+    console.log("Running Calibration Job with bodyData:", bodyData);
 
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/run_calibration/`, {
       method: "POST",
