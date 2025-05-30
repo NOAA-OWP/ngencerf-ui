@@ -760,3 +760,40 @@ select option {
   width:1px; height: 100%; background-color: #d9d9d9; position: relative; display: block; margin-left: auto; margin-right: auto;
 }
 
+.pagination-box {
+  display: grid;
+  gap: 2%;
+  grid-template-columns: 23% 75%;
+}
+.pagination-go-to-page, .pagination-pages, .pagination-rows {
+  font-size: 13px;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.text-center {
+  text-align: center;
+}
+.pagination-go-to-page, .pagination-pages {
+  display: inline-block;
+  margin-top: -10px;
+}
+.pagination-pages {
+  width: 70%;
+}
+
+.pagination-go-to-page {
+  padding-right: 0;
+  text-align: right;
+  width: 30%;
+}
+#PlotTableArea .pagination-go-to-page {
+  padding-right: 14px;
+}
+
+.pagination-go-to-page input {
+  display: inline-block;
+  font-size: 13px;
+  padding: 2px 3px;
+  width: 70px;
+}
