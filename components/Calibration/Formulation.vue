@@ -611,6 +611,10 @@ const handleNextPrevDialogClose = (opt: any) => {
 .pi.font-bold {
   font-weight: bold;
 }
+</style>
+
+
+<style>
 #CoveredBy .p-listbox-option:hover {
   background: none !important;
 }
