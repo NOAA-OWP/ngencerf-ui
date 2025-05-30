@@ -28,6 +28,10 @@
               Show notifications for
             </div>
             <div class="flex items-center gap-2">
+              <Checkbox v-model="successToast" inputId="successToast" name="successToast" value="success" binary />
+              <label for="successToast">Success</label>
+            </div>
+            <div class="flex items-center gap-2">
               <Checkbox v-model="infoToast" inputId="infoToast" name="infoToast" value="info" binary />
               <label for="infoToast">Information</label>
             </div>
@@ -38,10 +42,6 @@
             <div class="flex items-center gap-2">
               <Checkbox v-model="errorToast" inputId="errorToast" name="errorToast" value="error" binary />
               <label for="errorToast">Errors</label>
-            </div>
-            <div class="flex items-center gap-2">
-              <Checkbox v-model="successToast" inputId="successToast" name="successToast" value="success" binary />
-              <label for="successToast">Success</label>
             </div>
           </div>
         </div>
