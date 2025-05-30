@@ -203,6 +203,9 @@ button,
   border: 0px;
   display: inline-block;
 }
+.ngenButtonDiv.h-8 {
+  padding: 0px 25px !important;
+}
 
 .ngenButtonDiv:hover {
   background-color: var(--ngwcp-primary3) !important;
