@@ -48,10 +48,10 @@
                     </td>
                   </tr>
                   <tr height="32px" aria-label="Select Plot Name" title="Select Plot Name">
-                    <th scope="row" class="text-right"><label for="DisplayOptions">{{ iteration && iteration >= 1 ?
+                    <th scope="row" class="text-right"><label for="DisplayOptions">{{ plotList.length > 0 ?
                       'Display' : '' }}</label></th>
-                    <td class="pl-5" v-show='iteration && iteration >= 1'>
-                      <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
+                    <td class="pl-5">
+                      <Select v-show="plotList.length > 0" id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
                         optionLabel="name" optionValue="name">
                       </Select>
                     </td>
@@ -63,7 +63,7 @@
                       <div v-if="overallCalibrationValidationStatus === 'Done'"
                         style="margin-top:4px;margin-bottom:-4px;">
                         <Button class="ngenButtonDiv font-normal" @click="gotoEvaluation" aria-label="Go to
-                          Evaluation" title="Go to Evaluation">Go to Evaluation</Button>
+                          Evaluation" title="Evaluate">Evaluate</Button>
                       </div>
 
                       <div v-if="calibrationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
@@ -144,8 +144,45 @@
         <div v-else-if="selectedPlotFileUrl" id="GraphArea" class="p-2">
           <img :src="selectedPlotFileUrl" alt="Selected Plot" />
         </div>
-        <div v-else id="GraphArea" class="p-2">
-          <!--Data Display-->
+        <div v-else-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0" id="LogDisplayArea" class="p-2">
+          <div class="pl-4">
+            <table width="100%" summary="Calibration Log Options and File Path">
+              <caption class="sr-only">Calibration Log Options and File Path table</caption>  
+              <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
+              <tbody>  
+                <tr v-if="selectedLogList.length > 1">
+                  <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
+                  <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
+                  optionLabel="name" optionValue="name">
+                </Select></td>
+                </tr>
+                <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
+                  <td class="pr-2 pt-3"><b>Log Name</b></td>
+                  <td class="pt-3">{{ selectedLogName }}</td>
+                </tr>
+                <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
+                  <td class="pr-2 pt-3"><b>Log File Path</b></td>
+                  <td class="pt-3">{{ selectedLogFilePath }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="pt-4 pagination-rows">
+              Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}<br/>
+              NOTE: Only up to the last {{ logDataPageSize }} rows of the log file are displayed, 
+              newest to oldest.
+              <span v-if="calibrationStatus === 'Running'">
+                The full logs will be viewable on the Evaluate tab once the job has finished running.
+              </span>
+              <span v-else>
+                The full logs can be viewed on the Evaluate tab.
+              </span>
+            </div>
+
+            <div id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
+              <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -202,6 +239,7 @@ const {
 
 const {
   userCalibrationRunData,
+  gotoCalibrationRunId,
   calibrationJobNgenGlobalLogging,
   ngenLogLevel,
   logLevels,
@@ -216,17 +254,32 @@ const {
   runCalibrationJob,
   queryGetIteration,
   cancelCalibrationJob,
+  queryGetLogNames,
+  queryGetLogData,
+  queryGetLogStatus
 } = useRunStatusStore();
 
 const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
-const plotNamesToExclude = [
-  "Iteration Metrics Table",
-  "Iteration Parameters Table",
-  "Performance Metrics Table",
-];
+
+const logs = ref<APIResponse>({});
+const logDataPageSize = ref<number>(1000);
+const logLists = ref<DynamicObject>({});
+const selectedLogCategory = ref<string>('');
+const selectedLogList = ref<any[]>([]);
+const selectedLogName = ref<string>('');
+const selectedLogDisplay = ref<string>('');
+const selectedLogTotalSize = ref<number>(0);
+const selectedLogCurrentPage = ref<number>(1);
+const selectedLogTotalPages = ref<number>(1);
+const selectedLogStartRow = ref<number>(1);
+const selectedLogEndRow = ref<number>(logDataPageSize.value);
+const selectedLogFilePath = ref<string>('');
+const selectedLogByteOffset = ref<number>(0);
+const selectedLogStatus = ref<DynamicObject>({});
+let logTimeout;
 
 onMounted(async () => {
   toast.removeAllGroups();
@@ -255,6 +308,8 @@ onMounted(async () => {
         submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
       }
     }
+
+    populatePlotListOptions();
 
     // if calibration is Done, check if all validation statuses are Done
     if (userCalibrationRunData?.value?.status === 'Done') {
@@ -442,22 +497,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
-
-      // Get Plot Names
-      if (!((plotNames?.value as any)?._data?.plot_names) || (plotNames?.value as any)?._data?.plot_names.length === 0) {
-        plotNames.value = await queryGetPlotNames();
-      }
-
-      if ((plotNames.value as any)?._data.plot_names) {
-        // setting plotList will populate the dropdown
-        plotList.value = (plotNames.value as any)?._data?.plot_names?.filter(
-          (plot: any) => !plotNamesToExclude.includes(plot.name)
-        );
-      } else {
-        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names', life: ToastTimeout.timeoutWarn };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
     }
+
+    populatePlotListOptions();
 
     if (calibrationStatus.value === 'Running') {
       if (!calibrationStatusIntervalId.value) {
@@ -586,34 +628,82 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
   });
 }, { immediate: true });
 
+const populatePlotListOptions = async() => {
+  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Preparing Job Data'].includes(userCalibrationRunData?.value?.status))) {
+    let plotListOptions = [];
+    let logListOptions = [];
+    
+    // TO DO: Don't add plots to the list if we're not at the first valid iteration yet
+    // Get Plot Names
+    plotNames.value = await queryGetPlotNames();
+
+    if ((plotNames.value as any)?._data?.plot_names) {
+      // setting plotList will populate the dropdown
+      plotListOptions = (plotNames.value as any)?._data?.plot_names
+    }
+
+    // Get Names of available Logs
+    logs.value = await queryGetLogNames(
+      (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
+    );
+    if (logs.value?._data?.log_names) {
+      for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+          let logList = [];
+          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+            logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+          }
+          logLists.value[key] = logList;
+        });
+      }
+    }
+    
+    // Add Log Options to the dropdown
+    Object.keys(logLists.value).forEach(key => {
+      let optionName = capitalCase(key) + ' Logs';
+      logListOptions.push({ name: optionName, description: '' });
+    });
+
+    // Combine available plot and log options
+    plotList.value = plotListOptions.concat(logListOptions);
+  }
+}
+
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available.';
+  if (selectedPlotName.value) {
+    let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available.';
 
-  // provide custom message if missing selected plot is a validation plot
-  if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
-    plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
-  }
+    // provide custom message if missing selected plot is a validation plot
+    if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
+      plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
+    }
 
-  if (iteration.value && iteration.value >= 1) {
-    // get selected plot file name and url from server
-    const response: any = await queryGetPlot(selectedPlotName.value as string); // store this in RunStatusStore
+    if (selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
+      // selectedPlotName is a log 
+      // reset all of our plot refs except for selectedPlotName
+      resetUserPlotRefs(['selectedPlotName']);
+      selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
+    } else if (iteration.value && iteration.value >= 1) {
+      // get selected plot file name and url from server
+      const response: any = await queryGetPlot(selectedPlotName.value as string); // store this in RunStatusStore
 
-    if (response?._data?.plot_file_path && response?._data?.plot_url) {
-      selectedPlotFilename.value = response?._data?.plot_file_path;
-      selectedPlotFileUrl.value = response?._data?.plot_url;
+      if (response?._data?.plot_file_path && response?._data?.plot_url) {
+        selectedPlotFilename.value = response?._data?.plot_file_path;
+        selectedPlotFileUrl.value = response?._data?.plot_url;
+      } else {
+        toast.removeAllGroups();
+        selectedPlotFilename.value = null;
+        selectedPlotFileUrl.value = null;
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
     } else {
-      toast.removeAllGroups();
-      selectedPlotFilename.value = "";
-      selectedPlotFileUrl.value = "";
+      selectedPlotFilename.value = null;
+      selectedPlotFileUrl.value = null;
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-  } else {
-    selectedPlotFilename.value = "";
-    selectedPlotFileUrl.value = "";
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
-    toast.add(tMsg); addToastRecord(tMsg);
   }
 });
 
@@ -629,7 +719,7 @@ watch(submitTimeDate, () => {
 
 // Handle iteration changes
 watch(iteration, async () => {
-  if (iteration.value && iteration.value >= 1 && selectedPlotName.value) {
+  if (iteration.value && iteration.value >= 1 && selectedPlotName.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
     let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available';
 
     // provide custom message if missing selected plot is a validation plot
@@ -651,10 +741,118 @@ watch(iteration, async () => {
   }
 });
 
+// Reset refs when selectedPlotName changes
+const resetUserPlotRefs = (exceptions: any): void => {
+  if( !Array.isArray(exceptions) ) {
+    exceptions = [];
+  }
+
+  // plot file refs
+  if (!exceptions.includes('selectedPlotName')) {
+    selectedPlotName.value = null;
+  }
+  selectedPlotFilename.value = null;
+  selectedPlotFileUrl.value = null;
+
+  // log refs
+  selectedLogCategory.value = '';
+  selectedLogList.value = [];
+  selectedLogName.value = '';
+  selectedLogDisplay.value = '';
+  selectedLogTotalSize.value = 0;
+  selectedLogCurrentPage.value = 1;
+  selectedLogTotalPages.value = 0;
+  selectedLogStartRow.value = 1;
+  selectedLogEndRow.value = logDataPageSize.value;
+  selectedLogFilePath.value = '';
+  selectedLogByteOffset.value = 0;
+  selectedLogStatus.value = {};
+  clearTimeout(logTimeout);
+}
+
+// Handle selectedLogCategory changes
+watch(selectedLogCategory, async () => {
+  if (selectedLogCategory.value != '') {
+  selectedLogList.value = logLists.value[selectedLogCategory.value];
+    // start with the first log
+    selectedLogName.value = selectedLogList.value[0].name;
+    if (!selectedLogList.value.length) {
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+  }
+});
+
+const updateLogRefs = async(getLogData: boolean) => {
+  if (getLogData) {
+    const response: any = await queryGetLogData(
+      selectedLogCategory.value, // log_category
+      selectedLogName.value, // log_name
+      (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // calibration_run_id
+      -1, // start is -1 to tell the server we want only the last "page" of logs
+      logDataPageSize.value // limit
+    );
+    if (response?._data) {
+      let logText = '';
+      for (let t = 0; t < response?._data.log_data.length; t++) {
+        logText += response?._data.log_data[t] + '<br/>\n';
+      }
+      selectedLogDisplay.value = logText;
+      selectedLogTotalSize.value = response?._data.pagination_metadata?.count;
+      selectedLogTotalPages.value = 1;
+      selectedLogEndRow.value = response?._data.pagination_metadata?.count;
+      if (logDataPageSize.value < selectedLogTotalSize.value) {
+        selectedLogStartRow.value = (selectedLogTotalSize.value - logDataPageSize.value) + 1;
+      } else {
+        selectedLogStartRow.value = 1;
+      }
+      selectedLogFilePath.value = response?._data.log_path;
+      selectedLogByteOffset.value = response?._data?.byte_offset;
+    }
+  }
+  if (userCalibrationRunData.value.status === 'Running') {
+    // watch status every 10 seconds to see if log file changes
+    clearTimeout(logTimeout);
+    logTimeout = setTimeout(async() => {
+      const status_response: any = await queryGetLogStatus(
+        (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // calibration_run_id
+        selectedLogFilePath.value, // log_path
+        selectedLogByteOffset.value // byte_offset
+      )
+      if (status_response._data) {
+        selectedLogStatus.value = status_response._data;
+      }
+    }, 10000);
+  }
+}
+
+// Handle selectedLogName changes
+watch(selectedLogName, async () => {
+  if (selectedLogName.value !== '') {
+    updateLogRefs(true);
+  }
+});
+
+watch(selectedLogStatus, async () => {
+  if (selectedLogStatus.value !== {}) {
+    updateLogRefs(selectedLogStatus.value?.file_updated);
+  }
+});
+
+function capitalCase(str: string) {
+  return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
 const gotoEvaluation = () => {
+  gotoCalibrationRunId.value = userCalibrationRunData.value.calibration_run_id;
   const ele = document.getElementById("MainMenuEvaluation");
   ele?.click();
 }
+
+onUnmounted(() => {
+  // make sure page clears all selected plots/tables when the user leaves
+  resetUserPlotRefs([]);
+})
 </script>
 
 <style lang="scss" scoped>
