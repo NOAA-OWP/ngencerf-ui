@@ -47,6 +47,9 @@ export const useUserDataStore = defineStore(
     // sets value for global logging
     const calibrationJobNgenGlobalLogging = ref<boolean>(true);
 
+    // set ngen log level
+    const ngenLogLevel = ref<LogLevel>("info");
+
     // stores the log level for each module
     const logLevels: Record<string, Ref<LogLevel>> = reactive({});
 
@@ -375,6 +378,7 @@ export const useUserDataStore = defineStore(
     const clearUserCalibrationRunData = () => {
       userCalibrationRunData.value = undefined;
       calibrationJobNgenGlobalLogging.value = true;
+      ngenLogLevel.value = "info";
 
       // clear all log levels
       for (const module in logLevels) {
@@ -400,6 +404,7 @@ export const useUserDataStore = defineStore(
       userCalibrationRunData,
       gotoCalibrationRunId,
       calibrationJobNgenGlobalLogging,
+      ngenLogLevel,
       logLevels,
       isUserLoggedIn,
       logUserIn,

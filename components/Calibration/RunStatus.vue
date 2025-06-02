@@ -63,7 +63,7 @@
                       <div v-if="overallCalibrationValidationStatus === 'Done'"
                         style="margin-top:4px;margin-bottom:-4px;">
                         <Button class="ngenButtonDiv font-normal" @click="gotoEvaluation" aria-label="Go to
-                          Evaluation" title="Go to Evaluation">Go to Evaluation</Button>
+                          Evaluation" title="Evaluate">Evaluate</Button>
                       </div>
 
                       <div v-if="calibrationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
@@ -104,7 +104,7 @@
           </div>
 
           <div class="mb-4">
-            <p class="font-semibold mb-2 text-center">Module Logging Levels</p>
+            <p class="font-semibold mb-2 text-center">Ngen and Module Log Levels</p>
             <div :class="[
               'overflow-x-auto',
               { 'opacity-50 pointer-events-none': !calibrationJobNgenGlobalLogging }
@@ -119,7 +119,17 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(_, module) in logLevels" :key="module">
+                  <!-- ngen row at the top -->
+                  <tr>
+                    <td class="pr-4">ngen</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen-' + level"
+                      class="px-2">
+                      <input type="radio" :name="'loglevel-ngen'" :value="level" v-model="ngenLogLevel"
+                        :disabled="!calibrationJobNgenGlobalLogging" />
+                    </td>
+                  </tr>
+                  <!-- Per-module logLevels -->
+                  <tr v-for="(val, module) in logLevels" :key="module">
                     <td class="pr-4">{{ module }}</td>
                     <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="level" class="px-2">
                       <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]"
@@ -231,6 +241,7 @@ const {
   userCalibrationRunData,
   gotoCalibrationRunId,
   calibrationJobNgenGlobalLogging,
+  ngenLogLevel,
   logLevels,
 } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
@@ -881,20 +892,9 @@ onUnmounted(() => {
   text-align: right;
   padding-right: 20px;
 }
+</style>
 
-#resultsPathname {
-  background-color: #fff;
-  border: 0px solid #fff;
-  border-left: 0;
-  border-right: 0;
-  color: black;
-  box-shadow: none;
-}
-
-#selectedLogDisplay {
-  max-height: 400px;
-}
-
+<style>
 :root {
   .p-progressbar {
     background-color: yellow;
