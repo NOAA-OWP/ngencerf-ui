@@ -343,7 +343,7 @@ const {
   fetchValidationRunListByCalibrationRun,
 } = evaluationCalibrationRunStore;
 
-const { userCalibrationRunData, modulesFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, gotoCalibrationRunId, modulesFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
 const { isLoading, calibrationJobId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -355,12 +355,30 @@ const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
 const formulationName = "Formulation Name";
 
-onMounted(() => {
+onMounted(async() => {
   hilightTab(EvaluationTabs.tab_calibrationRuns);
   includeArchivedJobs.value = false;
+
   //clear calibration data if user was on calibration tab and clear previous evaluation run data user may have selected
   resetUserSelectedEvalCalibrationRun();
   fetchUserValidatedCalibrationJobsListData();
+
+  if(gotoCalibrationRunId.value) {
+    userSelectedEvalCalibrationRunId.value = gotoCalibrationRunId.value;
+    const validationRunList = await fetchValidationRunListByCalibrationRun();
+    if (validationRunList.length > 0) {
+      if (validationRunList.length > 1) {
+        viewSelectedCalibrationValidationRuns(gotoCalibrationRunId.value);
+      } else {
+        evaluateValidationJobFromCalibration(gotoCalibrationRunId.value);
+      }
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Calibration Job Not Ready for Evaluation', detail: 'The Calibration Job you chose cannot be evaluated at this time.', life: ToastTimeout.timeoutWarn };
+      toast.add(tMsg); addToastRecord(tMsg);
+      resetUserSelectedEvalCalibrationRun();
+    }
+    gotoCalibrationRunId.value = undefined;
+  }
 
   uiGageId.value = 'All';
   computedGageCalibrationRunList.value = [];
@@ -378,6 +396,7 @@ onMounted(() => {
   }
 
   updatedUserEvaluationJobsListData.value = userEvaluationCalibrationRunListData?.value;
+
   isLoading.value = false;
 });
 

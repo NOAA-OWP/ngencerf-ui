@@ -75,11 +75,11 @@
             @click="toggleMessagesGroup">
             Show Calibration Details</a>
           <br />
-          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName) && !showPlotGraph">
-            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">Show
+          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">
+            <a v-if="selectedPlotHasTimeseries && !showPlotGraph" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">Show
               SWE Time Series</a>
           </span>
-          <span v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName))">
+          <span v-else>
             <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">
               <span v-if="!showPlotGraph">Show </span>
               <span v-else>Hide </span>
@@ -218,20 +218,6 @@
     <div id="LogDisplayArea" class="p-2"
       v-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
-        <!--
-        <div v-if="selectedLogList.length > 1">
-          <label for="selectedLogOptions" class="pr-2 pt-3">Select {{ capitalCase(selectedLogCategory) }} Log</label>
-          <Select id="selectedLogOptions" class="p-select" v-model="selectedLogName" :options="selectedLogList"
-            optionLabel="name" optionValue="name">
-          </Select>
-        </div>
-        <div v-if="selectedLogList.length === 1" style="font-size: 0.9em;"><b
-            style="width:160px; display:inline-block;">Log Name</b> {{ selectedLogName }}</div>
-        
-        <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;"><b
-            style="width:160px; display:inline-block;">Log File Path</b> {{ selectedLogFilePath }}</div>
-        -->
-
         <table width="100%" summary="Calibration Log Options and File Path">
           <caption class="sr-only">Calibration Log Options and File Path table</caption>  
           <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
@@ -491,9 +477,9 @@ onMounted(() => {
     }
 
     // Get Plot Names
-    //if (!plotNames?.value?._data?.plot_names || !plotNames?.value?._data?.plot_names.length) {
-    plotNames.value = await queryGetPlotNames();
-    //}
+    if (calibrationJobId.value && calibrationJobId.value > 0) {
+      plotNames.value = await queryGetPlotNames();
+    }
 
     if (plotNames.value?._data?.plot_names) {
       // setting plotList will populate the dropdown
@@ -519,7 +505,7 @@ onMounted(() => {
     }
 
     // Get Names of ALL Logs
-    if (!logs.value?._data || !logs.value?._data?.length) {
+    if (evaluateValidationRunId.value > 0 && (!logs.value?._data || !logs.value?._data?.length)) {
       logs.value = await queryGetLogNames(
         (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0 // validation_run_id
       );
@@ -693,8 +679,8 @@ watch(selectedPlotName, async () => {
       }
     }
   }
-  // selectedPlotName is a log 
   else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
+    // selectedPlotName is a log 
     // reset all of our plot refs except for selectedPlotName
     resetUserPlotRefs(['selectedPlotName']);
     selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
@@ -726,16 +712,16 @@ watch(selectedPlotName, async () => {
       if (response?._data?.swe_timeseries_data) {
         // get time series data from server
         sweTimeSeriesData.value = response?._data?.swe_timeseries_data;
+        selectedPlotHasTimeseries.value = true;
+        // Start with SWE timeseries already displayed
+        togglePlotGraph();
       } else {
         selectedPlotHasTimeseries.value = false;
         toast.removeAllGroups();
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'SWE time series data is currently unavailable', life: ToastTimeout.timeoutInfo };
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'SWE time series data is currently unavailable', life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
-
-    // Start with SWE timeseries already displayed
-    togglePlotGraph();
   } else if (selectedPlotName.value) {
     // reset all of our plot refs except for selectedPlotName
     resetUserPlotRefs(['selectedPlotName']);
@@ -847,7 +833,7 @@ watch(selectedPlotName, async () => {
   }
 });
 
-// Reset refs when selectedPlotTable changes
+// Reset refs when selectedPlotName changes
 const resetUserPlotRefs = (exceptions: any): void => {
   if( !Array.isArray(exceptions) ) {
     exceptions = [];
@@ -1176,12 +1162,12 @@ const drawInteractivePlot = () => {
     fontSize: 14
   }
   if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
-    lineOptions.y.label = 'Depth (cm/s)';
+    lineOptions.y.label = 'Depth (m)';
     lineTipOptions.y.label = 'Depth';
-    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s\nClick to select this date`
-    dotOptions.y.label = 'Depth (cm/s)';
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
+    dotOptions.y.label = 'Depth (m)';
     dotTipOptions.y.label = 'Depth';
-    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s\nClick to select this date`
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
   } else {
     lineOptions.y.label = 'Flow (cm/s)';
     lineTipOptions.y.label = 'Flow';
@@ -1813,8 +1799,7 @@ onUnmounted(() => {
   z-index: 99;
 }
 
-#selectedLogDisplay,
-#ValidationLogDisplay {
+#selectedLogDisplay {
   max-height: 400px;
 }
 
