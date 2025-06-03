@@ -267,6 +267,11 @@ const cmArchiveRun = ref([
   { label: 'Un-archive', icon: 'pi pi-unlock', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.unarchive) }
 ]);
 
+const cmActiveRun = ref ([
+  { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
+  { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
+])
+
 
 onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
@@ -398,7 +403,9 @@ const closeMultJobsWindow = () => {
 }
 
 const whichContextMenu = computed(() => {
-  if (selectedCalibrationRun?.value?.is_archived) {
+  if (selectedCalibrationRun?.value?.status == 'Running') {
+    return cmActiveRun.value;
+  } else if (selectedCalibrationRun?.value?.is_archived) {
     return cmArchiveRun.value;
   } else if (selectedCalibrationRun?.value?.is_downloadable) {
     return cmDownloadRun.value;
