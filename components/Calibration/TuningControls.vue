@@ -250,7 +250,7 @@
     </DataTable>
   </div>
 
-  <div class="grid grid-rows-1 mt-8 ActionButtonsBox" id="Tuningbuttons">
+  <div class="grid grid-rows-1 mt-8 mb-4 ActionButtonsBox" id="Tuningbuttons">
     <div id="TuningBottomButtons" class="grid grid-cols-8">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-6 h-8" @click="saveTuningData()">
