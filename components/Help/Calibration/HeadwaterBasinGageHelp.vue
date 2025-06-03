@@ -36,7 +36,7 @@
             Upload allows the user to specify their own csv file containing hourly time-series details of forcing data.
             <strong><em>A gage must have already been selected to upload a file.</em></strong><br />
             <br />
-            There must be one forcing file per catchment in the headwater basin for the selected gage and they
+            When uploading a csv file, there must be one forcing file per catchment in the headwater basin for the selected gage and they
             must be in the following format, with the 1st line being the header identifying the following fields:<br />
             Time, LWDOWN, PFC, Q2D, RAINRATE, SWDOWN, T2D, U2D, V2D<br />
             <br>
@@ -47,13 +47,14 @@
         </tr>
         <tr>
           <th scope="row" class="td1">Observational</th>
-          <td class="td2">Pull down to select Observational Data source for the selected gage. 
-            Either Data Services for Enterprise Data Services or Upload to upload from local computer.<br />
+          <td class="td2">Pull down to select Observational Data source for the selected gage.
+            Either Data Services or Upload to upload from local computer. When using Data Servcies, 
+            the gage agency determines the source of the observational data.<br />
             <br />
             Upload allows the user to specify their own csv file hourly time-series details of observed gage streamflow data.
             <strong><em>A gage must have already been selected to upload a file.</em></strong><br />
             <br />
-            This file must be in the following format, with the the 1st line being the header
+            When uploading an observational file, it must be in the following format, with the the 1st line being the header
             identifying the following fields:<br />
             <br />
             <span class="italic">dateTime, q_cms</span><br />
@@ -75,7 +76,7 @@
           <td class="td2">&nbsp;</td>
         </tr>
         <tr>
-          <th scope="row" class="td1">Save Button:</th>
+          <th scope="row" class="td1">Save Button</th>
           <td class="td2">Save data from the tab. Partial saves are allowed.</td>
         </tr>
         <tr>
@@ -84,8 +85,16 @@
             clicked it will undo the change, reverting to the saved gage ID.</td>
         </tr>
         <tr>
-          <th scope="row" class="td1">Next Button:</th>
+          <th scope="row" class="td1">Next Button</th>
           <td class="td2">Move to the Formulation Tab. If there is any unsaved data, the user will first be prompted to save.</td>
+        </tr>
+        <tr>
+          <th scope="row" class="td1">&nbsp;</th>
+          <td class="td2">&nbsp;</td>
+        </tr>
+        <tr>
+          <th scope="row" class="td1">Note:</th>
+          <td class="td2">Gage details are shown when a gage id is selected. The basin map is generated once the Save button is clicked.</td>
         </tr>
       </tbody>
     </table>
