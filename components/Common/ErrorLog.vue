@@ -27,19 +27,19 @@
             <div class="flex items-center ml-5">
               Show notifications for
             </div>
-            <div class="flex items-center gap-2">
+            <div class="successBg flex items-center gap-2">
               <Checkbox v-model="successToast" inputId="successToast" name="successToast" value="success" binary />
               <label for="successToast">Success</label>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="infoBg flex items-center gap-2">
               <Checkbox v-model="infoToast" inputId="infoToast" name="infoToast" value="info" binary />
               <label for="infoToast">Information</label>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="warnBg flex items-center gap-2">
               <Checkbox v-model="warnToast" inputId="warnToast" name="warnToast" value="warn" binary />
               <label for="warnToast">Warnings</label>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="errorBg flex items-center gap-2">
               <Checkbox v-model="errorToast" inputId="errorToast" name="errorToast" value="error" binary />
               <label for="errorToast">Errors</label>
             </div>
@@ -53,7 +53,7 @@
 
               <Column :pt="ptColumn" header="" class="" style="width: 1%; text-align:center; vertical-align: top;">
                 <template #body="scope">
-                  <div :style="{ backgroundColor: getColor(scope.data.severity) }">&nbsp;</div>
+                  <div :style="{ backgroundColor: getColor(scope.data.severity) }">&nbsp;&nbsp;</div>
                 </template>
               </Column>
               <Column :pt="ptColumn" field="datetime" header="Date" class="columnClass" sortable

@@ -797,4 +797,35 @@ select option {
   padding: 2px 3px;
   width: 70px;
 }
-
+#MainLeftDataArea .p-datatable-hoverable .p-datatable-selectable-row:hover {
+  /*background-color: var(--p-listbox-option-selected-background) !important;*/
+  background-color: #ecfdf5 !important;
+}
+.successBg .p-checkbox-box  {
+  background-color: #4CAF50 !important;
+  border-color: #4CAF50 !important;
+}
+.infoBg .p-checkbox-box {
+  background-color: #2196F3 !important;
+  border-color: #2196F3 !important;
+}
+.warnBg .p-checkbox-box {
+  background-color: #FFC107 !important;
+  border-color: #FFC107 !important;
+}
+.errorBg .p-checkbox-box {
+  background-color: #FF5252 !important;
+  border-color: #FF5252 !important;
+}
+.successBg .p-checkbox-checked .p-checkbox-box, 
+.infoBg .p-checkbox-checked .p-checkbox-box, 
+.warnBg .p-checkbox-checked .p-checkbox-box, 
+.errorBg .p-checkbox-checked .p-checkbox-box {
+  opacity: 1;
+}
+.successBg .p-checkbox-box,
+.infoBg .p-checkbox-box,
+.warnBg .p-checkbox-box,
+.errorBg .p-checkbox-box {  
+  opacity: 0.3;
+}

@@ -3,126 +3,136 @@
     <h1 class="pt-3 mb-8 text-3xl font-bold text-center" aria-label="Forecast Status Run Tab" title="Forecast Status Run Tab">
       Forecast
     </h1>
-    <p class="text-center" style="font-size: 12px;font-weight: normal;margin-top:-20px;">
+    <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
       If status is Ready click Run to submit and run the forecast.
     </p>
     <br />
   </div>
   <div>
-    <div class="grid grid-cols-2">
-      <div class="col-span-1">
-        <table>
-          <caption style="text-align: center;font-size:1.1em;font-weight:bold;margin-bottom:3px;"
-            aria-label="Forecast Job Run Time Area" title="Forecast Job Run Time Area">Forecast Job Run Time
-          </caption>
-          <thead>
-            <tr height="25px">
-              <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr height="40px" :aria-label="'Calibration Job ID ' + calibrationRunForForecast?.calibration_run_id"
-              :title="'Calibration Job ID ' + calibrationRunForForecast?.calibration_run_id">
-              <th scope="row" class="text-right font-bold">
-                <div style="width: 140px;">Calibration Job ID</div>
-              </th>
-              <td class="pl-5">{{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(30) }}</td>
-            </tr>
-            <tr height="40px" :aria-label="'Forecast Job ID ' + forecastJobId"
-              :title="'Forecast Job ID ' + forecastJobId">
-              <th scope="row" class="text-right font-bold">
-                <div style="width: 140px;">Forecast Job ID</div>
-              </th>
-              <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
-            </tr>
-            <tr height="32px" :aria-label="'Submit Time ' + submitTime" :title="'Submit Time ' + submitTime">
-              <th scope="row" class="text-right font-bold">
-                <div style="width: 140px;">Submit Time</div>
-              </th>
-              <td class="pl-5">{{ submitTime ?? '-'.repeat(30) }}</td>
-            </tr>
-            <tr height="32px" :aria-label="'Elapsed Time ' + elapsedTime" :title="'Elapsed Time ' + elapsedTime">
-              <th scope="row" class="text-right font-bold">
-                <div style="width: 140px;">Elapsed Time</div>
-              </th>
-              <td class="pl-5">{{ elapsedTime ?? '-'.repeat(30) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
 
-      <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
-        <table>
-          <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;" aria-label="Forecast Job Status area"
-            title="Forecast Job Status area">Forecast Job Status</caption>
-          <thead>
-            <tr height="25px">
-              <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr height="40px" :aria-label="'Status is ' + overallForcingDownloadForecastStatus"
-              :title="'Status is ' + overallForcingDownloadForecastStatus">
-              <th scope="row" class="text-right font-bold">
-                <div style="width: 140px;">Status</div>
-              </th>
-              <td v-if="forcingDownloadStatus && forecastJobStatus" class="pl-5">{{ overallForcingDownloadForecastStatus
-                }}</td>
-              <td v-else class="pl-5">Ready</td>
-            </tr>
-            <tr height="32px" :aria-label="'Cycle is ' + (forecastCycle as ForecastCycle).name"
-              :title="'Cycle is ' + (forecastCycle as ForecastCycle).name">
-              <td class="text-right font-bold">
-                <div style="width: 140px;">Cycle</div>
-              </td>
-              <td class="pl-5">{{ (forecastCycle as ForecastCycle).name ?? '-'.repeat(30) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="grid place-items-center">
+      <div class="grid grid-cols-5">
+        <div class="col-span-2">
+          <table>
+            <caption style="text-align: center;font-size:1.1em;font-weight:bold;margin-bottom:3px;"
+              aria-label="Forecast Job Run Time Area" title="Forecast Job Run Time Area">Forecast Job Run Time
+            </caption>
+            <thead>
+              <tr height="25px">
+                <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr height="40px" :aria-label="'Calibration Job ID ' + calibrationRunForForecast?.calibration_run_id"
+                :title="'Calibration Job ID ' + calibrationRunForForecast?.calibration_run_id">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Calibration Job ID</div>
+                </th>
+                <td class="pl-5">{{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(30) }}</td>
+              </tr>
+              <tr height="40px" :aria-label="'Forecast Job ID ' + forecastJobId"
+                :title="'Forecast Job ID ' + forecastJobId">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Forecast Job ID</div>
+                </th>
+                <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
+              </tr>
+              <tr height="32px" :aria-label="'Submit Time ' + submitTime" :title="'Submit Time ' + submitTime">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Submit Time</div>
+                </th>
+                <td class="pl-5">{{ submitTime ?? '-'.repeat(30) }}</td>
+              </tr>
+              <tr height="32px" :aria-label="'Elapsed Time ' + elapsedTime" :title="'Elapsed Time ' + elapsedTime">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Elapsed Time</div>
+                </th>
+                <td class="pl-5">{{ elapsedTime ?? '-'.repeat(30) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      <div class="col-span-2">
-        <div style="display:flex; margin-top: 1em;" :aria-label="'Results pathname is ' + resultsPathname"
-          :title="'Results pathname is ' + resultsPathname">
-          <div class="text-right font-bold" style="width: 155px;">
-            <label class="text-right" for="resultsPathname" style="width: 155px;">Results Pathname</label>
-          </div>
-          <div class="pl-5" style="width: 100%;">
-            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+        <div data-v-a7d04dc9="" class="col-span-1"><div data-v-a7d04dc9="" class="vertical-separator"></div></div>
+
+        <div class="col-span-2 pl-5">
+          <table>
+            <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;" aria-label="Forecast Job Status area"
+              title="Forecast Job Status area">Forecast Job Status</caption>
+            <thead>
+              <tr height="25px">
+                <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr height="40px" :aria-label="'Status is ' + overallForcingDownloadForecastStatus"
+                :title="'Status is ' + overallForcingDownloadForecastStatus">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Status</div>
+                </th>
+                <td v-if="forcingDownloadStatus && forecastJobStatus" class="pl-5">{{ overallForcingDownloadForecastStatus
+                  }}</td>
+                <td v-else class="pl-5">Ready</td>
+              </tr>
+              <tr height="32px" :aria-label="'Cycle is ' + (forecastCycle as ForecastCycle).name"
+                :title="'Cycle is ' + (forecastCycle as ForecastCycle).name">
+                <td class="text-right font-bold">
+                  <div style="width: 140px;">Cycle</div>
+                </td>
+                <td class="pl-5">{{ (forecastCycle as ForecastCycle).name ?? '-'.repeat(30) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-span-5">
+          <div style="display:flex; margin-top: 1em;" :aria-label="'Results pathname is ' + resultsPathname"
+            :title="'Results pathname is ' + resultsPathname">
+            <div class="text-right font-bold" style="width: 155px;">
+              <label class="text-right whitespace-nowrap" for="resultsPathname" style="width: 155px;padding-top:1px;">Results Pathname</label>
+            </div>
+            <div class="pl-5" style="width: 100%;">
+              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="grid grid-rows-1 ActionButtonsBox" id="HBCbuttons">
-      <div class="row-span-1">
-        <div class="grid grid-cols-8">
-          <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
-            <div class="col-span-1mr-6 h-8">
-              <Button class=" ngenButtonDiv-green  font-normal" title="Run Button" aria-label="Run Button"
-                @click="startForecastRun()">
-                Run
-              </Button>
-            </div>
-          </span>
-          <span v-if="forcingDownloadStatus === 'Running' || forecastJobStatus === 'Running'">
-            <div class="col-span-1 mr-3">
-              <Button class="col-span-1 ngenButtonDiv-red mr h-8" title="Cancel Button" @click="cancelForecastRun()"
-                aria-label="Cancel Button">
-                Cancel
-              </Button>
-            </div>
-          </span>
-          <span v-if="overallForcingDownloadForecastStatus === 'Done'">
-            <div class="col-span-1 mr-3">
-              <Button class="ngenButtonDiv ml-6 font-normal h-8 px-4 whitespace-nowrap" title="View Results Button"
-                @click="goToResultsTab()" aria-label="View Results Button">
-                View Results
-              </Button>
-            </div>
-          </span>
+
+    <div id="HBCbuttonsOuter">
+      <div class="grid grid-rows-1 ActionButtonsBox mt-2" id="HBCbuttons">
+        <div class="row-span-1">
+          <div class="grid grid-cols-8">
+            <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
+              <div class="col-span-1 mr-6">
+                <Button class=" ngenButtonDiv-green font-normal" title="Run Button" aria-label="Run Button"
+                  @click="startForecastRun()">
+                  Run
+                </Button>
+              </div>
+            </span>
+            <span v-if="forcingDownloadStatus === 'Running' || forecastJobStatus === 'Running'">
+              <div class="col-span-1 mr-3">
+                <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" @click="cancelForecastRun()"
+                  aria-label="Cancel Button">
+                  Cancel
+                </Button>
+              </div>
+            </span>
+            <span v-if="overallForcingDownloadForecastStatus === 'Done'">
+              <div class="col-span-1 mr-3">
+                <Button class="ngenButtonDiv ml-6 font-normal px-4 whitespace-nowrap" title="View Results Button"
+                  @click="goToResultsTab()" aria-label="View Results Button">
+                  View Results
+                </Button>
+              </div>
+            </span>
+          </div>
         </div>
       </div>
     </div>
+    
+
     <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
@@ -356,5 +366,14 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
   border-left: 0;
   border-right: 0;
   color: black;
+  box-shadow: none;
+  padding-top:0px !important; padding-bottom: 0px !important;
+}
+#HBCbuttonsOuter {
+  width:auto; 
+  margin-left: auto; 
+  margin-right: auto; 
+  max-width: 800px; 
+  position: relative;
 }
 </style>
