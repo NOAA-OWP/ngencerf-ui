@@ -264,9 +264,11 @@ const { addToastRecord } = generalStore();
 
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 
+const plotListOptions = ref<any[]>([]);
 const logs = ref<APIResponse>({});
 const logDataPageSize = ref<number>(1000);
 const logLists = ref<DynamicObject>({});
+const logListOptions = ref<any[]>([]);
 const selectedLogCategory = ref<string>('');
 const selectedLogList = ref<any[]>([]);
 const selectedLogName = ref<string>('');
@@ -280,6 +282,59 @@ const selectedLogFilePath = ref<string>('');
 const selectedLogByteOffset = ref<number>(0);
 const selectedLogStatus = ref<DynamicObject>({});
 let logTimeout;
+
+const populatePlotListOptions = async() => {
+  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Preparing Job Data'].includes(userCalibrationRunData?.value?.status))) {
+    plotListOptions.value = [];
+    logListOptions.value = [];
+
+    // TO DO: Don't add plots to the list if we're not at the first valid iteration yet
+    // Get Plot Names
+    plotNames.value = await queryGetPlotNames();
+
+    if ((plotNames.value as any)?._data?.plot_names) {
+      // setting plotList will populate the dropdown
+      plotListOptions.value = (plotNames.value as any)?._data?.plot_names
+    }
+
+    // Get Names of available Logs
+    logs.value = await queryGetLogNames(
+      (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
+    );
+    if (logs.value?._data?.log_names) {
+      for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+          let logList = [];
+          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+            logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+          }
+          logLists.value[key] = logList;
+        });
+      }
+    }
+    
+    // Add Log Options to the dropdown
+    Object.keys(logLists.value).forEach(key => {
+      let optionName = capitalCase(key) + ' Logs';
+      logListOptions.value.push({ name: optionName, description: '' });
+    });
+
+    console.log('plotListOptions:', plotListOptions.value);
+    console.log('logListOptions:', logListOptions.value);
+
+    // Combine available plot and log options
+    for (const option of plotListOptions.value.concat(logListOptions.value)) {
+      if (!(option in plotList.value)) {
+        plotList.value.push(option);
+      }
+    }
+
+    // Skip directly to ngen log if status is Failed
+    if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
+      selectedPlotName.value = (logListOptions.value.at(-1)).name;
+    }
+  }
+}
 
 onMounted(async () => {
   toast.removeAllGroups();
@@ -308,8 +363,6 @@ onMounted(async () => {
         submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
       }
     }
-
-    populatePlotListOptions();
 
     // if calibration is Done, check if all validation statuses are Done
     if (userCalibrationRunData?.value?.status === 'Done') {
@@ -451,6 +504,11 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
     if (userCalibrationRunData.value.submit_date) {
       submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
+    }
+
+     // Skip directly to ngen log if status is Failed
+    if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
+      selectedPlotName.value = (logListOptions.value.at(-1)).name;
     }
 
     if (['Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
@@ -627,47 +685,6 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
     }
   });
 }, { immediate: true });
-
-const populatePlotListOptions = async() => {
-  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Preparing Job Data'].includes(userCalibrationRunData?.value?.status))) {
-    let plotListOptions = [];
-    let logListOptions = [];
-    
-    // TO DO: Don't add plots to the list if we're not at the first valid iteration yet
-    // Get Plot Names
-    plotNames.value = await queryGetPlotNames();
-
-    if ((plotNames.value as any)?._data?.plot_names) {
-      // setting plotList will populate the dropdown
-      plotListOptions = (plotNames.value as any)?._data?.plot_names
-    }
-
-    // Get Names of available Logs
-    logs.value = await queryGetLogNames(
-      (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
-    );
-    if (logs.value?._data?.log_names) {
-      for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-          let logList = [];
-          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-            logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
-          }
-          logLists.value[key] = logList;
-        });
-      }
-    }
-    
-    // Add Log Options to the dropdown
-    Object.keys(logLists.value).forEach(key => {
-      let optionName = capitalCase(key) + ' Logs';
-      logListOptions.push({ name: optionName, description: '' });
-    });
-
-    // Combine available plot and log options
-    plotList.value = plotListOptions.concat(logListOptions);
-  }
-}
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
@@ -851,6 +868,7 @@ const gotoEvaluation = () => {
 
 onUnmounted(() => {
   // make sure page clears all selected plots/tables when the user leaves
+  plotList.value = [];
   resetUserPlotRefs([]);
 })
 </script>
@@ -892,9 +910,20 @@ onUnmounted(() => {
   text-align: right;
   padding-right: 20px;
 }
-</style>
 
-<style>
+#resultsPathname {
+  background-color: #fff;
+  border: 0px solid #fff;
+  border-left: 0;
+  border-right: 0;
+  color: black;
+  box-shadow: none;
+}
+
+#selectedLogDisplay {
+  max-height: 400px;
+}
+
 :root {
   .p-progressbar {
     background-color: yellow;
