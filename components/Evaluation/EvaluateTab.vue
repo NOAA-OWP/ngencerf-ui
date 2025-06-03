@@ -69,11 +69,11 @@
             @click="toggleMessagesGroup">
             Show Calibration Details</a>
           <br />
-          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName) && !showPlotGraph">
-            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">Show
+          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">
+            <a v-if="selectedPlotHasTimeseries && !showPlotGraph" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">Show
               SWE Time Series</a>
           </span>
-          <span v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName))">
+          <span v-else>
             <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">
               <span v-if="!showPlotGraph">Show </span>
               <span v-else>Hide </span>
@@ -706,6 +706,7 @@ watch(selectedPlotName, async () => {
       if (response?._data?.swe_timeseries_data) {
         // get time series data from server
         sweTimeSeriesData.value = response?._data?.swe_timeseries_data;
+        selectedPlotHasTimeseries.value = true;
         // Start with SWE timeseries already displayed
         togglePlotGraph();
       } else {
@@ -1155,12 +1156,12 @@ const drawInteractivePlot = () => {
     fontSize: 14
   }
   if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
-    lineOptions.y.label = 'Depth (cm/s)';
+    lineOptions.y.label = 'Depth (m)';
     lineTipOptions.y.label = 'Depth';
-    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s\nClick to select this date`
-    dotOptions.y.label = 'Depth (cm/s)';
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
+    dotOptions.y.label = 'Depth (m)';
     dotTipOptions.y.label = 'Depth';
-    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s\nClick to select this date`
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
   } else {
     lineOptions.y.label = 'Flow (cm/s)';
     lineTipOptions.y.label = 'Flow';
