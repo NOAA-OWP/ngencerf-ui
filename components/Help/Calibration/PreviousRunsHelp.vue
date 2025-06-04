@@ -198,10 +198,7 @@
 
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 ._help-table .td1 {
   width: auto;
 }

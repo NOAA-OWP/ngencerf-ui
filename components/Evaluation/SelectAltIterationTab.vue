@@ -165,28 +165,25 @@ const navigateToEvaluateStatus = (event: any) => {
 }
 </script>
 
-<style lang="scss">
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style>
 #RunDetailsTbl .p-datatable-thead>tr:nth-child(2) th,
 #RunDetailsTbl .p-datatable-thead>tr:nth-child(2) th:hover {
-  background-color: global.$ngwcp_blue_md !important;
-  border: global.$ngwcp_blue_md;
+  background-color: #8BE3ED !important; /* replaced global.$ngwcp_blue_md */
+  border: #8BE3ED;
   color: var(--p-datatable-row-color) !important;
 }
 
 #RunDetailsTbl .p-datatable-thead>tr:nth-child(3) th,
 #RunDetailsTbl .p-datatable-thead>tr:nth-child(3) th:hover {
-  background-color: global.$ngwcp_blue_lt !important;
-  border: global.$ngwcp_blue_lt;
+  background-color: #D8FFFF !important; /* replaced global.$ngwcp_blue_lt */
+  border: #D8FFFF;
   color: var(--p-datatable-row-color) !important;
 }
 
 #CalTuningParamsTbl .p-datatable-thead>tr:nth-child(2) th,
 #CalTuningParamsTbl .p-datatable-thead>tr:nth-child(2) th:hover {
-  background-color: global.$ngwcp_blue_lt !important;
-  border: global.$ngwcp_blue_lt;
+  background-color: #D8FFFF !important; /* replaced global.$ngwcp_blue_lt */
+  border: #D8FFFF;
   color: var(--p-datatable-row-color) !important;
 }
 
@@ -224,8 +221,8 @@ table#cr-detail-list2 th {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
 }
 
-th.p-datatable-header-cell.bg-objective-function-col,
-th.p-datatable-header-cell.bg-objective-function-col:hover {
+.p-datatable-thead th.p-datatable-header-cell.bg-objective-function-col,
+.p-datatable-thead th.p-datatable-header-cell.bg-objective-function-col:hover {
   background-color: rgb(204, 85, 0) !important;
 }
 

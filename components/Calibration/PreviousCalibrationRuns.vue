@@ -1,14 +1,14 @@
 <template>
   <client-only>
-    <div class="mx-auto px-8 text-center overflow-auto">
-      <div>
+    <div class="mx-auto px- text-center overflow-auto">
+      <div class="pt-5">
         <!-- Page top -->
         <div>
           <h1 class="mt-10 mb-6 text-3xl font-bold inline-block">Calibration Jobs</h1>
           <Button class="ngenButtonDiv ml-8" @click="createNewCalibration" aria-label="New Calibration Job"
             title="New Calibration Job">New</Button>
-          <br />
-          <p class="prompt-txt mb-2" style="margin-top:-10px;">
+          <br clear="all" />
+          <p class="prompt-txt mb-2 pt-5" style="margin-top:-10px;">
             Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
           </p>
         </div>
@@ -267,6 +267,11 @@ const cmArchiveRun = ref([
   { label: 'Un-archive', icon: 'pi pi-unlock', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.unarchive) }
 ]);
 
+const cmActiveRun = ref ([
+  { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
+  { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
+])
+
 
 onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
@@ -398,7 +403,9 @@ const closeMultJobsWindow = () => {
 }
 
 const whichContextMenu = computed(() => {
-  if (selectedCalibrationRun?.value?.is_archived) {
+  if (selectedCalibrationRun?.value?.status == 'Running') {
+    return cmActiveRun.value;
+  } else if (selectedCalibrationRun?.value?.is_archived) {
     return cmArchiveRun.value;
   } else if (selectedCalibrationRun?.value?.is_downloadable) {
     return cmDownloadRun.value;
@@ -888,10 +895,7 @@ watch(calibrationDownloadJobID, () => {
 
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 label,
 small-label,
 .--dp-font-size {
@@ -928,7 +932,7 @@ small-label,
 
 .filter-link,
 .module-select {
-  color: global.$color-blue;
+  color: #0077ff;
   text-decoration: underline;
   background-color: transparent !important;
   padding: 5px;
@@ -942,7 +946,7 @@ small-label,
 
 .p-button:not(:disabled):hover {
   background-color: transparent;
-  color: global.$color-blue;
+  color: #0077ff;
   font-weight: bold;
 }
 
@@ -965,10 +969,10 @@ small-label,
 #ModuleFilter {
   height: 37px;
   background-color: #f3f3f3;
+}
 
-  p-multiselect-label-container {
-    margin-top: -6px;
-  }
+#ModuleFilter p-multiselect-label-container {
+  margin-top: -6px;
 }
 
 #Datatable,
@@ -998,17 +1002,7 @@ small-label,
   width: 1.25em;
 }
 
-.nowrap {
-  white-space: nowrap;
-}
-
-.grayedout {
-  color: #555 !important;
-}
-
-.p-checkbox-box {
-  border: 2px;
-}
+/* .nowrap and .grayedout are now in index.css for reuse */
 
 .archivedBackground {
   background-color: blue;

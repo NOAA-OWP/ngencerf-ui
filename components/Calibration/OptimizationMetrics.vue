@@ -1,7 +1,7 @@
 <template>
-  <div id="OptimizationMetrics" class="mt-4">
-    <div class="grid grid-rows-12 gap-1">
-      <div class="row-span-3">
+  <div id="OptimizationMetrics" class="mt-4 relative">
+    <div class="">
+      <div class="">
         <div class="grid grid-cols-2 pt-3 gap-10">
           <div class="col-span-1">
 
@@ -21,13 +21,13 @@
                 <div class="flex mt-2">
                   <div class="text-left font-bold">Algorithm Parameter(s)</div>
                   <div id="ClearTableBtn" class="ml-auto">
-                    <Button id="ClrBtn" @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2"
+                    <Button id="ClrBtn" @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2" style="font-size: 14px !important;margin-top:-4px;"
                       :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                       aria-label="Algorithm Parameters" title="Algorithm Parameter">Clear</Button>
                   </div>
                 </div>
 
-                <div id="AlgParamtable" class="mt-1">
+                <div id="AlgParamtable" class="mt-0">
                   <DataTable :value="uiOptimizationInputs" scrollable editMode="cell" scroll-height="300px"
                     fixedHeader=true>
                     <Column field="name" header="Parameter" sortable></Column>
@@ -48,9 +48,9 @@
         </div>
       </div>
 
-      <div class="row-span-1 hr">&nbsp;</div>
+      <div class="hr mt-4 mb-6">&nbsp;</div>
 
-      <div class="row-span-4">
+      <div class="">
         <div class="grid grid-cols-2 gap-10">
           <div class="col-span-1">
             <div id="ObjFunct">
@@ -113,9 +113,9 @@
         </div>
       </div>
 
-      <div class="row-span-1 hr">&nbsp;</div>
+      <div class="hr mt-4 mb-6">&nbsp;</div>
 
-      <div class="row-span-2 mb-4">
+      <div class="mb-4">
         <div class="grid grid-cols-2 gap-10">
           <div class="col-span-1">
             <!--REVIVING LOST CONTENT HERE-->
@@ -507,27 +507,11 @@ const handleNextPrevDialogClose = (opt: any) => {
 }
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #ObjectiveFunction_list,
 .p-select-list-container {
   position: relative;
   z-index: 2;
   max-height: 8rem !important;
-}
-
-#OptMetBottomButtons {
-  z-index: 9999;
-}
-
-#ClrBtn {
-  font-weight: bold;
-}
-#ClrBtn:hover {
-  background-color: transparent;
-  border: none;
-  color: global.$ngwcp_primary3 !important;
 }
 </style>

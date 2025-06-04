@@ -24,7 +24,5 @@ import AppFooter from "@/components/Common/AppFooter.vue";
 import AppHeader from "@/components/Common/AppHeader.vue";
 
 </script>
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
+<style scoped>
 </style>

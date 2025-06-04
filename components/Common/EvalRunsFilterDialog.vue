@@ -1,5 +1,5 @@
 <template>
-  <div id="CalRunsFilterDialog" class="JobsFilterBox mb-2 mt-4">
+  <div id="CalRunsFilterDialog" class="JobsFilterBox mb-1 mt-4">
 
     <div id="FilterDialog">
 
@@ -56,10 +56,10 @@
 
 
         <div class="col-span-2 text-right mr-3">
-          <Button id="CleareFiltersButton" class="c-blue mt-[22px]" label="Clear Filters" @click="resetFilters($event)"
+          <Button id="CleareFiltersButton" class="c-blue mt-[2px]" label="Clear Filters" @click="resetFilters($event)"
             aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
           </Button><br />
-          <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="refreshJobList()"
+          <Button id="RefreshJobList" class="c-blue mt-[2px]" label="Refresh List" @click="refreshJobList()"
             aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
           </Button>
         </div>
@@ -148,12 +148,9 @@ const resetFilters = (e: MouseEvent) => {
 
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #Header {
-  background-color: global.$ngwcp_primary3;
+  background-color: #0b3f60; /* replaced global.$ngwcp_primary3 */
 }
 
 #CalRunsFilterDialog {
@@ -164,26 +161,5 @@ const resetFilters = (e: MouseEvent) => {
 #ModuleList,
 #StatusList {
   border: 1px solid #888888;
-}
-
-.c-blue {
-  text-decoration: underline;
-  color: blue;
-  font-weight: normal !important;
-}
-
-.c-blue:hover {
-  color: blue !important;
-  background-color: transparent;
-  font-weight: bold;
-  border: none;
-}
-
-.c-blue:disabled {
-  color: #555 !important;
-}
-
-label {
-  cursor: default;
 }
 </style>

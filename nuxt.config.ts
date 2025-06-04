@@ -1,10 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { Base } from '#build/components';
+import tailwindcss from "@tailwindcss/vite";
 import Aura from '@primevue/themes/aura';
 
 export default defineNuxtConfig({
   devtools: { enabled: false },
-  css: ["/assets/styles/styles.scss", "@vuepic/vue-datepicker/dist/main.css"],
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ],
+  },
+  css: ["/assets/styles/index.css", "@vuepic/vue-datepicker/dist/main.css"],
   modules: [
     [
       "@pinia/nuxt",
@@ -17,13 +22,6 @@ export default defineNuxtConfig({
     "@nuxtjs/google-fonts",
     '@primevue/nuxt-module'
   ],
-
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
-  },
 
   googleFonts: {
     families: {
@@ -47,7 +45,7 @@ export default defineNuxtConfig({
       theme: {
         preset: Aura,
         options: {
-            darkModeSelector: false,
+          darkModeSelector: false,
         }
       }
     }

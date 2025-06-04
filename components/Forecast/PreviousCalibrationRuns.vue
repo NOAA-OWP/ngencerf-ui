@@ -407,10 +407,7 @@ const toggleMessagesGroup = () => {
 
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #calibrationRunList {
   height: 80%;
 }
@@ -421,7 +418,7 @@ const toggleMessagesGroup = () => {
 
 #CalibrationRunForForecastTable,
 .gage-filter-wrapper {
-  width: 1200px;
+  width: 1325px;
   margin: 0 auto;
 }
 

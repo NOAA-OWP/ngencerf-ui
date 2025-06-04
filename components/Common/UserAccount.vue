@@ -264,72 +264,18 @@ const closeAccountBox = () => {
 }
 
 </script>
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
 
+<style scoped>
 #UserBox {
   position: absolute;
   left: Calc(50vw - 365px);
   top: Calc(50vh - 300px);
   border: 5px solid #ccc;
   z-index: 999;
+}
 
-  #avatar {
-    width: 150px;
-    height: 150px;
-    float: right;
-    margin: 20px 20px 40px 0;
-    text-align: right;
-    vertical-align: top;
-  }
-
-  #passwordNotes {
-    text-align: left;
-    padding-left: 20px;
-
-    ul {
-      list-style: disc;
-      margin-top: 10px;
-    }
-
-    li {
-      margin-top: 5px;
-      margin-left: 18px;
-    }
-  }
-
-  .buttonArea {
-    text-align: left;
-  }
-
-  .ttl {
-    font-size: 35px;
-    margin-top: 10px;
-    text-align: center;
-  }
-
-  .name {
-    font-size: 20px;
-    text-align: center;
-    margin-top: 20px;
-  }
-
-  .chgpwd,
-  .updtnm {
-    font-size: 20px;
-    text-align: center;
-    color: #0077ff;
-    font-weight: normal;
-    text-decoration: underline;
-  }
-
-  .chgpwd.sel,
-  .updtnm.sel {
-    color: #000000;
-    font-weight: bold;
-    text-decoration: none;
-  }
-
+#UserBox #avatar {
+  width: 150px;
+  height: 150px;
 }
 </style>

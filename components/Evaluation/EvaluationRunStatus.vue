@@ -3,10 +3,9 @@
     <div class="grid grid-rows-7 pr-3">
       <div class="row-span-2">
         <div id="ResultsDisplay">
-          <div class="grid grid-cols-2">
-            <div class="col-span-1">
-              <table>
-
+          <div class="grid grid-cols-5">
+            <div class="col-span-2">
+              <table aria-describedby="Validation Run Time & Iteration">
                 <thead>
                   <tr height="35px">
                     <th scope="row" class="text-center border-b-[3px]" colspan="2" style="border-color: #d9d9d9;">Validation Run Time & Iteration</th>
@@ -36,8 +35,12 @@
               </table>
             </div>
 
-            <div class="col-span-1 pl-5" style="border-left: 1px solid #d9d9d9">
-              <table>
+            <div class="col-span-1">
+                <div class="vertical-separator"></div>
+            </div>
+
+            <div class="col-span-2">
+              <table aria-describedby="Validation Run Status">
                 <thead>
                   <tr height="35px">
                     <th scope="row" class="text-center border-b-[3px]" colspan="2" style="border-color: #d9d9d9;">Validation Run Status</th>
@@ -61,7 +64,7 @@
                     </td>
                   </tr>
                   <tr height="38px">
-                    <td class="pl-5" colspan="2">
+                    <td class="pl-5 text-right pr-4" colspan="2">
 
                       <!--BUTTONS - START-->
                       <span v-if="validationStatus === 'Done'">
@@ -221,26 +224,25 @@ const navigateToEvaluation = (event: any) => {
 }
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #ResultsDisplay {
   width: 50vw;
   margin: 20px auto;
   padding: 10px 10px 10px 20px;
   border-radius: 10px;
   height: 100px;
-  border: 0px solid global.$ngwcp_neutral_gray_md;
+  border: 0px solid #d9d9d9; /* replaced global.$ngwcp_neutral_gray_md */
   min-width: 750px;
-
+}
+#ResultsDisplay table {
+  width: 100%;
 }
 
 #GraphArea {
   height: 40vh;
   width: 100%;
   margin: 8px auto 0 auto;
-  border: 1px solid global.$ngwcp_neutral_gray_md;
+  border: 1px solid #d9d9d9; /* replaced global.$ngwcp_neutral_gray_md */
 }
 
 #RunStatus,

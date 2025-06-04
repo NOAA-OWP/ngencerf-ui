@@ -137,10 +137,7 @@ const NewCalibration = async () => {
 }
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #PgTitle {
   text-align: center;
   font-size: 30px;
@@ -159,13 +156,11 @@ const NewCalibration = async () => {
 #CalTable {
   width: 1000px;
   margin: 0 auto;
+}
 
-  .table {
-    thead tr th {
-      background-color: #F5A4A4;
-      border: 1px solid #000;
-    }
-  }
+#CalTable .table thead tr th {
+  background-color: #F5A4A4;
+  border: 1px solid #000;
 }
 
 .p-select {

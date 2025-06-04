@@ -10,13 +10,43 @@
   </Transition>
   <div id="EvaluatePage">
     <div class="pl-6 pr-2 pt-2">
-      <div class="flex mt-3">
-        <div class="w-1/2">
-          <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
-          <div class="inline-block w-2/3">
-            <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-              optionLabel="name" optionValue="name" :disabled="!plotList">
-            </Select>
+      <div class="flex mt-3">        
+        <div class="w-5/6 relative">
+
+          <div class="inline-block">
+            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <div class="inline-block w-2/3">
+              <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
+                optionLabel="name" optionValue="name" :disabled="!plotList">
+              </Select>
+            </div>
+          </div>
+
+
+          <div class="absolute" style="top:0px;right:0px;">
+            <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)"
+              class="p-0 relative overflow-visible">
+              <div class="grid grid-cols-3 gap-4">
+                <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+                  Select Date
+                </div>
+                <div class="text-nowrap">
+                  <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+                    @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
+                    :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true"
+                    utc='preserve' />
+                </div>
+                <div class="text-nowrap">
+                  <Button class="font-normal ngenButtonDiv-green ml-auto text-nowrap" label="Get Spatial Plots"
+                    aria-label="Get Spatial Plots" @click="getSpatialPlots" />
+                </div>
+                <div class="text-sm font-semibold col-span-3 text-nowrap text-center">
+                  <p class="font-bold">
+                    {{ getSweTimeRange() }}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="layout__table mt-2" style="width:100%">
@@ -36,32 +66,8 @@
             </div>
           </div>
         </div>
-        <div>
-          <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)"
-            class="p-2 relative overflow-visible">
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-nowrap text-right font-bold">
-                Select Date
-              </div>
-              <div class="text-nowrap">
-                <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-                  @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
-                  :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true"
-                  utc='preserve' />
-              </div>
-              <div class="text-nowrap">
-                <Button class="font-normal ngenButtonDiv-green ml-auto text-nowrap" label="Get Spatial Plots"
-                  aria-label="Get Spatial Plots" @click="getSpatialPlots" />
-              </div>
-              <div class="text-sm font-semibold col-span-3 text-nowrap text-center">
-                <p class="font-bold">
-                  {{ getSweTimeRange() }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="pl-4 ml-auto text-nowrap">
+
+        <div class="pl-4 ml-auto text-nowrap text-right">
           <span id="NewButton" class="ngenButtonDiv-alt bg-blue4"><button id="NewValidationBtn"
               @click="gotoSelectAlternateIteration">New Validation</button></span>
           <br />
@@ -69,11 +75,11 @@
             @click="toggleMessagesGroup">
             Show Calibration Details</a>
           <br />
-          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName) && !showPlotGraph">
-            <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">Show
+          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">
+            <a v-if="selectedPlotHasTimeseries && !showPlotGraph" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">Show
               SWE Time Series</a>
           </span>
-          <span v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName))">
+          <span v-else>
             <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">
               <span v-if="!showPlotGraph">Show </span>
               <span v-else>Hide </span>
@@ -628,7 +634,7 @@ watch(selectedPlotName, async () => {
               } else if (validation_type === 'valid_best') {
                 validation_type = 'Best';
               }
-              if (performanceMetrics.value?._data?.validations[v].iteration_num !== null) {
+              if (performanceMetrics.value?._data?.validations[v]?.iteration_num !== null) {
                 if (validation_type !== 'Iter') {
                   validation_type += ': Iter';
                 }
@@ -706,6 +712,7 @@ watch(selectedPlotName, async () => {
       if (response?._data?.swe_timeseries_data) {
         // get time series data from server
         sweTimeSeriesData.value = response?._data?.swe_timeseries_data;
+        selectedPlotHasTimeseries.value = true;
         // Start with SWE timeseries already displayed
         togglePlotGraph();
       } else {
@@ -1155,12 +1162,12 @@ const drawInteractivePlot = () => {
     fontSize: 14
   }
   if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
-    lineOptions.y.label = 'Depth (cm/s)';
+    lineOptions.y.label = 'Depth (m)';
     lineTipOptions.y.label = 'Depth';
-    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s\nClick to select this date`
-    dotOptions.y.label = 'Depth (cm/s)';
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
+    dotOptions.y.label = 'Depth (m)';
     dotTipOptions.y.label = 'Depth';
-    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} cm/s\nClick to select this date`
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
   } else {
     lineOptions.y.label = 'Flow (cm/s)';
     lineTipOptions.y.label = 'Flow';
@@ -1678,12 +1685,11 @@ onUnmounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
+<style scoped>
 #DisplayOptions {
-  width: 375px;
+  width:100%;
+  min-width: 300px;
+  max-width: 375px;
   margin-left: 0px;
 }
 
