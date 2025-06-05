@@ -289,12 +289,14 @@ const populatePlotListOptions = async() => {
     logListOptions.value = [];
 
     // TO DO: Don't add plots to the list if we're not at the first valid iteration yet
-    // Get Plot Names
-    plotNames.value = await queryGetPlotNames();
+    if (userCalibrationRunData?.value?.status != 'Failed') {
+      // Get Plot Names
+      plotNames.value = await queryGetPlotNames();
 
-    if ((plotNames.value as any)?._data?.plot_names) {
-      // setting plotList will populate the dropdown
-      plotListOptions.value = (plotNames.value as any)?._data?.plot_names
+      if ((plotNames.value as any)?._data?.plot_names) {
+        // setting plotList will populate the dropdown
+        plotListOptions.value = (plotNames.value as any)?._data?.plot_names
+      }
     }
 
     // Get Names of available Logs
@@ -319,9 +321,6 @@ const populatePlotListOptions = async() => {
       logListOptions.value.push({ name: optionName, description: '' });
     });
 
-    console.log('plotListOptions:', plotListOptions.value);
-    console.log('logListOptions:', logListOptions.value);
-
     // Combine available plot and log options
     for (const option of plotListOptions.value.concat(logListOptions.value)) {
       if (!(option in plotList.value)) {
@@ -332,6 +331,11 @@ const populatePlotListOptions = async() => {
     // Skip directly to ngen log if status is Failed
     if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
       selectedPlotName.value = (logListOptions.value.at(-1)).name;
+      nextTick(async () => {
+        if (selectedLogList.value.length > 1) {
+            selectedLogName.value = selectedLogList.value.at(-1).name;
+        }
+      });
     }
   }
 }
