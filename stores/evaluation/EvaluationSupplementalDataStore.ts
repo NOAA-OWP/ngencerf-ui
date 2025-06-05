@@ -210,8 +210,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
         validation_run_id: validation_run_id,
         log_category: log_category,
         log_name: log_name,
-        start: start !== undefined ? start.toString() : '',
-        limit: limit !== undefined ? limit.toString() : ''
+        start: start !== undefined ? start : '',
+        limit: limit !== undefined ? limit : ''
       })
     });
   };

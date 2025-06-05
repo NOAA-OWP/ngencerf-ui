@@ -41,32 +41,32 @@
           <i v-if="userCalibrationRunData?.parameters_selected" class="pi pi-check font-bold checkMark"></i>
         </td>
         <td data-tab="4" title="Output Variable to Calibrate" aria-label="Output Variable to Calibrate"
-          @click="tabClicked">Output Variable to Calibrate</td>
+          @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Output Variable to Calibrate</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.parameters_selected" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters" @click="tabClicked">Tuning Parameters
+        <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Tuning Parameters
         </td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.optimization" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Optimization Algorithm" aria-label="Optimization Algorithm" @click="tabClicked">
+        <td data-tab="5" title="Optimization Algorithm" aria-label="Optimization Algorithm" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
           Optimization Algorithm</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.objective_function" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Objective Function" aria-label="Objective Function" @click="tabClicked">
+        <td data-tab="5" title="Objective Function" aria-label="Objective Function" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
           Objective Function</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.stop_criteria" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Calibration Stop Criteria" aria-label="Calibration Stop Criteria" @click="tabClicked">
+        <td data-tab="5" title="Calibration Stop Criteria" aria-label="Calibration Stop Criteria" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
           Calibration Stop Criteria</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.save_plot_iteration_frequency" class="pi pi-check font-bold checkMark"></i>
         </td>
-        <td data-tab="5" title="Metrics and Plot Interval" aria-label="Metrics and Plot Interval" @click="tabClicked">
+        <td data-tab="5" title="Metrics and Plot Interval" aria-label="Metrics and Plot Interval" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
           Metrics / Plot Interval</td>
       </tr>
     </tbody>

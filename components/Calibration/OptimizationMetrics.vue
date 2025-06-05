@@ -1,6 +1,6 @@
 <template>
   <div id="OptimizationMetrics" class="mt-4">
-    <div class="grid grid-rows-12 gap-1">
+    <div v-if="!userCalibrationRunData.modules.includes('LSTM')" class="grid grid-rows-12 gap-1">
       <div class="row-span-3">
         <div class="grid grid-cols-2 pt-3 gap-10">
           <div class="col-span-1">
@@ -142,11 +142,17 @@
         <DynamicDialog />
       </div>
     </div>
+    <div v-else class="text-center">
+      <p>LSTM does not require user selection of Optimization, Metrics, Calibration Stop Criteria, or Plot Frequency.</p>
+
+      <p>Click "Next" to Continue.</p>
+    </div>
 
     <div id="OptMetBottomButtons" class="absolute b-0 grid grid-cols-8 mt-6 ActionButtonsBox">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-6 h-8">
-          <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button"
+          <Button v-if="!userCalibrationRunData.modules.includes('LSTM')" 
+            class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button"
             @click="saveOptMetData()">
             Save
           </Button>
@@ -382,49 +388,52 @@ const updateJobData = () => {
 const validateTab = () => {
   let error = false;
   let text = [];
-  let savedName = userCalibrationRunData?.value?.optimization ? userCalibrationRunData?.value?.optimization : '';
-  let newName = uiOptimization.value ? uiOptimization.value : '';
-  if (savedName !== newName) {
-    error = true;
-    text.push("Optimization Algorithm has been changed");
-  }
-  savedName = userCalibrationRunData?.value?.objective_function ? userCalibrationRunData?.value?.objective_function : '';
-  newName = uiObjectiveFunction.value ? uiObjectiveFunction.value : '';
-  if (savedName !== newName) {
-    error = true;
-    text.push("Objective Function has been changed");
-  }
-  if ((userCalibrationRunData?.value?.stop_criteria || 0) !== uiStopCriteria.value) {
-    error = true;
-    text.push("Calibration Stop Criteria has been changed");
-  }
-  if ((userCalibrationRunData?.value?.save_plot_iteration_frequency || 0) !== uiPlotFrequency.value) {
-    error = true;
-    text.push("Plot Generation Frequency has been changed");
-  }
-  if (userCalibrationRunData?.value?.optimization_inputs.length !== uiOptimizationInputs.value.length) {
-    error = true;
-    text.push("Algorithm Parameters have been changed");
-  }
+  if (!userCalibrationRunData?.value?.modules.includes('LSTM')) {
+    // Only validate this page if LSTM is not part of the formulation
+    let savedName = userCalibrationRunData?.value?.optimization ? userCalibrationRunData?.value?.optimization : '';
+    let newName = uiOptimization.value ? uiOptimization.value : '';
+    if (savedName !== newName) {
+      error = true;
+      text.push("Optimization Algorithm has been changed");
+    }
+    savedName = userCalibrationRunData?.value?.objective_function ? userCalibrationRunData?.value?.objective_function : '';
+    newName = uiObjectiveFunction.value ? uiObjectiveFunction.value : '';
+    if (savedName !== newName) {
+      error = true;
+      text.push("Objective Function has been changed");
+    }
+    if ((userCalibrationRunData?.value?.stop_criteria || 0) !== uiStopCriteria.value) {
+      error = true;
+      text.push("Calibration Stop Criteria has been changed");
+    }
+    if ((userCalibrationRunData?.value?.save_plot_iteration_frequency || 0) !== uiPlotFrequency.value) {
+      error = true;
+      text.push("Plot Generation Frequency has been changed");
+    }
+    if (userCalibrationRunData?.value?.optimization_inputs.length !== uiOptimizationInputs.value.length) {
+      error = true;
+      text.push("Algorithm Parameters have been changed");
+    }
 
-  if ((userCalibrationRunData?.value?.streamflow_threshold || 0) !== (uiStreamFlowThreshold.value || 0)) {
-    error = true;
-    text.push("Calculate Categorical Metrics (Flow Threshold) has been changed");
-  }
+    if ((userCalibrationRunData?.value?.streamflow_threshold || 0) !== (uiStreamFlowThreshold.value || 0)) {
+      error = true;
+      text.push("Calculate Categorical Metrics (Flow Threshold) has been changed");
+    }
 
-  if ((userCalibrationRunData?.value?.peak_flow_threshold || 0) !== (uiPeakFlowThreshold.value || 0)) {
-    error = true;
-    text.push("Calculate Event Based Metrics (Peak Flow Threshold) has been changed");
-  }
+    if ((userCalibrationRunData?.value?.peak_flow_threshold || 0) !== (uiPeakFlowThreshold.value || 0)) {
+      error = true;
+      text.push("Calculate Event Based Metrics (Peak Flow Threshold) has been changed");
+    }
 
-  if (userCalibrationRunData?.value?.optimization_inputs && userCalibrationRunData?.value?.optimization_inputs.length > 0)
-    uiOptimizationInputs.value.every((module, index) => {
-      if (userCalibrationRunData?.value?.optimization_inputs[index].name !== module.name ||
-        userCalibrationRunData?.value?.optimization_inputs[index].value !== module.value) {
-        error = true;
-        text.push("Algorithm Parameter(s) have been added or changed");
-      }
-    })
+    if (userCalibrationRunData?.value?.optimization_inputs && userCalibrationRunData?.value?.optimization_inputs.length > 0)
+      uiOptimizationInputs.value.every((module, index) => {
+        if (userCalibrationRunData?.value?.optimization_inputs[index].name !== module.name ||
+          userCalibrationRunData?.value?.optimization_inputs[index].value !== module.value) {
+          error = true;
+          text.push("Algorithm Parameter(s) have been added or changed");
+        }
+      })
+  }
   return { error: error, text: text }
 }
 

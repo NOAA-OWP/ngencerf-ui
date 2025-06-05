@@ -327,8 +327,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         log_category: log_category,
         log_name: log_name,
         calibration_run_id: calibration_run_id,
-        start: start !== undefined ? start.toString() : '',
-        limit: limit !== undefined ? limit.toString() : ''
+        start: start !== undefined ? start : '',
+        limit: limit !== undefined ? limit : ''
       })
     });
   };

@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div class="h-screen-inner pr-2">
+    <div v-if="!userCalibrationRunData?.modules?.some(item => item.toLowerCase() === 'lstm')" class="h-screen-inner pr-2">
       <div id="RunDetailsTbl" class="text-left mt-3 pr-3 pl-3 pt-1">
         <div class="tableTitle">Run Details - Calibration Job ID {{ calibrationJobId }}</div>
         <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="250px"
@@ -57,6 +57,9 @@
           </Button>
         </div>
       </div>
+    </div>
+    <div v-else>
+      This tab has been disabled for formulations using LSTM.
     </div>
 
   </client-only>
