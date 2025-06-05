@@ -167,16 +167,21 @@
               </tbody>
             </table>
 
-            <div class="pt-4 pagination-rows">
-              Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}<br/>
-              NOTE: Only up to the last {{ logDataPageSize }} rows of the log file are displayed, 
-              newest to oldest.
-              <span v-if="calibrationStatus === 'Running'">
-                The full logs will be viewable on the Evaluate tab once the job has finished running.
-              </span>
-              <span v-else>
-                The full logs can be viewed on the Evaluate tab.
-              </span>
+            <div v-if="selectedLogDisplay && selectedLogDisplay != ''">
+              <div class="pt-4 pagination-rows">
+                Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}<br/>
+                NOTE: Only up to the last {{ logDataPageSize }} rows of the log file are displayed, 
+                newest to oldest.
+                <span v-if="calibrationStatus === 'Running'">
+                  The full logs will be viewable on the Evaluate tab once the job has finished running.
+                </span>
+                <span v-else>
+                  The full logs can be viewed on the Evaluate tab.
+                </span>
+              </div>
+            </div>
+            <div v-else>
+              Log file unavailable
             </div>
 
             <div id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
@@ -813,7 +818,7 @@ const updateLogRefs = async(getLogData: boolean) => {
       -1, // start is -1 to tell the server we want only the last "page" of logs
       logDataPageSize.value // limit
     );
-    if (response?._data) {
+    if (response?._data?.log_data) {
       let logText = '';
       for (let t = 0; t < response?._data.log_data.length; t++) {
         logText += response?._data.log_data[t] + '<br/>\n';
@@ -829,6 +834,10 @@ const updateLogRefs = async(getLogData: boolean) => {
       }
       selectedLogFilePath.value = response?._data.log_path;
       selectedLogByteOffset.value = response?._data?.byte_offset;
+    } else {
+      toast.removeAllGroups();
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
   if (userCalibrationRunData.value.status === 'Running') {
