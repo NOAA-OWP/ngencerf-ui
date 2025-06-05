@@ -768,7 +768,7 @@ const acceptDelete = (selectedRunId: number) => {
 const exportSelectedCalibrationData = async () => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
   isLoading.value = true;
-  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Exporting JSON File for Calibration Job ID ' + selectedRunId, detail: 'Exporting configuration data to JSON file.', life: ToastTimeout.timeoutInfo };
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Export', detail: 'Request to export Calibration Job ID ' + selectedRunId + ' has been processed.', life: ToastTimeout.timeoutInfo };
   toast.add(tMsg); addToastRecord(tMsg);
   nextTick(async () => {
     try {
