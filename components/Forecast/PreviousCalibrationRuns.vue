@@ -158,7 +158,7 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 import { ForecastTabs } from "@/composables/NgencerfEnums";
 
-const { deleteCalibrationRun, getCalibrationJobZip } = useCalibrationJobStore();
+const { deleteCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
 
 const { addToastRecord } = generalStore();
 
@@ -198,6 +198,7 @@ const onRowContextMenu = (event: any) => {
     if (calibrationRunForForecast.value?.is_downloadable) {
       cmCalibrationRun.value.push({ label: 'Download Calibration Data', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
     }
+    cmCalibrationRun.value.push({ label: 'Export', icon: 'pi pi-file-export', command: () => exportSelectedCalibrationData() });
     cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
   }
 };
@@ -356,6 +357,25 @@ const acceptDelete = (selectedRunId: number) => {
   });
   calibrationRunForForecast.value = undefined;
 };
+
+/**
+ * Export user's calibration job configuration data to a JSON file
+ */
+const exportSelectedCalibrationData = async () => {
+  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
+  isLoading.value = true;
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Export', detail: 'Request to export Calibration Job ID ' + selectedRunId + ' has been processed.', life: ToastTimeout.timeoutInfo };
+  toast.add(tMsg); addToastRecord(tMsg);
+  nextTick(async () => {
+    try {
+      await exportJob(selectedRunId);
+    } catch (error) {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Export Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+    isLoading.value = false;
+  })
+}
 
 /**
  * Download all files in user's calibration job folder to a zip file

@@ -22,7 +22,7 @@
             <ConfirmDialog></ConfirmDialog>
 
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[144px]" ref="crContextMenu"
-              :model="whichContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+              :model="buildContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
 
             <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id"
               :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
@@ -226,7 +226,7 @@ const { getMenuIndex, addToastRecord } = generalStore();
 const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
   statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
-const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun, getCalibrationJobZip } = useCalibrationJobStore();
+const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -248,29 +248,62 @@ const runningColor = ref<string>('white');
 const showHideMultOps = ref<boolean>(false);
 const systemContextMenu = ref<boolean>(false);
 
-const cmCalibrationRun = ref([
-  { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.delete) },
-  { label: 'Archive', icon: 'pi pi-folder', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.archive) }
-]);
+const cmOpenRun = ref({
+  label: 'Open', 
+  icon: 'pi pi-folder-open', 
+  command: () => openSelectedCalibrationRun(selectedCalibrationRun) 
+});
+const cmCloneRun = ref({ 
+  label: 'Clone', 
+  icon: 'pi pi-clone', 
+  command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) 
+});
+const cmExportRun = ref({ 
+  label: 'Export', 
+  icon: 'pi pi-file-export', 
+  command: () => exportSelectedCalibrationData(selectedCalibrationRun) 
+});
+const cmDownloadRun = ref({ 
+  label: 'Download', 
+  icon: 'pi pi-download', 
+  command: () => downloadSelectedCalibrationData(selectedCalibrationRun) 
+});
+const cmDeleteRun = ref({ 
+  label: 'Delete', 
+  icon: 'pi pi-trash', 
+  command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.delete) 
+});
+const cmArchiveRun = ref({ 
+  label: 'Archive', 
+  icon: 'pi pi-folder', 
+  command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.archive) 
+});
+const cmUnarchiveRun = ref({
+  label: 'Un-archive', 
+  icon: 'pi pi-unlock', 
+  command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.unarchive)
+});
 
-const cmDownloadRun = ref([
-  { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Download', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData(selectedCalibrationRun) },
-  { label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.delete) },
-  { label: 'Archive', icon: 'pi pi-folder', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.archive) }
-]);
-
-const cmArchiveRun = ref([
-  { label: 'Un-archive', icon: 'pi pi-unlock', command: () => deleteSelectedCalibrationRun(selectedCalibrationRun, JobStatusAction.unarchive) }
-]);
-
-const cmActiveRun = ref ([
-  { label: 'Open', icon: 'pi pi-folder-open', command: () => openSelectedCalibrationRun(selectedCalibrationRun) },
-  { label: 'Clone', icon: 'pi pi-clone', command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) },
-])
+const buildContextMenu = computed(() => {
+  let contextMenuOptions = [];
+  if (selectedCalibrationRun?.value?.is_archived) {
+    contextMenuOptions.push(cmUnarchiveRun.value);
+  } else {
+    contextMenuOptions.push(cmOpenRun.value);
+    contextMenuOptions.push(cmCloneRun.value);
+    if (selectedCalibrationRun?.value?.status !== 'Running') {
+      if (selectedCalibrationRun?.value?.is_downloadable) {
+        contextMenuOptions.push(cmDownloadRun.value);
+      }
+    }
+    contextMenuOptions.push(cmExportRun.value);
+    if (selectedCalibrationRun?.value?.status !== 'Running') {
+      contextMenuOptions.push(cmDeleteRun.value);
+      contextMenuOptions.push(cmArchiveRun.value);
+    }
+  }
+  return contextMenuOptions;
+});
 
 
 onMounted(async () => {
@@ -400,19 +433,7 @@ const closeMultJobsWindow = () => {
   nextTick(async () => {
     highlightSelectedRows();
   })
-}
-
-const whichContextMenu = computed(() => {
-  if (selectedCalibrationRun?.value?.status == 'Running') {
-    return cmActiveRun.value;
-  } else if (selectedCalibrationRun?.value?.is_archived) {
-    return cmArchiveRun.value;
-  } else if (selectedCalibrationRun?.value?.is_downloadable) {
-    return cmDownloadRun.value;
-  } else {
-    return cmCalibrationRun.value;
-  }
-});
+};
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
@@ -852,6 +873,25 @@ const updateUserCalibrationJobsListData = async (): Promise<void> => {
       })
   );
 };
+
+/**
+ * Export user's calibration job configuration data to a JSON file
+ */
+const exportSelectedCalibrationData = async (selectedCalibrationRun: any) => {
+  const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
+  isLoading.value = true;
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Export', detail: 'Request to export Calibration Job ID ' + selectedRunId + ' has been processed.', life: ToastTimeout.timeoutInfo };
+  toast.add(tMsg); addToastRecord(tMsg);
+  nextTick(async () => {
+    try {
+      await exportJob(selectedRunId);
+    } catch (error) {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Export Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+    isLoading.value = false;
+  })
+}
 
 /**
  * Download all files in user's calibration job folder to a zip file
