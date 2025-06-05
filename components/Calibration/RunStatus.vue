@@ -156,7 +156,7 @@
                   optionLabel="name" optionValue="name">
                 </Select></td>
                 </tr>
-                <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
+                <tr v-if="selectedLogFilePath !== '' && selectedLogList.length === 1" style="font-size: 0.9em;">
                   <td class="pr-2 pt-3"><b>Log Name</b></td>
                   <td class="pt-3">{{ selectedLogName }}</td>
                 </tr>
@@ -167,7 +167,7 @@
               </tbody>
             </table>
 
-            <div v-if="selectedLogDisplay && selectedLogDisplay != ''">
+            <div v-if="selectedLogDisplay">
               <div class="pt-4 pagination-rows">
                 Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}<br/>
                 NOTE: Only up to the last {{ logDataPageSize }} rows of the log file are displayed, 
@@ -184,7 +184,7 @@
               Log file unavailable
             </div>
 
-            <div id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
+            <div v-if="selectedLogDisplay" id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
               <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
             </div>
           </div>
