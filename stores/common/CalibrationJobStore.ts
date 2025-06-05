@@ -125,6 +125,44 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   }
 
   /**
+ * Get cinfiguration data as JSON file
+ */
+  const exportJob = async (calibration_run_id: number) => {
+    await fetch(`${ngencerfBaseUrl}/calibration/export/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_id: calibration_run_id })
+    })
+      .then(response => {
+        if (!response.ok) {
+          const message = `Error: ${response.status} ${response.statusText}`;
+          throw new Error(message);
+        }
+        // Extract the filename from the Content-Disposition header if available
+        let file_user_name = getUserName().split("@")[0];
+        let file_name = `ngenCERF_${calibration_run_id}_${file_user_name}.json`; // default filename
+        return response.blob().then(blob => ({ blob, file_name }));
+      })
+      .then(({ blob, file_name }) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file_name; // Use the filename from the response header
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        throw error;
+      });
+  }
+
+  /**
  * Get calibration data as zip file
  */
   const getCalibrationJobZip = async (calibration_run_id: number) => {
@@ -219,7 +257,8 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     cloneCalibrationRun,
     deleteCalibrationRun,
     archiveCalibrationRun,
-    getCalibrationJobZip
+    exportJob,
+    getCalibrationJobZip,
   }
 },
   {

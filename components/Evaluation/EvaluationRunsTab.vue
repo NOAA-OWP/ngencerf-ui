@@ -286,7 +286,7 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 import { EvaluationTabs } from "@/composables/NgencerfEnums";
 
-const { deleteCalibrationRun, getCalibrationJobZip } = useCalibrationJobStore();
+const { deleteCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
 const showMessagesGroup = ref<boolean>(false);
 
 const crContextMenu = ref(); //calibration run context menu
@@ -489,10 +489,11 @@ const onRowContextMenu = (event: any) => {
     if (crRowData.validation_runs <= 1) {
       cmCalibrationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => viewValidationRunStatus(crRowData.calibration_run_id) })
     }
+    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
     if (selectedCalibrationRun.value?.is_downloadable) {
-        cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
-        cmCalibrationRun.value.push({ label: 'Download', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
+      cmCalibrationRun.value.push({ label: 'Download', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
     }
+    cmCalibrationRun.value.push({ label: 'Export', icon: 'pi pi-file-export', command: () => exportSelectedCalibrationData() });
     cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
   }
 };
@@ -759,6 +760,25 @@ const acceptDelete = (selectedRunId: number) => {
   });
   //selectedCalibrationRun.value = undefined;
 
+}
+
+/**
+ * Export user's calibration job configuration data to a JSON file
+ */
+const exportSelectedCalibrationData = async () => {
+  const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
+  isLoading.value = true;
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Exporting JSON File for Calibration Job ID ' + selectedRunId, detail: 'Exporting configuration data to JSON file.', life: ToastTimeout.timeoutInfo };
+  toast.add(tMsg); addToastRecord(tMsg);
+  nextTick(async () => {
+    try {
+      await exportJob(selectedRunId);
+    } catch (error) {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Export Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+    isLoading.value = false;
+  })
 }
 
 /**
