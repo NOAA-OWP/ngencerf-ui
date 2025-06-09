@@ -28,7 +28,10 @@
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 ._help-table .td1 {
   width: 200px;
 }

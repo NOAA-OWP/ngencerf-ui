@@ -7,7 +7,7 @@
 
   </div>
   <hr class="mt-2 mb-4" />
-  <p class="text-center font-bold" id="actionsSectionTitle">Available Actions</p>
+  <p class="text-center" style="font-weight: bold;" id="actionsSectionTitle">Available Actions</p>
   <table class="_help-table" aria-describedby="actionsSectionTitle">
     <thead>
       <tr>
@@ -28,7 +28,7 @@
     </table>
 
   <hr class="mt-2 mb-4" />
-  <p class="text-center font-bold" id="CaliPlotSectionTitle">Calibration Plots</p>
+  <p class="text-center" style="font-weight: bold;" id="CaliPlotSectionTitle">Calibration Plots</p>
   <table class="_help-table" aria-describedby="CaliPlotSectionTitle">
     <thead>
       <tr>
@@ -76,7 +76,7 @@
       </tbody>
     </table>
   <br />
-  <p class="text-center font-bold" id="ValidatePlotSectionTitle">Validation Plots</p>
+  <p class="text-center" style="font-weight: bold;" id="ValidatePlotSectionTitle">Validation Plots</p>
   <table class="_help-table" aria-describedby="ValidatePlotSectionTitle">
       <thead>
         <tr>
@@ -112,7 +112,7 @@
       </tbody>
     </table>
   <br />
-  <p class="text-center font-bold" id="TableSectionTitle">Tables</p>
+  <p class="text-center" style="font-weight: bold;" id="TableSectionTitle">Tables</p>
   <table class="_help-table" aria-describedby="TableSectionTitle">
       <thead>
         <tr>
@@ -148,7 +148,7 @@
       </tbody>
     </table>
   <br />
-  <p class="text-center font-bold" id="LogSectionTitle">Logs</p>
+  <p class="text-center" style="font-weight: bold;" id="LogSectionTitle">Logs</p>
   <table class="_help-table" aria-describedby="LogSectionTitle">
     <thead>
       <tr>
@@ -173,5 +173,7 @@
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
 </style>

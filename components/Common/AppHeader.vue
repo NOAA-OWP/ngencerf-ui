@@ -366,12 +366,15 @@ const MenuChanged = (e: MouseEvent) => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #TopBar {
   position: fixed;
   top: 0;
   height: 6px;
-  background-color: var(--ngwcp-primary1);
+  background-color: global.$ngwcp_primary1;
   width: 100%;
 }
 
@@ -380,8 +383,10 @@ const MenuChanged = (e: MouseEvent) => {
   margin-bottom: 4px;
 }
 
-#Logo img {
-  width: 200px;
+#Logo {
+  img {
+    width: 200px;
+  }
 }
 
 #PgmName {
@@ -401,35 +406,41 @@ const MenuChanged = (e: MouseEvent) => {
   float: right;
   margin-right: 100px;
   margin-top: 20px;
-}
-#MainMenu ul {
-  list-style: none;
-  margin-top: 0px;
-}
-#MainMenu li {
-  display: inline-block;
-  margin: 20px 7px 0;
-  font-size: 22px;
-}
-#MainMenu li a {
-  text-decoration: none;
-  color: #000;
-  font-weight: bold;
-  background-color: var(--ngwcp-neutral-gray-md);
-  border-radius: 5px;
-  padding: 15px 28px;
-}
-#MainMenu li a:hover {
-  background-color: #aaa;
-  text-decoration: none;
-}
-#MainMenu li .isActive {
-  color: #fff;
-  background-color: var(--ngwcp-primary1);
-}
-#MainMenu li .isActive:hover {
-  color: #fff;
-  background-color: var(--ngwcp-primary1);
+
+  ul {
+    list-style: none;
+    margin-top: 0px;
+  }
+
+  li {
+    display: inline-block;
+    margin: 20px 7px 0;
+    font-size: 22px;
+
+    a {
+      text-decoration: none;
+      color: #000;
+      font-weight: bold;
+      background-color: global.$ngwcp_neutral_gray_md;
+      border-radius: 5px;
+      padding: 15px 28px;
+    }
+
+    a:hover {
+      background-color: #aaa;
+      text-decoration: none;
+    }
+
+    .isActive {
+      color: #fff;
+      background-color: global.$ngwcp_primary1;
+    }
+
+    .isActive:hover {
+      color: #fff;
+      background-color: global.$ngwcp_primary1;
+    }
+  }
 }
 
 #Circles {
@@ -444,46 +455,53 @@ const MenuChanged = (e: MouseEvent) => {
   height: 50px;
   width: 50px;
   margin-top: 20px;
-  background-color: var(--ngwcp-primary2);
+  background-color: global.$ngwcp_primary2;
   color: white;
   border-radius: 50%;
   font-size: 38px;
   border: 1px solid #000;
   margin-left: 37px;
 }
+
 #UserCircle {
   display: inline-block;
   height: 70px;
   width: 70px;
   margin-top: 10px;
-  background-color: var(--ngwcp-neutral-gray-md);
+  background-color: global.$ngwcp_neutral_gray_md;
   border-radius: 50%;
   font-size: 30px;
   padding-top: 20px;
   margin-right: 40px;
 }
+
 #UserCircle:hover {
-  background-color: var(--ngwcp-primary2);
+  background-color: global.$ngwcp_primary2;
 }
+
 #HelpCircle:hover {
-  background-color: var(--ngwcp-primary2);
+  background-color: global.$ngwcp_primary2;
 }
+
 .userInitials {
   text-align: center;
 }
+
 .qmark {
   font-size: 35px;
 }
+
 #HelpLink {
   z-index: 9;
   text-align: center;
   height: 60px;
   width: 60px;
   display: inline-block;
-}
-#HelpLink #HelpCircle {
-  text-align: center;
-  margin-top: 15px;
+
+  #HelpCircle {
+    text-align: center;
+    margin-top: 15px;
+  }
 }
 
 #HelpWindow {

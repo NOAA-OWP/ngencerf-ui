@@ -22,7 +22,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const userSelectedEvalCalibrationRun = ref<any>();
   const loadCalibrationDataComplete = ref<boolean>(false);
 
-  const { includeArchivedJobs, userCalibrationRunData } = storeToRefs(useUserDataStore());
+  const { includeArchivedJobs } = storeToRefs(useUserDataStore());
 
   /**
    * list of calibration jobs with validation data
@@ -39,7 +39,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const gageCalibrationRunListHeaders = ref<any[]>([]);
   const computedGageCalibrationRunList = ref<CalibrationJobListItem[]>([]);
 
-  const selectedCalibrationCompareRuns = ref<CalibrationJobListItem[]>([])
+  const selectedCalibrationCompareRuns = ref<CalibrationJobListItem[]>([]);
 
   /**
   * @returns {SelectOption[]}

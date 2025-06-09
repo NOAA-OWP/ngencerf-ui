@@ -33,7 +33,10 @@ const hideServerInfo = () => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use '@/assets/styles/global.scss';
+@use '@/assets/styles/styles.scss';
+
 #FloatingInfo {
   position:sticky;
   margin-left: 20px;
@@ -45,10 +48,11 @@ const hideServerInfo = () => {
 #AppDate, #ServerDate {
   border: 2px solid black;
   padding: 5px;
+  border-radius: 10px;
+  background-color: white;
 }
 #Footer {
   font-size: 18px;
-  background-color: #eff4f7;
   font-family: NeueFrutigerWorld-Book, sans-serif;
   position: absolute;
   bottom: 0;
@@ -64,7 +68,7 @@ const hideServerInfo = () => {
 }
 
 .footerColor {
-  background-color: #eff4f7;
+  background-color: global.$ngwcp_background;
 }
 
 .version,

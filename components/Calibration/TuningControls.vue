@@ -24,17 +24,17 @@
                     <th scope="row" class="w-1/6">
                       <label for="SimulationStart" class="whitespace-nowrap">Simulation Start</label>
                     </th>
-                    <td class="text-left w-2/6 pb-1" style="position: relative;">
+                    <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                         @update:model-value="handleSimStartUpdate" aria-label="Calibration Time Simulation Start"
                         title="Calibration Time Simulation Start"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
-                    <th scope="row" class="pl-6 pr-2 w-1/6">
+                    <th scope="row" class="pl-6 w-1/6">
                       <label for="SimulationEnd" class="whitespace-nowrap">Simulation End</label>
                     </th>
-                    <td class="text-left w-2/6 pb-1" style="position: relative;">
+                    <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                         @update:model-value="handleSimEndUpdate" aria-label="Calibration Time Simulation End"
@@ -46,17 +46,17 @@
                     <th scope="row" class="w-1/6">
                       <label for="CalibrationStart" class="whitespace-nowrap">Calibration Start</label>
                     </th>
-                    <td class="text-left w-2/6 pb-1" style="position: relative;">
+                    <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                         @update:model-value="handleCalStartUpdate" aria-label="Calibration Time Calibration Start"
                         title="Calibration Time Calibration Start"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
-                    <th scope="row" class="pl-6 pr-2 w-1/6">
+                    <th scope="row" class="pl-6 w-1/6">
                       <label for="CalibrationEnd" class="whitespace-nowrap">Calibration End</label>
                     </th>
-                    <td class="text-left w-2/6 pb-1" style="position: relative;">
+                    <td class="text-left w-2/6" style="position: relative;">
                       <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                         @update:model-value="handleCalEndUpdate" aria-label="Calibration Time Calibration End"
@@ -84,7 +84,7 @@
                       <th scope="row" class="w-1/6">
                         <label for="ValSimulationStart" class="whitespace-nowrap">Simulation Start </label>
                       </th>
-                      <td class="text-left w-2/6 pb-1" style="position: relative;">
+                      <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
                           v-model="avSimStartTime" time-picker-inline text-input utc='preserve'
                           format="yyyy-MM-dd HH:00" @update:model-value="handleAvSimStartUpdate"
@@ -92,10 +92,10 @@
                           title="Automatic Validation Time Simulation Start"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                       </td>
-                      <th scope="row" class="pl-6 pr-2 w-1/6">
+                      <th scope="row" class="pl-6 w-1/6">
                         <label for="ValSimulationEnd" class="whitespace-nowrap">Simulation End </label>
                       </th>
-                      <td class="text-left w-2/6 pb-1" style="position: relative;">
+                      <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark" v-model="avSimEndTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                           @update:model-value="handleAvSimEndUpdate"
@@ -108,7 +108,7 @@
                       <th scope="row" class="w-1/6">
                         <label for="ValidationStart" class="whitespace-nowrap">Validation Start </label>
                       </th>
-                      <td class="text-left w-2/6 pb-1" style="position: relative;">
+                      <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark" v-model="avCalStartTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                           @update:model-value="handleAvCalStartUpdate"
@@ -116,10 +116,10 @@
                           title="Automatic Validation Time Validation Start"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                       </td>
-                      <th scope="row" class="pl-6 pr-2 w-1/6">
+                      <th scope="row" class="pl-6 w-1/6">
                         <label for="ValidationEnd" class="whitespace-nowrap">Validation End </label>
                       </th>
-                      <td class="text-left w-2/6 pb-1" style="position: relative;">
+                      <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                           @update:model-value="handleAvCalEndUpdate"
@@ -183,7 +183,7 @@
       </div>
 
       <div class="col-span-1 mt-2 relative">
-        <Button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg" style="position: absolute;font-size:14px !important;" 
+        <Button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
           @click="clearUserSelectedCalibrationTuningParameters()" aria-label="Clear Calibratable Parameters"
           title="Clear Calibratable Parameters"
           :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</Button>
@@ -1265,7 +1265,10 @@ const rowStyle = () => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #OutVar {
   width: 600px;
 }
@@ -1283,9 +1286,9 @@ const rowStyle = () => {
 }
 
 .datePickers {
-  width: 230px !important;
-  display: inline-block !important;
-  text-align: center !important;
+  width: 230px;
+  display: inline-block;
+  text-align: center;
 }
 
 .mmiInputs {

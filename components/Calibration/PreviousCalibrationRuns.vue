@@ -1,14 +1,14 @@
 <template>
   <client-only>
-    <div class="mx-auto px- text-center overflow-auto">
-      <div class="pt-5">
+    <div class="mx-auto px-8 text-center overflow-auto">
+      <div>
         <!-- Page top -->
         <div>
           <h1 class="mt-10 mb-6 text-3xl font-bold inline-block">Calibration Jobs</h1>
           <Button class="ngenButtonDiv ml-8" @click="createNewCalibration" aria-label="New Calibration Job"
             title="New Calibration Job">New</Button>
-          <br clear="all" />
-          <p class="prompt-txt mb-2 pt-5" style="margin-top:-10px;">
+          <br />
+          <p class="prompt-txt mb-2" style="margin-top:-10px;">
             Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
           </p>
         </div>
@@ -935,7 +935,10 @@ watch(calibrationDownloadJobID, () => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 label,
 small-label,
 .--dp-font-size {
@@ -1009,10 +1012,10 @@ small-label,
 #ModuleFilter {
   height: 37px;
   background-color: #f3f3f3;
-}
 
-#ModuleFilter p-multiselect-label-container {
-  margin-top: -6px;
+  p-multiselect-label-container {
+    margin-top: -6px;
+  }
 }
 
 #Datatable,
@@ -1042,7 +1045,17 @@ small-label,
   width: 1.25em;
 }
 
-/* .nowrap and .grayedout are now in index.css for reuse */
+.nowrap {
+  white-space: nowrap;
+}
+
+.grayedout {
+  color: #555 !important;
+}
+
+.p-checkbox-box {
+  border: 2px;
+}
 
 .archivedBackground {
   background-color: blue;

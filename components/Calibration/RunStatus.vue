@@ -873,14 +873,18 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #ResultsDisplay {
   width: 50vw;
   min-width: 720px;
   margin: 5px auto;
   padding: 6px 10px 6px 20px;
   border-radius: 10px;
-  border: 0px solid var(--ngwcp-neutral-gray-md);
+  border: 0px solid global.$ngwcp_neutral_gray_md;
+
 }
 
 #GraphArea {
@@ -896,19 +900,9 @@ onUnmounted(() => {
 }
 
 .p-progressbar {
-  background-color: yellow;
-  vertical-align: text-bottom;
-  margin-left: 10px;
-  width: 200px;
   display: inline-block;
+  width: 200px;
   height: 25px;
-}
-.p-progressbar-value {
-  color: black;
-  background-color: green;
-}
-.p-progressbar-label {
-  color: white;
 }
 
 .leftSideText {

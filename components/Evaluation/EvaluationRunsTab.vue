@@ -54,10 +54,10 @@
             * Iteration containing best parameter set determined during calibration.
           </div>
         </div>
-        <div class="flex mt-2 absolute -top-1 right-0">
+        <div class="flex mt-2">
           <div class="ml-auto mt-4">
             <div id="NewButton">
-              <Button id="btn-evaluate" class="p-button p-component c-blue font-normal pt-0" style="font-size: 16px !important;" @click.stop="returnCalibrationJobList">
+              <Button id="btn-evaluate" class="ngenButtonDiv" @click.stop="returnCalibrationJobList">
                 Back to Calibration Runs
               </Button>
             </div>
@@ -90,10 +90,10 @@
             </Column>
           </DataTable>
         </div>
-        <div class="flex mt-2 absolute -top-1 right-0">
+        <div class="flex mt-2">
           <div class="ml-auto mt-4">
             <div id="NewButton">
-              <Button id="btn-evaluate" class="p-button p-component c-blue font-normal" style="font-size: 16px !important;" @click.stop="returnCalibrationJobList">
+              <Button id="btn-evaluate" class="ngenButtonDiv" @click.stop="returnCalibrationJobList">
                 Back to Calibration Runs
               </Button>
             </div>
@@ -837,7 +837,10 @@ const rowStyle = (data: any) => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #calibrationRunList {
   height: 80%;
 }

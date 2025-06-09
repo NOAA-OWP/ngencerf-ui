@@ -77,7 +77,7 @@ Plot Generation Frequency: 5 -->
 //
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #Messages {
   padding: 15px;
   font-size: 1.2em;

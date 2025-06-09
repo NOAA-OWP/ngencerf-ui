@@ -233,7 +233,10 @@ const copyGitInfoToClipboard = () => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #AboutBox {
   right: 5px;
   top: 90px;

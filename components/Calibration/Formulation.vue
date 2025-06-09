@@ -45,7 +45,7 @@
               <div class="mt-5 mb-2 pl-4 text-lg" aria-label="List of groups covered by selection"
                 title="List of groups covered by selection"><strong>Groups Covered By Selections</strong></div>
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
-                optionValue="name" scrollHeight="18rem">
+                optionValue="name" scrollHeight="18rem" class="border-0">
                 <template #option="slotProps">
                   <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'"
                     :aria-label="slotProps.option.name + ' is ' + (slotProps.option.selected === true ? 'Checked' : 'Not Checked')"
@@ -594,7 +594,10 @@ const handleNextPrevDialogClose = (opt: any) => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #Groups,
 #formulationNameInput {
   width: 256px;
@@ -604,21 +607,102 @@ const handleNextPrevDialogClose = (opt: any) => {
   width: auto;
 }
 
-#CoveredBy {
-  border-width: 0px;
-  box-shadow: none;
+#FormulationName {
+  font-size: 1.2em;
 }
-.pi.font-bold {
-  font-weight: bold;
+
+#SlothCheck {
+  height: 20px;
+  width: 20px;
 }
-</style>
 
+ul#ModulesList {
+  border: 1px solid #000;
+  height: 250px;
+  overflow-y: scroll;
 
-<style>
-#CoveredBy .p-listbox-option:hover,
-#CoveredBy .p-listbox-option.p-listbox-option-selected {
-  background: none !important;
-  color: var(--p-listbox-option-color) !important;
-  cursor: auto !important;
+  li {
+    background-color: #eee;
+    border-bottom: 1px solid #000;
+    padding: 2px 2px 2px 5px;
+  }
+
+  li:hover {
+    background-color: global.$ngwcp_secondary3;
+    color: black;
+  }
+
+  .liActive {
+    background-color: global.$ngwcp_primary3;
+    color: white;
+  }
+}
+
+#ModuleList .p-listbox-option {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+#ModuleGroupSelect {
+  width: 125px;
+
+}
+
+table#CoveredBy {
+
+  tr td {
+    line-height: 2em;
+  }
+}
+
+#SlothBackground {
+  height: 301px;
+  width: 35vw;
+  background-color: global.$ngwcp_groupsbkg;
+  border-radius: 20px;
+  border: 1px solid #000;
+  padding: 10px 15px;
+  margin-left: 20px;
+}
+
+#AddUpdate {
+  width: 132px;
+  height: 55px;
+
+  button {
+    padding-top: 8px;
+  }
+}
+
+h1 {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.slothLable {
+  text-align: right;
+  width: 120px;
+}
+
+/* Listbox select (for Tuning Tab) */
+.p-listbox {
+  border-radius: 0px;
+}
+
+.p-listbox-list {
+  padding: 0px !important;
+}
+
+.p-listbox-list-container {
+  margin-top: 7px;
+}
+
+.p-listbox-option-selected {
+  background-color: global.$ngwcp_green_lt !important;
+}
+
+.p-listbox-option {
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 </style>

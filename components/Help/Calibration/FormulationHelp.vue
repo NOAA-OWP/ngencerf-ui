@@ -157,7 +157,10 @@
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 ._help-title {
     font-size: 18px;
     font-weight: bold;
