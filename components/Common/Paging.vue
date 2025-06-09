@@ -58,7 +58,10 @@ function gotoPage(page: number) {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 .pagingLink {
   padding-left: 4px;
   padding-right: 4px;

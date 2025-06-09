@@ -1685,7 +1685,10 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #DisplayOptions {
   width:100%;
   min-width: 300px;

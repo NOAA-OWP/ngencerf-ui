@@ -359,7 +359,10 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
 { immediate: true });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #resultsPathname {
   background-color: #fff;
   border: 0px solid #fff;

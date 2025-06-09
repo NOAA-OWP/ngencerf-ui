@@ -100,14 +100,34 @@ const resetFilters = (e: MouseEvent) => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #Header {
-  background-color: var(--ngwcp-primary3);
+  background-color: global.$ngwcp_primary3;
 }
 
 #ForecastRunsFilterDialog {
   background-color: white;
   padding-bottom: 5px;
+}
+
+.c-blue {
+  text-decoration: underline;
+  color: blue;
+  font-weight: normal !important;
+}
+
+.c-blue:hover {
+  color: blue !important;
+  background-color: transparent;
+  font-weight: bold;
+  border: none;
+}
+
+.c-blue:disabled {
+  color: #555 !important;
 }
 
 label {

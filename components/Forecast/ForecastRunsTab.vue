@@ -364,7 +364,10 @@ const refreshJobList = async () => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #HeadwaterBasinGage {
   width: 300px;
 }

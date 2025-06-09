@@ -23,5 +23,8 @@ import pdfUrl from '@/assets/styles/pdfs/VerificationSteps.pdf';
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 </style>

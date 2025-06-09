@@ -32,7 +32,7 @@
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
                         placeholder=" Password" aria-label="Password" toggleMask :feedback="false"
                         class="block w-[350px]" v-on:keypress="autoSubmit" />
-                      <Button text tabindex="-1" class="c-blue underline text-xs block mt-1" v-on:click="ForgotPassword">
+                      <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
                         Forgot Password
                       </Button>
                     </div>
@@ -41,7 +41,7 @@
                       aria-label="sign in">Sign In</Button>
 
                     <div class="signupButton underline text-base mt-2" aria-label="sign up">
-                      <Button text @click="openDialog" class="c-blue">Create an Account</Button>
+                      <Button @click="openDialog" class="c-blue">Create an Account</Button>
                     </div>
 
                   </form>
@@ -346,3 +346,32 @@ const GoToLanding = () => {
 };
 
 </script>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
+.needAccount {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 50px;
+}
+
+.signupButton {
+  border: 0px;
+  margin: 20px auto 0 0;
+}
+
+.ngenButtonDiv.disabledButton {
+  background-color: darkgray;
+}
+
+.disabledLink {
+  color: darkgray;
+}
+
+.c-blue:hover {
+  background-color: transparent;
+  font-weight: bold;
+  border: none;
+}
+</style>

@@ -350,7 +350,10 @@ const toggleMessagesGroup = async () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #MessagesGroupWindow {
   z-index: 999;
   border: 1px solid black;

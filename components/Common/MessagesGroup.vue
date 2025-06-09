@@ -214,7 +214,7 @@ const formatDate = (d: any) => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #Messages {
   padding: 0 15px;
   font-size: 1.2em;

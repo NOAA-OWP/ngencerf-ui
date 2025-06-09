@@ -176,7 +176,10 @@ const closeErroLogBox = () => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/global.scss";
+@use "@/assets/styles/styles.scss";
+
 #ErrorLog {
   position: absolute;
   right: 5px;
