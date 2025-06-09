@@ -241,7 +241,7 @@
       <!-- initValue column, editable -->
       <Column field="initValue" header="Initial Run Value" sortable>
         <template #body="slotProps">
-          <input type="text" v-model="slotProps.data.initial_value" @blur="onInitialValueBlur(slotProps.data)"
+          <input type="text" v-model="slotProps.data.initial_value"
             @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)" style="width: 100%;"
             slotProps.data.maximum :aria-label="'Initial value is ' + slotProps.data.initial_value"
             :title="'Initial value is ' + slotProps.data.initial_value" />
@@ -804,6 +804,9 @@ const validateAndBuildRequestBody = (): boolean => {
 
   if (areTuningParametersSet()) {
     saveTuningTabRequestBody.value.parameters = userSelectedCalibrationTuningParameters.value;
+
+    // check if any parameter initial values are out of range
+    areParameterInitialValuesOutOfRange();
   }
 
   if (Object.keys(saveTuningTabRequestBody.value).length === 0) {
@@ -1264,21 +1267,24 @@ const rowStyle = () => {
 }
 
 /**
- * Handle blur event for initial values in the parameter table
- * @param data Parameter table row data
+ * Check if the initial value from userSelectedCalibrationTuningParameters is out of range
+ * If they are, show a warning message
  */
-const onInitialValueBlur = (data: any) => {
-  // check if initial_value is within range of minimum and maximum
-  const parameterName = data.name;
-  const initialValue = parseFloat(data.initial_value);
-  const minimum = parseFloat(data.minimum);
-  const maximum = parseFloat(data.maximum);
+const areParameterInitialValuesOutOfRange = () => {
+  userSelectedCalibrationTuningParameters.value.forEach((param: any) => {
+    if (param.initial_value && param.minimum && param.maximum) {
+      checkInitialValueOutOfRange(
+        param.name,
+        parseFloat(param.initial_value),
+        parseFloat(param.minimum),
+        parseFloat(param.maximum)
+      );
+    }
+  });
+};
 
-  if (isNaN(initialValue) || isNaN(minimum) || isNaN(maximum)) {
-    return; // do not validate if values are not numbers
-  }
-
-  if (initialValue < minimum || initialValue > maximum) {
+const checkInitialValueOutOfRange = (parameterName: string, initialValue: number, min: number, max: number) => {
+  if (initialValue < min || initialValue > max) {
     const tMsg: ToastMessageOptions = {
       severity: 'warn',
       summary: 'WARNING',
