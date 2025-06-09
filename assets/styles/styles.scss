@@ -641,6 +641,11 @@ table.cols-bordered {
 .errorBg .p-checkbox-box {
   opacity: 0.3;
 }
+
+.vertical-separator {
+  width:1px; height: 100%; background-color: #d9d9d9; position: relative; display: block; margin-left: auto; margin-right: auto;
+}
+
 .JobsFilterBox {
   .JobsFilterSelect  {
     background-color: #f3f3f3;

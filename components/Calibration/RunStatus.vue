@@ -4,8 +4,8 @@
       <div>
         <div id="ResultsDisplay">
 
-          <div class="grid grid-cols-2">
-            <div class="col-span-1">
+          <div class="grid grid-cols-5">
+            <div class="col-span-2">
               <table>
                 <tbody>
                   <tr height="38px" :aria-label="'Submit Time ' + submitTime" :title="'Submit Time ' + submitTime">
@@ -34,7 +34,11 @@
               </table>
             </div>
 
-            <div class="col-span-1 pl-5 border-l border-[#d9d9d9]">
+            <div class="col-span-1">
+                <div class="vertical-separator"></div>
+            </div>
+
+            <div class="col-span-2">
               <table>
                 <tbody>
                   <tr height="38px" :aria-label="'Status ' + overallCalibrationValidationStatus"
