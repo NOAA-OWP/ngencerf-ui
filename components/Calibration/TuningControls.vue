@@ -241,7 +241,7 @@
       <!-- initValue column, editable -->
       <Column field="initValue" header="Initial Run Value" sortable>
         <template #body="slotProps">
-          <input type="text" v-model="slotProps.data.initial_value"
+          <input type="text" v-model="slotProps.data.initial_value" @blur="onInitialValueBlur(slotProps.data)"
             @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)" style="width: 100%;"
             slotProps.data.maximum :aria-label="'Initial value is ' + slotProps.data.initial_value"
             :title="'Initial value is ' + slotProps.data.initial_value" />
@@ -1260,6 +1260,37 @@ const rowStyle = () => {
   return {
     color: t ? "grey" : 'black',
     backgroundColor: t ? '#f0f0f0' : ''
+  }
+}
+
+/**
+ * Handle blur event for initial values in the parameter table
+ * @param data Parameter table row data
+ */
+const onInitialValueBlur = (data: any) => {
+  // check if initial_value is within range of minimum and maximum
+  const parameterName = data.name;
+  const initialValue = parseFloat(data.initial_value);
+  const minimum = parseFloat(data.minimum);
+  const maximum = parseFloat(data.maximum);
+
+  if (isNaN(initialValue) || isNaN(minimum) || isNaN(maximum)) {
+    return; // do not validate if values are not numbers
+  }
+
+  if (initialValue < minimum || initialValue > maximum) {
+    const tMsg: ToastMessageOptions = {
+      severity: 'warn',
+      summary: 'WARNING',
+      detail:
+        `Parameter ${parameterName} initial value is outside the min/max range ` +
+        `that will be used for parameter searching. Initial values will be used ` +
+        `for the initial calibration iteration (i.e. iteration 0). For subsequent ` +
+        `iterations, it will be constrained within the min/max range. You may ` +
+        `proceed as is or update the min, max, or initial value and save again.`,
+      life: ToastTimeout.timeoutWarn
+    };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
