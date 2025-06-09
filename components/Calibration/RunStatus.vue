@@ -154,18 +154,18 @@
               <caption class="sr-only">Calibration Log Options and File Path table</caption>  
               <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
               <tbody>  
-                <tr v-if="selectedLogList.length > 1">
-                  <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
+                <tr v-if="selectedLogList.length > 1" style="font-size: 0.9em;">
+                  <td class="pr-2 pt-3 whitespace-nowrap"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
                   <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
                   optionLabel="name" optionValue="name">
                 </Select></td>
                 </tr>
                 <tr v-if="selectedLogFilePath !== '' && selectedLogList.length === 1" style="font-size: 0.9em;">
-                  <td class="pr-2 pt-3"><b>Log Name</b></td>
+                  <td class="pr-2 pt-3 whitespace-nowrap"><b>Log Name</b></td>
                   <td class="pt-3">{{ selectedLogName }}</td>
                 </tr>
                 <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
-                  <td class="pr-2 pt-3"><b>Log File Path</b></td>
+                  <td class="pr-2 pt-3 whitespace-nowrap"><b>Log File Path</b></td>
                   <td class="pt-3">{{ selectedLogFilePath }}</td>
                 </tr>
               </tbody>
@@ -838,6 +838,11 @@ const updateLogRefs = async(getLogData: boolean) => {
       }
       selectedLogFilePath.value = response?._data.log_path;
       selectedLogByteOffset.value = response?._data?.byte_offset;
+      nextTick(async () => {
+        document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
+        - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
+        document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
+      });
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
@@ -935,10 +940,6 @@ onUnmounted(() => {
   border-right: 0;
   color: black;
   box-shadow: none;
-}
-
-#selectedLogDisplay {
-  max-height: 400px;
 }
 
 :root {
