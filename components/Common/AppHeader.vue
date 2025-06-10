@@ -36,7 +36,7 @@
                 <div id="UserGroup" class="grid grid-cols-2">
                     <div class="col-span-1">
                         <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'"
-                            class="pt-0" id="HelpCircle" title="Help for current tab" aria-label="Help for current tab"
+                            class="pt-0" id="HelpCircle" title="Help" aria-label="Help"
                             @click="displayHelp">?</Button>
                     </div>
 
@@ -88,7 +88,7 @@
                             </div>
                         </div>
 
-                        <div v-if="location.name === 'Evaluation'" class="py-10 px-1">
+                        <div v-else-if="location.name === 'Evaluation'" class="py-10 px-1">
                             <div v-if="getMenuIndex() === 2">
                                 <span v-if="getEvaluationTabIndex() === 1">
                                     <LazyEvaluationCalibrationRunsHelp />
@@ -105,7 +105,7 @@
                             </div>
                         </div>
 
-                        <div v-if="location.name === 'Forecast'" class="py-10 px-1">
+                        <div v-else-if="location.name === 'Forecast'" class="py-10 px-1">
                             <div v-if="getMenuIndex() === 3">
                                 <span v-if="getForecastTabIndex() === 1">
                                     <LazyForecastCalibrationRunsHelp />
