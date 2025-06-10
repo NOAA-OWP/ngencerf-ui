@@ -147,7 +147,7 @@
           </div>
         </span>
         <span v-else>
-          <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
+          <div class="col-span-1 mr-6 h-8 whitespace-nowrap" style="font-size: 16px;">
             Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
           </div>
         </span>
