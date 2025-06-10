@@ -155,12 +155,14 @@ import { generalStore } from "@/stores/common/GeneralStore";
 import { useLogout, useLogoutListen } from "@/composables/UseEventBus";
 import { getErrorTextFromStatus } from "@/utils/CommonHelpers";
 
-const LazyHelpLandingPageHelp = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
 const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
 const LazyUserAccount = defineAsyncComponent(() => import("@/components/Common/UserAccount.vue"))
 
-// Calibration Workflow
+// Lazy Load for Help Files
+const LazyHelpLandingPageHelp = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
+
+// Calibration Workflow Help Files
 const LazyCalibrationHelpPreviousRunsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/PreviousRunsHelp.vue"))
 const LazyCalibrationHelpHeadwaterBasinGageHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/HeadwaterBasinGageHelp.vue"))
 const LazyCalibrationHelpTuningControlsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/TuningControlsHelp.vue"))
@@ -168,13 +170,13 @@ const LazyCalibrationHelpFormulationHelp = defineAsyncComponent(() => import("..
 const LazyCalibrationHelpOptimizationMetricsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/OptimizationMetricsHelp.vue"))
 const LazyCalibrationHelpRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/RunStatusHelp.vue"))
 
-// Evaluation Workflow
+// Evaluation Workflow Help Files
 const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/CalibrationRunsHelp.vue"))
 const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
 const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/RunStatusHelp.vue"))
 
-// Forecast Workflow
+// Forecast Workflow Help Files
 const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
 const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
 const LazyForecastResultesHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
