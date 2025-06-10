@@ -18,7 +18,7 @@
         <li> Click the Calibration button to setup, view or run a Calibration job.</li>
         <li> Click the Evaluation button to evaluate previously run calibration jobs.</li>
         <li> Click the Forecast button to run or view a forecast.</li>
-        <li> Click the Verfification button to view a PDF containg the steps necessary to run a verification of a forecast.</li>
+        <li> Click the Verfification button to view a PDF containg the steps necessary to run a forecast verification.</li>
       </ul>
     </div>
   </div>
