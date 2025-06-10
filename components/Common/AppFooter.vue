@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import { generalStore } from "@/stores/common/GeneralStore";
 
-const { serverInfo } = generalStore();
+const { serverInfo } = storeToRefs(generalStore());
 
 const showServerInfo = () => {
   const e = document.getElementById('FloatingInfo');
