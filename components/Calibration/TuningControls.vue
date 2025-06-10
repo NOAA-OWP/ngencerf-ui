@@ -804,6 +804,9 @@ const validateAndBuildRequestBody = (): boolean => {
 
   if (areTuningParametersSet()) {
     saveTuningTabRequestBody.value.parameters = userSelectedCalibrationTuningParameters.value;
+
+    // check if any parameter initial values are out of range
+    areParameterInitialValuesOutOfRange();
   }
 
   if (Object.keys(saveTuningTabRequestBody.value).length === 0) {
@@ -1260,6 +1263,40 @@ const rowStyle = () => {
   return {
     color: t ? "grey" : 'black',
     backgroundColor: t ? '#f0f0f0' : ''
+  }
+}
+
+/**
+ * Check if the initial value from userSelectedCalibrationTuningParameters is out of range
+ * If they are, show a warning message
+ */
+const areParameterInitialValuesOutOfRange = () => {
+  userSelectedCalibrationTuningParameters.value.forEach((param: any) => {
+    if (param.initial_value && param.minimum && param.maximum) {
+      checkInitialValueOutOfRange(
+        param.name,
+        parseFloat(param.initial_value),
+        parseFloat(param.minimum),
+        parseFloat(param.maximum)
+      );
+    }
+  });
+};
+
+const checkInitialValueOutOfRange = (parameterName: string, initialValue: number, min: number, max: number) => {
+  if (initialValue < min || initialValue > max) {
+    const tMsg: ToastMessageOptions = {
+      severity: 'warn',
+      summary: 'WARNING',
+      detail:
+        `Parameter ${parameterName} initial value is outside the min/max range ` +
+        `that will be used for parameter searching. Initial values will be used ` +
+        `for the initial calibration iteration (i.e. iteration 0). For subsequent ` +
+        `iterations, it will be constrained within the min/max range. You may ` +
+        `proceed as is or update the min, max, or initial value and save again.`,
+      life: ToastTimeout.timeoutWarn
+    };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
