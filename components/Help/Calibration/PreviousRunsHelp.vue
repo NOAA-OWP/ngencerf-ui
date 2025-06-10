@@ -1,15 +1,23 @@
 <template>
     <div class="_help-page">
         <div class="_help-title">Calibration - Calibration Runs Tab</div>
-        <div class="_help-subtitle" style="text-align: center;">Displays list of calibration jobs</div>
+        <div class="_help-subtitle">Displays list of calibration jobs<br />
+            <br />
+            Filters are provided to narrow list of jobs.<br />
+            <br />
+            Select a job then right click for a list of actions.
+        </div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <br />
-        <p class="text-center">
-            Sort table by clicking on the sort icon in a column.
+        <hr />
+        <p class="text-center">Filter by Headwater Basin Gage, multi-select status, multi-select modules, and/or
+            archived jobs.<br />
+            <b>Apply Filters</b> must be clicked to filter the table.
         </p>
         <br />
+        <p class="text-center">Sort table by clicking on the sort icon in a column.</p>
+        <hr />
         <table class="_help-table" aria-label="Calibration Runs Tab Help Table">
             <thead>
                 <tr>
@@ -89,7 +97,7 @@
         <table class="_help-table" aria-label="Status Definitions">
             <thead>
                 <tr class="text-left">
-                    <th>Status</th>
+                    <th class="text-right" style="padding-right:30px;">Status</th>
                     <th>Description</th>
                 </tr>
             </thead>
@@ -206,51 +214,24 @@
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
-
-._help-title {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    padding-bottom: 14px;
-}
-._help-subtitle {
-    font-size: 14 px;
-    text-align: center;
-    padding-bottom: 14px;
-}
-._help-table .td1 {
-    width: auto;
-    min-width: 130px;
-    vertical-align: top;
-}
-._help-table .td1 {
-    width: auto;
-    min-width: 110px;
-}
-
-p {
-    margin-left: 50px;
-}
 </style>
 
 <style scoped>
 /* Define the flashing animation */
 @keyframes flashGreen {
     0% {
-        background-color: green;
-    }
-
-    50% {
         background-color: white;
     }
-
-    100% {
+    50% {
         background-color: green;
+    }
+    100% {
+        background-color: white;
     }
 }
 
 /* Apply the animation to the <td> element */
 .flash-green {
-    animation: flashGreen 1s linear infinite;
+    animation: flashGreen 1.5s linear infinite;
 }
 </style>

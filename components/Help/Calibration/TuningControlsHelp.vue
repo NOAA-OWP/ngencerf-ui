@@ -1,23 +1,25 @@
 <template>
     <div class="_help-page">
-        <div class="_help-title">ngenCERF Calibration Workflow - Tuning Controls Tab</div>
+        <div class="_help-title">Calibration - Tuning Controls Tab</div>
         <div class="_help-subtitle">
-            This tab provides the user the ability to select the time periods to run the calibration,
-            the time periods for an automatic validation based on the best set of parameters
-            determined during the calibration process, the output variable to calibrate and which module parameters for
-            the selected formulation to tune during calibration.
+            This tab provides the ability to select the time periods for calibration,
+            the time periods for automatic validation using the best set of parameters
+            determined during the calibration process, the output variable to calibrate and
+            which module parameters for the selected formulation to tune during calibration.<br />
+            <br />
+            Some fields on this tab are not available when LSTM is a module in the formulation.
         </div>
-        <p class="text-center" style="color:orange;font-size:0.8em;">
-            WARNING: Clicking the browser refresh button logs you out of ngenCERF, usually on your next action.
+        <p class="text-center" style="color:#cc5500;font-size:0.8em;">
+            WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <p style="margin-left: 40px; margin-top:20px;font-size:0.9em; line-height: 20px;">
-            <em>The Previous and Next buttons on each of the tabs are meant to guide the user
-                through a calibration setup,
-                starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
+        <hr />
+        <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
+            <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration
+                setup,
+                starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the
+                Progress
                 area to go to that specific setup tab.</em>
         </p>
-        <br />
-        <hr>
         <div style="margin-left: 25px; margin-top:20px;">
             <p><strong>General Rules:</strong></p>
             <div style="margin-left: 10px;">
@@ -71,7 +73,7 @@
                 in that field will be discarded.</em>
         </p>
         <br />
-        <table class="_help-table">
+        <table class="_help-table" aria-describedby="Tuning Controls Tab Help Table">
             <thead>
                 <tr>
                     <th>Item</th>
@@ -130,10 +132,17 @@
 
                 <tr>
                     <td class="td1">Load Parameters Button</td>
-                    <td class="td2">Click this to upload calibration tuning parameters from text file.
-                        If a parameter in the table is also in the updloaded file,
-                        the value from the file will overwrite the table value. Any parameters in the file that are not
-                        available for the fomulation will be discarded and a warning message displayed.
+                    <td class="td2">Click this to upload calibration tuning parameters from text file<br />
+                        <ul style="list-style-type: disc;margin-left: 20px;">
+                            <li>File can be csv, space delimited or tab delimited</li>
+                            <li>If a parameter already exists in the table, the value from the file will overwrite the
+                                table value</li>
+                            <li>Any parameters in the file that are not available for the fomulation will be discarded
+                                and a warning message displayed</li>
+                            <li>Valid model names: CFE-S, CFE-X, LASAM, Noah-OWP-Modular, Sac-SMA, SFT, SMP, Snow-17, T-Route, TopModel, UEB</li>
+                        </ul>
+                        Example:<br />
+                        <img class="mx-auto" width="90%" :src="image1" alt="Example Load Parameter File Image" />
                     </td>
                 </tr>
                 <tr>
@@ -150,13 +159,14 @@
                 <tr>
                     <td class="td1">Parameter Table</td>
                     <td class="td2">Editable list of the calibration parameters chosen. The source for these entries can
-                        be from the Name dropdown or uploaded from a file. Minimum, maximum and initial values must be
-                        provided.
+                        be from the Calibratable Parameters dropdown or uploaded from a file.<br />
+                        Minimum, maximum and initial values must be
+                        provided.<br />
                         The initial value is used for the calibration control run, iteration 0, and may be outside the
-                        min/max range.
-                        If it is, the values are saved and a warning will be issued to the user, at which point the user
-                        can make
-                        adjustments or leave as is.
+                        min/max range.<br />
+                        If it is outside the min/max range, the value is saved and a warning issued but the user may
+                        proceed
+                        or change the value and save again.
                     </td>
                 </tr>
                 <tr>
@@ -191,47 +201,28 @@
             </tbody>
         </table>
 
-        <p><strong>ERRORS</strong></p>
+        <p><strong>HINTS</strong></p>
         <p><strong>Calibration Tuning Controls disabled</strong></p>
-        <p>Either the observation data, the forcing data or both have not yet been
+        <p style="margin-left:10px;">Either the observation data, the forcing data or both have not yet been
             selected. Go to the Headwater Basin Gage tab and make sure this data has selected, uploded if
             Upload
             selected, and saved.
         </p>
         <p><strong>Parameters disabled</strong></p>
-        <p>The Formulation has not been chosen. Go to the Formulation tab and select the
+        <p style="margin-left:10px;">The Formulation has not been chosen. Go to the Formulation tab and select the
             formulation.
         </p>
         <p><strong>No data in parameter file</strong></p>
-        <p>The file may not exist, be empty, missing a requird column or data.
+        <p style="margin-left:10px;">The file may not exist, be empty, missing a required column or missing data.
         </p>
     </div>
 </template>
 
 <script setup lang="ts">
-
+import image1 from "@/assets/styles/img/TuningParameterLoadFileExample.png"
 </script>
 
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
-
-._help-title {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    padding-bottom: 14px;
-}
-
-._help-subtitle {
-    font-size: 14 px;
-    text-align: center;
-    padding-bottom: 14px;
-}
-
-._help-table .td1 {
-    width: auto;
-    min-width: 130px;
-    vertical-align: top;
-}
 </style>

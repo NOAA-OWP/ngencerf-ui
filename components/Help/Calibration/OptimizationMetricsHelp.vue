@@ -1,22 +1,23 @@
 <template>
     <div class="_help-page">
         <div class="_help-title">Calibration - Optimization/Metrics Tab</div>
-        <div class="_help-subtitle">This tab provides the user the ability to select the optimization algorithm, the
+        <div class="_help-subtitle">This tab provides the ability to select the optimization algorithm, the
             objective function, the calibration stop criteria, the plot generation frequency and additional metrics to
-            calculate. By default, the ngen-cal
-            program does not calculate the Categorical Metrics, POD, CSI, and FAR or the Event Based Metrics, PKBIAS,
-            PKTE, and EVBIAS but the user can opt to calculate these.</div>
+            calculate. By default, the ngen-cal program does not calculate the Categorical Metrics, POD, CSI, and FAR or
+            the Event Based Metrics, PKBIAS, PKTE, and EVBIAS but the user can opt to calculate these.<br />
+            <br />
+            This tab is not available when LSTM is a module in the formulation.
+        </div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <p style="margin-left: 40px; margin-top:20px;font-size:0.9em; line-height: 20px;">
-            <em>The Previous and Next buttons on each of the tabs are meant to guide the user
-                through a calibration setup,
-                starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
+        <hr />
+        <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
+            <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup, 
+                starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
                 area to go to that specific setup tab.</em>
         </p>
-        <br />
-        <table class="_help-table">
+        <table class="_help-table"  aria-describedby="Optimization/Metrics Tab Help Table">
             <thead>
                 <tr>
                     <th>Item</th>
@@ -100,22 +101,4 @@ import image1 from "@/assets/styles/img/OptimizationMetricsTable.png"
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
-._help-title {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    padding-bottom: 14px;
-}
-
-._help-subtitle {
-    font-size: 14 px;
-    text-align: center;
-    padding-bottom: 14px;
-}
-
-._help-table .td1 {
-    width: auto;
-    min-width: 130px;
-    vertical-align: top;
-}
 </style>

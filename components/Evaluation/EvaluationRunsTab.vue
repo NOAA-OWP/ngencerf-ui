@@ -58,7 +58,7 @@
           <div class="ml-auto mt-4">
             <div id="NewButton">
               <Button id="btn-evaluate" class="ngenButtonDiv" @click.stop="returnCalibrationJobList">
-                Back to Calibration Runs
+                View Calibration Runs
               </Button>
             </div>
           </div>
@@ -94,7 +94,7 @@
           <div class="ml-auto mt-4">
             <div id="NewButton">
               <Button id="btn-evaluate" class="ngenButtonDiv" @click.stop="returnCalibrationJobList">
-                Back to Calibration Runs
+                View Calibration Runs
               </Button>
             </div>
           </div>
