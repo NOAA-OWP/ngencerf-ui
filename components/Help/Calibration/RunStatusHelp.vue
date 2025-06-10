@@ -34,10 +34,10 @@
                     while the job is running based on the plot interval specified by the user.</li>
                 <li>The user can stop a running job by clicking the Cancel button.</li>
                 <li>When a job is running or finished, the user can view plots and logs generated during the calibration
-                    and
-                    validation runs.</li>
+                    andvalidation runs.</li>
                 <li>If a job fails during the calibration run, the <strong>ngen.log</strong> file will be displayed to
-                    aid understanding the failure.</li>
+                    aid understanding the failure. If this log does not show the error, select Calibration logs from
+                    Display and scroll to view output written to the console (stdout/stderr) to reveal the error</li>
             </ul>
         </div>
         <br />

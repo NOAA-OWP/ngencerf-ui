@@ -154,36 +154,41 @@
               <caption class="sr-only">Calibration Log Options and File Path table</caption>  
               <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
               <tbody>  
-                <tr v-if="selectedLogList.length > 1">
-                  <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
+                <tr v-if="selectedLogList.length > 1" style="font-size: 0.9em;">
+                  <td class="pr-2 pt-3 whitespace-nowrap"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
                   <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
                   optionLabel="name" optionValue="name">
                 </Select></td>
                 </tr>
-                <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
-                  <td class="pr-2 pt-3"><b>Log Name</b></td>
+                <tr v-if="selectedLogFilePath !== '' && selectedLogList.length === 1" style="font-size: 0.9em;">
+                  <td class="pr-2 pt-3 whitespace-nowrap"><b>Log Name</b></td>
                   <td class="pt-3">{{ selectedLogName }}</td>
                 </tr>
                 <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
-                  <td class="pr-2 pt-3"><b>Log File Path</b></td>
+                  <td class="pr-2 pt-3 whitespace-nowrap"><b>Log File Path</b></td>
                   <td class="pt-3">{{ selectedLogFilePath }}</td>
                 </tr>
               </tbody>
             </table>
 
-            <div class="pt-4 pagination-rows">
-              Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}<br/>
-              NOTE: Only up to the last {{ logDataPageSize }} rows of the log file are displayed, 
-              newest to oldest.
-              <span v-if="calibrationStatus === 'Running'">
-                The full logs will be viewable on the Evaluate tab once the job has finished running.
-              </span>
-              <span v-else>
-                The full logs can be viewed on the Evaluate tab.
-              </span>
+            <div v-if="selectedLogDisplay">
+              <div class="pt-4 pagination-rows">
+                Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}<br/>
+                NOTE: Only up to the last {{ logDataPageSize }} rows of the log file are displayed, 
+                newest to oldest.
+                <span v-if="calibrationStatus === 'Running'">
+                  The full logs will be viewable on the Evaluate tab once the job has finished running.
+                </span>
+                <span v-else>
+                  The full logs can be viewed on the Evaluate tab.
+                </span>
+              </div>
+            </div>
+            <div v-else>
+              Log file unavailable
             </div>
 
-            <div id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
+            <div v-if="selectedLogDisplay" id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
               <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
             </div>
           </div>
@@ -293,12 +298,14 @@ const populatePlotListOptions = async() => {
     logListOptions.value = [];
 
     // TO DO: Don't add plots to the list if we're not at the first valid iteration yet
-    // Get Plot Names
-    plotNames.value = await queryGetPlotNames();
+    if (userCalibrationRunData?.value?.status != 'Failed') {
+      // Get Plot Names
+      plotNames.value = await queryGetPlotNames();
 
-    if ((plotNames.value as any)?._data?.plot_names) {
-      // setting plotList will populate the dropdown
-      plotListOptions.value = (plotNames.value as any)?._data?.plot_names
+      if ((plotNames.value as any)?._data?.plot_names) {
+        // setting plotList will populate the dropdown
+        plotListOptions.value = (plotNames.value as any)?._data?.plot_names
+      }
     }
 
     // Get Names of available Logs
@@ -323,9 +330,6 @@ const populatePlotListOptions = async() => {
       logListOptions.value.push({ name: optionName, description: '' });
     });
 
-    console.log('plotListOptions:', plotListOptions.value);
-    console.log('logListOptions:', logListOptions.value);
-
     // Combine available plot and log options
     for (const option of plotListOptions.value.concat(logListOptions.value)) {
       if (!(option in plotList.value)) {
@@ -336,6 +340,11 @@ const populatePlotListOptions = async() => {
     // Skip directly to ngen log if status is Failed
     if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
       selectedPlotName.value = (logListOptions.value.at(-1)).name;
+      nextTick(async () => {
+        if (selectedLogList.value.length > 1) {
+            selectedLogName.value = selectedLogList.value.at(-1).name;
+        }
+      });
     }
   }
 }
@@ -813,7 +822,7 @@ const updateLogRefs = async(getLogData: boolean) => {
       -1, // start is -1 to tell the server we want only the last "page" of logs
       logDataPageSize.value // limit
     );
-    if (response?._data) {
+    if (response?._data?.log_data) {
       let logText = '';
       for (let t = 0; t < response?._data.log_data.length; t++) {
         logText += response?._data.log_data[t] + '<br/>\n';
@@ -829,6 +838,15 @@ const updateLogRefs = async(getLogData: boolean) => {
       }
       selectedLogFilePath.value = response?._data.log_path;
       selectedLogByteOffset.value = response?._data?.byte_offset;
+      nextTick(async () => {
+        document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
+        - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
+        document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
+      });
+    } else {
+      toast.removeAllGroups();
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
   if (userCalibrationRunData.value.status === 'Running') {
@@ -922,10 +940,6 @@ onUnmounted(() => {
   border-right: 0;
   color: black;
   box-shadow: none;
-}
-
-#selectedLogDisplay {
-  max-height: 400px;
 }
 
 :root {

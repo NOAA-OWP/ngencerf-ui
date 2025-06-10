@@ -7,7 +7,7 @@
             determined during the calibration process, the output variable to calibrate and
             which module parameters for the selected formulation to tune during calibration.<br />
             <br />
-            Some fields on this tab are not available when LSTM is a module in the formulation.
+            When LSTM is a module in the formulation, only Time Controls are required from this tab.
         </div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
@@ -15,10 +15,8 @@
         <hr />
         <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
             <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration
-                setup,
-                starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the
-                Progress
-                area to go to that specific setup tab.</em>
+                setup, starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the
+                Progress area to go to that specific setup tab.</em>
         </p>
         <div style="margin-left: 25px; margin-top:20px;">
             <p><strong>General Rules:</strong></p>
