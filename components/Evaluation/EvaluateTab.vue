@@ -240,13 +240,16 @@
         </table>
 
         <div class="pt-4">
-          <div class="pagination-box">
+          <div class="pagination-box" v-if="selectedLogDisplay">
             <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
             <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
           </div>
+          <div v-else>
+            Log file unavailable
+          </div>
         </div>
 
-        <div id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
+        <div id="selectedLogDisplay" v-if="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
           <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
         </div>
       </div>
@@ -1218,10 +1221,6 @@ const drawInteractivePlot = () => {
     }
     if (calData?.value?.validation_times.validation_end_time) {
       let valEndTime = new Date(calData?.value?.validation_times.validation_end_time);
-      if (valEndTime > new Date(plotGraphDateLimits.value.end)) {
-        // Don't plot Sim Start Time outside of the range of our usable data
-        valEndTime = new Date(plotGraphDateLimits.value.end);
-      }
       if (valEndTime >= plotGraphLeftEdge && valEndTime <= plotGraphRightEdge) {
         plotGraphOptions.value.marks.push(Plot.ruleX([valEndTime], { stroke: 'grey', strokeWidth: 2, strokeDasharray: 10 }));
         plotGraphOptions.value.marks.push(Plot.text([" Val End Time "], { x: [valEndTime], frameAnchor: 'top', textAnchor: 'end' }));
@@ -1282,7 +1281,6 @@ const drawInteractiveSlider = () => {
           };
           plotGraphSliderData.value.push(dataPoint);
         }
-        // console.log('Using column ' + plotTableColumns.value[c].value + ' to draw slider');
         break;
       }
     }
@@ -1556,7 +1554,7 @@ watch(selectedLogName, async () => {
       0, // start
       logDataPageSize.value // limit
     );
-    if (response?._data) {
+    if (response?._data?.log_data) {
       let logText = '';
       for (let t = 0; t < response?._data?.log_data.length; t++) {
         logText += response?._data?.log_data[t] + '<br/>\n';
@@ -1573,7 +1571,7 @@ watch(selectedLogName, async () => {
       selectedLogFilePath.value = response?._data?.log_path;
     } else {
       toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }

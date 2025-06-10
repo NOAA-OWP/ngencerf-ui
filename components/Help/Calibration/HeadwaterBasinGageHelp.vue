@@ -16,8 +16,8 @@
         <table class="_help-table" aria-describedby="Headwater Basin Gage Tab Help Table">
             <thead>
                 <tr>
-                    <th>Item</th>
-                    <th>Description</th>
+                    <th scope="row">Item</th>
+                    <th scope="row">Description</th>
                 </tr>
             </thead>
             <tbody>
