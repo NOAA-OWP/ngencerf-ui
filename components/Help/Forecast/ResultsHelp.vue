@@ -48,12 +48,4 @@
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
-
-.helpfile-ul {
-  list-style-type:disc !important;
-}
-
-._help-table .td1 {
-  width: 300px;
-}
 </style>

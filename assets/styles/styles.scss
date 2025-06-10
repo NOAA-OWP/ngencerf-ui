@@ -496,22 +496,22 @@ table.cols-bordered {
 
 // Help Pages
 ._help-page {
-  padding: 10px;
+  padding: 10px 20px 5px 20px;
 }
 
 ._help-title {
-  text-align: center;
-  font-size: 2em;
+  font-size: 24px;
   font-weight: bold;
+  text-align: center;
   margin-bottom: 10px;
   line-height: 1.3em;
 }
 
 ._help-subtitle {
-  text-align: left;
-  font-weight: bold;
+    font-size: 14 px;
+    text-align: center;
   margin: 15px 30px;
-  padding: 0 50px; 
+  padding: 0 30px; 
 }
 
 ._help-table {
@@ -521,19 +521,25 @@ table.cols-bordered {
 
 ._help-table .td1 {
   text-align: right;
-  padding-right: 30px;
-  width: 350px;
+    width: auto;
+    min-width: 130px;
   vertical-align: top !important;
   font-weight: 600;
 }
 
 ._help-table .td2 {
   width: auto;
+    padding-left: 15px;
+    vertical-align: top;
 }
 
-
 ._help-page p {
-  line-height: 2em;
+  line-height: normal;
+}
+
+._help-page hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 /* Right Side Blocks */

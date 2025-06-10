@@ -2,12 +2,13 @@
     <div class="_help-page">
         <div class="_help-title">Calibration - Status/Run Tab</div>
         <div class="_help-subtitle">This tab provides the user the ability to review their calibration setup,
-            run a calibration when status is Ready, view plots and logs during a run or after a run has finished.</div>
-        <br />
+            run a calibration when status is Ready, view plots and logs during a run or after a run has finished.
+        </div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <div style="margin-left: 30px; margin-top:20px;">
+        <hr />
+        <div style="margin-left: 30px; margin-top:10px;">
             <ul style="list-style-type: disc;">
                 <li>The right side of each tab in the Calibration workflow shows the Progress towards completing a
                     calibration
@@ -40,7 +41,7 @@
             </ul>
         </div>
         <br />
-        <table class="_help-table">
+        <table class="_help-table"  aria-describedby="Status / Run Tab Help Table">
             <thead>
                 <tr>
                     <th>Item</th>
@@ -129,25 +130,4 @@
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
-
-._help-title {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    padding-bottom: 14px;
-}
-._help-subtitle {
-    font-size: 14 px;
-    text-align: center;
-    padding-bottom: 14px;
-}
-._help-table .td1 {
-    width: auto;
-    min-width: 130px;
-    vertical-align: top;
-}
-
-p {
-    margin-left: 50px;
-}
 </style>

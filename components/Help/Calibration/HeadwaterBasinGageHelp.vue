@@ -1,21 +1,25 @@
 <template>
     <div class="_help-page">
-        <div class="_help-title" id="help-title">Calibration Headwater Basin Gage Tab</div>
+        <div class="_help-title" id="help-title">Calibration - Headwater Basin Gage Tab</div>
         <div class="_help-subtitle">Select the calibration gage for a headwater basin, along with the
             source for the Forcing Data, Observational Data and GeoPackage. User may upload their own files.
         </div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-
-        <p style="margin-left: 10px; margin-top:20px;font-size:0.9em; line-height: 20px;">
-            <em>The Previous and Next buttons on each of the tabs are meant to guide the user
-                through a calibration setup, 
+        <hr />
+        <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
+            <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup, 
                 starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
                 area to go to that specific setup tab.</em>
         </p>
-        <br />
-        <table class="_help-table" aria-describedby="help-title">
+        <table class="_help-table" aria-describedby="Headwater Basin Gage Tab Help Table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
             <tbody>
                 <tr>
                     <th scope="row" class="td1">Domain</th>
@@ -119,21 +123,4 @@ import image3 from "@/assets/styles/img/observationalexample.png"
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
-
-._help-title {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    padding-bottom: 14px;
-}
-._help-subtitle {
-    font-size: 14 px;
-    text-align: center;
-    padding-bottom: 14px;
-}
-._help-table .td1 {
-    width: auto;
-    min-width: 130px;
-    vertical-align: top;
-}
 </style>

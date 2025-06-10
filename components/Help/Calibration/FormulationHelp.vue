@@ -6,15 +6,13 @@
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-
-        <p style="margin-left: 10px; margin-top:20px;font-size:0.9em; line-height: 20px;">
-            <strong>NOTE:</strong> <em>The Previous and Next buttons on each of the tabs are meant to guide the user
-                through a calibration setup,
-                starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
+        <hr />
+        <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
+            <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup, 
+                starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
                 area to go to that specific setup tab.</em>
         </p>
-        <br />
-        <table class="_help-table">
+        <table class="_help-table"  aria-describedby="Formulation Tab Help Table">
             <thead>
                 <tr>
                     <th>Item</th>
@@ -73,7 +71,8 @@
         <div style="margin-left: 30px; margin-top:20px;">
             <ul style="list-style-type: disc;">
                 <li>Only one module per process (except for SFT and SMP, which are always run together currently)</li>
-                <li>Proceeses are Snowmelt, Evapotranspiration, Rainfall Runoff, Auxiliary Soil (aka Soil Moisture) and Routing</li>
+                <li>Processes are Snowmelt, Evapotranspiration, Rainfall Runoff, Auxiliary Soil (aka Soil Moisture) and
+                    Routing</li>
                 <li style="list-style-type: none;"> &nbsp;</li>
                 <li><strong>Snowmelt Process</strong> (Optional)
                     <ul style="margin-left: 20px;">
@@ -109,7 +108,8 @@
                         </li>
                         <li style="font-size:0.95em;"><strong>potential-evapotranspiration (PET):</strong></li>
                         <li style="margin-left: 15px;">
-                            <span style="color:#cc5500;font-size:.9em;"><em>Not currently integrated in ngenCERF</em></span>
+                            <span style="color:#cc5500;font-size:.9em;"><em>Not currently integrated in
+                                    ngenCERF</em></span>
                         </li>
                     </ul>
                 </li>
@@ -137,7 +137,8 @@
                         <li style="margin-left: 15px;">
                             SFT and SMP currently run together in ngen-cal.<br />
                             They require either CFE-(X, S) or LASAM.<br />
-                            They share parameters with CFE and LASAM, so calibration of those parameters is done jointly.
+                            They share parameters with CFE and LASAM, so calibration of those parameters is done
+                            jointly.
                         </li>
                     </ul>
                 </li>
@@ -147,7 +148,6 @@
                         <li style="font-size:0.95em;"><strong>T-Route</strong></li>
                     </ul>
                 </li>
-                <li style="list-style-type: none;"> &nbsp;</li>
             </ul>
         </div>
     </div>
@@ -160,23 +160,4 @@
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
-
-._help-title {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    padding-bottom: 14px;
-}
-
-._help-subtitle {
-    font-size: 14 px;
-    text-align: center;
-    padding-bottom: 14px;
-}
-
-._help-table .td1 {
-    width: auto;
-    min-width: 130px;
-    vertical-align: top;
-}
 </style>
