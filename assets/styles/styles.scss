@@ -546,11 +546,8 @@ table.cols-bordered {
   font-size: .9em;
 }
 
-#GageCutout {
-  margin-right: 5px;
-  max-height: 300px;
-
-}
+#TopRightBlock {padding: 10px 0px 0px 15px;}
+#GageCutout {margin-top:-40px;}
 
 /* Toast */
 .p-toast {
@@ -641,6 +638,11 @@ table.cols-bordered {
 .errorBg .p-checkbox-box {
   opacity: 0.3;
 }
+
+.vertical-separator {
+  width:1px; height: 100%; background-color: #d9d9d9; position: relative; display: block; margin-left: auto; margin-right: auto;
+}
+
 .JobsFilterBox {
   .JobsFilterSelect  {
     background-color: #f3f3f3;
