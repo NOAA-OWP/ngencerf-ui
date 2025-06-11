@@ -261,6 +261,7 @@ let dataTableElement: HTMLElement | null = null;
 const toast = useToast();
 
 onMounted(() => {
+  setUserSelection();
   nextTick(() => {
     hilightTab(CalibrationTabs.tab_formulation);
     toast.removeAllGroups();
@@ -276,8 +277,9 @@ onMounted(() => {
       userCalibrationRunData.value.modules = ['LSTM', 'T-Route'];
       selectedModuleValues.value = ['LSTM', 'T-Route'];
     }
+    console.log(selectedModuleValues.value);
+    console.log(userCalibrationRunData?.value?.modules);
     modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
-    setUserSelection();
   })
 });
 
