@@ -14,12 +14,12 @@
                 :field="col.field" :hidden="col.hidden ?? false" :class="col.styles ?? []" sortable></Column>
             </Row>
             <Row v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index" :pt="{ id: index }">
-              <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan">
+              <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :class="col.styles ?? []" :colspan="col.colspan">
               </Column>
             </Row>
           </ColumnGroup>
           <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :field="col.field"
-            :hidden="col.hidden ?? false"></Column>
+            :hidden="col.hidden ?? false" :class="col.styles ?? []"></Column>
         </DataTable>
         <div class="text-sm">* Metric used as Objective Function</div>
       </div>
@@ -68,7 +68,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useEvaluationAltIterationStore } from '@/stores/evaluation/EvaluationAltIterationStore';
 import { generalStore } from '@/stores/common/GeneralStore';
@@ -102,11 +102,6 @@ const selectedCalibrationByIterationParameterRow = ref<any>();
 
 const calibrationRunDetailTable = ref<HTMLTableElement>();
 const tuningParametersTable = ref<HTMLTableElement>();
-
-const ptColumn = ref({
-  columnHeaderContent: { style: { "justify-content": "center" } },
-  bodyCell: { style: { "text-align": "right" } }
-});
 
 onMounted(() => {
   hilightTab(EvaluationTabs.tab_selectAltIteration);
@@ -164,7 +159,7 @@ const navigateToEvaluateStatus = (event: any) => {
     const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Iteration ID', detail: 'Pleasea select a iteration job first.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Iteration ID', detail: 'Please select a iteration job first.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -231,6 +226,30 @@ table#cr-detail-list2 th {
 
 th.p-datatable-header-cell.bg-objective-function-col,
 th.p-datatable-header-cell.bg-objective-function-col:hover {
-  background-color: rgb(204, 85, 0);
+  background-color: rgb(204, 85, 0) !important;
+}
+
+#RunDetailsTbl .p-datatable-thead>tr:nth-child(2) th.bg-objective-function-col,
+#RunDetailsTbl .p-datatable-thead>tr:nth-child(2):hover th.bg-objective-function-col {
+  background-color: rgb(246, 189, 148) !important;
+  border: rgb(246, 189, 148);
+}
+
+#RunDetailsTbl .p-datatable-thead>tr:nth-child(3) th.bg-objective-function-col,
+#RunDetailsTbl .p-datatable-thead>tr:nth-child(3):hover th.bg-objective-function-col {
+  background-color: rgb(255, 241, 230) !important;
+  border: rgb(255, 241, 230);
+}
+
+tr.p-datatable-selectable-row td.bg-objective-function-col {
+  background-color: rgb(252, 248, 242) !important;
+}
+
+tr.p-datatable-selectable-row:hover td.bg-objective-function-col {
+  background-color: rgb(245, 238, 233)  !important;
+}
+
+tr.p-datatable-selectable-row.p-datatable-row-selected:hover td.bg-objective-function-col {
+  background-color: rgb(255, 236, 221) !important;
 }
 </style>

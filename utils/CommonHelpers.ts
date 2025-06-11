@@ -1,3 +1,4 @@
+import { ServerCodes } from '@/composables/NgencerfEnums';
 import { DateTime } from "luxon";
 
 /**
@@ -94,12 +95,14 @@ export const getOverallCalibrationValidationStatus = (
   ) {
     return `Calibration Done, Validation Best Running`;
   } else if (
-    calibrationStatus === 'Done' &&
-    validationControlStatus && validationControlStatus === 'Done' &&
-    validationBestStatus && validationBestStatus === 'Done'
-    ) {
-    return 'Done';
-  } else if (calibrationStatus === 'Done' && validationControlStatus) {
+    calibrationStatus === "Done" &&
+    validationControlStatus &&
+    validationControlStatus === "Done" &&
+    validationBestStatus &&
+    validationBestStatus === "Done"
+  ) {
+    return "Done";
+  } else if (calibrationStatus === "Done" && validationControlStatus) {
     // get the overall status of validation control and validation best
     const validationControlBestStatus = getValidControlAndValidBestStatus(
       validationControlStatus,
@@ -116,30 +119,35 @@ export const getOverallCalibrationValidationStatus = (
  * @param validBest
  * @returns {string}
  */
-export const getValidControlAndValidBestStatus = (validControlStatus: string, validBestStatus?: string): string => {
-  if (validControlStatus === 'Saved' || validBestStatus === 'Saved') {
-    return 'Saved';
-  }
-  else if (validControlStatus === 'Ready' || validBestStatus === 'Ready') {
-    return 'Ready';
-  }
-  else if (validControlStatus === 'Running' || validBestStatus === 'Running') {
-    return 'Running';
-  }
-  else if (validControlStatus === 'Cancelled' || validBestStatus === 'Cancelled') {
-    return 'Cancelled';
-  }
-  else if (validControlStatus === 'Failed' || validBestStatus === 'Failed') {
-    return 'Failed';
-  }
-  else if (validControlStatus === 'Server Error' || validBestStatus === 'Server Error') {
-    return 'Server Error';
-  }
-  else if (validControlStatus === 'Done' && validBestStatus === 'Done') {
-    return 'Done';
-  }
-  else {
-    return 'Unknown';
+export const getValidControlAndValidBestStatus = (
+  validControlStatus: string,
+  validBestStatus?: string
+): string => {
+  if (validControlStatus === "Saved" || validBestStatus === "Saved") {
+    return "Saved";
+  } else if (validControlStatus === "Ready" || validBestStatus === "Ready") {
+    return "Ready";
+  } else if (
+    validControlStatus === "Running" ||
+    validBestStatus === "Running"
+  ) {
+    return "Running";
+  } else if (
+    validControlStatus === "Cancelled" ||
+    validBestStatus === "Cancelled"
+  ) {
+    return "Cancelled";
+  } else if (validControlStatus === "Failed" || validBestStatus === "Failed") {
+    return "Failed";
+  } else if (
+    validControlStatus === "Server Error" ||
+    validBestStatus === "Server Error"
+  ) {
+    return "Server Error";
+  } else if (validControlStatus === "Done" && validBestStatus === "Done") {
+    return "Done";
+  } else {
+    return "Unknown";
   }
 };
 
@@ -212,5 +220,26 @@ export const arraysEqual = (arr1: any, arr2: any) => {
   }
   // If all elements are equal, return true
   return true;
+};
+
+export function getErrorTextFromStatus(status: number): string {
+  const result = ServerCodes.find(codeEntry => codeEntry.code === status);
+  return result ? result.error : "Unknown error code";
 }
 
+// Helper function that creates a comma-separated string from the array.
+// - If the array is empty, it returns an empty string.
+// - If there's one element, it returns that element as a string.
+// - If there are exactly 2 elements, it joins them with "and".
+// - If there are more than 2 elements, all but the last element are comma-separated,
+//   and the last element is preceded by "and" (without a trailing comma).
+export function formatMultJobNumbers(nums: number[]): string {
+  if (nums.length === 0) return '';
+  if (nums.length === 1) return `${nums[0]}`;
+  if (nums.length === 2) return `${nums[0]} and ${nums[1]}`;
+
+  // For more than 2 elements:
+  // Join all elements except the last with a comma followed by a space.
+  const allButLast = nums.slice(0, -1).join(', ');
+  return `${allButLast} and ${nums[nums.length - 1]}`;
+}

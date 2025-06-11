@@ -1,4 +1,3 @@
-
 <template>
   <!-- VerificationRightBlock -->
   <div id="VerificationRightBlock" class="grid grid-cols-1">

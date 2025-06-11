@@ -20,6 +20,19 @@
           </th>
           <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
         </tr>
+        <tr height="38px" :aria-label="'Status is ' + overallForcingDownloadForecastStatus"
+          :title="'Status is ' + overallForcingDownloadForecastStatus">
+          <th scope="row" class="text-right font-bold">
+            <div style="width: 140px;">Status</div>
+          </th>
+          <td class="pl-5">{{ overallForcingDownloadForecastStatus }}</td>
+        </tr>
+        <tr height="38px" :aria-label="'Elapsed Time ' + elapsedTime" :title="'Elapsed Time ' + elapsedTime">
+          <th scope="row" class="text-right font-bold">
+            <div style="width: 140px;">Elapsed Time</div>
+          </th>
+          <td class="pl-5">{{ elapsedTime ?? '-'.repeat(30) }}</td>
+        </tr>
         <tr height="38px" :aria-label="'Results Pathname is ' + resultsPathname"
           :title="'Results Pathname is ' + resultsPathname">
           <th scope="row" class="text-right font-bold" style="width: 140px;">
@@ -30,8 +43,7 @@
             <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
           </td>
         </tr>
-        <tr height="32px" :aria-label="'Cycle is ' + forecastCycleName"
-          :title="'Cycle is ' + forecastCycleName">
+        <tr height="32px" :aria-label="'Cycle is ' + forecastCycleName" :title="'Cycle is ' + forecastCycleName">
           <th scope="row" class="text-right font-bold">
             <div style="width: 140px;">Cycle</div>
           </th>
@@ -69,6 +81,8 @@ const {
   forecastCycleName,
   resultsPathname,
   forecastPlot,
+  elapsedTime,
+  overallForcingDownloadForecastStatus
 } = storeToRefs(useForecastStore());
 
 const {
@@ -85,7 +99,11 @@ onMounted(async () => {
   hilightTab(ForecastTabs.tab_results);
 
   // load Results tab data
-  await loadForecastResultsTabData();
+  const errorMessages: string[] = await loadForecastResultsTabData();
+  errorMessages.forEach((msg: string) => {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  });
 
 });
 </script>

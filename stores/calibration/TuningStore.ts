@@ -45,7 +45,8 @@ export const useTuningStore = defineStore(
     const tuningStore_data_loading = ref(true);
     const saveTuningTabRequestBody = ref<any>({});
 
-   
+    const selectedOutputVariableToCalibrate = ref<string>("Streamflow");
+
     /**
      * Load Tuning Tab data
      * @returns {Promise<any>}
@@ -187,6 +188,7 @@ export const useTuningStore = defineStore(
       simEndTime,
       calStartTime,
       calEndTime,
+      selectedOutputVariableToCalibrate,
       calibrationTuningParameters,
       userSelectedCalibrationTuningParameters,
       automatic_validation,

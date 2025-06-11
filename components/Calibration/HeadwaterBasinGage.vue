@@ -156,8 +156,8 @@ import { useDialog } from "primevue/usedialog";
 
 import type { SelectChangeEvent } from "primevue/select";
 import type { ToastMessageOptions } from "primevue/toast";
-import type { GageResetData } from "@/composables/NextGenModel.ts"
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import type { GageResetData } from "@/composables/NgencerfModels"
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useGageStore } from "@/stores/calibration/GageStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -176,8 +176,7 @@ import {
   useApiResponseToastSeverityCode
 } from "@/composables/ValidationHandlers";
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const { hardResetTuningTimeConrols } = useTuningStore();
@@ -315,7 +314,8 @@ const clearDataDueToGageChange = () => {
 
       const tMsg: ToastMessageOptions = {
         severity: 'info', summary: `Gage Changed`,
-        detail: "Calibration and Validation times must be set on the Tuning Controls tab"
+        detail: "Calibration and Validation times must be set on the Tuning Controls tab", 
+        life: ToastTimeout.timeoutInfo
       };
       toast.add(tMsg); addToastRecord(tMsg);
 
@@ -377,16 +377,16 @@ const handleDialogClose = (opt: any) => {
 
   if (opt && opt.data) {
     if (opt.data.saveFileResponseResult.status === 200) {
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: ToastTimeout.timeout5000 };
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: `File upload Completed`, detail: opt.data.saveFileResponseResult._data.message, life: ToastTimeout.timeoutInfo };
       toast.add(tMsg); addToastRecord(tMsg);
     } else {
       useApiErrorResponsePreprocess(opt.data.saveFileResponseResult).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Data Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(opt.data.saveFileResponseResult?.status), summary: 'Save Gage Data Failed.', detail: message, life: useApiResponseToastSeverityLife(opt.data.saveFileResponseResult?.status) };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: ToastTimeout.timeout10000 };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: `File upload Error`, detail: "There is an error when trying to upload selected file(s).", life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
   }
   fileUploadDialogOpened.value = false
@@ -474,7 +474,7 @@ const toggle_isNWMv3 = () => {
 const saveTabData = () => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeout10000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
@@ -486,13 +486,16 @@ const saveTabData = () => {
     }
 
     saveGageTabData().then(response => {
-      if (response.status === 200) {
+      if (response.status === 400) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Save Gage Data Failed.', detail: response._data.message };
+        toast.add(tMsg); addToastRecord(tMsg);
+      } else if (response.status === 200) {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
           toast.add(toastMessage); addToastRecord(toastMessage);
         })
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
-          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Data Failed.', detail: message };
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Data Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
           toast.add(tMsg); addToastRecord(tMsg);
         });
       }
@@ -518,6 +521,8 @@ const updateJobData = async (response: any) => {
     userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
     userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
+
+    userCalibrationRunData.value.num_catchments = response?._data.num_catchments;
 
     userCalibrationRunData.value.external_data_status.forcing = !(userCalibrationRunData.value.forcing_source === "");
     userCalibrationRunData.value.external_data_status.observational = !(userCalibrationRunData.value.observational_source === "");

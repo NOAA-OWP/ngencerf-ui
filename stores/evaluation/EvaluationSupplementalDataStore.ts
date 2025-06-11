@@ -5,6 +5,7 @@ import { DateTime } from "luxon";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import { formatISOStringOrDateToYYYYMMDD } from '@/utils/TimeHelpers';
@@ -13,6 +14,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+  const { selectedCalibrationCompareRuns } = storeToRefs(useEvaluationCalibrationRunStore());
   const { getAccessToken } = useUserDataStore();
 
 
@@ -61,7 +63,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     if (sweTimeSeriesData.value.length > 0) {
       sweStartDateTime.value = DateTime.fromISO(sweTimeSeriesData.value[0].timestamp, { zone: 'utc' });
     } else {
-      sweStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time, { zone: 'utc' });
+      sweStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time as string, { zone: 'utc' });
     }
     
     // this is used to set the min date for the date picker correctly
@@ -75,7 +77,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     if (sweTimeSeriesData.value.length > 0) {
       sweEndDateTime.value = DateTime.fromISO(sweTimeSeriesData.value[sweTimeSeriesData.value.length - 1].timestamp, { zone: 'utc' });
     } else {
-      sweEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time, { zone: 'utc' });
+      sweEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time as string, { zone: 'utc' });
     }
     
     // this is used to set the max date for the date picker correctly
@@ -150,11 +152,31 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     });
   };
 
+
+  /**
+  * Get Performance Metrics for Comparison
+  * @return {any}
+  */
+  const queryGetPerformanceMetricsForComparison = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_status_for_comparison/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          calibration_run_ids: selectedCalibrationCompareRuns.value.map(run => run.calibration_run_id)
+        }
+      )
+    });
+  };
+
   /**
    * Get Calibration/Validation Log Names
    * @return {any}
    */
-  const queryGetLogNames = async (validation_run_id: number = 0): Promise<any> => {
+  const queryGetLogNames = async (validation_run_id: number): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
       method: "POST",
       headers: {
@@ -174,7 +196,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   const queryGetLogData = async (
     log_category: string,
     log_name: string,
-    validation_run_id: number = 0,
+    validation_run_id: number,
     start?: number,
     limit?: number
   ): Promise<any> => {
@@ -256,6 +278,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     getSweTimeRange,
     queryGetIterations,
     queryGetPerformanceMetrics,
+    queryGetPerformanceMetricsForComparison,
     queryGetLogNames,
     queryGetLogData,
     getSweImagesByDate,

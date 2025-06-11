@@ -1,4 +1,4 @@
-FROM registry.sh.nextgenwaterprediction.com/infrastructure/rockylinux/rockylinux:latest
+FROM registry.sh.nextgenwaterprediction.com/infrastructure/rockylinux/rockylinux:9.3
 
 
 # runtime dependencies
@@ -16,15 +16,22 @@ RUN set -eux; \
     ; \
     dnf clean all
 
-ARG NODE_TAR_URL="https://nodejs.org/dist/v22.13.1/node-v22.13.1-linux-x64.tar.xz"
+# set node and npm versions
+ARG NODE_VERSION=22.15.0
+ARG NPM_VERSION=11.3.0
+ARG NODE_TAR_URL="https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
 
-# install Node.js
+# install node
 RUN curl --fail --silent --show-error --location "$NODE_TAR_URL" | \
     tar --extract --xz --directory=/usr/local --strip-components=1
 
-# add Node.js binaries to PATH
+# add node binaries to PATH
 ENV PATH="/usr/local/bin:${PATH}"
 
+# update npm version
+RUN npm install -g npm@${NPM_VERSION} && npm cache clean --force
+
+# create and set working directory
 RUN mkdir --parents /var/www/ngencerf/nuxt-app
 WORKDIR /var/www/ngencerf/nuxt-app
 
@@ -48,7 +55,7 @@ RUN set -eux; \
     key=${repo_url##*/}; \
     key=${key%.git}; \
     # Construct the file path using the derived key
-    GIT_INFO_PATH="public/${key}_git_info.json"; \
+    GIT_INFO_PATH="${key}_git_info.json"; \
     jq -n \
       --arg commit_hash "$(git rev-parse HEAD)" \
       --arg branch "$(git rev-parse --abbrev-ref HEAD)" \

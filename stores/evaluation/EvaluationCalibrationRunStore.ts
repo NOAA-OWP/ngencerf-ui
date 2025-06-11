@@ -1,7 +1,7 @@
 // @ts-check
 import { defineStore, storeToRefs } from "pinia";
 
-import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NextGenModel";
+import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -13,14 +13,16 @@ import { fixFloatToFivePlaces } from "@/utils/CommonHelpers";
 
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {
   const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
-  const { fetchUserCalibrationRunData, clearUserCalibrationRunData } = useUserDataStore();
+  const { fetchUserCalibrationRunData, clearUserCalibrationRunData, getAccessToken } = useUserDataStore();
   const calibrationRunList = ref<any[]>([]);
   const userSelectedEvalCalibrationRunId = ref<number>(0);
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { getAccessToken } = useUserDataStore();
+
   const uiGageId = ref<string>("");
   const userSelectedEvalCalibrationRun = ref<any>();
   const loadCalibrationDataComplete = ref<boolean>(false);
+
+  const { includeArchivedJobs } = storeToRefs(useUserDataStore());
 
   /**
    * list of calibration jobs with validation data
@@ -33,6 +35,11 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
   const calibrationValidationRunListHeaders = ref<any[]>([]);
   const computedCalibrationValidationRunList = ref<CalibrationValidationJobData[]>([]);
+
+  const gageCalibrationRunListHeaders = ref<any[]>([]);
+  const computedGageCalibrationRunList = ref<CalibrationJobListItem[]>([]);
+
+  const selectedCalibrationCompareRuns = ref<CalibrationJobListItem[]>([]);
 
   /**
   * @returns {SelectOption[]}
@@ -59,6 +66,19 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   });
 
   /**
+  * @returns {SelectOption[]}
+  */
+  const compareCalibrationRunGageList = computed(() => {
+    let gageOptionList = <SelectOption[]>[];
+    evaluationCalibrationRunGageList.value.forEach(gage => {
+      if (userEvaluationCalibrationRunListData.value.filter((row) => (row as CalibrationJobListItem).gage_id === gage.name).length >= 2) {
+        gageOptionList.push(gage);
+      }
+    });
+    return gageOptionList;
+  });
+
+  /**
    * fetch user created calibration job list data
    * @return {void}
    */
@@ -69,7 +89,8 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
-      }
+      },
+      body: JSON.stringify({ include_archived: includeArchivedJobs.value }),
     });
 
     if (runListDataResult?._data?.jobs.length > 0) {
@@ -135,6 +156,47 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       });
     }
   }
+  
+    /**
+     * Get Calibration Plot Names for Comparison
+     * @return {any}
+     */
+    const queryGetPlotNamesForComparison = async (): Promise<any> => {
+      return makeProtectedApiCall<CalibrationPlotListNamesData>(`${ngencerfBaseUrl}/calibration/get_plot_names_for_comparison/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${getAccessToken()}`,
+          "Content-Type": 'application/json'
+        },
+      });
+    };
+
+  /**
+   * Get Calibration Plots for Comparison
+   * @return {any}
+   */
+  const queryGetPlotsForComparison = async (
+    plotName: string,
+    gage_id: string,
+    start?: number,
+    limit?: number
+  ) => {
+    const plotDataResult = await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plots_for_comparison/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ 
+        calibration_run_ids: selectedCalibrationCompareRuns.value.map(run => run.calibration_run_id),
+        plot_name: plotName,
+        gage_id: gage_id,
+        start: start !== undefined ? start : 0,
+        limit: limit !== undefined ? limit : 100
+      })
+    });
+    return plotDataResult;
+  };
 
   const setSelectedCalibrationRunId = (calibration_run_id: number): void => {
     userSelectedEvalCalibrationRunId.value = calibrationJobId.value = calibration_run_id;
@@ -163,6 +225,10 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
   const resetUserSelectedCalibrationValidationRunList = () => {
     userSelectedCalibrationValidationRunList.value = [];
+  }
+
+  const resetUserSelectedCalibrationCompareRunList = () => {
+    userSelectedCalibrationCompareRunList.value = [];
   }
 
   /**
@@ -202,6 +268,14 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     evaluateValidationRunStatus.value = '';
   }
 
+  /**
+   * @return {void}
+   */
+  const resetUserSelectedEvalCompareRun = (): void => {
+    calibrationJobId.value = userSelectedEvalCalibrationRunId.value = evaluateIterationRunId.value = 0;
+    computedGageCalibrationRunList.value = [];
+  }
+
   useLogoutListen('logoutEvent', (evStr: string) => {
     if (evStr === "logout") {
       resetUserSelectedEvalCalibrationRun();
@@ -212,17 +286,22 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     uiGageId,
     calibrationRunList,
     evaluationCalibrationRunGageList,
+    compareCalibrationRunGageList,
     userSelectedEvalCalibrationRunId,
     loadCalibrationDataComplete,
 
     setSelectedCalibrationRunId,
     loadSelectedCalibrationRun,
     fetchUserValidatedCalibrationJobsListData,
+    queryGetPlotNamesForComparison,
+    queryGetPlotsForComparison,
     resetUserSelectedEvalCalibrationRun,
     getReferenceDataSetOptions,
     resetUserSelectedCalibrationValidationRunList,
     fetchUserSelectedCalibrationValidationRunList,
+    resetUserSelectedCalibrationCompareRunList,
     resetUserSelectedEvalValidationRun,
+    resetUserSelectedEvalCompareRun,
     clearUserCalibrationRunData,
     fetchValidationRunListByCalibrationRun,
 
@@ -230,6 +309,9 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     userEvaluationCalibrationRunListData,
     calibrationValidationRunListHeaders,
     computedCalibrationValidationRunList,
+    gageCalibrationRunListHeaders,
+    computedGageCalibrationRunList,
+    selectedCalibrationCompareRuns,
     evaluateValidationRunId,
     evaluateIterationRunId,
     evaluateValidationRunStatus,

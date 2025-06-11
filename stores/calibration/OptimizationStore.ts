@@ -8,7 +8,7 @@ import type {
   UserCalibrationRunOptimizationInputData,
   GeneralApiSaveResponse,
   SaveOptimizationPayload,
-} from "@/composables/NextGenModel";
+} from "@/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
@@ -83,8 +83,8 @@ export const useOptimizationStore = defineStore(
         userCalibrationRunData.value?.objective_function ?? "";
       uiOptimization.value = userCalibrationRunData.value?.optimization ?? "";
       uiPlotFrequency.value =
-        userCalibrationRunData.value?.save_plot_iteration_frequency ?? 0;
-      uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 0;
+        userCalibrationRunData.value?.save_plot_iteration_frequency ?? 1;
+      uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 2;
       uiOptimizationInputs.value = getOptimizationInputUserData.value ?? [];
     };
 
@@ -255,8 +255,8 @@ export const useOptimizationStore = defineStore(
       uiPeakFlowThreshold.value = undefined;
       uiObjectiveFunction.value = "";
       uiOptimization.value = "";
-      uiPlotFrequency.value = 0;
-      uiStopCriteria.value = 0;
+      uiPlotFrequency.value = 1;
+      uiStopCriteria.value = 2;
       uiOptimizationInputs.value = [];
     };
 

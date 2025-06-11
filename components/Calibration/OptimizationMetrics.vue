@@ -121,7 +121,7 @@
             <!--REVIVING LOST CONTENT HERE-->
             <div id="CalibrationStopCriteria" class="bordered">
               <label for="StopCriteria">Calibration Stop Criteria</label><br>
-              <InputNumber id="StopCriteria" inputId="stopCriteria" v-model="uiStopCriteria" showButtons :min="0"
+              <InputNumber id="StopCriteria" inputId="stopCriteria" v-model="uiStopCriteria" showButtons :min="2"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="Calibration Stop Criteria" title="Calibration Stop Criteria">
               </InputNumber>
@@ -132,7 +132,7 @@
             <div id="PlotGenFreq" class="bordered">
               <label for="PlotFrequency">Plot Generation Frequency (0 = off)</label><br>
               Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency"
-                v-model="uiPlotFrequency" showButtons :min="0" aria-label="Plot Generation Frequency, zero equals off"
+                v-model="uiPlotFrequency" showButtons :min="1" aria-label="Plot Generation Frequency, zero equals off"
                 title="Plot Generation Frequency, zero equals off"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputNumber>
               &nbsp;&nbsp;Iterations
@@ -219,13 +219,11 @@ const {
 } = storeToRefs(optimizationStore);
 
 const { saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
-const userDataStore = useUserDataStore();
-const { userCalibrationRunData } = storeToRefs(userDataStore);
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const cbCategoricalDisabled = ref<boolean>(false);
@@ -348,17 +346,17 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
 const saveOptMetData = () => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration' };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
     saveOptimizationTabData().then(response => {
       if (response.status === 200) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Optimization Metrics Data Saved', detail: response?._data?.message };
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Optimization Metrics Data Saved', detail: response?._data?.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
-          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Data Failed.', detail: message };
+          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Data Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status)};
           toast.add(tMsg); addToastRecord(tMsg);
         });
       }

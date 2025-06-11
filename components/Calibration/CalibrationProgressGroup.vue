@@ -4,8 +4,7 @@
       <tr>
         <td><i v-if="userCalibrationRunData?.gage?.gage_id"
             :class="(userCalibrationRunData?.gage?.gage_id) ? 'checkMark' : ''" class="pi pi-check font-bold"></i></td>
-        <td data-tab="2" title="Headwater Basin Gage" aria-label="Headwater Basin Gage"
-          @click="tabClicked">
+        <td data-tab="2" title="Headwater Basin Gage" aria-label="Headwater Basin Gage" @click="tabClicked">
           Headwater Basin Gage</td>
       </tr>
       <tr>
@@ -34,36 +33,41 @@
       </tr>
       <tr>
         <td><i v-if="checkStartEndTimeValues()" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="4" title="Start and End Times" aria-label="Start and End Times"
-          @click="tabClicked">
+        <td data-tab="4" title="Start and End Times" aria-label="Start and End Times" @click="tabClicked">
           Start and End Times</td>
       </tr>
       <tr>
+        <td>
+          <i v-if="userCalibrationRunData?.parameters_selected" class="pi pi-check font-bold checkMark"></i>
+        </td>
+        <td data-tab="4" title="Output Variable to Calibrate" aria-label="Output Variable to Calibrate"
+          @click="tabClicked">Output Variable to Calibrate</td>
+      </tr>
+      <tr>
         <td><i v-if="userCalibrationRunData?.parameters_selected" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters"
-          @click="tabClicked">Tuning Parameters</td>
+        <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters" @click="tabClicked">Tuning Parameters
+        </td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.optimization" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Optimization Algorithm"
-          aria-label="Optimization Algorithm" @click="tabClicked">Optimization Algorithm</td>
+        <td data-tab="5" title="Optimization Algorithm" aria-label="Optimization Algorithm" @click="tabClicked">
+          Optimization Algorithm</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.objective_function" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Objective Function" aria-label="Objective Function"
-          @click="tabClicked">
+        <td data-tab="5" title="Objective Function" aria-label="Objective Function" @click="tabClicked">
           Objective Function</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.stop_criteria" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Calibration Stop Criteria"
-          aria-label="Calibration Stop Criteria" @click="tabClicked">Calibration Stop Criteria</td>
+        <td data-tab="5" title="Calibration Stop Criteria" aria-label="Calibration Stop Criteria" @click="tabClicked">
+          Calibration Stop Criteria</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.save_plot_iteration_frequency" class="pi pi-check font-bold checkMark"></i>
         </td>
-        <td data-tab="5" title="Metrics and Plot Inteval"
-          aria-label="Metrics and Plot Inteval" @click="tabClicked">Metrics / Plot Inteval</td>
+        <td data-tab="5" title="Metrics and Plot Interval" aria-label="Metrics and Plot Interval" @click="tabClicked">
+          Metrics / Plot Interval</td>
       </tr>
     </tbody>
   </table>
@@ -71,13 +75,13 @@
 </template>
 
 <script lang="ts" setup>
- 
+
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
-const userDataStore = useUserDataStore();
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
-const { userCalibrationRunData } = storeToRefs(userDataStore);
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 
 const emit = defineEmits(["tabNumber"]);
