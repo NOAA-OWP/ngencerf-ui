@@ -115,13 +115,15 @@ const toast = useToast();
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
-const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, evaluateDisplayIterationNumber } = storeToRefs(useEvaluationRunStatusStore());
-const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime } = useEvaluationRunStatusStore();
+const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, evaluateDisplayIterationNumber, runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
+const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime, clearRunningStatusInfo } = useEvaluationRunStatusStore();
 
 const validationStatusCheckingInterval = ref<any>();
 
 onMounted(async () => {
   hilightTab(EvaluationTabs.tab_runStatus);
+
+  runStatusTabVisible.value = true;
 
   toast.removeAllGroups();
 
@@ -202,6 +204,8 @@ watch(validationStatus, async (newStatus, initialStatus) => {
 onUnmounted(() => {
   clearInterval(validationStatusCheckingInterval.value);
   clearInterval(validationRunningTimeInterval.value);
+  clearRunningStatusInfo();
+  runStatusTabVisible.value = false;
 })
 
 const cancelRun = async () => {

@@ -70,9 +70,8 @@
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
             <span
-              v-show="(evaluateIterationRunId && evaluateIterationRunId > 0) || (evaluateValidationRunId && evaluateValidationRunId > 0)">
+            <span v-show="runStatusTabVisible || (evaluateValidationRunId > 0 && evaluateValidationRunStatus === 'Running')">
               <div data-tab="5" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
-                v-show="runStatusTabVisible || (evaluateValidationRunId > 0 && evaluateValidationRunStatus === 'Running')"
                 aria-label="Run / Status" title="Run / Status">
                 Run / Status
                 <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>

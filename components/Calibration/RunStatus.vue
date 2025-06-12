@@ -756,29 +756,30 @@ watch(submitTimeDate, () => {
 
 // Handle iteration changes
 watch(iteration, async () => {
-  if (iteration.value && iteration.value >= 1 && selectedPlotName.value && selectedPlotName.value != plotListDefault.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
-    let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available';
-
+  if (iteration.value && iteration.value >= 1) {
     if (iteration.value == 1) {
       // populate plotListOptions on first iteration
       populatePlotListOptions();
     }
+    if (selectedPlotName.value && selectedPlotName.value != plotListDefault.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
+      let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available';
 
-    // provide custom message if missing selected plot is a validation plot
-    if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
-      plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
-    }
-    // get selected plot file name and url from server
-    const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
+      // provide custom message if missing selected plot is a validation plot
+      if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
+        plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
+      }
+      // get selected plot file name and url from server
+      const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
 
-    if (response?._data?.plot_file_path && response?._data?.plot_url) {
-      selectedPlotFilename.value = response?._data?.plot_file_path;
-      selectedPlotFileUrl.value = response?._data?.plot_url;
-    } else {
-      selectedPlotFilename.value = "";
-      selectedPlotFileUrl.value = "";
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
-      toast.add(tMsg); addToastRecord(tMsg);
+      if (response?._data?.plot_file_path && response?._data?.plot_url) {
+        selectedPlotFilename.value = response?._data?.plot_file_path;
+        selectedPlotFileUrl.value = response?._data?.plot_url;
+      } else {
+        selectedPlotFilename.value = "";
+        selectedPlotFileUrl.value = "";
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
     }
   }
 });
