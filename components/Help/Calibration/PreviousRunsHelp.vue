@@ -3,9 +3,7 @@
         <div class="_help-title">Calibration - Calibration Runs Tab</div>
         <div class="_help-subtitle">Displays list of calibration jobs<br />
             <br />
-            Filters are provided to narrow list of jobs.<br />
-            <br />
-            Select a job then right click for a list of actions.
+            Select a job then right click for available actions.
         </div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
@@ -13,6 +11,9 @@
         <hr />
         <p class="text-center">Filter by Headwater Basin Gage, multi-select status, multi-select modules, and/or
             archived jobs.<br />
+            <br >
+            Multi-select filters will show any job matching one of the 
+            selected items. i.e. It is an “or” filter not an “and” filter.<br />
             <b>Apply Filters</b> must be clicked to filter the table.
         </p>
         <br />
@@ -21,7 +22,7 @@
         <table class="_help-table" aria-label="Calibration Runs Tab Help Table">
             <thead>
                 <tr>
-                    <th class="text-left">Action</th>
+                    <th class="td1">Action</th>
                     <th>Description</th>
                 </tr>
             </thead>
@@ -38,7 +39,7 @@
                     <td class="td1 align-top">Filters</td>
                     <td class="td2 align-top" style="vertical-align:top;">Filter by Headwater Basin Gage,
                         multi-select status, multi-select modules, and/or archived jobs.
-                        Must click <b>Apply Filters</b> button to filter the table</td>
+                        Must click <b>Apply Filters</b> button to filter the table.</td>
                 </tr>
                 <tr>
                     <td class="td1 align-top">Clear Filters</td>
@@ -79,6 +80,10 @@
                 <tr>
                     <td class="td1 align-top" style="font-weight:normal;">Download</td>
                     <td class="td2 align-top">Download all data associated with a Done calibration job.</td>
+                </tr>
+                <tr>
+                    <td class="td1 align-top" style="font-weight:normal;">Export</td>
+                    <td class="td2 align-top">Export the Calibration Definition for used for CLI import command.</td>
                 </tr>
                 <tr>
                     <td class="td1 align-top" style="font-weight:normal;">Delete</td>

@@ -16,7 +16,7 @@
             <h1 class="pt-3 mb-8 text-3xl font-bold inline-block text-center w-[1200px]">
               <span>Forecast Runs</span><br />
               <span style="font-size: 12px;font-weight: normal;padding-left: 5px;">
-                Right click on a row for options.
+                Select a job then right click for available actions.
               </span>
             </h1>
           </div>

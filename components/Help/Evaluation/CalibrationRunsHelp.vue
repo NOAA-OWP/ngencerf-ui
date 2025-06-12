@@ -4,9 +4,7 @@
         <p class="_help-subtitle">
             Displays table of calibration jobs.<br />
             <br />
-            Filters are provided to narrow list of jobs.<br />
-            <br />
-            Select a job then right click for a list of actions.<br />
+            Select a job then right click for available actions.<br />
             <br />
             If the Evaluate action selected has more that one validation run, the table is populated with
             a list of associated validation runs. Select a run, then right click for available actions.
@@ -15,8 +13,11 @@
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
         <hr />
-        <p class="text-center">Filter by Headwater Basin Gage, multi-select status, multi-select modules, and/or
-            archived jobs.<br />
+        <p class="text-center">Filter by Headwater Basin Gage,
+            multi-select status, multi-select modules, and/or archived jobs.<br />
+            <br >
+            Multi-select filters will show any job matching one of the 
+            selected items. i.e. It is an “or” filter not an “and” filter.<br />
             <b>Apply Filters</b> must be clicked to filter the table.
         </p>
         <br />
@@ -66,6 +67,10 @@
                 <tr>
                     <td class="td1">Download</td>
                     <td class="td2">Download all the input and output data associated with a calibration run.</td>
+                </tr>
+                <tr>
+                    <td class="td1">Export</td>
+                    <td class="td2">Export the Calibration Definition for used for CLI import command.</td>
                 </tr>
                 <tr>
                     <td class="td1">Delete</td>

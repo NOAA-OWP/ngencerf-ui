@@ -15,7 +15,7 @@
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
             Calibration Runs<br />
             <span style="font-size: 12px;font-weight: normal;">
-              Select row and right click for options.
+              Select a job then right click for available actions.
             </span>
           </h1>
         </div>
