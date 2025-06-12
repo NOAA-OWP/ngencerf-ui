@@ -21,6 +21,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   const validationFailedStatus = ref<string[]>(['SERVER ERROR', 'FAIL']);
   const displayValidationId = ref<number>( 0 );
   const validationRunningTimeInterval = ref<any>();
+  const runStatusTabVisible = ref<boolean>(false);
 
    /**
     * @returns {Promise<any>}
@@ -126,6 +127,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     displayValidationId,
     validationRunningTimeInterval,
     evaluateDisplayIterationNumber,
+    runStatusTabVisible,
     executeIterationValidationRun,
     queryIterationValidationRunStatus,
     executeCancelIterationValidationRun,

@@ -173,7 +173,7 @@ import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
 import {
   useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
-  useApiResponseToastSeverityCode
+  useApiResponseToastSeverityCode, useApiResponseToastSeverityLife
 } from "@/composables/ValidationHandlers";
 
 const { isLoading } = storeToRefs(generalStore());
@@ -487,20 +487,21 @@ const saveTabData = () => {
 
     saveGageTabData().then(response => {
       if (response.status === 400) {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Save Gage Data Failed.', detail: response._data.message };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Save Gage Data Failed.', detail: response._data.message, life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
       } else if (response.status === 200) {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
           toast.add(toastMessage); addToastRecord(toastMessage);
         })
+        updateJobData(response);
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Data Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
           toast.add(tMsg); addToastRecord(tMsg);
         });
+        updateJobData(response);
       }
       isLoading.value = false;
-      updateJobData(response);
     });
   }
 };
