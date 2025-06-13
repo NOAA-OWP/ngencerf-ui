@@ -70,6 +70,7 @@ import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useEvaluationAltIterationStore } from '@/stores/evaluation/EvaluationAltIterationStore';
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
@@ -83,6 +84,10 @@ const {
   fetchCalibrationDataByIterationDataList,
   resetEvaluationAltIterationStore,
 } = useEvaluationAltIterationStore();
+
+const { fetchUserCalibrationRunData } = useUserDataStore();
+const userDataStore = useUserDataStore();
+const { userCalibrationRunData } = storeToRefs(userDataStore);
 
 const {
   calibrationRunDetailDataListHeaders,
@@ -105,6 +110,8 @@ const tuningParametersTable = ref<HTMLTableElement>();
 
 onMounted(() => {
   hilightTab(EvaluationTabs.tab_selectAltIteration);
+
+  fetchUserCalibrationRunData();
 
   nextTick(() => {
     resetEvaluationAltIterationStore();

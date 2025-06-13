@@ -10,7 +10,7 @@
   </Transition>
   <div id="EvaluatePage">
     <div class="pl-6 pr-2 pt-2">
-      <div class="flex mt-3">        
+      <div class="flex mt-3">
         <div class="w-5/6 relative">
 
           <div class="inline-block">
@@ -76,7 +76,8 @@
             Show Calibration Details</a>
           <br />
           <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">
-            <a v-if="selectedPlotHasTimeseries && !showPlotGraph" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">Show
+            <a v-if="selectedPlotHasTimeseries && !showPlotGraph" href="#" class="p-1 c-blue underline mt-1"
+              @click="togglePlotGraph">Show
               SWE Time Series</a>
           </span>
           <span v-else>
@@ -219,14 +220,20 @@
       v-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0">
       <div class="pl-4">
         <table width="100%" summary="Calibration Log Options and File Path">
-          <caption class="sr-only">Calibration Log Options and File Path table</caption>  
-          <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Calibration Log Label</th><th scope="col">Calibration Log Value</th></tr></thead>     
-          <tbody>  
+          <caption class="sr-only">Calibration Log Options and File Path table</caption>
+          <thead class="sr-only">
+            <tr>
+              <th scope="col" style="min-width: 185px;">Calibration Log Label</th>
+              <th scope="col">Calibration Log Value</th>
+            </tr>
+          </thead>
+          <tbody>
             <tr v-if="selectedLogList.length > 1">
-              <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
-              <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
-              optionLabel="name" optionValue="name">
-            </Select></td>
+              <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }}
+                  Log</label></td>
+              <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;"
+                  v-model="selectedLogName" :options="selectedLogList" optionLabel="name" optionValue="name">
+                </Select></td>
             </tr>
             <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
               <td class="pr-2 pt-3"><b>Log Name</b></td>
@@ -241,7 +248,8 @@
 
         <div class="pt-4">
           <div class="pagination-box" v-if="selectedLogDisplay">
-            <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{ selectedLogTotalSize }}</div>
+            <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{
+              selectedLogTotalSize }}</div>
             <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
           </div>
           <div v-else>
@@ -378,6 +386,7 @@ const {
   queryGetSWETimeseriesData
 } = EvaluationSupplementalDataStore;
 
+const plotListDefault = ref<string>('Select an option');
 const expandPlotTable = ref<Boolean>(false);
 const plotTables = ref<DynamicObject>({});
 const plotTableList = ref<any[]>([]);
@@ -484,9 +493,10 @@ onMounted(() => {
       plotNames.value = await queryGetPlotNames();
     }
 
+    plotList.value = [{ name: plotListDefault.value, description: '' }];
     if (plotNames.value?._data?.plot_names) {
       // setting plotList will populate the dropdown
-      plotList.value = plotNames?.value?._data?.plot_names;
+      plotList.value = plotList.value.concat(plotNames?.value?._data?.plot_names);
     } else {
       toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Error getting Plot Names', life: ToastTimeout.timeoutWarn };
@@ -522,7 +532,7 @@ onMounted(() => {
             logLists.value[key] = logList;
           });
         }
-        
+
         // Add Log Options to the dropdown
         Object.keys(logLists.value).forEach(key => {
           let optionName = capitalCase(key) + ' Logs';
@@ -537,294 +547,299 @@ onMounted(() => {
       }
     }
   })
+  if (!selectedPlotName.value) {
+    // Start with default option
+    selectedPlotName.value = plotListDefault.value;
+  }
   isEvaluationLoading.value = false;
 });
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
   // is the selected option a plot or supplemental table?
-  if (selectedPlotName.value && (supplementalTableOptions.value as any).includes(selectedPlotName.value)) {
-    selectedSupplementalTable.value = (supplementalTableOptions.value as any).indexOf(selectedPlotName.value) + 1;
-    // reset all of our plot refs by selectedPlotName and selectedSupplementalTable
-    resetUserPlotRefs(['selectedPlotName','selectedSupplementalTable']);
-    if (selectedSupplementalTable.value === 1) {
-      // Get Iteration Data
-      if (!iterations.value?._data || !iterations.value?._data?.length) {
-        iterations.value = await queryGetIterations();
-      }
-
-      // set up array for iterationMetricsData
-      iterationMetricsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
-      if (iterations.value?._data?.iteration_data) {
-        for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
-          const iterationMetricsRecord: DynamicObject = {};
-          iterationMetricsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
-          for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
-            let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
-            iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
-            if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] === '') && iterationMetricsRecord[metric_name]) {
-              iterationMetricsRecord[metric_name] = 'N/A';
-            } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
-              iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
-            }
-            if (i === 0) {
-              iterationMetricsColumns.value.push({ header: metric_name, field: metric_name });
-            }
-          }
-          iterationMetricsData.value.push(iterationMetricsRecord);
+  if (selectedPlotName.value && selectedPlotName.value !== plotListDefault.value) {
+    if ((supplementalTableOptions.value as any).includes(selectedPlotName.value)) {
+      selectedSupplementalTable.value = (supplementalTableOptions.value as any).indexOf(selectedPlotName.value) + 1;
+      // reset all of our plot refs by selectedPlotName and selectedSupplementalTable
+      resetUserPlotRefs(['selectedPlotName', 'selectedSupplementalTable']);
+      if (selectedSupplementalTable.value === 1) {
+        // Get Iteration Data
+        if (!iterations.value?._data || !iterations.value?._data?.length) {
+          iterations.value = await queryGetIterations();
         }
-      }
 
-      if (!iterationMetricsData.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: ToastTimeout.timeoutInfo };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-    } else if (selectedSupplementalTable.value === 2) {
-      // Get Iteration Data
-      if (!iterations.value?._data || !iterations.value?._data?.length) {
-        iterations.value = await queryGetIterations();
-      }
-
-      // set up array for iterationParamsData
-      iterationParamsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
-      if (iterations.value?._data?.iteration_data) {
-        for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
-          const iterationParamsRecord: DynamicObject = {};
-          iterationParamsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
-          for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
-            let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
-            iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
-            if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] === '') && iterationParamsRecord[param_name]) {
-              iterationParamsRecord[param_name] = 'N/A';
-            } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
-              iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
-            }
-            if (i === 0) {
-              iterationParamsColumns.value.push({ header: param_name, field: param_name });
-            }
-          }
-          iterationParamsData.value.push(iterationParamsRecord);
-        }
-      }
-
-      if (!iterationParamsData.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: ToastTimeout.timeoutInfo };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-    } else if (selectedSupplementalTable.value === 3) {
-      // Get Performance Metrics - put each one into the table as its own row
-      if (!performanceMetrics.value?._data || !performanceMetrics.value?._data?.length) {
-        performanceMetrics.value = await queryGetPerformanceMetrics();
-      }
-
-      if (performanceMetrics.value?._data) {
-        if (performanceMetrics.value?._data?.performance_metrics) {
-          // First add the metric names and the values from our Calibration run
-          performanceMetricsColumns.value.push({ header: 'Calibration Job ID ' + calibrationJobId.value, field: 'calibration_job_id_' + calibrationJobId.value });
-          Object.keys(performanceMetrics.value?._data.performance_metrics).forEach(key => {
-            performanceMetricsData.value.push({ 'metric': key });
-            performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = performanceMetrics.value?._data?.performance_metrics[key];
-          });
-          // Now go through the values from our Validations and add each metric value to the appropriate row
-          if (performanceMetrics.value?._data?.validations) {
-            for (let v = 0; v < performanceMetrics.value?._data?.validations.length; v++) {
-              let validation_run_id = performanceMetrics.value?._data?.validations[v].validation_run_id;
-              let validation_type = performanceMetrics.value?._data?.validations[v].validation_type;
-              if (validation_type === 'valid_iteration') {
-                validation_type = 'Iter';
-              } else if (validation_type === 'valid_control') {
-                validation_type = 'Control';
-              } else if (validation_type === 'valid_best') {
-                validation_type = 'Best';
+        // set up array for iterationMetricsData
+        iterationMetricsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
+        if (iterations.value?._data?.iteration_data) {
+          for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
+            const iterationMetricsRecord: DynamicObject = {};
+            iterationMetricsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
+            for (let m = 0; m < iterations.value?._data?.iteration_data[i].metrics.length; m++) {
+              let metric_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_name;
+              iterationMetricsRecord[metric_name] = iterations.value?._data?.iteration_data[i].metrics[m].metric_value;
+              if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] === '') && iterationMetricsRecord[metric_name]) {
+                iterationMetricsRecord[metric_name] = 'N/A';
+              } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
+                iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
               }
-              if (performanceMetrics.value?._data?.validations[v]?.iteration_num !== null) {
-                if (validation_type !== 'Iter') {
-                  validation_type += ': Iter';
+              if (i === 0) {
+                iterationMetricsColumns.value.push({ header: metric_name, field: metric_name });
+              }
+            }
+            iterationMetricsData.value.push(iterationMetricsRecord);
+          }
+        }
+
+        if (!iterationMetricsData.value.length) {
+          const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration metrics', life: ToastTimeout.timeoutInfo };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
+      } else if (selectedSupplementalTable.value === 2) {
+        // Get Iteration Data
+        if (!iterations.value?._data || !iterations.value?._data?.length) {
+          iterations.value = await queryGetIterations();
+        }
+
+        // set up array for iterationParamsData
+        iterationParamsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
+        if (iterations.value?._data?.iteration_data) {
+          for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
+            const iterationParamsRecord: DynamicObject = {};
+            iterationParamsRecord['iteration'] = iterations.value?._data?.iteration_data[i].iteration_num;
+            for (let p = 0; p < iterations.value?._data?.iteration_data[i].parameters.length; p++) {
+              let param_name = iterations.value?._data?.iteration_data[i].parameters[p].parameter_name;
+              iterationParamsRecord[param_name] = iterations.value?._data?.iteration_data[i].parameters[p].parameter_value;
+              if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] === '') && iterationParamsRecord[param_name]) {
+                iterationParamsRecord[param_name] = 'N/A';
+              } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
+                iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
+              }
+              if (i === 0) {
+                iterationParamsColumns.value.push({ header: param_name, field: param_name });
+              }
+            }
+            iterationParamsData.value.push(iterationParamsRecord);
+          }
+        }
+
+        if (!iterationParamsData.value.length) {
+          const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no iteration parameters', life: ToastTimeout.timeoutInfo };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
+      } else if (selectedSupplementalTable.value === 3) {
+        // Get Performance Metrics - put each one into the table as its own row
+        if (!performanceMetrics.value?._data || !performanceMetrics.value?._data?.length) {
+          performanceMetrics.value = await queryGetPerformanceMetrics();
+        }
+
+        if (performanceMetrics.value?._data) {
+          if (performanceMetrics.value?._data?.performance_metrics) {
+            // First add the metric names and the values from our Calibration run
+            performanceMetricsColumns.value.push({ header: 'Calibration Job ID ' + calibrationJobId.value, field: 'calibration_job_id_' + calibrationJobId.value });
+            Object.keys(performanceMetrics.value?._data.performance_metrics).forEach(key => {
+              performanceMetricsData.value.push({ 'metric': key });
+              performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = performanceMetrics.value?._data?.performance_metrics[key];
+            });
+            // Now go through the values from our Validations and add each metric value to the appropriate row
+            if (performanceMetrics.value?._data?.validations) {
+              for (let v = 0; v < performanceMetrics.value?._data?.validations.length; v++) {
+                let validation_run_id = performanceMetrics.value?._data?.validations[v].validation_run_id;
+                let validation_type = performanceMetrics.value?._data?.validations[v].validation_type;
+                if (validation_type === 'valid_iteration') {
+                  validation_type = 'Iter';
+                } else if (validation_type === 'valid_control') {
+                  validation_type = 'Control';
+                } else if (validation_type === 'valid_best') {
+                  validation_type = 'Best';
                 }
-                validation_type += ' ' + performanceMetrics.value?._data?.validations[v].iteration_num;
-              }
-              performanceMetricsColumns.value.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id });
-              if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
-                Object.keys(performanceMetrics.value?._data?.validations[v].performance_metrics).forEach(key => {
-                  // Loop through our existing rows and see if we have this metric already
-                  let metricRow = -1;
-                  for (let m = 0; m < performanceMetricsData.value.length; m++) {
-                    if (performanceMetricsData.value[m].metric === key) {
-                      metricRow = m;
-                      performanceMetricsData.value[m]['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
-                      break;
+                if (performanceMetrics.value?._data?.validations[v]?.iteration_num !== null) {
+                  if (validation_type !== 'Iter') {
+                    validation_type += ': Iter';
+                  }
+                  validation_type += ' ' + performanceMetrics.value?._data?.validations[v].iteration_num;
+                }
+                performanceMetricsColumns.value.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id });
+                if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
+                  Object.keys(performanceMetrics.value?._data?.validations[v].performance_metrics).forEach(key => {
+                    // Loop through our existing rows and see if we have this metric already
+                    let metricRow = -1;
+                    for (let m = 0; m < performanceMetricsData.value.length; m++) {
+                      if (performanceMetricsData.value[m].metric === key) {
+                        metricRow = m;
+                        performanceMetricsData.value[m]['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
+                        break;
+                      }
                     }
-                  }
-                  if (metricRow === -1) {
-                    // We didn't find this metric, so create a new row for it
-                    performanceMetricsData.value.push({ 'metric': key });
-                    performanceMetricsData.value.at(-1)['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
-                  }
-                });
+                    if (metricRow === -1) {
+                      // We didn't find this metric, so create a new row for it
+                      performanceMetricsData.value.push({ 'metric': key });
+                      performanceMetricsData.value.at(-1)['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
+                    }
+                  });
+                }
               }
-            }
-            // Now clean up our metric names so that they display nicely
-            for (let m = 0; m < performanceMetricsData.value.length; m++) {
-              let column_header_words = performanceMetricsData.value[m].metric.split("_");
-              for (let w = 0; w < column_header_words.length; w++) {
-                let word = column_header_words[w]
-                column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+              // Now clean up our metric names so that they display nicely
+              for (let m = 0; m < performanceMetricsData.value.length; m++) {
+                let column_header_words = performanceMetricsData.value[m].metric.split("_");
+                for (let w = 0; w < column_header_words.length; w++) {
+                  let word = column_header_words[w]
+                  column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+                }
+                let column_header = column_header_words.join(" ");
+                performanceMetricsData.value[m].metric = column_header;
               }
-              let column_header = column_header_words.join(" ");
-              performanceMetricsData.value[m].metric = column_header;
             }
           }
         }
+        if (!performanceMetricsData.value.length) {
+          const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: ToastTimeout.timeoutInfo };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
       }
-      if (!performanceMetricsData.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Calibration Run ' + calibrationJobId.value + ' has no performance metrics', life: ToastTimeout.timeoutInfo };
-        toast.add(tMsg); addToastRecord(tMsg);
+    } else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
+      // selectedPlotName is a log 
+      // reset all of our plot refs except for selectedPlotName
+      resetUserPlotRefs(['selectedPlotName']);
+      selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
+    }
+    else if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
+      // selectedPlotName is a grid display option
+      // reset all of our plot refs except for selectedPlotName
+      resetUserPlotRefs(['selectedPlotName']);
+      // set selectedGridType to 'catchment' by default if not already set
+      if (!selectedGridType.value) {
+        selectedGridType.value = 'catchment';
       }
-    }
-  }
-  else if (selectedPlotName.value && selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value) {
-    // selectedPlotName is a log 
-    // reset all of our plot refs except for selectedPlotName
-    resetUserPlotRefs(['selectedPlotName']);
-    selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
-  }
-  // selectedPlotName is a grid display option
-  else if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
-    // reset all of our plot refs except for selectedPlotName
-    resetUserPlotRefs(['selectedPlotName']);
-    // set selectedGridType to 'catchment' by default if not already set
-    if (!selectedGridType.value) {
-      selectedGridType.value = 'catchment';
-    }
 
-    // set sweStartDateTime and sweEndDateTime if not already set
-    if (!sweStartDateTime.value || !sweEndDateTime.value) {
-      setSweStartDateTime();
-      setSweEndDateTime();
-    }
-    // set selectedSweDateTime to sweStartDateTime if not already set
-    /* if (!selectedSweDateTime.value) {
-      selectedSweDateTime.value = sweStartDateTime.value;
-    } */
+      // set sweStartDateTime and sweEndDateTime if not already set
+      if (!sweStartDateTime.value || !sweEndDateTime.value) {
+        setSweStartDateTime();
+        setSweEndDateTime();
+      }
+      // set selectedSweDateTime to sweStartDateTime if not already set
+      /* if (!selectedSweDateTime.value) {
+        selectedSweDateTime.value = sweStartDateTime.value;
+      } */
 
-    // pre-load SWE Timeseries Data so that we know our date range
-    if (!sweTimeSeriesData.value || sweTimeSeriesData.value.length === 0) {
-      const response: any = await queryGetSWETimeseriesData(
+      // pre-load SWE Timeseries Data so that we know our date range
+      if (!sweTimeSeriesData.value || sweTimeSeriesData.value.length === 0) {
+        const response: any = await queryGetSWETimeseriesData(
+          (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+        );
+        if (response?._data?.swe_timeseries_data) {
+          // get time series data from server
+          sweTimeSeriesData.value = response?._data?.swe_timeseries_data;
+          selectedPlotHasTimeseries.value = true;
+          // Start with SWE timeseries already displayed
+          togglePlotGraph();
+        } else {
+          selectedPlotHasTimeseries.value = false;
+          toast.removeAllGroups();
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'SWE time series data is currently unavailable', life: ToastTimeout.timeoutInfo };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
+      }
+    } else if (selectedPlotName.value) {
+      // reset all of our plot refs except for selectedPlotName
+      resetUserPlotRefs(['selectedPlotName']);
+
+      // get selected plot file name and url from server
+      const response: any = await queryGetPlot(
+        selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
+        true, // include_data
+        true, // force_include_plot
+        (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
         (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
+        0, // start
+        plotTablePageSize.value // limit
       );
-      if (response?._data?.swe_timeseries_data) {
-        // get time series data from server
-        sweTimeSeriesData.value = response?._data?.swe_timeseries_data;
-        selectedPlotHasTimeseries.value = true;
-        // Start with SWE timeseries already displayed
-        togglePlotGraph();
-      } else {
-        selectedPlotHasTimeseries.value = false;
-        toast.removeAllGroups();
-        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'SWE time series data is currently unavailable', life: ToastTimeout.timeoutInfo };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-    }
-  } else if (selectedPlotName.value) {
-    // reset all of our plot refs except for selectedPlotName
-    resetUserPlotRefs(['selectedPlotName']);
-    
-    // get selected plot file name and url from server
-    const response: any = await queryGetPlot(
-      selectedPlotName.value !== null ? selectedPlotName.value : '', // plotName
-      true, // include_data
-      true, // force_include_plot
-      (evaluateValidationRunId.value) ? 0 : calibrationJobId.value, // calibration_run_id
-      (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
-      0, // start
-      plotTablePageSize.value // limit
-    );
 
-    if (response?._data) {
-      if (response?._data?.plot_file_path && response?._data?.plot_url) {
-        selectedPlotFilename.value = response?._data?.plot_file_path;
-        selectedPlotFileUrl.value = response?._data?.plot_url;
-        for (let p = 0; p < plotList.value.length; p++) {
-          if (plotList.value[p].name === selectedPlotName.value) {
-            selectedPlotHasTimeseries.value = plotList.value[p].timeseries_available;
+      if (response?._data) {
+        if (response?._data?.plot_file_path && response?._data?.plot_url) {
+          selectedPlotFilename.value = response?._data?.plot_file_path;
+          selectedPlotFileUrl.value = response?._data?.plot_url;
+          for (let p = 0; p < plotList.value.length; p++) {
+            if (plotList.value[p].name === selectedPlotName.value) {
+              selectedPlotHasTimeseries.value = plotList.value[p].timeseries_available;
+            }
           }
-        }
-      } else {
-        selectedPlotFilename.value = null;
-        selectedPlotFileUrl.value = null;
-        selectedPlotHasTimeseries.value = false;
-        toast.removeAllGroups();
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: ToastTimeout.timeoutInfo };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-
-      if (response?._data?.plot_data && response?._data?.plot_data.length > 0) {
-        plotTables.value = {};
-        plotTableList.value = [];
-        selectedPlotTable.value = '';
-        if (response?._data?.pagination_metadata?.count) {
-          plotTableTotalSize.value = response?._data?.pagination_metadata?.count;
         } else {
-          plotTableTotalSize.value = response?._data?.plot_data.length;
+          selectedPlotFilename.value = null;
+          selectedPlotFileUrl.value = null;
+          selectedPlotHasTimeseries.value = false;
+          toast.removeAllGroups();
+          const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Plot graph is currently unavailable', life: ToastTimeout.timeoutInfo };
+          toast.add(tMsg); addToastRecord(tMsg);
         }
-        plotTableData.value = [];
-        if (Array.isArray(response?._data?.plot_data[0])) {
-          // special case - we are dealing with an array of multiple tables, instead of a single table
-          for (let i = 0; i < response?._data?.plot_data.length; i++) {
-            // i is the iteration number - we need to get the table name from the iteration data row
-            let iteration_data_row = response?._data?.plot_data[i];
-            // table_name is the name of the run - should be the same across the entire iteration data row
-            let table_name = iteration_data_row[0].run;
-            // make sure our table is named in plotTables
-            if (!(table_name in plotTables.value)) {
-              plotTables.value[table_name] = [];
-            }
-            // now go through and add rows to our table
-            for (let d = 0; d < iteration_data_row.length; d++) {
-              let data_row = iteration_data_row[d];
-              delete data_row.run;
-              plotTables.value[table_name].push(data_row);
-            }
-          }
-          // find the name of our first table and make that one selected by default
-          Object.keys(plotTables.value).forEach(key => {
-            plotTableList.value.push({ name: key });
-          });
-          selectedPlotTable.value = plotTableList.value[0].name;
-          if (selectedPlotTable.value !== '') {
-            plotTableData.value = plotTables.value[selectedPlotTable.value];
+
+        if (response?._data?.plot_data && response?._data?.plot_data.length > 0) {
+          plotTables.value = {};
+          plotTableList.value = [];
+          selectedPlotTable.value = '';
+          if (response?._data?.pagination_metadata?.count) {
+            plotTableTotalSize.value = response?._data?.pagination_metadata?.count;
           } else {
-            plotTableData.value = [];
+            plotTableTotalSize.value = response?._data?.plot_data.length;
           }
-          adjustPlotTableColumns();
+          plotTableData.value = [];
+          if (Array.isArray(response?._data?.plot_data[0])) {
+            // special case - we are dealing with an array of multiple tables, instead of a single table
+            for (let i = 0; i < response?._data?.plot_data.length; i++) {
+              // i is the iteration number - we need to get the table name from the iteration data row
+              let iteration_data_row = response?._data?.plot_data[i];
+              // table_name is the name of the run - should be the same across the entire iteration data row
+              let table_name = iteration_data_row[0].run;
+              // make sure our table is named in plotTables
+              if (!(table_name in plotTables.value)) {
+                plotTables.value[table_name] = [];
+              }
+              // now go through and add rows to our table
+              for (let d = 0; d < iteration_data_row.length; d++) {
+                let data_row = iteration_data_row[d];
+                delete data_row.run;
+                plotTables.value[table_name].push(data_row);
+              }
+            }
+            // find the name of our first table and make that one selected by default
+            Object.keys(plotTables.value).forEach(key => {
+              plotTableList.value.push({ name: key });
+            });
+            selectedPlotTable.value = plotTableList.value[0].name;
+            if (selectedPlotTable.value !== '') {
+              plotTableData.value = plotTables.value[selectedPlotTable.value];
+            } else {
+              plotTableData.value = [];
+            }
+            adjustPlotTableColumns();
+          } else {
+            plotTables.value = { default_table: [] };
+            for (let d = 0; d < response?._data?.plot_data.length; d++) {
+              let data_row = response?._data?.plot_data[d];
+              if ("metrics" in data_row) {
+                for (let d = 0; d < data_row.metrics.length; d++) {
+                  data_row[data_row.metrics[d].name] = data_row.metrics[d].value;
+                }
+                delete data_row.metrics;
+              }
+              if ("parameters" in data_row) {
+                for (let d = 0; d < data_row.parameters.length; d++) {
+                  data_row[data_row.parameters[d].name] = data_row.parameters[d].value;
+                }
+                delete data_row.parameters;
+              }
+              plotTables.value.default_table.push(data_row);
+            }
+            plotTableData.value = plotTables.value.default_table;
+            adjustPlotTableColumns();
+          }
+          plotTableStartRow.value = 1;
+          plotTableEndRow.value = plotTableData.value.length;
+          plotTableTotalPages.value = Math.ceil(plotTableTotalSize.value / plotTablePageSize.value);
         } else {
-          plotTables.value = { default_table: [] };
-          for (let d = 0; d < response?._data?.plot_data.length; d++) {
-            let data_row = response?._data?.plot_data[d];
-            if ("metrics" in data_row) {
-              for (let d = 0; d < data_row.metrics.length; d++) {
-                data_row[data_row.metrics[d].name] = data_row.metrics[d].value;
-              }
-              delete data_row.metrics;
-            }
-            if ("parameters" in data_row) {
-              for (let d = 0; d < data_row.parameters.length; d++) {
-                data_row[data_row.parameters[d].name] = data_row.parameters[d].value;
-              }
-              delete data_row.parameters;
-            }
-            plotTables.value.default_table.push(data_row);
-          }
-          plotTableData.value = plotTables.value.default_table;
-          adjustPlotTableColumns();
+          plotTableData.value = [];
+          plotTableColumns.value = [];
+          plotTableErrorMessage.value = 'Data internally calculated by program and unavailable for table display.';
         }
-        plotTableStartRow.value = 1;
-        plotTableEndRow.value = plotTableData.value.length;
-        plotTableTotalPages.value = Math.ceil(plotTableTotalSize.value / plotTablePageSize.value);
-      } else {
-        plotTableData.value = [];
-        plotTableColumns.value = [];
-        plotTableErrorMessage.value = 'Data internally calculated by program and unavailable for table display.';
       }
     } else {
       // reset all of our plot refs except for selectedPlotName
@@ -833,18 +848,21 @@ watch(selectedPlotName, async () => {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
+  } else {
+    // reset all of our plot refs except for selectedPlotName
+    resetUserPlotRefs(['selectedPlotName']);
   }
 });
 
 // Reset refs when selectedPlotName changes
 const resetUserPlotRefs = (exceptions: any): void => {
-  if( !Array.isArray(exceptions) ) {
+  if (!Array.isArray(exceptions)) {
     exceptions = [];
   }
 
   // plot file refs
   if (!exceptions.includes('selectedPlotName')) {
-    selectedPlotName.value = null;
+    selectedPlotName.value = plotListDefault.value;
   }
   selectedPlotFilename.value = null;
   selectedPlotFileUrl.value = null;
@@ -1248,16 +1266,16 @@ const drawInteractivePlot = () => {
 
 
 const getSliderWidth = () => {
-  return (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().right 
+  return (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().right
     - (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().left;
 }
 
 const plotGraphCheckboxesEmpty = () => {
   if (plotGraphLines.value.length > 1) {
     for (let c = 0; c < plotGraphLines.value.length; c++) {
-      if (!(document?.getElementById('plotGraphCheckbox-' + (c + 1) ))) {
+      if (!(document?.getElementById('plotGraphCheckbox-' + (c + 1)))) {
         return false;
-      } else if ( (document?.getElementById('plotGraphCheckbox-' + (c + 1)) as HTMLInputElement).checked) {
+      } else if ((document?.getElementById('plotGraphCheckbox-' + (c + 1)) as HTMLInputElement).checked) {
         return false;
       }
     }
@@ -1512,11 +1530,11 @@ const setSliderDateRange = () => {
   let daysFromStart = Math.ceil(sliderBoxPosition.value.start * (plotGraphDateLimits.value.span / getSliderWidth()));
   let newStartDate = new Date(plotGraphDateLimits.value.start);
   newStartDate.setDate(newStartDate.getDate() + daysFromStart);
-  
+
   let daysFromEnd = Math.ceil((getSliderWidth() - sliderBoxPosition.value.end) * (plotGraphDateLimits.value.span / getSliderWidth()));
   let newEndDate = new Date(plotGraphDateLimits.value.end);
   newEndDate.setDate(newEndDate.getDate() - daysFromEnd);
-  
+
   (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
   plotGraphDateRange.value.start = newStartDate.toISOString().split('T')[0];
   (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
@@ -1535,11 +1553,13 @@ const toggleCustomizePlot = async () => {
 // Handle selectedLogCategory changes
 watch(selectedLogCategory, async () => {
   selectedLogList.value = logLists.value[selectedLogCategory.value];
-  // start with the first log
-  selectedLogName.value = selectedLogList.value[0].name;
-  if (!selectedLogList.value.length) {
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
-    toast.add(tMsg); addToastRecord(tMsg);
+  if (selectedLogList?.value?.length > 0) {
+    // start with the first log
+    selectedLogName.value = selectedLogList.value[0].name;
+    if (!selectedLogList.value.length) {
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   }
 });
 
@@ -1621,7 +1641,7 @@ function formatDateString(str: string) {
 const gotoSelectAlternateIteration = () => {
   nextTick(() => {
     const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[2];
+    const e = <HTMLElement>tabs[3];
     e.click();
   })
 }
@@ -1688,7 +1708,7 @@ onUnmounted(() => {
 @use "@/assets/styles/styles.scss";
 
 #DisplayOptions {
-  width:100%;
+  width: 100%;
   min-width: 300px;
   max-width: 375px;
   margin-left: 0px;

@@ -44,7 +44,7 @@
           <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px"
             sortField="validation_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="single"
             v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle"
-            @rowContextmenu="onRowVrContextMenu" @rowSelect="onEvalValdiationRowSelect"
+            @rowContextmenu="onRowVrContextMenu" @rowSelect="onEvalValidationRowSelect"
             @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
             <Column :pt="ptValColumns" v-for="(col, colIndex) in calibrationValidationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field">
@@ -299,6 +299,7 @@ const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const cmValidationRun = ref<DataTableContextMenuOption[]>([]);
 const cmCompareRun = ref<DataTableContextMenuOption[]>([]);
 
+const userDataStore = useUserDataStore();
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
 const updatedUserEvaluationJobsListData = ref<CalibrationJobListItem[]>([]);
@@ -313,6 +314,8 @@ const ptValColumns = ref({
   bodyCell: { style: { "text-align": "right", "padding-right": "10px" } }
 });
 
+const { fetchUserCalibrationRunData } = userDataStore;
+
 const {
   uiGageId,
   evaluationCalibrationRunGageList,
@@ -324,6 +327,7 @@ const {
   computedCalibrationValidationRunList,
   computedGageCalibrationRunList,
   selectedCalibrationCompareRuns,
+  selectedCalibrationModules,
   userEvaluationCalibrationRunListData,
   evaluateValidationRunId,
   evaluateValidationRunStatus,
@@ -485,9 +489,8 @@ const onRowContextMenu = (event: any) => {
       cmCalibrationRun.value.push({ label: 'Evaluate', icon: 'pi pi-chart-scatter', command: () => evaluateValidationJobFromCalibration(crRowData.calibration_run_id) })
     }
     cmCalibrationRun.value.push({ label: 'Compare Permutations', icon: 'pi pi-arrows-h', command: () => viewSelectedGageCalibrationRuns(crRowData.calibration_run_id, crRowData.gage_id) });
-    cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
-    if (crRowData.validation_runs <= 1) {
-      cmCalibrationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => viewValidationRunStatus(crRowData.calibration_run_id) })
+    if (!crRowData.modules?.some(item => item.toLowerCase() === 'lstm')) {
+      cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
     }
     cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
     if (selectedCalibrationRun.value?.is_downloadable) {
@@ -508,8 +511,8 @@ const onRowVrContextMenu = (event: any) => {
     }
     cmValidationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) });
     cmValidationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(userSelectedEvalCalibrationRunId.value) });
-    cmValidationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
     if (vrRowData.status.toLocaleUpperCase() === 'RUNNING') {
+      cmValidationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
       cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-ban', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
     }
   }
@@ -527,6 +530,8 @@ const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   resetUserSelectedEvalValidationRun();
   //loadSelectedCalibrationRun(event.data.calibration_run_id);
   setSelectedCalibrationRunId(event.data.calibration_run_id);
+  await fetchUserCalibrationRunData();
+  selectedCalibrationModules.value = userCalibrationRunData?.value?.modules;
   //isLoading.value = true;
   if (event.data.validation_runs === 1) {
     fetchUserSelectedCalibrationValidationRunList();
@@ -546,7 +551,7 @@ const onEvalCalibrationRowUnSelect = (event: any) => {
   resetUserSelectedEvalCalibrationRun();
 }
 
-const onEvalValdiationRowSelect = async (event: DataTableRowClickEvent) => {
+const onEvalValidationRowSelect = async (event: DataTableRowClickEvent) => {
   evaluateValidationRunId.value = event.data.validation_run_id;
   evaluateValidationRunStatus.value = event.data.status;
 }

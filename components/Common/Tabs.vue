@@ -64,15 +64,16 @@
             </div>
           </span>
           <span v-show="calibrationJobId > 0 && selectedCalibrationCompareRuns.length === 0">
-            <div data-tab="4" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
-              aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
-              Select Alternate Iteration
-              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-            </div>
-            <span
-              v-show="(evaluateIterationRunId && evaluateIterationRunId > 0) || (evaluateValidationRunId && evaluateValidationRunId > 0)">
+            <span v-show="!selectedCalibrationModules?.some(item => item.toLowerCase() === 'lstm')">
+              <div data-tab="4" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
+                aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
+                Select Alternate Iteration
+                <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+              </div>
+            </span>
+            <span v-show="runStatusTabVisible || (evaluateValidationRunId > 0 && evaluateValidationRunStatus === 'Running')">
               <div data-tab="5" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
-                aria-label="Run Validation tab" title="Run Validation tab">
+                aria-label="Run / Status" title="Run / Status">
                 Run / Status
                 <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
               </div>
@@ -144,6 +145,7 @@ import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
+import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 
 const {
@@ -161,8 +163,13 @@ const {
 } = generalStore();
 
 const {
-  selectedCalibrationCompareRuns
+  selectedCalibrationCompareRuns,
+  selectedCalibrationModules
 } = storeToRefs(useEvaluationCalibrationRunStore());
+
+const { 
+  runStatusTabVisible
+} = storeToRefs(useEvaluationRunStatusStore());
 
 const {
   overallForcingDownloadForecastStatus

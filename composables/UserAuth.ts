@@ -131,7 +131,17 @@ export const makeProtectedApiCall = async <T>(
     }
 
     // server Errors
-    if (myResponse.status >= 500 && myResponse.status < 600) {
+    if (myResponse.status == 504) {
+      responseData = {
+        _data: {
+          "message": 'Request to' + url + 'timed out',
+          "response_type": "error",
+        },
+        status: 504,
+        ok: false,
+      };
+      return responseData;
+    } else if (myResponse.status >= 500 && myResponse.status < 600) {
       responseData = {
         _data: await response.json(),
         status: response.status,
