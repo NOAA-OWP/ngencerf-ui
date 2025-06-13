@@ -64,12 +64,13 @@
             </div>
           </span>
           <span v-show="calibrationJobId > 0 && selectedCalibrationCompareRuns.length === 0">
-            <div data-tab="4" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
-              aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
-              Select Alternate Iteration
-              <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-            </div>
-            <span
+            <span v-show="!selectedCalibrationModules?.some(item => item.toLowerCase() === 'lstm')">
+              <div data-tab="4" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
+                aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
+                Select Alternate Iteration
+                <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+              </div>
+            </span>
             <span v-show="runStatusTabVisible || (evaluateValidationRunId > 0 && evaluateValidationRunStatus === 'Running')">
               <div data-tab="5" class="tabs prevent-select pl-25 mr-10" v-on:click="tabClicked"
                 aria-label="Run / Status" title="Run / Status">
