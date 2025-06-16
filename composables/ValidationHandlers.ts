@@ -133,6 +133,14 @@ export const useApiErrorResponseValidator = ( validationErrors: any ) => {
   return errors;
 }
 
+/**
+ * Preprocess API warning/error responses to extract relevant messages.
+ * NOTE: This will return string from 'message' as an error although 'message' is not always an error.
+ * So this function isn't safe to be used for all API responses, but we also want to capture 'message'
+ * when the response is OK (200) as some warning messages occur during OK responses, so we cannot do both at the same time.
+ * @param errorResponse The error response object from the API.
+ * @returns An array of warning/error messages.
+ */
 export const useApiErrorResponsePreprocess = ( errorResponse: any ) => {
   let errors = <string[]>[];
   if ( errorResponse?._data?.validation_errors ) {
