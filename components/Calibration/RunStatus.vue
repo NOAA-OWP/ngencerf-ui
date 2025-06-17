@@ -70,12 +70,12 @@
                           Evaluation" title="Evaluate">Evaluate</Button>
                       </div>
 
-                      <div v-if="calibrationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
+                      <div v-if="overallCalibrationValidationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
                         <span v-if="calibrationStatus === 'Ready'">
                           <Button class="font-normal ngenButtonDiv-green h-8" title="Run Button" aria-label="Run Button"
                             @click="startRun()">Run</Button>
                         </span>
-                        <span v-if="calibrationStatus === 'Running'">
+                        <span v-if="calibrationStatus === 'Running' || validationControlStatus === 'Running' || validationBestStatus === 'Running'">
                           <Button class="ngenButtonDiv-red h-8 mr-3" title="Cancel Button" @click="cancelRun()"
                             aria-label="Cancel Button">Cancel</Button>
                         </span>
