@@ -142,16 +142,32 @@ export const useApiErrorResponseValidator = ( validationErrors: any ) => {
  * @returns An array of warning/error messages.
  */
 export const useApiErrorResponsePreprocess = ( errorResponse: any ) => {
-  let errors = <string[]>[];
-  if ( errorResponse?._data?.validation_errors ) {
-    errors = useApiErrorResponseValidator( errorResponse?._data?.validation_errors );
+  let errors: string[] = [];
+
+  // add fatal_errors if they exist
+  if (errorResponse?._data?.fatal_errors) {
+    errors.push(...errorResponse?._data?.fatal_errors);
   }
-  if ( errorResponse?._data?.error && typeof errorResponse?._data?.error === 'string' &&  errorResponse?._data?.error.length > 0 ) {
+
+  // add validation_errors if they exist
+  if (errorResponse?._data?.validation_errors ) {
+    // if there are validation errors, use the validator to extract messages
+    errors.push(...useApiErrorResponseValidator( errorResponse?._data?.validation_errors ));
+  }
+
+  // add error if it exists
+  if (errorResponse?._data?.error && typeof errorResponse?._data?.error === 'string' &&  errorResponse?._data?.error.length > 0 ) {
     errors.push( errorResponse?._data?.error );
   }
-  if ( errorResponse?._data?.message && typeof errorResponse?._data?.message === 'string' &&  errorResponse?._data?.message.length > 0 ) {
+
+  // add message if it exists
+  // NOTE: This is not always an error, but we want to capture it as an error in some cases.
+  // So this function isn't safe to be used for all API responses.
+  // We should use this only when we know that the response is an error response.
+  if (errorResponse?._data?.message && typeof errorResponse?._data?.message === 'string' &&  errorResponse?._data?.message.length > 0 ) {
     errors.push( errorResponse?._data?.message );
   }
+
   return errors;
 }
 

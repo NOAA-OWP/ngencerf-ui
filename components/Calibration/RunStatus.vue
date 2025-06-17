@@ -747,6 +747,7 @@ watch(selectedPlotName, async () => {
 // Handle submitTimeDate changes
 watch(submitTimeDate, () => {
   if (isValidDate(submitTimeDate.value)) {
+    // convert submitTimeDate to local time format and set submitTime to display on the Status/Run tab
     submitTime.value = convertTimeZone(submitTimeDate.value as Date);
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
@@ -857,12 +858,11 @@ const updateLogRefs = async(getLogData: boolean) => {
         document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
       });
     } else {
-      toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
-  if (userCalibrationRunData.value.status === 'Running' && selectedLogFilePath.value) {
+  if (userCalibrationRunData?.value?.status === 'Running' && selectedLogFilePath.value) {
     // watch status every 10 seconds to see if log file changes
     clearTimeout(logTimeout);
     logTimeout = setTimeout(async() => {
