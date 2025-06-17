@@ -246,8 +246,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       })
     };
 
-    console.log("Running Calibration Job with bodyData:", bodyData);
-
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/run_calibration/`, {
       method: "POST",
       headers: {

@@ -568,9 +568,6 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             createElapsedTimeInterval();
           }
         }
-      } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
       }
     }
 
