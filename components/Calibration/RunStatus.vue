@@ -55,8 +55,8 @@
                     <th scope="row" class="text-right"><label for="DisplayOptions">{{ plotList.length > 0 ?
                       'Display' : '' }}</label></th>
                     <td class="pl-5">
-                      <Select v-show="plotList.length > 0" id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
-                        optionLabel="name" optionValue="name">
+                      <Select v-show="plotList.length > 0" id="DisplayOptions" class="p-select" v-model="selectedPlotName" 
+                        :options="plotList" option-label="name" optionValue="name">
                       </Select>
                     </td>
                   </tr>
@@ -274,6 +274,7 @@ const { addToastRecord } = generalStore();
 const calibrationStatus = computed(() => userCalibrationRunData?.value?.status);
 
 const plotListOptions = ref<any[]>([]);
+const plotListDefault = ref<string>('Select an option');
 const logs = ref<APIResponse>({});
 const logDataPageSize = ref<number>(1000);
 const logLists = ref<DynamicObject>({});
@@ -294,11 +295,11 @@ let logTimeout;
 
 const populatePlotListOptions = async() => {
   if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Preparing Job Data'].includes(userCalibrationRunData?.value?.status))) {
+    plotList.value = [{ name: plotListDefault.value, description: '' }];
     plotListOptions.value = [];
     logListOptions.value = [];
 
-    // TO DO: Don't add plots to the list if we're not at the first valid iteration yet
-    if (userCalibrationRunData?.value?.status != 'Failed') {
+    if (userCalibrationRunData?.value?.status != 'Failed' && (userCalibrationRunData?.value?.status != 'Running' || (iteration.value && iteration.value >= 1))) {
       // Get Plot Names
       plotNames.value = await queryGetPlotNames();
 
@@ -337,14 +338,17 @@ const populatePlotListOptions = async() => {
       }
     }
 
-    // Skip directly to ngen log if status is Failed
     if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
+      // Skip directly to ngen log if status is Failed
       selectedPlotName.value = (logListOptions.value.at(-1)).name;
       nextTick(async () => {
         if (selectedLogList.value.length > 1) {
             selectedLogName.value = selectedLogList.value.at(-1).name;
         }
       });
+    } else if (!selectedPlotName.value) {
+      // Start with default option
+      selectedPlotName.value = plotListDefault.value;
     }
   }
 }
@@ -564,9 +568,6 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             createElapsedTimeInterval();
           }
         }
-      } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
       }
     }
 
@@ -701,7 +702,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
 // Handle selectedPlotName changes
 watch(selectedPlotName, async () => {
-  if (selectedPlotName.value) {
+  if (selectedPlotName.value && selectedPlotName.value !== plotListDefault.value) {
     let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available.';
 
     // provide custom message if missing selected plot is a validation plot
@@ -734,12 +735,16 @@ watch(selectedPlotName, async () => {
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
+  } else {
+    // reset all of our plot refs except for selectedPlotName
+    resetUserPlotRefs(['selectedPlotName']);
   }
 });
 
 // Handle submitTimeDate changes
 watch(submitTimeDate, () => {
   if (isValidDate(submitTimeDate.value)) {
+    // convert submitTimeDate to local time format and set submitTime to display on the Status/Run tab
     submitTime.value = convertTimeZone(submitTimeDate.value as Date);
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
@@ -749,24 +754,30 @@ watch(submitTimeDate, () => {
 
 // Handle iteration changes
 watch(iteration, async () => {
-  if (iteration.value && iteration.value >= 1 && selectedPlotName.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
-    let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available';
-
-    // provide custom message if missing selected plot is a validation plot
-    if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
-      plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
+  if (iteration.value && iteration.value >= 1) {
+    if (iteration.value == 1) {
+      // populate plotListOptions on first iteration
+      populatePlotListOptions();
     }
-    // get selected plot file name and url from server
-    const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
+    if (selectedPlotName.value && selectedPlotName.value != plotListDefault.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
+      let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available';
 
-    if (response?._data?.plot_file_path && response?._data?.plot_url) {
-      selectedPlotFilename.value = response?._data?.plot_file_path;
-      selectedPlotFileUrl.value = response?._data?.plot_url;
-    } else {
-      selectedPlotFilename.value = "";
-      selectedPlotFileUrl.value = "";
-      const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
-      toast.add(tMsg); addToastRecord(tMsg);
+      // provide custom message if missing selected plot is a validation plot
+      if (ValidationPlotNames.includes(selectedPlotName.value as string)) {
+        plotNotAvailableMessage = selectedPlotName.value?.toString() + ' plot is not available until after validation is complete';
+      }
+      // get selected plot file name and url from server
+      const response: any = await queryGetPlot(selectedPlotName.value); // store this in RunStatusStore
+
+      if (response?._data?.plot_file_path && response?._data?.plot_url) {
+        selectedPlotFilename.value = response?._data?.plot_file_path;
+        selectedPlotFileUrl.value = response?._data?.plot_url;
+      } else {
+        selectedPlotFilename.value = "";
+        selectedPlotFileUrl.value = "";
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: plotNotAvailableMessage, life: ToastTimeout.timeoutWarn };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
     }
   }
 });
@@ -844,12 +855,11 @@ const updateLogRefs = async(getLogData: boolean) => {
         document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
       });
     } else {
-      toast.removeAllGroups();
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
-  if (userCalibrationRunData.value.status === 'Running') {
+  if (userCalibrationRunData?.value?.status === 'Running' && selectedLogFilePath.value) {
     // watch status every 10 seconds to see if log file changes
     clearTimeout(logTimeout);
     logTimeout = setTimeout(async() => {

@@ -14,7 +14,7 @@
         <p class="text-center">
             <strong>IMPORTANT</strong><br />
             <strong>Short Range Forecast</strong> is for <strong>CONUS</strong> gages only.<br />
-            Use then ngenCERF CLI for oCONUS Forecasts.<br />
+            Use the ngenCERF CLI for oCONUS Forecasts.<br />
             <br />
             <span style="color:red">Selecting an oCONUS gage will result in a Failed Forecast.</span>
         </p>

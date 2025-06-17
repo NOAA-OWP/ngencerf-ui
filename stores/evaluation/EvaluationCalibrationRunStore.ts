@@ -40,6 +40,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const computedGageCalibrationRunList = ref<CalibrationJobListItem[]>([]);
 
   const selectedCalibrationCompareRuns = ref<CalibrationJobListItem[]>([]);
+  const selectedCalibrationModules = ref<string[] | undefined>([]);
 
   /**
   * @returns {SelectOption[]}
@@ -312,6 +313,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     gageCalibrationRunListHeaders,
     computedGageCalibrationRunList,
     selectedCalibrationCompareRuns,
+    selectedCalibrationModules,
     evaluateValidationRunId,
     evaluateIterationRunId,
     evaluateValidationRunStatus,

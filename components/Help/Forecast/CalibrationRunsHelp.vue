@@ -4,7 +4,7 @@
         <p id="help-subtitle" class="_help-subtitle">
             Displays table of calibration jobs.<br />
             <br />
-            User selects one of the runs in the list to use as the basis for a forecast run.
+            Select a job then right click for available actions.
         </p>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
@@ -28,6 +28,14 @@
                 <tr>
                     <td class="td1">View Calibration Details</td>
                     <td class="td2">View more details about the calibration job than what is shown in the table.</td>
+                </tr>
+                <tr>
+                    <td class="td1">Download Calibration Data</td>
+                    <td class="td2">Download all the input and output data associated with a calibration run.</td>
+                </tr>
+                <tr>
+                    <td class="td1">Export</td>
+                    <td class="td2">Export the Calibration Definition for used for CLI import command.</td>
                 </tr>
                 <tr>
                     <td class="td1">Delete Calibration Job</td>
