@@ -55,6 +55,15 @@
                 </template>
 
               </Listbox>
+              <div v-if="!formulationIsValid" class="text-red-600">
+                Formulation is not valid
+                <span v-for="message in formulationInvalidMessages">
+                  <br/>{{ message }}
+                </span>
+              </div>
+              <div v-else class="text-green-600">
+                Formulation is valid
+              </div>
             </div>
           </div>
           <div class="col-span-1">&nbsp;</div>
@@ -241,10 +250,20 @@ const {
   fetchFormulationSlothParameterTypeOptions,
   fetchFormulationSlothParameterUnitOptions,
   fetchSelectedFormulationModuleOptions,
+  formulationIsValid,
+  formulationInvalidMessages,
   saveFormulationPayload
 } = storeToRefs(useFormulationStore());
 
-const { addNewSlothVariable, saveFormulationTabData, resetUserSelectionFormulation, deleteSlothVariable, setUserSelection } = useFormulationStore()
+const { 
+  addNewSlothVariable, 
+  updateFormulationValidRefs, 
+  saveFormulationTabData, 
+  resetUserSelectionFormulation, 
+  deleteSlothVariable, 
+  setUserSelection 
+} = useFormulationStore();
+
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
@@ -277,8 +296,6 @@ onMounted(() => {
       userCalibrationRunData.value.modules = ['LSTM', 'T-Route'];
       selectedModuleValues.value = ['LSTM', 'T-Route'];
     }
-    console.log(selectedModuleValues.value);
-    console.log(userCalibrationRunData?.value?.modules);
     modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
   })
 });
@@ -326,18 +343,7 @@ const deleteSelectedSlothParameterData = (selectedSlothParameterData: any) => {
 }
 
 const moduleListChanged = (e: ListboxChangeEvent) => {
-  /* if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
-    selectedModuleValues.value.push('T-Route');
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'T-Route must be included', detail: 'All Calibration Formulations are required to use T-Route and one other module at a minimum.', life: ToastTimeout.timeoutWarn };
-    toast.add(tMsg); addToastRecord(tMsg);
-  } else if (selectedModuleValues.value.length < 2) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Another module must be selected with T-Route.', detail: "All Calibration Formulations are required to use T-Route and one other module at a minimum.", life: ToastTimeout.timeoutWarn };
-    toast.add(tMsg); addToastRecord(tMsg);
-  } else if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
-    selectedModuleValues.value = ['LSTM','T-Route'];
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'LSTM can only be paired with T-Route', detail: 'Selecting LSTM automatically de-selects all other modules other than T-Route, which is required.', life: ToastTimeout.timeoutInfo };
-    toast.add(tMsg); addToastRecord(tMsg);
-  } */
+  updateFormulationValidRefs();
   modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }
 
@@ -400,26 +406,24 @@ const saveFormulationData = () => {
       if (response.status === 200) {
         if (response._data.eds_errors) {
           response._data.eds_errors.forEach((err: any) => {
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeoutWarn };
+            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeoutError };
+            toast.add(tMsg); addToastRecord(tMsg);
+          });
+        }
+        if (response._data.formulation_errors) {
+          response._data.formulation_errors.forEach((err: any) => {
+            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Formulation Error', detail: err, life: ToastTimeout.timeoutError };
+            toast.add(tMsg); addToastRecord(tMsg);
+          });
+        }
+        if (response._data.formulation_warnings) {
+          response._data.formulation_warnings.forEach((err: any) => {
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Warning', detail: err, life: ToastTimeout.timeoutWarn };
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
-        if (response?._data?.nwm_warning === true) {
-          let warnings = "";
-          let l = useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).length;
-          if (l > 0) {
-            useCalibrationFormulationTabSaveWarning(response?._data?.formulation_warning ?? {}).forEach((warning, index) => {
-              warnings += warning;
-              if (index !== l - 1) {
-                warnings += " ---- ";
-              }
-            });
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Accepted with Notices', detail: warnings, life: ToastTimeout.timeoutWarn };
-            toast.add(tMsg); addToastRecord(tMsg);
-          }
-        }
         isLoading.value = false;
         updateJobData();
       } else {

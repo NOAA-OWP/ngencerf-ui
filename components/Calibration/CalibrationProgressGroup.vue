@@ -26,8 +26,8 @@
         <td data-tab="2" title="Geopackage" aria-label="Geopackage" @click="tabClicked">Geopackage</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length"
-            :class="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length ? 'checkMark' : ''"
+        <td><i v-if="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length && formulationIsValid"
+            :class="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length && formulationIsValid ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
         <td data-tab="3" title="Formulation" aria-label="Formulation" @click="tabClicked">Formulation</td>
       </tr>
@@ -75,12 +75,16 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted } from "vue";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+const { formulationIsValid } = storeToRefs(useFormulationStore());
+const { updateFormulationValidRefs } = useFormulationStore();
 
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 
@@ -114,4 +118,13 @@ const tabClicked = (event: Event) => {
     emit("tabNumber", currentCalibrationTab.value);
   }
 }
+
+onMounted(() => {
+  nextTick(() => {
+    if (userCalibrationRunData?.value?.modules && userCalibrationRunData?.value?.modules.length > 0) {
+      // validate on page load if module list was previously saved
+      updateFormulationValidRefs();
+    }
+  });
+});
 </script>

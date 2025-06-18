@@ -34,6 +34,8 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   const useSlothParameters = ref<boolean>(false);
 
   const formulationTabData = ref<FormulationTabData>();
+  const formulationIsValid = ref<boolean>(false);
+  const formulationInvalidMessages = ref<string[]>([]);
 
   const saveFormulationPayload = ref<SaveFormulationTabPayload>({});
 
@@ -261,6 +263,45 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
    * return save formulation tab response from the server
    * @returns {GeneralApiSaveResponse}
    */
+  async function validateFormulationTabData() {
+    return await makeProtectedApiCall<GeneralApiSaveResponse>(
+      `${ngencerfBaseUrl}/calibration/validate_formulation_tab/`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          modules: selectedModuleValues.value.length > 0 ? selectedModuleValues.value : []
+        }),
+      }
+    );
+  }
+  
+  async function updateFormulationValidRefs() {
+    validateFormulationTabData().then(response => {
+      formulationIsValid.value = true;
+      formulationInvalidMessages.value = [];
+      if (response._data.formulation_errors) {
+        response._data.formulation_errors.forEach((err: any) => {
+          formulationIsValid.value = false;
+          formulationInvalidMessages.value.push('Error: ' + err);
+        });
+      }
+      if (response._data.formulation_warnings) {
+        response._data.formulation_warnings.forEach((err: any) => {
+          formulationIsValid.value = false;
+          formulationInvalidMessages.value.push('Error: ' + err);
+        });
+      }
+    });
+  }
+
+  /**
+   * return save formulation tab response from the server
+   * @returns {GeneralApiSaveResponse}
+   */
   async function saveFormulationTabData() {
     isLoading.value = true;
     saveFormulationPayload.value = <SaveFormulationTabPayload>{};
@@ -343,6 +384,8 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
 
   return {
     formulationTabData,
+    formulationIsValid,
+    formulationInvalidMessages,
     filterGroup,
     useSlothParameters,
     selectedModuleValues,
@@ -356,6 +399,8 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     fetchSelectedFormulationModuleOptions,
     addNewSlothVariable,
     saveFormulationTabData,
+    validateFormulationTabData,
+    updateFormulationValidRefs,
     isLoading,
     resetUserSelectionFormulation,
     deleteSlothVariable,
