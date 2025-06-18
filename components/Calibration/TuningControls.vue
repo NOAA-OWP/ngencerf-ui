@@ -138,7 +138,7 @@
     </div>
   </div>
 
-  <div class="pr-2">
+  <div class="pr-2" v-if="!userCalibrationRunData.modules.includes('LSTM')">
     <div class="text-left">
       <div class="hr my-3"></div>
       <div>
@@ -191,7 +191,7 @@
     </div>
   </div>
 
-  <div id="TuningDataList" class="mt-2 mb-10 overflow-auto max-h-[200px]" style="position: relative;">
+  <div id="TuningDataList" v-if="!userCalibrationRunData.modules.includes('LSTM')" class="mt-2 mb-10 overflow-auto max-h-[200px]" style="position: relative;">
     <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
       :model="cmTuningParameterData"></ContextMenu>
     <DataTable :value="userSelectedCalibrationTuningParameters" scrollable scroll-height="200px"

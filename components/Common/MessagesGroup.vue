@@ -81,7 +81,7 @@
           </div>
           <div class="line-spacer">&nbsp;</div>
 
-          <div v-if="userCalibrationRunData?.parameters_selected"
+          <div v-if="userCalibrationRunData?.parameters_selected && !calData?.modules?.includes('LSTM')"
             :aria-label="'Output Variable ' + selectedOutputVariableToCalibrate"
             :title="'Output Variable ' + selectedOutputVariableToCalibrate">
             <span class="font-medium">
@@ -90,12 +90,12 @@
             {{ selectedOutputVariableToCalibrate }}
           </div>
 
-          <div v-if="calData?.optimization"><span class="font-medium"
+          <div v-if="calData?.optimization && !calData?.modules?.includes('LSTM')"><span class="font-medium"
               :aria-label="'Optimization Algorithm ' + calData?.optimization"
               :title="'Optimization Algorithm ' + calData?.optimization">Optimization Algorithm:</span>
             {{ calData?.optimization }}</div>
 
-          <div v-if="calData?.stop_criteria"><span class="font-medium"
+          <div v-if="calData?.stop_criteria && !calData?.modules?.includes('LSTM')"><span class="font-medium"
               :aria-label="'Calibration Stop Criteria ' + calData?.stop_criteria"
               :title="'Calibration Stop Criteria ' + calData?.stop_criteria">Calibration Stop Criteria:</span>
             {{ calData?.stop_criteria }}</div>
@@ -133,17 +133,17 @@
               {{ formatDate(calData?.validation_times?.validation_end_time) }}</div>
           </div>
           <div class="line-spacer">&nbsp;</div>
-          <div v-if="userSelectedCalibrationTuningParameters && userSelectedCalibrationTuningParameters.length > 0"
+          <div v-if="userSelectedCalibrationTuningParameters && userSelectedCalibrationTuningParameters.length > 0 && !calData?.modules?.includes('LSTM')"
             :aria-label="'Tuning Parameters ' + userSelectedCalibrationTuningParameters.length"
             :title="'Tuning Parameters ' + userSelectedCalibrationTuningParameters.length">
             <span class="font-medium">Tuning Parameters:</span>
             {{ userSelectedCalibrationTuningParameters.length }}
           </div>
-          <div v-if="calData?.objective_function" :aria-label="'Objective Function ' + calData?.objective_function"
+          <div v-if="calData?.objective_function && !calData?.modules?.includes('LSTM')" :aria-label="'Objective Function ' + calData?.objective_function"
             :title="'Objective Function ' + calData?.objective_function"><span class="font-medium">Objective
               Function:</span>
             {{ calData?.objective_function }}</div>
-          <div v-if="calData?.save_plot_iteration_frequency"
+          <div v-if="calData?.save_plot_iteration_frequency && !calData?.modules?.includes('LSTM')"
             :aria-label="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"
             :title="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"><span
               class="font-medium">Plot Generation Frequency:</span>
