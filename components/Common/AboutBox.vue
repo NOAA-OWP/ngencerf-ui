@@ -50,7 +50,10 @@
             <Column v-for="(item, index) in Array.from(uniqueFields)" :key="item" :field="item"
               :sortable="index === 0 ? true : false" :header="Array.from(uniqueHeaders)[index]">
               <template #body="{ data }">
-                {{ formatTableOutput(data, item) }}
+                <!-- Using whitespace-nowrap for all fields except message -->
+                <span :class="item !== 'message' ? 'whitespace-nowrap' : ''">
+                  {{ formatTableOutput(data, item) }}
+                </span>
               </template>
             </Column>
           </DataTable>
@@ -180,8 +183,14 @@ function getUniqueFields(arr: unknown): string[] {
 }
 
 const formatTableOutput = (field: Record<string, string>, item: string) => {
+  // only display the first 8 characters of Commit Hash
   if (item.indexOf("_hash") !== -1) { return field[item].substring(0, 8) }
-  if (item.indexOf("_date") !== -1) { return formatISOStringOrDateToYYYYMMDDHHMM(field[item]) }
+
+  // format Build Date and Commit Date as YYYY-MM-DD HH:MM
+  if (item.indexOf("_date") !== -1 && field[item]?.toString().trim()) {
+    return formatISOStringOrDateToYYYYMMDDHHMM(field[item]);
+  }
+
   return field[item];
 }
 
