@@ -7,7 +7,7 @@
         </div>
       </div>
       <div class="grid row-span-10 gap-2">
-        <iframe class="inline" title="pdf" :src="pdfUrl" width="100%" height="100%"></iframe>
+        <iframe id="pdfViewer" class="inline" title="pdf" :src="pdfUrl"></iframe>
       </div>
       <div class="row-span-1">
         <AppFooter />
@@ -27,4 +27,8 @@ import pdfUrl from '@/assets/styles/pdfs/VerificationSteps.pdf';
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
 
+#pdfViewer {
+  width: 100%;
+  height: calc(100% - 180px);
+}
 </style>
