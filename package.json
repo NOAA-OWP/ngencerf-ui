@@ -73,9 +73,5 @@
     "tailwindcss": "3.4.17",
     "unplugin-auto-import": "^19.3.0",
     "unplugin-vue-components": "^28.7.0"
-  },
-  "overrides": {
-    "glob": "9.3.x",
-    "rimraf": "4.x"
   }
 }
