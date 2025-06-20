@@ -69,7 +69,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Compute Overall Calibration Validation Status
    */
   const overallCalibrationValidationStatus = computed<string>(() => {
-    if (userCalibrationRunData?.value?.status !== 'Done') {
+    if (userCalibrationRunData?.value?.status === 'Preparing Job Data') {
+      return 'Validating and Preparing Job Data';
+    } else if (userCalibrationRunData?.value?.status !== 'Done') {
       return `Calibration ${userCalibrationRunData?.value?.status}`;
     } else if (userCalibrationRunData?.value?.status === 'Done' && validationControlStatus?.value === 'Running') {
       return `Calibration Done, Validation Control Running`;
@@ -190,8 +192,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       params.set('calibration_run_id', calibration_run_id.toString());
     }
     if (include_data) {
-      params.set('start', start !== undefined ? start.toString() : '0');
-      params.set('limit', limit !== undefined ? limit.toString() : '1');
+      params.set('start', start !== undefined ? start : 0);
+      params.set('limit', limit !== undefined ? limit : 100);
     }
 
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/?${params.toString()}`, {
@@ -327,8 +329,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         log_category: log_category,
         log_name: log_name,
         calibration_run_id: calibration_run_id,
-        start: start !== undefined ? start.toString() : '',
-        limit: limit !== undefined ? limit.toString() : ''
+        start: start !== undefined ? start : 0,
+        limit: limit !== undefined ? limit : 1000
       })
     });
   };
