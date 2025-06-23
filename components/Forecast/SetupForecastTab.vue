@@ -8,17 +8,17 @@
                 calibrationRunForForecast?.calibration_run_id }}</h2>
         </div>
         <h1 class="mb-6 text-3xl font-bold text-center relative">
-            Forecast Cycle Selection
+            Forecast Configuration Selection
         </h1>
-        <p class="prompt-txt mt-2 text-center">Select a cycle then click Next.</p>
+        <p class="prompt-txt mt-2 text-center">Select a configuration then click Next.</p>
         <br />
     </div>
     <div>
         <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
             selectionMode="single" :rowClass="rowClass" :rowStyle="rowStyle">
-            <Column field="name" header="Cycle">
+            <Column field="name" header="Configuration">
                 <template #body="slotProps">
-                    <div :aria-label="'Cycle is ' + slotProps.data.name" :title="'Cycle is ' + slotProps.data.name">{{
+                    <div :aria-label="'Configuration is ' + slotProps.data.name" :title="'Configuration is ' + slotProps.data.name">{{
                         slotProps.data.name }}</div>
                 </template>
             </Column>
@@ -39,7 +39,7 @@
         </DataTable>
     </div>
     <div class="text-normal mt-2 mx-auto text-center">
-        <p>Cycles in <span class="text-gray-500">grey</span> are unavailable.</p>
+        <p>Configurations in <span class="text-gray-500">grey</span> are unavailable.</p>
         <br />
         <p class="text-center">
             <strong>IMPORTANT</strong><br />
@@ -87,14 +87,14 @@ const {
 const { loadSetupForecastTabData } = useForecastStore();
 
 /**
- * Disable row if forecast cycle is not active
+ * Disable row if forecast configuration is not active
  */
 const rowClass = (data: any) => {
     return [{ 'pointer-events-none': !data.is_active }];
 };
 
 /**
- * Add row styling if forecast cycle is not active.
+ * Add row styling if forecast configuration is not active.
  */
 const rowStyle = (data: any) => {
     return {
@@ -128,7 +128,7 @@ onMounted(async () => {
  */
 const onRowSelect = (e: any) => {
     // console.log('onRowSelect', e);
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Cycle Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeoutInfo };
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Configuration Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
 };
 

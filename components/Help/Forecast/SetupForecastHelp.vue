@@ -5,7 +5,7 @@
             Select the type of forecast to run.<br />
             <br />
             Greyed out rows in the table are not yet available from the GUI. Use the ngenCERF CLI to run those
-            cycles.
+            configuration.
         </p>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
@@ -20,7 +20,7 @@
         </p>
         <br />
         <p class="text-center">
-            Once the forecast cycle is selected, click on the Next button to review and run the forecast.
+            Once the forecast configuration is selected, click on the Next button to review and run the forecast.
         </p>
     </div>
 </template>
