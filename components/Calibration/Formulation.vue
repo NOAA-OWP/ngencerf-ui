@@ -55,14 +55,16 @@
                 </template>
 
               </Listbox>
-              <div v-if="!formulationIsValid" class="text-red-600">
-                Formulation incomplete
-                <span v-for="message in formulationInvalidMessages">
-                  <br/>{{ message }}
-                </span>
-              </div>
-              <div v-else class="text-green-600">
-                Formulation valid
+              <div class="mt-5">
+                <div v-if="!formulationIsValid" class="text-red-600">
+                    Formulation incomplete
+                    <span v-for="message in formulationInvalidMessages">
+                    <br/>{{ message }}
+                    </span>
+                </div>
+                <div v-else class="text-green-600">
+                    Formulation valid
+                </div>
               </div>
             </div>
           </div>
