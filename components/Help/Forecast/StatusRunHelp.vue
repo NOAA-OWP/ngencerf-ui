@@ -48,10 +48,10 @@
                         Forecast Running<br />
                         Done
                     </td>
-                <tr>
-                    <td class="td1">Cycle</td>
-                    <td class="td2">Forecast cycle</td>
                 </tr>
+                <tr>
+                    <td class="td1">Configuration</td>
+                    <td class="td2">Forecast configuration</td>
                 </tr>
                 <tr>
                     <td class="td1">&nbsp;</td>
