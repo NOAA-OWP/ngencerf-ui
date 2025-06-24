@@ -75,7 +75,6 @@
 </template>
 
 <script lang="ts" setup>
-
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
