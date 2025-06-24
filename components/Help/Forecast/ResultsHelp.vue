@@ -29,8 +29,8 @@
           <td class="td2">Location on the file system containing all data pertaining to this job.</td>
         </tr>
         <tr>
-          <td class="td1">Cycle</td>
-          <td class="td2">Type of Forecast cycle ran for this job.</td>
+          <td class="td1">Configuration</td>
+          <td class="td2">Type of Forecast configuration ran for this job.</td>
         </tr>
         <tr>
           <td class="td1">Graph</td>
