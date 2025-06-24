@@ -1553,13 +1553,15 @@ const toggleCustomizePlot = async () => {
 // Handle selectedLogCategory changes
 watch(selectedLogCategory, async () => {
   selectedLogList.value = logLists.value[selectedLogCategory.value];
+  selectedLogName.value = '';
   if (selectedLogList?.value?.length > 0) {
     // start with the first log
-    selectedLogName.value = selectedLogList.value[0].name;
-    if (!selectedLogList.value.length) {
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
+    nextTick(() => {
+      selectedLogName.value = selectedLogList.value[0].name;
+    });
+  } else {
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 });
 
