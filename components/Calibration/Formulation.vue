@@ -56,13 +56,13 @@
 
               </Listbox>
               <div v-if="!formulationIsValid" class="text-red-600">
-                Formulation is not valid
+                Formulation incomplete
                 <span v-for="message in formulationInvalidMessages">
                   <br/>{{ message }}
                 </span>
               </div>
               <div v-else class="text-green-600">
-                Formulation is valid
+                Formulation valid
               </div>
             </div>
           </div>
@@ -286,16 +286,7 @@ onMounted(() => {
     toast.removeAllGroups();
     mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
-    // Force T-Route to always be included
-    if (!userCalibrationRunData?.value?.modules.some(item => item.toLowerCase() === 't-route')) {
-      userCalibrationRunData?.value?.modules.push('T-Route');
-      selectedModuleValues.value.push('T-Route');
-    }
-    // If LSTM is selected, de-select everything else except for T-Route
-    if (userCalibrationRunData?.value?.modules.some(item => item.toLowerCase() === 'lstm')) {
-      userCalibrationRunData.value.modules = ['LSTM', 'T-Route'];
-      selectedModuleValues.value = ['LSTM', 'T-Route'];
-    }
+    updateFormulationValidRefs();
     modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
   })
 });
