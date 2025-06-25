@@ -66,9 +66,18 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   const setUserSelection = (): void => {
     formulationNameInput.value =
       userCalibrationRunData.value?.formulation_name ?? "";
-    //selectedModuleValues.value = getSavedModuleSelection.value ?? []
-    selectedModuleValues.value =
-      JSON.parse(JSON.stringify(userCalibrationRunData.value?.modules)) ?? [];
+    if (userCalibrationRunData.value?.modules != null) {
+        try {
+            selectedModuleValues.value = JSON.parse(
+                JSON.stringify(userCalibrationRunData.value.modules)
+            );
+        } catch (e) {
+            console.error("Failed to clone modules:", e);
+            selectedModuleValues.value = [];
+        }
+    } else {
+        selectedModuleValues.value = [];
+    }
     useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false;
     slothParameterInputs.value =
       JSON.parse(
