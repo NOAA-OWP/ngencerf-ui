@@ -179,7 +179,7 @@
                 <span v-if="calibrationStatus === 'Running'">
                   The full logs will be viewable on the Evaluate tab once the job has finished running.
                 </span>
-                <span v-else>
+                <span v-else-if="calibrationStatus !== 'Failed'">
                   The full logs can be viewed on the Evaluate tab.
                 </span>
               </div>

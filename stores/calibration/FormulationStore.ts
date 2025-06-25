@@ -64,8 +64,10 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   };
 
   const setUserSelection = (): void => {
+    console.log('calibrationJobId: ', calibrationJobId?.value);
+    console.log('modules: ', userCalibrationRunData?.value?.modules);
     formulationNameInput.value =
-      userCalibrationRunData.value?.formulation_name ?? "";
+      userCalibrationRunData?.value?.formulation_name ?? "";
     if (userCalibrationRunData.value?.modules != null) {
         try {
             selectedModuleValues.value = JSON.parse(
