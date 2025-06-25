@@ -69,8 +69,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * Compute Overall Calibration Validation Status
    */
   const overallCalibrationValidationStatus = computed<string>(() => {
-    if (userCalibrationRunData?.value?.status === 'Preparing Job Data') {
-      return 'Validating and Preparing Job Data';
+    if (userCalibrationRunData?.value?.status === 'Validating and Preparing Job Data') {
+      return userCalibrationRunData.value.status;
     } else if (userCalibrationRunData?.value?.status !== 'Done') {
       return `Calibration ${userCalibrationRunData?.value?.status}`;
     } else if (userCalibrationRunData?.value?.status === 'Done' && validationControlStatus?.value === 'Running') {

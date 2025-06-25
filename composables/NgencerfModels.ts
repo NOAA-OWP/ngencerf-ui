@@ -769,4 +769,4 @@ export interface GitData {
   message: string;
 }
 
-export type LogLevel = "debug" | "info" | "warn" | "severe" | "fatal";
+export type LogLevel = "debug" | "info" | "warning" | "severe" | "fatal";

@@ -201,8 +201,8 @@ onMounted(async () => {
 const createElapsedTimeInterval = () => {
   elapsedTimeIntervalId.value = setInterval(async () => {
     // continue incrementing elapsedTime every second while forcingDownloadStatus or forecastJobStatus
-    // is Running
-    if (forcingDownloadStatus.value === 'Running' || forecastJobStatus.value === 'Running') {
+    // are Running
+    if (['Running'].includes(forcingDownloadStatus.value ?? '') || ['Submitted', 'Running'].includes(forecastJobStatus.value ?? '')) {
       elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
     } else {
       clearInterval(elapsedTimeIntervalId.value);
@@ -222,8 +222,8 @@ const createForcingDownloadAndForecastStatusInterval = () => {
     const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
     if (forecast) {
-      // if forcing download and forecast job is not running, clear the interval
-      if (forecast.forcing_download.status !== 'Running' && forecast.status !== 'Running') {
+      // if forcing download and forecast job are not running, clear the interval
+      if (['Running'].includes(forecast.forcing_download.status) && ['Submitted', 'Running'].includes(forecast.status)) {
         clearInterval(forecastJobStatusIntervalId.value);
         forecastJobStatusIntervalId.value = undefined;
       }
@@ -250,8 +250,6 @@ const createForcingDownloadAndForecastStatusInterval = () => {
  * Start the forecast run
  */
 const startForecastRun = async () => {
-  forecastJobStatus.value = 'Submitted';
-
   try {
     const createAndRunForecastJobResponse = await createAndRunForecastJob(calibrationRunForForecast?.value?.calibration_run_id as number, forecastCycle?.value?.name as string);
 
@@ -316,7 +314,7 @@ const goToResultsTab = () => {
  */
 watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newForecastJobStatus) => {
   // when overallForcingDownloadForecastStatus first changes to Running, start incrementing elapsedTime every second until
-  // overallForcingDownloadForecastStatus changes to Done, Cancelled, Failed, or Server Error
+  // overallForcingDownloadForecastStatus changes to Done, Cancelled, Failed, or Server error
   if (forcingDownloadStatus.value === 'Running' || forecastJobStatus.value === 'Running') {
     // create elapsedTimeIntervalId to update elapsedTime every second while overallForcingDownloadForecastStatus 
     // is Running if not already created and submit_time is set
