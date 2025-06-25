@@ -241,6 +241,7 @@ const onRowContextMenu = (event: any) => {
   slothParamContextMenu.value.show(event.originalEvent)
 }
 const {
+  formulationTabData,
   filterGroup,
   useSlothParameters,
   selectedModuleValues,
@@ -258,6 +259,7 @@ const {
 } = storeToRefs(useFormulationStore());
 
 const { 
+  loadFormulationModels,
   addNewSlothVariable, 
   updateFormulationValidRefs, 
   saveFormulationTabData, 
@@ -281,7 +283,11 @@ let dataTableElement: HTMLElement | null = null;
 
 const toast = useToast();
 
-onMounted(() => {
+onMounted(async() => {
+  console.log('fetchFormulationModuleOptions: ', fetchFormulationModuleOptions.value);
+  if (!formulationTabData.value || !fetchFormulationModuleOptions.value || fetchFormulationModuleOptions.value.length === 0) {
+    await loadFormulationModels();
+  }
   setUserSelection();
   nextTick(() => {
     hilightTab(CalibrationTabs.tab_formulation);
