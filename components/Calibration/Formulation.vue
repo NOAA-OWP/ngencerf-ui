@@ -218,7 +218,7 @@ const { clearCalibratableParameters } = useTuningStore();
 
 const { addToastRecord } = generalStore();
 
-const { isLoading } = storeToRefs(generalStore());
+const { calibrationJobId, isLoading } = storeToRefs(generalStore());
 
 const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
@@ -284,19 +284,23 @@ let dataTableElement: HTMLElement | null = null;
 const toast = useToast();
 
 onMounted(async() => {
-  console.log('fetchFormulationModuleOptions: ', fetchFormulationModuleOptions.value);
-  if (!formulationTabData.value || !fetchFormulationModuleOptions.value || fetchFormulationModuleOptions.value.length === 0) {
-    await loadFormulationModels();
+  if (calibrationJobId.value) {
+    if (!formulationTabData.value || !fetchFormulationModuleOptions.value || fetchFormulationModuleOptions.value.length === 0) {
+      await loadFormulationModels();
+    }
+    if (!userCalibrationRunData.value) {
+      await fetchUserCalibrationRunData();
+    }
+    await setUserSelection();
+    nextTick(() => {
+      hilightTab(CalibrationTabs.tab_formulation);
+      toast.removeAllGroups();
+      mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
+      if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
+      updateFormulationValidRefs();
+      modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+    })
   }
-  setUserSelection();
-  nextTick(() => {
-    hilightTab(CalibrationTabs.tab_formulation);
-    toast.removeAllGroups();
-    mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
-    if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }
-    updateFormulationValidRefs();
-    modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
-  })
 });
 
 const addSlothOnEnter = (e: KeyboardEvent) => {
