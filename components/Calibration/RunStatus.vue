@@ -294,7 +294,7 @@ const selectedLogStatus = ref<DynamicObject>({});
 let logTimeout;
 
 const populatePlotListOptions = async() => {
-  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Preparing Job Data'].includes(userCalibrationRunData?.value?.status))) {
+  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Validating and Preparing Job Data'].includes(userCalibrationRunData?.value?.status))) {
     plotList.value = [{ name: plotListDefault.value, description: '' }];
     plotListOptions.value = [];
     logListOptions.value = [];
@@ -425,7 +425,7 @@ onMounted(async () => {
 const createElapsedTimeInterval = () => {
   elapsedTimeIntervalId.value = setInterval(async () => {
     if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
-      (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
+      (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate calibrationElapsedTime every second while Calibration is Running or Validation is not Done
       calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
     } else {
@@ -440,7 +440,7 @@ const startRun = async () => {
   isLoading.value = true;
   validationBestAchieved.value.isBest = false;
   if (userCalibrationRunData.value) {
-    userCalibrationRunData.value.status = 'Preparing Job Data';
+    userCalibrationRunData.value.status = 'Validating and Preparing Job Data';
 
     const runCalibrationResponse = await runCalibrationJob();
 
@@ -462,8 +462,8 @@ const startRun = async () => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
 
-      if (userCalibrationRunData?.value?.status !== 'Running') {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Running after clicking START', life: ToastTimeout.timeoutError };
+      if (userCalibrationRunData?.value?.status !== 'Submitted' && userCalibrationRunData?.value?.status !== 'Running') {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Submitted or Running after clicking START', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
       fetchUserCalibrationRunData();
@@ -550,9 +550,10 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
           validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
         }
 
-        // Calculate Running Time every second while calibration is Running or calibration is Done and valid_control and valid_best have not started or are Ready or Running
+        // calculate running time every second while calibration is Running 
+        // or calibration is Done and valid_control and valid_best have not started or are Submitted, Ready, Running
         if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
-          (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
+          (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
 
           const allDurs = [getStatusResponse._data.elapsed_time]
           if (allDurs.length && allDurs[0]) {
@@ -578,6 +579,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
     if (calibrationStatus.value === 'Running') {
       if (!calibrationStatusIntervalId.value) {
+        // create an interval to keep checking calibration status every 10 seconds while calibration is 'Running'
         calibrationStatusIntervalId.value = setInterval(async () => {
           const getIterationResponse = await queryGetIteration();
 
@@ -609,8 +611,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         iteration.value = getIterationResponse?._data?.iteration;
       }
 
-      if (!validControlAndValidBestStatus.value || ['Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')) {
-        // create an interval to keep checking validation statuses every 10 seconds while valid_control and valid_best are not Done, Cancelled, Failed, or Server error
+      // if valid_control and valid_best are not set or are 'Submitted', 'Ready' or 'Running', we need to create an interval to check their statuses
+      if (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')) {
+        // create an interval to keep checking validation statuses every 10 seconds while valid_control and valid_best are not Done, Cancelled, Failed, Server error, or Unknown
         if (!validationsStatusIntervalId.value) {
           validationsStatusIntervalId.value = setInterval(async () => {
             const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
@@ -632,7 +635,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
             }
 
             // if valid_control and valid_best are Done, Cancelled, Failed, Server error, or Unknown, clear the interval
-            if (['Done', 'Cancelled', 'Failed', 'Server Error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
+            if (['Done', 'Cancelled', 'Failed', 'Server error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
 
@@ -651,7 +654,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         }
       }
 
-      else if (['Done', 'Cancelled', 'Failed', 'Server Error'].includes(validControlAndValidBestStatus.value ?? '')) {
+      else if (['Done', 'Cancelled', 'Failed', 'Server error'].includes(validControlAndValidBestStatus.value ?? '')) {
         const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
 
         const validations = getStatusResponse?._data?.validations;
@@ -896,7 +899,7 @@ function capitalCase(str: string) {
 }
 
 const gotoEvaluation = () => {
-  gotoCalibrationRunId.value = userCalibrationRunData.value.calibration_run_id;
+  gotoCalibrationRunId.value = userCalibrationRunData?.value?.calibration_run_id;
   const ele = document.getElementById("MainMenuEvaluation");
   ele?.click();
 }

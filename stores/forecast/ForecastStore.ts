@@ -63,24 +63,26 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const overallForcingDownloadForecastStatus = computed<string>(() => {
     if (
       [
+        "Submitted",
         "Saved",
         "Ready",
         "Running",
         "Cancelled",
         "Failed",
-        "Server Error",
+        "Server error",
       ].includes(forcingDownloadStatus.value as string)
     ) {
       return `Forcing Download ${forcingDownloadStatus.value as string}`;
     } else if (forcingDownloadStatus.value === "Done") {
       if (
         [
+          "Submitted",
           "Saved",
           "Ready",
           "Running",
           "Cancelled",
           "Failed",
-          "Server Error",
+          "Server error",
         ].includes(forecastJobStatus.value as string)
       ) {
         return `Forcing Download Done, Forecast ${forecastJobStatus.value as string}`;
