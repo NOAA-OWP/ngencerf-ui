@@ -284,10 +284,7 @@ let dataTableElement: HTMLElement | null = null;
 const toast = useToast();
 
 onMounted(async() => {
-  if (!calibrationJobId.value) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'No Calibration Job Selected', detail: 'Formulation Tab was loaded without a Calibration Job ID selected.', life: ToastTimeout.timeoutError };
-    toast.add(tMsg); addToastRecord(tMsg);
-  } else {
+  if (calibrationJobId.value) {
     if (!formulationTabData.value || !fetchFormulationModuleOptions.value || fetchFormulationModuleOptions.value.length === 0) {
       await loadFormulationModels();
     }
