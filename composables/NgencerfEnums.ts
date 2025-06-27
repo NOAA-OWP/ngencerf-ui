@@ -136,7 +136,9 @@ export const ServerCodes = [
 export const JobStatusAction = {
   delete: 1,
   archive: 2,
-  unarchive: 3
+  unarchive: 3,
+  lock: 4,
+  unlock: 5
 };
 
 export const ValidationFormFields = {

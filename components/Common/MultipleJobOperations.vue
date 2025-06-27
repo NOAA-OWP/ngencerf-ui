@@ -16,14 +16,20 @@
       </div>
 
       <div v-if="!showConfirm" id="ButtonsAndMessages">
-        <Button class="ngenButtonDiv mt-3" @click="confirmAction('delete')" aria-label="Delete selected jobs"
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction('delete')" aria-label="Delete selected jobs"
           title="Delete selected jobs">DELETE selected jobs</Button>
 
-        <Button class="ngenButtonDiv mt-3" @click="confirmAction('archive')" aria-label="Archive selected jobs"
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction('archive')" aria-label="Archive selected jobs"
           title="Archive selected jobs">ARCHIVE selected jobs</Button>
 
-        <Button class="ngenButtonDiv mt-3" @click="confirmAction('unarchive')" aria-label="Unarchive selected jobs"
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction('unarchive')" aria-label="Unarchive selected jobs"
           title="Unarchive selected jobs" :disabled="disableArchiveBtn">UNARCHIVE selected jobs</Button>
+
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction('lock')" aria-label="Lock selected jobs"
+          title="Lock selected jobs">LOCK selected jobs</Button>
+
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction('unlock')" aria-label="Unlock selected jobs"
+          title="Unlock selected jobs" :disabled="disableLockBtn">UNLOCK selected jobs</Button>
       </div>
       <div v-else>
         <div class="font-bold font-lg">Are you sure you want to<br /> {{ actionType }} the selected jobs?</div>
@@ -49,7 +55,7 @@ const props = defineProps<{
 const showConfirm = ref<boolean>(false);
 const actionType = ref<string>()
 
-const emit = defineEmits(["DeleteSelectedJobs", "ArchiveSelectedJobs", "CloseMultJobWindow", 'UnarchiveSelectedJobs']);
+const emit = defineEmits(["DeleteSelectedJobs", "ArchiveSelectedJobs", "UnarchiveSelectedJobs", "LockSelectedJobs", "UnlockSelectedJobs", "CloseMultJobWindow"]);
 
 /**
  * Returns true if there are no archived items or if there is 
@@ -85,6 +91,12 @@ const actionSelect = (action: boolean) => {
     if( actionType.value === 'unarchive') {
       sendUnarchive();
     }
+    if( actionType.value === 'lock') {
+      sendLock();
+    }    
+    if( actionType.value === 'unlock') {
+      sendUnlock();
+    }
   }
 }
 
@@ -112,6 +124,24 @@ const sendArchive = () => {
  */
 const sendUnarchive = () => {
     emit("UnarchiveSelectedJobs");
+    sendClose();
+};
+
+/**
+ * Let the caller Apply the dialog
+ * @param: MouseEvent
+ */
+const sendLock = () => {
+    emit("LockSelectedJobs");
+    sendClose();
+};
+
+/**
+ * Let the caller Apply the dialog
+ * @param: MouseEvent
+ */
+const sendUnlock = () => {
+    emit("UnlockSelectedJobs");
     sendClose();
 };
 
