@@ -62,13 +62,14 @@ export const ToastTimeout = {
 };
 
 export const StatusTypes = [
+  { status: "Submitted", filterValue: "Submitted" },
   { status: "Done", filterValue: "Done" },
   { status: "Saved", filterValue: "Saved" },
   { status: "Ready", filterValue: "Ready" },
   { status: "Running", filterValue: "Running" },
   { status: "Cancelled", filterValue: "Cancelled" },
   { status: "Failed", filterValue: "Failed" },
-  { status: "Server Error", filterValue: "Server Error" },
+  { status: "Server error", filterValue: "Server error" },
 ];
 
 export const ServerCodes = [

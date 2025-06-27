@@ -40,7 +40,7 @@ export const isCalibrationJobStatusSavedOrReady = (
 };
 
 /**
- * Check if Calibration job status is 'Done', 'Cancelled', 'Failed', or 'Server Error'
+ * Check if Calibration job status is 'Done', 'Cancelled', 'Failed', or 'Server error'
  * @param status
  * @returns {boolean}
  */
@@ -49,7 +49,7 @@ export const isCalibrationJobFinished = (status?: string): boolean => {
     status === "Done" ||
     status === "Cancelled" ||
     status === "Failed" ||
-    status === "Server Error"
+    status === "Server error"
   );
 };
 
@@ -123,72 +123,29 @@ export const getValidControlAndValidBestStatus = (
   validControlStatus: string,
   validBestStatus?: string
 ): string => {
-  if (validControlStatus === "Saved" || validBestStatus === "Saved") {
-    return "Saved";
-  } else if (validControlStatus === "Ready" || validBestStatus === "Ready") {
-    return "Ready";
-  } else if (
-    validControlStatus === "Running" ||
-    validBestStatus === "Running"
-  ) {
-    return "Running";
-  } else if (
-    validControlStatus === "Cancelled" ||
-    validBestStatus === "Cancelled"
-  ) {
-    return "Cancelled";
-  } else if (validControlStatus === "Failed" || validBestStatus === "Failed") {
-    return "Failed";
-  } else if (
-    validControlStatus === "Server Error" ||
-    validBestStatus === "Server Error"
-  ) {
-    return "Server Error";
-  } else if (validControlStatus === "Done" && validBestStatus === "Done") {
-    return "Done";
-  } else {
-    return "Unknown";
-  }
-};
+  // statuses that are not 'Done'
+  const nonDoneStatuses = [
+    "Submitted",
+    "Saved",
+    "Ready",
+    "Running",
+    "Cancelled",
+    "Failed",
+    "Server error",
+  ];
 
-/**
- * Get the combined status of forecast_forcing_download_status and forecast_status
- * @param forecastForcingDownloadStatus
- * @param forecastStatus
- * @returns {string}
- */
-export const getOverallForecastStatus = (
-  forecastForcingDownloadStatus: string,
-  forecastStatus: string
-): string => {
-  if (
-    [
-      "Saved",
-      "Ready",
-      "Running",
-      "Cancelled",
-      "Failed",
-      "Server Error",
-    ].includes(forecastForcingDownloadStatus)
-  ) {
-    return `Forcing Download ${forecastForcingDownloadStatus}`;
-  } else if (forecastForcingDownloadStatus === "Done") {
-    if (
-      [
-        "Saved",
-        "Ready",
-        "Running",
-        "Cancelled",
-        "Failed",
-        "Server Error",
-      ].includes(forecastStatus)
-    ) {
-      return `Forcing Download Done, Forecast ${forecastStatus}`;
-    } else if (forecastStatus === "Done") {
-      return "Done";
-    } else {
-      return "Unknown";
+  // return non-Done status if either validControlStatus or validBestStatus
+  // are set to one of them
+  for (const status of nonDoneStatuses) {
+    if (validControlStatus === status || validBestStatus === status) {
+      return status;
     }
+  }
+
+  // if both are 'Done', return 'Done'
+  // else return 'Unknown'
+  if (validControlStatus === "Done" && validBestStatus === "Done") {
+    return "Done";
   } else {
     return "Unknown";
   }
