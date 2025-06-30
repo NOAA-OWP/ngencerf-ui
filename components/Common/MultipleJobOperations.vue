@@ -16,14 +16,20 @@
       </div>
 
       <div v-if="!showConfirm" id="ButtonsAndMessages">
-        <Button class="ngenButtonDiv mt-3" @click="confirmAction('delete')" aria-label="Delete selected jobs"
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction('delete')" aria-label="Delete selected jobs"
           title="Delete selected jobs">DELETE selected jobs</Button>
 
-        <Button class="ngenButtonDiv mt-3" @click="confirmAction('archive')" aria-label="Archive selected jobs"
-          title="Archive selected jobs">ARCHIVE selected jobs</Button>
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction('archive')" aria-label="Archive selected jobs"
+          title="Archive selected jobs" v-if="!hideArchiveBtn">ARCHIVE selected jobs</Button>
 
-        <Button class="ngenButtonDiv mt-3" @click="confirmAction('unarchive')" aria-label="Unarchive selected jobs"
-          title="Unarchive selected jobs" :disabled="disableArchiveBtn">UNARCHIVE selected jobs</Button>
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction('unarchive')" aria-label="Unarchive selected jobs"
+          title="Unarchive selected jobs" v-if="!hideUnarchiveBtn">UNARCHIVE selected jobs</Button>
+
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction('lock')" aria-label="Lock selected jobs"
+          title="Lock selected jobs" v-if="!hideLockBtn">LOCK selected jobs</Button>
+
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction('unlock')" aria-label="Unlock selected jobs"
+          title="Unlock selected jobs" v-if="!hideUnlockBtn">UNLOCK selected jobs</Button>
       </div>
       <div v-else>
         <div class="font-bold font-lg">Are you sure you want to<br /> {{ actionType }} the selected jobs?</div>
@@ -49,17 +55,65 @@ const props = defineProps<{
 const showConfirm = ref<boolean>(false);
 const actionType = ref<string>()
 
-const emit = defineEmits(["DeleteSelectedJobs", "ArchiveSelectedJobs", "CloseMultJobWindow", 'UnarchiveSelectedJobs']);
+const emit = defineEmits(["DeleteSelectedJobs", "ArchiveSelectedJobs", "UnarchiveSelectedJobs", "LockSelectedJobs", "UnlockSelectedJobs", "CloseMultJobWindow"]);
+
+/**
+ * Returns true if there are no non-archived items or if there is 
+ *  a mixed bag of archived and non-archived items
+ */
+const hideArchiveBtn = computed(() => {
+  const runs = props.calJobList;
+  if (runs.every(run => run.is_archived === true)) {
+    return true
+  } else if (runs.every(run => run.is_archived === false)) {
+    return false
+  } else {
+    // There is a mixture of both true and false values.
+    return false
+  }
+})
 
 /**
  * Returns true if there are no archived items or if there is 
  *  a mixed bag of archived and non-archived items
  */
-const disableArchiveBtn = computed(() => {
+const hideUnarchiveBtn = computed(() => {
   const runs = props.calJobList;
   if (runs.every(run => run.is_archived === false)) {
     return true
   } else if (runs.every(run => run.is_archived === true)) {
+    return false
+  } else {
+    // There is a mixture of both true and false values.
+    return false
+  }
+})
+
+  /**
+ * Returns true if there are no unlocked items or if there is 
+ *  a mixed bag of locked and unlocked items
+ */
+const hideLockBtn = computed(() => {
+  const runs = props.calJobList;
+  if (runs.every(run => run.is_locked === true)) {
+    return true
+  } else if (runs.every(run => run.is_locked === false)) {
+    return false
+  } else {
+    // There is a mixture of both true and false values.
+    return false
+  }
+})
+
+  /**
+ * Returns true if there are no locked items or if there is 
+ *  a mixed bag of locked and unlocked items
+ */
+const hideUnlockBtn = computed(() => {
+  const runs = props.calJobList;
+  if (runs.every(run => run.is_locked === false)) {
+    return true
+  } else if (runs.every(run => run.is_locked === true)) {
     return false
   } else {
     // There is a mixture of both true and false values.
@@ -84,6 +138,12 @@ const actionSelect = (action: boolean) => {
     }    
     if( actionType.value === 'unarchive') {
       sendUnarchive();
+    }
+    if( actionType.value === 'lock') {
+      sendLock();
+    }    
+    if( actionType.value === 'unlock') {
+      sendUnlock();
     }
   }
 }
@@ -112,6 +172,24 @@ const sendArchive = () => {
  */
 const sendUnarchive = () => {
     emit("UnarchiveSelectedJobs");
+    sendClose();
+};
+
+/**
+ * Let the caller Apply the dialog
+ * @param: MouseEvent
+ */
+const sendLock = () => {
+    emit("LockSelectedJobs");
+    sendClose();
+};
+
+/**
+ * Let the caller Apply the dialog
+ * @param: MouseEvent
+ */
+const sendUnlock = () => {
+    emit("UnlockSelectedJobs");
     sendClose();
 };
 

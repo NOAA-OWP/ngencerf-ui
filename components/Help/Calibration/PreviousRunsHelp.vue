@@ -95,6 +95,13 @@
                         Archived jobs will no longer appear in any Calibration Runs table unless the Archived filter is
                         active.</td>
                 </tr>
+                <tr>
+                    <td class="td1 align-top" style="font-weight:normal;">Lock/<br />UnLock</td>
+                    <td class="td2 align-top">Lock/Unlock the selected calibration job(s). 
+                        Locking a job prohibits deletion. Once locked the
+                        job cannnot be deleted until unlocked.
+                    </td>
+                </tr>
             </tbody>
         </table>
         <hr class="mt-3" style="height: 2px; background-color: black" />
