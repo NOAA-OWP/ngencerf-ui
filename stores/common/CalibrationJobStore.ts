@@ -111,6 +111,28 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   }
 
   /**
+  * Lock or Unlock a job
+  * If a single job comes in, make sure we put it into an array.
+  * Otherwise, it is an array.
+  */
+  async function lockCalibrationRun(runIds: any, lock: boolean) {
+    let toLock: number[];
+    if (!Array.isArray(runIds)) {
+      toLock = [runIds];
+    } else {
+      toLock = runIds;
+    }
+    return await makeProtectedApiCall<UserCalibrationRunData>(`${ngencerfBaseUrl}/calibration/lock_jobs/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ calibration_run_ids: toLock, lock: lock })
+    })
+  }
+
+  /**
  * Clone a job
  */
   async function cloneCalibrationRun(runId: number) {
@@ -257,6 +279,7 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     cloneCalibrationRun,
     deleteCalibrationRun,
     archiveCalibrationRun,
+    lockCalibrationRun,
     exportJob,
     getCalibrationJobZip,
   }
