@@ -52,6 +52,7 @@
                     :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
                     :title="'Job ID ' + slotProps.data.calibration_run_id">
                     {{ slotProps.data.calibration_run_id }}
+                    <span v-if="slotProps.data.is_locked" class="pi pi-lock"></span>
                   </span>
                 </template>
               </Column>
@@ -68,23 +69,6 @@
                     :aria-label="slotProps.data.is_archived ? 'Archived' : ''"
                     :title="slotProps.data.is_archived ? 'Archived' : ''">
                     {{ slotProps.data.is_archived ? 'Yes' : 'No' }}
-                  </span>
-                </template>
-              </Column>
-
-              <Column :pt="ptColumn" field="is_locked" :body="binaryValueBodyTemplate"
-                :sortable="true">
-                <template #header>
-                  <div class="column-header">
-                    <span>Locked?</span>
-                  </div>
-                </template>
-                <template #body="slotProps">
-                  <span v-if="slotProps.data.calibration_run_id"
-                    :aria-label="slotProps.data.is_locked ? 'Locked' : ''"
-                    :title="slotProps.data.is_locked ? 'Locked' : ''">
-                    {{ slotProps.data.is_locked ? 'Yes' : 'No' }}
-                    <span v-if="slotProps.data.is_locked" class="pi pi-lock"></span>
                   </span>
                 </template>
               </Column>
