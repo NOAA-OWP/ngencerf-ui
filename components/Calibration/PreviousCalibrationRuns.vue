@@ -686,21 +686,21 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   selectedMultipleCalibrationRuns.value = [];
 };
 
-const confirmDelete = useConfirm();
+const confirmAction = useConfirm();
 const changeSelectedCalibrationRunStatus = (selectedCalibrationRun: any, jobStatusAction: number) => {
   let ty = "";
   let label = "";
   if (jobStatusAction === JobStatusAction.delete) {
-    ty = "delete"
+    ty = "Delete"
     label = "DELETE"
   } else if (jobStatusAction === JobStatusAction.archive) {
-    ty = "archive"
+    ty = "Archive"
     label = "ARCHIVE"
   } else if (jobStatusAction === JobStatusAction.unarchive) {
-    ty = "unarchive (restore)"
+    ty = "Unarchive (restore)"
     label = "Unarchive (restore)"
   } else if (jobStatusAction === JobStatusAction.lock) {
-    ty = "lock"
+    ty = "Lock"
     label = "LOCK"
   } else if (jobStatusAction === JobStatusAction.unlock) {
     ty = "Unlock"
@@ -708,43 +708,47 @@ const changeSelectedCalibrationRunStatus = (selectedCalibrationRun: any, jobStat
   }
 
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id
-  const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '" + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
-  let confirmMessage = "Are you sure you want to " + ty + " calibration run " + selectedRunId + selectedRunName;
-  if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
 
-  confirmDelete.require({
-    message: confirmMessage,
-    header: 'Confirm Delete',
-    icon: 'pi pi-exclamation-triangle',
-    rejectProps: {
-      label: 'Cancel',
-      severity: 'secondary',
-      outlined: true
-    },
-    acceptProps: {
-      label: label
-    },
-    accept: () => {
-      if (jobStatusAction === JobStatusAction.delete) {
-        acceptDelete(selectedRunId)
+  // for lock and unlock, no need to confirm, just do it
+  if (jobStatusAction === JobStatusAction.lock) {
+    acceptLock(selectedRunId, true)
+  }
+  else if (jobStatusAction === JobStatusAction.unlock) {
+    acceptLock(selectedRunId, false)
+  }
+  else {
+    const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '" + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
+    let confirmMessage = "Are you sure you want to " + ty.toLowerCase() + " calibration run " + selectedRunId + selectedRunName;
+    if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
+
+    confirmAction.require({
+      message: confirmMessage,
+      header: 'Confirm ' + ty,
+      icon: 'pi pi-exclamation-triangle',
+      rejectProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true
+      },
+      acceptProps: {
+        label: label
+      },
+      accept: () => {
+        if (jobStatusAction === JobStatusAction.delete) {
+          acceptDelete(selectedRunId)
+        }
+        else if (jobStatusAction === JobStatusAction.archive) {
+          acceptArchive(selectedRunId, true)
+        }
+        else if (jobStatusAction === JobStatusAction.unarchive) {
+          acceptArchive(selectedRunId, false)
+        }
+      },
+      reject: () => {
+        //do nothing
       }
-      else if (jobStatusAction === JobStatusAction.archive) {
-        acceptArchive(selectedRunId, true)
-      }
-      else if (jobStatusAction === JobStatusAction.unarchive) {
-        acceptArchive(selectedRunId, false)
-      }
-      else if (jobStatusAction === JobStatusAction.lock) {
-        acceptLock(selectedRunId, true)
-      }
-      else if (jobStatusAction === JobStatusAction.unlock) {
-        acceptLock(selectedRunId, false)
-      }
-    },
-    reject: () => {
-      //do nothing
-    }
-  })
+    })
+  }
 }
 
 /**
@@ -752,6 +756,7 @@ const changeSelectedCalibrationRunStatus = (selectedCalibrationRun: any, jobStat
  */
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(async (response) => {
+    toast.removeAllGroups();
     if (response.status === 200) {
       const tMsg: ToastMessageOptions = { severity: 'success', 
         summary: 'Calibration Job Deleted', detail: 'Job ' + selectedRunId + ' deleted', life: ToastTimeout.timeoutSuccess };
@@ -786,6 +791,7 @@ const acceptMultipleDelete = () => {
           failureMessages.push(job.message);
         }
       });
+      toast.removeAllGroups();
       if (successMessages.length > 0) {
         const tMsg: ToastMessageOptions = { severity: 'success', 
           summary: 'Delete Multiple Jobs', detail: successMessages.join('\n'), 
@@ -817,6 +823,7 @@ const acceptMultipleDelete = () => {
  */
 const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
   archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
+    toast.removeAllGroups();
     if (response.status === 200) {
       const tMsg: ToastMessageOptions = { severity: 'success', 
         summary: 'Calibration Job ' + (archiveJob ? 'Archived' : 'Un-Archived'), detail: 'Job ' + selectedRunId + ' ' + (archiveJob ? 'Archived' : 'Un-Archived'), life: ToastTimeout.timeoutSuccess };
@@ -836,7 +843,7 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
 }
 
 /**
- * Accept archiving of muiltiple jobs
+ * Accept archiving of multiple jobs
  */
 const acceptMultipleArchive = (archiveJob: boolean) => {
   const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
@@ -851,6 +858,7 @@ const acceptMultipleArchive = (archiveJob: boolean) => {
           failureMessages.push(job.message);
         }
       });
+      toast.removeAllGroups();
       if (successMessages.length > 0) {
         const tMsg: ToastMessageOptions = { severity: 'success', 
           summary: archiveJob ? 'Archive' : 'Un-Archive' + ' Multiple Jobs', detail: successMessages.join('\n'), 
@@ -883,10 +891,11 @@ const acceptMultipleArchive = (archiveJob: boolean) => {
  */
 const acceptLock = (selectedRunId: number, lock: boolean) => {
   lockCalibrationRun(selectedRunId, lock).then(async (response) => {
+    toast.removeAllGroups();
     if (response.status === 200) {
-      const tMsg: ToastMessageOptions = { severity: 'success', 
+      /* const tMsg: ToastMessageOptions = { severity: 'success', 
         summary: 'Calibration Job ' + (lock ? 'Locked' : 'Unlocked'), detail: 'Job ' + selectedRunId + ' ' + (lock ? 'Locked' : 'Unlocked'), life: ToastTimeout.timeoutSuccess };
-      toast.add(tMsg); addToastRecord(tMsg);
+      toast.add(tMsg); addToastRecord(tMsg); */
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -902,7 +911,7 @@ const acceptLock = (selectedRunId: number, lock: boolean) => {
 }
 
 /**
- * Accept locking of muiltiple jobs
+ * Accept locking of multiple jobs
  */
 const acceptMultipleLock = (lock: boolean) => {
   const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
@@ -917,6 +926,7 @@ const acceptMultipleLock = (lock: boolean) => {
           failureMessages.push(job.message);
         }
       });
+      toast.removeAllGroups();
       if (successMessages.length > 0) {
         const tMsg: ToastMessageOptions = { severity: 'success', 
           summary: lock ? 'Lock' : 'Unlock' + ' Multiple Jobs', detail: successMessages.join('\n'), 
