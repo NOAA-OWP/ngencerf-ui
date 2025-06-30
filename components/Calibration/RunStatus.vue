@@ -929,6 +929,7 @@ watch(selectedLogName, async () => {
 });
 
 watch(selectedLogStatus, async () => {
+  // if selectedLogStatus is not empty, update log refs
   if (selectedLogStatus.value && Object.keys(selectedLogStatus.value).length > 0) {
     updateLogRefs(selectedLogStatus.value?.file_updated);
   }
