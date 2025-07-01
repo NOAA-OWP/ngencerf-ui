@@ -393,7 +393,8 @@ select option {
   font-size: 0.8em;
   white-space: nowrap;
 }
-#MainLeftDataArea .p-datatable-tbody > tr.p-datatable-row-selected {
+#MainLeftDataArea .p-datatable-tbody > tr.p-datatable-row-selected,
+#MainLeftDataArea .p-datatable-tbody > tr.p-datatable-row-selected:hover {
   background-color: #D8FFD8 !important;    
   color: black;
 }
