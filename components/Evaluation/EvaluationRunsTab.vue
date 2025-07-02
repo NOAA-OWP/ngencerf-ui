@@ -833,12 +833,12 @@ watch(calibrationDownloadJobID, () => {
 });
 
 const confirmArchive = useConfirm();
-const archiveSelectedCalibrationRun = (archiveJob: boolean) => {
+const archiveSelectedCalibrationRun = () => {
   const selectedRunId = contextMenuJob.value as number;
-  let confirmMessage = "Are you sure you want to " + (archiveJob ? "Archive" : "Un-Archive") + " this calibration run?"
+  let confirmMessage = "Are you sure you want to Archive this calibration run? Unarchiving must be done from the Calibration workflow."
   confirmArchive.require({
     message: confirmMessage,
-    header: 'Confirm ' + (archiveJob ? "Archive" : "Un-Archive"),
+    header: 'Confirm Archive',
     icon: 'pi pi-exclamation-triangle',
     rejectProps: {
       label: 'Cancel',
@@ -846,19 +846,19 @@ const archiveSelectedCalibrationRun = (archiveJob: boolean) => {
       outlined: true
     },
     acceptProps: {
-      label: (archiveJob ? "ARCHIVE" : "UN-ARCHIVE") + " RUN",
+      label: "ARCHIVE RUN",
     },
-    accept: () => acceptArchive(selectedRunId, archiveJob),
+    accept: () => acceptArchive(selectedRunId),
     reject: () => {
       //do nothing
     }
   })
 }
-const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
-  archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
+const acceptArchive = (selectedRunId: number) => {
+  archiveCalibrationRun(selectedRunId, true).then(async (response) => {
     if (response.status === 200) {
       const tMsg: ToastMessageOptions = { severity: 'success', 
-        summary: 'Calibration Job ' + (archiveJob ? 'Archived' : 'Un-Archived'), detail: 'Job ' + selectedRunId + ' ' + (archiveJob ? 'Archived' : 'Un-Archived'), life: ToastTimeout.timeoutSuccess };
+        summary: 'Calibration Job Archived', detail: 'Job ' + selectedRunId + ' Archived', life: ToastTimeout.timeoutSuccess };
       toast.add(tMsg); addToastRecord(tMsg);
       refreshJobList();
     } else {
