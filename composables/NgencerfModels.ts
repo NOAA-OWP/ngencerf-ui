@@ -702,6 +702,7 @@ export type CalibrationRunForForecast = {
   objective_function: string;
   optimization_algorithm: string;
   validations: CalibrationJobValidationItem[];
+  is_archived: boolean;
   is_downloadable: boolean;
 };
 

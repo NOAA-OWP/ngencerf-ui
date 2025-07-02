@@ -286,7 +286,7 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 import { EvaluationTabs } from "@/composables/NgencerfEnums";
 
-const { deleteCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
+const { deleteCalibrationRun, exportJob, getCalibrationJobZip, archiveCalibrationRun } = useCalibrationJobStore();
 const showMessagesGroup = ref<boolean>(false);
 
 const crContextMenu = ref(); //calibration run context menu
@@ -365,7 +365,6 @@ onMounted(async() => {
 
   //clear calibration data if user was on calibration tab and clear previous evaluation run data user may have selected
   resetUserSelectedEvalCalibrationRun();
-  fetchUserValidatedCalibrationJobsListData();
 
   if(gotoCalibrationRunId.value) {
     userSelectedEvalCalibrationRunId.value = gotoCalibrationRunId.value;
@@ -387,6 +386,10 @@ onMounted(async() => {
   uiGageId.value = 'All';
   computedGageCalibrationRunList.value = [];
   selectedCalibrationCompareRuns.value = [];
+
+  isLoading.value = true;
+
+  fetchUserValidatedCalibrationJobsListData();
   
   if (gageCalibrationRunListHeaders.value.length === 0) {
     gageCalibrationRunListHeaders.value.push({ field: 'calibration_run_id', header: "Job ID" });
@@ -498,6 +501,9 @@ const onRowContextMenu = (event: any) => {
     }
     cmCalibrationRun.value.push({ label: 'Export', icon: 'pi pi-file-export', command: () => exportSelectedCalibrationData() });
     cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
+    if (!selectedCalibrationRun.value?.is_archived) {
+      cmCalibrationRun.value.push({ label: 'Archive', icon: 'pi pi-folder', command: () => archiveSelectedCalibrationRun(true) });
+    }
   }
 };
 
@@ -825,6 +831,45 @@ watch(calibrationDownloadJobID, () => {
     calibrationDownloadFileName.value = null;
   }
 });
+
+const confirmArchive = useConfirm();
+const archiveSelectedCalibrationRun = (archiveJob: boolean) => {
+  const selectedRunId = contextMenuJob.value as number;
+  let confirmMessage = "Are you sure you want to " + (archiveJob ? "Archive" : "Un-Archive") + " this calibration run?"
+  confirmArchive.require({
+    message: confirmMessage,
+    header: 'Confirm ' + (archiveJob ? "Archive" : "Un-Archive"),
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: (archiveJob ? "ARCHIVE" : "UN-ARCHIVE") + " RUN",
+    },
+    accept: () => acceptArchive(selectedRunId, archiveJob),
+    reject: () => {
+      //do nothing
+    }
+  })
+}
+const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
+  archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
+    if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: 'success', 
+        summary: 'Calibration Job ' + (archiveJob ? 'Archived' : 'Un-Archived'), detail: 'Job ' + selectedRunId + ' ' + (archiveJob ? 'Archived' : 'Un-Archived'), life: ToastTimeout.timeoutSuccess };
+      toast.add(tMsg); addToastRecord(tMsg);
+      refreshJobList();
+    } else {
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Archive Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
+  });
+  selectedCalibrationRun.value = undefined;
+}
 
 const toggleMessagesGroup = () => {
   if (showMessagesGroup.value) {

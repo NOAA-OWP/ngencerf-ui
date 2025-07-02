@@ -158,7 +158,7 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 import { ForecastTabs } from "@/composables/NgencerfEnums";
 
-const { deleteCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
+const { deleteCalibrationRun, archiveCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
 
 const { addToastRecord } = generalStore();
 
@@ -200,6 +200,9 @@ const onRowContextMenu = (event: any) => {
     }
     cmCalibrationRun.value.push({ label: 'Export', icon: 'pi pi-file-export', command: () => exportSelectedCalibrationData() });
     cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
+    if (!selectedCalibrationRun.value?.is_archived) {
+      cmCalibrationRun.value.push({ label: 'Archive', icon: 'pi pi-folder', command: () => archiveSelectedCalibrationRun(true) });
+    }
   }
 };
 
@@ -347,7 +350,7 @@ const acceptDelete = (selectedRunId: number) => {
       const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
       summary: 'Delete Calibration Run', detail: 'Job ' + selectedRunId + ' deleted', life: useApiResponseToastSeverityLife(response?.status)};
       toast.add(tMsg); addToastRecord(tMsg);   
-      fetchUserValidatedCalibrationJobsListData();
+      getCalibrationJobsForForecast();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -357,6 +360,45 @@ const acceptDelete = (selectedRunId: number) => {
   });
   calibrationRunForForecast.value = undefined;
 };
+
+const confirmArchive = useConfirm();
+const archiveSelectedCalibrationRun = (archiveJob: boolean) => {
+  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
+  let confirmMessage = "Are you sure you want to " + (archiveJob ? "Archive" : "Un-Archive") + " this calibration run?"
+  confirmArchive.require({
+    message: confirmMessage,
+    header: 'Confirm ' + (archiveJob ? "Archive" : "Un-Archive"),
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: (archiveJob ? "ARCHIVE" : "UN-ARCHIVE") + " RUN",
+    },
+    accept: () => acceptArchive(selectedRunId, archiveJob),
+    reject: () => {
+      //do nothing
+    }
+  })
+}
+const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
+  archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
+    if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: 'success', 
+        summary: 'Calibration Job ' + (archiveJob ? 'Archived' : 'Un-Archived'), detail: 'Job ' + selectedRunId + ' ' + (archiveJob ? 'Archived' : 'Un-Archived'), life: ToastTimeout.timeoutSuccess };
+      toast.add(tMsg); addToastRecord(tMsg);
+      getCalibrationJobsForForecast();
+    } else {
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Archive Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
+  });
+  selectedCalibrationRun.value = undefined;
+}
 
 /**
  * Export user's calibration job configuration data to a JSON file
