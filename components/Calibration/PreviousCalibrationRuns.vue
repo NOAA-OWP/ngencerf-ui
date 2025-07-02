@@ -469,6 +469,7 @@ const ptColumn = ref({
 const refreshJobList = async () => {
   isLoading.value = true;
   await fetchUserCalibrationJobsListData();
+  await updateUserCalibrationJobsListData();
   isLoading.value = false;
 }
 
