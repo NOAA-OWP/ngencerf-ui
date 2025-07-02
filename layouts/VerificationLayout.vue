@@ -19,10 +19,19 @@
 </template>
 
 <script setup lang="ts">
-
+import { onUnmounted } from "vue";
 import AppFooter from "@/components/Common/AppFooter.vue";
 import AppHeader from "@/components/Common/AppHeader.vue";
 
+import { generalStore } from "@/stores/common/GeneralStore";
+
+const { getMenuIndex, getVerificationTabIndex, setVerificationTabIndex } = generalStore();
+
+onUnmounted(() => {
+  // Reset tab index to 1 when we leave this layout, 
+  // so that it doesn't try to mount the wrong tab when you return
+  setVerificationTabIndex(1);
+})
 </script>
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
