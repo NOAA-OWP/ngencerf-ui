@@ -74,12 +74,12 @@
                   }}</td>
                 <td v-else class="pl-5">Ready</td>
               </tr>
-              <tr height="32px" :aria-label="'Configuration is ' + (forecastCycle as ForecastCycle).name"
-                :title="'Configuration is ' + (forecastCycle as ForecastCycle).name">
+              <tr height="32px" :aria-label="'Configuration is ' + ((forecastCycle as ForecastCycle)?.name ?? 'Unknown')"
+                :title="'Configuration is ' + ((forecastCycle as ForecastCycle)?.name ?? 'Unknown')">
                 <td class="text-right font-bold">
                   <div style="width: 140px;">Configuration</div>
                 </td>
-                <td class="pl-5">{{ (forecastCycle as ForecastCycle).name ?? '-'.repeat(30) }}</td>
+                <td class="pl-5">{{ ((forecastCycle as ForecastCycle)?.name ?? 'Unknown') ?? '-'.repeat(30) }}</td>
               </tr>
             </tbody>
           </table>
