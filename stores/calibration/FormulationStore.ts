@@ -107,7 +107,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
             selected: false,
             groups: moduleData.groups,
           };
-          if (userCalibrationRunData.value?.modules.includes(moduleData.name)) {
+          if (userCalibrationRunData?.value?.modules?.includes(moduleData.name)) {
             selected_mouldes_list.push(selectOptionItem);
           } else {
             modules_list.push(selectOptionItem);

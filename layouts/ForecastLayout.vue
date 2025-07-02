@@ -29,9 +29,20 @@
 </template>
 
 <script setup lang="ts">
+import { onUnmounted } from "vue";
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
 import ForecastLeftBlock from "~/components/Forecast/ForecastLeftBlock.vue";
+
+import { generalStore } from "@/stores/common/GeneralStore";
+
+const { getMenuIndex, getForecastTabIndex, setForecastTabIndex } = generalStore();
+
+onUnmounted(() => {
+  // Reset tab index to 1 when we leave this layout, 
+  // so that it doesn't try to mount the wrong tab when you return
+  setForecastTabIndex(1);
+})
 
 </script>
 

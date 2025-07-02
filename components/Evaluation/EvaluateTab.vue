@@ -505,7 +505,7 @@ onMounted(() => {
     
     // add grid display options to the dropdown if not added already
     gridDisplayOptions.forEach(option => {
-      if (!plotList.value.some(item => item.name === option) && !userCalibrationRunData?.value.modules?.includes('LSTM')) {
+      if (!plotList.value.some(item => item.name === option) && !userCalibrationRunData?.value?.modules?.includes('LSTM')) {
         plotList.value.push({ name: option, description: '' });
       }
     });
@@ -513,7 +513,7 @@ onMounted(() => {
     // Add Supplemental Table Options to the dropdown
     for (let t = 0; t < supplementalTableOptions.value.length; t++) {
       if (!plotList.value.some(item => item.name === supplementalTableOptions.value[t]) &&
-        (supplementalTableOptions.value[t] != 'Iteration Parameters Table' || !userCalibrationRunData?.value.modules?.includes('LSTM'))) {
+        (supplementalTableOptions.value[t] != 'Iteration Parameters Table' || !userCalibrationRunData?.value?.modules?.includes('LSTM'))) {
         plotList.value.push({ name: supplementalTableOptions.value[t], description: '' });
       }
     }
