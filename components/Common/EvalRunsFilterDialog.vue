@@ -35,14 +35,14 @@
         </div>
         <div class="col-span-6">
           <div class="grid grid-cols-12">
-            <div class="col-span-4">
+            <!-- <div class="col-span-4">
               <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[30px] ml-[28px]"
                 aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
                 :pt="ptCheckbox" :disabled="disableAll">
               </Checkbox>
               <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
                 title="Include Archived Jobs">Include Archived</label>
-            </div>
+            </div> -->
             <div class="col-span-4">
               <div class="col-span-1">
                 <Button class="ngenButtonDiv mt-[25px] ml-[9px] align-center" label="Apply Filters"
