@@ -1,6 +1,6 @@
 <template>
   <div id="OptimizationMetrics" class="mt-4">
-    <div v-if="!userCalibrationRunData.modules.includes('LSTM')" class="grid grid-rows-12 gap-1">
+    <div v-if="!userCalibrationRunData?.modules?.includes('LSTM')" class="grid grid-rows-12 gap-1">
       <div class="row-span-3">
         <div class="grid grid-cols-2 pt-3 gap-10">
           <div class="col-span-1">
@@ -151,7 +151,7 @@
     <div id="OptMetBottomButtons" class="absolute b-0 grid grid-cols-8 mt-6 ActionButtonsBox">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-6 h-8">
-          <Button v-if="!userCalibrationRunData.modules.includes('LSTM')" 
+          <Button v-if="!userCalibrationRunData?.modules?.includes('LSTM')" 
             class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button"
             @click="saveOptMetData()">
             Save
