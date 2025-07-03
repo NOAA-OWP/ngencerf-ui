@@ -195,13 +195,13 @@ onMounted(async () => {
 });
 
 /**
- * Create elapsedTimeIntervalId to increment elapsedTime every second while forcingDownloadStatus
- * or forecastJobStatus is Running
+ * Create elapsedTimeIntervalId to increment elapsedTime every second while forcingDownloadStatus is Running
+ * or forecastJobStatus is Submitted or Running
  */
 const createElapsedTimeInterval = () => {
   elapsedTimeIntervalId.value = setInterval(async () => {
-    // continue incrementing elapsedTime every second while forcingDownloadStatus or forecastJobStatus
-    // are Running
+    // continue incrementing elapsedTime every second while forcingDownloadStatus is Submitted
+    // or forecastJobStatus is Submitted or Running
     if (['Running'].includes(forcingDownloadStatus.value ?? '') || ['Submitted', 'Running'].includes(forecastJobStatus.value ?? '')) {
       elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
     } else {
@@ -213,7 +213,7 @@ const createElapsedTimeInterval = () => {
 
 /**
  * Create forecastJobStatusIntervalId to update forcingDownloadStatus and forecastJobStatus every 10 seconds
- * while forcingDownloadStatus or forecastJobStatus is Running
+ * while forcingDownloadStatus or forecastJobStatus is Submitted or Running
  */
 const createForcingDownloadAndForecastStatusInterval = () => {
   forecastJobStatusIntervalId.value = setInterval(async () => {
@@ -222,14 +222,17 @@ const createForcingDownloadAndForecastStatusInterval = () => {
     const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
     if (forecast) {
-      // if forcing download and forecast job are not running, clear the interval
-      if (['Running'].includes(forecast.forcing_download.status) && ['Submitted', 'Running'].includes(forecast.status)) {
+      // if forcing download and forecast job are not Submitted or Running, clear the interval
+      if (
+        !['Submitted', 'Running'].includes(forecast?.forcing_download?.status ?? '') &&
+        !['Submitted', 'Running'].includes(forecast?.status ?? '')
+      ) {
         clearInterval(forecastJobStatusIntervalId.value);
         forecastJobStatusIntervalId.value = undefined;
       }
       // update forcingDownloadStatus and forecastJobStatus
-      forecastJobStatus.value = forecast.status;
-      forcingDownloadStatus.value = forecast.forcing_download.status;
+      forecastJobStatus.value = forecast?.status;
+      forcingDownloadStatus.value = forecast?.forcing_download?.status;
 
       // set submitTime if not already set
       if (!submitTime.value && forecast?.submit_date) {
@@ -250,9 +253,9 @@ const createForcingDownloadAndForecastStatusInterval = () => {
  * Start the forecast run
  */
 const startForecastRun = async () => {
-  try {
-    const createAndRunForecastJobResponse = await createAndRunForecastJob(calibrationRunForForecast?.value?.calibration_run_id as number, forecastCycle?.value?.name as string);
+  const createAndRunForecastJobResponse = await createAndRunForecastJob(calibrationRunForForecast?.value?.calibration_run_id as number, forecastCycle?.value?.name as string);
 
+  if (createAndRunForecastJobResponse.status >= 200 && createAndRunForecastJobResponse.status < 300) {
     forecastJobStatus.value = createAndRunForecastJobResponse._data.forecast_status;
     forcingDownloadStatus.value = createAndRunForecastJobResponse._data.forecast_forcing_download_status;
     forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
@@ -267,9 +270,18 @@ const startForecastRun = async () => {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-  } catch (error) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error running Forecast job', life: ToastTimeout.timeoutError };
-    toast.add(tMsg); addToastRecord(tMsg);
+  } else {
+    const getStatusResponse = await getStatus();
+    const forecasts: any[] = getStatusResponse?._data?.forecasts;
+    const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
+
+    if (forecast) {
+      forecastJobStatus.value = forecast?.status;
+      forcingDownloadStatus.value = forecast?.forcing_download?.status;
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`, life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   }
 };
 
@@ -313,44 +325,42 @@ const goToResultsTab = () => {
  * so we're essentially watching both forcingDownloadStatus and forecastJobStatus for changes
  */
 watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newForecastJobStatus) => {
-  // when overallForcingDownloadForecastStatus first changes to Running, start incrementing elapsedTime every second until
+  // when overallForcingDownloadForecastStatus first changes to Submitted or Running, start incrementing elapsedTime every second until
   // overallForcingDownloadForecastStatus changes to Done, Cancelled, Failed, or Server error
-  if (forcingDownloadStatus.value === 'Running' || forecastJobStatus.value === 'Running') {
-    // create elapsedTimeIntervalId to update elapsedTime every second while overallForcingDownloadForecastStatus 
-    // is Running if not already created and submit_time is set
-    if (!elapsedTimeIntervalId.value && submitTimeDate.value) {
+  if (['Submitted', 'Running'].includes(forcingDownloadStatus.value) || ['Submitted', 'Running'].includes(forecastJobStatus.value)) {
+    // if not already created, create elapsedTimeIntervalId to update elapsedTime every second while forcingDownloadStatus is Running
+    // or forecastJobStatus is Submitted or Running
+    if (forcingDownloadStatus.value === 'Running' && !elapsedTimeIntervalId.value && submitTimeDate.value) {
       createElapsedTimeInterval();
     }
-    // create forecastJobStatusIntervalId to update forcingDownloadStatus and forecastJobStatus every 10 seconds
-    // while forcingDownloadStatus or forecastJobStatus is Running if not already created
+    // if not already created, create forecastJobStatusIntervalId to update forcingDownloadStatus and forecastJobStatus every 10 seconds
+    // while forcingDownloadStatus or forecastJobStatus is Submitted or Running
     if (!forecastJobStatusIntervalId.value) {
       createForcingDownloadAndForecastStatusInterval();
     }
   }
 
-  // when overallForcingDownloadForecastStatus changes to Done, look for Forcing Download and Forecast 
+  // if interval incrementing elapsedTime every second is no longer running
+  // and when overallForcingDownloadForecastStatus changes to Done, look for Forcing Download and Forecast 
   // elapsedTimes from server and set elapsedTime to the sum of those durations
-  //  if interval incrementing elapsedTime every second is no longer running
-  if (forcingDownloadStatus.value === 'Done' || forecastJobStatus.value === 'Done') {
+  if (!forecastJobStatusIntervalId.value && forcingDownloadStatus.value === 'Done' || forecastJobStatus.value === 'Done') {
     // if forecastJobStatusIntervalId is not set, that means elapsedTime is no longer incrementing every second
     // so we need to get elapsed_time from the server
-    if (!forecastJobStatusIntervalId.value) {
-      const getStatusResponse = await getStatus();
-      const forecasts: any[] = getStatusResponse?._data.forecasts;
-      const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
+    const getStatusResponse = await getStatus();
+    const forecasts: any[] = getStatusResponse?._data.forecasts;
+    const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
-      if (forecast) {
-        // set elapsedTime
-        setElapsedTime(forecast);
+    if (forecast) {
+      // set elapsedTime
+      setElapsedTime(forecast);
 
-        if (!elapsedTime.value) {
-          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Elapsed time not set from server', life: ToastTimeout.timeoutError };
-          toast.add(tMsg); addToastRecord(tMsg);
-        }
-      } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`, life: ToastTimeout.timeoutError };
+      if (!elapsedTime.value) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Elapsed time not set from server', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`, life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 }, 

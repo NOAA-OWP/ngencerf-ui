@@ -424,7 +424,9 @@ onMounted(async () => {
  */
 const createElapsedTimeInterval = () => {
   elapsedTimeIntervalId.value = setInterval(async () => {
-    if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
+    if (
+      userCalibrationRunData.value?.status === 'Running' || 
+      (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate calibrationElapsedTime every second while Calibration is Running or Validation is not Done
       calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
@@ -433,7 +435,7 @@ const createElapsedTimeInterval = () => {
       elapsedTimeIntervalId.value = undefined;
     }
   }, 1000) as unknown as number;
-}
+};
 
 // Run Calibration Job
 const startRun = async () => {
@@ -444,6 +446,7 @@ const startRun = async () => {
 
     const runCalibrationResponse = await runCalibrationJob();
 
+    // nominal case
     if (runCalibrationResponse.status >= 200 && runCalibrationResponse.status < 300) {
       if (runCalibrationResponse?._data?.status) {
         userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
@@ -468,12 +471,18 @@ const startRun = async () => {
       }
       fetchUserCalibrationRunData();
     } else {
-      userCalibrationRunData.value.status = 'Failed';
-      const errorMessages: string[] = useApiErrorResponsePreprocess(runCalibrationResponse);
-      errorMessages.forEach((msg: string) => {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      });
+      const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
+      
+      if (getStatusResponse?._data?.status) {
+        userCalibrationRunData.value.status = getStatusResponse._data.status;
+      } else {
+        const errorMessages: string[] = useApiErrorResponsePreprocess(getStatusResponse);
+        errorMessages.forEach((msg: string) => {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
+          toast.add(tMsg); addToastRecord(tMsg);
+        });
+      }
+
     }
   } else {
     // userCalibrationRunData should always be set before getting to this point, but hey just in case
@@ -577,29 +586,47 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
     populatePlotListOptions();
 
-    if (calibrationStatus.value === 'Running') {
+    if (calibrationStatus.value === 'Submitted' || calibrationStatus.value === 'Running') {
       if (!calibrationStatusIntervalId.value) {
-        // create an interval to keep checking calibration status every 10 seconds while calibration is 'Running'
+        // create an interval to keep checking calibration status every 10 seconds while calibration is 'Submitted' or 'Running'
         calibrationStatusIntervalId.value = setInterval(async () => {
-          const getIterationResponse = await queryGetIteration();
+          if (calibrationStatus.value === 'Submitted') {
+            const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
 
-          // check if status changes from Running
-          if (getIterationResponse._data && getIterationResponse._data.status) {
-            if (getIterationResponse._data.status !== 'Running') {
-              if (userCalibrationRunData.value) {
-                clearInterval(calibrationStatusIntervalId.value);
-                calibrationStatusIntervalId.value = undefined;
-                userCalibrationRunData.value.status = getIterationResponse._data.status;
+            // check if status changes from Submitted or Running
+            if (getStatusResponse._data && getStatusResponse._data.status) {
+              if (getStatusResponse._data.status !== 'Submitted' && getStatusResponse._data.status !== 'Running') {
+                if (userCalibrationRunData.value) {
+                  clearInterval(calibrationStatusIntervalId.value);
+                  calibrationStatusIntervalId.value = undefined;
+                }
               }
+              userCalibrationRunData.value.status = getStatusResponse._data.status;
+            } else {
+              const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
+              toast.add(tMsg); addToastRecord(tMsg);
             }
           } else {
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
-            toast.add(tMsg); addToastRecord(tMsg);
-          }
+            const getIterationResponse = await queryGetIteration();
+            
+            // check if status changes from Submitted or Running
+            if (getIterationResponse._data && getIterationResponse._data.status) {
+              if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
+                if (userCalibrationRunData.value) {
+                  clearInterval(calibrationStatusIntervalId.value);
+                  calibrationStatusIntervalId.value = undefined;
+                }
+              }
+              userCalibrationRunData.value.status = getIterationResponse._data.status;
+            } else {
+              const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
+              toast.add(tMsg); addToastRecord(tMsg);
+            }
 
-          // check if iteration changes
-          if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
-            iteration.value = getIterationResponse._data.iteration;
+            // check if iteration changes
+            if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
+              iteration.value = getIterationResponse._data.iteration;
+            }
           }
         }, 10000) as unknown as number;
       }
@@ -889,7 +916,7 @@ watch(selectedLogName, async () => {
 });
 
 watch(selectedLogStatus, async () => {
-  if (selectedLogStatus.value !== {}) {
+  if (selectedLogStatus.value && Object.keys(selectedLogStatus.value).length > 0) {
     updateLogRefs(selectedLogStatus.value?.file_updated);
   }
 });

@@ -134,7 +134,7 @@ export const makeProtectedApiCall = async <T>(
     if (myResponse.status == 504) {
       responseData = {
         _data: {
-          "message": 'Request to' + url + 'timed out',
+          "message": 'Request to ' + url + ' timed out',
           "response_type": "error",
         },
         status: 504,
