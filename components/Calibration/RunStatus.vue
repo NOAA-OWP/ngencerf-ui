@@ -537,7 +537,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       selectedPlotName.value = (logListOptions.value.at(-1)).name;
     }
 
-    if (['Submitted', 'Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
+    if (['Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
       // Calculate Running Time
       if (submitTimeDate.value && submitTimeDate.value instanceof Date && !isNaN(submitTimeDate?.value.getTime())) {
         submitTime.value = convertTimeZone(submitTimeDate.value); // create a string from submit_date and convert it to local time format
@@ -586,29 +586,47 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
     populatePlotListOptions();
 
-    if (calibrationStatus.value === 'Submitted'  || calibrationStatus.value === 'Running') {
+    if (calibrationStatus.value === 'Submitted' ||calibrationStatus.value === 'Running') {
       if (!calibrationStatusIntervalId.value) {
         // create an interval to keep checking calibration status every 10 seconds while calibration is 'Submitted' or 'Running'
         calibrationStatusIntervalId.value = setInterval(async () => {
-          const getIterationResponse = await queryGetIteration();
+          if (calibrationStatus.value === 'Submitted') {
+            const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
 
-          // check if status changes from Submitted or Running
-          if (getIterationResponse._data && getIterationResponse._data.status) {
-            if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
-              if (userCalibrationRunData.value) {
-                clearInterval(calibrationStatusIntervalId.value);
-                calibrationStatusIntervalId.value = undefined;
-                userCalibrationRunData.value.status = getIterationResponse._data.status;
+            // check if status changes from Submitted or Running
+            if (getStatusResponse._data && getStatusResponse._data.status) {
+              if (getStatusResponse._data.status !== 'Submitted' && getStatusResponse._data.status !== 'Running') {
+                if (userCalibrationRunData.value) {
+                  clearInterval(calibrationStatusIntervalId.value);
+                  calibrationStatusIntervalId.value = undefined;
+                  userCalibrationRunData.value.status = getStatusResponse._data.status;
+                }
               }
+            } else {
+              const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
+              toast.add(tMsg); addToastRecord(tMsg);
             }
           } else {
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
-            toast.add(tMsg); addToastRecord(tMsg);
-          }
+            const getIterationResponse = await queryGetIteration();
+            
+            // check if status changes from Submitted or Running
+            if (getIterationResponse._data && getIterationResponse._data.status) {
+              if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
+                if (userCalibrationRunData.value) {
+                  clearInterval(calibrationStatusIntervalId.value);
+                  calibrationStatusIntervalId.value = undefined;
+                  userCalibrationRunData.value.status = getIterationResponse._data.status;
+                }
+              }
+            } else {
+              const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
+              toast.add(tMsg); addToastRecord(tMsg);
+            }
 
-          // check if iteration changes
-          if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
-            iteration.value = getIterationResponse._data.iteration;
+            // check if iteration changes
+            if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
+              iteration.value = getIterationResponse._data.iteration;
+            }
           }
         }, 10000) as unknown as number;
       }
