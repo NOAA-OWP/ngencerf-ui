@@ -586,7 +586,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
     populatePlotListOptions();
 
-    if (calibrationStatus.value === 'Submitted' ||calibrationStatus.value === 'Running') {
+    if (calibrationStatus.value === 'Submitted' || calibrationStatus.value === 'Running') {
       if (!calibrationStatusIntervalId.value) {
         // create an interval to keep checking calibration status every 10 seconds while calibration is 'Submitted' or 'Running'
         calibrationStatusIntervalId.value = setInterval(async () => {
@@ -599,9 +599,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
                 if (userCalibrationRunData.value) {
                   clearInterval(calibrationStatusIntervalId.value);
                   calibrationStatusIntervalId.value = undefined;
-                  userCalibrationRunData.value.status = getStatusResponse._data.status;
                 }
               }
+              userCalibrationRunData.value.status = getStatusResponse._data.status;
             } else {
               const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
               toast.add(tMsg); addToastRecord(tMsg);
@@ -615,9 +615,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
                 if (userCalibrationRunData.value) {
                   clearInterval(calibrationStatusIntervalId.value);
                   calibrationStatusIntervalId.value = undefined;
-                  userCalibrationRunData.value.status = getIterationResponse._data.status;
                 }
               }
+              userCalibrationRunData.value.status = getIterationResponse._data.status;
             } else {
               const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
               toast.add(tMsg); addToastRecord(tMsg);
