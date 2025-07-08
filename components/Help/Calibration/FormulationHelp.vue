@@ -79,7 +79,7 @@
                         <li style="font-style:italic">aka <strong>Snow Group</strong></li>
                         <li style="font-size:0.95em;"><strong>UEB:</strong></li>
                         <li style="margin-left: 15px;">
-                            If selected, will override snowmelt component of nowah-owp-modular;
+                            If selected, will override snowmelt component of noah-owp-modular;
                             cannot be selected in conjunction with another snow model.
                         </li>
                         <li style="font-size:0.95em;"><strong>Snow-17</strong></li>
