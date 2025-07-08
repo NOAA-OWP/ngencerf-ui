@@ -469,7 +469,7 @@ const startRun = async () => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Submitted or Running after clicking START', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      fetchUserCalibrationRunData();
+      //fetchUserCalibrationRunData();
     } else {
       const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
       
