@@ -57,13 +57,13 @@
               </Listbox>
               <div class="mt-5">
                 <div v-if="!formulationIsValid" class="text-red-600">
-                    Formulation incomplete
+                    Formulation Not Well-Formed
                     <span v-for="message in formulationInvalidMessages">
                     <br/>{{ message }}
                     </span>
                 </div>
                 <div v-else class="text-green-600">
-                    Formulation valid
+                    Formulation Calibratable
                 </div>
               </div>
             </div>

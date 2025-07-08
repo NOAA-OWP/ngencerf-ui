@@ -301,7 +301,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
       if (response._data.formulation_warnings) {
         response._data.formulation_warnings.forEach((err: any) => {
           formulationIsValid.value = false;
-          formulationInvalidMessages.value.push('Error: ' + err);
+          formulationInvalidMessages.value.push('Warning: ' + err);
         });
       }
     });
