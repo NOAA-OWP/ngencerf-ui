@@ -121,7 +121,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
 
       // get elapsed time from valid_best
-      if (validBest.elapsed_time) {
+      if (validBest?.elapsed_time) {
         calibrationElapsedTime.value = validBest.elapsed_time;
       }
     }
