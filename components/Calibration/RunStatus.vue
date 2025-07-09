@@ -370,15 +370,13 @@ onMounted(async () => {
     // Find matching key in log levels somehow
     Object.keys(logLevels.value).forEach(ui_key => {
       if (ui_key.toLowerCase() == server_key.toLowerCase()) {
-        console.log(ui_key + ' matches!');
-        logLevels.value[ui_key] = userCalibrationRunData?.value?.logging_config?.modules[server_key];
+        logLevels.value[ui_key] = ref(userCalibrationRunData?.value?.logging_config?.modules[server_key] as LogLevel);
       }
     });
   });
   if (userCalibrationRunData?.value?.logging_config?.modules['ngen']) {
-    ngenLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen'];
+    ngenLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen'] as LogLevel;
   }
-
   if (userCalibrationRunData?.value && getStatusResponse.status === 200) {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
   }
