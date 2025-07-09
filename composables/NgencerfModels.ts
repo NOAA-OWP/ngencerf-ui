@@ -150,6 +150,12 @@ export interface UserCalibrationRunData {
   external_data_status: ExternalDataStatus;
   geopackage_hydrofabric_file_path: string;
   geopackage_image_url: string;
+  logging_config: {
+    logging_enabled: boolean;
+    modules: {
+      [key: string]: string;
+    }
+  }
   modules: string[];
   formulation_name: string;
   formulation_warning?: FormulationWarning;

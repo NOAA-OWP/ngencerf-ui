@@ -364,6 +364,19 @@ onMounted(async () => {
   }
   const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
 
+  // set log levels
+  Object.keys(userCalibrationRunData?.value?.logging_config?.modules).forEach(server_key => {
+    console.log(server_key + ': ', userCalibrationRunData?.value?.logging_config?.modules[server_key]);
+    // Find matching key in log levels somehow
+    Object.keys(logLevels.value).forEach(ui_key => {
+      if (ui_key.toLowerCase() == server_key.toLowerCase()) {
+        logLevels.value[ui_key] = ref(userCalibrationRunData?.value?.logging_config?.modules[server_key] as LogLevel);
+      }
+    });
+  });
+  if (userCalibrationRunData?.value?.logging_config?.modules['ngen']) {
+    ngenLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen'] as LogLevel;
+  }
   if (userCalibrationRunData?.value && getStatusResponse.status === 200) {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
   }
