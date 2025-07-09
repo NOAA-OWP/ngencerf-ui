@@ -47,7 +47,7 @@ export default defineNuxtConfig({
       theme: {
         preset: Aura,
         options: {
-            darkModeSelector: false,
+          darkModeSelector: false,
         }
       }
     }
