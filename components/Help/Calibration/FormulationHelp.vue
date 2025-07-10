@@ -90,7 +90,7 @@
                             evapotranspiration module has not been selected.
                         </li>
                         <li style="margin-left: 15px;">
-                            If noah-owp-modular has been selected as the evapotranspiration module,
+                            If noah-owp-modular has been selected as the snow-melt module,
                             and another single purpose snow-melt module has been selected, the user will be warned
                             that there are two snow-melt modules selected and noah-owp-modular will not be used for
                             snow-melt.
