@@ -295,61 +295,64 @@ let logTimeout;
 
 const populatePlotListOptions = async() => {
   if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Validating and Preparing Job Data'].includes(userCalibrationRunData?.value?.status))) {
-    plotList.value = [{ name: plotListDefault.value, description: '' }];
+    plotList.value = [];
+    plotList.value.push({ name: plotListDefault.value, display_name: '' });
     plotListOptions.value = [];
     logListOptions.value = [];
 
-    if (userCalibrationRunData?.value?.status != 'Failed' && (userCalibrationRunData?.value?.status != 'Running' || (iteration.value && iteration.value >= 1))) {
-      // Get Plot Names
-      plotNames.value = await queryGetPlotNames();
+    nextTick(async () => {
+      if (userCalibrationRunData?.value?.status != 'Failed' && (userCalibrationRunData?.value?.status != 'Running' || (iteration.value && iteration.value >= 1))) {
+        // Get Plot Names
+        plotNames.value = await queryGetPlotNames();
 
-      if ((plotNames.value as any)?._data?.plot_names) {
-        // setting plotList will populate the dropdown
-        plotListOptions.value = (plotNames.value as any)?._data?.plot_names
-      }
-    }
-
-    // Get Names of available Logs
-    logs.value = await queryGetLogNames(
-      (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
-    );
-    if (logs.value?._data?.log_names) {
-      for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-          let logList = [];
-          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-            logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
-          }
-          logLists.value[key] = logList;
-        });
-      }
-    }
-    
-    // Add Log Options to the dropdown
-    Object.keys(logLists.value).forEach(key => {
-      let optionName = capitalCase(key) + ' Logs';
-      logListOptions.value.push({ name: optionName, description: '' });
-    });
-
-    // Combine available plot and log options
-    for (const option of plotListOptions.value.concat(logListOptions.value)) {
-      if (!(option in plotList.value)) {
-        plotList.value.push(option);
-      }
-    }
-
-    if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
-      // Skip directly to ngen log if status is Failed
-      selectedPlotName.value = (logListOptions.value.at(-1)).name;
-      nextTick(async () => {
-        if (selectedLogList.value.length > 1) {
-            selectedLogName.value = selectedLogList.value.at(-1).name;
+        if ((plotNames.value as any)?._data?.plot_names) {
+          // setting plotList will populate the dropdown
+          plotListOptions.value = (plotNames.value as any)?._data?.plot_names
         }
+      }
+
+      // Get Names of available Logs
+      logs.value = await queryGetLogNames(
+        (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
+      );
+      if (logs.value?._data?.log_names) {
+        for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+          Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+            let logList = [];
+            for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+              logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+            }
+            logLists.value[key] = logList;
+          });
+        }
+      }
+      
+      // Add Log Options to the dropdown
+      Object.keys(logLists.value).forEach(key => {
+        let optionName = capitalCase(key) + ' Logs';
+        logListOptions.value.push({ name: optionName, display_name: '' });
       });
-    } else if (!selectedPlotName.value) {
-      // Start with default option
-      selectedPlotName.value = plotListDefault.value;
-    }
+
+      // Combine available plot and log options
+      for (const option of plotListOptions.value.concat(logListOptions.value)) {
+        if (!(plotList.value.find(obj => obj.name === option.name))) {
+          plotList.value.push(option);
+        }
+      }
+
+      if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
+        // Skip directly to ngen log if status is Failed
+        selectedPlotName.value = (logListOptions.value.at(-1)).name;
+        nextTick(async () => {
+          if (selectedLogList.value.length > 1) {
+              selectedLogName.value = selectedLogList.value.at(-1).name;
+          }
+        });
+      } else if (!selectedPlotName.value) {
+        // Start with default option
+        selectedPlotName.value = plotListDefault.value;
+      }
+    });
   }
 }
 
@@ -366,7 +369,6 @@ onMounted(async () => {
 
   // set log levels
   Object.keys(userCalibrationRunData?.value?.logging_config?.modules).forEach(server_key => {
-    console.log(server_key + ': ', userCalibrationRunData?.value?.logging_config?.modules[server_key]);
     // Find matching key in log levels somehow
     Object.keys(logLevels.value).forEach(ui_key => {
       if (ui_key.toLowerCase() == server_key.toLowerCase()) {
@@ -597,7 +599,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
       }
     }
 
-    populatePlotListOptions();
+    await populatePlotListOptions();
 
     if (calibrationStatus.value === 'Submitted' || calibrationStatus.value === 'Running') {
       if (!calibrationStatusIntervalId.value) {
@@ -801,10 +803,8 @@ watch(submitTimeDate, () => {
 // Handle iteration changes
 watch(iteration, async () => {
   if (iteration.value && iteration.value >= 1) {
-    if (iteration.value == 1) {
-      // populate plotListOptions on first iteration
-      populatePlotListOptions();
-    }
+    // populate plotListOptions from iteration 1 onwards, in case a plot becomes available that wasn't before
+    await populatePlotListOptions();
     if (selectedPlotName.value && selectedPlotName.value != plotListDefault.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
       let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available';
 
