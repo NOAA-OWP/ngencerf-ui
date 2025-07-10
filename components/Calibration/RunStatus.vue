@@ -90,7 +90,7 @@
           </div>
         </div>
       </div>
-      <div>
+      <div v-if="(calibrationStatus === 'Saved' || calibrationStatus === 'Ready') || selectedPlotFileUrl || selectedLogCategory">
         <!--LOGGING SECTION-->
         <div v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'" id="LoggingSection"
           class="p-2 border-t border-[#d9d9d9] flex flex-col items-center">
@@ -536,8 +536,8 @@ const cancelRun = async () => {
   }
 };
 
-// Handle calibrationStatus changes
-watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
+// Handle calibration/validation status changes
+watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
   if (userCalibrationRunData.value) {
     if (userCalibrationRunData.value.stop_criteria) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
@@ -598,7 +598,7 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
-
+    
     await populatePlotListOptions();
 
     if (calibrationStatus.value === 'Submitted' || calibrationStatus.value === 'Running') {
