@@ -17,8 +17,8 @@ RUN set -eux; \
     dnf clean all
 
 # set node and npm versions
-ARG NODE_VERSION=22.15.0
-ARG NPM_VERSION=11.3.0
+ARG NODE_VERSION=22.17.0
+ARG NPM_VERSION=10.9.2
 ARG NODE_TAR_URL="https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
 
 # install node
