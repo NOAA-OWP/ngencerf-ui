@@ -40,8 +40,6 @@ export const generalStore = defineStore(
 
     const isLoading = ref<boolean>(false);
 
-    const refreshTokenIsLoading = ref<boolean>(false);
-
     // This is set if the user changes the gage.  Resets when saved.toastRecord
     const popupActive = ref<boolean>(false);
 
@@ -122,7 +120,6 @@ export const generalStore = defineStore(
     function resetGeneralStore() {
       calibrationJobId.value = 0;
       popupActive.value = false;
-      refreshTokenIsLoading.value = false;
     }
 
     return {
@@ -158,7 +155,6 @@ export const generalStore = defineStore(
       menuIndex,
       evaluationRunSelected,
       isLoading,
-      refreshTokenIsLoading,
       toastRecords,
       addToastRecord,
       clearToastRecords,
