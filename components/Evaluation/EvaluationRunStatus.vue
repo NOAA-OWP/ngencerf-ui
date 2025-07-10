@@ -18,11 +18,11 @@
                   <tr height="38px" :aria-label="'Submit Time ' + formatISOStringOrDateToYYYYMMDDHHMM(startTime)"
                     :title="'Submit Time ' + formatISOStringOrDateToYYYYMMDDHHMM(startTime)">
                     <th scope="row" class="text-right font-bold">Submit Time</th>
-                    <td class="pl-5">{{ startTime ? formatISOStringOrDateToYYYYMMDDHHMM(startTime) : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ startTime ? formatISOStringOrDateToYYYYMMDDHHMM(startTime) : '-'.repeat(15) }}</td>
                   </tr>
                   <tr height="38px" :aria-label="'Elapsed Time ' + runningTime" :title="'Elapsed Time ' + runningTime">
                     <th scope="row" class="text-right font-bold">Elapsed Time</th>
-                    <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ runningTime ? runningTime : '-'.repeat(15) }}</td>
                   </tr>
                   <tr height="38px" :aria-label="'Iteration ' + evaluateDisplayIterationNumber"
                     :title="'Iteration ' + evaluateDisplayIterationNumber">
