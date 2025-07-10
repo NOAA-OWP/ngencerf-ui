@@ -12,14 +12,14 @@
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Submit Time</div>
                     </th>
-                    <td class="pl-5">{{ submitTime ? submitTime : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ submitTime ? submitTime : '-'.repeat(15) }}</td>
                   </tr>
                   <tr height="32px" :aria-label="'Elapsed Time ' + calibrationElapsedTime"
                     :title="'Elapsed Time ' + calibrationElapsedTime">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Elapsed Time</div>
                     </th>
-                    <td class="pl-5">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(30) }}</td>
+                    <td class="pl-5">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(15) }}</td>
                   </tr>
                   <tr height="32px" :aria-label="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
                     'Interation ' + iteration" :title="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
@@ -28,7 +28,7 @@
                       <div style="width: 140px;">{{ validationBestAchieved.isBest ? 'Best ' : '' }} Iteration</div>
                     </th>
                     <td v-if="validationBestAchieved.isBest" class="pl-5">{{ validationBestAchieved.iteration }}</td>
-                    <td v-else class="pl-5">{{ iteration ?? '-'.repeat(30) }}</td>
+                    <td v-else class="pl-5">{{ iteration ?? '-'.repeat(15) }}</td>
                   </tr>
                 </tbody>
               </table>
