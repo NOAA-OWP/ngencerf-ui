@@ -56,14 +56,15 @@
 
               </Listbox>
               <div class="mt-5">
-                <div v-if="!formulationIsValid" class="text-red-600">
-                    Formulation Not Well-Formed
-                    <span v-for="message in formulationInvalidMessages">
+                <div v-if="formulationValidMessages" class="text-green-600">
+                    <span v-for="message in formulationValidMessages">
                     <br/>{{ message }}
                     </span>
                 </div>
-                <div v-else class="text-green-600">
-                    Formulation Calibratable
+                <div v-if="formulationInvalidMessages" class="text-red-600">
+                    <span v-for="message in formulationInvalidMessages">
+                    <br/>{{ message }}
+                    </span>
                 </div>
               </div>
             </div>
@@ -254,6 +255,7 @@ const {
   fetchFormulationSlothParameterUnitOptions,
   fetchSelectedFormulationModuleOptions,
   formulationIsValid,
+  formulationValidMessages,
   formulationInvalidMessages,
   saveFormulationPayload
 } = storeToRefs(useFormulationStore());

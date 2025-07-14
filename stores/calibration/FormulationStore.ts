@@ -35,6 +35,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
 
   const formulationTabData = ref<FormulationTabData>();
   const formulationIsValid = ref<boolean>(false);
+  const formulationValidMessages = ref<string[]>([]);
   const formulationInvalidMessages = ref<string[]>([]);
 
   const saveFormulationPayload = ref<SaveFormulationTabPayload>({});
@@ -291,6 +292,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   async function updateFormulationValidRefs() {
     validateFormulationTabData().then(response => {
       formulationIsValid.value = true;
+      formulationValidMessages.value = [];
       formulationInvalidMessages.value = [];
       if (response._data.formulation_errors) {
         response._data.formulation_errors.forEach((err: any) => {
@@ -302,6 +304,11 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
         response._data.formulation_warnings.forEach((err: any) => {
           formulationIsValid.value = false;
           formulationInvalidMessages.value.push('Warning: ' + err);
+        });
+      }
+      if (response._data.formulation_messages) {
+        response._data.formulation_messages.forEach((msg: any) => {
+          formulationValidMessages.value.push(msg);
         });
       }
     });
@@ -394,6 +401,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   return {
     formulationTabData,
     formulationIsValid,
+    formulationValidMessages,
     formulationInvalidMessages,
     filterGroup,
     useSlothParameters,
