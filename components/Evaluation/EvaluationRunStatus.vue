@@ -171,6 +171,7 @@ const selectedLogTotalPages = ref<number>(1);
 const selectedLogStartRow = ref<number>(1);
 const selectedLogEndRow = ref<number>(logDataPageSize.value);
 const selectedLogFilePath = ref<string>('');
+const autoScrollLog = ref<boolean>(false);
 
 onMounted(async () => {
   hilightTab(EvaluationTabs.tab_runStatus);
@@ -233,6 +234,10 @@ const startRun = async () => {
 
 const updateLogDisplay = () => {
   if (iterationValidationRunId.value > 0) {
+    if (selectedLogDisplay.value === '') {
+      // only scroll to the bottom of the log if it's being displayed for the first time
+      autoScrollLog.value = true;
+    }
     queryGetLogData(
       selectedLogCategory.value, // log_category
       selectedLogName.value, // log_name
@@ -255,6 +260,14 @@ const updateLogDisplay = () => {
           selectedLogStartRow.value = 1;
         }
         selectedLogFilePath.value = response?._data.log_path;
+        nextTick(async () => {
+          document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
+          - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
+          if (autoScrollLog.value) {
+            document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
+            autoScrollLog.value = false;
+          }
+        });
       } else {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -272,11 +285,15 @@ watch(validationStatus, async (newStatus, initialStatus) => {
         });
         if (!find_validation_run) {
           validationStatus.value = 'Fail';
+          clearInterval(validationStatusCheckingInterval.value);
+          clearInterval(validationRunningTimeInterval.value);
         } else {
           // make sure we actually have validation run
           const validation_run = find_validation_run.shift();
           if (!validation_run) {
             validationStatus.value = 'Fail';
+            clearInterval(validationStatusCheckingInterval.value);
+            clearInterval(validationRunningTimeInterval.value);
           } else {
             validationStatus.value = validation_run.status;
           }
@@ -358,9 +375,6 @@ const navigateToEvaluation = (event: any) => {
   width: 100%;
   margin: 8px auto 0 auto;
   border: 1px solid global.$ngwcp_neutral_gray_md;
-}
-#selectedLogDisplay {
-  max-height: 250px;
 }
 
 #RunStatus,
