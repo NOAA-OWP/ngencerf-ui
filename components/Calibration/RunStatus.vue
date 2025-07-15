@@ -188,7 +188,7 @@
               Log file unavailable
             </div>
 
-            <div v-if="selectedLogDisplay" id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
+            <div v-if="selectedLogDisplay" id="selectedLogDisplay" class="p-2 gray-border overflow-scroll">
               <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
             </div>
           </div>
@@ -618,6 +618,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
               }
               userCalibrationRunData.value.status = getStatusResponse._data.status;
             } else {
+              clearInterval(calibrationStatusIntervalId.value);
               const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
               toast.add(tMsg); addToastRecord(tMsg);
             }
@@ -861,12 +862,15 @@ const resetUserPlotRefs = (exceptions: any): void => {
 watch(selectedLogCategory, async () => {
   if (selectedLogCategory.value != '') {
   selectedLogList.value = logLists.value[selectedLogCategory.value];
-    // start with the first log
-    selectedLogName.value = selectedLogList.value[0].name;
-    if (!selectedLogList.value.length) {
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
+    selectedLogName.value = '';
+    nextTick(() => {
+      // start with the first log
+      selectedLogName.value = selectedLogList.value[0].name;
+      if (!selectedLogList.value.length) {
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+    });
   }
 });
 
@@ -898,7 +902,6 @@ const updateLogRefs = async(getLogData: boolean) => {
       nextTick(async () => {
         document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
         - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
-        document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
       });
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
@@ -924,7 +927,10 @@ const updateLogRefs = async(getLogData: boolean) => {
 // Handle selectedLogName changes
 watch(selectedLogName, async () => {
   if (selectedLogName.value !== '') {
-    updateLogRefs(true);
+    await updateLogRefs(true);
+    nextTick(async () => {
+      document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
+    });
   }
 });
 
@@ -976,6 +982,10 @@ onUnmounted(() => {
 #DisplayOptions {
   width: 250px;
   margin-left: 0px;
+}
+
+#selectedLogDisplay {
+  max-height: 300px;
 }
 
 .p-progressbar {
