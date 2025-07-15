@@ -34,8 +34,9 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   const useSlothParameters = ref<boolean>(false);
 
   const formulationTabData = ref<FormulationTabData>();
-  const formulationIsValid = ref<boolean>(false);
-  const formulationInvalidMessages = ref<string[]>([]);
+  const formulationInfoMessages = ref<string[]>([]);
+  const formulationErrorMessages = ref<string[]>([]);
+  const formulationWarningMessages = ref<string[]>([]);
 
   const saveFormulationPayload = ref<SaveFormulationTabPayload>({});
 
@@ -290,18 +291,22 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   
   async function updateFormulationValidRefs() {
     validateFormulationTabData().then(response => {
-      formulationIsValid.value = true;
-      formulationInvalidMessages.value = [];
+      formulationInfoMessages.value = [];
+      formulationErrorMessages.value = [];
+      formulationWarningMessages.value = [];
       if (response._data.formulation_errors) {
         response._data.formulation_errors.forEach((err: any) => {
-          formulationIsValid.value = false;
-          formulationInvalidMessages.value.push('Error: ' + err);
+          formulationErrorMessages.value.push('Error: ' + err);
         });
       }
       if (response._data.formulation_warnings) {
         response._data.formulation_warnings.forEach((err: any) => {
-          formulationIsValid.value = false;
-          formulationInvalidMessages.value.push('Warning: ' + err);
+          formulationWarningMessages.value.push('Warning: ' + err);
+        });
+      }
+      if (response._data.formulation_messages) {
+        response._data.formulation_messages.forEach((msg: any) => {
+          formulationInfoMessages.value.push(msg);
         });
       }
     });
@@ -393,8 +398,9 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
 
   return {
     formulationTabData,
-    formulationIsValid,
-    formulationInvalidMessages,
+    formulationInfoMessages,
+    formulationErrorMessages,
+    formulationWarningMessages,
     filterGroup,
     useSlothParameters,
     selectedModuleValues,
