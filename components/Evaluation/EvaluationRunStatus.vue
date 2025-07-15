@@ -1,6 +1,6 @@
 <template>
   <div id="ResultPage">
-    <div class="grid grid-rows-7 pr-3">
+    <div class="grid grid-rows-3 pr-3">
       <div class="row-span-2">
         <div id="ResultsDisplay">
           <div class="grid grid-cols-5">
@@ -67,7 +67,7 @@
                     <td class="pl-5 text-right pr-4" colspan="2">
 
                       <!--BUTTONS - START-->
-                      <span v-if="validationStatus === 'Done'">
+                      <span v-if="validationStatus === 'Done' || validationStatus === 'Fail'">
                         <Button id="ResultsArea" class="ngenButtonDiv" @click.stop="navigateToEvaluation"
                           aria-label="Go to Evaluation Button" title="Go to Evaluation Button">Evaluate</Button>
                       </span>
@@ -93,6 +93,45 @@
         </div>
       </div>
     </div>
+    <div id="LogDisplayArea" class="p-2"
+      v-if="selectedLogCategory !== '' && selectedLogFilePath !== ''">
+      <div class="pl-4">
+        <table width="100%" summary="Validation Log and File Path">
+          <caption class="sr-only">Validation Log and File Path table</caption>
+          <thead class="sr-only">
+            <tr>
+              <th scope="col" style="min-width: 185px;">Validation Log Label</th>
+              <th scope="col">Validation Log Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="font-size: 0.9em;">
+              <td class="pr-2 pt-3"><b>Log Name</b></td>
+              <td class="pt-3">Validation</td>
+            </tr>
+            <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
+              <td class="pr-2 pt-3"><b>Log File Path</b></td>
+              <td class="pt-3">{{ selectedLogFilePath }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="pt-4">
+          <div class="pagination-box" v-if="selectedLogDisplay">
+            <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{
+              selectedLogTotalSize }}</div>
+            <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
+          </div>
+          <div v-else>
+            Log file unavailable
+          </div>
+        </div>
+
+        <div id="selectedLogDisplay" v-if="selectedLogDisplay" class="p-2 gray-border overflow-scroll">
+          <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -103,9 +142,11 @@ import { useToast } from 'primevue/usetoast';
 import type { CalibrationGetStatusValidationItem } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
+import Paging from "../Common/Paging.vue";
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
+import { useEvaluationSupplementalDataStore } from "@/stores/evaluation/EvaluationSupplementalDataStore";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -117,8 +158,20 @@ const { addToastRecord } = generalStore();
 
 const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, evaluateDisplayIterationNumber, runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
 const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime, clearRunningStatusInfo } = useEvaluationRunStatusStore();
+const { queryGetLogData } = useEvaluationSupplementalDataStore();
 
 const validationStatusCheckingInterval = ref<any>();
+const logDataPageSize = ref<number>(1000);
+const selectedLogCategory = ref<string>('validation');
+const selectedLogName = ref<string>('ngen-cal stdout');
+const selectedLogDisplay = ref<string>('');
+const selectedLogTotalSize = ref<number>(0);
+const selectedLogCurrentPage = ref<number>(1);
+const selectedLogTotalPages = ref<number>(1);
+const selectedLogStartRow = ref<number>(1);
+const selectedLogEndRow = ref<number>(logDataPageSize.value);
+const selectedLogFilePath = ref<string>('');
+const autoScrollLog = ref<boolean>(false);
 
 onMounted(async () => {
   hilightTab(EvaluationTabs.tab_runStatus);
@@ -130,9 +183,15 @@ onMounted(async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
+  clearInterval(validationStatusCheckingInterval.value);
+  clearInterval(validationRunningTimeInterval.value);
+
   // assume having evaluateValidationRunId but not evaluateIterationRunId means user is intend to view the status of a done/stopped job
   if (evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0) {
     loadValidationStatusInformation(evaluateValidationRunId.value);
+    if (iterationValidationRunId.value > 0 && validationStatus.value !== '') {
+      updateLogDisplay();
+    }
   } else {
     // this condition assume we have evaluateIterationRunId value which also assume user want to run a new validation
     // this condition is specifically use to handle user click on status/run tab which can not reset certain value until user land on the tab
@@ -173,6 +232,50 @@ const startRun = async () => {
   });
 }
 
+const updateLogDisplay = () => {
+  if (iterationValidationRunId.value > 0) {
+    if (selectedLogDisplay.value === '') {
+      // only scroll to the bottom of the log if it's being displayed for the first time
+      autoScrollLog.value = true;
+    }
+    queryGetLogData(
+      selectedLogCategory.value, // log_category
+      selectedLogName.value, // log_name
+      iterationValidationRunId.value, // validation_run_id
+      selectedLogStartRow.value - 1, // start
+      logDataPageSize.value // limit
+    ).then(response => {
+      if (response?._data?.log_data) {
+        let logText = '';
+        for (let t = 0; t < response?._data.log_data.length; t++) {
+          logText += response?._data.log_data[t] + '<br/>\n';
+        }
+        selectedLogDisplay.value = logText;
+        selectedLogTotalSize.value = response?._data.pagination_metadata?.count;
+        selectedLogTotalPages.value = 1;
+        selectedLogEndRow.value = response?._data.pagination_metadata?.count;
+        if (logDataPageSize.value < selectedLogTotalSize.value) {
+          selectedLogStartRow.value = (selectedLogTotalSize.value - logDataPageSize.value) + 1;
+        } else {
+          selectedLogStartRow.value = 1;
+        }
+        selectedLogFilePath.value = response?._data.log_path;
+        nextTick(async () => {
+          document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
+          - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
+          if (autoScrollLog.value) {
+            document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
+            autoScrollLog.value = false;
+          }
+        });
+      } else {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+    })
+  }
+}
+
 watch(validationStatus, async (newStatus, initialStatus) => {
   if (newStatus !== null && !isValidationRunStopped(newStatus)) {
     validationStatusCheckingInterval.value = setInterval(async () => {
@@ -182,16 +285,21 @@ watch(validationStatus, async (newStatus, initialStatus) => {
         });
         if (!find_validation_run) {
           validationStatus.value = 'Fail';
+          clearInterval(validationStatusCheckingInterval.value);
+          clearInterval(validationRunningTimeInterval.value);
         } else {
-          // make sure we actually has validation run
+          // make sure we actually have validation run
           const validation_run = find_validation_run.shift();
           if (!validation_run) {
             validationStatus.value = 'Fail';
+            clearInterval(validationStatusCheckingInterval.value);
+            clearInterval(validationRunningTimeInterval.value);
           } else {
             validationStatus.value = validation_run.status;
           }
         }
       })
+      updateLogDisplay();
     }, 10000);
   } else {
     // this is for value assignment is only for running job that is now done/stopped
@@ -201,7 +309,23 @@ watch(validationStatus, async (newStatus, initialStatus) => {
   }
 });
 
+// Watch for page number changes in logs
+watch(selectedLogCurrentPage, async () => {
+  if (isNaN(selectedLogCurrentPage.value) || selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
+    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
+  } else {
+    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
+    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
+      selectedLogEndRow.value = selectedLogTotalSize.value;
+    } else {
+      selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
+    }
+    updateLogDisplay();
+  }
+});
+
 onUnmounted(() => {
+  console.log('Page has been unmounted; clearing validationStatusCheckingInterval and validationRunningTimeInterval');
   clearInterval(validationStatusCheckingInterval.value);
   clearInterval(validationRunningTimeInterval.value);
   clearRunningStatusInfo();
@@ -211,6 +335,7 @@ onUnmounted(() => {
 const cancelRun = async () => {
   executeCancelIterationValidationRun().then(response => {
     validationStatus.value = response?._data.status;
+    console.log('Run has been cancelled; clearing validationStatusCheckingInterval and validationRunningTimeInterval');
     clearInterval(validationStatusCheckingInterval.value);
     clearInterval(validationRunningTimeInterval.value);
   })
