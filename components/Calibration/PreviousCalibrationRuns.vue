@@ -76,6 +76,23 @@
                 </template>
               </Column>
 
+              <!-- <Column :pt="ptColumn" field="is_locked" :body="binaryValueBodyTemplate"
+                :sortable="true">
+                <template #header>
+                  <div class="column-header">
+                    <span>Locked?</span>
+                  </div>
+                </template>
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.calibration_run_id"
+                    :aria-label="slotProps.data.is_locked ? 'Locked' : ''"
+                    :title="slotProps.data.is_locked ? 'Locked' : ''">
+                    {{ slotProps.data.is_locked ? 'Yes' : 'No' }}
+                    <span v-if="slotProps.data.is_locked" class="pi pi-lock"></span>
+                  </span>
+                </template>
+              </Column> -->
+
               <Column :pt="ptColumn" field="gage_id" sortable>
                 <template #header>
                   <div class="column-header">
@@ -100,6 +117,19 @@
                     :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
                     :title="'Formulation Name ' + slotProps.data.formulation_name">
                     {{ slotProps.data.formulation_name }}
+                  </span>
+                </template>
+              </Column>
+              <Column :pt="ptColumn" field="stop_criteria" sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Stop Criteria<br/>(Iterations)</span>
+                  </div>
+                </template>
+                <template #body="slotProps">
+                  <span :aria-label="'Stop Criteria ' + slotProps.data.stop_criteria"
+                    :title="'Stop Criteria ' + slotProps.data.stop_criteria">
+                    {{ slotProps.data.stop_criteria > 0 ? slotProps.data.stop_criteria : 'N/A' }}
                   </span>
                 </template>
               </Column>
@@ -162,12 +192,6 @@
                   </span>
                 </template>
               </Column>
-              <Column :pt="ptColumn" field="stop_criteria" header="Stop Criteria" sortable> <template #body="slotProps">
-                  <span :aria-label="'Stop Criteria ' + slotProps.data.stop_criteria"
-                    :title="'Stop Criteria ' + slotProps.data.stop_criteria">
-                    {{ slotProps.data.stop_criteria > 0 ? slotProps.data.stop_criteria : 'N/A' }}
-                  </span>
-                </template></Column>
               <Column :pt="ptColumn" field="status" header="Status" sortable> <template #body="slotProps">
                   <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
                     :title="'Status ' + slotProps.data.status">

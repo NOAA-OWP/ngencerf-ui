@@ -143,7 +143,19 @@
                 </span>
               </template>
             </Column>
-
+            <Column :pt="ptColumn" field="gage_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Headwater</span><br /><span>Basin Gage</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
+                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
+                  {{ slotProps.data.gage_id }}
+                </span>
+              </template>
+            </Column>
             <Column :pt="ptColumn" field="formulation_name" sortable>
               <template #header>
                 <div class="column-header">
@@ -161,7 +173,7 @@
             <Column :pt="ptColumn" field="stop_criteria" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Stop</span><br /><span>Criteria</span>
+                  <span>Stop Criteria<br/>(Iterations)</span>
                 </div>
               </template>
               <template #body="slotProps">
@@ -182,19 +194,6 @@
                   :aria-label="'Validation Run ' + slotProps.data.validation_runs"
                   :title="'Validation Run ' + slotProps.data.validation_runs">
                   {{ slotProps.data.validation_runs }}
-                </span>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="gage_id" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Headwater</span><br /><span>Basin Gage</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
-                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
-                  {{ slotProps.data.gage_id }}
                 </span>
               </template>
             </Column>
