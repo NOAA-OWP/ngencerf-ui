@@ -162,6 +162,12 @@
                   </span>
                 </template>
               </Column>
+              <Column :pt="ptColumn" field="stop_criteria" header="Stop Criteria" sortable> <template #body="slotProps">
+                  <span :aria-label="'Stop Criteria ' + slotProps.data.stop_criteria"
+                    :title="'Stop Criteria ' + slotProps.data.stop_criteria">
+                    {{ slotProps.data.stop_criteria > 0 ? slotProps.data.stop_criteria : 'N/A' }}
+                  </span>
+                </template></Column>
               <Column :pt="ptColumn" field="status" header="Status" sortable> <template #body="slotProps">
                   <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
                     :title="'Status ' + slotProps.data.status">

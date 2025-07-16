@@ -125,6 +125,19 @@
                 </span>
               </template>
             </Column>
+            <Column :pt="ptColumn" field="stop_criteria" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Stop</span><br /><span>Criteria</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span :aria-label="'Stop Crtieria ' + slotProps.data.stop_criteria"
+                  :title="'Stop Crtieria ' + slotProps.data.stop_criteria">
+                  {{ slotProps.data.stop_criteria > 0 ? slotProps.data.stop_criteria : 'N/A' }}
+                </span>
+              </template>
+            </Column>
           </DataTable>
         </div>
       </div>
