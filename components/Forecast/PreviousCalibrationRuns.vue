@@ -49,6 +49,46 @@
                 </span>
               </template>
             </Column>
+            <Column :pt="ptColumn" field="gage_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Headwater</span><br /><span>Basin Gage</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
+                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
+                  {{ slotProps.data.gage_id }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="formulation_name" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Formulation Name</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.formulation_name"
+                  :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
+                  :title="'Formulation Name ' + slotProps.data.formulation_name">
+                  {{ slotProps.data.formulation_name }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="stop_criteria" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Stop Criteria<br/>(Iterations)</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span :aria-label="'Stop Crtieria ' + slotProps.data.stop_criteria"
+                  :title="'Stop Crtieria ' + slotProps.data.stop_criteria">
+                  {{ slotProps.data.stop_criteria > 0 ? slotProps.data.stop_criteria : 'N/A' }}
+                </span>
+              </template>
+            </Column>
             <Column :pt="ptColumn" field="status" header="Status" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
@@ -67,33 +107,6 @@
                 <span :aria-label="'Run Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
                   :title="'Run Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
                   {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
-                </span>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="formulation_name" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Formulation Name</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.formulation_name"
-                  :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
-                  :title="'Formulation Name ' + slotProps.data.formulation_name">
-                  {{ slotProps.data.formulation_name }}
-                </span>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="gage_id" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Headwater</span><br /><span>Basin Gage</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
-                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
-                  {{ slotProps.data.gage_id }}
                 </span>
               </template>
             </Column>

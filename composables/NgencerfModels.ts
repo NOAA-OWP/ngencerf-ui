@@ -98,6 +98,7 @@ export interface CalibrationJobListItem {
   is_locked: boolean;
   is_downloadable: boolean;
   validations: CalibrationJobValidationItem[];
+  stop_criteria: number;
   modules: string[];
 }
 
