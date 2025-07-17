@@ -177,12 +177,17 @@ export function sumAndFormatElapsedTimes(elapsedTimesArray: string[]): string {
 
   // iterate through the array of elapsed times
   elapsedTimesArray.forEach((elapsedTime) => {
-    const [hours, minutes, rawSeconds] = elapsedTime.split(':');
+    let days = 0;
+    if (elapsedTime.split(' ').length > 1) {
+      days = parseInt(elapsedTime.split(' ')[0]);
+    }
+    // account for possibility of days showing up first separated by a space for values >= 24 hours
+    const [hours, minutes, rawSeconds] = elapsedTime.split(' ').length > 1 ? elapsedTime.split(' ')[1].split(':') : elapsedTime.split(':');
     const seconds = Number(rawSeconds?.split('.')[0]); // remove decimal part safely
 
     const duration = Duration.fromObject({
-      hours: hours || 0,
-      minutes: minutes || 0,
+      hours: days > 0 ? parseInt(hours) + (days*24): parseInt(hours) || 0,
+      minutes: parseInt(minutes) || 0,
       seconds: Math.floor(seconds), // ignore milliseconds
     });
 
