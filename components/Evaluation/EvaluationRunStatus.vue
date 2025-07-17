@@ -227,8 +227,8 @@ const startRun = async () => {
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
       validationRunningTimeInterval.value = setInterval(async () => {
-        updateRunningTime(), 1000
-      }, 10000) as unknown as number;
+        updateRunningTime()
+      }, 1000) as unknown as number;
     } else {
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation', life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -283,13 +283,6 @@ const updateLogDisplay = () => {
 }
 
 watch(validationStatus, async (newStatus, initialStatus) => {
-  const tMsg: ToastMessageOptions = { 
-    severity: 'info', 
-    summary: 'EvaluationRunStatus.vue Line 314', 
-    detail: 'Validation status has changed to: ' + validationStatus.value, 
-    life: ToastTimeout.timeoutInfo 
-  };
-  toast.add(tMsg); addToastRecord(tMsg);
   if (newStatus !== null && !isValidationRunStopped(newStatus)) {
     validationStatusCheckingInterval.value = setInterval(async () => {
       queryIterationValidationRunStatus().then(response => {
