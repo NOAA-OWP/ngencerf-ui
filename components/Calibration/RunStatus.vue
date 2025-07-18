@@ -431,6 +431,12 @@ onMounted(async () => {
         validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
       }
     }
+    
+    if (userCalibrationRunData.value?.status === 'Running' || 
+      (userCalibrationRunData.value?.status === 'Done' &&
+      (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
+      updateIteration();
+    }
   });
 });
 
@@ -536,6 +542,30 @@ const cancelRun = async () => {
   }
 };
 
+// Update iteration
+const updateIteration = async () => {
+  const getIterationResponse = await queryGetIteration();
+  
+  // check if status changes from Submitted or Running
+  if (getIterationResponse._data && getIterationResponse._data.status) {
+    if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
+      if (userCalibrationRunData.value) {
+        clearInterval(calibrationStatusIntervalId.value);
+        calibrationStatusIntervalId.value = undefined;
+      }
+    }
+    userCalibrationRunData.value.status = getIterationResponse._data.status;
+  } else {
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+
+  // check if iteration changes
+  if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
+    iteration.value = getIterationResponse._data.iteration;
+  }
+}
+
 // Handle calibration/validation status changes
 watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
   if (userCalibrationRunData.value) {
@@ -623,26 +653,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
               toast.add(tMsg); addToastRecord(tMsg);
             }
           } else {
-            const getIterationResponse = await queryGetIteration();
-            
-            // check if status changes from Submitted or Running
-            if (getIterationResponse._data && getIterationResponse._data.status) {
-              if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
-                if (userCalibrationRunData.value) {
-                  clearInterval(calibrationStatusIntervalId.value);
-                  calibrationStatusIntervalId.value = undefined;
-                }
-              }
-              userCalibrationRunData.value.status = getIterationResponse._data.status;
-            } else {
-              const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
-              toast.add(tMsg); addToastRecord(tMsg);
-            }
-
-            // check if iteration changes
-            if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
-              iteration.value = getIterationResponse._data.iteration;
-            }
+            updateIteration();
           }
         }, 10000) as unknown as number;
       }
