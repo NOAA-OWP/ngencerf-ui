@@ -704,6 +704,7 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
+      await applyJobFilters();
       isLoading.value = false;
     } else {
       isLoading.value = false;
