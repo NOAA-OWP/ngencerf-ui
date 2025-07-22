@@ -23,7 +23,7 @@ export const useGageStore = defineStore(
     /**
      * ref section
      */
-    const { calibrationJobId } = storeToRefs(generalStore());
+    const { calibrationJobId, gageDataSourceHasChanged } = storeToRefs(generalStore());
     const { ngencerfBaseUrl } = useBackendConfig();
     const { getAccessToken } = useUserDataStore();
     const userDataStore = useUserDataStore();
@@ -226,7 +226,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserForcingFilesResponse;
     }
 
@@ -245,7 +245,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserObservationalFilesResponse;
     }
 
@@ -260,7 +260,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserGeopackageFilesResponse;
     }
 

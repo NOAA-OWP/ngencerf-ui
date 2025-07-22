@@ -1,7 +1,7 @@
 <template>
   <div id="HeadwaterBasinGage" class="">
     <div id="GageSettings" class="mt-4">
-      <div class="grid grid-rows-8 gap-6">
+      <div class="grid grid-rows-6 gap-6">
 
         <div class="row-span-1">
           <div class="grid grid-cols-3 gap-4">
@@ -55,7 +55,7 @@
         </div>
         <DynamicDialog />
 
-        <div class="row-span-5">
+        <div class="row-span-3">
           <div id="GageReport" v-if="gageData" class="text-sm inline ml-0">
             <div id="GrBox" class="mt-5">
               <table class="table-auto">
@@ -119,9 +119,9 @@
                 Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
               </div>
             </span>
-            <span v-if="gageHasChanged && userCalibrationRunData?.gage !== null">
+            <span v-if="(gageHasChanged && userCalibrationRunData?.gage !== null) || gageDataSourceHasChanged">
               <div class="col-span-1 mr-3">
-                <Button v-if="selectedGageValue" class="ngenButtonDiv-yellow" title="Revert Gage"
+                <Button class="ngenButtonDiv-yellow" title="Revert Gage"
                   @click="gageSelectionReset()" aria-label="Revert">Revert</Button>
               </div>
             </span>
@@ -190,7 +190,7 @@ const { gageData, selectedDomainValue, selectedForcingValue, selectedGageValue, 
 
 const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
   saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
-const { calibrationJobId, gageHasChanged } = storeToRefs(generalStore());
+const { calibrationJobId, gageHasChanged, gageDataSourceHasChanged } = storeToRefs(generalStore());
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 const dialog = useDialog();
@@ -209,6 +209,17 @@ const resetData = ref<GageResetData>({
   geopackage_image_url: ""
 })
 
+const setResetDataValues = () => {
+  if (userCalibrationRunData.value) {
+    // Save all information from the external data JSON.parse(JSON.stringify(obj));
+    resetData.value.external_data_status = JSON.parse(JSON.stringify(userCalibrationRunData.value.external_data_status));
+    resetData.value.geopackage_source = userCalibrationRunData.value.geopackage_source;
+    resetData.value.observational_source = userCalibrationRunData.value.observational_source;
+    resetData.value.forcing_source = userCalibrationRunData.value.forcing_source;
+    resetData.value.geopackage_image_url = userCalibrationRunData.value.geopackage_image_url;
+  }
+}
+
 onMounted(() => {
   nextTick(() => {
     hilightTab(CalibrationTabs.tab_headwaterBasinGage);
@@ -218,10 +229,12 @@ onMounted(() => {
     if (gageHasChanged.value && userCalibrationRunData?.value?.gage?.gage_id) {
       gageSelectionReset();
     } else {
-      selectedObservationalValue.value = getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '';
-      selectedForcingValue.value = getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
-      selectedGeopackageValue.value = getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
+      selectedObservationalValue.value = userCalibrationRunData?.value?.observational_source ? userCalibrationRunData.value.observational_source : (getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '');
+      selectedForcingValue.value = userCalibrationRunData?.value?.forcing_source ? userCalibrationRunData.value.forcing_source : (getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "");
+      selectedGeopackageValue.value = userCalibrationRunData?.value?.geopackage_image_url ? userCalibrationRunData.value.geopackage_image_url : (getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "");
     }
+    gageDataSourceHasChanged.value = false;
+    setResetDataValues();
     isLoading.value = false;
   });
 })
@@ -231,13 +244,7 @@ const onGageSelectionChange = () => {
   // Was there a previous gage?
   if (userCalibrationRunData?.value?.gage) {
     gageHasChanged.value = true;
-
-    // Save all information from the external data JSON.parse(JSON.stringify(obj));
-    resetData.value.external_data_status = JSON.parse(JSON.stringify(userCalibrationRunData.value.external_data_status));
-    resetData.value.geopackage_source = userCalibrationRunData.value.geopackage_source;
-    resetData.value.observational_source = userCalibrationRunData.value.observational_source;
-    resetData.value.forcing_source = userCalibrationRunData.value.forcing_source;
-    resetData.value.geopackage_image_url = userCalibrationRunData.value.geopackage_image_url;
+    setResetDataValues();
 
     if (userCalibrationRunData?.value?.external_data_status) {
       userCalibrationRunData.value.external_data_status.forcing = false;
@@ -260,6 +267,7 @@ const gageSelectionReset = () => {
   selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
   fetchSelectedGageData();
   gageHasChanged.value = false;
+  gageDataSourceHasChanged.value = false;
   const optList = getGageOptionsList;
   const gage = document.getElementById('Gage');
   if (selectedGageValue.value) {
@@ -278,6 +286,9 @@ const gageSelectionReset = () => {
     userCalibrationRunData.value.forcing_source = resetData.value.forcing_source;
     userCalibrationRunData.value.geopackage_image_url = resetData.value.geopackage_image_url;
   }
+  selectedGeopackageValue.value = resetData.value.geopackage_source;
+  selectedObservationalValue.value = resetData.value.observational_source;
+  selectedForcingValue.value = resetData.value.forcing_source;
 }
 
 const clearDataDueToGageChange = () => {
@@ -362,6 +373,9 @@ const showForcingFileUploadDialog = (headerText: string) => {
         saveFunction: saveUserForcingFiles
       },
       onClose: (opt) => {
+        if (selectedForcingValue.value !== userCalibrationRunData?.value?.forcing_source) {
+          gageDataSourceHasChanged.value = true;
+        }
         handleDialogClose(opt)
       },
     })
@@ -417,6 +431,9 @@ const showObservationalFileUploadDialog = (headerText: string) => {
         saveFunction: saveUserObservationalFile
       },
       onClose: (opt) => {
+        if (selectedObservationalValue.value !== userCalibrationRunData?.value?.observational_source) {
+          gageDataSourceHasChanged.value = true;
+        }
         handleDialogClose(opt)
       },
     })
@@ -449,6 +466,9 @@ const showGeopackageFileUploadDialog = (headerText: string) => {
         saveFunction: saveUserGeopackageFile
       },
       onClose: (opt) => {
+        if (selectedGeopackageValue.value !== userCalibrationRunData?.value?.geopackage_source) {
+          gageDataSourceHasChanged.value = true;
+        }
         handleDialogClose(opt)
       },
     })
@@ -547,6 +567,18 @@ const validateTab = () => {
     userCalibrationRunData?.value?.gage?.gage_id && (userCalibrationRunData?.value?.gage?.gage_id !== selectedGageValue.value)) {
     error = true;
     text.push("Gage value has been changed");
+  }
+  if (selectedObservationalValue.value !== userCalibrationRunData?.value?.observational_source) {
+    error = true;
+    text.push("Observational Source has been changed");
+  }
+  if (selectedForcingValue.value != userCalibrationRunData?.value?.forcing_source) {
+    error = true;
+    text.push("Forcing Source has been changed");
+  }
+  if (selectedGeopackageValue.value != userCalibrationRunData?.value?.geopackage_source) {
+    error = true;
+    text.push("GeoPackage has been changed");
   }
   return { error: error, text: text }
 }

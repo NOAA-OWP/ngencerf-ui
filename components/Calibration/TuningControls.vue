@@ -266,8 +266,8 @@
       </span>
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-3">
-          <!--<Button class="c-blue font-normal text-xl underline pt-1" title="Revert Button" @click="resetTuningData()"
-            aria-label="Revert Button">Revert</Button>-->
+          <Button v-if="tuningDataHasChanged || calibratableParametersHaveChanged" class="ngenButtonDiv-yellow" title="Revert"
+            @click="restorePage()" aria-label="Revert Button">Revert</Button>
         </div>
       </span>
       <span v-else>
@@ -291,7 +291,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 import Select from "primevue/select";
@@ -350,23 +350,25 @@ const {
   simEndTime,
   calStartTime,
   calEndTime,
-  selectedOutputVariableToCalibrate,
-  calibrationTuningParameters,
-  userSelectedCalibrationTuningParameters,
-  automatic_validation,
   avSimStartTime,
   avSimEndTime,
   avCalStartTime,
   avCalEndTime,
   rangeDateFrom,
   rangeDateTo,
+  selectedOutputVariableToCalibrate,
+  calibrationTuningParameters,
+  userSelectedCalibrationTuningParameters,
+  automatic_validation,
+  calibratableParametersHaveChanged,
+  tuningDataHasChanged,
   saveTuningTabRequestBody
 } = storeToRefs(tuningStore);
 
 const toast = useToast();
 const selectedParameter = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const isInitialSetupDone = ref(false);
+const isInitialSetupDone = ref<Boolean>(false);
 const selectedTuningParameterData = ref();
 const tuningContextMenu = ref();
 
@@ -481,48 +483,72 @@ const handleCalibrationTimeControlsClick = (event: Event) => {
 const handleSimStartUpdate = (value: any) => {
   if (typeof value === 'string') {
     simStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
+    if (simStartTime.value != userCalibrationRunData?.value?.calibration_times.simulation_start_time) {
+      tuningDataHasChanged.value = true;
+    }
   }
 };
 
 const handleSimEndUpdate = (value: any) => {
   if (typeof value === 'string') {
     simEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
+    if (simEndTime.value != userCalibrationRunData?.value?.calibration_times.simulation_end_time) {
+      tuningDataHasChanged.value = true;
+    }
   }
 };
 
 const handleCalStartUpdate = (value: any) => {
   if (typeof value === 'string') {
     calStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
+    if (calStartTime.value != userCalibrationRunData?.value?.calibration_times.calibration_start_time) {
+      tuningDataHasChanged.value = true;
+    }
   }
 };
 
 const handleCalEndUpdate = (value: any) => {
   if (typeof value === 'string') {
     calEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
+    if (calEndTime.value != userCalibrationRunData?.value?.calibration_times.calibration_end_time) {
+      tuningDataHasChanged.value = true;
+    }
   }
 };
 
 const handleAvSimStartUpdate = (value: any) => {
   if (typeof value === 'string') {
     avSimStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
+    if (avSimStartTime.value != userCalibrationRunData?.value?.validation_times.simulation_start_time) {
+      tuningDataHasChanged.value = true;
+    }
   }
 };
 
 const handleAvSimEndUpdate = (value: any) => {
   if (typeof value === 'string') {
     avSimEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
+    if (avSimEndTime.value != userCalibrationRunData?.value?.validation_times.simulation_end_time) {
+      tuningDataHasChanged.value = true;
+    }
   }
 };
 
 const handleAvCalStartUpdate = (value: any) => {
   if (typeof value === 'string') {
     avCalStartTime.value = DateTime.fromISO(value, { zone: 'utc' });
+    if (avCalStartTime.value != userCalibrationRunData?.value?.validation_times.validation_start_time) {
+      tuningDataHasChanged.value = true;
+    }
   }
 };
 
 const handleAvCalEndUpdate = (value: any) => {
   if (typeof value === 'string') {
     avCalEndTime.value = DateTime.fromISO(value, { zone: 'utc' });
+    if (avCalEndTime.value != userCalibrationRunData?.value?.validation_times.validation_end_time) {
+      tuningDataHasChanged.value = true;
+    }
   }
 };
 
@@ -694,6 +720,9 @@ const addCalibrationTuningParameter = () => {
     });
   }
 
+  // note that calibratable parameters have changed
+  calibratableParametersHaveChanged.value = true;
+
   // scroll to the bottom of the page and table
   scrollToBottom();
 };
@@ -762,6 +791,9 @@ const deleteCalibrationTuningParameter = (selectedTuningParameterData: any) => {
 const clearUserSelectedCalibrationTuningParameters = () => {
   userSelectedCalibrationTuningParameters.value = [];
   selectedTuningParameterData.value = null;
+
+  // note that calibratable parameters have changed
+  calibratableParametersHaveChanged.value = true;
 };
 
 /**
@@ -1027,6 +1059,8 @@ const saveTuningData = () => {
       };
       toast.add(tMsg); addToastRecord(tMsg);
       updateJobData();
+      calibratableParametersHaveChanged.value = false;
+      tuningDataHasChanged.value = false;
       tuningStore_data_loading.value = false;
     } else {
       tuningStore_data_loading.value = false;
@@ -1106,13 +1140,6 @@ const saveTuningData = () => {
   }
 };
 
-/**
- * git stat Tuning Tab data
- */
-const resetTuningData = () => {
-  // hardResetTuningStore(); // disable for now
-};
-
 const validateTab = () => {
   /* Check the DateTimes */
   let error = false;
@@ -1149,6 +1176,14 @@ const validateTab = () => {
     error = true;
     text.push("Validation End has changed");
   }
+  /* if (userCalibrationRunData?.value?.output_variable_to_calibrate && selectedOutputVariableToCalibrate.value !== userCalibrationRunData?.value?.output_variable_to_calibrate) {
+    error = true;
+    text.push("Output Variable to Calibrate has changed");
+  } */
+  if (calibratableParametersHaveChanged.value) {
+    error = true;
+    text.push("Calibratable Parameters have changed");
+  }
 
   return { error: error, text: text }
 }
@@ -1165,7 +1200,7 @@ const compareTimeEntries = (txtDT: string, dT: Date) => {
 }
 
 const restorePage = async () => {
-  // set calibration times
+  // reset calibration times
   if (userCalibrationRunData?.value?.calibration_times) {
     const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
     simStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
@@ -1174,7 +1209,7 @@ const restorePage = async () => {
     calEndTime.value = DateTime.fromISO(calibration_end_time, { zone: 'utc' });
   };
 
-  // set automatic validation times
+  // reset automatic validation times
   if (userCalibrationRunData?.value?.validation_times) {
     const { simulation_start_time, simulation_end_time, validation_start_time, validation_end_time } = userCalibrationRunData.value.validation_times;
     avSimStartTime.value = DateTime.fromISO(simulation_start_time, { zone: 'utc' });
@@ -1183,7 +1218,11 @@ const restorePage = async () => {
     avCalEndTime.value = DateTime.fromISO(validation_end_time, { zone: 'utc' });
   };
 
+  // reset calibratable parameters
+  loadTuningTabStaticData(true);
 
+  calibratableParametersHaveChanged.value = false;
+  tuningDataHasChanged.value = false;
 }
 
 const gotoNext = () => {
@@ -1299,6 +1338,11 @@ const checkInitialValueOutOfRange = (parameterName: string, initialValue: number
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
+
+onUnmounted(async () => {
+  calibratableParametersHaveChanged.value = false;
+  tuningDataHasChanged.value = false;
+})
 
 </script>
 
