@@ -546,14 +546,15 @@ const onRowCpContextMenu = (event: any) => {
 
 const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   resetUserSelectedEvalValidationRun();
+  isLoading.value = true;
   //loadSelectedCalibrationRun(event.data.calibration_run_id);
   setSelectedCalibrationRunId(event.data.calibration_run_id);
-  await fetchUserCalibrationRunData();
+  await fetchUserCalibrationRunData(false);
   selectedCalibrationModules.value = userCalibrationRunData?.value?.modules;
-  //isLoading.value = true;
   if (event.data.validation_runs === 1) {
     fetchUserSelectedCalibrationValidationRunList();
   }
+  isLoading.value = false;
 }
 
 watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
