@@ -45,6 +45,8 @@ export const generalStore = defineStore(
 
     // This is set if the user changes the gage.  Resets when saved.
     const gageHasChanged = ref<boolean>(false);
+    // This is set if the user changes any of the data sources on the gage tab.  Resets when saved.
+    const gageDataSourceHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
 
@@ -150,6 +152,7 @@ export const generalStore = defineStore(
       getServerInfo,
       serverInfo,
       gageHasChanged,
+      gageDataSourceHasChanged,
       modulesHaveChanged,
       verificationTabIndex,
       menuIndex,

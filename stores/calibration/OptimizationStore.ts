@@ -46,6 +46,7 @@ export const useOptimizationStore = defineStore(
     const objectiveFunctionOptionsList = ref<SelectOption[]>([]);
     const showObjectiveFunctionPeakFlow = ref<boolean>(false);
     const showObjectiveFunctionStreamFlow = ref<boolean>(false);
+    const optMetDataHasChanged = ref<boolean>(false);
 
     const saveOptMetPayload = ref<SaveOptimizationPayload>({});
 
@@ -228,6 +229,7 @@ export const useOptimizationStore = defineStore(
       uiOptimizationInputs.value.forEach((input_data) => {
         input_data.value = 0;
       });
+      optMetDataHasChanged.value = true;
     };
 
     /**
@@ -275,6 +277,7 @@ export const useOptimizationStore = defineStore(
       getObjectiveFunctionOptionsList,
       showObjectiveFunctionPeakFlow,
       showObjectiveFunctionStreamFlow,
+      optMetDataHasChanged,
       getSelectedMetricInfo,
       getOptimizationInputUserData,
       saveOptimizationTabData,

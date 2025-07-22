@@ -166,6 +166,7 @@ export interface UserCalibrationRunData {
   time_range: UserCalibrationRunTimeRangeData;
   calibration_times: UserCalibrationRunCalibrationTimesData;
   validation_times: UserCalibrationRunValidationTimesData;
+  output_variable_to_calibrate: string;
   num_catchments: number | null;
   parameters_selected: boolean;
   parameters: UserCalibrationRunParametersData[];
