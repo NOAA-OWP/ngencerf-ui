@@ -147,20 +147,24 @@ export const useGageStore = defineStore(
      *  @returns {void}
      */
     async function fetchSelectedGageData(): Promise<void> {
-      const selectedGageDataResponse = await makeProtectedApiCall<GageData>(
-        `${ngencerfBaseUrl}/calibration/get_gage/`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${getAccessToken()}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            gage_id: selectedGageValue.value,
-          }),
-        }
-      );
-      gageData.value = selectedGageDataResponse?._data ?? undefined;
+      if (selectedGageValue.value && selectedGageValue.value != '') {
+        const selectedGageDataResponse = await makeProtectedApiCall<GageData>(
+          `${ngencerfBaseUrl}/calibration/get_gage/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${getAccessToken()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              gage_id: selectedGageValue.value,
+            }),
+          }
+        );
+        gageData.value = selectedGageDataResponse?._data ?? undefined;
+      } else {
+        gageData.value = undefined;
+      }
     }
 
     /**
