@@ -47,6 +47,7 @@ export const useOptimizationStore = defineStore(
     const showObjectiveFunctionPeakFlow = ref<boolean>(false);
     const showObjectiveFunctionStreamFlow = ref<boolean>(false);
     const optMetDataHasChanged = ref<boolean>(false);
+    const algParamDataHasChanged = ref<boolean>(false);
 
     const saveOptMetPayload = ref<SaveOptimizationPayload>({});
 
@@ -278,6 +279,7 @@ export const useOptimizationStore = defineStore(
       showObjectiveFunctionPeakFlow,
       showObjectiveFunctionStreamFlow,
       optMetDataHasChanged,
+      algParamDataHasChanged,
       getSelectedMetricInfo,
       getOptimizationInputUserData,
       saveOptimizationTabData,

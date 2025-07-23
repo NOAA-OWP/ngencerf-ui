@@ -231,7 +231,7 @@ onMounted(() => {
     } else {
       selectedObservationalValue.value = userCalibrationRunData?.value?.observational_source ? userCalibrationRunData.value.observational_source : (getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '');
       selectedForcingValue.value = userCalibrationRunData?.value?.forcing_source ? userCalibrationRunData.value.forcing_source : (getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "");
-      selectedGeopackageValue.value = userCalibrationRunData?.value?.geopackage_image_url ? userCalibrationRunData.value.geopackage_image_url : (getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "");
+      selectedGeopackageValue.value = userCalibrationRunData?.value?.geopackage_source ? userCalibrationRunData.value.geopackage_source : (getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "");
     }
     gageDataSourceHasChanged.value = false;
     setResetDataValues();

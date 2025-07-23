@@ -35,7 +35,7 @@
                       <template #editor="{ index }">
                         <InputNumber v-model="uiOptimizationInputs[index].value" inputId="locale-us" locale="en-US"
                           :minFractionDigits="2" fluid autofocus class="w-20 p-1" aria-label="Initial Value"
-                          title="Initial Value" @input="handleOptimizationDataChange">
+                          title="Initial Value" @input="handleAlgorithmParameterChange">
                         </InputNumber>
                       </template>
                     </Column>
@@ -233,10 +233,12 @@ const {
   getSelectedMetricInfo,
   getOptimizationInputUserData,
   optMetDataHasChanged,
+  algParamDataHasChanged,
   saveOptMetPayload
 } = storeToRefs(optimizationStore);
 
 const { saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
+const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
@@ -251,8 +253,6 @@ const cbIsEvenBased = ref<boolean>(false);
 const showMetricPeakFlow = ref<boolean>(false);
 const showMetricStreamFlow = ref<boolean>(false);
 const ele = document.getElementById("MainLeftDataArea") as HTMLElement;
-
-const original_optimization_inputs = userCalibrationRunData.value?.optimization_inputs;
 
 onMounted(() => {
   hilightTab(CalibrationTabs.tab_optimizationMetrics);
@@ -337,6 +337,11 @@ const handleOptimizationDataChange = () => {
   optMetDataHasChanged.value = true;
 }
 
+const handleAlgorithmParameterChange = () => {
+  algParamDataHasChanged.value = true;
+  optMetDataHasChanged.value = true;
+}
+
 /**
  * explicitly reload optimization input table data
  */
@@ -386,6 +391,7 @@ const saveOptMetData = () => {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Optimization Metrics Data Saved', detail: response?._data?.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
         optMetDataHasChanged.value = false;
+        algParamDataHasChanged.value = false;
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Optimization Metrics Data Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status)};
@@ -451,23 +457,19 @@ const validateTab = () => {
       text.push("Calculate Event Based Metrics (Peak Flow Threshold) has been changed");
     }
 
-    if (userCalibrationRunData?.value?.optimization_inputs && userCalibrationRunData?.value?.optimization_inputs.length > 0) {
-      uiOptimizationInputs.value.every((module, index) => {
-        if (original_optimization_inputs[index].name !== module.name ||
-          original_optimization_inputs[index].value !== module.value) {
-          error = true;
-          text.push("Algorithm Parameter(s) have been added or changed");
-        }
-      })
+    if (algParamDataHasChanged.value) {
+      error = true;
+      text.push("Algorithm Parameter(s) have been added or changed");
     }
   }
   return { error: error, text: text }
 }
 
 const restorePage = async () => {
+  await fetchUserCalibrationRunData();
   if (userCalibrationRunData.value) {
     uiOptimization.value = userCalibrationRunData?.value?.optimization;
-    uiOptimizationInputs.value = original_optimization_inputs;
+    uiOptimizationInputs.value = userCalibrationRunData?.value?.optimization_inputs;
     uiObjectiveFunction.value = userCalibrationRunData?.value?.objective_function;
     uiStopCriteria.value = userCalibrationRunData?.value?.stop_criteria || 0;
     uiPlotFrequency.value = userCalibrationRunData?.value?.save_plot_iteration_frequency || 0;
