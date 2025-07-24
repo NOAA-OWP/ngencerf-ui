@@ -97,7 +97,7 @@
               </div><br />
 
               <Checkbox id="CalEventMetCB" inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline"
-                style="display:inline-block" :binary="true" v-model="cbIsEvenBased"
+                style="display:inline-block" :binary="true" v-model="cbIsEventBased"
                 aria-label="Calculate Event Based Metrics Checkbox" title="Calculate Event Based Metrics Checkbox"
                 :disabled="cbEventBasedDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 @change="toggleMetricPeakFlowInput" />
@@ -154,7 +154,6 @@
 
       <p>Click "Next" to Continue.</p>
     </div>
-
     <div id="OptMetBottomButtons" class="absolute b-0 grid grid-cols-8 mt-6 ActionButtonsBox">
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-6 h-8">
@@ -249,7 +248,7 @@ const { addToastRecord } = generalStore();
 const cbCategoricalDisabled = ref<boolean>(false);
 const cbEventBasedDisabled = ref<boolean>(false);
 const cbIsCategorical = ref<boolean>(false);
-const cbIsEvenBased = ref<boolean>(false);
+const cbIsEventBased = ref<boolean>(false);
 const showMetricPeakFlow = ref<boolean>(false);
 const showMetricStreamFlow = ref<boolean>(false);
 const ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -265,7 +264,7 @@ onMounted(() => {
   }
 
   if (userCalibrationRunData.value?.peak_flow_threshold) {
-    cbIsEvenBased.value = true;
+    cbIsEventBased.value = true;
     showMetricPeakFlow.value = true;
     uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold;
   }
@@ -290,7 +289,7 @@ const updateMetricFlowFieldVisibility = () => {
     const metricInfo = getSelectedMetricInfo.value?.pop();
 
     cbIsCategorical.value = metricInfo?.categorical ?? false;
-    cbIsEvenBased.value = metricInfo?.event_based ?? false;
+    cbIsEventBased.value = metricInfo?.event_based ?? false;
 
     if (metricInfo?.categorical === true) {
       showObjectiveFunctionStreamFlow.value = true;
@@ -321,9 +320,9 @@ const toggleMetricStreamFlowInput = () => {
  * metric peak flow field visibility toggle 
  */
 const toggleMetricPeakFlowInput = () => {
-  if (!cbEventBasedDisabled.value && cbIsEvenBased.value) {
+  if (!cbEventBasedDisabled.value && cbIsEventBased.value) {
     showMetricPeakFlow.value = true;
-  } else if (!cbIsEvenBased.value) {
+  } else if (!cbIsEventBased.value) {
     showMetricPeakFlow.value = false;
     uiPeakFlowThreshold.value = undefined;
   }
@@ -369,10 +368,10 @@ watch(() => optimizationStore_data_loading.value, (loading_status) => {
   if (metricInfo?.event_based === true) {
     showObjectiveFunctionPeakFlow.value = true;
     cbEventBasedDisabled.value = true;
-    cbIsEvenBased.value = true;
+    cbIsEventBased.value = true;
   } else if (!metricInfo?.event_based && uiPeakFlowThreshold.value) {
     showMetricPeakFlow.value = true;
-    cbIsEvenBased.value = true;
+    cbIsEventBased.value = true;
   }
 })
 
@@ -447,12 +446,16 @@ const validateTab = () => {
       text.push("Algorithm Parameters have been changed");
     }
 
-    if ((userCalibrationRunData?.value?.streamflow_threshold || 0) !== (uiStreamFlowThreshold.value || 0)) {
+    if ((cbIsCategorical.value && !userCalibrationRunData.value?.streamflow_threshold ) ||
+      (!cbIsCategorical.value && userCalibrationRunData.value?.streamflow_threshold ) ||
+      (userCalibrationRunData?.value?.streamflow_threshold || 0) !== (uiStreamFlowThreshold.value || 0)) {
       error = true;
       text.push("Calculate Categorical Metrics (Flow Threshold) has been changed");
     }
 
-    if ((userCalibrationRunData?.value?.peak_flow_threshold || 0) !== (uiPeakFlowThreshold.value || 0)) {
+    if ((cbIsEventBased.value && !userCalibrationRunData.value?.peak_flow_threshold ) ||
+      (!cbIsEventBased.value && userCalibrationRunData.value?.peak_flow_threshold ) ||
+      (userCalibrationRunData?.value?.peak_flow_threshold || 0) !== (uiPeakFlowThreshold.value || 0)) {
       error = true;
       text.push("Calculate Event Based Metrics (Peak Flow Threshold) has been changed");
     }
@@ -483,11 +486,11 @@ const restorePage = async () => {
     }
 
     if (userCalibrationRunData.value?.peak_flow_threshold) {
-      cbIsEvenBased.value = true;
+      cbIsEventBased.value = true;
       showMetricPeakFlow.value = true;
       uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold;
     } else {
-      cbIsEvenBased.value = false;
+      cbIsEventBased.value = false;
       showMetricPeakFlow.value = false;
     }
   }
@@ -576,10 +579,6 @@ onUnmounted(async () => {
   position: relative;
   z-index: 2;
   max-height: 8rem !important;
-}
-
-#OptMetBottomButtons {
-  z-index: 9999;
 }
 
 #ClrBtn {

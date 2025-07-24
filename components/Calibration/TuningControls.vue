@@ -776,6 +776,8 @@ const updateCalibrationTuningParameter = (index: number, field: string, ev: Even
       parameter.initial_value = value;
     }
   }
+  // note that calibratable parameters have changed
+  calibratableParametersHaveChanged.value = true;
 };
 
 /**
@@ -783,6 +785,9 @@ const updateCalibrationTuningParameter = (index: number, field: string, ev: Even
  */
 const deleteCalibrationTuningParameter = (selectedTuningParameterData: any) => {
   userSelectedCalibrationTuningParameters.value = userSelectedCalibrationTuningParameters.value.filter((param: any) => param.name !== selectedTuningParameterData.value.name);
+  
+  // note that calibratable parameters have changed
+  calibratableParametersHaveChanged.value = true;
 };
 
 /**
