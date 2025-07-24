@@ -94,7 +94,7 @@
             Forecast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[3].includes(currentForecastTab)" data-tab="3"
+          <div v-show="[3,4].includes(currentForecastTab)" data-tab="3"
             class="tabs prevent-select" v-on:click="tabClicked" aria-label="Setup Forecast Tab"
             title="Setup Forecast tab">
             Setup Forecast
