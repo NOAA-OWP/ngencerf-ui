@@ -266,8 +266,8 @@
       </span>
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-3">
-          <Button v-if="tuningDataHasChanged || calibratableParametersHaveChanged" class="ngenButtonDiv-yellow" title="Revert"
-            @click="restorePage()" aria-label="Revert Button">Revert</Button>
+          <Button v-if="tuningDataHasChanged || calibratableParametersHaveChanged" class="ngenButtonDiv-yellow" title="Revert All Changes"
+            @click="restorePage()" aria-label="Revert All Changes">Revert</Button>
         </div>
       </span>
       <span v-else>

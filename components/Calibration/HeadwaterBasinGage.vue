@@ -122,8 +122,8 @@
             </span>
             <span v-if="(gageHasChanged && userCalibrationRunData?.gage !== null) || gageDataSourceHasChanged">
               <div class="col-span-1 mr-3">
-                <Button class="ngenButtonDiv-yellow" title="Revert Gage"
-                  @click="gageSelectionReset()" aria-label="Revert">Revert</Button>
+                <Button class="ngenButtonDiv-yellow" title="Revert All Changes"
+                  @click="gageSelectionReset()" aria-label="Revert All Changes">Revert</Button>
               </div>
             </span>
             <span v-else>
@@ -632,7 +632,7 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
   if (opt.data && opt.data.moveToNextResponse) {
-    selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
+    gageSelectionReset();
     gotoNext();
   }
   if (opt.type && opt.type === 'dialog-close') {

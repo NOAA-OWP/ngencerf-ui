@@ -171,8 +171,8 @@
 
         <span v-if="modulesHaveChanged && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
           <div class="col-span-1 mr-3">
-            <Button class="ngenButtonDiv-yellow" title="Revert Gage" @click="resetModuleList()"
-              aria-label="Revert Gage">Revert</Button>
+            <Button class="ngenButtonDiv-yellow" title="Revert Module Changes" @click="resetModuleList()"
+              aria-label="Revert Module Changes">Revert</Button>
           </div>
         </span>
         <span v-else>

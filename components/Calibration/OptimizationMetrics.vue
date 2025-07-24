@@ -171,8 +171,8 @@
       </span>
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1">
-          <Button v-if="optMetDataHasChanged && !userCalibrationRunData?.modules?.includes('LSTM')" class="ngenButtonDiv-yellow" title="Revert"
-            @click="restorePage()" aria-label="Revert Button">Revert</Button>
+          <Button v-if="optMetDataHasChanged && !userCalibrationRunData?.modules?.includes('LSTM')" class="ngenButtonDiv-yellow" title="Revert All Changes"
+            @click="restorePage()" aria-label="Revert All Changes">Revert</Button>
         </div>
       </span>
       <div class="col-span-4">&nbsp;</div>
