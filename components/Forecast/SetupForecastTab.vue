@@ -136,7 +136,6 @@ const onRowSelect = (e: any) => {
  * Go to the Status Run tab
  */
 const goToStatusRunTab = () => {
-    // console.log('startForecastRun');
     const allTabs = document.getElementsByClassName("tabs");
     const e = allTabs[ForecastTabs.tab_statusRun] as HTMLElement;
     e.click();
