@@ -193,10 +193,10 @@ const onRowContextMenu = (event: any) => {
   if (selectedForecastJob && selectedForecastJob.value?.forecast_run_id === crRowData.forecast_run_id) {
     crContextMenu.value.show(event.originalEvent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
+    cmForecastRun.value.push({ label: 'Show Setup', icon: 'pi pi-bars', command: () => navigateToForecastSetup() });
+    cmForecastRun.value.push({ label: 'View Status', icon: 'pi pi-gauge', command: () => navigateToForecastRunStatus() });
     if (crRowData.forecast_status === 'Done') {
       cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToForecastResults() });
-    } else if (crRowData.forcing_download_status === 'Running' || crRowData.forecast_status === 'Running') {
-      cmForecastRun.value.push({ label: 'View Running Status', icon: 'pi pi-gauge', command: () => navigateToForecastRunStatus() });
     }
     cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
     cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
@@ -275,6 +275,21 @@ const navigateToSetupForecast = () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
+  });
+}
+
+const navigateToForecastSetup = () => {
+  isForecastLoading.value = true;
+  nextTick(async () => {
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast tab"]');
+
+    if (e) {
+      await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+      e.click();
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+    }
+    isForecastLoading.value = false;
   });
 }
 
