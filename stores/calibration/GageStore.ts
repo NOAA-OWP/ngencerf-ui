@@ -23,7 +23,7 @@ export const useGageStore = defineStore(
     /**
      * ref section
      */
-    const { calibrationJobId } = storeToRefs(generalStore());
+    const { calibrationJobId, gageDataSourceHasChanged } = storeToRefs(generalStore());
     const { ngencerfBaseUrl } = useBackendConfig();
     const { getAccessToken } = useUserDataStore();
     const userDataStore = useUserDataStore();
@@ -147,20 +147,24 @@ export const useGageStore = defineStore(
      *  @returns {void}
      */
     async function fetchSelectedGageData(): Promise<void> {
-      const selectedGageDataResponse = await makeProtectedApiCall<GageData>(
-        `${ngencerfBaseUrl}/calibration/get_gage/`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${getAccessToken()}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            gage_id: selectedGageValue.value,
-          }),
-        }
-      );
-      gageData.value = selectedGageDataResponse?._data ?? undefined;
+      if (selectedGageValue.value && selectedGageValue.value != '') {
+        const selectedGageDataResponse = await makeProtectedApiCall<GageData>(
+          `${ngencerfBaseUrl}/calibration/get_gage/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${getAccessToken()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              gage_id: selectedGageValue.value,
+            }),
+          }
+        );
+        gageData.value = selectedGageDataResponse?._data ?? undefined;
+      } else {
+        gageData.value = undefined;
+      }
     }
 
     /**
@@ -226,7 +230,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserForcingFilesResponse;
     }
 
@@ -245,7 +249,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserObservationalFilesResponse;
     }
 
@@ -260,7 +264,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserGeopackageFilesResponse;
     }
 
