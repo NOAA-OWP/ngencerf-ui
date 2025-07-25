@@ -103,7 +103,7 @@
       <div class="grid grid-rows-1 ActionButtonsBox mt-2" id="HBCbuttons">
         <div class="row-span-1">
           <div class="grid grid-cols-4">
-            <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
+            <span>
               <div class="col-span-1 mr-4">
                 <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Previous Button" aria-label="Previous Button"
                     @click="goToSetupForecastTab()">
