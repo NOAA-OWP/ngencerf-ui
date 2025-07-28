@@ -99,7 +99,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     ) {
       formulationTabData.value?.modules.forEach((moduleData) => {
         if (
-          !filterGroup.value ||
+          !filterGroup.value || filterGroup.value == 'ALL' ||
           moduleData.groups.includes(filterGroup.value)
         ) {
           const selectOptionItem = {
