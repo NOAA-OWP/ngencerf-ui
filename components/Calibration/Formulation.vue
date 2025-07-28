@@ -298,6 +298,9 @@ onMounted(async() => {
     if (!userCalibrationRunData.value) {
       await fetchUserCalibrationRunData();
     }
+    if (!userCalibrationRunData?.value?.modules.some(item => item.toLowerCase() === 't-route')) {
+      userCalibrationRunData?.value?.modules.push('T-Route');
+    }
     await setUserSelection();
     nextTick(() => {
       hilightTab(CalibrationTabs.tab_formulation);
