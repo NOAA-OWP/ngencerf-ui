@@ -169,10 +169,10 @@
           </div>
         </span>
 
-        <span v-if="modulesHaveChanged && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
+        <span v-if="formulationNameHasChanged || modulesHaveChanged">
           <div class="col-span-1 mr-3">
-            <Button class="ngenButtonDiv-yellow" title="Revert Module Changes" @click="resetModuleList()"
-              aria-label="Revert Module Changes">Revert</Button>
+            <Button class="ngenButtonDiv-yellow" title="Revert Changes" @click="restorePage()"
+              aria-label="Revert Changes">Revert</Button>
           </div>
         </span>
         <span v-else>
@@ -199,7 +199,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useDialog } from "primevue/usedialog";
 import { useToast } from "primevue/usetoast";
@@ -289,6 +289,7 @@ let mainLeftAreaElement: HTMLElement | null = null;
 let dataTableElement: HTMLElement | null = null;
 
 const toast = useToast();
+const formulationNameHasChanged = ref<boolean>(false);
 
 onMounted(async() => {
   if (calibrationJobId.value) {
@@ -385,6 +386,14 @@ const checkValidCharacters = (e: KeyboardEvent) => {
   }
   return false;
 }
+
+watch(formulationNameInput, () => {
+  if (formulationNameInput.value != userCalibrationRunData?.value?.formulation_name) {
+    formulationNameHasChanged.value = true;
+  } else {
+    formulationNameHasChanged.value = false;
+  }
+})
 
 /**
 * event bus for calibration button group click
@@ -538,8 +547,9 @@ const validateTab = () => {
 }
 
 const restorePage = () => {
-  selectedModuleValues.value = userCalibrationRunData?.value?.modules ? userCalibrationRunData?.value?.modules : [];
   formulationNameInput.value = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";
+  resetModuleList();
+  updateFormulationValidRefs();
   if (userCalibrationRunData.value) {
     useSlothParameters.value = userCalibrationRunData?.value?.use_sloth;
     slothParameterInputs.value = userCalibrationRunData?.value?.sloth_parameters;
@@ -613,6 +623,9 @@ const handleNextPrevDialogClose = (opt: any) => {
   }
 }
 
+onUnmounted(async() => {
+  restorePage();
+})
 </script>
 
 <style lang="scss" scoped>
