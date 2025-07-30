@@ -141,7 +141,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineExpose } from 'vue';
+import { defineProps } from 'vue';
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -208,7 +208,6 @@ const props = defineProps({
 const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele: HTMLElement = event.currentTarget as HTMLElement;
-  console.log('tab clicked!');
   if (props.callTabValidator) {
     const errors = props.callTabValidator();
     if (errors.error) {
@@ -276,10 +275,6 @@ const handleTabNavDialogClose = (opt: any, ele: HTMLElement) => {
   }
 }
 
-defineExpose({
-  goToTab,
-  showTabNavDialog
-});
 </script>
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
