@@ -1,25 +1,25 @@
 <template>
   <!-- LeftBlock.vue -->
   <div>
-    <CommonTabs @tabNumber="tabChanged" />
+    <Tabs @tabNumber="tabChanged" ref="tabNavRef" :call-tab-validator="validateChildTab" :call-tab-restore="restoreChildTab"/>
     
     <div v-if="activeTab === 1">
-      <CalibrationCalibrationRunsTab />
+      <CalibrationCalibrationRunsTab/>
     </div> 
     <div v-else-if="activeTab === 2">
-      <CalibrationHeadwaterBasinGage />
+      <CalibrationHeadwaterBasinGage ref="tabRef"/>
     </div>
     <div v-else-if="activeTab === 3">
-      <CalibrationFormulation />
+      <CalibrationFormulation ref="tabRef"/>
     </div>
     <div v-else-if="activeTab === 4">
-      <CalibrationTuningControls />
+      <CalibrationTuningControls ref="tabRef" />
     </div>
     <div v-else-if="activeTab === 5">
-      <CalibrationOptimizationMetrics />
+      <CalibrationOptimizationMetrics ref="tabRef" />
     </div>
     <div v-else-if="activeTab === 6">
-      <CalibrationRunStatus />
+      <CalibrationRunStatus/>
     </div>
     
   </div>
@@ -28,9 +28,10 @@
 
 <script setup lang="ts">
 
+import { ref } from 'vue';
 import { generalStore } from "@/stores/common/GeneralStore";
 
-import CommonTabs from '@/components/Common/Tabs.vue'
+import Tabs from '@/components/Common/Tabs.vue'
 import CalibrationHeadwaterBasinGage from '@/components/Calibration/HeadwaterBasinGage.vue';
 import CalibrationFormulation from'@/components/Calibration/Formulation.vue';
 import CalibrationTuningControls from'@/components/Calibration/TuningControls.vue';
@@ -48,4 +49,22 @@ const tabChanged = (tabNum: number) => {
     setCalibrationTabIndex(tabNum);
   }
 };
+
+const tabRef = ref(null);
+
+function validateChildTab() {
+  console.log('tabRef:',tabRef.value);
+  if (tabRef.value) {
+    console.log('calling original tab validator');
+    return tabRef.value.validateTab();
+  }
+  return false;
+}
+
+function restoreChildTab() {
+  if (tabRef.value) {
+    return tabRef.value.restoreTab();
+  }
+  return false;
+}
 </script>

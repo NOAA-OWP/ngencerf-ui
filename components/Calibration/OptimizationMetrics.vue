@@ -172,7 +172,7 @@
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1">
           <Button v-if="optMetDataHasChanged && !userCalibrationRunData?.modules?.includes('LSTM')" class="ngenButtonDiv-yellow" title="Revert All Changes"
-            @click="restorePage()" aria-label="Revert All Changes">Revert</Button>
+            @click="restoreTab()" aria-label="Revert All Changes">Revert</Button>
         </div>
       </span>
       <div class="col-span-4">&nbsp;</div>
@@ -194,10 +194,9 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, defineExpose } from "vue";
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
-import { useDialog } from "primevue/usedialog";
 
 import type { ToastMessageOptions } from "primevue/toast";
 
@@ -206,14 +205,9 @@ import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 
-import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
-
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
-
-const dialog = useDialog();
-const nextPrevDialogOpened = ref<boolean>(false);
 
 const optimizationStore = useOptimizationStore();
 const {
@@ -468,7 +462,7 @@ const validateTab = () => {
   return { error: error, text: text }
 }
 
-const restorePage = async () => {
+const restoreTab = async () => {
   await fetchUserCalibrationRunData();
   if (userCalibrationRunData.value) {
     uiOptimization.value = userCalibrationRunData?.value?.optimization;
@@ -497,73 +491,21 @@ const restorePage = async () => {
   optMetDataHasChanged.value = false;
 }
 
-const goNextTab = () => {
-  const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, true);
-  } else {
-    gotoNext();
-  }
-};
-
 const goPrevTab = () => {
-  const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, false);
-  } else {
-    gotoPrev();
-  }
-};
-
-const gotoNext = () => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
+  e.click();
+}
+const goNextTab = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_statusRun];
   e.click();
 }
 
-const gotoPrev = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
-  e.click();
-}
-
-const showPrevNextDialog = (body: string[], next: boolean) => {
-  if (!nextPrevDialogOpened.value) {
-    dialog.open(MoveNextPrevDialog, {
-      props: {
-        header: "Unsaved changes!",
-        style: {
-          width: 'auto',
-        },
-        modal: true,
-      },
-      data: {
-        body: body,
-        direction: next
-      },
-      onClose: (opt) => {
-        nextPrevDialogOpened.value = false;
-        handleNextPrevDialogClose(opt);
-      },
-
-    })
-    nextPrevDialogOpened.value = true
-  }
-}
-
-const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data && opt.data.moveToNextResponse) {
-    restorePage();
-    if (opt.data.goNext) {
-      gotoNext();
-    } else {
-      gotoPrev();
-    }
-  }
-  if (opt.type && opt.type === 'dialog-close') {
-    return;
-  }
-}
+defineExpose({
+  validateTab,
+  restoreTab
+});
 
 onUnmounted(async () => {
   optMetDataHasChanged.value = false;
