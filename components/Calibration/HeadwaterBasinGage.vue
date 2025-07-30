@@ -123,7 +123,7 @@
             <span v-if="(gageHasChanged && userCalibrationRunData?.gage !== null) || gageDataSourceHasChanged">
               <div class="col-span-1 mr-3">
                 <Button class="ngenButtonDiv-yellow" title="Revert All Changes"
-                  @click="gageSelectionReset()" aria-label="Revert All Changes">Revert</Button>
+                  @click="restoreTab()" aria-label="Revert All Changes">Revert</Button>
               </div>
             </span>
             <span v-else>
@@ -150,7 +150,7 @@
 
 </template>
 <script lang="ts" setup>
-import { onMounted } from "vue";
+import { onMounted, defineExpose } from "vue";
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 import { useDialog } from "primevue/usedialog";
@@ -166,7 +166,6 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 
-import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
@@ -196,7 +195,6 @@ const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
-const nextPrevDialogOpened = ref<boolean>(false);
 
 const resetData = ref<GageResetData>({
   external_data_status: {
@@ -229,7 +227,7 @@ onMounted(() => {
     if (ele) { ele.scrollTo(0, 0); }
     setResetDataValues();
     if (gageHasChanged.value && userCalibrationRunData?.value?.gage?.gage_id) {
-      gageSelectionReset();
+      restoreTab();
     } else {
       selectedForcingValue.value = resetData.value.forcing_source;
       selectedObservationalValue.value = resetData.value.observational_source;
@@ -266,9 +264,9 @@ const onGageSelectionChange = () => {
 }
 
 /**
- * Resets the Gage to the previous gage if it was changed and not saved.
+ * Resets the Gage and reverts other unsaved changes made on this page.
  */
-const gageSelectionReset = () => {
+const restoreTab = () => {
   selectedDomainValue.value = getSavedDomainValue.value ?? '';
   selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
   fetchSelectedGageData();
@@ -490,7 +488,7 @@ const showGeopackageFileUploadDialog = (headerText: string) => {
   }
 }
 
-const gotoNext = () => {
+const goNextTab = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_formulation];
   e.click();
@@ -582,63 +580,25 @@ const validateTab = () => {
     error = true;
     text.push("Gage value has been changed");
   }
-  if (selectedObservationalValue.value !== userCalibrationRunData?.value?.observational_source) {
-    error = true;
-    text.push("Observational Source has been changed");
-  }
-  if (selectedForcingValue.value != userCalibrationRunData?.value?.forcing_source) {
+  if (selectedForcingValue.value != resetData.value.forcing_source) {
     error = true;
     text.push("Forcing Source has been changed");
   }
-  if (selectedGeopackageValue.value != userCalibrationRunData?.value?.geopackage_source) {
+  if (selectedObservationalValue.value !== resetData.value.observational_source) {
+    error = true;
+    text.push("Observational Source has been changed");
+  }
+  if (selectedGeopackageValue.value != resetData.value.geopackage_source) {
     error = true;
     text.push("GeoPackage has been changed");
   }
   return { error: error, text: text }
 }
 
-const goNextTab = () => {
-  const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, true);
-  } else {
-    gotoNext();
-  }
-
-};
-
-const showPrevNextDialog = (body: string[], next: boolean) => {
-  if (!nextPrevDialogOpened.value) {
-    dialog.open(MoveNextPrevDialog, {
-      props: {
-        header: "Unsaved changes!",
-        style: {
-          width: 'auto',
-        },
-        modal: true,
-      },
-      data: {
-        body: body,
-        direction: next
-      },
-      onClose: (opt) => {
-        nextPrevDialogOpened.value = false;
-        handleNextPrevDialogClose(opt);
-      },
-    })
-    nextPrevDialogOpened.value = true
-  }
-}
-
-const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data && opt.data.moveToNextResponse) {
-    gageSelectionReset();
-    gotoNext();
-  }
-  if (opt.type && opt.type === 'dialog-close') {
-    return;
-  }
-}
+defineExpose({
+  validateTab,
+  restoreTab
+});
 
 </script>
 <style lang="scss" scoped>

@@ -153,7 +153,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   /**
-   * Load Forecast Status/Run tab data
+   * Load Forecast Run/Status tab data
    */
   const loadForecastStatusRunTabData = async (): Promise<string[]> => {
     let errorMessages: string[] = [];
@@ -218,7 +218,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const loadForecastResultsTabData = async (): Promise<string[]> => {
     const errorMessages: string[] = [];
 
-    // load forecast status/run tab data
+    // load forecast Run/Status tab data
     const loadForecastErrors: string[] = await loadForecastStatusRunTabData();
     if (loadForecastErrors.length > 0) {
       errorMessages.push(...loadForecastErrors);

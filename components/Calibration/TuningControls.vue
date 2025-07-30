@@ -267,7 +267,7 @@
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1 mr-3">
           <Button v-if="tuningDataHasChanged || calibratableParametersHaveChanged" class="ngenButtonDiv-yellow" title="Revert All Changes"
-            @click="restorePage()" aria-label="Revert All Changes">Revert</Button>
+            @click="restoreTab()" aria-label="Revert All Changes">Revert</Button>
         </div>
       </span>
       <span v-else>
@@ -291,12 +291,11 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, defineExpose } from "vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 import Select from "primevue/select";
 import { useToast } from "primevue/usetoast";
-import { useDialog } from "primevue/usedialog";
 
 import type { GeneralErrorResponse, NonFieldError } from "@/composables/NgencerfModels";
 
@@ -317,11 +316,6 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { ifEDSErrorsExist } from "@/utils/TuningControlsHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 import { hilightTab } from '@/composables/TabHilight';
-
-import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
-
-const dialog = useDialog();
-const nextPrevDialogOpened = ref<boolean>(false);
 
 const format = formatISOStringOrDateToYYYYMMDDHHMM;
 
@@ -1204,7 +1198,7 @@ const compareTimeEntries = (txtDT: string, dT: Date) => {
   return new Date(dT).getTime() !== new Date(txtDT).getTime();
 }
 
-const restorePage = async () => {
+const restoreTab = async () => {
   // reset calibration times
   if (userCalibrationRunData?.value?.calibration_times) {
     const { simulation_start_time, simulation_end_time, calibration_start_time, calibration_end_time } = userCalibrationRunData.value.calibration_times;
@@ -1230,73 +1224,21 @@ const restorePage = async () => {
   tuningDataHasChanged.value = false;
 }
 
-const gotoNext = () => {
+const goPrevTab = () => {
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_formulation];
+  e.click();
+};
+const goNextTab = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_optimizationMetrics];
   e.click();
 }
 
-const gotoPrev = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_formulation];
-  e.click();
-};
-
-const goNextTab = () => {
-  const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, true);
-  } else {
-    gotoNext();
-  }
-};
-
-const goPrevTab = () => {
-  const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, false);
-  } else {
-    gotoPrev();
-  }
-};
-
-const showPrevNextDialog = (body: string[], next: boolean) => {
-  if (!nextPrevDialogOpened.value) {
-    dialog.open(MoveNextPrevDialog, {
-      props: {
-        header: "Unsaved changes!",
-        style: {
-          width: 'auto',
-        },
-        modal: true,
-      },
-      data: {
-        body: body,
-        direction: next
-      },
-      onClose: (opt) => {
-        nextPrevDialogOpened.value = false;
-        handleNextPrevDialogClose(opt);
-      },
-
-    })
-    nextPrevDialogOpened.value = true
-  }
-}
-
-const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data && opt.data.moveToNextResponse) {
-    restorePage();
-    if (opt.data.goNext) {
-      gotoNext();
-    } else {
-      gotoPrev();
-    }
-  }
-  if (opt.type && opt.type === 'dialog-close') {
-    return;
-  }
-}
+defineExpose({
+  validateTab,
+  restoreTab
+});
 
 const rowClass = () => {
   return [{ "pointer-events-none": !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status) }];

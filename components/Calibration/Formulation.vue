@@ -171,7 +171,7 @@
 
         <span v-if="formulationNameHasChanged || modulesHaveChanged">
           <div class="col-span-1 mr-3">
-            <Button class="ngenButtonDiv-yellow" title="Revert Changes" @click="restorePage()"
+            <Button class="ngenButtonDiv-yellow" title="Revert Changes" @click="restoreTab()"
               aria-label="Revert Changes">Revert</Button>
           </div>
         </span>
@@ -199,9 +199,8 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, defineExpose } from "vue";
 import { storeToRefs } from "pinia";
-import { useDialog } from "primevue/usedialog";
 import { useToast } from "primevue/usetoast";
 
 import type { SlothParameterData } from '@/composables/NgencerfModels';
@@ -214,8 +213,6 @@ import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 
-import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
-
 import { hilightTab } from '@/composables/TabHilight';
 import { isCalibrationJobStatusSavedOrReady, arraysEqual } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
@@ -226,8 +223,6 @@ const { addToastRecord } = generalStore();
 
 const { calibrationJobId, isLoading } = storeToRefs(generalStore());
 
-const dialog = useDialog();
-const nextPrevDialogOpened = ref<boolean>(false);
 import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess,useApiResponseToastSeverityLife } from "@/composables/ValidationHandlers";
 import type { ListboxChangeEvent } from "primevue/listbox";
 
@@ -496,12 +491,11 @@ const validateTab = () => {
   let text = [];
   /* Check if formulation name changed */
   let newName = formulationNameInput.value ? formulationNameInput.value : '';
-  if (newName.trim() === "") {
-    error = true;
-    text.push("Please enter a valid Forumulation Name");
-  }
   let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : '';
-  if (savedName !== newName) {
+  if (newName.trim() === "" && userCalibrationRunData?.value?.formulation_name) {
+    error = true;
+    text.push("Please enter a valid Formulation Name");
+  } else if (savedName !== newName) {
     error = true;
     text.push("Formulation Name has been changed");
   }
@@ -546,7 +540,7 @@ const validateTab = () => {
   return { error: error, text: text }
 }
 
-const restorePage = () => {
+const restoreTab = () => {
   formulationNameInput.value = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";
   resetModuleList();
   updateFormulationValidRefs();
@@ -556,75 +550,24 @@ const restorePage = () => {
   }
 }
 
-const gotoNext = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
-  e.click();
-}
-const gotoPrev = () => {
+const goPrevTab = () => {
   const tabs = document.getElementsByClassName("tabs");
   const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
   e.click();
 }
-
 const goNextTab = () => {
-  const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, true);
-  } else {
-    gotoNext();
-  }
-};
-
-const goPrevTab = () => {
-  const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, false);
-  } else {
-    gotoPrev();
-  }
-};
-
-const showPrevNextDialog = (body: string[], next: boolean) => {
-  if (!nextPrevDialogOpened.value) {
-    dialog.open(MoveNextPrevDialog, {
-      props: {
-        header: "Unsaved changes!",
-        style: {
-          width: 'auto',
-        },
-        modal: true,
-      },
-      data: {
-        body: body,
-        direction: next
-      },
-      onClose: (opt) => {
-        nextPrevDialogOpened.value = false;
-        handleNextPrevDialogClose(opt);
-      },
-
-    })
-    nextPrevDialogOpened.value = true
-  }
+  const tabs = document.getElementsByClassName("tabs");
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
+  e.click();
 }
 
-const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data && opt.data.moveToNextResponse) {
-    restorePage();
-    if (opt.data.goNext) {
-      gotoNext();
-    } else {
-      gotoPrev();
-    }
-  }
-  if (opt.type && opt.type === 'dialog-close') {
-    return;
-  }
-}
+defineExpose({
+  validateTab,
+  restoreTab
+});
 
 onUnmounted(async() => {
-  restorePage();
+  restoreTab();
 })
 </script>
 

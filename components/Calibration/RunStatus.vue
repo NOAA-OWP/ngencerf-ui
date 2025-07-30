@@ -804,7 +804,7 @@ watch(selectedPlotName, async () => {
 // Handle submitTimeDate changes
 watch(submitTimeDate, () => {
   if (isValidDate(submitTimeDate.value)) {
-    // convert submitTimeDate to local time format and set submitTime to display on the Status/Run tab
+    // convert submitTimeDate to local time format and set submitTime to display on the Run/Status tab
     submitTime.value = convertTimeZone(submitTimeDate.value as Date);
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };

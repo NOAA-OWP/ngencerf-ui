@@ -101,8 +101,8 @@
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
           <div v-show="[4].includes(currentForecastTab) || (calibrationRunForForecast && (calibrationRunForForecast.cycle || forecastCycle))" data-tab="4"
-            class="tabs prevent-select" @click="tabClicked" aria-label="Status/Run tab" title="Status/Run Tab">
-            Status/Run
+            class="tabs prevent-select" @click="tabClicked" aria-label="Run/Status tab" title="Run/Status Tab">
+            Run/Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
           <div v-show="[5].includes(currentForecastTab) || calibrationRunForForecast && calibrationRunForForecast.forecast_status  === 'Done'" data-tab="5" class="tabs prevent-select" @click="tabClicked"
@@ -116,21 +116,25 @@
       <span v-else-if="currentMenu === 4"> <!-- VERIFICATION TABS -->
         <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
           <span data-tab="1" class="tabs activeTab prevent-select" @click="tabClicked"
-            aria-label="Calibration Runs tab" title="Calibration Runs tab">
-            Calibration Runs
+            aria-label="Verification Runs Tab" title="Verification Runs Tab">
+            Verification Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
-          <div data-tab="2" class="tabs prevent-select" @click="tabClicked" aria-label="Setup Forecast and Run Tab"
-            title="Setup Forecast / Run tab">
-            Setup Forecast / Run
+          <div v-show="[2].includes(currentVerificationTab) || (userVerificationJobData && (!userVerificationJobData.status || userVerificationJobData.status  === 'Ready'))"
+            data-tab="2" class="tabs prevent-select" @click="tabClicked" 
+            aria-label="Setup Verification Tab" title="Setup Verification Tab">
+            Setup Verification
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div data-tab="3" class="tabs prevent-select" @click="tabClicked" aria-label="Status tab" title="Status">
-            Status
+          <div v-show="[3].includes(currentVerificationTab) || userVerificationJobData" 
+            data-tab="3" class="tabs prevent-select" @click="tabClicked" 
+            aria-label="Run/Status Tab" title="Run/Status Tab">
+            Run/Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div id="results-tab" data-tab="4" class="tabs prevent-select" @click="tabClicked"
-            aria-label="Results tab" title="Results tab">
+          <div v-show="[4].includes(currentVerificationTab) || (userVerificationJobData && userVerificationJobData.status  === 'Done')" 
+            id="results-tab" data-tab="4" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Results Tab" title="Results Tab">
             Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
@@ -141,12 +145,20 @@
 </template>
 
 <script lang="ts" setup>
+import { defineProps } from 'vue';
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
+import { useVerificationStore } from "@/stores/verification/VerificationStore";
+
+import { useDialog } from "primevue/usedialog";
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+
+const dialog = useDialog();
+const navDialogOpened = ref<boolean>(false);
 
 const {
   calibrationJobId,
@@ -173,8 +185,15 @@ const {
 const {
   calibrationRunForForecast,
   forecastCycle,
+  forecastJobStatus,
   overallForcingDownloadForecastStatus
 } = storeToRefs(useForecastStore());
+
+const {
+  verificationJobId,
+  verificationJobStatus,
+  userVerificationJobData
+} = storeToRefs(useVerificationStore());
 
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
@@ -186,10 +205,33 @@ const currentMenu = ref(getMenuIndex());
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
 
+const props = defineProps({
+  callTabValidator: {
+    type: Function,
+    required: false,
+  },
+  callTabRestore: {
+    type: Function,
+    required: false,
+  }
+});
+
 const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele: HTMLElement = event.currentTarget as HTMLElement;
+  if (props.callTabValidator) {
+    const errors = props.callTabValidator();
+    if (errors.error) {
+      showTabNavDialog(errors.text, true, ele);
+    } else {
+      goToTab(ele);
+    }
+  } else {
+    goToTab(ele);
+  }
+}
 
+const goToTab = (ele: HTMLElement) => {
   nextTick(() => {
     // Send the selected tab info to the active tab set with emit
     if (currentMenu.value === 1) {
@@ -207,6 +249,43 @@ const tabClicked = (event: Event) => {
     }
   })
 }
+
+const showTabNavDialog = (body: string[], next: boolean, ele: HTMLElement) => {
+  if (!navDialogOpened.value) {
+    dialog.open(MoveNextPrevDialog, {
+      props: {
+        header: "Unsaved changes!",
+        style: {
+          width: 'auto',
+        },
+        modal: true,
+      },
+      data: {
+        body: body,
+        direction: next
+      },
+      onClose: (opt) => {
+        navDialogOpened.value = false;
+        handleTabNavDialogClose(opt, ele);
+      },
+
+    })
+    navDialogOpened.value = true;
+  }
+}
+
+const handleTabNavDialogClose = (opt: any, ele: HTMLElement) => {
+  if (opt.data && opt.data.moveToNextResponse) {
+    if (props.callTabRestore) {
+      props.callTabRestore();
+    }
+    goToTab(ele);
+  }
+  if (opt.type && opt.type === 'dialog-close') {
+    return;
+  }
+}
+
 </script>
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
