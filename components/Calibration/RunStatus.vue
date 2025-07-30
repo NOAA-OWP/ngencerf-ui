@@ -294,7 +294,7 @@ const selectedLogStatus = ref<DynamicObject>({});
 let logTimeout;
 
 const populatePlotListOptions = async() => {
-  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Validating and Preparing Job Data'].includes(userCalibrationRunData?.value?.status))) {
+  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Validating and Preparing Job Data','Submitted'].includes(userCalibrationRunData?.value?.status))) {
     plotList.value = [];
     plotList.value.push({ name: plotListDefault.value, display_name: '' });
     plotListOptions.value = [];
