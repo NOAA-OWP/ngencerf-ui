@@ -160,7 +160,7 @@ import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useVerificationStore } from "@/stores/verification/VerificationStore";
 
 import { useDialog } from "primevue/usedialog";
-import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+import MoveNextPrevDialog from "./MoveNextPrevDialog.vue";
 
 const dialog = useDialog();
 const navDialogOpened = ref<boolean>(false);
