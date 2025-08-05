@@ -24,8 +24,10 @@ export const ForecastTabs = {
 };
 
 export const VerificationTabs = {
-  tab_calibrationRuns: 0,
-  tab_results: 1,
+  tab_verificationJobs: 0,
+  tab_setupVerification: 1,
+  tab_runStatus: 2,
+  tab_results: 3,
 };
 
 export const NgencerfPages = {

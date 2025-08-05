@@ -21,12 +21,12 @@
                             to="evaluation" data-menu='2' @click="MenuChanged">Evaluation</NuxtLink>
                     </li>
                     <li aria-label="Forecast" title="Forecast">
-                        <NuxtLink id="MainMenuCForecast" :class="location.name === 'Forecast' ? 'isActive' : ''"
+                        <NuxtLink id="MainMenuForecast" :class="location.name === 'Forecast' ? 'isActive' : ''"
                             to="forecast" data-menu='3' @click="MenuChanged">Forecast</NuxtLink>
                     </li>
                     <li aria-label="Verification" title="Verification">
                         <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
-                            to="verification" data-menu='4' @click="">Verification</NuxtLink>
+                            to="verification" data-menu='4' @click="MenuChanged">Verification</NuxtLink>
                     </li>
                 </ul>
 

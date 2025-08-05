@@ -1,6 +1,6 @@
 <template>
     <div class="_help-page">
-        <div class="_help-title">Calibration - Status/Run Tab</div>
+        <div class="_help-title">Calibration - Run/Status Tab</div>
         <div class="_help-subtitle">This tab provides the user the ability to review their calibration setup,
             run a calibration when status is Ready, view plots and logs during a run or after a run has finished.
         </div>

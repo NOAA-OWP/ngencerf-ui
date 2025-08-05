@@ -755,6 +755,28 @@ export type ForecastJobs = {
   forecast_jobs: ForecastJob[];
 }
 
+export interface VerificationJob {
+  verification_job_id: number;
+  verification_yaml_file_path: string;
+  yaml_config_data: DynamicObject;
+  yaml_config_error_message: string;
+  job_data_dir: string;
+  submit_date: string;
+  run_start: string;
+  run_end: string;
+  performance_metrics: CalibrationGetStatusPerformanceMetricItem[] | null;
+  status: string;
+}
+
+export type VerificationJobs = {
+  verification_jobs: VerificationJob[];
+}
+
+export interface CreatedVerificationJob {
+  message: string;
+  verification_job_id: number;
+}
+
 export type PlotNames = {
   calibration_run_id: number;
   plot_names: NameAndDescription[];

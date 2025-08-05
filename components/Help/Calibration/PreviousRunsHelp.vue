@@ -55,7 +55,7 @@
                 </tr>
                 <tr>
                     <td class="td1 align-top">Double Click</td>
-                    <td class="td2 align-top">Opens calibration job and takes user to the Status/Run tab.
+                    <td class="td2 align-top">Opens calibration job and takes user to the Run/Status tab.
                         (Same as right click/Open)</td>
                 </tr>
                 <tr>

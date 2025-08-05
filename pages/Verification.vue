@@ -1,34 +1,27 @@
 <template>
-  <div class="h-full min-h-screen ">
-    <div class="grid grid-rows-12">
-      <div class="row-span-1">
-        <div>
-          <AppHeader />
-        </div>
-      </div>
-      <div class="grid row-span-10 gap-2">
-        <iframe id="pdfViewer" class="inline" title="pdf" :src="pdfUrl"></iframe>
-      </div>
-      <div class="row-span-1">
-        <AppFooter />
-      </div>
-    </div>
-  </div>
+  <VerificationLayout>
+    <slot />
+  </VerificationLayout>
 </template>
 
-<script setup lang="ts">
-import AppFooter from "@/components/Common/AppFooter.vue";
-import AppHeader from "@/components/Common/AppHeader.vue";
-import pdfUrl from '@/assets/styles/pdfs/VerificationSteps.pdf';
+<script lang="ts" setup>
+import { onMounted } from "vue";
+
+import VerificationLayout from "@/layouts/VerificationLayout.vue";
+
+import { generalStore } from "~/stores/common/GeneralStore";
+
+const { popupActive } = storeToRefs(generalStore());
+
+onMounted(() => {
+  popupActive.value = false;
+  nextTick(() => {
+    const allTabs = document.getElementsByClassName("tabs");
+    const e = allTabs[VerificationTabs.tab_verificationJobs] as HTMLElement;
+    if (e) {
+      e.click();
+    }
+  });
+});
 
 </script>
-
-<style lang="scss" scoped>
-@use "@/assets/styles/global.scss";
-@use "@/assets/styles/styles.scss";
-
-#pdfViewer {
-  width: 100%;
-  height: calc(100% - 180px);
-}
-</style>
