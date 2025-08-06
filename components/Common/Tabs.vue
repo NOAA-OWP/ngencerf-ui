@@ -120,24 +120,6 @@
             Verification Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
-          <div v-show="[2].includes(currentVerificationTab) || (userVerificationJobData && (!userVerificationJobData.status || userVerificationJobData.status  === 'Ready'))"
-            data-tab="2" class="tabs prevent-select" @click="tabClicked" 
-            aria-label="Setup Verification Tab" title="Setup Verification Tab">
-            Setup Verification
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div v-show="[3].includes(currentVerificationTab) || userVerificationJobData" 
-            data-tab="3" class="tabs prevent-select" @click="tabClicked" 
-            aria-label="Run/Status Tab" title="Run/Status Tab">
-            Run/Status
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div v-show="[4].includes(currentVerificationTab) || (userVerificationJobData && userVerificationJobData.status  === 'Done')" 
-            id="results-tab" data-tab="4" class="tabs prevent-select" @click="tabClicked"
-            aria-label="Results Tab" title="Results Tab">
-            Results
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
         </div>
       </span>
     </div>
@@ -152,7 +134,6 @@ import { generalStore } from "@/stores/common/GeneralStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
 
 import { useDialog } from "primevue/usedialog";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
@@ -188,12 +169,6 @@ const {
   forecastJobStatus,
   overallForcingDownloadForecastStatus
 } = storeToRefs(useForecastStore());
-
-const {
-  verificationJobId,
-  verificationJobStatus,
-  userVerificationJobData
-} = storeToRefs(useVerificationStore());
 
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
