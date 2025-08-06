@@ -39,6 +39,10 @@
         </DataTable>
     </div>
     <div class="text-normal mt-2 mx-auto text-center">
+      <span v-if="forecastJobStatus && forecastJobStatus !== 'Ready'">
+        This forecast has already been run. Click "Next" to see status.
+      </span>
+      <span v-else>
         <p>Configurations in <span class="text-gray-500">grey</span> are unavailable.</p>
         <br />
         <p class="text-center">
@@ -48,6 +52,7 @@
             <br />
             <span style="color:red">Using an oCONUS gage will result in a Failed Forecast.</span>
         </p>
+      </span>
     </div>
     <div>
         <span v-if="forecastCycle && forecastCycle.is_active">
@@ -79,9 +84,11 @@ const { addToastRecord } = generalStore();
 const toast = useToast();
 
 const {
-    calibrationRunForForecast,
-    forecastCycles,
-    forecastCycle,
+  calibrationRunForForecast,
+  forecastCycles,
+  forecastCycle,
+  forecastJobStatus,
+  forcingDownloadStatus,
 } = storeToRefs(useForecastStore());
 
 const { loadSetupForecastTabData } = useForecastStore();
@@ -90,7 +97,7 @@ const { loadSetupForecastTabData } = useForecastStore();
  * Disable row if forecast configuration is not active
  */
 const rowClass = (data: any) => {
-    return [{ 'pointer-events-none': !data.is_active }];
+    return [{ 'pointer-events-none': (!data.is_active || (forecastJobStatus.value && forecastJobStatus.value !== 'Ready'))}];
 };
 
 /**
@@ -98,7 +105,7 @@ const rowClass = (data: any) => {
  */
 const rowStyle = (data: any) => {
     return {
-        color: !data.is_active ? 'grey' : 'black',
+        color: (!data.is_active || (forecastJobStatus.value && forecastJobStatus.value !== 'Ready')) ? 'grey' : 'black',
         backgroundColor: !data.is_active ? '#f0f0f0' : ''
     };
 };
@@ -136,7 +143,6 @@ const onRowSelect = (e: any) => {
  * Go to the Status Run tab
  */
 const goToStatusRunTab = () => {
-    // console.log('startForecastRun');
     const allTabs = document.getElementsByClassName("tabs");
     const e = allTabs[ForecastTabs.tab_statusRun] as HTMLElement;
     e.click();

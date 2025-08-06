@@ -144,7 +144,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   });
 
   /**
-   * Load Setup Forecast tab data
+   * Load Setup Forecast Tab data
    */
   const loadSetupForecastTabData = async (): Promise<void> => {
     // load forecast cycles
