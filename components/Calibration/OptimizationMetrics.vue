@@ -135,10 +135,10 @@
           </div>
           <div class="col-span-1">
             <div id="PlotGenFreq" class="bordered">
-              <label for="PlotFrequency">Plot Generation Frequency (0 = off)</label><br>
+              <label for="PlotFrequency">Plot Generation Frequency</label><br>
               Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency"
-                v-model="uiPlotFrequency" showButtons :min="1" aria-label="Plot Generation Frequency, zero equals off"
-                title="Plot Generation Frequency, zero equals off"
+                v-model="uiPlotFrequency" showButtons :min="1" aria-label="Plot Generation Frequency"
+                title="Plot Generation Frequency"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 @input="handleOptimizationDataChange">
               </InputNumber>
