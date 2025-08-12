@@ -673,7 +673,7 @@ const handleFileUpload = async (event: Event) => {
               });
             }
           } else {
-            errorMessage = response._data?.error;
+            errorMessage = response._data?.message;
             const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Invalid data in parameter file', detail: errorMessage, life: ToastTimeout.timeoutError };
             toast.add(tMsg); addToastRecord(tMsg);
           }
@@ -690,7 +690,7 @@ const handleFileUpload = async (event: Event) => {
           toast.add(tMsg); addToastRecord(tMsg);
         }
       } else {
-        errorMessage = response._data?.error;
+        errorMessage = response._data?.message;
         const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Invalid data in parameter file', detail: errorMessage, life: ToastTimeout.timeoutWarn };
         toast.add(tMsg); addToastRecord(tMsg);
       }
