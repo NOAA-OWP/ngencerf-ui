@@ -19,7 +19,7 @@ import {
   isCalibrationJobFinished,
   getValidControlAndValidBestStatus
 } from '@/utils/CommonHelpers';
-import { convertTimeZone } from '@/utils/TimeHelpers';
+import { formatDateForRunOnString } from '@/utils/TimeHelpers';
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
@@ -99,7 +99,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     if (isCalibrationJobFinished(userCalibrationRunData?.value?.status)) {
       submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date as string);
       if (isValidDate(submitTimeDate.value)) {
-        submitTime.value = convertTimeZone(submitTimeDate.value);
+        submitTime.value = formatDateForRunOnString(submitTimeDate.value);
       }
     }
 

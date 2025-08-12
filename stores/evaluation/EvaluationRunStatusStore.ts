@@ -76,7 +76,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         evaluateDisplayIterationNumber.value = validation_run.iteration_num;
         startTime.value = validation_run.submit_date.toString();
         if ( validationStatus.value.toLocaleUpperCase() !== "RUNNING" ) {
-          runningTime.value = validation_run.elapsed_time?.toString() ?? '';
+          runningTime.value = validation_run.elapsed_time ? formatElapsedTime(validation_run.elapsed_time) : '';
         } else {
           validationRunningTimeInterval.value = setInterval( updateRunningTime, 1000 );
         }

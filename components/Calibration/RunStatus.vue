@@ -216,7 +216,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 
 import { ValidationPlotNames } from "@/composables/NgencerfEnums";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
+import { formatDateForRunOnString, calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -584,8 +584,9 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
 
     if (['Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
       // Calculate Running Time
-      if (submitTimeDate.value && submitTimeDate.value instanceof Date && !isNaN(submitTimeDate?.value.getTime())) {
-        submitTime.value = convertTimeZone(submitTimeDate.value); // create a string from submit_date and convert it to local time format
+      if (submitTimeDate.value && submitTimeDate.value instanceof Date && !isNaN(submitTimeDate?.value.getTime())) {    
+        // show submitTimeDate as UTC
+        submitTime.value = formatDateForRunOnString(submitTimeDate.value as Date);
 
         const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
         const validations = getStatusResponse?._data?.validations;
@@ -804,8 +805,8 @@ watch(selectedPlotName, async () => {
 // Handle submitTimeDate changes
 watch(submitTimeDate, () => {
   if (isValidDate(submitTimeDate.value)) {
-    // convert submitTimeDate to local time format and set submitTime to display on the Status/Run tab
-    submitTime.value = convertTimeZone(submitTimeDate.value as Date);
+    // show submitTimeDate as UTC
+    submitTime.value = formatDateForRunOnString(submitTimeDate.value as Date);
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);

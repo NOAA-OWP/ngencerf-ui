@@ -496,12 +496,11 @@ const validateTab = () => {
   let text = [];
   /* Check if formulation name changed */
   let newName = formulationNameInput.value ? formulationNameInput.value : '';
-  if (newName.trim() === "") {
-    error = true;
-    text.push("Please enter a valid Forumulation Name");
-  }
   let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : '';
-  if (savedName !== newName) {
+  if (newName.trim() === "" && userCalibrationRunData?.value?.formulation_name) {
+    error = true;
+    text.push("Please enter a valid Formulation Name");
+  } else if (savedName !== newName) {
     error = true;
     text.push("Formulation Name has been changed");
   }
