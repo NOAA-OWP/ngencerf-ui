@@ -673,11 +673,14 @@ const handleFileUpload = async (event: Event) => {
               });
             }
           } else {
-            errorMessage = response._data?.message;
+            errorMessage = response._data?.error;
             const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Invalid data in parameter file', detail: errorMessage, life: ToastTimeout.timeoutError };
             toast.add(tMsg); addToastRecord(tMsg);
           }
         });
+
+        calibratableParametersHaveChanged.value = true;
+        tuningDataHasChanged.value = true;
 
         // scroll to the bottom of the page and table
         scrollToBottom();
@@ -687,7 +690,8 @@ const handleFileUpload = async (event: Event) => {
           toast.add(tMsg); addToastRecord(tMsg);
         }
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No data in parameter file', life: ToastTimeout.timeoutWarn };
+        errorMessage = response._data?.error;
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Invalid data in parameter file', detail: errorMessage, life: ToastTimeout.timeoutWarn };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } catch (error) {
