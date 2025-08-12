@@ -12,14 +12,14 @@
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Submit Time</div>
                     </th>
-                    <td class="pl-5">{{ submitTime ? submitTime : '-'.repeat(15) }}</td>
+                    <td class="pl-3 whitespace-nowrap">{{ submitTime ? submitTime : '-'.repeat(15) }}</td>
                   </tr>
                   <tr height="32px" :aria-label="'Elapsed Time ' + calibrationElapsedTime"
                     :title="'Elapsed Time ' + calibrationElapsedTime">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Elapsed Time</div>
                     </th>
-                    <td class="pl-5">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(15) }}</td>
+                    <td class="pl-3 whitespace-nowrap">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(15) }}</td>
                   </tr>
                   <tr height="32px" :aria-label="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
                     'Interation ' + iteration" :title="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
@@ -27,8 +27,8 @@
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">{{ validationBestAchieved.isBest ? 'Best ' : '' }} Iteration</div>
                     </th>
-                    <td v-if="validationBestAchieved.isBest" class="pl-5">{{ validationBestAchieved.iteration }}</td>
-                    <td v-else class="pl-5">{{ iteration ?? '-'.repeat(15) }}</td>
+                    <td v-if="validationBestAchieved.isBest" class="pl-3">{{ validationBestAchieved.iteration }}</td>
+                    <td v-else class="pl-3 whitespace-nowrap">{{ iteration ?? '-'.repeat(15) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -44,7 +44,7 @@
                   <tr height="38px" :aria-label="'Status ' + overallCalibrationValidationStatus"
                     :title="'Status ' + overallCalibrationValidationStatus">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
-                    <td class="pl-5">
+                    <td class="pl-3">
                       <span id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md"
                         style="background-color: white;">
                         {{ overallCalibrationValidationStatus }}
@@ -54,7 +54,7 @@
                   <tr height="32px" aria-label="Select Plot Name" title="Select Plot Name">
                     <th scope="row" class="text-right"><label for="DisplayOptions">{{ plotList.length > 0 ?
                       'Display' : '' }}</label></th>
-                    <td class="pl-5">
+                    <td class="pl-3">
                       <Select v-show="plotList.length > 0" id="DisplayOptions" class="p-select" v-model="selectedPlotName" 
                         :options="plotList" option-label="name" optionValue="name">
                       </Select>
