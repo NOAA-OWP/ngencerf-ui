@@ -97,8 +97,26 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     if (runListDataResult?._data?.jobs.length > 0) {
       runListDataResult?._data?.jobs.forEach((runItem: ValidatedCalibrationRunListItem) => {
         try {
-          if (runItem.status.toLowerCase() === "done" && runItem.submit_date !== null) {
-            userEvaluationCalibrationRunListData.value.push(runItem);
+          if (runItem.submit_date !== null) {
+            if (runItem.status.toLowerCase() === 'done' && runItem.validations.length >= 1) {
+              const validationControlJobStatus: string | undefined = runItem.validations?.find
+                ((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_control')?.status;
+
+              const validationBestJobStatus: string | undefined = runItem.validations?.find
+                ((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_best')?.status;
+              
+              if (validationBestJobStatus && validationBestJobStatus.toLowerCase() === 'done') {
+                // get the overall calibration/validation status
+                const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
+                  runItem.status,
+                  validationControlJobStatus,
+                  validationBestJobStatus
+                );
+                
+                runItem.status = overallCalibrationValidationStatus;
+                userEvaluationCalibrationRunListData.value.push(runItem);
+              }
+            }
           }
         } catch(err) {
           console.log('ERROR! ', err.message);

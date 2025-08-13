@@ -246,12 +246,13 @@
               </template>
               <template #body="slotProps">
                 <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
-                  :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
+                  :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
+                  class="whitespace-nowrap">
                   {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
                 </span>
               </template>
             </Column>
-            <Column field="submit_date" sortable>
+            <Column :pt="ptColumn" field="submit_date" sortable>
               <template #header>
                 <div class="column-header">
                   <span>Submit</span><br /><span>Date</span>
@@ -259,8 +260,21 @@
               </template>
               <template #body="slotProps">
                 <span :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
-                  :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
+                  :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
+                  class="whitespace-nowrap">
                   {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="status" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Status</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span :aria-label="'Status ' + slotProps.data.status" :title="'Status ' + slotProps.data.status">
+                  {{ slotProps.data.status }}
                 </span>
               </template>
             </Column>
@@ -313,6 +327,7 @@ const cmCompareRun = ref<DataTableContextMenuOption[]>([]);
 
 const userDataStore = useUserDataStore();
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
+import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 
 const updatedUserEvaluationJobsListData = ref<CalibrationJobListItem[]>([]);
 
@@ -500,12 +515,14 @@ const onRowContextMenu = (event: any) => {
     if (crRowData.validation_runs > 1) {
       cmCalibrationRun.value.push({ label: 'Select Validation Run', icon: 'pi pi-search', command: () => viewSelectedCalibrationValidationRuns(crRowData.calibration_run_id) })
     } 
-    if (crRowData.validation_runs <= 1) {
+    if (crRowData.validation_runs == 1) {
       cmCalibrationRun.value.push({ label: 'Evaluate', icon: 'pi pi-chart-scatter', command: () => evaluateValidationJobFromCalibration(crRowData.calibration_run_id) })
     }
-    cmCalibrationRun.value.push({ label: 'Compare Permutations', icon: 'pi pi-arrows-h', command: () => viewSelectedGageCalibrationRuns(crRowData.calibration_run_id, crRowData.gage_id) });
-    if (!crRowData.modules?.some(item => item.toLowerCase() === 'lstm')) {
-      cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
+    if (crRowData.validation_runs >= 1) {
+      cmCalibrationRun.value.push({ label: 'Compare Permutations', icon: 'pi pi-arrows-h', command: () => viewSelectedGageCalibrationRuns(crRowData.calibration_run_id, crRowData.gage_id) });
+      if (!crRowData.modules?.some(item => item.toLowerCase() === 'lstm')) {
+        cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
+      }
     }
     cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
     if (selectedCalibrationRun.value?.is_downloadable) {
@@ -530,8 +547,8 @@ const onRowVrContextMenu = (event: any) => {
     cmValidationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) });
     cmValidationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(userSelectedEvalCalibrationRunId.value) });
     if (vrRowData.status.toLocaleUpperCase() === 'RUNNING') {
-      cmValidationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
-      cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-ban', command: () => navigationToStatusRun(vrRowData.validation_run_id, vrRowData.status) });
+      cmValidationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => navigationTorunStatus(vrRowData.validation_run_id, vrRowData.status) });
+      cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-ban', command: () => navigationTorunStatus(vrRowData.validation_run_id, vrRowData.status) });
     }
   }
 }
@@ -650,7 +667,7 @@ const viewSelectedGageCalibrationRuns = async (calibration_run_id: number, gage_
   })
 }
 
-const navigationToStatusRun = (validation_run_id: number, validation_status: string) => {
+const navigationToRunStatus = (validation_run_id: number, validation_status: string) => {
   evaluateValidationRunId.value = validation_run_id;
   evaluateValidationRunStatus.value = validation_status;
   const tabs = document.getElementsByClassName("tabs");
@@ -720,7 +737,7 @@ const viewValidationRunStatus = async (calibration_run_id: number): Promise<void
     setSelectedCalibrationRunId(calibration_run_id);
     await fetchValidationRunListByCalibrationRun().then(validationRunList => {
       if (validationRunList.length === 1) {
-        navigationToStatusRun(validationRunList[0].validation_run_id, validationRunList[0].status);
+        navigationToRunStatus(validationRunList[0].validation_run_id, validationRunList[0].status);
       }
     });
   })
