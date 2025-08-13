@@ -63,7 +63,7 @@ export const formatISOStringOrDateToYYYYMMDD = ( d: string | Date ): string => {
  */
 export const formatDateForRunOnString = (d: Date): string => {
   const dateTime = DateTime.fromJSDate(d, { zone: 'utc' });
-  return dateTime.toFormat("MM-dd yyyy 'at' HH:mm:ss 'UTC'");
+  return dateTime.toFormat("MMM d, yyyy 'at' HH:mm:ss 'UTC'");
 };
 
 /**
@@ -216,7 +216,7 @@ export function formatDuration(duration: any): string {
   let totalSeconds = Math.floor(duration.seconds);
   let totalMinutes = duration.minutes + Math.floor(totalSeconds / 60);
   let totalHours = duration.hours + Math.floor(totalMinutes / 60);
-  let totalDays = Math.floor(totalHours / 24);
+  let totalDays = Math.floor(duration.days);
 
   // normalize the values
   const seconds = totalSeconds % 60;

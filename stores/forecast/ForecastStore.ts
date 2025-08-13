@@ -10,7 +10,7 @@ import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import { isValidDate } from '@/utils/CommonHelpers';
-import { formatElapsedTime, convertTimeZone } from '@/utils/TimeHelpers';
+import { formatElapsedTime, formatDateForRunOnString } from '@/utils/TimeHelpers';
 
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();

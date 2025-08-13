@@ -12,14 +12,14 @@
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Submit Time</div>
                     </th>
-                    <td class="pl-5">{{ submitTime ? submitTime : '-'.repeat(15) }}</td>
+                    <td class="pl-3 whitespace-nowrap">{{ submitTime ? submitTime : '-'.repeat(15) }}</td>
                   </tr>
                   <tr height="32px" :aria-label="'Elapsed Time ' + calibrationElapsedTime"
                     :title="'Elapsed Time ' + calibrationElapsedTime">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Elapsed Time</div>
                     </th>
-                    <td class="pl-5">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(15) }}</td>
+                    <td class="pl-3 whitespace-nowrap">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(15) }}</td>
                   </tr>
                   <tr height="32px" :aria-label="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
                     'Interation ' + iteration" :title="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
@@ -27,8 +27,8 @@
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">{{ validationBestAchieved.isBest ? 'Best ' : '' }} Iteration</div>
                     </th>
-                    <td v-if="validationBestAchieved.isBest" class="pl-5">{{ validationBestAchieved.iteration }}</td>
-                    <td v-else class="pl-5">{{ iteration ?? '-'.repeat(15) }}</td>
+                    <td v-if="validationBestAchieved.isBest" class="pl-3">{{ validationBestAchieved.iteration }}</td>
+                    <td v-else class="pl-3 whitespace-nowrap">{{ iteration ?? '-'.repeat(15) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -44,7 +44,7 @@
                   <tr height="38px" :aria-label="'Status ' + overallCalibrationValidationStatus"
                     :title="'Status ' + overallCalibrationValidationStatus">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
-                    <td class="pl-5">
+                    <td class="pl-3">
                       <span id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md"
                         style="background-color: white;">
                         {{ overallCalibrationValidationStatus }}
@@ -54,7 +54,7 @@
                   <tr height="32px" aria-label="Select Plot Name" title="Select Plot Name">
                     <th scope="row" class="text-right"><label for="DisplayOptions">{{ plotList.length > 0 ?
                       'Display' : '' }}</label></th>
-                    <td class="pl-5">
+                    <td class="pl-3">
                       <Select v-show="plotList.length > 0" id="DisplayOptions" class="p-select" v-model="selectedPlotName" 
                         :options="plotList" option-label="name" optionValue="name">
                       </Select>
@@ -216,7 +216,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 
 import { ValidationPlotNames } from "@/composables/NgencerfEnums";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
+import { formatDateForRunOnString, calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -584,8 +584,9 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
 
     if (['Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
       // Calculate Running Time
-      if (submitTimeDate.value && submitTimeDate.value instanceof Date && !isNaN(submitTimeDate?.value.getTime())) {
-        submitTime.value = convertTimeZone(submitTimeDate.value); // create a string from submit_date and convert it to local time format
+      if (submitTimeDate.value && submitTimeDate.value instanceof Date && !isNaN(submitTimeDate?.value.getTime())) {    
+        // show submitTimeDate as UTC
+        submitTime.value = formatDateForRunOnString(submitTimeDate.value as Date);
 
         const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
         const validations = getStatusResponse?._data?.validations;
@@ -804,8 +805,8 @@ watch(selectedPlotName, async () => {
 // Handle submitTimeDate changes
 watch(submitTimeDate, () => {
   if (isValidDate(submitTimeDate.value)) {
-    // convert submitTimeDate to local time format and set submitTime to display on the Status/Run tab
-    submitTime.value = convertTimeZone(submitTimeDate.value as Date);
+    // show submitTimeDate as UTC
+    submitTime.value = formatDateForRunOnString(submitTimeDate.value as Date);
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);

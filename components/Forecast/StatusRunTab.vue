@@ -247,7 +247,7 @@ const createForcingDownloadAndForecastStatusInterval = () => {
         submitTimeDate.value = new Date(forecast?.submit_date as string);
 
         if (isValidDate(submitTimeDate.value)) {
-          submitTime.value = convertTimeZone(submitTimeDate.value);
+          submitTime.value = formatDateForRunOnString(submitTimeDate.value);
         }
       }
     } else {
@@ -272,7 +272,7 @@ const startForecastRun = async () => {
       submitTimeDate.value = new Date(createAndRunForecastJobResponse?._data?.submit_date);
 
       if (isValidDate(submitTimeDate.value)) {
-        submitTime.value = convertTimeZone(submitTimeDate.value);
+        submitTime.value = formatDateForRunOnString(submitTimeDate.value);
       }
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };

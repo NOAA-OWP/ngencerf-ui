@@ -194,7 +194,7 @@ onMounted(async () => {
     }
   } else {
     // this condition assume we have evaluateIterationRunId value which also assume user want to run a new validation
-    // this condition is specifically use to handle user click on status/run tab which can not reset certain value until user land on the tab
+    // this condition is specifically use to handle user click on Run/Status tab which can not reset certain value until user land on the tab
     evaluateValidationRunId.value = displayValidationId.value = 0;
     runningTime.value = startTime.value = "";
   }

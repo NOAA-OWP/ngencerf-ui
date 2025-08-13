@@ -528,6 +528,8 @@ const saveTabData = () => {
           toast.add(toastMessage); addToastRecord(toastMessage);
         })
         updateJobData(response);
+        gageHasChanged.value = false;
+        gageDataSourceHasChanged.value = false;
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Data Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };

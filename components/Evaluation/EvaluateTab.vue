@@ -1127,11 +1127,11 @@ const drawInteractivePlot = () => {
     };
     if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
       plotGraphOptions.value.y.label = 'Depth (m)';
-      plotGraphOptions.value.y.labelOffset = -10;
-      plotGraphOptions.value.marginLeft = 50;
     } else {
-      plotGraphOptions.value.y.label = 'Streamflow (cm/s)';
+      plotGraphOptions.value.y.label = 'Streamflow (m^3/s)';
     }
+    plotGraphOptions.value.y.labelOffset = -10;
+    plotGraphOptions.value.marginLeft = 50;
 
     for (let c = 1; c < plotTableColumns.value.length; c++) {
       if ((document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
@@ -1199,12 +1199,12 @@ const drawInteractivePlot = () => {
     dotTipOptions.y.label = 'Depth';
     dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
   } else {
-    lineOptions.y.label = 'Flow (cm/s)';
+    lineOptions.y.label = 'Flow (m^3/s)';
     lineTipOptions.y.label = 'Flow';
-    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} cm/s`;
-    dotOptions.y.label = 'Flow (cm/s)';
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} m^3/s`;
+    dotOptions.y.label = 'Flow (m^3/s)';
     dotTipOptions.y.label = 'Flow';
-    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} cm/s`;
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} m^3/s`;
   }
   if (plotLineData.length > 0) {
     plotGraphLeftEdge = new Date(plotLineData[0].time);
