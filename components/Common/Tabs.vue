@@ -64,7 +64,7 @@
             </div>
           </span>
           <span v-show="calibrationJobId > 0 && selectedCalibrationCompareRuns.length === 0">
-            <span v-show="!selectedCalibrationModules?.some(item => item.toLowerCase() === 'lstm')">
+            <span v-show="computedCalibrationValidationRunList.length >= 1 && !selectedCalibrationModules?.some(item => item.toLowerCase() === 'lstm')">
               <div data-tab="4" class="tabs prevent-select pl-25 mr-10" @click="tabClicked"
                 aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
                 Select Alternate Iteration
@@ -163,7 +163,8 @@ const {
 
 const {
   selectedCalibrationCompareRuns,
-  selectedCalibrationModules
+  selectedCalibrationModules,
+  computedCalibrationValidationRunList
 } = storeToRefs(useEvaluationCalibrationRunStore());
 
 const { 
@@ -173,6 +174,7 @@ const {
 const {
   calibrationRunForForecast,
   forecastCycle,
+  forecastJobStatus,
   overallForcingDownloadForecastStatus
 } = storeToRefs(useForecastStore());
 
