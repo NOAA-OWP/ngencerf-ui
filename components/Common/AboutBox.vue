@@ -198,7 +198,7 @@ const gitInfoArray = computed(() => {
   let infoArray = Object.entries(gitInfo.value).map(([repository, info]) => ({ repository, ...info }));
   // Append additional git info if it was loaded
   if (infoArray.length && addedGitInfo.value && Object.keys(addedGitInfo.value).length > 0) {
-    addedGitInfo.value.repository = 'ngencerf_ui';
+    addedGitInfo.value.repository = 'ngencerf-ui';
     infoArray.push(addedGitInfo.value);
   }
   getUniqueFields(infoArray);
