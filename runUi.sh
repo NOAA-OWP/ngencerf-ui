@@ -1,12 +1,12 @@
 #! /bin/bash
 
-# Run ngencerf_ui application
+# Run ngencerf-ui application
 # - Check the current node version against the required version in .nvmrc.
 # - If there's a mismatch, switch node versions using nvm and reinstalls dependencies.
 # - Generates Git information using generate_git_info.sh.
-# - Starts the ngencerf_ui application with npm.
+# - Starts the ngencerf-ui application with npm.
 
-# ngencerf_ui root directory
+# ngencerf-ui root directory
 ngencerf_ui="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 
 # Source the generate_git_info.sh script to use its functions
@@ -68,6 +68,6 @@ fi
 generate_git_info
 echo
 
-echo 'running ngencerf_ui in dev mode...'
+echo 'running ngencerf-ui in dev mode...'
 npm run dev
 echo
