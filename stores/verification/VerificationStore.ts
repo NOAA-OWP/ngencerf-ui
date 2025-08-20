@@ -270,6 +270,55 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
       );
     return saveVerificationSetupResponse;
   }
+  
+  /**
+   * Get Verification Plot Names
+   */
+  const getVerificationPlotNames = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot_names/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ verification_job_id: verificationJobId.value })
+    });
+  };
+
+  /**
+   * Get Verification Plot
+   */
+  const getVerificationPlot = async (
+    plotName: string
+  ): Promise<any> => {
+    const params = new URLSearchParams({
+      plot_name: plotName,
+      verification_job_id: verificationJobId.value ? verificationJobId.value.toString() : ''
+    });
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_verification_plot/?${params.toString()}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": "application/json"
+      }
+    });
+  };
+  
+  /**
+  * Delete a job
+  * If a single job comes in, make sure we put it into an array.
+  * Otherwise, it is an array.
+  */
+  async function deleteVerificationJob(runId: number) {
+    return await makeProtectedApiCall<VerificationJob>(`${ngencerfBaseUrl}/calibration/delete_verification_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ verification_job_id: runId })
+    });
+  };
 
   /**
    * Run Verification Job
