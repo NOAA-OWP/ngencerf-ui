@@ -262,6 +262,7 @@ const {
   formulationInfoMessages,
   formulationErrorMessages,
   formulationWarningMessages,
+  formulationIsCalibratable,
   saveFormulationPayload
 } = storeToRefs(useFormulationStore());
 
@@ -426,13 +427,16 @@ const saveFormulationData = () => {
 
     saveFormulationTabData().then(response => {
       if (response.status === 200) {
+        formulationIsCalibratable.value = true;
         if (response._data.eds_errors) {
+          formulationIsCalibratable.value = false;
           response._data.eds_errors.forEach((err: any) => {
             const tMsg: ToastMessageOptions = { severity: 'error', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeoutError };
             toast.add(tMsg); addToastRecord(tMsg);
           });
         }
         if (response._data.formulation_errors) {
+          formulationIsCalibratable.value = false;
           response._data.formulation_errors.forEach((err: any) => {
             const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Formulation Error', detail: err, life: ToastTimeout.timeoutError };
             toast.add(tMsg); addToastRecord(tMsg);

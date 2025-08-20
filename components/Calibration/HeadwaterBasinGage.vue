@@ -206,7 +206,7 @@ const resetData = ref<GageResetData>({
   },
   geopackage_source: "",
   observational_source: "",
-  forcing_source: "",
+  forcing_source_requested: "",
   geopackage_image_url: ""
 })
 
@@ -214,7 +214,7 @@ const setResetDataValues = () => {
   if (userCalibrationRunData.value) {
     // Save all information from the external data JSON.parse(JSON.stringify(obj));
     resetData.value.external_data_status = JSON.parse(JSON.stringify(userCalibrationRunData.value.external_data_status));
-    resetData.value.forcing_source = userCalibrationRunData.value.forcing_source ? userCalibrationRunData.value.forcing_source : (getForcingOptionsList.value ? getForcingOptionsList.value[0].name : '');
+    resetData.value.forcing_source_requested = userCalibrationRunData.value.forcing_source_requested ? userCalibrationRunData.value.forcing_source_requested : (getForcingOptionsList.value ? getForcingOptionsList.value[0].name : '');
     resetData.value.observational_source = userCalibrationRunData.value.observational_source ? userCalibrationRunData.value.observational_source : (getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '');
     resetData.value.geopackage_source = userCalibrationRunData.value.geopackage_source ? userCalibrationRunData.value.geopackage_source : (getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : '');
     resetData.value.geopackage_image_url = userCalibrationRunData.value.geopackage_image_url;
@@ -231,7 +231,7 @@ onMounted(() => {
     if (gageHasChanged.value && userCalibrationRunData?.value?.gage?.gage_id) {
       gageSelectionReset();
     } else {
-      selectedForcingValue.value = resetData.value.forcing_source;
+      selectedForcingValue.value = resetData.value.forcing_source_requested;
       selectedObservationalValue.value = resetData.value.observational_source;
       selectedGeopackageValue.value = resetData.value.geopackage_source;
     }
@@ -294,12 +294,12 @@ const gageSelectionReset = () => {
     userCalibrationRunData.value.external_data_status = JSON.parse(JSON.stringify(resetData.value.external_data_status))
     userCalibrationRunData.value.geopackage_source = resetData.value.geopackage_source;
     userCalibrationRunData.value.observational_source = resetData.value.observational_source;
-    userCalibrationRunData.value.forcing_source = resetData.value.forcing_source;
+    userCalibrationRunData.value.forcing_source_requested = resetData.value.forcing_source_requested;
     userCalibrationRunData.value.geopackage_image_url = resetData.value.geopackage_image_url;
   }
   selectedGeopackageValue.value = resetData.value.geopackage_source;
   selectedObservationalValue.value = resetData.value.observational_source;
-  selectedForcingValue.value = resetData.value.forcing_source;
+  selectedForcingValue.value = resetData.value.forcing_source_requested;
 }
 
 const clearDataDueToGageChange = () => {
@@ -385,7 +385,7 @@ const showForcingFileUploadDialog = (headerText: string) => {
         saveFunction: saveUserForcingFiles
       },
       onClose: (opt) => {
-        if (selectedForcingValue.value !== userCalibrationRunData?.value?.forcing_source) {
+        if (selectedForcingValue.value !== userCalibrationRunData?.value?.forcing_source_requested) {
           gageDataSourceHasChanged.value = true;
         }
         handleDialogClose(opt)
@@ -554,14 +554,15 @@ const updateJobData = async (response: any) => {
     }
 
     userCalibrationRunData.value.gage = newGage;
-    userCalibrationRunData.value.forcing_source = gagePayload.value.forcing_source as string;
+    userCalibrationRunData.value.forcing_source_requested = response?._data?.forcing_source_actual as string;
+    userCalibrationRunData.value.forcing_source_actual = response?._data?.forcing_source_requested as string;
     userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
     userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
 
     userCalibrationRunData.value.num_catchments = response?._data.num_catchments;
 
-    userCalibrationRunData.value.external_data_status.forcing = !(userCalibrationRunData.value.forcing_source === "");
+    userCalibrationRunData.value.external_data_status.forcing = !(userCalibrationRunData.value.forcing_source_requested === "");
     userCalibrationRunData.value.external_data_status.observational = !(userCalibrationRunData.value.observational_source === "");
     userCalibrationRunData.value.external_data_status.geopackage = !(userCalibrationRunData.value.geopackage_source === "");
   }
