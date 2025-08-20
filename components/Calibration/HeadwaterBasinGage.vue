@@ -585,15 +585,15 @@ const validateTab = () => {
     error = true;
     text.push("Gage value has been changed");
   }
-  if (selectedObservationalValue.value !== userCalibrationRunData?.value?.observational_source) {
-    error = true;
-    text.push("Observational Source has been changed");
-  }
-  if (selectedForcingValue.value != userCalibrationRunData?.value?.forcing_source) {
+  if (selectedForcingValue.value != resetData.value.forcing_source_requested) {
     error = true;
     text.push("Forcing Source has been changed");
   }
-  if (selectedGeopackageValue.value != userCalibrationRunData?.value?.geopackage_source) {
+  if (selectedObservationalValue.value !== resetData.value.observational_source) {
+    error = true;
+    text.push("Observational Source has been changed");
+  }
+  if (selectedGeopackageValue.value != resetData.value.geopackage_source) {
     error = true;
     text.push("GeoPackage has been changed");
   }
