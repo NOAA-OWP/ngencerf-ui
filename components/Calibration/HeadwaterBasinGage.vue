@@ -29,11 +29,11 @@
         <div class="row-span-1">
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
-              <label for="Forcing">Forcing Data</label><br />
+              <label for="Forcing">Forcing Source</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" defaultValue="AORC" @change="uploadForcingDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
-                aria-label="Forcing Data Select" title="Forcing Data Select"></Select>
+                aria-label="Forcing Source Select" title="Forcing Source Select"></Select>
             </div>
 
             <div class="col-span-1">
@@ -554,8 +554,8 @@ const updateJobData = async (response: any) => {
     }
 
     userCalibrationRunData.value.gage = newGage;
-    userCalibrationRunData.value.forcing_source_requested = response?._data?.forcing_source_actual as string;
-    userCalibrationRunData.value.forcing_source_actual = response?._data?.forcing_source_requested as string;
+    userCalibrationRunData.value.forcing_source_requested = response?._data?.forcing_source_requested as string;
+    userCalibrationRunData.value.forcing_source_actual = response?._data?.forcing_source_actual as string;
     userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
     userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
