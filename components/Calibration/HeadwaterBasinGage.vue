@@ -560,11 +560,26 @@ const updateJobData = async (response: any) => {
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
     userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
 
-    userCalibrationRunData.value.num_catchments = response?._data.num_catchments;
+    // check for EDS errors
+    if(response?._data?.eds_errors) {
+      response._data.eds_errors.forEach((eds_error: edsError) => {
+        if (eds_error.name === 'forcing') {
+          userCalibrationRunData.value.forcing_source_actual = '';
+          userCalibrationRunData.value.external_data_status.forcing = false;
+        }
+        else if (eds_error.name === 'observational') {
+          userCalibrationRunData.value.observational_source = '';
+          userCalibrationRunData.value.external_data_status.observational = false;
+        }
+        else if (eds_error.name === 'geopackage') {
+          userCalibrationRunData.value.geopackage_source = '';
+          userCalibrationRunData.value.geopackage_image_url = '';
+          userCalibrationRunData.value.external_data_status.geopackage = false;
+        }
+      })
+    }
 
-    userCalibrationRunData.value.external_data_status.forcing = !(userCalibrationRunData.value.forcing_source_requested === "");
-    userCalibrationRunData.value.external_data_status.observational = !(userCalibrationRunData.value.observational_source === "");
-    userCalibrationRunData.value.external_data_status.geopackage = !(userCalibrationRunData.value.geopackage_source === "");
+    userCalibrationRunData.value.num_catchments = response?._data.num_catchments;
   }
 }
 
