@@ -45,6 +45,7 @@ export interface NonFieldError {
 export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
   geopackage_image_url?: string | null;
   eds_errors: edsError[];
+  warnings: string[];
 }
 
 export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
@@ -141,7 +142,8 @@ export interface UserCalibrationRunData {
   job_data_dir: string;
   submit_date: string; // e.g. "2024-09-13T05:50:22.334Z"
   gage: GageData;
-  forcing_source: string;
+  forcing_source_requested: string;
+  forcing_source_actual: string;
   forcing_user_dir: string;
   forcing_dir_path: string;
   observational_source: string;
@@ -266,7 +268,7 @@ export interface GageOptionData {
 export interface SaveGageTabPayload {
   calibration_run_id?: number;
   gage_id?: string;
-  forcing_source?: string;
+  forcing_source_requested?: string;
   observational_source?: string;
   geopackage_source?: string;
 }
@@ -742,7 +744,7 @@ export type GageResetData = {
   };
   geopackage_source: string;
   observational_source: string;
-  forcing_source: string;
+  forcing_source_requested: string;
   geopackage_image_url: string;
 }
 

@@ -37,6 +37,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   const formulationInfoMessages = ref<string[]>([]);
   const formulationErrorMessages = ref<string[]>([]);
   const formulationWarningMessages = ref<string[]>([]);
+  const formulationIsCalibratable = ref<boolean>(false);
 
   const saveFormulationPayload = ref<SaveFormulationTabPayload>({});
 
@@ -295,9 +296,12 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
       formulationErrorMessages.value = [];
       formulationWarningMessages.value = [];
       if (response._data.formulation_errors) {
+        formulationIsCalibratable.value = false;
         response._data.formulation_errors.forEach((err: any) => {
           formulationErrorMessages.value.push('Error: ' + err);
         });
+      } else {
+        formulationIsCalibratable.value = true;
       }
       if (response._data.formulation_warnings) {
         response._data.formulation_warnings.forEach((err: any) => {
@@ -333,6 +337,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
         saveFormulationPayload.value
       );
       if (Object.keys(saveValidation.value).length > 0) {
+        formulationIsCalibratable.value = false;
         return Promise.resolve({
           _data: {
             message: "Unable to save formulation tab.",
@@ -401,6 +406,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     formulationInfoMessages,
     formulationErrorMessages,
     formulationWarningMessages,
+    formulationIsCalibratable,
     filterGroup,
     useSlothParameters,
     selectedModuleValues,
