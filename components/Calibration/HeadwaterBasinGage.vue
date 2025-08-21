@@ -560,7 +560,18 @@ const updateJobData = async (response: any) => {
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
     userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
 
-    // check for EDS errors
+    // Assume EDS status is true if sources are set
+    if (userCalibrationRunData.value.forcing_source_actual !== '') {
+      userCalibrationRunData.value.external_data_status.forcing = true;
+    }
+    if (userCalibrationRunData.value.observational_source !== '') {
+      userCalibrationRunData.value.external_data_status.observational = true;
+    }
+    if (userCalibrationRunData.value.geopackage_source !== '') {
+      userCalibrationRunData.value.external_data_status.geopackage = true;
+    }
+
+    // Now check for EDS errors
     if(response?._data?.eds_errors) {
       response._data.eds_errors.forEach((eds_error: edsError) => {
         if (eds_error.name === 'forcing') {
