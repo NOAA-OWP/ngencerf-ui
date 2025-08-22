@@ -270,6 +270,34 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
       );
     return saveVerificationSetupResponse;
   }
+
+  /**
+   * Run Verification Job
+   */
+  const runVerificationJob = async (verificationJobId: number): Promise<any> => {
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/run_verification/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ verification_job_id: verificationJobId })
+    });
+  };
+
+  /**
+   * Cancel Verification Job by querying cancel_job endpoint
+   */
+  const cancelVerificationJob = async (): Promise<any> => {
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/cancel_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ verification_job_id: verificationJobId.value })
+    });
+  };
   
   /**
    * Get Verification Plot Names
