@@ -302,47 +302,45 @@ const gageSelectionReset = () => {
   selectedForcingValue.value = resetData.value.forcing_source_requested;
 }
 
-const clearDataDueToGageChange = () => {
-  // check for an actual change
-  if (userCalibrationRunData?.value?.gage !== null && userCalibrationRunData?.value?.gage.gage_id !== selectedGageValue.value) {
-    isLoading.value = true;
-    setTimeout(() => {
-      fetchSelectedGageData();
-      hardResetTuningTimeConrols();
-      if (userCalibrationRunData.value) {
-        userCalibrationRunData.value.calibration_times.calibration_start_time = "";
-        userCalibrationRunData.value.calibration_times.calibration_end_time = "";
-        userCalibrationRunData.value.calibration_times.simulation_start_time = "";
-        userCalibrationRunData.value.calibration_times.simulation_end_time = "";
+const clearDataDueToGageOrSourceChange = () => {
+  // don't do the check for a change here any more - gageHasChanged and gageDataSourceHasChanged are being used earlier on to track changes
+  isLoading.value = true;
+  setTimeout(() => {
+    fetchSelectedGageData();
+    hardResetTuningTimeConrols();
+    if (userCalibrationRunData.value) {
+      userCalibrationRunData.value.calibration_times.calibration_start_time = "";
+      userCalibrationRunData.value.calibration_times.calibration_end_time = "";
+      userCalibrationRunData.value.calibration_times.simulation_start_time = "";
+      userCalibrationRunData.value.calibration_times.simulation_end_time = "";
 
-        userCalibrationRunData.value.validation_times.validation_start_time = "";
-        userCalibrationRunData.value.validation_times.validation_end_time = "";
-        userCalibrationRunData.value.validation_times.simulation_start_time = "";
-        userCalibrationRunData.value.validation_times.simulation_end_time = "";
+      userCalibrationRunData.value.validation_times.validation_start_time = "";
+      userCalibrationRunData.value.validation_times.validation_end_time = "";
+      userCalibrationRunData.value.validation_times.simulation_start_time = "";
+      userCalibrationRunData.value.validation_times.simulation_end_time = "";
+      
+      selectedForcingValue.value = getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
+      userCalibrationRunData.value.external_data_status.forcing = false;
+      
+      selectedObservationalValue.value = getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '';
+      userCalibrationRunData.value.external_data_status.observational = false;
 
-        selectedObservationalValue.value = getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '';
-        userCalibrationRunData.value.external_data_status.observational = false;
+      selectedGeopackageValue.value = getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
+      userCalibrationRunData.value.external_data_status.geopackage = false;
 
-        selectedForcingValue.value = getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
-        userCalibrationRunData.value.external_data_status.forcing = false;
+      // clear out geopackage_image_url
+      userCalibrationRunData.value.geopackage_image_url = "";
 
-        selectedGeopackageValue.value = getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
-        userCalibrationRunData.value.external_data_status.geopackage = false;
+    }
 
-        // clear out geopackage_image_url
-        userCalibrationRunData.value.geopackage_image_url = "";
+    const tMsg: ToastMessageOptions = {
+      severity: 'info', summary: `Gage or Sources Changed`,
+      detail: "Changes made here affect Time Controls. Make sure they are properly set on the Tuning Controls Tab.", 
+      life: ToastTimeout.timeoutInfo
+    };
+    toast.add(tMsg); addToastRecord(tMsg);
 
-      }
-
-      const tMsg: ToastMessageOptions = {
-        severity: 'info', summary: `Gage Changed`,
-        detail: "Calibration and Validation times must be set on the Tuning Controls tab", 
-        life: ToastTimeout.timeoutInfo
-      };
-      toast.add(tMsg); addToastRecord(tMsg);
-
-    }, 100);
-  }
+  }, 100);
 }
 
 const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
@@ -455,7 +453,8 @@ const showObservationalFileUploadDialog = (headerText: string) => {
 }
 
 const uploadGeopackageDlgOpen = (e: SelectChangeEvent) => {
-  gageDataSourceHasChanged.value = true;
+  // Commenting this out because Geopackage source change doesn't require times to be cleared
+  //gageDataSourceHasChanged.value = true;
   if (e && e.value === 'User Upload') {
     showGeopackageFileUploadDialog('Geopackage File')
   }
@@ -480,9 +479,9 @@ const showGeopackageFileUploadDialog = (headerText: string) => {
         saveFunction: saveUserGeopackageFile
       },
       onClose: (opt) => {
-        if (selectedGeopackageValue.value !== userCalibrationRunData?.value?.geopackage_source) {
+        /* if (selectedGeopackageValue.value !== userCalibrationRunData?.value?.geopackage_source) {
           gageDataSourceHasChanged.value = true;
-        }
+        } */
         handleDialogClose(opt)
       },
     })
@@ -513,10 +512,11 @@ const saveTabData = () => {
   } else {
     toast.removeAllGroups();
 
-    // Check for gage change
-    if (gageHasChanged.value) {
-      clearDataDueToGageChange();
+    // Check for gage / data source change
+    if (gageHasChanged.value || gageDataSourceHasChanged) {
+      clearDataDueToGageOrSourceChange();
       gageHasChanged.value = false;
+      gageDataSourceHasChanged.value = false;
     }
 
     saveGageTabData().then(response => {
@@ -527,14 +527,16 @@ const saveTabData = () => {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
           toast.add(toastMessage); addToastRecord(toastMessage);
         })
-        updateJobData(response);
         gageHasChanged.value = false;
         gageDataSourceHasChanged.value = false;
+        updateJobData(response);
       } else {
         useApiErrorResponsePreprocess(response).forEach(message => {
           const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Save Gage Data Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
           toast.add(tMsg); addToastRecord(tMsg);
         });
+        gageHasChanged.value = false;
+        gageDataSourceHasChanged.value = false;
         updateJobData(response);
       }
       isLoading.value = false;
@@ -591,9 +593,10 @@ const updateJobData = async (response: any) => {
     }
 
     userCalibrationRunData.value.num_catchments = response?._data.num_catchments;
+
+    setResetDataValues();
   }
 }
-
 
 const resetTabData = () => {
   resetUserSelectionGage();
