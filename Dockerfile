@@ -1,11 +1,10 @@
-FROM registry.sh.nextgenwaterprediction.com/infrastructure/rockylinux/rockylinux:9.3
-
+FROM rockylinux:9.3
 
 # runtime dependencies
 RUN set -eux; \
-    dnf install -y yum-utils ; \
+    dnf install -y dnf-plugins-core; \
     dnf config-manager --set-enabled crb; \
-    dnf install -y \
+    dnf install -y --allowerasing \
         file \
         findutils \
         git \
@@ -13,8 +12,10 @@ RUN set -eux; \
         which \
         xz \
         jq \
+        curl \
     ; \
-    dnf clean all
+    dnf clean all; \
+    rm -rf /var/cache/dnf
 
 # set node and npm versions
 ARG NODE_VERSION=22.17.0
