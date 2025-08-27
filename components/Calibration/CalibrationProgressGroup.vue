@@ -11,7 +11,7 @@
         <td><i v-if="userCalibrationRunData?.external_data_status?.forcing"
             :class="userCalibrationRunData?.external_data_status?.forcing ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing</td>
+        <td data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing Source</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.external_data_status?.observational"

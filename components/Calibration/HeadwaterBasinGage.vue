@@ -341,6 +341,7 @@ const clearDataDueToGageOrSourceChange = () => {
     toast.add(tMsg); addToastRecord(tMsg);
 
   }, 100);
+  isLoading.value = false;
 }
 
 const uploadForcingDlgOpen = (e: SelectChangeEvent) => {
@@ -504,7 +505,7 @@ const toggle_isNWMv3 = () => {
 
 };
 
-const saveTabData = () => {
+const saveTabData = async() => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
@@ -517,12 +518,14 @@ const saveTabData = () => {
       clearDataDueToGageOrSourceChange();
       gageHasChanged.value = false;
       gageDataSourceHasChanged.value = false;
+      isLoading.value = true;
     }
 
-    saveGageTabData().then(response => {
+    await saveGageTabData().then(response => {
       if (response.status === 400) {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Save Gage Data Failed.', detail: response._data.message, life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
+        isLoading.value = false;
       } else if (response.status === 200) {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
           toast.add(toastMessage); addToastRecord(toastMessage);
@@ -539,7 +542,6 @@ const saveTabData = () => {
         gageDataSourceHasChanged.value = false;
         updateJobData(response);
       }
-      isLoading.value = false;
     });
   }
 };
@@ -595,6 +597,8 @@ const updateJobData = async (response: any) => {
     userCalibrationRunData.value.num_catchments = response?._data.num_catchments;
 
     setResetDataValues();
+    
+    isLoading.value = false;
   }
 }
 
