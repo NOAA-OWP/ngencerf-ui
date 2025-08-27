@@ -190,6 +190,7 @@
       </div>
     </div>
   </div>
+  <div v-else class="h-36"></div>
 
   <div id="TuningDataList" v-if="!userCalibrationRunData?.modules?.includes('LSTM')" class="mt-2 mb-10 overflow-auto max-h-[200px]" style="position: relative;">
     <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
@@ -848,6 +849,8 @@ const validateAndBuildRequestBody = (): boolean => {
 
     // check if any parameter initial values are out of range
     areParameterInitialValuesOutOfRange();
+  } else {
+    saveTuningTabRequestBody.value.parameters = [];
   }
 
   if (Object.keys(saveTuningTabRequestBody.value).length === 0) {
@@ -1042,7 +1045,8 @@ const areTuningParametersSet = (): boolean => {
   // TODO: add more parameter validation checks here. e.g. check if min < max, etc.
   if (
     userSelectedCalibrationTuningParameters.value &&
-    userSelectedCalibrationTuningParameters.value.length > 0
+    userSelectedCalibrationTuningParameters.value.length > 0 &&
+    !userCalibrationRunData?.value?.modules?.includes('LSTM')
   ) {
     return true;
   }
@@ -1129,7 +1133,7 @@ const saveTuningData = () => {
           simulation_end_time: saveTuningTabRequestBody.value.validation_times.simulation_end_time.toISO()
         }
       }
-
+      
       if (saveTuningTabRequestBody.value.output_variable_to_calibrate) {
         userCalibrationRunData.value.output_variable_to_calibrate = saveTuningTabRequestBody.value.output_variable_to_calibrate;
       }
@@ -1349,6 +1353,7 @@ const checkInitialValueOutOfRange = (parameterName: string, initialValue: number
 }
 
 onUnmounted(async () => {
+  saveTuningTabRequestBody.value = {};
   calibratableParametersHaveChanged.value = false;
   tuningDataHasChanged.value = false;
 })

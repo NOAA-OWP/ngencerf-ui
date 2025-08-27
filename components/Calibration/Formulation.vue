@@ -451,6 +451,8 @@ const saveFormulationData = () => {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
         isLoading.value = false;
+        formulationNameHasChanged.value = false;
+        modulesHaveChanged.value = false;
         updateJobData();
       } else {
         isLoading.value = false;
