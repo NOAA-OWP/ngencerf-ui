@@ -56,21 +56,21 @@
 
               </Listbox>
               <div class="mt-5">
-                <div v-if="formulationInfoMessages" class="text-green-600">
-                    <span v-for="message in formulationInfoMessages">
+                <span v-if="formulationErrorMessages" class="text-red-600">
+                    <div v-for="message in formulationErrorMessages">
                     <br/>{{ message }}
-                    </span>
-                </div>
-                <div v-if="formulationErrorMessages" class="text-red-600">
-                    <span v-for="message in formulationErrorMessages">
+                    </div>
+                </span>
+                <span v-if="formulationInfoMessages" class="text-green-600">
+                    <div v-for="message in formulationInfoMessages">
                     <br/>{{ message }}
-                    </span>
-                </div>
-                <div v-if="formulationWarningMessages" class="text-amber-600">
-                    <span v-for="message in formulationWarningMessages">
+                    </div>
+                </span>
+                <span v-if="formulationWarningMessages" class="text-amber-600">
+                    <div v-for="message in formulationWarningMessages">
                     <br/>{{ message }}
-                    </span>
-                </div>
+                    </div>
+                </span>
               </div>
             </div>
           </div>
