@@ -17,9 +17,10 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   const validationStatus = ref<string>( "" );
   const runningTime = ref<string>("");
   const startTime = ref<string>("");
-  const validationStopStatus = ref<string[]>(['DONE', 'SERVER ERROR', 'FAIL', 'CANCELLED']);
-  const validationFailedStatus = ref<string[]>(['SERVER ERROR', 'FAIL']);
+  const validationStopStatus = ref<string[]>(['DONE', 'SERVER ERROR', 'FAILED', 'CANCELLED']);
+  const validationFailedStatus = ref<string[]>(['SERVER ERROR', 'FAILED']);
   const displayValidationId = ref<number>( 0 );
+  const validationStatusCheckingInterval = ref<any>();
   const validationRunningTimeInterval = ref<any>();
   const runStatusTabVisible = ref<boolean>(false);
 
@@ -80,6 +81,11 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         } else {
           validationRunningTimeInterval.value = setInterval( updateRunningTime, 1000 );
         }
+      } else {
+        clearInterval(validationStatusCheckingInterval.value);
+        clearInterval(validationRunningTimeInterval.value);
+        validationStatusCheckingInterval.value = undefined;
+        validationRunningTimeInterval.value = undefined;
       }
     })
   }
@@ -126,6 +132,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     iterationValidationRunId,
     displayValidationId,
     validationRunningTimeInterval,
+    validationStatusCheckingInterval,
     evaluateDisplayIterationNumber,
     runStatusTabVisible,
     executeIterationValidationRun,
