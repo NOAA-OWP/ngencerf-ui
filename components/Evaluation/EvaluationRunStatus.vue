@@ -191,24 +191,8 @@ onMounted(async () => {
   if (evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0) {
     loadValidationStatusInformation(evaluateValidationRunId.value);
     if (iterationValidationRunId.value > 0 && validationStatus.value !== '') {
-      if (validationStatus.value.toLocaleUpperCase() === 'RUNNING') {
-        const tMsg: ToastMessageOptions = { 
-          severity: 'info', 
-          summary: 'EvaluationRunStatusStore.ts Line 82', 
-          detail: 'Setting interval to track validation running time.', 
-          life: ToastTimeout.timeoutInfo 
-        };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
       updateLogDisplay();
     } else {
-      const tMsg: ToastMessageOptions = { 
-        severity: 'info', 
-        summary: 'EvaluationRunStatusStore.ts Line 85', 
-        detail: 'Validation run not found. Clearing all intervals.', 
-        life: ToastTimeout.timeoutInfo 
-      };
-      toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
     // this condition assume we have evaluateIterationRunId value which also assume user want to run a new validation
@@ -242,13 +226,6 @@ const startRun = async () => {
       validationStatus.value = response?._data?.status;
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
-      const tMsg: ToastMessageOptions = { 
-        severity: 'info', 
-        summary: 'EvaluationRunStatus.vue Line 233', 
-        detail: 'Setting interval to track validation running time.', 
-        life: ToastTimeout.timeoutInfo 
-      };
-      toast.add(tMsg); addToastRecord(tMsg);
       validationRunningTimeInterval.value = setInterval(async () => {
         updateRunningTime(), 1000
       }, 10000) as unknown as number;
@@ -314,13 +291,6 @@ watch(validationStatus, async (newStatus, initialStatus) => {
   };
   toast.add(tMsg); addToastRecord(tMsg);
   if (newStatus !== null && !isValidationRunStopped(newStatus)) {
-    const tMsg: ToastMessageOptions = { 
-      severity: 'info', 
-      summary: 'EvaluationRunStatus.vue Line 322', 
-      detail: 'Setting interval to check validation status.', 
-      life: ToastTimeout.timeoutInfo 
-    };
-    toast.add(tMsg); addToastRecord(tMsg);
     validationStatusCheckingInterval.value = setInterval(async () => {
       queryIterationValidationRunStatus().then(response => {
         let find_validation_run = undefined;
@@ -331,13 +301,6 @@ watch(validationStatus, async (newStatus, initialStatus) => {
         }
         if (!find_validation_run) {
           validationStatus.value = 'Failed';
-          const tMsg: ToastMessageOptions = { 
-            severity: 'info', 
-            summary: 'EvaluationRunStatus.vue Line 338', 
-            detail: 'Validation run ' + iterationValidationRunId.value + ' not found. Clearing all intervals.', 
-            life: ToastTimeout.timeoutInfo 
-          };
-          toast.add(tMsg); addToastRecord(tMsg);
           clearInterval(validationStatusCheckingInterval.value);
           clearInterval(validationRunningTimeInterval.value);
           validationStatusCheckingInterval.value = undefined;
@@ -347,13 +310,6 @@ watch(validationStatus, async (newStatus, initialStatus) => {
           const validation_run = find_validation_run.shift();
           if (!validation_run) {
             validationStatus.value = 'Failed';
-            const tMsg: ToastMessageOptions = { 
-              severity: 'info', 
-              summary: 'EvaluationRunStatus.vue Line 352', 
-              detail: 'Validation run ' + iterationValidationRunId.value + ' not found. Clearing all intervals.', 
-              life: ToastTimeout.timeoutInfo 
-            };
-            toast.add(tMsg); addToastRecord(tMsg);
             clearInterval(validationStatusCheckingInterval.value);
             clearInterval(validationRunningTimeInterval.value);
             validationStatusCheckingInterval.value = undefined;
@@ -368,13 +324,6 @@ watch(validationStatus, async (newStatus, initialStatus) => {
   } else {
     // this is for value assignment is only for running job that is now done/stopped
     if (iterationValidationRunId.value > 0) evaluateValidationRunId.value = iterationValidationRunId.value;
-    const tMsg: ToastMessageOptions = { 
-      severity: 'info', 
-      summary: 'EvaluationRunStatus.vue Line 373', 
-      detail: 'Validation run ' + iterationValidationRunId.value + ' now has status ' + newStatus + '. Clearing all intervals.',
-      life: ToastTimeout.timeoutInfo 
-    };
-    toast.add(tMsg); addToastRecord(tMsg);
     clearInterval(validationStatusCheckingInterval.value);
     clearInterval(validationRunningTimeInterval.value);
     validationStatusCheckingInterval.value = undefined;
@@ -398,13 +347,6 @@ watch(selectedLogCurrentPage, async () => {
 });
 
 onBeforeUnmount(() => {
-  const tMsg: ToastMessageOptions = { 
-    severity: 'info', 
-    summary: 'EvaluationRunStatus.vue Line 403', 
-    detail: 'Page has been unmounted. Clearing all intervals.',
-    life: ToastTimeout.timeoutInfo 
-  };
-  toast.add(tMsg); addToastRecord(tMsg);
   clearInterval(validationStatusCheckingInterval.value);
   clearInterval(validationRunningTimeInterval.value);
   validationStatusCheckingInterval.value = undefined;
@@ -416,13 +358,6 @@ onBeforeUnmount(() => {
 const cancelRun = async () => {
   executeCancelIterationValidationRun().then(response => {
     validationStatus.value = response?._data.status;
-    const tMsg: ToastMessageOptions = { 
-      severity: 'info', 
-      summary: 'EvaluationRunStatus.vue Line 421', 
-      detail: 'Run has been cancelled. Clearing all intervals.',
-      life: ToastTimeout.timeoutInfo 
-    };
-    toast.add(tMsg); addToastRecord(tMsg);
     clearInterval(validationStatusCheckingInterval.value);
     clearInterval(validationRunningTimeInterval.value);
     validationStatusCheckingInterval.value = undefined;
