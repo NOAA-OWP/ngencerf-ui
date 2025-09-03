@@ -547,8 +547,8 @@ const onRowVrContextMenu = (event: any) => {
     cmValidationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(userSelectedEvalCalibrationRunId.value) });
     cmValidationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(userSelectedEvalCalibrationRunId.value) });
     if (vrRowData.status.toLocaleUpperCase() === 'RUNNING') {
-      cmValidationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => navigationTorunStatus(vrRowData.validation_run_id, vrRowData.status) });
-      cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-ban', command: () => navigationTorunStatus(vrRowData.validation_run_id, vrRowData.status) });
+      cmValidationRun.value.push({ label: 'View Validation Run Stats', icon: 'pi pi-chart-bar', command: () => navigationToRunStatus(vrRowData.validation_run_id, vrRowData.status) });
+      cmValidationRun.value.push({ label: 'Cancel', icon: 'pi pi-ban', command: () => navigationToRunStatus(vrRowData.validation_run_id, vrRowData.status) });
     }
   }
 }
@@ -556,7 +556,6 @@ const onRowVrContextMenu = (event: any) => {
 const onRowCpContextMenu = (event: any) => {
   cmCompareRun.value = [];
   const cpRowData = event.data as ValidatedCalibrationRunListItem;
-  // console.log('cpContextMenu: ', cpContextMenu.value);
   cpContextMenu.value.show(event.originalEvent);
   cmCompareRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(cpRowData.calibration_run_id) })
 }

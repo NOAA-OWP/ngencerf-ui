@@ -67,7 +67,7 @@
                     <td class="pl-5 text-right pr-4" colspan="2">
 
                       <!--BUTTONS - START-->
-                      <span v-if="validationStatus === 'Done' || validationStatus === 'Fail'">
+                      <span v-if="validationStatus === 'Done' || validationStatus === 'Failed'">
                         <Button id="ResultsArea" class="ngenButtonDiv" @click.stop="navigateToEvaluation"
                           aria-label="Go to Evaluation Button" title="Go to Evaluation Button">Evaluate</Button>
                       </span>
@@ -136,7 +136,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onBeforeUnmount } from "vue";
 import { useToast } from 'primevue/usetoast';
 
 import type { CalibrationGetStatusValidationItem } from "@/composables/NgencerfModels";
@@ -156,11 +156,10 @@ const toast = useToast();
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
-const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, evaluateDisplayIterationNumber, runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
+const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, validationStatusCheckingInterval, evaluateDisplayIterationNumber, runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
 const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime, clearRunningStatusInfo } = useEvaluationRunStatusStore();
 const { queryGetLogData } = useEvaluationSupplementalDataStore();
 
-const validationStatusCheckingInterval = ref<any>();
 const logDataPageSize = ref<number>(1000);
 const selectedLogCategory = ref<string>('validation');
 const selectedLogName = ref<string>('ngen-cal stdout');
@@ -185,12 +184,15 @@ onMounted(async () => {
 
   clearInterval(validationStatusCheckingInterval.value);
   clearInterval(validationRunningTimeInterval.value);
+  validationStatusCheckingInterval.value = undefined;
+  validationRunningTimeInterval.value = undefined;
 
   // assume having evaluateValidationRunId but not evaluateIterationRunId means user is intend to view the status of a done/stopped job
   if (evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0) {
     loadValidationStatusInformation(evaluateValidationRunId.value);
     if (iterationValidationRunId.value > 0 && validationStatus.value !== '') {
       updateLogDisplay();
+    } else {
     }
   } else {
     // this condition assume we have evaluateIterationRunId value which also assume user want to run a new validation
@@ -224,7 +226,9 @@ const startRun = async () => {
       validationStatus.value = response?._data?.status;
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
-      validationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
+      validationRunningTimeInterval.value = setInterval(async () => {
+        updateRunningTime(), 1000
+      }, 10000) as unknown as number;
     } else {
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation', life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -260,14 +264,16 @@ const updateLogDisplay = () => {
           selectedLogStartRow.value = 1;
         }
         selectedLogFilePath.value = response?._data.log_path;
-        nextTick(async () => {
-          document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
-          - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
-          if (autoScrollLog.value) {
-            document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
-            autoScrollLog.value = false;
-          }
-        });
+        if (document.getElementById('selectedLogDisplay')) {
+          nextTick(async () => {
+            document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
+            - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
+            if (autoScrollLog.value) {
+              document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
+              autoScrollLog.value = false;
+            }
+          });
+        }
       } else {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -277,23 +283,37 @@ const updateLogDisplay = () => {
 }
 
 watch(validationStatus, async (newStatus, initialStatus) => {
+  const tMsg: ToastMessageOptions = { 
+    severity: 'info', 
+    summary: 'EvaluationRunStatus.vue Line 314', 
+    detail: 'Validation status has changed to: ' + validationStatus.value, 
+    life: ToastTimeout.timeoutInfo 
+  };
+  toast.add(tMsg); addToastRecord(tMsg);
   if (newStatus !== null && !isValidationRunStopped(newStatus)) {
     validationStatusCheckingInterval.value = setInterval(async () => {
       queryIterationValidationRunStatus().then(response => {
-        const find_validation_run = response._data.validations.filter((validation: CalibrationGetStatusValidationItem) => {
-          return validation.validation_run_id === iterationValidationRunId.value
-        });
+        let find_validation_run = undefined;
+        if (response._data.validations) {
+          find_validation_run = response._data.validations.filter((validation: CalibrationGetStatusValidationItem) => {
+            return validation.validation_run_id === iterationValidationRunId.value
+          });
+        }
         if (!find_validation_run) {
-          validationStatus.value = 'Fail';
+          validationStatus.value = 'Failed';
           clearInterval(validationStatusCheckingInterval.value);
           clearInterval(validationRunningTimeInterval.value);
+          validationStatusCheckingInterval.value = undefined;
+          validationRunningTimeInterval.value = undefined;
         } else {
           // make sure we actually have validation run
           const validation_run = find_validation_run.shift();
           if (!validation_run) {
-            validationStatus.value = 'Fail';
+            validationStatus.value = 'Failed';
             clearInterval(validationStatusCheckingInterval.value);
             clearInterval(validationRunningTimeInterval.value);
+            validationStatusCheckingInterval.value = undefined;
+            validationRunningTimeInterval.value = undefined;
           } else {
             validationStatus.value = validation_run.status;
           }
@@ -306,6 +326,8 @@ watch(validationStatus, async (newStatus, initialStatus) => {
     if (iterationValidationRunId.value > 0) evaluateValidationRunId.value = iterationValidationRunId.value;
     clearInterval(validationStatusCheckingInterval.value);
     clearInterval(validationRunningTimeInterval.value);
+    validationStatusCheckingInterval.value = undefined;
+    validationRunningTimeInterval.value = undefined;
   }
 });
 
@@ -324,10 +346,11 @@ watch(selectedLogCurrentPage, async () => {
   }
 });
 
-onUnmounted(() => {
-  console.log('Page has been unmounted; clearing validationStatusCheckingInterval and validationRunningTimeInterval');
+onBeforeUnmount(() => {
   clearInterval(validationStatusCheckingInterval.value);
   clearInterval(validationRunningTimeInterval.value);
+  validationStatusCheckingInterval.value = undefined;
+  validationRunningTimeInterval.value = undefined;
   clearRunningStatusInfo();
   runStatusTabVisible.value = false;
 })
@@ -335,9 +358,10 @@ onUnmounted(() => {
 const cancelRun = async () => {
   executeCancelIterationValidationRun().then(response => {
     validationStatus.value = response?._data.status;
-    console.log('Run has been cancelled; clearing validationStatusCheckingInterval and validationRunningTimeInterval');
     clearInterval(validationStatusCheckingInterval.value);
     clearInterval(validationRunningTimeInterval.value);
+    validationStatusCheckingInterval.value = undefined;
+    validationRunningTimeInterval.value = undefined;
   })
 }
 
