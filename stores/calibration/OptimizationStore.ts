@@ -139,11 +139,13 @@ export const useOptimizationStore = defineStore(
             name: data_input.name,
             value: data_input.default_value,
           };
-          let user_optimization_input = filterCalRunData(data_input.name);
+	  // Commenting out because we don't want to replace defaults with previous user selections
+	  // when switching optimization algorithm
+          /* let user_optimization_input = filterCalRunData(data_input.name);
 
           if (user_optimization_input && user_optimization_input.length !== 0) {
             data_item.value = user_optimization_input[0].value;
-          }
+          } */
 
           data_items.push(data_item);
         });

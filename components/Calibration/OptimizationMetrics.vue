@@ -441,7 +441,7 @@ const validateTab = () => {
       error = true;
       text.push("Plot Generation Frequency has been changed");
     }
-    if (userCalibrationRunData?.value?.optimization_inputs.length !== uiOptimizationInputs.value.length) {
+    if (userCalibrationRunData?.value?.optimization_inputs?.length !== uiOptimizationInputs?.value?.length) {
       error = true;
       text.push("Algorithm Parameters have been changed");
     }
