@@ -153,9 +153,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   /**
-   * Load Forecast Status/Run tab data
+   * Load Forecast Run/Status tab data
    */
-  const loadForecastStatusRunTabData = async (): Promise<string[]> => {
+  const loadForecastRunStatusTabData = async (): Promise<string[]> => {
     let errorMessages: string[] = [];
     // get forecast job data
     if (forecastJobId?.value) {
@@ -180,7 +180,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         if (forecastJob?.submit_date) {
           submitTimeDate.value = new Date(forecastJob?.submit_date as string);
           if (isValidDate(submitTimeDate.value)) {
-            submitTime.value = convertTimeZone(submitTimeDate.value);
+            submitTime.value = formatDateForRunOnString(submitTimeDate.value);
           } else {
             errorMessages.push(`Invalid submit date: ${forecastJob?.submit_date}`);
           }
@@ -218,8 +218,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const loadForecastResultsTabData = async (): Promise<string[]> => {
     const errorMessages: string[] = [];
 
-    // load forecast status/run tab data
-    const loadForecastErrors: string[] = await loadForecastStatusRunTabData();
+    // load forecast Run/Status tab data
+    const loadForecastErrors: string[] = await loadForecastRunStatusTabData();
     if (loadForecastErrors.length > 0) {
       errorMessages.push(...loadForecastErrors);
     }
@@ -493,7 +493,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     overallForcingDownloadForecastStatus,
     getForecastJobs,
     loadSetupForecastTabData,
-    loadForecastStatusRunTabData,
+    loadForecastRunStatusTabData,
     loadForecastResultsTabData,
     loadForecastTab,
     createAndRunForecastJob,

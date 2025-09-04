@@ -180,7 +180,7 @@ const {
 } = storeToRefs(useForecastStore());
 
 const {
-  loadForecastStatusRunTabData,
+  loadForecastRunStatusTabData,
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
@@ -196,10 +196,10 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
 
   // highlight the tab when selected
-  hilightTab(ForecastTabs.tab_statusRun);
+  hilightTab(ForecastTabs.tab_runStatus);
 
-  // load Status/Run tab data
-  await loadForecastStatusRunTabData();
+  // load Run/Status tab data
+  await loadForecastRunStatusTabData();
 });
 
 /**
@@ -307,7 +307,7 @@ const cancelForecastRun = async () => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      await loadForecastStatusRunTabData();
+      await loadForecastRunStatusTabData();
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Forecast status from server', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
