@@ -38,6 +38,12 @@
 
               </template>
             </Listbox>
+            <div v-if="selectedModuleValues.some(item => item.toLowerCase() === 'cfe-s') || selectedModuleValues.some(item => item.toLowerCase() === 'cfe-x')">
+              <span class="text-left pt-1">
+                <input type="checkbox" id="isAETRootzone" class="ml-2" v-model="isAETRootzone" @change="isAETRootzoneHasChanged = true"/>
+                <label class="inline-block text-[18px]" for="isAETRootzone">&nbsp;CFE AET Rootzone</label>
+              </span>
+            </div>
           </div>
           <div class="col-span-2">&nbsp;</div>
           <div class="col-span-5">
@@ -169,9 +175,9 @@
           </div>
         </span>
 
-        <span v-if="formulationNameHasChanged || modulesHaveChanged">
+        <span v-if="formulationNameHasChanged || modulesHaveChanged || isAETRootzoneHasChanged">
           <div class="col-span-1 mr-3">
-            <Button class="ngenButtonDiv-yellow" title="Revert Changes" @click="restorePage()"
+            <Button class="ngenButtonDiv-yellow" title="Revert Changes" @click="restoreTab()"
               aria-label="Revert Changes">Revert</Button>
           </div>
         </span>
@@ -252,6 +258,7 @@ const {
   useSlothParameters,
   selectedModuleValues,
   formulationNameInput,
+  isAETRootzone,
   slothParameterInputs,
   fetchFormulationModuleOptions,
   fetchFormulationModuleCoveredGroupFilterOptions,
@@ -291,6 +298,7 @@ let dataTableElement: HTMLElement | null = null;
 
 const toast = useToast();
 const formulationNameHasChanged = ref<boolean>(false);
+const isAETRootzoneHasChanged = ref<boolean>(false);
 
 onMounted(async() => {
   if (calibrationJobId.value) {
@@ -375,6 +383,9 @@ const resetModuleList = () => {
       modulesHaveChanged.value = false;
     }
   }
+  if (userCalibrationRunData?.value?.is_aet_rootzone) {
+    isAETRootzone.value = userCalibrationRunData.value.is_aet_rootzone;
+  }
 }
 
 /**
@@ -400,6 +411,10 @@ watch(formulationNameInput, () => {
 * event bus for calibration button group click
 */
 const saveFormulationData = () => {
+  // de-select AET Rootzone if formulation does not include CFE
+  if (!selectedModuleValues.value.some(item => item.toLowerCase() === 'cfe-s') && !selectedModuleValues.value.some(item => item.toLowerCase() === 'cfe-x')) {
+    isAETRootzone.value = false;
+  }
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -453,6 +468,7 @@ const saveFormulationData = () => {
         isLoading.value = false;
         formulationNameHasChanged.value = false;
         modulesHaveChanged.value = false;
+        isAETRootzoneHasChanged.value = false;
         updateJobData();
       } else {
         isLoading.value = false;
@@ -538,6 +554,11 @@ const validateTab = () => {
     selectedModuleValues.value = ['LSTM', 'T-Route'];
     text.push("LSTM can only be paired with T-Route");
   }
+  /* Has user checked/unchecked AET Rootzone? */
+  if (isAETRootzoneHasChanged.value) {
+    error = true;
+    text.push("CFE AET Rootzone has changed");
+  }
   /* Has user checked/unchecked Add SLoTH output variables? */
   if (useSlothParameters.value !== userCalibrationRunData?.value?.use_sloth) {
     error = true;
@@ -551,13 +572,15 @@ const validateTab = () => {
   return { error: error, text: text }
 }
 
-const restorePage = () => {
+const restoreTab = () => {
   formulationNameInput.value = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";
   resetModuleList();
   updateFormulationValidRefs();
   if (userCalibrationRunData.value) {
+    isAETRootzone.value = userCalibrationRunData?.value?.is_aet_rootzone;
     useSlothParameters.value = userCalibrationRunData?.value?.use_sloth;
     slothParameterInputs.value = userCalibrationRunData?.value?.sloth_parameters;
+    isAETRootzoneHasChanged.value = false;
   }
 }
 
@@ -629,7 +652,7 @@ const handleNextPrevDialogClose = (opt: any) => {
 }
 
 onUnmounted(async() => {
-  restorePage();
+  restoreTab();
 })
 </script>
 
