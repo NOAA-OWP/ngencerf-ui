@@ -166,7 +166,7 @@ const {
 const {
   setSelectedForecastRunId,
   resetSelectedForecastRunData,
-  loadForecastStatusRunTabData,
+  loadForecastRunStatusTabData,
   loadForecastResultsTabData,
   loadSelectedCalibrationRun,
   setSelectedForecastRowData,
@@ -286,13 +286,13 @@ const navigateToSetupForecast = () => {
 const navigateToForecastRunStatus = () => {
   isForecastLoading.value = true;
   nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Status/Run Tab"]');
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
 
     if (e) {
       await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Status/Run tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
     isForecastLoading.value = false;
   });

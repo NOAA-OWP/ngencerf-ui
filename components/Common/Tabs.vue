@@ -16,8 +16,8 @@
               Headwater Basin Gage
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
-            <div data-tab="3" class="tabs prevent-select" @click="tabClicked" aria-label=" Formulation tab"
-              title=" Formulation tab">
+            <div data-tab="3" class="tabs prevent-select" @click="tabClicked" aria-label="Formulation tab"
+              title="Formulation tab">
               Formulation
               <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
             </div>
@@ -94,15 +94,15 @@
             Forecast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[3].includes(currentForecastTab) || calibrationRunForForecast && (!calibrationRunForForecast.forecast_status || calibrationRunForForecast.forecast_status  === 'Ready')" data-tab="3"
+          <div v-show="[3].includes(currentForecastTab) || calibrationRunForForecast && (!calibrationRunForForecast.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast.forecast_status))" data-tab="3"
             class="tabs prevent-select" @click="tabClicked" aria-label="Setup Forecast Tab"
             title="Setup Forecast Tab">
             Setup Forecast
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
           <div v-show="[4].includes(currentForecastTab) || (calibrationRunForForecast && (calibrationRunForForecast.cycle || forecastCycle))" data-tab="4"
-            class="tabs prevent-select" @click="tabClicked" aria-label="Status/Run tab" title="Status/Run Tab">
-            Status/Run
+            class="tabs prevent-select" @click="tabClicked" aria-label="Run/Status tab" title="Run/Status Tab">
+            Run/Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
           <div v-show="[5].includes(currentForecastTab) || calibrationRunForForecast && calibrationRunForForecast.forecast_status  === 'Done'" data-tab="5" class="tabs prevent-select" @click="tabClicked"

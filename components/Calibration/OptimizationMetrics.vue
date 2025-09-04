@@ -517,7 +517,7 @@ const goPrevTab = () => {
 
 const gotoNext = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_statusRun];
+  const e = <HTMLElement>tabs[CalibrationTabs.tab_runStatus];
   e.click();
 }
 

@@ -58,7 +58,7 @@
         <span v-if="forecastCycle && forecastCycle.is_active">
             <div class="col-span-1 mr-4">
                 <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
-                    @click="goToStatusRunTab()">
+                    @click="goToRunStatusTab()">
                     Next
                 </Button>
             </div>
@@ -142,9 +142,9 @@ const onRowSelect = (e: any) => {
 /**
  * Go to the Status Run tab
  */
-const goToStatusRunTab = () => {
+const goToRunStatusTab = () => {
     const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[ForecastTabs.tab_statusRun] as HTMLElement;
+    const e = allTabs[ForecastTabs.tab_runStatus] as HTMLElement;
     e.click();
 };
 </script>
