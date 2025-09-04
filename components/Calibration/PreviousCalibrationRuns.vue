@@ -620,7 +620,7 @@ const loadEntireRun = () => {
 }
 const gotoRunStatusTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
-  const e = allTabs[CalibrationTabs.tab_statusRun] as HTMLElement;
+  const e = allTabs[CalibrationTabs.tab_runStatus] as HTMLElement;
   e.click();
 }
 
