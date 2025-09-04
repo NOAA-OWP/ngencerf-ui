@@ -387,7 +387,7 @@ onMounted(async () => {
   validationBestAchieved.value.isBest = false;
 
   nextTick(async () => {
-    hilightTab(CalibrationTabs.tab_statusRun);
+    hilightTab(CalibrationTabs.tab_runStatus);
     if (userCalibrationRunData.value) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
 
@@ -911,11 +911,14 @@ const updateLogRefs = async(getLogData: boolean) => {
       }
       selectedLogFilePath.value = response?._data.log_path;
       selectedLogByteOffset.value = response?._data?.byte_offset;
-      nextTick(async () => {
-        document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
-        - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
-      });
+      if (document.getElementById('selectedLogDisplay')) {
+        nextTick(async () => {
+          document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
+          - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
+        });
+      }
     } else {
+      selectedLogDisplay.value = '';
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
@@ -940,9 +943,11 @@ const updateLogRefs = async(getLogData: boolean) => {
 watch(selectedLogName, async () => {
   if (selectedLogName.value !== '') {
     await updateLogRefs(true);
-    nextTick(async () => {
-      document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
-    });
+    if (selectedLogDisplay.value && selectedLogDisplay.value != '') {
+      nextTick(async () => {
+        document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
+      });
+    }
   }
 });
 
