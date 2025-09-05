@@ -27,7 +27,7 @@
           <div v-if="calData?.forcing_source_requested" :aria-label="'Forcing Data ' + calData?.forcing_source_requested"
             :title="'Forcing Data ' + calData?.forcing_source_requested"><span class="font-medium">Forcing Source: </span>
             <span v-if="(calData?.forcing_source_actual && calData.forcing_source_actual != calData?.forcing_source_requested)">
-              {{ calData?.forcing_source_actual }}, {{ calData?.forcing_source_requested }} (Requested)
+              {{ calData?.forcing_source_actual }} ({{ calData?.forcing_source_requested }} Was Requested)
             </span>
             <span v-else>
               {{ calData?.forcing_source_requested }}
@@ -51,6 +51,10 @@
           <div v-if="calData?.modules?.length" :aria-label="'Modules ' + getModuleList()"
             :title="'Modules ' + getModuleList()"><span class="font-medium">Modules:
             </span>{{ getModuleList() }}</div>
+          <div v-if="calData?.modules?.includes('CFE-S') || calData?.modules?.includes('CFE-X')" :aria-label="'CFE AET Rootzone ' + (calData?.is_aet_rootzone ? 'Yes' : 'No')"
+            :title="'CFE AET Rootzone ' + (calData?.is_aet_rootzone ? 'Yes' : 'No')">
+            <span class="font-medium">CFE AET Rootzone:
+            </span>{{ (calData?.is_aet_rootzone ? 'Yes' : 'No') }}</div>
         </div>
       </div>
 

@@ -497,6 +497,7 @@ const updateJobData = () => {
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.formulation_name = saveFormulationPayload.value.formulation_name ?? '';
     userCalibrationRunData.value.modules = saveFormulationPayload.value.modules as string[];
+    userCalibrationRunData.value.is_aet_rootzone = saveFormulationPayload.value.is_aet_rootzone;
     userCalibrationRunData.value.sloth_parameters = saveFormulationPayload.value.sloth_parameters as [];
     userCalibrationRunData.value.use_sloth = saveFormulationPayload.value.use_sloth as boolean;
     clearCalibratableParameters();
