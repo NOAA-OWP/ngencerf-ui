@@ -38,11 +38,12 @@
 
               </template>
             </Listbox>
-            <div v-if="selectedModuleValues.some(item => item.toLowerCase() === 'cfe-s') || selectedModuleValues.some(item => item.toLowerCase() === 'cfe-x')">
-              <span class="text-left pt-1">
-                <input type="checkbox" id="isAETRootzone" class="ml-2" v-model="isAETRootzone" @change="isAETRootzoneHasChanged = true"/>
-                <label class="inline-block text-[18px]" for="isAETRootzone">&nbsp;CFE AET Rootzone</label>
-              </span>
+            <div class="pt-4 pl-2" v-if="selectedModuleValues.some(item => item.toLowerCase() === 'cfe-s') || selectedModuleValues.some(item => item.toLowerCase() === 'cfe-x')">
+              <Checkbox id="isAETRootzone" inputId="isAETRootzone" class="h-5 w-5 mr-3" style="display:inline-block"
+                :binary="true" v-model="isAETRootzone" aria-label="CFE AET Rootzone Checkbox"
+                title="CFE AET Rootzone Checkbox" @change="isAETRootzoneHasChanged = true" 
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
+              <label for="isAETRootzone" class="inline">CFE AET Rootzone</label>
             </div>
           </div>
           <div class="col-span-2">&nbsp;</div>
