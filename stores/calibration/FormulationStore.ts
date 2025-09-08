@@ -30,6 +30,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   const filterGroup = ref<string>("");
   const selectedModuleValues = ref<string[]>([]);
   const formulationNameInput = ref<string>("");
+  const isAETRootzone = ref<boolean>(false);
   const slothParameterInputs = ref<SlothParameterData[]>([]);
   const useSlothParameters = ref<boolean>(false);
 
@@ -79,6 +80,9 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
         }
     } else {
         selectedModuleValues.value = [];
+    }
+    if (userCalibrationRunData.value?.is_aet_rootzone) {
+      isAETRootzone.value = true;
     }
     useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false;
     slothParameterInputs.value =
@@ -329,6 +333,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
       : "";
     saveFormulationPayload.value.modules =
       selectedModuleValues.value.length > 0 ? selectedModuleValues.value : [];
+    saveFormulationPayload.value.is_aet_rootzone = isAETRootzone.value;
     saveFormulationPayload.value.sloth_parameters =
       slothParameterInputs.value.length > 0 ? slothParameterInputs.value : [];
 
@@ -397,6 +402,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   const resetFormulationStore = (): void => {
     formulationNameInput.value = "";
     selectedModuleValues.value = ['T-Route'];
+    isAETRootzone.value = false;
     useSlothParameters.value = false;
     slothParameterInputs.value = [];
   };
@@ -411,6 +417,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     useSlothParameters,
     selectedModuleValues,
     formulationNameInput,
+    isAETRootzone,
     slothParameterInputs,
     fetchFormulationModuleOptions,
     fetchFormulationModuleCoveredGroupFilterOptions,

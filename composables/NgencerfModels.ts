@@ -161,6 +161,7 @@ export interface UserCalibrationRunData {
   }
   modules: string[];
   formulation_name: string;
+  is_aet_rootzone: boolean;
   formulation_warning?: FormulationWarning;
   use_sloth: boolean;
   sloth_parameters: SlothParameterData[];
@@ -330,6 +331,7 @@ export interface FormulationModuleData {
 export interface SaveFormulationTabPayload {
   calibration_run_id?: number;
   formulation_name?: string;
+  is_aet_rootzone?: boolean;
   modules?: string[];
   use_sloth?: boolean;
   sloth_parameters?: SlothParameterData[];
