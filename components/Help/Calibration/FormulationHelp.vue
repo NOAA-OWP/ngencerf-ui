@@ -79,7 +79,7 @@
                         <li style="font-style:italic">aka <strong>Snow Group</strong></li>
                         <li style="font-size:0.95em;"><strong>UEB:</strong></li>
                         <li style="margin-left: 15px;">
-                            If selected, will override snowmelt component of nowah-owp-modular;
+                            If selected, will override snowmelt component of noah-owp-modular;
                             cannot be selected in conjunction with another snow model.
                         </li>
                         <li style="font-size:0.95em;"><strong>Snow-17</strong></li>
@@ -90,7 +90,7 @@
                             evapotranspiration module has not been selected.
                         </li>
                         <li style="margin-left: 15px;">
-                            If noah-owp-modular has been selected as the evapotranspiration module,
+                            If noah-owp-modular has been selected as the snow-melt module,
                             and another single purpose snow-melt module has been selected, the user will be warned
                             that there are two snow-melt modules selected and noah-owp-modular will not be used for
                             snow-melt.
@@ -150,7 +150,449 @@
                 </li>
             </ul>
         </div>
+        <br />
+        <hr />
+        <div class="_help-title" style="padding-top: 20px;padding-bottom: 0px;">NWM v3 Output Variable Map</div>
+        <div style="margin-left: 30px; margin-top:20px;">
+            <div class="overflow-x-auto overflow-y-auto max-h-[80vh]">
+                <table class="table-auto border-collapse border border-gray-300 text-sm" aria-label="NWM v3 Variable to Module Mapping Table">
+                <thead class="sticky top-0 z-10 bg-gray-100">
+                    <tr class="border-b border-gray-300">
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom bg-gray-100 text-left">NWM v3 Variable</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom rainfall-runoff">CFE</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom rainfall-runoff">LASAM</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom multiple">Noah-OWP-Modular</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom rainfall-runoff">Sac-SMA</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom soil-moisture">SFT</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom soil-moisture">SMP</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom snow">Snow17</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom rainfall-runoff">TopModel</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom multiple">TopoFlow</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom snow">UEB</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[85px] align-bottom routing">T-Route</th>
+                    <th class="sticky top-0 z-10 border px-2 py-1 w-[200px] align-bottom bg-gray-100 text-left">Precedence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-t border-gray-300">
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">sfcheadsubrt</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 routing text-center"></td>
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">inflow</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 routing text-center">•</td>
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">outflow</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 routing text-center">•</td>
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">reservoir_assimilated_value</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 routing text-center">•</td>
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">water_sfc_elev</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 routing text-center">•</td>
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">nudge</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 routing text-center">•</td>
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">qbucket</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 routing text-center"></td>
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">streamflow</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 routing text-center"></td>
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">velocity</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>
+                    <td class="border px-2 py-1 multiple text-center"></td>
+                    <td class="border px-2 py-1 snow text-center"></td>
+                    <td class="border px-2 py-1 routing text-center">•</td>
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">ACSNOM</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left">Snow 17</td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">SNOWT_AVG</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">SOILICE</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center">•</td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left">SFT</td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">SOILSAT_TOP</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center">•</td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left">SMP</td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">QRAIN</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left">Rainfall Runoff Module</td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">FSNO</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">SNOWH</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left">Snow17</td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">SNLIQ</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">SNEQV</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">QSNOW</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">SOIL_T</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center">•</td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left">SFT</td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">SOIL_M</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center">•</td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left">SMP</td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">SFCRNOFF</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center">•</td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">TRAD</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left">SFT</td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">LH</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">FIRA</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                    <tr>
+                    <td class="border left-0 bg-white z-10 px-2 py-1 text-left">HFX</td>
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- CFE -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- LASAM -->
+                    <td class="border px-2 py-1 multiple text-center">•</td>         <!-- Noah-OWP-Modular -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- Sac-SMA -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SFT -->
+                    <td class="border px-2 py-1 soil-moisture text-center"></td>    <!-- SMP -->
+                    <td class="border px-2 py-1 snow text-center"></td>             <!-- Snow17 -->
+                    <td class="border px-2 py-1 rainfall-runoff text-center"></td>  <!-- TopModel -->
+                    <td class="border px-2 py-1 multiple text-center"></td>         <!-- TopoFlow -->
+                    <td class="border px-2 py-1 snow text-center">•</td>             <!-- UEB -->
+                    <td class="border px-2 py-1 routing text-center"></td>          <!-- T-Route -->
+                    <td class="border px-2 py-1 w-[200px] text-left"></td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>   
+            <div class="mt-6">
+                <p class="text-md font-semibold">Legend</p>
+                <table class="table-fixed border-separate border-spacing-0 border-gray-300" aria-label="NWM v3 Variable to Module Mapping Table Legend">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="border pl-2 pr-2 pt-0 pb-0 w-1/3 text-left snow" style="font-size: small;">Snow</td>
+                        <td class="border pl-2 pr-2 pt-0 pb-0 w-1/3 text-left soil-moisture" style="font-size: small;">Soil Moisture</td>
+                        <td class="border pl-2 pr-2 pt-0 pb-0 w-1/3 text-left rainfall-runoff" style="font-size: small;">Rainfall Runoff</td>
+                    </tr>
+                    <tr>
+                        <td class="border pl-2 pr-2 pt-0 pb-0 w-1/3 text-left routing" style="font-size: small;">Routing</td>
+                        <td class="border pl-2 pr-2 pt-0 pb-0 w-1/3 text-left multiple" style="font-size: small;">Multiple</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>         
+        </div>
     </div>
+
 </template>
 
 <script setup lang="ts">
@@ -160,4 +602,39 @@
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
+
+.rainfall-runoff {
+  @apply bg-green-400;
+}
+td.rainfall-runoff {
+  @apply text-2xl;
+}
+
+.soil-moisture {
+  @apply bg-orange-300;
+}
+td.soil-moisture {
+  @apply text-2xl;
+}
+
+.multiple {
+  @apply bg-fuchsia-400;
+}
+td.multiple {
+  @apply text-2xl;
+}
+
+.routing {
+  @apply bg-cyan-400;
+}
+td.routing {
+  @apply text-2xl;
+}
+
+.snow {
+  @apply bg-sky-200;
+}
+td.snow {
+  @apply text-2xl;
+}
 </style>

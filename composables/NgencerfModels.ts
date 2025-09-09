@@ -45,6 +45,7 @@ export interface NonFieldError {
 export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
   geopackage_image_url?: string | null;
   eds_errors: edsError[];
+  warnings: string[];
 }
 
 export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
@@ -98,6 +99,7 @@ export interface CalibrationJobListItem {
   is_locked: boolean;
   is_downloadable: boolean;
   validations: CalibrationJobValidationItem[];
+  stop_criteria: number;
   modules: string[];
 }
 
@@ -140,7 +142,8 @@ export interface UserCalibrationRunData {
   job_data_dir: string;
   submit_date: string; // e.g. "2024-09-13T05:50:22.334Z"
   gage: GageData;
-  forcing_source: string;
+  forcing_source_requested: string;
+  forcing_source_actual: string;
   forcing_user_dir: string;
   forcing_dir_path: string;
   observational_source: string;
@@ -150,8 +153,15 @@ export interface UserCalibrationRunData {
   external_data_status: ExternalDataStatus;
   geopackage_hydrofabric_file_path: string;
   geopackage_image_url: string;
+  logging_config: {
+    logging_enabled: boolean;
+    modules: {
+      [key: string]: string;
+    }
+  }
   modules: string[];
   formulation_name: string;
+  is_aet_rootzone: boolean;
   formulation_warning?: FormulationWarning;
   use_sloth: boolean;
   sloth_parameters: SlothParameterData[];
@@ -159,6 +169,7 @@ export interface UserCalibrationRunData {
   time_range: UserCalibrationRunTimeRangeData;
   calibration_times: UserCalibrationRunCalibrationTimesData;
   validation_times: UserCalibrationRunValidationTimesData;
+  output_variable_to_calibrate: string;
   num_catchments: number | null;
   parameters_selected: boolean;
   parameters: UserCalibrationRunParametersData[];
@@ -258,7 +269,7 @@ export interface GageOptionData {
 export interface SaveGageTabPayload {
   calibration_run_id?: number;
   gage_id?: string;
-  forcing_source?: string;
+  forcing_source_requested?: string;
   observational_source?: string;
   geopackage_source?: string;
 }
@@ -320,6 +331,7 @@ export interface FormulationModuleData {
 export interface SaveFormulationTabPayload {
   calibration_run_id?: number;
   formulation_name?: string;
+  is_aet_rootzone?: boolean;
   modules?: string[];
   use_sloth?: boolean;
   sloth_parameters?: SlothParameterData[];
@@ -734,7 +746,7 @@ export type GageResetData = {
   };
   geopackage_source: string;
   observational_source: string;
-  forcing_source: string;
+  forcing_source_requested: string;
   geopackage_image_url: string;
 }
 

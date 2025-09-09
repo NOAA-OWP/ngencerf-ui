@@ -14,23 +14,29 @@
           <div v-if="calData?.num_catchments" :aria-label="'Catchments ' + calData?.num_catchments"
             :title="'Gage ' + calData?.num_catchments"><span class="font-medium">Catchments:</span>
             {{ calData?.num_catchments }}</div>
-
-          <div v-if="calData?.forcing_source" :aria-label="'Forcing Data ' + calData?.forcing_source"
-            :title="'Forcing Data ' + calData?.forcing_source"><span class="font-medium">Forcing Data:</span>
-            {{ calData?.forcing_source }}
-          </div>
-          <div v-if="calData?.observational_source" :aria-label="'Observational Data ' + calData?.observational_source"
-            :title="'Observational Data ' + calData?.observational_source"><span class="font-medium">Observational
-              Data:</span> {{
-                calData?.observational_source }}
-          </div>
-
         </div>
 
         <div class="col-span-1">
           <div v-if="calData?.gage?.station_name" :aria-label="'Station Name ' + calData?.gage?.station_name"
             :title="'Station Name ' + calData?.gage?.station_name">
             <span class="font-medium">{{ calData?.gage?.station_name }}</span>
+          </div>
+        </div>
+
+        <div class="col-span-2">
+          <div v-if="calData?.forcing_source_requested" :aria-label="'Forcing Data ' + calData?.forcing_source_requested"
+            :title="'Forcing Data ' + calData?.forcing_source_requested"><span class="font-medium">Forcing Source: </span>
+            <span v-if="(calData?.forcing_source_actual && calData.forcing_source_actual != calData?.forcing_source_requested)">
+              {{ calData?.forcing_source_actual }} ({{ calData?.forcing_source_requested }} Was Requested)
+            </span>
+            <span v-else>
+              {{ calData?.forcing_source_requested }}
+            </span>
+          </div>
+          <div v-if="calData?.observational_source" :aria-label="'Observational Data ' + calData?.observational_source"
+            :title="'Observational Data ' + calData?.observational_source"><span class="font-medium">Observational
+              Data:</span> 
+            {{ calData?.observational_source }}
           </div>
         </div>
       </div>
@@ -45,6 +51,10 @@
           <div v-if="calData?.modules?.length" :aria-label="'Modules ' + getModuleList()"
             :title="'Modules ' + getModuleList()"><span class="font-medium">Modules:
             </span>{{ getModuleList() }}</div>
+          <div v-if="calData?.modules?.includes('CFE-S') || calData?.modules?.includes('CFE-X')" :aria-label="'CFE AET Rootzone ' + (calData?.is_aet_rootzone ? 'Yes' : 'No')"
+            :title="'CFE AET Rootzone ' + (calData?.is_aet_rootzone ? 'Yes' : 'No')">
+            <span class="font-medium">CFE AET Rootzone:
+            </span>{{ (calData?.is_aet_rootzone ? 'Yes' : 'No') }}</div>
         </div>
       </div>
 

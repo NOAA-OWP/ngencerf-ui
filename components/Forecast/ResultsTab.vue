@@ -11,14 +11,14 @@
           <th scope="row" class="text-right font-bold">
             <div style="width: 140px;">Calibration Job ID</div>
           </th>
-          <td class="pl-5">{{ calibrationJobId ?? '-'.repeat(30) }}</td>
+          <td class="pl-5">{{ calibrationJobId ?? '-'.repeat(15) }}</td>
         </tr>
         <tr height="38px" :aria-label="'Forecast Job ID is ' + forecastJobId"
           :title="'Forecast Job ID is ' + forecastJobId">
           <th scope="row" class="text-right font-bold">
             <div style="width: 140px;">Forecast Job ID</div>
           </th>
-          <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
+          <td class="pl-5">{{ forecastJobId ?? '-'.repeat(15) }}</td>
         </tr>
         <tr height="38px" :aria-label="'Status is ' + overallForcingDownloadForecastStatus"
           :title="'Status is ' + overallForcingDownloadForecastStatus">
@@ -31,7 +31,7 @@
           <th scope="row" class="text-right font-bold">
             <div style="width: 140px;">Elapsed Time</div>
           </th>
-          <td class="pl-5">{{ elapsedTime ?? '-'.repeat(30) }}</td>
+          <td class="pl-5">{{ elapsedTime ?? '-'.repeat(15) }}</td>
         </tr>
         <tr height="38px" :aria-label="'Results Pathname is ' + resultsPathname"
           :title="'Results Pathname is ' + resultsPathname">
@@ -47,7 +47,7 @@
           <th scope="row" class="text-right font-bold">
             <div style="width: 140px;">Cycle</div>
           </th>
-          <td class="pl-5">{{ forecastCycleName ?? '-'.repeat(30) }}</td>
+          <td class="pl-5">{{ forecastCycleName ?? '-'.repeat(15) }}</td>
         </tr>
       </tbody>
     </table>

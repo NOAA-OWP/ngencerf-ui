@@ -46,6 +46,8 @@ export const useOptimizationStore = defineStore(
     const objectiveFunctionOptionsList = ref<SelectOption[]>([]);
     const showObjectiveFunctionPeakFlow = ref<boolean>(false);
     const showObjectiveFunctionStreamFlow = ref<boolean>(false);
+    const optMetDataHasChanged = ref<boolean>(false);
+    const algParamDataHasChanged = ref<boolean>(false);
 
     const saveOptMetPayload = ref<SaveOptimizationPayload>({});
 
@@ -137,11 +139,13 @@ export const useOptimizationStore = defineStore(
             name: data_input.name,
             value: data_input.default_value,
           };
-          let user_optimization_input = filterCalRunData(data_input.name);
+	  // Commenting out because we don't want to replace defaults with previous user selections
+	  // when switching optimization algorithm
+          /* let user_optimization_input = filterCalRunData(data_input.name);
 
           if (user_optimization_input && user_optimization_input.length !== 0) {
             data_item.value = user_optimization_input[0].value;
-          }
+          } */
 
           data_items.push(data_item);
         });
@@ -228,6 +232,7 @@ export const useOptimizationStore = defineStore(
       uiOptimizationInputs.value.forEach((input_data) => {
         input_data.value = 0;
       });
+      optMetDataHasChanged.value = true;
     };
 
     /**
@@ -275,6 +280,8 @@ export const useOptimizationStore = defineStore(
       getObjectiveFunctionOptionsList,
       showObjectiveFunctionPeakFlow,
       showObjectiveFunctionStreamFlow,
+      optMetDataHasChanged,
+      algParamDataHasChanged,
       getSelectedMetricInfo,
       getOptimizationInputUserData,
       saveOptimizationTabData,

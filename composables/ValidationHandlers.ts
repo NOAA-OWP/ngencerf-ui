@@ -54,6 +54,17 @@ export const useProcessCalibrationGageSavedResponse = (savedResponse: GageBasinA
     })
   }
 
+  if (savedResponse.hasOwnProperty('warnings') && savedResponse.warnings.length > 0) {
+    savedResponse.warnings.forEach((warning: string) => {
+      messages.value.push({
+        severity: 'warn',
+        summary: 'AORC Error',
+        detail: warning,
+        life: ToastTimeout.timeoutWarn
+      });
+    })
+  }
+
   return messages.value;
 }
 

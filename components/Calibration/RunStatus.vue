@@ -12,14 +12,14 @@
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Submit Time</div>
                     </th>
-                    <td class="pl-5">{{ submitTime ? submitTime : '-'.repeat(30) }}</td>
+                    <td class="pl-3 whitespace-nowrap">{{ submitTime ? submitTime : '-'.repeat(15) }}</td>
                   </tr>
                   <tr height="32px" :aria-label="'Elapsed Time ' + calibrationElapsedTime"
                     :title="'Elapsed Time ' + calibrationElapsedTime">
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">Elapsed Time</div>
                     </th>
-                    <td class="pl-5">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(30) }}</td>
+                    <td class="pl-3 whitespace-nowrap">{{ calibrationElapsedTime ? calibrationElapsedTime : '-'.repeat(15) }}</td>
                   </tr>
                   <tr height="32px" :aria-label="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
                     'Interation ' + iteration" :title="validationBestAchieved.isBest ? 'Best Iteration ' + validationBestAchieved.iteration :
@@ -27,8 +27,8 @@
                     <th scope="row" class="text-right font-bold">
                       <div style="width: 140px;">{{ validationBestAchieved.isBest ? 'Best ' : '' }} Iteration</div>
                     </th>
-                    <td v-if="validationBestAchieved.isBest" class="pl-5">{{ validationBestAchieved.iteration }}</td>
-                    <td v-else class="pl-5">{{ iteration ?? '-'.repeat(30) }}</td>
+                    <td v-if="validationBestAchieved.isBest" class="pl-3">{{ validationBestAchieved.iteration }}</td>
+                    <td v-else class="pl-3 whitespace-nowrap">{{ iteration ?? '-'.repeat(15) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -44,7 +44,7 @@
                   <tr height="38px" :aria-label="'Status ' + overallCalibrationValidationStatus"
                     :title="'Status ' + overallCalibrationValidationStatus">
                     <th scope="row" class="text-right"><label for="RunStatus">Status</label></th>
-                    <td class="pl-5">
+                    <td class="pl-3">
                       <span id="RunStatus" class="dummyProgress ml-2 whitespace-nowrap text-md"
                         style="background-color: white;">
                         {{ overallCalibrationValidationStatus }}
@@ -54,7 +54,7 @@
                   <tr height="32px" aria-label="Select Plot Name" title="Select Plot Name">
                     <th scope="row" class="text-right"><label for="DisplayOptions">{{ plotList.length > 0 ?
                       'Display' : '' }}</label></th>
-                    <td class="pl-5">
+                    <td class="pl-3">
                       <Select v-show="plotList.length > 0" id="DisplayOptions" class="p-select" v-model="selectedPlotName" 
                         :options="plotList" option-label="name" optionValue="name">
                       </Select>
@@ -90,7 +90,7 @@
           </div>
         </div>
       </div>
-      <div>
+      <div v-if="(calibrationStatus === 'Saved' || calibrationStatus === 'Ready') || selectedPlotFileUrl || selectedLogCategory">
         <!--LOGGING SECTION-->
         <div v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'" id="LoggingSection"
           class="p-2 border-t border-[#d9d9d9] flex flex-col items-center">
@@ -188,7 +188,7 @@
               Log file unavailable
             </div>
 
-            <div v-if="selectedLogDisplay" id="selectedLogDisplay" class="p-2 gray-border h-600 overflow-scroll">
+            <div v-if="selectedLogDisplay" id="selectedLogDisplay" class="p-2 gray-border overflow-scroll">
               <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
             </div>
           </div>
@@ -216,7 +216,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 
 import { ValidationPlotNames } from "@/composables/NgencerfEnums";
 import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
-import { convertTimeZone, calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
+import { formatDateForRunOnString, calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -294,62 +294,65 @@ const selectedLogStatus = ref<DynamicObject>({});
 let logTimeout;
 
 const populatePlotListOptions = async() => {
-  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Validating and Preparing Job Data'].includes(userCalibrationRunData?.value?.status))) {
-    plotList.value = [{ name: plotListDefault.value, description: '' }];
+  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Validating and Preparing Job Data','Submitted'].includes(userCalibrationRunData?.value?.status))) {
+    plotList.value = [];
+    plotList.value.push({ name: plotListDefault.value, display_name: '' });
     plotListOptions.value = [];
     logListOptions.value = [];
 
-    if (userCalibrationRunData?.value?.status != 'Failed' && (userCalibrationRunData?.value?.status != 'Running' || (iteration.value && iteration.value >= 1))) {
-      // Get Plot Names
-      plotNames.value = await queryGetPlotNames();
+    nextTick(async () => {
+      if (userCalibrationRunData?.value?.status != 'Failed' && (userCalibrationRunData?.value?.status != 'Running' || (iteration.value && iteration.value >= 1))) {
+        // Get Plot Names
+        plotNames.value = await queryGetPlotNames();
 
-      if ((plotNames.value as any)?._data?.plot_names) {
-        // setting plotList will populate the dropdown
-        plotListOptions.value = (plotNames.value as any)?._data?.plot_names
-      }
-    }
-
-    // Get Names of available Logs
-    logs.value = await queryGetLogNames(
-      (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
-    );
-    if (logs.value?._data?.log_names) {
-      for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-          let logList = [];
-          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-            logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
-          }
-          logLists.value[key] = logList;
-        });
-      }
-    }
-    
-    // Add Log Options to the dropdown
-    Object.keys(logLists.value).forEach(key => {
-      let optionName = capitalCase(key) + ' Logs';
-      logListOptions.value.push({ name: optionName, description: '' });
-    });
-
-    // Combine available plot and log options
-    for (const option of plotListOptions.value.concat(logListOptions.value)) {
-      if (!(option in plotList.value)) {
-        plotList.value.push(option);
-      }
-    }
-
-    if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
-      // Skip directly to ngen log if status is Failed
-      selectedPlotName.value = (logListOptions.value.at(-1)).name;
-      nextTick(async () => {
-        if (selectedLogList.value.length > 1) {
-            selectedLogName.value = selectedLogList.value.at(-1).name;
+        if ((plotNames.value as any)?._data?.plot_names) {
+          // setting plotList will populate the dropdown
+          plotListOptions.value = (plotNames.value as any)?._data?.plot_names
         }
+      }
+
+      // Get Names of available Logs
+      logs.value = await queryGetLogNames(
+        (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
+      );
+      if (logs.value?._data?.log_names) {
+        for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+          Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+            let logList = [];
+            for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+              logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+            }
+            logLists.value[key] = logList;
+          });
+        }
+      }
+      
+      // Add Log Options to the dropdown
+      Object.keys(logLists.value).forEach(key => {
+        let optionName = capitalCase(key) + ' Logs';
+        logListOptions.value.push({ name: optionName, display_name: '' });
       });
-    } else if (!selectedPlotName.value) {
-      // Start with default option
-      selectedPlotName.value = plotListDefault.value;
-    }
+
+      // Combine available plot and log options
+      for (const option of plotListOptions.value.concat(logListOptions.value)) {
+        if (!(plotList.value.find(obj => obj.name === option.name))) {
+          plotList.value.push(option);
+        }
+      }
+
+      if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
+        // Skip directly to ngen log if status is Failed
+        selectedPlotName.value = (logListOptions.value.at(-1)).name;
+        nextTick(async () => {
+          if (selectedLogList.value.length > 1) {
+              selectedLogName.value = selectedLogList.value.at(-1).name;
+          }
+        });
+      } else if (!selectedPlotName.value) {
+        // Start with default option
+        selectedPlotName.value = plotListDefault.value;
+      }
+    });
   }
 }
 
@@ -364,6 +367,18 @@ onMounted(async () => {
   }
   const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
 
+  // set log levels
+  Object.keys(userCalibrationRunData?.value?.logging_config?.modules).forEach(server_key => {
+    // Find matching key in log levels somehow
+    Object.keys(logLevels.value).forEach(ui_key => {
+      if (ui_key.toLowerCase() == server_key.toLowerCase()) {
+        logLevels.value[ui_key] = ref(userCalibrationRunData?.value?.logging_config?.modules[server_key] as LogLevel);
+      }
+    });
+  });
+  if (userCalibrationRunData?.value?.logging_config?.modules['ngen']) {
+    ngenLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen'] as LogLevel;
+  }
   if (userCalibrationRunData?.value && getStatusResponse.status === 200) {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
   }
@@ -372,7 +387,7 @@ onMounted(async () => {
   validationBestAchieved.value.isBest = false;
 
   nextTick(async () => {
-    hilightTab(CalibrationTabs.tab_statusRun);
+    hilightTab(CalibrationTabs.tab_runStatus);
     if (userCalibrationRunData.value) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
 
@@ -415,6 +430,12 @@ onMounted(async () => {
       if (validationControlStatus?.value) {
         validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
       }
+    }
+    
+    if (userCalibrationRunData.value?.status === 'Running' || 
+      (userCalibrationRunData.value?.status === 'Done' &&
+      (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
+      updateIteration();
     }
   });
 });
@@ -469,7 +490,7 @@ const startRun = async () => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Submitted or Running after clicking START', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      fetchUserCalibrationRunData();
+      //fetchUserCalibrationRunData();
     } else {
       const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
       
@@ -521,8 +542,32 @@ const cancelRun = async () => {
   }
 };
 
-// Handle calibrationStatus changes
-watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
+// Update iteration
+const updateIteration = async () => {
+  const getIterationResponse = await queryGetIteration();
+  
+  // check if status changes from Submitted or Running
+  if (getIterationResponse._data && getIterationResponse._data.status) {
+    if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
+      if (userCalibrationRunData.value) {
+        clearInterval(calibrationStatusIntervalId.value);
+        calibrationStatusIntervalId.value = undefined;
+      }
+    }
+    userCalibrationRunData.value.status = getIterationResponse._data.status;
+  } else {
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+
+  // check if iteration changes
+  if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
+    iteration.value = getIterationResponse._data.iteration;
+  }
+}
+
+// Handle calibration/validation status changes
+watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
   if (userCalibrationRunData.value) {
     if (userCalibrationRunData.value.stop_criteria) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
@@ -539,8 +584,9 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
 
     if (['Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
       // Calculate Running Time
-      if (submitTimeDate.value && submitTimeDate.value instanceof Date && !isNaN(submitTimeDate?.value.getTime())) {
-        submitTime.value = convertTimeZone(submitTimeDate.value); // create a string from submit_date and convert it to local time format
+      if (submitTimeDate.value && submitTimeDate.value instanceof Date && !isNaN(submitTimeDate?.value.getTime())) {    
+        // show submitTimeDate as UTC
+        submitTime.value = formatDateForRunOnString(submitTimeDate.value as Date);
 
         const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
         const validations = getStatusResponse?._data?.validations;
@@ -583,8 +629,8 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
-
-    populatePlotListOptions();
+    
+    await populatePlotListOptions();
 
     if (calibrationStatus.value === 'Submitted' || calibrationStatus.value === 'Running') {
       if (!calibrationStatusIntervalId.value) {
@@ -603,30 +649,12 @@ watch(calibrationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCl
               }
               userCalibrationRunData.value.status = getStatusResponse._data.status;
             } else {
+              clearInterval(calibrationStatusIntervalId.value);
               const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
               toast.add(tMsg); addToastRecord(tMsg);
             }
           } else {
-            const getIterationResponse = await queryGetIteration();
-            
-            // check if status changes from Submitted or Running
-            if (getIterationResponse._data && getIterationResponse._data.status) {
-              if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
-                if (userCalibrationRunData.value) {
-                  clearInterval(calibrationStatusIntervalId.value);
-                  calibrationStatusIntervalId.value = undefined;
-                }
-              }
-              userCalibrationRunData.value.status = getIterationResponse._data.status;
-            } else {
-              const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
-              toast.add(tMsg); addToastRecord(tMsg);
-            }
-
-            // check if iteration changes
-            if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
-              iteration.value = getIterationResponse._data.iteration;
-            }
+            updateIteration();
           }
         }, 10000) as unknown as number;
       }
@@ -777,8 +805,8 @@ watch(selectedPlotName, async () => {
 // Handle submitTimeDate changes
 watch(submitTimeDate, () => {
   if (isValidDate(submitTimeDate.value)) {
-    // convert submitTimeDate to local time format and set submitTime to display on the Status/Run tab
-    submitTime.value = convertTimeZone(submitTimeDate.value as Date);
+    // show submitTimeDate as UTC
+    submitTime.value = formatDateForRunOnString(submitTimeDate.value as Date);
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -788,10 +816,8 @@ watch(submitTimeDate, () => {
 // Handle iteration changes
 watch(iteration, async () => {
   if (iteration.value && iteration.value >= 1) {
-    if (iteration.value == 1) {
-      // populate plotListOptions on first iteration
-      populatePlotListOptions();
-    }
+    // populate plotListOptions from iteration 1 onwards, in case a plot becomes available that wasn't before
+    await populatePlotListOptions();
     if (selectedPlotName.value && selectedPlotName.value != plotListDefault.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
       let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available';
 
@@ -848,12 +874,15 @@ const resetUserPlotRefs = (exceptions: any): void => {
 watch(selectedLogCategory, async () => {
   if (selectedLogCategory.value != '') {
   selectedLogList.value = logLists.value[selectedLogCategory.value];
-    // start with the first log
-    selectedLogName.value = selectedLogList.value[0].name;
-    if (!selectedLogList.value.length) {
-      const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
+    selectedLogName.value = '';
+    nextTick(() => {
+      // start with the first log
+      selectedLogName.value = selectedLogList.value[0].name;
+      if (!selectedLogList.value.length) {
+        const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+    });
   }
 });
 
@@ -882,12 +911,14 @@ const updateLogRefs = async(getLogData: boolean) => {
       }
       selectedLogFilePath.value = response?._data.log_path;
       selectedLogByteOffset.value = response?._data?.byte_offset;
-      nextTick(async () => {
-        document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
-        - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
-        document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
-      });
+      if (document.getElementById('selectedLogDisplay')) {
+        nextTick(async () => {
+          document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
+          - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
+        });
+      }
     } else {
+      selectedLogDisplay.value = '';
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
@@ -911,11 +942,17 @@ const updateLogRefs = async(getLogData: boolean) => {
 // Handle selectedLogName changes
 watch(selectedLogName, async () => {
   if (selectedLogName.value !== '') {
-    updateLogRefs(true);
+    await updateLogRefs(true);
+    if (selectedLogDisplay.value && selectedLogDisplay.value != '') {
+      nextTick(async () => {
+        document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
+      });
+    }
   }
 });
 
 watch(selectedLogStatus, async () => {
+  // if selectedLogStatus is not empty, update log refs
   if (selectedLogStatus.value && Object.keys(selectedLogStatus.value).length > 0) {
     updateLogRefs(selectedLogStatus.value?.file_updated);
   }
@@ -962,6 +999,10 @@ onUnmounted(() => {
 #DisplayOptions {
   width: 250px;
   margin-left: 0px;
+}
+
+#selectedLogDisplay {
+  max-height: 300px;
 }
 
 .p-progressbar {

@@ -30,12 +30,15 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   const filterGroup = ref<string>("");
   const selectedModuleValues = ref<string[]>([]);
   const formulationNameInput = ref<string>("");
+  const isAETRootzone = ref<boolean>(false);
   const slothParameterInputs = ref<SlothParameterData[]>([]);
   const useSlothParameters = ref<boolean>(false);
 
   const formulationTabData = ref<FormulationTabData>();
-  const formulationIsValid = ref<boolean>(false);
-  const formulationInvalidMessages = ref<string[]>([]);
+  const formulationInfoMessages = ref<string[]>([]);
+  const formulationErrorMessages = ref<string[]>([]);
+  const formulationWarningMessages = ref<string[]>([]);
+  const formulationIsCalibratable = ref<boolean>(false);
 
   const saveFormulationPayload = ref<SaveFormulationTabPayload>({});
 
@@ -78,6 +81,9 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     } else {
         selectedModuleValues.value = [];
     }
+    if (userCalibrationRunData.value?.is_aet_rootzone) {
+      isAETRootzone.value = true;
+    }
     useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false;
     slothParameterInputs.value =
       JSON.parse(
@@ -98,7 +104,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     ) {
       formulationTabData.value?.modules.forEach((moduleData) => {
         if (
-          !filterGroup.value ||
+          !filterGroup.value || filterGroup.value == 'ALL' ||
           moduleData.groups.includes(filterGroup.value)
         ) {
           const selectOptionItem = {
@@ -290,18 +296,25 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   
   async function updateFormulationValidRefs() {
     validateFormulationTabData().then(response => {
-      formulationIsValid.value = true;
-      formulationInvalidMessages.value = [];
+      formulationInfoMessages.value = [];
+      formulationErrorMessages.value = [];
+      formulationWarningMessages.value = [];
       if (response._data.formulation_errors) {
+        formulationIsCalibratable.value = false;
         response._data.formulation_errors.forEach((err: any) => {
-          formulationIsValid.value = false;
-          formulationInvalidMessages.value.push('Error: ' + err);
+          formulationErrorMessages.value.push('Error: ' + err);
         });
+      } else {
+        formulationIsCalibratable.value = true;
       }
       if (response._data.formulation_warnings) {
         response._data.formulation_warnings.forEach((err: any) => {
-          formulationIsValid.value = false;
-          formulationInvalidMessages.value.push('Error: ' + err);
+          formulationWarningMessages.value.push('Warning: ' + err);
+        });
+      }
+      if (response._data.formulation_messages) {
+        response._data.formulation_messages.forEach((msg: any) => {
+          formulationInfoMessages.value.push(msg);
         });
       }
     });
@@ -320,6 +333,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
       : "";
     saveFormulationPayload.value.modules =
       selectedModuleValues.value.length > 0 ? selectedModuleValues.value : [];
+    saveFormulationPayload.value.is_aet_rootzone = isAETRootzone.value;
     saveFormulationPayload.value.sloth_parameters =
       slothParameterInputs.value.length > 0 ? slothParameterInputs.value : [];
 
@@ -328,6 +342,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
         saveFormulationPayload.value
       );
       if (Object.keys(saveValidation.value).length > 0) {
+        formulationIsCalibratable.value = false;
         return Promise.resolve({
           _data: {
             message: "Unable to save formulation tab.",
@@ -387,18 +402,22 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   const resetFormulationStore = (): void => {
     formulationNameInput.value = "";
     selectedModuleValues.value = ['T-Route'];
+    isAETRootzone.value = false;
     useSlothParameters.value = false;
     slothParameterInputs.value = [];
   };
 
   return {
     formulationTabData,
-    formulationIsValid,
-    formulationInvalidMessages,
+    formulationInfoMessages,
+    formulationErrorMessages,
+    formulationWarningMessages,
+    formulationIsCalibratable,
     filterGroup,
     useSlothParameters,
     selectedModuleValues,
     formulationNameInput,
+    isAETRootzone,
     slothParameterInputs,
     fetchFormulationModuleOptions,
     fetchFormulationModuleCoveredGroupFilterOptions,

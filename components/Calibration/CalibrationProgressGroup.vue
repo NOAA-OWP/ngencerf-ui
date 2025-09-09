@@ -11,7 +11,7 @@
         <td><i v-if="userCalibrationRunData?.external_data_status?.forcing"
             :class="userCalibrationRunData?.external_data_status?.forcing ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing</td>
+        <td data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing Source</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.external_data_status?.observational"
@@ -26,8 +26,8 @@
         <td data-tab="2" title="Geopackage" aria-label="Geopackage" @click="tabClicked">Geopackage</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length"
-            :class="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length ? 'checkMark' : ''"
+        <td><i v-if="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length && formulationIsCalibratable"
+            :class="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length && formulationIsCalibratable ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
         <td data-tab="3" title="Formulation" aria-label="Formulation" @click="tabClicked">Formulation</td>
       </tr>
@@ -77,13 +77,39 @@
 <script lang="ts" setup>
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+const { selectedModuleValues, formulationIsCalibratable } = storeToRefs(useFormulationStore());
+const { validateFormulationTabData } = useFormulationStore();
 
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 
 const emit = defineEmits(["tabNumber"]);
+
+onMounted(async() => {
+  // check to see if formulation is calibratable
+  if (userCalibrationRunData.value?.modules != null) {
+    try {
+      selectedModuleValues.value = JSON.parse(
+        JSON.stringify(userCalibrationRunData.value.modules)
+      );
+    } catch (e) {
+      console.error("Failed to clone modules:", e);
+      selectedModuleValues.value = [];
+    }
+  } else {
+    selectedModuleValues.value = [];
+  }
+  validateFormulationTabData().then(response => {
+    if (response._data.formulation_errors) {
+      formulationIsCalibratable.value = false;
+    } else {
+      formulationIsCalibratable.value = true;
+    }
+  });
+})
 
 const checkStartEndTimeValues = () => {
   return (

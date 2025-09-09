@@ -4,7 +4,7 @@ export const CalibrationTabs = {
   tab_formulation: 2,
   tab_tuningControls: 3,
   tab_optimizationMetrics: 4,
-  tab_statusRun: 5,
+  tab_runStatus: 5,
 };
 
 export const EvaluationTabs = {
@@ -19,7 +19,7 @@ export const ForecastTabs = {
   tab_calibrationRuns: 0,
   tab_forecastRuns: 1,
   tab_setupForecast: 2,
-  tab_statusRun: 3,
+  tab_runStatus: 3,
   tab_results: 4,
 };
 
@@ -143,6 +143,7 @@ export const JobStatusAction = {
 
 export const ValidationFormFields = {
   formulation_name: "Formulation Name",
+  is_aet_rootzone: "CFE AET Rootzone",
   modules: "Formulation Modules",
   sloth_parameters: "Sloth Parameters",
   maps_to_module: "Sloth Parameter For Module",

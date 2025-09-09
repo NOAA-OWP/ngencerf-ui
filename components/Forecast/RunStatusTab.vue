@@ -28,26 +28,26 @@
                 <th scope="row" class="text-right font-bold">
                   <div style="width: 140px;">Calibration Job ID</div>
                 </th>
-                <td class="pl-5">{{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(30) }}</td>
+                <td class="pl-5">{{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(15) }}</td>
               </tr>
               <tr height="40px" :aria-label="'Forecast Job ID ' + forecastJobId"
                 :title="'Forecast Job ID ' + forecastJobId">
                 <th scope="row" class="text-right font-bold">
                   <div style="width: 140px;">Forecast Job ID</div>
                 </th>
-                <td class="pl-5">{{ forecastJobId ?? '-'.repeat(30) }}</td>
+                <td class="pl-5">{{ forecastJobId ?? '-'.repeat(15) }}</td>
               </tr>
               <tr height="32px" :aria-label="'Submit Time ' + submitTime" :title="'Submit Time ' + submitTime">
                 <th scope="row" class="text-right font-bold">
                   <div style="width: 140px;">Submit Time</div>
                 </th>
-                <td class="pl-5">{{ submitTime ?? '-'.repeat(30) }}</td>
+                <td class="pl-5">{{ submitTime ?? '-'.repeat(15) }}</td>
               </tr>
               <tr height="32px" :aria-label="'Elapsed Time ' + elapsedTime" :title="'Elapsed Time ' + elapsedTime">
                 <th scope="row" class="text-right font-bold">
                   <div style="width: 140px;">Elapsed Time</div>
                 </th>
-                <td class="pl-5">{{ elapsedTime ?? '-'.repeat(30) }}</td>
+                <td class="pl-5">{{ elapsedTime ?? '-'.repeat(15) }}</td>
               </tr>
             </tbody>
           </table>
@@ -79,7 +79,7 @@
                 <td class="text-right font-bold">
                   <div style="width: 140px;">Configuration</div>
                 </td>
-                <td class="pl-5">{{ ((forecastCycle as ForecastCycle)?.name ?? 'Unknown') ?? '-'.repeat(30) }}</td>
+                <td class="pl-5">{{ ((forecastCycle as ForecastCycle)?.name ?? 'Unknown') ?? '-'.repeat(15) }}</td>
               </tr>
             </tbody>
           </table>
@@ -102,7 +102,15 @@
     <div id="HBCbuttonsOuter">
       <div class="grid grid-rows-1 ActionButtonsBox mt-2" id="HBCbuttons">
         <div class="row-span-1">
-          <div class="grid grid-cols-8">
+          <div class="grid grid-cols-4">
+            <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
+              <div class="col-span-1 mr-4">
+                <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Previous Button" aria-label="Previous Button"
+                    @click="goToSetupForecastTab()">
+                    Previous
+                </Button>
+              </div>
+            </span>
             <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
               <div class="col-span-1 mr-6">
                 <Button class=" ngenButtonDiv-green font-normal" title="Run Button" aria-label="Run Button"
@@ -172,7 +180,7 @@ const {
 } = storeToRefs(useForecastStore());
 
 const {
-  loadForecastStatusRunTabData,
+  loadForecastRunStatusTabData,
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
@@ -188,10 +196,10 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
 
   // highlight the tab when selected
-  hilightTab(ForecastTabs.tab_statusRun);
+  hilightTab(ForecastTabs.tab_runStatus);
 
-  // load Status/Run tab data
-  await loadForecastStatusRunTabData();
+  // load Run/Status tab data
+  await loadForecastRunStatusTabData();
 });
 
 /**
@@ -239,7 +247,7 @@ const createForcingDownloadAndForecastStatusInterval = () => {
         submitTimeDate.value = new Date(forecast?.submit_date as string);
 
         if (isValidDate(submitTimeDate.value)) {
-          submitTime.value = convertTimeZone(submitTimeDate.value);
+          submitTime.value = formatDateForRunOnString(submitTimeDate.value);
         }
       }
     } else {
@@ -264,7 +272,7 @@ const startForecastRun = async () => {
       submitTimeDate.value = new Date(createAndRunForecastJobResponse?._data?.submit_date);
 
       if (isValidDate(submitTimeDate.value)) {
-        submitTime.value = convertTimeZone(submitTimeDate.value);
+        submitTime.value = formatDateForRunOnString(submitTimeDate.value);
       }
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
@@ -299,7 +307,7 @@ const cancelForecastRun = async () => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      await loadForecastStatusRunTabData();
+      await loadForecastRunStatusTabData();
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Forecast status from server', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -365,6 +373,15 @@ watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newFore
   }
 }, 
 { immediate: true });
+
+/**
+ * Go to the Setup Forecast Tab
+ */
+const goToSetupForecastTab = () => {
+    const allTabs = document.getElementsByClassName("tabs");
+    const e = allTabs[ForecastTabs.tab_setupForecast] as HTMLElement;
+    e.click();
+};
 </script>
 
 <style lang="scss" scoped>

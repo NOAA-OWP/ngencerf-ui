@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { Base } from '#build/components';
-import Aura from '@primevue/themes/aura';
+import Aura from '@primeuix/themes/aura';
 
 export default defineNuxtConfig({
   devtools: { enabled: false },
@@ -47,7 +47,7 @@ export default defineNuxtConfig({
       theme: {
         preset: Aura,
         options: {
-            darkModeSelector: false,
+          darkModeSelector: false,
         }
       }
     }

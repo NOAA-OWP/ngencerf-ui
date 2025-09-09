@@ -314,7 +314,7 @@ import { DateTime } from "luxon";
 import type { DynamicObject } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
-import { formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
+import { formatElapsedTime, formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
 import { isValidDate, isValidDateTime } from "@/utils/CommonHelpers";
 
 import { generalStore } from '@/stores/common/GeneralStore';
@@ -639,7 +639,11 @@ watch(selectedPlotName, async () => {
             performanceMetricsColumns.value.push({ header: 'Calibration Job ID ' + calibrationJobId.value, field: 'calibration_job_id_' + calibrationJobId.value });
             Object.keys(performanceMetrics.value?._data.performance_metrics).forEach(key => {
               performanceMetricsData.value.push({ 'metric': key });
-              performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = performanceMetrics.value?._data?.performance_metrics[key];
+              let metric_value = performanceMetrics.value?._data?.performance_metrics[key];
+              if (key == 'elapsed_time') {
+                metric_value = formatElapsedTime(metric_value);
+              }
+              performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = metric_value;
             });
             // Now go through the values from our Validations and add each metric value to the appropriate row
             if (performanceMetrics.value?._data?.validations) {
@@ -662,19 +666,23 @@ watch(selectedPlotName, async () => {
                 performanceMetricsColumns.value.push({ header: 'Validation Job ID ' + validation_run_id + ' (' + validation_type + ')', field: 'validation_job_id_' + validation_run_id });
                 if (performanceMetrics.value?._data?.validations[v]?.performance_metrics) {
                   Object.keys(performanceMetrics.value?._data?.validations[v].performance_metrics).forEach(key => {
+                    let metric_value = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
+                    if (key == 'elapsed_time') {
+                      metric_value = formatElapsedTime(metric_value);
+                    }
                     // Loop through our existing rows and see if we have this metric already
                     let metricRow = -1;
                     for (let m = 0; m < performanceMetricsData.value.length; m++) {
                       if (performanceMetricsData.value[m].metric === key) {
                         metricRow = m;
-                        performanceMetricsData.value[m]['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
+                        performanceMetricsData.value[m]['validation_job_id_' + validation_run_id] = metric_value;
                         break;
                       }
                     }
                     if (metricRow === -1) {
                       // We didn't find this metric, so create a new row for it
                       performanceMetricsData.value.push({ 'metric': key });
-                      performanceMetricsData.value.at(-1)['validation_job_id_' + validation_run_id] = performanceMetrics.value?._data?.validations[v].performance_metrics[key];
+                      performanceMetricsData.value.at(-1)['validation_job_id_' + validation_run_id] = metric_value;
                     }
                   });
                 }
@@ -1119,11 +1127,11 @@ const drawInteractivePlot = () => {
     };
     if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
       plotGraphOptions.value.y.label = 'Depth (m)';
-      plotGraphOptions.value.y.labelOffset = -10;
-      plotGraphOptions.value.marginLeft = 50;
     } else {
-      plotGraphOptions.value.y.label = 'Streamflow (cm/s)';
+      plotGraphOptions.value.y.label = 'Streamflow (m^3/s)';
     }
+    plotGraphOptions.value.y.labelOffset = -10;
+    plotGraphOptions.value.marginLeft = 50;
 
     for (let c = 1; c < plotTableColumns.value.length; c++) {
       if ((document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
@@ -1191,12 +1199,12 @@ const drawInteractivePlot = () => {
     dotTipOptions.y.label = 'Depth';
     dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
   } else {
-    lineOptions.y.label = 'Flow (cm/s)';
+    lineOptions.y.label = 'Flow (m^3/s)';
     lineTipOptions.y.label = 'Flow';
-    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} cm/s`;
-    dotOptions.y.label = 'Flow (cm/s)';
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} m^3/s`;
+    dotOptions.y.label = 'Flow (m^3/s)';
     dotTipOptions.y.label = 'Flow';
-    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} cm/s`;
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} m^3/s`;
   }
   if (plotLineData.length > 0) {
     plotGraphLeftEdge = new Date(plotLineData[0].time);
@@ -1553,16 +1561,18 @@ const toggleCustomizePlot = async () => {
 
 // Handle selectedLogCategory changes
 watch(selectedLogCategory, async () => {
-  selectedLogList.value = logLists.value[selectedLogCategory.value];
-  selectedLogName.value = '';
-  if (selectedLogList?.value?.length > 0) {
-    // start with the first log
-    nextTick(() => {
-      selectedLogName.value = selectedLogList.value[0].name;
-    });
-  } else {
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
-    toast.add(tMsg); addToastRecord(tMsg);
+  if (selectedLogCategory.value !== '') {
+    selectedLogList.value = logLists.value[selectedLogCategory.value];
+    selectedLogName.value = '';
+    if (selectedLogList?.value?.length > 0) {
+      // start with the first log
+      nextTick(() => {
+        selectedLogName.value = selectedLogList.value[0].name;
+      });
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedPlotName.value + ' not available', life: ToastTimeout.timeoutInfo };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   }
 });
 

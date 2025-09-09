@@ -52,20 +52,12 @@ export const refreshAccessToken = async (
  * @param userOptions
  * @returns response from the API call
  */
-
-let rqstUrl: string;
-let rqstUserOptions: any;
-
 export const makeProtectedApiCall = async <T>(
   url: string,
   userOptions: any = {}
 ): Promise<any> => {
   const { isLoading } = storeToRefs(generalStore());
   const { lastServerError } = storeToRefs(useUserDataStore());
-
-  // Save the call data in case we need to refresh.
-  rqstUrl = url;
-  rqstUserOptions = userOptions;
 
   let responseData: any;
 
@@ -113,8 +105,8 @@ export const makeProtectedApiCall = async <T>(
         sendUserToLogin();
         return;
       }
-      rqstUserOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
-      return makeProtectedApiCall(rqstUrl, rqstUserOptions);
+      userOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
+      return makeProtectedApiCall(url, userOptions);
     }
 
     // Client bad requests, except for Unauthorized, which is handled above

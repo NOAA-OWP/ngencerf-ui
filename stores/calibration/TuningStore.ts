@@ -46,12 +46,14 @@ export const useTuningStore = defineStore(
     const saveTuningTabRequestBody = ref<any>({});
 
     const selectedOutputVariableToCalibrate = ref<string>("Streamflow");
+    const calibratableParametersHaveChanged = ref<boolean>(false);
+    const tuningDataHasChanged = ref<boolean>(false);
 
     /**
      * Load Tuning Tab data
      * @returns {Promise<any>}
      */
-    async function loadTuningTabStaticData(): Promise<any> {
+    async function loadTuningTabStaticData(forceReset: boolean=false): Promise<any> {
       tuningStore_data_loading.value = true;
       loadTuningTabData.value = await makeProtectedApiCall<any>(
         `${ngencerfBaseUrl}/calibration/load_tuning_tab/`,
@@ -97,7 +99,8 @@ export const useTuningStore = defineStore(
       // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
       if (
         !userSelectedCalibrationTuningParameters.value ||
-        userSelectedCalibrationTuningParameters.value.length === 0
+        userSelectedCalibrationTuningParameters.value.length === 0 ||
+        forceReset
       ) {
         userSelectedCalibrationTuningParameters.value =
           calibrationTuningParameters.value
@@ -188,16 +191,18 @@ export const useTuningStore = defineStore(
       simEndTime,
       calStartTime,
       calEndTime,
-      selectedOutputVariableToCalibrate,
-      calibrationTuningParameters,
-      userSelectedCalibrationTuningParameters,
-      automatic_validation,
       avSimStartTime,
       avSimEndTime,
       avCalStartTime,
       avCalEndTime,
       rangeDateFrom,
       rangeDateTo,
+      selectedOutputVariableToCalibrate,
+      calibrationTuningParameters,
+      userSelectedCalibrationTuningParameters,
+      automatic_validation,
+      calibratableParametersHaveChanged,
+      tuningDataHasChanged,
       saveTuningTabRequestBody,
       saveTuningTabData,
       clearCalibratableParameters,
