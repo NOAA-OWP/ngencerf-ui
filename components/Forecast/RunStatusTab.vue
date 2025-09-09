@@ -382,6 +382,16 @@ const goToSetupForecastTab = () => {
     const e = allTabs[ForecastTabs.tab_setupForecast] as HTMLElement;
     e.click();
 };
+
+onBeforeUnmount(() => {
+  clearInterval(forecastJobStatusIntervalId.value);
+  clearInterval(elapsedTimeIntervalId.value);
+  forecastJobStatusIntervalId.value = undefined;
+  elapsedTimeIntervalId.value = undefined;
+  forecastJobStatus.value = "";
+  submitTime.value = "";
+  elapsedTime.value = "";
+})
 </script>
 
 <style lang="scss" scoped>
