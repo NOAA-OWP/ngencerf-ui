@@ -446,7 +446,7 @@ onMounted(async () => {
 const createElapsedTimeInterval = () => {
   elapsedTimeIntervalId.value = setInterval(async () => {
     if (
-      userCalibrationRunData.value?.status === 'Running' || 
+      ['Validating and Preparing Job Data','Running'].includes(userCalibrationRunData.value?.status) || 
       (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate calibrationElapsedTime every second while Calibration is Running or Validation is not Done
@@ -460,10 +460,14 @@ const createElapsedTimeInterval = () => {
 
 // Run Calibration Job
 const startRun = async () => {
-  isLoading.value = true;
+  //isLoading.value = true;
   validationBestAchieved.value.isBest = false;
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Validating and Preparing Job Data';
+
+    submitTimeDate.value = new Date();
+
+    createElapsedTimeInterval();
 
     const runCalibrationResponse = await runCalibrationJob();
 
@@ -510,12 +514,12 @@ const startRun = async () => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'userCalibrationRunData not set', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
-  isLoading.value = false;
+  //isLoading.value = false;
 };
 
 // Cancel Calibration Job
 const cancelRun = async () => {
-  if (calibrationStatus.value === 'Running') {
+  if (calibrationStatus.value === 'Running'  || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') {
     try {
       const cancelCalibrationResponse = await cancelCalibrationJob();
 
@@ -537,7 +541,7 @@ const cancelRun = async () => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration', life: ToastTimeout.timeoutWarn };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration/Validation status not set to Running. Cannot cancel Calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
@@ -607,7 +611,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
 
         // calculate running time every second while calibration is Running 
         // or calibration is Done and valid_control and valid_best have not started or are Submitted, Ready, Running
-        if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
+        if (['Validating and Preparing Job Data','Running'].includes(userCalibrationRunData.value?.status) || (userCalibrationRunData.value?.status === 'Done' &&
           (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
 
           const allDurs = [getStatusResponse._data.elapsed_time]
