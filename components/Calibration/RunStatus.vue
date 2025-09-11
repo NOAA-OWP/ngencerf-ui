@@ -431,10 +431,10 @@ onMounted(async () => {
       if (validationControlStatus?.value) {
         validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
       }
-    }
     
     // always update the iteration number for any status other than Saved or Ready
     updateIteration();
+    }
   });
 });
 
