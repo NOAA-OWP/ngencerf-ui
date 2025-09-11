@@ -215,7 +215,7 @@ import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { generalStore } from "~/stores/common/GeneralStore";
 
 import { ValidationPlotNames } from "@/composables/NgencerfEnums";
-import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
+import { isCalibrationJobStatusSavedOrReady, isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
 import { formatDateForRunOnString, calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
 
 import { hilightTab } from '@/composables/TabHilight';
@@ -263,6 +263,7 @@ const {
   runCalibrationJob,
   queryGetIteration,
   cancelCalibrationJob,
+  cancelValidationJob,
   queryGetLogNames,
   queryGetLogData,
   queryGetLogStatus
@@ -396,8 +397,8 @@ onMounted(async () => {
       }
     }
 
-    // if calibration is Done, check if all validation statuses are Done
-    if (userCalibrationRunData?.value?.status === 'Done') {
+    // if calibration is not Saved or Ready, check validation statuses
+    if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
       const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
       const validations = getStatusResponse?._data?.validations;
 
@@ -432,11 +433,8 @@ onMounted(async () => {
       }
     }
     
-    if (userCalibrationRunData.value?.status === 'Running' || 
-      (userCalibrationRunData.value?.status === 'Done' &&
-      (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
-      updateIteration();
-    }
+    // always update the iteration number for any status other than Saved or Ready
+    updateIteration();
   });
 });
 
@@ -519,9 +517,23 @@ const startRun = async () => {
 
 // Cancel Calibration Job
 const cancelRun = async () => {
-  if (calibrationStatus.value === 'Running'  || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') {
+  if (calibrationStatus.value === 'Running' || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') {
     try {
-      const cancelCalibrationResponse = await cancelCalibrationJob();
+      let cancelCalibrationResponse = undefined;
+      if (calibrationStatus.value === 'Running') {
+        cancelCalibrationResponse = await cancelCalibrationJob();
+      } else {
+        // get validations
+        const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
+        const validations = getStatusResponse?._data?.validations;
+        if (validationControlStatus.value === 'Running') {
+          const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
+          cancelCalibrationResponse = await cancelValidationJob(validControl.validation_run_id);
+        } else {
+          const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
+          cancelCalibrationResponse = await cancelValidationJob(validBest.validation_run_id);
+        }
+      }
 
       if (cancelCalibrationResponse?._data.status) {
         if (userCalibrationRunData.value) {
