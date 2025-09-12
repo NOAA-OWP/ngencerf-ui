@@ -302,7 +302,7 @@ const populatePlotListOptions = async() => {
     logListOptions.value = [];
 
     nextTick(async () => {
-      if (userCalibrationRunData?.value?.status != 'Failed' && (userCalibrationRunData?.value?.status != 'Running' || (iteration.value && iteration.value >= 1))) {
+      if (iteration.value && iteration.value >= 1) {
         // Get Plot Names
         plotNames.value = await queryGetPlotNames();
 
