@@ -295,7 +295,7 @@ const selectedLogStatus = ref<DynamicObject>({});
 let logTimeout;
 
 const populatePlotListOptions = async() => {
-  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Validating and Preparing Job Data','Submitted'].includes(userCalibrationRunData?.value?.status))) {
+  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     plotList.value = [];
     plotList.value.push({ name: plotListDefault.value, display_name: '' });
     plotListOptions.value = [];
@@ -433,7 +433,8 @@ onMounted(async () => {
       }
     
     // always update the iteration number for any status other than Saved or Ready
-    updateIteration();
+    await updateIteration();
+    await populatePlotListOptions();
     }
   });
 });
@@ -986,6 +987,7 @@ const gotoEvaluation = () => {
 
 onUnmounted(() => {
   // make sure page clears all selected plots/tables when the user leaves
+  iteration.value = undefined;
   plotList.value = [];
   resetUserPlotRefs([]);
 })
