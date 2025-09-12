@@ -215,7 +215,7 @@ import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { generalStore } from "~/stores/common/GeneralStore";
 
 import { ValidationPlotNames } from "@/composables/NgencerfEnums";
-import { isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
+import { isCalibrationJobStatusSavedOrReady, isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
 import { formatDateForRunOnString, calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
 
 import { hilightTab } from '@/composables/TabHilight';
@@ -263,6 +263,7 @@ const {
   runCalibrationJob,
   queryGetIteration,
   cancelCalibrationJob,
+  cancelValidationJob,
   queryGetLogNames,
   queryGetLogData,
   queryGetLogStatus
@@ -294,14 +295,14 @@ const selectedLogStatus = ref<DynamicObject>({});
 let logTimeout;
 
 const populatePlotListOptions = async() => {
-  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !(['Saved','Ready','Validating and Preparing Job Data','Submitted'].includes(userCalibrationRunData?.value?.status))) {
+  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     plotList.value = [];
     plotList.value.push({ name: plotListDefault.value, display_name: '' });
     plotListOptions.value = [];
     logListOptions.value = [];
 
     nextTick(async () => {
-      if (userCalibrationRunData?.value?.status != 'Failed' && (userCalibrationRunData?.value?.status != 'Running' || (iteration.value && iteration.value >= 1))) {
+      if (iteration.value && iteration.value >= 1) {
         // Get Plot Names
         plotNames.value = await queryGetPlotNames();
 
@@ -396,8 +397,8 @@ onMounted(async () => {
       }
     }
 
-    // if calibration is Done, check if all validation statuses are Done
-    if (userCalibrationRunData?.value?.status === 'Done') {
+    // if calibration is not Saved or Ready, check validation statuses
+    if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
       const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
       const validations = getStatusResponse?._data?.validations;
 
@@ -430,12 +431,10 @@ onMounted(async () => {
       if (validationControlStatus?.value) {
         validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
       }
-    }
     
-    if (userCalibrationRunData.value?.status === 'Running' || 
-      (userCalibrationRunData.value?.status === 'Done' &&
-      (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
-      updateIteration();
+    // always update the iteration number for any status other than Saved or Ready
+    await updateIteration();
+    await populatePlotListOptions();
     }
   });
 });
@@ -446,7 +445,7 @@ onMounted(async () => {
 const createElapsedTimeInterval = () => {
   elapsedTimeIntervalId.value = setInterval(async () => {
     if (
-      userCalibrationRunData.value?.status === 'Running' || 
+      ['Validating and Preparing Job Data','Running'].includes(userCalibrationRunData.value?.status) || 
       (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate calibrationElapsedTime every second while Calibration is Running or Validation is not Done
@@ -460,10 +459,14 @@ const createElapsedTimeInterval = () => {
 
 // Run Calibration Job
 const startRun = async () => {
-  isLoading.value = true;
+  //isLoading.value = true;
   validationBestAchieved.value.isBest = false;
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Validating and Preparing Job Data';
+
+    submitTimeDate.value = new Date();
+
+    createElapsedTimeInterval();
 
     const runCalibrationResponse = await runCalibrationJob();
 
@@ -510,14 +513,28 @@ const startRun = async () => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'userCalibrationRunData not set', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
-  isLoading.value = false;
+  //isLoading.value = false;
 };
 
 // Cancel Calibration Job
 const cancelRun = async () => {
-  if (calibrationStatus.value === 'Running') {
+  if (calibrationStatus.value === 'Running' || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') {
     try {
-      const cancelCalibrationResponse = await cancelCalibrationJob();
+      let cancelCalibrationResponse = undefined;
+      if (calibrationStatus.value === 'Running') {
+        cancelCalibrationResponse = await cancelCalibrationJob();
+      } else {
+        // get validations
+        const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
+        const validations = getStatusResponse?._data?.validations;
+        if (validationControlStatus.value === 'Running') {
+          const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
+          cancelCalibrationResponse = await cancelValidationJob(validControl.validation_run_id);
+        } else {
+          const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
+          cancelCalibrationResponse = await cancelValidationJob(validBest.validation_run_id);
+        }
+      }
 
       if (cancelCalibrationResponse?._data.status) {
         if (userCalibrationRunData.value) {
@@ -537,7 +554,7 @@ const cancelRun = async () => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration status not set to Running. Cannot cancel Calibration', life: ToastTimeout.timeoutWarn };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration/Validation status not set to Running. Cannot cancel Calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
@@ -607,7 +624,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
 
         // calculate running time every second while calibration is Running 
         // or calibration is Done and valid_control and valid_best have not started or are Submitted, Ready, Running
-        if (userCalibrationRunData.value?.status === 'Running' || (userCalibrationRunData.value?.status === 'Done' &&
+        if (['Validating and Preparing Job Data','Running'].includes(userCalibrationRunData.value?.status) || (userCalibrationRunData.value?.status === 'Done' &&
           (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
 
           const allDurs = [getStatusResponse._data.elapsed_time]
@@ -970,6 +987,7 @@ const gotoEvaluation = () => {
 
 onUnmounted(() => {
   // make sure page clears all selected plots/tables when the user leaves
+  iteration.value = undefined;
   plotList.value = [];
   resetUserPlotRefs([]);
 })
