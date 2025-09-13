@@ -30,11 +30,11 @@
                     <td class="td2">View more details about the calibration job than what is shown in the table.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Download Calibration Data</td>
+                    <td class="td1">Download Results</td>
                     <td class="td2">Download all the input and output data associated with a calibration run.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Export</td>
+                    <td class="td1">Export Calibration Config</td>
                     <td class="td2">Export the Calibration Definition for used for CLI import command.</td>
                 </tr>
                 <tr>

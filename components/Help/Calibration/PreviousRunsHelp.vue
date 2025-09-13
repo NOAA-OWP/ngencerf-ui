@@ -78,16 +78,16 @@
                         will be added at the top of the table. User will remain on this page.</td>
                 </tr>
                 <tr>
-                    <td class="td1 align-top" style="font-weight:normal;">Download</td>
+                    <td class="td1 align-top" style="font-weight:normal;">Download Calibration Data</td>
                     <td class="td2 align-top">Download all data associated with a Done calibration job.</td>
                 </tr>
                 <tr>
-                    <td class="td1 align-top" style="font-weight:normal;">Export</td>
+                    <td class="td1 align-top" style="font-weight:normal;">Export Calibration Config</td>
                     <td class="td2 align-top">Export the Calibration Definition for used for CLI import command.</td>
                 </tr>
                 <tr>
                     <td class="td1 align-top" style="font-weight:normal;">Delete</td>
-                    <td class="td2 align-top">Permanently deletes the selected calibration job(s) from the system.</td>
+                    <td class="td2 align-top">Permanently deletes the selected calibration job from the system.</td>
                 </tr>
                 <tr>
                     <td class="td1 align-top" style="font-weight:normal;">Archive/<br />Unarchive</td>
