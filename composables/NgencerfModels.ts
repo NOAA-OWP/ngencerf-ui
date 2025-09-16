@@ -731,6 +731,7 @@ export type CalibrationRunForForecast = {
   optimization_algorithm: string;
   validations: CalibrationJobValidationItem[];
   is_archived: boolean;
+  is_locked: boolean;
   is_downloadable: boolean;
   forecast_run_id: number;
   forecast_status: string;
@@ -746,7 +747,11 @@ export interface ForecastJob {
   cycle_date: string;
   gage_id: string;
   forecast_status: string;
-  cold_start_status: string;
+  cold_start?: {
+    cold_start_status: string;
+    cold_start_date: string;
+    cold_start_submit_date: string;
+  }
   submit_date: string;
   failure_messages: any;
 }
@@ -757,6 +762,7 @@ export type ForecastJobs = {
 
 export interface VerificationJob {
   verification_job_id: number;
+  forecast_run: ForecastJob;
   verification_yaml_file_path: string;
   yaml_config_data: DynamicObject;
   yaml_config_error_message: string;
@@ -766,6 +772,8 @@ export interface VerificationJob {
   run_end: string;
   performance_metrics: CalibrationGetStatusPerformanceMetricItem[] | null;
   status: string;
+  data_source: string;
+  failure_messages: any;
 }
 
 export type VerificationJobs = {
