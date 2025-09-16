@@ -21,7 +21,7 @@
               @RefreshJobList="refreshJobList()" :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
 
-            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[144px]" ref="crContextMenu"
+            <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[250px]" ref="crContextMenu"
               :model="buildContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
 
             <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id"
@@ -295,12 +295,12 @@ const cmCloneRun = ref({
   command: () => cloneSelectedCalibrationRun(selectedCalibrationRun) 
 });
 const cmExportRun = ref({ 
-  label: 'Export', 
+  label: 'Export Calibration Config', 
   icon: 'pi pi-file-export', 
   command: () => exportSelectedCalibrationData(selectedCalibrationRun) 
 });
 const cmDownloadRun = ref({ 
-  label: 'Download', 
+  label: 'Download Results', 
   icon: 'pi pi-download', 
   command: () => downloadSelectedCalibrationData(selectedCalibrationRun) 
 });

@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { onUnmounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import AppFooter from "@/components/Common/AppFooter.vue";
 import AppHeader from "@/components/Common/AppHeader.vue";
 import CalibrationRightBlock from "@/components/Calibration/CalibrationRightBlock.vue";
@@ -60,6 +60,11 @@ import CalibrationLeftBlock from "@/components/Calibration/CalibrationLeftBlock.
 import { generalStore } from "@/stores/common/GeneralStore";
 
 const { getMenuIndex, getCalibrationTabIndex, setCalibrationTabIndex } = generalStore();
+
+onMounted (() => {
+  console.log('getMenuIndex:', getMenuIndex());
+  console.log('getCalibrationTabIndex:', getCalibrationTabIndex());
+})
 
 onUnmounted(() => {
   // Reset tab index to 1 when we leave this layout, 

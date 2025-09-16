@@ -290,6 +290,21 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
     });
   };
+
+  /**
+   * Cancel Validation Job
+   * @returns {any}
+   */
+  const cancelValidationJob = async (validation_run_id: number): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/cancel_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ validation_run_id: validation_run_id })
+    });
+  };
   
   /**
     * Get Calibration Log Names
@@ -420,6 +435,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     runCalibrationJob,
     queryGetIteration,
     cancelCalibrationJob,
+    cancelValidationJob,
     queryGetLogNames,
     queryGetLogData,
     queryGetLogStatus,
