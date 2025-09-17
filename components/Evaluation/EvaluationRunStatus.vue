@@ -361,10 +361,6 @@ const navigateToEvaluation = (event: any) => {
 }
 
 onUnmounted(() => {
-  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'hardResetRunStatusStore called from EvaluationRunStatus', life: ToastTimeout.timeoutInfo };
-  toast.add(tMsg); addToastRecord(tMsg);
-  console.log('validationStatusCheckingIntervalId:',validationStatusCheckingIntervalId.value);
-  console.log('validationRunningTimeIntervalId:',validationRunningTimeIntervalId.value);
   runStatusTabVisible.value = false;
 })
 </script>
