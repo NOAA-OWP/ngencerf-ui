@@ -35,6 +35,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
   const calibrationValidationRunListHeaders = ref<any[]>([]);
   const computedCalibrationValidationRunList = ref<CalibrationValidationJobData[]>([]);
+  const displayCalibrationValidationRunList = ref<CalibrationValidationJobData[]>([]);
 
   const gageCalibrationRunListHeaders = ref<any[]>([]);
   const computedGageCalibrationRunList = ref<CalibrationJobListItem[]>([]);
@@ -114,6 +115,11 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
                 );
                 
                 runItem.status = overallCalibrationValidationStatus;
+                // we don't need the control run as part of our list of validations - remove it before adding runItem to our list
+                const filteredValidations = runItem.validations.filter(validation => validation.validation_type !== 'valid_control');
+                runItem.validations = filteredValidations;
+                runItem.validation_runs = filteredValidations.length;
+                runItem.validation_run_ids = filteredValidations.map(validation => validation.validation_run_id);
                 userEvaluationCalibrationRunListData.value.push(runItem);
               }
             }
@@ -178,6 +184,11 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         computedCalibrationValidationRunList.value.push(rowData);
       });
     }
+  }
+  const displayUserSelectedCalibrationValidationRunList = () => {
+    computedCalibrationValidationRunList.value.forEach((validation: CalibrationValidationJobData) => {
+      displayCalibrationValidationRunList.value.push(validation);
+    }) 
   }
   
     /**
@@ -288,6 +299,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     evaluateValidationRunId.value = 0;
     calibrationValidationRunListHeaders.value = [];
     computedCalibrationValidationRunList.value = [];
+    displayCalibrationValidationRunList.value = [];
     evaluateValidationRunStatus.value = '';
   }
 
@@ -322,6 +334,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     getReferenceDataSetOptions,
     resetUserSelectedCalibrationValidationRunList,
     fetchUserSelectedCalibrationValidationRunList,
+    displayUserSelectedCalibrationValidationRunList,
     resetUserSelectedCalibrationCompareRunList,
     resetUserSelectedEvalValidationRun,
     resetUserSelectedEvalCompareRun,
@@ -332,6 +345,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     userEvaluationCalibrationRunListData,
     calibrationValidationRunListHeaders,
     computedCalibrationValidationRunList,
+    displayCalibrationValidationRunList,
     gageCalibrationRunListHeaders,
     computedGageCalibrationRunList,
     selectedCalibrationCompareRuns,

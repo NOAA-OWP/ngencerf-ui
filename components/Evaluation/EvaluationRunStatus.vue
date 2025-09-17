@@ -339,13 +339,31 @@ watch(selectedLogCurrentPage, async () => {
   }
 });
 
-onBeforeUnmount(() => {
+const clearIntervals = (() => {
   clearInterval(validationStatusCheckingInterval.value);
   clearInterval(validationRunningTimeInterval.value);
   validationStatusCheckingInterval.value = undefined;
   validationRunningTimeInterval.value = undefined;
   clearRunningStatusInfo();
   runStatusTabVisible.value = false;
+})
+
+onBeforeUnmount(() => {
+  clearIntervals();
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'EvaluationRunStatus Tab BeforeUnmount', life: ToastTimeout.timeoutInfo };
+  toast.add(tMsg); addToastRecord(tMsg);
+})
+
+onUnmounted(() => {
+  clearIntervals();
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'EvaluationRunStatus Tab Unmount', life: ToastTimeout.timeoutInfo };
+  toast.add(tMsg); addToastRecord(tMsg);
+})
+
+onDeactivated(() => {
+  clearIntervals();
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'EvaluationRunStatus Tab Deactivated', life: ToastTimeout.timeoutInfo };
+  toast.add(tMsg); addToastRecord(tMsg);
 })
 
 const cancelRun = async () => {

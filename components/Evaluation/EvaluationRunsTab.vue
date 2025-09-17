@@ -13,7 +13,7 @@
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-6 text-3xl font-bold text-center relative">
-            <span v-if="computedCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
+            <span v-if="displayCalibrationValidationRunList.length > 1">Validation Runs for Calibration Job {{
               userSelectedEvalCalibrationRunId }}<br />
               <span class="prompt-txt">
                 Select row then right click for available options.
@@ -37,11 +37,11 @@
 
       <!-- Show list of validation runs if user has picked a calibration job with multiple validations -->
       
-      <div v-if="computedCalibrationValidationRunList.length > 1">
+      <div v-if="displayCalibrationValidationRunList.length > 1">
         <div id="evaluationCalibrationList">
           <ContextMenu :pt="{ root: { id: ' vr-context-menu' } }" class="bg-white" ref="vrContextMenu"
             :model="cmValidationRun"></ContextMenu>
-          <DataTable id="validation-list" :value="computedCalibrationValidationRunList" scrollable scroll-height="400px"
+          <DataTable id="validation-list" :value="displayCalibrationValidationRunList" scrollable scroll-height="400px"
             sortField="validation_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="single"
             v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle"
             @rowContextmenu="onRowVrContextMenu" @rowSelect="onEvalValidationRowSelect"
@@ -352,6 +352,7 @@ const {
   calibrationValidationRunListHeaders,
   gageCalibrationRunListHeaders,
   computedCalibrationValidationRunList,
+  displayCalibrationValidationRunList,
   computedGageCalibrationRunList,
   selectedCalibrationCompareRuns,
   selectedCalibrationModules,
@@ -364,6 +365,7 @@ const { calibrationDownloadJobID, calibrationDownloadFileName } = storeToRefs(us
 
 const {
   fetchUserSelectedCalibrationValidationRunList,
+  displayUserSelectedCalibrationValidationRunList,
   loadSelectedCalibrationRun,
   resetUserSelectedEvalCalibrationRun,
   resetUserSelectedEvalValidationRun,
@@ -567,9 +569,7 @@ const onEvalCalibrationRowSelect = async (event: DataTableRowClickEvent) => {
   setSelectedCalibrationRunId(event.data.calibration_run_id);
   await fetchUserCalibrationRunData(false);
   selectedCalibrationModules.value = userCalibrationRunData?.value?.modules;
-  if (event.data.validation_runs === 1) {
-    fetchUserSelectedCalibrationValidationRunList();
-  }
+  fetchUserSelectedCalibrationValidationRunList();
   isLoading.value = false;
 }
 
@@ -608,7 +608,7 @@ const openSelectedCalibrationRun = () => {
   resetUserSelectedEvalValidationRun();
   nextTick(async () => {
     setSelectedCalibrationRunId(contextMenuJob.value as number);
-    await fetchUserSelectedCalibrationValidationRunList();
+    await displayUserSelectedCalibrationValidationRunList();
     isLoading.value = false;
   })
 }
@@ -628,6 +628,7 @@ const viewSelectedCalibrationValidationRuns = async (calibration_run_id: number)
   nextTick(async () => {
     setSelectedCalibrationRunId(calibration_run_id);
     await fetchUserSelectedCalibrationValidationRunList();
+    displayUserSelectedCalibrationValidationRunList();
     isLoading.value = false;
   })
 }
