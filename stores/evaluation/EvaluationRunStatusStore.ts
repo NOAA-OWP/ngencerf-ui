@@ -20,8 +20,8 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   const validationStopStatus = ref<string[]>(['DONE', 'SERVER ERROR', 'FAILED', 'CANCELLED']);
   const validationFailedStatus = ref<string[]>(['SERVER ERROR', 'FAILED']);
   const displayValidationId = ref<number>( 0 );
-  const validationStatusCheckingInterval = ref<any>();
-  const validationRunningTimeInterval = ref<any>();
+  const validationStatusCheckingIntervalId = ref<number>();
+  const validationRunningTimeIntervalId = ref<number>();
   const runStatusTabVisible = ref<boolean>(false);
 
    /**
@@ -79,13 +79,13 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         if ( validationStatus.value.toLocaleUpperCase() !== "RUNNING" ) {
           runningTime.value = validation_run.elapsed_time ? formatElapsedTime(validation_run.elapsed_time) : '';
         } else {
-          validationRunningTimeInterval.value = setInterval( updateRunningTime, 1000 );
+          validationRunningTimeIntervalId.value = setInterval( updateRunningTime, 1000 );
         }
       } else {
-        clearInterval(validationStatusCheckingInterval.value);
-        clearInterval(validationRunningTimeInterval.value);
-        validationStatusCheckingInterval.value = undefined;
-        validationRunningTimeInterval.value = undefined;
+        clearInterval(validationStatusCheckingIntervalId.value);
+        clearInterval(validationRunningTimeIntervalId.value);
+        validationStatusCheckingIntervalId.value = undefined;
+        validationRunningTimeIntervalId.value = undefined;
       }
     })
   }
@@ -119,11 +119,24 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     return validationStopStatus.value.includes(status.toUpperCase());
   }
 
-  const clearRunningStatusInfo = () => {
+  /**
+   * Hard Reset Run/Status Store
+   */
+  const hardResetRunStatusStore = (): void => {
     validationStatus.value = "";
     startTime.value = "";
     runningTime.value = "";
-  }
+
+    if (validationStatusCheckingIntervalId.value) {
+      clearInterval(validationStatusCheckingIntervalId.value);
+      validationStatusCheckingIntervalId.value = undefined;
+    }
+
+    if (validationRunningTimeIntervalId.value) {
+      clearInterval(validationRunningTimeIntervalId.value);
+      validationRunningTimeIntervalId.value = undefined;
+    }
+  };
 
   return {
     runningTime,
@@ -131,19 +144,19 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     validationStatus,
     iterationValidationRunId,
     displayValidationId,
-    validationRunningTimeInterval,
-    validationStatusCheckingInterval,
+    validationRunningTimeIntervalId,
+    validationStatusCheckingIntervalId,
     evaluateDisplayIterationNumber,
     runStatusTabVisible,
     executeIterationValidationRun,
     queryIterationValidationRunStatus,
     executeCancelIterationValidationRun,
     isValidationRunStopped,
-    clearRunningStatusInfo,
     isValidationRunDone,
     isValidationRerunable,
     loadValidationStatusInformation,
     updateRunningTime,
+    hardResetRunStatusStore
   }
 })
 

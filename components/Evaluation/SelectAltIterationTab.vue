@@ -101,8 +101,9 @@ const {
   computedtuningParametersDataList,
 } = storeToRefs(useEvaluationAltIterationStore());
 
-const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
-const { iterationValidationRunId, validationRunningTimeInterval, validationStatusCheckingInterval } = storeToRefs(useEvaluationRunStatusStore());
+const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
+const { hardResetRunStatusStore } = useEvaluationRunStatusStore();
+const { iterationValidationRunId } = storeToRefs(useEvaluationRunStatusStore());
 const { calibrationJobId, evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());
 
 const selectedCalibrationByIterationDetailRow = ref<any>();
@@ -119,11 +120,6 @@ onMounted(() => {
   nextTick(() => {
     resetEvaluationAltIterationStore();
     fetchCalibrationDataByIterationDataList();
-    
-    //clear intervals if user was on Run/Status tab
-    console.log('Line 125: SelectAltIterationTab has been mounted. Clearing all intervals.');
-    clearInterval(validationStatusCheckingInterval.value);
-    clearInterval(validationRunningTimeInterval.value);
 
     const syncScroll = (source: any, target: any) => {
       source.addEventListener("scroll", (event: Event) => {
@@ -169,7 +165,7 @@ const onTableRowUnselect = (event: DataTableRowClickEvent) => {
 const navigateToEvaluateStatus = (event: any) => {
   if (evaluateIterationRunId.value && evaluateIterationRunId.value > 0) {
     iterationValidationRunId.value = evaluateValidationRunId.value = 0;
-    clearRunningStatusInfo();
+    hardResetRunStatusStore();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
     e.click();
