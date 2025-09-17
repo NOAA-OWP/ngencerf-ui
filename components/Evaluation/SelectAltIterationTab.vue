@@ -101,7 +101,8 @@ const {
   computedtuningParametersDataList,
 } = storeToRefs(useEvaluationAltIterationStore());
 
-const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
+const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
+const { hardResetRunStatusStore } = useEvaluationRunStatusStore();
 const { iterationValidationRunId } = storeToRefs(useEvaluationRunStatusStore());
 const { calibrationJobId, evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());
 
@@ -164,7 +165,11 @@ const onTableRowUnselect = (event: DataTableRowClickEvent) => {
 const navigateToEvaluateStatus = (event: any) => {
   if (evaluateIterationRunId.value && evaluateIterationRunId.value > 0) {
     iterationValidationRunId.value = evaluateValidationRunId.value = 0;
-    clearRunningStatusInfo();
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'hardResetRunStatusStore called from SelectAltIterationTab', life: ToastTimeout.timeoutInfo };
+    toast.add(tMsg); addToastRecord(tMsg);
+    console.log('validationStatusCheckingIntervalId:',validationStatusCheckingIntervalId.value);
+    console.log('validationRunningTimeIntervalId:',validationRunningTimeIntervalId.value);
+    hardResetRunStatusStore();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
     e.click();

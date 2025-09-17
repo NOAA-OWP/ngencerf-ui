@@ -301,6 +301,7 @@ import type { CalibrationValidationJobData, DataTableContextMenuOption } from "@
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
+import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { generalStore } from "@/stores/common/GeneralStore"
@@ -327,7 +328,6 @@ const cmCompareRun = ref<DataTableContextMenuOption[]>([]);
 
 const userDataStore = useUserDataStore();
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
-import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 
 const updatedUserEvaluationJobsListData = ref<CalibrationJobListItem[]>([]);
 
@@ -376,6 +376,9 @@ const {
   fetchValidationRunListByCalibrationRun,
 } = evaluationCalibrationRunStore;
 
+const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
+const { hardResetRunStatusStore } = useEvaluationRunStatusStore();
+
 const { userCalibrationRunData, gotoCalibrationRunId, modulesFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
 const { isLoading, calibrationJobId } = storeToRefs(generalStore());
@@ -394,6 +397,13 @@ onMounted(async() => {
 
   //clear calibration data if user was on calibration tab and clear previous evaluation run data user may have selected
   resetUserSelectedEvalCalibrationRun();
+
+  //reset Run/Status store in case we have running intervals
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'hardResetRunStatusStore called from EvaluationRunsTab', life: ToastTimeout.timeoutInfo };
+  toast.add(tMsg); addToastRecord(tMsg);
+  console.log('validationStatusCheckingIntervalId:',validationStatusCheckingIntervalId.value);
+  console.log('validationRunningTimeIntervalId:',validationRunningTimeIntervalId.value);
+  hardResetRunStatusStore();
 
   if(gotoCalibrationRunId.value) {
     userSelectedEvalCalibrationRunId.value = gotoCalibrationRunId.value;

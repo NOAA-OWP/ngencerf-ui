@@ -136,7 +136,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 
 import type { CalibrationGetStatusValidationItem } from "@/composables/NgencerfModels";
@@ -156,8 +156,8 @@ const toast = useToast();
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
-const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeInterval, validationStatusCheckingInterval, evaluateDisplayIterationNumber, runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
-const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime, clearRunningStatusInfo } = useEvaluationRunStatusStore();
+const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeIntervalId, validationStatusCheckingIntervalId, evaluateDisplayIterationNumber, runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
+const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime, hardResetRunStatusStore } = useEvaluationRunStatusStore();
 const { queryGetLogData } = useEvaluationSupplementalDataStore();
 
 const logDataPageSize = ref<number>(1000);
@@ -182,10 +182,10 @@ onMounted(async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
-  clearInterval(validationStatusCheckingInterval.value);
-  clearInterval(validationRunningTimeInterval.value);
-  validationStatusCheckingInterval.value = undefined;
-  validationRunningTimeInterval.value = undefined;
+  clearInterval(validationStatusCheckingIntervalId.value);
+  clearInterval(validationRunningTimeIntervalId.value);
+  validationStatusCheckingIntervalId.value = undefined;
+  validationRunningTimeIntervalId.value = undefined;
 
   // assume having evaluateValidationRunId but not evaluateIterationRunId means user is intend to view the status of a done/stopped job
   if (evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0) {
@@ -226,7 +226,7 @@ const startRun = async () => {
       validationStatus.value = response?._data?.status;
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
-      validationRunningTimeInterval.value = setInterval(async () => {
+      validationRunningTimeIntervalId.value = setInterval(async () => {
         updateRunningTime()
       }, 1000) as unknown as number;
     } else {
@@ -284,7 +284,7 @@ const updateLogDisplay = () => {
 
 watch(validationStatus, async (newStatus, initialStatus) => {
   if (newStatus !== null && !isValidationRunStopped(newStatus)) {
-    validationStatusCheckingInterval.value = setInterval(async () => {
+    validationStatusCheckingIntervalId.value = setInterval(async () => {
       queryIterationValidationRunStatus().then(response => {
         let find_validation_run = undefined;
         if (response._data.validations) {
@@ -294,19 +294,19 @@ watch(validationStatus, async (newStatus, initialStatus) => {
         }
         if (!find_validation_run) {
           validationStatus.value = 'Failed';
-          clearInterval(validationStatusCheckingInterval.value);
-          clearInterval(validationRunningTimeInterval.value);
-          validationStatusCheckingInterval.value = undefined;
-          validationRunningTimeInterval.value = undefined;
+          clearInterval(validationStatusCheckingIntervalId.value);
+          clearInterval(validationRunningTimeIntervalId.value);
+          validationStatusCheckingIntervalId.value = undefined;
+          validationRunningTimeIntervalId.value = undefined;
         } else {
           // make sure we actually have validation run
           const validation_run = find_validation_run.shift();
           if (!validation_run) {
             validationStatus.value = 'Failed';
-            clearInterval(validationStatusCheckingInterval.value);
-            clearInterval(validationRunningTimeInterval.value);
-            validationStatusCheckingInterval.value = undefined;
-            validationRunningTimeInterval.value = undefined;
+            clearInterval(validationStatusCheckingIntervalId.value);
+            clearInterval(validationRunningTimeIntervalId.value);
+            validationStatusCheckingIntervalId.value = undefined;
+            validationRunningTimeIntervalId.value = undefined;
           } else {
             validationStatus.value = validation_run.status;
           }
@@ -317,10 +317,10 @@ watch(validationStatus, async (newStatus, initialStatus) => {
   } else {
     // this is for value assignment is only for running job that is now done/stopped
     if (iterationValidationRunId.value > 0) evaluateValidationRunId.value = iterationValidationRunId.value;
-    clearInterval(validationStatusCheckingInterval.value);
-    clearInterval(validationRunningTimeInterval.value);
-    validationStatusCheckingInterval.value = undefined;
-    validationRunningTimeInterval.value = undefined;
+    clearInterval(validationStatusCheckingIntervalId.value);
+    clearInterval(validationRunningTimeIntervalId.value);
+    validationStatusCheckingIntervalId.value = undefined;
+    validationRunningTimeIntervalId.value = undefined;
   }
 });
 
@@ -339,40 +339,13 @@ watch(selectedLogCurrentPage, async () => {
   }
 });
 
-const clearIntervals = (() => {
-  clearInterval(validationStatusCheckingInterval.value);
-  clearInterval(validationRunningTimeInterval.value);
-  validationStatusCheckingInterval.value = undefined;
-  validationRunningTimeInterval.value = undefined;
-  clearRunningStatusInfo();
-  runStatusTabVisible.value = false;
-})
-
-onBeforeUnmount(() => {
-  clearIntervals();
-  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'EvaluationRunStatus Tab BeforeUnmount', life: ToastTimeout.timeoutInfo };
-  toast.add(tMsg); addToastRecord(tMsg);
-})
-
-onUnmounted(() => {
-  clearIntervals();
-  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'EvaluationRunStatus Tab Unmount', life: ToastTimeout.timeoutInfo };
-  toast.add(tMsg); addToastRecord(tMsg);
-})
-
-onDeactivated(() => {
-  clearIntervals();
-  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'EvaluationRunStatus Tab Deactivated', life: ToastTimeout.timeoutInfo };
-  toast.add(tMsg); addToastRecord(tMsg);
-})
-
 const cancelRun = async () => {
   executeCancelIterationValidationRun().then(response => {
     validationStatus.value = response?._data.status;
-    clearInterval(validationStatusCheckingInterval.value);
-    clearInterval(validationRunningTimeInterval.value);
-    validationStatusCheckingInterval.value = undefined;
-    validationRunningTimeInterval.value = undefined;
+    clearInterval(validationStatusCheckingIntervalId.value);
+    clearInterval(validationRunningTimeIntervalId.value);
+    validationStatusCheckingIntervalId.value = undefined;
+    validationRunningTimeIntervalId.value = undefined;
   })
 }
 
@@ -386,6 +359,14 @@ const navigateToEvaluation = (event: any) => {
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
+
+onUnmounted(() => {
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'hardResetRunStatusStore called from EvaluationRunStatus', life: ToastTimeout.timeoutInfo };
+  toast.add(tMsg); addToastRecord(tMsg);
+  console.log('validationStatusCheckingIntervalId:',validationStatusCheckingIntervalId.value);
+  console.log('validationRunningTimeIntervalId:',validationRunningTimeIntervalId.value);
+  runStatusTabVisible.value = false;
+})
 </script>
 
 <style lang="scss" scoped>
