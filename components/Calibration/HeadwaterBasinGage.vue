@@ -515,7 +515,7 @@ const saveTabData = async() => {
 
     // Check for gage / data source change
     if (gageHasChanged.value || gageDataSourceHasChanged) {
-      clearDataDueToGageOrSourceChange();
+      //clearDataDueToGageOrSourceChange();
       gageHasChanged.value = false;
       gageDataSourceHasChanged.value = false;
       isLoading.value = true;
