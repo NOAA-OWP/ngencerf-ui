@@ -31,7 +31,7 @@
             <div class="col-span-1">
               <label for="Forcing">Forcing Source</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                optionValue="name" class="user-select" defaultValue="AORC" @change="uploadForcingDlgOpen($event)"
+                optionValue="name" class="user-select" @change="uploadForcingDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="Forcing Source Select" title="Forcing Source Select"></Select>
             </div>
@@ -302,7 +302,7 @@ const gageSelectionReset = () => {
   selectedForcingValue.value = resetData.value.forcing_source_requested;
 }
 
-const clearDataDueToGageOrSourceChange = () => {
+const clearDataDueToGageChange = () => {
   // don't do the check for a change here any more - gageHasChanged and gageDataSourceHasChanged are being used earlier on to track changes
   isLoading.value = true;
   setTimeout(() => {
@@ -318,19 +318,6 @@ const clearDataDueToGageOrSourceChange = () => {
       userCalibrationRunData.value.validation_times.validation_end_time = "";
       userCalibrationRunData.value.validation_times.simulation_start_time = "";
       userCalibrationRunData.value.validation_times.simulation_end_time = "";
-      
-      selectedForcingValue.value = getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
-      userCalibrationRunData.value.external_data_status.forcing = false;
-      
-      selectedObservationalValue.value = getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '';
-      userCalibrationRunData.value.external_data_status.observational = false;
-
-      selectedGeopackageValue.value = getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
-      userCalibrationRunData.value.external_data_status.geopackage = false;
-
-      // clear out geopackage_image_url
-      userCalibrationRunData.value.geopackage_image_url = "";
-
     }
 
     const tMsg: ToastMessageOptions = {
@@ -515,7 +502,7 @@ const saveTabData = async() => {
 
     // Check for gage / data source change
     if (gageHasChanged.value || gageDataSourceHasChanged) {
-      //clearDataDueToGageOrSourceChange();
+      clearDataDueToGageChange();
       gageHasChanged.value = false;
       gageDataSourceHasChanged.value = false;
       isLoading.value = true;
