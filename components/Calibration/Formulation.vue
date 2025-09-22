@@ -641,7 +641,7 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
   if (opt.data && opt.data.moveToNextResponse) {
-    restorePage();
+    restoreTab();
     if (opt.data.goNext) {
       gotoNext();
     } else {
@@ -653,7 +653,7 @@ const handleNextPrevDialogClose = (opt: any) => {
   }
 }
 
-onUnmounted(async() => {
+onUnmounted(() => {
   restoreTab();
 })
 </script>
