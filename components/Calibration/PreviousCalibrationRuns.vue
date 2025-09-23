@@ -701,7 +701,7 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
   cloneCalibrationRun(selectedRunId).then(async (response) => {
     if (response.status === 200) {
-      await fetchUserCalibrationJobsListData();
+      //await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
       await applyJobFilters();

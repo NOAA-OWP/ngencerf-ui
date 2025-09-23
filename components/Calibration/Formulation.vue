@@ -531,30 +531,32 @@ const validateTab = () => {
   /* check if list of modules changed */
   let selModules = selectedModuleValues.value;
   let savedModules = userCalibrationRunData?.value?.modules;
+  let selModulesHaveChanged = false;
   if (!arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules)) {
-    error = true;
-    text.push("Selected Modules have been changed");
+    selModulesHaveChanged = true;
   } else {
     selModules.every((module) => {
       if (savedModules && savedModules.indexOf(module) === -1) {
-        error = true;
-        text.push("Selected Modules have been changed");
-        return false;
+        selModulesHaveChanged = true;
       }
     })
   }
-  /* Has user included T-Route and at least one other module? */
-  if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
+  if (selModulesHaveChanged) {
     error = true;
-    text.push("T-Route must be included");
-  } else if (selectedModuleValues.value.length < 2) {
-    error = true;
-    text.push("Another module must be selected with T-Route.");
-  }
-  /* Has user included LSTM? (De-select everything else but T-route) */
-  if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
-    selectedModuleValues.value = ['LSTM', 'T-Route'];
-    text.push("LSTM can only be paired with T-Route");
+    text.push("Selected Modules have been changed");
+    /* Has user included T-Route and at least one other module? */
+    if (!selectedModuleValues.value.some(item => item.toLowerCase() === 't-route')) {
+      error = true;
+      text.push("T-Route must be included");
+    } else if (selectedModuleValues.value.length < 2) {
+      error = true;
+      text.push("Another module must be selected with T-Route.");
+    }
+    /* Has user included LSTM? (De-select everything else but T-route) */
+    if (selectedModuleValues.value.some(item => item.toLowerCase() === 'lstm') && selectedModuleValues.value.length > 2) {
+      selectedModuleValues.value = ['LSTM', 'T-Route'];
+      text.push("LSTM can only be paired with T-Route");
+    }
   }
   /* Has user checked/unchecked AET Rootzone? */
   if (isAETRootzoneHasChanged.value) {
@@ -641,7 +643,7 @@ const showPrevNextDialog = (body: string[], next: boolean) => {
 
 const handleNextPrevDialogClose = (opt: any) => {
   if (opt.data && opt.data.moveToNextResponse) {
-    restorePage();
+    restoreTab();
     if (opt.data.goNext) {
       gotoNext();
     } else {
@@ -653,7 +655,7 @@ const handleNextPrevDialogClose = (opt: any) => {
   }
 }
 
-onUnmounted(async() => {
+onUnmounted(() => {
   restoreTab();
 })
 </script>
