@@ -705,6 +705,13 @@ export type ForecastCycle = {
   data_sources: string;
   time_range: string;
   is_active: boolean;
+  availability_lag: number;
+  domain: string;
+  cycle_start: number;
+  cycle_end: number;
+  cycle_freq: number;
+  fcst_win: number;
+  fcst_timestep: number;
 };
 
 export type CalibrationRunsForForecast = CalibrationRunForForecast[];
@@ -712,6 +719,7 @@ export type CalibrationRunsForForecast = CalibrationRunForForecast[];
 export type CalibrationRunForForecast = {
   calibration_run_id: number;
   gage_id: string;
+  domain_name: string;
   job_genesis: string;
   created_at: string;
   status: string;

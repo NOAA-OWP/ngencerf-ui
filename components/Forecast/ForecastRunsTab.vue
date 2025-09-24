@@ -255,15 +255,6 @@ const clearDataAndNavigateToSetupForecast = () => {
     // clear all user-selected forecast data
     resetUserSelectedForecastCalibrationRun();
 
-    // set calibrationRunForForecast based on selectedForecastJob
-    calibrationRunForForecast.value = calibrationRunsForForecast.value.find((calibrationRun: CalibrationRunForForecast) => {
-      return calibrationRun.calibration_run_id === selectedForecastJob.value?.calibration_run_id;
-    }) as CalibrationRunForForecast;
-
-    // set userCalibrationRunData
-    await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
-    isForecastLoading.value = false;
-
     navigateToSetupForecast();
   });
 };
@@ -274,7 +265,14 @@ const navigateToSetupForecast = () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
 
     if (e) {
+      // set calibrationRunForForecast based on selectedForecastJob
+      calibrationRunForForecast.value = calibrationRunsForForecast.value.find((calibrationRun: CalibrationRunForForecast) => {
+        return calibrationRun.calibration_run_id === selectedForecastJob.value?.calibration_run_id;
+      }) as CalibrationRunForForecast;
+
+      // set userCalibrationRunData
       await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+      isForecastLoading.value = false;
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);

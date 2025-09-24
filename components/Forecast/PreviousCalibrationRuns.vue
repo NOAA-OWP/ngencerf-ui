@@ -299,12 +299,8 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
 });
 
 const openSelectedCalibrationRun = async () => {
-//   console.log('openSelectedCalibrationRun');
-//   console.log('calibrationRunForForecast.value.calibration_run_id: ', calibrationRunForForecast.value?.calibration_run_id);
   isLoading.value = true;
   resetUserSelectedEvalValidationRun();
-  // console.log('calibrationRunForForecast.value.calibration_run_id: ', calibrationRunForForecast.value?.calibration_run_id);
-
   await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
   await fetchUserSelectedCalibrationValidationRunList();
   navigateToSetupForecast();
