@@ -74,6 +74,20 @@
                   }}</td>
                 <td v-else class="pl-5">Ready</td>
               </tr>
+              <tr height="32px" :aria-label="'Cycle Date is ' + (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'Unknown')"
+                :title="'Cycle Date is ' + (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None')">
+                <td class="text-right font-bold">
+                  <div style="width: 140px;">Cycle Date</div>
+                </td>
+                <td class="pl-5">{{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None') }}</td>
+              </tr>
+              <tr height="32px" :aria-label="'Cold Start Date is ' + (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : 'Unknown')"
+                :title="'Cold Start Date is ' + (coldStartDate ? formatISOStringOrDateToYYYYMMDD(coldStartDate) : 'None')">
+                <td class="text-right font-bold">
+                  <div style="width: 140px;">Cold Start Date</div>
+                </td>
+                <td class="pl-5">{{ (coldStartDate ? formatISOStringOrDateToYYYYMMDD(coldStartDate) : 'None') }}</td>
+              </tr>
               <tr height="32px" :aria-label="'Configuration is ' + ((forecastCycle as ForecastCycle)?.name ?? 'Unknown')"
                 :title="'Configuration is ' + ((forecastCycle as ForecastCycle)?.name ?? 'Unknown')">
                 <td class="text-right font-bold">
@@ -166,6 +180,8 @@ const toast = useToast();
 
 const {
   forecastJobId,
+  coldStartDate,
+  cycleDate,
   forecastCycle,
   forecastJobStatus,
   forcingDownloadStatus,
@@ -261,7 +277,12 @@ const createForcingDownloadAndForecastStatusInterval = () => {
  * Start the forecast run
  */
 const startForecastRun = async () => {
-  const createAndRunForecastJobResponse = await createAndRunForecastJob(calibrationRunForForecast?.value?.calibration_run_id as number, forecastCycle?.value?.name as string);
+  const createAndRunForecastJobResponse = await createAndRunForecastJob(
+    calibrationRunForForecast?.value?.calibration_run_id as number, 
+    forecastCycle?.value?.name as string,
+    cycleDate.value,
+    coldStartDate.value
+  );
 
   if (createAndRunForecastJobResponse.status >= 200 && createAndRunForecastJobResponse.status < 300) {
     forecastJobStatus.value = createAndRunForecastJobResponse._data.forecast_status;
@@ -382,6 +403,16 @@ const goToSetupForecastTab = () => {
     const e = allTabs[ForecastTabs.tab_setupForecast] as HTMLElement;
     e.click();
 };
+
+onBeforeUnmount(() => {
+  clearInterval(forecastJobStatusIntervalId.value);
+  clearInterval(elapsedTimeIntervalId.value);
+  forecastJobStatusIntervalId.value = undefined;
+  elapsedTimeIntervalId.value = undefined;
+  forecastJobStatus.value = "";
+  submitTime.value = "";
+  elapsedTime.value = "";
+})
 </script>
 
 <style lang="scss" scoped>

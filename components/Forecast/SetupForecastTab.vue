@@ -4,13 +4,17 @@
             aria-label="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id"
             title="'Calibration Job ID is  ' + calibrationRunForForecast?.calibration_run_id">
             <h2>Gage ID: {{ calibrationRunForForecast?.gage_id }}</h2>
+            <h2 style="font-size:1.5em; padding-top:5px;">Domain: 
+                {{ calibrationRunForForecast?.domain_name }}</h2>
             <h2 style="font-size:1.5em; padding-top:5px;">Calibration Job ID: {{
                 calibrationRunForForecast?.calibration_run_id }}</h2>
         </div>
         <h1 class="mb-6 text-3xl font-bold text-center relative">
             Forecast Configuration Selection
         </h1>
-        <p class="prompt-txt mt-2 text-center">Select a configuration then click Next.</p>
+        <p class="prompt-txt mt-2 text-center">
+            Select a configuration, choose Cycle Date/Hour and optional Cold Start Date, then click Next.
+        </p>
         <br />
     </div>
     <div>
@@ -38,24 +42,49 @@
             </Column>
         </DataTable>
     </div>
-    <div class="text-normal mt-2 mx-auto text-center">
-      <span v-if="forecastJobStatus && forecastJobStatus !== 'Ready'">
-        This forecast has already been run. Click "Next" to see status.
-      </span>
-      <span v-else>
-        <p>Configurations in <span class="text-gray-500">grey</span> are unavailable.</p>
-        <br />
-        <p class="text-center">
-            <strong>IMPORTANT</strong><br />
-            <strong>Short Range Forecast</strong> is for <strong>CONUS</strong> gages only.<br />
-            Use the ngenCERF CLI for oCONUS Forecasts.<br />
-            <br />
-            <span style="color:red">Using an oCONUS gage will result in a Failed Forecast.</span>
-        </p>
-      </span>
+    <div v-if="forecastJobStatus && forecastJobStatus !== 'Ready'" class="text-normal mt-2 mx-auto text-center">
+      This forecast has already been run. Click "Next" to see status.
+    </div>
+    <div v-else class="grid place-items-center" style="margin-top:15px;">
+      <div class="grid grid-cols-4">
+        <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+          Cycle Date {{ forecastJobStatus }}
+        </div>
+        <div class="text-nowrap">
+          <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+            @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
+            :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
+            :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
+            :teleport="true" utc='preserve' 
+            :disabled="!forecastCycle"/>
+        </div>
+        <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+          Cold Start Date
+        </div>
+        <div class="text-nowrap">
+          <VueDatePicker v-model="coldStartDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+            @update:model-value="convertColdStartDateStringToDateTimeObject" :enable-time-picker="false"
+            :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
+            :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
+            :teleport="true" utc='preserve' 
+            :disabled="!forecastCycle"/>
+        </div>
+        <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+          Hour
+        </div>
+        <div class="text-nowrap">
+          <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
+            aria-label="Cycle Hour Select" title="Cycle Hour Select"
+            :disabled="!forecastCycle">
+          </Select>
+        </div>
+        <div class="text-nowrap" style="padding-top:8px;">
+          Z
+        </div>
+      </div>
     </div>
     <div>
-        <span v-if="forecastCycle && forecastCycle.is_active">
+        <span v-if="cycleDate && cycleHour && forecastCycle && forecastCycle.is_active">
             <div class="col-span-1 mr-4">
                 <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
                     @click="goToRunStatusTab()">
@@ -69,6 +98,8 @@
 
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
+import VueDatePicker from "@vuepic/vue-datepicker";
+import { DateTime } from "luxon";
 
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
@@ -85,6 +116,8 @@ const toast = useToast();
 
 const {
   calibrationRunForForecast,
+  coldStartDate,
+  cycleDate,
   forecastCycles,
   forecastCycle,
   forecastJobStatus,
@@ -92,6 +125,11 @@ const {
 } = storeToRefs(useForecastStore());
 
 const { loadSetupForecastTabData } = useForecastStore();
+
+const minCycleDate = ref<any>();
+const maxCycleDate = ref<any>();
+const cycleHour = ref<number>();
+const cycleHourList = ref<number[]>([]);
 
 /**
  * Disable row if forecast configuration is not active
@@ -115,6 +153,13 @@ onMounted(async () => {
     toast.removeAllGroups(); // clear all toast messages
     isLoading.value = false; // set isLoading to false
 
+    minCycleDate.value = DateTime.utc(2022, 1, 1, 12, 0, 0);
+    maxCycleDate.value = DateTime.utc();
+
+    if (!cycleDate.value) {
+      cycleDate.value = maxCycleDate.value;
+    }
+
     // scroll to top of the page
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
@@ -123,18 +168,46 @@ onMounted(async () => {
     hilightTab(ForecastTabs.tab_setupForecast);
 
     nextTick(async () => {
-        // load tab data if forecastCycles is empty
-        if (!forecastCycles.value || forecastCycles.value.length === 0) {
-            await loadSetupForecastTabData();
+        // load tab data to populate forecastCycles
+        await loadSetupForecastTabData();
+        if (forecastCycle.value) {
+            getCycleHourList();
         }
     });
 });
+
+// Convert coldStartDate and cycleDate strings to Date objects
+// VueDatePicker sets these to strings, so we need to convert them to Date objects
+const convertCycleDateStringToDateTimeObject = (value: string) => {
+  if (cycleDate.value) {
+      cycleDate.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+}
+const convertColdStartDateStringToDateTimeObject = (value: string) => {
+  if (coldStartDate.value) {
+      coldStartDate.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+}
+
+watch(forecastCycle, async () => {
+  cycleHourList.value = [];
+  getCycleHourList();
+})
+
+const getCycleHourList = () => {
+  if(forecastCycle?.value) {
+    let h = forecastCycle?.value?.cycle_start;
+    while (h <= forecastCycle?.value?.cycle_end) {
+      cycleHourList.value.push(h);
+      h += forecastCycle?.value?.cycle_freq;
+    }
+  }
+}
 
 /**
  * On DataTable row selection
  */
 const onRowSelect = (e: any) => {
-    // console.log('onRowSelect', e);
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Configuration Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
 };
@@ -143,9 +216,27 @@ const onRowSelect = (e: any) => {
  * Go to the Status Run tab
  */
 const goToRunStatusTab = () => {
-    const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[ForecastTabs.tab_runStatus] as HTMLElement;
-    e.click();
+    if (!forecastCycle.value) {
+      const alert = window.alert('You must select a configuration and then set the Cycle Date/Hour.');
+      return false;
+    } else if (!cycleDate.value || !cycleHour.value) {
+      const alert = window.alert('Invalid Cycle Date chosen.\n\nMake sure to choose a date within the available date range, and an hour that is available for your chosen cycle.');
+      return false;
+    } else {
+      cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
+      if (coldStartDate.value && coldStartDate.value >= cycleDate.value) {
+        const alert = window.alert('Cold Start Date must be before the Cycle Date.');
+        return false;
+      }
+      // validate the day/hour to make sure it is within the availability window
+      let latestForecastDate = maxCycleDate.value.minus({ hours: forecastCycle.value.availability_lag})
+      if (latestForecastDate < cycleDate.value) {
+          const alert = window.alert('Forecast data might not yet be available for your chosen cycle date.');
+      }
+      const allTabs = document.getElementsByClassName("tabs");
+      const e = allTabs[ForecastTabs.tab_runStatus] as HTMLElement;
+      e.click();
+    }
 };
 </script>
 

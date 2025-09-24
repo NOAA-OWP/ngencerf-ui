@@ -1,5 +1,5 @@
 import { defineStore, storeToRefs } from "pinia";
-import { Duration } from "luxon";
+import { DateTime, Duration } from "luxon";
 
 
 import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastCycle, ForecastJob, ForecastJobs } from "@/composables/NgencerfModels";
@@ -22,6 +22,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
   // refs
   const forecastJobId = ref<number>();
+  const cycleDate = ref<any>();
+  const coldStartDate = ref<any>();
   const forecastCycles = ref<ForecastCycle[]>();
   const forecastCycle = ref<ForecastCycle>();
   const forecastCycleName = ref<string>();
@@ -243,21 +245,32 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
-      }
+      },
+      body: JSON.stringify({ calibration_run_id: calibrationRunForForecast?.value?.calibration_run_id })
     });
   };
 
   /**
    * Create and Run Forecast Job by querying create_and_run_forecast endpoint
    */
-  const createAndRunForecastJob = async (calibrationRunId: number, forecastCycleName: string): Promise<any> => {
+  const createAndRunForecastJob = async (
+    calibrationRunId: number, 
+    forecastCycleName: string,
+    cycleDate: DateTime,
+    coldStartDate: DateTime | null
+  ): Promise<any> => {
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/create_and_run_forecast/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationRunId, cycle_name: forecastCycleName })
+      body: JSON.stringify({
+        calibration_run_id: calibrationRunId, 
+        cycle_name: forecastCycleName,
+        cycle_date: cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
+        cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDD(coldStartDate) : null
+      })
     });
   };
 
@@ -370,6 +383,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const setSelectedForecastRowData = async (forecast_row_data: ForecastJob): Promise<void> => {
     setSelectedForecastRunId(forecast_row_data.forecast_run_id);
     setSelectedCalibrationRunId(forecast_row_data.calibration_run_id);
+    loadSelectedCalibrationRun(forecast_row_data.calibration_run_id);
+    
+    calibrationRunForForecast.value = (forecast_row_data as any as CalibrationRunForForecast);
+    forecastJobStatus.value = (forecast_row_data as any as CalibrationRunForForecast).status;
 
     /// load forecastCycles
     await loadSetupForecastTabData();
@@ -377,13 +394,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastCycle.value = forecastCycles.value?.find((forecast_cycle_data: ForecastCycle) =>
       forecast_cycle_data.name === forecast_row_data.cycle
     );
-
-    /*
-     * the follow is hack to get around the fact that we are using calibrationRunForForecast to check for calibration_run_id, but it's only set on calibration run tab
-     * user should be able to go straight to forecast runs and view results so this is a easy way to provide it.
-     */
-    calibrationRunForForecast.value = (forecast_row_data as any as CalibrationRunForForecast);
-    forecastJobStatus.value = (forecast_row_data as any as CalibrationRunForForecast).status;
   }
 
   const resetSelectedForecastRunData = (): void => {
@@ -440,6 +450,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    */
   const resetUserSelectedForecastCalibrationRun = (): void => {
     forecastJobId.value = undefined;
+    cycleDate.value = undefined;
+    coldStartDate.value = undefined;
     forecastCycles.value = [];
     forecastCycle.value = undefined;
     forecastCycleName.value = undefined;
@@ -469,6 +481,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
 
   return {
     forecastJobId,
+    cycleDate,
+    coldStartDate,
     forecastCycles,
     forecastCycle,
     forecastCycleName,
