@@ -45,7 +45,20 @@
     <div v-if="forecastJobStatus && forecastJobStatus !== 'Ready'" class="text-normal mt-2 mx-auto text-center">
       This forecast has already been run. Click "Next" to see status.
     </div>
-    <div v-else class="grid place-items-center" style="margin-top:15px;">
+    <div v-else-if="forecastCycle" class="grid place-items-center" style="margin-top:15px;">
+      <div class="font-bold">Availability for {{ forecastCycle.name }}:</div>
+      <ul>
+        <li v-if="forecastCycle.availability_lag > 0">
+          Most recent forecast available: {{ forecastCycle.availability_lag }} 
+          hour{{ forecastCycle.availability_lag > 1 ? 's' : '' }} before current time
+        </li>
+        <li>
+          Cycle hours available: {{ cycleHourList.length < 24 ? cycleHourList.join(', ') : '0-23' }}
+        </li>
+        <li>
+          Forecast window: {{ forecastCycle.fcst_win }} hour{{ forecastCycle.fcst_win > 1 ? 's' : '' }}
+        </li>
+      </ul>
       <div class="grid grid-cols-4">
         <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
           Cycle Date {{ forecastJobStatus }}
@@ -81,17 +94,17 @@
         <div class="text-nowrap" style="padding-top:8px;">
           Z
         </div>
-      </div>
-    </div>
-    <div>
-        <span v-if="cycleDate && cycleHour && forecastCycle && forecastCycle.is_active">
+        <div>
+          <span v-if="cycleDate && cycleHour && forecastCycle && forecastCycle.is_active">
             <div class="col-span-1 mr-4">
-                <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
-                    @click="goToRunStatusTab()">
-                    Next
-                </Button>
+              <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
+                @click="goToRunStatusTab()">
+                Next
+              </Button>
             </div>
-        </span>
+          </span>
+        </div>
+      </div>
     </div>
     <div class="waitgif" v-if="isLoading"> <img alt="Please wait..." src="@/assets/styles/img/wait.gif" /> </div>
 </template>
@@ -195,12 +208,15 @@ watch(forecastCycle, async () => {
 })
 
 const getCycleHourList = () => {
-  if(forecastCycle?.value) {
+  if (forecastCycle?.value) {
     let h = forecastCycle?.value?.cycle_start;
     while (h <= forecastCycle?.value?.cycle_end) {
       cycleHourList.value.push(h);
       h += forecastCycle?.value?.cycle_freq;
     }
+    nextTick(async () => {
+      document.getElementById('MainLeftDataArea').parentNode.scrollTop = document.getElementById('MainLeftDataArea').parentNode.scrollHeight;
+    });
   }
 }
 

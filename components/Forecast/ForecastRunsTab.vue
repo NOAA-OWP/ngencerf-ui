@@ -47,12 +47,52 @@
                 </span>
               </template>
             </Column>
+            <Column :pt="ptColumn" field="gage_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Headwater</span><br /><span>Basin Gage</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
+                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
+                  {{ slotProps.data.gage_id }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="domain_name" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Domain</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.domain_name" :aria-label="'Domain ' + slotProps.data.domain_name"
+                  :title="'Domain ' + slotProps.data.domain_name">
+                  {{ slotProps.data.domain_name }}
+                </span>
+              </template>
+            </Column>
             <Column :pt="ptColumn" field="cycle" header="Forecast Cycle" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.cycle" :aria-label="'Forecast Cycle ' + slotProps.data.cycle"
                   :title="'Forecast Cycle ' + slotProps.data.cycle">
                   {{ slotProps.data.cycle }}
                 </span>
+              </template>
+            </Column>
+            <Column field="cycle_date" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Cycle Date</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <div v-if="slotProps.data.cycle_date" class="text-center"
+                  :aria-label="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date)"
+                  :title="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) }}
+                </div>
               </template>
             </Column>
             <Column :pt="ptColumn" field="forecast_status" sortable>
@@ -82,19 +122,6 @@
                 </div>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="gage_id" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Headwater</span><br /><span>Basin Gage</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
-                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
-                  {{ slotProps.data.gage_id }}
-                </span>
-              </template>
-            </Column>
             <Column :pt="ptColumn" field="calibration_run_id" sortable>
               <template #header>
                 <div class="column-header">
@@ -106,20 +133,6 @@
                   :aria-label="'Calibration Job ID ' + slotProps.data.calibration_run_id"
                   :title="'Calibration Job ID ' + slotProps.data.calibration_run_id">
                   {{ slotProps.data.calibration_run_id }}
-                </span>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="forcing_download_status" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Forcing</span><br /><span>Download Status</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.forcing_download_status"
-                  :aria-label="'Forcing Download Status ' + slotProps.data.forcing_download_status"
-                  :title="'Forcing Download Status ' + slotProps.data.forcing_download_status">
-                  {{ slotProps.data.forcing_download_status }}
                 </span>
               </template>
             </Column>
