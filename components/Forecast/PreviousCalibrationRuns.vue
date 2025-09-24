@@ -62,6 +62,19 @@
                 </span>
               </template>
             </Column>
+            <Column :pt="ptColumn" field="domain_name" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Domain</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.domain_name" :aria-label="'Domain ' + slotProps.data.domain_name"
+                  :title="'Domain ' + slotProps.data.domain_name">
+                  {{ slotProps.data.domain_name }}
+                </span>
+              </template>
+            </Column>
             <Column :pt="ptColumn" field="formulation_name" sortable>
               <template #header>
                 <div class="column-header">
