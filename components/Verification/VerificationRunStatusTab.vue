@@ -66,6 +66,15 @@
                 <td v-if="verificationJobStatus" class="pl-5">{{ verificationJobStatus }}</td>
                 <td v-else class="pl-5">Ready</td>
               </tr>
+              <tr v-if="failureMessages" height="38px" aria-label="Failure Message" title="Failure Message">
+                <th scope="row" class="text-right"><label for="FailureMessages">Failure Message</label></th>
+                <td id="FailureMessages" class="pl-3">
+                  <span v-for="message in failureMessages" class="dummyProgress ml-2 whitespace-nowrap text-md"
+                    style="background-color: white;">
+                    {{ message }}<br/>
+                  </span>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
