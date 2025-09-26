@@ -29,6 +29,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const forecastCycleName = ref<string>();
   const forecastJobStatus = ref<string>();
   const forcingDownloadStatus = ref<string>();
+  const failureMessages = ref<any>();;
   const elapsedTime = ref<string>();
   const submitTimeDate = ref<Date>();
   const submitTime = ref<string>();
@@ -176,6 +177,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         forecastCycleName.value = forecastJob?.cycle;
         forecastJobStatus.value = forecastJob?.status;
         forcingDownloadStatus.value = forecastJob?.forcing_download?.status;
+        failureMessages.value = getStatusResponse?._data?.failure_messages;
         // set elapsedTime
         setElapsedTime(forecastJob);
 
@@ -457,6 +459,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastCycleName.value = undefined;
     forecastJobStatus.value = undefined;
     forcingDownloadStatus.value = undefined;
+    failureMessages.value = undefined;
     elapsedTime.value = undefined;
     submitTimeDate.value = undefined;
     submitTime.value = undefined;
@@ -488,6 +491,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastCycleName,
     forecastJobStatus,
     forcingDownloadStatus,
+    failureMessages,
     elapsedTime,
     submitTimeDate,
     submitTime,

@@ -74,6 +74,15 @@
                   }}</td>
                 <td v-else class="pl-5">Ready</td>
               </tr>
+              <tr v-if="failureMessages" height="38px" aria-label="Failure Message" title="Failure Message">
+                <th scope="row" class="text-right"><label for="FailureMessages">Failure Message</label></th>
+                <td id="FailureMessages" class="pl-3">
+                  <span v-for="message in failureMessages" class="dummyProgress ml-2 whitespace-nowrap text-md"
+                    style="background-color: white;">
+                    {{ message }}<br/>
+                  </span>
+                </td>
+              </tr>
               <tr height="32px" :aria-label="'Cycle Date is ' + (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'Unknown')"
                 :title="'Cycle Date is ' + (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None')">
                 <td class="text-right font-bold">
@@ -185,6 +194,7 @@ const {
   forecastCycle,
   forecastJobStatus,
   forcingDownloadStatus,
+  failureMessages,
   elapsedTime,
   submitTimeDate,
   submitTime,
@@ -257,6 +267,7 @@ const createForcingDownloadAndForecastStatusInterval = () => {
       // update forcingDownloadStatus and forecastJobStatus
       forecastJobStatus.value = forecast?.status;
       forcingDownloadStatus.value = forecast?.forcing_download?.status;
+      failureMessages.value = getStatusResponse?._data?.failure_messages;
 
       // set submitTime if not already set
       if (!submitTime.value && forecast?.submit_date) {
@@ -287,6 +298,7 @@ const startForecastRun = async () => {
   if (createAndRunForecastJobResponse.status >= 200 && createAndRunForecastJobResponse.status < 300) {
     forecastJobStatus.value = createAndRunForecastJobResponse._data.forecast_status;
     forcingDownloadStatus.value = createAndRunForecastJobResponse._data.forecast_forcing_download_status;
+    failureMessages.value = createAndRunForecastJobResponse._data.failure_messages;
     forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
 
     if (createAndRunForecastJobResponse?._data?.submit_date) {
@@ -307,6 +319,7 @@ const startForecastRun = async () => {
     if (forecast) {
       forecastJobStatus.value = forecast?.status;
       forcingDownloadStatus.value = forecast?.forcing_download?.status;
+      failureMessages.value = forecast?.failure_messages;
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -323,6 +336,7 @@ const cancelForecastRun = async () => {
 
     if (cancelForecastJobResponse?._data?.status) {
       forecastJobStatus.value = cancelForecastJobResponse._data.status;
+      failureMessages.value = cancelForecastJobResponse._data.failure_messages;
 
       if (forecastJobStatus.value !== 'Cancelled') {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };
@@ -410,6 +424,7 @@ onBeforeUnmount(() => {
   forecastJobStatusIntervalId.value = undefined;
   elapsedTimeIntervalId.value = undefined;
   forecastJobStatus.value = "";
+  failureMessages.value = undefined;
   submitTime.value = "";
   elapsedTime.value = "";
 })
