@@ -22,7 +22,7 @@
           </div>
 
           <ForecastRunsDialog id="ForecastRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
-            @ResetJobFilters="resetJobFilters()" @RefreshJobList="refreshJobList()" :forecastJobs="filteredForecastRuns"
+            @ResetJobFilters="resetJobFilters()" @RefreshJobList="refreshJobList()" :forecastJobs="forecastRuns"
             ref="forecastRunsFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
@@ -166,7 +166,6 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const forecastStore = useForecastStore();
 const {
-  forecastRunGageList,
   uiGageId,
   calibrationRunForForecast,
   calibrationRunsForForecast,
@@ -383,6 +382,10 @@ watch(selectedForecastJob, () => {
     calibrationRunForForecast.value = undefined;
   }
 })
+
+onUnmounted(async () => {
+  uiGageId.value = "";
+});
 
 </script>
 
