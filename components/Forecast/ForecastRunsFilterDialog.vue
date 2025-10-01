@@ -42,7 +42,7 @@ import type { ForecastJob } from "@/composables/NgencerfModels"
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 
-const { uiGageId, forecastRunGageList } = storeToRefs(useForecastStore());
+const { uiGageId } = storeToRefs(useForecastStore());
 
 const emit = defineEmits(["ApplyJobFilters", "ResetJobFilters", "RefreshJobList"]);
 
@@ -51,6 +51,29 @@ const props = defineProps<{
   disableAll: boolean;
 }>();
 
+/**
+* @returns {SelectOption[]}
+*/
+const forecastRunGageList = computed(() => {
+  let gageOptionList = <SelectOption[]>[];
+  gageOptionList.push({
+    'name': "All",
+    'description': "All"
+  });
+  props.forecastJobs.forEach(runItem => {
+    const checkGageIndex = gageOptionList.findIndex(
+      (gageOption) =>
+        gageOption.name === (runItem as any as CalibrationRunForForecast).gage_id
+    ) !== -1;
+    if (!checkGageIndex) {
+      gageOptionList.push({
+        'name': (runItem as any as CalibrationRunForForecast).gage_id,
+        'description': (runItem as any as CalibrationRunForForecast).gage_id
+      });
+    }
+  });
+  return gageOptionList;
+});
 
 const filterActive = computed(() => {
   return uiGageId.value === 'All' || uiGageId.value === '';

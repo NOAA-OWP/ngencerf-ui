@@ -11,7 +11,7 @@
           <div class="col-span-12">
             <div class="grid grid-rows-12 mx-auto px-4 py-2">
               <div class="grid row-span-12 white-tall-content-box">
-                <div class="overflow-auto">
+                <div id="MainLeftDataParent" class="overflow-auto">
                   <div id="MainLeftDataArea" class="overflow-auto"> 
                     <ForecastLeftBlock />
                   </div>
