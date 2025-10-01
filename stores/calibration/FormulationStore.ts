@@ -81,9 +81,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     } else {
         selectedModuleValues.value = [];
     }
-    if (userCalibrationRunData.value?.is_aet_rootzone) {
-      isAETRootzone.value = true;
-    }
+    isAETRootzone.value = userCalibrationRunData.value?.is_aet_rootzone ? userCalibrationRunData.value.is_aet_rootzone : false;
     useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false;
     slothParameterInputs.value =
       JSON.parse(
