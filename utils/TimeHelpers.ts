@@ -7,11 +7,7 @@ import { DateTime, Duration } from "luxon";
  * @returns {DateTime} DateTime object
  */
 export const convertISOStringOrDateToDateTime = (d: string | Date): any => {
-  if (typeof d === 'string') {
-    return DateTime.fromISO(d, { zone: 'utc' });
-  } else {
-    return DateTime.fromJSDate(d, { zone: 'utc' });
-  }
+  return DateTime.fromISO(d, { zone: 'utc' });
 };
 
 /**
@@ -28,12 +24,8 @@ export const formatISOStringOrDateToYYYYMMDDHHMM = ( d: string | Date ): string 
     return d;
   }
 
-  if (typeof d !== 'object') {
-    // convert string or Date object to Luxon DateTime in UTC
-    dateTime = convertISOStringOrDateToDateTime(d);
-  } else {
-    dateTime = d;
-  }
+  // convert string or Date object to Luxon DateTime in UTC
+  dateTime = convertISOStringOrDateToDateTime(d);
 
   // Return the formatted date in 'yyyy-MM-dd HH:mm' format
   return dateTime.toFormat('yyyy-MM-dd HH:mm');
@@ -53,12 +45,7 @@ export const formatISOStringOrDateToYYYYMMDD = ( d: string | Date ): string => {
     return d;
   }
 
-  if (typeof d !== 'object') {
-    // convert string or Date object to Luxon DateTime in UTC
-    dateTime = convertISOStringOrDateToDateTime(d);
-  } else {
-    dateTime = d;
-  }
+  dateTime = convertISOStringOrDateToDateTime(d);
 
   // Return the formatted date in 'yyyy-MM-dd' format
   return dateTime.toFormat('yyyy-MM-dd');
