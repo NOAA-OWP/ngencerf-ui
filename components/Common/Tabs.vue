@@ -150,7 +150,6 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from 'vue';
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -158,12 +157,6 @@ import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/Evaluation
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useVerificationStore } from "@/stores/verification/VerificationStore";
-
-import { useDialog } from "primevue/usedialog";
-import MoveNextPrevDialog from "./MoveNextPrevDialog.vue";
-
-const dialog = useDialog();
-const navDialogOpened = ref<boolean>(false);
 
 const {
   calibrationJobId,
@@ -211,33 +204,10 @@ const currentMenu = ref(getMenuIndex());
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
 const tabNotCompleted = ref(false);
 
-const props = defineProps({
-  callTabValidator: {
-    type: Function,
-    required: false,
-  },
-  callTabRestore: {
-    type: Function,
-    required: false,
-  }
-});
-
 const tabClicked = (event: Event) => {
   event.preventDefault();
   const ele: HTMLElement = event.currentTarget as HTMLElement;
-  if (props.callTabValidator) {
-    const errors = props.callTabValidator();
-    if (errors.error) {
-      showTabNavDialog(errors.text, true, ele);
-    } else {
-      goToTab(ele);
-    }
-  } else {
-    goToTab(ele);
-  }
-}
 
-const goToTab = (ele: HTMLElement) => {
   nextTick(() => {
     // Send the selected tab info to the active tab set with emit
     if (currentMenu.value === 1) {
@@ -255,43 +225,6 @@ const goToTab = (ele: HTMLElement) => {
     }
   })
 }
-
-const showTabNavDialog = (body: string[], next: boolean, ele: HTMLElement) => {
-  if (!navDialogOpened.value) {
-    dialog.open(MoveNextPrevDialog, {
-      props: {
-        header: "Unsaved changes!",
-        style: {
-          width: 'auto',
-        },
-        modal: true,
-      },
-      data: {
-        body: body,
-        direction: next
-      },
-      onClose: (opt) => {
-        navDialogOpened.value = false;
-        handleTabNavDialogClose(opt, ele);
-      },
-
-    })
-    navDialogOpened.value = true;
-  }
-}
-
-const handleTabNavDialogClose = (opt: any, ele: HTMLElement) => {
-  if (opt.data && opt.data.moveToNextResponse) {
-    if (props.callTabRestore) {
-      props.callTabRestore();
-    }
-    goToTab(ele);
-  }
-  if (opt.type && opt.type === 'dialog-close') {
-    return;
-  }
-}
-
 </script>
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
