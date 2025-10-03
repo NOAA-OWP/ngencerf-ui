@@ -116,6 +116,15 @@ onMounted(() => {
   hilightTab(EvaluationTabs.tab_selectAltIteration);
 
   fetchUserCalibrationRunData();
+  
+  const tMsg: ToastMessageOptions = { 
+    severity: 'info', 
+    summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
+    detail: 'Called from hardResetRunStatusStore()', 
+    life: ToastTimeout.timeoutInfo 
+  };
+  toast.add(tMsg); addToastRecord(tMsg);
+  hardResetRunStatusStore();
 
   nextTick(() => {
     resetEvaluationAltIterationStore();
