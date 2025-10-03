@@ -1,6 +1,7 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
+import type { ToastMessageOptions } from "primevue/toast";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -19,6 +20,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   const startTime = ref<string>("");
   const validationStopStatus = ref<string[]>(['DONE', 'SERVER ERROR', 'FAILED', 'CANCELLED']);
   const validationFailedStatus = ref<string[]>(['SERVER ERROR', 'FAILED']);
+  const failureMessages = ref<any>();
   const displayValidationId = ref<number>( 0 );
   const validationStatusCheckingIntervalId = ref<number>();
   const validationRunningTimeIntervalId = ref<number>();
@@ -66,6 +68,12 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   }
 
   const loadValidationStatusInformation = async ( validation_run_id: number ) => {
+    let tMsg: ToastMessageOptions = { 
+      severity: 'info', 
+      summary: '', 
+      detail: '', 
+      life: ToastTimeout.timeoutInfo 
+    };
     queryIterationValidationRunStatus().then( response => {
       const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
         return validation.validation_run_id === validation_run_id
@@ -74,20 +82,34 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         displayValidationId.value = validation_run_id;
         const validation_run = find_validation_run.shift() as CalibrationGetStatusValidationItem;
         validationStatus.value = validation_run.status;
+        failureMessages.value = response?._data?.failure_messages;
         evaluateDisplayIterationNumber.value = validation_run.iteration_num;
         startTime.value = validation_run.submit_date.toString();
         if ( validationStatus.value.toLocaleUpperCase() !== "RUNNING" ) {
           runningTime.value = validation_run.elapsed_time ? formatElapsedTime(validation_run.elapsed_time) : '';
         } else {
-          validationRunningTimeIntervalId.value = setInterval( updateRunningTime, 1000 );
+          tMsg = { 
+            severity: 'info', 
+            summary: 'Setting validationRunningTimeIntervalId', 
+            detail: 'Called from loadValidationStatusInformation() function after validationStatus change to ' + validationStatus.value, 
+            life: ToastTimeout.timeoutInfo 
+          };
+          validationRunningTimeIntervalId.value = setInterval( updateRunningTime, 1000 ) as unknown as number;
         }
       } else {
+        tMsg = { 
+          severity: 'info', 
+          summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
+          detail: 'Called from loadValidationStatusInformation() function after validation run not found', 
+          life: ToastTimeout.timeoutInfo 
+        };
         clearInterval(validationStatusCheckingIntervalId.value);
         clearInterval(validationRunningTimeIntervalId.value);
         validationStatusCheckingIntervalId.value = undefined;
         validationRunningTimeIntervalId.value = undefined;
       }
     })
+    return tMsg;
   }
 
   const updateRunningTime = (): void => {
@@ -142,6 +164,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     runningTime,
     startTime,
     validationStatus,
+    failureMessages,
     iterationValidationRunId,
     displayValidationId,
     validationRunningTimeIntervalId,

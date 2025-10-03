@@ -370,6 +370,13 @@ onMounted(async () => {
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     resetGageStore();
     hardResetTuningStore();
+    const tMsg: ToastMessageOptions = { 
+      severity: 'info', 
+      summary: 'Clearing elapsedTimeIntervalId, calibrationStatusIntervalId, validationsStatusIntervalId', 
+      detail: 'Called from hardResetRunStatusStore()', 
+      life: ToastTimeout.timeoutInfo 
+    };
+    toast.add(tMsg); addToastRecord(tMsg);
     hardResetRunStatusStore();
     clearUserCalibrationRunData();
     await updateUserCalibrationJobsListData();
@@ -398,12 +405,10 @@ const onRowContextMenu = (event: any) => {
 };
 
 const dtRowSelected = (e: any) => {
-  //console.log('Row selected: ', e.data);
   addCalibrationRun(e.data);
 }
 
 const dtRowUnselect = (e: any) => {
-  //console.log('Row unselected: ', e.data);
   deleteCalibrationRunById(e.data);
 }
 
@@ -590,7 +595,6 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   */
   calibrationJobId.value = selectedCalibrationRun.value.calibration_run_id;
   queryUserCalibrationRunData().then(queryResponse => {
-    // console.log('queryResponse: ', queryResponse);
     if (queryResponse?.status === 200) {
       userCalibrationRunData.value = queryResponse?._data;
       loadEntireRun();

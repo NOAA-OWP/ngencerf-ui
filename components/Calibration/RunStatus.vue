@@ -90,6 +90,20 @@
           </div>
         </div>
       </div>
+      <div v-if="userCalibrationRunData?.failure_messages">
+        <div style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
+          <div class="text-right font-bold" style="width: 155px;">
+            <label class="text-right whitespace-nowrap" for="failureMessage" style="width: 155px;padding-top:1px;">
+              Failure Message
+            </label>
+          </div>
+          <div class="pl-5" style="width: 100%;">
+            <span v-for="message in userCalibrationRunData.failure_messages">
+              {{ message }}<br/>
+            </span>
+          </div>
+        </div>
+      </div>
       <div v-if="(calibrationStatus === 'Saved' || calibrationStatus === 'Ready') || selectedPlotFileUrl || selectedLogCategory">
         <!--LOGGING SECTION-->
         <div v-if="calibrationStatus === 'Saved' || calibrationStatus === 'Ready'" id="LoggingSection"
@@ -382,6 +396,7 @@ onMounted(async () => {
   }
   if (userCalibrationRunData?.value && getStatusResponse.status === 200) {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
+    userCalibrationRunData.value.failure_messages = getStatusResponse._data.failure_messages;
   }
 
   // Clear best iteration flag
@@ -443,6 +458,13 @@ onMounted(async () => {
  * Create elapsedTimeIntervalId to update calibrationElapsedTime every second while Calibration is Running or Validation is not Done
  */
 const createElapsedTimeInterval = () => {
+  const tMsg: ToastMessageOptions = { 
+    severity: 'info', 
+    summary: 'Setting elapsedTimeIntervalId', 
+    detail: 'Called from createElapsedTimeInterval() function', 
+    life: ToastTimeout.timeoutInfo 
+  };
+  toast.add(tMsg); addToastRecord(tMsg);
   elapsedTimeIntervalId.value = setInterval(async () => {
     if (
       ['Validating and Preparing Job Data','Running'].includes(userCalibrationRunData.value?.status) || 
@@ -451,6 +473,13 @@ const createElapsedTimeInterval = () => {
       // Calculate calibrationElapsedTime every second while Calibration is Running or Validation is not Done
       calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
     } else {
+      const tMsg: ToastMessageOptions = { 
+        severity: 'info', 
+        summary: 'Clearing elapsedTimeIntervalId', 
+        detail: 'Called from createElapsedTimeInterval() after status change to ' + userCalibrationRunData.value?.status, 
+        life: ToastTimeout.timeoutInfo 
+      };
+      toast.add(tMsg); addToastRecord(tMsg);
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
     }
@@ -474,6 +503,7 @@ const startRun = async () => {
     if (runCalibrationResponse.status >= 200 && runCalibrationResponse.status < 300) {
       if (runCalibrationResponse?._data?.status) {
         userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
+        userCalibrationRunData.value.failure_messages = runCalibrationResponse._data.failure_messages;
       } else {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -499,6 +529,7 @@ const startRun = async () => {
       
       if (getStatusResponse?._data?.status) {
         userCalibrationRunData.value.status = getStatusResponse._data.status;
+        userCalibrationRunData.value.failure_messages = getStatusResponse._data.failure_messages;
       } else {
         const errorMessages: string[] = useApiErrorResponsePreprocess(getStatusResponse);
         errorMessages.forEach((msg: string) => {
@@ -539,6 +570,7 @@ const cancelRun = async () => {
       if (cancelCalibrationResponse?._data.status) {
         if (userCalibrationRunData.value) {
           userCalibrationRunData.value.status = cancelCalibrationResponse?._data.status;
+          userCalibrationRunData.value.failure_messages = getStatusResponse._data.failure_messages;
         }
         if (userCalibrationRunData?.value?.status !== 'Cancelled') {
           const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };
@@ -567,11 +599,19 @@ const updateIteration = async () => {
   if (getIterationResponse._data && getIterationResponse._data.status) {
     if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
       if (userCalibrationRunData.value) {
+        const tMsg: ToastMessageOptions = { 
+          severity: 'info', 
+          summary: 'Clearing calibrationStatusIntervalId', 
+          detail: 'Called from updateIteration() after status change to ' + getIterationResponse._data.status, 
+          life: ToastTimeout.timeoutInfo 
+        };
+        toast.add(tMsg); addToastRecord(tMsg);
         clearInterval(calibrationStatusIntervalId.value);
         calibrationStatusIntervalId.value = undefined;
       }
     }
     userCalibrationRunData.value.status = getIterationResponse._data.status;
+    userCalibrationRunData.value.failure_messages = getIterationResponse._data.failure_messages;
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -652,6 +692,13 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
     if (calibrationStatus.value === 'Submitted' || calibrationStatus.value === 'Running') {
       if (!calibrationStatusIntervalId.value) {
         // create an interval to keep checking calibration status every 10 seconds while calibration is 'Submitted' or 'Running'
+        const tMsg: ToastMessageOptions = { 
+          severity: 'info', 
+          summary: 'Setting calibrationStatusIntervalId', 
+          detail: 'Called from watch function after overallCalibrationValidationStatus changed to ' + newCalibrationStatus, 
+          life: ToastTimeout.timeoutInfo 
+        };
+        toast.add(tMsg); addToastRecord(tMsg);
         calibrationStatusIntervalId.value = setInterval(async () => {
           if (calibrationStatus.value === 'Submitted') {
             const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
@@ -660,12 +707,27 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
             if (getStatusResponse._data && getStatusResponse._data.status) {
               if (getStatusResponse._data.status !== 'Submitted' && getStatusResponse._data.status !== 'Running') {
                 if (userCalibrationRunData.value) {
+                  const tMsg: ToastMessageOptions = { 
+                    severity: 'info', 
+                    summary: 'Clearing calibrationStatusIntervalId', 
+                    detail: 'Called from overallCalibrationValidationStatus watch function after getStatusResponse change to ' + getStatusResponse._data.status, 
+                    life: ToastTimeout.timeoutInfo 
+                  };
+                  toast.add(tMsg); addToastRecord(tMsg);
                   clearInterval(calibrationStatusIntervalId.value);
                   calibrationStatusIntervalId.value = undefined;
                 }
               }
               userCalibrationRunData.value.status = getStatusResponse._data.status;
+              userCalibrationRunData.value.failure_messages = getStatusResponse._data.failure_messages;
             } else {
+              const tMsg1: ToastMessageOptions = { 
+                severity: 'info', 
+                summary: 'Clearing calibrationStatusIntervalId', 
+                detail: 'Called from updateIteration() after a bad response from queryGetCalibrationStatus()', 
+                life: ToastTimeout.timeoutInfo 
+              };
+              toast.add(tMsg1); addToastRecord(tMsg1);
               clearInterval(calibrationStatusIntervalId.value);
               const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
               toast.add(tMsg); addToastRecord(tMsg);
@@ -687,6 +749,13 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
       if (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')) {
         // create an interval to keep checking validation statuses every 10 seconds while valid_control and valid_best are not Done, Cancelled, Failed, Server error, or Unknown
         if (!validationsStatusIntervalId.value) {
+          const tMsg: ToastMessageOptions = { 
+            severity: 'info', 
+            summary: 'Setting validationsStatusIntervalId', 
+            detail: 'Called from watch function after overallCalibrationValidationStatus changed to ' + newCalibrationStatus, 
+            life: ToastTimeout.timeoutInfo 
+          };
+          toast.add(tMsg); addToastRecord(tMsg);
           validationsStatusIntervalId.value = setInterval(async () => {
             const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
             const validations = getStatusResponse?._data?.validations;
@@ -708,6 +777,13 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
 
             // if valid_control and valid_best are Done, Cancelled, Failed, Server error, or Unknown, clear the interval
             if (['Done', 'Cancelled', 'Failed', 'Server error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
+              const tMsg: ToastMessageOptions = { 
+                severity: 'info', 
+                summary: 'Clearing calibrationStatusIntervalId', 
+                detail: 'Called from overallCalibrationValidationStatus watch function after validControlAndValidBestStatus change to ' + validControlAndValidBestStatus.value, 
+                life: ToastTimeout.timeoutInfo 
+              };
+              toast.add(tMsg); addToastRecord(tMsg);
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
 
@@ -755,12 +831,26 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
 
       // clear intervals that checks calibration status and set stopCriteriaMet to true
       stopCriteriaMet.value = true;
+      const tMsg: ToastMessageOptions = { 
+        severity: 'info', 
+        summary: 'Clearing calibrationStatusIntervalId', 
+        detail: 'Called from overallCalibrationValidationStatus watch function after stopCriteriaMet', 
+        life: ToastTimeout.timeoutInfo 
+      };
+      toast.add(tMsg); addToastRecord(tMsg);
       clearInterval(calibrationStatusIntervalId.value);
       calibrationStatusIntervalId.value = undefined;
     }
 
     else if (['Cancelled', 'Failed', 'Server error'].includes(calibrationStatus.value ?? '')) {
       stopCriteriaMet.value = false;
+      const tMsg: ToastMessageOptions = { 
+        severity: 'info', 
+        summary: 'Clearing elapsedTimeIntervalId, calibrationStatusIntervalId, validationsStatusIntervalId', 
+        detail: 'Called from overallCalibrationValidationStatus watch function after calibrationStatus change to ' + calibrationStatus.value , 
+        life: ToastTimeout.timeoutInfo 
+      };
+      toast.add(tMsg); addToastRecord(tMsg);
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
       clearInterval(calibrationStatusIntervalId.value);
