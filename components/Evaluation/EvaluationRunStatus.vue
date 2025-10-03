@@ -93,6 +93,22 @@
         </div>
       </div>
     </div>
+
+    <div v-if="failureMessages">
+      <div style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
+        <div class="text-right font-bold" style="width: 155px;">
+          <label class="text-right whitespace-nowrap" for="failureMessage" style="width: 155px;padding-top:1px;">
+            Failure Message
+          </label>
+        </div>
+        <div class="pl-5" style="width: 100%;">
+          <span v-for="message in failureMessages">
+            {{ message }}<br/>
+          </span>
+        </div>
+      </div>
+    </div>
+
     <div id="LogDisplayArea" class="p-2"
       v-if="selectedLogCategory !== '' && selectedLogFilePath !== ''">
       <div class="pl-4">
@@ -156,7 +172,7 @@ const toast = useToast();
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
-const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeIntervalId, validationStatusCheckingIntervalId, evaluateDisplayIterationNumber, runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
+const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeIntervalId, validationStatusCheckingIntervalId, evaluateDisplayIterationNumber, runStatusTabVisible, failureMessages } = storeToRefs(useEvaluationRunStatusStore());
 const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime, hardResetRunStatusStore } = useEvaluationRunStatusStore();
 const { queryGetLogData } = useEvaluationSupplementalDataStore();
 
@@ -182,6 +198,13 @@ onMounted(async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
+  const tMsg: ToastMessageOptions = { 
+    severity: 'info', 
+    summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
+    detail: 'Called from onmounted()', 
+    life: ToastTimeout.timeoutInfo 
+  };
+  toast.add(tMsg); addToastRecord(tMsg);
   clearInterval(validationStatusCheckingIntervalId.value);
   clearInterval(validationRunningTimeIntervalId.value);
   validationStatusCheckingIntervalId.value = undefined;
@@ -189,7 +212,10 @@ onMounted(async () => {
 
   // assume having evaluateValidationRunId but not evaluateIterationRunId means user is intend to view the status of a done/stopped job
   if (evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0) {
-    loadValidationStatusInformation(evaluateValidationRunId.value);
+    let tMsg = await loadValidationStatusInformation(evaluateValidationRunId.value);
+    if (tMsg.summary !== '') {
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
     if (iterationValidationRunId.value > 0 && validationStatus.value !== '') {
       updateLogDisplay();
     } else {
@@ -224,8 +250,16 @@ const startRun = async () => {
   executeIterationValidationRun().then((response) => {
     if (response.status === 201) {
       validationStatus.value = response?._data?.status;
+      failureMessages.value = response?._data?.failure_messages;
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
+      const tMsg: ToastMessageOptions = { 
+        severity: 'info', 
+        summary: 'Setting validationRunningTimeIntervalId', 
+        detail: 'Called from startRun() function', 
+        life: ToastTimeout.timeoutInfo 
+      };
+      toast.add(tMsg); addToastRecord(tMsg);
       validationRunningTimeIntervalId.value = setInterval(async () => {
         updateRunningTime()
       }, 1000) as unknown as number;
@@ -284,6 +318,13 @@ const updateLogDisplay = () => {
 
 watch(validationStatus, async (newStatus, initialStatus) => {
   if (newStatus !== null && !isValidationRunStopped(newStatus)) {
+    const tMsg: ToastMessageOptions = { 
+      severity: 'info', 
+      summary: 'Setting validationStatusCheckingIntervalId', 
+      detail: 'Called from watch function after validationStatus changed to ' + newStatus, 
+      life: ToastTimeout.timeoutInfo 
+    };
+    toast.add(tMsg); addToastRecord(tMsg);
     validationStatusCheckingIntervalId.value = setInterval(async () => {
       queryIterationValidationRunStatus().then(response => {
         let find_validation_run = undefined;
@@ -294,6 +335,13 @@ watch(validationStatus, async (newStatus, initialStatus) => {
         }
         if (!find_validation_run) {
           validationStatus.value = 'Failed';
+          const tMsg: ToastMessageOptions = { 
+            severity: 'info', 
+            summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
+            detail: 'Called from validationStatus watch function after validation run not found', 
+            life: ToastTimeout.timeoutInfo 
+          };
+          toast.add(tMsg); addToastRecord(tMsg);
           clearInterval(validationStatusCheckingIntervalId.value);
           clearInterval(validationRunningTimeIntervalId.value);
           validationStatusCheckingIntervalId.value = undefined;
@@ -303,6 +351,13 @@ watch(validationStatus, async (newStatus, initialStatus) => {
           const validation_run = find_validation_run.shift();
           if (!validation_run) {
             validationStatus.value = 'Failed';
+            const tMsg: ToastMessageOptions = { 
+              severity: 'info', 
+              summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
+              detail: 'Called from validationStatus watch function after validation run not found', 
+              life: ToastTimeout.timeoutInfo 
+            };
+            toast.add(tMsg); addToastRecord(tMsg);
             clearInterval(validationStatusCheckingIntervalId.value);
             clearInterval(validationRunningTimeIntervalId.value);
             validationStatusCheckingIntervalId.value = undefined;
@@ -313,10 +368,17 @@ watch(validationStatus, async (newStatus, initialStatus) => {
         }
       })
       updateLogDisplay();
-    }, 10000);
+    }, 10000) as unknown as number;
   } else {
     // this is for value assignment is only for running job that is now done/stopped
     if (iterationValidationRunId.value > 0) evaluateValidationRunId.value = iterationValidationRunId.value;
+    const tMsg: ToastMessageOptions = { 
+      severity: 'info', 
+      summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
+      detail: 'Called from validationStatus watch function after status change to ' + newStatus, 
+      life: ToastTimeout.timeoutInfo 
+    };
+    toast.add(tMsg); addToastRecord(tMsg);
     clearInterval(validationStatusCheckingIntervalId.value);
     clearInterval(validationRunningTimeIntervalId.value);
     validationStatusCheckingIntervalId.value = undefined;
@@ -342,6 +404,14 @@ watch(selectedLogCurrentPage, async () => {
 const cancelRun = async () => {
   executeCancelIterationValidationRun().then(response => {
     validationStatus.value = response?._data.status;
+    failureMessages.value = response?._data?.failure_messages;
+    const tMsg: ToastMessageOptions = { 
+      severity: 'info', 
+      summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
+      detail: 'Called from cancelRun() function', 
+      life: ToastTimeout.timeoutInfo 
+    };
+    toast.add(tMsg); addToastRecord(tMsg);
     clearInterval(validationStatusCheckingIntervalId.value);
     clearInterval(validationRunningTimeIntervalId.value);
     validationStatusCheckingIntervalId.value = undefined;
@@ -362,6 +432,7 @@ const navigateToEvaluation = (event: any) => {
 
 onUnmounted(() => {
   runStatusTabVisible.value = false;
+  failureMessages.value = undefined;
 })
 </script>
 

@@ -399,6 +399,13 @@ onMounted(async() => {
   resetUserSelectedEvalCalibrationRun();
 
   //reset Run/Status store in case we have running intervals
+  const tMsg: ToastMessageOptions = { 
+    severity: 'info', 
+    summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
+    detail: 'Called from hardResetRunStatusStore()', 
+    life: ToastTimeout.timeoutInfo 
+  };
+  toast.add(tMsg); addToastRecord(tMsg);
   hardResetRunStatusStore();
 
   if(gotoCalibrationRunId.value) {

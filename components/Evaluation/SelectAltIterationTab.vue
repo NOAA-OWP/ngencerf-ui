@@ -165,6 +165,13 @@ const onTableRowUnselect = (event: DataTableRowClickEvent) => {
 const navigateToEvaluateStatus = (event: any) => {
   if (evaluateIterationRunId.value && evaluateIterationRunId.value > 0) {
     iterationValidationRunId.value = evaluateValidationRunId.value = 0;
+    const tMsg: ToastMessageOptions = { 
+      severity: 'info', 
+      summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
+      detail: 'Called from hardResetRunStatusStore()', 
+      life: ToastTimeout.timeoutInfo 
+    };
+    toast.add(tMsg); addToastRecord(tMsg);
     hardResetRunStatusStore();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
