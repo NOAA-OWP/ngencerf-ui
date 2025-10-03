@@ -18,7 +18,7 @@
         <br />
     </div>
     <div>
-        <DataTable :value="forecastCycles" sortField="cycle" scrollable v-model:selection="forecastCycle"
+        <DataTable :value="forecastConfigurations" sortField="fcst_win" scrollable v-model:selection="forecastConfiguration"
             selectionMode="single" :rowClass="rowClass" :rowStyle="rowStyle">
             <Column field="name" header="Configuration">
                 <template #body="slotProps">
@@ -45,18 +45,18 @@
     <div v-if="forecastJobStatus && forecastJobStatus !== 'Ready'" class="text-normal mt-2 mx-auto text-center">
       This forecast has already been run. Click "Next" to see status.
     </div>
-    <div v-else-if="forecastCycle" class="grid place-items-center" style="margin-top:15px;">
-      <div class="font-bold">Availability for {{ forecastCycle.name }}:</div>
+    <div v-else-if="forecastConfiguration" class="grid place-items-center" style="margin-top:15px;">
+      <div class="font-bold">Availability for {{ forecastConfiguration.name }}:</div>
       <ul>
-        <li v-if="forecastCycle.availability_lag > 0">
-          Most recent forecast available: {{ forecastCycle.availability_lag }} 
-          hour{{ forecastCycle.availability_lag > 1 ? 's' : '' }} before current time
+        <li v-if="forecastConfiguration.availability_lag > 0">
+          Most recent forecast available: {{ forecastConfiguration.availability_lag }} 
+          hour{{ forecastConfiguration.availability_lag > 1 ? 's' : '' }} before current time
         </li>
         <li>
           Cycle hours available: {{ cycleHourList.length < 24 ? cycleHourList.join(', ') : '0-23' }}
         </li>
         <li>
-          Forecast window: {{ forecastCycle.fcst_win }} hour{{ forecastCycle.fcst_win > 1 ? 's' : '' }}
+          Forecast window: {{ forecastConfiguration.fcst_win }} hour{{ forecastConfiguration.fcst_win > 1 ? 's' : '' }}
         </li>
       </ul>
       <div class="grid grid-cols-4">
@@ -69,7 +69,7 @@
             :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
             :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
             :teleport="true" utc='preserve' 
-            :disabled="!forecastCycle"/>
+            :disabled="!forecastConfiguration"/>
         </div>
         <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
           Cold Start Date
@@ -80,7 +80,7 @@
             :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
             :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
             :teleport="true" utc='preserve' 
-            :disabled="!forecastCycle"/>
+            :disabled="!forecastConfiguration"/>
         </div>
         <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
           Hour
@@ -88,14 +88,14 @@
         <div class="text-nowrap">
           <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
             aria-label="Cycle Hour Select" title="Cycle Hour Select"
-            :disabled="!forecastCycle">
+            :disabled="!forecastConfiguration">
           </Select>
         </div>
         <div class="text-nowrap" style="padding-top:8px;">
           Z
         </div>
         <div>
-          <span v-if="cycleDate && cycleHour && forecastCycle && forecastCycle.is_active">
+          <span v-if="cycleDate && (cycleHour || cycleHour === 0) && forecastConfiguration && forecastConfiguration.is_active">
             <div class="col-span-1 mr-4">
               <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
                 @click="goToRunStatusTab()">
@@ -131,8 +131,8 @@ const {
   calibrationRunForForecast,
   coldStartDate,
   cycleDate,
-  forecastCycles,
-  forecastCycle,
+  forecastConfigurations,
+  forecastConfiguration,
   forecastJobStatus,
   forcingDownloadStatus,
 } = storeToRefs(useForecastStore());
@@ -181,9 +181,9 @@ onMounted(async () => {
     hilightTab(ForecastTabs.tab_setupForecast);
 
     nextTick(async () => {
-        // load tab data to populate forecastCycles
+        // load tab data to populate forecastConfigurations
         await loadSetupForecastTabData();
-        if (forecastCycle.value) {
+        if (forecastConfiguration.value) {
             getCycleHourList();
         }
     });
@@ -202,17 +202,17 @@ const convertColdStartDateStringToDateTimeObject = (value: string) => {
   }
 }
 
-watch(forecastCycle, async () => {
+watch(forecastConfiguration, async () => {
   cycleHourList.value = [];
   getCycleHourList();
 })
 
 const getCycleHourList = () => {
-  if (forecastCycle?.value) {
-    let h = forecastCycle?.value?.cycle_start;
-    while (h <= forecastCycle?.value?.cycle_end) {
+  if (forecastConfiguration?.value) {
+    let h = forecastConfiguration?.value?.cycle_start;
+    while (h <= forecastConfiguration?.value?.cycle_end) {
       cycleHourList.value.push(h);
-      h += forecastCycle?.value?.cycle_freq;
+      h += forecastConfiguration?.value?.cycle_freq;
     }
     nextTick(async () => {
       document.getElementById('MainLeftDataArea').parentNode.scrollTop = document.getElementById('MainLeftDataArea').parentNode.scrollHeight;
@@ -232,11 +232,11 @@ const onRowSelect = (e: any) => {
  * Go to the Status Run tab
  */
 const goToRunStatusTab = () => {
-    if (!forecastCycle.value) {
+    if (!forecastConfiguration.value) {
       const alert = window.alert('You must select a configuration and then set the Cycle Date/Hour.');
       return false;
-    } else if (!cycleDate.value || !cycleHour.value) {
-      const alert = window.alert('Invalid Cycle Date chosen.\n\nMake sure to choose a date within the available date range, and an hour that is available for your chosen cycle.');
+    } else if (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0)) {
+      const alert = window.alert('Invalid Cycle Date chosen.\n\nMake sure to choose a date within the available date range, and an hour that is available for your chosen configuration.');
       return false;
     } else {
       cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
@@ -245,7 +245,7 @@ const goToRunStatusTab = () => {
         return false;
       }
       // validate the day/hour to make sure it is within the availability window
-      let latestForecastDate = maxCycleDate.value.minus({ hours: forecastCycle.value.availability_lag})
+      let latestForecastDate = maxCycleDate.value.minus({ hours: forecastConfiguration.value.availability_lag})
       if (latestForecastDate < cycleDate.value) {
           const alert = window.alert('Forecast data might not yet be available for your chosen cycle date.');
       }

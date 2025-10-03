@@ -2,7 +2,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { DateTime, Duration } from "luxon";
 
 
-import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastCycle, ForecastJob, ForecastJobs } from "@/composables/NgencerfModels";
+import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastConfiguration, ForecastJob, ForecastJobs } from "@/composables/NgencerfModels";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
@@ -24,9 +24,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const forecastJobId = ref<number>();
   const cycleDate = ref<any>();
   const coldStartDate = ref<any>();
-  const forecastCycles = ref<ForecastCycle[]>();
-  const forecastCycle = ref<ForecastCycle>();
-  const forecastCycleName = ref<string>();
+  const forecastConfigurations = ref<ForecastConfiguration[]>();
+  const forecastConfiguration = ref<ForecastConfiguration>();
+  const forecastConfigurationName = ref<string>();
   const forecastJobStatus = ref<string>();
   const forcingDownloadStatus = ref<string>();
   const failureMessages = ref<any>();;
@@ -152,7 +152,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const loadSetupForecastTabData = async (): Promise<void> => {
     // load forecast cycles
     const loadForecastTabResponse: any = await loadForecastTab();
-    forecastCycles.value = loadForecastTabResponse?._data?.forecast_cycle_values;
+    forecastConfigurations.value = loadForecastTabResponse?._data?.forecast_configuration_values;
   };
 
   /**
@@ -166,6 +166,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       const getStatusResponse: any = await getStatus();
 
       if (getStatusResponse.status === 200) {
+        failureMessages.value = getStatusResponse?._data?.failure_messages;
+
         // TODO: create forecastJob interface
         const forecastJob: any = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
 
@@ -173,11 +175,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
           return ['No forecast job found'];
         }
 
-        // set forecastCycle, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
-        forecastCycleName.value = forecastJob?.cycle;
+        // set forecastConfiguration, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
+        forecastConfigurationName.value = forecastJob?.configuration;
         forecastJobStatus.value = forecastJob?.status;
         forcingDownloadStatus.value = forecastJob?.forcing_download?.status;
-        failureMessages.value = getStatusResponse?._data?.failure_messages;
         // set elapsedTime
         setElapsedTime(forecastJob);
 
@@ -257,7 +258,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    */
   const createAndRunForecastJob = async (
     calibrationRunId: number, 
-    forecastCycleName: string,
+    forecastConfigurationName: string,
     cycleDate: DateTime,
     coldStartDate: DateTime | null
   ): Promise<any> => {
@@ -269,7 +270,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       },
       body: JSON.stringify({
         calibration_run_id: calibrationRunId, 
-        cycle_name: forecastCycleName,
+        configuration_name: forecastConfigurationName,
         cycle_date: cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
         cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDD(coldStartDate) : null
       })
@@ -390,18 +391,18 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationRunForForecast.value = (forecast_row_data as any as CalibrationRunForForecast);
     forecastJobStatus.value = (forecast_row_data as any as CalibrationRunForForecast).status;
 
-    /// load forecastCycles
+    /// load forecastConfigurations
     await loadSetupForecastTabData();
 
-    forecastCycle.value = forecastCycles.value?.find((forecast_cycle_data: ForecastCycle) =>
-      forecast_cycle_data.name === forecast_row_data.cycle
+    forecastConfiguration.value = forecastConfigurations.value?.find((forecast_configuration_data: ForecastConfiguration) =>
+      forecast_configuration_data.name === forecast_row_data.configuration
     );
   }
 
   const resetSelectedForecastRunData = (): void => {
     forecastJobId.value = undefined;
     forecastJobStatus.value = undefined;
-    forecastCycle.value = undefined;
+    forecastConfiguration.value = undefined;
     resetSelectedCalibrationRunId();
   }
 
@@ -454,9 +455,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobId.value = undefined;
     cycleDate.value = undefined;
     coldStartDate.value = undefined;
-    forecastCycles.value = [];
-    forecastCycle.value = undefined;
-    forecastCycleName.value = undefined;
+    forecastConfigurations.value = [];
+    forecastConfiguration.value = undefined;
+    forecastConfigurationName.value = undefined;
     forecastJobStatus.value = undefined;
     forcingDownloadStatus.value = undefined;
     failureMessages.value = undefined;
@@ -486,9 +487,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobId,
     cycleDate,
     coldStartDate,
-    forecastCycles,
-    forecastCycle,
-    forecastCycleName,
+    forecastConfigurations,
+    forecastConfiguration,
+    forecastConfigurationName,
     forecastJobStatus,
     forcingDownloadStatus,
     failureMessages,
