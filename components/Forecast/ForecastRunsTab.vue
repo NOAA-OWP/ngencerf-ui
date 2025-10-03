@@ -73,11 +73,11 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="cycle" header="Forecast Cycle" sortable>
+            <Column :pt="ptColumn" field="configuration" header="Configuration" sortable>
               <template #body="slotProps">
-                <span v-if="slotProps.data.cycle" :aria-label="'Forecast Cycle ' + slotProps.data.cycle"
-                  :title="'Forecast Cycle ' + slotProps.data.cycle">
-                  {{ slotProps.data.cycle }}
+                <span v-if="slotProps.data.configuration" :aria-label="'Configuration ' + slotProps.data.configuration"
+                  :title="'Configuration ' + slotProps.data.configuration">
+                  {{ slotProps.data.configuration }}
                 </span>
               </template>
             </Column>

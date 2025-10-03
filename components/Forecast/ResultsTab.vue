@@ -31,11 +31,11 @@
           <td class="pl-5" nowrap>{{ elapsedTime ?? '-'.repeat(15) }}</td>
         </tr>
         <tr height="30px">
-          <th class="text-right font-bold" :aria-label="'Cycle is ' + forecastCycleName"
-            :title="'Cycle is ' + forecastCycleName">
-            <div style="width: 140px;">Cycle</div>
+          <th class="text-right font-bold" :aria-label="'Configuration is ' + forecastConfigurationName"
+            :title="'Configuration is ' + forecastConfigurationName">
+            <div style="width: 140px;">Configuration</div>
           </th>
-          <td class="pl-5" nowrap>{{ forecastCycleName }}</td>
+          <td class="pl-5" nowrap>{{ forecastConfigurationName }}</td>
           <th class="text-right font-bold" style="width: 140px;">
             <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
           </th>
@@ -129,7 +129,7 @@ const { addToastRecord } = generalStore();
 const {
   calibrationRunForForecast,
   forecastJobId,
-  forecastCycleName,
+  forecastConfigurationName,
   resultsPathname,
   forecastPlot,
   elapsedTime,

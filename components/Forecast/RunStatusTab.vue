@@ -74,15 +74,6 @@
                   }}</td>
                 <td v-else class="pl-5">Ready</td>
               </tr>
-              <tr v-if="failureMessages" height="38px" aria-label="Failure Message" title="Failure Message">
-                <th scope="row" class="text-right"><label for="FailureMessages">Failure Message</label></th>
-                <td id="FailureMessages" class="pl-3">
-                  <span v-for="message in failureMessages" class="dummyProgress ml-2 whitespace-nowrap text-md"
-                    style="background-color: white;">
-                    {{ message }}<br/>
-                  </span>
-                </td>
-              </tr>
               <tr height="32px" :aria-label="'Cycle Date is ' + (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'Unknown')"
                 :title="'Cycle Date is ' + (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None')">
                 <td class="text-right font-bold">
@@ -97,12 +88,12 @@
                 </td>
                 <td class="pl-5">{{ (coldStartDate ? formatISOStringOrDateToYYYYMMDD(coldStartDate) : 'None') }}</td>
               </tr>
-              <tr height="32px" :aria-label="'Configuration is ' + ((forecastCycle as ForecastCycle)?.name ?? 'Unknown')"
-                :title="'Configuration is ' + ((forecastCycle as ForecastCycle)?.name ?? 'Unknown')">
+              <tr height="32px" :aria-label="'Configuration is ' + ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown')"
+                :title="'Configuration is ' + ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown')">
                 <td class="text-right font-bold">
                   <div style="width: 140px;">Configuration</div>
                 </td>
-                <td class="pl-5">{{ ((forecastCycle as ForecastCycle)?.name ?? 'Unknown') ?? '-'.repeat(15) }}</td>
+                <td class="pl-5">{{ ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown') ?? '-'.repeat(15) }}</td>
               </tr>
             </tbody>
           </table>
@@ -116,6 +107,21 @@
             </div>
             <div class="pl-5" style="width: 100%;">
               <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-5" v-if="failureMessages">
+          <div style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
+            <div class="text-right font-bold" style="width: 155px;">
+              <label class="text-right whitespace-nowrap" for="failureMessage" style="width: 155px;padding-top:1px;">
+                Failure Message
+              </label>
+            </div>
+            <div class="pl-5" style="width: 100%;">
+              <span v-for="message in failureMessages">
+                {{ message }}<br/>
+              </span>
             </div>
           </div>
         </div>
@@ -191,7 +197,7 @@ const {
   forecastJobId,
   coldStartDate,
   cycleDate,
-  forecastCycle,
+  forecastConfiguration,
   forecastJobStatus,
   forcingDownloadStatus,
   failureMessages,
@@ -290,7 +296,7 @@ const createForcingDownloadAndForecastStatusInterval = () => {
 const startForecastRun = async () => {
   const createAndRunForecastJobResponse = await createAndRunForecastJob(
     calibrationRunForForecast?.value?.calibration_run_id as number, 
-    forecastCycle?.value?.name as string,
+    forecastConfiguration?.value?.name as string,
     cycleDate.value,
     coldStartDate.value
   );
