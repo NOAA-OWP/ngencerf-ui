@@ -371,13 +371,6 @@ onMounted(async () => {
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     resetGageStore();
     hardResetTuningStore();
-    const tMsg: ToastMessageOptions = { 
-      severity: 'info', 
-      summary: `Clearing elapsedTimeIntervalId ${elapsedTimeIntervalId?.value}, calibrationStatusIntervalId ${calibrationStatusIntervalId?.value}, validationsStatusIntervalId ${validationsStatusIntervalId.value}`, 
-      detail: 'Called from hardResetRunStatusStore()', 
-      life: ToastTimeout.timeoutInfo 
-    };
-    toast.add(tMsg); addToastRecord(tMsg);
     hardResetRunStatusStore();
     clearUserCalibrationRunData();
     await updateUserCalibrationJobsListData();
