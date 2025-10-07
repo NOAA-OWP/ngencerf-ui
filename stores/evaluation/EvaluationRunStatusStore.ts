@@ -1,7 +1,6 @@
 // @ts-check
 
 import { defineStore, storeToRefs } from "pinia";
-import type { ToastMessageOptions } from "primevue/toast";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -68,12 +67,6 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   }
 
   const loadValidationStatusInformation = async ( validation_run_id: number ) => {
-    let tMsg: ToastMessageOptions = { 
-      severity: 'info', 
-      summary: '', 
-      detail: '', 
-      life: ToastTimeout.timeoutInfo 
-    };
     queryIterationValidationRunStatus().then( response => {
       const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
         return validation.validation_run_id === validation_run_id
@@ -88,28 +81,18 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         if ( validationStatus.value.toLocaleUpperCase() !== "RUNNING" ) {
           runningTime.value = validation_run.elapsed_time ? formatElapsedTime(validation_run.elapsed_time) : '';
         } else {
-          tMsg = { 
-            severity: 'info', 
-            summary: 'Setting validationRunningTimeIntervalId', 
-            detail: 'Called from loadValidationStatusInformation() function after validationStatus change to ' + validationStatus.value, 
-            life: ToastTimeout.timeoutInfo 
-          };
+          if (validationRunningTimeIntervalId.value) {
+            clearInterval(validationRunningTimeIntervalId.value);
+          }
           validationRunningTimeIntervalId.value = setInterval( updateRunningTime, 1000 ) as unknown as number;
         }
       } else {
-        tMsg = { 
-          severity: 'info', 
-          summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
-          detail: 'Called from loadValidationStatusInformation() function after validation run not found', 
-          life: ToastTimeout.timeoutInfo 
-        };
         clearInterval(validationStatusCheckingIntervalId.value);
         clearInterval(validationRunningTimeIntervalId.value);
         validationStatusCheckingIntervalId.value = undefined;
         validationRunningTimeIntervalId.value = undefined;
       }
     })
-    return tMsg;
   }
 
   const updateRunningTime = (): void => {
