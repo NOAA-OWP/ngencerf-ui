@@ -377,7 +377,7 @@ const {
 } = evaluationCalibrationRunStore;
 
 const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
-const { hardResetRunStatusStore } = useEvaluationRunStatusStore();
+const { hardResetEvaluationRunStatusStore } = useEvaluationRunStatusStore();
 
 const { userCalibrationRunData, gotoCalibrationRunId, modulesFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
@@ -401,12 +401,12 @@ onMounted(async() => {
   //reset Run/Status store in case we have running intervals
   const tMsg: ToastMessageOptions = { 
     severity: 'info', 
-    summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
-    detail: 'Called from hardResetRunStatusStore()', 
+    summary: `Clearing validationStatusCheckingIntervalId ${validationStatusCheckingIntervalId?.value}, validationRunningTimeIntervalId ${validationRunningTimeIntervalId?.value}`, 
+    detail: 'Called from hardResetEvaluationRunStatusStore()', 
     life: ToastTimeout.timeoutInfo 
   };
   toast.add(tMsg); addToastRecord(tMsg);
-  hardResetRunStatusStore();
+  hardResetEvaluationRunStatusStore();
 
   if(gotoCalibrationRunId.value) {
     userSelectedEvalCalibrationRunId.value = gotoCalibrationRunId.value;

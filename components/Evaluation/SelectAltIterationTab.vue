@@ -102,7 +102,7 @@ const {
 } = storeToRefs(useEvaluationAltIterationStore());
 
 const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
-const { hardResetRunStatusStore } = useEvaluationRunStatusStore();
+const { hardResetEvaluationRunStatusStore } = useEvaluationRunStatusStore();
 const { iterationValidationRunId } = storeToRefs(useEvaluationRunStatusStore());
 const { calibrationJobId, evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());
 
@@ -119,12 +119,12 @@ onMounted(() => {
   
   const tMsg: ToastMessageOptions = { 
     severity: 'info', 
-    summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
-    detail: 'Called from hardResetRunStatusStore()', 
+    summary: `Clearing validationStatusCheckingIntervalId ${validationStatusCheckingIntervalId?.value}, validationRunningTimeIntervalId ${validationRunningTimeIntervalId?.value}`, 
+    detail: 'Called from hardResetEvaluationRunStatusStore()', 
     life: ToastTimeout.timeoutInfo 
   };
   toast.add(tMsg); addToastRecord(tMsg);
-  hardResetRunStatusStore();
+  hardResetEvaluationRunStatusStore();
 
   nextTick(() => {
     resetEvaluationAltIterationStore();
@@ -176,12 +176,12 @@ const navigateToEvaluateStatus = (event: any) => {
     iterationValidationRunId.value = evaluateValidationRunId.value = 0;
     const tMsg: ToastMessageOptions = { 
       severity: 'info', 
-      summary: 'Clearing validationStatusCheckingIntervalId, validationRunningTimeIntervalId', 
-      detail: 'Called from hardResetRunStatusStore()', 
+      summary: `Clearing validationStatusCheckingIntervalId ${validationStatusCheckingIntervalId?.value}, validationRunningTimeIntervalId ${validationRunningTimeIntervalId?.value}`, 
+      detail: 'Called from hardResetEvaluationRunStatusStore()', 
       life: ToastTimeout.timeoutInfo 
     };
     toast.add(tMsg); addToastRecord(tMsg);
-    hardResetRunStatusStore();
+    hardResetEvaluationRunStatusStore();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
     e.click();

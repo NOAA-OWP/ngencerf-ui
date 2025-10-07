@@ -144,7 +144,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   /**
    * Hard Reset Run/Status Store
    */
-  const hardResetRunStatusStore = (): void => {
+  const hardResetEvaluationRunStatusStore = (): void => {
     validationStatus.value = "";
     startTime.value = "";
     runningTime.value = "";
@@ -179,7 +179,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     isValidationRerunable,
     loadValidationStatusInformation,
     updateRunningTime,
-    hardResetRunStatusStore
+    hardResetEvaluationRunStatusStore
   }
 })
 

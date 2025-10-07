@@ -253,6 +253,7 @@ const { loadOptimizationTabStaticData } = useOptimizationStore();
 const { loadTuningTabStaticData, hardResetTuningStore } = useTuningStore();
 
 const { hardResetRunStatusStore } = useRunStatusStore();
+const { elapsedTimeIntervalId, calibrationStatusIntervalId, validationsStatusIntervalId } = storeToRefs(useRunStatusStore());
 
 const { calibrationJobId } = storeToRefs(generalStore());
 const { calibrationDownloadJobID, calibrationDownloadFileName } = storeToRefs(useCalibrationJobStore());
@@ -372,7 +373,7 @@ onMounted(async () => {
     hardResetTuningStore();
     const tMsg: ToastMessageOptions = { 
       severity: 'info', 
-      summary: 'Clearing elapsedTimeIntervalId, calibrationStatusIntervalId, validationsStatusIntervalId', 
+      summary: `Clearing elapsedTimeIntervalId ${elapsedTimeIntervalId?.value}, calibrationStatusIntervalId ${calibrationStatusIntervalId?.value}, validationsStatusIntervalId ${validationsStatusIntervalId.value}`, 
       detail: 'Called from hardResetRunStatusStore()', 
       life: ToastTimeout.timeoutInfo 
     };
