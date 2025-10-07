@@ -173,7 +173,7 @@ const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalS
 const { addToastRecord } = generalStore();
 
 const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeIntervalId, validationStatusCheckingIntervalId, evaluateDisplayIterationNumber, runStatusTabVisible, failureMessages } = storeToRefs(useEvaluationRunStatusStore());
-const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime, hardResetRunStatusStore } = useEvaluationRunStatusStore();
+const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime, hardResetEvaluationRunStatusStore } = useEvaluationRunStatusStore();
 const { queryGetLogData } = useEvaluationSupplementalDataStore();
 
 const logDataPageSize = ref<number>(1000);
