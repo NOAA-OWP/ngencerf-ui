@@ -700,7 +700,7 @@ export type CombinedVersionInfo = {
   ngenCerf_copyright: string;
 };
 
-export type ForecastCycle = {
+export type ForecastConfiguration = {
   name: string;
   data_sources: string;
   time_range: string;
@@ -732,16 +732,23 @@ export type CalibrationRunForForecast = {
   validations: CalibrationJobValidationItem[];
   is_archived: boolean;
   is_downloadable: boolean;
+  forecast_run_id: number;
+  forecast_status: string;
+  configuration: string;
+  cycle_date: string;
+  cold_start_date: string;
 };
 
 export interface ForecastJob {
   calibration_run_id: number;
   forecast_run_id: number;
-  cycle: string;
+  configuration: string;
+  cycle_date: string;
   gage_id: string;
   forecast_status: string;
-  forcing_download_status: string;
+  cold_start_status: string;
   submit_date: string;
+  failure_messages: any;
 }
 
 export type ForecastJobs = {

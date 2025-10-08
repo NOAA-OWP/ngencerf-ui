@@ -28,7 +28,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const forecastConfiguration = ref<ForecastConfiguration>();
   const forecastConfigurationName = ref<string>();
   const forecastJobStatus = ref<string>();
-  const forcingDownloadStatus = ref<string>();
+  const coldStartJobStatus = ref<string>();
   const failureMessages = ref<any>();;
   const elapsedTime = ref<string>();
   const submitTimeDate = ref<Date>();
@@ -61,9 +61,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   });
 
   /**
-   * Compute Overall Forcing Download and Forecast status
+   * Compute Overall Cold Start and Forecast status
    */
-  const overallForcingDownloadForecastStatus = computed<string>(() => {
+  const overallColdStartForecastStatus = computed<string>(() => {
     if (
       [
         "Submitted",
@@ -73,27 +73,27 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         "Cancelled",
         "Failed",
         "Server error",
-      ].includes(forcingDownloadStatus.value as string)
+      ].includes(coldStartJobStatus.value as string)
     ) {
-      return `Forcing Download ${forcingDownloadStatus.value as string}`;
-    } else if (forcingDownloadStatus.value === "Done") {
-      if (
-        [
-          "Submitted",
-          "Saved",
-          "Ready",
-          "Running",
-          "Cancelled",
-          "Failed",
-          "Server error",
-        ].includes(forecastJobStatus.value as string)
-      ) {
-        return `Forcing Download Done, Forecast ${forecastJobStatus.value as string}`;
-      } else if (forecastJobStatus.value === "Done") {
-        return "Done";
+      return `Cold Start ${coldStartJobStatus.value as string}`;
+    } else if (
+      [
+        "Submitted",
+        "Saved",
+        "Ready",
+        "Running",
+        "Cancelled",
+        "Failed",
+        "Server error",
+      ].includes(forecastJobStatus.value as string)
+    ) {
+      if (coldStartJobStatus.value === "Done") {
+        return `Cold Start Done, Forecast ${forecastJobStatus.value as string}`;
       } else {
-        return "Unknown";
+        return forecastJobStatus.value as string;
       }
+    } else if (forecastJobStatus.value === "Done") {
+      return "Done";
     } else {
       return "Unknown";
     }
@@ -178,7 +178,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         // set forecastConfiguration, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
         forecastConfigurationName.value = forecastJob?.configuration;
         forecastJobStatus.value = forecastJob?.status;
-        forcingDownloadStatus.value = forecastJob?.forcing_download?.status;
+        coldStartJobStatus.value = forecastJob?.cold_start?.status;
         // set elapsedTime
         setElapsedTime(forecastJob);
 
@@ -201,20 +201,19 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * Set elapsedTime
    */
   const setElapsedTime = (forecastJob: any): void => {
-    if (forecastJob?.forcing_download?.elapsed_time) {
-      if (forecastJob?.elapsed_time) {
+    if (forecastJob?.elapsed_time) {
+      if (forecastJob?.cold_start?.elapsed_time) {
         const elapsedTimeArray: string[] = [];
-        elapsedTimeArray.push(forecastJob?.forcing_download?.elapsed_time);
+        elapsedTimeArray.push(forecastJob?.cold_start?.elapsed_time);
         elapsedTimeArray.push(forecastJob?.elapsed_time);
 
-        // sume and format forecast and forcing download elapsed times
+        // sume and format forecast and cold start elapsed times
         elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
       } else {
-        // format the forcing download elapsed time to a string in 'hh:mm:ss' or 'd 'Days,' hh:mm:ss' format
-        elapsedTime.value = formatElapsedTime(forecastJob?.forcing_download?.elapsed_time);
+        // format the cold start elapsed time to a string in 'hh:mm:ss' or 'd 'Days,' hh:mm:ss' format
+        elapsedTime.value = formatElapsedTime(forecastJob?.elapsed_time);
       }
     }
-
   };
 
   /**
@@ -391,7 +390,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationRunForForecast.value = (forecast_row_data as any as CalibrationRunForForecast);
     forecastJobStatus.value = (forecast_row_data as any as CalibrationRunForForecast).status;
 
-    /// load forecastConfigurations
+    // load forecastConfigurations
     await loadSetupForecastTabData();
 
     forecastConfiguration.value = forecastConfigurations.value?.find((forecast_configuration_data: ForecastConfiguration) =>
@@ -459,7 +458,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastConfiguration.value = undefined;
     forecastConfigurationName.value = undefined;
     forecastJobStatus.value = undefined;
-    forcingDownloadStatus.value = undefined;
+    coldStartJobStatus.value = undefined;
     failureMessages.value = undefined;
     elapsedTime.value = undefined;
     submitTimeDate.value = undefined;
@@ -491,7 +490,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastConfiguration,
     forecastConfigurationName,
     forecastJobStatus,
-    forcingDownloadStatus,
+    coldStartJobStatus,
     failureMessages,
     elapsedTime,
     submitTimeDate,
@@ -509,7 +508,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     filteredForecastRuns,
     selectedForecastJob,
     isForecastLoading,
-    overallForcingDownloadForecastStatus,
+    overallColdStartForecastStatus,
     getForecastJobs,
     loadSetupForecastTabData,
     loadForecastRunStatusTabData,
