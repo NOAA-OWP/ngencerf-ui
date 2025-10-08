@@ -437,21 +437,19 @@ onMounted(async () => {
         });
         calibrationElapsedTime.value = sumAndFormatElapsedTimes(allDurs);
       }
-
-
-      if (validControl?.status) {
-        validationControlStatus.value = validControl.status;
-      }
-      if (validBest?.status) {
-        validationBestStatus.value = validBest.status;
-      }
-      if (validationControlStatus?.value) {
-        validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
-      }
+      
+      validationControlStatus.value = validControl?.status ? validControl.status : undefined;
+      validationBestStatus.value = validBest?.status ? validBest.status : undefined;
+      validControlAndValidBestStatus.value = validationControlStatus?.value ? getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value) : undefined;
     
-    // always update the iteration number for any status other than Saved or Ready
-    await updateIteration();
-    await populatePlotListOptions();
+      // always update the iteration number for any status other than Saved or Ready
+      await updateIteration();
+      await populatePlotListOptions();
+    } else {
+      // If job is saved or ready we need to explicitly clear the validation statuses
+      validationControlStatus.value = undefined;
+      validationBestStatus.value = undefined;
+      validControlAndValidBestStatus.value = undefined;
     }
   });
 });
@@ -1017,6 +1015,9 @@ onUnmounted(() => {
   // make sure page clears all selected plots/tables when the user leaves
   iteration.value = undefined;
   plotList.value = [];
+  validationControlStatus.value = undefined;
+  validationBestStatus.value = undefined;
+  validControlAndValidBestStatus.value = undefined;
   resetUserPlotRefs([]);
 })
 </script>
