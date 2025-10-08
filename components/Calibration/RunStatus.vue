@@ -328,7 +328,6 @@ const populatePlotListOptions = async() => {
 
       if (!['Submitted','Validating and Preparing Job Data'].includes(userCalibrationRunData?.value?.status)) {
         // Get Names of available Logs
-        console.log('Status when requesting log names: ', userCalibrationRunData?.value?.status);
         logs.value = await queryGetLogNames(
           (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
         );
@@ -417,7 +416,6 @@ onMounted(async () => {
 
     // if calibration is not Saved or Ready, check validation statuses
     if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-      const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
       const validations = getStatusResponse?._data?.validations;
 
       const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
@@ -593,7 +591,9 @@ const updateIteration = async () => {
       }
     }
     userCalibrationRunData.value.status = getIterationResponse._data.status;
-    userCalibrationRunData.value.failure_messages = getIterationResponse._data.failure_messages;
+    if (getIterationResponse._data.failure_messages) {
+      userCalibrationRunData.value.failure_messages = getIterationResponse._data.failure_messages;
+    }
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
