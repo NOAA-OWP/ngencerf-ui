@@ -316,7 +316,7 @@ const populatePlotListOptions = async() => {
     logListOptions.value = [];
 
     nextTick(async () => {
-      if (iteration.value && iteration.value >= 1) {
+      if (userCalibrationRunData?.value?.status === 'Done' || (iteration.value && iteration.value >= 1)) {
         // Get Plot Names
         plotNames.value = await queryGetPlotNames();
 
@@ -326,19 +326,21 @@ const populatePlotListOptions = async() => {
         }
       }
 
-      // Get Names of available Logs
-      logs.value = await queryGetLogNames(
-        (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
-      );
-      if (logs.value?._data?.log_names) {
-        for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-          Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-            let logList = [];
-            for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-              logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
-            }
-            logLists.value[key] = logList;
-          });
+      if (userCalibrationRunData?.value?.status !== 'Submitted') {
+        // Get Names of available Logs
+        logs.value = await queryGetLogNames(
+          (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
+        );
+        if (logs.value?._data?.log_names) {
+          for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+            Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+              let logList = [];
+              for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+                logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+              }
+              logLists.value[key] = logList;
+            });
+          }
         }
       }
       
