@@ -12,11 +12,11 @@
             <div style="width: 140px;">Calibration Job ID</div>
           </th>
           <td class="pl-5" nowrap>{{ calibrationJobId }}</td>
-          <th class="text-right font-bold" :aria-label="'Status is ' + overallForcingDownloadForecastStatus"
-            :title="'Status is ' + overallForcingDownloadForecastStatus">
+          <th class="text-right font-bold" :aria-label="'Status is ' + overallColdStartForecastStatus"
+            :title="'Status is ' + overallColdStartForecastStatus">
             <div style="width: 140px;">Status</div>
           </th>
-          <td class="pl-5" nowrap>{{ overallForcingDownloadForecastStatus }}</td>
+          <td class="pl-5" nowrap>{{ overallColdStartForecastStatus }}</td>
         </tr>
         <tr height="30px">
           <th class="text-right font-bold" :aria-label="'Forecast Job ID is ' + forecastJobId"
@@ -47,8 +47,8 @@
       </tbody>
     </table>
   </div>
-  <div>
-    <div class="text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
+  <div class="flex">
+    <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
       <div id="PlotGraphArea" ref="plotGraphArea" v-if="!plotGraphCheckboxesEmpty()">
         <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
         <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
@@ -68,41 +68,41 @@
           </div>
         </div>
       </div>
-      <div id="PlotGraphControls">
-        <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue underline mt-1 pb-2"
-          @click="toggleCustomizePlot">
+    </div>
+    <div class="p-4 grow-0" id="PlotGraphControls">
+      <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue underline mt-1 pb-2"
+        @click="toggleCustomizePlot">
+        Customize Viewer
+      </a>
+      <div v-if="plotGraphLines.length > 0">
+        <div v-for="item in plotGraphLines" :key="item.id">
+          <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
+            v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
+          <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
+        </div>
+      </div>
+      <div v-if="plotGraphCheckboxesEmpty()">
+        Check at least one box to generate an interactive plot.
+      </div>
+      <div id="CustomizePlotWindow" v-if="showCustomizePlot">
+        <div class="text-right sticky top-0">
+          <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+            class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
+        </div>
+        <h2 class="mt-5" aria-label="Customize Viewer" title="Customize Viewer">
           Customize Viewer
-        </a>
+        </h2>
         <div v-if="plotGraphLines.length > 0">
-          <div v-for="item in plotGraphLines" :key="item.id">
-            <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
-              v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
-            <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
-          </div>
-        </div>
-        <div v-if="plotGraphCheckboxesEmpty()">
-          Check at least one box to generate an interactive plot.
-        </div>
-        <div id="CustomizePlotWindow" v-if="showCustomizePlot">
-          <div class="text-right sticky top-0">
-            <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-              class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
-          </div>
-          <h2 class="mt-5" aria-label="Customize Viewer" title="Customize Viewer">
-            Customize Viewer
-          </h2>
-          <div v-if="plotGraphLines.length > 0">
-            <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
-              <div>
-                <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
-              </div>
-              <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
-                :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
-              </Select>
-              <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol"
-                :options="plotGraphSymbolList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
-              </Select>
+          <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
+            <div>
+              <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
             </div>
+            <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
+              :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+            </Select>
+            <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol"
+              :options="plotGraphSymbolList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+            </Select>
           </div>
         </div>
       </div>
@@ -133,7 +133,7 @@ const {
   resultsPathname,
   forecastPlot,
   elapsedTime,
-  overallForcingDownloadForecastStatus
+  overallColdStartForecastStatus
 } = storeToRefs(useForecastStore());
 
 const {
@@ -340,8 +340,10 @@ const drawInteractivePlot = () => {
       marks: [],
       width: (plotGraphArea.value as HTMLElement).offsetWidth - 50,
       height: ((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
-        - (document.getElementById('PlotGraphArea') as HTMLElement).getBoundingClientRect().top) - 100
+        - (document.getElementById('PlotGraphArea') as HTMLElement).getBoundingClientRect().top) - 150
     };
+    console.log('MainLeftDataParent bottom:',(document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom);
+    console.log('PlotGraphArea top:',(document.getElementById('PlotGraphArea') as HTMLElement).getBoundingClientRect().top);
     plotGraphOptions.value.y.label = 'Streamflow (m^3/s)';
     plotGraphOptions.value.y.labelOffset = -10;
     plotGraphOptions.value.marginLeft = 50;
@@ -474,7 +476,6 @@ const drawInteractiveSlider = () => {
           };
           plotGraphSliderData.value.push(dataPoint);
         }
-        break;
       }
     }
     let lineOptions = {
@@ -714,6 +715,7 @@ onUnmounted(async() => {
 
 #PlotGraphArea {
   width: 100%;
+  padding-bottom: 100px;
 }
 
 #PlotGraphArea label {
@@ -759,5 +761,19 @@ onUnmounted(async() => {
   position: relative;
   top: 100px;
   font-size: 12px;
+}
+
+#PlotGraphControls {
+  min-width: 225px;
+}
+
+#PlotGraphControls input[type='checkbox'] {
+  margin-top: 4px;
+}
+
+#PlotGraphControls label,
+#CustomizePlotWindow label {
+  margin: 0 4px 4px 4px !important;
+  display: inline-block;
 }
 </style>

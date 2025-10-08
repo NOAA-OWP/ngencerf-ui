@@ -134,7 +134,7 @@ const {
   forecastConfigurations,
   forecastConfiguration,
   forecastJobStatus,
-  forcingDownloadStatus,
+  coldStartJobStatus,
 } = storeToRefs(useForecastStore());
 
 const { loadSetupForecastTabData } = useForecastStore();

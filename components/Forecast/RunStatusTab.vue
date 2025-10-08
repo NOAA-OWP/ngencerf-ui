@@ -65,12 +65,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr height="40px" :aria-label="'Status is ' + overallForcingDownloadForecastStatus"
-                :title="'Status is ' + overallForcingDownloadForecastStatus">
+              <tr height="40px" :aria-label="'Status is ' + overallColdStartForecastStatus"
+                :title="'Status is ' + overallColdStartForecastStatus">
                 <th scope="row" class="text-right font-bold">
                   <div style="width: 140px;">Status</div>
                 </th>
-                <td v-if="forcingDownloadStatus && forecastJobStatus" class="pl-5">{{ overallForcingDownloadForecastStatus
+                <td v-if="coldStartJobStatus && forecastJobStatus" class="pl-5">{{ overallColdStartForecastStatus
                   }}</td>
                 <td v-else class="pl-5">Ready</td>
               </tr>
@@ -148,7 +148,7 @@
                 </Button>
               </div>
             </span>
-            <span v-if="forcingDownloadStatus === 'Running' || forecastJobStatus === 'Running'">
+            <span v-if="coldStartJobStatus === 'Running' || forecastJobStatus === 'Running'">
               <div class="col-span-1 mr-3">
                 <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" @click="cancelForecastRun()"
                   aria-label="Cancel Button">
@@ -156,7 +156,7 @@
                 </Button>
               </div>
             </span>
-            <span v-if="overallForcingDownloadForecastStatus === 'Done'">
+            <span v-if="overallColdStartForecastStatus === 'Done'">
               <div class="col-span-1 mr-3">
                 <Button class="ngenButtonDiv ml-6 font-normal px-4 whitespace-nowrap" title="View Results Button"
                   @click="goToResultsTab()" aria-label="View Results Button">
@@ -199,7 +199,7 @@ const {
   cycleDate,
   forecastConfiguration,
   forecastJobStatus,
-  forcingDownloadStatus,
+  coldStartJobStatus,
   failureMessages,
   elapsedTime,
   submitTimeDate,
@@ -208,7 +208,7 @@ const {
   forecastJobStatusIntervalId,
   resultsPathname,
   calibrationRunForForecast,
-  overallForcingDownloadForecastStatus
+  overallColdStartForecastStatus
 } = storeToRefs(useForecastStore());
 
 const {
@@ -235,14 +235,17 @@ onMounted(async () => {
 });
 
 /**
- * Create elapsedTimeIntervalId to increment elapsedTime every second while forcingDownloadStatus is Running
+ * Create elapsedTimeIntervalId to increment elapsedTime every second while coldStartJobStatus is Running
  * or forecastJobStatus is Submitted or Running
  */
 const createElapsedTimeInterval = () => {
+  if (elapsedTimeIntervalId.value) {
+    clearInterval(elapsedTimeIntervalId.value);
+  }
   elapsedTimeIntervalId.value = setInterval(async () => {
-    // continue incrementing elapsedTime every second while forcingDownloadStatus is Submitted
+    // continue incrementing elapsedTime every second while coldStartJobStatus is Submitted
     // or forecastJobStatus is Submitted or Running
-    if (['Running'].includes(forcingDownloadStatus.value ?? '') || ['Submitted', 'Running'].includes(forecastJobStatus.value ?? '')) {
+    if (['Running'].includes(coldStartJobStatus.value ?? '') || ['Submitted', 'Running'].includes(forecastJobStatus.value ?? '')) {
       elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
     } else {
       clearInterval(elapsedTimeIntervalId.value);
@@ -252,27 +255,30 @@ const createElapsedTimeInterval = () => {
 };
 
 /**
- * Create forecastJobStatusIntervalId to update forcingDownloadStatus and forecastJobStatus every 10 seconds
- * while forcingDownloadStatus or forecastJobStatus is Submitted or Running
+ * Create forecastJobStatusIntervalId to update coldStartJobStatus and forecastJobStatus every 10 seconds
+ * while coldStartJobStatus or forecastJobStatus is Submitted or Running
  */
-const createForcingDownloadAndForecastStatusInterval = () => {
+const createColdStartAndForecastStatusInterval = () => {
+  if (forecastJobStatusIntervalId.value) {
+    clearInterval(forecastJobStatusIntervalId.value);
+  }
   forecastJobStatusIntervalId.value = setInterval(async () => {
     const getStatusResponse = await getStatus();
     const forecasts: any[] = getStatusResponse?._data.forecasts;
     const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
     if (forecast) {
-      // if forcing download and forecast job are not Submitted or Running, clear the interval
+      // if cold start and forecast job are not Submitted or Running, clear the interval
       if (
-        !['Submitted', 'Running'].includes(forecast?.forcing_download?.status ?? '') &&
+        !['Submitted', 'Running'].includes(forecast?.cold_start?.status ?? '') &&
         !['Submitted', 'Running'].includes(forecast?.status ?? '')
       ) {
         clearInterval(forecastJobStatusIntervalId.value);
         forecastJobStatusIntervalId.value = undefined;
       }
-      // update forcingDownloadStatus and forecastJobStatus
+      // update coldStartJobStatus and forecastJobStatus
       forecastJobStatus.value = forecast?.status;
-      forcingDownloadStatus.value = forecast?.forcing_download?.status;
+      coldStartJobStatus.value = forecast?.cold_start?.status;
       failureMessages.value = getStatusResponse?._data?.failure_messages;
 
       // set submitTime if not already set
@@ -303,7 +309,7 @@ const startForecastRun = async () => {
 
   if (createAndRunForecastJobResponse.status >= 200 && createAndRunForecastJobResponse.status < 300) {
     forecastJobStatus.value = createAndRunForecastJobResponse._data.forecast_status;
-    forcingDownloadStatus.value = createAndRunForecastJobResponse._data.forecast_forcing_download_status;
+    coldStartJobStatus.value = createAndRunForecastJobResponse._data.forecast_cold_start_status;
     failureMessages.value = createAndRunForecastJobResponse._data.failure_messages;
     forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
 
@@ -324,7 +330,7 @@ const startForecastRun = async () => {
 
     if (forecast) {
       forecastJobStatus.value = forecast?.status;
-      forcingDownloadStatus.value = forecast?.forcing_download?.status;
+      coldStartJobStatus.value = forecast?.cold_start?.status;
       failureMessages.value = forecast?.failure_messages;
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`, life: ToastTimeout.timeoutError };
@@ -369,30 +375,30 @@ const goToResultsTab = () => {
 };
 
 /**
- * Watch overallForcingDownloadForecastStatus for changes
- * overallForcingDownloadForecastStatus is a computed value based on forcingDownloadStatus and forecastJobStatus
- * so we're essentially watching both forcingDownloadStatus and forecastJobStatus for changes
+ * Watch overallColdStartForecastStatus for changes
+ * overallColdStartForecastStatus is a computed value based on coldStartJobStatus and forecastJobStatus
+ * so we're essentially watching both coldStartJobStatus and forecastJobStatus for changes
  */
-watch(overallForcingDownloadForecastStatus, async (oldForecastJobStatus, newForecastJobStatus) => {
-  // when overallForcingDownloadForecastStatus first changes to Submitted or Running, start incrementing elapsedTime every second until
-  // overallForcingDownloadForecastStatus changes to Done, Cancelled, Failed, or Server error
-  if (['Submitted', 'Running'].includes(forcingDownloadStatus.value) || ['Submitted', 'Running'].includes(forecastJobStatus.value)) {
-    // if not already created, create elapsedTimeIntervalId to update elapsedTime every second while forcingDownloadStatus is Running
+watch(overallColdStartForecastStatus, async (oldForecastJobStatus, newForecastJobStatus) => {
+  // when overallColdStartForecastStatus first changes to Submitted or Running, start incrementing elapsedTime every second until
+  // overallColdStartForecastStatus changes to Done, Cancelled, Failed, or Server error
+  if (['Submitted', 'Running'].includes(coldStartJobStatus.value) || ['Submitted', 'Running'].includes(forecastJobStatus.value)) {
+    // if not already created, create elapsedTimeIntervalId to update elapsedTime every second while coldStartJobStatus is Running
     // or forecastJobStatus is Submitted or Running
-    if (forcingDownloadStatus.value === 'Running' && !elapsedTimeIntervalId.value && submitTimeDate.value) {
+    if (coldStartJobStatus.value === 'Running' && !elapsedTimeIntervalId.value && submitTimeDate.value) {
       createElapsedTimeInterval();
     }
-    // if not already created, create forecastJobStatusIntervalId to update forcingDownloadStatus and forecastJobStatus every 10 seconds
-    // while forcingDownloadStatus or forecastJobStatus is Submitted or Running
+    // if not already created, create forecastJobStatusIntervalId to update coldStartJobStatus and forecastJobStatus every 10 seconds
+    // while coldStartJobStatus or forecastJobStatus is Submitted or Running
     if (!forecastJobStatusIntervalId.value) {
-      createForcingDownloadAndForecastStatusInterval();
+      createColdStartAndForecastStatusInterval();
     }
   }
 
   // if interval incrementing elapsedTime every second is no longer running
-  // and when overallForcingDownloadForecastStatus changes to Done, look for Forcing Download and Forecast 
+  // and when overallColdStartForecastStatus changes to Done, look for Cold Start and Forecast 
   // elapsedTimes from server and set elapsedTime to the sum of those durations
-  if (!forecastJobStatusIntervalId.value && forcingDownloadStatus.value === 'Done' || forecastJobStatus.value === 'Done') {
+  if (!forecastJobStatusIntervalId.value && coldStartJobStatus.value === 'Done' || forecastJobStatus.value === 'Done') {
     // if forecastJobStatusIntervalId is not set, that means elapsedTime is no longer incrementing every second
     // so we need to get elapsed_time from the server
     const getStatusResponse = await getStatus();

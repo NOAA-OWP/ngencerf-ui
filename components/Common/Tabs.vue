@@ -94,18 +94,18 @@
             Forecast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[3].includes(currentForecastTab) || calibrationRunForForecast && (!calibrationRunForForecast.status || ['Saved','Ready'].includes(calibrationRunForForecast.status))" data-tab="3"
+          <div v-show="[3].includes(currentForecastTab) || calibrationRunForForecast && (!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status))" data-tab="3"
             class="tabs prevent-select" @click="tabClicked" aria-label="Setup Forecast Tab"
             title="Setup Forecast Tab">
             Setup Forecast
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[4].includes(currentForecastTab) || (calibrationRunForForecast && (calibrationRunForForecast.configuration || forecastConfiguration))" data-tab="4"
+          <div v-show="[4].includes(currentForecastTab) || (calibrationRunForForecast && calibrationRunForForecast?.configuration)" data-tab="4"
             class="tabs prevent-select" @click="tabClicked" aria-label="Run/Status tab" title="Run/Status Tab">
             Run/Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[5].includes(currentForecastTab) || calibrationRunForForecast && calibrationRunForForecast.status  === 'Done'" data-tab="5" class="tabs prevent-select" @click="tabClicked"
+          <div v-show="[5].includes(currentForecastTab) || calibrationRunForForecast && calibrationRunForForecast.forecast_status  === 'Done'" data-tab="5" class="tabs prevent-select" @click="tabClicked"
             aria-label="Results tab" title="Results tab">
             Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
