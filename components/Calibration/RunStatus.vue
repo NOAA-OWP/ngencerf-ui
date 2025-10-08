@@ -560,7 +560,6 @@ const cancelRun = async () => {
       if (cancelCalibrationResponse?._data.status) {
         if (userCalibrationRunData.value) {
           userCalibrationRunData.value.status = cancelCalibrationResponse?._data.status;
-          userCalibrationRunData.value.failure_messages = getStatusResponse._data.failure_messages;
         }
         if (userCalibrationRunData?.value?.status !== 'Cancelled') {
           const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };
