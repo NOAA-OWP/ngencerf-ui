@@ -326,8 +326,9 @@ const populatePlotListOptions = async() => {
         }
       }
 
-      if (userCalibrationRunData?.value?.status !== 'Submitted') {
+      if (!['Submitted','Validating and Preparing Job Data'].includes(userCalibrationRunData?.value?.status)) {
         // Get Names of available Logs
+        console.log('Status when requesting log names: ', userCalibrationRunData?.value?.status);
         logs.value = await queryGetLogNames(
           (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
         );
@@ -463,7 +464,7 @@ const createElapsedTimeInterval = () => {
   }
   elapsedTimeIntervalId.value = setInterval(async () => {
     if (
-      ['Validating and Preparing Job Data','Running'].includes(userCalibrationRunData.value?.status) || 
+      ['Validating and Preparing Job Data','Submitted','Running'].includes(userCalibrationRunData.value?.status) || 
       (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate calibrationElapsedTime every second while Calibration is Running or Validation is not Done
