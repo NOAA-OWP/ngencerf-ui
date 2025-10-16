@@ -96,6 +96,9 @@
                                 <span v-if="getEvaluationTabIndex() === 2">
                                     <LazyEvaluationEvaluatesHelp />
                                 </span>
+                                <span v-if="getEvaluationTabIndex() === 3">
+                                    <LazyEvaluationComparePermutationsHelp />
+                                </span>
                                 <span v-if="getEvaluationTabIndex() === 4">
                                     <LazyEvaluationCalibrationSelectAltInterationssHelp />
                                 </span>
@@ -173,6 +176,7 @@ const LazyCalibrationHelpRunStatusHelp = defineAsyncComponent(() => import("@/co
 // Evaluation Workflow Help Files
 const LazyEvaluationCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/CalibrationRunsHelp.vue"))
 const LazyEvaluationEvaluatesHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/EvaluateHelp.vue"))
+const LazyEvaluationComparePermutationsHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/ComparePermutationsHelp.vue"))
 const LazyEvaluationCalibrationSelectAltInterationssHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/SelectAltIterationHelp.vue"))
 const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Evaluation/RunStatusHelp.vue"))
 
