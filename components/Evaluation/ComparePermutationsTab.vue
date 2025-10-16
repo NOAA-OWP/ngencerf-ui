@@ -124,7 +124,7 @@ const cmCompareRun = ref<DataTableContextMenuOption[]>([]);
 
 const selectedSupplementalTable = ref<number>(0);
 const supplementalTableOptions = ref<any[]>([
-  'Performance Metrics Table'
+  'Performance Metrics'
 ]);
 const performanceMetrics = ref<APIResponse>({});
 const performanceMetricsData = ref<any[]>([]);
