@@ -735,9 +735,9 @@ watch(selectedPlotName, async () => {
         const response: any = await queryGetSWETimeseriesData(
           (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
         );
-        if (response?._data?.swe_timeseries_data) {
+        if (response?._data?.timeseries_data) {
           // get time series data from server
-          sweTimeSeriesData.value = response?._data?.swe_timeseries_data;
+          sweTimeSeriesData.value = response?._data?.timeseries_data;
           selectedPlotHasTimeseries.value = true;
           // Start with SWE timeseries already displayed
           togglePlotGraph();
