@@ -4,7 +4,8 @@
         <div id="TopBar">&nbsp;</div>
         <div class="grid grid-cols-12 gap-1" style="height: 80px">
             <div v-if="isUserLoggedIn()" id="PgmName" class="col-span-2 mt-6">
-                <NuxtLink title="Link to Landing Page" to="LandingPage">ngenCERF</NuxtLink>
+                <NuxtLink title="Link to Landing Page" to="LandingPage"
+                    oncontextmenu="return false;">ngenCERF</NuxtLink>
             </div>
             <div v-else id="PgmName" class="col-span-2 mt-6">
                 <div>ngenCERF</div>
@@ -14,19 +15,23 @@
                 <ul v-show="userLoggedIn && location.name !== 'Login'" id="MainMenu">
                     <li aria-label="Calibration" title="Calibration">
                         <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''"
-                            to="calibration" data-menu='1' @click="MenuChanged">Calibration</NuxtLink>
+                            to="calibration" data-menu='1' @click="MenuChanged"
+                            oncontextmenu="return false;">Calibration</NuxtLink>
                     </li>
                     <li aria-label="Evaluation" title="Evaluation">
                         <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''"
-                            to="evaluation" data-menu='2' @click="MenuChanged">Evaluation</NuxtLink>
+                            to="evaluation" data-menu='2' @click="MenuChanged"
+                            oncontextmenu="return false;">Evaluation</NuxtLink>
                     </li>
                     <li aria-label="Forecast" title="Forecast">
                         <NuxtLink id="MainMenuForecast" :class="location.name === 'Forecast' ? 'isActive' : ''"
-                            to="forecast" data-menu='3' @click="MenuChanged">Forecast</NuxtLink>
+                            to="forecast" data-menu='3' @click="MenuChanged"
+                            oncontextmenu="return false;">Forecast</NuxtLink>
                     </li>
                     <li aria-label="Verification" title="Verification">
                         <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
-                            to="verification" data-menu='4' @click="MenuChanged">Verification</NuxtLink>
+                            to="verification" data-menu='4' @click="MenuChanged"
+                            oncontextmenu="return false;">Verification</NuxtLink>
                     </li>
                 </ul>
 

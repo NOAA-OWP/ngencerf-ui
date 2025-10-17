@@ -125,6 +125,12 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         }
 
         if (verificationJobStatus?.value?.toLocaleUpperCase() === "RUNNING") {
+          if (verificationStatusCheckingInterval.value) {
+            clearInterval(verificationStatusCheckingInterval.value);
+          }
+          if (verificationRunningTimeInterval.value) {
+            clearInterval(verificationRunningTimeInterval.value);
+          }
           verificationStatusCheckingInterval.value = setInterval(loadVerificationStatusInformation, 10000);
           verificationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
         }
@@ -184,7 +190,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   };
 
   /**
-   * Call get_status endpoint with selectedVerificationJob.value.verification_job_id
+   * Call get_status endpoint with userVerificationJobData.value.verification_job_id
    * @return {any}
    */
   const getVerificationStatus = async (): Promise<any> => {
@@ -194,7 +200,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ verification_job_id: selectedVerificationJob.value?.verification_job_id })
+      body: JSON.stringify({ verification_job_id: userVerificationJobData.value?.verification_job_id })
     });
   };
   
@@ -297,7 +303,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
           }
           if ( verificationJobStatus?.value?.toLocaleUpperCase() !== "RUNNING" ) {
             elapsedTime.value = response._data.elapsed_time ? formatElapsedTime(response._data.elapsed_time) : '';
-            loadSelectedVerificationJob(selectedVerificationJob.value?.verification_job_id);
+            loadSelectedVerificationJob(userVerificationJobData?.value?.verification_job_id);
             clearInterval(verificationStatusCheckingInterval.value);
             clearInterval(verificationRunningTimeInterval.value);
             verificationStatusCheckingInterval.value = undefined;
@@ -331,7 +337,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
    * Get Verification Plot Names
    */
   const getVerificationPlotNames = async (): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot_names/`, {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_verification_plot_names/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,

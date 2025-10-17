@@ -187,7 +187,8 @@ const {
   getForecastRunsForVerification,
   resetSelectedVerificationJobData,
   fetchNewVerificationJobId,
-  loadSelectedVerificationJob
+  loadSelectedVerificationJob,
+  setSelectedVerificationJobId
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
@@ -247,7 +248,7 @@ const navigateToSetupVerification = () => {
 
     if (e) {
       if (selectedVerificationJob.value) {
-        await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_job_id as number);
+        await setSelectedVerificationJobId(selectedVerificationJob?.value?.verification_job_id as number);
       }
       e.click();
     } else {

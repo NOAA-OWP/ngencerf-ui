@@ -284,9 +284,6 @@ const createColdStartAndForecastStatusInterval = () => {
     // if cold start and forecast job are not Submitted or Running, clear the interval
     if (!['Submitted', 'Running'].includes(coldStartJobStatus.value ?? '') && !['Submitted', 'Running'].includes(forecastJobStatus.value ?? ''))
     {
-      console.log('coldStartJobStatus:',coldStartJobStatus.value);
-      console.log('forecastJobStatus:',forecastJobStatus.value);
-      console.log('Clearing all intervals');
       clearInterval(forecastJobStatusIntervalId.value);
       forecastJobStatusIntervalId.value = undefined;
       clearInterval(elapsedTimeIntervalId.value);

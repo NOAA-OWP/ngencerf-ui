@@ -205,6 +205,12 @@ const startVerificationJob = async () => {
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
         }
+        if (verificationStatusCheckingInterval.value) {
+          clearInterval(verificationStatusCheckingInterval.value);
+        }
+        if (verificationRunningTimeInterval.value) {
+          clearInterval(verificationRunningTimeInterval.value);
+        }
         verificationStatusCheckingInterval.value = setInterval(loadVerificationStatusInformation, 10000);
         verificationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
       } else {
