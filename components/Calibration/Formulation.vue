@@ -27,13 +27,13 @@
             </div>
             <div class="pt-4 mb-1 font-bold text-base">Select Modules</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
-              optionLabel="name" optionValue="name" class="h-60" @change="moduleListChanged"
+              optionLabel="display_name" optionValue="name" class="h-60" @change="moduleListChanged"
               :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
                   <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
                     :title="slotProps.option.name">
-                    {{ slotProps.option.name }}</div>
+                    {{ slotProps.option.display_name }}</div>
                 </div>
 
               </template>

@@ -200,6 +200,12 @@
           <DataTable :value="iterationMetricsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
             <Column v-for="(col, colIndex) in iterationMetricsColumns" :key="colIndex" :header="col.header"
               :field="col.field" sortable></Column>
+              <!-- should be able to have col.tooltip show up as a tooltip here -->
+              <!-- <template #header="slotProps">
+                <div class="column-header">
+                  {{ slotProps.column.props.header }}
+                </div>
+              </template> -->
           </DataTable>
         </div>
         <div v-if="iterationParamsData && selectedSupplementalTable === 2">
@@ -570,7 +576,7 @@ watch(selectedPlotName, async () => {
         }
 
         // set up array for iterationMetricsData
-        iterationMetricsColumns.value = [{ header: 'Iteration', field: 'iteration' }];
+        iterationMetricsColumns.value = [{ header: 'Iteration', field: 'iteration', tooltip: 'Iteration' }];
         if (iterations.value?._data?.iteration_data) {
           for (let i = 0; i < iterations.value?._data?.iteration_data?.length; i++) {
             const iterationMetricsRecord: DynamicObject = {};
@@ -584,7 +590,8 @@ watch(selectedPlotName, async () => {
                 iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
               }
               if (i === 0) {
-                iterationMetricsColumns.value.push({ header: metric_name, field: metric_name });
+                let metric_display_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_display_name;
+                iterationMetricsColumns.value.push({ header: metric_name, field: metric_name, tooltip: metric_display_name });
               }
             }
             iterationMetricsData.value.push(iterationMetricsRecord);

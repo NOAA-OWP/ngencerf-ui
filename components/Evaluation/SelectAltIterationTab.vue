@@ -11,7 +11,14 @@
           <ColumnGroup type="header">
             <Row>
               <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header"
-                :field="col.field" :hidden="col.hidden ?? false" :class="col.styles ?? []" sortable></Column>
+                :field="col.field" :hidden="col.hidden ?? false" :class="col.styles ?? []" sortable>
+                <!-- should be able to have col.tooltip show up as a tooltip here -->
+                <!-- <template #header="slotProps">
+                  <div class="column-header">
+                    {{ slotProps.column.props.header }}
+                  </div>
+                </template> -->
+              </Column>
             </Row>
             <Row v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index" :pt="{ id: index }">
               <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :class="col.styles ?? []" :colspan="col.colspan">
