@@ -1,6 +1,6 @@
 <template>
     <div class="_help-page">
-        <div class="_help-title">Forecast - Status/Run Tab</div>
+        <div class="_help-title">Forecast - Run/Status Tab</div>
         <div class="_help-subtitle">
             This tab provides the ability to run the forecast.<br />
             First the real-time forcing data will be downloaded,

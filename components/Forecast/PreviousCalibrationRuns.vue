@@ -197,7 +197,8 @@ const ptColumn = ref({
 });
 
 const forecastStore = useForecastStore();
-const { getCalibrationJobsForForecast, resetUserSelectedForecastCalibrationRun } = forecastStore;
+const { forecastJobId } = storeToRefs(forecastStore);
+const { getCalibrationJobsForForecast, resetUserSelectedForecastCalibrationRun, hardResetForecastRunStatusStore } = forecastStore;
 
 
 const toast = useToast();
@@ -254,6 +255,11 @@ const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId } = useForeca
 
 onMounted(async () => {
   isLoading.value = true;
+  forecastJobId.value = undefined;
+
+  //reset Run/Status store in case we have running intervals
+  hardResetForecastRunStatusStore();
+
   hilightTab(ForecastTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }

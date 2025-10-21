@@ -120,7 +120,7 @@
                                     <LazyForecastSetupForecastHelp />
                                 </span>
                                 <span v-if="getForecastTabIndex() === 4">
-                                    <LazyForecastStatusRunHelp />
+                                    <LazyForecastRunStatusHelp />
                                 </span>
                                 <span v-if="getForecastTabIndex() === 5">
                                     <LazyForecastResultesHelp />
@@ -185,7 +185,7 @@ const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/com
 const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
 const LazyForecastResultesHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
 const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
-const LazyForecastStatusRunHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/StatusRunHelp.vue"));
+const LazyForecastRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/RunStatusHelp.vue"));
 
 const { popupActive } = storeToRefs(generalStore());
 

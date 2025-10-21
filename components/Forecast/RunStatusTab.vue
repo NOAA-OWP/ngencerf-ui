@@ -70,8 +70,7 @@
                 <th scope="row" class="text-right font-bold">
                   <div style="width: 140px;">Status</div>
                 </th>
-                <td v-if="coldStartJobStatus && forecastJobStatus" class="pl-5">{{ overallColdStartForecastStatus
-                  }}</td>
+                <td v-if="forecastJobId && overallColdStartForecastStatus" class="pl-5">{{ overallColdStartForecastStatus }}</td>
                 <td v-else class="pl-5">Ready</td>
               </tr>
               <tr height="32px" :aria-label="'Cycle Date is ' + (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'Unknown')"
@@ -132,7 +131,7 @@
       <div class="grid grid-rows-1 ActionButtonsBox mt-2" id="HBCbuttons">
         <div class="row-span-1">
           <div class="grid grid-cols-4">
-            <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
+            <span v-if="!forecastJobStatus || (!coldStartJobStatus && forecastJobStatus === 'Ready')">
               <div class="col-span-1 mr-4">
                 <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Previous Button" aria-label="Previous Button"
                     @click="goToSetupForecastTab()">
@@ -216,7 +215,8 @@ const {
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
-  setElapsedTime
+  setElapsedTime,
+  hardResetForecastRunStatusStore
 } = useForecastStore();
 
 onMounted(async () => {
@@ -230,8 +230,24 @@ onMounted(async () => {
   // highlight the tab when selected
   hilightTab(ForecastTabs.tab_runStatus);
 
+  clearInterval(forecastJobStatusIntervalId.value);
+  clearInterval(elapsedTimeIntervalId.value);
+  forecastJobStatusIntervalId.value = undefined;
+  elapsedTimeIntervalId.value = undefined;
+
   // load Run/Status tab data
   await loadForecastRunStatusTabData();
+  if (forecastJobId.value) {
+    createColdStartAndForecastStatusInterval();
+    createElapsedTimeInterval();
+  }
+
+  if (!cycleDate.value && calibrationRunForForecast?.value?.cycle_date) {
+    cycleDate.value = calibrationRunForForecast.value.cycle_date;
+  }
+  if (!coldStartDate.value && calibrationRunForForecast?.value?.cold_start_date) {
+    coldStartDate.value = calibrationRunForForecast.value.cold_start_date;
+  }
 });
 
 /**
@@ -239,15 +255,17 @@ onMounted(async () => {
  * or forecastJobStatus is Submitted or Running
  */
 const createElapsedTimeInterval = () => {
-  if (elapsedTimeIntervalId.value) {
-    clearInterval(elapsedTimeIntervalId.value);
-  }
+  clearInterval(elapsedTimeIntervalId.value);
+  console.log('Creating elapsed time interval');
   elapsedTimeIntervalId.value = setInterval(async () => {
     // continue incrementing elapsedTime every second while coldStartJobStatus is Submitted
     // or forecastJobStatus is Submitted or Running
-    if (['Running'].includes(coldStartJobStatus.value ?? '') || ['Submitted', 'Running'].includes(forecastJobStatus.value ?? '')) {
+    if (['Submitted','Running'].includes(coldStartJobStatus.value ?? '') || ['Submitted', 'Running'].includes(forecastJobStatus.value ?? '')) {
       elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
     } else {
+      console.log('forecastJobStatus:',coldStartJobStatus.value);
+      console.log('forecastJobStatus:',forecastJobStatus.value);
+      console.log('Clearing elapsed time interval');
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
     }
@@ -259,39 +277,20 @@ const createElapsedTimeInterval = () => {
  * while coldStartJobStatus or forecastJobStatus is Submitted or Running
  */
 const createColdStartAndForecastStatusInterval = () => {
-  if (forecastJobStatusIntervalId.value) {
-    clearInterval(forecastJobStatusIntervalId.value);
-  }
+  console.log('Creating Status interval');
+  clearInterval(forecastJobStatusIntervalId.value);
   forecastJobStatusIntervalId.value = setInterval(async () => {
-    const getStatusResponse = await getStatus();
-    const forecasts: any[] = getStatusResponse?._data.forecasts;
-    const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
-
-    if (forecast) {
-      // if cold start and forecast job are not Submitted or Running, clear the interval
-      if (
-        !['Submitted', 'Running'].includes(forecast?.cold_start?.status ?? '') &&
-        !['Submitted', 'Running'].includes(forecast?.status ?? '')
-      ) {
-        clearInterval(forecastJobStatusIntervalId.value);
-        forecastJobStatusIntervalId.value = undefined;
-      }
-      // update coldStartJobStatus and forecastJobStatus
-      forecastJobStatus.value = forecast?.status;
-      coldStartJobStatus.value = forecast?.cold_start?.status;
-      failureMessages.value = getStatusResponse?._data?.failure_messages;
-
-      // set submitTime if not already set
-      if (!submitTime.value && forecast?.submit_date) {
-        submitTimeDate.value = new Date(forecast?.submit_date as string);
-
-        if (isValidDate(submitTimeDate.value)) {
-          submitTime.value = formatDateForRunOnString(submitTimeDate.value);
-        }
-      }
-    } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`, life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
+    loadForecastRunStatusTabData();
+    // if cold start and forecast job are not Submitted or Running, clear the interval
+    if (!['Submitted', 'Running'].includes(coldStartJobStatus.value ?? '') && !['Submitted', 'Running'].includes(forecastJobStatus.value ?? ''))
+    {
+      console.log('coldStartJobStatus:',coldStartJobStatus.value);
+      console.log('forecastJobStatus:',forecastJobStatus.value);
+      console.log('Clearing all intervals');
+      clearInterval(forecastJobStatusIntervalId.value);
+      forecastJobStatusIntervalId.value = undefined;
+      clearInterval(elapsedTimeIntervalId.value);
+      elapsedTimeIntervalId.value = undefined;
     }
   }, 10000) as unknown as number;
 };
@@ -308,10 +307,11 @@ const startForecastRun = async () => {
   );
 
   if (createAndRunForecastJobResponse.status >= 200 && createAndRunForecastJobResponse.status < 300) {
-    forecastJobStatus.value = createAndRunForecastJobResponse._data.forecast_status;
-    coldStartJobStatus.value = createAndRunForecastJobResponse._data.forecast_cold_start_status;
-    failureMessages.value = createAndRunForecastJobResponse._data.failure_messages;
     forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
+    await loadForecastRunStatusTabData();
+
+    createColdStartAndForecastStatusInterval();
+    createElapsedTimeInterval();
 
     if (createAndRunForecastJobResponse?._data?.submit_date) {
       submitTimeDate.value = new Date(createAndRunForecastJobResponse?._data?.submit_date);
@@ -330,10 +330,10 @@ const startForecastRun = async () => {
 
     if (forecast) {
       forecastJobStatus.value = forecast?.status;
-      coldStartJobStatus.value = forecast?.cold_start?.status;
+      coldStartJobStatus.value = forecast?.cold_start_date?.status;
       failureMessages.value = forecast?.failure_messages;
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`, life: ToastTimeout.timeoutError };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Unable to run forecast job`, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   }
@@ -375,53 +375,6 @@ const goToResultsTab = () => {
 };
 
 /**
- * Watch overallColdStartForecastStatus for changes
- * overallColdStartForecastStatus is a computed value based on coldStartJobStatus and forecastJobStatus
- * so we're essentially watching both coldStartJobStatus and forecastJobStatus for changes
- */
-watch(overallColdStartForecastStatus, async (oldForecastJobStatus, newForecastJobStatus) => {
-  // when overallColdStartForecastStatus first changes to Submitted or Running, start incrementing elapsedTime every second until
-  // overallColdStartForecastStatus changes to Done, Cancelled, Failed, or Server error
-  if (['Submitted', 'Running'].includes(coldStartJobStatus.value) || ['Submitted', 'Running'].includes(forecastJobStatus.value)) {
-    // if not already created, create elapsedTimeIntervalId to update elapsedTime every second while coldStartJobStatus is Running
-    // or forecastJobStatus is Submitted or Running
-    if (coldStartJobStatus.value === 'Running' && !elapsedTimeIntervalId.value && submitTimeDate.value) {
-      createElapsedTimeInterval();
-    }
-    // if not already created, create forecastJobStatusIntervalId to update coldStartJobStatus and forecastJobStatus every 10 seconds
-    // while coldStartJobStatus or forecastJobStatus is Submitted or Running
-    if (!forecastJobStatusIntervalId.value) {
-      createColdStartAndForecastStatusInterval();
-    }
-  }
-
-  // if interval incrementing elapsedTime every second is no longer running
-  // and when overallColdStartForecastStatus changes to Done, look for Cold Start and Forecast 
-  // elapsedTimes from server and set elapsedTime to the sum of those durations
-  if (!forecastJobStatusIntervalId.value && coldStartJobStatus.value === 'Done' || forecastJobStatus.value === 'Done') {
-    // if forecastJobStatusIntervalId is not set, that means elapsedTime is no longer incrementing every second
-    // so we need to get elapsed_time from the server
-    const getStatusResponse = await getStatus();
-    const forecasts: any[] = getStatusResponse?._data.forecasts;
-    const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
-
-    if (forecast) {
-      // set elapsedTime
-      setElapsedTime(forecast);
-
-      if (!elapsedTime.value) {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Elapsed time not set from server', life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-    } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Forecast job ${forecastJobId.value} in server response`, life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
-  }
-}, 
-{ immediate: true });
-
-/**
  * Go to the Setup Forecast Tab
  */
 const goToSetupForecastTab = () => {
@@ -431,14 +384,7 @@ const goToSetupForecastTab = () => {
 };
 
 onBeforeUnmount(() => {
-  clearInterval(forecastJobStatusIntervalId.value);
-  clearInterval(elapsedTimeIntervalId.value);
-  forecastJobStatusIntervalId.value = undefined;
-  elapsedTimeIntervalId.value = undefined;
-  forecastJobStatus.value = "";
-  failureMessages.value = undefined;
-  submitTime.value = "";
-  elapsedTime.value = "";
+  hardResetForecastRunStatusStore();
 })
 </script>
 

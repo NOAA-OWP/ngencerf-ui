@@ -61,7 +61,7 @@
       </ul>
       <div class="grid grid-cols-4">
         <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
-          Cycle Date {{ forecastJobStatus }}
+          Cycle Date
         </div>
         <div class="text-nowrap">
           <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
@@ -165,6 +165,14 @@ const rowStyle = (data: any) => {
 onMounted(async () => {
     toast.removeAllGroups(); // clear all toast messages
     isLoading.value = false; // set isLoading to false
+    
+    if (!cycleHour.value && cycleDate.value) {
+      try {
+        cycleHour.value = cycleDate.value.getHours();
+      } catch {
+        cycleHour.value = cycleDate.value.hour;
+      }
+    }
 
     minCycleDate.value = DateTime.utc(2022, 1, 1, 12, 0, 0);
     maxCycleDate.value = DateTime.utc();
