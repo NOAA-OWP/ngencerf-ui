@@ -214,7 +214,7 @@ onMounted(async () => {
   });
 });
 
-// Reset refs when selectedPlotName changes
+// Reset refs when mounting/unmounting tab
 const resetUserPlotRefs = (exceptions: any): void => {
   if (!Array.isArray(exceptions)) {
     exceptions = [];
@@ -244,7 +244,7 @@ const resetUserPlotRefs = (exceptions: any): void => {
 }
 
 watch(forecastPlot, async () => {
-  if (forecastPlot.value.plot_data && forecastPlot.value.plot_data.length > 0) {
+  if (forecastPlot.value.timeseries_data && forecastPlot.value.timeseries_data.length > 0) {
     showForecastPlot();
   }
 });
@@ -252,8 +252,8 @@ watch(forecastPlot, async () => {
 const showForecastPlot = async () => {
   if (!plotGraphData.value || plotGraphData.value.length === 0) {
     // standard interactive plot logic
-    if (forecastPlot.value.plot_data) {
-      plotGraphDataRaw.value = forecastPlot.value.plot_data;
+    if (forecastPlot.value.timeseries_data) {
+      plotGraphDataRaw.value = forecastPlot.value.timeseries_data;
       adjustPlotGraphColumns();
     }
     // setting min/max dates will trigger the date filter below
@@ -342,8 +342,6 @@ const drawInteractivePlot = () => {
       height: ((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
         - (document.getElementById('PlotGraphArea') as HTMLElement).getBoundingClientRect().top) - 150
     };
-    console.log('MainLeftDataParent bottom:',(document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom);
-    console.log('PlotGraphArea top:',(document.getElementById('PlotGraphArea') as HTMLElement).getBoundingClientRect().top);
     plotGraphOptions.value.y.label = 'Streamflow (m^3/s)';
     plotGraphOptions.value.y.labelOffset = -10;
     plotGraphOptions.value.marginLeft = 50;
@@ -527,7 +525,6 @@ watch(plotGraphDateRange, async () => {
 
 const interactivePlotDateFilter = () => {
   let tempPlotGraphData = [];
-
   if (plotGraphDateRange.value.start > plotGraphDateRange.value.end) {
     plotGraphDateRange.value = {
       start: plotGraphDateRange.value.end,

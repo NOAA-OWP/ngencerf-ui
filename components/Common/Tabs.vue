@@ -105,7 +105,7 @@
             Run/Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[5].includes(currentForecastTab) || calibrationRunForForecast && calibrationRunForForecast.forecast_status  === 'Done'" data-tab="5" class="tabs prevent-select" @click="tabClicked"
+          <div v-show="[5].includes(currentForecastTab) || calibrationRunForForecast && calibrationRunForForecast?.forecast_status === 'Done'" data-tab="5" class="tabs prevent-select" @click="tabClicked"
             aria-label="Results tab" title="Results tab">
             Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>

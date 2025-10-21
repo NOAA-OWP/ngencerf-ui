@@ -166,6 +166,7 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 const forecastStore = useForecastStore();
 const {
+  forecastJobId,
   uiGageId,
   calibrationRunForForecast,
   calibrationRunsForForecast,
@@ -184,7 +185,10 @@ const {
   setSelectedForecastRowData,
   getForecastJobs,
   getCalibrationJobsForForecast,
-  resetUserSelectedForecastCalibrationRun } = useForecastStore();
+  deleteForecastJob,
+  resetUserSelectedForecastCalibrationRun,
+  hardResetForecastRunStatusStore
+} = useForecastStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
@@ -213,11 +217,18 @@ const onRowContextMenu = (event: any) => {
     }
     cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
     cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    if (crRowData.forecast_status !== 'Running') {
+      cmForecastRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedForecastJob() });
+    }
   }
 };
 
 onMounted(async () => {
   isForecastLoading.value = true;
+  forecastJobId.value = undefined;
+
+  //reset Run/Status store in case we have running intervals
+  hardResetForecastRunStatusStore();
 
   hilightTab(ForecastTabs.tab_forecastRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -320,6 +331,45 @@ const navigateToForecastResults = () => {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
     isForecastLoading.value = false;
+  });
+}
+
+const confirmDelete = useConfirm();
+const deleteSelectedForecastJob = () => {
+  const selectedRunId = calibrationRunForForecast?.value?.forecast_run_id as number;
+  let confirmMessage = "Are you sure you want to delete this forecast job?"
+  confirmDelete.require({
+    message: confirmMessage,
+    header: 'Confirm Delete',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'DELETE JOB',
+    },
+    accept: () => acceptDelete(selectedRunId),
+    reject: () => {
+      //do nothing
+    }
+  })
+}
+const acceptDelete = (selectedRunId: number) => {
+  deleteForecastJob(selectedRunId).then(response => {
+    if (response.status === 200) {
+      const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
+      summary: 'Delete Forecast Job', detail: 'Job ' + selectedRunId + ' deleted', life: useApiResponseToastSeverityLife(response?.status)};
+      toast.add(tMsg); addToastRecord(tMsg);   
+      getForecastJobs();
+      resetSelectedForecastRunData();
+    } else {
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Verification Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
   });
 }
 

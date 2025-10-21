@@ -115,6 +115,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
 
     if (runListDataResult?._data?.forecast_jobs.length > 0) {
       runListDataResult?._data?.forecast_jobs.forEach((jobItem: ForecastJob) => {
+        if (jobItem.cold_start_status && jobItem.cold_start_status !== 'Done') {
+          jobItem.forecast_status = 'Cold Start ' + jobItem.cold_start_status;
+        }
         forecastRuns.value.push(jobItem);
       });
       // maintain an original forecastRuns so we can revert to it when we clear the Forecast Runs filter
@@ -170,7 +173,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
 
         // TODO: create forecastJob interface
         const forecastJob: any = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
-
+        
         if (!forecastJob) {
           return ['No forecast job found'];
         }
@@ -178,17 +181,22 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         // set forecastConfiguration, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
         forecastConfigurationName.value = forecastJob?.configuration;
         forecastJobStatus.value = forecastJob?.status;
-        coldStartJobStatus.value = forecastJob?.cold_start?.status;
-        // set elapsedTime
-        setElapsedTime(forecastJob);
+        coldStartJobStatus.value = forecastJob?.cold_start_run?.status;
 
-        if (forecastJob?.submit_date) {
+        if (forecastJob?.cold_start_run?.submit_date) {
+          submitTimeDate.value = new Date(forecastJob?.cold_start_run.submit_date as string);
+        } else if (forecastJob?.submit_date) {
           submitTimeDate.value = new Date(forecastJob?.submit_date as string);
-          if (isValidDate(submitTimeDate.value)) {
-            submitTime.value = formatDateForRunOnString(submitTimeDate.value);
-          } else {
-            errorMessages.push(`Invalid submit date: ${forecastJob?.submit_date}`);
-          }
+        }
+        if (isValidDate(submitTimeDate.value)) {
+          submitTime.value = formatDateForRunOnString(submitTimeDate.value);
+        } else {
+          errorMessages.push(`Invalid submit date: ${forecastJob?.submit_date}`);
+        }
+        
+        if (forecastJob?.cold_start_run?.elapsed_time || forecastJob?.elapsed_time) {
+          // set elapsedTime
+          setElapsedTime(forecastJob);
         }
       } else {
         return useApiErrorResponsePreprocess(getStatusResponse);
@@ -201,19 +209,17 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * Set elapsedTime
    */
   const setElapsedTime = (forecastJob: any): void => {
-    if (forecastJob?.elapsed_time) {
-      if (forecastJob?.cold_start?.elapsed_time) {
-        const elapsedTimeArray: string[] = [];
-        elapsedTimeArray.push(forecastJob?.cold_start?.elapsed_time);
-        elapsedTimeArray.push(forecastJob?.elapsed_time);
+    const elapsedTimeArray: string[] = [];
 
-        // sume and format forecast and cold start elapsed times
-        elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
-      } else {
-        // format the cold start elapsed time to a string in 'hh:mm:ss' or 'd 'Days,' hh:mm:ss' format
-        elapsedTime.value = formatElapsedTime(forecastJob?.elapsed_time);
-      }
+    if (forecastJob?.cold_start_run?.elapsed_time) {
+      elapsedTimeArray.push(forecastJob?.cold_start_run?.elapsed_time);
     }
+    if (forecastJob?.elapsed_time) {
+      elapsedTimeArray.push(forecastJob?.elapsed_time);
+    }
+    
+    // sum and format forecast and cold start elapsed times
+    elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
   };
 
   /**
@@ -291,6 +297,22 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   /**
+  * Delete a job
+  * If a single job comes in, make sure we put it into an array.
+  * Otherwise, it is an array.
+  */
+  async function deleteForecastJob(runId: number) {
+    return await makeProtectedApiCall<ForecastJob>(`${ngencerfBaseUrl}/calibration/delete_forecast_job/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ forecast_run_id: runId })
+    });
+  };
+
+  /**
    * Query get_calibration_jobs_for_forecast endpoint
    */
   const getCalibrationJobsForForecast = async (): Promise<any> => {
@@ -322,40 +344,15 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   /**
-   * Get Forecast Plots
-   */
-  const getForecastPlotNames = async (): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot_names/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({ forecast_run_id: forecastJobId.value })
-    });
-  };
-
-  /**
    * Get Forecast Plot
    */
-  const getForecastPlot = async ({
-    plotName,
-    include_data = false,
-    force_include_plot = false,
-  }: {
-    plotName: string;
-    include_data?: boolean;
-    force_include_plot?: boolean;
-  }): Promise<any> => {
+  const getForecastPlot = async (): Promise<any> => {
     if (forecastJobId.value) {
       const params = new URLSearchParams({
-        plot_name: plotName,
-        include_data: include_data.toString(),
-        force_include_plot: force_include_plot.toString(),
         forecast_run_id: forecastJobId.value.toString(),
       });
 
-      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/?${params.toString()}`, {
+      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_forecast_timeseries_data/?${params.toString()}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${getAccessToken()}`,
@@ -410,36 +407,13 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    */
   const setForecastPlot = async (): Promise<string[]> => {
     if (forecastJobId?.value) {
-      const getForecastPlotNamesResponse: any = await getForecastPlotNames();
+      const getForecastPlotResponse: any = await getForecastPlot();
 
-      // set forecastPlotNamesList
-      if (getForecastPlotNamesResponse.status === 200) {
-        if (getForecastPlotNamesResponse?._data?.plot_names) {
-          const forecastPlotNamesList: any[] = getForecastPlotNamesResponse._data.plot_names;
-
-          // there should only be one forecast plot
-          if (forecastPlotNamesList.length === 1) {
-            forecastPlotName.value = forecastPlotNamesList[0];
-            const getForecastPlotResponse: any = await getForecastPlot({
-              plotName: (forecastPlotName?.value?.name as string),
-              include_data: true,
-              force_include_plot: true
-            });
-
-            if (getForecastPlotResponse.status === 200) {
-              forecastPlot.value = getForecastPlotResponse._data;
-              return [];
-            } else {
-              return useApiErrorResponsePreprocess(getForecastPlotResponse);
-            }
-          } else {
-            return [`${forecastPlotNamesList.length} forecast plots found. Only one forecast plot is expected.`];
-          }
-        } else {
-          return ['Could not get forecast plot names from get_plot_names endpoint'];
-        }
+      if (getForecastPlotResponse.status === 200) {
+        forecastPlot.value = getForecastPlotResponse._data;
+        return [];
       } else {
-        return useApiErrorResponsePreprocess(getForecastPlotNamesResponse);
+        return useApiErrorResponsePreprocess(getForecastPlotResponse);
       }
     } else {
       return ['No forecast job id found'];
@@ -467,6 +441,25 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastPlot.value = undefined;
     calibrationRunForForecast.value = undefined;
 
+    clearInterval(elapsedTimeIntervalId.value);
+    elapsedTimeIntervalId.value = undefined;
+    clearInterval(forecastJobStatusIntervalId.value);
+    forecastJobStatusIntervalId.value = undefined;
+    
+    isForecastLoading.value = false;
+
+    clearUserCalibrationRunData();
+  }
+
+  /**
+   * Hard Reset Run/Status Store
+   */
+  const hardResetForecastRunStatusStore = (): void => {
+    forecastJobStatus.value = "";
+    coldStartJobStatus.value = "";
+    elapsedTime.value = undefined;
+    submitTime.value = undefined;
+
     if (elapsedTimeIntervalId.value) {
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
@@ -476,11 +469,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       clearInterval(forecastJobStatusIntervalId.value);
       forecastJobStatusIntervalId.value = undefined;
     }
-    isForecastLoading.value = false;
-
-    clearUserCalibrationRunData();
-  }
-
+  };
 
   return {
     forecastJobId,
@@ -516,6 +505,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     loadForecastTab,
     createAndRunForecastJob,
     cancelForecastJob,
+    deleteForecastJob,
     getCalibrationJobsForForecast,
     resetUserSelectedForecastCalibrationRun,
     loadSelectedCalibrationRun,
@@ -524,11 +514,11 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     setForecastPlot,
     setElapsedTime,
     getStatus,
-    getForecastPlotNames,
     getForecastPlot,
     setSelectedForecastRunId,
     resetSelectedForecastRunData,
-    setSelectedForecastRowData
+    setSelectedForecastRowData,
+    hardResetForecastRunStatusStore
   };
 });
 
