@@ -183,6 +183,7 @@
 import { storeToRefs } from 'pinia';
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 
@@ -190,6 +191,7 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
 const { userCalibrationRunData, calibrationJobNgenGlobalLogging } = storeToRefs(useUserDataStore());
 const calData = ref(userCalibrationRunData);
+const { fetchFormulationModuleOptions } = useFormulationStore();
 const {
   userSelectedCalibrationTuningParameters,
   selectedOutputVariableToCalibrate,
@@ -206,9 +208,12 @@ const componentProps = withDefaults(defineProps<{
 const getModuleList = () => {
   let modules = "";
   calData.value?.modules.forEach(element => {
-    modules += element;
-    if (calData.value?.modules[calData.value?.modules.length - 1] !== element) {
-      modules += ", ";
+    let module_option = fetchFormulationModuleOptions.find(module => module.name === element);
+    if (module_option) {
+      modules += module_option.display_name;
+      if (calData.value?.modules[calData.value?.modules.length - 1] !== element) {
+        modules += ", ";
+      }
     }
   });
   return modules;

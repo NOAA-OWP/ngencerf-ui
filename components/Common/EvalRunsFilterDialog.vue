@@ -19,7 +19,7 @@
             <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
               title="Module Filter">Modules</label>
             <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
-              optionLabel="name" optionValue="name" :maxSelectedLabels="3" class="JobsFilterSelect w-full" aria-label="Module Filter"
+              optionLabel="display_name" optionValue="name" :maxSelectedLabels="3" class="JobsFilterSelect w-full" aria-label="Module Filter"
               title="Module Filter" :disabled="disableAll">
               <template #header>
                 <div class="absolute cursor-pointer top-2 left-[38px]">&nbsp; Select All Items</div>
@@ -27,7 +27,7 @@
               <template #option="slotProps">
                 <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
                   :title="slotProps.option.name">
-                  {{ slotProps.option.name }}&nbsp;
+                  {{ slotProps.option.display_name }}&nbsp;
                 </div>
               </template>
             </MultiSelect>

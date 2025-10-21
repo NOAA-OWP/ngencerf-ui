@@ -56,7 +56,7 @@
             <div id="ObjFunct">
               <label for="ObjectiveFunction<">Objective Function</label>
               <Select id="ObjectiveFunction" class="rounded-md" filter v-model="uiObjectiveFunction"
-                :options="getObjectiveFunctionOptionsList" optionLabel="name" optionValue="name" placeholder=""
+                :options="getObjectiveFunctionOptionsList" optionLabel="display_name" optionValue="name" placeholder=""
                 @change="updateMetricFlowFieldVisibility" aria-label="Objective Function" title="Objective Function"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-2">

@@ -113,7 +113,8 @@ export const useOptimizationStore = defineStore(
       optimizationTabData.value?.metrics.forEach((metric_option) => {
         objectiveFunctionOptionsList.value.push({
           name: metric_option.name,
-          description: metric_option.name,
+          display_name: metric_option.display_name,
+          description: metric_option.display_name,
           selected: false,
           groups: [],
         });

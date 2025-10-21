@@ -95,7 +95,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
    */
   const fetchFormulationModuleOptions = computed(() => {
     let modules_list = <SelectOption[]>[];
-    let selected_mouldes_list = <SelectOption[]>[];
+    let selected_modules_list = <SelectOption[]>[];
     if (
       formulationTabData.value?.modules &&
       formulationTabData.value?.modules.length > 0
@@ -107,12 +107,13 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
         ) {
           const selectOptionItem = {
             name: moduleData.name,
-            description: moduleData.name,
+            display_name: moduleData.display_name,
+            description: moduleData.display_name,
             selected: false,
             groups: moduleData.groups,
           };
           if (userCalibrationRunData?.value?.modules?.includes(moduleData.name)) {
-            selected_mouldes_list.push(selectOptionItem);
+            selected_modules_list.push(selectOptionItem);
           } else {
             modules_list.push(selectOptionItem);
           }
@@ -120,7 +121,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
       });
     }
 
-    return selected_mouldes_list
+    return selected_modules_list
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name))
       .concat(

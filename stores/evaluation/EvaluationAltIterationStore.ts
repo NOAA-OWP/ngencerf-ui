@@ -68,6 +68,7 @@ export const useEvaluationAltIterationStore = defineStore(
                   header: `${Number(data.metric_value).toFixed(4)}`,
                   colspan: 1,
                   metric_name: data.metric_name,
+                  metric_display_name: data.metric_display_name,
                   styles: []
                 }
                 headerRow.push(headerCell);
@@ -130,11 +131,13 @@ export const useEvaluationAltIterationStore = defineStore(
                   let headerColumn = <DynamicTableColumn>{
                     field: metric.metric_name,
                     header: metric_header_label,
+                    tooltip: metric.metric_display_name,
                   };
                   let headerCell = {
                     header: `${Number(metric.metric_value).toFixed(4)}`,
                     colspan: 1,
                     metric_name: metric.metric_name,
+                    metric_display_name: metric.metric_display_name,
                     styles: [],
                   }
                   if (

@@ -61,11 +61,6 @@ import { generalStore } from "@/stores/common/GeneralStore";
 
 const { getMenuIndex, getCalibrationTabIndex, setCalibrationTabIndex } = generalStore();
 
-onMounted (() => {
-  console.log('getMenuIndex:', getMenuIndex());
-  console.log('getCalibrationTabIndex:', getCalibrationTabIndex());
-})
-
 onUnmounted(() => {
   // Reset tab index to 1 when we leave this layout, 
   // so that it doesn't try to mount the wrong tab when you return

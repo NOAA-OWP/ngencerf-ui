@@ -182,6 +182,7 @@ export interface UserCalibrationRunData {
   save_output_iteration: boolean;
   stop_criteria: number;
   status: string;
+  failure_messages: any;
 }
 
 export interface FormulationWarning {
@@ -324,6 +325,7 @@ export interface FormulationTabData {
 
 export interface FormulationModuleData {
   name: string;
+  display_name: string;
   groups: string[];
   used_by_calibration_run: boolean;
 }
@@ -378,6 +380,7 @@ export interface tuning_save {
  */
 export interface SelectOption {
   name: string;
+  display_name: string;
   description: string;
   selected?: boolean;
   groups?: string[];
@@ -436,6 +439,7 @@ export interface OptimizationTabData {
 
 export interface OptimizationMetricData {
   name: string;
+  display_name: string;
   description: string;
   is_active: boolean;
   categorical: boolean;
@@ -561,6 +565,7 @@ export interface DynamicTableColumn {
   header?: string;
   hidden?: boolean;
   styles?: string[];
+  tooltip?: string;
 }
 
 export interface CalibrationRunByIteration {
@@ -598,6 +603,7 @@ export interface CalibrationRunByIterationRetrospectiveData {
 
 export interface CalibrationRunIterationMetricData {
   metric_name: string;
+  metric_display_name: string;
   metric_value: number;
 }
 
@@ -636,6 +642,7 @@ export interface CalibrationGetStatusResponse {
   submit_date: Date;
   elapsed_time: string | null;
   performance_metrics: CalibrationGetStatusPerformanceMetricItem[] | null;
+  failure_messages: any;
 }
 
 export interface CalibrationGetStatusValidationItem {
@@ -648,6 +655,7 @@ export interface CalibrationGetStatusValidationItem {
   run_start: Date;
   elapsed_time?: string | null;
   performance_metrics?: CalibrationGetStatusPerformanceMetricItem[] | null;
+  failure_messages: any;
 }
 
 export interface CalibrationGetStatusPerformanceMetricItem {
