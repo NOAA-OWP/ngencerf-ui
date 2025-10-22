@@ -115,8 +115,11 @@ export const useForecastStore = defineStore('ForecastStore', () => {
 
     if (runListDataResult?._data?.forecast_jobs.length > 0) {
       runListDataResult?._data?.forecast_jobs.forEach((jobItem: ForecastJob) => {
-        if (jobItem.cold_start_status && jobItem.cold_start_status !== 'Done') {
-          jobItem.forecast_status = 'Cold Start ' + jobItem.cold_start_status;
+        if (jobItem.cold_start?.cold_start_status && jobItem.cold_start.cold_start_status !== 'Done') {
+          jobItem.forecast_status = 'Cold Start ' + jobItem.cold_start.cold_start_status;
+        }
+        if (jobItem.cold_start?.cold_start_submit_date && jobItem.cold_start.cold_start_submit_date !== '') {
+          jobItem.submit_date = jobItem.cold_start.cold_start_submit_date;
         }
         forecastRuns.value.push(jobItem);
       });
@@ -277,7 +280,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         calibration_run_id: calibrationRunId, 
         configuration_name: forecastConfigurationName,
         cycle_date: cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
-        cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDD(coldStartDate) : null
+        cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null
       })
     });
   };
@@ -316,16 +319,45 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * Query get_calibration_jobs_for_forecast endpoint
    */
   const getCalibrationJobsForForecast = async (): Promise<any> => {
-    return makeProtectedApiCall<CalibrationRunsForForecast>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_forecast/`, {
+    calibrationRunsForForecast.value = [];
+    const runListDataResult = await makeProtectedApiCall<CalibrationRunsForForecast>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_forecast/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
       body: ""
-    }).then((result) => {
-      calibrationRunsForForecast.value = result._data.jobs;
     });
+
+    if (runListDataResult?._data?.jobs.length > 0) {
+      runListDataResult?._data?.jobs.forEach((runItem: ValidatedCalibrationRunListItem) => {
+        try {
+          if (runItem.submit_date !== null) {
+            if (runItem.status.toLowerCase() === 'done' && runItem.validations.length >= 1) {
+              const validationControlJobStatus: string | undefined = runItem.validations?.find
+                ((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_control')?.status;
+
+              const validationBestJobStatus: string | undefined = runItem.validations?.find
+                ((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_best')?.status;
+              
+              if (validationBestJobStatus && validationBestJobStatus.toLowerCase() === 'done') {
+                // get the overall calibration/validation status
+                const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
+                  runItem.status,
+                  validationControlJobStatus,
+                  validationBestJobStatus
+                );
+                
+                runItem.status = overallCalibrationValidationStatus;
+              }
+            }
+            calibrationRunsForForecast.value.push(runItem);
+          }
+        } catch(err) {
+          console.log('ERROR! ', err.message);
+        }
+      });
+    }
   };
 
   /**
