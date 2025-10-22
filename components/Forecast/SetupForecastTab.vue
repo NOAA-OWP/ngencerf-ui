@@ -20,24 +20,37 @@
     <div>
         <DataTable :value="forecastConfigurations" sortField="fcst_win" scrollable v-model:selection="forecastConfiguration"
             selectionMode="single" :rowClass="rowClass" :rowStyle="rowStyle">
-            <Column field="name" header="Configuration">
+            <Column field="name" header="Configuration" sortable>
                 <template #body="slotProps">
-                    <div :aria-label="'Configuration is ' + slotProps.data.name" :title="'Configuration is ' + slotProps.data.name">{{
-                        slotProps.data.name }}</div>
+                    <div :aria-label="'Configuration is ' + slotProps.data.name" 
+                      :title="'Configuration is ' + slotProps.data.name">
+                      {{ slotProps.data.name }}</div>
                 </template>
             </Column>
-            <Column field="data_sources" header="Data Sources">
+            <Column field="availability_lag" header="Most Recent Forecast Available" sortable>
                 <template #body="slotProps">
-                    <div :aria-label="'Data Sources: ' + slotProps.data.data_sources"
-                        :title="'Data Sources: ' + slotProps.data.data_sources">{{
-                            slotProps.data.data_sources }}</div>
+                    <div :aria-label="'Most Recent Forecast Available is ' + slotProps.data.availability_lag"
+                        :title="'Most Recent Forecast Available is ' + slotProps.data.availability_lag">
+                        {{ slotProps.data.availability_lag }} hour{{ slotProps.data.availability_lag > 1 ? 's' : '' }} 
+                        before current time</div>
                 </template>
             </Column>
-            <Column field="time_range" header="Time Range (ngenCERF)">
+            <Column field="cycle_freq" header="Cycle Hours Available" sortable>
                 <template #body="slotProps">
-                    <div :aria-label="'Time Range is ' + slotProps.data.name"
-                        :title="'Time Range is ' + slotProps.data.time_range">{{
-                            slotProps.data.time_range }}</div>
+                    <div :aria-label="'Cycle Hours Available: ' + slotProps.data.cycle_freq"
+                        :title="'Cycle Hours Available: ' + slotProps.data.cycle_freq">
+                        {{ slotProps.data.cycle_freq > 1 ? 
+                            'Every ' + slotProps.data.cycle_freq + ' hours from ' + slotProps.data.cycle_start + 'Z to ' + slotProps.data.cycle_end + 'Z'
+                            : 'Every hour' 
+                        }}
+                        </div>
+                </template>
+            </Column>
+            <Column field="fcst_win" header="Forecast Window" sortable>
+                <template #body="slotProps">
+                    <div :aria-label="'Forecast Window is ' + slotProps.data.fcst_win"
+                        :title="'Forecast Window is ' + slotProps.data.fcst_win">
+                        {{ slotProps.data.fcst_win }} hour{{ slotProps.data.fcst_win > 1 ? 's' : '' }}</div>
                 </template>
             </Column>
         </DataTable>
@@ -59,18 +72,7 @@
           Forecast window: {{ forecastConfiguration.fcst_win }} hour{{ forecastConfiguration.fcst_win > 1 ? 's' : '' }}
         </li>
       </ul>
-      <div class="grid grid-cols-4">
-        <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
-          Cycle Date
-        </div>
-        <div class="text-nowrap">
-          <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-            @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
-            :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
-            :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
-            :teleport="true" utc='preserve' 
-            :disabled="!forecastConfiguration"/>
-        </div>
+      <div class="grid grid-cols-5">
         <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
           Cold Start Date
         </div>
@@ -83,19 +85,18 @@
             :disabled="!forecastConfiguration"/>
         </div>
         <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
-          Hour
+          Cycle Date
         </div>
         <div class="text-nowrap">
-          <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
-            aria-label="Cycle Hour Select" title="Cycle Hour Select"
-            :disabled="!forecastConfiguration">
-          </Select>
-        </div>
-        <div class="text-nowrap" style="padding-top:8px;">
-          Z
+          <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+            @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
+            :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
+            :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
+            :teleport="true" utc='preserve' 
+            :disabled="!forecastConfiguration"/>
         </div>
         <div>
-          <span v-if="cycleDate && (cycleHour || cycleHour === 0) && forecastConfiguration && forecastConfiguration.is_active">
+          <span v-if="cycleDate && (cycleHour || cycleHour === 0) && forecastConfiguration">
             <div class="col-span-1 mr-4">
               <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
                 @click="goToRunStatusTab()">
@@ -103,6 +104,26 @@
               </Button>
             </div>
           </span>
+        </div>
+        <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+          Cold Start Hour
+        </div>
+        <div class="text-nowrap">
+          <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
+            aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
+            :disabled="!forecastConfiguration">
+          </Select>
+          Z
+        </div>
+        <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+          Cycle Hour
+        </div>
+        <div class="text-nowrap">
+          <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
+            aria-label="Cycle Hour Select" title="Cycle Hour Select"
+            :disabled="!forecastConfiguration">
+          </Select>
+          Z
         </div>
       </div>
     </div>
@@ -143,12 +164,14 @@ const minCycleDate = ref<any>();
 const maxCycleDate = ref<any>();
 const cycleHour = ref<number>();
 const cycleHourList = ref<number[]>([]);
+const coldStartHour = ref<number>();
+const coldStartHourList = ref<number[]>(Array.from({ length: 24 }, (_, index) => index));
 
 /**
  * Disable row if forecast configuration is not active
  */
 const rowClass = (data: any) => {
-    return [{ 'pointer-events-none': (!data.is_active || (forecastJobStatus.value && forecastJobStatus.value !== 'Ready'))}];
+    return [{ 'pointer-events-none': (forecastJobStatus.value && forecastJobStatus.value !== 'Ready')}];
 };
 
 /**
@@ -156,8 +179,7 @@ const rowClass = (data: any) => {
  */
 const rowStyle = (data: any) => {
     return {
-        color: (!data.is_active || (forecastJobStatus.value && forecastJobStatus.value !== 'Ready')) ? 'grey' : 'black',
-        backgroundColor: !data.is_active ? '#f0f0f0' : ''
+        color: (forecastJobStatus.value && forecastJobStatus.value !== 'Ready') ? 'grey' : 'black'
     };
 };
 
@@ -179,6 +201,14 @@ onMounted(async () => {
 
     if (!cycleDate.value) {
       cycleDate.value = maxCycleDate.value;
+    }
+    
+    if (!coldStartHour.value && coldStartDate.value) {
+      try {
+        coldStartHour.value = coldStartDate.value.getHours();
+      } catch {
+        coldStartHour.value = coldStartDate.value.hour;
+      }
     }
 
     // scroll to top of the page
@@ -229,14 +259,6 @@ const getCycleHourList = () => {
 }
 
 /**
- * On DataTable row selection
- */
-const onRowSelect = (e: any) => {
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Configuration Selected', detail: `${e.data.name}, is_active: ${e.data.is_active}`, life: ToastTimeout.timeoutInfo };
-    toast.add(tMsg); addToastRecord(tMsg);
-};
-
-/**
  * Go to the Status Run tab
  */
 const goToRunStatusTab = () => {
@@ -246,8 +268,14 @@ const goToRunStatusTab = () => {
     } else if (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0)) {
       const alert = window.alert('Invalid Cycle Date chosen.\n\nMake sure to choose a date within the available date range, and an hour that is available for your chosen configuration.');
       return false;
+    } else if (!coldStartDate.value && (coldStartHour.value && coldStartHour.value > 0)) {
+      const alert = window.alert('Invalid Cold Start Date chosen.\n\nMake sure to choose a date and an hour, or leave both fields empty to run a forecast without a cold start.');
+      return false;
     } else {
       cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
+      if (coldStartDate.value) {
+        coldStartDate.value = coldStartDate.value.set({ hour: coldStartHour.value ? coldStartHour.value : 0, minute: 0, second: 0 });
+      }
       if (coldStartDate.value && coldStartDate.value >= cycleDate.value) {
         const alert = window.alert('Cold Start Date must be before the Cycle Date.');
         return false;

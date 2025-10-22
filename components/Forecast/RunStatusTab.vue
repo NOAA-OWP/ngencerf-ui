@@ -80,12 +80,12 @@
                 </td>
                 <td class="pl-5">{{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None') }}</td>
               </tr>
-              <tr height="32px" :aria-label="'Cold Start Date is ' + (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : 'Unknown')"
-                :title="'Cold Start Date is ' + (coldStartDate ? formatISOStringOrDateToYYYYMMDD(coldStartDate) : 'None')">
+              <tr height="32px" :aria-label="'Cold Start Date is ' + (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'Unknown')"
+                :title="'Cold Start Date is ' + (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'None')">
                 <td class="text-right font-bold">
                   <div style="width: 140px;">Cold Start Date</div>
                 </td>
-                <td class="pl-5">{{ (coldStartDate ? formatISOStringOrDateToYYYYMMDD(coldStartDate) : 'None') }}</td>
+                <td class="pl-5">{{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'None') }}</td>
               </tr>
               <tr height="32px" :aria-label="'Configuration is ' + ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown')"
                 :title="'Configuration is ' + ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown')">
@@ -330,7 +330,7 @@ const startForecastRun = async () => {
 
     if (forecast) {
       forecastJobStatus.value = forecast?.status;
-      coldStartJobStatus.value = forecast?.cold_start_date?.status;
+      coldStartJobStatus.value = forecast?.cold_start?.status;
       failureMessages.value = forecast?.failure_messages;
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Unable to run forecast job`, life: ToastTimeout.timeoutError };

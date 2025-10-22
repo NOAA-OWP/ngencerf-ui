@@ -47,6 +47,20 @@
                 </span>
               </template>
             </Column>
+            <Column :pt="ptColumn" field="calibration_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Calibration</span><br /><span>Job ID</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.calibration_run_id"
+                  :aria-label="'Calibration Job ID ' + slotProps.data.calibration_run_id"
+                  :title="'Calibration Job ID ' + slotProps.data.calibration_run_id">
+                  {{ slotProps.data.calibration_run_id }}
+                </span>
+              </template>
+            </Column>
             <Column :pt="ptColumn" field="gage_id" sortable>
               <template #header>
                 <div class="column-header">
@@ -89,9 +103,23 @@
               </template>
               <template #body="slotProps">
                 <div v-if="slotProps.data.cycle_date" class="text-center"
-                  :aria-label="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date)"
-                  :title="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date)">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) }}
+                  :aria-label="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) + 'Z'"
+                  :title="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) + 'Z'">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) }}Z
+                </div>
+              </template>
+            </Column>
+            <Column field="cold_start.cold_start_date" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Cold Start Date</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <div v-if="slotProps.data.cold_start?.cold_start_date" class="text-center"
+                  :aria-label="'Cold Start Date ' + (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) + 'Z' : '')"
+                  :title="'Cold Start Date ' + (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) + 'Z' : '')">
+                  {{ (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) + 'Z' : '') }}
                 </div>
               </template>
             </Column>
@@ -120,20 +148,6 @@
                   :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
                   {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
                 </div>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="calibration_run_id" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Calibration</span><br /><span>Job ID</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.calibration_run_id"
-                  :aria-label="'Calibration Job ID ' + slotProps.data.calibration_run_id"
-                  :title="'Calibration Job ID ' + slotProps.data.calibration_run_id">
-                  {{ slotProps.data.calibration_run_id }}
-                </span>
               </template>
             </Column>
           </DataTable>
