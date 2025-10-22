@@ -125,6 +125,7 @@
                   :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
                   :title="'Job ID ' + slotProps.data.calibration_run_id">
                   {{ slotProps.data.calibration_run_id }}
+                  <span v-if="slotProps.data.is_locked" class="pi pi-lock"></span>
                 </span>
               </template></Column>
 
@@ -537,8 +538,10 @@ const onRowContextMenu = (event: any) => {
       cmCalibrationRun.value.push({ label: 'Download Results', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
     }
     cmCalibrationRun.value.push({ label: 'Export Calibration Config', icon: 'pi pi-file-export', command: () => exportSelectedCalibrationData() });
-    cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
-    if (!selectedCalibrationRun.value?.is_archived) {
+    if (!selectedCalibrationRun?.value?.status.includes('Submitted') && !selectedCalibrationRun?.value?.status.includes('Running') && !selectedCalibrationRun?.value?.is_locked) {
+      cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
+    }
+    if (!selectedCalibrationRun?.value?.status.includes('Submitted') && !selectedCalibrationRun?.value?.status.includes('Running') && !selectedCalibrationRun.value?.is_archived) {
       cmCalibrationRun.value.push({ label: 'Archive', icon: 'pi pi-folder', command: () => archiveSelectedCalibrationRun(true) });
     }
   }
@@ -793,9 +796,28 @@ const deleteSelectedCalibrationRun = () => {
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
     if (response.status === 200) {
-      const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), 
-      summary: 'Delete Calibration Run', detail: 'Job ' + selectedRunId + ' deleted', life: useApiResponseToastSeverityLife(response?.status)};
-      toast.add(tMsg); addToastRecord(tMsg);   
+      let successMessages: string[] = [];
+      let failureMessages: string[] = [];
+      response._data?.jobs.forEach(job => {
+        if (job.success) {
+          successMessages.push(job.message);
+        } else {
+          failureMessages.push(job.message);
+        }
+      });
+      toast.removeAllGroups();
+      if (successMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'success', 
+          summary: 'Delete Job', detail: successMessages.join('\n'), 
+          life: ToastTimeout.timeoutSuccess};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (failureMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'error', 
+          summary: 'Delete Job', detail: failureMessages.join('\n'), 
+          life: ToastTimeout.timeoutError};
+        toast.add(tMsg); addToastRecord(tMsg);
+      } 
       fetchUserValidatedCalibrationJobsListData();
       resetUserSelectedEvalValidationRun();
     } else {
@@ -893,9 +915,28 @@ const archiveSelectedCalibrationRun = () => {
 const acceptArchive = (selectedRunId: number) => {
   archiveCalibrationRun(selectedRunId, true).then(async (response) => {
     if (response.status === 200) {
-      const tMsg: ToastMessageOptions = { severity: 'success', 
-        summary: 'Calibration Job Archived', detail: 'Job ' + selectedRunId + ' Archived', life: ToastTimeout.timeoutSuccess };
-      toast.add(tMsg); addToastRecord(tMsg);
+      let successMessages: string[] = [];
+      let failureMessages: string[] = [];
+      response._data?.jobs.forEach(job => {
+        if (job.success) {
+          successMessages.push(job.message);
+        } else {
+          failureMessages.push(job.message);
+        }
+      });
+      toast.removeAllGroups();
+      if (successMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'success', 
+          summary: 'Archive Job', detail: successMessages.join('\n'), 
+          life: ToastTimeout.timeoutSuccess};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (failureMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'error', 
+          summary: 'Archive Job', detail: failureMessages.join('\n'), 
+          life: ToastTimeout.timeoutError};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
       refreshJobList();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {

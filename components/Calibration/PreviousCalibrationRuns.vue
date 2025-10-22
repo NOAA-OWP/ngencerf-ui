@@ -338,13 +338,13 @@ const buildContextMenu = computed(() => {
   } else {
     contextMenuOptions.push(cmOpenRun.value);
     contextMenuOptions.push(cmCloneRun.value);
-    if (selectedCalibrationRun?.value?.status !== 'Running') {
+    if (!selectedCalibrationRun?.value?.status.includes('Submitted') && !selectedCalibrationRun?.value?.status.includes('Running')) {
       if (selectedCalibrationRun?.value?.is_downloadable) {
         contextMenuOptions.push(cmDownloadRun.value);
       }
     }
     contextMenuOptions.push(cmExportRun.value);
-    if (selectedCalibrationRun?.value?.status !== 'Running') {
+    if (!selectedCalibrationRun?.value?.status.includes('Submitted') && !selectedCalibrationRun?.value?.status.includes('Running')) {
       if (!selectedCalibrationRun?.value?.is_locked) {
         contextMenuOptions.push(cmDeleteRun.value);
       }
@@ -788,9 +788,28 @@ const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(async (response) => {
     toast.removeAllGroups();
     if (response.status === 200) {
-      const tMsg: ToastMessageOptions = { severity: 'success', 
-        summary: 'Calibration Job Deleted', detail: 'Job ' + selectedRunId + ' deleted', life: ToastTimeout.timeoutSuccess };
-      toast.add(tMsg); addToastRecord(tMsg);
+      let successMessages: string[] = [];
+      let failureMessages: string[] = [];
+      response._data?.jobs.forEach(job => {
+        if (job.success) {
+          successMessages.push(job.message);
+        } else {
+          failureMessages.push(job.message);
+        }
+      });
+      toast.removeAllGroups();
+      if (successMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'success', 
+          summary: 'Delete Job', detail: successMessages.join('\n'), 
+          life: ToastTimeout.timeoutSuccess};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (failureMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'error', 
+          summary: 'Delete Job', detail: failureMessages.join('\n'), 
+          life: ToastTimeout.timeoutError};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
@@ -855,9 +874,28 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
   archiveCalibrationRun(selectedRunId, archiveJob).then(async (response) => {
     toast.removeAllGroups();
     if (response.status === 200) {
-      const tMsg: ToastMessageOptions = { severity: 'success', 
-        summary: 'Calibration Job ' + (archiveJob ? 'Archived' : 'Un-Archived'), detail: 'Job ' + selectedRunId + ' ' + (archiveJob ? 'Archived' : 'Un-Archived'), life: ToastTimeout.timeoutSuccess };
-      toast.add(tMsg); addToastRecord(tMsg);
+      let successMessages: string[] = [];
+      let failureMessages: string[] = [];
+      response._data?.jobs.forEach(job => {
+        if (job.success) {
+          successMessages.push(job.message);
+        } else {
+          failureMessages.push(job.message);
+        }
+      });
+      toast.removeAllGroups();
+      if (successMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'success', 
+          summary: (archiveJob ? 'Archive' : 'Un-Archive') + ' Job', detail: successMessages.join('\n'), 
+          life: ToastTimeout.timeoutSuccess};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (failureMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'error', 
+          summary: (archiveJob ? 'Archive' : 'Un-Archive') + ' Job', detail: failureMessages.join('\n'), 
+          life: ToastTimeout.timeoutError};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
       await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
