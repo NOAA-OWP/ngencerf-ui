@@ -103,6 +103,14 @@
                 </span>
               </template>
             </Column>
+            <Column :pt="ptColumn" field="status" header="Status" sortable>
+              <template #body="slotProps">
+                <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
+                  :title="'Status ' + slotProps.data.status">
+                  {{ slotProps.data.status }}
+                </span>
+              </template>
+            </Column>
             <Column :pt="ptColumn" field="submit_date" sortable>
               <template #header>
                 <div class="column-header">
