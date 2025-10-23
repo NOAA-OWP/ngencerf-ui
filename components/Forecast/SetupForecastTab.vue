@@ -1,13 +1,40 @@
 <template>
+    <Transition name="slide-fade">
+      <div id="MessagesGroupWindow" v-if="showMessagesGroup">
+        <div class="text-right sticky top-0">
+          <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+            class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
+        </div>
+        <MessagesGroup />
+      </div>
+    </Transition>
     <div>
         <div style="font-size: 12px;font-weight: normal;margin-top:15px;"
-            aria-label="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id"
-            title="'Calibration Job ID is  ' + calibrationRunForForecast?.calibration_run_id">
-            <h2>Gage ID: {{ calibrationRunForForecast?.gage_id }}</h2>
-            <h2 style="font-size:1.5em; padding-top:5px;">Domain: 
-                {{ calibrationRunForForecast?.domain_name }}</h2>
-            <h2 style="font-size:1.5em; padding-top:5px;">Calibration Job ID: {{
-                calibrationRunForForecast?.calibration_run_id }}</h2>
+            :aria-label="'Gage ID is ' + calibrationRunForForecast?.gage_id"
+            :title="'Gage ID is  ' + calibrationRunForForecast?.gage_id">
+            <h2>
+              Gage ID: 
+              {{ calibrationRunForForecast?.gage_id }}
+            </h2>
+        </div>
+        <div style="font-size: 12px;font-weight: normal;margin-top:2px;"
+            :aria-label="'Domain is ' + calibrationRunForForecast?.domain_name"
+            :title="'Domain ID is  ' + calibrationRunForForecast?.domain_name">
+            <h2 style="font-size:1.5em; padding-top:5px;">
+              Domain: 
+              {{ calibrationRunForForecast?.domain_name }}
+            </h2>
+        </div>
+        <div style="font-size: 12px;font-weight: normal;margin-top:2px;"
+            :aria-label="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id"
+            :title="'Calibration Job ID is  ' + calibrationRunForForecast?.calibration_run_id">
+            <h2 style="font-size:1.5em; padding-top:5px;">
+                <a v-if="userCalibrationRunData" href="#" class="c-blue underline"
+                  @click="toggleMessagesGroup">
+                  Calibration Job ID: 
+                  {{ calibrationRunForForecast?.calibration_run_id }}
+                </a>
+            </h2>
         </div>
         <h1 class="mb-6 text-3xl font-bold text-center relative">
             Forecast Configuration Selection
@@ -138,15 +165,23 @@ import { DateTime } from "luxon";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 
+import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { generalStore } from '~/stores/common/GeneralStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 
-const { isLoading } = storeToRefs(generalStore());
+import MessagesGroup from "../Common/MessagesGroup.vue";
+
+const { calibrationJobId, isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const toast = useToast();
+
+const showMessagesGroup = ref<Boolean>(false);
+
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+const { fetchUserCalibrationRunData } = useUserDataStore();
 
 const {
   calibrationRunForForecast,
@@ -219,6 +254,9 @@ onMounted(async () => {
     hilightTab(ForecastTabs.tab_setupForecast);
 
     nextTick(async () => {
+        // load userCalibrationRunData so we can show details on user request
+        calibrationJobId.value = calibrationRunForForecast.value?.calibration_run_id;
+        await fetchUserCalibrationRunData();
         // load tab data to populate forecastConfigurations
         await loadSetupForecastTabData();
         if (forecastConfiguration.value) {
@@ -226,6 +264,14 @@ onMounted(async () => {
         }
     });
 });
+
+const toggleMessagesGroup = async () => {
+  if (showMessagesGroup.value) {
+    showMessagesGroup.value = false;
+  } else {
+    showMessagesGroup.value = true;
+  }
+}
 
 // Convert coldStartDate and cycleDate strings to Date objects
 // VueDatePicker sets these to strings, so we need to convert them to Date objects
@@ -295,4 +341,15 @@ const goToRunStatusTab = () => {
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
+
+#MessagesGroupWindow {
+  z-index: 100;
+  border: 1px solid black;
+  position: absolute;
+  right: 2%;
+  top: 161px;
+  width: 48%;
+  background-color: white;
+  overflow: auto;
+}
 </style>
