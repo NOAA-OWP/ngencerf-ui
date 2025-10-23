@@ -335,7 +335,7 @@ const buildContextMenu = computed(() => {
   let contextMenuOptions = [];
   if (selectedCalibrationRun?.value?.is_archived) {
     contextMenuOptions.push(cmUnarchiveRun.value);
-  } else {
+  } else if (selectedCalibrationRun?.value && selectedCalibrationRun?.value?.status) {
     contextMenuOptions.push(cmOpenRun.value);
     contextMenuOptions.push(cmCloneRun.value);
     if (!selectedCalibrationRun?.value?.status.includes('Submitted') && !selectedCalibrationRun?.value?.status.includes('Running')) {
