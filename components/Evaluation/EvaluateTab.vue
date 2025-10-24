@@ -24,16 +24,17 @@
 
 
           <div class="absolute" style="top:0px;right:0px;">
-            <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)"
+            <div v-if="selectedPlotName && selectedPlotName == selectedGridDisplay?.name"
               class="p-0 relative overflow-visible">
               <div class="grid grid-cols-3 gap-4">
                 <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
                   Select Date
                 </div>
                 <div class="text-nowrap">
-                  <VueDatePicker v-model="selectedSweDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-                    @update:model-value="convertSelectedSweDateStringToDateTimeObject" :enable-time-picker="false"
-                    :min-date="minSweDateTime.toISO()" :max-date="maxSweDateTime.toISO()" :teleport="true"
+                  <VueDatePicker v-model="selectedGridDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+                    @update:model-value="convertSelectedGridDateStringToDateTimeObject" 
+                    :enable-time-picker="(selectedGridDisplay?.abbr === 'SWE' ? false : true)"
+                    :min-date="minGridDateTime.toISO()" :max-date="maxGridDateTime.toISO()" :teleport="true"
                     utc='preserve' />
                 </div>
                 <div class="text-nowrap">
@@ -42,7 +43,7 @@
                 </div>
                 <div class="text-sm font-semibold col-span-3 text-nowrap text-center">
                   <p class="font-bold">
-                    {{ getSweTimeRange() }}
+                    {{ getGridTimeRange() }}
                   </p>
                 </div>
               </div>
@@ -75,10 +76,9 @@
             @click="toggleMessagesGroup">
             Show Calibration Details</a>
           <br />
-          <span v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName)">
+          <span v-if="selectedPlotName && selectedPlotName == selectedGridDisplay?.name">
             <a v-if="selectedPlotHasTimeseries && !showPlotGraph" href="#" class="p-1 c-blue underline mt-1"
-              @click="togglePlotGraph">Show
-              SWE Time Series</a>
+              @click="togglePlotGraph">Show {{ selectedGridDisplay?.abbr }} Time Series</a>
           </span>
           <span v-else>
             <a v-if="selectedPlotHasTimeseries" href="#" class="p-1 c-blue underline mt-1" @click="togglePlotGraph">
@@ -90,7 +90,7 @@
         </div>
       </div>
     </div>
-    <div v-if="!(selectedPlotName && gridDisplayOptions.includes(selectedPlotName)) && !showPlotGraph"
+    <div v-if="!(selectedPlotName && selectedPlotName == selectedGridDisplay?.name) && !showPlotGraph"
       :class="{ 'grid grid-cols-2': !expandPlotTable }">
       <div class="text-center" v-if="!expandPlotTable">
         <div id="GraphArea" class="p-2" v-if="selectedPlotName && selectedPlotFileUrl">
@@ -270,35 +270,27 @@
     </div>
 
     <!-- Grid Data -->
-    <div v-if="selectedPlotName && gridDisplayOptions.includes(selectedPlotName) && !showPlotGraph"
+    <div v-if="selectedPlotName && selectedPlotName == selectedGridDisplay?.name && selectedGridImages && !showPlotGraph"
       class="p-4 min-h-screen overflow-visible">
       <div class="grid grid-cols-3 gap-4 mt-4 p-2">
-        <div class="flex flex-col items-center p-2">
-          <h1 class="text-xl font-bold">SNODAS</h1>
-          <div class="flex items-center justify-center space-x-2 p-2 w-full">
-            <RadioButton v-model="selectedGridType" inputId="gridType1" value="gridded" name="gridType" />
-            <label for="gridType1">Gridded</label>
-            <RadioButton v-model="selectedGridType" inputId="gridType2" value="catchment" name="gridType" />
-            <label for="gridType2">Catchment Means</label>
+        <div v-for="(category, category_count) in selectedGridImages" :key="category_count" 
+          class="flex flex-col items-center p-2">
+          <h1 class="text-xl font-bold">{{ category.category_name }}</h1>
+          <div v-if="category.grid_types?.length > 0" class="flex items-center justify-center space-x-2 p-2 w-full">
+            <span v-for="(grid_type, grid_count) in category.grid_types" :key="grid_count">
+              <RadioButton v-model="selectedGridTypes[category_count]" 
+                :inputId="category.category_name + '_' + grid_count" :value="grid_type.grid_name" name="gridType"/>
+              <label for="gridType1">{{ grid_type.grid_name }}</label>
+            </span>
           </div>
-          <p v-if="selectedGridType === 'gridded'" class="text-[12px] text-gray-600 text-center">Snow Water Equivalent
-            (SWE) - Raw Values</p>
-          <p v-if="selectedGridType === 'catchment'" class="text-[12px] text-gray-600 text-center">Snow Water Equivalent
-            (SWE) - Catchment Means</p>
           <div>
-            <div v-if="selectedGridType === 'gridded' && selectedSnodasRawMapUrl" id="GraphArea" class="p-2">
-              <img :src="selectedSnodasRawMapUrl" alt="Selected SNODAS" />
-            </div>
-            <div v-if="selectedGridType === 'catchment' && selectedSnodasLumpedMapUrl" id="GraphArea" class="p-2">
-              <img :src="selectedSnodasLumpedMapUrl" alt="Selected SNODAS" />
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col items-center p-2">
-          <h1 class="text-xl font-bold">Simulated</h1>
-          <p class="text-[12px] text-gray-600 mt-9">Snow Water Equivalent (SWE) - Catchment Means</p>
-          <div v-if="selectedSnodasSimMapUrl" id="GraphArea" class="p-2">
-            <img :src="selectedSnodasSimMapUrl" alt="Selected SNODAS" />
+            <span v-for="grid_type in category.grid_types">
+              <span v-for="image in grid_type.images">
+                <div v-if="selectedGridTypes[category_count] === grid_type.grid_name" class="GridImage p-2">
+                  <img :src="image.image_url" :alt="image.image_name" />
+                </div>
+              </span>
+            </span>
           </div>
         </div>
       </div>
@@ -359,16 +351,16 @@ const {
   selectedPlotFileUrl,
   simulatedSources,
   gridTypes,
-  selectedGridType,
-  sweStartDateTime,
-  minSweDateTime,
-  sweEndDateTime,
-  maxSweDateTime,
-  selectedSweDateTime,
-  selectedSnodasLumpedMapUrl,
-  selectedSnodasRawMapUrl,
-  selectedSnodasSimMapUrl,
-  sweTimeSeriesData,
+  gridDisplayOptions,
+  selectedGridDisplay,
+  selectedGridTypes,
+  gridStartDateTime,
+  minGridDateTime,
+  gridEndDateTime,
+  maxGridDateTime,
+  selectedGridDateTime,
+  selectedGridImages,
+  gridTimeSeriesData,
   isEvaluationLoading
 } = storeToRefs(EvaluationSupplementalDataStore);
 
@@ -381,15 +373,15 @@ const {
   queryGetPlot,
 } = runStatusStore;
 const {
-  setSweStartDateTime,
-  setSweEndDateTime,
-  getSweTimeRange,
+  setgridStartDateTime,
+  setgridEndDateTime,
+  getGridTimeRange,
   queryGetIterations,
   queryGetPerformanceMetrics,
   queryGetLogNames,
   queryGetLogData,
-  loadSweImages,
-  queryGetSWETimeseriesData
+  loadGridImages,
+  queryGetGridTimeSeriesData
 } = EvaluationSupplementalDataStore;
 
 const plotListDefault = ref<string>('Select an option');
@@ -475,9 +467,6 @@ const plotGraphSliderHelpText = [
   'Drag left or right to move the Start and End Dates.',
   'Click inside the highlighted date range or on its edges to make changes.'
 ]
-const gridDisplayOptions = [
-  "Snow Water Equivalent",
-]
 
 onMounted(() => {
   isEvaluationLoading.value = true;
@@ -510,9 +499,9 @@ onMounted(() => {
     }
     
     // add grid display options to the dropdown if not added already
-    gridDisplayOptions.forEach(option => {
-      if (!plotList.value.some(item => item.name === option) && !userCalibrationRunData?.value?.modules?.includes('LSTM')) {
-        plotList.value.push({ name: option, description: '' });
+    gridDisplayOptions.value.forEach(option => {
+      if (!plotList.value.some(item => item.name === option.name) && !userCalibrationRunData?.value?.modules?.includes('LSTM')) {
+        plotList.value.push({ name: option.name, description: '' });
       }
     });
 
@@ -718,40 +707,34 @@ watch(selectedPlotName, async () => {
       resetUserPlotRefs(['selectedPlotName']);
       selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
     }
-    else if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
+    else if (selectedPlotName.value && gridDisplayOptions.value.find(option => option.name == selectedPlotName.value)) {
       // selectedPlotName is a grid display option
+      selectedGridDisplay.value = gridDisplayOptions.value.find(option => option.name == selectedPlotName.value);
+      
       // reset all of our plot refs except for selectedPlotName
-      resetUserPlotRefs(['selectedPlotName']);
-      // set selectedGridType to 'catchment' by default if not already set
-      if (!selectedGridType.value) {
-        selectedGridType.value = 'catchment';
+      resetUserPlotRefs(['selectedPlotName','selectedGridDisplay']);
+
+      // set gridStartDateTime and gridEndDateTime if not already set
+      if (!gridStartDateTime.value || !gridEndDateTime.value) {
+        setgridStartDateTime();
+        setgridEndDateTime();
       }
 
-      // set sweStartDateTime and sweEndDateTime if not already set
-      if (!sweStartDateTime.value || !sweEndDateTime.value) {
-        setSweStartDateTime();
-        setSweEndDateTime();
-      }
-      // set selectedSweDateTime to sweStartDateTime if not already set
-      /* if (!selectedSweDateTime.value) {
-        selectedSweDateTime.value = sweStartDateTime.value;
-      } */
-
-      // pre-load SWE Timeseries Data so that we know our date range
-      if (!sweTimeSeriesData.value || sweTimeSeriesData.value.length === 0) {
-        const response: any = await queryGetSWETimeseriesData(
+      // pre-load Grid Timeseries Data so that we know our date range
+      if (!gridTimeSeriesData.value || gridTimeSeriesData.value.length === 0) {
+        const response: any = await queryGetGridTimeSeriesData(
           (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
         );
+        // get time series data from server - need to make this more dynamic
         if (response?._data?.timeseries_data) {
-          // get time series data from server
-          sweTimeSeriesData.value = response?._data?.timeseries_data;
+          gridTimeSeriesData.value = response?._data?.timeseries_data;
           selectedPlotHasTimeseries.value = true;
-          // Start with SWE timeseries already displayed
+          // Start with timeseries already displayed
           togglePlotGraph();
         } else {
           selectedPlotHasTimeseries.value = false;
           toast.removeAllGroups();
-          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'SWE time series data is currently unavailable', life: ToastTimeout.timeoutInfo };
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: selectedGridDisplay?.value?.abbr + ' time series data is currently unavailable', life: ToastTimeout.timeoutInfo };
           toast.add(tMsg); addToastRecord(tMsg);
         }
       }
@@ -942,17 +925,18 @@ const resetUserPlotRefs = (exceptions: any): void => {
   selectedLogEndRow.value = logDataPageSize.value;
   selectedLogFilePath.value = '';
 
-  // SWE refs
-  selectedGridType.value = '';
-  sweStartDateTime.value = null;
-  minSweDateTime.value = null;
-  sweEndDateTime.value = null;
-  maxSweDateTime.value = null;
-  selectedSweDateTime.value = null;
-  selectedSnodasLumpedMapUrl.value = '';
-  selectedSnodasRawMapUrl.value = '';
-  selectedSnodasSimMapUrl.value = '';
-  sweTimeSeriesData.value = [];
+  // Grid refs
+  if (!exceptions.includes('selectedGridDisplay')) {
+    selectedGridDisplay.value = {};
+  }
+  selectedGridTypes.value = [];
+  gridStartDateTime.value = null;
+  minGridDateTime.value = null;
+  gridEndDateTime.value = null;
+  maxGridDateTime.value = null;
+  selectedGridDateTime.value = null;
+  selectedGridImages.value = [];
+  gridTimeSeriesData.value = [];
 }
 
 // Handle selectedPlotTable changes
@@ -963,17 +947,17 @@ watch(selectedPlotTable, async () => {
   }
 });
 
-// Convert selectedSweDateTime string to Date object
-// VueDatePicker sets selectedSweDateTime to a string, so we need to convert it to a Date object
-const convertSelectedSweDateStringToDateTimeObject = (value: string) => {
-  selectedSweDateTime.value = DateTime.fromISO(value, { zone: 'utc' });
+// Convert selectedGridDateTime string to Date object
+// VueDatePicker sets selectedGridDateTime to a string, so we need to convert it to a Date object
+const convertSelectedGridDateStringToDateTimeObject = (value: string) => {
+  selectedGridDateTime.value = DateTime.fromISO(value, { zone: 'utc' });
 }
 
-// Handle selectedSweDateTime changes
-// if selectedSweDateTime is a string, convert it to a Date object
-watch(selectedSweDateTime, async () => {
-  if (typeof selectedSweDateTime.value === 'string') {
-    convertSelectedSweDateStringToDateTimeObject(selectedSweDateTime.value);
+// Handle selectedGridDateTime changes
+// if selectedGridDateTime is a string, convert it to a Date object
+watch(selectedGridDateTime, async () => {
+  if (typeof selectedGridDateTime.value === 'string') {
+    convertSelectedGridDateStringToDateTimeObject(selectedGridDateTime.value);
   }
 });
 
@@ -1075,9 +1059,9 @@ const togglePlotGraph = async () => {
     showPlotGraph.value = false;
   } else {
     if (!plotGraphData.value || plotGraphData.value.length === 0) {
-      if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
-        // special case for SWE time series
-        plotGraphDataRaw.value = sweTimeSeriesData.value;
+      if (selectedPlotName.value == selectedGridDisplay?.value?.name) {
+        // special case for grid time series
+        plotGraphDataRaw.value = gridTimeSeriesData.value;
         plotTableData.value = plotGraphDataRaw.value;
         adjustPlotTableColumns();
       } else {
@@ -1132,8 +1116,12 @@ const drawInteractivePlot = () => {
       height: ((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
         - (document.getElementById('PlotGraphArea') as HTMLElement).getBoundingClientRect().top) - 150
     };
-    if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
-      plotGraphOptions.value.y.label = 'Depth (m)';
+    if (selectedPlotName.value == selectedGridDisplay?.value?.name) {
+      if (selectedGridDisplay.value.abbr == 'SWE') {
+        plotGraphOptions.value.y.label = 'Depth (m)';
+      } else if (selectedGridDisplay.value.abbr == 'SMAP') {
+        plotGraphOptions.value.y.label = 'Rootzone Soil Moisture (m^3/m^3)';
+      }
     } else {
       plotGraphOptions.value.y.label = 'Streamflow (m^3/s)';
     }
@@ -1198,7 +1186,7 @@ const drawInteractivePlot = () => {
     title: (d: DotTipData) => `${d.name} (${d.color} ${d.symbol})`,
     fontSize: 14
   }
-  if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
+  if (selectedPlotName.value == selectedGridDisplay?.value?.name) {
     lineOptions.y.label = 'Depth (m)';
     lineTipOptions.y.label = 'Depth';
     lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
@@ -1264,11 +1252,11 @@ const drawInteractivePlot = () => {
   (plotGraphSVG.value as HTMLElement).innerHTML = '';
   const plot = Plot.plot(plotGraphOptions.value);
   (plotGraphSVG.value as HTMLElement).append(plot);
-  if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
+  if (selectedPlotName.value == selectedGridDisplay?.value?.name) {
     plot.addEventListener("click", e => {
       if (plot.value?.time) {
-        // Update SWE date picker
-        selectedSweDateTime.value = (new Date(plot.value.time)).toISOString().split('T')[0];
+        // Update grid date picker
+        selectedGridDateTime.value = (new Date(plot.value.time)).toISOString().split('T')[0];
       }
     });
   }
@@ -1306,8 +1294,8 @@ const drawInteractiveSlider = () => {
     plotGraphSliderData.value = [];
     let rowSkip = plotGraphDataRaw.value.length / 1000;
     for (let c = 1; c < plotTableColumns.value.length; c++) {
-      if ((gridDisplayOptions.includes(selectedPlotName.value as string) && plotTableColumns.value[c].value.toLowerCase().indexOf('snodas') >= 0) ||
-        (!gridDisplayOptions.includes(selectedPlotName.value as string) && (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked)) {
+      if ((selectedPlotName.value == selectedGridDisplay?.value?.name && c === 1) ||
+        (!selectedPlotName.value == selectedGridDisplay?.value?.name && (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked)) {
         for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
           let dataPoint = {
             time: new Date(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[0].value]),
@@ -1341,26 +1329,26 @@ const drawInteractiveSlider = () => {
 
     if (!sliderBoxPosition.value || Object.keys(sliderBoxPosition.value).length !== 2) {
       // we don't have a previous position to remember
-      if (gridDisplayOptions.includes(selectedPlotName.value as string)) {
-        // find our highest SNODAS measurement and start there
-        let snodasColumnName = '';
-        let snodasMaxValue = 0;
-        let snodasMaxDate = null;
+      if (selectedPlotName.value == selectedGridDisplay?.value?.name) {
+        // find our highest measurement and start there
+        let gridColumnName = '';
+        let gridMaxValue = 0;
+        let gridMaxDate = null;
         Object.keys(plotGraphData.value[0]).forEach(key => {
-          if (key.toLowerCase().indexOf('snodas') >= 0) {
-            snodasColumnName = key;
+          if (key.toLowerCase().indexOf('snodas') >= 0 || key.toLowerCase().indexOf('smap') >= 0) {
+            gridColumnName = key;
           }
         });
         for (let d = 0; d < plotGraphData.value.length; d++) {
-          if (plotGraphData.value[d][snodasColumnName] > snodasMaxValue) {
-            snodasMaxValue = plotGraphData.value[d][snodasColumnName];
-            snodasMaxDate = new Date(plotGraphData.value[d]['timestamp'])
+          if (plotGraphData.value[d][gridColumnName] > gridMaxValue) {
+            gridMaxValue = plotGraphData.value[d][gridColumnName];
+            gridMaxDate = new Date(plotGraphData.value[d]['timestamp'])
           }
         }
-        // override the default date for SWE
-        selectedSweDateTime.value = snodasMaxDate?.toISOString().split('T')[0];
+        // override the default date for grid
+        selectedGridDateTime.value = gridMaxDate?.toISOString().split('T')[0];
         // start with a 4-month range around our highest measurement
-        let daysFromStart = Math.round((snodasMaxDate as Date).getTime() - (new Date(plotGraphDateRange.value.start)).getTime()) / (1000 * 3600 * 24);
+        let daysFromStart = Math.round((gridMaxDate as Date).getTime() - (new Date(plotGraphDateRange.value.start)).getTime()) / (1000 * 3600 * 24);
         let sliderBoxStart = Math.ceil((daysFromStart - 150) * (getSliderWidth() / plotGraphDateLimits.value.span));
         let sliderBoxEnd = Math.ceil((daysFromStart + 90) * (getSliderWidth() / plotGraphDateLimits.value.span));
         sliderBoxPosition.value = {
@@ -1679,30 +1667,38 @@ const toggleMessagesGroup = async () => {
   }
 }
 
-// call get_swe_images_by_date to load the SWE images when user clicks 'Get Spatial Plot' button
+// Load the grid images when user clicks 'Get Spatial Plot' button
 const getSpatialPlots = async () => {
   isEvaluationLoading.value = true;
   showPlotGraph.value = false;
-  if (selectedPlotName.value && gridDisplayOptions.includes(selectedPlotName.value)) {
-    // load the SWE images
-    if (selectedSweDateTime.value && isValidDateTime(selectedSweDateTime.value)) {
-      const selectedSweDate: Date = selectedSweDateTime.value.toJSDate();
-      if (isValidDate(selectedSweDate)) {
-        // load the SWE images
-        const loadSweImagesErrors = await loadSweImages(evaluateValidationRunId.value, formatISOStringOrDateToYYYYMMDD(selectedSweDate as Date));
+  if (selectedPlotName.value && selectedPlotName.value == selectedGridDisplay?.value?.name) {
+    if (selectedGridDateTime.value && isValidDateTime(selectedGridDateTime.value)) {
+      // load the Grid images
+      const loadGridImagesErrors = await loadGridImages(
+        evaluateValidationRunId.value, 
+        selectedGridDisplay.value.abbr === 'SWE' ? 
+          formatISOStringOrDateToYYYYMMDD(selectedGridDateTime.value as Date) :
+          formatISOStringOrDateToYYYYMMDDHHMM(selectedGridDateTime.value as Date) + ':00'
+      );
 
-        if (loadSweImagesErrors) {
-          loadSweImagesErrors.forEach((errorMessage) => {
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage, life: ToastTimeout.timeoutError };
-            toast.add(tMsg); addToastRecord(tMsg);
-          });
+      if (loadGridImagesErrors) {
+        loadGridImagesErrors.forEach((errorMessage) => {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: errorMessage, life: ToastTimeout.timeoutError };
+          toast.add(tMsg); addToastRecord(tMsg);
+        });
+      }
+
+      // default selected images to the first one in each set
+      selectedGridTypes.value = [];
+      if (selectedGridImages.value) {
+        for (let c = 0; c < selectedGridImages.value.length; c++) {
+          if (selectedGridImages.value[c].grid_types.length > 0) {
+            selectedGridTypes.value.push(selectedGridImages.value[c].grid_types[0].grid_name);
+          }
         }
-      } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in Date format', life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
       }
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected SWE date is not in DateTime format', life: ToastTimeout.timeoutError };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Selected ' + selectedGridDisplay?.value?.name + ' date is not in DateTime format', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
     isEvaluationLoading.value = false;
@@ -1742,7 +1738,7 @@ onUnmounted(() => {
   width: 275px;
 }
 
-#GraphArea img {
+#GraphArea img, .GridImage img {
   margin: 20px auto;
 }
 
