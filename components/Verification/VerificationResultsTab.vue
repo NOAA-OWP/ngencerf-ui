@@ -57,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
 import type { ToastMessageOptions } from "primevue/toast";

@@ -763,7 +763,7 @@ export type ForecastJobs = {
 export interface VerificationJob {
   verification_job_id: number;
   forecast_run: ForecastJob;
-  verification_yaml_file_path: string;
+  verification_config: string;
   yaml_config_data: DynamicObject;
   yaml_config_error_message: string;
   job_data_dir: string;

@@ -185,7 +185,7 @@ const {
   calibrationRunForForecast,
   forecastConfiguration,
   forecastJobStatus,
-  overallForcingDownloadForecastStatus
+  overallColdStartForecastStatus
 } = storeToRefs(useForecastStore());
 
 const {

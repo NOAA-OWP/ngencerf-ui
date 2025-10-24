@@ -1,8 +1,7 @@
 import { defineStore, storeToRefs } from "pinia";
-import { Duration } from "luxon";
 
 
-import type { SelectOption, VerificationJob, VerificationJobs } from "@/composables/NgencerfModels";
+import type { VerificationJob, VerificationJobs } from "@/composables/NgencerfModels";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
@@ -19,7 +18,6 @@ const { selectedForecastJob } = storeToRefs(forecastStore);
 export const useVerificationStore = defineStore('VerificationStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
-  const { verificationSetupHasChanged } = storeToRefs(generalStore());
 
   // refs
   const forecastJobId = ref<number>();
@@ -240,43 +238,18 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
  * @returns {CreatedVerificationJob}
  */
   async function fetchNewVerificationJobId() {
-    let requestBody = {};
-    if (selectedForecastJob?.value?.forecast_run_id) {
-      requestBody = {forecast_run_id: selectedForecastJob.value.forecast_run_id};
-    }
     return await makeProtectedApiCall<CreatedVerificationJob>(`${ngencerfBaseUrl}/calibration/create_verification_job/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        forecast_run_id: selectedForecastJob?.value?.forecast_run_id
+      })
     });
   }
-
-  /**
-   * return saving verification setup tab response from the server
-   * @returns {GeneralApiSaveResponse | GeneralErrorResponse}
-   */
-  async function saveVerificationSetupData() {
-    const saveVerificationSetupResponse =
-      await makeProtectedApiCall<GeneralApiSaveResponse | GeneralErrorResponse>(
-        `${ngencerfBaseUrl}/calibration/save_verification_setup/`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${getAccessToken()}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            'verification_job_id': verificationJobId.value,
-            'verification_yaml_file_path': selectedVerificationYamlFile.value
-          }),
-        }
-      );
-    return saveVerificationSetupResponse;
-  }
-
+  
   /**
    * Run Verification Job
    */
@@ -425,7 +398,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     loadVerificationRunStatusTabData,
     loadVerificationResultsTabData,
     loadVerificationTab,
-    saveVerificationSetupData,
     runVerificationJob,
     cancelVerificationJob,
     updateRunningTime,

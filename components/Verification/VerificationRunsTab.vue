@@ -12,11 +12,10 @@
     <div class="pr-2">
       <div class="text-center">
         <h1 class="mt-10 mb-6 text-3xl font-bold inline-block">Verification Jobs</h1>
-        <Button class="ngenButtonDiv ml-8" @click="createNewVerification" aria-label="New Verification Job"
-          title="New Verification Job">New</Button>
         <br />
         <p class="prompt-txt mb-2" style="margin-top:-10px;">
-          Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
+          Double click on a row to open, or right click for more options. To create a new Verification job,
+          go to "Forecast Runs" and right-click on a Forecast.
         </p>
       </div>
       <div id="verificationJobList">
@@ -57,14 +56,6 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="data_source" header="Data Source" sortable>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.status" :aria-label="'Data Source ' + slotProps.data.data_source"
-                  :title="'Data Source ' + slotProps.data.data_source">
-                  {{ slotProps.data.data_source }}
-                </span>
-              </template>
-            </Column>
             <Column :pt="ptColumn" field="forecast_run_id" header="Forecast Job ID" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.forecast_run_id" :aria-label="'Forecast Job ID ' + slotProps.data.forecast_run_id"
@@ -80,21 +71,6 @@
                   :title="'Status ' + slotProps.data.status">
                   {{ slotProps.data.status }}
                 </span>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="verification_yaml_file_path" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>YAML File</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.data_source === 'nwm' && slotProps.data.verification_yaml_file_path"
-                  :aria-label="'YAML File ' + slotProps.data.verification_yaml_file_path"
-                  :title="'YAML File ' + slotProps.data.verification_yaml_file_path">
-                  {{ slotProps.data.verification_yaml_file_path.replace(/\\/g, '/').split('/').pop() }}
-                </span>
-                <span v-else-if="slotProps.data.data_source === 'ngen'">N/A</span>
               </template>
             </Column>
             <Column :pt="ptColumn" field="submit_date" sortable>
@@ -149,14 +125,10 @@ const {
 } = storeToRefs(verificationStore);
 
 const {
-  setSelectedVerificationJobId,
   resetSelectedVerificationJobData,
-  loadVerificationRunStatusTabData,
-  loadVerificationResultsTabData,
   loadSelectedVerificationJob,
   setSelectedVerificationRowData,
   getVerificationJobs,
-  fetchNewVerificationJobId,
   deleteVerificationJob
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
@@ -177,9 +149,9 @@ const onRowContextMenu = (event: any) => {
   const vrRowData = event.data as VerificationJob;
   if (selectedVerificationJob && selectedVerificationJob.value?.verification_job_id === vrRowData.verification_job_id) {
     vrContextMenu.value.show(event.originalEvent);
-    //if (['Saved','Ready'].includes(vrRowData.status)) {
+    if (['Saved','Ready'].includes(vrRowData.status)) {
       cmVerificationJob.value.push({ label: 'Show Setup', icon: 'pi pi-bars', command: () => navigateToSetupVerification() });
-    //}
+    }
     cmVerificationJob.value.push({ label: 'View Status', icon: 'pi pi-gauge', command: () => navigateToVerificationJobStatus() });
     if (vrRowData.status === 'Done') {
       cmVerificationJob.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToVerificationResults() });
@@ -203,6 +175,8 @@ onMounted(() => {
 
     // load verificationJobs
     await getVerificationJobs();
+
+    console.log('filteredVerificationJobs:',filteredVerificationJobs.value);
   });
 
   isVerificationLoading.value = false;
@@ -215,30 +189,6 @@ const onVerificationRowSelect = async (event: DataTableRowClickEvent) => {
 
 const onVerificationRowUnSelect = async (event: DataTableRowClickEvent) => {
   resetSelectedVerificationJobData();
-}
-
-const createNewVerification = async () => {
-  // Clear out old data
-  resetSelectedVerificationJobData();
-  fetchNewVerificationJobId().then(response => {
-    if (response.status === 201) {
-      if (response?._data && response?._data?.verification_job_id && response?._data?.verification_job_id > 0) {
-        verificationJobId.value = response?._data?.verification_job_id as number;
-        loadSelectedVerificationJob(verificationJobId.value).then(queryResponse => {
-          userVerificationJobData.value = queryResponse?._data;
-          navigateToSetupVerification();
-        });
-      } else {
-        const tMsg: ToastMessageOptions = { severity: "error", summary: 'Create Verification Job Failed.', detail: "Unable to Retrieve Valid Verification Job Id", life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-    } else {
-      useApiErrorResponsePreprocess(response).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Create Verification Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
-        toast.add(tMsg); addToastRecord(tMsg);
-      });
-    }
-  });
 }
 
 const confirmDelete = useConfirm();
@@ -352,14 +302,6 @@ const toggleMessagesGroup = () => {
   font-size: 30px;
   margin-top: 40px;
   margin-bottom: 40px;
-}
-
-#NewButton {
-  width: 147px;
-  height: 33px;
-  padding: 10px;
-  border-radius: 20px;
-  font-size: 21px;
 }
 
 #VerTable {
