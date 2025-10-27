@@ -175,8 +175,6 @@ onMounted(() => {
 
     // load verificationJobs
     await getVerificationJobs();
-
-    console.log('filteredVerificationJobs:',filteredVerificationJobs.value);
   });
 
   isVerificationLoading.value = false;

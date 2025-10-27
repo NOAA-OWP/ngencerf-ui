@@ -125,7 +125,7 @@
             Verification Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
-          <div v-show="[3].includes(currentVerificationTab) || (userVerificationJobData && (userVerificationJobData.status || ['Saved','Ready'].includes(userVerificationJobData.status)))"
+          <div v-show="[3].includes(currentVerificationTab) || (userVerificationJobData && (!userVerificationJobData.status || ['Saved','Ready'].includes(userVerificationJobData.status)))"
             data-tab="3" class="tabs prevent-select" @click="tabClicked" 
             aria-label="Setup Verification Tab" title="Setup Verification Tab">
             Setup Verification
