@@ -763,16 +763,12 @@ export type ForecastJobs = {
 export interface VerificationJob {
   verification_job_id: number;
   forecast_run: ForecastJob;
-  verification_config: string;
   yaml_config_data: DynamicObject;
-  yaml_config_error_message: string;
-  job_data_dir: string;
   submit_date: string;
   run_start: string;
   run_end: string;
   performance_metrics: CalibrationGetStatusPerformanceMetricItem[] | null;
   status: string;
-  data_source: string;
   failure_messages: any;
 }
 

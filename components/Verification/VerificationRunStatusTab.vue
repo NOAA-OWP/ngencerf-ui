@@ -70,18 +70,6 @@
           </table>
         </div>
 
-        <div class="col-span-5">
-          <div style="display:flex; margin-top: 1em;" :aria-label="'Results pathname is ' + resultsPathname"
-            :title="'Results pathname is ' + resultsPathname">
-            <div class="text-right font-bold" style="width: 155px;">
-              <label class="text-right whitespace-nowrap" for="resultsPathname" style="width: 155px;padding-top:1px;">Results Pathname</label>
-            </div>
-            <div class="pl-5" style="width: 100%;">
-              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
-            </div>
-          </div>
-        </div>
-
         <div class="col-span-5" v-if="failureMessages">
           <div style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
             <div class="text-right font-bold" style="width: 155px;">
@@ -165,7 +153,6 @@ const {
   verificationRunningTimeInterval,
   verificationJobStatus,
   failureMessages,
-  resultsPathname,
   isVerificationLoading 
 } = storeToRefs(verificationStore);
 const { 
@@ -184,6 +171,10 @@ onMounted(() => {
   clearInterval(verificationRunningTimeInterval.value);
   verificationStatusCheckingInterval.value = undefined;
   verificationRunningTimeInterval.value = undefined;
+  verificationJobStatus.value = undefined;
+  failureMessages.value = undefined;
+  submitTime.value = undefined;
+  elapsedTime.value = undefined;
 
   loadVerificationStatusInformation();
 
@@ -285,14 +276,5 @@ onUnmounted(() => {
   font-size: 30px;
   margin-top: 40px;
   margin-bottom: 40px;
-}
-
-#resultsPathname {
-  background-color: #fff;
-  border: 0px solid #fff;
-  border-left: 0;
-  border-right: 0;
-  color: black;
-  box-shadow: none;
 }
 </style>

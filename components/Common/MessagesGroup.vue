@@ -221,7 +221,7 @@ const getModuleList = () => {
 
 const formatDate = (d: any) => {
   if ((d instanceof Date)) {
-    console.log('Date');
+    return d;
   } else {
     return formatISOStringOrDateToYYYYMMDDHHMM(d);
   }

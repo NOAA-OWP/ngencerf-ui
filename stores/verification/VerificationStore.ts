@@ -31,7 +31,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   const userVerificationJobData = ref<VerificationJob>();
   
   const verificationDate = ref<any>();
-  const selectedVerificationYamlFile = ref<string | undefined>();
   const yamlConfigData = ref<DynamicObject>({});
 
   const verificationJobStatus = ref<string>();
@@ -355,17 +354,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     });
   };
 
-  /**
-   * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
-   */
-  const resultsPathname = computed<string>(() => {
-    if (userVerificationJobData?.value?.job_data_dir) {
-      return userVerificationJobData.value.job_data_dir;
-    } else {
-      return "";
-    }
-  });
-
 
   return {
     forecastJobId,
@@ -384,9 +372,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     selectedVerificationJob,
     userVerificationJobData,
     verificationDate,
-    selectedVerificationYamlFile,
     yamlConfigData,
-    resultsPathname,
     verificationPlotNames,
     verificationPlot,
     isVerificationLoading,

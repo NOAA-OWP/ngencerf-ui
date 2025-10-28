@@ -39,7 +39,7 @@
     </div>
 
     <div>
-      <span v-if="selectedVerificationYamlFile" class="font-bold">YAML Configuration from {{ selectedVerificationYamlFile }}:</span>
+      <span v-if="yamlConfigData" class="font-bold">YAML Configuration:</span>
       <div id="YamlConfigData"></div>
     </div>
 
@@ -71,7 +71,6 @@ const { selectedForecastJob } = storeToRefs(forecastStore);
 const { 
   verificationJobId, 
   userVerificationJobData, 
-  selectedVerificationYamlFile,
   yamlConfigData,
   isVerificationLoading 
 } = storeToRefs(verificationStore);
@@ -108,13 +107,8 @@ const formatYamlConfigData = (data: DynamicObject, indent: number=1) => {
 
 const renderYamlConfigData = () => {
   // reset verification_yaml_file_path
-  selectedVerificationYamlFile.value = userVerificationJobData?.value?.verification_yaml_file_path ? userVerificationJobData?.value?.verification_yaml_file_path.replace(/\\/g, '/').split('/').pop() : undefined;
   if (userVerificationJobData?.value?.yaml_config_data) {
     yamlConfigData.value = userVerificationJobData?.value?.yaml_config_data;
-  }
-  if (userVerificationJobData?.value?.yaml_config_error_message) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'YAML Configuration Error', detail: userVerificationJobData.value.yaml_config_error_message, life: ToastTimeout.timeoutError };
-    toast.add(tMsg); addToastRecord(tMsg);
   }
   if (yamlConfigData.value) {
     document.getElementById('YamlConfigData').innerHTML = formatYamlConfigData(yamlConfigData.value);
@@ -130,7 +124,6 @@ const goNextTab = () => {
 }
 
 onUnmounted(() => {
-  selectedVerificationYamlFile.value = undefined
   yamlConfigData.value = {};
 });
 

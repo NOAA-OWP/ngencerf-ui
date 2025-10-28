@@ -244,7 +244,7 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
 const navigateToSetupVerification = () => {
   isVerificationLoading.value = true;
   nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Verification Tab"]');
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
 
     if (e) {
       if (selectedVerificationJob.value) {
@@ -252,7 +252,7 @@ const navigateToSetupVerification = () => {
       }
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Verification Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
     isVerificationLoading.value = false;
   });

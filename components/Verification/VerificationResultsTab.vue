@@ -11,7 +11,7 @@
             <div style="width: 160px;">Display</div>
           </th>
           <td class="pl-5">
-            <Select id="DisplayOptions" class="p-select" v-model="verificationPlot" :options="verificationPlotNames"
+            <Select id="DisplayOptions" class="p-select min-w-[300px]" v-model="verificationPlot" :options="verificationPlotNames"
               optionLabel="display_name" optionValue="name" :disabled="!verificationPlotNames">
             </Select>
           </td>
@@ -23,28 +23,11 @@
           </th>
           <td class="pl-5">{{ verificationJobId ?? '-'.repeat(15) }}</td>
         </tr>
-        <tr height="38px" :aria-label="'Status is ' + verificationJobStatus"
-          :title="'Status is ' + verificationJobStatus">
-          <th scope="row" class="text-right font-bold">
-            <div style="width: 160px;">Status</div>
-          </th>
-          <td class="pl-5">{{ userVerificationJobData?.status }}</td>
-        </tr>
         <tr height="38px" :aria-label="'Elapsed Time ' + elapsedTime" :title="'Elapsed Time ' + elapsedTime">
           <th scope="row" class="text-right font-bold">
             <div style="width: 160px;">Elapsed Time</div>
           </th>
           <td class="pl-5">{{ elapsedTime ?? '-'.repeat(15) }}</td>
-        </tr>
-        <tr height="38px" :aria-label="'Results Pathname is ' + resultsPathname"
-          :title="'Results Pathname is ' + resultsPathname">
-          <th scope="row" class="text-right font-bold" style="width: 160px;">
-            <label class="text-right" for="resultsPathname" style="width: 160px;">Results Pathname</label>
-          </th>
-          <td class="pl-5" style="width: 100%;" :aria-label="'Job Data Directory is ' + resultsPathname"
-            :title="'Job Data Directory is ' + resultsPathname">
-            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
-          </td>
         </tr>
       </tbody>
     </table>
@@ -79,7 +62,6 @@ const {
   submitTime,
   elapsedTime,
   verificationJobStatus,
-  resultsPathname,
   verificationPlotNames,
   verificationPlot,
   isVerificationLoading 
@@ -90,6 +72,7 @@ const {
   getVerificationPlot 
 } = useVerificationStore();
 
+const verificationPlotDefault = ref<string>('Select an option');
 const verificationPlotFileUrl = ref<string | undefined>();
 
 import { hilightTab } from '@/composables/TabHilight';
@@ -104,12 +87,15 @@ onMounted(async() => {
   })
 
   const response = await getVerificationPlotNames();
-  verificationPlotNames.value = response?._data?.plot_names;
+  if (response?._data?.plot_names) {
+    verificationPlotNames.value = [{ name: verificationPlotDefault.value, display_name: verificationPlotDefault.value }, ...response._data.plot_names];
+    verificationPlot.value = verificationPlotDefault.value;
+  }
 })
 
 // Handle verificationPlot changes
 watch(verificationPlot, async () => {
-  if(verificationPlot.value) {
+  if(verificationPlot.value && verificationPlot.value != verificationPlotDefault.value) {
     const response: any = await getVerificationPlot(verificationPlot.value);
     verificationPlotFileUrl.value = response?._data?.plot_url;
   } else {
