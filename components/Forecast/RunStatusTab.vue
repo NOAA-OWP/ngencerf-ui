@@ -256,16 +256,12 @@ onMounted(async () => {
  */
 const createElapsedTimeInterval = () => {
   clearInterval(elapsedTimeIntervalId.value);
-  console.log('Creating elapsed time interval');
   elapsedTimeIntervalId.value = setInterval(async () => {
     // continue incrementing elapsedTime every second while coldStartJobStatus is Submitted
     // or forecastJobStatus is Submitted or Running
     if (['Submitted','Running'].includes(coldStartJobStatus.value ?? '') || ['Submitted', 'Running'].includes(forecastJobStatus.value ?? '')) {
       elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
     } else {
-      console.log('forecastJobStatus:',coldStartJobStatus.value);
-      console.log('forecastJobStatus:',forecastJobStatus.value);
-      console.log('Clearing elapsed time interval');
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
     }
@@ -277,16 +273,12 @@ const createElapsedTimeInterval = () => {
  * while coldStartJobStatus or forecastJobStatus is Submitted or Running
  */
 const createColdStartAndForecastStatusInterval = () => {
-  console.log('Creating Status interval');
   clearInterval(forecastJobStatusIntervalId.value);
   forecastJobStatusIntervalId.value = setInterval(async () => {
     loadForecastRunStatusTabData();
     // if cold start and forecast job are not Submitted or Running, clear the interval
     if (!['Submitted', 'Running'].includes(coldStartJobStatus.value ?? '') && !['Submitted', 'Running'].includes(forecastJobStatus.value ?? ''))
     {
-      console.log('coldStartJobStatus:',coldStartJobStatus.value);
-      console.log('forecastJobStatus:',forecastJobStatus.value);
-      console.log('Clearing all intervals');
       clearInterval(forecastJobStatusIntervalId.value);
       forecastJobStatusIntervalId.value = undefined;
       clearInterval(elapsedTimeIntervalId.value);

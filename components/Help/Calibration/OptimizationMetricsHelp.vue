@@ -81,7 +81,7 @@
                 </tr>
                 <tr>
                     <td class="td1">Next Button</td>
-                    <td class="td2">Move to the Status/Run Tab. If there is any unsaved data, the user will first be
+                    <td class="td2">Move to the Run/Status Tab. If there is any unsaved data, the user will first be
                         prompted
                         to save.</td>
                 </tr>

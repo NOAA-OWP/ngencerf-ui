@@ -49,6 +49,8 @@ export const generalStore = defineStore(
     const gageDataSourceHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
+    // This is set if Verification Setup has changed
+    const verificationSetupHasChanged = ref<boolean>(false);
 
     const toastRecords = ref<ToastRecord[]>([]);
 
@@ -154,6 +156,7 @@ export const generalStore = defineStore(
       gageHasChanged,
       gageDataSourceHasChanged,
       modulesHaveChanged,
+      verificationSetupHasChanged,
       verificationTabIndex,
       menuIndex,
       evaluationRunSelected,

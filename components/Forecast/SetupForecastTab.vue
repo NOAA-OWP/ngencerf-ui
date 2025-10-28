@@ -100,10 +100,10 @@
         </li>
       </ul>
       <div class="grid grid-cols-5">
-        <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+        <div class="text-nowrap text-right font-bold p-1">
           Cold Start Date
         </div>
-        <div class="text-nowrap">
+        <div class="text-nowrap p-1">
           <VueDatePicker v-model="coldStartDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
             @update:model-value="convertColdStartDateStringToDateTimeObject" :enable-time-picker="false"
             :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
@@ -111,10 +111,10 @@
             :teleport="true" utc='preserve' 
             :disabled="!forecastConfiguration"/>
         </div>
-        <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+        <div class="text-nowrap text-right font-bold p-1">
           Cycle Date
         </div>
-        <div class="text-nowrap">
+        <div class="text-nowrap p-1">
           <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
             @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
             :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
@@ -124,7 +124,7 @@
         </div>
         <div>
           <span v-if="cycleDate && (cycleHour || cycleHour === 0) && forecastConfiguration">
-            <div class="col-span-1 mr-4">
+            <div class="col-span-1 mr-4 p-1">
               <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
                 @click="goToRunStatusTab()">
                 Next
@@ -132,20 +132,20 @@
             </div>
           </span>
         </div>
-        <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+        <div class="text-nowrap text-right font-bold p-1">
           Cold Start Hour
         </div>
-        <div class="text-nowrap">
+        <div class="text-nowrap p-1">
           <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
             aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
             :disabled="!forecastConfiguration">
           </Select>
           Z
         </div>
-        <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
+        <div class="text-nowrap text-right font-bold p-1">
           Cycle Hour
         </div>
-        <div class="text-nowrap">
+        <div class="text-nowrap p-1">
           <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
             aria-label="Cycle Hour Select" title="Cycle Hour Select"
             :disabled="!forecastConfiguration">

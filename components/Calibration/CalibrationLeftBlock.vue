@@ -1,7 +1,7 @@
 <template>
   <!-- LeftBlock.vue -->
   <div>
-    <CommonTabs @tabNumber="tabChanged" />
+    <Tabs @tabNumber="tabChanged" />
     
     <div v-if="activeTab === 1">
       <CalibrationCalibrationRunsTab />
@@ -30,7 +30,7 @@
 
 import { generalStore } from "@/stores/common/GeneralStore";
 
-import CommonTabs from '@/components/Common/Tabs.vue'
+import Tabs from '@/components/Common/Tabs.vue'
 import CalibrationHeadwaterBasinGage from '@/components/Calibration/HeadwaterBasinGage.vue';
 import CalibrationFormulation from'@/components/Calibration/Formulation.vue';
 import CalibrationTuningControls from'@/components/Calibration/TuningControls.vue';
