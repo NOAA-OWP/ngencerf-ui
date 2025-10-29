@@ -176,7 +176,7 @@
         <div v-if="calData?.last_updated_on" class="col-span-2">
           <div :aria-label="'Last Updated At ' + formatDate(calData?.last_updated_on)"
             :title="'Last Updated At ' + formatDate(calData?.last_updated_on)"><span class="font-medium">
-              Last Updated At:</span>
+              Last Updated:</span>
             {{ formatDate(calData?.last_updated_on) }}</div>
         </div>
       </div>
