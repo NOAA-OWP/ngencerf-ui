@@ -2,6 +2,16 @@ import { DateTime, Duration } from "luxon";
 
 
 /**
+ * Returns current timestamp as DateTime object
+ * @param d
+ * @returns {DateTime} DateTime object
+ */
+export const nowUTC = () => {
+  return DateTime.utc();
+};
+
+
+/**
  * Converts a string in ISO format or a Date object to a DateTime object
  * @param d
  * @returns {DateTime} DateTime object

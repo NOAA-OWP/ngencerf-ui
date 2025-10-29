@@ -92,7 +92,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ include_archived: includeArchivedJobs.value }),
+      body: JSON.stringify({filters: {include_archived: includeArchivedJobs.value} }),
     });
 
     if (runListDataResult?._data?.jobs.length > 0) {

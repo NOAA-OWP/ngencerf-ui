@@ -583,6 +583,8 @@ const updateJobData = async (response: any) => {
 
     userCalibrationRunData.value.num_catchments = response?._data.num_catchments;
 
+    userCalibrationRunData.value.last_updated_on = formatISOStringOrDateToYYYYMMDDHHMM(nowUTC());
+
     setResetDataValues();
     
     isLoading.value = false;
