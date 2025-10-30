@@ -1294,8 +1294,7 @@ const drawInteractiveSlider = () => {
     plotGraphSliderData.value = [];
     let rowSkip = plotGraphDataRaw.value.length / 1000;
     for (let c = 1; c < plotTableColumns.value.length; c++) {
-      if ((selectedPlotName.value == selectedGridDisplay?.value?.name && c === 1) ||
-        (!selectedPlotName.value == selectedGridDisplay?.value?.name && (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked)) {
+      if (c === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
         for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
           let dataPoint = {
             time: new Date(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[0].value]),
