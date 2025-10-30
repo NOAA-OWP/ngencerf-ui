@@ -413,6 +413,7 @@ const updateJobData = () => {
     userCalibrationRunData.value.stop_criteria = saveOptMetPayload.value.stop_criteria as number
     userCalibrationRunData.value.save_plot_iteration_frequency = saveOptMetPayload.value.save_plot_iteration_frequency as number
     userCalibrationRunData.value.save_output_iteration = saveOptMetPayload.value.save_output_iteration as boolean
+    userCalibrationRunData.value.last_updated_on = formatISOStringOrDateToYYYYMMDDHHMM(nowUTC());
   }
 };
 

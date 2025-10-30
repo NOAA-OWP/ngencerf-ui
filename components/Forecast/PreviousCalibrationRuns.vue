@@ -103,23 +103,43 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="status" header="Status" sortable>
+            <Column :pt="ptColumn" field="created_at" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Creation Date</span>
+                </div>
+              </template>
               <template #body="slotProps">
-                <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
-                  :title="'Status ' + slotProps.data.status">
-                  {{ slotProps.data.status }}
+                <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
+                  :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
+                  class="whitespace-nowrap">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="last_updated_on" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Last Updated</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span :aria-label="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
+                  :title="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
+                  class="whitespace-nowrap">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on) }}
                 </span>
               </template>
             </Column>
             <Column :pt="ptColumn" field="submit_date" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Run Date</span>
+                  <span>Submit Date</span>
                 </div>
               </template>
               <template #body="slotProps">
-                <span :aria-label="'Run Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
-                  :title="'Run Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
+                <span :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
+                  :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
                   {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
                 </span>
               </template>

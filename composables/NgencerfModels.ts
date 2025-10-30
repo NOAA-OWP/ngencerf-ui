@@ -88,6 +88,7 @@ export interface CalibrationJobListItem {
   gage_id: string;
   job_genesis: string;
   created_at: Date;
+  last_updated_on: string;
   status: string;
   calibration_start_period: Date;
   calibration_end_period: Date;
@@ -141,6 +142,7 @@ export interface UserCalibrationRunData {
   calibration_run_id: number;
   job_data_dir: string;
   submit_date: string; // e.g. "2024-09-13T05:50:22.334Z"
+  last_updated_on: string;
   gage: GageData;
   forcing_source_requested: string;
   forcing_source_actual: string;

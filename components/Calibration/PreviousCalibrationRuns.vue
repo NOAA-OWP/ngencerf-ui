@@ -160,6 +160,21 @@
                   </span>
                 </template>
               </Column>
+              <Column field="last_updated_on" sortable>
+                <template #header>
+                  <div class="column-header">
+                    <span>Last Updated</span>
+                  </div>
+                </template>
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.last_updated_on"
+                    :aria-label="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
+                    :title="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
+                    class="nowrap">
+                    {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on) }}
+                  </span>
+                </template>
+              </Column>
               <Column field="submit_date" sortable>
                 <template #header>
                   <div class="column-header">
@@ -175,7 +190,7 @@
                   </span>
                 </template>
               </Column>
-              <Column  sortable>
+              <Column sortable>
                 <template #header>
                   <div class="column-header">
                     <span>Calibration Period</span>
