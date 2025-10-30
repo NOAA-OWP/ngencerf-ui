@@ -256,12 +256,12 @@
             <Column :pt="ptColumn" field="last_updated_on" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Last</span><br /><span>Update</span>
+                  <span>Last</span><br /><span>Updated</span>
                 </div>
               </template>
               <template #body="slotProps">
-                <span :aria-label="'Last Update ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
-                  :title="'Last Update ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
+                <span :aria-label="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
+                  :title="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
                   class="whitespace-nowrap">
                   {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on) }}
                 </span>

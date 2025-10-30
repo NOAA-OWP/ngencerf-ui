@@ -163,13 +163,13 @@
               <Column field="last_updated_on" sortable>
                 <template #header>
                   <div class="column-header">
-                    <span>Last Update</span>
+                    <span>Last Updated</span>
                   </div>
                 </template>
                 <template #body="slotProps">
                   <span v-if="slotProps.data.last_updated_on"
-                    :aria-label="'Last Update ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
-                    :title="'Last Update ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
+                    :aria-label="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
+                    :title="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
                     class="nowrap">
                     {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on) }}
                   </span>
