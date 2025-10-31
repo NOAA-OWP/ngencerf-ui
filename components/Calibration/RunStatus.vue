@@ -137,12 +137,20 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- ngen row at the top -->
+                  <!-- ngen and ngen-forcing rows at the top -->
                   <tr>
                     <td class="pr-4">ngen</td>
-                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen-' + level"
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen' + level"
                       class="px-2">
                       <input type="radio" :name="'loglevel-ngen'" :value="level" v-model="ngenLogLevel"
+                        :disabled="!calibrationJobNgenGlobalLogging" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="pr-4">ngen-forcing</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen-forcing' + level"
+                      class="px-2">
+                      <input type="radio" :name="'loglevel-ngen-forcing'" :value="level" v-model="logLevels['ngen-forcing']"
                         :disabled="!calibrationJobNgenGlobalLogging" />
                     </td>
                   </tr>
@@ -264,7 +272,9 @@ const {
   userCalibrationRunData,
   gotoCalibrationRunId,
   calibrationJobNgenGlobalLogging,
+  calibrationJobNgenForcingLogging,
   ngenLogLevel,
+  ngenForcingLogLevel,
   logLevels,
 } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
