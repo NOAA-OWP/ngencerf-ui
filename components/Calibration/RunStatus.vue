@@ -150,7 +150,7 @@
                     <td class="pr-4">ngen-forcing</td>
                     <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen-forcing' + level"
                       class="px-2">
-                      <input type="radio" :name="'loglevel-ngen-forcing'" :value="level" v-model="logLevels['ngen-forcing']"
+                      <input type="radio" :name="'loglevel-ngen-forcing'" :value="level" v-model="ngenForcingLogLevel"
                         :disabled="!calibrationJobNgenGlobalLogging" />
                     </td>
                   </tr>
@@ -272,7 +272,6 @@ const {
   userCalibrationRunData,
   gotoCalibrationRunId,
   calibrationJobNgenGlobalLogging,
-  calibrationJobNgenForcingLogging,
   ngenLogLevel,
   ngenForcingLogLevel,
   logLevels,
@@ -395,6 +394,16 @@ onMounted(async () => {
   const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
 
   // set log levels
+  if (userCalibrationRunData?.value?.logging_config?.modules['ngen']) {
+    ngenLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen'] as LogLevel;
+  } else {
+    ngenLogLevel.value = 'info';
+  }
+  if (userCalibrationRunData?.value?.logging_config?.modules['ngen-forcing']) {
+    ngenForcingLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen-forcing'] as LogLevel;
+  } else {
+    ngenForcingLogLevel.value = 'info';
+  }
   Object.keys(userCalibrationRunData?.value?.logging_config?.modules).forEach(server_key => {
     // Find matching key in log levels somehow
     Object.keys(logLevels.value).forEach(ui_key => {
@@ -403,9 +412,6 @@ onMounted(async () => {
       }
     });
   });
-  if (userCalibrationRunData?.value?.logging_config?.modules['ngen']) {
-    ngenLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen'] as LogLevel;
-  }
   if (userCalibrationRunData?.value && getStatusResponse.status === 200) {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
     userCalibrationRunData.value.failure_messages = getStatusResponse._data.failure_messages;

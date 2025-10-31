@@ -28,7 +28,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const {
     userCalibrationRunData,
     calibrationJobNgenGlobalLogging,
-    calibrationJobNgenForcingLogging,
     ngenLogLevel,
     ngenForcingLogLevel,
     logLevels,
@@ -216,6 +215,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive
    */
   const runCalibrationJob = async (): Promise<any> => {
+    console.log('ngenForcingLogLevel:',ngenForcingLogLevel.value);
     const rawLogLevels = toRaw(logLevels.value);
 
     // transform module ref values to their actual values to be sent to the backend

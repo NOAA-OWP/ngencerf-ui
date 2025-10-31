@@ -14,7 +14,7 @@ import { formatElapsedTime, formatDateForRunOnString } from '@/utils/TimeHelpers
 
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+  const { userCalibrationRunData, ngenLogLevel, ngenForcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
   const {
     getAccessToken,
     fetchUserCalibrationRunData,
@@ -46,6 +46,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const forecastRuns = ref<ForecastJob[]>([]);
   const filteredForecastRuns = ref<ForecastJob[]>([]);
   const selectedForecastJob = ref<ForecastJob>();
+
+  const forecastJobNgenGlobalLogging = ref<boolean>(true);
 
   const isForecastLoading = ref<boolean>(false);
 
@@ -270,6 +272,22 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     cycleDate: DateTime,
     coldStartDate: DateTime | null
   ): Promise<any> => {
+    const rawLogLevels = toRaw(logLevels.value);
+
+    // transform module ref values to their actual values to be sent to the backend
+    const serializedModules: Record<string, LogLevel> | undefined =
+      Object.entries(rawLogLevels).reduce((acc, [key, val]) => {
+        if (val && typeof val === 'object' && 'value' in val) {
+          acc[key] = val.value;
+        }
+        return acc;
+      }, {} as Record<string, LogLevel>);
+    console.log('serializedModules:',serializedModules.value);
+    console.log('modules:',{
+      'ngen': ngenLogLevel.value,
+      'ngen-forcing': ngenForcingLogLevel.value,
+      ...serializedModules
+    });
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/create_and_run_forecast/`, {
       method: "POST",
       headers: {
@@ -280,7 +298,18 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         calibration_run_id: calibrationRunId, 
         configuration_name: forecastConfigurationName,
         cycle_date: cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
-        cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null
+        cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
+        logging_config: {
+          logging_enabled: forecastJobNgenGlobalLogging.value,
+          ...(serializedModules && {
+            // add ngenLogLevel and ngenForcingLogLevel to beginning of the object
+            modules: {
+              'ngen': ngenLogLevel.value,
+              'ngen-forcing': ngenForcingLogLevel.value,
+              ...serializedModules
+            }
+          })
+        },
       })
     });
   };
@@ -475,6 +504,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       clearInterval(forecastJobStatusIntervalId.value);
       forecastJobStatusIntervalId.value = undefined;
     }
+
+    forecastJobNgenGlobalLogging.value = true;
   };
 
   return {
@@ -504,6 +535,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     selectedForecastJob,
     isForecastLoading,
     overallColdStartForecastStatus,
+    forecastJobNgenGlobalLogging,
     getForecastJobs,
     loadSetupForecastTabData,
     loadForecastRunStatusTabData,

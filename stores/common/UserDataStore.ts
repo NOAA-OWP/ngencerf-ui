@@ -45,9 +45,8 @@ export const useUserDataStore = defineStore(
 
     const lastServerError = ref<ServerStatus>();
 
-    // sets value for global and ngen-forcing logging
+    // sets value for global logging
     const calibrationJobNgenGlobalLogging = ref<boolean>(true);
-    const calibrationJobNgenForcingLogging = ref<boolean>(true);
 
     // set ngen log level
     const ngenLogLevel = ref<LogLevel>("info");
@@ -385,7 +384,6 @@ export const useUserDataStore = defineStore(
     const clearUserCalibrationRunData = () => {
       userCalibrationRunData.value = undefined;
       calibrationJobNgenGlobalLogging.value = true;
-      calibrationJobNgenForcingLogging.value = true;
       ngenLogLevel.value = "info";
       ngenForcingLogLevel.value = "info";
 
@@ -414,7 +412,6 @@ export const useUserDataStore = defineStore(
       userCalibrationRunData,
       gotoCalibrationRunId,
       calibrationJobNgenGlobalLogging,
-      calibrationJobNgenForcingLogging,
       ngenLogLevel,
       ngenForcingLogLevel,
       logLevels,
