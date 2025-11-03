@@ -204,11 +204,10 @@ const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabInde
 
 const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
-const { lastServerError } = storeToRefs(useUserDataStore());
+const { userInitials, lastServerError } = storeToRefs(useUserDataStore());
 
 const location = useRoute();
 
-const userInitials = ref<string>('');
 const userLoggedIn = ref<boolean>();
 
 import pdfUrl from '@/assets/styles/pdfs/NGWPC_NgenCERF_Users_Guide.pdf';

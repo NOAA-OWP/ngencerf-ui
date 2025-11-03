@@ -25,6 +25,7 @@ export const useUserDataStore = defineStore(
     const userName = ref("");
     const firstName = ref("");
     const lastName = ref("");
+    const userInitials = ref<string>('');
     const accessToken = ref<string | null>(null);
     const refreshToken = ref<string | null>(null);
 
@@ -133,18 +134,22 @@ export const useUserDataStore = defineStore(
      * @returns {string} name of user
      */
     function getUserInitials(): string {
-      let n = userName.value;
-      if (n) {
-        let atSignPos = n.indexOf("@");
-        if (atSignPos !== -1) {
-          let name = n.substring(0, atSignPos);
-          let dotPos = name.lastIndexOf(".");
-          if (dotPos !== -1) {
-            return (name[0] + name.substring(dotPos + 1)[0]).toUpperCase();
+      if (firstName.value && lastName.value) {
+        return firstName.value.toUpperCase()[0] + lastName.value.toUpperCase()[0];
+      } else {
+        let n = userName.value;
+        if (n) {
+          let atSignPos = n.indexOf("@");
+          if (atSignPos !== -1) {
+            let name = n.substring(0, atSignPos);
+            let dotPos = name.lastIndexOf(".");
+            if (dotPos !== -1) {
+              return (name[0] + name.substring(dotPos + 1)[0]).toUpperCase();
+            }
+            return userName.value.toUpperCase()[0];
+          } else {
+            return userName.value.toUpperCase()[0];
           }
-          return userName.value.toUpperCase()[0];
-        } else {
-          return userName.value.toUpperCase()[0];
         }
       }
       return "";
@@ -394,6 +399,7 @@ export const useUserDataStore = defineStore(
       userName,
       firstName,
       lastName,
+      userInitials,
       accessToken,
       refreshToken,
       modulesFilterList,
