@@ -282,12 +282,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         }
         return acc;
       }, {} as Record<string, LogLevel>);
-    console.log('serializedModules:',serializedModules.value);
-    console.log('modules:',{
-      'ngen': ngenLogLevel.value,
-      'ngen-forcing': ngenForcingLogLevel.value,
-      ...serializedModules
-    });
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/create_and_run_forecast/`, {
       method: "POST",
       headers: {
