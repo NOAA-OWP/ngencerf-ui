@@ -157,7 +157,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- ngen and ngen-forcing rows at the top -->
+                  <!-- ngen and forcing rows at the top -->
                   <tr>
                     <td class="pr-4">ngen</td>
                     <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen' + level"
@@ -167,10 +167,10 @@
                     </td>
                   </tr>
                   <tr>
-                    <td class="pr-4">ngen-forcing</td>
-                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen-forcing' + level"
+                    <td class="pr-4">forcing</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'forcing' + level"
                       class="px-2">
-                      <input type="radio" :name="'loglevel-ngen-forcing'" :value="level" v-model="ngenForcingLogLevel"
+                      <input type="radio" :name="'loglevel-forcing'" :value="level" v-model="forcingLogLevel"
                         :disabled="!forecastJobNgenGlobalLogging" />
                     </td>
                   </tr>
@@ -256,7 +256,7 @@ const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
-const { userCalibrationRunData, ngenLogLevel, ngenForcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
 
 const {
   forecastJobId,
@@ -308,10 +308,10 @@ onMounted(async () => {
   } else {
     ngenLogLevel.value = 'info';
   }
-  if (userCalibrationRunData?.value?.logging_config?.modules['ngen-forcing']) {
-    ngenForcingLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen-forcing'] as LogLevel;
+  if (userCalibrationRunData?.value?.logging_config?.modules['forcing']) {
+    forcingLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['forcing'] as LogLevel;
   } else {
-    ngenForcingLogLevel.value = 'info';
+    forcingLogLevel.value = 'info';
   }
   
   Object.keys(userCalibrationRunData?.value?.logging_config?.modules).forEach(server_key => {

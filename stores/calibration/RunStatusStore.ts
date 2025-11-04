@@ -29,7 +29,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     userCalibrationRunData,
     calibrationJobNgenGlobalLogging,
     ngenLogLevel,
-    ngenForcingLogLevel,
+    forcingLogLevel,
     logLevels,
   } = storeToRefs(useUserDataStore());
 
@@ -239,10 +239,10 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         logging_config: {
           logging_enabled: calibrationJobNgenGlobalLogging.value,
           ...(serializedModules && {
-            // add ngenLogLevel and ngenForcingLogLevel to beginning of the object
+            // add ngenLogLevel and forcingLogLevel to beginning of the object
             modules: {
               'ngen': ngenLogLevel.value,
-              'ngen-forcing': ngenForcingLogLevel.value,
+              'forcing': forcingLogLevel.value,
               ...serializedModules
             }
           })

@@ -14,7 +14,7 @@ import { formatElapsedTime, formatDateForRunOnString } from '@/utils/TimeHelpers
 
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { userCalibrationRunData, ngenLogLevel, ngenForcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
+  const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
   const {
     getAccessToken,
     fetchUserCalibrationRunData,
@@ -296,10 +296,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         logging_config: {
           logging_enabled: forecastJobNgenGlobalLogging.value,
           ...(serializedModules && {
-            // add ngenLogLevel and ngenForcingLogLevel to beginning of the object
+            // add ngenLogLevel and forcingLogLevel to beginning of the object
             modules: {
               'ngen': ngenLogLevel.value,
-              'ngen-forcing': ngenForcingLogLevel.value,
+              'forcing': forcingLogLevel.value,
               ...serializedModules
             }
           })
