@@ -190,8 +190,12 @@ const changePassword = async () => {
   passwordChangeData.re_new_password = confirmNewpass.value.trim();
 
   toast.removeAllGroups();
-  if (passwordChangeData.current_password !== "" && passwordChangeData.new_password !== "" && passwordChangeData.re_new_password !== ""
-    && (passwordChangeData.new_password === passwordChangeData.re_new_password)) {
+  let failureMessages: string[] = [];
+  if (passwordChangeData.current_password === "" || passwordChangeData.new_password === "" || passwordChangeData.re_new_password === "") {
+    failureMessages.push("All fields must be filled out.");
+  } else if (passwordChangeData.new_password !== passwordChangeData.re_new_password) {
+    failureMessages.push("New password fields do not match.");
+  } else {
     const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/set_password/`, {
       method: 'POST',
       headers: {
@@ -203,32 +207,27 @@ const changePassword = async () => {
     if (error?.value) {
       let e = error.value?.data;
       if (!e) {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: "Cannot reach server. Error code: " + error.value.statusCode, life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
+        failureMessages.push("Cannot reach server. Error code: " + error.value.statusCode);
       } else {
         for (const key of Object.keys(e)) {
           for (const message of e[key]) {
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: message, life: ToastTimeout.timeoutError };
-            toast.add(tMsg); addToastRecord(tMsg);
+            failureMessages.push(message);
           }
         }
       }
-      return;
+    } else {
+      // Clear out the inputs and report success
+      oldpass.value = "";
+      newpass.value = "";
+      confirmNewpass.value = "";
     }
-    // Clear out the inputs and report success
-    oldpass.value = "";
-    newpass.value = "";
-    confirmNewpass.value = "";
-    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Password Change Successful', detail: "You have successfully changed your password", life: ToastTimeout.timeoutSuccess };
-    toast.add(tMsg); addToastRecord(tMsg);
-  } else if (passwordChangeData.current_password === "" || passwordChangeData.new_password === "" || passwordChangeData.re_new_password === "") {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: "All fields must be filled out.", life: ToastTimeout.timeoutError };
-    toast.add(tMsg); addToastRecord(tMsg);
-  } else if (passwordChangeData.new_password !== passwordChangeData.re_new_password) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: "New password fields do not match.", life: ToastTimeout.timeoutError };
+  }
+  if (failureMessages.length > 0) {
+    failureMessages.push("Password not updated.");
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: failureMessages.join('\n'), life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: "Your password was not changed.", life: ToastTimeout.timeoutError };
+    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Password Change Successful', detail: "You have successfully changed your password", life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -242,7 +241,10 @@ const updateName = async () => {
   updateNameData.last_name = newLastName.value.trim();
 
   toast.removeAllGroups();
-  if (updateNameData.first_name !== "" && updateNameData.last_name !== "") {
+  let failureMessages: string[] = [];
+  if (updateNameData.first_name === "" || updateNameData.last_name=== "") {
+    failureMessages.push("First and last names must be filled out.")
+  } else {
     const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/me/`, {
       method: 'PATCH',
       headers: {
@@ -254,29 +256,27 @@ const updateName = async () => {
     if (error?.value) {
       let e = error.value?.data;
       if (!e) {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: "Cannot reach server. Error code: " + error.value.statusCode, life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
+        failureMessages.push("Cannot reach server. Error code: " + error.value.statusCode);
       } else {
         for (const key of Object.keys(e)) {
           for (const message of e[key]) {
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: message, life: ToastTimeout.timeoutError };
-            toast.add(tMsg); addToastRecord(tMsg);
+            failureMessages.push(message);
           }
         }
       }
-      return;
+    } else {
+      // Clear out the inputs and report success
+      setFirstName(updateNameData.first_name);
+      setLastName(updateNameData.last_name);
+      userInitials.value = getUserInitials();
     }
-    // Clear out the inputs and report success
-    setFirstName(updateNameData.first_name);
-    setLastName(updateNameData.last_name);
-    userInitials.value = getUserInitials();
-    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Name Change Successful', detail: "You have successfully changed your name", life: ToastTimeout.timeoutSuccess };
-    toast.add(tMsg); addToastRecord(tMsg);
-  } else if (updateNameData.first_name === "" || updateNameData.last_name=== "") {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: "First and last names must be filled out.", life: ToastTimeout.timeoutError };
+  }
+  if (failureMessages.length > 0) {
+    failureMessages.push("Name not updated.");
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: failureMessages.join('\n'), life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: "Name was not changed", life: ToastTimeout.timeoutError };
+    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Name Change Successful', detail: "You have successfully changed your name", life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
