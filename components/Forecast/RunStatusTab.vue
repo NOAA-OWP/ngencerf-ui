@@ -124,6 +124,69 @@
             </div>
           </div>
         </div>
+
+        <!--LOGGING SECTION-->
+        <div v-if="!(forecastJobId && overallColdStartForecastStatus) || ['Saved','Ready'].includes(overallColdStartForecastStatus)" 
+          class="col-span-5 p-2 border-t border-[#d9d9d9] flex flex-col items-center" id="LoggingSection">
+          <div class="mb-4">
+            <div class="inline-flex flex-col items-center">
+              <p class="font-semibold mb-2">Global Logging</p>
+              <div class="flex gap-6">
+                <label v-for="[label, val] in [['Enabled', true], ['Disabled', false]]" :key="label as string"
+                  class="flex items-center gap-1">
+                  <input type="radio" :value="val" v-model="forecastJobNgenGlobalLogging" />
+                  <span>{{ label }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <p class="font-semibold mb-2 text-center">Ngen and Module Log Levels</p>
+            <div :class="[
+              'overflow-x-auto',
+              { 'opacity-50 pointer-events-none': !forecastJobNgenGlobalLogging }
+            ]">
+              <table class="table-auto text-left border-collapse mx-auto" aria-label="Module Logging Levels">
+                <thead>
+                  <tr>
+                    <th class="pr-4">Module</th>
+                    <th v-for="level in ['Debug', 'Info', 'Warning', 'Severe', 'Fatal']" :key="level" class="px-2">
+                      {{ level }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- ngen and forcing rows at the top -->
+                  <tr>
+                    <td class="pr-4">ngen</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen' + level"
+                      class="px-2">
+                      <input type="radio" :name="'loglevel-ngen'" :value="level" v-model="ngenLogLevel"
+                        :disabled="!forecastJobNgenGlobalLogging" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="pr-4">forcing</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'forcing' + level"
+                      class="px-2">
+                      <input type="radio" :name="'loglevel-forcing'" :value="level" v-model="forcingLogLevel"
+                        :disabled="!forecastJobNgenGlobalLogging" />
+                    </td>
+                  </tr>
+                  <!-- Per-module logLevels -->
+                  <tr v-for="(val, module) in logLevels" :key="module">
+                    <td class="pr-4">{{ module }}</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="level" class="px-2">
+                      <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]"
+                        :disabled="!forecastJobNgenGlobalLogging" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -181,6 +244,7 @@ import { useToast } from 'primevue/usetoast';
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { generalStore } from '~/stores/common/GeneralStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 
 import { hilightTab } from '@/composables/TabHilight';
@@ -191,6 +255,8 @@ const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const toast = useToast();
+
+const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
 
 const {
   forecastJobId,
@@ -207,7 +273,8 @@ const {
   forecastJobStatusIntervalId,
   resultsPathname,
   calibrationRunForForecast,
-  overallColdStartForecastStatus
+  overallColdStartForecastStatus,
+  forecastJobNgenGlobalLogging,
 } = storeToRefs(useForecastStore());
 
 const {
@@ -234,6 +301,27 @@ onMounted(async () => {
   clearInterval(elapsedTimeIntervalId.value);
   forecastJobStatusIntervalId.value = undefined;
   elapsedTimeIntervalId.value = undefined;
+
+  // set log levels
+  if (calibrationRunForForecast?.value?.logging_config?.modules['ngen']) {
+    ngenLogLevel.value = calibrationRunForForecast?.value?.logging_config?.modules['ngen'] as LogLevel;
+  } else {
+    ngenLogLevel.value = 'info';
+  }
+  if (userCalibrationRunData?.value?.logging_config?.modules['forcing']) {
+    forcingLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['forcing'] as LogLevel;
+  } else {
+    forcingLogLevel.value = 'info';
+  }
+  
+  Object.keys(userCalibrationRunData?.value?.logging_config?.modules).forEach(server_key => {
+    // Find matching key in log levels somehow
+    Object.keys(logLevels.value).forEach(ui_key => {
+      if (ui_key.toLowerCase() == server_key.toLowerCase()) {
+        logLevels.value[ui_key] = ref(userCalibrationRunData?.value?.logging_config?.modules[server_key] as LogLevel);
+      }
+    });
+  });
 
   // load Run/Status tab data
   await loadForecastRunStatusTabData();
@@ -295,7 +383,7 @@ const startForecastRun = async () => {
     calibrationRunForForecast?.value?.calibration_run_id as number, 
     forecastConfiguration?.value?.name as string,
     cycleDate.value,
-    coldStartDate.value
+    coldStartDate.value,
   );
 
   if (createAndRunForecastJobResponse.status >= 200 && createAndRunForecastJobResponse.status < 300) {

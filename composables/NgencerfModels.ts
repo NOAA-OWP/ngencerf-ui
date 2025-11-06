@@ -740,6 +740,12 @@ export type CalibrationRunForForecast = {
   configuration: string;
   cycle_date: string;
   cold_start_date: string;
+  logging_config: {
+    logging_enabled: boolean;
+    modules: {
+      [key: string]: string;
+    }
+  }
 };
 
 export interface ForecastJob {

@@ -137,12 +137,20 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- ngen row at the top -->
+                  <!-- ngen and forcing rows at the top -->
                   <tr>
                     <td class="pr-4">ngen</td>
-                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen-' + level"
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen' + level"
                       class="px-2">
                       <input type="radio" :name="'loglevel-ngen'" :value="level" v-model="ngenLogLevel"
+                        :disabled="!calibrationJobNgenGlobalLogging" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="pr-4">forcing</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'forcing' + level"
+                      class="px-2">
+                      <input type="radio" :name="'loglevel-forcing'" :value="level" v-model="forcingLogLevel"
                         :disabled="!calibrationJobNgenGlobalLogging" />
                     </td>
                   </tr>
@@ -265,6 +273,7 @@ const {
   gotoCalibrationRunId,
   calibrationJobNgenGlobalLogging,
   ngenLogLevel,
+  forcingLogLevel,
   logLevels,
 } = storeToRefs(userDataStore);
 const { fetchUserCalibrationRunData } = userDataStore;
@@ -385,6 +394,16 @@ onMounted(async () => {
   const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
 
   // set log levels
+  if (userCalibrationRunData?.value?.logging_config?.modules['ngen']) {
+    ngenLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen'] as LogLevel;
+  } else {
+    ngenLogLevel.value = 'info';
+  }
+  if (userCalibrationRunData?.value?.logging_config?.modules['forcing']) {
+    forcingLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['forcing'] as LogLevel;
+  } else {
+    forcingLogLevel.value = 'info';
+  }
   Object.keys(userCalibrationRunData?.value?.logging_config?.modules).forEach(server_key => {
     // Find matching key in log levels somehow
     Object.keys(logLevels.value).forEach(ui_key => {
@@ -393,9 +412,6 @@ onMounted(async () => {
       }
     });
   });
-  if (userCalibrationRunData?.value?.logging_config?.modules['ngen']) {
-    ngenLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen'] as LogLevel;
-  }
   if (userCalibrationRunData?.value && getStatusResponse.status === 200) {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
     userCalibrationRunData.value.failure_messages = getStatusResponse._data.failure_messages;
