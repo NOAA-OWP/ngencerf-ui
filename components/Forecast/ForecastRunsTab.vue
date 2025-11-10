@@ -10,7 +10,7 @@
   </Transition>
   <client-only>
     <div class="pr-2">
-      <div id="calibrationRunList">
+      <div id="forecastRunListSort">
         <div id="ForecastTable" class="w-[1200px] mx-auto">
           <div class="flex mt-2">
             <h1 class="pt-3 mb-8 text-3xl font-bold inline-block text-center w-[1200px]">
@@ -28,8 +28,17 @@
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmForecastRun"></ContextMenu>
-          <DataTable id="ForecastRuns" :value="filteredForecastRuns" scrollable scroll-height="400px"
-            sortField="forecast_run_id" :sortOrder="-1" table-style="min-width: 50rem"
+          
+          <div v-if="filteredForecastRuns.length > 0 && forecastRunListTotalSize > 0" class="pagination-box">
+            <div class="pagination-rows">
+              Rows {{ forecastRunListStartRow }} to {{ forecastRunListEndRow }} of {{ forecastRunListTotalSize }}
+            </div>
+            <Paging v-model:currentPage="forecastRunListCurrentPage" :totalPages=forecastRunListTotalPages />
+          </div>
+
+          <DataTable id="ForecastRuns" :value="filteredForecastRuns" 
+            scrollable scroll-height="400px" table-style="min-width: 50rem"
+            v-model:sortField="forecastRunListSort.field" v-model:sortOrder="forecastRunListSort.direction"
             v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
             class="boxed">
@@ -177,6 +186,7 @@ import { hilightTab } from '@/composables/TabHilight';
 import type { DataTableRowClickEvent } from "primevue/datatable";
 import ForecastRunsDialog from "@/components/Forecast/ForecastRunsFilterDialog.vue";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import Paging from "../Common/Paging.vue";
 
 const forecastStore = useForecastStore();
 const {
@@ -186,6 +196,13 @@ const {
   calibrationRunsForForecast,
   forecastRuns,
   filteredForecastRuns,
+  forecastRunListPageSize,
+  forecastRunListCurrentPage,
+  forecastRunListTotalPages,
+  forecastRunListTotalSize,
+  forecastRunListStartRow,
+  forecastRunListEndRow,
+  forecastRunListSort,
   selectedForecastJob,
   isForecastLoading
 } = storeToRefs(forecastStore);
@@ -208,6 +225,23 @@ const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 
 const { addToastRecord } = generalStore();
+
+// watch for sort order change - reset current page to 1
+watch(forecastRunListSort, async() => {
+  forecastRunListCurrentPage.value = 1;
+  await getForecastJobs();
+  await getCalibrationJobsForForecast();
+},{ deep: true });
+
+// Watch for page number changes in job list
+watch(forecastRunListCurrentPage, async () => {
+  if (isNaN(forecastRunListCurrentPage.value) || forecastRunListCurrentPage.value < 1 || forecastRunListCurrentPage.value > Math.ceil(forecastRunListTotalSize.value / forecastRunListPageSize.value)) {
+    console.log('ERROR: Page number ' + forecastRunListCurrentPage.value + ' out of bounds');
+  } else {
+    await getForecastJobs();
+    await getCalibrationJobsForForecast();
+  }
+});
 
 const cmForecastRun = ref<DataTableContextMenuOption[]>([]);
 
@@ -240,6 +274,7 @@ const onRowContextMenu = (event: any) => {
 onMounted(async () => {
   isForecastLoading.value = true;
   forecastJobId.value = undefined;
+  forecastRunListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
   hardResetForecastRunStatusStore();

@@ -85,7 +85,7 @@
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="multiple"
             v-model:selection="selectedCalibrationCompareRuns" :rowStyle="rowStyle" class="boxed"
             @rowContextmenu="onRowCpContextMenu">
-            <Column :pt="ptValColumns" v-for="(col, colIndex) in gageCalibrationRunListHeaders" :key="colIndex"
+            <Column :pt="ptValColumns" v-for="(col, colIndex) in gageevaluationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field" sortable>
             </Column>
           </DataTable>
@@ -102,8 +102,8 @@
       </div>
 
       <!-- Default is to show the user's list of Calibration runs -->
-      <div id="calibrationRunList"
-        v-else-if="userEvaluationCalibrationRunListData.length > 0">
+      <div id="evaluationRunList"
+        v-else-if="userEvaluationevaluationRunListData.length > 0">
 
         <div id="CalTable" class="w-max mx-auto">
           <EvalRunsFilterDialog id="EvalRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
@@ -113,14 +113,27 @@
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
-
-
-          <DataTable id="EvalRunTable" :value="updatedUserEvaluationJobsListData" scrollable scroll-height="400px"
-            sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
-            v-model:selection="selectedCalibrationRun" selectionMode="single" :rowStyle="rowStyle"
+          
+          <div v-if="updatedUserEvaluationJobsListData.length > 0 && evaluationRunListTotalSize > 0" class="pagination-box">
+            <div class="pagination-rows">
+              Rows {{ evaluationRunListStartRow }} to {{ evaluationRunListEndRow }} of {{ evaluationRunListTotalSize }}
+            </div>
+            <Paging v-model:currentPage="evaluationRunListCurrentPage" :totalPages=evaluationRunListTotalPages />
+          </div>
+          
+          <DataTable id="EvalRunTable" table-style="min-width: 50rem" scrollable scroll-height="400px"
+            :value="updatedUserEvaluationJobsListData" v-model:selection="selectedCalibrationRun" 
+            v-model:sortField="evaluationRunListSort.field" v-model:sortOrder="evaluationRunListSort.direction"
+            selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable> <template #body="slotProps">
+            <Column :pt="ptColumn" field="calibration_run_id" sortable> 
+              <template #header>
+                <div class="column-header">
+                  <span>Job ID</span>
+                </div>
+              </template>
+              <template #body="slotProps">
                 <span v-if="slotProps.data.calibration_run_id"
                   :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
                   :title="'Job ID ' + slotProps.data.calibration_run_id">
@@ -253,20 +266,6 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="last_updated_on" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Last</span><br /><span>Updated</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span :aria-label="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
-                  :title="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
-                  class="whitespace-nowrap">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on) }}
-                </span>
-              </template>
-            </Column>
             <Column :pt="ptColumn" field="submit_date" sortable>
               <template #header>
                 <div class="column-header">
@@ -323,6 +322,7 @@ import { generalStore } from "@/stores/common/GeneralStore"
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 import EvalRunsFilterDialog from "@/components/Common/EvalRunsFilterDialog.vue"
+import Paging from "../Common/Paging.vue";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -365,13 +365,20 @@ const {
   loadCalibrationDataComplete,
   userSelectedEvalCalibrationRunId,
   calibrationValidationRunListHeaders,
-  gageCalibrationRunListHeaders,
+  gageevaluationRunListHeaders,
   computedCalibrationValidationRunList,
   displayCalibrationValidationRunList,
   computedGageCalibrationRunList,
   selectedCalibrationCompareRuns,
   selectedCalibrationModules,
-  userEvaluationCalibrationRunListData,
+  userEvaluationevaluationRunListData,
+  evaluationRunListPageSize,
+  evaluationRunListCurrentPage,
+  evaluationRunListTotalPages,
+  evaluationRunListTotalSize,
+  evaluationRunListStartRow,
+  evaluationRunListEndRow,
+  evaluationRunListSort,
   evaluateValidationRunId,
   evaluateValidationRunStatus,
 } = storeToRefs(evaluationCalibrationRunStore);
@@ -438,21 +445,22 @@ onMounted(async() => {
   selectedCalibrationCompareRuns.value = [];
 
   isLoading.value = true;
+  evaluationRunListCurrentPage.value = 1;
 
   fetchUserValidatedCalibrationJobsListData();
   
-  if (gageCalibrationRunListHeaders.value.length === 0) {
-    gageCalibrationRunListHeaders.value.push({ field: 'calibration_run_id', header: "Job ID" });
-    gageCalibrationRunListHeaders.value.push({ field: 'status', header: "Status" });
-    gageCalibrationRunListHeaders.value.push({ field: 'submit_date', header: "Submit Date" });
-    gageCalibrationRunListHeaders.value.push({ field: 'formulation_name', header: "Formulation Name" });
-    gageCalibrationRunListHeaders.value.push({ field: 'gage_id', header: "Headwater Basin Gage" });
-    gageCalibrationRunListHeaders.value.push({ field: 'calibration_period', header: "Calibration Period" });
-    gageCalibrationRunListHeaders.value.push({ field: 'objective_function', header: "Objective Function" });
-    gageCalibrationRunListHeaders.value.push({ field: 'optimization_algorithm', header: "Optimization Algorithm" });
+  if (gageevaluationRunListHeaders.value.length === 0) {
+    gageevaluationRunListHeaders.value.push({ field: 'calibration_run_id', header: "Job ID" });
+    gageevaluationRunListHeaders.value.push({ field: 'status', header: "Status" });
+    gageevaluationRunListHeaders.value.push({ field: 'submit_date', header: "Submit Date" });
+    gageevaluationRunListHeaders.value.push({ field: 'formulation_name', header: "Formulation Name" });
+    gageevaluationRunListHeaders.value.push({ field: 'gage_id', header: "Headwater Basin Gage" });
+    gageevaluationRunListHeaders.value.push({ field: 'period', header: "Calibration Period" });
+    gageevaluationRunListHeaders.value.push({ field: 'objective_function', header: "Objective Function" });
+    gageevaluationRunListHeaders.value.push({ field: 'optimization_algorithm', header: "Optimization Algorithm" });
   }
 
-  updatedUserEvaluationJobsListData.value = userEvaluationCalibrationRunListData?.value;
+  updatedUserEvaluationJobsListData.value = userEvaluationevaluationRunListData?.value;
 
   isLoading.value = false;
 });
@@ -473,15 +481,30 @@ function splitHeader(header: string): { first: string; second: string } {
   return { first: header, second: '' };
 }
 
+// watch for sort order change - reset current page to 1
+watch(evaluationRunListSort, () => {
+  evaluationRunListCurrentPage.value = 1
+  refreshJobList();
+},{ deep: true });
+
+// Watch for page number changes in job list
+watch(evaluationRunListCurrentPage, async () => {
+  if (isNaN(evaluationRunListCurrentPage.value) || evaluationRunListCurrentPage.value < 1 || evaluationRunListCurrentPage.value > Math.ceil(evaluationRunListTotalSize.value / evaluationRunListPageSize.value)) {
+    console.log('ERROR: Page number ' + evaluationRunListCurrentPage.value + ' out of bounds');
+  } else {
+    refreshJobList();
+  }
+});
+
 const refreshJobList = async () => {
   isLoading.value = true;
   await fetchUserValidatedCalibrationJobsListData();
-  updatedUserEvaluationJobsListData.value = userEvaluationCalibrationRunListData?.value;
+  updatedUserEvaluationJobsListData.value = userEvaluationevaluationRunListData?.value;
   isLoading.value = false;
 }
 
 const checkArchived = computed(() => {
-  return userEvaluationCalibrationRunListData?.value.some(item => item.is_archived === true)
+  return userEvaluationevaluationRunListData?.value.some(item => item.is_archived === true)
 });
 
 // A method to convert the binary value (boolean) to a sortable format
@@ -499,7 +522,7 @@ const applyJobFilters = async () => {
   await fetchUserValidatedCalibrationJobsListData();
   let fullJobList: CalibrationJobListItem[];
   let list: CalibrationJobListItem[];
-  updatedUserEvaluationJobsListData.value = userEvaluationCalibrationRunListData.value;
+  updatedUserEvaluationJobsListData.value = userEvaluationevaluationRunListData.value;
 
   if (updatedUserEvaluationJobsListData?.value) {
     // Filter Headwater Basin Gage for the initial whole list
@@ -522,12 +545,6 @@ const applyJobFilters = async () => {
     isLoading.value = false;
   }
 };
-
-
-
-
-
-
 
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
@@ -663,7 +680,7 @@ const viewSelectedGageCalibrationRuns = async (calibration_run_id: number, gage_
   clearUserCalibrationRunData();
   
   nextTick(async () => {
-    let filteredRunList = userEvaluationCalibrationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === gage_id);
+    let filteredRunList = userEvaluationevaluationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === gage_id);
     if (filteredRunList.length >= 2) {
       uiGageId.value = gage_id;
       filteredRunList.forEach((calibration_job: CalibrationJobListItem) => {
@@ -673,7 +690,7 @@ const viewSelectedGageCalibrationRuns = async (calibration_run_id: number, gage_
         rowData['submit_date'] = formatISOStringOrDateToYYYYMMDDHHMM(calibration_job.submit_date);
         rowData['formulation_name'] = calibration_job.formulation_name;
         rowData['gage_id'] = calibration_job.gage_id;
-        rowData['calibration_period'] = formatISOStringOrDateToYYYYMMDD(calibration_job.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDD(calibration_job.calibration_end_period);
+        rowData['period'] = formatISOStringOrDateToYYYYMMDD(calibration_job.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDD(calibration_job.calibration_end_period);
         rowData['objective_function'] = calibration_job.objective_function;
         rowData['optimization_algorithm'] = calibration_job.optimization_algorithm;
         computedGageCalibrationRunList.value.push(rowData);
@@ -982,7 +999,7 @@ const rowStyle = (data: any) => {
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
 
-#calibrationRunList {
+#evaluationRunList {
   height: 80%;
 }
 

@@ -24,8 +24,16 @@
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[250px]" ref="crContextMenu"
               :model="buildContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
 
-            <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id"
-              :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
+            <div v-if="updatedUserCalibrationJobsListData.length > 0 && calibrationRunListTotalSize > 0" class="pagination-box">
+              <div class="pagination-rows">
+                Rows {{ calibrationRunListStartRow }} to {{ calibrationRunListEndRow }} of {{ calibrationRunListTotalSize }}
+              </div>
+              <Paging v-model:currentPage="calibrationRunListCurrentPage" :totalPages=calibrationRunListTotalPages />
+            </div>
+
+            <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" 
+              scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
+              v-model:sortField="calibrationRunListSort.field" v-model:sortOrder="calibrationRunListSort.direction"
               v-model:selection="selectedCalibrationRun" selectionMode="multiple" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)" @row-select="dtRowSelected($event)"
@@ -75,23 +83,6 @@
                   </span>
                 </template>
               </Column>
-
-              <!-- <Column :pt="ptColumn" field="is_locked" :body="binaryValueBodyTemplate"
-                :sortable="true">
-                <template #header>
-                  <div class="column-header">
-                    <span>Locked?</span>
-                  </div>
-                </template>
-                <template #body="slotProps">
-                  <span v-if="slotProps.data.calibration_run_id"
-                    :aria-label="slotProps.data.is_locked ? 'Locked' : ''"
-                    :title="slotProps.data.is_locked ? 'Locked' : ''">
-                    {{ slotProps.data.is_locked ? 'Yes' : 'No' }}
-                    <span v-if="slotProps.data.is_locked" class="pi pi-lock"></span>
-                  </span>
-                </template>
-              </Column> -->
 
               <Column :pt="ptColumn" field="gage_id" sortable>
                 <template #header>
@@ -190,7 +181,7 @@
                   </span>
                 </template>
               </Column>
-              <Column sortable>
+              <Column field="period" sortable>
                 <template #header>
                   <div class="column-header">
                     <span>Calibration Period</span>
@@ -236,7 +227,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, getCurrentInstance } from "vue";
+import { onMounted, onUnmounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
@@ -245,6 +236,7 @@ import Swal from 'sweetalert2';
 //const LazyJobFilterDialog = defineAsyncComponent(() => import("@/components/Common/JobFilterDialog.vue"));
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import MultipleJobOperations from "@/components/Common/MultipleJobOperations.vue"
+import Paging from "../Common/Paging.vue";
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -274,8 +266,21 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { calibrationDownloadJobID, calibrationDownloadFileName } = storeToRefs(useCalibrationJobStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
-const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
-  statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
+const { 
+  userCalibrationJobsListData, 
+  userCalibrationRunData, 
+  calibrationRunListPageSize,
+  calibrationRunListCurrentPage,
+  calibrationRunListTotalPages,
+  calibrationRunListTotalSize,
+  calibrationRunListStartRow,
+  calibrationRunListEndRow,
+  calibrationRunListSort,
+  uiGageId, 
+  modulesFilterList,
+  statusTypeFilterList, 
+  includeArchivedJobs 
+} = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun, 
   lockCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
@@ -383,6 +388,7 @@ onMounted(async () => {
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); } 
     includeArchivedJobs.value = false;
+    calibrationRunListCurrentPage.value = 1;
     // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
     resetGageStore();
     hardResetTuningStore();
@@ -509,6 +515,20 @@ const ptColumn = ref({
 
 /************************************************************/
 
+// watch for sort order change - reset current page to 1
+watch(calibrationRunListSort, () => {
+  calibrationRunListCurrentPage.value = 1
+  refreshJobList();
+},{ deep: true });
+
+// Watch for page number changes in job list
+watch(calibrationRunListCurrentPage, async () => {
+  if (isNaN(calibrationRunListCurrentPage.value) || calibrationRunListCurrentPage.value < 1 || calibrationRunListCurrentPage.value > Math.ceil(calibrationRunListTotalSize.value / calibrationRunListPageSize.value)) {
+    console.log('ERROR: Page number ' + calibrationRunListCurrentPage.value + ' out of bounds');
+  } else {
+    refreshJobList();
+  }
+});
 
 const refreshJobList = async () => {
   isLoading.value = true;

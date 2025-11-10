@@ -1,7 +1,7 @@
 // @ts-check
 import { defineStore, storeToRefs } from "pinia";
 
-import type { SelectOption, CalibrationValidationRunData, ValidatedCalibrationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NgencerfModels";
+import type { SelectOption, CalibrationValidationRunData, ValidatedevaluationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -14,7 +14,7 @@ import { fixFloatToFivePlaces } from "@/utils/CommonHelpers";
 export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrationRunStore', () => {
   const { calibrationJobId, evaluateValidationRunId, evaluateIterationRunId, evaluateValidationRunStatus } = storeToRefs(generalStore());
   const { fetchUserCalibrationRunData, clearUserCalibrationRunData, getAccessToken } = useUserDataStore();
-  const calibrationRunList = ref<any[]>([]);
+  const evaluationRunList = ref<any[]>([]);
   const userSelectedEvalCalibrationRunId = ref<number>(0);
   const { ngencerfBaseUrl } = useBackendConfig();
 
@@ -27,7 +27,14 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   /**
    * list of calibration jobs with validation data
    */
-  const userEvaluationCalibrationRunListData = ref<ValidatedCalibrationRunListItem[]>([]);
+  const userEvaluationevaluationRunListData = ref<ValidatedCalibrationRunListItem[]>([]);
+  const evaluationRunListPageSize = ref<number>(50);
+  const evaluationRunListCurrentPage = ref<number>(1);
+  const evaluationRunListTotalPages = ref<number>(0);
+  const evaluationRunListTotalSize = ref<number>(0);
+  const evaluationRunListStartRow = ref<number>(1);
+  const evaluationRunListEndRow = ref<number>(evaluationRunListPageSize.value);
+  const evaluationRunListSort = ref<DynamicObject>({'field': 'calibration_run_id', 'direction': -1});
   /**
    * list of validation jobs of a selected calibration job id
    */
@@ -37,7 +44,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const computedCalibrationValidationRunList = ref<CalibrationValidationJobData[]>([]);
   const displayCalibrationValidationRunList = ref<CalibrationValidationJobData[]>([]);
 
-  const gageCalibrationRunListHeaders = ref<any[]>([]);
+  const gageevaluationRunListHeaders = ref<any[]>([]);
   const computedGageCalibrationRunList = ref<CalibrationJobListItem[]>([]);
 
   const selectedCalibrationCompareRuns = ref<CalibrationJobListItem[]>([]);
@@ -52,7 +59,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       'name': "All",
       'description': "All"
     });
-    userEvaluationCalibrationRunListData.value.forEach(runItem => {
+    userEvaluationevaluationRunListData.value.forEach(runItem => {
       const checkGageIndex = gageOptionList.findIndex(
         (gageOption) =>
           gageOption.name === runItem.gage_id
@@ -73,7 +80,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const compareCalibrationRunGageList = computed(() => {
     let gageOptionList = <SelectOption[]>[];
     evaluationCalibrationRunGageList.value.forEach(gage => {
-      if (userEvaluationCalibrationRunListData.value.filter((row) => (row as CalibrationJobListItem).gage_id === gage.name).length >= 2) {
+      if (userEvaluationevaluationRunListData.value.filter((row) => (row as CalibrationJobListItem).gage_id === gage.name).length >= 2) {
         gageOptionList.push(gage);
       }
     });
@@ -85,15 +92,24 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    * @return {void}
    */
   async function fetchUserValidatedCalibrationJobsListData() {
-    userEvaluationCalibrationRunListData.value = [];
-    const runListDataResult = await makeProtectedApiCall<ValidatedCalibrationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
+    const runListDataResult = await makeProtectedApiCall<ValidatedevaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({filters: {include_archived: includeArchivedJobs.value} }),
+      body: JSON.stringify({
+        limit: evaluationRunListPageSize.value,
+        offset: (evaluationRunListCurrentPage.value - 1) * evaluationRunListPageSize.value,
+        sort: {
+          field: evaluationRunListSort.value.field,
+          direction: evaluationRunListSort.value.direction === -1 ? 'desc' : 'asc'
+        },
+        filters: {include_archived: includeArchivedJobs.value} 
+      }),
     });
+
+    userEvaluationevaluationRunListData.value = [];
 
     if (runListDataResult?._data?.jobs.length > 0) {
       runListDataResult?._data?.jobs.forEach((runItem: ValidatedCalibrationRunListItem) => {
@@ -120,7 +136,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
                 runItem.validations = filteredValidations;
                 runItem.validation_runs = filteredValidations.length;
                 runItem.validation_run_ids = filteredValidations.map(validation => validation.validation_run_id);
-                userEvaluationCalibrationRunListData.value.push(runItem);
+                userEvaluationevaluationRunListData.value.push(runItem);
               }
             }
           }
@@ -129,6 +145,11 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         }
       });
     }
+
+    evaluationRunListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
+    evaluationRunListTotalPages.value = Math.ceil(evaluationRunListTotalSize.value / evaluationRunListPageSize.value);
+    evaluationRunListStartRow.value = (evaluationRunListPageSize.value * (evaluationRunListCurrentPage.value - 1)) + 1;
+    evaluationRunListEndRow.value = Math.min(evaluationRunListStartRow.value + (evaluationRunListPageSize.value - 1), evaluationRunListTotalSize.value);
   }
 
   const fetchValidationRunListByCalibrationRun = async () => {
@@ -240,7 +261,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   * @returns {number}
   */
   const getValidationRunIdByCalibrationRunId = computed(() => {
-    const find_validation_run = userEvaluationCalibrationRunListData.value.filter((validation: ValidatedCalibrationRunListItem) => {
+    const find_validation_run = userEvaluationevaluationRunListData.value.filter((validation: ValidatedCalibrationRunListItem) => {
       return validation.calibration_run_id === calibrationJobId.value;
     });
     if (!find_validation_run) {
@@ -319,7 +340,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
 
   return {
     uiGageId,
-    calibrationRunList,
+    evaluationRunList,
     evaluationCalibrationRunGageList,
     compareCalibrationRunGageList,
     userSelectedEvalCalibrationRunId,
@@ -342,11 +363,18 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     fetchValidationRunListByCalibrationRun,
 
     getValidationRunIdByCalibrationRunId,
-    userEvaluationCalibrationRunListData,
+    userEvaluationevaluationRunListData,
+    evaluationRunListPageSize,
+    evaluationRunListCurrentPage,
+    evaluationRunListTotalPages,
+    evaluationRunListTotalSize,
+    evaluationRunListStartRow,
+    evaluationRunListEndRow,
+    evaluationRunListSort,
     calibrationValidationRunListHeaders,
     computedCalibrationValidationRunList,
     displayCalibrationValidationRunList,
-    gageCalibrationRunListHeaders,
+    gageevaluationRunListHeaders,
     computedGageCalibrationRunList,
     selectedCalibrationCompareRuns,
     selectedCalibrationModules,

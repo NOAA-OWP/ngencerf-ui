@@ -21,6 +21,20 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     clearUserCalibrationRunData } = useUserDataStore();
   const { calibrationJobId } = storeToRefs(generalStore());
   // refs
+  const calibrationRunsForForecastListPageSize = ref<number>(50);
+  const calibrationRunsForForecastListCurrentPage = ref<number>(1);
+  const calibrationRunsForForecastListTotalPages = ref<number>(0);
+  const calibrationRunsForForecastListTotalSize = ref<number>(0);
+  const calibrationRunsForForecastListStartRow = ref<number>(1);
+  const calibrationRunsForForecastListEndRow = ref<number>(calibrationRunsForForecastListPageSize.value);
+  const calibrationRunsForForecastListSort = ref<DynamicObject>({'field': 'calibration_run_id', 'direction': -1});
+  const forecastRunListPageSize = ref<number>(50);
+  const forecastRunListCurrentPage = ref<number>(1);
+  const forecastRunListTotalPages = ref<number>(0);
+  const forecastRunListTotalSize = ref<number>(0);
+  const forecastRunListStartRow = ref<number>(1);
+  const forecastRunListEndRow = ref<number>(forecastRunListPageSize.value);
+  const forecastRunListSort = ref<DynamicObject>({'field': 'forecast_run_id', 'direction': -1});
   const forecastJobId = ref<number>();
   const cycleDate = ref<any>();
   const coldStartDate = ref<any>();
@@ -112,7 +126,15 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        limit: forecastRunListPageSize.value,
+        offset: (forecastRunListCurrentPage.value - 1) * forecastRunListPageSize.value,
+        sort: {
+          field: forecastRunListSort.value.field,
+          direction: forecastRunListSort.value.direction === -1 ? 'desc' : 'asc'
+        }
+      })
     });
 
     if (runListDataResult?._data?.forecast_jobs.length > 0) {
@@ -127,6 +149,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       });
       // maintain an original forecastRuns so we can revert to it when we clear the Forecast Runs filter
       filteredForecastRuns.value = [...forecastRuns.value];
+      forecastRunListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
+      forecastRunListTotalPages.value = Math.ceil(forecastRunListTotalSize.value / forecastRunListPageSize.value);
+      forecastRunListStartRow.value = (forecastRunListPageSize.value * (forecastRunListCurrentPage.value - 1)) + 1;
+      forecastRunListEndRow.value = Math.min(forecastRunListStartRow.value + (forecastRunListPageSize.value - 1), forecastRunListTotalSize.value);
     }
   }
 
@@ -349,11 +375,23 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: ""
+      body: JSON.stringify({
+        limit: calibrationRunsForForecastListPageSize.value,
+        offset: (calibrationRunsForForecastListCurrentPage.value - 1) * calibrationRunsForForecastListPageSize.value,
+        sort: {
+          field: calibrationRunsForForecastListSort.value.field,
+          direction: calibrationRunsForForecastListSort.value.direction === -1 ? 'desc' : 'asc'
+        },
+        filters: {include_archived: false} 
+      })
     });
 
     if (runListDataResult?._data?.jobs.length > 0) {
       calibrationRunsForForecast.value = runListDataResult._data.jobs;
+      calibrationRunsForForecastListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
+      calibrationRunsForForecastListTotalPages.value = Math.ceil(calibrationRunsForForecastListTotalSize.value / calibrationRunsForForecastListPageSize.value);
+      calibrationRunsForForecastListStartRow.value = (calibrationRunsForForecastListPageSize.value * (calibrationRunsForForecastListCurrentPage.value - 1)) + 1;
+      calibrationRunsForForecastListEndRow.value = Math.min(calibrationRunsForForecastListStartRow.value + (calibrationRunsForForecastListPageSize.value - 1), calibrationRunsForForecastListTotalSize.value);
     }
   };
 
@@ -523,6 +561,20 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastRunGageList,
     calibrationRunsForForecast,
     calibrationRunForForecast,
+    calibrationRunsForForecastListPageSize,
+    calibrationRunsForForecastListCurrentPage,
+    calibrationRunsForForecastListTotalPages,
+    calibrationRunsForForecastListTotalSize,
+    calibrationRunsForForecastListStartRow,
+    calibrationRunsForForecastListEndRow,
+    calibrationRunsForForecastListSort,
+    forecastRunListPageSize,
+    forecastRunListCurrentPage,
+    forecastRunListTotalPages,
+    forecastRunListTotalSize,
+    forecastRunListStartRow,
+    forecastRunListEndRow,
+    forecastRunListSort,
     uiGageId,
     forecastRuns,
     filteredForecastRuns,

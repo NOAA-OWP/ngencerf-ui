@@ -61,17 +61,4 @@ function gotoPage(page: number) {
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
-
-.pagingLink {
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-top: 8px;
-}
-.pagingLink a:hover {
-  text-decoration: underline;
-  cursor: pointer;
-}
-.pagingLink.active {
-  font-weight: bold;
-}
 </style>

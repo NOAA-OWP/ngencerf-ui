@@ -34,6 +34,13 @@ export const useUserDataStore = defineStore(
     const userCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
     const userCalibrationRunData = ref<UserCalibrationRunData>();
     const gotoCalibrationRunId = ref<number>();
+    const calibrationRunListPageSize = ref<number>(50);
+    const calibrationRunListCurrentPage = ref<number>(1);
+    const calibrationRunListTotalPages = ref<number>(0);
+    const calibrationRunListTotalSize = ref<number>(0);
+    const calibrationRunListStartRow = ref<number>(1);
+    const calibrationRunListEndRow = ref<number>(calibrationRunListPageSize.value);
+    const calibrationRunListSort = ref<DynamicObject>({'field': 'calibration_run_id', 'direction': -1});
 
     const userSelectedCalibrationIterationId = ref<number | null>(null);
     const uiGageId = ref<string>("");
@@ -285,11 +292,23 @@ export const useUserDataStore = defineStore(
               Authorization: `Bearer ${getAccessToken()}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({filters: {include_archived: includeArchivedJobs.value} }),
+            body: JSON.stringify({
+              limit: calibrationRunListPageSize.value,
+              offset: (calibrationRunListCurrentPage.value - 1) * calibrationRunListPageSize.value,
+              sort: {
+                field: calibrationRunListSort.value.field,
+                direction: calibrationRunListSort.value.direction === -1 ? 'desc' : 'asc'
+              },
+              filters: {include_archived: includeArchivedJobs.value} 
+            }),
           }
         );
 
       userCalibrationJobsListData.value = jobsListDataResult?._data?.jobs ?? [];
+      calibrationRunListTotalSize.value = jobsListDataResult?._data?.total_count ?? 0;
+      calibrationRunListTotalPages.value = Math.ceil(calibrationRunListTotalSize.value / calibrationRunListPageSize.value);
+      calibrationRunListStartRow.value = (calibrationRunListPageSize.value * (calibrationRunListCurrentPage.value - 1)) + 1;
+      calibrationRunListEndRow.value = Math.min(calibrationRunListStartRow.value + (calibrationRunListPageSize.value - 1), calibrationRunListTotalSize.value);
     }
 
     /**
@@ -411,6 +430,13 @@ export const useUserDataStore = defineStore(
       userCalibrationJobsListData,
       userCalibrationRunData,
       gotoCalibrationRunId,
+      calibrationRunListPageSize,
+      calibrationRunListCurrentPage,
+      calibrationRunListTotalPages,
+      calibrationRunListTotalSize,
+      calibrationRunListStartRow,
+      calibrationRunListEndRow,
+      calibrationRunListSort,
       calibrationJobNgenGlobalLogging,
       ngenLogLevel,
       forcingLogLevel,
