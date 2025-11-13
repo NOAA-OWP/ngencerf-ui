@@ -11,7 +11,7 @@
   <client-only>
     <div class="pr-2">
       <div id="forecastRunListSort">
-        <div id="ForecastTable" class="w-[1200px] mx-auto">
+        <div id="ForecastTable" class="w-max mx-auto">
           <div class="flex mt-2">
             <h1 class="pt-3 mb-8 text-3xl font-bold inline-block text-center w-[1200px]">
               <span>Forecast Runs</span><br />
@@ -29,14 +29,17 @@
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmForecastRun"></ContextMenu>
           
-          <div v-if="filteredForecastRuns.length > 0 && forecastRunListTotalSize > 0" class="pagination-box">
+          <div v-if="forecastRuns.length > 0 && forecastRunListTotalSize > 0" class="pagination-box">
             <div class="pagination-rows">
               Rows {{ forecastRunListStartRow }} to {{ forecastRunListEndRow }} of {{ forecastRunListTotalSize }}
             </div>
             <Paging v-model:currentPage="forecastRunListCurrentPage" :totalPages=forecastRunListTotalPages />
           </div>
+          <div v-else>
+            No results. Try changing or clearing filters.
+          </div>
 
-          <DataTable id="ForecastRuns" :value="filteredForecastRuns" 
+          <DataTable id="ForecastRuns" :value="forecastRuns" 
             scrollable scroll-height="400px" table-style="min-width: 50rem"
             v-model:sortField="forecastRunListSort.field" v-model:sortOrder="forecastRunListSort.direction"
             v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
@@ -191,11 +194,9 @@ import Paging from "../Common/Paging.vue";
 const forecastStore = useForecastStore();
 const {
   forecastJobId,
-  uiGageId,
   calibrationRunForForecast,
   calibrationRunsForForecast,
   forecastRuns,
-  filteredForecastRuns,
   forecastRunListPageSize,
   forecastRunListCurrentPage,
   forecastRunListTotalPages,
@@ -450,10 +451,6 @@ watch(selectedForecastJob, () => {
     calibrationRunForForecast.value = undefined;
   }
 })
-
-onUnmounted(async () => {
-  uiGageId.value = "";
-});
 
 </script>
 

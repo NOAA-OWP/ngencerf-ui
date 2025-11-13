@@ -11,7 +11,7 @@
   <client-only>
     <div class="pr-2">
       <div id="forecastRunList">
-        <div id="ForecastTable" class="w-[1200px] mx-auto">
+        <div id="ForecastTable" class="w-max mx-auto">
           <div class="flex mt-2">
             <h1 class="pt-3 mb-8 text-3xl font-bold inline-block text-center w-[1200px]">
               <span>Forecast Runs</span><br />
@@ -21,23 +21,22 @@
             </h1>
           </div>
 
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
-            :show-gage="false" :show-modules="false" :show-archived="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
-
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'fr-context-menu' } }" class="bg-white" ref="frContextMenu"
             :model="cmForecastRun"></ContextMenu>
           
-          <div v-if="filteredForecastRunsForVerification.length > 0 && forecastRunsForVerificationListTotalSize > 0" class="pagination-box">
+          <div v-if="forecastRunsForVerification.length > 0 && forecastRunsForVerificationListTotalSize > 0" class="pagination-box">
             <div class="pagination-rows">
               Rows {{ forecastRunsForVerificationListStartRow }} to {{ forecastRunsForVerificationListEndRow }} of {{ forecastRunsForVerificationListTotalSize }}
             </div>
             <Paging v-model:currentPage="forecastRunsForVerificationListCurrentPage" :totalPages=forecastRunsForVerificationListTotalPages />
           </div>
+          <div v-else>
+            No results. Try changing or clearing filters.
+          </div>
           
           <DataTable id="ForecastRuns" table-style="min-width: 50rem" scrollable scroll-height="400px"
-            :value="filteredForecastRunsForVerification" 
+            :value="forecastRunsForVerification" 
             v-model:sortField="forecastRunsForVerificationListSort.field" v-model:sortOrder="forecastRunsForVerificationListSort.direction"
             v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
@@ -102,19 +101,6 @@
                   :title="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date)">
                   {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) }}
                 </div>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="forecast_status" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Job Status</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.forecast_status" :aria-label="'Job Status ' + slotProps.data.forecast_status"
-                  :title="'Job Status ' + slotProps.data.forecast_status">
-                  {{ slotProps.data.forecast_status }}
-                </span>
               </template>
             </Column>
             <Column field="submit_date" sortable>
@@ -184,7 +170,6 @@ const {
 const {
   forecastJobId,
   forecastRunsForVerification,
-  filteredForecastRunsForVerification,
   forecastRunsForVerificationListPageSize,
   forecastRunsForVerificationListCurrentPage,
   forecastRunsForVerificationListTotalPages,

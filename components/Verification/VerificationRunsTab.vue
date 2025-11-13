@@ -28,15 +28,18 @@
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="vrContextMenu"
             :model="cmVerificationJob"></ContextMenu>
           
-          <div v-if="filteredVerificationJobs.length > 0 && verificationRunListTotalSize > 0" class="pagination-box">
+          <div v-if="verificationJobs.length > 0 && verificationRunListTotalSize > 0" class="pagination-box">
             <div class="pagination-rows">
               Rows {{ verificationRunListStartRow }} to {{ verificationRunListEndRow }} of {{ verificationRunListTotalSize }}
             </div>
             <Paging v-model:currentPage="verificationRunListCurrentPage" :totalPages=verificationRunListTotalPages />
           </div>
+          <div v-else>
+            No results. Try changing or clearing filters.
+          </div>
 
           <DataTable id="VerificationJobTable" table-style="min-width: 50rem" scrollable scroll-height="400px"
-            :value="filteredVerificationJobs"
+            :value="verificationJobs"
             v-model:sortField="verificationRunListSort.field" v-model:sortOrder="verificationRunListSort.direction"
             v-model:selection="selectedVerificationJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onVerificationRowSelect" @rowUnselect="onVerificationRowUnSelect"
@@ -127,7 +130,6 @@ import Paging from "../Common/Paging.vue";
 const verificationStore = useVerificationStore();
 const {
   verificationJobs,
-  filteredVerificationJobs,
   verificationRunListPageSize,
   verificationRunListCurrentPage,
   verificationRunListTotalPages,

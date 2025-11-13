@@ -10,7 +10,7 @@
           <Select id="HeadwaterBasinGage" class="mt-1 basin-gage-filter text-left" v-model="uiGageId"
             :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
             aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
-            :disabled="disableAll" @change="refreshJobList()">
+            :disabled="disableAll" @change="refreshJobList();">
           </Select>
         </div>
 
@@ -61,21 +61,27 @@
             </div>
           </div>
         </div>
+        <!--- Pad with empty cells to the right of filters that aren't shown -->
+        <div class="col-span-2" v-show="!showGage"></div>
+        <div class="col-span-2" v-show="!showStatus"></div>
+        <div class="col-span-4" v-show="!showModules"></div>
         <div class="col-span-4">
           <div class="grid grid-cols-8">
-            <div class="col-span-4" v-show="showArchived">
-              <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[30px] ml-[28px]"
-                aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
-                :pt="ptCheckbox" :disabled="disableAll" @click="refreshJobList()">
-              </Checkbox>
-              <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
-                title="Include Archived Jobs">Include Archived</label>
+            <div class="col-span-4">
+              <span v-show="showArchived">
+                <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[30px] ml-[28px]"
+                  aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
+                  :pt="ptCheckbox" :disabled="disableAll" @change="refreshJobList()">
+                </Checkbox>
+                <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
+                  title="Include Archived Jobs">Include Archived</label>
+              </span>
             </div>
             <div class="col-span-4 text-right mr-[16px]">
               <Button id="ClearFiltersButton" class="c-blue mt-[22px]" label="Clear Filters"
                 @click="resetFilters()" aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
               </Button><br />
-              <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="refreshJobList()"
+              <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="clearGageList(); refreshJobList()"
                 aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
               </Button>
             </div>
@@ -99,7 +105,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const { fetchFormulationModuleOptions } = useFormulationStore();
 
-const { uiGageId, calibrationRunGageList, modulesFilterList, moduleOperator, statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
+const { uiGageId, uiGageList, modulesFilterList, moduleOperator, statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
 const emit = defineEmits(["ModulesFilterDialogClosing", "RefreshJobList"]);
 
@@ -107,9 +113,33 @@ const ptCheckbox = ref({
   box: { style: { "border": "2px solid #0c5274" } },
 });
 
+/**
+ * @returns {SelectOption[]}
+ */
+const calibrationRunGageList = computed(() => {
+  let gageOptionList = <SelectOption[]>[];
+  gageOptionList.push({
+    name: "All",
+    description: "All",
+  });
+  uiGageList.value.forEach((gage_id) => {
+    const checkGageIndex =
+      gageOptionList.findIndex(
+        (gageOption) => gageOption.name === gage_id
+      ) !== -1;
+    if (!checkGageIndex) {
+      gageOptionList.push({
+        name: gage_id,
+        description: gage_id,
+      });
+    }
+  });
+  return gageOptionList;
+});
+
 const moduleOperatorList = [
-  { name: "any" },
-  { name: "all" }
+  { name: "All" },
+  { name: "Any" }
 ]
 
 interface Props {
@@ -128,14 +158,6 @@ const props = withDefaults(defineProps<Props>(), {
   showArchived: true,
 });
 
-onMounted(() => {
-  nextTick(() => {
-    setTimeout(() => {
-      resetFilters();
-    }, 250) // Necessary to make sure that data has been retreived.
-  });
-})
-
 const filterActive = computed(() => {
   return (
     (props.showModules === false || uiGageId.value === '' || uiGageId.value === 'All') && 
@@ -145,9 +167,11 @@ const filterActive = computed(() => {
   );
 });
 
+const clearGageList = () => {
+  uiGageList.value = [];
+}
 
 const refreshJobList = () => {
-  console.log("modulesFilterList:",modulesFilterList.value);
   emit("RefreshJobList");
 }
 
@@ -155,12 +179,18 @@ const refreshJobList = () => {
  * Reset filters
  */
 const resetFilters = () => {
-  if (props.showGage) uiGageId.value = 'All';
-  if (props.showModules) {modulesFilterList.value = []; moduleOperator.value = 'any';}
-  if (props.showStatus) statusTypeFilterList.value = [];
-  if (props.showArchived) includeArchivedJobs.value = false;
-  emit("RefreshJobList");
+  uiGageId.value = 'All';
+  modulesFilterList.value = []; 
+  moduleOperator.value = 'All';
+  statusTypeFilterList.value = [];
+  includeArchivedJobs.value = false;
+  refreshJobList();
 }
+
+onUnmounted(() => {
+  resetFilters();
+  clearGageList();
+})
 
 </script>
 

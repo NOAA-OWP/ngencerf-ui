@@ -71,10 +71,10 @@
           <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
             <div class="inline-block w-1/6 pb-3">
-                <Select id="HeadwaterBasinGageCompare" class="mt-2 basin-gage-filter text-left" v-model="uiGageId"
+                <Select id="HeadwaterBasinGageCompare" class="mt-2 basin-gage-filter text-left" v-model="uiCompareGageId"
                     :options="compareCalibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
                     aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
-                    @change="viewSelectedGageCalibrationRuns(0, uiGageId);">
+                    @change="viewSelectedGageCalibrationRuns(0, uiCompareGageId);">
                 </Select>
             </div>
         </div>
@@ -112,15 +112,18 @@
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
           
-          <div v-if="updatedUserEvaluationJobsListData.length > 0 && evaluationRunListTotalSize > 0" class="pagination-box">
+          <div v-if="userEvaluationRunListData.length > 0 && evaluationRunListTotalSize > 0" class="pagination-box">
             <div class="pagination-rows">
               Rows {{ evaluationRunListStartRow }} to {{ evaluationRunListEndRow }} of {{ evaluationRunListTotalSize }}
             </div>
             <Paging v-model:currentPage="evaluationRunListCurrentPage" :totalPages=evaluationRunListTotalPages />
           </div>
+          <div v-else>
+            No results. Try changing or clearing filters.
+          </div>
           
           <DataTable id="EvalRunTable" table-style="min-width: 50rem" scrollable scroll-height="400px"
-            :value="updatedUserEvaluationJobsListData" v-model:selection="selectedCalibrationRun" 
+            :value="userEvaluationRunListData" v-model:selection="selectedCalibrationRun" 
             v-model:sortField="evaluationRunListSort.field" v-model:sortOrder="evaluationRunListSort.direction"
             selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
@@ -140,7 +143,7 @@
                 </span>
               </template></Column>
 
-            <Column v-if="checkArchived" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
+            <Column v-if="includeArchivedJobs" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
               :sortable="true">
               <template #header>
                 <div class="column-header">
@@ -342,8 +345,6 @@ const cmCompareRun = ref<DataTableContextMenuOption[]>([]);
 const userDataStore = useUserDataStore();
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 
-const updatedUserEvaluationJobsListData = ref<CalibrationJobListItem[]>([]);
-
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   bodyCell: { style: { "text-align": "center" } }
@@ -357,7 +358,7 @@ const ptValColumns = ref({
 const { fetchUserCalibrationRunData } = userDataStore;
 
 const {
-  uiGageId, 
+  uiCompareGageId, 
   evaluationCalibrationRunGageList,
   compareCalibrationRunGageList,
   loadCalibrationDataComplete,
@@ -369,7 +370,7 @@ const {
   computedGageCalibrationRunList,
   selectedCalibrationCompareRuns,
   selectedCalibrationModules,
-  userEvaluationevaluationRunListData,
+  userEvaluationRunListData,
   evaluationRunListPageSize,
   evaluationRunListCurrentPage,
   evaluationRunListTotalPages,
@@ -399,7 +400,7 @@ const {
 const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
 const { hardResetEvaluationRunStatusStore } = useEvaluationRunStatusStore();
 
-const { userCalibrationRunData, gotoCalibrationRunId, modulesFilterList, moduleOperator, statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, gotoCalibrationRunId, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
 const { isLoading, calibrationJobId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -422,7 +423,6 @@ onMounted(async() => {
   hardResetEvaluationRunStatusStore();
 
   await fetchUserValidatedCalibrationJobsListData();
-  updatedUserEvaluationJobsListData.value = userEvaluationevaluationRunListData?.value;
 
   if(gotoCalibrationRunId.value) {
     userSelectedEvalCalibrationRunId.value = gotoCalibrationRunId.value;
@@ -441,7 +441,7 @@ onMounted(async() => {
     gotoCalibrationRunId.value = undefined;
   }
 
-  uiGageId.value = 'All';
+  uiCompareGageId.value = 'All';
   computedGageCalibrationRunList.value = [];
   selectedCalibrationCompareRuns.value = [];
 
@@ -460,8 +460,6 @@ onMounted(async() => {
     gageevaluationRunListHeaders.value.push({ field: 'objective_function', header: "Objective Function" });
     gageevaluationRunListHeaders.value.push({ field: 'optimization_algorithm', header: "Optimization Algorithm" });
   }
-
-  updatedUserEvaluationJobsListData.value = userEvaluationevaluationRunListData?.value;
 
   isLoading.value = false;
 });
@@ -500,13 +498,8 @@ watch(evaluationRunListCurrentPage, async () => {
 const refreshJobList = async () => {
   isLoading.value = true;
   await fetchUserValidatedCalibrationJobsListData();
-  updatedUserEvaluationJobsListData.value = userEvaluationevaluationRunListData?.value;
   isLoading.value = false;
 }
-
-const checkArchived = computed(() => {
-  return userEvaluationevaluationRunListData?.value.some(item => item.is_archived === true)
-});
 
 // A method to convert the binary value (boolean) to a sortable format
 const binaryValueBodyTemplate = (rowData: any) => {
@@ -647,9 +640,9 @@ const viewSelectedGageCalibrationRuns = async (calibration_run_id: number, gage_
   clearUserCalibrationRunData();
   
   nextTick(async () => {
-    let filteredRunList = userEvaluationevaluationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === gage_id);
+    let filteredRunList = userEvaluationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === gage_id);
     if (filteredRunList.length >= 2) {
-      uiGageId.value = gage_id;
+      uiCompareGageId.value = gage_id;
       filteredRunList.forEach((calibration_job: CalibrationJobListItem) => {
         let rowData = <any>{};
         rowData['calibration_run_id'] = calibration_job.calibration_run_id;
@@ -764,7 +757,7 @@ const navigateToEvaluation = (event: any) => {
 const returnCalibrationJobList = (event: any) => {
   selectedCalibrationRun.value = selectedCalibrationValidationRun.value = undefined;
   resetUserSelectedEvalValidationRun();
-  uiGageId.value = 'All';
+  uiCompareGageId.value = 'All';
   resetUserSelectedEvalCompareRun();
   clearUserCalibrationRunData();
 }

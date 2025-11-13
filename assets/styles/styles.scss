@@ -407,7 +407,7 @@ select option {
   grid-template-columns: 23% 75%;
   gap: 2%;
 }
-.pagination-rows, .pagination-go-to-page, .pagination-pages {margin-bottom: 4px; font-weight: normal; font-size: 13px;}
+.pagination-rows, .pagination-go-to-page, .pagination-pages {margin-bottom: 4px; font-weight: normal; font-size: 13px; text-align: left;}
 .pagination-go-to-page input {width:70px; display: inline-block; padding: 2px 3px;font-size: 13px;}
 .pagination-go-to-page, .pagination-pages {display:inline-block; margin-top:-10px;}
 .pagination-go-to-page {width:30%;text-align: right; padding-right: 0px;}

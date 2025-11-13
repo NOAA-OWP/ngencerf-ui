@@ -18,16 +18,16 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const userSelectedEvalCalibrationRunId = ref<number>(0);
   const { ngencerfBaseUrl } = useBackendConfig();
 
-  const uiGageId = ref<string>("");
+  const uiCompareGageId = ref<string>("");
   const userSelectedEvalCalibrationRun = ref<any>();
   const loadCalibrationDataComplete = ref<boolean>(false);
 
-  const { modulesFilterList, moduleOperator, statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
+  const { modulesFilterList, moduleOperator, uiGageId, uiGageList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
   /**
    * list of calibration jobs with validation data
    */
-  const userEvaluationevaluationRunListData = ref<ValidatedCalibrationRunListItem[]>([]);
+  const userEvaluationRunListData = ref<ValidatedCalibrationRunListItem[]>([]);
   const evaluationRunListPageSize = ref<number>(50);
   const evaluationRunListCurrentPage = ref<number>(1);
   const evaluationRunListTotalPages = ref<number>(0);
@@ -59,7 +59,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       'name': "All",
       'description': "All"
     });
-    userEvaluationevaluationRunListData.value.forEach(runItem => {
+    userEvaluationRunListData.value.forEach(runItem => {
       const checkGageIndex = gageOptionList.findIndex(
         (gageOption) =>
           gageOption.name === runItem.gage_id
@@ -80,7 +80,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const compareCalibrationRunGageList = computed(() => {
     let gageOptionList = <SelectOption[]>[];
     evaluationCalibrationRunGageList.value.forEach(gage => {
-      if (userEvaluationevaluationRunListData.value.filter((row) => (row as CalibrationJobListItem).gage_id === gage.name).length >= 2) {
+      if (userEvaluationRunListData.value.filter((row) => (row as CalibrationJobListItem).gage_id === gage.name).length >= 2) {
         gageOptionList.push(gage);
       }
     });
@@ -103,11 +103,11 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         module_filter: {
           modules: modulesFilterList.value,
-          operator: moduleOperator.value === 'all' ? 'and' : 'or'
+          operator: moduleOperator.value === 'All' ? 'and' : 'or'
         },
-        status: statusTypeFilterList.value,
         include_archived: includeArchivedJobs.value
-      }
+      },
+      get_gages: uiGageList.value.length === 0
     }
     const runListDataResult = await makeProtectedApiCall<ValidatedevaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
       method: "POST",
@@ -118,10 +118,10 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       body: JSON.stringify(requestBody),
     });
 
-    userEvaluationevaluationRunListData.value = [];
+    userEvaluationRunListData.value = runListDataResult?._data?.jobs ?? [];
 
-    if (runListDataResult?._data?.jobs && runListDataResult?._data?.jobs.length > 0) {
-      runListDataResult?._data?.jobs.forEach((runItem: ValidatedCalibrationRunListItem) => {
+    if (userEvaluationRunListData.value && userEvaluationRunListData.value.length > 0) {
+      userEvaluationRunListData.value.forEach((runItem: ValidatedCalibrationRunListItem) => {
         try {
           if (runItem.submit_date !== null) {
             if (runItem.status.toLowerCase() === 'done' && runItem.validations.length >= 1) {
@@ -145,7 +145,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
                 runItem.validations = filteredValidations;
                 runItem.validation_runs = filteredValidations.length;
                 runItem.validation_run_ids = filteredValidations.map(validation => validation.validation_run_id);
-                userEvaluationevaluationRunListData.value.push(runItem);
               }
             }
           }
@@ -159,6 +158,11 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     evaluationRunListTotalPages.value = Math.ceil(evaluationRunListTotalSize.value / evaluationRunListPageSize.value);
     evaluationRunListStartRow.value = (evaluationRunListPageSize.value * (evaluationRunListCurrentPage.value - 1)) + 1;
     evaluationRunListEndRow.value = Math.min(evaluationRunListStartRow.value + (evaluationRunListPageSize.value - 1), evaluationRunListTotalSize.value);
+    
+    if (runListDataResult?._data?.gages) {
+      uiGageList.value = runListDataResult?._data?.gages;
+      uiGageList.value.sort();
+    }
   }
 
   const fetchValidationRunListByCalibrationRun = async () => {
@@ -270,7 +274,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   * @returns {number}
   */
   const getValidationRunIdByCalibrationRunId = computed(() => {
-    const find_validation_run = userEvaluationevaluationRunListData.value.filter((validation: ValidatedCalibrationRunListItem) => {
+    const find_validation_run = userEvaluationRunListData.value.filter((validation: ValidatedCalibrationRunListItem) => {
       return validation.calibration_run_id === calibrationJobId.value;
     });
     if (!find_validation_run) {
@@ -348,7 +352,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   })
 
   return {
-    uiGageId,
+    uiCompareGageId,
     evaluationRunList,
     evaluationCalibrationRunGageList,
     compareCalibrationRunGageList,
@@ -372,7 +376,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     fetchValidationRunListByCalibrationRun,
 
     getValidationRunIdByCalibrationRunId,
-    userEvaluationevaluationRunListData,
+    userEvaluationRunListData,
     evaluationRunListPageSize,
     evaluationRunListCurrentPage,
     evaluationRunListTotalPages,

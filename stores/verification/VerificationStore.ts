@@ -22,8 +22,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   // refs
   const forecastJobId = ref<number>();
   const forecastRunsForVerification = ref<ForecastJob[]>([]);
-  const filteredForecastRunsForVerification = ref<ForecastJob[]>([]);
-  const forecastRunsForVerificationListPageSize = ref<number>(10);
+  const forecastRunsForVerificationListPageSize = ref<number>(50);
   const forecastRunsForVerificationListCurrentPage = ref<number>(1);
   const forecastRunsForVerificationListTotalPages = ref<number>(0);
   const forecastRunsForVerificationListTotalSize = ref<number>(0);
@@ -33,10 +32,9 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   
   const verificationJobId = ref<number>();
   const verificationJobs = ref<VerificationJob[]>([]);
-  const filteredVerificationJobs = ref<VerificationJob[]>([]);
   const selectedVerificationJob = ref<VerificationJob>();
   const userVerificationJobData = ref<VerificationJob>();
-  const verificationRunListPageSize = ref<number>(10);
+  const verificationRunListPageSize = ref<number>(50);
   const verificationRunListCurrentPage = ref<number>(1);
   const verificationRunListTotalPages = ref<number>(0);
   const verificationRunListTotalSize = ref<number>(0);
@@ -73,8 +71,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         direction: forecastRunsForVerificationListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
-        status: statusTypeFilterList.value,
-        include_archived: false
+        status: statusTypeFilterList.value
       }
     }
     const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs_for_verification/`, {
@@ -86,17 +83,11 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
       body: JSON.stringify(requestBody)
     });
 
-    if (runListDataResult?._data?.forecast_jobs && runListDataResult?._data?.forecast_jobs.length > 0) {
-      runListDataResult?._data?.forecast_jobs.forEach((jobItem: ForecastJob) => {
-        forecastRunsForVerification.value.push(jobItem);
-      });
-      // maintain an original forecastRuns so we can revert to it when we clear the Forecast Runs filter
-      filteredForecastRunsForVerification.value = [...forecastRunsForVerification.value];
-      forecastRunsForVerificationListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
-      forecastRunsForVerificationListTotalPages.value = Math.ceil(forecastRunsForVerificationListTotalSize.value / forecastRunsForVerificationListPageSize.value);
-      forecastRunsForVerificationListStartRow.value = (forecastRunsForVerificationListPageSize.value * (forecastRunsForVerificationListCurrentPage.value - 1)) + 1;
-      forecastRunsForVerificationListEndRow.value = Math.min(forecastRunsForVerificationListStartRow.value + (forecastRunsForVerificationListPageSize.value - 1), forecastRunsForVerificationListTotalSize.value);
-    }
+    forecastRunsForVerification.value = runListDataResult?._data?.forecast_jobs ?? [];
+    forecastRunsForVerificationListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
+    forecastRunsForVerificationListTotalPages.value = Math.ceil(forecastRunsForVerificationListTotalSize.value / forecastRunsForVerificationListPageSize.value);
+    forecastRunsForVerificationListStartRow.value = (forecastRunsForVerificationListPageSize.value * (forecastRunsForVerificationListCurrentPage.value - 1)) + 1;
+    forecastRunsForVerificationListEndRow.value = Math.min(forecastRunsForVerificationListStartRow.value + (forecastRunsForVerificationListPageSize.value - 1), forecastRunsForVerificationListTotalSize.value);
   }
 
   const setSelectedForecastRunId = (forecast_job_id: number): void => {
@@ -121,8 +112,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         direction: verificationRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
-        status: statusTypeFilterList.value,
-        include_archived: false
+        status: statusTypeFilterList.value
       }
     }
     const runListDataResult = await makeProtectedApiCall<VerificationJobs>(`${ngencerfBaseUrl}/calibration/get_verification_jobs/`, {
@@ -134,22 +124,11 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
       body: JSON.stringify(requestBody)
     });
 
-    if (runListDataResult?._data?.verification_jobs && runListDataResult?._data?.verification_jobs.length > 0) {
-      runListDataResult?._data?.verification_jobs.forEach((jobItem: VerificationJob) => {
-        if (jobItem.forecast_run_id) {
-          jobItem.data_source = 'ngen'
-        } else {
-          jobItem.data_source = 'nwm'
-        }
-        verificationJobs.value.push(jobItem);
-      });
-      // maintain an original verificationJobs so we can revert to it when we clear the Verification Runs filter
-      filteredVerificationJobs.value = [...verificationJobs.value];
-      verificationRunListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
-      verificationRunListTotalPages.value = Math.ceil(verificationRunListTotalSize.value / verificationRunListPageSize.value);
-      verificationRunListStartRow.value = (verificationRunListPageSize.value * (verificationRunListCurrentPage.value - 1)) + 1;
-      verificationRunListEndRow.value = Math.min(verificationRunListStartRow.value + (verificationRunListPageSize.value - 1), verificationRunListTotalSize.value);
-    }
+    verificationJobs.value = runListDataResult?._data?.verification_jobs ?? [];
+    verificationRunListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
+    verificationRunListTotalPages.value = Math.ceil(verificationRunListTotalSize.value / verificationRunListPageSize.value);
+    verificationRunListStartRow.value = (verificationRunListPageSize.value * (verificationRunListCurrentPage.value - 1)) + 1;
+    verificationRunListEndRow.value = Math.min(verificationRunListStartRow.value + (verificationRunListPageSize.value - 1), verificationRunListTotalSize.value);
   }
 
   /**
@@ -406,7 +385,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   return {
     forecastJobId,
     forecastRunsForVerification,
-    filteredForecastRunsForVerification,
     forecastRunsForVerificationListPageSize,
     forecastRunsForVerificationListCurrentPage,
     forecastRunsForVerificationListTotalPages,
@@ -423,7 +401,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     verificationStatusCheckingInterval,
     verificationRunningTimeInterval,
     verificationJobs,
-    filteredVerificationJobs,
     verificationRunListPageSize,
     verificationRunListCurrentPage,
     verificationRunListTotalPages,

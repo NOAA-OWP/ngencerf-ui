@@ -22,23 +22,26 @@
       </div>
 
       <div id="calibrationRunsForForecastList">
-        <div id="CalTable">
+        <div id="CalTable" class="w-max mx-auto">
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
-            :show-gage="false" :show-modules="false" :show-archived="false"
+            :show-status="false" :show-modules="false" :show-archived="false"
             @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
           
-          <div v-if="filteredData.length > 0 && calibrationRunsForForecastListTotalSize > 0" class="pagination-box">
+          <div v-if="calibrationRunsForForecast.length > 0 && calibrationRunsForForecastListTotalSize > 0" class="pagination-box">
             <div class="pagination-rows">
               Rows {{ calibrationRunsForForecastListStartRow }} to {{ calibrationRunsForForecastListEndRow }} of {{ calibrationRunsForForecastListTotalSize }}
             </div>
             <Paging v-model:currentPage="calibrationRunsForForecastListCurrentPage" :totalPages=calibrationRunsForForecastListTotalPages />
           </div>
+          <div v-else>
+            No results. Try changing or clearing filters.
+          </div>
 
-          <DataTable id="CalibrationRunForForecastTable" :value="filteredData" 
+          <DataTable id="CalibrationRunForForecastTable" :value="calibrationRunsForForecast" 
             scrollable scroll-height="400px" table-style="min-width: 50rem"
             v-model:sortField="calibrationRunsForForecastListSort.field" v-model:sortOrder="calibrationRunsForForecastListSort.direction"
             v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
@@ -270,7 +273,6 @@ const onRowContextMenu = (event: any) => {
 };
 
 const {
-  uiGageId,
   loadCalibrationDataComplete,
   userSelectedEvalCalibrationRunId,
 } = storeToRefs(evaluationCalibrationRunStore);
@@ -309,15 +311,6 @@ onMounted(async () => {
     await getCalibrationJobsForForecast();
     isLoading.value = false;
   });
-});
-
-// Computed filtered data for DataTables
-const filteredData = computed(() => {
-  if (!uiGageId.value || uiGageId.value === "All") {
-    return calibrationRunsForForecast?.value;
-  } else {
-    return calibrationRunsForForecast?.value?.filter((row) => (row as any as CalibrationJobListItem).gage_id === uiGageId.value);
-  }
 });
 
 // watch for sort order change - reset current page to 1

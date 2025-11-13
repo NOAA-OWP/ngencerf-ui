@@ -44,10 +44,11 @@ export const useUserDataStore = defineStore(
 
     const userSelectedCalibrationIterationId = ref<number | null>(null);
     const uiGageId = ref<string>("");
+    const uiGageList = ref<string[]>([]);
 
     // Used for Calibration Job Filter
     const modulesFilterList = ref<string[]>([]);
-    const moduleOperator = ref<string>('any');
+    const moduleOperator = ref<string>('All');
     const statusTypeFilterList = ref<string[]>([]);
     const includeArchivedJobs = ref<boolean>(false);
 
@@ -255,29 +256,6 @@ export const useUserDataStore = defineStore(
     function getIsTokenExpired() {
       return tokenExpired.value;
     }
-    /**
-     * @returns {SelectOption[]}
-     */
-    const calibrationRunGageList = computed(() => {
-      let gageOptionList = <SelectOption[]>[];
-      gageOptionList.push({
-        name: "All",
-        description: "All",
-      });
-      userCalibrationJobsListData.value.forEach((runItem) => {
-        const checkGageIndex =
-          gageOptionList.findIndex(
-            (gageOption) => gageOption.name === runItem.gage_id
-          ) !== -1;
-        if (!checkGageIndex) {
-          gageOptionList.push({
-            name: runItem.gage_id,
-            description: runItem.gage_id,
-          });
-        }
-      });
-      return gageOptionList;
-    });
 
     /**
      * fetch user created calibration job list datauser created calibration
@@ -295,11 +273,12 @@ export const useUserDataStore = defineStore(
           gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
           module_filter: {
             modules: modulesFilterList.value,
-            operator: moduleOperator.value === 'all' ? 'and' : 'or'
+            operator: moduleOperator.value === 'All' ? 'and' : 'or'
           },
           status: statusTypeFilterList.value,
           include_archived: includeArchivedJobs.value
         },
+        get_gages: uiGageList.value.length === 0
       }
       const jobsListDataResult =
         await makeProtectedApiCall<CalibrationJobsList>(
@@ -319,6 +298,11 @@ export const useUserDataStore = defineStore(
       calibrationRunListTotalPages.value = Math.ceil(calibrationRunListTotalSize.value / calibrationRunListPageSize.value);
       calibrationRunListStartRow.value = (calibrationRunListPageSize.value * (calibrationRunListCurrentPage.value - 1)) + 1;
       calibrationRunListEndRow.value = Math.min(calibrationRunListStartRow.value + (calibrationRunListPageSize.value - 1), calibrationRunListTotalSize.value);
+      
+      if (jobsListDataResult?._data?.gages) {
+        uiGageList.value = jobsListDataResult?._data?.gages;
+        uiGageList.value.sort();
+      }
     }
 
     /**
@@ -424,8 +408,8 @@ export const useUserDataStore = defineStore(
 
     return {
       userSelectedCalibrationIterationId,
-      calibrationRunGageList,
       uiGageId,
+      uiGageList,
       isLoggedIn,
       userName,
       firstName,
