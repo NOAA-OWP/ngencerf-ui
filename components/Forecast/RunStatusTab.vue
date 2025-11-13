@@ -379,6 +379,7 @@ const createColdStartAndForecastStatusInterval = () => {
  * Start the forecast run
  */
 const startForecastRun = async () => {
+  calibrationRunForForecast.value.forecast_status = 'Submitted';
   const createAndRunForecastJobResponse = await createAndRunForecastJob(
     calibrationRunForForecast?.value?.calibration_run_id as number, 
     forecastConfiguration?.value?.name as string,
