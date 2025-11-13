@@ -3,7 +3,6 @@ import { defineStore, storeToRefs } from "pinia";
 
 import type { VerificationJob, VerificationJobs } from "@/composables/NgencerfModels";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { generalStore } from "@/stores/common/GeneralStore";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 
 import { makeProtectedApiCall } from "@/composables/UserAuth";
@@ -18,12 +17,13 @@ const { selectedForecastJob } = storeToRefs(forecastStore);
 export const useVerificationStore = defineStore('VerificationStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
+  const { statusTypeFilterList } = storeToRefs(useUserDataStore());
 
   // refs
   const forecastJobId = ref<number>();
   const forecastRunsForVerification = ref<ForecastJob[]>([]);
   const filteredForecastRunsForVerification = ref<ForecastJob[]>([]);
-  const forecastRunsForVerificationListPageSize = ref<number>(50);
+  const forecastRunsForVerificationListPageSize = ref<number>(10);
   const forecastRunsForVerificationListCurrentPage = ref<number>(1);
   const forecastRunsForVerificationListTotalPages = ref<number>(0);
   const forecastRunsForVerificationListTotalSize = ref<number>(0);
@@ -36,7 +36,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   const filteredVerificationJobs = ref<VerificationJob[]>([]);
   const selectedVerificationJob = ref<VerificationJob>();
   const userVerificationJobData = ref<VerificationJob>();
-  const verificationRunListPageSize = ref<number>(50);
+  const verificationRunListPageSize = ref<number>(10);
   const verificationRunListCurrentPage = ref<number>(1);
   const verificationRunListTotalPages = ref<number>(0);
   const verificationRunListTotalSize = ref<number>(0);
@@ -65,23 +65,28 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
    */
   const getForecastRunsForVerification = async (): Promise<any> => {
     forecastRunsForVerification.value = [];
+    let requestBody = {
+      limit: forecastRunsForVerificationListPageSize.value,
+      offset: (forecastRunsForVerificationListCurrentPage.value - 1) * forecastRunsForVerificationListPageSize.value,
+      sort: {
+        field: forecastRunsForVerificationListSort.value.field,
+        direction: forecastRunsForVerificationListSort.value.direction === -1 ? 'desc' : 'asc'
+      },
+      filters: {
+        status: statusTypeFilterList.value,
+        include_archived: false
+      }
+    }
     const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs_for_verification/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({
-        limit: forecastRunsForVerificationListPageSize.value,
-        offset: (forecastRunsForVerificationListCurrentPage.value - 1) * forecastRunsForVerificationListPageSize.value,
-        sort: {
-          field: forecastRunsForVerificationListSort.value.field,
-          direction: forecastRunsForVerificationListSort.value.direction === -1 ? 'desc' : 'asc'
-        }
-      })
+      body: JSON.stringify(requestBody)
     });
 
-    if (runListDataResult?._data?.forecast_jobs.length > 0) {
+    if (runListDataResult?._data?.forecast_jobs && runListDataResult?._data?.forecast_jobs.length > 0) {
       runListDataResult?._data?.forecast_jobs.forEach((jobItem: ForecastJob) => {
         forecastRunsForVerification.value.push(jobItem);
       });
@@ -108,23 +113,28 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
    */
   const getVerificationJobs = async (): Promise<any> => {
     verificationJobs.value = [];
+    let requestBody = {
+      limit: verificationRunListPageSize.value,
+      offset: (verificationRunListCurrentPage.value - 1) * verificationRunListPageSize.value,
+      sort: {
+        field: verificationRunListSort.value.field,
+        direction: verificationRunListSort.value.direction === -1 ? 'desc' : 'asc'
+      },
+      filters: {
+        status: statusTypeFilterList.value,
+        include_archived: false
+      }
+    }
     const runListDataResult = await makeProtectedApiCall<VerificationJobs>(`${ngencerfBaseUrl}/calibration/get_verification_jobs/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({
-        limit: verificationRunListPageSize.value,
-        offset: (verificationRunListCurrentPage.value - 1) * verificationRunListPageSize.value,
-        sort: {
-          field: verificationRunListSort.value.field,
-          direction: verificationRunListSort.value.direction === -1 ? 'desc' : 'asc'
-        }
-      })
+      body: JSON.stringify(requestBody)
     });
 
-    if (runListDataResult?._data?.verification_jobs.length > 0) {
+    if (runListDataResult?._data?.verification_jobs && runListDataResult?._data?.verification_jobs.length > 0) {
       runListDataResult?._data?.verification_jobs.forEach((jobItem: VerificationJob) => {
         if (jobItem.forecast_run_id) {
           jobItem.data_source = 'ngen'

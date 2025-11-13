@@ -22,7 +22,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const userSelectedEvalCalibrationRun = ref<any>();
   const loadCalibrationDataComplete = ref<boolean>(false);
 
-  const { includeArchivedJobs } = storeToRefs(useUserDataStore());
+  const { modulesFilterList, moduleOperator, statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
   /**
    * list of calibration jobs with validation data
@@ -92,26 +92,35 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    * @return {void}
    */
   async function fetchUserValidatedCalibrationJobsListData() {
+    let requestBody = {
+      limit: evaluationRunListPageSize.value,
+      offset: (evaluationRunListCurrentPage.value - 1) * evaluationRunListPageSize.value,
+      sort: {
+        field: evaluationRunListSort.value.field,
+        direction: evaluationRunListSort.value.direction === -1 ? 'desc' : 'asc'
+      },
+      filters: {
+        gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
+        module_filter: {
+          modules: modulesFilterList.value,
+          operator: moduleOperator.value === 'all' ? 'and' : 'or'
+        },
+        status: statusTypeFilterList.value,
+        include_archived: includeArchivedJobs.value
+      }
+    }
     const runListDataResult = await makeProtectedApiCall<ValidatedevaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({
-        limit: evaluationRunListPageSize.value,
-        offset: (evaluationRunListCurrentPage.value - 1) * evaluationRunListPageSize.value,
-        sort: {
-          field: evaluationRunListSort.value.field,
-          direction: evaluationRunListSort.value.direction === -1 ? 'desc' : 'asc'
-        },
-        filters: {include_archived: includeArchivedJobs.value} 
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     userEvaluationevaluationRunListData.value = [];
 
-    if (runListDataResult?._data?.jobs.length > 0) {
+    if (runListDataResult?._data?.jobs && runListDataResult?._data?.jobs.length > 0) {
       runListDataResult?._data?.jobs.forEach((runItem: ValidatedCalibrationRunListItem) => {
         try {
           if (runItem.submit_date !== null) {

@@ -23,15 +23,10 @@
 
       <div id="calibrationRunsForForecastList">
         <div id="CalTable">
-          <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
-            <div class="col-span-1">
-              <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                :options="forecastRunGageList" filter optionLabel="name" optionValue="name"
-                aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
-                placeholder="All"></Select>
-            </div>
-          </div>
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+            :show-gage="false" :show-modules="false" :show-archived="false"
+            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
@@ -209,6 +204,7 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
@@ -325,19 +321,25 @@ const filteredData = computed(() => {
 });
 
 // watch for sort order change - reset current page to 1
-watch(calibrationRunsForForecastListSort, async() => {
+watch(calibrationRunsForForecastListSort, () => {
   calibrationRunsForForecastListCurrentPage.value = 1;
-  await getCalibrationJobsForForecast();
+  refreshJobList();
 },{ deep: true });
 
 // Watch for page number changes in job list
-watch(calibrationRunsForForecastListCurrentPage, async () => {
+watch(calibrationRunsForForecastListCurrentPage, () => {
   if (isNaN(calibrationRunsForForecastListCurrentPage.value) || calibrationRunsForForecastListCurrentPage.value < 1 || calibrationRunsForForecastListCurrentPage.value > Math.ceil(calibrationRunsForForecastListTotalSize.value / calibrationRunsForForecastListPageSize.value)) {
     console.log('ERROR: Page number ' + calibrationRunsForForecastListCurrentPage.value + ' out of bounds');
   } else {
-    await getCalibrationJobsForForecast();
+    refreshJobList();
   }
 });
+
+const refreshJobList = async () => {
+  isLoading.value = true;
+  await getCalibrationJobsForForecast();
+  isLoading.value = false;
+}
 
 const viewCalibrationDetails = async (calibration_run_id: number) => {
   isLoading.value = true;

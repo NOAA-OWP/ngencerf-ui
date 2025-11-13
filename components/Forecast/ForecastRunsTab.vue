@@ -21,9 +21,9 @@
             </h1>
           </div>
 
-          <ForecastRunsDialog id="ForecastRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
-            @ResetJobFilters="resetJobFilters()" @RefreshJobList="refreshJobList()" :forecastJobs="forecastRuns"
-            ref="forecastRunsFilterDialog" />
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+            :show-gage="false" :show-modules="false" :show-archived="false"
+            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -184,8 +184,8 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 
 import type { DataTableRowClickEvent } from "primevue/datatable";
-import ForecastRunsDialog from "@/components/Forecast/ForecastRunsFilterDialog.vue";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 const forecastStore = useForecastStore();
@@ -437,42 +437,11 @@ const toggleMessagesGroup = () => {
 }
 
 /**
- * Apply Forecast Jobs Filters
- */
-const applyJobFilters = async () => {
-  isForecastLoading.value = true;
-
-  if (filteredForecastRuns?.value && filteredForecastRuns?.value.length > 0) {
-    if (uiGageId.value && uiGageId.value !== 'All') {
-      filteredForecastRuns.value = forecastRuns?.value?.filter((forecastRun: ForecastJob) => forecastRun.gage_id === uiGageId.value);
-    } else {
-      await resetJobFilters();
-    }
-  }
-
-  isForecastLoading.value = false;
-};
-
-/**
- * Reset Forecast Jobs Filters
- */
-const resetJobFilters = async () => {
-  isForecastLoading.value = true;
-
-  if (forecastRuns?.value && forecastRuns?.value.length > 0) {
-    filteredForecastRuns.value = [...forecastRuns.value];
-  }
-
-  isForecastLoading.value = false;
-}
-
-/**
  * Refresh Forecast Jobs Table
  */
 const refreshJobList = async () => {
   isForecastLoading.value = true;
   await getForecastJobs();
-  await applyJobFilters();
   isForecastLoading.value = false;
 }
 

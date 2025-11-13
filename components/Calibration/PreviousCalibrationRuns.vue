@@ -17,8 +17,8 @@
         <div class="">
 
           <div id="CalTable" class="w-max mx-auto">
-            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="disableFilters"
-              @RefreshJobList="refreshJobList()" :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
+            <JobFilterDialog id="JobFilterDialog" :disable-all="disableFilters" @RefreshJobList="refreshJobList()" 
+              ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
 
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[250px]" ref="crContextMenu"
@@ -278,6 +278,7 @@ const {
   calibrationRunListSort,
   uiGageId, 
   modulesFilterList,
+  moduleOperator,
   statusTypeFilterList, 
   includeArchivedJobs 
 } = storeToRefs(useUserDataStore());
@@ -551,51 +552,6 @@ const binaryValueBodyTemplate = (rowData: any) => {
   return rowData.is_archived ? 'Yes' : 'No'; // Or return 1/0 as string or number
 };
 
-/**
- * Applies the job filters
- */
-let listcals: CalibrationJobListItem[];
-const applyJobFilters = async () => {
-  isLoading.value = true;
-  await fetchUserCalibrationJobsListData();
-  let fullJobList: CalibrationJobListItem[];
-  let list: CalibrationJobListItem[];
-  await updateUserCalibrationJobsListData();
-
-  if (updatedUserCalibrationJobsListData?.value) {
-    // Filter Headwater Basin Gage for the initial whole list
-    if (!uiGageId.value || uiGageId.value === "All") {
-      fullJobList = updatedUserCalibrationJobsListData?.value;
-    } else {
-      fullJobList = updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
-    }
-
-    // Get calibrations
-    listcals = (statusTypeFilterList.value.length > 0) ? fullJobList.filter((job) => statusTypeFilterList.value.includes(job.status)) : fullJobList;
-
-    // Get evaluations
-    list = fullJobList.filter(job =>
-      job.validations.length > 0 &&
-      job.validations.some(validation => statusTypeFilterList.value.includes(validation.status))
-    );
-    // Combine lists
-    fullJobList = [...listcals, ...list];
-
-    if (modulesFilterList.value.length) {
-      list = fullJobList.filter(job =>
-        job.modules.some(module => modulesFilterList.value.includes(module))
-      );
-      fullJobList = list;
-    }
-
-    updatedUserCalibrationJobsListData.value = fullJobList.filter((job, index, self) =>
-      index === self.findIndex(j => j.calibration_run_id === job.calibration_run_id)
-    );
-    isLoading.value = false;
-  }
-};
-
-
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
   data.value = e.data;
@@ -737,7 +693,6 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
       //await fetchUserCalibrationJobsListData();
       // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
       await updateUserCalibrationJobsListData();
-      await applyJobFilters();
       isLoading.value = false;
     } else {
       isLoading.value = false;

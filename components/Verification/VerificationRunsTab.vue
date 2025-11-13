@@ -20,11 +20,10 @@
       </div>
       <div id="verificationRunList">
         <div id="VerTable">
-          <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
-            <div class="col-span-1">
-              <!-- Filters go here -->
-            </div>
-          </div>
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+            :show-gage="false" :show-modules="false" :show-archived="false"
+            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="vrContextMenu"
             :model="cmVerificationJob"></ContextMenu>
@@ -122,6 +121,7 @@ import { hilightTab } from '@/composables/TabHilight';
 
 import type { DataTableRowClickEvent } from "primevue/datatable";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 const verificationStore = useVerificationStore();
@@ -162,19 +162,28 @@ const ptColumn = ref({
 });
 
 // watch for sort order change - reset current page to 1
-watch(verificationRunListSort, async() => {
+watch(verificationRunListSort, () => {
   verificationRunListCurrentPage.value = 1;
-  await getVerificationJobs();
+  refreshJobList();
 },{ deep: true });
 
 // Watch for page number changes in job list
-watch(verificationRunListCurrentPage, async () => {
+watch(verificationRunListCurrentPage, () => {
   if (isNaN(verificationRunListCurrentPage.value) || verificationRunListCurrentPage.value < 1 || verificationRunListCurrentPage.value > Math.ceil(verificationRunListTotalSize.value / verificationRunListPageSize.value)) {
     console.log('ERROR: Page number ' + verificationRunListCurrentPage.value + ' out of bounds');
   } else {
-    await getVerificationJobs();
+    refreshJobList();
   }
 });
+
+/**
+ * Refresh Verification Jobs Table
+ */
+const refreshJobList = async () => {
+  isVerificationLoading.value = true;
+  await getVerificationJobs();
+  isVerificationLoading.value = false;
+}
 
 const onRowContextMenu = (event: any) => {
   cmVerificationJob.value = [];

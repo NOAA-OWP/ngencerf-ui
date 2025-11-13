@@ -47,6 +47,7 @@ export const useUserDataStore = defineStore(
 
     // Used for Calibration Job Filter
     const modulesFilterList = ref<string[]>([]);
+    const moduleOperator = ref<string>('any');
     const statusTypeFilterList = ref<string[]>([]);
     const includeArchivedJobs = ref<boolean>(false);
 
@@ -283,6 +284,23 @@ export const useUserDataStore = defineStore(
      * @return {void}
      */
     async function fetchUserCalibrationJobsListData() {
+      let requestBody = {
+        limit: calibrationRunListPageSize.value,
+        offset: (calibrationRunListCurrentPage.value - 1) * calibrationRunListPageSize.value,
+        sort: {
+          field: calibrationRunListSort.value.field,
+          direction: calibrationRunListSort.value.direction === -1 ? 'desc' : 'asc'
+        },
+        filters: {
+          gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
+          module_filter: {
+            modules: modulesFilterList.value,
+            operator: moduleOperator.value === 'all' ? 'and' : 'or'
+          },
+          status: statusTypeFilterList.value,
+          include_archived: includeArchivedJobs.value
+        },
+      }
       const jobsListDataResult =
         await makeProtectedApiCall<CalibrationJobsList>(
           `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`,
@@ -292,15 +310,7 @@ export const useUserDataStore = defineStore(
               Authorization: `Bearer ${getAccessToken()}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              limit: calibrationRunListPageSize.value,
-              offset: (calibrationRunListCurrentPage.value - 1) * calibrationRunListPageSize.value,
-              sort: {
-                field: calibrationRunListSort.value.field,
-                direction: calibrationRunListSort.value.direction === -1 ? 'desc' : 'asc'
-              },
-              filters: {include_archived: includeArchivedJobs.value} 
-            }),
+            body: JSON.stringify(requestBody),
           }
         );
 
@@ -424,6 +434,7 @@ export const useUserDataStore = defineStore(
       accessToken,
       refreshToken,
       modulesFilterList,
+      moduleOperator,
       statusTypeFilterList,
       includeArchivedJobs,
       lastServerError,

@@ -21,9 +21,9 @@
             </h1>
           </div>
 
-          <ForecastRunsDialog id="ForecastRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
-            @ResetJobFilters="resetJobFilters()" @RefreshJobList="refreshJobList()" :forecastJobs="forecastRunsForVerification"
-            ref="forecastRunsFilterDialog" />
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+            :show-gage="false" :show-modules="false" :show-archived="false"
+            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'fr-context-menu' } }" class="bg-white" ref="frContextMenu"
@@ -171,8 +171,8 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 
 import type { DataTableRowClickEvent } from "primevue/datatable";
-import ForecastRunsDialog from "@/components/Forecast/ForecastRunsFilterDialog.vue";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 const forecastStore = useForecastStore();
@@ -330,42 +330,11 @@ const toggleMessagesGroup = () => {
 }
 
 /**
- * Apply Forecast Jobs Filters
- */
-const applyJobFilters = async () => {
-  isVerificationLoading.value = true;
-
-  if (filteredForecastRunsForVerification?.value && filteredForecastRunsForVerification?.value.length > 0) {
-    if (uiGageId.value && uiGageId.value !== 'All') {
-      filteredForecastRunsForVerification.value = forecastRunsForVerification?.value?.filter((forecastRun: ForecastJob) => forecastRun.gage_id === uiGageId.value);
-    } else {
-      await resetJobFilters();
-    }
-  }
-
-  isVerificationLoading.value = false;
-};
-
-/**
- * Reset Forecast Jobs Filters
- */
-const resetJobFilters = async () => {
-  isVerificationLoading.value = true;
-
-  if (forecastRunsForVerification?.value && forecastRunsForVerification?.value.length > 0) {
-    filteredForecastRunsForVerification.value = [...forecastRunsForVerification.value];
-  }
-
-  isVerificationLoading.value = false;
-}
-
-/**
  * Refresh Forecast Jobs Table
  */
 const refreshJobList = async () => {
   isVerificationLoading.value = true;
   await getForecastRunsForVerification();
-  await applyJobFilters();
   isVerificationLoading.value = false;
 }
 

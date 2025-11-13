@@ -102,13 +102,11 @@
       </div>
 
       <!-- Default is to show the user's list of Calibration runs -->
-      <div id="evaluationRunList"
-        v-else-if="userEvaluationevaluationRunListData.length > 0">
+      <div id="evaluationRunList">
 
         <div id="CalTable" class="w-max mx-auto">
-          <EvalRunsFilterDialog id="EvalRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
-            @RefreshJobList="refreshJobList()" :calJobs="updatedUserEvaluationJobsListData"
-            ref="evalRunsFilterDialog" />
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" :show-status="false"
+            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -321,7 +319,7 @@ import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { generalStore } from "@/stores/common/GeneralStore"
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
-import EvalRunsFilterDialog from "@/components/Common/EvalRunsFilterDialog.vue"
+import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
@@ -359,7 +357,7 @@ const ptValColumns = ref({
 const { fetchUserCalibrationRunData } = userDataStore;
 
 const {
-  uiGageId,
+  uiGageId, 
   evaluationCalibrationRunGageList,
   compareCalibrationRunGageList,
   loadCalibrationDataComplete,
@@ -401,7 +399,7 @@ const {
 const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
 const { hardResetEvaluationRunStatusStore } = useEvaluationRunStatusStore();
 
-const { userCalibrationRunData, gotoCalibrationRunId, modulesFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, gotoCalibrationRunId, modulesFilterList, moduleOperator, statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
 
 const { isLoading, calibrationJobId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -422,6 +420,9 @@ onMounted(async() => {
 
   //reset Run/Status store in case we have running intervals
   hardResetEvaluationRunStatusStore();
+
+  await fetchUserValidatedCalibrationJobsListData();
+  updatedUserEvaluationJobsListData.value = userEvaluationevaluationRunListData?.value;
 
   if(gotoCalibrationRunId.value) {
     userSelectedEvalCalibrationRunId.value = gotoCalibrationRunId.value;
@@ -510,40 +511,6 @@ const checkArchived = computed(() => {
 // A method to convert the binary value (boolean) to a sortable format
 const binaryValueBodyTemplate = (rowData: any) => {
   return rowData.is_archived ? 'Yes' : 'No'; // Or return 1/0 as string or number
-};
-
-
-/**
- * Applies the job filters
- */
-let listcals: CalibrationJobListItem[];
-const applyJobFilters = async () => {
-  isLoading.value = true;
-  await fetchUserValidatedCalibrationJobsListData();
-  let fullJobList: CalibrationJobListItem[];
-  let list: CalibrationJobListItem[];
-  updatedUserEvaluationJobsListData.value = userEvaluationevaluationRunListData.value;
-
-  if (updatedUserEvaluationJobsListData?.value) {
-    // Filter Headwater Basin Gage for the initial whole list
-    if (!uiGageId.value || uiGageId.value === "All") {
-      fullJobList = updatedUserEvaluationJobsListData?.value;
-    } else {
-      fullJobList = updatedUserEvaluationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
-    }
-
-    if (modulesFilterList.value.length) {
-      list = fullJobList.filter(job =>
-        job.modules.some(module => modulesFilterList.value.includes(module))
-      );
-      fullJobList = list;
-    }
-
-    updatedUserEvaluationJobsListData.value = fullJobList.filter((job, index, self) =>
-      index === self.findIndex(j => j.calibration_run_id === job.calibration_run_id)
-    );
-    isLoading.value = false;
-  }
 };
 
 const onRowContextMenu = (event: any) => {
@@ -1008,7 +975,7 @@ const rowStyle = (data: any) => {
 }
 
 #EvalRunTable,
-#EvalRunsFilterDialog {
+#JobFilterDialog {
   width: 1325px;
 }
 

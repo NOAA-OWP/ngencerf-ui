@@ -14,21 +14,21 @@ import { formatElapsedTime, formatDateForRunOnString } from '@/utils/TimeHelpers
 
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
+  const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels, statusTypeFilterList } = storeToRefs(useUserDataStore());
   const {
     getAccessToken,
     fetchUserCalibrationRunData,
     clearUserCalibrationRunData } = useUserDataStore();
   const { calibrationJobId } = storeToRefs(generalStore());
   // refs
-  const calibrationRunsForForecastListPageSize = ref<number>(50);
+  const calibrationRunsForForecastListPageSize = ref<number>(10);
   const calibrationRunsForForecastListCurrentPage = ref<number>(1);
   const calibrationRunsForForecastListTotalPages = ref<number>(0);
   const calibrationRunsForForecastListTotalSize = ref<number>(0);
   const calibrationRunsForForecastListStartRow = ref<number>(1);
   const calibrationRunsForForecastListEndRow = ref<number>(calibrationRunsForForecastListPageSize.value);
   const calibrationRunsForForecastListSort = ref<DynamicObject>({'field': 'calibration_run_id', 'direction': -1});
-  const forecastRunListPageSize = ref<number>(50);
+  const forecastRunListPageSize = ref<number>(10);
   const forecastRunListCurrentPage = ref<number>(1);
   const forecastRunListTotalPages = ref<number>(0);
   const forecastRunListTotalSize = ref<number>(0);
@@ -121,23 +121,28 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    */
   const getForecastJobs = async (): Promise<any> => {
     forecastRuns.value = [];
+    let requestBody = {
+      limit: forecastRunListPageSize.value,
+      offset: (forecastRunListCurrentPage.value - 1) * forecastRunListPageSize.value,
+      sort: {
+        field: forecastRunListSort.value.field,
+        direction: forecastRunListSort.value.direction === -1 ? 'desc' : 'asc'
+      },
+      filters: {
+        status: statusTypeFilterList.value,
+        include_archived: false
+      }
+    }
     const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({
-        limit: forecastRunListPageSize.value,
-        offset: (forecastRunListCurrentPage.value - 1) * forecastRunListPageSize.value,
-        sort: {
-          field: forecastRunListSort.value.field,
-          direction: forecastRunListSort.value.direction === -1 ? 'desc' : 'asc'
-        }
-      })
+      body: JSON.stringify(requestBody)
     });
 
-    if (runListDataResult?._data?.forecast_jobs.length > 0) {
+    if (runListDataResult?._data?.forecast_jobs && runListDataResult?._data?.forecast_jobs.length > 0) {
       runListDataResult?._data?.forecast_jobs.forEach((jobItem: ForecastJob) => {
         if (jobItem.cold_start?.cold_start_status && jobItem.cold_start.cold_start_status !== 'Done') {
           jobItem.forecast_status = 'Cold Start ' + jobItem.cold_start.cold_start_status;
@@ -369,24 +374,28 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    */
   const getCalibrationJobsForForecast = async (): Promise<any> => {
     calibrationRunsForForecast.value = [];
+    let requestBody = {
+      limit: calibrationRunsForForecastListPageSize.value,
+      offset: (calibrationRunsForForecastListCurrentPage.value - 1) * calibrationRunsForForecastListPageSize.value,
+      sort: {
+        field: calibrationRunsForForecastListSort.value.field,
+        direction: calibrationRunsForForecastListSort.value.direction === -1 ? 'desc' : 'asc'
+      },
+      filters: {
+        status: statusTypeFilterList.value,
+        include_archived: false
+      }
+    }
     const runListDataResult = await makeProtectedApiCall<CalibrationRunsForForecast>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_forecast/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({
-        limit: calibrationRunsForForecastListPageSize.value,
-        offset: (calibrationRunsForForecastListCurrentPage.value - 1) * calibrationRunsForForecastListPageSize.value,
-        sort: {
-          field: calibrationRunsForForecastListSort.value.field,
-          direction: calibrationRunsForForecastListSort.value.direction === -1 ? 'desc' : 'asc'
-        },
-        filters: {include_archived: false} 
-      })
+      body: JSON.stringify(requestBody)
     });
 
-    if (runListDataResult?._data?.jobs.length > 0) {
+    if (runListDataResult?._data?.jobs && runListDataResult?._data?.jobs.length > 0) {
       calibrationRunsForForecast.value = runListDataResult._data.jobs;
       calibrationRunsForForecastListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
       calibrationRunsForForecastListTotalPages.value = Math.ceil(calibrationRunsForForecastListTotalSize.value / calibrationRunsForForecastListPageSize.value);
