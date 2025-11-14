@@ -198,14 +198,14 @@
       <div id="SupplementalTableArea" class="p-2">
         <div v-if="iterationMetricsData && selectedSupplementalTable === 1">
           <DataTable :value="iterationMetricsData" scrollable scroll-height="500px" fixedHeader=true :multi-sort="true">
-            <Column v-for="(col, colIndex) in iterationMetricsColumns" :key="colIndex" :header="col.header"
-              :field="col.field" sortable></Column>
-              <!-- should be able to have col.tooltip show up as a tooltip here -->
-              <!-- <template #header="slotProps">
-                <div class="column-header">
-                  {{ slotProps.column.props.header }}
+            <Column v-for="(col, colIndex) in iterationMetricsColumns" :key="colIndex"
+              :field="col.field" sortable>
+              <template #header="slotProps">
+                <div class="column-header" :aria-label="col.tooltip" :title="col.tooltip">
+                  <span>{{ col.header }}</span>
                 </div>
-              </template> -->
+              </template>
+            </Column>
           </DataTable>
         </div>
         <div v-if="iterationParamsData && selectedSupplementalTable === 2">
