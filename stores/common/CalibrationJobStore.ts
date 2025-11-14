@@ -147,7 +147,7 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   }
 
   /**
- * Get cinfiguration data as JSON file
+ * Get configuration data as JSON file
  */
   const exportJob = async (calibration_run_id: number) => {
     await fetch(`${ngencerfBaseUrl}/calibration/export/`, {

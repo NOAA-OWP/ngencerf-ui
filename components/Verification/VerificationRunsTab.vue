@@ -18,27 +18,38 @@
           go to "Forecast Runs" and right-click on a Forecast.
         </p>
       </div>
-      <div id="verificationJobList">
+      <div id="verificationRunList">
         <div id="VerTable">
-          <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
-            <div class="col-span-1">
-              <!-- Filters go here -->
-            </div>
-          </div>
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+            :show-gage="false" :show-modules="false" :show-archived="false"
+            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="vrContextMenu"
             :model="cmVerificationJob"></ContextMenu>
-          <DataTable id="VerificationJobTable" :value="filteredVerificationJobs" scrollable scroll-height="400px"
-            sortField="verification_job_id" :sortOrder="-1" table-style="min-width: 50rem"
+          
+          <div v-if="verificationJobs.length > 0 && verificationRunListTotalSize > 0" class="pagination-box">
+            <div class="pagination-rows">
+              Rows {{ verificationRunListStartRow }} to {{ verificationRunListEndRow }} of {{ verificationRunListTotalSize }}
+            </div>
+            <Paging v-model:currentPage="verificationRunListCurrentPage" :totalPages=verificationRunListTotalPages />
+          </div>
+          <div v-else>
+            No results. Try changing or clearing filters.
+          </div>
+
+          <DataTable id="VerificationJobTable" table-style="min-width: 50rem" scrollable scroll-height="400px"
+            :value="verificationJobs"
+            v-model:sortField="verificationRunListSort.field" v-model:sortOrder="verificationRunListSort.direction"
             v-model:selection="selectedVerificationJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onVerificationRowSelect" @rowUnselect="onVerificationRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column :pt="ptColumn" field="verification_job_id" header="Job ID" sortable>
+            <Column :pt="ptColumn" field="verification_run_id" header="Job ID" sortable>
               <template #body="slotProps">
-                <span v-if="slotProps.data.verification_job_id"
-                  :aria-label="'Job ID ' + slotProps.data.verification_job_id"
-                  :title="'Job ID ' + slotProps.data.verification_job_id">
-                  {{ slotProps.data.verification_job_id }}
+                <span v-if="slotProps.data.verification_run_id"
+                  :aria-label="'Job ID ' + slotProps.data.verification_run_id"
+                  :title="'Job ID ' + slotProps.data.verification_run_id">
+                  {{ slotProps.data.verification_run_id }}
                 </span>
               </template>
             </Column>
@@ -113,11 +124,19 @@ import { hilightTab } from '@/composables/TabHilight';
 
 import type { DataTableRowClickEvent } from "primevue/datatable";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
+import Paging from "../Common/Paging.vue";
 
 const verificationStore = useVerificationStore();
 const {
   verificationJobs,
-  filteredVerificationJobs,
+  verificationRunListPageSize,
+  verificationRunListCurrentPage,
+  verificationRunListTotalPages,
+  verificationRunListTotalSize,
+  verificationRunListStartRow,
+  verificationRunListEndRow,
+  verificationRunListSort,
   selectedVerificationJob,
   verificationJobId,
   userVerificationJobData,
@@ -144,10 +163,34 @@ const ptColumn = ref({
   bodyCell: { style: { "text-align": "center" } }
 });
 
+// watch for sort order change - reset current page to 1
+watch(verificationRunListSort, () => {
+  verificationRunListCurrentPage.value = 1;
+  refreshJobList();
+},{ deep: true });
+
+// Watch for page number changes in job list
+watch(verificationRunListCurrentPage, () => {
+  if (isNaN(verificationRunListCurrentPage.value) || verificationRunListCurrentPage.value < 1 || verificationRunListCurrentPage.value > Math.ceil(verificationRunListTotalSize.value / verificationRunListPageSize.value)) {
+    console.log('ERROR: Page number ' + verificationRunListCurrentPage.value + ' out of bounds');
+  } else {
+    refreshJobList();
+  }
+});
+
+/**
+ * Refresh Verification Jobs Table
+ */
+const refreshJobList = async () => {
+  isVerificationLoading.value = true;
+  await getVerificationJobs();
+  isVerificationLoading.value = false;
+}
+
 const onRowContextMenu = (event: any) => {
   cmVerificationJob.value = [];
   const vrRowData = event.data as VerificationJob;
-  if (selectedVerificationJob && selectedVerificationJob.value?.verification_job_id === vrRowData.verification_job_id) {
+  if (selectedVerificationJob && selectedVerificationJob.value?.verification_run_id === vrRowData.verification_run_id) {
     vrContextMenu.value.show(event.originalEvent);
     if (['Saved','Ready'].includes(vrRowData.status)) {
       cmVerificationJob.value.push({ label: 'Show Setup', icon: 'pi pi-bars', command: () => navigateToSetupVerification() });
@@ -172,6 +215,7 @@ onMounted(() => {
   nextTick(async () => {
     // clear all user-selected verification data
     resetSelectedVerificationJobData();
+    verificationRunListCurrentPage.value = 1;
 
     // load verificationJobs
     await getVerificationJobs();
@@ -191,7 +235,7 @@ const onVerificationRowUnSelect = async (event: DataTableRowClickEvent) => {
 
 const confirmDelete = useConfirm();
 const deleteSelectedVerificationJob = () => {
-  const selectedRunId = selectedVerificationJob?.value?.verification_job_id as number;
+  const selectedRunId = selectedVerificationJob?.value?.verification_run_id as number;
   let confirmMessage = "Are you sure you want to delete this verification job?"
   confirmDelete.require({
     message: confirmMessage,
@@ -235,7 +279,7 @@ const navigateToSetupVerification = () => {
 
     if (e) {
       if (selectedVerificationJob.value) {
-        await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_job_id as number);
+        await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_run_id as number);
       }
       e.click();
     } else {
@@ -251,7 +295,7 @@ const navigateToVerificationJobStatus = () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
 
     if (e) {
-      await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_job_id as number);
+      await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
@@ -266,7 +310,7 @@ const navigateToVerificationResults = () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results Tab"]');
 
     if (e) {
-      await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_job_id as number);
+      await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);

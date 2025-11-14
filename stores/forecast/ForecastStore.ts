@@ -14,13 +14,27 @@ import { formatElapsedTime, formatDateForRunOnString } from '@/utils/TimeHelpers
 
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
+  const { userCalibrationRunData, uiGageId, uiGageList, ngenLogLevel, forcingLogLevel, logLevels, statusTypeFilterList } = storeToRefs(useUserDataStore());
   const {
     getAccessToken,
     fetchUserCalibrationRunData,
     clearUserCalibrationRunData } = useUserDataStore();
   const { calibrationJobId } = storeToRefs(generalStore());
   // refs
+  const calibrationRunsForForecastListPageSize = ref<number>(50);
+  const calibrationRunsForForecastListCurrentPage = ref<number>(1);
+  const calibrationRunsForForecastListTotalPages = ref<number>(0);
+  const calibrationRunsForForecastListTotalSize = ref<number>(0);
+  const calibrationRunsForForecastListStartRow = ref<number>(1);
+  const calibrationRunsForForecastListEndRow = ref<number>(calibrationRunsForForecastListPageSize.value);
+  const calibrationRunsForForecastListSort = ref<DynamicObject>({'field': 'calibration_run_id', 'direction': -1});
+  const forecastRunListPageSize = ref<number>(50);
+  const forecastRunListCurrentPage = ref<number>(1);
+  const forecastRunListTotalPages = ref<number>(0);
+  const forecastRunListTotalSize = ref<number>(0);
+  const forecastRunListStartRow = ref<number>(1);
+  const forecastRunListEndRow = ref<number>(forecastRunListPageSize.value);
+  const forecastRunListSort = ref<DynamicObject>({'field': 'forecast_run_id', 'direction': -1});
   const forecastJobId = ref<number>();
   const cycleDate = ref<any>();
   const coldStartDate = ref<any>();
@@ -41,10 +55,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const calibrationRunsForForecast = ref<CalibrationRunsForForecast>([]);
   const calibrationRunForForecast = ref<CalibrationRunForForecast>();
 
-  const uiGageId = ref<string>("");
-
   const forecastRuns = ref<ForecastJob[]>([]);
-  const filteredForecastRuns = ref<ForecastJob[]>([]);
   const selectedForecastJob = ref<ForecastJob>();
 
   const forecastJobNgenGlobalLogging = ref<boolean>(true);
@@ -107,26 +118,41 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    */
   const getForecastJobs = async (): Promise<any> => {
     forecastRuns.value = [];
+    let requestBody = {
+      limit: forecastRunListPageSize.value,
+      offset: (forecastRunListCurrentPage.value - 1) * forecastRunListPageSize.value,
+      sort: {
+        field: forecastRunListSort.value.field,
+        direction: forecastRunListSort.value.direction === -1 ? 'desc' : 'asc'
+      },
+      filters: {
+        status: statusTypeFilterList.value
+      }
+    }
     const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
-      }
+      },
+      body: JSON.stringify(requestBody)
     });
 
-    if (runListDataResult?._data?.forecast_jobs.length > 0) {
-      runListDataResult?._data?.forecast_jobs.forEach((jobItem: ForecastJob) => {
+    forecastRuns.value = runListDataResult?._data?.forecast_jobs ?? [];
+    forecastRunListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
+    forecastRunListTotalPages.value = Math.ceil(forecastRunListTotalSize.value / forecastRunListPageSize.value);
+    forecastRunListStartRow.value = (forecastRunListPageSize.value * (forecastRunListCurrentPage.value - 1)) + 1;
+    forecastRunListEndRow.value = Math.min(forecastRunListStartRow.value + (forecastRunListPageSize.value - 1), forecastRunListTotalSize.value);
+    
+    if (forecastRuns.value && forecastRuns.value.length > 0) {
+      forecastRuns.value.forEach((jobItem: ForecastJob) => {
         if (jobItem.cold_start?.cold_start_status && jobItem.cold_start.cold_start_status !== 'Done') {
           jobItem.forecast_status = 'Cold Start ' + jobItem.cold_start.cold_start_status;
         }
         if (jobItem.cold_start?.cold_start_submit_date && jobItem.cold_start.cold_start_submit_date !== '') {
           jobItem.submit_date = jobItem.cold_start.cold_start_submit_date;
         }
-        forecastRuns.value.push(jobItem);
       });
-      // maintain an original forecastRuns so we can revert to it when we clear the Forecast Runs filter
-      filteredForecastRuns.value = [...forecastRuns.value];
     }
   }
 
@@ -343,17 +369,37 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    */
   const getCalibrationJobsForForecast = async (): Promise<any> => {
     calibrationRunsForForecast.value = [];
+    let requestBody = {
+      limit: calibrationRunsForForecastListPageSize.value,
+      offset: (calibrationRunsForForecastListCurrentPage.value - 1) * calibrationRunsForForecastListPageSize.value,
+      sort: {
+        field: calibrationRunsForForecastListSort.value.field,
+        direction: calibrationRunsForForecastListSort.value.direction === -1 ? 'desc' : 'asc'
+      },
+      filters: {
+        gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
+        include_archived: false
+      },
+      get_gages: uiGageList.value.length === 0
+    }
     const runListDataResult = await makeProtectedApiCall<CalibrationRunsForForecast>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_forecast/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: ""
+      body: JSON.stringify(requestBody)
     });
 
-    if (runListDataResult?._data?.jobs.length > 0) {
-      calibrationRunsForForecast.value = runListDataResult._data.jobs;
+    calibrationRunsForForecast.value = runListDataResult._data.jobs ?? [];
+    calibrationRunsForForecastListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
+    calibrationRunsForForecastListTotalPages.value = Math.ceil(calibrationRunsForForecastListTotalSize.value / calibrationRunsForForecastListPageSize.value);
+    calibrationRunsForForecastListStartRow.value = (calibrationRunsForForecastListPageSize.value * (calibrationRunsForForecastListCurrentPage.value - 1)) + 1;
+    calibrationRunsForForecastListEndRow.value = Math.min(calibrationRunsForForecastListStartRow.value + (calibrationRunsForForecastListPageSize.value - 1), calibrationRunsForForecastListTotalSize.value);
+    
+    if (runListDataResult?._data?.gages) {
+      uiGageList.value = runListDataResult?._data?.gages;
+      uiGageList.value.sort();
     }
   };
 
@@ -523,9 +569,21 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastRunGageList,
     calibrationRunsForForecast,
     calibrationRunForForecast,
-    uiGageId,
+    calibrationRunsForForecastListPageSize,
+    calibrationRunsForForecastListCurrentPage,
+    calibrationRunsForForecastListTotalPages,
+    calibrationRunsForForecastListTotalSize,
+    calibrationRunsForForecastListStartRow,
+    calibrationRunsForForecastListEndRow,
+    calibrationRunsForForecastListSort,
+    forecastRunListPageSize,
+    forecastRunListCurrentPage,
+    forecastRunListTotalPages,
+    forecastRunListTotalSize,
+    forecastRunListStartRow,
+    forecastRunListEndRow,
+    forecastRunListSort,
     forecastRuns,
-    filteredForecastRuns,
     selectedForecastJob,
     isForecastLoading,
     overallColdStartForecastStatus,

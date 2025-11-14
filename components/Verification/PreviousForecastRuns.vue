@@ -11,7 +11,7 @@
   <client-only>
     <div class="pr-2">
       <div id="forecastRunList">
-        <div id="ForecastTable" class="w-[1200px] mx-auto">
+        <div id="ForecastTable" class="w-max mx-auto">
           <div class="flex mt-2">
             <h1 class="pt-3 mb-8 text-3xl font-bold inline-block text-center w-[1200px]">
               <span>Forecast Runs</span><br />
@@ -21,15 +21,23 @@
             </h1>
           </div>
 
-          <ForecastRunsDialog id="ForecastRunsFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="false"
-            @ResetJobFilters="resetJobFilters()" @RefreshJobList="refreshJobList()" :forecastJobs="forecastRunsForVerification"
-            ref="forecastRunsFilterDialog" />
-
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'fr-context-menu' } }" class="bg-white" ref="frContextMenu"
             :model="cmForecastRun"></ContextMenu>
-          <DataTable id="ForecastRuns" :value="filteredForecastRunsForVerification" scrollable scroll-height="400px"
-            sortField="forecast_run_id" :sortOrder="-1" table-style="min-width: 50rem"
+          
+          <div v-if="forecastRunsForVerification.length > 0 && forecastRunsForVerificationListTotalSize > 0" class="pagination-box">
+            <div class="pagination-rows">
+              Rows {{ forecastRunsForVerificationListStartRow }} to {{ forecastRunsForVerificationListEndRow }} of {{ forecastRunsForVerificationListTotalSize }}
+            </div>
+            <Paging v-model:currentPage="forecastRunsForVerificationListCurrentPage" :totalPages=forecastRunsForVerificationListTotalPages />
+          </div>
+          <div v-else>
+            No results. Try changing or clearing filters.
+          </div>
+          
+          <DataTable id="ForecastRuns" table-style="min-width: 50rem" scrollable scroll-height="400px"
+            :value="forecastRunsForVerification" 
+            v-model:sortField="forecastRunsForVerificationListSort.field" v-model:sortOrder="forecastRunsForVerificationListSort.direction"
             v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
             class="boxed">
@@ -95,19 +103,6 @@
                 </div>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="forecast_status" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Job Status</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.forecast_status" :aria-label="'Job Status ' + slotProps.data.forecast_status"
-                  :title="'Job Status ' + slotProps.data.forecast_status">
-                  {{ slotProps.data.forecast_status }}
-                </span>
-              </template>
-            </Column>
             <Column field="submit_date" sortable>
               <template #header>
                 <div class="column-header">
@@ -162,19 +157,23 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 
 import type { DataTableRowClickEvent } from "primevue/datatable";
-import ForecastRunsDialog from "@/components/Forecast/ForecastRunsFilterDialog.vue";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
+import Paging from "../Common/Paging.vue";
 
 const forecastStore = useForecastStore();
 const verificationStore = useVerificationStore();
-const {
-  uiGageId,
-  selectedForecastJob
-} = storeToRefs(forecastStore);
+const { selectedForecastJob } = storeToRefs(forecastStore);
 const {
   forecastJobId,
   forecastRunsForVerification,
-  filteredForecastRunsForVerification,
+  forecastRunsForVerificationListPageSize,
+  forecastRunsForVerificationListCurrentPage,
+  forecastRunsForVerificationListTotalPages,
+  forecastRunsForVerificationListTotalSize,
+  forecastRunsForVerificationListStartRow,
+  forecastRunsForVerificationListEndRow,
+  forecastRunsForVerificationListSort,
   verificationJobId,
   selectedVerificationJob,
   userVerificationJobData,
@@ -203,6 +202,21 @@ const ptColumn = ref({
   bodyCell: { style: { "text-align": "center" } }
 });
 
+// watch for sort order change - reset current page to 1
+watch(forecastRunsForVerificationListSort, async() => {
+  forecastRunsForVerificationListCurrentPage.value = 1;
+  await getForecastRunsForVerification();
+},{ deep: true });
+
+// Watch for page number changes in job list
+watch(forecastRunsForVerificationListCurrentPage, async () => {
+  if (isNaN(forecastRunsForVerificationListCurrentPage.value) || forecastRunsForVerificationListCurrentPage.value < 1 || forecastRunsForVerificationListCurrentPage.value > Math.ceil(forecastRunsForVerificationListTotalSize.value / forecastRunsForVerificationListPageSize.value)) {
+    console.log('ERROR: Page number ' + forecastRunsForVerificationListCurrentPage.value + ' out of bounds');
+  } else {
+    await getForecastRunsForVerification();
+  }
+});
+
 const onRowContextMenu = (event: any) => {
   cmForecastRun.value = [];
   const crRowData = event.data as ForecastJob;
@@ -224,6 +238,7 @@ onMounted(async () => {
     // clear previously selected forecast job
     selectedForecastJob.value = undefined;
     forecastJobId.value = undefined;
+    forecastRunsForVerificationListCurrentPage.value = 1;
 
     // load forecast runs
     await getForecastRunsForVerification();
@@ -248,7 +263,7 @@ const navigateToSetupVerification = () => {
 
     if (e) {
       if (selectedVerificationJob.value) {
-        await setSelectedVerificationJobId(selectedVerificationJob?.value?.verification_job_id as number);
+        await setSelectedVerificationJobId(selectedVerificationJob?.value?.verification_run_id as number);
       }
       e.click();
     } else {
@@ -263,8 +278,8 @@ const createNewVerification = async () => {
   resetSelectedVerificationJobData();
   fetchNewVerificationJobId().then(response => {
     if (response.status === 201) {
-      if (response?._data && response?._data?.verification_job_id && response?._data?.verification_job_id > 0) {
-        verificationJobId.value = response?._data?.verification_job_id as number;
+      if (response?._data && response?._data?.verification_run_id && response?._data?.verification_run_id > 0) {
+        verificationJobId.value = response?._data?.verification_run_id as number;
         loadSelectedVerificationJob(verificationJobId.value).then(queryResponse => {
           userVerificationJobData.value = queryResponse?._data;
           navigateToSetupVerification();
@@ -297,48 +312,13 @@ const toggleMessagesGroup = () => {
 }
 
 /**
- * Apply Forecast Jobs Filters
- */
-const applyJobFilters = async () => {
-  isVerificationLoading.value = true;
-
-  if (filteredForecastRuns?.value && filteredForecastRuns?.value.length > 0) {
-    if (uiGageId.value && uiGageId.value !== 'All') {
-      filteredForecastRuns.value = forecastRuns?.value?.filter((forecastRun: ForecastJob) => forecastRun.gage_id === uiGageId.value);
-    } else {
-      await resetJobFilters();
-    }
-  }
-
-  isVerificationLoading.value = false;
-};
-
-/**
- * Reset Forecast Jobs Filters
- */
-const resetJobFilters = async () => {
-  isVerificationLoading.value = true;
-
-  if (forecastRuns?.value && forecastRuns?.value.length > 0) {
-    filteredForecastRuns.value = [...forecastRuns.value];
-  }
-
-  isVerificationLoading.value = false;
-}
-
-/**
  * Refresh Forecast Jobs Table
  */
 const refreshJobList = async () => {
   isVerificationLoading.value = true;
   await getForecastRunsForVerification();
-  await applyJobFilters();
   isVerificationLoading.value = false;
 }
-
-onUnmounted(async () => {
-  uiGageId.value = "";
-});
 
 </script>
 

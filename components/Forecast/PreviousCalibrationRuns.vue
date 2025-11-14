@@ -21,22 +21,29 @@
         </div>
       </div>
 
-      <div id="calibrationRunList">
-        <div id="CalTable">
-          <div class="grid grid-cols-2 mb-5 gage-filter-wrapper">
-            <div class="col-span-1">
-              <label for="HeadwaterBasinGage">Headwater Basin Gage Filter</label><br>
-              <Select id="HeadwaterBasinGage" class="mr-2 basin-gage-filter" v-model="uiGageId"
-                :options="forecastRunGageList" filter optionLabel="name" optionValue="name"
-                aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
-                placeholder="All"></Select>
-            </div>
-          </div>
+      <div id="calibrationRunsForForecastList">
+        <div id="CalTable" class="w-max mx-auto">
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+            :show-status="false" :show-modules="false" :show-archived="false"
+            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
-          <DataTable id="CalibrationRunForForecastTable" :value="filteredData" scrollable scroll-height="400px"
-            sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem"
+          
+          <div v-if="calibrationRunsForForecast.length > 0 && calibrationRunsForForecastListTotalSize > 0" class="pagination-box">
+            <div class="pagination-rows">
+              Rows {{ calibrationRunsForForecastListStartRow }} to {{ calibrationRunsForForecastListEndRow }} of {{ calibrationRunsForForecastListTotalSize }}
+            </div>
+            <Paging v-model:currentPage="calibrationRunsForForecastListCurrentPage" :totalPages=calibrationRunsForForecastListTotalPages />
+          </div>
+          <div v-else>
+            No results. Try changing or clearing filters.
+          </div>
+
+          <DataTable id="CalibrationRunForForecastTable" :value="calibrationRunsForForecast" 
+            scrollable scroll-height="400px" table-style="min-width: 50rem"
+            v-model:sortField="calibrationRunsForForecastListSort.field" v-model:sortOrder="calibrationRunsForForecastListSort.direction"
             v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onCalibrationRunForForecastRowSelect" @rowUnselect="onCalibrationRunForForecastRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
@@ -200,6 +207,8 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
+import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
+import Paging from "../Common/Paging.vue";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -218,7 +227,16 @@ const ptColumn = ref({
 });
 
 const forecastStore = useForecastStore();
-const { forecastJobId } = storeToRefs(forecastStore);
+const { 
+  forecastJobId,
+  calibrationRunsForForecastListPageSize,
+  calibrationRunsForForecastListCurrentPage,
+  calibrationRunsForForecastListTotalPages,
+  calibrationRunsForForecastListTotalSize,
+  calibrationRunsForForecastListStartRow,
+  calibrationRunsForForecastListEndRow,
+  calibrationRunsForForecastListSort 
+} = storeToRefs(forecastStore);
 const { getCalibrationJobsForForecast, resetUserSelectedForecastCalibrationRun, hardResetForecastRunStatusStore } = forecastStore;
 
 
@@ -255,7 +273,6 @@ const onRowContextMenu = (event: any) => {
 };
 
 const {
-  uiGageId,
   loadCalibrationDataComplete,
   userSelectedEvalCalibrationRunId,
 } = storeToRefs(evaluationCalibrationRunStore);
@@ -277,6 +294,7 @@ const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId } = useForeca
 onMounted(async () => {
   isLoading.value = true;
   forecastJobId.value = undefined;
+  calibrationRunsForForecastListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
   hardResetForecastRunStatusStore();
@@ -295,15 +313,26 @@ onMounted(async () => {
   });
 });
 
-// Computed filtered data for DataTables
-const filteredData = computed(() => {
-  if (!uiGageId.value || uiGageId.value === "All") {
-    return calibrationRunsForForecast?.value;
+// watch for sort order change - reset current page to 1
+watch(calibrationRunsForForecastListSort, () => {
+  calibrationRunsForForecastListCurrentPage.value = 1;
+  refreshJobList();
+},{ deep: true });
+
+// Watch for page number changes in job list
+watch(calibrationRunsForForecastListCurrentPage, () => {
+  if (isNaN(calibrationRunsForForecastListCurrentPage.value) || calibrationRunsForForecastListCurrentPage.value < 1 || calibrationRunsForForecastListCurrentPage.value > Math.ceil(calibrationRunsForForecastListTotalSize.value / calibrationRunsForForecastListPageSize.value)) {
+    console.log('ERROR: Page number ' + calibrationRunsForForecastListCurrentPage.value + ' out of bounds');
   } else {
-    return calibrationRunsForForecast?.value?.filter((row) => (row as any as CalibrationJobListItem).gage_id === uiGageId.value);
+    refreshJobList();
   }
 });
 
+const refreshJobList = async () => {
+  isLoading.value = true;
+  await getCalibrationJobsForForecast();
+  isLoading.value = false;
+}
 
 const viewCalibrationDetails = async (calibration_run_id: number) => {
   isLoading.value = true;
@@ -560,7 +589,7 @@ const toggleMessagesGroup = () => {
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
 
-#calibrationRunList {
+#calibrationRunsForForecastList {
   height: 80%;
 }
 

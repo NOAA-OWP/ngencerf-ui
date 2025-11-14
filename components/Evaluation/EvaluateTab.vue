@@ -1863,22 +1863,6 @@ onUnmounted(() => {
   border: 2px solid #d9d9d9;
 }
 
-.pagingLink {
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-top: 8px;
-}
-
-.pagingLink a:hover {
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.pagingLink.active {
-  font-weight: bold;
-}
-
-
 .layout__table {
   position: relative;
   display: block;

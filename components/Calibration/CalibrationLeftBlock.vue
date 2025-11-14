@@ -32,11 +32,11 @@ import { generalStore } from "@/stores/common/GeneralStore";
 
 import Tabs from '@/components/Common/Tabs.vue'
 import CalibrationHeadwaterBasinGage from '@/components/Calibration/HeadwaterBasinGage.vue';
-import CalibrationFormulation from'@/components/Calibration/Formulation.vue';
-import CalibrationTuningControls from'@/components/Calibration/TuningControls.vue';
-import CalibrationOptimizationMetrics from'@/components/Calibration/OptimizationMetrics.vue';
-import CalibrationRunStatus from'@/components/Calibration/RunStatus.vue';
-import CalibrationCalibrationRunsTab from'@/components/Calibration/PreviousCalibrationRuns.vue';
+import CalibrationFormulation from '@/components/Calibration/Formulation.vue';
+import CalibrationTuningControls from '@/components/Calibration/TuningControls.vue';
+import CalibrationOptimizationMetrics from '@/components/Calibration/OptimizationMetrics.vue';
+import CalibrationRunStatus from '@/components/Calibration/RunStatus.vue';
+import CalibrationCalibrationRunsTab from '@/components/Calibration/PreviousCalibrationRuns.vue';
 
 const { getCalibrationTabIndex, setCalibrationTabIndex } = generalStore();
 // Default to Tab 1, HeadwaterBasinGage

@@ -17,15 +17,26 @@
         <div class="">
 
           <div id="CalTable" class="w-max mx-auto">
-            <JobFilterDialog id="JobFilterDialog" @ApplyJobFilters="applyJobFilters()" :disable-all="disableFilters"
-              @RefreshJobList="refreshJobList()" :calJobs="updatedUserCalibrationJobsListData" ref="jobFilterDialog" />
+            <JobFilterDialog id="JobFilterDialog" :disable-all="disableFilters" @RefreshJobList="refreshJobList()" 
+              ref="jobFilterDialog" />
             <ConfirmDialog></ConfirmDialog>
 
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[250px]" ref="crContextMenu"
               :model="buildContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
 
-            <DataTable id="Datatable" :value="updatedUserCalibrationJobsListData" sortField="calibration_run_id"
-              :sortOrder="-1" scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
+            <div v-if="userCalibrationJobsListData.length > 0 && calibrationRunListTotalSize > 0" class="pagination-box">
+              <div class="pagination-rows">
+                Rows {{ calibrationRunListStartRow }} to {{ calibrationRunListEndRow }} of {{ calibrationRunListTotalSize }}
+              </div>
+              <Paging v-model:currentPage="calibrationRunListCurrentPage" :totalPages=calibrationRunListTotalPages />
+            </div>
+            <div v-else>
+              No results. Try changing or clearing filters.
+            </div>
+
+            <DataTable id="Datatable" :value="userCalibrationJobsListData" 
+              scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
+              v-model:sortField="calibrationRunListSort.field" v-model:sortOrder="calibrationRunListSort.direction"
               v-model:selection="selectedCalibrationRun" selectionMode="multiple" contextMenu
               v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)" @row-select="dtRowSelected($event)"
@@ -60,7 +71,7 @@
                 </template>
               </Column>
 
-              <Column v-if="checkArchived" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
+              <Column v-if="includeArchivedJobs" :pt="ptColumn" field="is_archived" :body="binaryValueBodyTemplate"
                 :sortable="true">
                 <template #header>
                   <div class="column-header">
@@ -75,23 +86,6 @@
                   </span>
                 </template>
               </Column>
-
-              <!-- <Column :pt="ptColumn" field="is_locked" :body="binaryValueBodyTemplate"
-                :sortable="true">
-                <template #header>
-                  <div class="column-header">
-                    <span>Locked?</span>
-                  </div>
-                </template>
-                <template #body="slotProps">
-                  <span v-if="slotProps.data.calibration_run_id"
-                    :aria-label="slotProps.data.is_locked ? 'Locked' : ''"
-                    :title="slotProps.data.is_locked ? 'Locked' : ''">
-                    {{ slotProps.data.is_locked ? 'Yes' : 'No' }}
-                    <span v-if="slotProps.data.is_locked" class="pi pi-lock"></span>
-                  </span>
-                </template>
-              </Column> -->
 
               <Column :pt="ptColumn" field="gage_id" sortable>
                 <template #header>
@@ -190,7 +184,7 @@
                   </span>
                 </template>
               </Column>
-              <Column sortable>
+              <Column field="period" sortable>
                 <template #header>
                   <div class="column-header">
                     <span>Calibration Period</span>
@@ -236,7 +230,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, getCurrentInstance } from "vue";
+import { onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
@@ -245,6 +239,7 @@ import Swal from 'sweetalert2';
 //const LazyJobFilterDialog = defineAsyncComponent(() => import("@/components/Common/JobFilterDialog.vue"));
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import MultipleJobOperations from "@/components/Common/MultipleJobOperations.vue"
+import Paging from "../Common/Paging.vue";
 
 import type { CalibrationJobListItem, CalibrationJobValidationItem } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -274,8 +269,18 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { calibrationDownloadJobID, calibrationDownloadFileName } = storeToRefs(useCalibrationJobStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
-const { userCalibrationJobsListData, userCalibrationRunData, uiGageId, modulesFilterList,
-  statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
+const { 
+  userCalibrationJobsListData, 
+  userCalibrationRunData, 
+  includeArchivedJobs,
+  calibrationRunListPageSize,
+  calibrationRunListCurrentPage,
+  calibrationRunListTotalPages,
+  calibrationRunListTotalSize,
+  calibrationRunListStartRow,
+  calibrationRunListEndRow,
+  calibrationRunListSort
+} = storeToRefs(useUserDataStore());
 const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
 const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun, 
   lockCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
@@ -291,8 +296,6 @@ const selectedCalibrationRun = ref<CalibrationJobListItem>();
 
 const selectedMultipleCalibrationRuns = ref<number[]>([]);
 const selectedMultipleCalibrationRunData = ref<CalibrationJobListItem[]>([]);
-
-const updatedUserCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
 
 let interval: number | undefined;
 const runningColor = ref<string>('white');
@@ -382,13 +385,12 @@ onMounted(async () => {
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); } 
-    includeArchivedJobs.value = false;
-    // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
+    calibrationRunListCurrentPage.value = 1;
     resetGageStore();
     hardResetTuningStore();
     hardResetRunStatusStore();
     clearUserCalibrationRunData();
-    await updateUserCalibrationJobsListData();
+    await fetchUserCalibrationJobsListData();
     interval = window.setInterval(toggleColor, 500); // Toggle every 500ms (0.5s)
   }
 })
@@ -509,11 +511,24 @@ const ptColumn = ref({
 
 /************************************************************/
 
+// watch for sort order change - reset current page to 1
+watch(calibrationRunListSort, () => {
+  calibrationRunListCurrentPage.value = 1
+  refreshJobList();
+},{ deep: true });
+
+// Watch for page number changes in job list
+watch(calibrationRunListCurrentPage, async () => {
+  if (isNaN(calibrationRunListCurrentPage.value) || calibrationRunListCurrentPage.value < 1 || calibrationRunListCurrentPage.value > Math.ceil(calibrationRunListTotalSize.value / calibrationRunListPageSize.value)) {
+    console.log('ERROR: Page number ' + calibrationRunListCurrentPage.value + ' out of bounds');
+  } else {
+    refreshJobList();
+  }
+});
 
 const refreshJobList = async () => {
   isLoading.value = true;
   await fetchUserCalibrationJobsListData();
-  await updateUserCalibrationJobsListData();
   isLoading.value = false;
 }
 
@@ -522,59 +537,10 @@ const toggleColor = () => {
   runningColor.value = runningColor.value === 'white' ? 'green' : 'white';
 };
 
-const checkArchived = computed(() => {
-  return updatedUserCalibrationJobsListData?.value.some(item => item.is_archived === true)
-});
-
 // A method to convert the binary value (boolean) to a sortable format
 const binaryValueBodyTemplate = (rowData: any) => {
   return rowData.is_archived ? 'Yes' : 'No'; // Or return 1/0 as string or number
 };
-
-/**
- * Applies the job filters
- */
-let listcals: CalibrationJobListItem[];
-const applyJobFilters = async () => {
-  isLoading.value = true;
-  await fetchUserCalibrationJobsListData();
-  let fullJobList: CalibrationJobListItem[];
-  let list: CalibrationJobListItem[];
-  await updateUserCalibrationJobsListData();
-
-  if (updatedUserCalibrationJobsListData?.value) {
-    // Filter Headwater Basin Gage for the initial whole list
-    if (!uiGageId.value || uiGageId.value === "All") {
-      fullJobList = updatedUserCalibrationJobsListData?.value;
-    } else {
-      fullJobList = updatedUserCalibrationJobsListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === uiGageId.value);
-    }
-
-    // Get calibrations
-    listcals = (statusTypeFilterList.value.length > 0) ? fullJobList.filter((job) => statusTypeFilterList.value.includes(job.status)) : fullJobList;
-
-    // Get evaluations
-    list = fullJobList.filter(job =>
-      job.validations.length > 0 &&
-      job.validations.some(validation => statusTypeFilterList.value.includes(validation.status))
-    );
-    // Combine lists
-    fullJobList = [...listcals, ...list];
-
-    if (modulesFilterList.value.length) {
-      list = fullJobList.filter(job =>
-        job.modules.some(module => modulesFilterList.value.includes(module))
-      );
-      fullJobList = list;
-    }
-
-    updatedUserCalibrationJobsListData.value = fullJobList.filter((job, index, self) =>
-      index === self.findIndex(j => j.calibration_run_id === job.calibration_run_id)
-    );
-    isLoading.value = false;
-  }
-};
-
 
 const onRowDblClick = (e: any) => {
   const data = ref<any>();
@@ -714,10 +680,7 @@ const cloneSelectedCalibrationRun = (selectedCalibrationRun: any) => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
   cloneCalibrationRun(selectedRunId).then(async (response) => {
     if (response.status === 200) {
-      //await fetchUserCalibrationJobsListData();
-      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
-      await updateUserCalibrationJobsListData();
-      await applyJobFilters();
+      await fetchUserCalibrationJobsListData();
       isLoading.value = false;
     } else {
       isLoading.value = false;
@@ -826,8 +789,6 @@ const acceptDelete = (selectedRunId: number) => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
       await fetchUserCalibrationJobsListData();
-      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
-      await updateUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -869,8 +830,6 @@ const acceptMultipleDelete = () => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
       await fetchUserCalibrationJobsListData();
-      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
-      await updateUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Jobs Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -912,8 +871,6 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
       await fetchUserCalibrationJobsListData();
-      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
-      await updateUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Archive Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -955,8 +912,6 @@ const acceptMultipleArchive = (archiveJob: boolean) => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
       await fetchUserCalibrationJobsListData();
-      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
-      await updateUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: (archiveJob ? 'Archive' : 'Un-Archive') + ' Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -980,8 +935,6 @@ const acceptLock = (selectedRunId: number, lock: boolean) => {
         summary: 'Calibration Job ' + (lock ? 'Locked' : 'Unlocked'), detail: 'Job ' + selectedRunId + ' ' + (lock ? 'Locked' : 'Unlocked'), life: ToastTimeout.timeoutSuccess };
       toast.add(tMsg); addToastRecord(tMsg); */
       await fetchUserCalibrationJobsListData();
-      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
-      await updateUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Lock Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -1023,8 +976,6 @@ const acceptMultipleLock = (lock: boolean) => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
       await fetchUserCalibrationJobsListData();
-      // populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
-      await updateUserCalibrationJobsListData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: (lock ? 'Lock' : 'Unlock') + ' Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -1035,42 +986,6 @@ const acceptMultipleLock = (lock: boolean) => {
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
 }
-
-
-/**
- * Populate updatedUserCalibrationJobsListData with the job statuses to include the validation status
- */
-const updateUserCalibrationJobsListData = async (): Promise<void> => {
-  // set updatedUserCalibrationJobsListData to userCalibrationJobsListData, but with the updated status for the job to include the validation status
-  updatedUserCalibrationJobsListData.value = await Promise.all(
-    userCalibrationJobsListData.value
-      .map(async (calibrationJob: CalibrationJobListItem) => {
-        // if Calibration job is done, get validation statuses and update the overall status
-        if (calibrationJob.status === 'Done') {
-          const validationControlJobStatus: string | undefined = calibrationJob.validations?.find((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_control')?.status;
-
-          const validationBestJobStatus: string | undefined = calibrationJob.validations?.find
-            ((validation: CalibrationJobValidationItem) => validation.validation_type === 'valid_best')?.status;
-
-          // get the overall calibration/validation status
-          const overallCalibrationValidationStatus: string = getOverallCalibrationValidationStatus(
-            calibrationJob.status,
-            validationControlJobStatus,
-            validationBestJobStatus
-          );
-
-          // save userCalibrationJobsListData with the updated status for the job
-          return {
-            ...calibrationJob,
-            status: overallCalibrationValidationStatus
-          };
-        } else {
-          // Calibration is not done, so just return the job data with the status as is
-          return calibrationJob;
-        }
-      })
-  );
-};
 
 /**
  * Export user's calibration job configuration data to a JSON file
