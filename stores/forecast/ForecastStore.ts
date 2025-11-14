@@ -14,7 +14,7 @@ import { formatElapsedTime, formatDateForRunOnString } from '@/utils/TimeHelpers
 
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels, statusTypeFilterList } = storeToRefs(useUserDataStore());
+  const { userCalibrationRunData, uiGageId, uiGageList, ngenLogLevel, forcingLogLevel, logLevels, statusTypeFilterList } = storeToRefs(useUserDataStore());
   const {
     getAccessToken,
     fetchUserCalibrationRunData,
