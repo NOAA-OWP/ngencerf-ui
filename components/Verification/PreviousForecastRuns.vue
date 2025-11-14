@@ -163,10 +163,7 @@ import Paging from "../Common/Paging.vue";
 
 const forecastStore = useForecastStore();
 const verificationStore = useVerificationStore();
-const {
-  uiGageId,
-  selectedForecastJob
-} = storeToRefs(forecastStore);
+const { selectedForecastJob } = storeToRefs(forecastStore);
 const {
   forecastJobId,
   forecastRunsForVerification,
@@ -322,10 +319,6 @@ const refreshJobList = async () => {
   await getForecastRunsForVerification();
   isVerificationLoading.value = false;
 }
-
-onUnmounted(async () => {
-  uiGageId.value = "";
-});
 
 </script>
 
