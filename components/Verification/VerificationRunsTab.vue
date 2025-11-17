@@ -192,9 +192,6 @@ const onRowContextMenu = (event: any) => {
   const vrRowData = event.data as VerificationJob;
   if (selectedVerificationJob && selectedVerificationJob.value?.verification_run_id === vrRowData.verification_run_id) {
     vrContextMenu.value.show(event.originalEvent);
-    if (['Saved','Ready'].includes(vrRowData.status)) {
-      cmVerificationJob.value.push({ label: 'Show Setup', icon: 'pi pi-bars', command: () => navigateToSetupVerification() });
-    }
     cmVerificationJob.value.push({ label: 'View Status', icon: 'pi pi-gauge', command: () => navigateToVerificationJobStatus() });
     if (vrRowData.status === 'Done') {
       cmVerificationJob.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToVerificationResults() });
