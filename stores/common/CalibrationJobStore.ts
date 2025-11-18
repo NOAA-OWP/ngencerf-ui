@@ -1,6 +1,6 @@
 // @ts-check
 
-import { defineStore, storeToRefs } from "pinia";
+import { defineStore, storeToRefs, acceptHMRUpdate } from "pinia";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
@@ -286,7 +286,7 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
 },
   {
     persist: {
-      storage: piniaPluginPersistedstate.localStorage(),
+      key: getStorageKey("CalibrationJobStore"),
     },
   })
 
