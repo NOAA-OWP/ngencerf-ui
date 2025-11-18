@@ -88,6 +88,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Trust Git Repository Ownership
+        run: git config --global --add safe.directory /__w/ngencerf-ui/ngencerf-ui
+
       - name: Run unit tests and generate reports
         run: |
           # The 'test:unit' script runs Vitest and generates JUnit XML and Cobertura coverage reports.
