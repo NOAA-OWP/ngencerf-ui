@@ -3,7 +3,7 @@
  *  The General Store will be responsible for handling information OUTSIDE of the data needed for the back end.
  *  Data will include the current menu status and the current tab status for each of the 4 menu items
  */
-import { defineStore } from "pinia";
+import { defineStore, acceptHMRUpdate } from "pinia";
 
 import type { CombinedVersionInfo, ToastRecord } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
@@ -169,7 +169,7 @@ export const generalStore = defineStore(
   },
   {
     persist: {
-      storage: piniaPluginPersistedstate.localStorage(),
+      key: getStorageKey("generalStore"),
     },
   }
 );
