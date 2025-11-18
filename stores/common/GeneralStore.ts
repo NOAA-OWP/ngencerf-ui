@@ -7,6 +7,7 @@ import { defineStore, acceptHMRUpdate } from "pinia";
 
 import type { CombinedVersionInfo, ToastRecord } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
+import { getStorageKey } from "~/utils/Storage";
 
 export const generalStore = defineStore(
   "generalStore",

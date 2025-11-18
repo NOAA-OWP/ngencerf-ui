@@ -1,6 +1,7 @@
 // @ts-check
 
 import { defineStore, storeToRefs, acceptHMRUpdate } from "pinia";
+import { getStorageKey } from "~/utils/Storage";
 
 import type {
   CalibrationJobListItem,
