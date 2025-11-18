@@ -2,7 +2,7 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
           class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
