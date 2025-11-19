@@ -17,10 +17,13 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
   const validationStatus = ref<string>( "" );
   const runningTime = ref<string>("");
   const startTime = ref<string>("");
-  const validationStopStatus = ref<string[]>(['DONE', 'SERVER ERROR', 'FAIL', 'CANCELLED']);
-  const validationFailedStatus = ref<string[]>(['SERVER ERROR', 'FAIL']);
+  const validationStopStatus = ref<string[]>(['DONE', 'SERVER ERROR', 'FAILED', 'CANCELLED']);
+  const validationFailedStatus = ref<string[]>(['SERVER ERROR', 'FAILED']);
+  const failureMessages = ref<any>();
   const displayValidationId = ref<number>( 0 );
-  const validationRunningTimeInterval = ref<any>();
+  const validationStatusCheckingIntervalId = ref<number>();
+  const validationRunningTimeIntervalId = ref<number>();
+  const runStatusTabVisible = ref<boolean>(false);
 
    /**
     * @returns {Promise<any>}
@@ -72,13 +75,22 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         displayValidationId.value = validation_run_id;
         const validation_run = find_validation_run.shift() as CalibrationGetStatusValidationItem;
         validationStatus.value = validation_run.status;
+        failureMessages.value = response?._data?.failure_messages;
         evaluateDisplayIterationNumber.value = validation_run.iteration_num;
         startTime.value = validation_run.submit_date.toString();
         if ( validationStatus.value.toLocaleUpperCase() !== "RUNNING" ) {
-          runningTime.value = validation_run.elapsed_time?.toString() ?? '';
+          runningTime.value = validation_run.elapsed_time ? formatElapsedTime(validation_run.elapsed_time) : '';
         } else {
-          validationRunningTimeInterval.value = setInterval( updateRunningTime, 1000 );
+          if (validationRunningTimeIntervalId.value) {
+            clearInterval(validationRunningTimeIntervalId.value);
+          }
+          validationRunningTimeIntervalId.value = setInterval( updateRunningTime, 1000 ) as unknown as number;
         }
+      } else {
+        clearInterval(validationStatusCheckingIntervalId.value);
+        clearInterval(validationRunningTimeIntervalId.value);
+        validationStatusCheckingIntervalId.value = undefined;
+        validationRunningTimeIntervalId.value = undefined;
       }
     })
   }
@@ -112,29 +124,45 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     return validationStopStatus.value.includes(status.toUpperCase());
   }
 
-  const clearRunningStatusInfo = () => {
+  /**
+   * Hard Reset Run/Status Store
+   */
+  const hardResetEvaluationRunStatusStore = (): void => {
     validationStatus.value = "";
     startTime.value = "";
     runningTime.value = "";
-  }
+
+    if (validationStatusCheckingIntervalId.value) {
+      clearInterval(validationStatusCheckingIntervalId.value);
+      validationStatusCheckingIntervalId.value = undefined;
+    }
+
+    if (validationRunningTimeIntervalId.value) {
+      clearInterval(validationRunningTimeIntervalId.value);
+      validationRunningTimeIntervalId.value = undefined;
+    }
+  };
 
   return {
     runningTime,
     startTime,
     validationStatus,
+    failureMessages,
     iterationValidationRunId,
     displayValidationId,
-    validationRunningTimeInterval,
+    validationRunningTimeIntervalId,
+    validationStatusCheckingIntervalId,
     evaluateDisplayIterationNumber,
+    runStatusTabVisible,
     executeIterationValidationRun,
     queryIterationValidationRunStatus,
     executeCancelIterationValidationRun,
     isValidationRunStopped,
-    clearRunningStatusInfo,
     isValidationRunDone,
     isValidationRerunable,
     loadValidationStatusInformation,
     updateRunningTime,
+    hardResetEvaluationRunStatusStore
   }
 })
 

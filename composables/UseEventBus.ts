@@ -1,5 +1,5 @@
 import mitt from 'mitt'
-import type { LogoutEvent, AccountEvent } from './NextGenModel'
+import type { LogoutEvent, AccountEvent } from './NgencerfModels'
 
 type logoutEvents = LogoutEvent
 const logoutEmitter = mitt<LogoutEvent>()

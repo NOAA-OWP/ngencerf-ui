@@ -11,8 +11,7 @@ import { onMounted } from "vue";
 
 import EvaluationLayout from "@/layouts/EvaluationLayout.vue";
 import { generalStore } from "~/stores/common/GeneralStore";
-const gstore = generalStore();
-const { popupActive } = storeToRefs(gstore);
+const { popupActive } = storeToRefs(generalStore());
 
 onMounted(() => {
   popupActive.value = false;

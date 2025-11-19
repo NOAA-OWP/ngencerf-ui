@@ -3,20 +3,19 @@
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
         <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
-          class="absolute cursor-pointer right-0 boxed mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
+          class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
     </div>
   </Transition>
   <client-only>
-    <div class="h-screen-inner pr-2">
-
+    <div class="pr-2">
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
             Calibration Runs<br />
             <span style="font-size: 12px;font-weight: normal;">
-              Select row and right click for options.
+              Select a job then right click for available actions.
             </span>
           </h1>
         </div>
@@ -47,26 +46,42 @@
                   :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
                   :title="'Job ID ' + slotProps.data.calibration_run_id">
                   {{ slotProps.data.calibration_run_id }}
+                  <span v-if="slotProps.data.is_locked" class="pi pi-lock"></span>
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="status" header="Status" sortable>
+            <Column :pt="ptColumn" field="gage_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Headwater</span><br /><span>Basin Gage</span>
+                </div>
+              </template>
               <template #body="slotProps">
-                <span v-if="slotProps.data.status" :aria-label="'Status ' + slotProps.data.status"
-                  :title="'Status ' + slotProps.data.status">
-                  {{ slotProps.data.status }}
+                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
+                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
+                  {{ slotProps.data.gage_id }}
                 </span>
               </template>
             </Column>
-            <Column field="submit_date" header="Run Date" sortable>
+            <Column :pt="ptColumn" field="domain_name" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Domain</span>
+                </div>
+              </template>
               <template #body="slotProps">
-                <span :aria-label="'Run Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
-                  :title="'Run Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
+                <span v-if="slotProps.data.domain_name" :aria-label="'Domain ' + slotProps.data.domain_name"
+                  :title="'Domain ' + slotProps.data.domain_name">
+                  {{ slotProps.data.domain_name }}
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="formulation_name" header="Formulation Name" sortable>
+            <Column :pt="ptColumn" field="formulation_name" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Formulation Name</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.formulation_name"
                   :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
@@ -75,15 +90,66 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="gage_id" header="Headwater Basin Gage" sortable>
+            <Column :pt="ptColumn" field="stop_criteria" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Stop Criteria<br/>(Iterations)</span>
+                </div>
+              </template>
               <template #body="slotProps">
-                <span v-if="slotProps.data.gage_id" :aria-label="'Headwater Basin Gage ' + slotProps.data.gage_id"
-                  :title="'Headwater Basin Gage ' + slotProps.data.gage_id">
-                  {{ slotProps.data.gage_id }}
+                <span :aria-label="'Stop Crtieria ' + slotProps.data.stop_criteria"
+                  :title="'Stop Crtieria ' + slotProps.data.stop_criteria">
+                  {{ slotProps.data.stop_criteria > 0 ? slotProps.data.stop_criteria : 'N/A' }}
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="objective_function" header="Objective Function" sortable>
+            <Column :pt="ptColumn" field="created_at" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Creation Date</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
+                  :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
+                  class="whitespace-nowrap">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="last_updated_on" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Last Updated</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span :aria-label="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
+                  :title="'Last Updated ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on)"
+                  class="whitespace-nowrap">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.last_updated_on) }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="submit_date" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Submit Date</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <span :aria-label="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)"
+                  :title="'Submit Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.submit_date) }}
+                </span>
+              </template>
+            </Column>
+            <Column :pt="ptColumn" field="objective_function" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Objective</span><br /><span>Function</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.objective_function"
                   :aria-label="'Objective Function ' + slotProps.data.objective_function"
@@ -92,7 +158,12 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="optimization_algorithm" header="Optimization Algorithm" sortable>
+            <Column :pt="ptColumn" field="optimization_algorithm" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Optimization</span><br /><span>Algorithm</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.optimization_algorithm"
                   :aria-label="'Optimization Algorithm ' + slotProps.data.optimization_algorithm"
@@ -119,8 +190,8 @@ import { useToast } from "primevue/usetoast";
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
-import type { CalibrationRunForForecast, DataTableContextMenuOption } from "@/composables/NextGenModel";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import type { CalibrationRunForForecast, DataTableContextMenuOption } from "@/composables/NgencerfModels";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
@@ -132,9 +203,9 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
-import { ForecastTabs } from "@/composables/NextgenEnums";
+import { ForecastTabs } from "@/composables/NgencerfEnums";
 
-const { deleteCalibrationRun } = useCalibrationJobStore();
+const { deleteCalibrationRun, archiveCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
 
 const { addToastRecord } = generalStore();
 
@@ -147,7 +218,8 @@ const ptColumn = ref({
 });
 
 const forecastStore = useForecastStore();
-const { getCalibrationJobsForForecast, resetUserSelectedForecastCalibrationRun } = forecastStore;
+const { forecastJobId } = storeToRefs(forecastStore);
+const { getCalibrationJobsForForecast, resetUserSelectedForecastCalibrationRun, hardResetForecastRunStatusStore } = forecastStore;
 
 
 const toast = useToast();
@@ -156,22 +228,29 @@ const crContextMenu = ref(); //calibration run context menu
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRunForForecast>();
 
-const gstore = generalStore();
-const { isLoading } = storeToRefs(gstore);
+const { isLoading } = storeToRefs(generalStore());
+const { calibrationDownloadJobID, calibrationDownloadFileName } = storeToRefs(useCalibrationJobStore());
 
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
   const crRowData = event.data as CalibrationRunForForecast;
-  if (calibrationRunForForecast && calibrationRunForForecast.value?.calibration_run_id == crRowData.calibration_run_id) {
+  if (calibrationRunForForecast && calibrationRunForForecast.value?.calibration_run_id === crRowData.calibration_run_id) {
     crContextMenu.value.show(event.originalEvent);
     //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     setSelectedCalibrationRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
-    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-fw-pisearch', command: () => navigateToSetupForecast() });
-    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-fw-pisearch', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
-    //cmCalibrationRun.value.push( { label: 'Evaluate', icon: 'pi pi-fw-pisearch', command: () => openSelectedCalibrationRun() } );
-    //cmCalibrationRun.value.push( { label: 'Show Setup', icon: 'pi pi-fw-pisearch', command: () => onCalibrationRunForForecastRowSelect() } );    
-    cmCalibrationRun.value.push({ label: 'Delete Calibration Job', icon: 'pi pi-fw-pisearch', command: () => deleteSelectedCalibrationRun() });
+    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => navigateToSetupForecast() });
+    cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    if (calibrationRunForForecast.value?.is_downloadable) {
+      cmCalibrationRun.value.push({ label: 'Download Results', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
+    }
+    cmCalibrationRun.value.push({ label: 'Export Calibration Config', icon: 'pi pi-file-export', command: () => exportSelectedCalibrationData() });
+    if (!calibrationRunForForecast?.value?.status.includes('Submitted') && !calibrationRunForForecast?.value?.status.includes('Running') && !calibrationRunForForecast?.value?.is_locked) {
+      cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
+    }
+    if (!calibrationRunForForecast?.value?.status.includes('Submitted') && !calibrationRunForForecast?.value?.status.includes('Running') && !calibrationRunForForecast.value?.is_archived) {
+      cmCalibrationRun.value.push({ label: 'Archive', icon: 'pi pi-folder', command: () => archiveSelectedCalibrationRun(true) });
+    }
   }
 };
 
@@ -197,6 +276,11 @@ const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId } = useForeca
 
 onMounted(async () => {
   isLoading.value = true;
+  forecastJobId.value = undefined;
+
+  //reset Run/Status store in case we have running intervals
+  hardResetForecastRunStatusStore();
+
   hilightTab(ForecastTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
@@ -255,25 +339,26 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
 });
 
 const openSelectedCalibrationRun = async () => {
-  console.log('openSelectedCalibrationRun');
-  console.log('calibrationRunForForecast.value.calibration_run_id: ', calibrationRunForForecast.value?.calibration_run_id);
   isLoading.value = true;
   resetUserSelectedEvalValidationRun();
-  console.log('calibrationRunForForecast.value.calibration_run_id: ', calibrationRunForForecast.value?.calibration_run_id);
-
   await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
   await fetchUserSelectedCalibrationValidationRunList();
   navigateToSetupForecast();
   isLoading.value = false;
 };
 
-const navigateToSetupForecast = () => {
+const navigateToSetupForecast = async () => {
   if (calibrationRunForForecast?.value?.calibration_run_id && calibrationRunForForecast.value.calibration_run_id > 0) {
-    const tabs = document.getElementsByClassName("tabs");
-    const e = <HTMLElement>tabs[ForecastTabs.tab_setupForecast];
-    e.click();
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
+    if (e) {
+      await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
+      e.click();
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Setup Forecast Tab not found', life: ToastTimeout.timeoutError};
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -311,16 +396,155 @@ const deleteSelectedCalibrationRun = () => {
 const acceptDelete = (selectedRunId: number) => {
   deleteCalibrationRun(selectedRunId).then(response => {
     if (response.status === 200) {
-      fetchUserValidatedCalibrationJobsListData();
+      let successMessages: string[] = [];
+      let failureMessages: string[] = [];
+      response._data?.jobs.forEach(job => {
+        if (job.success) {
+          successMessages.push(job.message);
+        } else {
+          failureMessages.push(job.message);
+        }
+      });
+      toast.removeAllGroups();
+      if (successMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'success', 
+          summary: 'Delete Job', detail: successMessages.join('\n'), 
+          life: ToastTimeout.timeoutSuccess};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (failureMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'error', 
+          summary: 'Delete Job', detail: failureMessages.join('\n'), 
+          life: ToastTimeout.timeoutError};
+        toast.add(tMsg); addToastRecord(tMsg);
+      } 
+      getCalibrationJobsForForecast();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: ToastTimeout.timeout10000 };
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }
   });
   calibrationRunForForecast.value = undefined;
 };
+
+const confirmArchive = useConfirm();
+const archiveSelectedCalibrationRun = () => {
+  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
+  let confirmMessage = "Are you sure you want to Archive this calibration run? Unarchiving must be done from the Calibration workflow."
+  confirmArchive.require({
+    message: confirmMessage,
+    header: 'Confirm Archive',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: "ARCHIVE RUN",
+    },
+    accept: () => acceptArchive(selectedRunId),
+    reject: () => {
+      //do nothing
+    }
+  })
+}
+const acceptArchive = (selectedRunId: number) => {
+  archiveCalibrationRun(selectedRunId, true).then(async (response) => {
+    if (response.status === 200) {
+      let successMessages: string[] = [];
+      let failureMessages: string[] = [];
+      response._data?.jobs.forEach(job => {
+        if (job.success) {
+          successMessages.push(job.message);
+        } else {
+          failureMessages.push(job.message);
+        }
+      });
+      toast.removeAllGroups();
+      if (successMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'success', 
+          summary: 'Archive Job', detail: successMessages.join('\n'), 
+          life: ToastTimeout.timeoutSuccess};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (failureMessages.length > 0) {
+        const tMsg: ToastMessageOptions = { severity: 'error', 
+          summary: 'Archive Job', detail: failureMessages.join('\n'), 
+          life: ToastTimeout.timeoutError};
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      getCalibrationJobsForForecast();
+    } else {
+      useApiErrorResponsePreprocess(response).forEach(message => {
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Archive Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
+  });
+  selectedCalibrationRun.value = undefined;
+}
+
+/**
+ * Export user's calibration job configuration data to a JSON file
+ */
+const exportSelectedCalibrationData = async () => {
+  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
+  isLoading.value = true;
+  const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Export Calibration Config', detail: 'Request to export Calibration Job ID ' + selectedRunId + ' has been processed.', life: ToastTimeout.timeoutInfo };
+  toast.add(tMsg); addToastRecord(tMsg);
+  nextTick(async () => {
+    try {
+      await exportJob(selectedRunId);
+    } catch (error) {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Export Calibration Config Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+    isLoading.value = false;
+  })
+}
+
+/**
+ * Download all files in user's calibration job folder to a zip file
+ */
+ const downloadSelectedCalibrationData = async () => {
+  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
+  if (calibrationRunForForecast.value?.is_downloadable) {
+    //isLoading.value = true;
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Results Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and will be prompted to save when the file is ready.', life: ToastTimeout.timeoutInfo };
+    toast.add(tMsg); addToastRecord(tMsg);
+    nextTick(async () => {
+      try {
+        // If successful, this job will update calibrationDownloadFileName, and watch function will trigger a Toast message
+        await getCalibrationJobZip(selectedRunId);
+      } catch (error) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Results Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeoutError };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      //isLoading.value = false;
+    })
+  } else {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: 'Data cannot be downloaded for Calibration Job + ' + selectedRunId + '.', life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+}
+
+watch(calibrationDownloadJobID, () => {
+  if (calibrationDownloadJobID.value) {
+    // Display Toast message saying download was successful and then clear the Job ID/filename refs
+    // to avoid interfering with next download
+    let tDetail = 'Results zip file successfully created.'
+    if (calibrationDownloadFileName.value) {
+      tDetail = 'Results zip file "' + calibrationDownloadFileName.value + '" successfully created.'
+    }
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Results Successful for Calibration Job ID ' + calibrationDownloadJobID.value, detail: tDetail, life: ToastTimeout.timeoutInfo };
+    toast.add(tMsg); addToastRecord(tMsg);
+    calibrationDownloadJobID.value = null;
+    calibrationDownloadFileName.value = null;
+  }
+});
 
 const toggleMessagesGroup = () => {
   if (showMessagesGroup.value) {
@@ -346,7 +570,7 @@ const toggleMessagesGroup = () => {
 
 #CalibrationRunForForecastTable,
 .gage-filter-wrapper {
-  width: 1270px;
+  width: 1325px;
   margin: 0 auto;
 }
 

@@ -349,17 +349,13 @@ select option {
   text-align: center;
   vertical-align: middle;
 }
+
 .dp__input_icons {
   padding: 10px 12px !important;
 }
 .dp--clear-btn, .dp__input_icon {
   top: 16px !important;
 }
-.p-listbox-option {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
 // DataTables
 .p-datatable-header-cell {
   padding: 5px 8px !important;
@@ -397,7 +393,8 @@ select option {
   font-size: 0.8em;
   white-space: nowrap;
 }
-#MainLeftDataArea .p-datatable-tbody > tr.p-datatable-row-selected {
+#MainLeftDataArea .p-datatable-tbody > tr.p-datatable-row-selected,
+#MainLeftDataArea .p-datatable-tbody > tr.p-datatable-row-selected:hover {
   background-color: #D8FFD8 !important;    
   color: black;
 }
@@ -405,13 +402,16 @@ select option {
 
 .pagination-box {
   display: grid;
-  grid-template-columns: 35% 65%;
-  gap: 10px;
+  /*grid-template-columns: 35% 65%;
+  gap: 10px;*/
+  grid-template-columns: 23% 75%;
+  gap: 2%;
 }
 .pagination-rows, .pagination-go-to-page, .pagination-pages {margin-bottom: 4px; font-weight: normal; font-size: 13px;}
 .pagination-go-to-page input {width:70px; display: inline-block; padding: 2px 3px;font-size: 13px;}
 .pagination-go-to-page, .pagination-pages {display:inline-block; margin-top:-10px;}
-.pagination-go-to-page {width:30%;text-align: center;}
+.pagination-go-to-page {width:30%;text-align: right; padding-right: 0px;}
+#PlotTableArea .pagination-go-to-page {padding-right: 14px;}
 .pagination-pages {width:70%;}
 
 // default color ovewrites
@@ -470,6 +470,16 @@ table.alt-row-colors {
     background-color: global.$ngwcp_neutral_gray_md;
   }
 }
+
+// Style for two line column headers
+.column-header {
+  font-size: 0.8em;
+  font-weight: bold;
+  line-height: 1.4em;
+  text-align: center;
+  margin: auto auto;
+}
+
 table.cols-bordered {
   border: 1px solid #e6e6e6;
   border-width: 3px 0 3px 3px;
@@ -487,44 +497,50 @@ table.cols-bordered {
 
 // Help Pages
 ._help-page {
-  padding: 10px;
+  padding: 5px 5px 5px 5px;
 }
 
 ._help-title {
-  text-align: center;
-  font-size: 2em;
+  font-size: 24px;
   font-weight: bold;
+  text-align: center;
   margin-bottom: 10px;
   line-height: 1.3em;
 }
 
 ._help-subtitle {
-  text-align: left;
-  font-weight: bold;
-  margin: 15px 30px;
-  padding: 0 50px; 
+  font-size: 14 px;
+  text-align: center;
+  margin: 10px 10px;
+  padding: 0 10px; 
 }
 
 ._help-table {
-  margin-top: 20px;
-  margin-left: 20px;
+  margin-top: 5px;
+  margin-left: 5px;
 }
 
 ._help-table .td1 {
   text-align: right;
-  padding-right: 30px;
-  width: 350px;
-  vertical-align: top !important;
-  font-weight: 600;
+    width: auto;
+    min-width: 200px;
+    vertical-align: top !important;
+    font-weight: 600;
 }
 
 ._help-table .td2 {
   width: auto;
+    padding-left: 15px;
+    vertical-align: top;
 }
 
-
 ._help-page p {
-  line-height: 2em;
+  line-height: normal;
+}
+
+._help-page hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 /* Right Side Blocks */
@@ -537,11 +553,8 @@ table.cols-bordered {
   font-size: .9em;
 }
 
-#GageCutout {
-  margin-right: 5px;
-  max-height: 300px;
-
-}
+#TopRightBlock {padding: 10px 0px 0px 15px;}
+#GageCutout {margin-top:-40px;}
 
 /* Toast */
 .p-toast {
@@ -555,19 +568,6 @@ table.cols-bordered {
   border: 2px solid;
 }
 
-/* Listbox select (for Tuning Tab) */
-.p-listbox {
-  border-radius: 0px;
-}
-.p-listbox-list {
-  padding: 0px !important;
-}
-.p-listbox-list-container {
-  margin-top: 7px;
-}
-.p-listbox-option-selected {
-  background-color: global.$ngwcp_green_lt !important; 
-}
 #MainLeftDataArea .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected {
   color: var(--p-listbox-option-color); 
   font-weight: 500;
@@ -607,6 +607,62 @@ table.cols-bordered {
   }
 }
 
-.basin-gage-filter { 
-  width: 220px !important;
+#MainLeftDataArea .p-datatable-hoverable .p-datatable-selectable-row:hover {
+  /*background-color: var(--p-listbox-option-selected-background) !important;*/
+  background-color: #ecfdf5 !important;
+}
+
+.successBg .p-checkbox-box {
+  background-color: #4CAF50 !important;
+  border-color: #4CAF50 !important;
+}
+
+.infoBg .p-checkbox-box {
+  background-color: #2196F3 !important;
+  border-color: #2196F3 !important;
+}
+
+.warnBg .p-checkbox-box {
+  background-color: #FFC107 !important;
+  border-color: #FFC107 !important;
+}
+
+.errorBg .p-checkbox-box {
+  background-color: #FF5252 !important;
+  border-color: #FF5252 !important;
+}
+
+.successBg .p-checkbox-checked .p-checkbox-box,
+.infoBg .p-checkbox-checked .p-checkbox-box,
+.warnBg .p-checkbox-checked .p-checkbox-box,
+.errorBg .p-checkbox-checked .p-checkbox-box {
+  opacity: 1;
+}
+
+.successBg .p-checkbox-box,
+.infoBg .p-checkbox-box,
+.warnBg .p-checkbox-box,
+.errorBg .p-checkbox-box {
+  opacity: 0.3;
+}
+
+.vertical-separator {
+  width:1px; height: 100%; background-color: #d9d9d9; position: relative; display: block; margin-left: auto; margin-right: auto;
+}
+
+.JobsFilterBox {
+  .JobsFilterSelect  {
+    background-color: #f3f3f3;
+    border: 0px solid #d9d9d9 !important;    
+    padding-top: 4px;
+    padding-bottom: 4px;  
+
+    .p-multiselect-label {
+      padding: 0px;
+    }
+
+    .p-multiselect-dropdown {
+      color:#000000;
+    }
+  }
 }

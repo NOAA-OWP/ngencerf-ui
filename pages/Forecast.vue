@@ -10,8 +10,8 @@ import { onMounted } from "vue";
 import ForecastLayout from "@/layouts/ForecastLayout.vue";
 
 import { generalStore } from "~/stores/common/GeneralStore";
-const gstore = generalStore();
-const { popupActive } = storeToRefs(gstore);
+
+const { popupActive } = storeToRefs(generalStore());
 
 onMounted(() => {
   popupActive.value = false;

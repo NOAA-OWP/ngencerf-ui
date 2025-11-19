@@ -2,16 +2,22 @@ import { DateTime, Duration } from "luxon";
 
 
 /**
+ * Returns current timestamp as DateTime object
+ * @param d
+ * @returns {DateTime} DateTime object
+ */
+export const nowUTC = () => {
+  return DateTime.utc();
+};
+
+
+/**
  * Converts a string in ISO format or a Date object to a DateTime object
  * @param d
  * @returns {DateTime} DateTime object
  */
 export const convertISOStringOrDateToDateTime = (d: string | Date): any => {
-  if (typeof d === 'string') {
-    return DateTime.fromISO(d, { zone: 'utc' });
-  } else {
-    return DateTime.fromJSDate(d, { zone: 'utc' });
-  }
+  return DateTime.fromISO(d, { zone: 'utc' });
 };
 
 /**
@@ -49,7 +55,6 @@ export const formatISOStringOrDateToYYYYMMDD = ( d: string | Date ): string => {
     return d;
   }
 
-  // convert string or Date object to Luxon DateTime in UTC
   dateTime = convertISOStringOrDateToDateTime(d);
 
   // Return the formatted date in 'yyyy-MM-dd' format
@@ -63,7 +68,7 @@ export const formatISOStringOrDateToYYYYMMDD = ( d: string | Date ): string => {
  */
 export const formatDateForRunOnString = (d: Date): string => {
   const dateTime = DateTime.fromJSDate(d, { zone: 'utc' });
-  return dateTime.toFormat("MM-dd yyyy 'at' HH:mm:ss 'UTC'");
+  return dateTime.toFormat("MMM d, yyyy 'at' HH:mm:ss 'UTC'");
 };
 
 /**
@@ -151,17 +156,20 @@ export function calculateElapsedTime(start_time: Date, end_time: Date): string {
  * @returns {string} string representation of a Duration object in 'hh:mm:ss or 'd 'Days,' hh:mm:ss' format
  */
 export function formatElapsedTime(elapsedTime: string): string {
-  // parse out hours, minutes, and seconds from the elapsed_time string
-const [hours, minutes, rawSeconds] = elapsedTime.split(':');
-const seconds = Number(rawSeconds?.split('.')[0]); // remove decimal part safely
+  let days = 0;
+  if (elapsedTime.split(' ').length > 1) {
+    days = parseInt(elapsedTime.split(' ')[0]);
+  }
+  // account for possibility of days showing up first separated by a space for values >= 24 hours
+  const [hours, minutes, rawSeconds] = elapsedTime.split(' ').length > 1 ? elapsedTime.split(' ')[1].split(':') : elapsedTime.split(':');
+  const seconds = Number(rawSeconds?.split('.')[0]); // remove decimal part safely
 
-  // convert elapsedTime string into a Duration object
   const duration = Duration.fromObject({
-    hours: hours || 0,
-    minutes: minutes || 0,
-    seconds: Math.floor(seconds) // ignore milliseconds
+    hours: days > 0 ? parseInt(hours) + (days*24): parseInt(hours) || 0,
+    minutes: parseInt(minutes) || 0,
+    seconds: Math.floor(seconds), // ignore milliseconds
   });
-
+  
   // return the formatted string in 'hh:mm:ss' or 'd 'Days,' hh:mm:ss' format
   return formatDuration(duration);
 }; 
@@ -177,12 +185,17 @@ export function sumAndFormatElapsedTimes(elapsedTimesArray: string[]): string {
 
   // iterate through the array of elapsed times
   elapsedTimesArray.forEach((elapsedTime) => {
-    const [hours, minutes, rawSeconds] = elapsedTime.split(':');
+    let days = 0;
+    if (elapsedTime.split(' ').length > 1) {
+      days = parseInt(elapsedTime.split(' ')[0]);
+    }
+    // account for possibility of days showing up first separated by a space for values >= 24 hours
+    const [hours, minutes, rawSeconds] = elapsedTime.split(' ').length > 1 ? elapsedTime.split(' ')[1].split(':') : elapsedTime.split(':');
     const seconds = Number(rawSeconds?.split('.')[0]); // remove decimal part safely
 
     const duration = Duration.fromObject({
-      hours: hours || 0,
-      minutes: minutes || 0,
+      hours: days > 0 ? parseInt(hours) + (days*24): parseInt(hours) || 0,
+      minutes: parseInt(minutes) || 0,
       seconds: Math.floor(seconds), // ignore milliseconds
     });
 
@@ -208,7 +221,7 @@ export function formatDuration(duration: any): string {
   let totalSeconds = Math.floor(duration.seconds);
   let totalMinutes = duration.minutes + Math.floor(totalSeconds / 60);
   let totalHours = duration.hours + Math.floor(totalMinutes / 60);
-  let days = Math.floor(duration.as('days')) + Math.floor(totalHours / 24);
+  let totalDays = Math.floor(duration.days);
 
   // normalize the values
   const seconds = totalSeconds % 60;
@@ -216,6 +229,11 @@ export function formatDuration(duration: any): string {
   const hours = totalHours % 24;
 
   // construct string in 'hh:mm:ss' or 'd 'Days,' hh:mm:ss' format
-  const daysPart = days > 0 ? `${days} Days, ` : '';
+  let daysPart = '';
+  if (totalDays === 1) {
+    daysPart = '1 Day, ';
+  } else if (totalDays > 1) {
+    daysPart = `${totalDays} Days, `
+  }
   return daysPart + Duration.fromObject({ hours, minutes, seconds }).toFormat("hh:mm:ss");
 };
