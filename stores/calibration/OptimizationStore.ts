@@ -222,13 +222,6 @@ export const useOptimizationStore = defineStore(
       }
     }
 
-    const getSelectedMetricInfo = computed(() => {
-      const selectedMetric = optimizationTabData.value?.metrics.filter(
-        (metric_data) => metric_data.name === uiObjectiveFunction.value
-      );
-      return selectedMetric;
-    });
-
     const resetOptimizationInputs = () => {
       uiOptimizationInputs.value.forEach((input_data) => {
         input_data.value = 0;
@@ -283,7 +276,6 @@ export const useOptimizationStore = defineStore(
       showObjectiveFunctionStreamFlow,
       optMetDataHasChanged,
       algParamDataHasChanged,
-      getSelectedMetricInfo,
       getOptimizationInputUserData,
       saveOptimizationTabData,
       resetOptimizationInputs,

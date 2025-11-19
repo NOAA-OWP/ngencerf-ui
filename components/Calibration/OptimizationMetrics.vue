@@ -88,7 +88,7 @@
               <div class="pl-8">
                 <span class="text-sm ml-2">(POD, CSI, FAR)</span>
               </div>
-              <div v-if="showMetricStreamFlow" id="FlowThreshold" class="mt-2 pl-8">
+              <div v-if="showMetricStreamFlow && !cbCategoricalDisabled" id="FlowThreshold" class="mt-2 pl-8">
 
                 Flow Threshold <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
                   :minFractionDigits="2" class="w-24" aria-label="Flow Threshold" title="Flow Threshold"
@@ -105,7 +105,7 @@
               <div class="pl-8">
                 <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
               </div>
-              <div v-if="showMetricPeakFlow" id="FlowThreshold" class="mt-2 pl-8">
+              <div v-if="showMetricPeakFlow && !cbEventBasedDisabled" id="FlowThreshold" class="mt-2 pl-8">
                 Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
                   :minFractionDigits="2" class="w-24" aria-label=" Peak Flow Threshold" title=" Peak Flow Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
@@ -217,6 +217,7 @@ const nextPrevDialogOpened = ref<boolean>(false);
 
 const optimizationStore = useOptimizationStore();
 const {
+  optimizationTabData,
   uiObjectiveFunction,
   uiOptimization,
   uiOptimizationInputs,
@@ -229,7 +230,6 @@ const {
   getObjectiveFunctionOptionsList,
   showObjectiveFunctionPeakFlow,
   showObjectiveFunctionStreamFlow,
-  getSelectedMetricInfo,
   getOptimizationInputUserData,
   optMetDataHasChanged,
   algParamDataHasChanged,
@@ -245,6 +245,7 @@ const toast = useToast();
 const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
+const selectedMetric = ref<OptimizationMetricData>();
 const cbCategoricalDisabled = ref<boolean>(false);
 const cbEventBasedDisabled = ref<boolean>(false);
 const cbIsCategorical = ref<boolean>(false);
@@ -257,6 +258,9 @@ onMounted(() => {
   hilightTab(CalibrationTabs.tab_optimizationMetrics);
   toast.removeAllGroups();
   if (ele) { ele.scrollTo(0, 0); }
+
+  updateMetricFlowFieldVisibility();
+
   if (userCalibrationRunData.value?.streamflow_threshold) {
     cbIsCategorical.value = true;
     showMetricStreamFlow.value = true;
@@ -268,6 +272,7 @@ onMounted(() => {
     showMetricPeakFlow.value = true;
     uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold;
   }
+
   isLoading.value = false;
 })
 
@@ -275,27 +280,29 @@ onMounted(() => {
  * update objective function and metric peak flow/stream flow field visibility
  */
 const updateMetricFlowFieldVisibility = () => {
-  if (getSelectedMetricInfo.value) {
-    //reset toggleable field available property
-    cbCategoricalDisabled.value = false;
-    cbEventBasedDisabled.value = false;
-    showObjectiveFunctionStreamFlow.value = false;
-    showObjectiveFunctionPeakFlow.value = false;
-    uiStreamFlowThreshold.value = undefined;
-    uiPeakFlowThreshold.value = undefined;
-    showMetricStreamFlow.value = false;
-    showMetricPeakFlow.value = false;
+  //reset toggleable field available property
+  cbCategoricalDisabled.value = false;
+  cbEventBasedDisabled.value = false;
+  showObjectiveFunctionStreamFlow.value = false;
+  showObjectiveFunctionPeakFlow.value = false;
+  uiStreamFlowThreshold.value = undefined;
+  uiPeakFlowThreshold.value = undefined;
+  showMetricStreamFlow.value = false;
+  showMetricPeakFlow.value = false;
 
-    const metricInfo = getSelectedMetricInfo.value?.pop();
+  selectedMetric.value = optimizationTabData.value?.metrics.find(
+    metric_data => metric_data.name === uiObjectiveFunction.value
+  );
 
-    cbIsCategorical.value = metricInfo?.categorical ?? false;
-    cbIsEventBased.value = metricInfo?.event_based ?? false;
+  if (selectedMetric.value) {
+    cbIsCategorical.value = selectedMetric?.value?.categorical ?? false;
+    cbIsEventBased.value = selectedMetric?.value?.event_based ?? false;
 
-    if (metricInfo?.categorical === true) {
+    if (selectedMetric?.value?.categorical === true) {
       showObjectiveFunctionStreamFlow.value = true;
       cbCategoricalDisabled.value = true;
     }
-    if (metricInfo?.event_based === true) {
+    if (selectedMetric?.value?.event_based === true) {
       showObjectiveFunctionPeakFlow.value = true;
       cbEventBasedDisabled.value = true;
     }
@@ -354,22 +361,20 @@ const optimizationSelectChange = () => {
  * make sure we manage the display base on user input AFTER data loading has completed 
  */
 watch(() => optimizationStore_data_loading.value, (loading_status) => {
-  const metricInfo = getSelectedMetricInfo.value?.pop();
-
-  if (metricInfo?.categorical === true) {
+  if (selectedMetric?.value?.categorical === true) {
     showObjectiveFunctionStreamFlow.value = true;
     cbCategoricalDisabled.value = true;
     cbIsCategorical.value = true;
-  } else if (!metricInfo?.categorical && uiStreamFlowThreshold.value) {
+  } else if (!selectedMetric?.value?.categorical && uiStreamFlowThreshold.value) {
     showMetricStreamFlow.value = true;
     cbIsCategorical.value = true;
   }
 
-  if (metricInfo?.event_based === true) {
+  if (selectedMetric?.value?.event_based === true) {
     showObjectiveFunctionPeakFlow.value = true;
     cbEventBasedDisabled.value = true;
     cbIsEventBased.value = true;
-  } else if (!metricInfo?.event_based && uiPeakFlowThreshold.value) {
+  } else if (!selectedMetric?.value?.event_based && uiPeakFlowThreshold.value) {
     showMetricPeakFlow.value = true;
     cbIsEventBased.value = true;
   }
