@@ -14,7 +14,23 @@ import { formatElapsedTime, formatDateForRunOnString } from '@/utils/TimeHelpers
 
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
-  const { userCalibrationRunData, uiGageId, uiGageList, ngenLogLevel, forcingLogLevel, logLevels, statusTypeFilterList } = storeToRefs(useUserDataStore());
+  const { 
+    userCalibrationRunData, 
+    uiGageId, 
+    uiGageList, 
+    createdAtStart,
+    createdAtEnd,
+    minCreatedAt,
+    maxCreatedAt,
+    jobIdStart,
+    jobIdEnd,
+    minJobId,
+    maxJobId,
+    statusTypeFilterList,
+    ngenLogLevel, 
+    forcingLogLevel, 
+    logLevels
+  } = storeToRefs(useUserDataStore());
   const {
     getAccessToken,
     fetchUserCalibrationRunData,
@@ -126,6 +142,32 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         direction: forecastRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
+        date_filter:
+          (createdAtStart.value && createdAtEnd.value) ? {
+            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+            operator: "between"
+          } : createdAtStart.value ? {
+            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+            operator: "after"
+          } : createdAtEnd.value ? {
+            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+            operator: "before"
+          } : {}
+        ,
+        id_filter:
+          (jobIdStart.value && jobIdEnd.value) ? {
+            start_id: jobIdStart.value,
+            end_id: jobIdEnd.value,
+            operator: "between"
+          } : jobIdStart.value ? {
+            id: jobIdStart.value,
+            operator: "after"
+          } : jobIdEnd.value ? {
+            id: jobIdEnd.value,
+            operator: "before"
+          } : {}
+        ,
         status: statusTypeFilterList.value
       }
     }
@@ -153,6 +195,14 @@ export const useForecastStore = defineStore('ForecastStore', () => {
           jobItem.submit_date = jobItem.cold_start.cold_start_submit_date;
         }
       });
+    }
+    if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
+      minCreatedAt.value = runListDataResult?._data?.date_range[0];
+      maxCreatedAt.value = runListDataResult?._data?.date_range[1];
+    }
+    if (runListDataResult?._data?.id_range && runListDataResult?._data?.id_range.length === 2) {
+      minJobId.value = runListDataResult?._data?.id_range[0];
+      maxJobId.value = runListDataResult?._data?.id_range[1];
     }
   }
 
@@ -378,6 +428,32 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       },
       filters: {
         gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
+        date_filter:
+          (createdAtStart.value && createdAtEnd.value) ? {
+            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+            operator: "between"
+          } : createdAtStart.value ? {
+            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+            operator: "after"
+          } : createdAtEnd.value ? {
+            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+            operator: "before"
+          } : {}
+        ,
+        id_filter:
+          (jobIdStart.value && jobIdEnd.value) ? {
+            start_id: jobIdStart.value,
+            end_id: jobIdEnd.value,
+            operator: "between"
+          } : jobIdStart.value ? {
+            id: jobIdStart.value,
+            operator: "after"
+          } : jobIdEnd.value ? {
+            id: jobIdEnd.value,
+            operator: "before"
+          } : {}
+        ,
         include_archived: false
       },
       get_gages: uiGageList.value.length === 0
@@ -400,6 +476,14 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     if (runListDataResult?._data?.gages) {
       uiGageList.value = runListDataResult?._data?.gages;
       uiGageList.value.sort();
+    }
+    if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
+      minCreatedAt.value = runListDataResult?._data?.date_range[0];
+      maxCreatedAt.value = runListDataResult?._data?.date_range[1];
+    }
+    if (runListDataResult?._data?.id_range && runListDataResult?._data?.id_range.length === 2) {
+      minJobId.value = runListDataResult?._data?.id_range[0];
+      maxJobId.value = runListDataResult?._data?.id_range[1];
     }
   };
 

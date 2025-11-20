@@ -96,7 +96,7 @@
         <div>
           <div class="text-right mr-[16px] whitespace-nowrap">
             <Button id="ClearFiltersButton" class="c-blue mt-[22px]" label="Clear Filters"
-              @click="resetFilters()" aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
+              @click="resetFilters()" aria-label="Clear filters" title="Clear filters" :disabled="filterInactive">
             </Button><br />
             <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="clearGageList(); refreshJobList()"
               aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
@@ -202,14 +202,14 @@ const props = withDefaults(defineProps<Props>(), {
   showJobId: true,
 });
 
-const filterActive = computed(() => {
+const filterInactive = computed(() => {
   return (
-    (props.showModules === false || uiGageId.value === '' || uiGageId.value === 'All') && 
+    (props.showGage === false || uiGageId.value === '' || uiGageId.value === 'All') && 
     (props.showModules === false || modulesFilterList.value.length === 0) && 
     (props.showStatus === false || statusTypeFilterList.value === null || statusTypeFilterList.value.length === 0) &&
-    (props.showArchived === false || includeArchivedJobs.value === false) ||
-    (props.showCreatedAt === false || (createdAtStart === null && createdAtEnd === null)) ||
-    (props.showJobId === false || (jobIdStart === null && jobIdEnd === null))
+    (props.showArchived === false || includeArchivedJobs.value === false) &&
+    (props.showCreatedAt === false || (createdAtStart.value === null && createdAtEnd.value === null)) &&
+    (props.showJobId === false || (jobIdStart.value === null && jobIdEnd.value === null))
   );
 });
 
