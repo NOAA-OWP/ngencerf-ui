@@ -3,87 +3,111 @@
 
     <div id="FilterDialog">
 
-      <div class="grid grid-cols-12 gap-2 text-sx">
-        <div class="col-span-2" v-show="showGage">
-          <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
-            title="Headwater Basin Gage">Headwater Basin Gage</label>
-          <Select id="HeadwaterBasinGage" class="mt-1 basin-gage-filter text-left" v-model="uiGageId"
-            :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
-            aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
-            :disabled="disableAll" @change="refreshJobList();">
-          </Select>
-        </div>
-
-        <div class="col-span-2" v-show="showStatus">
-          <label class="block text-left mb-1" for="StatusList" aria-label="Status Filter"
-            title="Status Filter">Status</label>
-          <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
-            optionValue="filterValue" :maxSelectedLabels="3" class="JobsFilterSelect w-full" aria-label="Status Filter"
-            title="Status Filter" :disabled="disableAll" @change="refreshJobList()">
-            <template #header>
-              <div class="absolute cursor-pointer top-2 left-[38px]">&nbsp; Select All Items</div>
-            </template>
-            <template #option="slotProps">
-              <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
-                :title="slotProps.option.filterValue">
-                {{ slotProps.option.filterValue }}
-              </div>
-            </template>
-          </MultiSelect>
-        </div>
-
-        <div class="col-span-4" v-show="showModules">
-          <div class="grid grid-cols-2">
-            <div class="col-span-2">
-              <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
-                title="Module Filter">Modules</label>
+      <div class="grid grid-cols-6 gap-2 text-sx">
+        <div class="col-span-5">
+          <div class="flex flex-wrap gap-2">
+            <div v-show="showGage" class="whitespace-nowrap">
+              <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
+                title="Headwater Basin Gage">Headwater Basin Gage</label>
+              <Select id="HeadwaterBasinGage" class="mt-1 basin-gage-filter text-left w-40" v-model="uiGageId"
+                :options="calibrationRunGageList" filter optionLabel="name" optionValue="name" placeholder="All"
+                aria-label="Headwater Basin Gage Filter Select" title="Headwater Basin Gage Filter Select"
+                :disabled="disableAll" @change="refreshJobList();">
+              </Select>
             </div>
-            <div>
-              <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
-                optionLabel="display_name" optionValue="name" :maxSelectedLabels="3" class="JobsFilterSelect w-full" aria-label="Module Filter"
-                title="Module Filter" :disabled="disableAll" @change="refreshJobList()">
+            
+            <div v-show="showStatus" class="whitespace-nowrap">
+              <label class="block text-left mb-1" for="StatusList" aria-label="Status Filter"
+                title="Status Filter">Status</label>
+              <MultiSelect id="StatusList" v-model="statusTypeFilterList" :options="StatusTypes" optionLabel="status"
+                optionValue="filterValue" :maxSelectedLabels="3" class="JobsFilterSelect w-40" aria-label="Status Filter"
+                title="Status Filter" :disabled="disableAll" @change="refreshJobList()">
                 <template #header>
                   <div class="absolute cursor-pointer top-2 left-[38px]">&nbsp; Select All Items</div>
                 </template>
                 <template #option="slotProps">
-                  <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
-                    :title="slotProps.option.name">
-                    {{ slotProps.option.display_name }}&nbsp;
+                  <div class="font-ui leading-none" :aria-label="slotProps.option.filterValue"
+                    :title="slotProps.option.filterValue">
+                    {{ slotProps.option.filterValue }}
                   </div>
                 </template>
               </MultiSelect>
             </div>
-            <div>
-              <Select id="ModuleOperator" v-model="moduleOperator" :options="moduleOperatorList" optionLabel="name"
-                optionValue="name" class="user-select" @change="refreshJobList()"
-                v-show="modulesFilterList.length > 1" aria-label="Module Operator" title="Module Operator">
-              </Select>
+
+            <div v-show="showModules" class="whitespace-nowrap">
+              <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
+                title="Module Filter">Modules</label>
+              <div class="flex gap-2 w-70">
+                <div>
+                  <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
+                    optionLabel="display_name" optionValue="name" :maxSelectedLabels="3" class="JobsFilterSelect w-40" aria-label="Module Filter"
+                    title="Module Filter" :disabled="disableAll" @change="refreshJobList()">
+                    <template #header>
+                      <div class="absolute cursor-pointer top-2 left-[38px]">&nbsp; Select All Items</div>
+                    </template>
+                    <template #option="slotProps">
+                      <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
+                        :title="slotProps.option.name">
+                        {{ slotProps.option.display_name }}&nbsp;
+                      </div>
+                    </template>
+                  </MultiSelect>
+                </div>
+                <div>
+                  <Select id="ModuleOperator" v-model="moduleOperator" :options="moduleOperatorList" optionLabel="name"
+                    optionValue="name" class="user-select w-12" @change="refreshJobList()"
+                    v-show="modulesFilterList.length > 1" aria-label="Module Operator" title="Module Operator">
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-2" v-show="showCreatedAt || showJobId">
+              <div class="flex gap-2" v-show="showCreatedAt">
+                <div>
+                  <label class="block text-left mb-1" for="createdAtStart" aria-label="Created After Filter"
+                    title="Created After Filter">Created After</label>
+                  <VueDatePicker id="createdAtStart" v-model="createdAtStart" class="dp__theme_dark w-40" text-input format="yyyy-MM-dd"
+                    @update:model-value="convertCreatedAtStartStringToDateTimeObject" :enable-time-picker="false"
+                    v-bind="minMaxCreatedAtProps" :teleport="true" utc='preserve'/>
+                </div>
+                <div>
+                  <label class="block text-left mb-1" for="createdAtEnd" aria-label="Created Before Filter"
+                    title="Created Before Filter">Created Before</label>
+                  <VueDatePicker id="createdAtEnd" v-model="createdAtEnd" class="dp__theme_dark w-40" text-input format="yyyy-MM-dd"
+                    @update:model-value="convertCreatedAtEndStringToDateTimeObject" :enable-time-picker="false"
+                    v-bind="minMaxCreatedAtProps" :teleport="true" utc='preserve'/>
+                </div>
+              </div>
+              <div class="flex gap-2" v-show="showJobId">
+                <div>
+                  <label class="block text-left mb-1" for="jobIdStart" aria-label="Job ID Start Filter"
+                    title="Job ID Start Filter">Job ID Start</label>
+                  <InputNumber id="jobIdStart" class="w-24" v-model="jobIdStart" v-bind="minMaxJobIdProps"/>
+                </div>
+                <div>
+                  <label class="block text-left mb-1" for="jobIdEnd" aria-label="Job ID End Filter"
+                    title="Job ID End Filter">Job ID End</label>
+                  <InputNumber id="jobIdEnd" class="w-24" v-model="jobIdEnd" v-bind="minMaxJobIdProps"/>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <!--- Pad with empty cells to the right of filters that aren't shown -->
-        <div class="col-span-2" v-show="!showGage"></div>
-        <div class="col-span-2" v-show="!showStatus"></div>
-        <div class="col-span-4" v-show="!showModules"></div>
-        <div class="col-span-4">
-          <div class="grid grid-cols-8">
-            <div class="col-span-4">
-              <span v-show="showArchived">
-                <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs mt-[30px] ml-[28px]"
-                  aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
-                  :pt="ptCheckbox" :disabled="disableAll" @change="refreshJobList()">
-                </Checkbox>
-                <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
-                  title="Include Archived Jobs">Include Archived</label>
-              </span>
-            </div>
-            <div class="col-span-4 text-right mr-[16px]">
-              <Button id="ClearFiltersButton" class="c-blue mt-[22px]" label="Clear Filters"
-                @click="resetFilters()" aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
-              </Button><br />
-              <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="clearGageList(); refreshJobList()"
-                aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
-              </Button>
+        <div>
+          <div class="text-right mr-[16px] whitespace-nowrap">
+            <Button id="ClearFiltersButton" class="c-blue mt-[22px]" label="Clear Filters"
+              @click="resetFilters()" aria-label="Clear filters" title="Clear filters" :disabled="filterActive">
+            </Button><br />
+            <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="clearGageList(); refreshJobList()"
+              aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
+            </Button>
+            <div v-show="showArchived">
+              <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs"
+                aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
+                :pt="ptCheckbox" :disabled="disableAll" @change="refreshJobList()">
+              </Checkbox>
+              <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
+                title="Include Archived Jobs">Include Archived</label>
             </div>
           </div>
         </div>
@@ -96,7 +120,8 @@
 import Button from "primevue/button";
 import MultiSelect from 'primevue/multiselect';
 import Select from "primevue/select";
-
+import VueDatePicker from "@vuepic/vue-datepicker";
+import { DateTime } from "luxon";
 
 import { StatusTypes } from "@/composables/NgencerfEnums";
 
@@ -105,7 +130,22 @@ import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const { fetchFormulationModuleOptions } = useFormulationStore();
 
-const { uiGageId, uiGageList, modulesFilterList, moduleOperator, statusTypeFilterList, includeArchivedJobs } = storeToRefs(useUserDataStore());
+const { 
+  uiGageId, 
+  uiGageList, 
+  modulesFilterList, 
+  moduleOperator, 
+  statusTypeFilterList, 
+  includeArchivedJobs,
+  createdAtStart,
+  createdAtEnd,
+  minCreatedAt,
+  maxCreatedAt,
+  jobIdStart,
+  jobIdEnd,
+  minJobId,
+  maxJobId
+} = storeToRefs(useUserDataStore());
 
 const emit = defineEmits(["ModulesFilterDialogClosing", "RefreshJobList"]);
 
@@ -148,6 +188,8 @@ interface Props {
   showStatus?: boolean;
   showModules?: boolean;
   showArchived?: boolean;
+  showCreatedAt?: boolean;
+  showJobId?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -156,6 +198,8 @@ const props = withDefaults(defineProps<Props>(), {
   showStatus: true,
   showModules: true,
   showArchived: true,
+  showCreatedAt: true,
+  showJobId: true,
 });
 
 const filterActive = computed(() => {
@@ -163,8 +207,55 @@ const filterActive = computed(() => {
     (props.showModules === false || uiGageId.value === '' || uiGageId.value === 'All') && 
     (props.showModules === false || modulesFilterList.value.length === 0) && 
     (props.showStatus === false || statusTypeFilterList.value === null || statusTypeFilterList.value.length === 0) &&
-    (props.showArchived === false || includeArchivedJobs.value === false)
+    (props.showArchived === false || includeArchivedJobs.value === false) ||
+    (props.showCreatedAt === false || (createdAtStart === null && createdAtEnd === null)) ||
+    (props.showJobId === false || (jobIdStart === null && jobIdEnd === null))
   );
+});
+
+const minMaxCreatedAtProps = computed(() => {
+  const props = {};
+  if (minCreatedAt.value) {
+    props.minDate = minCreatedAt.value;
+  }
+  if (maxCreatedAt.value) {
+    props.maxDate = maxCreatedAt.value;
+  }
+  return props;
+});
+
+const minMaxJobIdProps = computed(() => {
+  const props = {};
+  props.min = minJobId.value ?? 1;
+  if (maxJobId.value) {
+    props.max = maxJobId.value;
+  }
+  return props;
+});
+
+// Convert createdAtStart string to Date object
+// VueDatePicker sets createdAtStart to a string, so we need to convert it to a Date object
+const convertCreatedAtStartStringToDateTimeObject = (value: string) => {
+  if (createdAtStart.value) {
+    createdAtStart.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+  refreshJobList();
+}
+
+// Convert createdAtEnd string to Date object
+// VueDatePicker sets createdAtEnd to a string, so we need to convert it to a Date object
+const convertCreatedAtEndStringToDateTimeObject = (value: string) => {
+  if (createdAtEnd.value) {
+    createdAtEnd.value = DateTime.fromISO(value, { zone: 'utc' });
+  }
+  refreshJobList();
+}
+
+watch(jobIdStart, () => {
+  refreshJobList();
+});
+watch(jobIdEnd, () => {
+  refreshJobList();
 });
 
 const clearGageList = () => {
@@ -184,6 +275,14 @@ const resetFilters = () => {
   moduleOperator.value = 'All';
   statusTypeFilterList.value = [];
   includeArchivedJobs.value = false;
+  createdAtStart.value = null;
+  createdAtEnd.value = null;
+  minCreatedAt.value = null;
+  maxCreatedAt.value = null;
+  jobIdStart.value = null;
+  jobIdEnd.value = null;
+  minJobId.value = null;
+  maxJobId.value = null;
   refreshJobList();
 }
 

@@ -20,6 +20,9 @@
               </span>
             </h1>
           </div>
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+            :show-status="false" :show-gage="false" :show-modules="false" :show-archived="false"
+            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'fr-context-menu' } }" class="bg-white" ref="frContextMenu"

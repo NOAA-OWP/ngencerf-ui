@@ -46,11 +46,19 @@ export const useUserDataStore = defineStore(
     const uiGageId = ref<string>("");
     const uiGageList = ref<string[]>([]);
 
-    // Used for Calibration Job Filter
+    // Used for Job Filters
     const modulesFilterList = ref<string[]>([]);
     const moduleOperator = ref<string>('All');
     const statusTypeFilterList = ref<string[]>([]);
     const includeArchivedJobs = ref<boolean>(false);
+    const createdAtStart = ref<any>();
+    const createdAtEnd = ref<any>();
+    const minCreatedAt = ref<any>();
+    const maxCreatedAt = ref<any>();
+    const jobIdStart = ref<any>();
+    const jobIdEnd = ref<any>();
+    const minJobId = ref<any>();
+    const maxJobId = ref<any>();
 
     const lastServerError = ref<ServerStatus>();
 
@@ -275,6 +283,32 @@ export const useUserDataStore = defineStore(
             modules: modulesFilterList.value,
             operator: moduleOperator.value === 'All' ? 'and' : 'or'
           },
+          date_filter:
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "before"
+            } : {}
+          ,
+          id_filter:
+            (jobIdStart.value && jobIdEnd.value) ? {
+              start_id: jobIdStart.value,
+              end_id: jobIdEnd.value,
+              operator: "between"
+            } : jobIdStart.value ? {
+              id: jobIdStart.value,
+              operator: "after"
+            } : jobIdEnd.value ? {
+              id: jobIdEnd.value,
+              operator: "before"
+            } : {}
+          ,
           status: statusTypeFilterList.value,
           include_archived: includeArchivedJobs.value
         },
@@ -302,6 +336,14 @@ export const useUserDataStore = defineStore(
       if (jobsListDataResult?._data?.gages) {
         uiGageList.value = jobsListDataResult?._data?.gages;
         uiGageList.value.sort();
+      }
+      if (jobsListDataResult?._data?.date_range && jobsListDataResult?._data?.date_range.length === 2) {
+        minCreatedAt.value = jobsListDataResult?._data?.date_range[0];
+        maxCreatedAt.value = jobsListDataResult?._data?.date_range[1];
+      }
+      if (jobsListDataResult?._data?.id_range && jobsListDataResult?._data?.id_range.length === 2) {
+        minJobId.value = jobsListDataResult?._data?.id_range[0];
+        maxJobId.value = jobsListDataResult?._data?.id_range[1];
       }
     }
 
@@ -421,6 +463,14 @@ export const useUserDataStore = defineStore(
       moduleOperator,
       statusTypeFilterList,
       includeArchivedJobs,
+      createdAtStart,
+      createdAtEnd,
+      minCreatedAt,
+      maxCreatedAt,
+      jobIdStart,
+      jobIdEnd,
+      minJobId,
+      maxJobId,
       lastServerError,
       userCalibrationJobsListData,
       userCalibrationRunData,
