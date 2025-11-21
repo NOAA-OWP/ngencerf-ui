@@ -34,7 +34,7 @@ export const useUserDataStore = defineStore(
     const userCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
     const userCalibrationRunData = ref<UserCalibrationRunData>();
     const gotoCalibrationRunId = ref<number>();
-    const calibrationRunListPageSize = ref<number>(50);
+    const calibrationRunListPageSize = ref<number>(10);
     const calibrationRunListCurrentPage = ref<number>(1);
     const calibrationRunListTotalPages = ref<number>(0);
     const calibrationRunListTotalSize = ref<number>(0);
@@ -59,6 +59,8 @@ export const useUserDataStore = defineStore(
     const jobIdEnd = ref<any>();
     const minJobId = ref<any>();
     const maxJobId = ref<any>();
+    const selectedBulkJobAction = ref<number>(JobStatusAction.delete);
+    const selectedBulkJobActionScope = ref<boolean>(false);
 
     const lastServerError = ref<ServerStatus>();
 
@@ -348,6 +350,66 @@ export const useUserDataStore = defineStore(
     }
 
     /**
+     * fetch list of calibration job IDs only (for bulk actions)
+     * @return {void}
+     */
+    async function fetchUserCalibrationJobsListIDsOnly() {
+      // apply user's filters without paging, since we want the entire list
+      let requestBody = {
+        filters: {
+          gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
+          module_filter: {
+            modules: modulesFilterList.value,
+            operator: moduleOperator.value === 'All' ? 'and' : 'or'
+          },
+          date_filter:
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "before"
+            } : {}
+          ,
+          id_filter:
+            (jobIdStart.value && jobIdEnd.value) ? {
+              start_id: jobIdStart.value,
+              end_id: jobIdEnd.value,
+              operator: "between"
+            } : jobIdStart.value ? {
+              id: jobIdStart.value,
+              operator: "after"
+            } : jobIdEnd.value ? {
+              id: jobIdEnd.value,
+              operator: "before"
+            } : {}
+          ,
+          status: statusTypeFilterList.value,
+          include_archived: includeArchivedJobs.value
+        },
+        ids_only: true
+      }
+      const jobsListIDsResult =
+        await makeProtectedApiCall<CalibrationJobsList>(
+          `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${getAccessToken()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
+
+      return jobsListIDsResult?._data?.jobs ?? [];
+    }
+
+    /**
      * fetch user validation jobs associated with the selected calibration run
      * @param {number} calibrationRunId
      * @return {Promise<ValidationJobsList>}
@@ -471,6 +533,8 @@ export const useUserDataStore = defineStore(
       jobIdEnd,
       minJobId,
       maxJobId,
+      selectedBulkJobAction,
+      selectedBulkJobActionScope,
       lastServerError,
       userCalibrationJobsListData,
       userCalibrationRunData,
@@ -504,6 +568,7 @@ export const useUserDataStore = defineStore(
       getAccessToken,
       getRefreshToken,
       fetchUserCalibrationJobsListData,
+      fetchUserCalibrationJobsListIDsOnly,
       getValidationJobs,
       queryUserCalibrationRunData,
       fetchUserCalibrationRunData,

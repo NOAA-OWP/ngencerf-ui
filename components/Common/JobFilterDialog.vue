@@ -112,18 +112,43 @@
           </div>
         </div>
       </div>
+
+      <div v-show="showBulkJobAction && totalSize > 1 && !filterInactive" class="flex gap-2">
+        <div>
+          Apply bulk action to filtered jobs:
+        </div>
+        <div>
+          <Select id="selectedBulkJobAction" v-model="selectedBulkJobAction" :disabled="disableAll"
+            :options="bulkJobActionsList" optionLabel="name" optionValue="value" 
+            class="user-select w-12" aria-label="Select Bulk Job Action" title="Select Bulk Job Action">
+          </Select>
+        </div>
+        <div v-show="totalPages > 1">
+          <Select id="selectedBulkJobActionScope" v-model="selectedBulkJobActionScope" :disabled="disableAll"
+            :options="bulkJobActionScopeList" optionLabel="name" optionValue="value" 
+            class="user-select w-12" aria-label="Select This Page or All Pages" title="Select This Page or All Pages">
+          </Select>
+        </div>
+        <div>
+          <Button class="ngenButtonDiv ml-8" @click="bulkJobAction()" :disabled="disableAll"
+            aria-label="Apply Bulk Action" title="Apply Bulk Action">Apply</Button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { getCurrentInstance, defineExpose } from 'vue';
+const instance = getCurrentInstance();
+
 import Button from "primevue/button";
 import MultiSelect from 'primevue/multiselect';
 import Select from "primevue/select";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import { DateTime } from "luxon";
 
-import { StatusTypes } from "@/composables/NgencerfEnums";
+import { StatusTypes, JobStatusAction } from "@/composables/NgencerfEnums";
 
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
@@ -144,10 +169,27 @@ const {
   jobIdStart,
   jobIdEnd,
   minJobId,
-  maxJobId
+  maxJobId,
+  selectedBulkJobAction,
+  selectedBulkJobActionScope
 } = storeToRefs(useUserDataStore());
 
-const emit = defineEmits(["ModulesFilterDialogClosing", "RefreshJobList"]);
+const emit = defineEmits(["ModulesFilterDialogClosing", "RefreshJobList", "BulkJobAction"]);
+
+const moduleOperatorList = [
+  { name: "All" },
+  { name: "Any" }
+]
+const bulkJobActionsList: { name: string, value: number }[] = Object.keys(JobStatusAction)
+  .map(key => ({
+    name: key.charAt(0).toUpperCase() + key.slice(1),
+    value: JobStatusAction[key as keyof typeof JobStatusAction]
+  }));
+const bulkJobActionScopeList = [
+  { name: "this page only", value: false },
+  { name: "all pages", value: true }
+]
+const showBulkJobAction = ref<boolean>(false);
 
 const ptCheckbox = ref({
   box: { style: { "border": "2px solid #0c5274" } },
@@ -177,13 +219,10 @@ const calibrationRunGageList = computed(() => {
   return gageOptionList;
 });
 
-const moduleOperatorList = [
-  { name: "All" },
-  { name: "Any" }
-]
-
 interface Props {
   disableAll?: boolean;
+  totalSize?: number;
+  totalPages?: number;
   showGage?: boolean;
   showStatus?: boolean;
   showModules?: boolean;
@@ -194,6 +233,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   disableAll: true,
+  totalSize: 0,
+  totalPages: 1,
   showGage: true,
   showStatus: true,
   showModules: true,
@@ -266,6 +307,10 @@ const refreshJobList = () => {
   emit("RefreshJobList");
 }
 
+const bulkJobAction = () => {
+  emit("BulkJobAction");
+}
+
 /**
  * Reset filters
  */
@@ -283,8 +328,19 @@ const resetFilters = () => {
   jobIdEnd.value = null;
   minJobId.value = null;
   maxJobId.value = null;
+  showBulkJobAction.value = false;
+  selectedBulkJobAction.value = 1;
+  selectedBulkJobActionScope.value = false;
   refreshJobList();
 }
+
+defineExpose({ resetFilters });
+
+onMounted(() => {
+  if (instance?.vnode?.props?.onBulkJobAction) {
+    showBulkJobAction.value = true;
+  }
+})
 
 onUnmounted(() => {
   resetFilters();
