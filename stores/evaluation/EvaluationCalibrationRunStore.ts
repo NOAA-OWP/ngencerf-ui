@@ -35,6 +35,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     jobIdEnd,
     minJobId,
     maxJobId,
+    statusTypeFilterList,
     includeArchivedJobs
   } = storeToRefs(useUserDataStore());
 
@@ -145,6 +146,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
             operator: "before"
           } : {}
         ,
+        status: statusTypeFilterList.value,
         include_archived: includeArchivedJobs.value
       },
       get_gages: uiGageList.value.length === 0
