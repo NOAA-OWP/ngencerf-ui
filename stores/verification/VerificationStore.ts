@@ -17,7 +17,17 @@ const { selectedForecastJob } = storeToRefs(forecastStore);
 export const useVerificationStore = defineStore('VerificationStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
-  const { statusTypeFilterList } = storeToRefs(useUserDataStore());
+  const { 
+    createdAtStart,
+    createdAtEnd,
+    minCreatedAt,
+    maxCreatedAt,
+    jobIdStart,
+    jobIdEnd,
+    minJobId,
+    maxJobId,
+    statusTypeFilterList 
+  } = storeToRefs(useUserDataStore());
 
   // refs
   const forecastJobId = ref<number>();
@@ -71,6 +81,32 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         direction: forecastRunsForVerificationListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
+        date_filter:
+          (createdAtStart.value && createdAtEnd.value) ? {
+            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+            operator: "between"
+          } : createdAtStart.value ? {
+            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+            operator: "after"
+          } : createdAtEnd.value ? {
+            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+            operator: "before"
+          } : {}
+        ,
+        id_filter:
+          (jobIdStart.value && jobIdEnd.value) ? {
+            start_id: jobIdStart.value,
+            end_id: jobIdEnd.value,
+            operator: "between"
+          } : jobIdStart.value ? {
+            id: jobIdStart.value,
+            operator: "after"
+          } : jobIdEnd.value ? {
+            id: jobIdEnd.value,
+            operator: "before"
+          } : {}
+        ,
         status: statusTypeFilterList.value
       }
     }
@@ -88,6 +124,15 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     forecastRunsForVerificationListTotalPages.value = Math.ceil(forecastRunsForVerificationListTotalSize.value / forecastRunsForVerificationListPageSize.value);
     forecastRunsForVerificationListStartRow.value = (forecastRunsForVerificationListPageSize.value * (forecastRunsForVerificationListCurrentPage.value - 1)) + 1;
     forecastRunsForVerificationListEndRow.value = Math.min(forecastRunsForVerificationListStartRow.value + (forecastRunsForVerificationListPageSize.value - 1), forecastRunsForVerificationListTotalSize.value);
+    
+    if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
+      minCreatedAt.value = runListDataResult?._data?.date_range[0];
+      maxCreatedAt.value = runListDataResult?._data?.date_range[1];
+    }
+    if (runListDataResult?._data?.id_range && runListDataResult?._data?.id_range.length === 2) {
+      minJobId.value = runListDataResult?._data?.id_range[0];
+      maxJobId.value = runListDataResult?._data?.id_range[1];
+    }
   }
 
   const setSelectedForecastRunId = (forecast_job_id: number): void => {
@@ -112,6 +157,32 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         direction: verificationRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
+        date_filter:
+          (createdAtStart.value && createdAtEnd.value) ? {
+            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+            operator: "between"
+          } : createdAtStart.value ? {
+            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+            operator: "after"
+          } : createdAtEnd.value ? {
+            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+            operator: "before"
+          } : {}
+        ,
+        id_filter:
+          (jobIdStart.value && jobIdEnd.value) ? {
+            start_id: jobIdStart.value,
+            end_id: jobIdEnd.value,
+            operator: "between"
+          } : jobIdStart.value ? {
+            id: jobIdStart.value,
+            operator: "after"
+          } : jobIdEnd.value ? {
+            id: jobIdEnd.value,
+            operator: "before"
+          } : {}
+        ,
         status: statusTypeFilterList.value
       }
     }
@@ -129,6 +200,15 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     verificationRunListTotalPages.value = Math.ceil(verificationRunListTotalSize.value / verificationRunListPageSize.value);
     verificationRunListStartRow.value = (verificationRunListPageSize.value * (verificationRunListCurrentPage.value - 1)) + 1;
     verificationRunListEndRow.value = Math.min(verificationRunListStartRow.value + (verificationRunListPageSize.value - 1), verificationRunListTotalSize.value);
+
+    if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
+      minCreatedAt.value = runListDataResult?._data?.date_range[0];
+      maxCreatedAt.value = runListDataResult?._data?.date_range[1];
+    }
+    if (runListDataResult?._data?.id_range && runListDataResult?._data?.id_range.length === 2) {
+      minJobId.value = runListDataResult?._data?.id_range[0];
+      maxJobId.value = runListDataResult?._data?.id_range[1];
+    }
   }
 
   /**

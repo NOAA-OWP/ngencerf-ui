@@ -56,7 +56,7 @@
             <Column :pt="ptColumn" field="created_at" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Created</span>
+                  <span>Creation Date</span>
                 </div>
               </template>
               <template #body="slotProps">

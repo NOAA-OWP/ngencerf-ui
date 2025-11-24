@@ -105,8 +105,7 @@
       <div id="evaluationRunList">
 
         <div id="CalTable" class="w-max mx-auto">
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" :show-status="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"

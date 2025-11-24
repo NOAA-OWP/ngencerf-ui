@@ -7,36 +7,40 @@
         aria-label="Close"><img alt="Close" class="w-5 cursor-pointer" aria-label="Close"
           src="@/assets/styles/img/xclose.png" @click="sendClose()"></div>
       <hr />
-      <div class="mt-3">There {{ props.calJobs.length > 1 ? 'are ' : 'is ' }} {{ props.calJobs.length }} selected job{{
-        props.calJobs.length > 1 ? 's' : '' }}: </div>
+      <div class="mt-3">
+        There {{ props.calJobs.length > 1 ? 'are ' : 'is ' }} {{ props.calJobs.length }} 
+        selected job{{ props.calJobs.length > 1 ? 's' : '' }}{{ calJobs.length <= 10 ? ':' : '.' }}
+      </div>
 
-      <div>
+      <div v-if="calJobs.length <= 10">
         <span v-for="(item, index) of calJobs">
-          {{ item }}{{ index < calJobs.length - 1 && calJobs.length > 2 ? ', ' : '' }} {{ index === calJobs.length - 2 ? ' and ' : '' }} </span>
+          {{ item }}{{ index < calJobs.length - 1 && calJobs.length > 2 ? ', ' : '' }} 
+          {{ index === calJobs.length - 2 ? ' and ' : '' }}
+        </span>
       </div>
 
       <div v-if="!showConfirm" id="ButtonsAndMessages">
-        <Button class="ngenButtonDiv mt-2" @click="confirmAction('delete')" aria-label="Delete selected jobs"
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction(JobStatusAction.delete)" aria-label="Delete selected jobs"
           title="Delete selected jobs">DELETE selected jobs</Button>
 
-        <Button class="ngenButtonDiv mt-2" @click="confirmAction('archive')" aria-label="Archive selected jobs"
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction(JobStatusAction.archive)" aria-label="Archive selected jobs"
           title="Archive selected jobs" v-if="!hideArchiveBtn">ARCHIVE selected jobs</Button>
 
-        <Button class="ngenButtonDiv mt-2" @click="confirmAction('unarchive')" aria-label="Unarchive selected jobs"
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction(JobStatusAction.unarchive)" aria-label="Unarchive selected jobs"
           title="Unarchive selected jobs" v-if="!hideUnarchiveBtn">UNARCHIVE selected jobs</Button>
 
-        <Button class="ngenButtonDiv mt-2" @click="confirmAction('lock')" aria-label="Lock selected jobs"
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction(JobStatusAction.lock)" aria-label="Lock selected jobs"
           title="Lock selected jobs" v-if="!hideLockBtn">LOCK selected jobs</Button>
 
-        <Button class="ngenButtonDiv mt-2" @click="confirmAction('unlock')" aria-label="Unlock selected jobs"
+        <Button class="ngenButtonDiv mt-2" @click="confirmAction(JobStatusAction.unlock)" aria-label="Unlock selected jobs"
           title="Unlock selected jobs" v-if="!hideUnlockBtn">UNLOCK selected jobs</Button>
       </div>
       <div v-else>
-        <div class="font-bold font-lg">Are you sure you want to<br /> {{ actionType }} the selected jobs?</div>
-         <Button class="ngenButtonDiv mt-3" @click="actionSelect(true)" :aria-label="actionType + 'selected jobs'"
-          :title="actionType + 'selected jobs'">Yes</Button>
-        <Button class="ngenButtonDiv mt-3 ml-3" @click="actionSelect(false)" :aria-label="actionType + 'selected jobs'"
-          :title="actionType + 'selected jobs'">Cancel</Button>       
+        <div class="font-bold font-lg">Are you sure you want to<br /> {{ actionTypeDisplay }} the selected jobs?</div>
+         <Button class="ngenButtonDiv mt-3" @click="actionSelect(true)" :aria-label="actionTypeDisplay + 'selected jobs'"
+          :title="actionTypeDisplay + 'selected jobs'">Yes</Button>
+        <Button class="ngenButtonDiv mt-3 ml-3" @click="actionSelect(false)" :aria-label="actionTypeDisplay + 'selected jobs'"
+          :title="actionTypeDisplay + 'selected jobs'">Cancel</Button>       
       </div>
     </div>
   </client-only>
@@ -44,6 +48,8 @@
 
 <script lang="ts" setup>
 import Button from "primevue/button";
+import { defineExpose } from 'vue';
+import { JobStatusAction } from "@/composables/NgencerfEnums";
 
 import type { CalibrationJobListItem } from "@/composables/NgencerfModels";
 
@@ -53,7 +59,14 @@ const props = defineProps<{
 }>();
 
 const showConfirm = ref<boolean>(false);
-const actionType = ref<string>()
+const actionType = ref<number>()
+const actionTypeDisplay = computed(() => {
+  for (const key in JobStatusAction) {
+    if (JobStatusAction[key] === actionType.value) {
+      return key;
+    }
+  }
+})
 
 const emit = defineEmits(["DeleteSelectedJobs", "ArchiveSelectedJobs", "UnarchiveSelectedJobs", "LockSelectedJobs", "UnlockSelectedJobs", "CloseMultJobWindow"]);
 
@@ -121,7 +134,7 @@ const hideUnlockBtn = computed(() => {
   }
 })
 
-const confirmAction = (action: string) => {
+const confirmAction = (action: number) => {
   actionType.value = action;
   showConfirm.value = true;
 }
@@ -130,19 +143,19 @@ const actionSelect = (action: boolean) => {
   if( !action ) {
     sendClose();
   } else {
-    if( actionType.value === 'delete') {
+    if( actionType.value === JobStatusAction.delete) {
       sendDelete();
     }    
-    if( actionType.value === 'archive') {
+    if( actionType.value === JobStatusAction.archive) {
       sendArchive();
     }    
-    if( actionType.value === 'unarchive') {
+    if( actionType.value === JobStatusAction.unarchive) {
       sendUnarchive();
     }
-    if( actionType.value === 'lock') {
+    if( actionType.value === JobStatusAction.lock) {
       sendLock();
     }    
-    if( actionType.value === 'unlock') {
+    if( actionType.value === JobStatusAction.unlock) {
       sendUnlock();
     }
   }
@@ -200,6 +213,8 @@ const sendUnlock = () => {
 const sendClose = () => {
   emit("CloseMultJobWindow");
 };
+
+defineExpose({ confirmAction });
 
 </script>
 

@@ -20,6 +20,9 @@
               </span>
             </h1>
           </div>
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+            :show-status="false" :show-gage="false" :show-modules="false" :show-archived="false"
+            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'fr-context-menu' } }" class="bg-white" ref="frContextMenu"
@@ -79,6 +82,20 @@
                   :title="'Domain ' + slotProps.data.domain_name">
                   {{ slotProps.data.domain_name }}
                 </span>
+              </template>
+            </Column>
+            <Column field="created_at" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Creation Date</span>
+                </div>
+              </template>
+              <template #body="slotProps">
+                <div v-if="slotProps.data.created_at" class="text-center"
+                  :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
+                  :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
+                </div>
               </template>
             </Column>
             <Column :pt="ptColumn" field="configuration" header="Configuration" sortable>

@@ -22,7 +22,22 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const userSelectedEvalCalibrationRun = ref<any>();
   const loadCalibrationDataComplete = ref<boolean>(false);
 
-  const { modulesFilterList, moduleOperator, uiGageId, uiGageList, includeArchivedJobs } = storeToRefs(useUserDataStore());
+  const { 
+    modulesFilterList, 
+    moduleOperator, 
+    uiGageId, 
+    uiGageList, 
+    createdAtStart,
+    createdAtEnd,
+    minCreatedAt,
+    maxCreatedAt,
+    jobIdStart,
+    jobIdEnd,
+    minJobId,
+    maxJobId,
+    statusTypeFilterList,
+    includeArchivedJobs
+  } = storeToRefs(useUserDataStore());
 
   /**
    * list of calibration jobs with validation data
@@ -105,6 +120,33 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
           modules: modulesFilterList.value,
           operator: moduleOperator.value === 'All' ? 'and' : 'or'
         },
+        date_filter:
+          (createdAtStart.value && createdAtEnd.value) ? {
+            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+            operator: "between"
+          } : createdAtStart.value ? {
+            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+            operator: "after"
+          } : createdAtEnd.value ? {
+            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+            operator: "before"
+          } : {}
+        ,
+        id_filter:
+          (jobIdStart.value && jobIdEnd.value) ? {
+            start_id: jobIdStart.value,
+            end_id: jobIdEnd.value,
+            operator: "between"
+          } : jobIdStart.value ? {
+            id: jobIdStart.value,
+            operator: "after"
+          } : jobIdEnd.value ? {
+            id: jobIdEnd.value,
+            operator: "before"
+          } : {}
+        ,
+        status: statusTypeFilterList.value,
         include_archived: includeArchivedJobs.value
       },
       get_gages: uiGageList.value.length === 0
@@ -162,6 +204,14 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     if (runListDataResult?._data?.gages) {
       uiGageList.value = runListDataResult?._data?.gages;
       uiGageList.value.sort();
+    }
+    if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
+      minCreatedAt.value = runListDataResult?._data?.date_range[0];
+      maxCreatedAt.value = runListDataResult?._data?.date_range[1];
+    }
+    if (runListDataResult?._data?.id_range && runListDataResult?._data?.id_range.length === 2) {
+      minJobId.value = runListDataResult?._data?.id_range[0];
+      maxJobId.value = runListDataResult?._data?.id_range[1];
     }
   }
 

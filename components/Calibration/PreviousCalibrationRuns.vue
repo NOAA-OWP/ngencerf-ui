@@ -17,8 +17,10 @@
         <div class="">
 
           <div id="CalTable" class="w-max mx-auto">
-            <JobFilterDialog id="JobFilterDialog" :disable-all="disableFilters" @RefreshJobList="refreshJobList()" 
-              ref="jobFilterDialog" />
+            <JobFilterDialog id="JobFilterDialog" :disable-all="disableFilters" 
+              :totalSize="calibrationRunListTotalSize" :totalPages="calibrationRunListTotalPages"
+              @RefreshJobList="refreshJobList()" @BulkJobAction="bulkJobAction()" ref="jobFilterRef" />
+            
             <ConfirmDialog></ConfirmDialog>
 
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[250px]" ref="crContextMenu"
@@ -28,7 +30,7 @@
               <div class="pagination-rows">
                 Rows {{ calibrationRunListStartRow }} to {{ calibrationRunListEndRow }} of {{ calibrationRunListTotalSize }}
               </div>
-              <Paging v-model:currentPage="calibrationRunListCurrentPage" :totalPages=calibrationRunListTotalPages />
+              <Paging v-model:currentPage="calibrationRunListCurrentPage" :totalPages="calibrationRunListTotalPages" />
             </div>
             <div v-else>
               No results. Try changing or clearing filters.
@@ -212,11 +214,11 @@
         </div>
 
         <div id="MultJobOpsDlg" v-if="showHideMultOps">
-          <MultipleJobOperations :cal-jobs="selectedMultipleCalibrationRuns"
-            :cal-job-list="selectedMultipleCalibrationRunData" @DeleteSelectedJobs="acceptMultipleDelete()"
-            @ArchiveSelectedJobs="acceptMultipleArchive(true)" @UnarchiveSelectedJobs="acceptMultipleArchive(false)"
-            @LockSelectedJobs="acceptMultipleLock(true)" @UnlockSelectedJobs="acceptMultipleLock(false)"
-            @CloseMultJobWindow="closeMultJobsWindow" />
+          <MultipleJobOperations ref="multiJobRef" :cal-jobs="selectedMultipleCalibrationRuns"
+            :cal-job-list="selectedMultipleCalibrationRunData" :cal-job-text="selectedMultipleCalibrationRunsText"
+            @DeleteSelectedJobs="acceptMultipleDelete()" @ArchiveSelectedJobs="acceptMultipleArchive(true)" 
+            @UnarchiveSelectedJobs="acceptMultipleArchive(false)" @LockSelectedJobs="acceptMultipleLock(true)" 
+            @UnlockSelectedJobs="acceptMultipleLock(false)" @CloseMultJobWindow="closeMultJobsWindow"/>
         </div>
 
       </div>
@@ -273,6 +275,8 @@ const {
   userCalibrationJobsListData, 
   userCalibrationRunData, 
   includeArchivedJobs,
+  selectedBulkJobAction,
+  selectedBulkJobActionScope,
   calibrationRunListPageSize,
   calibrationRunListCurrentPage,
   calibrationRunListTotalPages,
@@ -281,9 +285,21 @@ const {
   calibrationRunListEndRow,
   calibrationRunListSort
 } = storeToRefs(useUserDataStore());
-const { queryUserCalibrationRunData, fetchUserCalibrationJobsListData, clearUserCalibrationRunData } = useUserDataStore();
-const { fetchNewCalibrationRunId, deleteCalibrationRun, cloneCalibrationRun, archiveCalibrationRun, 
-  lockCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
+const { 
+  queryUserCalibrationRunData, 
+  fetchUserCalibrationJobsListData, 
+  fetchUserCalibrationJobsListIDsOnly,
+  clearUserCalibrationRunData 
+} = useUserDataStore();
+const { 
+  fetchNewCalibrationRunId, 
+  deleteCalibrationRun, 
+  cloneCalibrationRun, 
+  archiveCalibrationRun, 
+  lockCalibrationRun, 
+  exportJob, 
+  getCalibrationJobZip 
+} = useCalibrationJobStore();
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -296,12 +312,15 @@ const selectedCalibrationRun = ref<CalibrationJobListItem>();
 
 const selectedMultipleCalibrationRuns = ref<number[]>([]);
 const selectedMultipleCalibrationRunData = ref<CalibrationJobListItem[]>([]);
+const selectedMultipleCalibrationRunsText = ref<string>('');
 
 let interval: number | undefined;
 const runningColor = ref<string>('white');
 
 const showHideMultOps = ref<boolean>(false);
 const systemContextMenu = ref<boolean>(false);
+const multiJobRef = ref(null);
+const jobFilterRef = ref(null);
 
 const cmOpenRun = ref({
   label: 'Open', 
@@ -530,6 +549,26 @@ const refreshJobList = async () => {
   isLoading.value = true;
   await fetchUserCalibrationJobsListData();
   isLoading.value = false;
+}
+
+const bulkJobAction = async () => {
+  // If scope is all pages (true) and there are multiple pages, retrieve list of job IDs. 
+  // Otherwise just use the list from the currently displayed page.
+  if (selectedBulkJobActionScope.value && calibrationRunListTotalPages.value > 1) {
+    isLoading.value = true;
+    selectedMultipleCalibrationRuns.value = await fetchUserCalibrationJobsListIDsOnly();
+    isLoading.value = false;
+  } else {
+    selectedMultipleCalibrationRuns.value = userCalibrationJobsListData.value.map(job => job.calibration_run_id);
+  }
+  showHideMultOps.value = true;
+  // wait a tick for the multi-job menu to display so that it only shows the confirm button
+  nextTick(async () => {
+    if (multiJobRef.value) {
+      // ask the user to confirm the action - MultipleJobOperations will take care of the rest
+      multiJobRef.value.confirmAction(selectedBulkJobAction.value);
+    }
+  });
 }
 
 // Function to toggle the color between 'red' and 'blue'
@@ -788,7 +827,7 @@ const acceptDelete = (selectedRunId: number) => {
           life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      await fetchUserCalibrationJobsListData();
+      refreshJobList();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -805,6 +844,8 @@ const acceptDelete = (selectedRunId: number) => {
  */
 const acceptMultipleDelete = () => {
   const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
+  // keep track of whether we're archiving the entire list
+  let deleteAllJobs = selectedMultipleCalibrationRuns.value.length === calibrationRunListTotalSize.value;
   deleteCalibrationRun(selectedMultipleCalibrationRuns.value).then(async (response) => {
     if (response.status === 200) {
       let successMessages: string[] = [];
@@ -829,7 +870,19 @@ const acceptMultipleDelete = () => {
           life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      await fetchUserCalibrationJobsListData();
+      if (jobFilterRef.value && deleteAllJobs) {
+        // if we just deleted the entire list, clear filters and inform the user
+        jobFilterRef.value.resetFilters();
+        const tMsg: ToastMessageOptions = { 
+          severity: "info", 
+          summary: 'All Jobs Deleted', 
+          detail: 'All jobs in your filtered list were deleted. Resetting filters to show your remaining jobs.', 
+          life: ToastTimeout.timeoutInfo 
+        };
+        toast.add(tMsg); addToastRecord(tMsg);
+      } else {
+        refreshJobList();
+      }
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Jobs Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -837,6 +890,7 @@ const acceptMultipleDelete = () => {
       });
     }
   });
+
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
 }
@@ -870,7 +924,7 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
           life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      await fetchUserCalibrationJobsListData();
+      refreshJobList();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Archive Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -878,6 +932,7 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
       });
     }
   });
+
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
 }
@@ -887,6 +942,8 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
  */
 const acceptMultipleArchive = (archiveJob: boolean) => {
   const sortedNumbers = formatMultJobNumbers([...selectedMultipleCalibrationRuns.value].sort((a, b) => a - b));
+  // keep track of whether we're archiving the entire list
+  let archiveAllJobs = selectedMultipleCalibrationRuns.value.length === calibrationRunListTotalSize.value && archiveJob;
   archiveCalibrationRun(selectedMultipleCalibrationRuns.value, archiveJob).then(async (response) => {
     if (response.status === 200) {
       let successMessages: string[] = [];
@@ -911,7 +968,18 @@ const acceptMultipleArchive = (archiveJob: boolean) => {
           life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      await fetchUserCalibrationJobsListData();
+      if (archiveAllJobs && !includeArchivedJobs.value) 
+      {
+        // if we just archived the entire list and we're not showing archived jobs, inform the user
+        const tMsg: ToastMessageOptions = { 
+          severity: "info", 
+          summary: 'All Jobs Archived', 
+          detail: 'All jobs in your filtered list were archived. Click "Include Archived" to see them.', 
+          life: ToastTimeout.timeoutInfo 
+        };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      refreshJobList();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: (archiveJob ? 'Archive' : 'Un-Archive') + ' Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };

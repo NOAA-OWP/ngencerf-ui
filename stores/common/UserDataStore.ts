@@ -46,11 +46,21 @@ export const useUserDataStore = defineStore(
     const uiGageId = ref<string>("");
     const uiGageList = ref<string[]>([]);
 
-    // Used for Calibration Job Filter
+    // Used for Job Filters
     const modulesFilterList = ref<string[]>([]);
     const moduleOperator = ref<string>('All');
     const statusTypeFilterList = ref<string[]>([]);
     const includeArchivedJobs = ref<boolean>(false);
+    const createdAtStart = ref<any>(null);
+    const createdAtEnd = ref<any>(null);
+    const minCreatedAt = ref<any>(null);
+    const maxCreatedAt = ref<any>(null);
+    const jobIdStart = ref<any>(null);
+    const jobIdEnd = ref<any>(null);
+    const minJobId = ref<any>(null);
+    const maxJobId = ref<any>(null);
+    const selectedBulkJobAction = ref<number>(JobStatusAction.delete);
+    const selectedBulkJobActionScope = ref<boolean>(false);
 
     const lastServerError = ref<ServerStatus>();
 
@@ -275,6 +285,32 @@ export const useUserDataStore = defineStore(
             modules: modulesFilterList.value,
             operator: moduleOperator.value === 'All' ? 'and' : 'or'
           },
+          date_filter:
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "before"
+            } : {}
+          ,
+          id_filter:
+            (jobIdStart.value && jobIdEnd.value) ? {
+              start_id: jobIdStart.value,
+              end_id: jobIdEnd.value,
+              operator: "between"
+            } : jobIdStart.value ? {
+              id: jobIdStart.value,
+              operator: "after"
+            } : jobIdEnd.value ? {
+              id: jobIdEnd.value,
+              operator: "before"
+            } : {}
+          ,
           status: statusTypeFilterList.value,
           include_archived: includeArchivedJobs.value
         },
@@ -303,6 +339,74 @@ export const useUserDataStore = defineStore(
         uiGageList.value = jobsListDataResult?._data?.gages;
         uiGageList.value.sort();
       }
+      if (jobsListDataResult?._data?.date_range && jobsListDataResult?._data?.date_range.length === 2) {
+        minCreatedAt.value = jobsListDataResult?._data?.date_range[0];
+        maxCreatedAt.value = jobsListDataResult?._data?.date_range[1];
+      }
+      if (jobsListDataResult?._data?.id_range && jobsListDataResult?._data?.id_range.length === 2) {
+        minJobId.value = jobsListDataResult?._data?.id_range[0];
+        maxJobId.value = jobsListDataResult?._data?.id_range[1];
+      }
+    }
+
+    /**
+     * fetch list of calibration job IDs only (for bulk actions)
+     * @return {void}
+     */
+    async function fetchUserCalibrationJobsListIDsOnly() {
+      // apply user's filters without paging, since we want the entire list
+      let requestBody = {
+        filters: {
+          gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
+          module_filter: {
+            modules: modulesFilterList.value,
+            operator: moduleOperator.value === 'All' ? 'and' : 'or'
+          },
+          date_filter:
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "before"
+            } : {}
+          ,
+          id_filter:
+            (jobIdStart.value && jobIdEnd.value) ? {
+              start_id: jobIdStart.value,
+              end_id: jobIdEnd.value,
+              operator: "between"
+            } : jobIdStart.value ? {
+              id: jobIdStart.value,
+              operator: "after"
+            } : jobIdEnd.value ? {
+              id: jobIdEnd.value,
+              operator: "before"
+            } : {}
+          ,
+          status: statusTypeFilterList.value,
+          include_archived: includeArchivedJobs.value
+        },
+        ids_only: true
+      }
+      const jobsListIDsResult =
+        await makeProtectedApiCall<CalibrationJobsList>(
+          `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${getAccessToken()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
+
+      return jobsListIDsResult?._data?.jobs ?? [];
     }
 
     /**
@@ -421,6 +525,16 @@ export const useUserDataStore = defineStore(
       moduleOperator,
       statusTypeFilterList,
       includeArchivedJobs,
+      createdAtStart,
+      createdAtEnd,
+      minCreatedAt,
+      maxCreatedAt,
+      jobIdStart,
+      jobIdEnd,
+      minJobId,
+      maxJobId,
+      selectedBulkJobAction,
+      selectedBulkJobActionScope,
       lastServerError,
       userCalibrationJobsListData,
       userCalibrationRunData,
@@ -454,6 +568,7 @@ export const useUserDataStore = defineStore(
       getAccessToken,
       getRefreshToken,
       fetchUserCalibrationJobsListData,
+      fetchUserCalibrationJobsListIDsOnly,
       getValidationJobs,
       queryUserCalibrationRunData,
       fetchUserCalibrationRunData,
