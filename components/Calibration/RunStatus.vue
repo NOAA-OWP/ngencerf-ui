@@ -445,6 +445,15 @@ onMounted(async () => {
       validationControlStatus.value = validControl?.status ? validControl.status : undefined;
       validationBestStatus.value = validBest?.status ? validBest.status : undefined;
       validControlAndValidBestStatus.value = validationControlStatus?.value ? getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value) : undefined;
+
+      if (getStatusResponse?._data?.run_end) {
+        calibrationElapsedTime.value = calculateElapsedTime(
+          submitTimeDate.value as Date, 
+          validBest?.run_end ? new Date(validBest.run_end) :
+          validControl?.run_end ? new Date(validControl.run_end) : 
+          new Date(getStatusResponse?._data?.run_end)
+        );
+      }
     
       // always update the iteration number for any status other than Saved or Ready
       await updateIteration();
@@ -731,12 +740,12 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
             if (['Done', 'Cancelled', 'Failed', 'Server error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
-
+              
               calibrationElapsedTime.value = calculateElapsedTime(
                 submitTimeDate.value as Date, 
                 validBest?.run_end ? new Date(validBest.run_end) :
                 validControl?.run_end ? new Date(validControl.run_end) : 
-                getStatusResponse?._data?.run_end
+                new Date(getStatusResponse?._data?.run_end)
               );
             }
           }, 10000) as unknown as number;
@@ -755,7 +764,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
           submitTimeDate.value as Date, 
           validBest?.run_end ? new Date(validBest.run_end) :
           validControl?.run_end ? new Date(validControl.run_end) : 
-          getStatusResponse?._data?.run_end
+          new Date(getStatusResponse?._data?.run_end)
         );
 
         if (validControl?.status) {
