@@ -339,9 +339,6 @@ const clearDataAndNavigateToSetupForecast = () => {
   isForecastLoading.value = true;
 
   nextTick(async () => {
-    // clear all user-selected forecast data
-    resetUserSelectedForecastCalibrationRun();
-
     navigateToSetupForecast();
   });
 };
