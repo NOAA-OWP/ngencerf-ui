@@ -441,17 +441,6 @@ onMounted(async () => {
         validationBestAchieved.value.isBest = (validBest.validation_type === "valid_best");
         validationBestAchieved.value.iteration = validBest.iteration_num;
       }
-
-      const allDurs = [getStatusResponse._data.elapsed_time]
-
-      if (allDurs.length && allDurs[0]) {
-        validations.forEach((value: CalibrationGetStatusValidationItem) => {
-          if (value.elapsed_time) {
-            allDurs.push(value.elapsed_time);
-          }
-        });
-        calibrationElapsedTime.value = sumAndFormatElapsedTimes(allDurs);
-      }
       
       validationControlStatus.value = validControl?.status ? validControl.status : undefined;
       validationBestStatus.value = validBest?.status ? validBest.status : undefined;
@@ -664,16 +653,6 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
         // or calibration is Done and valid_control and valid_best have not started or are Submitted, Ready, Running
         if (['Validating and Preparing Job Data','Running'].includes(userCalibrationRunData.value?.status) || (userCalibrationRunData.value?.status === 'Done' &&
           (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
-
-          const allDurs = [getStatusResponse._data.elapsed_time]
-          if (allDurs.length && allDurs[0]) {
-            validations.forEach((value: CalibrationGetStatusValidationItem) => {
-              if (value.elapsed_time) {
-                allDurs.push(value.elapsed_time);
-              }
-            });
-            calibrationElapsedTime.value = sumAndFormatElapsedTimes(allDurs);
-          }
           // Create an interval to update calibrationElapsedTime every second while Calibration is Running or Validation is not Done
           if (!elapsedTimeIntervalId.value) {
             createElapsedTimeInterval();
@@ -753,16 +732,12 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
 
-              const allDurs = [getStatusResponse._data.elapsed_time]
-              if (allDurs.length && allDurs[0]) {
-                validations.forEach((value: CalibrationGetStatusValidationItem) => {
-                  if (value.elapsed_time) {
-                    allDurs.push(value.elapsed_time);
-                  }
-                });
-                calibrationElapsedTime.value = sumAndFormatElapsedTimes(allDurs);
-              }
-
+              calibrationElapsedTime.value = calculateElapsedTime(
+                submitTimeDate.value as Date, 
+                validBest?.run_end ? new Date(validBest.run_end) :
+                validControl?.run_end ? new Date(validControl.run_end) : 
+                getStatusResponse?._data?.run_end
+              );
             }
           }, 10000) as unknown as number;
         }
@@ -776,16 +751,12 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
         const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
 
-        // Calculate elapsed time
-        const allDurs = [getStatusResponse._data.elapsed_time]
-        if (allDurs.length && allDurs[0]) {
-          validations.forEach((value: CalibrationGetStatusValidationItem) => {
-            if (value.elapsed_time) {
-              allDurs.push(value.elapsed_time);
-            }
-          });
-          calibrationElapsedTime.value = sumAndFormatElapsedTimes(allDurs);
-        }
+        calibrationElapsedTime.value = calculateElapsedTime(
+          submitTimeDate.value as Date, 
+          validBest?.run_end ? new Date(validBest.run_end) :
+          validControl?.run_end ? new Date(validControl.run_end) : 
+          getStatusResponse?._data?.run_end
+        );
 
         if (validControl?.status) {
           validationControlStatus.value = validControl.status;

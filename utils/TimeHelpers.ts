@@ -139,7 +139,7 @@ export function calculateTimeRange(
 export function calculateElapsedTime(start_time: Date, end_time: Date): string {
   const start = DateTime.fromJSDate(start_time);
   const end = DateTime.fromJSDate(end_time);
-
+  
   // create a Duration object representing the difference between the two Date objects
   let diffDuration = end.diff(start, ["days", "hours", "minutes", "seconds"]);
 
