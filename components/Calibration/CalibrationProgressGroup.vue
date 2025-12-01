@@ -1,5 +1,5 @@
 <template>
-  <table id="CalibrationProgressTable" class="progressTable prevent-select">
+  <table v-if="userCalibrationRunData" id="CalibrationProgressTable" class="progressTable prevent-select">
     <tbody>
       <tr>
         <td><i v-if="userCalibrationRunData?.gage?.gage_id"
@@ -87,26 +87,29 @@ const currentCalibrationTab = ref(getCalibrationTabIndex());
 const emit = defineEmits(["tabNumber"]);
 
 onMounted(async() => {
-  // check to see if formulation is calibratable
-  if (userCalibrationRunData.value?.modules != null) {
-    try {
-      selectedModuleValues.value = JSON.parse(
-        JSON.stringify(userCalibrationRunData.value.modules)
-      );
-    } catch (e) {
-      console.error("Failed to clone modules:", e);
+  if (userCalibrationRunData.value) {
+    // check to see if formulation is calibratable
+    if (userCalibrationRunData.value?.modules != null) {
+      try {
+        selectedModuleValues.value = JSON.parse(
+          JSON.stringify(userCalibrationRunData.value.modules)
+        );
+      } catch (e) {
+        console.error("Failed to clone modules:", e);
+        selectedModuleValues.value = [];
+      }
+    } else {
       selectedModuleValues.value = [];
     }
-  } else {
-    selectedModuleValues.value = [];
-  }
-  validateFormulationTabData().then(response => {
-    if (response._data.formulation_errors) {
-      formulationIsCalibratable.value = false;
-    } else {
-      formulationIsCalibratable.value = true;
+    formulationIsCalibratable.value = false;
+    if (selectedModuleValues.value.length > 0) {
+      validateFormulationTabData().then(response => {
+        if (!response._data.formulation_errors) {
+          formulationIsCalibratable.value = true;
+        }
+      });
     }
-  });
+  }
 })
 
 const checkStartEndTimeValues = () => {

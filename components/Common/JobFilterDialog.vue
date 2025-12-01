@@ -345,7 +345,9 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  resetFilters();
+  if (!filterInactive.value) {
+    resetFilters();
+  }
   clearGageList();
 })
 

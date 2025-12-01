@@ -64,8 +64,7 @@ export const useOptimizationStore = defineStore(
           headers: {
             Authorization: `Bearer ${getAccessToken()}`,
             "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ calibration_run_id: calibrationJobId.value }),
+          }
         }
       ).then((optimizationTabDataResult) => {
         optimizationTabData.value =
