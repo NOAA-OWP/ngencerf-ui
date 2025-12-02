@@ -613,7 +613,6 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
       userCalibrationRunData.value = queryResponse?._data;
       gotoRunStatusTab();
     } else {
-      isLoading.value = false;
       let tDetail = "Unable to Retrieve Calibration Job Data";
       if (queryResponse?._data?.message) {
         tDetail = queryResponse._data.message;
@@ -622,6 +621,7 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   });
+  isLoading.value = false;
 }
 
 const gotoRunStatusTab = () => {
