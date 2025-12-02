@@ -269,23 +269,6 @@ const acceptDelete = (selectedRunId: number) => {
   });
 }
 
-const navigateToSetupVerification = () => {
-  isVerificationLoading.value = true;
-  nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Verification Tab"]');
-
-    if (e) {
-      if (selectedVerificationJob.value) {
-        await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_run_id as number);
-      }
-      e.click();
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Verification Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
-    }
-    isVerificationLoading.value = false;
-  });
-}
-
 const navigateToVerificationJobStatus = () => {
   isVerificationLoading.value = true;
   nextTick(async () => {

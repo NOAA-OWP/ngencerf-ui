@@ -202,7 +202,6 @@ const {
   setSelectedForecastRowData,
   getForecastRunsForVerification,
   resetSelectedVerificationJobData,
-  fetchNewVerificationJobId,
   loadSelectedVerificationJob,
   setSelectedVerificationJobId
 } = useVerificationStore();
@@ -252,9 +251,7 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
 
   nextTick(async () => {
-    // clear previously selected forecast job
-    selectedForecastJob.value = undefined;
-    forecastJobId.value = undefined;
+    resetSelectedVerificationJobData();
     forecastRunsForVerificationListCurrentPage.value = 1;
 
     // load forecast runs
@@ -273,7 +270,7 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
   forecastJobId.value = undefined;
 }
 
-const navigateToSetupVerification = () => {
+const navigateToVerificationJobStatus = () => {
   isVerificationLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
@@ -291,27 +288,8 @@ const navigateToSetupVerification = () => {
 }
 
 const createNewVerification = async () => {
-  // Clear out old data
-  resetSelectedVerificationJobData();
-  fetchNewVerificationJobId().then(response => {
-    if (response.status === 201) {
-      if (response?._data && response?._data?.verification_run_id && response?._data?.verification_run_id > 0) {
-        verificationJobId.value = response?._data?.verification_run_id as number;
-        loadSelectedVerificationJob(verificationJobId.value).then(queryResponse => {
-          userVerificationJobData.value = queryResponse?._data;
-          navigateToSetupVerification();
-        });
-      } else {
-        const tMsg: ToastMessageOptions = { severity: "error", summary: 'Create Verification Job Failed.', detail: "Unable to Retrieve Valid Verification Job Id", life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-    } else {
-      useApiErrorResponsePreprocess(response).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Create Verification Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
-        toast.add(tMsg); addToastRecord(tMsg);
-      });
-    }
-  });
+  // Just go to Run/Status with the selected forecast - no need to create anything new yet
+  navigateToVerificationJobStatus();
 }
 
 const rowStyle = (data: any) => {
