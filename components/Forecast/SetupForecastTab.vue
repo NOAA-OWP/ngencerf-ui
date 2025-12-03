@@ -39,12 +39,13 @@
         <h1 class="mb-6 text-3xl font-bold text-center relative">
             Forecast Configuration Selection
         </h1>
-        <p class="prompt-txt mt-2 text-center">
+        <p  v-if="!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)"
+            class="prompt-txt mt-2 text-center">
             Select a configuration, choose Cycle Date/Hour and optional Cold Start Date, then click Next.
         </p>
         <br />
     </div>
-    <div>
+    <div v-if="!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)">
         <DataTable :value="forecastConfigurations" sortField="fcst_win" scrollable v-model:selection="forecastConfiguration"
             selectionMode="single" :rowClass="rowClass" :rowStyle="rowStyle">
             <Column field="name" header="Configuration" sortable>
@@ -82,8 +83,12 @@
             </Column>
         </DataTable>
     </div>
-    <div v-if="forecastJobStatus && forecastJobStatus !== 'Ready'" class="text-normal mt-2 mx-auto text-center">
-      This forecast has already been run. Click "Next" to see status.
+    <div v-if="calibrationRunForForecast?.forecast_status && !['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)" class="text-normal mt-2 mx-auto text-center">
+      This forecast has already been run. Click Next to see status.
+      <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
+        @click="goToRunStatusTab()">
+        Next
+      </Button>
     </div>
     <div v-else-if="forecastConfiguration" class="grid place-items-center" style="margin-top:15px;">
       <div class="font-bold">Availability for {{ forecastConfiguration.name }}:</div>
@@ -308,33 +313,35 @@ const getCycleHourList = () => {
  * Go to the Status Run tab
  */
 const goToRunStatusTab = () => {
-    if (!forecastConfiguration.value) {
-      const alert = window.alert('You must select a configuration and then set the Cycle Date/Hour.');
-      return false;
-    } else if (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0)) {
-      const alert = window.alert('Invalid Cycle Date chosen.\n\nMake sure to choose a date within the available date range, and an hour that is available for your chosen configuration.');
-      return false;
-    } else if (!coldStartDate.value && (coldStartHour.value && coldStartHour.value > 0)) {
-      const alert = window.alert('Invalid Cold Start Date chosen.\n\nMake sure to choose a date and an hour, or leave both fields empty to run a forecast without a cold start.');
-      return false;
-    } else {
-      cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
-      if (coldStartDate.value) {
-        coldStartDate.value = coldStartDate.value.set({ hour: coldStartHour.value ? coldStartHour.value : 0, minute: 0, second: 0 });
-      }
-      if (coldStartDate.value && coldStartDate.value >= cycleDate.value) {
-        const alert = window.alert('Cold Start Date must be before the Cycle Date.');
-        return false;
-      }
-      // validate the day/hour to make sure it is within the availability window
-      let latestForecastDate = maxCycleDate.value.minus({ hours: forecastConfiguration.value.availability_lag})
-      if (latestForecastDate < cycleDate.value) {
-          const alert = window.alert('Forecast data might not yet be available for your chosen cycle date.');
-      }
-      const allTabs = document.getElementsByClassName("tabs");
-      const e = allTabs[ForecastTabs.tab_runStatus] as HTMLElement;
-      e.click();
+    if (!calibrationRunForForecast.value?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast.value?.forecast_status)) {
+        if (!forecastConfiguration.value) {
+          const alert = window.alert('You must select a configuration and then set the Cycle Date/Hour.');
+          return false;
+        } else if (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0)) {
+          const alert = window.alert('Invalid Cycle Date chosen.\n\nMake sure to choose a date within the available date range, and an hour that is available for your chosen configuration.');
+          return false;
+        } else if (!coldStartDate.value && (coldStartHour.value && coldStartHour.value > 0)) {
+          const alert = window.alert('Invalid Cold Start Date chosen.\n\nMake sure to choose a date and an hour, or leave both fields empty to run a forecast without a cold start.');
+          return false;
+        } else {
+          cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
+          if (coldStartDate.value) {
+            coldStartDate.value = coldStartDate.value.set({ hour: coldStartHour.value ? coldStartHour.value : 0, minute: 0, second: 0 });
+          }
+          if (coldStartDate.value && coldStartDate.value >= cycleDate.value) {
+            const alert = window.alert('Cold Start Date must be before the Cycle Date.');
+            return false;
+          }
+          // validate the day/hour to make sure it is within the availability window
+          let latestForecastDate = maxCycleDate.value.minus({ hours: forecastConfiguration.value.availability_lag})
+          if (latestForecastDate < cycleDate.value) {
+              const alert = window.alert('Forecast data might not yet be available for your chosen cycle date.');
+          }
+        }
     }
+    const allTabs = document.getElementsByClassName("tabs");
+    const e = allTabs[ForecastTabs.tab_runStatus] as HTMLElement;
+    e.click();
 };
 </script>
 

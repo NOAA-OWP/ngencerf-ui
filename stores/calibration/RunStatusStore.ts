@@ -120,11 +120,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     }
     if (validationControlStatus?.value && validationBestStatus?.value) {
       validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
-
-      // get elapsed time from valid_best
-      if (validBest?.elapsed_time) {
-        calibrationElapsedTime.value = validBest.elapsed_time;
-      }
     }
 
     // load plotNames and plotList from get_plot_names

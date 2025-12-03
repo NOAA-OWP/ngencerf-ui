@@ -34,14 +34,33 @@ export const useUserDataStore = defineStore(
     const userCalibrationJobsListData = ref<CalibrationJobListItem[]>([]);
     const userCalibrationRunData = ref<UserCalibrationRunData>();
     const gotoCalibrationRunId = ref<number>();
+    const calibrationRunListPageSize = ref<number>(50);
+    const calibrationRunListCurrentPage = ref<number>(1);
+    const calibrationRunListTotalPages = ref<number>(0);
+    const calibrationRunListTotalSize = ref<number>(0);
+    const calibrationRunListStartRow = ref<number>(1);
+    const calibrationRunListEndRow = ref<number>(calibrationRunListPageSize.value);
+    const calibrationRunListSort = ref<DynamicObject>({'field': 'calibration_run_id', 'direction': -1});
 
     const userSelectedCalibrationIterationId = ref<number | null>(null);
     const uiGageId = ref<string>("");
+    const uiGageList = ref<string[]>([]);
 
-    // Used for Calibration Job Filter
+    // Used for Job Filters
     const modulesFilterList = ref<string[]>([]);
+    const moduleOperator = ref<string>('All');
     const statusTypeFilterList = ref<string[]>([]);
     const includeArchivedJobs = ref<boolean>(false);
+    const createdAtStart = ref<any>(null);
+    const createdAtEnd = ref<any>(null);
+    const minCreatedAt = ref<any>(null);
+    const maxCreatedAt = ref<any>(null);
+    const jobIdStart = ref<any>(null);
+    const jobIdEnd = ref<any>(null);
+    const minJobId = ref<any>(null);
+    const maxJobId = ref<any>(null);
+    const selectedBulkJobAction = ref<number>(JobStatusAction.delete);
+    const selectedBulkJobActionScope = ref<boolean>(false);
 
     const lastServerError = ref<ServerStatus>();
 
@@ -247,35 +266,56 @@ export const useUserDataStore = defineStore(
     function getIsTokenExpired() {
       return tokenExpired.value;
     }
-    /**
-     * @returns {SelectOption[]}
-     */
-    const calibrationRunGageList = computed(() => {
-      let gageOptionList = <SelectOption[]>[];
-      gageOptionList.push({
-        name: "All",
-        description: "All",
-      });
-      userCalibrationJobsListData.value.forEach((runItem) => {
-        const checkGageIndex =
-          gageOptionList.findIndex(
-            (gageOption) => gageOption.name === runItem.gage_id
-          ) !== -1;
-        if (!checkGageIndex) {
-          gageOptionList.push({
-            name: runItem.gage_id,
-            description: runItem.gage_id,
-          });
-        }
-      });
-      return gageOptionList;
-    });
 
     /**
      * fetch user created calibration job list datauser created calibration
      * @return {void}
      */
     async function fetchUserCalibrationJobsListData() {
+      let requestBody = {
+        limit: calibrationRunListPageSize.value,
+        offset: (calibrationRunListCurrentPage.value - 1) * calibrationRunListPageSize.value,
+        sort: {
+          field: calibrationRunListSort.value.field,
+          direction: calibrationRunListSort.value.direction === -1 ? 'desc' : 'asc'
+        },
+        filters: {
+          gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
+          module_filter: {
+            modules: modulesFilterList.value,
+            operator: moduleOperator.value === 'All' ? 'and' : 'or'
+          },
+          date_filter:
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "before"
+            } : {}
+          ,
+          id_filter:
+            (jobIdStart.value && jobIdEnd.value) ? {
+              start_id: jobIdStart.value,
+              end_id: jobIdEnd.value,
+              operator: "between"
+            } : jobIdStart.value ? {
+              id: jobIdStart.value,
+              operator: "after"
+            } : jobIdEnd.value ? {
+              id: jobIdEnd.value,
+              operator: "before"
+            } : {}
+          ,
+          status: statusTypeFilterList.value,
+          include_archived: includeArchivedJobs.value
+        },
+        get_gages: uiGageList.value.length === 0
+      }
       const jobsListDataResult =
         await makeProtectedApiCall<CalibrationJobsList>(
           `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`,
@@ -285,11 +325,88 @@ export const useUserDataStore = defineStore(
               Authorization: `Bearer ${getAccessToken()}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({filters: {include_archived: includeArchivedJobs.value} }),
+            body: JSON.stringify(requestBody),
           }
         );
 
       userCalibrationJobsListData.value = jobsListDataResult?._data?.jobs ?? [];
+      calibrationRunListTotalSize.value = jobsListDataResult?._data?.total_count ?? 0;
+      calibrationRunListTotalPages.value = Math.ceil(calibrationRunListTotalSize.value / calibrationRunListPageSize.value);
+      calibrationRunListStartRow.value = (calibrationRunListPageSize.value * (calibrationRunListCurrentPage.value - 1)) + 1;
+      calibrationRunListEndRow.value = Math.min(calibrationRunListStartRow.value + (calibrationRunListPageSize.value - 1), calibrationRunListTotalSize.value);
+      
+      if (jobsListDataResult?._data?.gages) {
+        uiGageList.value = jobsListDataResult?._data?.gages;
+        uiGageList.value.sort();
+      }
+      if (jobsListDataResult?._data?.date_range && jobsListDataResult?._data?.date_range.length === 2) {
+        minCreatedAt.value = jobsListDataResult?._data?.date_range[0];
+        maxCreatedAt.value = jobsListDataResult?._data?.date_range[1];
+      }
+      if (jobsListDataResult?._data?.id_range && jobsListDataResult?._data?.id_range.length === 2) {
+        minJobId.value = jobsListDataResult?._data?.id_range[0];
+        maxJobId.value = jobsListDataResult?._data?.id_range[1];
+      }
+    }
+
+    /**
+     * fetch list of calibration job IDs only (for bulk actions)
+     * @return {void}
+     */
+    async function fetchUserCalibrationJobsListIDsOnly() {
+      // apply user's filters without paging, since we want the entire list
+      let requestBody = {
+        filters: {
+          gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
+          module_filter: {
+            modules: modulesFilterList.value,
+            operator: moduleOperator.value === 'All' ? 'and' : 'or'
+          },
+          date_filter:
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              operator: "before"
+            } : {}
+          ,
+          id_filter:
+            (jobIdStart.value && jobIdEnd.value) ? {
+              start_id: jobIdStart.value,
+              end_id: jobIdEnd.value,
+              operator: "between"
+            } : jobIdStart.value ? {
+              id: jobIdStart.value,
+              operator: "after"
+            } : jobIdEnd.value ? {
+              id: jobIdEnd.value,
+              operator: "before"
+            } : {}
+          ,
+          status: statusTypeFilterList.value,
+          include_archived: includeArchivedJobs.value
+        },
+        ids_only: true
+      }
+      const jobsListIDsResult =
+        await makeProtectedApiCall<CalibrationJobsList>(
+          `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${getAccessToken()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
+
+      return jobsListIDsResult?._data?.jobs ?? [];
     }
 
     /**
@@ -395,8 +512,8 @@ export const useUserDataStore = defineStore(
 
     return {
       userSelectedCalibrationIterationId,
-      calibrationRunGageList,
       uiGageId,
+      uiGageList,
       isLoggedIn,
       userName,
       firstName,
@@ -405,12 +522,30 @@ export const useUserDataStore = defineStore(
       accessToken,
       refreshToken,
       modulesFilterList,
+      moduleOperator,
       statusTypeFilterList,
       includeArchivedJobs,
+      createdAtStart,
+      createdAtEnd,
+      minCreatedAt,
+      maxCreatedAt,
+      jobIdStart,
+      jobIdEnd,
+      minJobId,
+      maxJobId,
+      selectedBulkJobAction,
+      selectedBulkJobActionScope,
       lastServerError,
       userCalibrationJobsListData,
       userCalibrationRunData,
       gotoCalibrationRunId,
+      calibrationRunListPageSize,
+      calibrationRunListCurrentPage,
+      calibrationRunListTotalPages,
+      calibrationRunListTotalSize,
+      calibrationRunListStartRow,
+      calibrationRunListEndRow,
+      calibrationRunListSort,
       calibrationJobNgenGlobalLogging,
       ngenLogLevel,
       forcingLogLevel,
@@ -433,6 +568,7 @@ export const useUserDataStore = defineStore(
       getAccessToken,
       getRefreshToken,
       fetchUserCalibrationJobsListData,
+      fetchUserCalibrationJobsListIDsOnly,
       getValidationJobs,
       queryUserCalibrationRunData,
       fetchUserCalibrationRunData,

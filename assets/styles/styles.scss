@@ -407,12 +407,15 @@ select option {
   grid-template-columns: 23% 75%;
   gap: 2%;
 }
-.pagination-rows, .pagination-go-to-page, .pagination-pages {margin-bottom: 4px; font-weight: normal; font-size: 13px;}
+.pagination-rows, .pagination-go-to-page, .pagination-pages {margin-bottom: 4px; font-weight: normal; font-size: 13px; text-align: left;}
 .pagination-go-to-page input {width:70px; display: inline-block; padding: 2px 3px;font-size: 13px;}
 .pagination-go-to-page, .pagination-pages {display:inline-block; margin-top:-10px;}
 .pagination-go-to-page {width:30%;text-align: right; padding-right: 0px;}
-#PlotTableArea .pagination-go-to-page {padding-right: 14px;}
+#PlotTable.pagination-go-to-page {padding-right: 14px;}
 .pagination-pages {width:70%;}
+.pagingLink { padding-left: 4px; padding-right: 4px; padding-top: 8px; }
+.pagingLink a:hover { text-decoration: underline; cursor: pointer; }
+.pagingLink.active { font-weight: bold; }
 
 // default color ovewrites
 .bg-green { background-color: global.$ngwcp_secondary4 !important; }
