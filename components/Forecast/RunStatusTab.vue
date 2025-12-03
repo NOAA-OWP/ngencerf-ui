@@ -87,12 +87,12 @@
                 </td>
                 <td class="pl-5">{{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'None') }}</td>
               </tr>
-              <tr height="32px" :aria-label="'Configuration is ' + ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown')"
-                :title="'Configuration is ' + ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown')">
+              <tr height="32px" :aria-label="'Configuration is ' + (forecastConfigurationName ?? 'Unknown')"
+                :title="'Configuration is ' + (forecastConfigurationName ?? 'Unknown')">
                 <td class="text-right font-bold">
                   <div style="width: 140px;">Configuration</div>
                 </td>
-                <td class="pl-5">{{ ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown') ?? '-'.repeat(15) }}</td>
+                <td class="pl-5">{{ forecastConfigurationName ?? 'Unknown' }}</td>
               </tr>
             </tbody>
           </table>
@@ -256,6 +256,7 @@ const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
+const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
 
 const {
@@ -263,6 +264,7 @@ const {
   coldStartDate,
   cycleDate,
   forecastConfiguration,
+  forecastConfigurationName,
   forecastJobStatus,
   coldStartJobStatus,
   failureMessages,
@@ -297,6 +299,17 @@ onMounted(async () => {
   // highlight the tab when selected
   hilightTab(ForecastTabs.tab_runStatus);
 
+  // load Run/Status tab data
+  await loadForecastRunStatusTabData();
+  // get calibration job data if we don't already have it
+  if (!userCalibrationRunData.value) {
+    await fetchUserCalibrationRunData();
+  }
+  if (forecastJobId.value) {
+    createColdStartAndForecastStatusInterval();
+    createElapsedTimeInterval();
+  }
+
   clearInterval(forecastJobStatusIntervalId.value);
   clearInterval(elapsedTimeIntervalId.value);
   forecastJobStatusIntervalId.value = undefined;
@@ -308,26 +321,21 @@ onMounted(async () => {
   } else {
     ngenLogLevel.value = 'info';
   }
-  if (userCalibrationRunData?.value?.logging_config?.modules['forcing']) {
+  if (calibrationRunForForecast?.value?.logging_config?.modules['forcing']) {
     forcingLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['forcing'] as LogLevel;
   } else {
     forcingLogLevel.value = 'info';
   }
   
-  Object.keys(userCalibrationRunData?.value?.logging_config?.modules).forEach(server_key => {
-    // Find matching key in log levels somehow
-    Object.keys(logLevels.value).forEach(ui_key => {
-      if (ui_key.toLowerCase() == server_key.toLowerCase()) {
-        logLevels.value[ui_key] = ref(userCalibrationRunData?.value?.logging_config?.modules[server_key] as LogLevel);
-      }
+  if (calibrationRunForForecast?.value?.logging_config?.modules) {
+    Object.keys(calibrationRunForForecast.value.logging_config.modules).forEach(server_key => {
+      // Find matching key in log levels somehow
+      Object.keys(logLevels.value).forEach(ui_key => {
+        if (ui_key.toLowerCase() == server_key.toLowerCase()) {
+          logLevels.value[ui_key] = ref(calibrationRunForForecast.value.logging_config.modules[server_key] as LogLevel);
+        }
+      });
     });
-  });
-
-  // load Run/Status tab data
-  await loadForecastRunStatusTabData();
-  if (forecastJobId.value) {
-    createColdStartAndForecastStatusInterval();
-    createElapsedTimeInterval();
   }
 
   if (!cycleDate.value && calibrationRunForForecast?.value?.cycle_date) {
