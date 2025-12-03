@@ -383,6 +383,8 @@ const populatePlotListOptions = async() => {
 }
 
 onMounted(async () => {
+  isLoading.value = true;
+
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
@@ -455,8 +457,10 @@ onMounted(async () => {
         );
       }
     
-      // always update the iteration number for any status other than Saved or Ready
-      await updateIteration();
+      // check to see if iteration number is defined for any status other than Saved or Ready
+      if (!iteration.value) {
+        await updateIteration();
+      }
       await populatePlotListOptions();
     } else {
       // If job is saved or ready we need to explicitly clear the validation statuses
@@ -464,6 +468,7 @@ onMounted(async () => {
       validationBestStatus.value = undefined;
       validControlAndValidBestStatus.value = undefined;
     }
+    isLoading.value = false;
   });
 });
 
@@ -490,7 +495,6 @@ const createElapsedTimeInterval = () => {
 
 // Run Calibration Job
 const startRun = async () => {
-  //isLoading.value = true;
   validationBestAchieved.value.isBest = false;
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Validating and Preparing Job Data';
@@ -546,7 +550,6 @@ const startRun = async () => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'userCalibrationRunData not set', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
-  //isLoading.value = false;
 };
 
 // Cancel Calibration Job
@@ -596,32 +599,33 @@ const cancelRun = async () => {
 const updateIteration = async () => {
   const getIterationResponse = await queryGetIteration();
   
-  // check if status changes from Submitted or Running
-  if (getIterationResponse._data && getIterationResponse._data.status) {
-    if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
-      if (userCalibrationRunData.value) {
-        clearInterval(calibrationStatusIntervalId.value);
-        calibrationStatusIntervalId.value = undefined;
-      }
+  if (getIterationResponse._data) {
+    // check if iteration changes
+    if (isNotNullOrUndefined(getIterationResponse._data.iteration)) {
+      iteration.value = getIterationResponse._data.iteration;
     }
-    userCalibrationRunData.value.status = getIterationResponse._data.status;
-    if (getIterationResponse._data.failure_messages) {
-      userCalibrationRunData.value.failure_messages = getIterationResponse._data.failure_messages;
+    // check if status changes from Submitted or Running
+    if (getIterationResponse._data.status) {
+      if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
+        if (userCalibrationRunData.value) {
+          clearInterval(calibrationStatusIntervalId.value);
+          calibrationStatusIntervalId.value = undefined;
+        }
+      }
+      userCalibrationRunData.value.status = getIterationResponse._data.status;
+      if (getIterationResponse._data.failure_messages) {
+        userCalibrationRunData.value.failure_messages = getIterationResponse._data.failure_messages;
+      }
     }
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
-
-  // check if iteration changes
-  if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
-    iteration.value = getIterationResponse._data.iteration;
-  }
 }
 
 // Handle calibration/validation status changes
 watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
-  if (userCalibrationRunData.value) {
+  if (userCalibrationRunData.value && (oldCalibrationStatus || newCalibrationStatus) && !isLoading.value) {
     if (userCalibrationRunData.value.stop_criteria) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
     }
@@ -854,7 +858,7 @@ watch(submitTimeDate, () => {
 
 // Handle iteration changes
 watch(iteration, async () => {
-  if (iteration.value && iteration.value >= 1) {
+  if (iteration.value && iteration.value >= 1 && !isLoading.value) {
     // populate plotListOptions from iteration 1 onwards, in case a plot becomes available that wasn't before
     await populatePlotListOptions();
     if (selectedPlotName.value && selectedPlotName.value != plotListDefault.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
