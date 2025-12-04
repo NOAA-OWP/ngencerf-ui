@@ -59,7 +59,7 @@ export const useUserDataStore = defineStore(
     const jobIdEnd = ref<any>(null);
     const minJobId = ref<any>(null);
     const maxJobId = ref<any>(null);
-    const selectedBulkJobAction = ref<number>(JobStatusAction.delete);
+    const selectedBulkJobAction = ref<number>(0);
     const selectedBulkJobActionScope = ref<boolean>(false);
 
     const lastServerError = ref<ServerStatus>();

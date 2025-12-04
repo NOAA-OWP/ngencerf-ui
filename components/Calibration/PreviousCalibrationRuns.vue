@@ -19,6 +19,7 @@
           <div id="CalTable" class="w-max mx-auto">
             <JobFilterDialog id="JobFilterDialog" :disable-all="disableFilters" 
               :totalSize="calibrationRunListTotalSize" :totalPages="calibrationRunListTotalPages"
+              v-model:currentPage="calibrationRunListCurrentPage"
               @RefreshJobList="refreshJobList()" @BulkJobAction="bulkJobAction()" ref="jobFilterRef" />
             
             <ConfirmDialog></ConfirmDialog>
@@ -532,7 +533,7 @@ const ptColumn = ref({
 
 // watch for sort order change - reset current page to 1
 watch(calibrationRunListSort, () => {
-  calibrationRunListCurrentPage.value = 1
+  calibrationRunListCurrentPage.value = 1;
   refreshJobList();
 },{ deep: true });
 
