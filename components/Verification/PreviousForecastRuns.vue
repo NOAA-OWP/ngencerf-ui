@@ -22,6 +22,8 @@
           </div>
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-status="false" :show-gage="false" :show-modules="false" :show-archived="false"
+            :totalSize="forecastRunsForVerificationListTotalSize" :totalPages="forecastRunsForVerificationListTotalPages"
+            v-model:currentPage="forecastRunsForVerificationListCurrentPage"
             @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>

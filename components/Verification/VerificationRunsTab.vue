@@ -22,6 +22,8 @@
         <div id="VerTable">
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-gage="false" :show-modules="false" :show-archived="false"
+            :totalSize="verificationRunListTotalSize" :totalPages="verificationRunListTotalPages"
+            v-model:currentPage="verificationRunListCurrentPage"
             @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>

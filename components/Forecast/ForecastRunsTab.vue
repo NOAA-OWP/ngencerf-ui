@@ -23,6 +23,8 @@
 
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-gage="false" :show-modules="false" :show-archived="false"
+            :totalSize="forecastRunListTotalSize" :totalPages="forecastRunListTotalPages"
+            v-model:currentPage="forecastRunListCurrentPage"
             @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>

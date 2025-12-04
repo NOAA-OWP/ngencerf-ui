@@ -25,6 +25,8 @@
         <div id="CalTable" class="w-max mx-auto">
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-status="false" :show-modules="false" :show-archived="false"
+            :totalSize="calibrationRunsForForecastListTotalSize" :totalPages="calibrationRunsForForecastListTotalPages"
+            v-model:currentPage="calibrationRunsForForecastListCurrentPage"
             @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
