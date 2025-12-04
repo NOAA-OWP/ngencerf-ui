@@ -75,7 +75,7 @@
                           <Button class="font-normal ngenButtonDiv-green h-8" title="Run Button" aria-label="Run Button"
                             @click="startRun()">Run</Button>
                         </span>
-                        <span v-if="calibrationStatus === 'Running' || validationControlStatus === 'Running' || validationBestStatus === 'Running'">
+                        <span v-if="['Submitted','Running'].includes(calibrationStatus) || validationControlStatus === 'Running' || validationBestStatus === 'Running'">
                           <Button class="ngenButtonDiv-red h-8 mr-3" title="Cancel Button" @click="cancelRun()"
                             aria-label="Cancel Button">Cancel</Button>
                         </span>
@@ -551,7 +551,7 @@ const startRun = async () => {
 
 // Cancel Calibration Job
 const cancelRun = async () => {
-  if (calibrationStatus.value === 'Running' || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') {
+  if (['Submitted','Running'].includes(calibrationStatus.value) || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') {
     try {
       let cancelCalibrationResponse = undefined;
       if (calibrationStatus.value === 'Running') {
@@ -587,7 +587,7 @@ const cancelRun = async () => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration/Validation status not set to Running. Cannot cancel Calibration', life: ToastTimeout.timeoutWarn };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration/Validation status not set to Submitted or Running. Cannot cancel Calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
@@ -660,7 +660,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
 
         // calculate running time every second while calibration is Running 
         // or calibration is Done and valid_control and valid_best have not started or are Submitted, Ready, Running
-        if (['Validating and Preparing Job Data','Running'].includes(userCalibrationRunData.value?.status) || (userCalibrationRunData.value?.status === 'Done' &&
+        if (['Validating and Preparing Job Data','Submitted','Running'].includes(userCalibrationRunData.value?.status) || (userCalibrationRunData.value?.status === 'Done' &&
           (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
           // Create an interval to update calibrationElapsedTime every second while Calibration is Running or Validation is not Done
           if (!elapsedTimeIntervalId.value) {

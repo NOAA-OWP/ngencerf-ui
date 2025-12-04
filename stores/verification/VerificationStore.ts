@@ -298,7 +298,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
    * @return {any}
    */
   const getVerificationStatus = async (): Promise<any> => {
-    console.log('userVerificationJobData:',userVerificationJobData.value);
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_verification_status/`, {
       method: "POST",
       headers: {

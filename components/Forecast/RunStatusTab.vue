@@ -210,7 +210,7 @@
                 </Button>
               </div>
             </span>
-            <span v-if="coldStartJobStatus === 'Running' || forecastJobStatus === 'Running'">
+            <span v-if="['Submitted','Running'].includes(coldStartJobStatus) || ['Submitted','Running'].includes(forecastJobStatus)">
               <div class="col-span-1 mr-3">
                 <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" @click="cancelForecastRun()"
                   aria-label="Cancel Button">

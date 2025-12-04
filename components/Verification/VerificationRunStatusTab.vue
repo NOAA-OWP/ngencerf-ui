@@ -94,7 +94,7 @@
               Run
             </Button>
           </span>
-          <span v-if="verificationJobStatus === 'Running'">
+          <span v-if="['Submitted','Running'].includes(verificationJobStatus)">
             <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" @click="stopVerificationJob()"
               aria-label="Cancel Button">
               Cancel
