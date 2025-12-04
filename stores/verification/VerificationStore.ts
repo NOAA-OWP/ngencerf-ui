@@ -43,7 +43,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   const verificationJobId = ref<number>();
   const verificationJobs = ref<VerificationJob[]>([]);
   const selectedVerificationJob = ref<VerificationJob>();
-  const userVerificationJobData = ref<VerificationJob>();
   const verificationRunListPageSize = ref<number>(50);
   const verificationRunListCurrentPage = ref<number>(1);
   const verificationRunListTotalPages = ref<number>(0);
@@ -307,26 +306,10 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
       body: JSON.stringify({ verification_run_id: verificationJobId.value })
     });
   };
-  
-  /**
-   * Load Selected Verification Run
-   */
-  const loadSelectedVerificationJob = async (verification_run_id: number): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_verification_job/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({ verification_run_id: verification_run_id })
-    });
-  };
 
   const setSelectedVerificationJobId = async(verification_run_id: number): Promise<void> => {
     verificationJobId.value = verification_run_id;
-    let response = await loadSelectedVerificationJob(verificationJobId.value);
-    userVerificationJobData.value = response._data;
-    forecastJobId.value = userVerificationJobData.value?.forecast_run.forecast_run_id;
+    forecastJobId.value = selectedVerificationJob.value?.forecast_run_id;
   }
 
   const setSelectedVerificationRowData = async (verification_row_data: VerificationJob): Promise<void> => {
@@ -340,7 +323,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     forecastJobId.value = undefined;
     selectedVerificationJob.value = undefined;
     verificationJobId.value = undefined;
-    userVerificationJobData.value = undefined;
   }
   
   /**
@@ -360,6 +342,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   const loadVerificationStatusInformation = async () => {
     getVerificationStatus().then( response => {
       if ( response._data.status ) {
+        selectedVerificationJob.value = response._data;
         verificationJobStatus.value = response._data.status;
         failureMessages.value = response._data.failure_messages;
         if (response._data.submit_date) {
@@ -369,7 +352,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
           }
           if ( verificationJobStatus?.value?.toLocaleUpperCase() !== "RUNNING" ) {
             elapsedTime.value = response._data.elapsed_time ? formatElapsedTime(response._data.elapsed_time) : '';
-            loadSelectedVerificationJob(userVerificationJobData?.value ? userVerificationJobData?.value?.verification_run_id : verificationJobId?.value);
             clearInterval(verificationStatusCheckingInterval.value);
             clearInterval(verificationRunningTimeInterval.value);
             verificationStatusCheckingInterval.value = undefined;
@@ -476,7 +458,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     verificationRunListEndRow,
     verificationRunListSort,
     selectedVerificationJob,
-    userVerificationJobData,
     verificationDate,
     yamlConfigData,
     verificationPlotNames,
@@ -486,7 +467,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     setSelectedForecastRunId,
     setSelectedForecastRowData,
     getVerificationJobs,
-    loadSelectedVerificationJob,
     loadVerificationRunStatusTabData,
     loadVerificationResultsTabData,
     loadVerificationTab,

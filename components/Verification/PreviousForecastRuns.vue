@@ -193,7 +193,6 @@ const {
   forecastRunsForVerificationListSort,
   verificationJobId,
   selectedVerificationJob,
-  userVerificationJobData,
   isVerificationLoading
 } = storeToRefs(verificationStore);
 
@@ -202,7 +201,6 @@ const {
   setSelectedForecastRowData,
   getForecastRunsForVerification,
   resetSelectedVerificationJobData,
-  loadSelectedVerificationJob,
   setSelectedVerificationJobId
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);

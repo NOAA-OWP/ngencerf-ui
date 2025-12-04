@@ -57,9 +57,7 @@ const verificationStore = useVerificationStore();
 
 const { 
   verificationJobId, 
-  userVerificationJobData, 
-  submitTimeDate,
-  submitTime,
+  selectedVerificationJob, 
   elapsedTime,
   verificationJobStatus,
   verificationPlotNames,
