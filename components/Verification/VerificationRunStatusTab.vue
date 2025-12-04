@@ -85,16 +85,7 @@
           </div>
         </div>
 
-        <div class="col-span-2 pl-5">
-          <span v-if="!verificationJobStatus || ['Saved','Ready'].includes(verificationJobStatus)">
-            <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Previous Button" aria-label="Previous Button"
-                @click="goPreviousTab()">
-                Previous
-            </Button>
-          </span>
-        </div>
-
-        <div class="col-span-1"></div>
+        <div class="col-span-3"></div>
 
         <div class="col-span-2 pl-5">
           <span v-if="verificationJobStatus === 'Ready'">
@@ -241,12 +232,6 @@ const stopVerificationJob = async () => {
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
-
-const goPreviousTab = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[VerificationTabs.tab_setupVerification];
-  e.click();
-}
 
 const goNextTab = () => {
   const tabs = document.getElementsByClassName("tabs");

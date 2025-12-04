@@ -124,6 +124,13 @@ export const generalStore = defineStore(
     function resetGeneralStore() {
       calibrationJobId.value = 0;
       popupActive.value = false;
+
+      // Also reset current menu/tab index so that user doesn't get redirected to a tab from the previous session
+      menuIndex.value = '1';
+      calibrationTabIndex.value = '1';
+      evaluationTabIndex.value = '1';
+      forecastTabIndex.value = '1';
+      verificationTabIndex.value = '1';
     }
 
     return {

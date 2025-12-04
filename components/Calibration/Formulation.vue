@@ -65,17 +65,17 @@
               <div class="mt-5">
                 <span v-if="formulationWarningMessages" class="text-amber-600">
                     <div v-for="message in formulationWarningMessages">
-                    <br/>{{ message }}
+                    <br/><div class="whitespace-pre-line">{{ message }}</div>
                     </div>
                 </span>
                 <span v-if="formulationInfoMessages" class="text-green-600">
                     <div v-for="message in formulationInfoMessages">
-                    <br/>{{ message }}
+                    <br/><div class="whitespace-pre-line">{{ message }}</div>
                     </div>
                 </span>
                 <span v-if="formulationErrorMessages" class="text-red-600">
                     <div v-for="message in formulationErrorMessages">
-                    <br/>{{ message }}
+                    <br/><div class="whitespace-pre-line">{{ message }}</div>
                     </div>
                 </span>
               </div>

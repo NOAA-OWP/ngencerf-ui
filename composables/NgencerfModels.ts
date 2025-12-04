@@ -81,6 +81,7 @@ export interface FormulationTabSaveWarningGroupRequirement {
  */
 export interface CalibrationJobsList {
   jobs: CalibrationJobListItem[];
+  total_count?: number;
 }
 
 export interface CalibrationJobListItem {
@@ -531,6 +532,7 @@ export interface ValidatedCalibrationRunListItem
 
 export interface ValidatedCalibrationRunList {
   jobs: ValidatedCalibrationRunListItem[];
+  total_count?: number;
 }
 
 export interface CalibrationValidationRunData {
@@ -766,10 +768,11 @@ export interface ForecastJob {
 
 export type ForecastJobs = {
   forecast_jobs: ForecastJob[];
+  total_count?: number;
 }
 
 export interface VerificationJob {
-  verification_job_id: number;
+  verification_run_id: number;
   forecast_run: ForecastJob;
   yaml_config_data: DynamicObject;
   submit_date: string;
@@ -782,11 +785,12 @@ export interface VerificationJob {
 
 export type VerificationJobs = {
   verification_jobs: VerificationJob[];
+  total_count?: number;
 }
 
 export interface CreatedVerificationJob {
   message: string;
-  verification_job_id: number;
+  verification_run_id: number;
 }
 
 export type PlotNames = {
