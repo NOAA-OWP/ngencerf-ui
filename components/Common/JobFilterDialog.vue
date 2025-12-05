@@ -154,6 +154,7 @@ import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const { fetchFormulationModuleOptions } = useFormulationStore();
+const { filterGroup } = storeToRefs(useFormulationStore());
 
 const { 
   uiGageId, 
@@ -337,6 +338,7 @@ const resetFilters = () => {
 defineExpose({ resetFilters });
 
 onMounted(() => {
+  filterGroup.value = '';
   if (instance?.vnode?.props?.onBulkJobAction) {
     showBulkJobAction.value = true;
   }

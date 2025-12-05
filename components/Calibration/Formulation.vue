@@ -579,6 +579,7 @@ const validateTab = () => {
 
 const restoreTab = () => {
   formulationNameInput.value = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";
+  filterGroup.value = '';
   resetModuleList();
   updateFormulationValidRefs();
   if (userCalibrationRunData.value) {
