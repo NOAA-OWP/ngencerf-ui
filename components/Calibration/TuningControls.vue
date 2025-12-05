@@ -930,7 +930,7 @@ const areCalibrationTimesValidated = (): boolean => {
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
-  if (calStartDate <= simStartDate || calStartDate > simEndDate) {
+  if (calStartDate < simStartDate || calStartDate > simEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
