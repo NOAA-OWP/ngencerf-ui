@@ -37,7 +37,7 @@
           Start and End Times</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.parameters_selected && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="(checkStartEndTimeValues() || userCalibrationRunData?.parameters_selected) && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
         <td data-tab="4" title="Output Variable to Calibrate" aria-label="Output Variable to Calibrate"
           @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Output Variable to Calibrate</td>
       </tr>
