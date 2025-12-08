@@ -319,7 +319,7 @@ function adjustPlotGraphColumns() {
         } else if (!isNaN(parseFloat(plotGraphDataRaw.value[d][key])) && isFinite(plotGraphDataRaw.value[d][key]) && plotGraphDataRaw.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
           try {
-            plotGraphDataRaw.value[d][key] = Number(plotGraphDataRaw.value[d][key]).toFixed(5);
+            plotGraphDataRaw.value[d][key] = Number(plotGraphDataRaw.value[d][key].toFixed(5));
           } catch (error) {
             console.error('Error rounding value ' + plotGraphDataRaw.value[d][key] + ': ', error);
           }

@@ -576,7 +576,7 @@ watch(selectedPlotName, async () => {
               if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] === '') && iterationMetricsRecord[metric_name]) {
                 iterationMetricsRecord[metric_name] = 'N/A';
               } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
-                iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
+                iterationMetricsRecord[metric_name] = Number(iterationMetricsRecord[metric_name].toFixed(5));
               }
               if (i === 0) {
                 let metric_display_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_display_name;
@@ -609,7 +609,7 @@ watch(selectedPlotName, async () => {
               if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] === '') && iterationParamsRecord[param_name]) {
                 iterationParamsRecord[param_name] = 'N/A';
               } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
-                iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
+                iterationParamsRecord[param_name] = Number(iterationParamsRecord[param_name].toFixed(5));
               }
               if (i === 0) {
                 iterationParamsColumns.value.push({ header: param_name, field: param_name });
@@ -980,7 +980,7 @@ function adjustPlotTableColumns() {
         } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
           try {
-            plotTableData.value[d][key] = Number(plotTableData.value[d][key]).toFixed(5);
+            plotTableData.value[d][key] = Number(plotTableData.value[d][key].toFixed(5));
           } catch (error) {
             console.error('Error rounding value ' + plotTableData.value[d][key] + ': ', error);
           }
