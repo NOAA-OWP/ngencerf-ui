@@ -51,11 +51,11 @@
                       </span>
                     </td>
                   </tr>
-                  <tr height="32px" aria-label="Select Plot Name" title="Select Plot Name">
-                    <th scope="row" class="text-right"><label for="DisplayOptions">{{ plotList.length > 0 ?
-                      'Display' : '' }}</label></th>
+                  <tr v-show="plotList.length > 1" height="32px" aria-label="Select Plot or Log Name" 
+                    title="Select Plot or Log Name">
+                    <th scope="row" class="text-right"><label for="DisplayOptions">Display</label></th>
                     <td class="pl-3">
-                      <Select v-show="plotList.length > 0" id="DisplayOptions" class="p-select" v-model="selectedPlotName" 
+                      <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" 
                         :options="plotList" option-label="name" optionValue="name">
                       </Select>
                     </td>
@@ -325,7 +325,7 @@ const populatePlotListOptions = async() => {
     logListOptions.value = [];
 
     nextTick(async () => {
-      if (userCalibrationRunData?.value?.status === 'Done' || (iteration.value && iteration.value >= 1)) {
+      if (['Running','Done','Cancelled','Failed','Server error'].includes(userCalibrationRunData?.value?.status) && (iteration.value && iteration.value >= 1)) {
         // Get Plot Names
         plotNames.value = await queryGetPlotNames();
 
