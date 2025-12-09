@@ -70,8 +70,6 @@ export const useOptimizationStore = defineStore(
         optimizationTabData.value =
           optimizationTabDataResult?._data ?? undefined;
         optimizationStore_data_loading.value = false;
-
-        setUserSelection();
       });
     };
 
@@ -278,6 +276,7 @@ export const useOptimizationStore = defineStore(
       getOptimizationInputUserData,
       saveOptimizationTabData,
       resetOptimizationInputs,
+      setUserSelection,
       resetUserSelectionOptimization,
       resetOptimizationStore,
       loadOptimizationTabStaticData,

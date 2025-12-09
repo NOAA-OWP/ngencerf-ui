@@ -236,7 +236,7 @@ const {
   saveOptMetPayload
 } = storeToRefs(optimizationStore);
 
-const { loadOptimizationTabStaticData, saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
+const { loadOptimizationTabStaticData, setUserSelection, saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
@@ -258,6 +258,7 @@ onMounted(async() => {
   if (!optimizationTabData.value) {
     await loadOptimizationTabStaticData();
   }
+  setUserSelection();
   
   hilightTab(CalibrationTabs.tab_optimizationMetrics);
   toast.removeAllGroups();

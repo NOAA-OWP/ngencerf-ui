@@ -231,7 +231,7 @@ onMounted(async() => {
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
     setResetDataValues();
-    if (gageHasChanged.value && userCalibrationRunData?.value?.gage?.gage_id) {
+    if (userCalibrationRunData?.value?.gage?.gage_id) {
       gageSelectionReset();
     } else {
       selectedForcingValue.value = resetData.value.forcing_source_requested;
