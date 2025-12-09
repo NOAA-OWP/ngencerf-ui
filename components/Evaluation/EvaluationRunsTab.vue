@@ -519,7 +519,7 @@ const onRowContextMenu = (event: any) => {
     }
     if (crRowData.validation_runs >= 1) {
       cmCalibrationRun.value.push({ label: 'Compare Permutations', icon: 'pi pi-arrows-h', command: () => viewSelectedGageCalibrationRuns(crRowData.calibration_run_id, crRowData.gage_id) });
-      if (!crRowData.modules?.some(item => item.toLowerCase() === 'lstm')) {
+      if (!['Submitted','Running'].includes(selectedCalibrationRun?.value?.status) && !crRowData.modules?.some(item => item.toLowerCase() === 'lstm')) {
         cmCalibrationRun.value.push({ label: 'New Validation Run', icon: 'pi pi-chevron-circle-right', command: () => viewSelectAlternateIteration(crRowData.calibration_run_id) });
       }
     }
@@ -528,10 +528,10 @@ const onRowContextMenu = (event: any) => {
       cmCalibrationRun.value.push({ label: 'Download Results', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
     }
     cmCalibrationRun.value.push({ label: 'Export Calibration Config', icon: 'pi pi-file-export', command: () => exportSelectedCalibrationData() });
-    if (!selectedCalibrationRun?.value?.status.includes('Submitted') && !selectedCalibrationRun?.value?.status.includes('Running') && !selectedCalibrationRun?.value?.is_locked) {
+    if (!['Submitted','Running'].includes(selectedCalibrationRun?.value?.status) && !selectedCalibrationRun?.value?.is_locked) {
       cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
     }
-    if (!selectedCalibrationRun?.value?.status.includes('Submitted') && !selectedCalibrationRun?.value?.status.includes('Running') && !selectedCalibrationRun.value?.is_archived) {
+    if (!['Submitted','Running'].includes(selectedCalibrationRun?.value?.status) && !selectedCalibrationRun.value?.is_archived) {
       cmCalibrationRun.value.push({ label: 'Archive', icon: 'pi pi-folder', command: () => archiveSelectedCalibrationRun(true) });
     }
   }
