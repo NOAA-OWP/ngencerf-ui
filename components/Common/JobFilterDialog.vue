@@ -121,7 +121,7 @@
           </div>
           <div>
             <Select id="selectedBulkJobAction" v-model="selectedBulkJobAction" :disabled="disableAll"
-              :options="bulkJobActionsList" optionLabel="name" optionValue="value" 
+              :options="bulkJobActionsListDisplay" optionLabel="name" optionValue="value" 
               class="user-select w-12" aria-label="Select Bulk Job Action" title="Select Bulk Job Action">
             </Select>
           </div>
@@ -179,23 +179,6 @@ const {
 
 const emit = defineEmits(["ModulesFilterDialogClosing", "RefreshJobList", "BulkJobAction","update:currentPage"]);
 
-const moduleOperatorList = [
-  { name: "All" },
-  { name: "Any" }
-]
-const bulkJobActionsList: { name: string, value: number }[] = [
-  {name: 'select an action', value: 0},
-  ...Object.keys(JobStatusAction).map(key => ({
-    name: key.charAt(0).toUpperCase() + key.slice(1),
-    value: JobStatusAction[key as keyof typeof JobStatusAction]
-  }))
-];
-const bulkJobActionScopeList = [
-  { name: "this page only", value: false },
-  { name: "all pages", value: true }
-]
-const showBulkJobAction = ref<boolean>(false);
-
 const ptCheckbox = ref({
   box: { style: { "border": "2px solid #0c5274" } },
 });
@@ -235,6 +218,7 @@ interface Props {
   showArchived?: boolean;
   showCreatedAt?: boolean;
   showJobId?: boolean;
+  showBulkActions?: number[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -248,7 +232,38 @@ const props = withDefaults(defineProps<Props>(), {
   showArchived: true,
   showCreatedAt: true,
   showJobId: true,
+  showBulkActions: () => [],
 });
+
+const moduleOperatorList = [
+  { name: "All" },
+  { name: "Any" }
+]
+const bulkJobActionsList: { name: string, value: number }[] = [
+  {name: 'select an action', value: 0, show: true},
+  ...Object.keys(JobStatusAction).map(key => ({
+    name: key.charAt(0).toUpperCase() + key.slice(1),
+    value: JobStatusAction[key as keyof typeof JobStatusAction]
+  }))
+];
+const bulkJobActionScopeList = [
+  { name: "this page only", value: false },
+  { name: "all pages", value: true }
+]
+const showBulkJobAction = ref<boolean>(false);
+
+const bulkJobActionsListDisplay = computed(() => {
+  // if specific bulk actions are passed in based on archived/locked status of jobs in list, 
+  // AND we're only applying a bulk action to a single page (selectedBulkJobActionScope = false), 
+  // filter the available actions here
+  if (props.showBulkActions.length > 0 && !selectedBulkJobActionScope.value) {
+    return bulkJobActionsList.filter(option => {
+      return props.showBulkActions.includes(option.value)
+    });
+  }
+  // otherwise, allow all bulk actions
+  return bulkJobActionsList;
+})
 
 const filterInactive = computed(() => {
   return (
@@ -304,6 +319,11 @@ watch(jobIdStart, () => {
 });
 watch(jobIdEnd, () => {
   refreshJobList();
+});
+watch(selectedBulkJobAction, () => {
+  if(!selectedBulkJobAction.value) {
+    selectedBulkJobAction.value = 0;
+  }
 });
 
 const clearGageList = () => {
