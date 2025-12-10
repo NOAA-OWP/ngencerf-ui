@@ -277,13 +277,15 @@ const filterInactive = computed(() => {
 });
 
 const minMaxCreatedAtProps = computed(() => {
+  // hack - setting timestamps to noon the datepicker doesn't seem to understand that it's already getting UTC dates
   const props = {};
   if (minCreatedAt.value) {
-    props.minDate = minCreatedAt.value;
+    props.minDate = new Date(minCreatedAt.value.split('T')[0] + 'T12:00:00Z');
   }
   if (maxCreatedAt.value) {
-    props.maxDate = maxCreatedAt.value;
+    props.maxDate = new Date(maxCreatedAt.value.split('T')[0] + 'T12:00:00Z');
   }
+  console.log('props:',props);
   return props;
 });
 
@@ -320,9 +322,12 @@ watch(jobIdStart, () => {
 watch(jobIdEnd, () => {
   refreshJobList();
 });
-watch(selectedBulkJobAction, () => {
-  if(!selectedBulkJobAction.value) {
+watch(bulkJobActionsListDisplay, () => {
+  // if the display options for bulk action changes and the previously selected action is removed,
+  // set the selected value back to the "select an action" placeholder
+  if(!bulkJobActionsListDisplay.value.some(option => option.value === selectedBulkJobAction.value)) {
     selectedBulkJobAction.value = 0;
+    document.getElementById('selectedBulkJobAction').selectedIndex = 0;
   }
 });
 

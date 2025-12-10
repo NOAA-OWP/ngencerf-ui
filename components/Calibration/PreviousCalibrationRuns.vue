@@ -14,8 +14,7 @@
         </div>
 
         <!-- Table -->
-        <div class="">
-
+        <div>
           <div id="CalTable" class="w-max mx-auto">
             <JobFilterDialog id="JobFilterDialog" :disable-all="disableFilters" 
               :totalSize="calibrationRunListTotalSize" :totalPages="calibrationRunListTotalPages"
