@@ -285,7 +285,6 @@ const minMaxCreatedAtProps = computed(() => {
   if (maxCreatedAt.value) {
     props.maxDate = new Date(maxCreatedAt.value.split('T')[0] + 'T12:00:00Z');
   }
-  console.log('props:',props);
   return props;
 });
 

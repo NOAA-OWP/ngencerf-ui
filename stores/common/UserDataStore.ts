@@ -287,14 +287,14 @@ export const useUserDataStore = defineStore(
           },
           date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
-              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
               operator: "between"
             } : createdAtStart.value ? {
-              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
               operator: "after"
             } : createdAtEnd.value ? {
-              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
               operator: "before"
             } : {}
           ,
@@ -364,14 +364,14 @@ export const useUserDataStore = defineStore(
           },
           date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
-              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
               operator: "between"
             } : createdAtStart.value ? {
-              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
               operator: "after"
             } : createdAtEnd.value ? {
-              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
               operator: "before"
             } : {}
           ,
