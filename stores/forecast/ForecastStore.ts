@@ -632,6 +632,22 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastJobNgenGlobalLogging.value = true;
   };
 
+  /**
+   * reset job filters
+   */
+  const resetFilters = () => {
+    uiGageId.value = 'All';
+    statusTypeFilterList.value = [];
+    createdAtStart.value = null;
+    createdAtEnd.value = null;
+    minCreatedAt.value = null;
+    maxCreatedAt.value = null;
+    jobIdStart.value = null;
+    jobIdEnd.value = null;
+    minJobId.value = null;
+    maxJobId.value = null;
+  };
+
   return {
     forecastJobId,
     cycleDate,
@@ -692,7 +708,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     setSelectedForecastRunId,
     resetSelectedForecastRunData,
     setSelectedForecastRowData,
-    hardResetForecastRunStatusStore
+    hardResetForecastRunStatusStore,
+    resetFilters
   };
 });
 

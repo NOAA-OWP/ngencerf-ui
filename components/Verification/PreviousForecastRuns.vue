@@ -24,7 +24,7 @@
             :show-status="false" :show-gage="false" :show-modules="false" :show-archived="false"
             :totalSize="forecastRunsForVerificationListTotalSize" :totalPages="forecastRunsForVerificationListTotalPages"
             v-model:currentPage="forecastRunsForVerificationListCurrentPage"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'fr-context-menu' } }" class="bg-white" ref="frContextMenu"
@@ -206,7 +206,8 @@ const {
   resetSelectedVerificationJobData,
   fetchNewVerificationJobId,
   loadSelectedVerificationJob,
-  setSelectedVerificationJobId
+  setSelectedVerificationJobId,
+  resetFilters
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();

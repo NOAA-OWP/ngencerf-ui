@@ -395,6 +395,25 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     computedGageCalibrationRunList.value = [];
   }
 
+  /**
+   * reset job filters
+   */
+  const resetFilters = () => {
+    uiGageId.value = 'All';
+    modulesFilterList.value = []; 
+    moduleOperator.value = 'All';
+    statusTypeFilterList.value = [];
+    includeArchivedJobs.value = false;
+    createdAtStart.value = null;
+    createdAtEnd.value = null;
+    minCreatedAt.value = null;
+    maxCreatedAt.value = null;
+    jobIdStart.value = null;
+    jobIdEnd.value = null;
+    minJobId.value = null;
+    maxJobId.value = null;
+  };
+
   useLogoutListen('logoutEvent', (evStr: string) => {
     if (evStr === "logout") {
       resetUserSelectedEvalCalibrationRun();
@@ -424,6 +443,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     resetUserSelectedEvalCompareRun,
     clearUserCalibrationRunData,
     fetchValidationRunListByCalibrationRun,
+    resetFilters,
 
     getValidationRunIdByCalibrationRunId,
     userEvaluationRunListData,

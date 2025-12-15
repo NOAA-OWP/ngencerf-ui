@@ -19,7 +19,8 @@
             <JobFilterDialog id="JobFilterDialog" :disable-all="disableFilters" 
               :totalSize="calibrationRunListTotalSize" :totalPages="calibrationRunListTotalPages"
               v-model:currentPage="calibrationRunListCurrentPage" @RefreshJobList="refreshJobList()" 
-              @BulkJobAction="bulkJobAction()" :showBulkActions="showBulkActions" ref="jobFilterRef" />
+              @ResetFilters="resetFilters()" @BulkJobAction="bulkJobAction()" :showBulkActions="showBulkActions" 
+              ref="jobFilterRef" />
             
             <ConfirmDialog></ConfirmDialog>
 
@@ -289,7 +290,8 @@ const {
   queryUserCalibrationRunData, 
   fetchUserCalibrationJobsListData, 
   fetchUserCalibrationJobsListIDsOnly,
-  clearUserCalibrationRunData 
+  clearUserCalibrationRunData,
+  resetFilters
 } = useUserDataStore();
 const { 
   fetchNewCalibrationRunId, 
@@ -400,6 +402,11 @@ const buildContextMenu = computed(() => {
 onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
     hilightTab(CalibrationTabs.tab_calibrationRuns);
+
+    resetFilters();
+
+    selectedBulkJobAction.value = 0;
+    selectedBulkJobActionScope.value = false;
 
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;

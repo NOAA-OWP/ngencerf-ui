@@ -177,7 +177,7 @@ const {
   selectedBulkJobActionScope
 } = storeToRefs(useUserDataStore());
 
-const emit = defineEmits(["ModulesFilterDialogClosing", "RefreshJobList", "BulkJobAction","update:currentPage"]);
+const emit = defineEmits(["ModulesFilterDialogClosing", "RefreshJobList", "ResetFilters", "BulkJobAction", "update:currentPage"]);
 
 const ptCheckbox = ref({
   box: { style: { "border": "2px solid #0c5274" } },
@@ -350,21 +350,7 @@ const bulkJobAction = () => {
  * Reset filters
  */
 const resetFilters = (refresh_job_list: boolean=true) => {
-  uiGageId.value = 'All';
-  modulesFilterList.value = []; 
-  moduleOperator.value = 'All';
-  statusTypeFilterList.value = [];
-  includeArchivedJobs.value = false;
-  createdAtStart.value = null;
-  createdAtEnd.value = null;
-  minCreatedAt.value = null;
-  maxCreatedAt.value = null;
-  jobIdStart.value = null;
-  jobIdEnd.value = null;
-  minJobId.value = null;
-  maxJobId.value = null;
-  selectedBulkJobAction.value = 0;
-  selectedBulkJobActionScope.value = false;
+  emit("ResetFilters");
   if(refresh_job_list) {
     refreshJobList();
   }

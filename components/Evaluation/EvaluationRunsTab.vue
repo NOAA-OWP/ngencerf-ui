@@ -108,7 +108,7 @@
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" :show-status="false"
           :totalSize="evaluationRunListTotalSize" :totalPages="evaluationRunListTotalPages"
           v-model:currentPage="evaluationRunListCurrentPage"
-          @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+          @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -397,6 +397,7 @@ const {
   clearUserCalibrationRunData,
   setSelectedCalibrationRunId,
   fetchValidationRunListByCalibrationRun,
+  resetFilters
 } = evaluationCalibrationRunStore;
 
 const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
@@ -417,6 +418,7 @@ const formulationName = "Formulation Name";
 onMounted(async() => {
   hilightTab(EvaluationTabs.tab_calibrationRuns);
   includeArchivedJobs.value = false;
+  resetFilters();
 
   //clear calibration data if user was on calibration tab and clear previous evaluation run data user may have selected
   resetUserSelectedEvalCalibrationRun();

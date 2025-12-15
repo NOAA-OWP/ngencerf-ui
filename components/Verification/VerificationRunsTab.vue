@@ -24,7 +24,7 @@
             :show-gage="false" :show-modules="false" :show-archived="false"
             :totalSize="verificationRunListTotalSize" :totalPages="verificationRunListTotalPages"
             v-model:currentPage="verificationRunListCurrentPage"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="vrContextMenu"
@@ -150,7 +150,8 @@ const {
   loadSelectedVerificationJob,
   setSelectedVerificationRowData,
   getVerificationJobs,
-  deleteVerificationJob
+  deleteVerificationJob,
+  resetFilters
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();

@@ -510,6 +510,27 @@ export const useUserDataStore = defineStore(
       }
     };
 
+    /**
+     * reset job filters
+     */
+    const resetFilters = () => {
+      uiGageId.value = 'All';
+      modulesFilterList.value = []; 
+      moduleOperator.value = 'All';
+      statusTypeFilterList.value = [];
+      includeArchivedJobs.value = false;
+      createdAtStart.value = null;
+      createdAtEnd.value = null;
+      minCreatedAt.value = null;
+      maxCreatedAt.value = null;
+      jobIdStart.value = null;
+      jobIdEnd.value = null;
+      minJobId.value = null;
+      maxJobId.value = null;
+      selectedBulkJobAction.value = 0;
+      selectedBulkJobActionScope.value = false;
+    };
+
     return {
       userSelectedCalibrationIterationId,
       uiGageId,
@@ -574,6 +595,7 @@ export const useUserDataStore = defineStore(
       fetchUserCalibrationRunData,
       hardResetUserDataStore,
       clearUserCalibrationRunData,
+      resetFilters
     };
   },
   {

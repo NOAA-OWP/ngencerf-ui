@@ -462,6 +462,21 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     });
   };
 
+  /**
+   * reset job filters
+   */
+  const resetFilters = () => {
+    statusTypeFilterList.value = [];
+    createdAtStart.value = null;
+    createdAtEnd.value = null;
+    minCreatedAt.value = null;
+    maxCreatedAt.value = null;
+    jobIdStart.value = null;
+    jobIdEnd.value = null;
+    minJobId.value = null;
+    maxJobId.value = null;
+  };
+
 
   return {
     forecastJobId,
@@ -515,7 +530,8 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     fetchNewVerificationJobId,
     getVerificationPlotNames,
     getVerificationPlot,
-    deleteVerificationJob
+    deleteVerificationJob,
+    resetFilters
   };
 });
 
