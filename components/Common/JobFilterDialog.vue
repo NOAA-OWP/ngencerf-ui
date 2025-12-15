@@ -349,7 +349,7 @@ const bulkJobAction = () => {
 /**
  * Reset filters
  */
-const resetFilters = () => {
+const resetFilters = (refresh_job_list: boolean=true) => {
   uiGageId.value = 'All';
   modulesFilterList.value = []; 
   moduleOperator.value = 'All';
@@ -365,19 +365,22 @@ const resetFilters = () => {
   maxJobId.value = null;
   selectedBulkJobAction.value = 0;
   selectedBulkJobActionScope.value = false;
-  refreshJobList();
+  if(refresh_job_list) {
+    refreshJobList();
+  }
 }
 
 defineExpose({ resetFilters });
 
 onMounted(() => {
+  resetFilters(false);
   if (instance?.vnode?.props?.onBulkJobAction) {
     showBulkJobAction.value = true;
   }
 })
 
 onUnmounted(() => {
-  resetFilters();
+  resetFilters(false);
   clearGageList();
 })
 
