@@ -12,7 +12,7 @@
     </div>
     <div id="ComparePermutationsPage">
         <div v-if="plotList && plotList.length >= 2" class="pl-2 pr-2 pt-2">
-            <p class="pr-2 pt-3 mb-[10px] font-bold">Select Comparison Display for Gage {{ uiGageId }}</p>
+            <p class="pr-2 pt-3 mb-[10px] font-bold">Select Comparison Display for Gage {{ uiCompareGageId }}</p>
             <div class="flex mt-3">
                 <label for="DisplayOptions" class="pr-2 pt-1">Display </label>
                 <div class="inline-block w-1/6">
@@ -99,7 +99,7 @@ const {
     selectedPlotName
 } = storeToRefs(runStatusStore);
 const {
-  uiGageId,
+  uiCompareGageId,
   selectedCalibrationCompareRuns,
 } = storeToRefs(evaluationCalibrationRunStore);
 const {
@@ -272,7 +272,7 @@ const getPlotTableData = async () => {
     // get selected plot file name and url from server
     const response: any = await queryGetPlotsForComparison(
       selectedPlotName.value, // plotName
-      uiGageId.value, // gage_id
+      uiCompareGageId.value, // gage_id
     );
     if (response?._data?.plots) {
       for (let p = 0; p < plotList.value.length; p++) {

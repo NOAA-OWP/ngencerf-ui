@@ -121,18 +121,18 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
           operator: moduleOperator.value === 'All' ? 'and' : 'or'
         },
         date_filter:
-          (createdAtStart.value && createdAtEnd.value) ? {
-            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "between"
-          } : createdAtStart.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            operator: "after"
-          } : createdAtEnd.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "before"
-          } : {}
-        ,
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "before"
+            } : {}
+          ,
         id_filter:
           (jobIdStart.value && jobIdEnd.value) ? {
             start_id: jobIdStart.value,
@@ -395,6 +395,25 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     computedGageCalibrationRunList.value = [];
   }
 
+  /**
+   * reset job filters
+   */
+  const resetFilters = () => {
+    uiGageId.value = 'All';
+    modulesFilterList.value = []; 
+    moduleOperator.value = 'All';
+    statusTypeFilterList.value = [];
+    includeArchivedJobs.value = false;
+    createdAtStart.value = null;
+    createdAtEnd.value = null;
+    minCreatedAt.value = null;
+    maxCreatedAt.value = null;
+    jobIdStart.value = null;
+    jobIdEnd.value = null;
+    minJobId.value = null;
+    maxJobId.value = null;
+  };
+
   useLogoutListen('logoutEvent', (evStr: string) => {
     if (evStr === "logout") {
       resetUserSelectedEvalCalibrationRun();
@@ -424,6 +443,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     resetUserSelectedEvalCompareRun,
     clearUserCalibrationRunData,
     fetchValidationRunListByCalibrationRun,
+    resetFilters,
 
     getValidationRunIdByCalibrationRunId,
     userEvaluationRunListData,

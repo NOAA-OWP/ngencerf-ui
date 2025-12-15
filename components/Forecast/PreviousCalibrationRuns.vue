@@ -25,7 +25,9 @@
         <div id="CalTable" class="w-max mx-auto">
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-status="false" :show-modules="false" :show-archived="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            :totalSize="calibrationRunsForForecastListTotalSize" :totalPages="calibrationRunsForForecastListTotalPages"
+            v-model:currentPage="calibrationRunsForForecastListCurrentPage"
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -237,7 +239,12 @@ const {
   calibrationRunsForForecastListEndRow,
   calibrationRunsForForecastListSort 
 } = storeToRefs(forecastStore);
-const { getCalibrationJobsForForecast, resetUserSelectedForecastCalibrationRun, hardResetForecastRunStatusStore } = forecastStore;
+const { 
+  getCalibrationJobsForForecast, 
+  resetUserSelectedForecastCalibrationRun, 
+  hardResetForecastRunStatusStore,
+  resetFilters
+} = forecastStore;
 
 
 const toast = useToast();

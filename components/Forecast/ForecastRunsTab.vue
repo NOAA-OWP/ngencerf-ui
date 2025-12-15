@@ -23,7 +23,9 @@
 
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-gage="false" :show-modules="false" :show-archived="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            :totalSize="forecastRunListTotalSize" :totalPages="forecastRunListTotalPages"
+            v-model:currentPage="forecastRunListCurrentPage"
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -231,7 +233,8 @@ const {
   getCalibrationJobsForForecast,
   deleteForecastJob,
   resetUserSelectedForecastCalibrationRun,
-  hardResetForecastRunStatusStore
+  hardResetForecastRunStatusStore,
+  resetFilters
 } = useForecastStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();

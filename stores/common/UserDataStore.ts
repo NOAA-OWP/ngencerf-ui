@@ -59,7 +59,7 @@ export const useUserDataStore = defineStore(
     const jobIdEnd = ref<any>(null);
     const minJobId = ref<any>(null);
     const maxJobId = ref<any>(null);
-    const selectedBulkJobAction = ref<number>(JobStatusAction.delete);
+    const selectedBulkJobAction = ref<number>(0);
     const selectedBulkJobActionScope = ref<boolean>(false);
 
     const lastServerError = ref<ServerStatus>();
@@ -287,14 +287,14 @@ export const useUserDataStore = defineStore(
           },
           date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
-              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
               operator: "between"
             } : createdAtStart.value ? {
-              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
               operator: "after"
             } : createdAtEnd.value ? {
-              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
               operator: "before"
             } : {}
           ,
@@ -364,14 +364,14 @@ export const useUserDataStore = defineStore(
           },
           date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
-              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
               operator: "between"
             } : createdAtStart.value ? {
-              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
               operator: "after"
             } : createdAtEnd.value ? {
-              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
               operator: "before"
             } : {}
           ,
@@ -510,6 +510,27 @@ export const useUserDataStore = defineStore(
       }
     };
 
+    /**
+     * reset job filters
+     */
+    const resetFilters = () => {
+      uiGageId.value = 'All';
+      modulesFilterList.value = []; 
+      moduleOperator.value = 'All';
+      statusTypeFilterList.value = [];
+      includeArchivedJobs.value = false;
+      createdAtStart.value = null;
+      createdAtEnd.value = null;
+      minCreatedAt.value = null;
+      maxCreatedAt.value = null;
+      jobIdStart.value = null;
+      jobIdEnd.value = null;
+      minJobId.value = null;
+      maxJobId.value = null;
+      selectedBulkJobAction.value = 0;
+      selectedBulkJobActionScope.value = false;
+    };
+
     return {
       userSelectedCalibrationIterationId,
       uiGageId,
@@ -574,6 +595,7 @@ export const useUserDataStore = defineStore(
       fetchUserCalibrationRunData,
       hardResetUserDataStore,
       clearUserCalibrationRunData,
+      resetFilters
     };
   },
   {

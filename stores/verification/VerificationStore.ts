@@ -81,18 +81,18 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
       },
       filters: {
         date_filter:
-          (createdAtStart.value && createdAtEnd.value) ? {
-            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "between"
-          } : createdAtStart.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            operator: "after"
-          } : createdAtEnd.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "before"
-          } : {}
-        ,
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "before"
+            } : {}
+          ,
         id_filter:
           (jobIdStart.value && jobIdEnd.value) ? {
             start_id: jobIdStart.value,
@@ -157,18 +157,18 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
       },
       filters: {
         date_filter:
-          (createdAtStart.value && createdAtEnd.value) ? {
-            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "between"
-          } : createdAtStart.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            operator: "after"
-          } : createdAtEnd.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "before"
-          } : {}
-        ,
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "before"
+            } : {}
+          ,
         id_filter:
           (jobIdStart.value && jobIdEnd.value) ? {
             start_id: jobIdStart.value,
@@ -430,6 +430,21 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     });
   };
 
+  /**
+   * reset job filters
+   */
+  const resetFilters = () => {
+    statusTypeFilterList.value = [];
+    createdAtStart.value = null;
+    createdAtEnd.value = null;
+    minCreatedAt.value = null;
+    maxCreatedAt.value = null;
+    jobIdStart.value = null;
+    jobIdEnd.value = null;
+    minJobId.value = null;
+    maxJobId.value = null;
+  };
+
 
   return {
     forecastJobId,
@@ -480,7 +495,8 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     setSelectedVerificationRowData,
     getVerificationPlotNames,
     getVerificationPlot,
-    deleteVerificationJob
+    deleteVerificationJob,
+    resetFilters
   };
 });
 

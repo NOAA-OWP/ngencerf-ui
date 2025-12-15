@@ -14,12 +14,13 @@
         </div>
 
         <!-- Table -->
-        <div class="">
-
+        <div>
           <div id="CalTable" class="w-max mx-auto">
             <JobFilterDialog id="JobFilterDialog" :disable-all="disableFilters" 
               :totalSize="calibrationRunListTotalSize" :totalPages="calibrationRunListTotalPages"
-              @RefreshJobList="refreshJobList()" @BulkJobAction="bulkJobAction()" ref="jobFilterRef" />
+              v-model:currentPage="calibrationRunListCurrentPage" @RefreshJobList="refreshJobList()" 
+              @ResetFilters="resetFilters()" @BulkJobAction="bulkJobAction()" :showBulkActions="showBulkActions" 
+              ref="jobFilterRef" />
             
             <ConfirmDialog></ConfirmDialog>
 
@@ -289,7 +290,8 @@ const {
   queryUserCalibrationRunData, 
   fetchUserCalibrationJobsListData, 
   fetchUserCalibrationJobsListIDsOnly,
-  clearUserCalibrationRunData 
+  clearUserCalibrationRunData,
+  resetFilters
 } = useUserDataStore();
 const { 
   fetchNewCalibrationRunId, 
@@ -401,6 +403,11 @@ onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
     hilightTab(CalibrationTabs.tab_calibrationRuns);
 
+    resetFilters();
+
+    selectedBulkJobAction.value = 0;
+    selectedBulkJobActionScope.value = false;
+
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); } 
@@ -503,6 +510,29 @@ const disableFilters = computed(() => {
   return (selectedMultipleCalibrationRuns.value.length > 1);
 });
 
+const showBulkActions = computed(() => {
+  // let JobFilterDialogue know based on our job list what bulk actions to allow
+  // always include the placeholder option
+  let actionValues = [0];
+  if (userCalibrationJobsListData.value.some(run => run.is_archived === false)) {
+    // only allow delete and archive if there are unarchived jobs
+    actionValues.push(1);
+    actionValues.push(2);
+  }
+  if (userCalibrationJobsListData.value.some(run => run.is_archived === true)) {
+    // only allow unarchive if there are archived jobs
+    actionValues.push(3);
+  }
+  if (userCalibrationJobsListData.value.some(run => run.is_locked === false && run.is_archived === false)) {
+    // only allow lock if there are unlocked jobs that are not archived
+    actionValues.push(4);
+  }
+  if (userCalibrationJobsListData.value.some(run => run.is_locked === true)) {
+    // only allow unlock if there are locked jobs
+    actionValues.push(5);
+  }
+  return actionValues;
+});
 
 const handleContextMenu = (event: MouseEvent) => {
   event.preventDefault(); // Prevent the default context menu
@@ -532,7 +562,7 @@ const ptColumn = ref({
 
 // watch for sort order change - reset current page to 1
 watch(calibrationRunListSort, () => {
-  calibrationRunListCurrentPage.value = 1
+  calibrationRunListCurrentPage.value = 1;
   refreshJobList();
 },{ deep: true });
 
@@ -987,7 +1017,7 @@ const acceptLock = (selectedRunId: number, lock: boolean) => {
       /* const tMsg: ToastMessageOptions = { severity: 'success', 
         summary: 'Calibration Job ' + (lock ? 'Locked' : 'Unlocked'), detail: 'Job ' + selectedRunId + ' ' + (lock ? 'Locked' : 'Unlocked'), life: ToastTimeout.timeoutSuccess };
       toast.add(tMsg); addToastRecord(tMsg); */
-      await fetchUserCalibrationJobsListData();
+      refreshJobList();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Lock Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -1028,7 +1058,7 @@ const acceptMultipleLock = (lock: boolean) => {
           life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      await fetchUserCalibrationJobsListData();
+      refreshJobList();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: (lock ? 'Lock' : 'Unlock') + ' Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };

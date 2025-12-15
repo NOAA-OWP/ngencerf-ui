@@ -113,25 +113,28 @@
         </div>
       </div>
 
-      <div v-show="showBulkJobAction && totalSize > 1 && !filterInactive" class="flex gap-2">
-        <div>
-          Apply bulk action to filtered jobs:
-        </div>
-        <div>
-          <Select id="selectedBulkJobAction" v-model="selectedBulkJobAction" :disabled="disableAll"
-            :options="bulkJobActionsList" optionLabel="name" optionValue="value" 
-            class="user-select w-12" aria-label="Select Bulk Job Action" title="Select Bulk Job Action">
-          </Select>
-        </div>
-        <div v-show="totalPages > 1">
-          <Select id="selectedBulkJobActionScope" v-model="selectedBulkJobActionScope" :disabled="disableAll"
-            :options="bulkJobActionScopeList" optionLabel="name" optionValue="value" 
-            class="user-select w-12" aria-label="Select This Page or All Pages" title="Select This Page or All Pages">
-          </Select>
-        </div>
-        <div>
-          <Button class="ngenButtonDiv ml-8" @click="bulkJobAction()" :disabled="disableAll"
-            aria-label="Apply Bulk Action" title="Apply Bulk Action">Apply</Button>
+      <div v-show="showBulkJobAction && totalSize > 1 && !filterInactive">
+        <hr class="border-t-2 border-gray-300 my-4">
+        <div class="flex gap-2">
+          <div>
+            Apply bulk action to filtered jobs:
+          </div>
+          <div>
+            <Select id="selectedBulkJobAction" v-model="selectedBulkJobAction" :disabled="disableAll"
+              :options="bulkJobActionsListDisplay" optionLabel="name" optionValue="value" 
+              class="user-select w-12" aria-label="Select Bulk Job Action" title="Select Bulk Job Action">
+            </Select>
+          </div>
+          <div v-show="totalPages > 1">
+            <Select id="selectedBulkJobActionScope" v-model="selectedBulkJobActionScope" :disabled="disableAll"
+              :options="bulkJobActionScopeList" optionLabel="name" optionValue="value" 
+              class="user-select w-12" aria-label="Select This Page or All Pages" title="Select This Page or All Pages">
+            </Select>
+          </div>
+          <div>
+            <Button v-if="selectedBulkJobAction" class="ngenButtonDiv ml-8" @click="bulkJobAction()" :disabled="disableAll"
+              aria-label="Apply Bulk Action" title="Apply Bulk Action">Apply Bulk Action</Button>
+          </div>
         </div>
       </div>
     </div>
@@ -175,22 +178,7 @@ const {
   selectedBulkJobActionScope
 } = storeToRefs(useUserDataStore());
 
-const emit = defineEmits(["ModulesFilterDialogClosing", "RefreshJobList", "BulkJobAction"]);
-
-const moduleOperatorList = [
-  { name: "All" },
-  { name: "Any" }
-]
-const bulkJobActionsList: { name: string, value: number }[] = Object.keys(JobStatusAction)
-  .map(key => ({
-    name: key.charAt(0).toUpperCase() + key.slice(1),
-    value: JobStatusAction[key as keyof typeof JobStatusAction]
-  }));
-const bulkJobActionScopeList = [
-  { name: "this page only", value: false },
-  { name: "all pages", value: true }
-]
-const showBulkJobAction = ref<boolean>(false);
+const emit = defineEmits(["ModulesFilterDialogClosing", "RefreshJobList", "ResetFilters", "BulkJobAction", "update:currentPage"]);
 
 const ptCheckbox = ref({
   box: { style: { "border": "2px solid #0c5274" } },
@@ -224,25 +212,59 @@ interface Props {
   disableAll?: boolean;
   totalSize?: number;
   totalPages?: number;
+  currentPage?: number;
   showGage?: boolean;
   showStatus?: boolean;
   showModules?: boolean;
   showArchived?: boolean;
   showCreatedAt?: boolean;
   showJobId?: boolean;
+  showBulkActions?: number[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
   disableAll: true,
   totalSize: 0,
   totalPages: 1,
+  currentPage: 1,
   showGage: true,
   showStatus: true,
   showModules: true,
   showArchived: true,
   showCreatedAt: true,
   showJobId: true,
+  showBulkActions: () => [],
 });
+
+const moduleOperatorList = [
+  { name: "All" },
+  { name: "Any" }
+]
+const bulkJobActionsList: { name: string, value: number }[] = [
+  {name: 'select an action', value: 0, show: true},
+  ...Object.keys(JobStatusAction).map(key => ({
+    name: key.charAt(0).toUpperCase() + key.slice(1),
+    value: JobStatusAction[key as keyof typeof JobStatusAction]
+  }))
+];
+const bulkJobActionScopeList = [
+  { name: "this page only", value: false },
+  { name: "all pages", value: true }
+]
+const showBulkJobAction = ref<boolean>(false);
+
+const bulkJobActionsListDisplay = computed(() => {
+  // if specific bulk actions are passed in based on archived/locked status of jobs in list, 
+  // AND we're only applying a bulk action to a single page (selectedBulkJobActionScope = false), 
+  // filter the available actions here
+  if (props.showBulkActions.length > 0 && !selectedBulkJobActionScope.value) {
+    return bulkJobActionsList.filter(option => {
+      return props.showBulkActions.includes(option.value)
+    });
+  }
+  // otherwise, allow all bulk actions
+  return bulkJobActionsList;
+})
 
 const filterInactive = computed(() => {
   return (
@@ -256,12 +278,13 @@ const filterInactive = computed(() => {
 });
 
 const minMaxCreatedAtProps = computed(() => {
+  // hack - setting timestamps to noon the datepicker doesn't seem to understand that it's already getting UTC dates
   const props = {};
   if (minCreatedAt.value) {
-    props.minDate = minCreatedAt.value;
+    props.minDate = new Date(minCreatedAt.value.split('T')[0] + 'T12:00:00Z');
   }
   if (maxCreatedAt.value) {
-    props.maxDate = maxCreatedAt.value;
+    props.maxDate = new Date(maxCreatedAt.value.split('T')[0] + 'T12:00:00Z');
   }
   return props;
 });
@@ -299,40 +322,37 @@ watch(jobIdStart, () => {
 watch(jobIdEnd, () => {
   refreshJobList();
 });
+watch(bulkJobActionsListDisplay, () => {
+  // if the display options for bulk action changes and the previously selected action is removed,
+  // set the selected value back to the "select an action" placeholder
+  if(!bulkJobActionsListDisplay.value.some(option => option.value === selectedBulkJobAction.value)) {
+    selectedBulkJobAction.value = 0;
+    document.getElementById('selectedBulkJobAction').selectedIndex = 0;
+  }
+});
 
 const clearGageList = () => {
   uiGageList.value = [];
 }
 
 const refreshJobList = () => {
+  // when changing any filter, reset current page to 1
+  emit('update:currentPage', 1);
   emit("RefreshJobList");
 }
 
 const bulkJobAction = () => {
-  emit("BulkJobAction");
+  if (selectedBulkJobAction.value && selectedBulkJobAction.value > 0) {
+    emit("BulkJobAction");
+  }
 }
 
 /**
  * Reset filters
  */
-const resetFilters = (refresh_list: boolean=true) => {
-  uiGageId.value = 'All';
-  modulesFilterList.value = []; 
-  moduleOperator.value = 'All';
-  statusTypeFilterList.value = [];
-  includeArchivedJobs.value = false;
-  createdAtStart.value = null;
-  createdAtEnd.value = null;
-  minCreatedAt.value = null;
-  maxCreatedAt.value = null;
-  jobIdStart.value = null;
-  jobIdEnd.value = null;
-  minJobId.value = null;
-  maxJobId.value = null;
-  showBulkJobAction.value = false;
-  selectedBulkJobAction.value = 1;
-  selectedBulkJobActionScope.value = false;
-  if (refresh_list) {
+const resetFilters = (refresh_job_list: boolean=true) => {
+  emit("ResetFilters");
+  if(refresh_job_list) {
     refreshJobList();
   }
 }
@@ -340,16 +360,14 @@ const resetFilters = (refresh_list: boolean=true) => {
 defineExpose({ resetFilters });
 
 onMounted(() => {
-  filterGroup.value = '';
+  resetFilters(false);
   if (instance?.vnode?.props?.onBulkJobAction) {
     showBulkJobAction.value = true;
   }
 })
 
 onUnmounted(() => {
-  if (!filterInactive.value) {
-    resetFilters();
-  }
+  resetFilters(false);
   clearGageList();
 })
 

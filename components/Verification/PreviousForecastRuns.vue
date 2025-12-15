@@ -22,7 +22,9 @@
           </div>
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-status="false" :show-gage="false" :show-modules="false" :show-archived="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            :totalSize="forecastRunsForVerificationListTotalSize" :totalPages="forecastRunsForVerificationListTotalPages"
+            v-model:currentPage="forecastRunsForVerificationListCurrentPage"
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'fr-context-menu' } }" class="bg-white" ref="frContextMenu"
@@ -201,7 +203,10 @@ const {
   setSelectedForecastRowData,
   getForecastRunsForVerification,
   resetSelectedVerificationJobData,
-  setSelectedVerificationJobId
+  fetchNewVerificationJobId,
+  loadSelectedVerificationJob,
+  setSelectedVerificationJobId,
+  resetFilters
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
