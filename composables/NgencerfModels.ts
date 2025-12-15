@@ -773,7 +773,8 @@ export type ForecastJobs = {
 
 export interface VerificationJob {
   verification_run_id: number;
-  forecast_run: ForecastJob;
+  forecast_run?: ForecastJob;
+  forecast_run_id?: number;
   yaml_config_data: DynamicObject;
   submit_date: string;
   run_start: string;

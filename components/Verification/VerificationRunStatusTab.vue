@@ -3,8 +3,8 @@
     <h1 class="pt-3 mb-8 text-3xl font-bold text-center" aria-label="Verification Run/Status Tab" title="Verification Run/Status Tab">
       Verification Run/Status
     </h1>
-    <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
-      If status is Ready click Run to submit and run the verification.
+    <p v-if="!verificationJobId" class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
+      Click Run to submit and run the verification.
     </p>
     <br />
   </div>
@@ -23,6 +23,13 @@
               </tr>
             </thead>
             <tbody>
+              <tr height="40px" :aria-label="'Forecast Job ID ' + forecastJobId"
+                :title="'Forecast Job ID ' + forecastJobId">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Forecast Job ID</div>
+                </th>
+                <td class="pl-5">{{ forecastJobId ?? '-'.repeat(15) }}</td>
+              </tr>
               <tr height="40px" :aria-label="'Verification Job ID ' + verificationJobId"
                 :title="'Verification Job ID ' + verificationJobId">
                 <th scope="row" class="text-right font-bold">
@@ -88,7 +95,7 @@
         <div class="col-span-3"></div>
 
         <div class="col-span-2 pl-5">
-          <span v-if="verificationJobStatus === 'Ready'">
+          <span v-if="forecastJobId && !verificationJobId">
             <Button class=" ngenButtonDiv-green font-normal" title="Run Button" aria-label="Run Button"
               @click="startVerificationJob()">
               Run
@@ -135,8 +142,8 @@ import { useVerificationStore } from "@/stores/verification/VerificationStore";
 const verificationStore = useVerificationStore();
 
 const { 
+  forecastJobId,
   verificationJobId, 
-  userVerificationJobData, 
   submitTimeDate,
   submitTime,
   elapsedTime,
@@ -150,7 +157,7 @@ const {
   loadVerificationRunStatusTabData,
   loadVerificationStatusInformation,
   updateRunningTime,
-  runVerificationJob,
+  createAndRunVerificationJob,
   cancelVerificationJob
 } = useVerificationStore();
 
@@ -167,17 +174,19 @@ onMounted(() => {
   submitTime.value = undefined;
   elapsedTime.value = undefined;
 
-  loadVerificationStatusInformation();
-
-  loadVerificationRunStatusTabData();
+  if (verificationJobId.value) {
+    loadVerificationStatusInformation();
+    loadVerificationRunStatusTabData();
+  }
 })
 
 /**
  * Start the verification job
  */
 const startVerificationJob = async () => {
-  runVerificationJob(verificationJobId.value as number).then((response) => {
+  createAndRunVerificationJob().then((response) => {
     if (response.status >= 200 && response.status < 300) {
+      verificationJobId.value = response._data.verification_run_id;
       verificationJobStatus.value = response._data.status;
       failureMessages.value = response._data.failure_messages;
 

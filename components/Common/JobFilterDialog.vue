@@ -315,7 +315,7 @@ const bulkJobAction = () => {
 /**
  * Reset filters
  */
-const resetFilters = () => {
+const resetFilters = (refresh_list: boolean=true) => {
   uiGageId.value = 'All';
   modulesFilterList.value = []; 
   moduleOperator.value = 'All';
@@ -332,7 +332,9 @@ const resetFilters = () => {
   showBulkJobAction.value = false;
   selectedBulkJobAction.value = 1;
   selectedBulkJobActionScope.value = false;
-  refreshJobList();
+  if (refresh_list) {
+    refreshJobList();
+  }
 }
 
 defineExpose({ resetFilters });

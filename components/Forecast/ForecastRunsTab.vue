@@ -225,8 +225,6 @@ const {
 const {
   setSelectedForecastRunId,
   resetSelectedForecastRunData,
-  loadForecastRunStatusTabData,
-  loadForecastResultsTabData,
   loadSelectedCalibrationRun,
   setSelectedForecastRowData,
   getForecastJobs,
