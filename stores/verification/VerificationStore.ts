@@ -43,7 +43,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   const verificationJobId = ref<number>();
   const verificationJobs = ref<VerificationJob[]>([]);
   const selectedVerificationJob = ref<VerificationJob>();
-  const userVerificationJobData = ref<VerificationJob>();
   const verificationRunListPageSize = ref<number>(50);
   const verificationRunListCurrentPage = ref<number>(1);
   const verificationRunListTotalPages = ref<number>(0);
@@ -294,39 +293,23 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   };
 
   /**
-   * Call get_status endpoint with userVerificationJobData.value.verification_run_id
+   * Call get_status endpoint with verificationJobId
    * @return {any}
    */
   const getVerificationStatus = async (): Promise<any> => {
-    console.log('userVerificationJobData:',userVerificationJobData.value);
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_verification_status/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ verification_run_id: userVerificationJobData.value?.verification_run_id })
-    });
-  };
-  
-  /**
-   * Load Selected Verification Run
-   */
-  const loadSelectedVerificationJob = async (verification_run_id: number): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/load_verification_job/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({ verification_run_id: verification_run_id })
+      body: JSON.stringify({ verification_run_id: verificationJobId.value })
     });
   };
 
   const setSelectedVerificationJobId = async(verification_run_id: number): Promise<void> => {
     verificationJobId.value = verification_run_id;
-    let response = await loadSelectedVerificationJob(verificationJobId.value);
-    userVerificationJobData.value = response._data;
+    forecastJobId.value = selectedVerificationJob.value?.forecast_run_id;
   }
 
   const setSelectedVerificationRowData = async (verification_row_data: VerificationJob): Promise<void> => {
@@ -335,45 +318,31 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   }
 
   const resetSelectedVerificationJobData = (): void => {
-    verificationJobId.value = undefined;
+    // clear previously selected forecast/verification jobs
+    selectedForecastJob.value = undefined;
+    forecastJobId.value = undefined;
     selectedVerificationJob.value = undefined;
-    userVerificationJobData.value = undefined;
-  }
-
-  /**
- * return a new verification run id generated from the server
- * @returns {CreatedVerificationJob}
- */
-  async function fetchNewVerificationJobId() {
-    return await makeProtectedApiCall<CreatedVerificationJob>(`${ngencerfBaseUrl}/calibration/create_verification_job/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({
-        forecast_run_id: selectedForecastJob?.value?.forecast_run_id
-      })
-    });
+    verificationJobId.value = undefined;
   }
   
   /**
-   * Run Verification Job
+   * Create and Run Verification Job
    */
-  const runVerificationJob = async (verificationJobId: number): Promise<any> => {
-    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/run_verification/`, {
+  const createAndRunVerificationJob = (): Promise<any> => {
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/create_and_run_verification_job/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ verification_run_id: verificationJobId })
+      body: JSON.stringify({ forecast_run_id: selectedForecastJob?.value?.forecast_run_id })
     });
   };
   
   const loadVerificationStatusInformation = async () => {
     getVerificationStatus().then( response => {
       if ( response._data.status ) {
+        selectedVerificationJob.value = response._data;
         verificationJobStatus.value = response._data.status;
         failureMessages.value = response._data.failure_messages;
         if (response._data.submit_date) {
@@ -383,7 +352,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
           }
           if ( verificationJobStatus?.value?.toLocaleUpperCase() !== "RUNNING" ) {
             elapsedTime.value = response._data.elapsed_time ? formatElapsedTime(response._data.elapsed_time) : '';
-            loadSelectedVerificationJob(userVerificationJobData?.value?.verification_run_id);
             clearInterval(verificationStatusCheckingInterval.value);
             clearInterval(verificationRunningTimeInterval.value);
             verificationStatusCheckingInterval.value = undefined;
@@ -505,7 +473,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     verificationRunListEndRow,
     verificationRunListSort,
     selectedVerificationJob,
-    userVerificationJobData,
     verificationDate,
     yamlConfigData,
     verificationPlotNames,
@@ -515,11 +482,10 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     setSelectedForecastRunId,
     setSelectedForecastRowData,
     getVerificationJobs,
-    loadSelectedVerificationJob,
     loadVerificationRunStatusTabData,
     loadVerificationResultsTabData,
     loadVerificationTab,
-    runVerificationJob,
+    createAndRunVerificationJob,
     cancelVerificationJob,
     updateRunningTime,
     getVerificationStatus,
@@ -527,7 +493,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     setSelectedVerificationJobId,
     resetSelectedVerificationJobData,
     setSelectedVerificationRowData,
-    fetchNewVerificationJobId,
     getVerificationPlotNames,
     getVerificationPlot,
     deleteVerificationJob,

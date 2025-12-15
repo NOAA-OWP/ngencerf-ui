@@ -194,6 +194,7 @@ const {
   cycleDate,
   forecastConfigurations,
   forecastConfiguration,
+  forecastConfigurationName,
   forecastJobStatus,
   coldStartJobStatus,
 } = storeToRefs(useForecastStore());
@@ -294,6 +295,7 @@ const convertColdStartDateStringToDateTimeObject = (value: string) => {
 watch(forecastConfiguration, async () => {
   cycleHourList.value = [];
   getCycleHourList();
+  forecastConfigurationName.value = forecastConfiguration?.value?.name;
 })
 
 const getCycleHourList = () => {

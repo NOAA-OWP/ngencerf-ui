@@ -641,9 +641,8 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   queryUserCalibrationRunData().then(queryResponse => {
     if (queryResponse?.status === 200) {
       userCalibrationRunData.value = queryResponse?._data;
-      loadEntireRun();
+      gotoRunStatusTab();
     } else {
-      isLoading.value = false;
       let tDetail = "Unable to Retrieve Calibration Job Data";
       if (queryResponse?._data?.message) {
         tDetail = queryResponse._data.message;
@@ -652,20 +651,9 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   });
+  isLoading.value = false;
 }
 
-const loadEntireRun = () => {
-  isLoading.value = true;
-  nextTick(async () => {
-    await loadGageTabStaticData();
-    isLoading.value = true;
-    await loadTuningTabStaticData();
-    await loadOptimizationTabStaticData();
-    isLoading.value = false;
-    gotoRunStatusTab();
-  })
-
-}
 const gotoRunStatusTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
   const e = allTabs[CalibrationTabs.tab_runStatus] as HTMLElement;
@@ -731,9 +719,6 @@ const createNewCalibration = async () => {
 
 const gotoHeadwaterBasinGage = () => {
   nextTick(async () => {
-    await loadGageTabStaticData();
-    await loadTuningTabStaticData();
-    await loadOptimizationTabStaticData();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
     e.click();

@@ -157,6 +157,7 @@ import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const { fetchFormulationModuleOptions } = useFormulationStore();
+const { filterGroup } = storeToRefs(useFormulationStore());
 
 const { 
   uiGageId, 

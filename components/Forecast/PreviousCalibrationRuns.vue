@@ -374,20 +374,10 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
   }
 });
 
-const openSelectedCalibrationRun = async () => {
-  isLoading.value = true;
-  resetUserSelectedEvalValidationRun();
-  await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
-  await fetchUserSelectedCalibrationValidationRunList();
-  navigateToSetupForecast();
-  isLoading.value = false;
-};
-
 const navigateToSetupForecast = async () => {
   if (calibrationRunForForecast?.value?.calibration_run_id && calibrationRunForForecast.value.calibration_run_id > 0) {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
     if (e) {
-      await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
       e.click();
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Setup Forecast Tab not found', life: ToastTimeout.timeoutError};

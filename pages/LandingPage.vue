@@ -47,11 +47,11 @@ const toast = useToast();
 
 const { popupActive } = storeToRefs(generalStore());
 
-const { resetGageStore } = useGageStore();
+const { resetGageStore, loadGageTabStaticData } = useGageStore();
 const { resetFormulationStore, loadFormulationModels } = useFormulationStore();
-const { resetOptimizationStore } = useOptimizationStore();
-const { hardResetRunStatusStore } = useRunStatusStore();
 const { hardResetTuningStore } = useTuningStore();
+const { resetOptimizationStore, loadOptimizationTabStaticData } = useOptimizationStore();
+const { hardResetRunStatusStore } = useRunStatusStore();
 const { addToastRecord } = generalStore();
 
 const formulationStore = useFormulationStore;
@@ -67,7 +67,9 @@ onMounted(async () => {
   resetOptimizationStore();
   hardResetRunStatusStore();
   hardResetTuningStore();
+  await loadGageTabStaticData();
   await loadFormulationModels();
+  await loadOptimizationTabStaticData();
   await fetchUserCalibrationJobsListData();
   /* if (!formulationTabData.value) {
     const tMsg: ToastMessageOptions = { severity: "error", summary: 'Server Error', detail: "Unable to Retrieve Module List", life: ToastTimeout.timeoutError };

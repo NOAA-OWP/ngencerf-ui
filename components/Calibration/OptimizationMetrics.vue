@@ -236,7 +236,7 @@ const {
   saveOptMetPayload
 } = storeToRefs(optimizationStore);
 
-const { saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
+const { loadOptimizationTabStaticData, setUserSelection, saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
@@ -254,7 +254,12 @@ const showMetricPeakFlow = ref<boolean>(false);
 const showMetricStreamFlow = ref<boolean>(false);
 const ele = document.getElementById("MainLeftDataArea") as HTMLElement;
 
-onMounted(() => {
+onMounted(async() => {
+  if (!optimizationTabData.value) {
+    await loadOptimizationTabStaticData();
+  }
+  setUserSelection();
+  
   hilightTab(CalibrationTabs.tab_optimizationMetrics);
   toast.removeAllGroups();
   if (ele) { ele.scrollTo(0, 0); }

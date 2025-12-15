@@ -185,12 +185,12 @@ const { hardResetTuningTimeConrols } = useTuningStore();
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 
-const { gageData, getSavedDomainValue, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
+const { gageData, gageTabData, getSavedDomainValue, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
   getObservationalOptionsList, gagePayload } = storeToRefs(useGageStore());
 
-const { fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, saveUserForcingFiles,
-  saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
+const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUserSelectionGage, 
+  saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
 const { calibrationJobId, gageHasChanged, gageDataSourceHasChanged } = storeToRefs(generalStore());
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 const toast = useToast();
@@ -221,14 +221,17 @@ const setResetDataValues = () => {
   }
 }
 
-onMounted(() => {
+onMounted(async() => {
+  if (!gageTabData.value) {
+    await loadGageTabStaticData();
+  }
   nextTick(() => {
     hilightTab(CalibrationTabs.tab_headwaterBasinGage);
     toast.removeAllGroups();
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
     setResetDataValues();
-    if (gageHasChanged.value && userCalibrationRunData?.value?.gage?.gage_id) {
+    if (userCalibrationRunData?.value?.gage?.gage_id) {
       gageSelectionReset();
     } else {
       selectedForcingValue.value = resetData.value.forcing_source_requested;

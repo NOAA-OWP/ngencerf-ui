@@ -115,8 +115,9 @@ import { useToast } from 'primevue/usetoast';
 
 import type { ToastMessageOptions } from "primevue/toast";
 
-import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { generalStore } from '~/stores/common/GeneralStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { useForecastStore } from '@/stores/forecast/ForecastStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -125,6 +126,10 @@ import * as Plot from "@observablehq/plot";
 
 const { calibrationJobId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
+
+const { fetchUserCalibrationRunData } = useUserDataStore();
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+
 
 const {
   calibrationRunForForecast,
@@ -212,6 +217,10 @@ onMounted(async () => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   });
+  // get calibration job data if we don't already have it
+  if (!userCalibrationRunData.value) {
+    await fetchUserCalibrationRunData();
+  }
 });
 
 // Reset refs when mounting/unmounting tab
@@ -319,7 +328,7 @@ function adjustPlotGraphColumns() {
         } else if (!isNaN(parseFloat(plotGraphDataRaw.value[d][key])) && isFinite(plotGraphDataRaw.value[d][key]) && plotGraphDataRaw.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
           try {
-            plotGraphDataRaw.value[d][key] = Number(plotGraphDataRaw.value[d][key]).toFixed(5);
+            plotGraphDataRaw.value[d][key] = Number(plotGraphDataRaw.value[d][key].toFixed(5));
           } catch (error) {
             console.error('Error rounding value ' + plotGraphDataRaw.value[d][key] + ': ', error);
           }

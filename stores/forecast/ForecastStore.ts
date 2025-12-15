@@ -541,17 +541,11 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const setSelectedForecastRowData = async (forecast_row_data: ForecastJob): Promise<void> => {
     setSelectedForecastRunId(forecast_row_data.forecast_run_id);
     setSelectedCalibrationRunId(forecast_row_data.calibration_run_id);
-    loadSelectedCalibrationRun(forecast_row_data.calibration_run_id);
     
+    console.log('forecast_row_data:',forecast_row_data);
     calibrationRunForForecast.value = (forecast_row_data as any as CalibrationRunForForecast);
     forecastJobStatus.value = (forecast_row_data as any as CalibrationRunForForecast).status;
-
-    // load forecastConfigurations
-    await loadSetupForecastTabData();
-
-    forecastConfiguration.value = forecastConfigurations.value?.find((forecast_configuration_data: ForecastConfiguration) =>
-      forecast_configuration_data.name === forecast_row_data.configuration
-    );
+    forecastConfigurationName.value = forecast_row_data.configuration;
   }
 
   const resetSelectedForecastRunData = (): void => {

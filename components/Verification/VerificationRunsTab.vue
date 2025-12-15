@@ -141,13 +141,11 @@ const {
   verificationRunListSort,
   selectedVerificationJob,
   verificationJobId,
-  userVerificationJobData,
   isVerificationLoading
 } = storeToRefs(verificationStore);
 
 const {
   resetSelectedVerificationJobData,
-  loadSelectedVerificationJob,
   setSelectedVerificationRowData,
   getVerificationJobs,
   deleteVerificationJob,
@@ -272,30 +270,12 @@ const acceptDelete = (selectedRunId: number) => {
   });
 }
 
-const navigateToSetupVerification = () => {
-  isVerificationLoading.value = true;
-  nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Verification Tab"]');
-
-    if (e) {
-      if (selectedVerificationJob.value) {
-        await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_run_id as number);
-      }
-      e.click();
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Verification Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
-    }
-    isVerificationLoading.value = false;
-  });
-}
-
 const navigateToVerificationJobStatus = () => {
   isVerificationLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
 
     if (e) {
-      await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
@@ -310,7 +290,6 @@ const navigateToVerificationResults = () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results Tab"]');
 
     if (e) {
-      await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
