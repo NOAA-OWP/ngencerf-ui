@@ -138,7 +138,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       limit: forecastRunListPageSize.value,
       offset: (forecastRunListCurrentPage.value - 1) * forecastRunListPageSize.value,
       sort: {
-        field: forecastRunListSort.value.field,
+        field: forecastRunListSort.value.field.split(".").at(-1),
         direction: forecastRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
@@ -542,7 +542,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     setSelectedForecastRunId(forecast_row_data.forecast_run_id);
     setSelectedCalibrationRunId(forecast_row_data.calibration_run_id);
     
-    console.log('forecast_row_data:',forecast_row_data);
     calibrationRunForForecast.value = (forecast_row_data as any as CalibrationRunForForecast);
     forecastJobStatus.value = (forecast_row_data as any as CalibrationRunForForecast).status;
     forecastConfigurationName.value = forecast_row_data.configuration;
