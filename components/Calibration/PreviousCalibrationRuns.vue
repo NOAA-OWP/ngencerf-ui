@@ -507,7 +507,8 @@ watch(selectedCalibrationRun, () => {
 });
 
 const disableFilters = computed(() => {
-  return (selectedMultipleCalibrationRuns.value.length > 1);
+  return false;
+  //return (selectedMultipleCalibrationRuns.value.length > 1);
 });
 
 const showBulkActions = computed(() => {
@@ -577,6 +578,9 @@ watch(calibrationRunListCurrentPage, async () => {
 
 const refreshJobList = async () => {
   isLoading.value = true;
+  // changing filters clears previous selections
+  selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
   await fetchUserCalibrationJobsListData();
   isLoading.value = false;
 }
