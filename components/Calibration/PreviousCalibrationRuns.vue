@@ -578,8 +578,9 @@ watch(calibrationRunListCurrentPage, async () => {
 
 const refreshJobList = async () => {
   isLoading.value = true;
-  // selectedCalibrationRun.value = undefined
-  // selectedMultipleCalibrationRuns.value = [];
+  // changing filters clears previous selections
+  selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
   await fetchUserCalibrationJobsListData();
   isLoading.value = false;
 }
