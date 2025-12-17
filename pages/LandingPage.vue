@@ -25,7 +25,7 @@
   </client-only>
 </template>
 <script setup lang="ts">
-import { onMounted, nextTick } from "vue";
+import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 
 import AppHeader from '@/components/Common/AppHeader.vue';
@@ -38,30 +38,41 @@ import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
-
 import { generalStore } from "~/stores/common/GeneralStore";
-const gstore = generalStore();
-const { popupActive } = storeToRefs(gstore);
+
+import { useToast } from "primevue/usetoast";
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
+const toast = useToast();
+
+const { popupActive } = storeToRefs(generalStore());
 
 const { resetGageStore } = useGageStore();
-const { resetFormulationStore } = useFormulationStore();
+const { resetFormulationStore, loadFormulationModels } = useFormulationStore();
 const { resetOptimizationStore } = useOptimizationStore();
 const { hardResetRunStatusStore } = useRunStatusStore();
 const { hardResetTuningStore } = useTuningStore();
+const { addToastRecord } = generalStore();
+
+const formulationStore = useFormulationStore;
+const { formulationTabData } = storeToRefs(formulationStore())
 
 const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs(useCalibrationJobStore());
-const { fetchUserCalibrationJobsListData, getUserName, getUserFullName} = useUserDataStore()
+const { fetchUserCalibrationJobsListData, getUserFullName } = useUserDataStore()
 
-onMounted(() => {
+onMounted(async () => {
   popupActive.value = false;
-  nextTick(() => {
-    resetGageStore();
-    resetFormulationStore();
-    resetOptimizationStore();
-    hardResetRunStatusStore();
-    hardResetTuningStore();
-    fetchUserCalibrationJobsListData();
-  })
+  resetGageStore();
+  resetFormulationStore();
+  resetOptimizationStore();
+  hardResetRunStatusStore();
+  hardResetTuningStore();
+  await loadFormulationModels();
+  await fetchUserCalibrationJobsListData();
+  /* if (!formulationTabData.value) {
+    const tMsg: ToastMessageOptions = { severity: "error", summary: 'Server Error', detail: "Unable to Retrieve Module List", life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  } */
 })
 
 </script>

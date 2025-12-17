@@ -15,7 +15,7 @@ import type {
   GeneralErrorResponse,
   SaveGageTabResponse,
   SaveGageTabPayload,
-} from "@/composables/NextGenModel";
+} from "@/composables/NgencerfModels";
 
 export const useGageStore = defineStore(
   "GageStore",
@@ -23,7 +23,7 @@ export const useGageStore = defineStore(
     /**
      * ref section
      */
-    const { calibrationJobId } = storeToRefs(generalStore());
+    const { calibrationJobId, gageDataSourceHasChanged } = storeToRefs(generalStore());
     const { ngencerfBaseUrl } = useBackendConfig();
     const { getAccessToken } = useUserDataStore();
     const userDataStore = useUserDataStore();
@@ -147,20 +147,24 @@ export const useGageStore = defineStore(
      *  @returns {void}
      */
     async function fetchSelectedGageData(): Promise<void> {
-      const selectedGageDataResponse = await makeProtectedApiCall<GageData>(
-        `${ngencerfBaseUrl}/calibration/get_gage/`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${getAccessToken()}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            gage_id: selectedGageValue.value,
-          }),
-        }
-      );
-      gageData.value = selectedGageDataResponse?._data ?? undefined;
+      if (selectedGageValue.value && selectedGageValue.value != '') {
+        const selectedGageDataResponse = await makeProtectedApiCall<GageData>(
+          `${ngencerfBaseUrl}/calibration/get_gage/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${getAccessToken()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              gage_id: selectedGageValue.value,
+            }),
+          }
+        );
+        gageData.value = selectedGageDataResponse?._data ?? undefined;
+      } else {
+        gageData.value = undefined;
+      }
     }
 
     /**
@@ -171,7 +175,7 @@ export const useGageStore = defineStore(
       if (selectedGageValue.value)
         gagePayload.value["gage_id"] = selectedGageValue.value;
       if (selectedForcingValue.value)
-        gagePayload.value["forcing_source"] = selectedForcingValue.value;
+        gagePayload.value["forcing_source_requested"] = selectedForcingValue.value;
       if (selectedObservationalValue.value)
         gagePayload.value["observational_source"] = selectedObservationalValue.value;
       if (selectedGeopackageValue.value)
@@ -226,7 +230,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserForcingFilesResponse;
     }
 
@@ -245,7 +249,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserObservationalFilesResponse;
     }
 
@@ -260,7 +264,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserGeopackageFilesResponse;
     }
 
@@ -271,8 +275,8 @@ export const useGageStore = defineStore(
     const setUserSelection = (): void => {
       selectedDomainValue.value = getSavedDomainValue.value ?? ""
       selectedGageValue.value = userCalibrationRunData.value?.gage?.gage_id ?? ""
-      selectedForcingValue.value =  !userCalibrationRunData.value?.external_data_status.observational && getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
-      selectedObservationalValue.value = !userCalibrationRunData.value?.external_data_status.forcing && getObservationalOptionsList.value ? getObservationalOptionsList.value [0].name : "";
+      selectedForcingValue.value =  !userCalibrationRunData.value?.external_data_status.forcing && getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
+      selectedObservationalValue.value = !userCalibrationRunData.value?.external_data_status.observational && getObservationalOptionsList.value ? getObservationalOptionsList.value [0].name : "";
       selectedGeopackageValue.value = !userCalibrationRunData.value?.external_data_status.geopackage && getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
       gageData.value = userCalibrationRunData.value?.gage ?? undefined
     }

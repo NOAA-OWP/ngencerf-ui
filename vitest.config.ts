@@ -3,9 +3,6 @@ import { defineConfig } from "vitest/config";
 import vue from "@vitejs/plugin-vue";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
-import PrimeVueResolvers from "unplugin-vue-components/resolvers";
-
-//import VueTypeImports from "vite-plugin-vue-type-imports";
 
 export default defineConfig({
   plugins: [

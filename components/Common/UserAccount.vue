@@ -1,14 +1,14 @@
 <template>
   <!-- User Page -->
 
-  <div id="UserBox" class="bg-white mx-auto px-16 pt-10 pb-16 rounded-lg max-w-screen-md">
+  <div id="UserBox" class="bg-white mx-auto p-5 rounded-lg max-w-screen-md">
 
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-2 gap-2">
       <div class="col-span-2">
         <div class="ttl">Your Account</div>
         <div class="name">
-          {{ fullName }}
-          <div class="pt-1" style="font-size:0.7em;">{{ userName }}</div>
+          {{ firstName }} {{ lastName }}
+          <span class="pt-1 inline-block ml-3" style="font-size:0.7em;">( {{ userName }} )</span>
         </div>
       </div>
       <div class="col-span-1">
@@ -25,21 +25,20 @@
       <div class="col-span-1">
         <form @submit.prevent="changePassword" @cancel="closeAccountBox" v-if="showForm === 'changePassword'">
           <div class="passwordBox grid row-auto">
-
             <label for="OldPass">Old password</label>
-            <div class="mb-3">
+            <div class="mb-2">
               <Password id="OldPass" type="password" name="password" autocomplete="current-password" v-model="oldpass"
                 aria-label="Enter old password here" title="Enter old password here" toggleMask :feedback="false" />
             </div>
 
             <label for="NewPass">New password</label>
-            <div class="mb-3">
+            <div class="mb-2">
               <Password id="NewPass" type="password" name="password" autocomplete="new-password" v-model="newpass"
                 aria-label="Enter new password here" title="Enter new password here" toggleMask :feedback="true" />
             </div>
 
             <label for="ReNewPass">Confirm New password</label>
-            <div class="mb-3">
+            <div class="mb-2">
               <Password id="ReNewPass" type="password" name="password" autocomplete="new-password"
                 v-model="confirmNewpass" aria-label="Confirm New Password" title="Confirm New Password" toggleMask
                 :feedback="false" />
@@ -47,7 +46,7 @@
             </div>
           </div>
 
-          <div class="buttonArea mt-4">
+          <div class="buttonArea mt-2">
             <Button class="ngenButtonDiv mr-6" id="UpdateButton" type="submit" aria-label="Update with new password"
               title="Update with new password">
               Update
@@ -111,7 +110,7 @@ import Password from 'primevue/password';
 import { useToast } from "primevue/usetoast";
 
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 
@@ -122,12 +121,15 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 
 const { addToastRecord } = generalStore();
 
+const { firstName, lastName, userInitials } = storeToRefs(useUserDataStore());
+
 const {
   getAccessToken,
   getUserName,
   getUserFullName,
   getUserFirstName,
   getUserLastName,
+  getUserInitials,
   setFirstName,
   setLastName
 } = useUserDataStore();
@@ -187,8 +189,13 @@ const changePassword = async () => {
   passwordChangeData.new_password = newpass.value.trim();
   passwordChangeData.re_new_password = confirmNewpass.value.trim();
 
-  if (passwordChangeData.current_password !== "" && passwordChangeData.new_password !== "" && passwordChangeData.re_new_password !== ""
-    && (passwordChangeData.new_password === passwordChangeData.re_new_password)) {
+  toast.removeAllGroups();
+  let failureMessages: string[] = [];
+  if (passwordChangeData.current_password === "" || passwordChangeData.new_password === "" || passwordChangeData.re_new_password === "") {
+    failureMessages.push("All fields must be filled out.");
+  } else if (passwordChangeData.new_password !== passwordChangeData.re_new_password) {
+    failureMessages.push("New password fields do not match.");
+  } else {
     const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/set_password/`, {
       method: 'POST',
       headers: {
@@ -197,26 +204,30 @@ const changePassword = async () => {
       },
       body: passwordChangeData
     });
-    // error.value.statuscode
-    if (error.value) {
-      let e = error.value?.data?.detail;
+    if (error?.value) {
+      let e = error.value?.data;
       if (!e) {
-        e = "Cannot reach server. Error code: " + error.value.statusCode;
+        failureMessages.push("Cannot reach server. Error code: " + error.value.statusCode);
+      } else {
+        for (const key of Object.keys(e)) {
+          for (const message of e[key]) {
+            failureMessages.push(message);
+          }
+        }
       }
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: ToastTimeout.timeout3000 };
-      toast.add(tMsg); addToastRecord(tMsg);
-      console.error("Error during user creation:", error.value?.message, error.value?.data);
-      return;
+    } else {
+      // Clear out the inputs and report success
+      oldpass.value = "";
+      newpass.value = "";
+      confirmNewpass.value = "";
     }
-    console.log("changePassword", data);
-    // Clear out the inputs and report success
-    oldpass.value = "";
-    newpass.value = "";
-    confirmNewpass.value = "";
-    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Password Change Successful', detail: "You have successfully changed your password", life: ToastTimeout.timeout3000 };
+  }
+  if (failureMessages.length > 0) {
+    failureMessages.push("Password not updated.");
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: failureMessages.join('\n'), life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: "Password was not changed", life: ToastTimeout.timeout3000 };
+    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Password Change Successful', detail: "You have successfully changed your password", life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -229,7 +240,11 @@ const updateName = async () => {
   updateNameData.first_name = newFirstName.value.trim();
   updateNameData.last_name = newLastName.value.trim();
 
-  if (updateNameData.first_name !== "" && updateNameData.last_name !== "") {
+  toast.removeAllGroups();
+  let failureMessages: string[] = [];
+  if (updateNameData.first_name === "" || updateNameData.last_name=== "") {
+    failureMessages.push("First and last names must be filled out.")
+  } else {
     const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/me/`, {
       method: 'PATCH',
       headers: {
@@ -238,25 +253,30 @@ const updateName = async () => {
       },
       body: updateNameData
     });
-    // error.value.statuscode
-    if (error.value) {
-      let e = error.value?.data?.detail;
+    if (error?.value) {
+      let e = error.value?.data;
       if (!e) {
-        e = "Cannot reach server. Error code: " + error.value.statusCode;
+        failureMessages.push("Cannot reach server. Error code: " + error.value.statusCode);
+      } else {
+        for (const key of Object.keys(e)) {
+          for (const message of e[key]) {
+            failureMessages.push(message);
+          }
+        }
       }
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: ToastTimeout.timeout3000 };
-      toast.add(tMsg); addToastRecord(tMsg);
-      console.error("Error during user update:", error.value?.message, error.value?.data);
-      return;
+    } else {
+      // Clear out the inputs and report success
+      setFirstName(updateNameData.first_name);
+      setLastName(updateNameData.last_name);
+      userInitials.value = getUserInitials();
     }
-    console.log("UpdateNameData", data);
-    // Clear out the inputs and report success
-    setFirstName(updateNameData.first_name);
-    setLastName(updateNameData.last_name);
-    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Name Change Successful', detail: "You have successfully changed your name", life: ToastTimeout.timeout3000 };
+  }
+  if (failureMessages.length > 0) {
+    failureMessages.push("Name not updated.");
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: failureMessages.join('\n'), life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Name Change Error', detail: "Name was not changed", life: ToastTimeout.timeout3000 };
+    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Name Change Successful', detail: "You have successfully changed your name", life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -308,19 +328,19 @@ const closeAccountBox = () => {
 
   .ttl {
     font-size: 35px;
-    margin-top: 15px;
+    margin-top: 10px;
     text-align: center;
   }
 
   .name {
     font-size: 20px;
     text-align: center;
-    margin-top: 25px;
+    margin-top: 20px;
   }
 
   .chgpwd,
   .updtnm {
-    font-size: 25px;
+    font-size: 20px;
     text-align: center;
     color: #0077ff;
     font-weight: normal;

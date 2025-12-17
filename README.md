@@ -1,19 +1,15 @@
-# Vue3/NUXT3 Framework for the NEXGEN UI
+# Vue3/NUXT3 Framework for the ngencerf UI
 
-This project requires a specific version level of NodeJs.
+This project requires a specific version level of Node.js.
 
-The easiest way to control NodeJs versions is by installing the Node Version Manager
+The easiest way to control Node.js versions is by installing the Node Version Manager (nvm). Folow the instructions [here](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) to install nvm.
 
-Install docs from three different sites:
+Once you have installed nvm, you need to install the correct Node.js version:
 
-- <https://www.linode.com/docs/guides/how-to-install-use-node-version-manager-nvm/>
-- <https://www.geeksforgeeks.org/how-to-install-nvm-on-ubuntu-22-04/>
-- <https://monovm.com/blog/install-nvm-on-ubuntu/>
-
-Once you have installed NVM, you need to install the correct NodeJs version:
-
-nvm install 20.13.1
-nvm use 20.13.1
+```bash
+nvm install 20.15.0
+nvm use 20.15.0
+```
 
 Then you can proceed....
 
@@ -24,7 +20,6 @@ Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introdu
 Make sure to install the dependencies:
 
 ```bash
-# npm
 npm install
 ```
 
@@ -41,8 +36,7 @@ Note `http://localhost:8000` is used by default if `NGENCERF_BASE_URL` is not se
 Start the development server on `http://localhost:3000`:
 
 ```bash
-# npm
-npm run dev
+./runUi.sh
 ```
 
 ### Adding Authenticated API Calls to ngencerf-server
@@ -52,8 +46,8 @@ If you need to make authenticated API calls to `ngencerf-server`, use the `makeP
 Here is an example of how to use `makeProtectedApiCall`:
 
 ```typescript
-import { makeProtectedApiCall } from "~/composables/UserAuth";
-import { useBackendConfig } from "~/composables/UseBackendConfig";
+import { makeProtectedApiCall } from "@/composables/UserAuth";
+import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const { ngencerfBaseUrl } = useBackendConfig();
@@ -77,7 +71,6 @@ console.log("protectedApiCallOutput:", protectedApiCallOutput);
 Build the application for production:
 
 ```bash
-# npm
 npm run build
 ```
 
@@ -86,7 +79,6 @@ npm run build
 Locally preview production build:
 
 ```bash
-# npm
 npm run preview
 ```
 
