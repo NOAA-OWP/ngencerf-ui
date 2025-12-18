@@ -250,8 +250,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       const getStatusResponse: any = await getStatus();
 
       if (getStatusResponse.status === 200) {
-        failureMessages.value = getStatusResponse?._data?.failure_messages;
-
         // TODO: create forecastJob interface
         const forecastJob: any = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
         
@@ -263,6 +261,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         forecastConfigurationName.value = forecastJob?.configuration;
         forecastJobStatus.value = forecastJob?.status;
         coldStartJobStatus.value = forecastJob?.cold_start_run?.status;
+        failureMessages.value = forecastJob?.failure_messages;
 
         if (forecastJob?.cold_start_run?.submit_date) {
           submitTimeDate.value = new Date(forecastJob?.cold_start_run.submit_date as string);
