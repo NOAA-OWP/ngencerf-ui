@@ -295,6 +295,7 @@ const updateLogDisplay = () => {
           });
         }
       } else {
+        selectedLogFilePath.value = '';
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }

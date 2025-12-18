@@ -962,6 +962,7 @@ const updateLogRefs = async(getLogData: boolean) => {
       }
     } else {
       selectedLogDisplay.value = '';
+      selectedLogFilePath.value = '';
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
@@ -1033,7 +1034,6 @@ onUnmounted(() => {
   padding: 6px 10px 6px 20px;
   border-radius: 10px;
   border: 0px solid global.$ngwcp_neutral_gray_md;
-
 }
 
 #GraphArea {

@@ -385,6 +385,73 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   /**
+    * Get Forecast Log Names
+    * @return {any}
+    */
+  const queryGetLogNames = async (forecast_run_id: number): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        forecast_run_id: forecast_run_id
+      })
+    });
+  };
+
+  /**
+    * Get Forecast Log Data
+    * @return {any}
+    */
+  const queryGetLogData = async (
+    log_category: string,
+    log_name: string,
+    forecast_run_id: number,
+    start?: number,
+    limit?: number
+  ): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        log_category: log_category,
+        log_name: log_name,
+        forecast_run_id: forecast_run_id,
+        start: start !== undefined ? start : 0,
+        limit: limit !== undefined ? limit : 1000
+      })
+    });
+  };
+
+  /** 
+   * Get Forecast Log Status
+   * @return {any}
+   */
+  const queryGetLogStatus = async (
+    forecast_run_id: number,
+    log_path: string,
+    byte_offset: number
+  ): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_status/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        forecast_run_id: forecast_run_id,
+        log_path: log_path,
+        byte_offset: byte_offset,
+      })
+    });
+  };
+
+  /**
    * Cancel Forecast Job by querying cancel_job endpoint
    */
   const cancelForecastJob = async (): Promise<any> => {
@@ -688,6 +755,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     loadForecastTab,
     createAndRunForecastJob,
     cancelForecastJob,
+    queryGetLogNames,
+    queryGetLogData,
+    queryGetLogStatus,
     deleteForecastJob,
     getCalibrationJobsForForecast,
     resetUserSelectedForecastCalibrationRun,
