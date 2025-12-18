@@ -1,6 +1,7 @@
 // @ts-check
 
-import { defineStore, storeToRefs } from "pinia";
+import { defineStore, storeToRefs, acceptHMRUpdate } from "pinia";
+import { getStorageKey } from "~/utils/Storage";
 
 import type {
   CalibrationJobListItem,
@@ -600,7 +601,7 @@ export const useUserDataStore = defineStore(
   },
   {
     persist: {
-      storage: piniaPluginPersistedstate.localStorage(),
+      key: getStorageKey("UserDataStore"),
     },
   }
 );
