@@ -1020,14 +1020,14 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if avCalStartDate is not within avSimStartDate and avSimEndDate
   if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Calibration Start must be within Simulation Start and End', life: ToastTimeout.timeoutError };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation and Calibration Start must be within Simulation Start and End', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
   if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End', life: ToastTimeout.timeoutError };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation and Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
