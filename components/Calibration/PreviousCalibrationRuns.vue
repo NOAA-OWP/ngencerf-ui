@@ -507,8 +507,7 @@ watch(selectedCalibrationRun, () => {
 });
 
 const disableFilters = computed(() => {
-  return false;
-  //return (selectedMultipleCalibrationRuns.value.length > 1);
+  return showHideMultOps.value;
 });
 
 const showBulkActions = computed(() => {
