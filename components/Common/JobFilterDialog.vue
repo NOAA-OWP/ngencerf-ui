@@ -1,6 +1,5 @@
 <template>
-  <div id="JobFilterDialog" class="JobsFilterBox mb-2 mt-4">
-
+  <div id="JobFilterDialog" class="JobsFilterBox mb-2 mt-4" :style="`opacity: ${disableAll ? '50%' : '100%'}`">
     <div id="FilterDialog">
 
       <div class="grid grid-cols-6 gap-2 text-sx">
@@ -70,26 +69,26 @@
                     title="Created After Filter">Created After</label>
                   <VueDatePicker id="createdAtStart" v-model="createdAtStart" class="dp__theme_dark w-40" text-input format="yyyy-MM-dd"
                     @update:model-value="convertCreatedAtStartStringToDateTimeObject" :enable-time-picker="false"
-                    v-bind="minMaxCreatedAtProps" :teleport="true" utc='preserve'/>
+                    v-bind="minMaxCreatedAtProps" :disabled="disableAll" :teleport="true" utc='preserve'/>
                 </div>
                 <div>
                   <label class="block text-left mb-1" for="createdAtEnd" aria-label="Created Before Filter"
                     title="Created Before Filter">Created Before</label>
                   <VueDatePicker id="createdAtEnd" v-model="createdAtEnd" class="dp__theme_dark w-40" text-input format="yyyy-MM-dd"
                     @update:model-value="convertCreatedAtEndStringToDateTimeObject" :enable-time-picker="false"
-                    v-bind="minMaxCreatedAtProps" :teleport="true" utc='preserve'/>
+                    v-bind="minMaxCreatedAtProps" :disabled="disableAll" :teleport="true" utc='preserve'/>
                 </div>
               </div>
               <div class="flex gap-2" v-show="showJobId">
                 <div>
                   <label class="block text-left mb-1" for="jobIdStart" aria-label="Job ID Start Filter"
                     title="Job ID Start Filter">Job ID Start</label>
-                  <InputNumber id="jobIdStart" class="w-24" v-model="jobIdStart" v-bind="minMaxJobIdProps"/>
+                  <InputNumber id="jobIdStart" class="w-24" v-model="jobIdStart" v-bind="minMaxJobIdProps" :disabled="disableAll"/>
                 </div>
                 <div>
                   <label class="block text-left mb-1" for="jobIdEnd" aria-label="Job ID End Filter"
                     title="Job ID End Filter">Job ID End</label>
-                  <InputNumber id="jobIdEnd" class="w-24" v-model="jobIdEnd" v-bind="minMaxJobIdProps"/>
+                  <InputNumber id="jobIdEnd" class="w-24" v-model="jobIdEnd" v-bind="minMaxJobIdProps" :disabled="disableAll"/>
                 </div>
               </div>
             </div>
@@ -98,7 +97,7 @@
         <div>
           <div class="text-right mr-[16px] whitespace-nowrap">
             <Button id="ClearFiltersButton" class="c-blue mt-[22px]" label="Clear Filters"
-              @click="resetFilters()" aria-label="Clear filters" title="Clear filters" :disabled="filterInactive">
+              @click="resetFilters()" aria-label="Clear filters" title="Clear filters" :disabled="filterInactive || disableAll">
             </Button><br />
             <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="clearGageList(); refreshJobList()"
               aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
