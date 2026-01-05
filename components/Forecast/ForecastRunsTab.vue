@@ -279,8 +279,10 @@ const onRowContextMenu = (event: any) => {
     if (crRowData.forecast_status === 'Done') {
       cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToForecastResults() });
     }
-    cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
-    cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    if (crRowData.calibration_run_id) {
+      cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
+      cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    }
     if (crRowData.forecast_status !== 'Running') {
       cmForecastRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedForecastJob() });
     }

@@ -256,15 +256,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   });
 
   /**
-   * Load Setup Forecast Tab data
-   */
-  const loadSetupForecastTabData = async (): Promise<void> => {
-    // load forecast cycles
-    const loadForecastTabResponse: any = await loadForecastTab();
-    forecastConfigurations.value = loadForecastTabResponse?._data?.forecast_configuration_values;
-  };
-
-  /**
    * Load Forecast Run/Status tab data
    */
   const loadForecastRunStatusTabData = async (): Promise<string[]> => {
@@ -914,7 +905,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     selectedLogByteOffset,
     selectedLogStatus,
     getForecastJobs,
-    loadSetupForecastTabData,
     loadForecastRunStatusTabData,
     loadForecastResultsTabData,
     loadForecastTab,

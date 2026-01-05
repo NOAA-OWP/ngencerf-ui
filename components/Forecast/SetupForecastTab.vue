@@ -199,7 +199,7 @@ const {
   coldStartJobStatus,
 } = storeToRefs(useForecastStore());
 
-const { loadSetupForecastTabData } = useForecastStore();
+const { loadForecastTab } = useForecastStore();
 
 const minCycleDate = ref<any>();
 const maxCycleDate = ref<any>();
@@ -264,7 +264,13 @@ onMounted(async () => {
         calibrationJobId.value = calibrationRunForForecast.value?.calibration_run_id;
         await fetchUserCalibrationRunData();
         // load tab data to populate forecastConfigurations
-        await loadSetupForecastTabData();
+        const loadForecastTabResponse: any = await loadForecastTab();
+        if (loadForecastTabResponse?._data?.forecast_configuration_values) {
+          forecastConfigurations.value = loadForecastTabResponse?._data?.forecast_configuration_values;
+        } else {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Unable to load forecast configurations. Did you select a valid calibration job?', life: ToastTimeout.timeoutError };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
         if (forecastConfiguration.value) {
             getCycleHourList();
         }
