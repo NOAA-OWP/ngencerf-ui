@@ -35,10 +35,10 @@
             </div>
 
             <div v-show="showModules" class="whitespace-nowrap">
-              <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
-                title="Module Filter">Modules</label>
               <div class="flex gap-2 w-70">
                 <div>
+                  <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
+                    title="Module Filter">Modules</label>
                   <MultiSelect id="ModuleList" v-model="modulesFilterList" :options="fetchFormulationModuleOptions"
                     optionLabel="display_name" optionValue="name" :maxSelectedLabels="3" class="JobsFilterSelect w-40" aria-label="Module Filter"
                     title="Module Filter" :disabled="disableAll" @change="refreshJobList()">
@@ -53,10 +53,12 @@
                     </template>
                   </MultiSelect>
                 </div>
-                <div>
+                <div v-show="modulesFilterList.length > 1">
+                  <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
+                    title="Module Filter">Match Logic</label>
                   <Select id="ModuleOperator" v-model="moduleOperator" :options="moduleOperatorList" optionLabel="name"
                     optionValue="name" class="user-select w-12" @change="refreshJobList()"
-                    v-show="modulesFilterList.length > 1" aria-label="Module Operator" title="Module Operator">
+                    aria-label="Module Operator" title="Module Operator">
                   </Select>
                 </div>
               </div>
@@ -237,8 +239,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const moduleOperatorList = [
-  { name: "All" },
-  { name: "Any" }
+  { name: "All Modules (AND)" },
+  { name: "Any Module (OR)" }
 ]
 const bulkJobActionsList: { name: string, value: number }[] = [
   {name: 'select an action', value: 0, show: true},
