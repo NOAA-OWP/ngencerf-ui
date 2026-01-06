@@ -198,46 +198,8 @@
         </div>
 
         <!-- DISPLAY LOGS -->
-        <div v-else-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0" id="LogDisplayArea" class="col-span-5 p-2">
-          <div class="pl-4">
-            <table width="100%" summary="Forecast Log Options and File Path">
-              <caption class="sr-only">Forecast Log Options and File Path table</caption>  
-              <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Forecast Log Label</th><th scope="col">Forecast Log Value</th></tr></thead>     
-              <tbody>  
-                <tr v-if="selectedLogList.length > 1" style="font-size: 0.9em;">
-                  <td class="pr-2 pt-3 whitespace-nowrap"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
-                  <td>
-                    <Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
-                      optionLabel="name" optionValue="name">
-                    </Select>
-                  </td>
-                </tr>
-                <tr v-if="selectedLogFilePath !== '' && selectedLogList.length === 1" style="font-size: 0.9em;">
-                  <td class="pr-2 pt-3 whitespace-nowrap"><b>Log Name</b></td>
-                  <td class="pt-3">{{ selectedLogName }}</td>
-                </tr>
-                <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
-                  <td class="pr-2 pt-3 whitespace-nowrap"><b>Log File Path</b></td>
-                  <td class="pt-3 whitespace-nowrap overflow-auto">{{ selectedLogFilePath }}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div v-if="selectedLogDisplay">
-              <div class="pagination-box" v-if="selectedLogDisplay">
-                <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{
-                  selectedLogTotalSize }}</div>
-                <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
-              </div>
-            </div>
-            <div v-else>
-              Log file unavailable
-            </div>
-
-            <div v-if="selectedLogDisplay" id="selectedLogDisplay" class="p-2 gray-border overflow-scroll">
-              <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
-            </div>
-          </div>
+        <div v-else class="col-span-5">
+          <LogDisplay/>
         </div>
       </div>
     </div>
@@ -293,7 +255,7 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
 import type { ToastMessageOptions } from "primevue/toast";
-import Paging from "../Common/Paging.vue";
+import LogDisplay from "../Common/LogDisplay.vue";
 
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
@@ -329,6 +291,8 @@ const {
   calibrationRunForForecast,
   overallColdStartForecastStatus,
   forecastJobNgenGlobalLogging,
+  selectedLogCategory,
+  logList
 } = storeToRefs(useForecastStore());
 
 const {
@@ -336,79 +300,10 @@ const {
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
-  queryGetLogNames,
-  queryGetLogData,
-  queryGetLogStatus,
-  setElapsedTime,
+  populateLogListOptions,
+  resetUserLogRefs,
   hardResetForecastRunStatusStore
 } = useForecastStore();
-
-const logList = ref<any[]>([]);
-const logListDefault = ref<string>('Select an option');
-const logs = ref<APIResponse>({});
-const logDataPageSize = ref<number>(1000);
-const logLists = ref<DynamicObject>({});
-const logListOptions = ref<any[]>([]);
-const selectedLogCategory = ref<string>('');
-const selectedLogList = ref<any[]>([]);
-const selectedLogName = ref<string>('');
-const selectedLogDisplay = ref<string>('');
-const selectedLogTotalSize = ref<number>(0);
-const selectedLogCurrentPage = ref<number>(1);
-const selectedLogTotalPages = ref<number>(1);
-const selectedLogStartRow = ref<number>(1);
-const selectedLogEndRow = ref<number>(logDataPageSize.value);
-const selectedLogFilePath = ref<string>('');
-const selectedLogByteOffset = ref<number>(0);
-const selectedLogStatus = ref<DynamicObject>({});
-let logTimeout;
-
-const populateLogListOptions = async() => {
-  if (forecastJobId.value && !['Submitted','Validating and Preparing Job Data'].includes(overallColdStartForecastStatus.value)) {
-    logList.value = [];
-    logList.value.push({ name: '', display_name: logListDefault.value });
-    logListOptions.value = [];
-
-    nextTick(async () => {
-      // Get Names of available Logs
-      logs.value = await queryGetLogNames(forecastJobId.value);
-      if (logs.value?._data?.log_names) {
-        for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-          Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-            let logNameList = [];
-            for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-              logNameList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
-            }
-            logLists.value[key] = logNameList;
-          });
-        }
-      }
-      
-      // Add Log Options to the dropdown
-      Object.keys(logLists.value).forEach(key => {
-        logListOptions.value.push({ name: key, display_name: capitalCase(key) + ' Logs' });
-      });
-      for (const option of logListOptions.value) {
-        if (!(logList.value.find(obj => obj.name === option.name))) {
-          logList.value.push(option);
-        }
-      }
-
-      if ((coldStartJobStatus.value == 'Failed' || forecastJobStatus.value == 'Failed') && logListOptions.value.length > 0) {
-        // Skip directly to ngen log if status is Failed
-        selectedLogCategory.value = (logListOptions.value.at(-1)).name;
-        nextTick(async () => {
-          if (selectedLogList.value.length > 1) {
-              selectedLogName.value = selectedLogList.value.at(-1).name;
-          }
-        });
-      } else if (!selectedLogName.value) {
-        // Start with default option
-        selectedLogCategory.value = logListDefault.value;
-      }
-    });
-  }
-}
 
 onMounted(async () => {
   toast.removeAllGroups(); // clear all toast messages
@@ -506,162 +401,6 @@ const createColdStartAndForecastStatusInterval = () => {
   }, 10000) as unknown as number;
 };
 
-watch(overallColdStartForecastStatus, async (newColdStartForecastStatus, oldColdStartForecastStatus) => {
-  if (forecastJobId.value && (newColdStartForecastStatus || oldColdStartForecastStatus) && !isLoading.value) {
-    await populateLogListOptions();
-  }
-}, { immediate: true });
-
-// Reset refs when selectedLogName changes
-const resetUserLogRefs = (): void => {
-  // log refs
-  selectedLogCategory.value = '';
-  selectedLogList.value = [];
-  selectedLogName.value = '';
-  selectedLogDisplay.value = '';
-  selectedLogTotalSize.value = 0;
-  selectedLogCurrentPage.value = 1;
-  selectedLogTotalPages.value = 0;
-  selectedLogStartRow.value = 1;
-  selectedLogEndRow.value = logDataPageSize.value;
-  selectedLogFilePath.value = '';
-  selectedLogByteOffset.value = 0;
-  selectedLogStatus.value = {};
-  clearTimeout(logTimeout);
-}
-
-// Handle selectedLogCategory changes
-watch(selectedLogCategory, async () => {
-  if (selectedLogCategory.value != '' && selectedLogCategory.value != logListDefault.value) {
-    selectedLogList.value = logLists.value[selectedLogCategory.value];
-    selectedLogName.value = '';
-    nextTick(() => {
-      // start with the first log
-      selectedLogName.value = selectedLogList.value[0].name;
-      if (!selectedLogList.value.length) {
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: selectedLogName.value + ' not available', life: ToastTimeout.timeoutInfo };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-    });
-  } else {
-    selectedLogList.value = [];
-    selectedLogName.value = '';
-  }
-});
-
-const updateLogRefs = async(getLogData: boolean) => {
-  if (getLogData) {
-    const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category
-      selectedLogName.value, // log_name
-      forecastJobId.value, // forecast_run_id
-      overallColdStartForecastStatus.value === 'Done' ? 0 : -1, // start from first page if done, else last page
-      logDataPageSize.value // limit
-    );
-    if (response?._data?.log_data) {
-      let logText = '';
-      for (let t = 0; t < response?._data.log_data.length; t++) {
-        logText += response?._data.log_data[t] + '<br/>\n';
-      }
-      selectedLogDisplay.value = logText;
-      selectedLogTotalSize.value = response?._data.pagination_metadata?.count;
-      // only show one page for running jobs (this disables paging)
-      selectedLogTotalPages.value = 
-        (['Submitted','Running'].includes(coldStartJobStatus.value) || 
-          ['Submitted','Running'].includes(forecastJobStatus.value)
-        ) ? 1 : Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
-      selectedLogEndRow.value = response?._data.pagination_metadata?.count;
-      if (logDataPageSize.value < selectedLogTotalSize.value) {
-        selectedLogStartRow.value = (selectedLogTotalSize.value - logDataPageSize.value) + 1;
-      } else {
-        selectedLogStartRow.value = 1;
-      }
-      selectedLogFilePath.value = response?._data.log_path;
-      selectedLogByteOffset.value = response?._data?.byte_offset;
-      if (document.getElementById('selectedLogDisplay')) {
-        nextTick(async () => {
-          document.getElementById('selectedLogDisplay').style.height = (Math.max((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
-          - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top, 250) + 'px');
-        });
-      }
-    } else {
-      selectedLogDisplay.value = '';
-      selectedLogFilePath.value = '';
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
-  }
-  if ((coldStartJobStatus.value === 'Running' || forecastJobStatus.value === 'Running') && selectedLogFilePath.value) {
-    // watch status every 10 seconds to see if log file changes
-    clearTimeout(logTimeout);
-    logTimeout = setTimeout(async() => {
-      const status_response: any = await queryGetLogStatus(
-        forecastJobId.value, // forecast_run_id
-        selectedLogFilePath.value, // log_path
-        selectedLogByteOffset.value // byte_offset
-      )
-      if (status_response._data) {
-        selectedLogStatus.value = status_response._data;
-      }
-    }, 10000);
-  }
-}
-
-// Handle selectedLogName changes
-watch(selectedLogName, async () => {
-  if (selectedLogName.value !== '') {
-    await updateLogRefs(true);
-    if (selectedLogDisplay.value && selectedLogDisplay.value != '') {
-      nextTick(async () => {
-        document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
-      });
-    }
-  }
-});
-
-// Watch for page number changes in logs
-watch(selectedLogCurrentPage, async () => {
-  if (isNaN(selectedLogCurrentPage.value) || selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
-    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
-  } else {
-    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
-    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
-      selectedLogEndRow.value = selectedLogTotalSize.value;
-    } else {
-      selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
-    }
-    const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
-      selectedLogName.value, // log_name
-      forecastJobId.value, // forecast_run_id
-      selectedLogStartRow.value - 1, // start
-      logDataPageSize.value // limit
-    );
-    if (response?._data) {
-      let logText = '';
-      for (let t = 0; t < response?._data?.log_data.length; t++) {
-        logText += response?._data?.log_data[t] + '<br/>\n';
-      }
-      selectedLogDisplay.value = logText;
-    } else {
-      toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log data is currently unavailable', life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
-  }
-});
-
-watch(selectedLogStatus, async () => {
-  // if selectedLogStatus is not empty, update log refs
-  if (selectedLogStatus.value && Object.keys(selectedLogStatus.value).length > 0) {
-    updateLogRefs(selectedLogStatus.value?.file_updated);
-  }
-});
-
-function capitalCase(str: string) {
-  return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-}
-
 /**
  * Start the forecast run
  */
@@ -706,6 +445,12 @@ const startForecastRun = async () => {
     }
   }
 };
+
+watch(overallColdStartForecastStatus, async (newColdStartForecastStatus, oldColdStartForecastStatus) => {
+  if (forecastJobId.value && (newColdStartForecastStatus || oldColdStartForecastStatus) && !isLoading.value) {
+    await populateLogListOptions();
+  }
+}, { immediate: true });
 
 /**
  * Cancel the forecast run
@@ -752,9 +497,9 @@ const goToSetupForecastTab = () => {
 };
 
 onUnmounted(() => {
-  // make sure page clears all selected plots/tables when the user leaves
-  logList.value = [];
+  // make sure page clears all log data when the user leaves
   hardResetForecastRunStatusStore();
+  logList.value = [];
   resetUserLogRefs();
 })
 </script>

@@ -12,6 +12,10 @@ import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers"
 import { isValidDate } from '@/utils/CommonHelpers';
 import { formatElapsedTime, formatDateForRunOnString } from '@/utils/TimeHelpers';
 
+function capitalCase(str: string) {
+  return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
 export const useForecastStore = defineStore('ForecastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { 
@@ -76,7 +80,28 @@ export const useForecastStore = defineStore('ForecastStore', () => {
 
   const forecastJobNgenGlobalLogging = ref<boolean>(true);
 
+  const logList = ref<any[]>([]);
+  const logListDefault = ref<string>('Select an option');
+  const logs = ref<APIResponse>({});
+  const logDataPageSize = ref<number>(1000);
+  const logLists = ref<DynamicObject>({});
+  const logListOptions = ref<any[]>([]);
+  const selectedLogCategory = ref<string>('');
+  const selectedLogList = ref<any[]>([]);
+  const selectedLogName = ref<string>('');
+  const selectedLogDisplay = ref<string>('');
+  const selectedLogTotalSize = ref<number>(0);
+  const selectedLogCurrentPage = ref<number>(1);
+  const selectedLogTotalPages = ref<number>(1);
+  const selectedLogStartRow = ref<number>(1);
+  const selectedLogEndRow = ref<number>(logDataPageSize.value);
+  const selectedLogFilePath = ref<string>('');
+  const selectedLogByteOffset = ref<number>(0);
+  const selectedLogStatus = ref<DynamicObject>({});
+
   const isForecastLoading = ref<boolean>(false);
+  
+  let logTimeout;
 
   /**
    * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
@@ -638,6 +663,129 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     }
   };
 
+  /**
+   * populate log list options
+   */
+  const populateLogListOptions = async(plotListOptions: [] = []) => {
+    if (forecastJobId.value && !['Submitted','Validating and Preparing Job Data'].includes(overallColdStartForecastStatus.value)) {
+      logList.value = [];
+      logList.value.push({ name: '', display_name: logListDefault.value });
+      logListOptions.value = plotListOptions ?? [];
+
+      nextTick(async () => {
+        // Get Names of available Logs
+        logs.value = await queryGetLogNames(forecastJobId.value);
+        if (logs.value?._data?.log_names) {
+          for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+            Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+              let logNameList = [];
+              for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+                logNameList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+              }
+              logLists.value[key] = logNameList;
+            });
+          }
+        }
+        
+        // Add Log Options to the dropdown
+        Object.keys(logLists.value).forEach(key => {
+          logListOptions.value.push({ name: key, display_name: capitalCase(key) + ' Logs' });
+        });
+        for (const option of logListOptions.value) {
+          if (!(logList.value.find(obj => obj.name === option.name))) {
+            logList.value.push(option);
+          }
+        }
+
+        if ((coldStartJobStatus.value == 'Failed' || forecastJobStatus.value == 'Failed') && logListOptions.value.length > 0) {
+          // Skip directly to ngen log if status is Failed
+          selectedLogCategory.value = (logListOptions.value.at(-1)).name;
+          nextTick(async () => {
+            if (selectedLogList.value.length > 1) {
+                selectedLogName.value = selectedLogList.value.at(-1).name;
+            }
+          });
+        } else if (!selectedLogCategory.value) {
+          // Start with first option
+          selectedLogCategory.value = logListOptions.value[0].name;
+        }
+      });
+    }
+  }
+
+  // Reset refs when selectedLogName changes
+  const resetUserLogRefs = (): void => {
+    // log refs
+    selectedLogCategory.value = '';
+    selectedLogList.value = [];
+    selectedLogName.value = '';
+    selectedLogDisplay.value = '';
+    selectedLogTotalSize.value = 0;
+    selectedLogCurrentPage.value = 1;
+    selectedLogTotalPages.value = 0;
+    selectedLogStartRow.value = 1;
+    selectedLogEndRow.value = logDataPageSize.value;
+    selectedLogFilePath.value = '';
+    selectedLogByteOffset.value = 0;
+    selectedLogStatus.value = {};
+    clearTimeout(logTimeout);
+  }
+
+  const updateLogRefs = async(getLogData: boolean) => {
+    if (getLogData) {
+      const response: any = await queryGetLogData(
+        selectedLogCategory.value, // log_category
+        selectedLogName.value, // log_name
+        forecastJobId.value, // forecast_run_id
+        overallColdStartForecastStatus.value === 'Done' ? 0 : -1, // start from first page if done, else last page
+        logDataPageSize.value // limit
+      );
+      if (response?._data?.log_data) {
+        let logText = '';
+        for (let t = 0; t < response?._data.log_data.length; t++) {
+          logText += response?._data.log_data[t] + '<br/>\n';
+        }
+        selectedLogDisplay.value = logText;
+        selectedLogTotalSize.value = response?._data.pagination_metadata?.count;
+        // only show one page for running jobs (this disables paging)
+        selectedLogTotalPages.value = 
+          (['Submitted','Running'].includes(coldStartJobStatus.value) || 
+            ['Submitted','Running'].includes(forecastJobStatus.value)
+          ) ? 1 : Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
+        selectedLogEndRow.value = response?._data.pagination_metadata?.count;
+        if (logDataPageSize.value < selectedLogTotalSize.value) {
+          selectedLogStartRow.value = (selectedLogTotalSize.value - logDataPageSize.value) + 1;
+        } else {
+          selectedLogStartRow.value = 1;
+        }
+        selectedLogFilePath.value = response?._data.log_path;
+        selectedLogByteOffset.value = response?._data?.byte_offset;
+        if (document.getElementById('selectedLogDisplay')) {
+          nextTick(async () => {
+            document.getElementById('selectedLogDisplay').style.height = (Math.max((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
+            - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top, 250) + 'px');
+          });
+        }
+      } else {
+        selectedLogDisplay.value = '';
+        selectedLogFilePath.value = '';
+      }
+    }
+    if ((coldStartJobStatus.value === 'Running' || forecastJobStatus.value === 'Running') && selectedLogFilePath.value) {
+      // watch status every 10 seconds to see if log file changes
+      clearTimeout(logTimeout);
+      logTimeout = setTimeout(async() => {
+        const status_response: any = await queryGetLogStatus(
+          forecastJobId.value, // forecast_run_id
+          selectedLogFilePath.value, // log_path
+          selectedLogByteOffset.value // byte_offset
+        )
+        if (status_response._data) {
+          selectedLogStatus.value = status_response._data;
+        }
+      }, 10000);
+    }
+  }
 
   /**
    * reset user-selected forecast data
@@ -747,6 +895,24 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     isForecastLoading,
     overallColdStartForecastStatus,
     forecastJobNgenGlobalLogging,
+    logList,
+    logListDefault,
+    logs,
+    logDataPageSize,
+    logLists,
+    logListOptions,
+    selectedLogCategory,
+    selectedLogList,
+    selectedLogName,
+    selectedLogDisplay,
+    selectedLogTotalSize,
+    selectedLogCurrentPage,
+    selectedLogTotalPages,
+    selectedLogStartRow,
+    selectedLogEndRow,
+    selectedLogFilePath,
+    selectedLogByteOffset,
+    selectedLogStatus,
     getForecastJobs,
     loadSetupForecastTabData,
     loadForecastRunStatusTabData,
@@ -770,6 +936,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     setSelectedForecastRunId,
     resetSelectedForecastRunData,
     setSelectedForecastRowData,
+    populateLogListOptions,
+    resetUserLogRefs,
+    updateLogRefs,
     hardResetForecastRunStatusStore,
     resetFilters
   };

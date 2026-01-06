@@ -36,10 +36,21 @@
             <div style="width: 140px;">Configuration</div>
           </th>
           <td class="pl-5" nowrap>{{ forecastConfigurationName }}</td>
+          <th v-show="logList.length > 1" class="text-right font-bold" 
+            aria-label="Select Plot or Log Name" title="Select Plot or Log Name">
+            <div style="width: 140px;">Display</div>
+          </th>
+          <td v-show="logList.length > 1" class="pl-5" nowrap>
+            <Select id="DisplayOptions" class="p-select" v-model="selectedLogCategory" 
+              :options="logList" option-label="display_name" optionValue="name">
+            </Select>
+          </td>
+        </tr>
+        <tr>
           <th class="text-right font-bold" style="width: 140px;">
             <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
           </th>
-          <td class="pl-5" style="width: 100%;" :aria-label="'Job Data Directory is ' + resultsPathname"
+          <td class="row-span-3 pl-5" style="width: 100%;" :aria-label="'Job Data Directory is ' + resultsPathname"
             :title="'Job Data Directory is ' + resultsPathname">
             <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
           </td>
@@ -47,7 +58,7 @@
       </tbody>
     </table>
   </div>
-  <div class="flex">
+  <div v-show="selectedLogCategory == 'forecast plot'" class="flex">
     <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
       <div id="PlotGraphArea" ref="plotGraphArea" v-if="!plotGraphCheckboxesEmpty()">
         <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
@@ -108,10 +119,14 @@
       </div>
     </div>
   </div>
+  <div v-show="selectedLogCategory && selectedLogCategory != 'forecast plot'">
+    <LogDisplay/>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
+import LogDisplay from "../Common/LogDisplay.vue";
 
 import type { ToastMessageOptions } from "primevue/toast";
 
@@ -138,11 +153,15 @@ const {
   resultsPathname,
   forecastPlot,
   elapsedTime,
-  overallColdStartForecastStatus
+  overallColdStartForecastStatus,
+  selectedLogCategory,
+  logList
 } = storeToRefs(useForecastStore());
 
 const {
   loadForecastResultsTabData,
+  populateLogListOptions,
+  resetUserLogRefs,
 } = useForecastStore();
 
 const toast = useToast();
@@ -208,6 +227,9 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
 
   hilightTab(ForecastTabs.tab_results);
+
+  await populateLogListOptions([{ name: 'forecast plot', display_name: 'Streamflow Time Series' }]);
+  selectedLogCategory.value = 'forecast plot';
 
   resetUserPlotRefs([]);
 
@@ -328,7 +350,7 @@ function adjustPlotGraphColumns() {
         } else if (!isNaN(parseFloat(plotGraphDataRaw.value[d][key])) && isFinite(plotGraphDataRaw.value[d][key]) && plotGraphDataRaw.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
           try {
-            plotGraphDataRaw.value[d][key] = Number(plotGraphDataRaw.value[d][key].toFixed(5));
+            plotGraphDataRaw.value[d][key] = parseFloat(Number(plotGraphDataRaw.value[d][key]).toFixed(5));
           } catch (error) {
             console.error('Error rounding value ' + plotGraphDataRaw.value[d][key] + ': ', error);
           }
@@ -701,8 +723,11 @@ const toggleCustomizePlot = async () => {
   }
 }
 
-onUnmounted(async() => {
+onUnmounted(() => {
+  // make sure page clears all plot/log data when the user leaves
   resetUserPlotRefs([]);
+  logList.value = [];
+  resetUserLogRefs();
 })
 </script>
 
