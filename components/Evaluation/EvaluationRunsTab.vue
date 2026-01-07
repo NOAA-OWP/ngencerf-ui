@@ -102,7 +102,7 @@
       </div>
 
       <!-- Default is to show the user's list of Calibration runs -->
-      <div id="evaluationRunList">
+      <div v-else id="evaluationRunList">
 
         <div id="CalTable" class="w-max mx-auto">
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" :show-status="false"

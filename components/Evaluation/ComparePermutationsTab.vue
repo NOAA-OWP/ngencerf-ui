@@ -150,8 +150,7 @@ onMounted(() => {
 
         const response = await queryGetPlotNamesForComparison();
         if (response.ok) {
-          plotNames.value = response;
-          plotList.value = ((plotNames?.value as any)?._data as PlotNames)?.plot_names;
+          plotList.value = [];
 
           // Add Supplemental Table Options to the dropdown
           for (let t = 0; t < supplementalTableOptions.value.length; t++) {
@@ -160,10 +159,14 @@ onMounted(() => {
             }
           }
 
+          plotNames.value = response;
+          plotList.value = [...plotList.value, ...((plotNames?.value as any)?._data as PlotNames)?.plot_names];
+
           // If we only have one plot option, hide the dropdown and just default to that option
           if (plotList.value.length === 1) {
               selectedPlotName.value = plotList.value[0].name
           }
+          selectedPlotName.value = 'Performance Metrics';
         } else {
           toast.removeAllGroups();
           const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot names', life: ToastTimeout.timeoutError };
