@@ -20,6 +20,8 @@
               :totalSize="calibrationRunListTotalSize" :totalPages="calibrationRunListTotalPages"
               v-model:currentPage="calibrationRunListCurrentPage" @RefreshJobList="refreshJobList()" 
               @ResetFilters="resetFilters()" @BulkJobAction="bulkJobAction()" :showBulkActions="showBulkActions" 
+              :selected-jobs="selectedMultipleCalibrationRuns" :all-jobs="allCalibrationRuns" :visible-jobs="visibleCalibrationRuns"
+              @SelectAllJobs="selectAllJobs()" @SelectVisibleJobs="selectVisibleJobs()" @DeselectAllJobs="deselectAllJobs()"
               ref="jobFilterRef" />
             
             <ConfirmDialog></ConfirmDialog>
@@ -40,8 +42,8 @@
             <DataTable id="Datatable" :value="userCalibrationJobsListData" 
               scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:sortField="calibrationRunListSort.field" v-model:sortOrder="calibrationRunListSort.direction"
-              v-model:selection="selectedCalibrationRun" selectionMode="multiple" contextMenu
-              v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
+              v-model:selection="selectedCalibrationRun" selectionMode="multiple" dataKey="calibration_run_id" 
+              v-model:contextMenuSelection="selectedCalibrationRun" contextMenu @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)" @row-select="dtRowSelected($event)"
               @row-unselect="dtRowUnselect($event)">
 
@@ -277,7 +279,6 @@ const {
   userCalibrationRunData, 
   includeArchivedJobs,
   selectedBulkJobAction,
-  selectedBulkJobActionScope,
   calibrationRunListPageSize,
   calibrationRunListCurrentPage,
   calibrationRunListTotalPages,
@@ -315,6 +316,8 @@ const selectedCalibrationRun = ref<CalibrationJobListItem>();
 const selectedMultipleCalibrationRuns = ref<number[]>([]);
 const selectedMultipleCalibrationRunData = ref<CalibrationJobListItem[]>([]);
 const selectedMultipleCalibrationRunsText = ref<string>('');
+const allCalibrationRuns = ref<number[]>([]);
+const visibleCalibrationRuns = ref<number[]>([]);
 
 let interval: number | undefined;
 const runningColor = ref<string>('white');
@@ -406,7 +409,6 @@ onMounted(async () => {
     resetFilters();
 
     selectedBulkJobAction.value = 0;
-    selectedBulkJobActionScope.value = false;
 
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -417,6 +419,12 @@ onMounted(async () => {
     hardResetRunStatusStore();
     clearUserCalibrationRunData();
     await fetchUserCalibrationJobsListData();
+    visibleCalibrationRuns.value = userCalibrationJobsListData.value.map(job => job.calibration_run_id);
+    if (calibrationRunListTotalPages.value > 1) {
+      allCalibrationRuns.value = await fetchUserCalibrationJobsListIDsOnly();
+    } else {
+      allCalibrationRuns.value = visibleCalibrationRuns.value;
+    }
     interval = window.setInterval(toggleColor, 500); // Toggle every 500ms (0.5s)
   }
 })
@@ -446,7 +454,7 @@ const dtRowSelected = (e: any) => {
 }
 
 const dtRowUnselect = (e: any) => {
-  deleteCalibrationRunById(e.data);
+  removeCalibrationRun(e.data);
 }
 
 const highlightSelectedRows = () => {
@@ -485,7 +493,7 @@ function addCalibrationRun(calRun: CalibrationJobListItem): void {
  * In this example, it will remove any calibration run with id equal to 1.
  * @param id - The calibration run id to delete (default is 1).
  */
-function deleteCalibrationRunById(calRun: CalibrationJobListItem): void {
+function removeCalibrationRun(calRun: CalibrationJobListItem): void {
   selectedMultipleCalibrationRuns.value = selectedMultipleCalibrationRuns.value.filter(
     run => run !== calRun.calibration_run_id
   );
@@ -581,27 +589,49 @@ const refreshJobList = async () => {
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
   await fetchUserCalibrationJobsListData();
+  visibleCalibrationRuns.value = userCalibrationJobsListData.value.map(job => job.calibration_run_id);
+  if (calibrationRunListTotalPages.value > 1) {
+    allCalibrationRuns.value = await fetchUserCalibrationJobsListIDsOnly();
+  } else {
+    allCalibrationRuns.value = visibleCalibrationRuns.value;
+  }
   isLoading.value = false;
 }
 
+const selectAllJobs = () => {
+  // select all jobs on ALL pages
+  selectedCalibrationRun.value = userCalibrationJobsListData.value;
+  selectedMultipleCalibrationRuns.value = allCalibrationRuns.value;
+  selectedMultipleCalibrationRunData.value = userCalibrationJobsListData.value;
+}
+
+const selectVisibleJobs = () => {
+  // select all jobs on current page only
+  selectedCalibrationRun.value = userCalibrationJobsListData.value;
+  selectedMultipleCalibrationRuns.value = visibleCalibrationRuns.value;
+  selectedMultipleCalibrationRunData.value = userCalibrationJobsListData.value;
+}
+
+const deselectAllJobs = () => {
+  selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
+  selectedMultipleCalibrationRunData.value = [];
+}
+
 const bulkJobAction = async () => {
-  // If scope is all pages (true) and there are multiple pages, retrieve list of job IDs. 
-  // Otherwise just use the list from the currently displayed page.
-  if (selectedBulkJobActionScope.value && calibrationRunListTotalPages.value > 1) {
-    isLoading.value = true;
-    selectedMultipleCalibrationRuns.value = await fetchUserCalibrationJobsListIDsOnly();
-    isLoading.value = false;
+  if (selectedMultipleCalibrationRuns.value.length > 0) {
+    showHideMultOps.value = true;
+    // wait a tick for the multi-job menu to display so that it only shows the confirm button
+    nextTick(async () => {
+      if (multiJobRef.value) {
+        // ask the user to confirm the action - MultipleJobOperations will take care of the rest
+        multiJobRef.value.confirmAction(selectedBulkJobAction.value);
+      }
+    });
   } else {
-    selectedMultipleCalibrationRuns.value = userCalibrationJobsListData.value.map(job => job.calibration_run_id);
+    const tMsg: ToastMessageOptions = { severity: "error", summary: 'No Jobs Selected.', detail: 'A bulk action cannot be applied when no jobs are selected.', life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
-  showHideMultOps.value = true;
-  // wait a tick for the multi-job menu to display so that it only shows the confirm button
-  nextTick(async () => {
-    if (multiJobRef.value) {
-      // ask the user to confirm the action - MultipleJobOperations will take care of the rest
-      multiJobRef.value.confirmAction(selectedBulkJobAction.value);
-    }
-  });
 }
 
 // Function to toggle the color between 'red' and 'blue'

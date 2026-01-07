@@ -114,22 +114,27 @@
         </div>
       </div>
 
-      <div v-show="showBulkJobAction && totalSize > 1 && !filterInactive">
+      <div v-show="showBulkJobAction && totalSize > 1">
         <hr class="border-t-2 border-gray-300 my-4">
         <div class="flex gap-2">
+          <div class="text-left">
+            <Button id="SelectAllJobs" class="c-blue mt-[5px]" label="Select All Jobs" @click="selectAllJobs()"
+              aria-label="Select All Jobs" title="Select All Jobs" :disabled="props.selectedJobs == props.allJobs">
+            </Button><br />
+            <Button v-show="totalPages > 1" id="SelectVisibleJobs" class="c-blue mt-[5px]" label="Select Visible Jobs" @click="selectVisibleJobs()"
+              aria-label="Select Visible Jobs" title="Select Visible Jobs" :disabled="props.selectedJobs == props.visibleJobs">
+            </Button><br />
+            <Button id="DeselectAllJobs" class="c-blue mt-[5px]" label="Deselect All Jobs" @click="deselectAllJobs()"
+              aria-label="Deselect All Jobs" title="Deselect All Jobs" :disabled="props.selectedJobs.length == 0">
+            </Button>
+          </div>
           <div>
-            Apply bulk action to filtered jobs:
+            Apply bulk action to selected jobs:
           </div>
           <div>
             <Select id="selectedBulkJobAction" v-model="selectedBulkJobAction" :disabled="disableAll"
               :options="bulkJobActionsListDisplay" optionLabel="name" optionValue="value" 
               class="user-select w-12" aria-label="Select Bulk Job Action" title="Select Bulk Job Action">
-            </Select>
-          </div>
-          <div v-show="totalPages > 1">
-            <Select id="selectedBulkJobActionScope" v-model="selectedBulkJobActionScope" :disabled="disableAll"
-              :options="bulkJobActionScopeList" optionLabel="name" optionValue="value" 
-              class="user-select w-12" aria-label="Select This Page or All Pages" title="Select This Page or All Pages">
             </Select>
           </div>
           <div>
@@ -175,11 +180,19 @@ const {
   jobIdEnd,
   minJobId,
   maxJobId,
-  selectedBulkJobAction,
-  selectedBulkJobActionScope
+  selectedBulkJobAction
 } = storeToRefs(useUserDataStore());
 
-const emit = defineEmits(["ModulesFilterDialogClosing", "RefreshJobList", "ResetFilters", "BulkJobAction", "update:currentPage"]);
+const emit = defineEmits([
+  "ModulesFilterDialogClosing", 
+  "RefreshJobList", 
+  "ResetFilters", 
+  "BulkJobAction", 
+  "selectAllJobs",
+  "selectVisibleJobs",
+  "deselectAllJobs",
+  "update:currentPage"
+]);
 
 const ptCheckbox = ref({
   box: { style: { "border": "2px solid #0c5274" } },
@@ -210,6 +223,9 @@ const calibrationRunGageList = computed(() => {
 });
 
 interface Props {
+  selectedJobs?: number[];
+  allJobs?: number[];
+  visibleJobs?: number[];
   disableAll?: boolean;
   totalSize?: number;
   totalPages?: number;
@@ -224,6 +240,9 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  selectedJobs: () => [],
+  allJobs: () => [],
+  visibleJobs: () => [],
   disableAll: true,
   totalSize: 0,
   totalPages: 1,
@@ -248,17 +267,12 @@ const bulkJobActionsList: { name: string, value: number }[] = [
     value: JobStatusAction[key as keyof typeof JobStatusAction]
   }))
 ];
-const bulkJobActionScopeList = [
-  { name: "this page only", value: false },
-  { name: "all pages", value: true }
-]
 const showBulkJobAction = ref<boolean>(false);
 
 const bulkJobActionsListDisplay = computed(() => {
   // if specific bulk actions are passed in based on archived/locked status of jobs in list, 
-  // AND we're only applying a bulk action to a single page (selectedBulkJobActionScope = false), 
   // filter the available actions here
-  if (props.showBulkActions.length > 0 && !selectedBulkJobActionScope.value) {
+  if (props.showBulkActions.length > 0) {
     return bulkJobActionsList.filter(option => {
       return props.showBulkActions.includes(option.value)
     });
@@ -346,6 +360,18 @@ const bulkJobAction = () => {
   if (selectedBulkJobAction.value && selectedBulkJobAction.value > 0) {
     emit("BulkJobAction");
   }
+}
+
+const selectAllJobs = () => {
+  emit("selectAllJobs");
+}
+
+const selectVisibleJobs = () => {
+  emit("selectVisibleJobs");
+}
+
+const deselectAllJobs = () => {
+  emit("deselectAllJobs");
 }
 
 /**
