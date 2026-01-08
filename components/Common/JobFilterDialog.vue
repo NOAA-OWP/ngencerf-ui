@@ -117,17 +117,6 @@
       <div v-show="showBulkJobAction && totalSize > 1">
         <hr class="border-t-2 border-gray-300 my-4">
         <div class="flex gap-2">
-          <div class="text-left">
-            <Button id="SelectAllJobs" class="c-blue mt-[5px]" label="Select All Jobs" @click="selectAllJobs()"
-              aria-label="Select All Jobs" title="Select All Jobs" :disabled="props.selectedJobs == props.allJobs">
-            </Button><br />
-            <Button v-show="totalPages > 1" id="SelectVisibleJobs" class="c-blue mt-[5px]" label="Select Visible Jobs" @click="selectVisibleJobs()"
-              aria-label="Select Visible Jobs" title="Select Visible Jobs" :disabled="props.selectedJobs == props.visibleJobs">
-            </Button><br />
-            <Button id="DeselectAllJobs" class="c-blue mt-[5px]" label="Deselect All Jobs" @click="deselectAllJobs()"
-              aria-label="Deselect All Jobs" title="Deselect All Jobs" :disabled="props.selectedJobs.length == 0">
-            </Button>
-          </div>
           <div>
             Apply bulk action to selected jobs:
           </div>
@@ -140,6 +129,21 @@
           <div>
             <Button v-if="selectedBulkJobAction" class="ngenButtonDiv ml-8" @click="bulkJobAction()" :disabled="disableAll"
               aria-label="Apply Bulk Action" title="Apply Bulk Action">Apply Bulk Action</Button>
+          </div>
+          <div>
+            <Button id="SelectAllJobs" class="c-blue mt-[5px]" label="Select All Jobs" @click="selectAllJobs()"
+              aria-label="Select All Jobs" title="Select All Jobs" :disabled="props.selectedJobs == props.allJobs">
+            </Button>
+          </div>
+          <div v-if="totalPages > 1">
+            <Button id="SelectVisibleJobs" class="c-blue mt-[5px]" label="Select Visible Jobs" @click="selectVisibleJobs()"
+              aria-label="Select Visible Jobs" title="Select Visible Jobs" :disabled="props.selectedJobs == props.visibleJobs">
+            </Button>
+          </div>
+          <div>
+            <Button id="DeselectAllJobs" class="c-blue mt-[5px]" label="Deselect All Jobs" @click="deselectAllJobs()"
+              aria-label="Deselect All Jobs" title="Deselect All Jobs" :disabled="props.selectedJobs.length == 0">
+            </Button>
           </div>
         </div>
       </div>
