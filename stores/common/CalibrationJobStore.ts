@@ -19,7 +19,6 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
 
   const calibrationDownloadJobID = ref<number | null>(null);
   const calibrationDownloadFileName = ref<string | null>(null);
-  const calibrationDownloadStatusIntervalId = ref<number>();
 
   /**
  * returns list of calibration job data from server
@@ -205,21 +204,18 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     });
     
     // create an interval to keep checking download status every 10 seconds
-    if (calibrationDownloadStatusIntervalId.value) {
-      clearInterval(calibrationDownloadStatusIntervalId.value);
-    }
-    calibrationDownloadStatusIntervalId.value = setInterval(async () => {
+    let calibrationDownloadStatusIntervalId = setInterval(async () => {
       getCalibrationJobZipStatus(calibration_run_id)
       .then(response => {
         if (response && response._data.zip_status) {
           if (response._data.zip_status === 'done') {
-            clearInterval(calibrationDownloadStatusIntervalId.value);
+            clearInterval(calibrationDownloadStatusIntervalId);
             downloadCalibrationJobZip(calibration_run_id);
           }
         } else {
-          clearInterval(calibrationDownloadStatusIntervalId.value);
-          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Download Status', life: ToastTimeout.timeoutWarn };
-          toast.add(tMsg); addToastRecord(tMsg);
+          clearInterval(calibrationDownloadStatusIntervalId);
+          const message = `Error: ${response._data.zip_status} Unable to get Calibration Job Download Status`;
+          throw new Error(message);
         }
       });
     }, 5000) as unknown as number;
