@@ -266,33 +266,26 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       const getStatusResponse: any = await getStatus();
 
       if (getStatusResponse.status === 200) {
-        // TODO: create forecastJob interface
-        const forecastJob: any = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
-        
-        if (!forecastJob) {
-          return ['No forecast job found'];
-        }
-
         // set forecastConfiguration, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
-        forecastConfigurationName.value = forecastJob?.configuration;
-        forecastJobStatus.value = forecastJob?.status;
-        coldStartJobStatus.value = forecastJob?.cold_start_run?.status;
-        failureMessages.value = forecastJob?.failure_messages;
+        forecastConfigurationName.value = getStatusResponse?._data?.configuration;
+        forecastJobStatus.value = getStatusResponse?._data?.status;
+        coldStartJobStatus.value = getStatusResponse?._data?.cold_start_run?.status;
+        failureMessages.value = getStatusResponse?._data?.failure_messages;
 
-        if (forecastJob?.cold_start_run?.submit_date) {
-          submitTimeDate.value = new Date(forecastJob?.cold_start_run.submit_date as string);
-        } else if (forecastJob?.submit_date) {
-          submitTimeDate.value = new Date(forecastJob?.submit_date as string);
+        if (getStatusResponse?._data?.cold_start_run?.submit_date) {
+          submitTimeDate.value = new Date(getStatusResponse?._data?.cold_start_run.submit_date as string);
+        } else if (getStatusResponse?._data?.submit_date) {
+          submitTimeDate.value = new Date(getStatusResponse?._data?.submit_date as string);
         }
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
         } else {
-          errorMessages.push(`Invalid submit date: ${forecastJob?.submit_date}`);
+          errorMessages.push(`Invalid submit date: ${getStatusResponse?._data?.submit_date}`);
         }
         
-        if (forecastJob?.cold_start_run?.elapsed_time || forecastJob?.elapsed_time) {
+        if (getStatusResponse?._data?.cold_start_run?.elapsed_time || getStatusResponse?._data?.elapsed_time) {
           // set elapsedTime
-          setElapsedTime(forecastJob);
+          setElapsedTime(getStatusResponse?._data);
         }
       } else {
         return useApiErrorResponsePreprocess(getStatusResponse);
@@ -580,7 +573,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationRunForForecast.value?.calibration_run_id })
+      body: JSON.stringify({ forecast_run_id: forecastJobId.value })
     });
   };
 

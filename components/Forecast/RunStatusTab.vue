@@ -315,14 +315,13 @@ onMounted(async () => {
 
   // highlight the tab when selected
   hilightTab(ForecastTabs.tab_runStatus);
-
-  // load Run/Status tab data
-  await loadForecastRunStatusTabData();
+  
   // get calibration job data if we don't already have it
   if (!userCalibrationRunData.value) {
     await fetchUserCalibrationRunData();
   }
   if (forecastJobId.value) {
+    await loadForecastRunStatusTabData();
     await populateLogListOptions();
     createColdStartAndForecastStatusInterval();
     createElapsedTimeInterval();

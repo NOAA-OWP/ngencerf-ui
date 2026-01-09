@@ -55,20 +55,6 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="created_at" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Creation Date</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.created_at"
-                  :aria-label="'Created at ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
-                  :title="'Created at ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
-                </span>
-              </template>
-            </Column>
             <Column :pt="ptColumn" field="forecast_run_id" header="Forecast Job ID" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.forecast_run_id" :aria-label="'Forecast Job ID ' + slotProps.data.forecast_run_id"

@@ -297,7 +297,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
    * @return {any}
    */
   const getVerificationStatus = async (): Promise<any> => {
-    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_verification_status/`, {
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_status/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
