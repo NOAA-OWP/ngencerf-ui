@@ -121,14 +121,10 @@
             Apply bulk action to selected jobs:
           </div>
           <div>
-            <Select id="selectedBulkJobAction" v-model="selectedBulkJobAction" :disabled="disableAll"
-              :options="bulkJobActionsListDisplay" optionLabel="name" optionValue="value" 
+            <Select id="selectedBulkJobAction" v-model="selectedBulkJobAction" :disabled="disableAll || props.selectedJobs.length == 0"
+              :options="bulkJobActionsListDisplay" optionLabel="name" optionValue="value" @change="bulkJobAction()"
               class="user-select w-12" aria-label="Select Bulk Job Action" title="Select Bulk Job Action">
             </Select>
-          </div>
-          <div>
-            <Button v-if="selectedBulkJobAction" class="ngenButtonDiv ml-8" @click="bulkJobAction()" :disabled="disableAll"
-              aria-label="Apply Bulk Action" title="Apply Bulk Action">Apply Bulk Action</Button>
           </div>
           <div>
             <Button id="SelectAllJobs" class="c-blue mt-[5px]" label="Select All Jobs" @click="selectAllJobs()"

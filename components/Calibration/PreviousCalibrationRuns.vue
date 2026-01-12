@@ -885,6 +885,7 @@ const acceptDelete = (selectedRunId: number) => {
   });
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 /**
@@ -941,6 +942,7 @@ const acceptMultipleDelete = () => {
 
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 /**
@@ -983,6 +985,7 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
 
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 /**
@@ -1037,6 +1040,7 @@ const acceptMultipleArchive = (archiveJob: boolean) => {
   });
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 
@@ -1060,6 +1064,7 @@ const acceptLock = (selectedRunId: number, lock: boolean) => {
   });
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 /**
@@ -1101,6 +1106,7 @@ const acceptMultipleLock = (lock: boolean) => {
   });
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 /**
