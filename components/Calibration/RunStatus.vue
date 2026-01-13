@@ -1019,6 +1019,7 @@ onUnmounted(() => {
   validationControlStatus.value = undefined;
   validationBestStatus.value = undefined;
   validControlAndValidBestStatus.value = undefined;
+  submitTimeDate.value = undefined;
   resetUserPlotRefs([]);
 })
 </script>
