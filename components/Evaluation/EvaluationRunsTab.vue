@@ -82,9 +82,9 @@
           <ContextMenu :pt="{ root: { id: ' cp-context-menu' } }" class="bg-white" ref="cpContextMenu"
             :model="cmCompareRun"></ContextMenu>
           <DataTable id="compare-list" :value="computedGageCalibrationRunList" scrollable scroll-height="400px"
-            sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="multiple"
-            v-model:selection="selectedCalibrationCompareRuns" :rowStyle="rowStyle" class="boxed"
-            @rowContextmenu="onRowCpContextMenu">
+            sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem" 
+            selectionMode="multiple" :metaKeySelection="true" @rowContextmenu="onRowCpContextMenu"
+            v-model:selection="selectedCalibrationCompareRuns" :rowStyle="rowStyle" class="boxed">
             <Column :pt="ptValColumns" v-for="(col, colIndex) in gageevaluationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field" sortable>
             </Column>

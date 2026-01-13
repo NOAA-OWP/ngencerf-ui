@@ -27,7 +27,7 @@
             <ConfirmDialog></ConfirmDialog>
 
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[250px]" ref="crContextMenu"
-              :model="buildContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+              :model="buildContextMenu" @hide="onRowContextMenuHide"></ContextMenu>
 
             <div v-if="userCalibrationJobsListData.length > 0 && calibrationRunListTotalSize > 0" class="pagination-box">
               <div class="pagination-rows">
@@ -42,7 +42,7 @@
             <DataTable id="Datatable" :value="userCalibrationJobsListData" 
               scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:sortField="calibrationRunListSort.field" v-model:sortOrder="calibrationRunListSort.direction"
-              v-model:selection="selectedCalibrationRun" selectionMode="multiple" dataKey="calibration_run_id" 
+              v-model:selection="selectedCalibrationRun" selectionMode="multiple" :metaKeySelection="true" dataKey="calibration_run_id" 
               v-model:contextMenuSelection="selectedCalibrationRun" contextMenu @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)" @row-select="dtRowSelected($event)"
               @row-unselect="dtRowUnselect($event)">
@@ -437,7 +437,9 @@ onBeforeUnmount(() => {
 });
 
 const onRowContextMenu = (event: any) => {
-  if (selectedMultipleCalibrationRuns.value.length <= 1) {
+  if (selectedMultipleCalibrationRuns.value.length <= 1 || !selectedMultipleCalibrationRuns.value.includes(selectedCalibrationRun.value.calibration_run_id)) {
+    selectedMultipleCalibrationRuns.value = [selectedCalibrationRun.value.calibration_run_id];
+    selectedMultipleCalibrationRunData.value = [selectedCalibrationRun.value];
     crContextMenu.value.show(event.originalEvent);
   }
   else {
@@ -449,7 +451,21 @@ const onRowContextMenu = (event: any) => {
   })
 };
 
+const onRowContextMenuHide = (event: any) => {
+  selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
+  selectedMultipleCalibrationRunData.value = [];
+  nextTick(async () => {
+    highlightSelectedRows();
+  })
+};
+
 const dtRowSelected = (e: any) => {
+  if (!e.originalEvent.ctrlKey && !e.originalEvent.shiftKey) {
+    // single-click - clear any previous multiple selections
+    selectedMultipleCalibrationRuns.value = [];
+    selectedMultipleCalibrationRunData.value = [];
+  }
   addCalibrationRun(e.data);
 }
 
