@@ -917,7 +917,7 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'calibrationtimes must be within time_range. Was not saved.', life: ToastTimeout.timeoutWarn };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'Calibration times must be within time_range. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -1011,6 +1011,19 @@ const areValidationTimesValidated = (): boolean => {
     }
   }
 
+  // set conditions to check if validation are not within time_range
+  const isAvSimStartWithinRange = avSimStartDate >= rangeStartDate && avSimStartDate <= rangeEndDate;
+  const isAvSimEndWithinRange = avSimEndDate >= rangeStartDate && avSimEndDate <= rangeEndDate;
+  const isAvCalStartWithinRange = avCalStartDate >= rangeStartDate && avCalStartDate <= rangeEndDate;
+  const isAvCalEndWithinRange = avCalEndDate >= rangeStartDate && avCalEndDate <= rangeEndDate;
+
+  // check if calibration_times are not within time_range
+  if (!isAvSimStartWithinRange || !isAvSimEndWithinRange || !isAvCalStartWithinRange || !isAvCalEndWithinRange) {
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'Validaton times must be within time_range. Was not saved.', life: ToastTimeout.timeoutWarn };
+    toast.add(tMsg); addToastRecord(tMsg);
+    return false;
+  }
+
   // check if avSimEndDate is not after avSimStartDate
   if (avSimStartDate >= avSimEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Simulation End must be after Simulation Start', life: ToastTimeout.timeoutError };
@@ -1077,36 +1090,50 @@ const saveTuningData = () => {
     } else {
       tuningStore_data_loading.value = false;
 
+      let messageBody = '';
       if (saveTuningTabResponse._data && saveTuningTabResponse._data.response_type) {
         if (saveTuningTabResponse._data.response_type === "validation_error") {
           if (saveTuningTabResponse._data.validation_errors) {
-            if (saveTuningTabResponse._data.validation_errors && saveTuningTabResponse._data.validation_errors.parameters) {
-              saveTuningTabResponse._data.validation_errors.parameters.forEach((err: GeneralErrorResponse) => {
-                if (Object.keys(err).length) {
-                  (err as any as NonFieldError).non_field_errors.forEach(er => {
-                    const tMsg: ToastMessageOptions = {
-                      severity: 'error',
-                      summary: `Error Saving Tuning Data`,
-                      detail: er,
-                      life: ToastTimeout.timeoutError,
-                    };
-                    toast.add(tMsg); addToastRecord(tMsg);
+            if (saveTuningTabResponse._data.validation_errors) {
+              Object.keys(saveTuningTabResponse._data.validation_errors).forEach((error_type: string) => {
+                if (Array.isArray(saveTuningTabResponse._data.validation_errors[error_type])) {
+                  saveTuningTabResponse._data.validation_errors[error_type].forEach((error_item: any) => {
+                    Object.keys(error_item).forEach((error_field: string) => {
+                      error_item[error_field].forEach((message: string) => {
+                        messageBody += error_field + ': ' + message + '\n';
+                      });
+                    });
+                  })
+                } else {
+                  Object.keys(saveTuningTabResponse._data.validation_errors[error_type]).forEach((error_field: string) => {
+                    saveTuningTabResponse._data.validation_errors[error_type][error_field].forEach((message: string) => {
+                      messageBody += error_field + ': ' + message + '\n';
+                    });
                   });
                 }
               });
             }
           }
         }
-      } else {
-        const errorMessage = saveTuningTabResponse?._data.message;
-        const tMsg: ToastMessageOptions = {
-          severity: 'error',
-          summary: `Error Saving Tuning Data`,
-          detail: errorMessage,
-          life: ToastTimeout.timeoutError,
-        };
-        toast.add(tMsg); addToastRecord(tMsg);
+      } 
+      if (saveTuningTabResponse?._data?.response_type === 'error' && saveTuningTabResponse?._data?.message) {
+        // string could be JSON - try parsing it; otherwise output it verbatim
+        try {
+          const jsonMessages = JSON.parse(saveTuningTabResponse._data.message);
+          for (const message of jsonMessages) {
+            messageBody += message + '\n';
+          }
+        } catch(e) {
+          messageBody += saveTuningTabResponse._data.message;
+        }
       }
+      const tMsg: ToastMessageOptions = {
+        severity: 'error',
+        summary: `Error Saving Tuning Data`,
+        detail: messageBody,
+        life: ToastTimeout.timeoutError,
+      };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   };
 
