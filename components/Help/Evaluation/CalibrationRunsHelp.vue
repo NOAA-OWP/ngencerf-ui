@@ -2,16 +2,37 @@
     <div class="_help-page">
         <div class="_help-title">Evaluation - Calibration Runs Tab</div>
         <p class="_help-subtitle">
-            Displays table of calibration jobs.<br />
-            <br />
-            Select a job then right click for available actions.<br />
-            <br />
-            If the Evaluate action selected has more that one validation run, the table is populated with
-            a list of associated validation runs. Select a run, then right click for available actions.
+            Displays table of successfully completed calibration jobs available for evaluation.
         </p>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
+        <hr class="my-6 border-black" />
+        <div style="margin-left: 5px; margin-top:20px; margin-right: 5px;">
+            <div class="text-center font-bold text-xl mb-3">General Rules</div>
+            <div style="margin-left: 10px;">
+            <ul style="list-style-type: disc; margin-left: 20px;">
+                <li>Use filters to narrow the list of calibration jobs.</li>
+                <li>Use <strong>Ctrl+Click</strong> to select or deselect multiple individual jobs.</li>
+                <li>Use <strong>Shift+Click</strong> to select a range of jobs between the last selected job and the clicked job.</li>
+                <li>Select a job, then right-click to view available actions.</li>
+                <li>
+                If the <strong>Compare Permutations</strong> action is selected, the table will display jobs with the same gage ID.
+                <ul class="list-disc list-outside ml-6 space-y-0">
+                    <li>When the "Select Calibration Runs to Compare" table appears, the <strong>View Calibration Runs</strong> button is automatically shown. Click it to return to the main Calibration Runs table.</li>
+                    <li>When 2 or more jobs are selected, the "Compare" button automatically appears. Click it to compare permutations.</li>
+                </ul>
+                </li>
+                <li>
+                If the <strong>Evaluate</strong> action is selected and the job has multiple validation runs, the table will display the associated validation runs.
+                <ul class="list-disc list-outside ml-6 space-y-0">
+                    <li>When the "Associated Validation Runs" table appears, the <strong>View Calibration Runs</strong> button is automatically shown. Click it to return to the main Calibration Runs table.</li>
+                    <li>Select a validation run, then right-click to access the available actions for that run.</li>
+                </ul>
+                </li>
+            </ul>
+            </div>
+        </div>
         <hr class="my-6 border-black" />
 
         <div id="filters" class="text-center font-bold text-xl mb-3">Filtering Calibration Jobs</div>
@@ -58,14 +79,6 @@
             <p><strong>Refresh List</strong></p>
             <p class="mb-2">Refreshes the list of filtered jobs.</p>
 
-            <p><strong>Include Archived</strong></p>
-            <p class="mb-2">Check this box to include jobs that have been archived in the table.</p>
-            <ul class="list-disc list-outside ml-6 mb-4 space-y-0.5">
-                <li>When enabled, archived jobs will be shown along with active jobs.</li>
-                <li>All other filters (Headwater Basin Gage, Status, Modules, Created Date, Job ID) will also apply to archived jobs.</li>
-                <li>When disabled, only active (non-archived) jobs are displayed.</li>
-            </ul>
-
         </div>
         
         <hr class="my-6 border-black" />
@@ -107,10 +120,6 @@
                         generate data for an alternate iteration from the calibration run.</td>
                 </tr>
                 <tr>
-                    <td class="td1">View Valdiation Run Stats</td>
-                    <td class="td2">View the status and some statics of the specific validation run.</td>
-                </tr>
-                <tr>
                     <td class="td1">View Calibration Details</td>
                     <td class="td2">View the setup details of the calibration run.</td>
                 </tr>
@@ -127,12 +136,16 @@
                     <td class="td2">Delete the selected calibration job and all it's associated validation jobs. User
                         will remain on this page.</td>
                 </tr>
+                <tr>
+                    <td class="td1"">Archive</td>
+                    <td class="td2">Archive the selected calibration job(s).
+                        Archived jobs will not longer appear in any Calibration Runs table.<br /><br />Archived jobs 
+                        cannot be used directly to evaluate a job. To use one, open the Calibration workflow and 
+                        unarchive the job from the Calibration Runs tab.
+                    </td>
+                </tr>
             </tbody>
         </table>
-        <br />
-        <p class="text-center">The <strong>"View Calibrations Runs"</strong> button will appear for the<br />
-            <strong>Compare Permutations</strong> and <strong>Validation Runs</strong> actions.<br />
-            Clicking this button will populate the table with the list of calibration jobs.</p>
     </div>
 </template>
 
