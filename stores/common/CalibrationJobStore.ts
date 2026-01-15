@@ -188,7 +188,7 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
  * Get calibration data as zip file
  */
   const getCalibrationJobZip = async (calibration_run_id: number) => {
-    await fetch(`${ngencerfBaseUrl}/calibration/start_zip_for_calibration_job/`, {
+    await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/start_zip_for_calibration_job/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
