@@ -105,7 +105,7 @@
       <div v-else id="evaluationRunList">
 
         <div id="CalTable" class="w-max mx-auto">
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" :show-status="false"
+          <JobFilterDialog id="JobFilterDialog" :disable-all="false" :show-status="false" :show-archived="false"
           :totalSize="evaluationRunListTotalSize" :totalPages="evaluationRunListTotalPages"
           v-model:currentPage="evaluationRunListCurrentPage"
           @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
