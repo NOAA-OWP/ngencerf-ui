@@ -820,25 +820,20 @@ const AutoValChecked = () => {
 const validateAndBuildRequestBody = (): boolean => {
   saveTuningTabRequestBody.value.calibration_run_id = calibrationJobId.value;
 
-  if (areCalibrationTimesSet()) {
-    if (areCalibrationTimesValidated()) {
-      saveTuningTabRequestBody.value.calibration_times = {
-        simulation_start_time: simStartTime.value,
-        simulation_end_time: simEndTime.value,
-        calibration_start_time: calStartTime.value,
-        calibration_end_time: calEndTime.value
-      };
-    }
-  }
-  if (areValidationTimesSet()) {
-    if (areValidationTimesValidated()) {
-      saveTuningTabRequestBody.value.validation_times = {
-        simulation_start_time: avSimStartTime.value,
-        simulation_end_time: avSimEndTime.value,
-        validation_start_time: avCalStartTime.value,
-        validation_end_time: avCalEndTime.value
-      };
-    }
+  // only send calibration/validation dates in the payload to the server if ALL are valid
+  if (areCalibrationTimesSet() && areCalibrationTimesValidated() && areValidationTimesSet() && areValidationTimesValidated()) {
+    saveTuningTabRequestBody.value.calibration_times = {
+      simulation_start_time: simStartTime.value,
+      simulation_end_time: simEndTime.value,
+      calibration_start_time: calStartTime.value,
+      calibration_end_time: calEndTime.value
+    };
+    saveTuningTabRequestBody.value.validation_times = {
+      simulation_start_time: avSimStartTime.value,
+      simulation_end_time: avSimEndTime.value,
+      validation_start_time: avCalStartTime.value,
+      validation_end_time: avCalEndTime.value
+    };
   }
 
   saveTuningTabRequestBody.value.automatic_validation = automatic_validation.value;
