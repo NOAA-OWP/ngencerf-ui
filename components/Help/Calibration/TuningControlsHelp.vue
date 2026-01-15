@@ -19,57 +19,66 @@
                 Progress area to go to that specific setup tab.</em>
         </p>
         <div style="margin-left: 25px; margin-top:20px;">
-            <p><strong>General Rules:</strong></p>
+            <div class="text-center font-bold text-xl mb-3">General Rules</div>
             <div style="margin-left: 10px;">
                 <ul style="list-style-type: disc;margin-left: 20px;">
-                    <li>The observational and forcing data must have been selected or uploaded in order to select Time
-                        Controls.</li>
-                    <li>The formulation must have been chosen to select the Output Variable to Calibrate and Tuning
-                        Parameters.</li>
+                    <li>When entering data manually, press <strong>Enter</strong> to confirm each field;
+                        otherwise, the value will be discarded.</li>
+                    <li>When using the Date Time widget, click <strong>Select</strong> to confirm the field.</li>
+                    <li>Forcing and observational data must have been selected on the Headwater Basin Gage
+                        tab to enter Time Controls.</li>
+                    <li>The formulation must have been saved on the Formulation tab to select the Output
+                        Variable to Calibrate and Tuning Parameters.</li>
+                    <li>Partial saves are allowed, but all fields in the Time Controls section 
+                        must be completed before saving that section.</li>
                 </ul>
             </div>
             <br />
-            <p><strong>Time Control Rules:</strong></p>
-            <div style="margin-left: 10px;">
-                <ul style="list-style-type: disc;margin-left: 20px;">
-                    <li>Calibration Start and End times must be within the Calibration Simulation Start and End times.
-                    </li>
-                    <li>Validation Start and End times must be within the Validation Simulation Start and End times.
-                    </li>
-                    <li>Calibration Start and End Times cannot overlap Validation Start and End times.</li>
-                    <li>Validation Simulation times must encompass both the Calibration and the Validation times.</li>
-                    <li>Times are hourly and must be specified to the top of the hour (hh:00).</li>
-                </ul>
-            </div>
-            <br />
-            <p><strong>Example:</strong></p>
-            <span><strong>Calibration Times:</strong></span>
-            <div style="margin-left: 10px;">
-                <ul style="list-style-type: disc;margin-left: 20px;">
-                    <li>Simulation Start: 2015-10-01 00:00</li>
-                    <li>Calibration Start: 2016-10-01 00:00</li>
-                    <li>Simulation End: 2017-09-30 23:00</li>
-                    <li>Calibration End: 2017-09-30 23:00</li>
-                </ul>
-            </div>
-            <br />
-            <span><strong>Validation Times:</strong></span>
-            <div style="margin-left: 10px;">
-                <ul style="list-style-type: disc;margin-left: 20px;">
-                    <li>Simulation Start: 2016-10-01 00:00</li>
-                    <li>Validation Start: 2019-10-30 00:00</li>
-                    <li>Simulation End: 2020-09-30 23:00</li>
-                    <li>Validation End: 2020-09-30 23:00</li>
-                </ul>
+            
+            <div id="time-control-rules" class="mb-6">
+                <div class="text-center font-bold text-xl mb-3">Time Control Rules</div>
+
+                <!-- Rules -->
+                <div class="ml-2 space-y-3">
+                    <p><strong>1. Calibration Time Controls</strong></p>
+                    <ul class="list-disc list-outside ml-9 space-y-0">
+                        <li>Calibration period must fall within the <strong>Calibration Simulation</strong> period.</li>
+                        <li>Calibration period cannot overlap the <strong>Validation</strong> period.</li>
+                    </ul>
+
+                    <p><strong>2. Validation Time Controls</strong></p>
+                    <ul class="list-disc list-outside ml-9 space-y-0">
+                        <li>Validation period must fall within the <strong>Validation Simulation</strong> period.</li>
+                        <li>Vaidation Simulation period must encompass the entire <strong>Calibration</strong> period.</li>
+                    </ul>
+
+                    <p><strong>3. Hourly requirement</strong></p>
+                    <ul class="list-disc list-outside ml-9 space-y-1">
+                        <li>All times are in full hours and must be specified at the top of the hour (hh:00).</li>
+                    </ul>
+                </div>
+
+                <!-- Example -->
+                <div class="mt-4">
+                    <p class="font-bold mb-2">Example</p>
+
+                    <div class="ml-2 space-y-2">
+                        <p><strong>Calibration Times:</strong></p>
+                        <ul class="list-disc list-outside ml-6 space-y-0">
+                            <li>Simulation period: 2015-10-01 00:00 → 2017-09-30 23:00</li>
+                            <li>Calibration period: 2016-10-01 00:00 → 2017-09-30 23:00</li>
+                        </ul>
+
+                        <p><strong>Validation Times:</strong></p>
+                        <ul class="list-disc list-outside ml-6 space-y-0">
+                            <li>Simulation period: 2016-10-01 00:00 → 2020-09-30 23:00</li>
+                            <li>Validation period: 2019-10-30 00:00 → 2020-09-30 23:00</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
-        <br />
         <hr>
-        <br />
-        <p style="line-height:20px;text-align:center;">
-            <b>IMPORTANT</b><br /><em>When manually entering data, the <b>Enter</b> key must be hit otherwise data
-                in that field will be discarded.</em>
-        </p>
         <br />
         <table class="_help-table" aria-describedby="Tuning Controls Tab Help Table">
             <thead>
@@ -94,26 +103,20 @@
                 <tr>
                     <td class="td1">Range</td>
                     <td class="td2">Non-editable field displaying the available time range for running calibration and
-                        validation.
-                        This is determined by the time ranges available in the forcing and observational data selected
-                        in the
-                        Headwater Basin Gage tab. All time controls are constrained by this range.</td>
+                        validation. This is determined by the time ranges available in the forcing and observational 
+                        data selected in the Headwater Basin Gage tab. All time controls are constrained by this range.</td>
                 </tr>
                 <tr>
                     <td class="td1">Calibration Time Controls</td>
                     <td class="td2">The user selects four times to run the calibration. The Simulation Start and End
-                        times reflect
-                        the period of time to perform the entire run. The Calibration Start and End times reflect the
-                        period of time to
-                        actually calibrate using the tuning parameters. This allows for a “warm-up” period prior to
-                        performing the
-                        calibration.</td>
+                        times reflect the period of time to perform the entire run. The Calibration Start and End times
+                        reflect the period of time to actually calibrate using the tuning parameters. This allows for 
+                        a “warm-up” period prior to performing the calibration.</td>
                 </tr>
                 <tr>
                     <td class="td1">Validation Time Controls</td>
                     <td class="td2">Same rules as the Calibration Time Controls except the Validation time range is
-                        further constrained
-                        in that it cannot overalap the Calibration time range.
+                        further constrained in that it cannot overlap the Calibration time range.
                     </td>
                 </tr>
                 <tr>
