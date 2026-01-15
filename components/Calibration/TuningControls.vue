@@ -1014,7 +1014,7 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if calibration_times are not within time_range
   if (!isAvSimStartWithinRange || !isAvSimEndWithinRange || !isAvCalStartWithinRange || !isAvCalEndWithinRange) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'Validaton times must be within time_range. Was not saved.', life: ToastTimeout.timeoutWarn };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'Validation times must be within time_range. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -1072,12 +1072,23 @@ const saveTuningData = () => {
   const handleSaveTuningTab = async () => {
     const saveTuningTabResponse = await saveTuningTabData();
     if (saveTuningTabResponse?.ok) {
-      const tMsg: ToastMessageOptions = {
-        severity: 'success', summary: `Success`,
-        detail: "Saved Tuning data",
-        life: ToastTimeout.timeoutSuccess
-      };
-      toast.add(tMsg); addToastRecord(tMsg);
+      if (saveTuningTabRequestBody.value?.calibration_times && saveTuningTabRequestBody.value?.validation_times) {
+        // times and calibratable parameters were both saved
+        const tMsg: ToastMessageOptions = {
+          severity: 'success', summary: `Success`,
+          detail: "Saved Tuning Data",
+          life: ToastTimeout.timeoutSuccess
+        };
+        toast.add(tMsg); addToastRecord(tMsg);
+      } else {
+        //only calibratable parameters were saved
+        const tMsg: ToastMessageOptions = {
+          severity: 'info', summary: `Partial Success`,
+          detail: "Saved calibratable parameters only. Calibration and Validation times still need to be set properly.",
+          life: ToastTimeout.timeoutSuccess
+        };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
       updateJobData();
       calibratableParametersHaveChanged.value = false;
       tuningDataHasChanged.value = false;
@@ -1376,6 +1387,14 @@ const checkInitialValueOutOfRange = (parameterName: string, initialValue: number
 
 onUnmounted(async () => {
   saveTuningTabRequestBody.value = {};
+  simStartTime.value = '';
+  simEndTime.value = '';
+  calStartTime.value = '';
+  calEndTime.value = '';
+  avSimStartTime.value = '';
+  avSimEndTime.value = '';
+  avCalStartTime.value = '';
+  avCalEndTime.value = '';
   calibratableParametersHaveChanged.value = false;
   tuningDataHasChanged.value = false;
 })
