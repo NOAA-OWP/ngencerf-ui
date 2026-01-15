@@ -2,7 +2,7 @@
     <div class="_help-page">
         <div class="_help-title" id="help-title">Calibration - Headwater Basin Gage Tab</div>
         <div class="_help-subtitle">Select the calibration gage for a headwater basin, along with the
-            source for the Forcing Data, Observational Data and GeoPackage. User may upload their own files.
+            source for the Forcing Data, Observational Data and GeoPackage.
         </div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
