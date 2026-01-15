@@ -54,7 +54,7 @@
                 </div>
                 <div v-show="modulesFilterList.length > 1">
                   <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
-                    title="Module Filter">Match Logic</label>
+                    title="Module Filter">Module Match</label>
                   <Select id="ModuleOperator" v-model="moduleOperator" :options="moduleOperatorList" optionLabel="name"
                     optionValue="name" class="user-select w-12" @change="refreshJobList()"
                     aria-label="Module Operator" title="Module Operator">
@@ -257,8 +257,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const moduleOperatorList = [
-  { name: "All Modules (AND)" },
-  { name: "Any Module (OR)" }
+  { name: "Match all selected" },
+  { name: "Match any selected" }
 ]
 const bulkJobActionsList: { name: string, value: number }[] = [
   {name: 'select an action', value: 0, show: true},
