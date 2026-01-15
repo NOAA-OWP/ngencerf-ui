@@ -7,40 +7,63 @@
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <hr />
-        <div style="margin-left: 30px; margin-top:10px;">
-            <ul style="list-style-type: disc;">
-                <li>The right side of each tab in the Calibration workflow shows the Progress towards completing a
-                    calibration
-                    setup
-                    and a summary of the choices made for the setup.</li>
-                <li>Once all the required data has been entered, all checkmarks will be set
-                    and the status will be Ready. Otherwise the status will be Saved or one of the finished statuses.
+        <hr class="my-6 border-black" />
+        <div class="ml-2 mb-6">
+            <p class="text-center font-bold text-xl mb-2">General Job Progress and Status</p>
+            <ul class="list-disc list-outside ml-6 space-y-2">
+                <li>
+                    The right side of each tab in the <strong>Calibration workflow</strong> displays progress toward completing a calibration setup and summarizes the choices made for the setup.
                 </li>
-                <li>When the user hits Run, the final subsetting and validation of acquired data occurs. Depending on the size of
-                    the headwater basin, this could delay the actual start of the calibration run. Another delay can
-                    occur while waiting for resources.
+                <li>
+                    Once all required data has been entered, all checkmarks are set and the status becomes <strong>Ready</strong>. Otherwise, the status remains <strong>Saved</strong> or one of the finished statuses.
                 </li>
-                <li>Normal Status Transitions:</li>
-                <li style="list-style-type: none;padding-left: 10px;">
-                    <strong>Calibration Ready -&gt; Submitted -&gt; Calibration Running -&gt; Calibration Done,
-                        Validation Control
-                        Running -&gt;
-                        Calibration Done, Validation Best Running -&gt; Done </strong>
+                <li>
+                    Clicking <strong>Run</strong> triggers the final subsetting and validation of acquired data. Depending on the size of the headwater basin, this may delay the start of the calibration run. Additional delays may occur while waiting for available resources.
                 </li>
-                <li>Once the calibration job has started, after the 1st iteratoin, the user can view plots. These plots
-                    will be
-                    automatically updated
-                    while the job is running based on the plot interval specified by the user.</li>
-                <li>The user can stop a running job by clicking the Cancel button.</li>
-                <li>When a job is running or finished, the user can view plots and logs generated during the calibration
-                    andvalidation runs.</li>
-                <li>If a job fails during the calibration run, the <strong>ngen.log</strong> file will be displayed to
-                    aid understanding the failure. If this log does not show the error, select Calibration logs from
-                    Display and scroll to view output written to the console (stdout/stderr) to reveal the error</li>
+                <li> <strong>Normal status transitions:</strong>
+                    <li style="list-style-type: none;padding-left: 10px;">
+                        <strong>Calibration Ready -&gt; Submitted -&gt; Calibration Running -&gt; Calibration Done,
+                            Validation Control
+                            Running -&gt;
+                            Calibration Done, Validation Best Running -&gt; Done </strong>
+                    </li>
+                </li>
+                <li>
+                    <p class="font-bold mb-2">Iteration, Logs and Plots</p>
+                    <ul class="list-disc list-outside ml-6 space-y-2">
+                        <li>
+                            Logs are available as soon as the job starts running, but some logs may not appear until 
+                            downstream processes start (ie. ngen). This allows you to monitor progress in real time.
+                        </li>
+                        <li>
+                            <strong>Iteration</strong> indicates the completed iteration number. Iteration 0 is the control run.
+                        </li>
+                        <li>
+                            Once Iteration 0 is complete in a running calibration job, plots become available and are automatically updated according to the user-specified plot interval.
+                        </li>
+                        <li>
+                            When the calibration phase completes successfully, the Iteration title changes to <strong>Best Iteration</strong> to highlight the optimal results.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    A running job can be stopped at any time by clicking the <strong>Cancel</strong> button.
+                </li>
+                <li>
+                    While a job is running or after it has finished, users can view plots and logs generated during the calibration and validation runs.
+                </li>
+                <li>
+                    If a job fails during the calibration run:
+                    <ol class="list-decimal list-outside ml-4">
+                        <li>The <strong>ngen.log</strong> file is automatically displayed to help identify the problem.</li>
+                        <li>If the issue is not clear, select <strong>Calibration logs</strong> from <strong>Display</strong> 
+                            and scroll through the console output (stdout/stderr) to investigate further.</li>
+                    </ol>
+                </li>
             </ul>
         </div>
-        <br />
+        <hr class="my-6 border-black" />
+        <div id="filters" class="text-center font-bold text-xl mb-3">Calibration Job Controls and Indicators</div>
         <table class="_help-table"  aria-describedby="Status / Run Tab Help Table">
             <thead>
                 <tr>
@@ -96,16 +119,10 @@
                 </tr>
                 <tr>
                     <td class="td1">Display</td>
-                    <td class="td2">Once at least one iteration has been completed, plots are available for monitoring
-                        the
-                        calibration
-                        process. Use this pulldown to select the plot. A message will appear if the plot is not
-                        available yet. These
-                        plots
-                        are also available to view after the run is complete. Go to the Evaluation workflow to view the
-                        time series
-                        and other
-                        data associated with each plot.</td>
+                    <td class="td2">
+                        Use this pulldown to select a plot or log. A message appears if the selected item is not yet 
+                        available. Go to the Evaluation workflow to review associated time series and other data.
+                    </td>
                 </tr>
                 <tr>
                     <td class="td1">&nbsp;</td>
