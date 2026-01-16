@@ -240,6 +240,7 @@ const startRun = async () => {
   executeIterationValidationRun().then((response) => {
     if (response.status === 201) {
       validationStatus.value = response?._data?.status;
+      console.log('validationStatus:',validationStatus.value);
       failureMessages.value = response?._data?.failure_messages;
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
@@ -310,30 +311,14 @@ watch(validationStatus, async (newStatus, initialStatus) => {
     }
     validationStatusCheckingIntervalId.value = setInterval(async () => {
       queryIterationValidationRunStatus().then(response => {
-        let find_validation_run = undefined;
-        if (response._data.validations) {
-          find_validation_run = response._data.validations.filter((validation: CalibrationGetStatusValidationItem) => {
-            return validation.validation_run_id === iterationValidationRunId.value
-          });
-        }
-        if (!find_validation_run) {
+        if (response?._data?.status) {
+          validationStatus.value = response._data.status;
+        } else {
           validationStatus.value = 'Failed';
           clearInterval(validationStatusCheckingIntervalId.value);
           clearInterval(validationRunningTimeIntervalId.value);
           validationStatusCheckingIntervalId.value = undefined;
           validationRunningTimeIntervalId.value = undefined;
-        } else {
-          // make sure we actually have validation run
-          const validation_run = find_validation_run.shift();
-          if (!validation_run) {
-            validationStatus.value = 'Failed';
-            clearInterval(validationStatusCheckingIntervalId.value);
-            clearInterval(validationRunningTimeIntervalId.value);
-            validationStatusCheckingIntervalId.value = undefined;
-            validationRunningTimeIntervalId.value = undefined;
-          } else {
-            validationStatus.value = validation_run.status;
-          }
         }
       })
       updateLogDisplay();
