@@ -376,6 +376,7 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
 
 const navigateToSetupForecast = async () => {
   if (calibrationRunForForecast?.value?.calibration_run_id && calibrationRunForForecast.value.calibration_run_id > 0) {
+    forecastJobId.value = undefined;
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
     if (e) {
       e.click();
