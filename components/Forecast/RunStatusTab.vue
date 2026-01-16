@@ -1,202 +1,250 @@
 <template>
-  <Transition name="slide-fade">
-    <div id="MessagesGroupWindow" v-if="showMessagesGroup">
-      <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-          class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
-      </div>
-      <MessagesGroup />
-    </div>
-  </Transition>
-  <div id="ForecastRunStatusPage">
-    <div class="pl-6 pr-2 pt-2">
-      <div class="flex mt-3">
-        <div class="w-5/6 relative">
-          <div v-if="logList.length > 1" class="inline-block">
-            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
-            <div class="inline-block w-2/3">
-              <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
-                v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
-              </Select>
-            </div>
-          </div>
-          <div v-else-if="!forecastJobId || !overallColdStartForecastStatus" class="w-full">
-            <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
-              Click Run to submit and run the forecast.
-            </p>
-          </div>
-          
-          <div class="grid auto-cols-max grid-cols-3 gap=1 text-sm text-left mt-2">
-            <div class="col-span-1">
-              <div>
-                <span class="font-medium">Calibration Job ID: </span>
-                {{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(15) }}
-              </div>
-              <div>
-                <span class="font-medium">Forecast Job ID: </span>
-                {{ forecastJobId ?? '-'.repeat(15) }}
-              </div>
-              <div>
-                <span class="font-medium">Gage: </span>
-                {{ userCalibrationRunData?.gage?.gage_id }}
-              </div>
-              <div>
-                <span class="font-medium">Station Name: </span>
-                {{ userCalibrationRunData?.gage?.station_name }}
-              </div>
-            </div>
-            <div class="col-span-1">
-              <div>
-                <span class="font-medium">Configuration: </span>
-                {{ forecastConfigurationName ?? 'Unknown' }}
-              </div>
-              <div>
-                <span class="font-medium">Cycle Date: </span>
-                {{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None') }}
-              </div>
-              <div>
-                <span class="font-medium">Cold Start Date: </span>
-                {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'None') }}
-              </div>
-            </div>
-            <div class="col-span-1">
-              <div>
-                <span class="font-medium">Status: </span>
-                {{ (forecastJobId && overallColdStartForecastStatus) ? overallColdStartForecastStatus : 'Ready' }}
-              </div>
-              <div>
-                <span class="font-medium">Submit Time: </span>
-                {{ submitTime ?? '-'.repeat(15) }}
-              </div>
-              <div>
-                <span class="font-medium">Elapsed Time: </span>
-                {{ elapsedTime ?? '-'.repeat(15) }}
-              </div>
-              <div class="mt-2 mb-2">
-                <!--BUTTONS - START-->
-                <span v-if="!forecastJobStatus || (!coldStartJobStatus && forecastJobStatus === 'Ready')">
-                  <Button class="ngenButtonDiv ml-6 font-normal px-4" title="Previous Button" aria-label="Previous Button"
-                    @click="goToSetupForecastTab()">
-                    Previous
-                  </Button>
-                </span>
-                <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
-                  <Button class="ngenButtonDiv-green ml-6 font-normal px-4" title="Run Button" aria-label="Run Button"
-                    @click="startForecastRun()">
-                    Run
-                  </Button>
-                </span>
-                <span v-if="['Submitted','Running'].includes(coldStartJobStatus) || ['Submitted','Running'].includes(forecastJobStatus)">
-                  <Button class="ngenButtonDiv-red ml-6 font-normal px-4" title="Cancel Button" @click="cancelForecastRun()"
-                    aria-label="Cancel Button">
-                    Cancel
-                  </Button>
-                </span>
-                <span v-if="overallColdStartForecastStatus === 'Done'">
-                  <Button class="ngenButtonDiv ml-6 font-normal px-4 whitespace-nowrap" title="View Results Button"
-                    @click="goToResultsTab()" aria-label="View Results Button">
-                    View Results
-                  </Button>
-                </span>
-                <!--BUTTONS - END-->
-              </div>
-            </div>
-            <div class="col-span-3">
-              <div>
-                <span class="font-bold">Results Pathname: </span>
-                <span class="whitespace-nowrap overflow-auto">{{ resultsPathname }}</span>
-              </div>
-            </div>
-          </div>
-            
-          <div>
-            <div v-if="failureMessages" class="text-left pl-3 text-nowrap" style="font-size:0.9em;">
-              <label for="status">Failure Message </label>
-              <div class="pl-5" style="width: 100%;">
-                <span v-for="message in failureMessages">
-                  {{ message }}<br/>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+  <div class="w-full">
+    <h1 class="pt-3 mb-8 text-3xl font-bold text-center" aria-label="Forecast Status Run Tab" title="Forecast Status Run Tab">
+      Forecast
+    </h1>
+    <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
+      If status is Ready click Run to submit and run the forecast.
+    </p>
+    <br />
+  </div>
+  <div>
 
-        <div class="pl-4 ml-auto text-nowrap text-right">
-          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue underline mt-1"
-            @click="toggleMessagesGroup">
-            Show Calibration Details</a>
-        </div>
-
-      </div>
-    </div>
-
-    <!--LOGGING SECTION-->
-    <div v-if="!(forecastJobId && overallColdStartForecastStatus) || ['Saved','Ready'].includes(overallColdStartForecastStatus)" 
-      class="col-span-5 p-2 border-t border-[#d9d9d9] flex flex-col items-center" id="LoggingSection">
-      <div class="mb-4">
-        <div class="inline-flex flex-col items-center">
-          <p class="font-semibold mb-2">Global Logging</p>
-          <div class="flex gap-6">
-            <label v-for="[label, val] in [['Enabled', true], ['Disabled', false]]" :key="label as string"
-              class="flex items-center gap-1">
-              <input type="radio" :value="val" v-model="forecastJobNgenGlobalLogging" />
-              <span>{{ label }}</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="mb-4">
-        <p class="font-semibold mb-2 text-center">Ngen and Module Log Levels</p>
-        <div :class="[
-          'overflow-x-auto',
-          { 'opacity-50 pointer-events-none': !forecastJobNgenGlobalLogging }
-        ]">
-          <table class="table-auto text-left border-collapse mx-auto" aria-label="Module Logging Levels">
+    <div class="grid place-items-center">
+      <div class="grid grid-cols-5">
+        <div class="col-span-2">
+          <table>
+            <caption style="text-align: center;font-size:1.1em;font-weight:bold;margin-bottom:3px;"
+              aria-label="Forecast Job Run Time Area" title="Forecast Job Run Time Area">Forecast Job Run Time
+            </caption>
             <thead>
-              <tr>
-                <th class="pr-4">Module</th>
-                <th v-for="level in ['Debug', 'Info', 'Warning', 'Severe', 'Fatal']" :key="level" class="px-2">
-                  {{ level }}
-                </th>
+              <tr height="25px">
+                <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
               </tr>
             </thead>
             <tbody>
-              <!-- ngen and forcing rows at the top -->
-              <tr>
-                <td class="pr-4">ngen</td>
-                <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen' + level"
-                  class="px-2">
-                  <input type="radio" :name="'loglevel-ngen'" :value="level" v-model="ngenLogLevel"
-                    :disabled="!forecastJobNgenGlobalLogging" />
-                </td>
+              <tr height="40px" :aria-label="'Calibration Job ID ' + calibrationRunForForecast?.calibration_run_id"
+                :title="'Calibration Job ID ' + calibrationRunForForecast?.calibration_run_id">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Calibration Job ID</div>
+                </th>
+                <td class="pl-5">{{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(15) }}</td>
               </tr>
-              <tr>
-                <td class="pr-4">forcing</td>
-                <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'forcing' + level"
-                  class="px-2">
-                  <input type="radio" :name="'loglevel-forcing'" :value="level" v-model="forcingLogLevel"
-                    :disabled="!forecastJobNgenGlobalLogging" />
-                </td>
+              <tr height="40px" :aria-label="'Forecast Job ID ' + forecastJobId"
+                :title="'Forecast Job ID ' + forecastJobId">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Forecast Job ID</div>
+                </th>
+                <td class="pl-5">{{ forecastJobId ?? '-'.repeat(15) }}</td>
               </tr>
-              <!-- Per-module logLevels -->
-              <tr v-for="(val, module) in logLevels" :key="module">
-                <td class="pr-4">{{ module }}</td>
-                <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="level" class="px-2">
-                  <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]"
-                    :disabled="!forecastJobNgenGlobalLogging" />
+              <tr height="32px" :aria-label="'Submit Time ' + submitTime" :title="'Submit Time ' + submitTime">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Submit Time</div>
+                </th>
+                <td class="pl-5">{{ submitTime ?? '-'.repeat(15) }}</td>
+              </tr>
+              <tr height="32px" :aria-label="'Elapsed Time ' + elapsedTime" :title="'Elapsed Time ' + elapsedTime">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Elapsed Time</div>
+                </th>
+                <td class="pl-5">{{ elapsedTime ?? '-'.repeat(15) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div data-v-a7d04dc9="" class="col-span-1"><div data-v-a7d04dc9="" class="vertical-separator"></div></div>
+
+        <div class="col-span-2 pl-5">
+          <table>
+            <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;" aria-label="Forecast Job Status area"
+              title="Forecast Job Status area">Forecast Job Status</caption>
+            <thead>
+              <tr height="25px">
+                <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr height="40px" :aria-label="'Status is ' + overallColdStartForecastStatus"
+                :title="'Status is ' + overallColdStartForecastStatus">
+                <th scope="row" class="text-right font-bold">
+                  <div style="width: 140px;">Status</div>
+                </th>
+                <td v-if="forecastJobId && overallColdStartForecastStatus" class="pl-5">{{ overallColdStartForecastStatus }}</td>
+                <td v-else class="pl-5">Ready</td>
+              </tr>
+              <tr height="32px" :aria-label="'Cycle Date is ' + (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'Unknown')"
+                :title="'Cycle Date is ' + (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None')">
+                <td class="text-right font-bold">
+                  <div style="width: 140px;">Cycle Date</div>
+                </td>
+                <td class="pl-5">{{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None') }}</td>
+              </tr>
+              <tr height="32px" :aria-label="'Cold Start Date is ' + (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'Unknown')"
+                :title="'Cold Start Date is ' + (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'None')">
+                <td class="text-right font-bold">
+                  <div style="width: 140px;">Cold Start Date</div>
+                </td>
+                <td class="pl-5">{{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'None') }}</td>
+              </tr>
+              <tr height="32px" :aria-label="'Configuration is ' + (forecastConfigurationName ?? 'Unknown')"
+                :title="'Configuration is ' + (forecastConfigurationName ?? 'Unknown')">
+                <td class="text-right font-bold">
+                  <div style="width: 140px;">Configuration</div>
+                </td>
+                <td class="pl-5">{{ forecastConfigurationName ?? 'Unknown' }}</td>
+              </tr>
+              <tr v-show="logList.length > 1" height="32px" aria-label="Select Log Name" 
+                title="Select Log Name">
+                <th scope="row" class="text-right"><label for="DisplayOptions">Display</label></th>
+                <td class="pl-3">
+                  <Select id="DisplayOptions" class="p-select" v-model="selectedLogCategory" 
+                    :options="logList" option-label="display_name" optionValue="name">
+                  </Select>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+
+        <div class="col-span-5">
+          <div style="display:flex; margin-top: 1em;" :aria-label="'Results pathname is ' + resultsPathname"
+            :title="'Results pathname is ' + resultsPathname">
+            <div class="text-right font-bold" style="width: 155px;">
+              <label class="text-right whitespace-nowrap" for="resultsPathname" style="width: 155px;padding-top:1px;">Results Pathname</label>
+            </div>
+            <div class="pl-5" style="width: 100%;">
+              <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-5" v-if="failureMessages">
+          <div style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
+            <div class="text-right font-bold" style="width: 155px;">
+              <label class="text-right whitespace-nowrap" for="failureMessage" style="width: 155px;padding-top:1px;">
+                Failure Message
+              </label>
+            </div>
+            <div class="pl-5" style="width: 100%;">
+              <span v-for="message in failureMessages">
+                {{ message }}<br/>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!--LOGGING SECTION-->
+        <div v-if="!(forecastJobId && overallColdStartForecastStatus) || ['Saved','Ready'].includes(overallColdStartForecastStatus)" 
+          class="col-span-5 p-2 border-t border-[#d9d9d9] flex flex-col items-center" id="LoggingSection">
+          <div class="mb-4">
+            <div class="inline-flex flex-col items-center">
+              <p class="font-semibold mb-2">Global Logging</p>
+              <div class="flex gap-6">
+                <label v-for="[label, val] in [['Enabled', true], ['Disabled', false]]" :key="label as string"
+                  class="flex items-center gap-1">
+                  <input type="radio" :value="val" v-model="forecastJobNgenGlobalLogging" />
+                  <span>{{ label }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <p class="font-semibold mb-2 text-center">Ngen and Module Log Levels</p>
+            <div :class="[
+              'overflow-x-auto',
+              { 'opacity-50 pointer-events-none': !forecastJobNgenGlobalLogging }
+            ]">
+              <table class="table-auto text-left border-collapse mx-auto" aria-label="Module Logging Levels">
+                <thead>
+                  <tr>
+                    <th class="pr-4">Module</th>
+                    <th v-for="level in ['Debug', 'Info', 'Warning', 'Severe', 'Fatal']" :key="level" class="px-2">
+                      {{ level }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- ngen and forcing rows at the top -->
+                  <tr>
+                    <td class="pr-4">ngen</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'ngen' + level"
+                      class="px-2">
+                      <input type="radio" :name="'loglevel-ngen'" :value="level" v-model="ngenLogLevel"
+                        :disabled="!forecastJobNgenGlobalLogging" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="pr-4">forcing</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="'forcing' + level"
+                      class="px-2">
+                      <input type="radio" :name="'loglevel-forcing'" :value="level" v-model="forcingLogLevel"
+                        :disabled="!forecastJobNgenGlobalLogging" />
+                    </td>
+                  </tr>
+                  <!-- Per-module logLevels -->
+                  <tr v-for="(val, module) in logLevels" :key="module">
+                    <td class="pr-4">{{ module }}</td>
+                    <td v-for="level in ['debug', 'info', 'warning', 'severe', 'fatal']" :key="level" class="px-2">
+                      <input type="radio" :name="`loglevel-${module}`" :value="level" v-model="logLevels[module]"
+                        :disabled="!forecastJobNgenGlobalLogging" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- DISPLAY LOGS -->
+        <div v-else class="col-span-5">
+          <LogDisplay/>
+        </div>
       </div>
     </div>
 
-    <!-- DISPLAY LOGS -->
-    <div v-else>
-      <LogDisplay/>
+    <div id="HBCbuttonsOuter">
+      <div class="grid grid-rows-1 ActionButtonsBox mt-2" id="HBCbuttons">
+        <div class="row-span-1">
+          <div class="grid grid-cols-4">
+            <span v-if="!forecastJobStatus || (!coldStartJobStatus && forecastJobStatus === 'Ready')">
+              <div class="col-span-1 mr-4">
+                <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Previous Button" aria-label="Previous Button"
+                    @click="goToSetupForecastTab()">
+                    Previous
+                </Button>
+              </div>
+            </span>
+            <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
+              <div class="col-span-1 mr-6">
+                <Button class=" ngenButtonDiv-green font-normal" title="Run Button" aria-label="Run Button"
+                  @click="startForecastRun()">
+                  Run
+                </Button>
+              </div>
+            </span>
+            <span v-if="['Submitted','Running'].includes(coldStartJobStatus) || ['Submitted','Running'].includes(forecastJobStatus)">
+              <div class="col-span-1 mr-3">
+                <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" @click="cancelForecastRun()"
+                  aria-label="Cancel Button">
+                  Cancel
+                </Button>
+              </div>
+            </span>
+            <span v-if="overallColdStartForecastStatus === 'Done'">
+              <div class="col-span-1 mr-3">
+                <Button class="ngenButtonDiv ml-6 font-normal px-4 whitespace-nowrap" title="View Results Button"
+                  @click="goToResultsTab()" aria-label="View Results Button">
+                  View Results
+                </Button>
+              </div>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
+    
 
     <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
@@ -207,7 +255,6 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
 import type { ToastMessageOptions } from "primevue/toast";
-import MessagesGroup from "../Common/MessagesGroup.vue";
 import LogDisplay from "../Common/LogDisplay.vue";
 
 import { generalStore } from '~/stores/common/GeneralStore';
@@ -222,8 +269,6 @@ const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const toast = useToast();
-
-const showMessagesGroup = ref<Boolean>(false);
 
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
@@ -317,14 +362,6 @@ onMounted(async () => {
     coldStartDate.value = calibrationRunForForecast.value.cold_start_date;
   }
 });
-
-const toggleMessagesGroup = async () => {
-  if (showMessagesGroup.value) {
-    showMessagesGroup.value = false;
-  } else {
-    showMessagesGroup.value = true;
-  }
-}
 
 /**
  * Create elapsedTimeIntervalId to increment elapsedTime every second while coldStartJobStatus is Running
@@ -479,19 +516,19 @@ onUnmounted(() => {
   box-shadow: none;
   padding-top:0px !important; padding-bottom: 0px !important;
 }
+#HBCbuttonsOuter {
+  width:auto; 
+  margin-left: auto; 
+  margin-right: auto; 
+  max-width: 800px; 
+  position: relative;
+}
 
 #selectedLogDisplay {
   max-height: 300px;
 }
 
-#MessagesGroupWindow {
-  z-index: 100;
-  border: 1px solid black;
-  position: absolute;
-  right: 2%;
-  top: 161px;
-  width: 48%;
-  background-color: white;
-  overflow: auto;
+.gray-border {
+  border: 2px solid #d9d9d9;
 }
 </style>
