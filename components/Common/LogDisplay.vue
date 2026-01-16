@@ -1,30 +1,22 @@
 <template>
   <div v-if="selectedLogCategory !== '' && selectedLogList && selectedLogList.length > 0" id="LogDisplayArea" class="col-span-5 p-2">
     <div class="pl-4">
-      <table width="100%" summary="Forecast Log Options and File Path">
-        <caption class="sr-only">Forecast Log Options and File Path table</caption>  
-        <thead class="sr-only"><tr><th scope="col" style="min-width: 185px;">Forecast Log Label</th><th scope="col">Forecast Log Value</th></tr></thead>     
-        <tbody>  
-          <tr v-if="selectedLogList.length > 1" style="font-size: 0.9em;">
-            <td class="pr-2 pt-3 whitespace-nowrap"><label for="selectedLogOptions">Select {{ selectedLogCategoryDisplay }} Log</label></td>
-            <td>
-              <Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
-                optionLabel="name" optionValue="name">
-              </Select>
-            </td>
-          </tr>
-          <tr v-if="selectedLogFilePath !== '' && selectedLogList.length === 1" style="font-size: 0.9em;">
-            <td class="pr-2 pt-3 whitespace-nowrap"><b>Log Name</b></td>
-            <td class="pt-3">{{ selectedLogName }}</td>
-          </tr>
-          <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
-            <td class="pr-2 pt-3 whitespace-nowrap"><b>Log File Path</b></td>
-            <td class="pt-3 whitespace-nowrap overflow-auto">{{ selectedLogFilePath }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-if="selectedLogList.length > 1" style="font-size: 0.9em;">
+        <span class="font-bold pr-2 pt-3">Select {{ selectedLogCategoryDisplay }} Log: </span>
+        <Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
+          optionLabel="name" optionValue="name">
+        </Select>
+      </div>
+      <div v-if="selectedLogFilePath !== '' && selectedLogList.length === 1" style="font-size: 0.9em;">
+        <span class="font-bold">Log Name: </span>
+        {{ selectedLogName }}
+      </div>
+      <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
+        <span class="font-bold">Log File Path: </span>
+        <span class="whitespace-nowrap overflow-auto">{{ selectedLogFilePath }}</span>
+      </div>
 
-      <div v-if="selectedLogDisplay">
+      <div v-if="selectedLogDisplay" class="mt-2">
         <div class="pagination-box" v-if="selectedLogDisplay">
           <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{
             selectedLogTotalSize }}</div>
@@ -108,6 +100,8 @@ watch(selectedLogName, async () => {
     await updateLogRefs(true);
     if (selectedLogDisplay.value && selectedLogDisplay.value != '') {
       nextTick(async () => {
+        document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
+          - ((document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top + 10)) + 'px');
         document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
       });
     } else {
@@ -168,4 +162,8 @@ const selectedLogCategoryDisplay = computed(() => {
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
+
+.gray-border {
+  border: 2px solid #d9d9d9;
+}
 </style>

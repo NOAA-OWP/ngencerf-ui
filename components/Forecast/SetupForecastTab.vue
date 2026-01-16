@@ -228,6 +228,8 @@ const rowStyle = (data: any) => {
 onMounted(async () => {
     toast.removeAllGroups(); // clear all toast messages
     isLoading.value = false; // set isLoading to false
+
+    console.log('calibrationRunForForecast:',calibrationRunForForecast.value);
     
     if (!cycleHour.value && cycleDate.value) {
       try {

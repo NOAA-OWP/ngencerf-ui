@@ -432,6 +432,10 @@ onUnmounted(() => {
   text-align: right;
   padding-right: 20px;
 }
+
+.gray-border {
+  border: 2px solid #d9d9d9;
+}
 </style>
 
 <style>

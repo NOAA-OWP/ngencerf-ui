@@ -345,6 +345,7 @@ const navigateToSetupForecast = () => {
 
       // set userCalibrationRunData
       await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+      forecastJobId.value = undefined;
       isForecastLoading.value = false;
       e.click();
     } else {

@@ -1074,6 +1074,10 @@ onUnmounted(() => {
   box-shadow: none;
 }
 
+.gray-border {
+  border: 2px solid #d9d9d9;
+}
+
 :root {
   .p-progressbar {
     background-color: yellow;

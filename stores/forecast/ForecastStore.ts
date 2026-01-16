@@ -732,10 +732,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         selectedLogDisplay.value = logText;
         selectedLogTotalSize.value = response?._data.pagination_metadata?.count;
         // only show one page for running jobs (this disables paging)
-        selectedLogTotalPages.value = 
-          (['Submitted','Running'].includes(coldStartJobStatus.value) || 
-            ['Submitted','Running'].includes(forecastJobStatus.value)
-          ) ? 1 : Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
+        selectedLogTotalPages.value = overallColdStartForecastStatus.value !== 'Done' ? 1 : Math.ceil(selectedLogTotalSize.value / logDataPageSize.value);
         selectedLogEndRow.value = response?._data.pagination_metadata?.count;
         if (logDataPageSize.value < selectedLogTotalSize.value) {
           selectedLogStartRow.value = (selectedLogTotalSize.value - logDataPageSize.value) + 1;
