@@ -60,7 +60,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const displayCalibrationValidationRunList = ref<CalibrationValidationJobData[]>([]);
 
   const gageevaluationRunListHeaders = ref<any[]>([]);
-  const computedGageCalibrationRunList = ref<CalibrationJobListItem[]>([]);
+  const userEvaluationRunListDataByGage = ref<CalibrationJobListItem[]>([]);
 
   const selectedCalibrationCompareRuns = ref<CalibrationJobListItem[]>([]);
   const selectedCalibrationModules = ref<string[] | undefined>([]);
@@ -213,6 +213,33 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       minJobId.value = runListDataResult?._data?.id_range[0];
       maxJobId.value = runListDataResult?._data?.id_range[1];
     }
+  }
+
+  /**
+   * fetch user created calibration job list data by gage (for compare permutations)
+   * @return {void}
+   */
+  async function fetchUserValidatedCalibrationJobsListDataForComparison() {
+    let requestBody = {
+      sort: {
+        field: evaluationRunListSort.value.field,
+        direction: evaluationRunListSort.value.direction === -1 ? 'desc' : 'asc'
+      },
+      filters: {
+        gage_id: uiCompareGageId.value && uiCompareGageId.value !== "All" ? uiCompareGageId.value: "",
+      },
+      get_gages: uiGageList.value.length === 0
+    }
+    const runListDataResult = await makeProtectedApiCall<ValidatedevaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    return runListDataResult?._data?.jobs ?? [];
   }
 
   const fetchValidationRunListByCalibrationRun = async () => {
@@ -392,7 +419,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    */
   const resetUserSelectedEvalCompareRun = (): void => {
     calibrationJobId.value = userSelectedEvalCalibrationRunId.value = evaluateIterationRunId.value = 0;
-    computedGageCalibrationRunList.value = [];
+    userEvaluationRunListDataByGage.value = [];
   }
 
   /**
@@ -431,6 +458,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     setSelectedCalibrationRunId,
     loadSelectedCalibrationRun,
     fetchUserValidatedCalibrationJobsListData,
+    fetchUserValidatedCalibrationJobsListDataForComparison,
     queryGetPlotNamesForComparison,
     queryGetPlotsForComparison,
     resetUserSelectedEvalCalibrationRun,
@@ -458,7 +486,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     computedCalibrationValidationRunList,
     displayCalibrationValidationRunList,
     gageevaluationRunListHeaders,
-    computedGageCalibrationRunList,
+    userEvaluationRunListDataByGage,
     selectedCalibrationCompareRuns,
     selectedCalibrationModules,
     evaluateValidationRunId,

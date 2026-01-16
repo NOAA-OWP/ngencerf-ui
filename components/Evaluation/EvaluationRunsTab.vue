@@ -19,7 +19,7 @@
                 Select row then right click for available options.
               </span>
             </span>
-            <span v-else-if="computedGageCalibrationRunList.length > 1">Select Calibration Runs to Compare
+            <span v-else-if="userEvaluationRunListDataByGage.length > 1">Select Calibration Runs to Compare
               <Button v-if="selectedCalibrationCompareRuns.length >= 2" id="btn-compare" class="ngenButtonDiv" style="position: absolute; right:0px;top:78px;" 
                 @click.stop="compareSelectedCalibrationJobs">
                 Compare
@@ -66,7 +66,7 @@
       </div>
 
       <!-- Show a list of calibration jobs from the same gage if user has chosen to Compare -->
-      <div v-else-if="computedGageCalibrationRunList.length > 1">
+      <div v-else-if="userEvaluationRunListDataByGage.length > 1">
         <div id="FilterDialog">
           <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
@@ -81,7 +81,7 @@
         <div id="evaluationCalibrationList">
           <ContextMenu :pt="{ root: { id: ' cp-context-menu' } }" class="bg-white" ref="cpContextMenu"
             :model="cmCompareRun"></ContextMenu>
-          <DataTable id="compare-list" :value="computedGageCalibrationRunList" scrollable scroll-height="400px"
+          <DataTable id="compare-list" :value="userEvaluationRunListDataByGage" scrollable scroll-height="400px"
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem" 
             selectionMode="multiple" :metaKeySelection="true" @rowContextmenu="onRowCpContextMenu"
             v-model:selection="selectedCalibrationCompareRuns" :rowStyle="rowStyle" class="boxed">
@@ -369,7 +369,7 @@ const {
   gageevaluationRunListHeaders,
   computedCalibrationValidationRunList,
   displayCalibrationValidationRunList,
-  computedGageCalibrationRunList,
+  userEvaluationRunListDataByGage,
   selectedCalibrationCompareRuns,
   selectedCalibrationModules,
   userEvaluationRunListData,
@@ -394,6 +394,7 @@ const {
   resetUserSelectedEvalValidationRun,
   resetUserSelectedEvalCompareRun,
   fetchUserValidatedCalibrationJobsListData,
+  fetchUserValidatedCalibrationJobsListDataForComparison,
   clearUserCalibrationRunData,
   setSelectedCalibrationRunId,
   fetchValidationRunListByCalibrationRun,
@@ -446,7 +447,7 @@ onMounted(async() => {
   }
 
   uiCompareGageId.value = 'All';
-  computedGageCalibrationRunList.value = [];
+  userEvaluationRunListDataByGage.value = [];
   selectedCalibrationCompareRuns.value = [];
 
   isLoading.value = true;
@@ -640,11 +641,12 @@ const viewSelectedCalibrationValidationRuns = async (calibration_run_id: number)
 const viewSelectedGageCalibrationRuns = async (calibration_run_id: number, gage_id: string) => {
   isLoading.value = true;
   userSelectedEvalCalibrationRunId.value = calibrationJobId.value = 0;
-  computedGageCalibrationRunList.value = [];
+  userEvaluationRunListDataByGage.value = [];
+  uiCompareGageId.value = gage_id;
+  let filteredRunList = await fetchUserValidatedCalibrationJobsListDataForComparison();
   clearUserCalibrationRunData();
   
   nextTick(async () => {
-    let filteredRunList = userEvaluationRunListData?.value?.filter((row) => (row as CalibrationJobListItem).gage_id === gage_id);
     if (filteredRunList.length >= 2) {
       uiCompareGageId.value = gage_id;
       filteredRunList.forEach((calibration_job: CalibrationJobListItem) => {
@@ -657,7 +659,7 @@ const viewSelectedGageCalibrationRuns = async (calibration_run_id: number, gage_
         rowData['period'] = formatISOStringOrDateToYYYYMMDD(calibration_job.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDD(calibration_job.calibration_end_period);
         rowData['objective_function'] = calibration_job.objective_function;
         rowData['optimization_algorithm'] = calibration_job.optimization_algorithm;
-        computedGageCalibrationRunList.value.push(rowData);
+        userEvaluationRunListDataByGage.value.push(rowData);
         if (calibration_job.calibration_run_id == calibration_run_id) {
           // start with the job that the user picked already highlighted
           selectedCalibrationCompareRuns.value = [rowData];
