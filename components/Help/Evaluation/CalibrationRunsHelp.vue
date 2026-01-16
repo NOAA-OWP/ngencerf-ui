@@ -137,7 +137,7 @@
                         will remain on this page.</td>
                 </tr>
                 <tr>
-                    <td class="td1"">Archive</td>
+                    <td class="td1">Archive</td>
                     <td class="td2">Archive the selected calibration job(s).
                         Archived jobs will not longer appear in any Calibration Runs table.<br /><br />Archived jobs 
                         cannot be used directly to evaluate a job. To use one, open the Calibration workflow and 
