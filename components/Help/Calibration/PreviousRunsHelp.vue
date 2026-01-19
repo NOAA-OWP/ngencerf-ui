@@ -157,7 +157,11 @@
                 </tr>
                 <tr>
                     <td class="td1 align-top" style="font-weight:normal;">Delete</td>
-                    <td class="td2 align-top">Permanently deletes the selected calibration job from the system.</td>
+                    <td class="td2 align-top">Selecting this action will <strong>permanently delete the chosen calibration job</strong> along 
+                        with all associated validation, forecast, and verification jobs. All references to this 
+                        job will also be removed from the database. <strong>This action cannot be undone.</strong> 
+                        After deletion, you will remain on the current page.
+                    </td>
                 </tr>
                 <tr>
                     <td class="td1 align-top" style="font-weight:normal;">Archive/<br />Unarchive</td>
