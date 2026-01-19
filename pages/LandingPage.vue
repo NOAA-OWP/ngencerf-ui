@@ -30,7 +30,8 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                     <!-- Running Processes Card -->
                     <div class="bg-teal-100 text-teal-800 p-6 rounded-lg shadow-md flex flex-col items-center">
-                        <i class="pi pi-cog pi-spin text-teal-600 text-3xl mb-2"></i>
+                       <i class="pi pi-cog text-teal-600 text-3xl mb-2"
+                            :class="{ 'pi-spin': runningCalibrationJobs > 0 }"></i>
                             <div class="text-3xl sm:text-4xl font-extrabold text-teal-800">
                             {{ runningCalibrationJobs }}
                         </div>
