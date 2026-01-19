@@ -1,5 +1,5 @@
 <template>
-    <div id="help-top" class="_help-page relative scroll-smooth px-6 py-4">
+    <div class="_help-page">
         <div class="_help-title">Calibration - Calibration Runs Tab</div>
         <div class="_help-subtitle">Displays list of calibration jobs<br />
             <br />
@@ -10,12 +10,12 @@
         </p>
         <hr class="my-6 border-black" />
 
-        <div id="new_button" class="text-center font-bold text-xl mb-3">New Button</div>
+        <div class="text-center font-bold text-xl mb-3">New Button</div>
         <p class="text-center mb-2">Click to create a calibration setup from scratch.</p>
 
         <hr class="my-6 border-black" />
 
-        <div id="filters" class="text-center font-bold text-xl mb-3">Filtering Calibration Jobs</div>
+        <div class="text-center font-bold text-xl mb-3">Filtering Calibration Jobs</div>
         <div class="ml-2">
             <p class="mb-4">
             Use the filters at the top of the table to narrow down the list of calibration jobs. 
@@ -73,11 +73,11 @@
         </div>
         
         <hr class="my-6 border-black" />
-        <div id="calibration-jobs" class="text-center font-bold text-xl mb-3">Calibration Jobs Table</div>
+        <div class="text-center font-bold text-xl mb-3">Calibration Jobs Table</div>
         <hr/>
 
         <div class="ml-2">
-            <div id="bulk-actions" class="text-center font-bold text-l mb-4">Bulk Actions</div>
+            <div class="text-center font-bold text-l mb-4">Bulk Actions</div>
 
             <p class="mb-4">
             The <strong>Bulk Actions</strong> dropdown allows you to perform actions on multiple calibration jobs at once.
@@ -87,7 +87,7 @@
             <p><strong>Selecting Jobs</strong></p>
             <ul class="list-disc list-outside ml-6 space-y-0">
                 <li>Click a job to select a single job.</li>
-                <li>Use <strong>Ctrl+Click</strong> (or <strong>Cmd+Click</strong> on Mac) to select or deselect multiple individual jobs.</li>
+                <li>Use <strong>Ctrl+Click</strong> to select or deselect multiple individual jobs.</li>
                 <li>Use <strong>Shift+Click</strong> to select a range of jobs between the last selected job and the clicked job.</li>
             </ul>
             </div>
@@ -112,7 +112,7 @@
 
         <hr/>
 
-        <div id="calibration-jobs-table"class="text-center font-bold text-l mb-4">Table</div>
+        <div class="text-center font-bold text-l mb-4">Table</div>
         <p class="text-center">Sort table by clicking on the sort icon in a column.</p>
         <hr />
         <table class="_help-table" aria-label="Calibration Runs Tab Help Table">
@@ -175,7 +175,7 @@
             </tbody>
         </table>
         <hr class="mt-3" style="height: 2px; background-color: black" />
-        <div id="status-definitions" class="mt-3 text-center font-bold text-xl">Status Definitions</div>
+        <div class="mt-3 text-center font-bold text-xl">Status Definitions</div>
         <table class="_help-table" aria-label="Status Definitions">
             <thead>
                 <tr class="text-left">
@@ -221,7 +221,7 @@
             </tbody>
         </table>
         <hr class="mt-3" style="height: 2px; background-color: black" />
-        <div id="color-coding" class="mt-3 text-center font-bold text-xl">Table Color Coding</div>
+        <div class="mt-3 text-center font-bold text-xl">Table Color Coding</div>
         <p class="font-bold">The leftmost column is color coded by the status of the job</p>
         <table class="ml-28 w-auto" aria-label="Table Color Coding">
             <thead>
