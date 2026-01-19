@@ -50,6 +50,18 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     }, 0)
   })
 
+ /**
+ * based on the current user's list of calibration job return number of job with status of "ready"
+ * @returns {number}
+ */
+  const readyCalibrationJobs = computed(() => {
+    return userCalibrationJobsListData.value?.reduce((total_ready_jobs: number, job: CalibrationJobListItem) => {
+      if (job.status.toLowerCase() === 'ready') total_ready_jobs += 1;
+      return total_ready_jobs;
+    }, 0)
+  })
+
+
   /**
  * return a new calibration run id generated from the server
  * @returns {CreatedCalibrationRun}
@@ -290,6 +302,7 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     fetchJobsListData,
     calibrationJobId,
     savedCalibrationJobs,
+    readyCalibrationJobs,
     runningCalibrationJobs,
     calibrationDownloadJobID,
     calibrationDownloadFileName,
