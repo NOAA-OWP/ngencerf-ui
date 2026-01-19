@@ -240,7 +240,6 @@ const startRun = async () => {
   executeIterationValidationRun().then((response) => {
     if (response.status === 201) {
       validationStatus.value = response?._data?.status;
-      console.log('validationStatus:',validationStatus.value);
       failureMessages.value = response?._data?.failure_messages;
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
