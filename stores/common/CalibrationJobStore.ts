@@ -180,23 +180,35 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
         throw new Error(message);
       }
     });
-    
-    // create an interval to keep checking download status every 10 seconds
-    let calibrationDownloadStatusIntervalId = setInterval(async () => {
-      getCalibrationJobZipStatus(calibration_run_id)
-      .then(response => {
-        if (response && response._data.zip_status) {
-          if (response._data.zip_status === 'done') {
+
+    // return a promise that resolves/rejects when the interval finishes
+    return await new Promise<void>((resolve, reject) => {
+      // create an interval to keep checking download status every 10 seconds
+      let calibrationDownloadStatusIntervalId = setInterval(async () => {
+        getCalibrationJobZipStatus(calibration_run_id)
+        .then(async response => {
+          const zipStatus = response?._data?.zip_status;
+          a = b;
+          if (zipStatus === 'done') {
             clearInterval(calibrationDownloadStatusIntervalId);
-            downloadCalibrationJobZip(calibration_run_id);
+            await downloadCalibrationJobZip(calibration_run_id);
+            resolve();
+          } else if (!zipStatus) {
+            clearInterval(calibrationDownloadStatusIntervalId);
+            reject(new Error("Unable to get Calibration Job Download Status (missing zip_status)"));
+            return;
+          } else if (zipStatus === 'error' || zipStatus === 'failed') {
+            clearInterval(calibrationDownloadStatusIntervalId);
+            reject(new Error(`Calibration Job Zip build failed: ${zipStatus}`));
+            return;
           }
-        } else {
+        })
+        .catch(err => {
           clearInterval(calibrationDownloadStatusIntervalId);
-          const message = `Error: ${response._data.zip_status} Unable to get Calibration Job Download Status`;
-          throw new Error(message);
-        }
-      });
-    }, 5000) as unknown as number;
+          reject(err);
+        });
+      }, 5000) as unknown as number;
+    });
   }
 
   /**
