@@ -105,10 +105,15 @@ const { hardResetRunStatusStore } = useRunStatusStore();
 const { addToastRecord } = generalStore();
 
 const formulationStore = useFormulationStore;
-const { formulationTabData } = storeToRefs(formulationStore())
+const { formulationTabData } = storeToRefs(formulationStore());
+const { statusTypeFilterList } = storeToRefs(useUserDataStore());
+const { fetchUserCalibrationJobsListIDsOnly } = useUserDataStore();
 
-const { savedCalibrationJobs, readyCalibrationJobs, runningCalibrationJobs } = storeToRefs(useCalibrationJobStore());
-const { fetchUserCalibrationJobsListData, getUserFullName } = useUserDataStore()
+const { getUserFullName } = useUserDataStore()
+
+const runningCalibrationJobs = ref<number | null>(null);
+const readyCalibrationJobs = ref<number | null>(null);
+const savedCalibrationJobs = ref<number | null>(null);
 
 onMounted(async () => {
   popupActive.value = false;
@@ -120,11 +125,18 @@ onMounted(async () => {
   await loadGageTabStaticData();
   await loadFormulationModels();
   await loadOptimizationTabStaticData();
-  await fetchUserCalibrationJobsListData();
-  /* if (!formulationTabData.value) {
-    const tMsg: ToastMessageOptions = { severity: "error", summary: 'Server Error', detail: "Unable to Retrieve Module List", life: ToastTimeout.timeoutError };
-    toast.add(tMsg); addToastRecord(tMsg);
-  } */
+
+  statusTypeFilterList.value = ['Running'];
+  const runningCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
+  runningCalibrationJobs.value = runningCalibrationJobsList.length;
+
+  statusTypeFilterList.value = ['Ready'];
+  const readyCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
+  readyCalibrationJobs.value = readyCalibrationJobsList.length;
+
+  statusTypeFilterList.value = ['Saved'];
+  const savedCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
+  savedCalibrationJobs.value = savedCalibrationJobsList.length;
 })
 
 </script>

@@ -14,7 +14,7 @@ import type { CalibrationJobListItem } from "@/composables/NgencerfModels";
 export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken, getUserName } = useUserDataStore();
-  const { userCalibrationRunData, userCalibrationJobsListData } = storeToRefs(useUserDataStore());
+  const { userCalibrationJobsListData } = storeToRefs(useUserDataStore());
   const { calibrationJobId } = storeToRefs(generalStore());
 
   const calibrationDownloadJobID = ref<number | null>(null);
@@ -27,40 +27,6 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   const fetchJobsListData = computed(() => {
     return userCalibrationJobsListData.value ?? [];
   })
-
-  /**
- * based on the current user's list of calibration job return number of job with status of "saved"
- * @returns {number}
- */
-  const savedCalibrationJobs = computed(() => {
-    return userCalibrationJobsListData.value?.reduce((total_saved_jobs: number, job: CalibrationJobListItem) => {
-      if (job.status.toLowerCase() === 'saved') total_saved_jobs += 1;
-      return total_saved_jobs;
-    }, 0)
-  })
-
-  /**
- * based on the current user's list of calibration job return number of job with status of "running"
- * @returns {number}
- */
-  const runningCalibrationJobs = computed(() => {
-    return userCalibrationJobsListData.value?.reduce((total_running_jobs: number, job: CalibrationJobListItem) => {
-      if (job.status.toLowerCase() === 'running') total_running_jobs += 1;
-      return total_running_jobs;
-    }, 0)
-  })
-
- /**
- * based on the current user's list of calibration job return number of job with status of "ready"
- * @returns {number}
- */
-  const readyCalibrationJobs = computed(() => {
-    return userCalibrationJobsListData.value?.reduce((total_ready_jobs: number, job: CalibrationJobListItem) => {
-      if (job.status.toLowerCase() === 'ready') total_ready_jobs += 1;
-      return total_ready_jobs;
-    }, 0)
-  })
-
 
   /**
  * return a new calibration run id generated from the server
@@ -301,9 +267,6 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   return {
     fetchJobsListData,
     calibrationJobId,
-    savedCalibrationJobs,
-    readyCalibrationJobs,
-    runningCalibrationJobs,
     calibrationDownloadJobID,
     calibrationDownloadFileName,
     fetchNewCalibrationRunId,
