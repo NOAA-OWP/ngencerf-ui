@@ -209,26 +209,28 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
       body: JSON.stringify({ calibration_run_id: calibration_run_id })
     })
     .then(response => {
-      if (!response.ok) {
+      //if (!response.ok) {
+        console.log('Throwing error after start_zip_for_calibration_job response');
         const message = `Error: ${response.status} ${response.statusText}`;
         throw new Error(message);
-      }
+      //}
     });
     
     // create an interval to keep checking download status every 10 seconds
     let calibrationDownloadStatusIntervalId = setInterval(async () => {
       getCalibrationJobZipStatus(calibration_run_id)
       .then(response => {
-        if (response && response._data.zip_status) {
+        /* if (response && response._data.zip_status) {
           if (response._data.zip_status === 'done') {
             clearInterval(calibrationDownloadStatusIntervalId);
             downloadCalibrationJobZip(calibration_run_id);
           }
-        } else {
+        } else { */
           clearInterval(calibrationDownloadStatusIntervalId);
-          const message = `Error: ${response._data.zip_status} Unable to get Calibration Job Download Status`;
+          console.log('Throwing error after get_zip_status response');
+          const message = `Error: Unable to get Calibration Job Download Status`;
           throw new Error(message);
-        }
+        //}
       });
     }, 5000) as unknown as number;
   }
@@ -260,10 +262,11 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
       body: JSON.stringify({ calibration_run_id: calibration_run_id })
     })
     .then(response => {
-      if (!response.ok) {
+      console.log('Throwing error after download_calibration_zip response');
+      // (!response.ok) {
         const message = `Error: ${response.status} ${response.statusText}`;
         throw new Error(message);
-      }
+      //}
       // Extract the filename from the Content-Disposition header if available
       const contentDisposition = response.headers.get('Content-Disposition');
       let file_user_name = getUserName().split("@")[0];
