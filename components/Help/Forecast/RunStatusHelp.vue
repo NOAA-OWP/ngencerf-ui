@@ -37,10 +37,6 @@
                     <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
                 </tr>
                 <tr>
-                    <td class="td1">Results Pathname</td>
-                    <td class="td2">Location on the file system containing all data pertaining to this job.</td>
-                </tr>
-                <tr>
                     <td class="td1">Status</td>
                     <td class="td2">
                         Ready - Click Run to start.<br />
@@ -50,14 +46,39 @@
                     </td>
                 </tr>
                 <tr>
+                    <td class="td1">Cycle Date</td>
+                    <td class="td2">Location on the file system containing all data pertaining to this job.</td>
+                </tr>
+                <tr>
+                    <td class="td1">Cold Start Date</td>
+                    <td class="td2">Date/Time the job was submitted to run.
+                    </td>
+                </tr>
+                <tr>
                     <td class="td1">Configuration</td>
-                    <td class="td2">Forecast configuration</td>
+                    <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
+                </tr>
+                <tr>
+                    <td class="td1">Results Pathname</td>
+                    <td class="td2">Location on the file system containing all data pertaining to this job.</td>
+                </tr>
+                <tr>
+                    <td class="td1">Global Logging</td>
+                    <td class="td2">Enable or Disable the Error Warning and Trapping system for ngen and modules.</td>
+                </tr>
+                <tr>
+                    <td class="td1">Log Levels</td>
+                    <td class="td2">Set the individual log level for ngen and modules.</td>
                 </tr>
                 <tr>
                     <td class="td1">&nbsp;</td>
                     <td class="td2">&nbsp;</td>
                 </tr>
-
+                <tr>
+                    <td class="td1">Previous Button</td>
+                    <td class="td2">Go to the previous tab.
+                    </td>
+                </tr>
                 <tr>
                     <td class="td1">Run Button</td>
                     <td class="td2">Start the job. First the latest Forcing data is downloaded then the forecast is run.
