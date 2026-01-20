@@ -209,30 +209,40 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
       body: JSON.stringify({ calibration_run_id: calibration_run_id })
     })
     .then(response => {
-      //if (!response.ok) {
-        console.log('Throwing error after start_zip_for_calibration_job response');
+      if (!response.ok) {
         const message = `Error: ${response.status} ${response.statusText}`;
         throw new Error(message);
-      //}
+      }
     });
-    
-    // create an interval to keep checking download status every 10 seconds
-    let calibrationDownloadStatusIntervalId = setInterval(async () => {
-      getCalibrationJobZipStatus(calibration_run_id)
-      .then(response => {
-        /* if (response && response._data.zip_status) {
-          if (response._data.zip_status === 'done') {
+
+    // return a promise that resolves/rejects when the interval finishes
+    return await new Promise<void>((resolve, reject) => {
+      // create an interval to keep checking download status every 10 seconds
+      let calibrationDownloadStatusIntervalId = setInterval(async () => {
+        getCalibrationJobZipStatus(calibration_run_id)
+        .then(async response => {
+          const zipStatus = response?._data?.zip_status;
+          a = b;
+          if (zipStatus === 'done') {
             clearInterval(calibrationDownloadStatusIntervalId);
-            downloadCalibrationJobZip(calibration_run_id);
+            await downloadCalibrationJobZip(calibration_run_id);
+            resolve();
+          } else if (!zipStatus) {
+            clearInterval(calibrationDownloadStatusIntervalId);
+            reject(new Error("Unable to get Calibration Job Download Status (missing zip_status)"));
+            return;
+          } else if (zipStatus === 'error' || zipStatus === 'failed') {
+            clearInterval(calibrationDownloadStatusIntervalId);
+            reject(new Error(`Calibration Job Zip build failed: ${zipStatus}`));
+            return;
           }
-        } else { */
+        })
+        .catch(err => {
           clearInterval(calibrationDownloadStatusIntervalId);
-          console.log('Throwing error after get_zip_status response');
-          const message = `Error: Unable to get Calibration Job Download Status`;
-          throw new Error(message);
-        //}
-      });
-    }, 5000) as unknown as number;
+          reject(err);
+        });
+      }, 5000) as unknown as number;
+    });
   }
 
   /**
@@ -262,11 +272,10 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
       body: JSON.stringify({ calibration_run_id: calibration_run_id })
     })
     .then(response => {
-      console.log('Throwing error after download_calibration_zip response');
-      // (!response.ok) {
+      if (!response.ok) {
         const message = `Error: ${response.status} ${response.statusText}`;
         throw new Error(message);
-      //}
+      }
       // Extract the filename from the Content-Disposition header if available
       const contentDisposition = response.headers.get('Content-Disposition');
       let file_user_name = getUserName().split("@")[0];
