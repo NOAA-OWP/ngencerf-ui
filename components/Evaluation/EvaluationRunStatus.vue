@@ -102,8 +102,8 @@
           </label>
         </div>
         <div class="pl-5" style="width: 100%;">
-          <span v-for="message in failureMessages">
-            {{ message }}<br/>
+          <span v-for="failure_message in failureMessages">
+            {{ failure_message.message }}<br/>
           </span>
         </div>
       </div>
@@ -205,10 +205,10 @@ onMounted(async () => {
 
   // assume having evaluateValidationRunId but not evaluateIterationRunId means user is intend to view the status of a done/stopped job
   if (evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0) {
+    iterationValidationRunId.value = evaluateValidationRunId.value;
     await loadValidationStatusInformation(evaluateValidationRunId.value);
     if (iterationValidationRunId.value > 0 && validationStatus.value !== '') {
       updateLogDisplay();
-    } else {
     }
   } else {
     // this condition assume we have evaluateIterationRunId value which also assume user want to run a new validation
