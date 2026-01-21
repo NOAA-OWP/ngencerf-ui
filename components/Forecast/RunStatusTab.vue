@@ -87,12 +87,21 @@
                 </td>
                 <td class="pl-5">{{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'None') }}</td>
               </tr>
-              <tr height="32px" :aria-label="'Configuration is ' + ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown')"
-                :title="'Configuration is ' + ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown')">
+              <tr height="32px" :aria-label="'Configuration is ' + (forecastConfigurationName ?? 'Unknown')"
+                :title="'Configuration is ' + (forecastConfigurationName ?? 'Unknown')">
                 <td class="text-right font-bold">
                   <div style="width: 140px;">Configuration</div>
                 </td>
-                <td class="pl-5">{{ ((forecastConfiguration as ForecastConfiguration)?.name ?? 'Unknown') ?? '-'.repeat(15) }}</td>
+                <td class="pl-5">{{ forecastConfigurationName ?? 'Unknown' }}</td>
+              </tr>
+              <tr v-show="logList.length > 1" height="32px" aria-label="Select Log Name" 
+                title="Select Log Name">
+                <th scope="row" class="text-right"><label for="DisplayOptions">Display</label></th>
+                <td class="pl-3">
+                  <Select id="DisplayOptions" class="p-select" v-model="selectedLogCategory" 
+                    :options="logList" option-label="display_name" optionValue="name">
+                  </Select>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -187,6 +196,11 @@
             </div>
           </div>
         </div>
+
+        <!-- DISPLAY LOGS -->
+        <div v-else class="col-span-5">
+          <LogDisplay/>
+        </div>
       </div>
     </div>
 
@@ -210,7 +224,7 @@
                 </Button>
               </div>
             </span>
-            <span v-if="coldStartJobStatus === 'Running' || forecastJobStatus === 'Running'">
+            <span v-if="['Submitted','Running'].includes(coldStartJobStatus) || ['Submitted','Running'].includes(forecastJobStatus)">
               <div class="col-span-1 mr-3">
                 <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" @click="cancelForecastRun()"
                   aria-label="Cancel Button">
@@ -240,8 +254,8 @@
 
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
-
 import type { ToastMessageOptions } from "primevue/toast";
+import LogDisplay from "../Common/LogDisplay.vue";
 
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
@@ -256,6 +270,7 @@ const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
+const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
 
 const {
@@ -263,6 +278,7 @@ const {
   coldStartDate,
   cycleDate,
   forecastConfiguration,
+  forecastConfigurationName,
   forecastJobStatus,
   coldStartJobStatus,
   failureMessages,
@@ -275,6 +291,8 @@ const {
   calibrationRunForForecast,
   overallColdStartForecastStatus,
   forecastJobNgenGlobalLogging,
+  selectedLogCategory,
+  logList
 } = storeToRefs(useForecastStore());
 
 const {
@@ -282,7 +300,8 @@ const {
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
-  setElapsedTime,
+  populateLogListOptions,
+  resetUserLogRefs,
   hardResetForecastRunStatusStore
 } = useForecastStore();
 
@@ -296,6 +315,17 @@ onMounted(async () => {
 
   // highlight the tab when selected
   hilightTab(ForecastTabs.tab_runStatus);
+  
+  // get calibration job data if we don't already have it
+  if (!userCalibrationRunData.value) {
+    await fetchUserCalibrationRunData();
+  }
+  if (forecastJobId.value) {
+    await loadForecastRunStatusTabData();
+    await populateLogListOptions();
+    createColdStartAndForecastStatusInterval();
+    createElapsedTimeInterval();
+  }
 
   clearInterval(forecastJobStatusIntervalId.value);
   clearInterval(elapsedTimeIntervalId.value);
@@ -308,26 +338,21 @@ onMounted(async () => {
   } else {
     ngenLogLevel.value = 'info';
   }
-  if (userCalibrationRunData?.value?.logging_config?.modules['forcing']) {
+  if (calibrationRunForForecast?.value?.logging_config?.modules['forcing']) {
     forcingLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['forcing'] as LogLevel;
   } else {
     forcingLogLevel.value = 'info';
   }
   
-  Object.keys(userCalibrationRunData?.value?.logging_config?.modules).forEach(server_key => {
-    // Find matching key in log levels somehow
-    Object.keys(logLevels.value).forEach(ui_key => {
-      if (ui_key.toLowerCase() == server_key.toLowerCase()) {
-        logLevels.value[ui_key] = ref(userCalibrationRunData?.value?.logging_config?.modules[server_key] as LogLevel);
-      }
+  if (calibrationRunForForecast?.value?.logging_config?.modules) {
+    Object.keys(calibrationRunForForecast.value.logging_config.modules).forEach(server_key => {
+      // Find matching key in log levels somehow
+      Object.keys(logLevels.value).forEach(ui_key => {
+        if (ui_key.toLowerCase() == server_key.toLowerCase()) {
+          logLevels.value[ui_key] = ref(calibrationRunForForecast.value.logging_config.modules[server_key] as LogLevel);
+        }
+      });
     });
-  });
-
-  // load Run/Status tab data
-  await loadForecastRunStatusTabData();
-  if (forecastJobId.value) {
-    createColdStartAndForecastStatusInterval();
-    createElapsedTimeInterval();
   }
 
   if (!cycleDate.value && calibrationRunForForecast?.value?.cycle_date) {
@@ -420,6 +445,12 @@ const startForecastRun = async () => {
   }
 };
 
+watch(overallColdStartForecastStatus, async (newColdStartForecastStatus, oldColdStartForecastStatus) => {
+  if (forecastJobId.value && (newColdStartForecastStatus || oldColdStartForecastStatus) && !isLoading.value) {
+    await populateLogListOptions();
+  }
+}, { immediate: true });
+
 /**
  * Cancel the forecast run
  */
@@ -464,8 +495,11 @@ const goToSetupForecastTab = () => {
     e.click();
 };
 
-onBeforeUnmount(() => {
+onUnmounted(() => {
+  // make sure page clears all log data when the user leaves
   hardResetForecastRunStatusStore();
+  logList.value = [];
+  resetUserLogRefs();
 })
 </script>
 
@@ -488,5 +522,13 @@ onBeforeUnmount(() => {
   margin-right: auto; 
   max-width: 800px; 
   position: relative;
+}
+
+#selectedLogDisplay {
+  max-height: 300px;
+}
+
+.gray-border {
+  border: 2px solid #d9d9d9;
 }
 </style>

@@ -1,28 +1,78 @@
 <template>
   <client-only>
     <div class="h-full">
-      <div class="grid grid-rows-3 h-full">
-        <div class="row-span-1">
-          <div>
-            <AppHeader />
-          </div>
-        </div>
-        <div class="row-span-1">
-          <div id="CenterBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-lg">
-            <div class="mx-auto px-8 text-center text-2xl mt-8 mb-8 ">
-              <h1 class="text-4xl font-bold">Next Generation Water Prediction Capability</h1>
-              <div class="pt-8 pb-8">Welcome <strong>{{ getUserFullName() }}</strong></div>
-              <div>You have {{ runningCalibrationJobs }} current processes running</div>
-              <div>You have {{ savedCalibrationJobs }} calibration setups to complete</div>
+        <div class="grid grid-rows-3 h-full">
+
+            <!-- Header -->
+            <div class="row-span-1">
+                <AppHeader />
             </div>
-          </div>
+
+            <!-- Center Content -->
+            <div class="row-span-1">
+                <div
+                id="CenterBox"
+                class="bg-white mx-auto px-6 py-8 rounded-[10px] max-w-screen-lg shadow-md"
+                >
+                <!-- Page Title -->
+                <div class="text-center mb-6">
+                    <h1 class="text-4xl font-bold">Next Generation Water Prediction Capability</h1>
+                    <div class="text-lg sm:text-xl text-gray-700 mt-2">
+                    Welcome <strong>{{ getUserFullName() }}</strong>
+                    </div>
+                </div>
+
+                <hr class="my-6 border-black" />
+
+                <!-- Dashboard Section -->
+                <div class="text-center font-bold text-2xl mb-4">Dashboard</div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                    <!-- Running Processes Card -->
+                    <div class="bg-teal-100 text-teal-800 p-6 rounded-lg shadow-md flex flex-col items-center">
+                       <i class="pi pi-cog text-teal-600 text-3xl mb-2"
+                            :class="{ 'pi-spin': runningCalibrationJobs > 0 }"></i>
+                            <div class="text-3xl sm:text-4xl font-extrabold text-teal-800">
+                            {{ runningCalibrationJobs }}
+                        </div>
+                        <div class="text-sm sm:text-base text-gray-700 mt-2">
+                            Calibrations Running
+                        </div>
+                    </div>
+
+                    <!-- Ready to Run Card -->
+                    <div class="bg-green-50 p-6 rounded-lg shadow-md flex flex-col items-center">
+                        <i class="pi pi-play-circle text-green-600 text-3xl mb-2"></i>
+                        <div class="text-3xl sm:text-4xl font-extrabold text-green-600">
+                            {{ readyCalibrationJobs }}
+                        </div>
+                        <div class="text-sm sm:text-base text-gray-700 mt-2">
+                            Calibrations Ready to Run
+                        </div>
+                    </div>
+
+                    <!-- Setups to Complete Card -->
+                    <div class="bg-amber-50 p-6 rounded-lg shadow-md flex flex-col items-center">
+                        <i class="pi pi-sliders-h text-amber-600 text-3xl mb-2"></i>
+                        <div class="text-3xl sm:text-4xl font-extrabold text-amber-600">
+                            {{ savedCalibrationJobs }}
+                        </div>
+                        <div class="text-sm sm:text-base text-gray-700 mt-2">
+                            Calibrations In Setup
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="row-span-1">
+                <AppFooter />
+            </div>
         </div>
-      </div>
-      <div class="row-span-1">
-        <AppFooter />
-      </div>
     </div>
-  </client-only>
+</client-only>
+
 </template>
 <script setup lang="ts">
 import { onMounted } from "vue";
@@ -47,18 +97,23 @@ const toast = useToast();
 
 const { popupActive } = storeToRefs(generalStore());
 
-const { resetGageStore } = useGageStore();
+const { resetGageStore, loadGageTabStaticData } = useGageStore();
 const { resetFormulationStore, loadFormulationModels } = useFormulationStore();
-const { resetOptimizationStore } = useOptimizationStore();
-const { hardResetRunStatusStore } = useRunStatusStore();
 const { hardResetTuningStore } = useTuningStore();
+const { resetOptimizationStore, loadOptimizationTabStaticData } = useOptimizationStore();
+const { hardResetRunStatusStore } = useRunStatusStore();
 const { addToastRecord } = generalStore();
 
 const formulationStore = useFormulationStore;
-const { formulationTabData } = storeToRefs(formulationStore())
+const { formulationTabData } = storeToRefs(formulationStore());
+const { statusTypeFilterList } = storeToRefs(useUserDataStore());
+const { fetchUserCalibrationJobsListIDsOnly } = useUserDataStore();
 
-const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs(useCalibrationJobStore());
-const { fetchUserCalibrationJobsListData, getUserFullName } = useUserDataStore()
+const { getUserFullName } = useUserDataStore()
+
+const runningCalibrationJobs = ref<number | null>(null);
+const readyCalibrationJobs = ref<number | null>(null);
+const savedCalibrationJobs = ref<number | null>(null);
 
 onMounted(async () => {
   popupActive.value = false;
@@ -67,12 +122,21 @@ onMounted(async () => {
   resetOptimizationStore();
   hardResetRunStatusStore();
   hardResetTuningStore();
+  await loadGageTabStaticData();
   await loadFormulationModels();
-  await fetchUserCalibrationJobsListData();
-  /* if (!formulationTabData.value) {
-    const tMsg: ToastMessageOptions = { severity: "error", summary: 'Server Error', detail: "Unable to Retrieve Module List", life: ToastTimeout.timeoutError };
-    toast.add(tMsg); addToastRecord(tMsg);
-  } */
+  await loadOptimizationTabStaticData();
+
+  statusTypeFilterList.value = ['Running'];
+  const runningCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
+  runningCalibrationJobs.value = runningCalibrationJobsList.length;
+
+  statusTypeFilterList.value = ['Ready'];
+  const readyCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
+  readyCalibrationJobs.value = readyCalibrationJobsList.length;
+
+  statusTypeFilterList.value = ['Saved'];
+  const savedCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
+  savedCalibrationJobs.value = savedCalibrationJobsList.length;
 })
 
 </script>

@@ -2,7 +2,7 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
           class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
@@ -25,7 +25,9 @@
         <div id="CalTable" class="w-max mx-auto">
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-status="false" :show-modules="false" :show-archived="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            :totalSize="calibrationRunsForForecastListTotalSize" :totalPages="calibrationRunsForForecastListTotalPages"
+            v-model:currentPage="calibrationRunsForForecastListCurrentPage"
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -237,7 +239,12 @@ const {
   calibrationRunsForForecastListEndRow,
   calibrationRunsForForecastListSort 
 } = storeToRefs(forecastStore);
-const { getCalibrationJobsForForecast, resetUserSelectedForecastCalibrationRun, hardResetForecastRunStatusStore } = forecastStore;
+const { 
+  getCalibrationJobsForForecast, 
+  resetUserSelectedForecastCalibrationRun, 
+  hardResetForecastRunStatusStore,
+  resetFilters
+} = forecastStore;
 
 
 const toast = useToast();
@@ -367,20 +374,11 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
   }
 });
 
-const openSelectedCalibrationRun = async () => {
-  isLoading.value = true;
-  resetUserSelectedEvalValidationRun();
-  await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
-  await fetchUserSelectedCalibrationValidationRunList();
-  navigateToSetupForecast();
-  isLoading.value = false;
-};
-
 const navigateToSetupForecast = async () => {
   if (calibrationRunForForecast?.value?.calibration_run_id && calibrationRunForForecast.value.calibration_run_id > 0) {
+    forecastJobId.value = undefined;
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
     if (e) {
-      await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
       e.click();
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Setup Forecast Tab not found', life: ToastTimeout.timeoutError};

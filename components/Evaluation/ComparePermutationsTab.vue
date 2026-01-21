@@ -160,10 +160,8 @@ onMounted(() => {
             }
           }
 
-          // If we only have one plot option, hide the dropdown and just default to that option
-          if (plotList.value.length === 1) {
-              selectedPlotName.value = plotList.value[0].name
-          }
+          // default to the first option in the list
+          selectedPlotName.value = plotList.value[0].name
         } else {
           toast.removeAllGroups();
           const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error getting plot names', life: ToastTimeout.timeoutError };
@@ -321,7 +319,7 @@ const getPlotTableData = async () => {
             } else if (!isNaN(parseFloat(plotTables.value[t].table_data[r][key])) && isFinite(plotTables.value[t].table_data[r][key]) && plotTables.value[t].table_data[r][key].toString().indexOf('.') > 0) {
               // attempt to round to 5 digits - just display as is if there are any problems doing this
               try {
-                plotTables.value[t].table_data[r][key] = Number(plotTables.value[t].table_data[r][key]).toFixed(5);
+                plotTables.value[t].table_data[r][key] = Number(plotTables.value[t].table_data[r][key].toFixed(5));
               } catch (error) {
                 console.error('Error rounding value ' + plotTables.value[t].table_data[r][key] + ': ', error);
               }

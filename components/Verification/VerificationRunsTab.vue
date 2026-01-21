@@ -2,7 +2,7 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
           class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
@@ -22,7 +22,9 @@
         <div id="VerTable">
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-gage="false" :show-modules="false" :show-archived="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            :totalSize="verificationRunListTotalSize" :totalPages="verificationRunListTotalPages"
+            v-model:currentPage="verificationRunListCurrentPage"
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="vrContextMenu"
@@ -50,20 +52,6 @@
                   :aria-label="'Job ID ' + slotProps.data.verification_run_id"
                   :title="'Job ID ' + slotProps.data.verification_run_id">
                   {{ slotProps.data.verification_run_id }}
-                </span>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="created_at" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Creation Date</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <span v-if="slotProps.data.created_at"
-                  :aria-label="'Created at ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
-                  :title="'Created at ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
                 </span>
               </template>
             </Column>
@@ -139,16 +127,15 @@ const {
   verificationRunListSort,
   selectedVerificationJob,
   verificationJobId,
-  userVerificationJobData,
   isVerificationLoading
 } = storeToRefs(verificationStore);
 
 const {
   resetSelectedVerificationJobData,
-  loadSelectedVerificationJob,
   setSelectedVerificationRowData,
   getVerificationJobs,
-  deleteVerificationJob
+  deleteVerificationJob,
+  resetFilters
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
@@ -269,30 +256,12 @@ const acceptDelete = (selectedRunId: number) => {
   });
 }
 
-const navigateToSetupVerification = () => {
-  isVerificationLoading.value = true;
-  nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Verification Tab"]');
-
-    if (e) {
-      if (selectedVerificationJob.value) {
-        await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_run_id as number);
-      }
-      e.click();
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Verification Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
-    }
-    isVerificationLoading.value = false;
-  });
-}
-
 const navigateToVerificationJobStatus = () => {
   isVerificationLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
 
     if (e) {
-      await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
@@ -307,7 +276,6 @@ const navigateToVerificationResults = () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results Tab"]');
 
     if (e) {
-      await loadSelectedVerificationJob(selectedVerificationJob?.value?.verification_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);

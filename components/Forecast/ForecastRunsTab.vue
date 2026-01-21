@@ -2,7 +2,7 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
           class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
@@ -23,7 +23,9 @@
 
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-gage="false" :show-modules="false" :show-archived="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            :totalSize="forecastRunListTotalSize" :totalPages="forecastRunListTotalPages"
+            v-model:currentPage="forecastRunListCurrentPage"
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -97,20 +99,6 @@
                   :title="'Domain ' + slotProps.data.domain_name">
                   {{ slotProps.data.domain_name }}
                 </span>
-              </template>
-            </Column>
-            <Column field="created_at" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Creation Date</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <div v-if="slotProps.data.created_at" class="text-center"
-                  :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
-                  :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
-                </div>
               </template>
             </Column>
             <Column :pt="ptColumn" field="configuration" header="Configuration" sortable>
@@ -225,15 +213,14 @@ const {
 const {
   setSelectedForecastRunId,
   resetSelectedForecastRunData,
-  loadForecastRunStatusTabData,
-  loadForecastResultsTabData,
   loadSelectedCalibrationRun,
   setSelectedForecastRowData,
   getForecastJobs,
   getCalibrationJobsForForecast,
   deleteForecastJob,
   resetUserSelectedForecastCalibrationRun,
-  hardResetForecastRunStatusStore
+  hardResetForecastRunStatusStore,
+  resetFilters
 } = useForecastStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
@@ -278,8 +265,10 @@ const onRowContextMenu = (event: any) => {
     if (crRowData.forecast_status === 'Done') {
       cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToForecastResults() });
     }
-    cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
-    cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    if (crRowData.calibration_run_id) {
+      cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
+      cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    }
     if (crRowData.forecast_status !== 'Running') {
       cmForecastRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedForecastJob() });
     }
@@ -356,6 +345,7 @@ const navigateToSetupForecast = () => {
 
       // set userCalibrationRunData
       await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+      forecastJobId.value = undefined;
       isForecastLoading.value = false;
       e.click();
     } else {

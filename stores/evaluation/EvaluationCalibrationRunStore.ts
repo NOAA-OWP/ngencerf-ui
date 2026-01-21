@@ -60,7 +60,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const displayCalibrationValidationRunList = ref<CalibrationValidationJobData[]>([]);
 
   const gageevaluationRunListHeaders = ref<any[]>([]);
-  const computedGageCalibrationRunList = ref<CalibrationJobListItem[]>([]);
+  const userEvaluationRunListDataByGage = ref<CalibrationJobListItem[]>([]);
 
   const selectedCalibrationCompareRuns = ref<CalibrationJobListItem[]>([]);
   const selectedCalibrationModules = ref<string[] | undefined>([]);
@@ -121,18 +121,18 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
           operator: moduleOperator.value === 'All' ? 'and' : 'or'
         },
         date_filter:
-          (createdAtStart.value && createdAtEnd.value) ? {
-            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "between"
-          } : createdAtStart.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            operator: "after"
-          } : createdAtEnd.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "before"
-          } : {}
-        ,
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "before"
+            } : {}
+          ,
         id_filter:
           (jobIdStart.value && jobIdEnd.value) ? {
             start_id: jobIdStart.value,
@@ -213,6 +213,33 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       minJobId.value = runListDataResult?._data?.id_range[0];
       maxJobId.value = runListDataResult?._data?.id_range[1];
     }
+  }
+
+  /**
+   * fetch user created calibration job list data by gage (for compare permutations)
+   * @return {void}
+   */
+  async function fetchUserValidatedCalibrationJobsListDataForComparison() {
+    let requestBody = {
+      sort: {
+        field: evaluationRunListSort.value.field,
+        direction: evaluationRunListSort.value.direction === -1 ? 'desc' : 'asc'
+      },
+      filters: {
+        gage_id: uiCompareGageId.value && uiCompareGageId.value !== "All" ? uiCompareGageId.value: "",
+      },
+      get_gages: uiGageList.value.length === 0
+    }
+    const runListDataResult = await makeProtectedApiCall<ValidatedevaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    return runListDataResult?._data?.jobs ?? [];
   }
 
   const fetchValidationRunListByCalibrationRun = async () => {
@@ -392,8 +419,27 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    */
   const resetUserSelectedEvalCompareRun = (): void => {
     calibrationJobId.value = userSelectedEvalCalibrationRunId.value = evaluateIterationRunId.value = 0;
-    computedGageCalibrationRunList.value = [];
+    userEvaluationRunListDataByGage.value = [];
   }
+
+  /**
+   * reset job filters
+   */
+  const resetFilters = () => {
+    uiGageId.value = 'All';
+    modulesFilterList.value = []; 
+    moduleOperator.value = 'All';
+    statusTypeFilterList.value = [];
+    includeArchivedJobs.value = false;
+    createdAtStart.value = null;
+    createdAtEnd.value = null;
+    minCreatedAt.value = null;
+    maxCreatedAt.value = null;
+    jobIdStart.value = null;
+    jobIdEnd.value = null;
+    minJobId.value = null;
+    maxJobId.value = null;
+  };
 
   useLogoutListen('logoutEvent', (evStr: string) => {
     if (evStr === "logout") {
@@ -412,6 +458,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     setSelectedCalibrationRunId,
     loadSelectedCalibrationRun,
     fetchUserValidatedCalibrationJobsListData,
+    fetchUserValidatedCalibrationJobsListDataForComparison,
     queryGetPlotNamesForComparison,
     queryGetPlotsForComparison,
     resetUserSelectedEvalCalibrationRun,
@@ -424,6 +471,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     resetUserSelectedEvalCompareRun,
     clearUserCalibrationRunData,
     fetchValidationRunListByCalibrationRun,
+    resetFilters,
 
     getValidationRunIdByCalibrationRunId,
     userEvaluationRunListData,
@@ -438,7 +486,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     computedCalibrationValidationRunList,
     displayCalibrationValidationRunList,
     gageevaluationRunListHeaders,
-    computedGageCalibrationRunList,
+    userEvaluationRunListDataByGage,
     selectedCalibrationCompareRuns,
     selectedCalibrationModules,
     evaluateValidationRunId,

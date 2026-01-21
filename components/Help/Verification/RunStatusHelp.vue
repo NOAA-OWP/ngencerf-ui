@@ -1,17 +1,17 @@
 <template>
     <div class="_help-page">
-        <div class="_help-title">Forecast - Run/Status Tab</div>
+        <div class="_help-title">Verification - Run/Status Tab</div>
         <div class="_help-subtitle">
-            This tab provides the ability to run the forecast.<br />
+            This tab provides the ability to run the Verification.<br />
             First the real-time forcing data will be downloaded,
             which can take several minutes.<br />
-            Once the forcing data is ready the forecast will automatically start.
+            Once the forcing data is ready the Verification will automatically start.
         </div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
         <hr />
-        <table class="_help-table" aria-label="Forecast Run / Status Help Table">
+        <table class="_help-table" aria-label="Verification Run / Status Help Table">
             <thead>
                 <tr>
                     <th>Item</th>
@@ -20,12 +20,12 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="td1">Calibration Job ID</td>
-                    <td class="td2">Calibration Job ID as the basis for the forecast run.</td>
+                    <td class="td1">Forecast Job ID</td>
+                    <td class="td2">Forecast Job ID as the basis for the Verification run.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Forecast Job ID</td>
-                    <td class="td2">This Forecast Job ID.</td>
+                    <td class="td1">Verification Job ID</td>
+                    <td class="td2">This Verification Job ID.</td>
                 </tr>
                 <tr>
                     <td class="td1">Submit Time</td>
@@ -41,47 +41,17 @@
                     <td class="td2">
                         Ready - Click Run to start.<br />
                         Forcing Download Running<br />
-                        Forecast Running<br />
+                        Verification Running<br />
                         Done
                     </td>
-                </tr>
-                <tr>
-                    <td class="td1">Cycle Date</td>
-                    <td class="td2">Location on the file system containing all data pertaining to this job.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Cold Start Date</td>
-                    <td class="td2">Date/Time the job was submitted to run.
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td1">Configuration</td>
-                    <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
                 </tr>
                 <tr>
                     <td class="td1">Results Pathname</td>
                     <td class="td2">Location on the file system containing all data pertaining to this job.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Global Logging</td>
-                    <td class="td2">Enable or Disable the Error Warning and Trapping system for ngen and modules.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Log Levels</td>
-                    <td class="td2">Set the individual log level for ngen and modules.</td>
-                </tr>
-                <tr>
-                    <td class="td1">&nbsp;</td>
-                    <td class="td2">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="td1">Previous Button</td>
-                    <td class="td2">Go to the previous tab.
-                    </td>
-                </tr>
-                <tr>
                     <td class="td1">Run Button</td>
-                    <td class="td2">Start the job. First the latest Forcing data is downloaded then the forecast is run.
+                    <td class="td2">Start the job. First the latest Forcing data is downloaded then the Verification is run.
                     </td>
                 </tr>
                 <tr>
@@ -91,9 +61,8 @@
                 </tr>
                 <tr>
                     <td class="td1">View Results Button</td>
-                    <td class="td2">View results of the forecast. Appears once the job is done.</td>
+                    <td class="td2">View results of the verification. Appears once the job is done.</td>
                 </tr>
-
             </tbody>
         </table>
     </div>

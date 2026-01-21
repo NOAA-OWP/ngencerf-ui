@@ -28,7 +28,7 @@
                       <VueDatePicker id="SimulationStart" class="datePickers dp__theme_dark" v-model="simStartTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                         @update:model-value="handleSimStartUpdate" aria-label="Calibration Time Simulation Start"
-                        title="Calibration Time Simulation Start"
+                        title="Calibration Time Simulation Start" :teleport="true"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                     <th scope="row" class="pl-6 w-1/6">
@@ -38,7 +38,7 @@
                       <VueDatePicker id="SimulationEnd" class="datePickers dp__theme_dark" v-model="simEndTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                         @update:model-value="handleSimEndUpdate" aria-label="Calibration Time Simulation End"
-                        title="Calibration Time Simulation End"
+                        title="Calibration Time Simulation End" :teleport="true"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                   </tr>
@@ -50,7 +50,7 @@
                       <VueDatePicker id="CalibrationStart" class="datePickers dp__theme_dark" v-model="calStartTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                         @update:model-value="handleCalStartUpdate" aria-label="Calibration Time Calibration Start"
-                        title="Calibration Time Calibration Start"
+                        title="Calibration Time Calibration Start" :teleport="true"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                     <th scope="row" class="pl-6 w-1/6">
@@ -60,7 +60,7 @@
                       <VueDatePicker id="CalibrationEnd" class="datePickers dp__theme_dark" v-model="calEndTime"
                         time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
                         @update:model-value="handleCalEndUpdate" aria-label="Calibration Time Calibration End"
-                        title="Calibration Time Calibration End"
+                        title="Calibration Time Calibration End" :teleport="true"
                         :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
                     </td>
                   </tr>
@@ -85,9 +85,9 @@
                         <label for="ValSimulationStart" class="whitespace-nowrap">Simulation Start </label>
                       </th>
                       <td class="text-left w-2/6" style="position: relative;">
-                        <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark"
-                          v-model="avSimStartTime" time-picker-inline text-input utc='preserve'
-                          format="yyyy-MM-dd HH:00" @update:model-value="handleAvSimStartUpdate"
+                        <VueDatePicker id="ValSimulationStart" class="datePickers dp__theme_dark" v-model="avSimStartTime" 
+                          time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00" 
+                          @update:model-value="handleAvSimStartUpdate" :teleport="true"
                           aria-label="Automatic Validation Time Simulation Start"
                           title="Automatic Validation Time Simulation Start"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
@@ -98,7 +98,7 @@
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValSimulationEnd" class="datePickers dp__theme_dark" v-model="avSimEndTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                          @update:model-value="handleAvSimEndUpdate"
+                          @update:model-value="handleAvSimEndUpdate" :teleport="true"
                           aria-label="Automatic Validation Time Simulation End"
                           title="Automatic Validation Time Simulation End"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
@@ -111,7 +111,7 @@
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValidationStart" class="datePickers dp__theme_dark" v-model="avCalStartTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                          @update:model-value="handleAvCalStartUpdate"
+                          @update:model-value="handleAvCalStartUpdate" :teleport="true"
                           aria-label="VAutomatic Validation Time alidation Start"
                           title="Automatic Validation Time Validation Start"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
@@ -122,7 +122,7 @@
                       <td class="text-left w-2/6" style="position: relative;">
                         <VueDatePicker id="ValidationEnd" class="datePickers dp__theme_dark" v-model="avCalEndTime"
                           time-picker-inline text-input utc='preserve' format="yyyy-MM-dd HH:00"
-                          @update:model-value="handleAvCalEndUpdate"
+                          @update:model-value="handleAvCalEndUpdate" :teleport="true"
                           aria-label="Automatic Validation Time Validation End"
                           title="Automatic Validation Time Validation End"
                           :disabled="!isTimeRangeSet() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)" />
@@ -190,7 +190,6 @@
       </div>
     </div>
   </div>
-  <div v-else class="h-36"></div>
 
   <div id="TuningDataList" v-if="!userCalibrationRunData?.modules?.includes('LSTM')" class="mt-2 mb-10 overflow-auto max-h-[200px]" style="position: relative;">
     <ContextMenu :pt="{ root: { id: 'tuning-context-menu' } }" class="bg-white" ref="tuningContextMenu"
@@ -821,25 +820,20 @@ const AutoValChecked = () => {
 const validateAndBuildRequestBody = (): boolean => {
   saveTuningTabRequestBody.value.calibration_run_id = calibrationJobId.value;
 
-  if (areCalibrationTimesSet()) {
-    if (areCalibrationTimesValidated()) {
-      saveTuningTabRequestBody.value.calibration_times = {
-        simulation_start_time: simStartTime.value,
-        simulation_end_time: simEndTime.value,
-        calibration_start_time: calStartTime.value,
-        calibration_end_time: calEndTime.value
-      };
-    }
-  }
-  if (areValidationTimesSet()) {
-    if (areValidationTimesValidated()) {
-      saveTuningTabRequestBody.value.validation_times = {
-        simulation_start_time: avSimStartTime.value,
-        simulation_end_time: avSimEndTime.value,
-        validation_start_time: avCalStartTime.value,
-        validation_end_time: avCalEndTime.value
-      };
-    }
+  // only send calibration/validation dates in the payload to the server if ALL are valid
+  if (areCalibrationTimesSet() && areCalibrationTimesValidated() && areValidationTimesSet() && areValidationTimesValidated()) {
+    saveTuningTabRequestBody.value.calibration_times = {
+      simulation_start_time: simStartTime.value,
+      simulation_end_time: simEndTime.value,
+      calibration_start_time: calStartTime.value,
+      calibration_end_time: calEndTime.value
+    };
+    saveTuningTabRequestBody.value.validation_times = {
+      simulation_start_time: avSimStartTime.value,
+      simulation_end_time: avSimEndTime.value,
+      validation_start_time: avCalStartTime.value,
+      validation_end_time: avCalEndTime.value
+    };
   }
 
   saveTuningTabRequestBody.value.automatic_validation = automatic_validation.value;
@@ -918,7 +912,7 @@ const areCalibrationTimesValidated = (): boolean => {
 
   // check if calibration_times are not within time_range
   if (!isSimStartWithinRange || !isSimEndWithinRange || !isCalStartWithinRange || !isCalEndWithinRange) {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'calibrationtimes must be within time_range. Was not saved.', life: ToastTimeout.timeoutWarn };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'Calibration times must be within time_range. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -931,7 +925,7 @@ const areCalibrationTimesValidated = (): boolean => {
   }
 
   // check if calibration_start_time is not within simulation_start_time and simulation_end_time
-  if (calStartDate <= simStartDate || calStartDate > simEndDate) {
+  if (calStartDate < simStartDate || calStartDate > simEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time range problem', detail: 'calibration_start_time must be within simulation_start_time and simulation_end_time. Was not saved.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
@@ -1012,6 +1006,19 @@ const areValidationTimesValidated = (): boolean => {
     }
   }
 
+  // set conditions to check if validation are not within time_range
+  const isAvSimStartWithinRange = avSimStartDate >= rangeStartDate && avSimStartDate <= rangeEndDate;
+  const isAvSimEndWithinRange = avSimEndDate >= rangeStartDate && avSimEndDate <= rangeEndDate;
+  const isAvCalStartWithinRange = avCalStartDate >= rangeStartDate && avCalStartDate <= rangeEndDate;
+  const isAvCalEndWithinRange = avCalEndDate >= rangeStartDate && avCalEndDate <= rangeEndDate;
+
+  // check if calibration_times are not within time_range
+  if (!isAvSimStartWithinRange || !isAvSimEndWithinRange || !isAvCalStartWithinRange || !isAvCalEndWithinRange) {
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Time out of range', detail: 'Validation times must be within time_range. Was not saved.', life: ToastTimeout.timeoutWarn };
+    toast.add(tMsg); addToastRecord(tMsg);
+    return false;
+  }
+
   // check if avSimEndDate is not after avSimStartDate
   if (avSimStartDate >= avSimEndDate) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Simulation End must be after Simulation Start', life: ToastTimeout.timeoutError };
@@ -1021,14 +1028,14 @@ const areValidationTimesValidated = (): boolean => {
 
   // check if avCalStartDate is not within avSimStartDate and avSimEndDate
   if (avCalStartDate < avSimStartDate || avCalStartDate > avSimEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Calibration Start must be within Simulation Start and End', life: ToastTimeout.timeoutError };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation and Calibration Start must be within Simulation Start and End', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
 
   // check if avCalEndDate is not after avCalStartDate and not less than avSimEndDate
   if (avCalEndDate <= avCalStartDate || avCalEndDate > avSimEndDate) {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End', life: ToastTimeout.timeoutError };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Time error', detail: 'Validation and Calibration End must be after Validation Calibration Start and less than or equal to Validation Simulation End', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
     return false;
   }
@@ -1065,12 +1072,23 @@ const saveTuningData = () => {
   const handleSaveTuningTab = async () => {
     const saveTuningTabResponse = await saveTuningTabData();
     if (saveTuningTabResponse?.ok) {
-      const tMsg: ToastMessageOptions = {
-        severity: 'success', summary: `Success`,
-        detail: "Saved Tuning data",
-        life: ToastTimeout.timeoutSuccess
-      };
-      toast.add(tMsg); addToastRecord(tMsg);
+      if (saveTuningTabRequestBody.value?.calibration_times && saveTuningTabRequestBody.value?.validation_times) {
+        // times and calibratable parameters were both saved
+        const tMsg: ToastMessageOptions = {
+          severity: 'success', summary: `Success`,
+          detail: "Saved Tuning Data",
+          life: ToastTimeout.timeoutSuccess
+        };
+        toast.add(tMsg); addToastRecord(tMsg);
+      } else {
+        //only calibratable parameters were saved
+        const tMsg: ToastMessageOptions = {
+          severity: 'info', summary: `Partial Success`,
+          detail: "Saved calibratable parameters only. Calibration and Validation times still need to be set properly.",
+          life: ToastTimeout.timeoutSuccess
+        };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
       updateJobData();
       calibratableParametersHaveChanged.value = false;
       tuningDataHasChanged.value = false;
@@ -1078,36 +1096,50 @@ const saveTuningData = () => {
     } else {
       tuningStore_data_loading.value = false;
 
+      let messageBody = '';
       if (saveTuningTabResponse._data && saveTuningTabResponse._data.response_type) {
         if (saveTuningTabResponse._data.response_type === "validation_error") {
           if (saveTuningTabResponse._data.validation_errors) {
-            if (saveTuningTabResponse._data.validation_errors && saveTuningTabResponse._data.validation_errors.parameters) {
-              saveTuningTabResponse._data.validation_errors.parameters.forEach((err: GeneralErrorResponse) => {
-                if (Object.keys(err).length) {
-                  (err as any as NonFieldError).non_field_errors.forEach(er => {
-                    const tMsg: ToastMessageOptions = {
-                      severity: 'error',
-                      summary: `Error Saving Tuning Data`,
-                      detail: er,
-                      life: ToastTimeout.timeoutError,
-                    };
-                    toast.add(tMsg); addToastRecord(tMsg);
+            if (saveTuningTabResponse._data.validation_errors) {
+              Object.keys(saveTuningTabResponse._data.validation_errors).forEach((error_type: string) => {
+                if (Array.isArray(saveTuningTabResponse._data.validation_errors[error_type])) {
+                  saveTuningTabResponse._data.validation_errors[error_type].forEach((error_item: any) => {
+                    Object.keys(error_item).forEach((error_field: string) => {
+                      error_item[error_field].forEach((message: string) => {
+                        messageBody += error_field + ': ' + message + '\n';
+                      });
+                    });
+                  })
+                } else {
+                  Object.keys(saveTuningTabResponse._data.validation_errors[error_type]).forEach((error_field: string) => {
+                    saveTuningTabResponse._data.validation_errors[error_type][error_field].forEach((message: string) => {
+                      messageBody += error_field + ': ' + message + '\n';
+                    });
                   });
                 }
               });
             }
           }
         }
-      } else {
-        const errorMessage = saveTuningTabResponse?._data.message;
-        const tMsg: ToastMessageOptions = {
-          severity: 'error',
-          summary: `Error Saving Tuning Data`,
-          detail: errorMessage,
-          life: ToastTimeout.timeoutError,
-        };
-        toast.add(tMsg); addToastRecord(tMsg);
+      } 
+      if (saveTuningTabResponse?._data?.response_type === 'error' && saveTuningTabResponse?._data?.message) {
+        // string could be JSON - try parsing it; otherwise output it verbatim
+        try {
+          const jsonMessages = JSON.parse(saveTuningTabResponse._data.message);
+          for (const message of jsonMessages) {
+            messageBody += message + '\n';
+          }
+        } catch(e) {
+          messageBody += saveTuningTabResponse._data.message;
+        }
       }
+      const tMsg: ToastMessageOptions = {
+        severity: 'error',
+        summary: `Error Saving Tuning Data`,
+        detail: messageBody,
+        life: ToastTimeout.timeoutError,
+      };
+      toast.add(tMsg); addToastRecord(tMsg);
     }
   };
 
@@ -1355,6 +1387,14 @@ const checkInitialValueOutOfRange = (parameterName: string, initialValue: number
 
 onUnmounted(async () => {
   saveTuningTabRequestBody.value = {};
+  simStartTime.value = '';
+  simEndTime.value = '';
+  calStartTime.value = '';
+  calEndTime.value = '';
+  avSimStartTime.value = '';
+  avSimEndTime.value = '';
+  avCalStartTime.value = '';
+  avCalEndTime.value = '';
   calibratableParametersHaveChanged.value = false;
   tuningDataHasChanged.value = false;
 })

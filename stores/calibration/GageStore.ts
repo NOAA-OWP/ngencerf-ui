@@ -55,8 +55,7 @@ export const useGageStore = defineStore(
           headers: {
             Authorization: `Bearer ${getAccessToken()}`,
             "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ calibration_run_id: calibrationJobId.value }),
+          }
         }
       ).then((gageTabDataResult) => {
         gageTabData.value = gageTabDataResult?._data ?? undefined;

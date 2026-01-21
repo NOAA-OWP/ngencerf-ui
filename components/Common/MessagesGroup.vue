@@ -202,6 +202,7 @@ const {
   userSelectedCalibrationTuningParameters,
   selectedOutputVariableToCalibrate,
 } = storeToRefs(useTuningStore());
+const { loadTuningTabStaticData } = useTuningStore();
 const { resultsPathname } = storeToRefs(useRunStatusStore());
 
 const componentProps = withDefaults(defineProps<{
@@ -232,6 +233,13 @@ const formatDate = (d: any) => {
     return formatISOStringOrDateToYYYYMMDDHHMM(d);
   }
 };
+
+onMounted(async() => {
+  // make sure tuning parameters are loaded
+  if (!userSelectedCalibrationTuningParameters.value || userSelectedCalibrationTuningParameters.value.length === 0) {
+    await loadTuningTabStaticData();
+  }
+})
 
 </script>
 

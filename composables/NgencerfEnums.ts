@@ -26,9 +26,8 @@ export const ForecastTabs = {
 export const VerificationTabs = {
   tab_forecastRuns: 0,
   tab_verificationJobs: 1,
-  tab_setupVerification: 2,
-  tab_runStatus: 3,
-  tab_results: 4,
+  tab_runStatus: 2,
+  tab_results: 3,
 };
 
 export const NgencerfPages = {

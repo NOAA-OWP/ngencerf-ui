@@ -8,15 +8,111 @@
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <hr />
-        <p class="text-center">Filter by Headwater Basin Gage, multi-select status, multi-select modules, and/or
-            archived jobs.<br />
-            <br >
-            Multi-select filters will show any job matching one of the 
-            selected items. i.e. It is an “or” filter not an “and” filter.<br />
-            <b>Apply Filters</b> must be clicked to filter the table.
-        </p>
-        <br />
+        <hr class="my-6 border-black" />
+
+        <div class="text-center font-bold text-xl mb-3">New Button</div>
+        <p class="text-center mb-2">Click to create a calibration setup from scratch.</p>
+
+        <hr class="my-6 border-black" />
+
+        <div class="text-center font-bold text-xl mb-3">Filtering Calibration Jobs</div>
+        <div class="ml-2">
+            <p class="mb-4">
+            Use the filters at the top of the table to narrow down the list of calibration jobs. 
+            You can use any combination of filters; only jobs that match <strong>all active filters</strong> will be shown. 
+            The table updates automatically as you select filters.
+            </p>
+
+            <p><strong>Headwater Basin Gage</strong></p>
+            <p class="mb-2">Select a single gage to show jobs for that basin.</p>
+
+            <p><strong>Status</strong></p>
+            <p class="mb-2">Multi-select filter. Jobs matching any selected status will be shown.</p>
+
+            <p><strong>Modules</strong></p>
+            <p class="mb-2">Multi-select filter. If more than one module is selected, a Module Match pull-down appears.</p>
+            <div class="ml-2">
+                <p class="ml-4"><strong>Module Match</strong></p>
+                <ul class="list-disc list-outside ml-8 mb-4 space-y-0">
+                <li><strong>Match all selected modules:</strong> Shows only jobs that include <em>every</em> selected module.</li>
+                <li><strong>Match any selected module:</strong> Shows jobs that include <em>at least one</em> of the selected modules.</li>
+                </ul>
+            </div>
+
+            <p><strong>Created After</strong></p>
+            <p class="mb-2">Show jobs created on or after the selected date.</p>
+
+            <p><strong>Created Before</strong></p>
+            <p class="mb-2">Show jobs created on or before the selected date.</p>
+
+            <p><strong>Job ID Start</strong></p>
+            <p class="mb-2">Show jobs with ID greater than or equal to this number.</p>
+
+            <p><strong>Job ID End</strong></p>
+            <p class="mb-2">Show jobs with ID less than or equal to this number.</p>
+
+            <p class="mt-4 mb-4 italic">
+            <strong>Tip:</strong> You can use multiple filters together to narrow results further. If no jobs appear, try relaxing one or more filters.
+            </p>
+
+            <hr>
+            <p><strong>Clear Filters</strong></p>
+            <p class="mb-2">Clears/Resets the filters.</p>
+
+            <p><strong>Refresh List</strong></p>
+            <p class="mb-2">Refreshes the list of filtered jobs.</p>
+
+            <p><strong>Include Archived</strong></p>
+            <p class="mb-2">Check this box to include jobs that have been archived in the table.</p>
+            <ul class="list-disc list-outside ml-6 mb-4 space-y-0.5">
+                <li>When enabled, archived jobs will be shown along with active jobs.</li>
+                <li>All other filters (Headwater Basin Gage, Status, Modules, Created Date, Job ID) will also apply to archived jobs.</li>
+                <li>When disabled, only active (non-archived) jobs are displayed.</li>
+            </ul>
+
+        </div>
+        
+        <hr class="my-6 border-black" />
+        <div class="text-center font-bold text-xl mb-3">Calibration Jobs Table</div>
+        <hr/>
+
+        <div class="ml-2">
+            <div class="text-center font-bold text-l mb-4">Bulk Actions</div>
+
+            <p class="mb-4">
+            The <strong>Bulk Actions</strong> dropdown allows you to perform actions on multiple calibration jobs at once.
+            </p>
+
+            <div class="mb-2">
+            <p><strong>Selecting Jobs</strong></p>
+            <ul class="list-disc list-outside ml-6 space-y-0">
+                <li>Click a job to select a single job.</li>
+                <li>Use <strong>Ctrl+Click</strong> to select or deselect multiple individual jobs.</li>
+                <li>Use <strong>Shift+Click</strong> to select a range of jobs between the last selected job and the clicked job.</li>
+            </ul>
+            </div>
+
+            <p><strong>Bulk Actions Dropdown</strong></p>
+            <p class="mb-2">Once jobs are selected, use the dropdown to apply an action to all selected jobs. Only actions that can be applied 
+                            to the selected jobs will be available.</p>
+
+            <p class="mb-2">
+            <strong>Select All Jobs / Deselect All Jobs</strong>
+            </p>
+            <ul class="list-disc list-outside ml-6 mb-4 space-y-0">
+            <li><strong>Select All Jobs:</strong> Selects every job currently visible in the table.</li>
+            <li><strong>Deselect All Jobs:</strong> Clears all current selections.</li>
+            <li>These links are automatically <strong>enabled or disabled</strong> depending on the current selection state (for example, "Select All" is disabled if all jobs are already selected).</li>
+            </ul>
+
+            <p class="mt-2 italic">
+            <strong>Tip:</strong> Bulk actions are applied only to the jobs you select, so make sure your selections are correct before applying an action.
+            </p>
+        </div>
+
+        <hr/>
+
+        <div class="text-center font-bold text-l mb-4">Table</div>
         <p class="text-center">Sort table by clicking on the sort icon in a column.</p>
         <hr />
         <table class="_help-table" aria-label="Calibration Runs Tab Help Table">
@@ -27,32 +123,6 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="td1 align-top">New Button</td>
-                    <td class="td2 align-top">Click to create a calibration setup from scratch.</td>
-                </tr>
-                <tr>
-                    <td class="td1 align-top">&nbsp;</td>
-                    <td class="td2 align-top">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="td1 align-top">Filters</td>
-                    <td class="td2 align-top" style="vertical-align:top;">Filter by Headwater Basin Gage,
-                        multi-select status, multi-select modules, and/or archived jobs.
-                        Must click <b>Apply Filters</b> button to filter the table.</td>
-                </tr>
-                <tr>
-                    <td class="td1 align-top">Clear Filters</td>
-                    <td class="td2 align-top">Clears/Resets the filters.</td>
-                </tr>
-                <tr>
-                    <td class="td1 align-top">Refresh List</td>
-                    <td class="td2 align-top">Refreshes the list of filtered jobs.</td>
-                </tr>
-                <tr>
-                    <td class="td1 align-top">&nbsp;</td>
-                    <td class="td2 align-top">&nbsp;</td>
-                </tr>
                 <tr>
                     <td class="td1 align-top">Double Click</td>
                     <td class="td2 align-top">Opens calibration job and takes user to the Run/Status tab.
@@ -78,7 +148,7 @@
                         will be added at the top of the table. User will remain on this page.</td>
                 </tr>
                 <tr>
-                    <td class="td1 align-top" style="font-weight:normal;">Download Calibration Data</td>
+                    <td class="td1 align-top" style="font-weight:normal;">Download Results</td>
                     <td class="td2 align-top">Download all data associated with a Done calibration job.</td>
                 </tr>
                 <tr>
@@ -87,7 +157,11 @@
                 </tr>
                 <tr>
                     <td class="td1 align-top" style="font-weight:normal;">Delete</td>
-                    <td class="td2 align-top">Permanently deletes the selected calibration job from the system.</td>
+                    <td class="td2 align-top">Selecting this action will <strong>permanently delete the chosen calibration job</strong> along 
+                        with all associated validation, forecast, and verification jobs. All references to this 
+                        job will also be removed from the database. <strong>This action cannot be undone.</strong> 
+                        After deletion, you will remain on the current page.
+                    </td>
                 </tr>
                 <tr>
                     <td class="td1 align-top" style="font-weight:normal;">Archive/<br />Unarchive</td>
@@ -215,12 +289,10 @@
                 </tr>
             </tbody>
         </table>
-
     </div>
 </template>
 
 <script setup lang="ts">
-
 </script>
 
 <style lang="scss" scoped>

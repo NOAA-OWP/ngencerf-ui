@@ -19,72 +19,73 @@
         </p>
         <table class="_help-table"  aria-describedby="Optimization/Metrics Tab Help Table">
             <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Description</th>
-                </tr>
+            <tr>
+                <th>Item</th>
+                <th>Description</th>
+            </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="td1">Optimization Algorithm</td>
-                    <td class="td2">Select from the dropdown which optimization algorithm to use for the calibration.
-                        Once one is
-                        selected any required algorithm parameters will be populated in the Parameter table. </td>
-                </tr>
-                <tr>
-                    <td class="td1">Algorithm Parameters</td>
-                    <td class="td2">The parameter name is provided. The user must provide the value.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Calibration Stop Criteria</td>
-                    <td class="td2">The number of iterations for each worker to execute while performing calibration.
-                        DDS has one
-                        worker, but both GWO and PSO have 20 workers.
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td1">Objective Function</td>
-                    <td class="td2">
-                        Select a metric to use as the objective function during calibration. Note that all metric
-                        in the table below are appropriate to use as an objective function. (MFDC, FBIAS, NSWwt)<br />
-                        If a Categorical metric (POD, CSI, FAR) is selected, the user must provide the Flow
-                        Threshold.<br />
-                        If an Event based metric (PKBIAS, PKTE, EVBIAS) is selected, the user must provide the Peak Flow
-                        Threshold.
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td1">Calculate Categorical Metrics</td>
-                    <td class="td2">If a Categorical metric (POD, CSI, FAR) is not selected as the objective function,
-                        the user can select this checkbox to have the program also calculate the Categorical Metrics.
-                        The
-                        Flow Threshold must be entered by the user.
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td1">Calculate Event Based Metrics</td>
-                    <td class="td2">If an Event Based metric (PKBIAS, PKTE, EVBIAS) is not selected as the objective
-                        function, the user can select
-                        this checkbox to have the program also calculate the Event Based Metrics.
-                        The Peak Flow Threshold must be entered by the user.
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td1">Save Button</td>
-                    <td class="td2">Save data from the tab. Partial saves are allowed.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Prev Button</td>
-                    <td class="td2">Move to the Tuning Controls Tab. If there is any unsaved data, the user will first
-                        be prompted
-                        to save.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Next Button</td>
-                    <td class="td2">Move to the Run/Status Tab. If there is any unsaved data, the user will first be
-                        prompted
-                        to save.</td>
-                </tr>
+            <tr>
+                <td class="td1">Optimization Algorithm</td>
+                <td class="td2">
+                Select the optimization algorithm to use for calibration from the dropdown. Once selected,
+                any required algorithm parameters will be automatically populated in the Algorithm Parameter table.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Algorithm Parameters</td>
+                <td class="td2">
+                Each parameter name is listed. The user must provide the corresponding value.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Calibration Stop Criteria</td>
+                <td class="td2">
+                Specifies the number of iterations each worker executes during calibration. DDS uses one worker, while GWO and PSO use 20 workers.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Objective Function</td>
+                <td class="td2">
+                Select the metric to use as the objective function. All metrics in the table (MFDC, FBIAS, NSWwt) are valid choices.<br />
+                - For Categorical metrics (POD, CSI, FAR), the Flow Threshold must be provided.<br />
+                - For Event-based metrics (PKBIAS, PKTE, EVBIAS), the Peak Flow Threshold must be provided.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Calculate Categorical Metrics</td>
+                <td class="td2">
+                Check this box to calculate Categorical Metrics if they are <strong>not</strong> selected as the Objective Function.  
+                If a Categorical metric (POD, CSI, FAR) <strong>is selected as the Objective Function</strong>, this checkbox is automatically disabled.  
+                The Flow Threshold must be entered when the checkbox is enabled.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Calculate Event-Based Metrics</td>
+                <td class="td2">
+                    Check this box to calculate Event-Based Metrics if they are <strong>not</strong> selected as the Objective Function.  
+                    If an Event-Based metric (PKBIAS, PKTE, EVBIAS) <strong>is selected as the Objective Function</strong>, this checkbox is automatically disabled.  
+                    The Peak Flow Threshold must be entered when the checkbox is enabled.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Save Button</td>
+                <td class="td2">
+                Saves data from the tab. Partial saves are allowed.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Prev Button</td>
+                <td class="td2">
+                Moves to the Tuning Controls Tab. If there is unsaved data, the user is prompted to save or discard changes.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Next Button</td>
+                <td class="td2">
+                Moves to the Run/Status Tab. If there is unsaved data, the user is prompted to save or discard changes.
+                </td>
+            </tr>
             </tbody>
         </table>
         <div class="mt-4">
