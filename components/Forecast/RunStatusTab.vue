@@ -127,8 +127,8 @@
               </label>
             </div>
             <div class="pl-5" style="width: 100%;">
-              <span v-for="message in failureMessages">
-                {{ message }}<br/>
+              <span v-for="failure_message in failureMessages">
+                {{ failure_message.message }}<br/>
               </span>
             </div>
           </div>
