@@ -11,8 +11,8 @@
             <div style="width: 160px;">Display</div>
           </th>
           <td class="pl-5">
-            <Select id="DisplayOptions" class="p-select min-w-[300px]" v-model="verificationPlot" :options="verificationPlotNames"
-              optionLabel="display_name" optionValue="name" :disabled="!verificationPlotNames">
+            <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
+              v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
             </Select>
           </td>
         </tr>
@@ -33,8 +33,13 @@
     </table>
   </div>
   <div>
-    <div v-if="verificationPlot && verificationPlotFileUrl" id="VerificationPlot" class="p-2" aria-label="Plot display area" title="Plot display area">
+    <div v-if="verificationPlotNames?.some(plot => plot.name === selectedLogCategory) && verificationPlotFileUrl" id="VerificationPlot" class="p-2" aria-label="Plot display area" title="Plot display area">
       <img :src="verificationPlotFileUrl" alt="Selected Plot" />
+    </div>
+    <!-- DISPLAY LOGS -->
+
+    <div v-show="selectedLogCategory && !verificationPlotNames?.some(plot => plot.name === selectedLogCategory)">
+      <LogDisplay/>
     </div>
   </div>
 </template>
@@ -48,8 +53,9 @@ import { ToastTimeout } from "@/composables/NgencerfEnums";
 import { storeToRefs } from "pinia";
 
 import { generalStore } from "@/stores/common/GeneralStore";
-const { addToastRecord } = generalStore();
+import { useLogStore } from '@/stores/common/LogStore';
 
+const { addToastRecord } = generalStore();
 const toast = useToast();
 
 import { useVerificationStore } from "@/stores/verification/VerificationStore";
@@ -60,15 +66,22 @@ const {
   selectedVerificationJob, 
   elapsedTime,
   verificationJobStatus,
-  verificationPlotNames,
-  verificationPlot,
-  isVerificationLoading 
+  verificationPlotNames
 } = storeToRefs(verificationStore);
 const { 
   getVerificationStatus,
   getVerificationPlotNames, 
   getVerificationPlot 
 } = useVerificationStore();
+
+const {
+  selectedLogCategory,
+  logList
+} = storeToRefs(useLogStore());
+const {
+  populateLogListOptions,
+  resetUserLogRefs
+} = useLogStore();
 
 const verificationPlotDefault = ref<string>('Select an option');
 const verificationPlotFileUrl = ref<string | undefined>();
@@ -87,14 +100,17 @@ onMounted(async() => {
   const response = await getVerificationPlotNames();
   if (response?._data?.plot_names) {
     verificationPlotNames.value = [{ name: verificationPlotDefault.value, display_name: verificationPlotDefault.value }, ...response._data.plot_names];
-    verificationPlot.value = verificationPlotDefault.value;
   }
+
+  await populateLogListOptions(verificationPlotNames.value);
+  selectedLogCategory.value = verificationPlotDefault.value;
 })
 
 // Handle verificationPlot changes
-watch(verificationPlot, async () => {
-  if(verificationPlot.value && verificationPlot.value != verificationPlotDefault.value) {
-    const response: any = await getVerificationPlot(verificationPlot.value);
+watch(selectedLogCategory, async () => {
+  if(selectedLogCategory.value && selectedLogCategory.value != verificationPlotDefault.value &&
+    verificationPlotNames.value.some(plot => plot.name === selectedLogCategory.value)) {
+    const response: any = await getVerificationPlot(selectedLogCategory.value);
     verificationPlotFileUrl.value = response?._data?.plot_url;
   } else {
     verificationPlotFileUrl.value = undefined;
@@ -104,6 +120,7 @@ watch(verificationPlot, async () => {
 onUnmounted(() => {
   verificationPlot.value = undefined;
   verificationPlotFileUrl.value = undefined;
+  resetUserLogRefs();
 })
 
 </script>

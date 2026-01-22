@@ -213,6 +213,7 @@ import LogDisplay from "../Common/LogDisplay.vue";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { useLogStore } from '@/stores/common/LogStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 import { isValidDate } from '@/utils/CommonHelpers';
@@ -246,19 +247,23 @@ const {
   calibrationRunForForecast,
   overallColdStartForecastStatus,
   forecastJobNgenGlobalLogging,
-  selectedLogCategory,
-  logList
 } = storeToRefs(useForecastStore());
-
 const {
   loadForecastRunStatusTabData,
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
-  populateLogListOptions,
-  resetUserLogRefs,
   hardResetForecastRunStatusStore
 } = useForecastStore();
+
+const {
+  selectedLogCategory,
+  logList
+} = storeToRefs(useLogStore());
+const {
+  populateLogListOptions,
+  resetUserLogRefs
+} = useLogStore();
 
 onMounted(async () => {
   toast.removeAllGroups(); // clear all toast messages
