@@ -35,6 +35,8 @@ export const useLogStore = defineStore('LogStore', () => {
 
   let logTimeout;
 
+  console.log('verificationJobId:',verificationJobId.value);
+
   const requestBodyID = {
     [
       verificationJobId.value ? 'verification_run_id' :
@@ -47,15 +49,10 @@ export const useLogStore = defineStore('LogStore', () => {
   }
 
   /**
-    * Get Forecast Log Names
+    * Get Log Names
     * @return {any}
     */
   const queryGetLogNames = async (): Promise<any> => {
-    if (verificationJobId.value) {
-      requestBody['verification_job_id'] = verificationJobId.value;
-    } else if (forecastJobId.value) {
-      requestBody['forecast_job_id'] = forecastJobId.value;
-    }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
       method: "POST",
       headers: {
@@ -67,7 +64,7 @@ export const useLogStore = defineStore('LogStore', () => {
   };
 
   /**
-    * Get Forecast Log Data
+    * Get Log Data
     * @return {any}
     */
   const queryGetLogData = async (
@@ -76,11 +73,6 @@ export const useLogStore = defineStore('LogStore', () => {
     start?: number,
     limit?: number
   ): Promise<any> => {
-    if (verificationJobId.value) {
-      requestBody['verification_job_id'] = verificationJobId.value;
-    } else if (forecastJobId.value) {
-      requestBody['forecast_job_id'] = forecastJobId.value;
-    }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log/`, {
       method: "POST",
       headers: {
@@ -98,7 +90,7 @@ export const useLogStore = defineStore('LogStore', () => {
   };
 
   /** 
-   * Get Forecast Log Status
+   * Get Log Status
    * @return {any}
    */
   const queryGetLogStatus = async (
@@ -132,7 +124,7 @@ export const useLogStore = defineStore('LogStore', () => {
     if (currentJobStatus.value && !['Submitted','Validating and Preparing Job Data'].includes(currentJobStatus.value)) {
       logList.value = [];
       logList.value.push({ name: '', display_name: logListDefault.value });
-      logListOptions.value = plotListOptions ?? [];
+      logListOptions.value = [...plotListOptions];
 
       nextTick(async () => {
         // Get Names of available Logs

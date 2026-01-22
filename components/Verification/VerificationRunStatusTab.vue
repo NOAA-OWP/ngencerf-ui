@@ -105,6 +105,7 @@
 <script setup lang="ts">
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
+import LogDisplay from "../Common/LogDisplay.vue";
 
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
@@ -253,6 +254,7 @@ onUnmounted(() => {
   failureMessages.value = undefined;
   submitTime.value = undefined;
   elapsedTime.value = undefined;
+  logList.value = [];
   resetUserLogRefs();
 })
 
