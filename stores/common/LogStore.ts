@@ -35,39 +35,31 @@ export const useLogStore = defineStore('LogStore', () => {
 
   let logTimeout;
 
-  const requestBodyID = {
-    [
-      verificationJobId.value ? 'verification_run_id' :
-      (forecastJobId.value ? 'forecast_run_id' :
-      'calibration_run_id')
-    ]:
-    verificationJobId.value ? verificationJobId.value :
-    (forecastJobId.value ? forecastJobId.value :
-    null)
-  }
-
   /**
-    * Get Forecast Log Names
+    * Get Log Names
     * @return {any}
     */
   const queryGetLogNames = async (): Promise<any> => {
-    if (verificationJobId.value) {
-      requestBody['verification_job_id'] = verificationJobId.value;
-    } else if (forecastJobId.value) {
-      requestBody['forecast_job_id'] = forecastJobId.value;
-    }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify(requestBodyID)
+      body: JSON.stringify({[
+          verificationJobId.value ? 'verification_run_id' :
+          (forecastJobId.value ? 'forecast_run_id' :
+          'calibration_run_id')
+        ]:
+        verificationJobId.value ? verificationJobId.value :
+        (forecastJobId.value ? forecastJobId.value :
+        null)
+      })
     });
   };
 
   /**
-    * Get Forecast Log Data
+    * Get Log Data
     * @return {any}
     */
   const queryGetLogData = async (
@@ -76,11 +68,6 @@ export const useLogStore = defineStore('LogStore', () => {
     start?: number,
     limit?: number
   ): Promise<any> => {
-    if (verificationJobId.value) {
-      requestBody['verification_job_id'] = verificationJobId.value;
-    } else if (forecastJobId.value) {
-      requestBody['forecast_job_id'] = forecastJobId.value;
-    }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log/`, {
       method: "POST",
       headers: {
@@ -92,13 +79,20 @@ export const useLogStore = defineStore('LogStore', () => {
         log_name: log_name,
         start: start !== undefined ? start : 0,
         limit: limit !== undefined ? limit : 1000,
-        ...requestBodyID
+        [
+          verificationJobId.value ? 'verification_run_id' :
+          (forecastJobId.value ? 'forecast_run_id' :
+          'calibration_run_id')
+        ]:
+        verificationJobId.value ? verificationJobId.value :
+        (forecastJobId.value ? forecastJobId.value :
+        null)
       })
     });
   };
 
   /** 
-   * Get Forecast Log Status
+   * Get Log Status
    * @return {any}
    */
   const queryGetLogStatus = async (
@@ -114,7 +108,14 @@ export const useLogStore = defineStore('LogStore', () => {
       body: JSON.stringify({
         log_path: log_path,
         byte_offset: byte_offset,
-        ...requestBodyID
+        [
+          verificationJobId.value ? 'verification_run_id' :
+          (forecastJobId.value ? 'forecast_run_id' :
+          'calibration_run_id')
+        ]:
+        verificationJobId.value ? verificationJobId.value :
+        (forecastJobId.value ? forecastJobId.value :
+        null)
       })
     });
   };
@@ -129,50 +130,55 @@ export const useLogStore = defineStore('LogStore', () => {
    * populate log list options
    */
   const populateLogListOptions = async(plotListOptions: [] = []) => {
-    if (currentJobStatus.value && !['Submitted','Validating and Preparing Job Data'].includes(currentJobStatus.value)) {
-      logList.value = [];
-      logList.value.push({ name: '', display_name: logListDefault.value });
-      logListOptions.value = plotListOptions ?? [];
-
-      nextTick(async () => {
-        // Get Names of available Logs
-        logs.value = await queryGetLogNames();
-        if (logs.value?._data?.log_names) {
-          for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-            Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-              let logNameList = [];
-              for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-                logNameList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
-              }
-              logLists.value[key] = logNameList;
-            });
+    logLists.value = {};
+    logList.value = [];
+    logListOptions.value = [];
+    
+    logList.value.push({ name: '', display_name: logListDefault.value });
+    for (const option of plotListOptions) {
+      logListOptions.value.push(option);
+    }
+  
+    // Get Names of available Logs
+    logs.value = await queryGetLogNames();
+    if (logs.value?._data?.log_names) {
+      for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+          let logNameList = [];
+          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+            logNameList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
           }
-        }
-        
-        // Add Log Options to the dropdown
-        Object.keys(logLists.value).forEach(key => {
-          logListOptions.value.push({ name: key, display_name: capitalCase(key) + ' Logs' });
+          logLists.value[key] = logNameList;
         });
-        for (const option of logListOptions.value) {
-          if (!(logList.value.find(obj => obj.name === option.name))) {
-            logList.value.push(option);
-          }
-        }
+      }
+    }
+    
+    // Add Log Options to the dropdown
+    Object.keys(logLists.value).forEach(key => {
+      logListOptions.value.push({ name: key, display_name: capitalCase(key) + ' Logs' });
+    });
+    for (const option of logListOptions.value) {
+      if (!(logList.value.find(obj => obj.name === option.name))) {
+        logList.value.push(option);
+      }
+    }
 
-        if (currentJobStatus.value && currentJobStatus.value.includes('Failed') && logListOptions.value.length > 0) {
-          // Skip directly to first available log if status is Failed
-          selectedLogCategory.value = (logListOptions.value.at(-1)).name;
-          nextTick(async () => {
-            if (selectedLogList.value.length > 1) {
-                selectedLogName.value = selectedLogList.value.at(-1).name;
-            }
-          });
-        } else if (!selectedLogCategory.value) {
-          // Start with first option
-          selectedLogCategory.value = logListOptions.value[0].name;
+    if ((!selectedLogCategory.value || (currentJobStatus.value && currentJobStatus.value.includes('Failed'))) && logListOptions.value.length > 0) {
+      // Skip directly to first available log if status is Failed or no option has been picked
+      selectedLogCategory.value = logListOptions.value[0].name;
+      nextTick(() => {
+        if (!selectedLogList.value || selectedLogList.value.length === 0) {
+          selectedLogList.value = logLists.value[selectedLogCategory.value];
+        }
+        if (selectedLogList.value && selectedLogList.value.length > 0) {
+          selectedLogName.value = selectedLogList.value.at(-1).name;
         }
       });
     }
+
+    logLists.value = logLists.value;
+    logList.value = logList.value;
+    logListOptions.value = logListOptions.value;
   }
 
   // Reset refs when selectedLogName changes

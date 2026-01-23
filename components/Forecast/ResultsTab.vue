@@ -57,7 +57,7 @@
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Status: </span>
-                {{ overallColdStartForecastStatus }}
+                {{ overallColdStartForecastStatus ?? 'Unknown' }}
               </div>
               <div>
                 <span class="font-medium">Submit Time: </span>
@@ -189,6 +189,8 @@ const {
   submitTimeDate,
   submitTime,
   elapsedTime,
+  forecastJobStatus,
+  coldStartJobStatus,
   overallColdStartForecastStatus,
 } = storeToRefs(useForecastStore());
 
@@ -198,7 +200,8 @@ const {
 
 const {
   selectedLogCategory,
-  logList
+  logList,
+  logListOptions
 } = storeToRefs(useLogStore());
 const {
   populateLogListOptions,
@@ -270,7 +273,7 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
 
   hilightTab(ForecastTabs.tab_results);
-
+  
   await populateLogListOptions([{ name: 'forecast plot', display_name: 'Streamflow Time Series' }]);
   selectedLogCategory.value = 'forecast plot';
 
@@ -778,6 +781,7 @@ onUnmounted(() => {
   // make sure page clears all plot/log data when the user leaves
   resetUserPlotRefs([]);
   logList.value = [];
+  logListOptions.value = [];
   resetUserLogRefs();
 })
 </script>

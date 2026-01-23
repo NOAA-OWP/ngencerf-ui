@@ -105,6 +105,7 @@
 <script setup lang="ts">
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
+import LogDisplay from "../Common/LogDisplay.vue";
 
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
@@ -144,7 +145,8 @@ const {
 
 const {
   selectedLogCategory,
-  logList
+  logList,
+  logListOptions
 } = storeToRefs(useLogStore());
 const {
   populateLogListOptions,
@@ -164,17 +166,20 @@ onMounted(async() => {
   elapsedTime.value = undefined;
 
   if (verificationJobId.value) {
-    await populateLogListOptions();
-    loadVerificationStatusInformation();
-    loadVerificationRunStatusTabData();
+    await loadVerificationStatusInformation();
+    await loadVerificationRunStatusTabData();
+    if (verificationJobStatus.value && !['Ready','Submitted'].includes(verificationJobStatus.value)) {
+      await populateLogListOptions();
+    }
   }
-})
 
-watch(verificationJobStatus, async (newVerificationJobStatus, oldVerificationJobStatus) => {
-  if (forecastJobId.value && (newVerificationJobStatus || oldVerificationJobStatus) && !isLoading.value) {
-    await populateLogListOptions();
-  }
-}, { immediate: true });
+  watch(verificationJobStatus, async (newVerificationJobStatus, oldVerificationJobStatus) => {
+    if (forecastJobId.value && oldVerificationJobStatus && oldVerificationJobStatus !== "Unknown" && 
+      newVerificationJobStatus && newVerificationJobStatus !== "Unknown" && !isLoading.value) {
+      await populateLogListOptions();
+    }
+  });
+})
 
 /**
  * Start the verification job
@@ -253,6 +258,8 @@ onUnmounted(() => {
   failureMessages.value = undefined;
   submitTime.value = undefined;
   elapsedTime.value = undefined;
+  logList.value = [];
+  logListOptions.value = [];
   resetUserLogRefs();
 })
 

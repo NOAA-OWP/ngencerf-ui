@@ -282,7 +282,9 @@ onMounted(async () => {
   }
   if (forecastJobId.value) {
     await loadForecastRunStatusTabData();
-    await populateLogListOptions();
+    if (overallColdStartForecastStatus.value && !['Ready','Submitted'].includes(overallColdStartForecastStatus.value)) {
+      await populateLogListOptions();
+    }
     createColdStartAndForecastStatusInterval();
     createElapsedTimeInterval();
   }
@@ -321,6 +323,13 @@ onMounted(async () => {
   if (!coldStartDate.value && calibrationRunForForecast?.value?.cold_start_date) {
     coldStartDate.value = calibrationRunForForecast.value.cold_start_date;
   }
+
+  watch(overallColdStartForecastStatus, (newColdStartForecastStatus, oldColdStartForecastStatus) => {
+    if (forecastJobId.value && oldColdStartForecastStatus && oldColdStartForecastStatus !== "Unknown" && 
+      newColdStartForecastStatus && newColdStartForecastStatus !== "Unknown" && !isLoading.value) {
+      populateLogListOptions();
+    }
+  });
 });
 
 const toggleMessagesGroup = async () => {
@@ -413,12 +422,6 @@ const startForecastRun = async () => {
   }
 };
 
-watch(overallColdStartForecastStatus, async (newColdStartForecastStatus, oldColdStartForecastStatus) => {
-  if (forecastJobId.value && (newColdStartForecastStatus || oldColdStartForecastStatus) && !isLoading.value) {
-    await populateLogListOptions();
-  }
-}, { immediate: true });
-
 /**
  * Cancel the forecast run
  */
@@ -467,6 +470,8 @@ onUnmounted(() => {
   // make sure page clears all log data when the user leaves
   hardResetForecastRunStatusStore();
   logList.value = [];
+  forecastJobStatus.value = undefined;
+  coldStartJobStatus.value = undefined;
   resetUserLogRefs();
 })
 </script>
