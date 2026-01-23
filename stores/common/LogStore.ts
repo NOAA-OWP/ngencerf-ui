@@ -35,19 +35,6 @@ export const useLogStore = defineStore('LogStore', () => {
 
   let logTimeout;
 
-  console.log('verificationJobId:',verificationJobId.value);
-
-  const requestBodyID = {
-    [
-      verificationJobId.value ? 'verification_run_id' :
-      (forecastJobId.value ? 'forecast_run_id' :
-      'calibration_run_id')
-    ]:
-    verificationJobId.value ? verificationJobId.value :
-    (forecastJobId.value ? forecastJobId.value :
-    null)
-  }
-
   /**
     * Get Log Names
     * @return {any}
@@ -143,22 +130,23 @@ export const useLogStore = defineStore('LogStore', () => {
    * populate log list options
    */
   const populateLogListOptions = async(plotListOptions: [] = []) => {
-    if (currentJobStatus.value && !['Submitted','Validating and Preparing Job Data'].includes(currentJobStatus.value)) {
-      logList.value = [];
-      logList.value.push({ name: '', display_name: logListDefault.value });
-      logListOptions.value = [...plotListOptions];
-
-      nextTick(async () => {
-        // Get Names of available Logs
-        logs.value = await queryGetLogNames();
-        if (logs.value?._data?.log_names) {
-          for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-            Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-              let logNameList = [];
-              for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-                logNameList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
-              }
-              logLists.value[key] = logNameList;
+    logLists.value = {};
+    logList.value = [];
+    logListOptions.value = [];
+    
+    logList.value.push({ name: '', display_name: logListDefault.value });
+    for (const option of plotListOptions) {
+      logListOptions.value.push(option);
+    }
+  
+    // Get Names of available Logs
+    logs.value = await queryGetLogNames();
+    if (logs.value?._data?.log_names) {
+      for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
+        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
+          let logNameList = [];
+          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
+            logNameList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
           }
           logLists.value[key] = logNameList;
         });
@@ -186,6 +174,9 @@ export const useLogStore = defineStore('LogStore', () => {
           selectedLogName.value = selectedLogList.value.at(-1).name;
         }
       });
+    } else if (!selectedLogCategory.value) {
+      // Start with first option
+      selectedLogCategory.value = logListOptions.value[0].name;
     }
 
     logLists.value = logLists.value;
