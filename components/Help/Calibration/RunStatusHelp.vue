@@ -20,17 +20,16 @@
                 <li>
                     Clicking <strong>Run</strong> triggers the final subsetting and validation of acquired data. Depending on the size of the headwater basin, this may delay the start of the calibration run. Additional delays may occur while waiting for available resources.
                 </li>
-                <li> <strong>Normal status transitions:</strong>
-                    <li style="list-style-type: none;padding-left: 10px;">
-                        <strong>Calibration Ready -&gt; Submitted -&gt; Calibration Running -&gt; Calibration Done,
-                            Validation Control
-                            Running -&gt;
-                            Calibration Done, Validation Best Running -&gt; Done </strong>
-                    </li>
+                <li><p class="mb-0">Normal status transitions</p>
+                    <div class="ml-2"><strong>Calibration Ready -&gt; Submitted -&gt; Calibration Running -&gt; Calibration Done,
+                        Validation Control
+                        Running -&gt;
+                        Calibration Done, Validation Best Running -&gt; Done </strong>
+                    </div>
                 </li>
                 <li>
-                    <p class="font-bold mb-2">Iteration, Logs and Plots</p>
-                    <ul class="list-disc list-outside ml-6 space-y-2">
+                    <p class="mb-0">Iteration, Logs and Plots</p>
+                    <ul class="list-disc list-outside ml-6 space-y-0">
                         <li>
                             Logs are available as soon as the job starts running, but some logs may not appear until 
                             downstream processes start (ie. ngen). This allows you to monitor progress in real time.
