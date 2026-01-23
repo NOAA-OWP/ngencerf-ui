@@ -49,7 +49,7 @@
                     <p><strong>2. Validation Time Controls</strong></p>
                     <ul class="list-disc list-outside ml-9 space-y-0">
                         <li>Validation period must fall within the <strong>Validation Simulation</strong> period.</li>
-                        <li>Vaidation Simulation period must encompass the entire <strong>Calibration</strong> period.</li>
+                        <li>Validation Simulation period must encompass the entire <strong>Calibration</strong> period.</li>
                     </ul>
 
                     <p><strong>3. Hourly requirement</strong></p>
