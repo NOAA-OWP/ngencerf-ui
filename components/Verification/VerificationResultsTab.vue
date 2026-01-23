@@ -41,7 +41,7 @@
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Status: </span>
-                {{ verificationJobStatus ?? 'Ready' }}
+                {{ verificationJobStatus ?? 'Unknown' }}
               </div>
               <div>
                 <span class="font-medium">Submit Time: </span>
@@ -120,7 +120,8 @@ const {
 
 const {
   selectedLogCategory,
-  logList
+  logList,
+  logListOptions
 } = storeToRefs(useLogStore());
 const {
   populateLogListOptions,
@@ -134,7 +135,7 @@ import { hilightTab } from '@/composables/TabHilight';
 onMounted(async() => {
   hilightTab(VerificationTabs.tab_results);
 
-  getVerificationStatus().then( async(response) => {
+  getVerificationStatus().then((response) => {
     if ( response._data.status ) {
       verificationJobStatus.value = response._data.status;
       selectedVerificationJob.value.forecast_run = response._data?.forecast_run;
@@ -143,7 +144,7 @@ onMounted(async() => {
       }
       if (response._data?.calibration_run_id) {
         calibrationJobId.value = response._data.calibration_run_id;
-        await fetchUserCalibrationRunData();
+        fetchUserCalibrationRunData();
       }
       if (response?._data?.submit_date) {
         submitTimeDate.value = new Date(response?._data?.submit_date);
@@ -186,6 +187,7 @@ onUnmounted(() => {
   verificationPlotNames.value = [];
   verificationPlotFileUrl.value = undefined;
   logList.value = [];
+  logListOptions.value = [];
   resetUserLogRefs();
 })
 

@@ -50,7 +50,6 @@ const toast = useToast();
 const {
   logList,
   logListDefault,
-  logs,
   logDataPageSize,
   logLists,
   logListOptions,
@@ -64,12 +63,9 @@ const {
   selectedLogStartRow,
   selectedLogEndRow,
   selectedLogFilePath,
-  selectedLogByteOffset,
   selectedLogStatus
 } = storeToRefs(useLogStore());
 const {
-  populateLogListOptions,
-  resetUserLogRefs,
   updateLogRefs
 } = useLogStore();
 
@@ -153,6 +149,14 @@ const selectedLogCategoryDisplay = computed(() => {
     return optionFound.display_name.replace(' Logs','');
   }
   return selectedLogCategory.value;
+})
+
+onUnmounted(() => {
+  logList.value = [];
+  logListOptions.value = [];
+  logListOptions.value = [];
+  selectedLogCategory.value = logListDefault.value;
+  selectedLogName.value = '';
 })
 </script>
 
