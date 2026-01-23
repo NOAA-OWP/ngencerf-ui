@@ -1,131 +1,165 @@
 <template>
-  <div class="col-span-2">
-    <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
-      <span id="tab-title">Forecast Run Results</span>
-    </h1>
-
-    <table aria-describedby="tab-title">
-      <tbody>
-        <tr height="30px" :aria-label="'Calibration Job ID is ' + calibrationJobId"
-          :title="'Calibration Job ID is ' + calibrationJobId">
-          <th class="text-right font-bold">
-            <div style="width: 140px;">Calibration Job ID</div>
-          </th>
-          <td class="pl-5" nowrap>{{ calibrationJobId }}</td>
-          <th class="text-right font-bold" :aria-label="'Status is ' + overallColdStartForecastStatus"
-            :title="'Status is ' + overallColdStartForecastStatus">
-            <div style="width: 140px;">Status</div>
-          </th>
-          <td class="pl-5" nowrap>{{ overallColdStartForecastStatus }}</td>
-        </tr>
-        <tr height="30px">
-          <th class="text-right font-bold" :aria-label="'Forecast Job ID is ' + forecastJobId"
-            :title="'Forecast Job ID is ' + forecastJobId">
-            <div style="width: 140px;">Forecast Job ID</div>
-          </th>
-          <td class="pl-5" nowrap>{{ forecastJobId }}</td>
-          <th class="text-right font-bold" :aria-label="'Elapsed Time is ' + elapsedTime"
-            :title="'Elapsed Time is ' + elapsedTime">
-            <div style="width: 140px;">Elapsed Time</div>
-          </th>
-          <td class="pl-5" nowrap>{{ elapsedTime ?? '-'.repeat(15) }}</td>
-        </tr>
-        <tr height="30px">
-          <th class="text-right font-bold" :aria-label="'Configuration is ' + forecastConfigurationName"
-            :title="'Configuration is ' + forecastConfigurationName">
-            <div style="width: 140px;">Configuration</div>
-          </th>
-          <td class="pl-5" nowrap>{{ forecastConfigurationName }}</td>
-          <th v-show="logList.length > 1" class="text-right font-bold" 
-            aria-label="Select Plot or Log Name" title="Select Plot or Log Name">
-            <div style="width: 140px;">Display</div>
-          </th>
-          <td v-show="logList.length > 1" class="pl-5" nowrap>
-            <Select id="DisplayOptions" class="p-select" v-model="selectedLogCategory" 
-              :options="logList" option-label="display_name" optionValue="name">
-            </Select>
-          </td>
-        </tr>
-        <tr>
-          <th class="text-right font-bold" style="width: 140px;">
-            <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
-          </th>
-          <td class="row-span-3 pl-5" style="width: 100%;" :aria-label="'Job Data Directory is ' + resultsPathname"
-            :title="'Job Data Directory is ' + resultsPathname">
-            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div v-show="selectedLogCategory == 'forecast plot'" class="flex">
-    <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
-      <div id="PlotGraphArea" ref="plotGraphArea" v-if="!plotGraphCheckboxesEmpty()">
-        <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
-        <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
-          <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
-            @mouseup="sliderDragEnd" @mouseleave="sliderDragCancel">
-            <div id="PlotGraphSliderBox" ref="plotGraphSliderBox"></div>
-          </div>
-        </div>
-        <div id="PlotGraphSliderDateRange">
-          <div class="flex flex-row justify-center">
-            {{ formatDateString(plotGraphDateRange.start) }} - {{ formatDateString(plotGraphDateRange.end) }}
-          </div>
-        </div>
-        <div id="PlotGraphSliderHelp">
-          <div class="flex flex-row justify-center">
-            {{ plotGraphSliderHelpDisplay }}
-          </div>
-        </div>
+  <Transition name="slide-fade">
+    <div id="MessagesGroupWindow" v-if="showMessagesGroup">
+      <div class="text-right sticky top-0">
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+          class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
+      <MessagesGroup />
     </div>
-    <div class="p-4 grow-0" id="PlotGraphControls">
-      <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue underline mt-1 pb-2"
-        @click="toggleCustomizePlot">
-        Customize Viewer
-      </a>
-      <div v-if="plotGraphLines.length > 0">
-        <div v-for="item in plotGraphLines" :key="item.id">
-          <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
-            v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
-          <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
-        </div>
-      </div>
-      <div v-if="plotGraphCheckboxesEmpty()">
-        Check at least one box to generate an interactive plot.
-      </div>
-      <div id="CustomizePlotWindow" v-if="showCustomizePlot">
-        <div class="text-right sticky top-0">
-          <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-            class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
-        </div>
-        <h2 class="mt-5" aria-label="Customize Viewer" title="Customize Viewer">
-          Customize Viewer
-        </h2>
-        <div v-if="plotGraphLines.length > 0">
-          <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
-            <div>
-              <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
+  </Transition>
+  <div id="ForecastRunStatusPage">
+    <div class="pl-6 pr-2 pt-2">
+      <div class="flex mt-3">
+        <div class="w-5/6 relative">
+          <div v-if="logList.length > 1" class="inline-block">
+            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <div class="inline-block w-2/3">
+              <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;" 
+                v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
+              </Select>
             </div>
-            <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
-              :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
-            </Select>
-            <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol"
-              :options="plotGraphSymbolList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
-            </Select>
+          </div>
+          
+          <div class="grid auto-cols-max grid-cols-3 gap=1 text-sm text-left mt-2">
+            <div class="col-span-1">
+              <div>
+                <span class="font-medium">Calibration Job ID: </span>
+                {{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(15) }}
+              </div>
+              <div>
+                <span class="font-medium">Forecast Job ID: </span>
+                {{ forecastJobId ?? '-'.repeat(15) }}
+              </div>
+              <div>
+                <span class="font-medium">Gage: </span>
+                {{ userCalibrationRunData?.gage?.gage_id }}
+              </div>
+              <div>
+                <span class="font-medium">Station Name: </span>
+                {{ userCalibrationRunData?.gage?.station_name }}
+              </div>
+            </div>
+            <div class="col-span-1">
+              <div>
+                <span class="font-medium">Configuration: </span>
+                {{ forecastConfigurationName ?? 'Unknown' }}
+              </div>
+              <div>
+                <span class="font-medium">Cycle Date: </span>
+                {{ (calibrationRunForForecast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cycle_date) + 'Z' : 'None') }}
+              </div>
+              <div>
+                <span class="font-medium">Cold Start Date: </span>
+                {{ (calibrationRunForForecast?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cold_start_date) + 'Z' : 'None') }}
+              </div>
+            </div>
+            <div class="col-span-1">
+              <div>
+                <span class="font-medium">Status: </span>
+                {{ overallColdStartForecastStatus }}
+              </div>
+              <div>
+                <span class="font-medium">Submit Time: </span>
+                {{ submitTime ?? '-'.repeat(15) }}
+              </div>
+              <div>
+                <span class="font-medium">Elapsed Time: </span>
+                {{ elapsedTime ?? '-'.repeat(15) }}
+              </div>
+            </div>
+            <div class="col-span-3">
+              <div>
+                <span class="font-bold">Results Pathname: </span>
+                <span class="whitespace-nowrap overflow-auto">{{ resultsPathname }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pl-4 ml-auto text-nowrap text-right">
+          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue underline mt-1"
+            @click="toggleMessagesGroup">
+            Show Calibration Details</a>
+        </div>
+
+      </div>
+    </div>
+
+    <div v-show="selectedLogCategory == 'forecast plot'" class="flex">
+      <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
+        <div id="PlotGraphArea" ref="plotGraphArea" v-if="!plotGraphCheckboxesEmpty()">
+          <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
+          <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
+            <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
+              @mouseup="sliderDragEnd" @mouseleave="sliderDragCancel">
+              <div id="PlotGraphSliderBox" ref="plotGraphSliderBox"></div>
+            </div>
+          </div>
+          <div id="PlotGraphSliderDateRange">
+            <div class="flex flex-row justify-center">
+              {{ formatDateString(plotGraphDateRange.start) }} - {{ formatDateString(plotGraphDateRange.end) }}
+            </div>
+          </div>
+          <div id="PlotGraphSliderHelp">
+            <div class="flex flex-row justify-center">
+              {{ plotGraphSliderHelpDisplay }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 grow-0" id="PlotGraphControls">
+        <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue underline mt-1 pb-2"
+          @click="toggleCustomizePlot">
+          Customize Viewer
+        </a>
+        <div v-if="plotGraphLines.length > 0">
+          <div v-for="item in plotGraphLines" :key="item.id">
+            <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
+              v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
+            <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
+          </div>
+        </div>
+        <div v-if="plotGraphCheckboxesEmpty()">
+          Check at least one box to generate an interactive plot.
+        </div>
+        <div id="CustomizePlotWindow" v-if="showCustomizePlot">
+          <div class="text-right sticky top-0">
+            <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+              class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
+          </div>
+          <h2 class="mt-5" aria-label="Customize Viewer" title="Customize Viewer">
+            Customize Viewer
+          </h2>
+          <div v-if="plotGraphLines.length > 0">
+            <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
+              <div>
+                <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
+              </div>
+              <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
+                :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+              </Select>
+              <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol"
+                :options="plotGraphSymbolList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+              </Select>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div v-show="selectedLogCategory && selectedLogCategory != 'forecast plot'">
-    <LogDisplay/>
+    <div v-show="selectedLogCategory && selectedLogCategory != 'forecast plot'">
+      <LogDisplay/>
+    </div>
+
+    <div class="waitgif" v-if="isLoading">
+      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
+import MessagesGroup from "../Common/MessagesGroup.vue";
 import LogDisplay from "../Common/LogDisplay.vue";
 
 import type { ToastMessageOptions } from "primevue/toast";
@@ -133,18 +167,18 @@ import type { ToastMessageOptions } from "primevue/toast";
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { useLogStore } from '@/stores/common/LogStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 
 import { convertISOStringOrDateToDateTime } from '@/utils/TimeHelpers';
 import * as Plot from "@observablehq/plot";
 
-const { calibrationJobId } = storeToRefs(generalStore());
+const { calibrationJobId, isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-
 
 const {
   calibrationRunForForecast,
@@ -152,19 +186,28 @@ const {
   forecastConfigurationName,
   resultsPathname,
   forecastPlot,
+  submitTimeDate,
+  submitTime,
   elapsedTime,
   overallColdStartForecastStatus,
-  selectedLogCategory,
-  logList
 } = storeToRefs(useForecastStore());
 
 const {
   loadForecastResultsTabData,
-  populateLogListOptions,
-  resetUserLogRefs,
 } = useForecastStore();
 
+const {
+  selectedLogCategory,
+  logList
+} = storeToRefs(useLogStore());
+const {
+  populateLogListOptions,
+  resetUserLogRefs
+} = useLogStore();
+
 const toast = useToast();
+
+const showMessagesGroup = ref<Boolean>(false);
 
 const plotGraphArea = ref<HTMLElement>();
 const plotGraphSVG = ref<HTMLElement>();
@@ -244,6 +287,14 @@ onMounted(async () => {
     await fetchUserCalibrationRunData();
   }
 });
+
+const toggleMessagesGroup = async () => {
+  if (showMessagesGroup.value) {
+    showMessagesGroup.value = false;
+  } else {
+    showMessagesGroup.value = true;
+  }
+}
 
 // Reset refs when mounting/unmounting tab
 const resetUserPlotRefs = (exceptions: any): void => {
@@ -806,5 +857,16 @@ onUnmounted(() => {
 #CustomizePlotWindow label {
   margin: 0 4px 4px 4px !important;
   display: inline-block;
+}
+
+#MessagesGroupWindow {
+  z-index: 100;
+  border: 1px solid black;
+  position: absolute;
+  right: 2%;
+  top: 161px;
+  width: 48%;
+  background-color: white;
+  overflow: auto;
 }
 </style>

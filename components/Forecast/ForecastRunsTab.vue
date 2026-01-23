@@ -169,7 +169,7 @@
       </div>
 
     </div>
-    <div class="waitgif" v-if="isForecastLoading">
+    <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
@@ -193,6 +193,8 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
+const { isLoading } = storeToRefs(generalStore());
+
 const forecastStore = useForecastStore();
 const {
   forecastJobId,
@@ -206,8 +208,7 @@ const {
   forecastRunListStartRow,
   forecastRunListEndRow,
   forecastRunListSort,
-  selectedForecastJob,
-  isForecastLoading
+  selectedForecastJob
 } = storeToRefs(forecastStore);
 
 const {
@@ -276,7 +277,7 @@ const onRowContextMenu = (event: any) => {
 };
 
 onMounted(async () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   forecastJobId.value = undefined;
   forecastRunListCurrentPage.value = 1;
 
@@ -303,7 +304,7 @@ onMounted(async () => {
     await getCalibrationJobsForForecast();
   });
 
-  isForecastLoading.value = false;
+  isLoading.value = false;
 });
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
@@ -316,16 +317,16 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
 }
 
 const viewCalibrationDetails = async (calibration_run_id: number) => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     await loadSelectedCalibrationRun(calibration_run_id);
-    isForecastLoading.value = false;
+    isLoading.value = false;
     showMessagesGroup.value = true;
   })
 }
 
 const clearDataAndNavigateToSetupForecast = () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
 
   nextTick(async () => {
     navigateToSetupForecast();
@@ -333,7 +334,7 @@ const clearDataAndNavigateToSetupForecast = () => {
 };
 
 const navigateToSetupForecast = () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
 
@@ -346,17 +347,17 @@ const navigateToSetupForecast = () => {
       // set userCalibrationRunData
       await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
       forecastJobId.value = undefined;
-      isForecastLoading.value = false;
+      isLoading.value = false;
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
-    isForecastLoading.value = false;
+    isLoading.value = false;
   });
 }
 
 const navigateToForecastRunStatus = () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
 
@@ -366,12 +367,12 @@ const navigateToForecastRunStatus = () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
-    isForecastLoading.value = false;
+    isLoading.value = false;
   });
 }
 
 const navigateToForecastResults = () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results tab"]');
 
@@ -381,7 +382,7 @@ const navigateToForecastResults = () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
-    isForecastLoading.value = false;
+    isLoading.value = false;
   });
 }
 
@@ -442,9 +443,9 @@ const toggleMessagesGroup = () => {
  * Refresh Forecast Jobs Table
  */
 const refreshJobList = async () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   await getForecastJobs();
-  isForecastLoading.value = false;
+  isLoading.value = false;
 }
 
 watch(selectedForecastJob, () => {

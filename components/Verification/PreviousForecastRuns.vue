@@ -141,7 +141,7 @@
       </div>
 
     </div>
-    <div class="waitgif" v-if="isVerificationLoading">
+    <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
@@ -166,6 +166,8 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
+const { isLoading } = storeToRefs(generalStore());
+
 const forecastStore = useForecastStore();
 const verificationStore = useVerificationStore();
 const { selectedForecastJob } = storeToRefs(forecastStore);
@@ -180,8 +182,7 @@ const {
   forecastRunsForVerificationListEndRow,
   forecastRunsForVerificationListSort,
   verificationJobId,
-  selectedVerificationJob,
-  isVerificationLoading
+  selectedVerificationJob
 } = storeToRefs(verificationStore);
 
 const {
@@ -233,7 +234,7 @@ const onRowContextMenu = (event: any) => {
 };
 
 onMounted(async () => {
-  isVerificationLoading.value = true;
+  isLoading.value = true;
 
   hilightTab(VerificationTabs.tab_forecastRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -247,7 +248,7 @@ onMounted(async () => {
     await getForecastRunsForVerification();
   });
 
-  isVerificationLoading.value = false;
+  isLoading.value = false;
 });
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
@@ -260,7 +261,7 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
 }
 
 const navigateToVerificationJobStatus = () => {
-  isVerificationLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
 
@@ -272,7 +273,7 @@ const navigateToVerificationJobStatus = () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
-    isVerificationLoading.value = false;
+    isLoading.value = false;
   });
 }
 
@@ -299,9 +300,9 @@ const toggleMessagesGroup = () => {
  * Refresh Forecast Jobs Table
  */
 const refreshJobList = async () => {
-  isVerificationLoading.value = true;
+  isLoading.value = true;
   await getForecastRunsForVerification();
-  isVerificationLoading.value = false;
+  isLoading.value = false;
 }
 
 </script>
