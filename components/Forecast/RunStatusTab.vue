@@ -325,8 +325,14 @@ onMounted(async () => {
   }
 
   watch(overallColdStartForecastStatus, (newColdStartForecastStatus, oldColdStartForecastStatus) => {
-    if (forecastJobId.value && oldColdStartForecastStatus && oldColdStartForecastStatus !== "Unknown" && 
-      newColdStartForecastStatus && newColdStartForecastStatus !== "Unknown" && !isLoading.value) {
+    if (forecastJobId.value && 
+      ( 
+        ['Submitted','Running'].includes(coldStartJobStatus.value ?? '') || 
+        ['Submitted','Running'].includes(forecastJobStatus.value ?? '') ||
+        (oldColdStartForecastStatus && oldColdStartForecastStatus !== "Unknown" && 
+        newColdStartForecastStatus && newColdStartForecastStatus !== "Unknown")
+      )
+    ) {
       populateLogListOptions();
     }
   });

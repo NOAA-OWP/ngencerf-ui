@@ -174,9 +174,14 @@ onMounted(async() => {
   }
 
   watch(verificationJobStatus, async (newVerificationJobStatus, oldVerificationJobStatus) => {
-    if (forecastJobId.value && oldVerificationJobStatus && oldVerificationJobStatus !== "Unknown" && 
-      newVerificationJobStatus && newVerificationJobStatus !== "Unknown" && !isLoading.value) {
-      await populateLogListOptions();
+    if (verificationJobId.value && 
+      ( 
+        ['Submitted','Running'].includes(newVerificationJobStatus ?? '') || 
+        (oldVerificationJobStatus && oldVerificationJobStatus !== "Unknown" && 
+        newVerificationJobStatus && newVerificationJobStatus !== "Unknown")
+      )
+    ) {
+      populateLogListOptions();
     }
   });
 })
