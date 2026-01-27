@@ -35,7 +35,7 @@
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + 'UTC' : (selectedForecastJob?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedForecastJob.cycle_date) + 'UTC' : 'None')) }}
+                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + ' UTC' : (selectedForecastJob?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedForecastJob.cycle_date) + ' UTC' : 'None')) }}
               </div>
             </div>
             <div class="col-span-1">
