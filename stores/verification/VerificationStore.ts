@@ -32,6 +32,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   // refs
   const forecastJobId = ref<number>();
   const forecastRunsForVerification = ref<ForecastJob[]>([]);
+  const selectedForecastJob = ref<ForecastJob>();
   const forecastRunsForVerificationListPageSize = ref<number>(50);
   const forecastRunsForVerificationListCurrentPage = ref<number>(1);
   const forecastRunsForVerificationListTotalPages = ref<number>(0);
@@ -137,6 +138,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   }
 
   const setSelectedForecastRowData = async (forecast_row_data: ForecastJob): Promise<void> => {
+    selectedForecastJob.value = forecast_row_data;
     setSelectedForecastRunId(forecast_row_data.forecast_run_id);
   }
 
@@ -514,6 +516,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   return {
     forecastJobId,
     forecastRunsForVerification,
+    selectedForecastJob,
     forecastRunsForVerificationListPageSize,
     forecastRunsForVerificationListCurrentPage,
     forecastRunsForVerificationListTotalPages,

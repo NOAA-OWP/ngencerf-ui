@@ -31,11 +31,11 @@
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Configuration: </span>
-                {{ selectedVerificationJob?.forecast_run?.configuration ?? 'Unknown' }}
+                {{ selectedVerificationJob?.forecast_run?.configuration ?? (selectedForecastJob?.configuration ?? 'Unknown') }}
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + ' UTC' : 'None') }}
+                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + 'UTC' : (selectedForecastJob?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedForecastJob.cycle_date) + 'UTC' : 'None')) }}
               </div>
             </div>
             <div class="col-span-1">
@@ -124,6 +124,7 @@ const toast = useToast();
 const verificationStore = useVerificationStore();
 
 const { 
+  selectedForecastJob,
   selectedVerificationJob,
   forecastJobId,
   verificationJobId, 
