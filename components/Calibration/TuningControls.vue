@@ -452,8 +452,8 @@ onMounted(async () => {
  */
 const isTimeRangeSet = (): boolean => {
   const timeRange = userCalibrationRunData?.value?.time_range;
-
-  if (timeRange && Object.keys(timeRange).length > 0) {
+  
+  if (timeRange && Object.keys(timeRange).length > 0 && rangeDateFrom.value && rangeDateTo.value) {
     return true;
   } else {
     return false;

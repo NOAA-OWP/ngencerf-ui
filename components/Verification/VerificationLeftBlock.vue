@@ -31,6 +31,9 @@ import VerificationResultsTab from "./VerificationResultsTab.vue"
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getVerificationTabIndex, setVerificationTabIndex } = generalStore();
 
+import { useVerificationStore } from '@/stores/verification/VerificationStore';
+const { verificationJobId } = storeToRefs(useVerificationStore());
+
 // Default to Tab 1, HeadwaterBasinGage
 const activeTab = ref(getVerificationTabIndex());
 
@@ -39,4 +42,9 @@ const tabChanged = (tabNum: number) => {
   activeTab.value = tabNum;
   setVerificationTabIndex(tabNum);
 };
+
+onUnmounted(() => {
+  verificationJobId.value = undefined;
+})
+
 </script>

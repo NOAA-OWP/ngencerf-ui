@@ -91,7 +91,7 @@
       </div>
     </div>
 
-    <div class="waitgif" v-if="isVerificationLoading">
+    <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
@@ -115,6 +115,8 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
+const { isLoading } = storeToRefs(generalStore());
+
 const verificationStore = useVerificationStore();
 const {
   verificationJobs,
@@ -126,8 +128,7 @@ const {
   verificationRunListEndRow,
   verificationRunListSort,
   selectedVerificationJob,
-  verificationJobId,
-  isVerificationLoading
+  verificationJobId
 } = storeToRefs(verificationStore);
 
 const {
@@ -169,9 +170,9 @@ watch(verificationRunListCurrentPage, () => {
  * Refresh Verification Jobs Table
  */
 const refreshJobList = async () => {
-  isVerificationLoading.value = true;
+  isLoading.value = true;
   await getVerificationJobs();
-  isVerificationLoading.value = false;
+  isLoading.value = false;
 }
 
 const onRowContextMenu = (event: any) => {
@@ -190,7 +191,7 @@ const onRowContextMenu = (event: any) => {
 };
 
 onMounted(() => {
-  isVerificationLoading.value = true;
+  isLoading.value = true;
 
   hilightTab(VerificationTabs.tab_verificationJobs);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -205,7 +206,7 @@ onMounted(() => {
     await getVerificationJobs();
   });
 
-  isVerificationLoading.value = false;
+  isLoading.value = false;
 })
 
 const onVerificationRowSelect = async (event: DataTableRowClickEvent) => {
@@ -257,7 +258,7 @@ const acceptDelete = (selectedRunId: number) => {
 }
 
 const navigateToVerificationJobStatus = () => {
-  isVerificationLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
 
@@ -266,12 +267,12 @@ const navigateToVerificationJobStatus = () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
-    isVerificationLoading.value = false;
+    isLoading.value = false;
   });
 }
 
 const navigateToVerificationResults = () => {
-  isVerificationLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results Tab"]');
 
@@ -280,7 +281,7 @@ const navigateToVerificationResults = () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
-    isVerificationLoading.value = false;
+    isLoading.value = false;
   });
 }
 

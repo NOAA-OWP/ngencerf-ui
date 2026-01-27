@@ -59,6 +59,15 @@
                 :options="getObjectiveFunctionOptionsList" optionLabel="display_name" optionValue="name" placeholder=""
                 @change="updateMetricFlowFieldVisibility" aria-label="Objective Function" title="Objective Function"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
+              <div v-if="uiObjectiveFunction" class="ml-3 mt-2">
+                For {{ uiObjectiveFunction }} the Objective Function = 
+                {{
+                  ['KGE','NSE','NNSE','NSELOG','CORR','CSI','POD'].includes(uiObjectiveFunction.toUpperCase()) ? '1 - metric' :
+                    (['RMSE','MAE','RSR','FAR','PKBIAS','PKTE','EVBIAS'].includes(uiObjectiveFunction.toUpperCase()) ? 'metric' :
+                      ['PBIAS','LSEG_FDC','HSEG_FDC'].includes(uiObjectiveFunction.toUpperCase()) ? 'abs(metric)' : ''
+                    )
+                }}
+              </div>
               <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-2">
                 Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
                   :minFractionDigits="2" class="w-24" aria-label="Flow Threshold" title="Flow Threshold"
