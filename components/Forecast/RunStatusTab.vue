@@ -275,6 +275,11 @@ onMounted(async () => {
 
   // highlight the tab when selected
   hilightTab(ForecastTabs.tab_runStatus);
+
+  clearInterval(forecastJobStatusIntervalId.value);
+  clearInterval(elapsedTimeIntervalId.value);
+  forecastJobStatusIntervalId.value = undefined;
+  elapsedTimeIntervalId.value = undefined;
   
   // get calibration job data if we don't already have it
   if (!userCalibrationRunData.value) {
@@ -288,11 +293,6 @@ onMounted(async () => {
     createColdStartAndForecastStatusInterval();
     createElapsedTimeInterval();
   }
-
-  clearInterval(forecastJobStatusIntervalId.value);
-  clearInterval(elapsedTimeIntervalId.value);
-  forecastJobStatusIntervalId.value = undefined;
-  elapsedTimeIntervalId.value = undefined;
 
   // set log levels
   if (calibrationRunForForecast?.value?.logging_config?.modules['ngen']) {
