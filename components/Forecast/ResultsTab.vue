@@ -47,11 +47,11 @@
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (calibrationRunForForecast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cycle_date): 'None') }}
+                {{ (calibrationRunForForecast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cycle_date) + ' UTC' : 'None') }}
               </div>
               <div>
                 <span class="font-medium">Cold Start Date: </span>
-                {{ (calibrationRunForForecast?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cold_start_date): 'None') }}
+                {{ (calibrationRunForForecast?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cold_start_date) + ' UTC' : 'None') }}
               </div>
             </div>
             <div class="col-span-1">
