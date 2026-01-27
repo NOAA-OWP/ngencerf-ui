@@ -11,9 +11,6 @@ import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers"
 import { isValidDate } from '@/utils/CommonHelpers';
 import { formatElapsedTime, formatDateForRunOnString } from '@/utils/TimeHelpers';
 
-const forecastStore = useForecastStore();
-const { selectedForecastJob } = storeToRefs(forecastStore);
-
 export const useVerificationStore = defineStore('VerificationStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
@@ -28,6 +25,9 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     maxJobId,
     statusTypeFilterList 
   } = storeToRefs(useUserDataStore());
+
+  const forecastStore = useForecastStore();
+  const { selectedForecastJob } = storeToRefs(forecastStore);
 
   // refs
   const forecastJobId = ref<number>();
@@ -61,10 +61,8 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   const submitTime = ref<string>();
   const verificationStatusCheckingInterval = ref<any>();
   const verificationRunningTimeInterval = ref<any>();
-  const verificationPlotNames = ref<string[]>(); // TODO: create verificationPlotNames interface
+  const verificationPlotNames = ref<any>(); // TODO: create verificationPlotNames interface
   const verificationPlot = ref<any>(); // TODO: create verificationPlot interface
-
-  const isVerificationLoading = ref<boolean>(false);
 
   /**
    * fetch get_forecast_jobs_for_verification
@@ -139,6 +137,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   }
 
   const setSelectedForecastRowData = async (forecast_row_data: ForecastJob): Promise<void> => {
+    selectedForecastJob.value = forecast_row_data;
     setSelectedForecastRunId(forecast_row_data.forecast_run_id);
   }
 
@@ -516,6 +515,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   return {
     forecastJobId,
     forecastRunsForVerification,
+    selectedForecastJob,
     forecastRunsForVerificationListPageSize,
     forecastRunsForVerificationListCurrentPage,
     forecastRunsForVerificationListTotalPages,
@@ -544,7 +544,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     yamlConfigData,
     verificationPlotNames,
     verificationPlot,
-    isVerificationLoading,
     getForecastRunsForVerification,
     setSelectedForecastRunId,
     setSelectedForecastRowData,

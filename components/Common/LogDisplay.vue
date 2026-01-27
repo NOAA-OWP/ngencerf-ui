@@ -40,18 +40,16 @@ import type { ToastMessageOptions } from "primevue/toast";
 import Paging from "../Common/Paging.vue";
 
 import { generalStore } from '~/stores/common/GeneralStore';
-import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { useLogStore } from '@/stores/common/LogStore';
 
-const { isLoading } = storeToRefs(generalStore());
+const { ngencerfBaseUrl } = useBackendConfig();
+
 const { addToastRecord } = generalStore();
 const toast = useToast();
 
 const {
-  forecastJobId,
-  overallColdStartForecastStatus,
   logList,
   logListDefault,
-  logs,
   logDataPageSize,
   logLists,
   logListOptions,
@@ -65,15 +63,11 @@ const {
   selectedLogStartRow,
   selectedLogEndRow,
   selectedLogFilePath,
-  selectedLogByteOffset,
   selectedLogStatus
-} = storeToRefs(useForecastStore());
-
+} = storeToRefs(useLogStore());
 const {
-  queryGetLogData,
-  resetUserLogRefs,
   updateLogRefs
-} = useForecastStore();
+} = useLogStore();
 
 // Handle selectedLogCategory changes
 watch(selectedLogCategory, async () => {
@@ -125,7 +119,6 @@ watch(selectedLogCurrentPage, async () => {
     const response: any = await queryGetLogData(
       selectedLogCategory.value, // log_category,
       selectedLogName.value, // log_name
-      forecastJobId.value, // forecast_run_id
       selectedLogStartRow.value - 1, // start
       logDataPageSize.value // limit
     );
@@ -156,6 +149,14 @@ const selectedLogCategoryDisplay = computed(() => {
     return optionFound.display_name.replace(' Logs','');
   }
   return selectedLogCategory.value;
+})
+
+onUnmounted(() => {
+  logList.value = [];
+  logListOptions.value = [];
+  logListOptions.value = [];
+  selectedLogCategory.value = logListDefault.value;
+  selectedLogName.value = '';
 })
 </script>
 

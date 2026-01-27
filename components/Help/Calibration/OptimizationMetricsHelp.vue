@@ -88,15 +88,124 @@
             </tr>
             </tbody>
         </table>
+        <hr />
         <div class="mt-4">
-            <p style="text-align: center;font-weight: bold;">Metric Definitions</p>
-            <img class="mx-auto" width="90%" :src="image1" alt="" />
+            <p class="mb-2 text-center font-bold">Metric Definitions</p>
+            <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-200 text-left text-sm" 
+                    aria-label="Metrics table listing all calibration and evaluation metrics with descriptions">
+                <thead class="bg-gray-300 font-bold">
+                <tr>
+                    <th class="px-4 py-1 font-bold">Metric Acronym</th>
+                    <th class="px-4 py-1 font-bold">Description</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">Corr</td>
+                    <td class="px-4 py-1">Pearson Correlation</td>
+                </tr>
+                <tr class="bg-yellow-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">CSI</td>
+                    <td class="px-4 py-1">Critical Success Index (Categorical Metric)</td>
+                </tr>
+                <tr class="bg-blue-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">EVBIAS</td>
+                    <td class="px-4 py-1">Event Volume Bias (Event-Based Metric)</td>
+                </tr>
+                <tr class="bg-yellow-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">FAR</td>
+                    <td class="px-4 py-1">False Alarm Ratio (Categorical Metric)</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">HSEG_FDC</td>
+                    <td class="px-4 py-1">Percent bias of high flow segment of flow duration curve</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">KGE</td>
+                    <td class="px-4 py-1">Kling-Gupta Efficiency</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">LSEG_FDC</td>
+                    <td class="px-4 py-1">Percent bias of low flow segment of flow duration curve</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">MAE</td>
+                    <td class="px-4 py-1">Mean Absolute Error</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">NNSE</td>
+                    <td class="px-4 py-1">Normalized NSE</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">NSE</td>
+                    <td class="px-4 py-1">Nash-Sutcliffe Efficiency</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">NSELog</td>
+                    <td class="px-4 py-1">NSE of logarithmic values</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">PBIAS</td>
+                    <td class="px-4 py-1">Percent Bias</td>
+                </tr>
+                <tr class="bg-blue-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">PKBIAS</td>
+                    <td class="px-4 py-1">Event Absolute Peak Flow Bias (Event-Based Metric)</td>
+                </tr>
+                <tr class="bg-blue-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">PKTE</td>
+                    <td class="px-4 py-1">Event Peak Flow Timing Error (Event-Based Metric)</td>
+                </tr>
+                <tr class="bg-yellow-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">POD</td>
+                    <td class="px-4 py-1">Probability of Detection (Categorical Metric)</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">RMSE</td>
+                    <td class="px-4 py-1">Root Mean Square Error</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">RSR</td>
+                    <td class="px-4 py-1">Ratio of RMSE to standard deviation of observation</td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mt-4 text-md font-semibold">Legend</p>
+            <div class="overflow-x-auto mt-1">
+            <table class="min-w-max border border-gray-200 text-left text-sm" aria-label="Legend table explaining metric types and corresponding background colors">
+                <thead class="bg-gray-300 font-bold">
+                <tr>
+                    <th>&nbsp;</th> 
+                    <th class="px-2 py-1 font-bold" scope="col">Metric Type</th>
+                    <th class="px-2 py-1 font-bold" scope="col">Description</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                    <td class="px-2 py-0.5">
+                    <div class="w-5 h-5 bg-yellow-50 border border-gray-300"></div>
+                    </td>
+                    <td class="px-2 py-0.5 font-bold">Categorical Metric</td>
+                    <td class="px-2 py-0.5">Metrics based on categorical event detection (e.g., POD, CSI, FAR)</td>
+                </tr>
+                <tr>
+                    <td class="px-2 py-0.5">
+                    <div class="w-5 h-5 bg-blue-50 border border-gray-300"></div>
+                    </td>
+                    <td class="px-2 py-0.5 font-bold">Event-Based Metric</td>
+                    <td class="px-2 py-0.5">Metrics based on event flows, peaks, or volumes (e.g., EVBIAS, PKBIAS, PKTE)</td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import image1 from "@/assets/styles/img/OptimizationMetricsTable.png"
+
 </script>
 
 <style lang="scss" scoped>

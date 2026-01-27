@@ -173,7 +173,7 @@
                     <td class="td1 align-top" style="font-weight:normal;">Lock/<br />UnLock</td>
                     <td class="td2 align-top">Lock/Unlock the selected calibration job(s). 
                         Locking a job prohibits deletion. Once locked the
-                        job cannnot be deleted until unlocked.
+                        job cannot be deleted until unlocked.
                     </td>
                 </tr>
             </tbody>

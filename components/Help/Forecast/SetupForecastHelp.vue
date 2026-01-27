@@ -7,6 +7,10 @@
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
         <hr class="my-6 border-black" />
+        <p class="text-center font-medium">
+            All times referenced are in Coordinated Universal Time (UTC), also known as Zulu (Z)
+        </p>
+        <hr class="my-6 border-black" />
 
         <div class="ml-2">
             <!-- Forecast configuration details -->
