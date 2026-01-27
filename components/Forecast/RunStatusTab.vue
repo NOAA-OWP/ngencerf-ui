@@ -52,11 +52,11 @@
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None') }}
+                {{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : 'None') }}
               </div>
               <div>
                 <span class="font-medium">Cold Start Date: </span>
-                {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'None') }}
+                {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : 'None') }}
               </div>
             </div>
             <div class="col-span-1">

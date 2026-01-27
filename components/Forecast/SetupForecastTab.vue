@@ -145,7 +145,6 @@
             aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
             :disabled="!forecastConfiguration">
           </Select>
-          Z
         </div>
         <div class="text-nowrap text-right font-bold p-1">
           Cycle Hour<span class="text-red-600">*</span>
@@ -155,7 +154,6 @@
             aria-label="Cycle Hour Select" title="Cycle Hour Select"
             :disabled="!forecastConfiguration">
           </Select>
-          Z
         </div>
       </div>
     </div>

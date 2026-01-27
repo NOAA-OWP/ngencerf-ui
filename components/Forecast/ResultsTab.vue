@@ -47,11 +47,11 @@
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (calibrationRunForForecast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cycle_date) + 'Z' : 'None') }}
+                {{ (calibrationRunForForecast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cycle_date): 'None') }}
               </div>
               <div>
                 <span class="font-medium">Cold Start Date: </span>
-                {{ (calibrationRunForForecast?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cold_start_date) + 'Z' : 'None') }}
+                {{ (calibrationRunForForecast?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cold_start_date): 'None') }}
               </div>
             </div>
             <div class="col-span-1">
@@ -436,14 +436,14 @@ const drawInteractivePlot = () => {
         for (let d = 0; d < plotGraphData.value.length; d++) {
           if (plotGraphLines.value[c - 1].symbol === 'line') {
             plotLineData.push({
-              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][plotGraphColumns.value[0].value].replace(" ","T") + "Z").toJSDate(),
+              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][plotGraphColumns.value[0].value].replace(" ","T")).toJSDate(),
               'measurement': parseFloat(plotGraphData.value[d][plotGraphColumns.value[c].value]),
               'color': plotGraphLines.value[c - 1].color,
               'name': plotGraphLines.value[c - 1].name
             });
           } else {
             plotDotData.push({
-              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][plotGraphColumns.value[0].value].replace(" ","T") + "Z").toJSDate(),
+              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][plotGraphColumns.value[0].value].replace(" ","T")).toJSDate(),
               'measurement': parseFloat(plotGraphData.value[d][plotGraphColumns.value[c].value]),
               'color': plotGraphLines.value[c - 1].color,
               'symbol': plotGraphLines.value[c - 1].symbol,
@@ -463,8 +463,8 @@ const drawInteractivePlot = () => {
     measurement: string;
   }
 
-  let plotGraphLeftEdge = convertISOStringOrDateToDateTime(plotGraphDateRange.value.start.replace(" ","T") + "Z").toJSDate();
-  let plotGraphRightEdge = convertISOStringOrDateToDateTime(plotGraphDateRange.value.end.replace(" ","T") + "Z").toJSDate();
+  let plotGraphLeftEdge = convertISOStringOrDateToDateTime(plotGraphDateRange.value.start.replace(" ","T")).toJSDate();
+  let plotGraphRightEdge = convertISOStringOrDateToDateTime(plotGraphDateRange.value.end.replace(" ","T")).toJSDate();
   let lineOptions = {
     x: { value: 'time', label: 'Time' },
     y: { value: 'measurement', label: 'Measurement' },
@@ -554,7 +554,7 @@ const drawInteractiveSlider = () => {
       if (plotGraphLines.value.length === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
         for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
           let dataPoint = {
-            time: convertISOStringOrDateToDateTime((plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[0].value]).replace(" ","T") + "Z").toJSDate(),
+            time: convertISOStringOrDateToDateTime((plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[0].value]).replace(" ","T")).toJSDate(),
             measurement: parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[c].value])
           };
           plotGraphSliderData.value.push(dataPoint);
@@ -754,11 +754,11 @@ const setSliderDateRange = () => {
   }
 
   let hoursFromStart = Math.ceil(sliderBoxPosition.value.start * (plotGraphDateLimits.value.span / getSliderWidth()));
-  let newStartDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.start).replace(" ","T") + "Z").toJSDate();
+  let newStartDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.start).replace(" ","T")).toJSDate();
   newStartDate.setHours(newStartDate.getHours() + hoursFromStart);
 
   let hoursFromEnd = Math.ceil((getSliderWidth() - sliderBoxPosition.value.end) * (plotGraphDateLimits.value.span / getSliderWidth()));
-  let newEndDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.end.replace(" ","T") + "Z")).toJSDate();
+  let newEndDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.end.replace(" ","T"))).toJSDate();
   newEndDate.setHours(newEndDate.getHours() - hoursFromEnd);
 
   (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
