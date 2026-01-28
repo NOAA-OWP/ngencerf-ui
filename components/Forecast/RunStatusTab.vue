@@ -52,11 +52,11 @@
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None') }}
+                {{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + ' UTC' : 'None') }}
               </div>
               <div>
                 <span class="font-medium">Cold Start Date: </span>
-                {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'None') }}
+                {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + ' UTC'  : 'None') }}
               </div>
             </div>
             <div class="col-span-1">
@@ -275,6 +275,11 @@ onMounted(async () => {
 
   // highlight the tab when selected
   hilightTab(ForecastTabs.tab_runStatus);
+
+  clearInterval(forecastJobStatusIntervalId.value);
+  clearInterval(elapsedTimeIntervalId.value);
+  forecastJobStatusIntervalId.value = undefined;
+  elapsedTimeIntervalId.value = undefined;
   
   // get calibration job data if we don't already have it
   if (!userCalibrationRunData.value) {
@@ -288,11 +293,6 @@ onMounted(async () => {
     createColdStartAndForecastStatusInterval();
     createElapsedTimeInterval();
   }
-
-  clearInterval(forecastJobStatusIntervalId.value);
-  clearInterval(elapsedTimeIntervalId.value);
-  forecastJobStatusIntervalId.value = undefined;
-  elapsedTimeIntervalId.value = undefined;
 
   // set log levels
   if (calibrationRunForForecast?.value?.logging_config?.modules['ngen']) {
@@ -325,8 +325,14 @@ onMounted(async () => {
   }
 
   watch(overallColdStartForecastStatus, (newColdStartForecastStatus, oldColdStartForecastStatus) => {
-    if (forecastJobId.value && oldColdStartForecastStatus && oldColdStartForecastStatus !== "Unknown" && 
-      newColdStartForecastStatus && newColdStartForecastStatus !== "Unknown" && !isLoading.value) {
+    if (forecastJobId.value && 
+      ( 
+        ['Submitted','Running'].includes(coldStartJobStatus.value ?? '') || 
+        ['Submitted','Running'].includes(forecastJobStatus.value ?? '') ||
+        (oldColdStartForecastStatus && oldColdStartForecastStatus !== "Unknown" && 
+        newColdStartForecastStatus && newColdStartForecastStatus !== "Unknown")
+      )
+    ) {
       populateLogListOptions();
     }
   });

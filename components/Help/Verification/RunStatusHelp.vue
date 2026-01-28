@@ -10,7 +10,11 @@
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <hr />
+        <hr class="my-6 border-black" />
+        <p class="text-center font-medium">
+            All times referenced are in Coordinated Universal Time (UTC).
+        </p>
+        <hr class="my-6 border-black" />
         <table class="_help-table" aria-label="Verification Run / Status Help Table">
             <thead>
                 <tr>
