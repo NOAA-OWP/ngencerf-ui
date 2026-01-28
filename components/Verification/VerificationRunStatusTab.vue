@@ -3,7 +3,7 @@
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="logList.length > 1" class="inline-block">
+          <div v-if="logList.length > 0" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
@@ -31,11 +31,11 @@
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Configuration: </span>
-                {{ selectedVerificationJob?.forecast_run?.configuration ?? 'Unknown' }}
+                {{ selectedVerificationJob?.forecast_run?.configuration ?? (selectedForecastJob?.configuration ?? 'Unknown') }}
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + 'Z' : 'None') }}
+                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + ' UTC' : (selectedForecastJob?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedForecastJob.cycle_date) + ' UTC' : 'None')) }}
               </div>
             </div>
             <div class="col-span-1">
@@ -92,7 +92,7 @@
     </div>
 
     <!-- DISPLAY LOGS -->
-    <div v-if="logList.length > 1">
+    <div v-show="logList.length > 0">
       <LogDisplay/>
     </div>
 
@@ -124,6 +124,7 @@ const toast = useToast();
 const verificationStore = useVerificationStore();
 
 const { 
+  selectedForecastJob,
   selectedVerificationJob,
   forecastJobId,
   verificationJobId, 
@@ -174,9 +175,14 @@ onMounted(async() => {
   }
 
   watch(verificationJobStatus, async (newVerificationJobStatus, oldVerificationJobStatus) => {
-    if (forecastJobId.value && oldVerificationJobStatus && oldVerificationJobStatus !== "Unknown" && 
-      newVerificationJobStatus && newVerificationJobStatus !== "Unknown" && !isLoading.value) {
-      await populateLogListOptions();
+    if (verificationJobId.value && 
+      ( 
+        newVerificationJobStatus === 'Running' || 
+        (oldVerificationJobStatus && oldVerificationJobStatus !== "Unknown" && 
+        newVerificationJobStatus && newVerificationJobStatus !== "Unknown")
+      )
+    ) {
+      populateLogListOptions();
     }
   });
 })

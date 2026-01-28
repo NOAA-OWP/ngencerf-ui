@@ -5,7 +5,7 @@
         <div class="grid grid-cols-8">
           <div class="col-span-8">
             <div id="FormulationName" class="block mt-1" aria-label="Forumulation Name" title="Formulation Name">
-              <label for="formulationNameInput" class="text-lg">Formulation Name </label>
+              <label for="formulationNameInput" class="text-lg required-label">Formulation Name</label>
               <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
                 aria-label="Input Forumulation Name" title="Input Formulation Name" required
                 @keypress="checkValidCharacters($event)"
@@ -25,7 +25,7 @@
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               </div>
             </div>
-            <div class="pt-4 mb-1 font-bold text-base">Select Modules</div>
+            <div class="pt-4 mb-1 font-bold text-base required-label">Select Modules</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
               optionLabel="display_name" optionValue="name" class="h-60" @change="moduleListChanged"
               :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
@@ -43,7 +43,7 @@
                 :binary="true" v-model="isAETRootzone" aria-label="CFE AET Rootzone Checkbox"
                 title="CFE AET Rootzone Checkbox" @change="isAETRootzoneHasChanged = true" 
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
-              <label for="isAETRootzone" class="inline">CFE AET Rootzone</label>
+              <label for="isAETRootzone" class="inline required-label">CFE AET Rootzone</label>
             </div>
           </div>
           <div class="col-span-2">&nbsp;</div>
@@ -172,7 +172,7 @@
         </span>
         <span v-else>
           <div class="col-span-1 mr-6 h-8 whitespace-nowrap" style="font-size: 16px;">
-            Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
+            {{ submitTimeDate ? 'Run on ' + formatDateForRunOnString(submitTimeDate) : 'Run on Unknown Date' }}
           </div>
         </span>
 
@@ -308,6 +308,9 @@ onMounted(async() => {
     }
     if (!userCalibrationRunData.value) {
       await fetchUserCalibrationRunData();
+    }
+    if (userCalibrationRunData?.value?.submit_date) {
+      submitTimeDate.value = new Date(userCalibrationRunData.value.submit_date);
     }
     if (!userCalibrationRunData?.value?.modules.some(item => item.toLowerCase() === 't-route')) {
       userCalibrationRunData?.value?.modules.push('T-Route');

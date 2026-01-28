@@ -7,7 +7,7 @@
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
               <div class="col-span-1">
-                <label for="Domain">Domain</label><br />
+                <label for="Domain" class="required-label">Domain</label><br />
                 <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
                   optionValue="name" placeholder=" ... " aria-label="Domain Select" title="Domain Select"
                   @change="onDomainSelectionChange"
@@ -16,36 +16,35 @@
             </div>
 
             <div class="col-span-1">
-              <label for="Gage" @focus="focusSelectInput">Gage</label><br />
+              <label for="Gage" @focus="focusSelectInput" class="required-label">Gage</label><br />
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
                 @change="onGageSelectionChange" @focus="focusSelectInput" aria-label="Gage Select" title="Gage Select"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
-            <div class="col-span-1">&nbsp;</div>
-          </div>
-        </div>
-        <div class="row-span-1">
-          <div class="grid grid-cols-3 gap-4">
-            <div class="col-span-1">
-              <label for="Forcing">Forcing Source</label><br />
+            <div class="col-span-1" v-if="getForcingOptionsList.length > 1">
+              <label for="Forcing" class="required-label">Forcing Source</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" @change="uploadForcingDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="Forcing Source Select" title="Forcing Source Select"></Select>
             </div>
+          </div>
+        </div>
+        <div class="row-span-1" v-if="getObservationalOptionsList.length > 1 || getGeopackageOptionsList.length > 1">
+          <div class="grid grid-cols-3 gap-4">
 
-            <div class="col-span-1">
-              <label for="Observational">Observational Data</label><br />
+            <div class="col-span-1" v-if="getObservationalOptionsList.length > 1">
+              <label for="Observational" class="required-label">Observational Data</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
                 optionLabel="name" optionValue="name" class="user-select" @change="uploadObservationalDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="Observational Data Select" title="Observational Data Select"></Select>
             </div>
 
-            <div class="col-span-1">
-              <label for="Geopackage">GeoPackage</label><br />
+            <div class="col-span-1" v-if="getGeopackageOptionsList.length > 1">
+              <label for="Geopackage" class="required-label">GeoPackage</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" @change="uploadGeopackageDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
@@ -117,7 +116,7 @@
             </span>
             <span v-else>
               <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-                Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
+                {{ submitTimeDate ? 'Run on ' + formatDateForRunOnString(submitTimeDate) : 'Run on Unknown Date' }}
               </div>
             </span>
             <span v-if="(gageHasChanged && userCalibrationRunData?.gage !== null) || gageDataSourceHasChanged">
@@ -231,6 +230,9 @@ onMounted(async() => {
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
     setResetDataValues();
+    if (userCalibrationRunData?.value?.submit_date) {
+      submitTimeDate.value = new Date(userCalibrationRunData.value.submit_date);
+    }
     if (userCalibrationRunData?.value?.gage?.gage_id) {
       gageSelectionReset();
     } else {

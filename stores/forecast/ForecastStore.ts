@@ -251,13 +251,11 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         }
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
+          if (overallColdStartForecastStatus.value === 'Done' && getStatusResponse?._data?.run_end) {
+            elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date(getStatusResponse._data.run_end as string));
+          }
         } else {
           errorMessages.push(`Invalid submit date: ${getStatusResponse?._data?.submit_date}`);
-        }
-        
-        if (getStatusResponse?._data?.cold_start_run?.elapsed_time || getStatusResponse?._data?.elapsed_time) {
-          // set elapsedTime
-          setElapsedTime(getStatusResponse?._data);
         }
       } else {
         return useApiErrorResponsePreprocess(getStatusResponse);

@@ -18,7 +18,6 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
 
   const calibrationDownloadJobID = ref<number | null>(null);
-  const calibrationDownloadFileName = ref<string | null>(null);
 
   /**
  * returns list of calibration job data from server
@@ -180,23 +179,34 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
         throw new Error(message);
       }
     });
-    
-    // create an interval to keep checking download status every 10 seconds
-    let calibrationDownloadStatusIntervalId = setInterval(async () => {
-      getCalibrationJobZipStatus(calibration_run_id)
-      .then(response => {
-        if (response && response._data.zip_status) {
-          if (response._data.zip_status === 'done') {
+
+    // return a promise that resolves/rejects when the interval finishes
+    return await new Promise<void>((resolve, reject) => {
+      // create an interval to keep checking download status every 10 seconds
+      let calibrationDownloadStatusIntervalId = setInterval(async () => {
+        getCalibrationJobZipStatus(calibration_run_id)
+        .then(async response => {
+          const zipStatus = response?._data?.zip_status;
+          if (zipStatus === 'done') {
             clearInterval(calibrationDownloadStatusIntervalId);
-            downloadCalibrationJobZip(calibration_run_id);
+            await downloadCalibrationJobZip(calibration_run_id);
+            resolve();
+          } else if (!zipStatus) {
+            clearInterval(calibrationDownloadStatusIntervalId);
+            reject(new Error("Unable to get Calibration Job Download Status (missing zip_status)"));
+            return;
+          } else if (zipStatus === 'error' || zipStatus === 'failed') {
+            clearInterval(calibrationDownloadStatusIntervalId);
+            reject(new Error(`Calibration Job Zip build failed: ${zipStatus}`));
+            return;
           }
-        } else {
+        })
+        .catch(err => {
           clearInterval(calibrationDownloadStatusIntervalId);
-          const message = `Error: ${response._data.zip_status} Unable to get Calibration Job Download Status`;
-          throw new Error(message);
-        }
-      });
-    }, 5000) as unknown as number;
+          reject(err);
+        });
+      }, 5000) as unknown as number;
+    });
   }
 
   /**
@@ -217,7 +227,7 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
  * Request calibration data zip file once it is built
  */
   const downloadCalibrationJobZip = async (calibration_run_id: number) => {
-    await fetch(`${ngencerfBaseUrl}/calibration/download_calibration_zip/`, {
+    await makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_calibration_zip_download_url/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -230,34 +240,18 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
         const message = `Error: ${response.status} ${response.statusText}`;
         throw new Error(message);
       }
-      // Extract the filename from the Content-Disposition header if available
-      const contentDisposition = response.headers.get('Content-Disposition');
-      let file_user_name = getUserName().split("@")[0];
-      let file_name = `${calibration_run_id}_${file_user_name}.zip`; // default filename
-      if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
-        // Parse filename, handling quotes if necessary
-        const file_name_regex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-        const matches = file_name_regex.exec(contentDisposition);
-        if (matches != null && matches[1]) {
-          file_name = matches[1].replace(/['"]/g, "");
-        }
-      }
-      return response.blob().then(blob => ({ blob, file_name }));
-    })
-    .then(({ blob, file_name }) => {
-      const url = URL.createObjectURL(blob);
+      const downloadUrl = ngencerfBaseUrl + '/' + response._data.download_url
       const a = document.createElement("a");
-      a.href = url;
-      a.download = file_name; // Use the filename from the response header
+      a.href = downloadUrl;
+      a.download = '';
 
       // Update refs with the Job ID and file name so that we can access them outside of the store
       calibrationDownloadJobID.value = calibration_run_id;
-      calibrationDownloadFileName.value = file_name;
 
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(downloadUrl);
     })
     .catch(error => {
       throw error;
@@ -268,7 +262,6 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
     fetchJobsListData,
     calibrationJobId,
     calibrationDownloadJobID,
-    calibrationDownloadFileName,
     fetchNewCalibrationRunId,
     cloneCalibrationRun,
     deleteCalibrationRun,

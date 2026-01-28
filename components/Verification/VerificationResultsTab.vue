@@ -1,5 +1,5 @@
 <template>
-  <div id="ForecastRunStatusPage">
+  <div id="VerificationRunStatusPage">
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
@@ -35,7 +35,7 @@
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + 'Z' : 'None') }}
+                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + ' UTC' : 'None') }}
               </div>
             </div>
             <div class="col-span-1">
@@ -59,7 +59,7 @@
     </div>
 
     <!-- DISPLAY PLOT -->
-    <div v-if="verificationPlotNames?.some(plot => plot.name === selectedLogCategory) && verificationPlotFileUrl" id="VerificationPlot" class="p-2" aria-label="Plot display area" title="Plot display area">
+    <div v-if="verificationPlotNames?.some(plot => plot.name === selectedLogCategory) && verificationPlotFileUrl" id="VerificationPlot" class="p-2 w-full" aria-label="Plot display area" title="Plot display area">
       <img :src="verificationPlotFileUrl" alt="Selected Plot" />
     </div>
     <!-- DISPLAY LOGS -->

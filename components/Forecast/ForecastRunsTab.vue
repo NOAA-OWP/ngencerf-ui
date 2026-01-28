@@ -117,9 +117,9 @@
               </template>
               <template #body="slotProps">
                 <div v-if="slotProps.data.cycle_date" class="text-center"
-                  :aria-label="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) + 'Z'"
-                  :title="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) + 'Z'">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) }}Z
+                  :aria-label="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date)"
+                  :title="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) }}
                 </div>
               </template>
             </Column>
@@ -131,9 +131,9 @@
               </template>
               <template #body="slotProps">
                 <div v-if="slotProps.data.cold_start?.cold_start_date" class="text-center"
-                  :aria-label="'Cold Start Date ' + (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) + 'Z' : '')"
-                  :title="'Cold Start Date ' + (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) + 'Z' : '')">
-                  {{ (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) + 'Z' : '') }}
+                  :aria-label="'Cold Start Date ' + (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) : '')"
+                  :title="'Cold Start Date ' + (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) : '')">
+                  {{ (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) : '') }}
                 </div>
               </template>
             </Column>

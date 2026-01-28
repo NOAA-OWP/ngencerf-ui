@@ -12,7 +12,7 @@
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="logList.length > 1" class="inline-block">
+          <div v-if="logList.length > 0" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
@@ -52,11 +52,11 @@
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None') }}
+                {{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + ' UTC' : 'None') }}
               </div>
               <div>
                 <span class="font-medium">Cold Start Date: </span>
-                {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + 'Z' : 'None') }}
+                {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + ' UTC'  : 'None') }}
               </div>
             </div>
             <div class="col-span-1">
@@ -275,6 +275,11 @@ onMounted(async () => {
 
   // highlight the tab when selected
   hilightTab(ForecastTabs.tab_runStatus);
+
+  clearInterval(forecastJobStatusIntervalId.value);
+  clearInterval(elapsedTimeIntervalId.value);
+  forecastJobStatusIntervalId.value = undefined;
+  elapsedTimeIntervalId.value = undefined;
   
   // get calibration job data if we don't already have it
   if (!userCalibrationRunData.value) {
@@ -288,11 +293,6 @@ onMounted(async () => {
     createColdStartAndForecastStatusInterval();
     createElapsedTimeInterval();
   }
-
-  clearInterval(forecastJobStatusIntervalId.value);
-  clearInterval(elapsedTimeIntervalId.value);
-  forecastJobStatusIntervalId.value = undefined;
-  elapsedTimeIntervalId.value = undefined;
 
   // set log levels
   if (calibrationRunForForecast?.value?.logging_config?.modules['ngen']) {
@@ -320,13 +320,19 @@ onMounted(async () => {
   if (!cycleDate.value && calibrationRunForForecast?.value?.cycle_date) {
     cycleDate.value = calibrationRunForForecast.value.cycle_date;
   }
-  if (!coldStartDate.value && calibrationRunForForecast?.value?.cold_start_date) {
-    coldStartDate.value = calibrationRunForForecast.value.cold_start_date;
+  if (!coldStartDate.value && calibrationRunForForecast?.value?.cold_start?.cold_start_date) {
+    coldStartDate.value = calibrationRunForForecast.value.cold_start.cold_start_date;
   }
 
   watch(overallColdStartForecastStatus, (newColdStartForecastStatus, oldColdStartForecastStatus) => {
-    if (forecastJobId.value && oldColdStartForecastStatus && oldColdStartForecastStatus !== "Unknown" && 
-      newColdStartForecastStatus && newColdStartForecastStatus !== "Unknown" && !isLoading.value) {
+    if (forecastJobId.value && 
+      ( 
+        coldStartJobStatus.value === 'Running' ||
+        forecastJobStatus.value === 'Running' ||
+        (oldColdStartForecastStatus && oldColdStartForecastStatus !== "Unknown" && 
+        newColdStartForecastStatus && newColdStartForecastStatus !== "Unknown")
+      )
+    ) {
       populateLogListOptions();
     }
   });

@@ -271,7 +271,7 @@ const { hardResetRunStatusStore } = useRunStatusStore();
 const { elapsedTimeIntervalId, calibrationStatusIntervalId, validationsStatusIntervalId } = storeToRefs(useRunStatusStore());
 
 const { calibrationJobId } = storeToRefs(generalStore());
-const { calibrationDownloadJobID, calibrationDownloadFileName } = storeToRefs(useCalibrationJobStore());
+const { calibrationDownloadJobID } = storeToRefs(useCalibrationJobStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { 
@@ -690,7 +690,11 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   queryUserCalibrationRunData().then(queryResponse => {
     if (queryResponse?.status === 200) {
       userCalibrationRunData.value = queryResponse?._data;
-      gotoRunStatusTab();
+      if (userCalibrationRunData.value.status === 'Saved') {
+        gotoHeadwaterBasinGage();
+      } else {
+        gotoRunStatusTab();
+      }
     } else {
       let tDetail = "Unable to Retrieve Calibration Job Data";
       if (queryResponse?._data?.message) {
@@ -1155,7 +1159,7 @@ const downloadSelectedCalibrationData = async (selectedCalibrationRun: any) => {
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {
-        // If successful, this job will update calibrationDownloadFileName, and watch function will trigger a Toast message
+        // If successful, this job will update calibrationDownloadJobID, and watch function will trigger a Toast message
         await getCalibrationJobZip(selectedRunId);
       } catch (error) {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeoutError };
@@ -1174,13 +1178,9 @@ watch(calibrationDownloadJobID, () => {
     // Display Toast message saying download was successful and then clear the Job ID/filename refs
     // to avoid interfering with next download
     let tDetail = 'Download zip file successfully created.'
-    if (calibrationDownloadFileName.value) {
-      tDetail = 'Download zip file "' + calibrationDownloadFileName.value + '" successfully created.'
-    }
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + calibrationDownloadJobID.value, detail: tDetail, life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
     calibrationDownloadJobID.value = null;
-    calibrationDownloadFileName.value = null;
   }
 });
 
