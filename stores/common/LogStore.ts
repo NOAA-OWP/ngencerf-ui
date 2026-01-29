@@ -96,7 +96,8 @@ export const useLogStore = defineStore('LogStore', () => {
    * @return {any}
    */
   const queryGetLogStatus = async (
-    log_path: string,
+    log_category: string,
+    log_name: string,
     byte_offset: number
   ): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_status/`, {
@@ -106,7 +107,8 @@ export const useLogStore = defineStore('LogStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        log_path: log_path,
+        log_category: log_category,
+        log_name: log_name,
         byte_offset: byte_offset,
         [
           verificationJobId.value ? 'verification_run_id' :
@@ -238,17 +240,16 @@ export const useLogStore = defineStore('LogStore', () => {
         selectedLogFilePath.value = '';
       }
     }
-    if (currentJobStatus.value && currentJobStatus.value.includes('Running') && selectedLogFilePath.value) {
+    if (currentJobStatus.value && currentJobStatus.value.includes('Running')) {
       // watch status every 10 seconds to see if log file changes
       clearTimeout(logTimeout);
       logTimeout = setTimeout(async() => {
         const status_response: any = await queryGetLogStatus(
-          selectedLogFilePath.value, // log_path
+          selectedLogCategory.value, // log_category
+          selectedLogName.value, // log_name
           selectedLogByteOffset.value // byte_offset
         )
-        if (status_response._data) {
-          selectedLogStatus.value = status_response._data;
-        }
+        selectedLogStatus.value = status_response?._data;
       }, 10000);
     }
   }
