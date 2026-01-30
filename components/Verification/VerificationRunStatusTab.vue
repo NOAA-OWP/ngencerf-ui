@@ -177,7 +177,7 @@ onMounted(async() => {
   watch(verificationJobStatus, async (newVerificationJobStatus, oldVerificationJobStatus) => {
     if (verificationJobId.value && 
       ( 
-        ['Submitted','Running'].includes(newVerificationJobStatus ?? '') || 
+        newVerificationJobStatus === 'Running' || 
         (oldVerificationJobStatus && oldVerificationJobStatus !== "Unknown" && 
         newVerificationJobStatus && newVerificationJobStatus !== "Unknown")
       )

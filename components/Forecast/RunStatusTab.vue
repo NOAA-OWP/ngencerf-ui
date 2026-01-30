@@ -327,8 +327,8 @@ onMounted(async () => {
   watch(overallColdStartForecastStatus, (newColdStartForecastStatus, oldColdStartForecastStatus) => {
     if (forecastJobId.value && 
       ( 
-        ['Submitted','Running'].includes(coldStartJobStatus.value ?? '') || 
-        ['Submitted','Running'].includes(forecastJobStatus.value ?? '') ||
+        coldStartJobStatus.value === 'Running' ||
+        forecastJobStatus.value === 'Running' ||
         (oldColdStartForecastStatus && oldColdStartForecastStatus !== "Unknown" && 
         newColdStartForecastStatus && newColdStartForecastStatus !== "Unknown")
       )
