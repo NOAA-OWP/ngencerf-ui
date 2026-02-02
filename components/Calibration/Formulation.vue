@@ -172,7 +172,7 @@
         </span>
         <span v-else>
           <div class="col-span-1 mr-6 h-8 whitespace-nowrap" style="font-size: 16px;">
-            Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
+            {{ submitTimeDate ? 'Run on ' + formatDateForRunOnString(submitTimeDate) : 'Run on Unknown Date' }}
           </div>
         </span>
 
@@ -308,6 +308,9 @@ onMounted(async() => {
     }
     if (!userCalibrationRunData.value) {
       await fetchUserCalibrationRunData();
+    }
+    if (userCalibrationRunData?.value?.submit_date) {
+      submitTimeDate.value = new Date(userCalibrationRunData.value.submit_date);
     }
     if (!userCalibrationRunData?.value?.modules.some(item => item.toLowerCase() === 't-route')) {
       userCalibrationRunData?.value?.modules.push('T-Route');

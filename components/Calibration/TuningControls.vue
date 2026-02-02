@@ -261,7 +261,7 @@
       </span>
       <span v-else>
         <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-          Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
+          {{ submitTimeDate ? 'Run on ' + formatDateForRunOnString(submitTimeDate) : 'Run on Unknown Date' }}
         </div>
       </span>
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
@@ -393,6 +393,9 @@ onMounted(async () => {
 
   // Check to see if there is a job. If not, don't initialize this tab!
   if (calibrationJobId.value) {
+    if (userCalibrationRunData?.value?.submit_date) {
+      submitTimeDate.value = new Date(userCalibrationRunData.value.submit_date);
+    }
 
     if (!userSelectedCalibrationTuningParameters.value.length) {
       selectedTuningParameterData.value = null;
