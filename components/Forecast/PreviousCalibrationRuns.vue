@@ -85,17 +85,17 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="formulation_name" sortable>
+            <Column :pt="ptColumn" field="job_name" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Formulation Name</span>
+                  <span>Job Name</span>
                 </div>
               </template>
               <template #body="slotProps">
-                <span v-if="slotProps.data.formulation_name"
-                  :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
-                  :title="'Formulation Name ' + slotProps.data.formulation_name">
-                  {{ slotProps.data.formulation_name }}
+                <span v-if="slotProps.data.job_name"
+                  :aria-label="'Job Name ' + slotProps.data.job_name"
+                  :title="'Job Name ' + slotProps.data.job_name">
+                  {{ slotProps.data.job_name }}
                 </span>
               </template>
             </Column>

@@ -1,8 +1,15 @@
 <template>
   <div id="HeadwaterBasinGage" class="">
     <div id="GageSettings" class="mt-4">
+      <div id="JobName" class="block mt-1" aria-label="Job Name" title="Job Name">
+        <label for="jobNameInput" class="text-lg">Job Name </label>
+        <InputText id="jobNameInput" v-model="jobNameInput" class="inline-block w-64 p-1"
+          aria-label="Input Job Name" title="Input Job Name" required
+          @keypress="checkValidCharacters($event)"
+          :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputText>
+      </div>
+      <div class="mb-2 hr mt-3"></div>
       <div class="grid grid-rows-6 gap-6">
-
         <div class="row-span-1">
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
@@ -119,7 +126,7 @@
                 {{ submitTimeDate ? 'Run on ' + formatDateForRunOnString(submitTimeDate) : 'Run on Unknown Date' }}
               </div>
             </span>
-            <span v-if="(gageHasChanged && userCalibrationRunData?.gage !== null) || gageDataSourceHasChanged">
+            <span v-if="jobNameHasChanged || (gageHasChanged && userCalibrationRunData?.gage !== null) || gageDataSourceHasChanged">
               <div class="col-span-1 mr-3">
                 <Button class="ngenButtonDiv-yellow" title="Revert All Changes"
                   @click="gageSelectionReset()" aria-label="Revert All Changes">Revert</Button>
@@ -184,7 +191,7 @@ const { hardResetTuningTimeConrols } = useTuningStore();
 const userDataStore = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(userDataStore);
 
-const { gageData, gageTabData, getSavedDomainValue, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
+const {jobNameInput, gageData, gageTabData, getSavedDomainValue, selectedDomainValue, selectedForcingValue, selectedGageValue, getGageOptionsList,
   selectedObservationalValue, selectedGeopackageValue, getGeopackageOptionsList, getDomainOptionsList, getForcingOptionsList,
   getObservationalOptionsList, gagePayload } = storeToRefs(useGageStore());
 
@@ -196,6 +203,7 @@ const toast = useToast();
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
 const nextPrevDialogOpened = ref<boolean>(false);
+const jobNameHasChanged = ref<boolean>(false);
 
 const resetData = ref<GageResetData>({
   external_data_status: {
@@ -245,6 +253,14 @@ onMounted(async() => {
   });
 })
 
+watch(jobNameInput, () => {
+  if (jobNameInput.value != userCalibrationRunData?.value?.job_name) {
+    jobNameHasChanged.value = true;
+  } else {
+    jobNameHasChanged.value = false;
+  }
+})
+
 const onDomainSelectionChange = () => {
   gageDataSourceHasChanged.value = true;
 }
@@ -274,6 +290,7 @@ const onGageSelectionChange = () => {
  * Resets the Gage to the previous gage if it was changed and not saved.
  */
 const gageSelectionReset = () => {
+  jobNameInput.value = userCalibrationRunData?.value?.job_name ?? "";
   selectedDomainValue.value = getSavedDomainValue.value ?? '';
   selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
   fetchSelectedGageData();
@@ -497,6 +514,17 @@ const toggle_isNWMv3 = () => {
 
 };
 
+/**
+ * Prevent unwanted characters
+ */
+const checkValidCharacters = (e: KeyboardEvent) => {
+  if (/^[a-zA-Z0-9_-]+$/.test(e.key) === false) {
+    e.preventDefault();
+    return true;
+  }
+  return false;
+}
+
 const saveTabData = async() => {
   isLoading.value = true;
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
@@ -508,6 +536,7 @@ const saveTabData = async() => {
     // Check for gage / data source change
     if (gageHasChanged.value || gageDataSourceHasChanged) {
       clearDataDueToGageChange();
+      jobNameHasChanged.value = false;
       gageHasChanged.value = false;
       gageDataSourceHasChanged.value = false;
       isLoading.value = true;
@@ -540,6 +569,8 @@ const saveTabData = async() => {
 
 const updateJobData = async (response: any) => {
   if (userCalibrationRunData.value) {
+    userCalibrationRunData.value.job_name = response?._data?.job_name ?? jobNameInput.value;
+
     let newGage = {
       gage_id: gageData.value?.gage_id ?? '',
       agency: gageData.value?.agency ?? '',
@@ -607,6 +638,16 @@ const resetTabData = () => {
 const validateTab = () => {
   let error = false;
   let text = [];
+  /* Check if Job Name changed */
+  let newName = jobNameInput.value ? jobNameInput.value : '';
+  let savedName = userCalibrationRunData?.value?.job_name ? userCalibrationRunData?.value?.job_name : '';
+  if (newName.trim() === "" && userCalibrationRunData?.value?.job_name) {
+    error = true;
+    text.push("Please enter a valid Job Name");
+  } else if (savedName !== newName) {
+    error = true;
+    text.push("Job Name has been changed");
+  }
   if (userCalibrationRunData?.value?.gage === null && selectedGageValue.value ||
     userCalibrationRunData?.value?.gage?.gage_id && (userCalibrationRunData?.value?.gage?.gage_id !== selectedGageValue.value)) {
     error = true;
@@ -674,6 +715,14 @@ const handleNextPrevDialogClose = (opt: any) => {
 <style lang="scss" scoped>
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
+
+#jobNameInput {
+  width: 256px;
+}
+
+#JobName {
+  font-size: 1.2em;
+}
 
 #GageReport {
   table {

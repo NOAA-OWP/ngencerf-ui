@@ -48,7 +48,7 @@
                   scrollable scroll-height="500px" :multi-sort="true" selectionMode="single"
                   v-model:selection="selectedDataRow" @rowContextmenu="onRowCpContextMenu">
                   <Column v-for="col of table.columns" :key="col.value" :field="col.value" :header="col.header"
-                      :sortable="true" :pt="col.value === 'formulation_name' ? ptColumnText : (col.value === 'calibration_run_id' ? ptColumnId : ptColumn)"></Column>
+                      :sortable="true" :pt="col.value === 'job_name' ? ptColumnText : (col.value === 'calibration_run_id' ? ptColumnId : ptColumn)"></Column>
               </DataTable>
             </div>
         </div>
@@ -226,7 +226,7 @@ watch(selectedPlotName, async () => {
       performanceMetrics.value = await queryGetPerformanceMetricsForComparison();
       performanceMetricsColumns.value = [
         { header: 'Job ID', field: 'calibration_run_id' }, 
-        { header: 'Formulation Name', field: 'formulation_name' }
+        { header: 'Job Name', field: 'job_name' }
       ];
 
       if (performanceMetrics.value?._data) {
@@ -234,7 +234,7 @@ watch(selectedPlotName, async () => {
           // First add the metric names and the values from our Calibration run
           let row_data = {
             'calibration_run_id': performanceMetrics.value?._data?.statuses[s].calibration_run_id, 
-            'formulation_name': performanceMetrics.value?._data?.statuses[s].formulation_name
+            'job_name': performanceMetrics.value?._data?.statuses[s].job_name
           };
           if (performanceMetrics.value?._data?.statuses[s].performance_metrics) {
             Object.keys(performanceMetrics.value?._data.statuses[s].performance_metrics).forEach(key => {
@@ -297,8 +297,8 @@ const getPlotTableData = async () => {
             case 'calibration_run_id':
               header = 'Run ID';
               break;
-            case 'formulation_name':
-              header = 'Formulation Name';
+            case 'job_name':
+              header = 'Job Name';
               break;
             case 'run_date':
               header = 'Run Date';

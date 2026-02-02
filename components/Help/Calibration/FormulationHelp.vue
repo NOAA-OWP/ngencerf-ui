@@ -1,7 +1,7 @@
 <template>
     <div class="_help-page">
         <div class="_help-title">Calibration - Formulation Tab</div>
-        <div class="_help-subtitle">Provide a user defined formulation name for this calibration job and
+        <div class="_help-subtitle">Provide a user defined job name for this calibration job and
             select the forumlation modules.</div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
@@ -19,7 +19,7 @@
                 <ul style="list-style-type: disc;margin-left: 20px;">
                     <li>When entering data manually, press <strong>Enter</strong> to confirm each field;
                         otherwise, the value will be discarded.</li>
-                    <li>A <strong>Formulation Name</strong> is required before anything on this tab can be saved.</li>
+                    <li>A <strong>Job Name</strong> is required before anything on this tab can be saved.</li>
                     <li>Selecting modules automatically:
                         <ul class="list-disc list-outside ml-6 space-y-0">
                             <li>Checks the corresponding hydrologic group.</li>
@@ -46,8 +46,8 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="td1">Formulation Name</td>
-                        <td class="td2">Enter name for the formulation. Alphanumeric characters, underscore (_) and dashes (-) are
+                        <td class="td1">Job Name</td>
+                        <td class="td2">Enter name for the job. Alphanumeric characters, underscore (_) and dashes (-) are
                             allowed. <strong>Spaces are not allowed</strong>.</td>
                     </tr>
                     <tr>

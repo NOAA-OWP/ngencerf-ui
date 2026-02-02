@@ -173,17 +173,17 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="formulation_name" sortable>
+            <Column :pt="ptColumn" field="job_name" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Formulation Name</span>
+                  <span>Job Name</span>
                 </div>
               </template>
               <template #body="slotProps">
-                <span v-if="slotProps.data.formulation_name"
-                  :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
-                  :title="'Formulation Name ' + slotProps.data.formulation_name">
-                  {{ slotProps.data.formulation_name }}
+                <span v-if="slotProps.data.job_name"
+                  :aria-label="'Job Name ' + slotProps.data.job_name"
+                  :title="'Job Name ' + slotProps.data.job_name">
+                  {{ slotProps.data.job_name }}
                 </span>
               </template>
             </Column>
@@ -414,7 +414,7 @@ const toast = useToast();
 const selectedCalibrationRun = ref<ValidatedCalibrationRunListItem>();
 const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 
-const formulationName = "Formulation Name";
+const jobName = "Job Name";
 
 onMounted(async() => {
   hilightTab(EvaluationTabs.tab_calibrationRuns);
@@ -459,7 +459,7 @@ onMounted(async() => {
     gageevaluationRunListHeaders.value.push({ field: 'calibration_run_id', header: "Job ID" });
     gageevaluationRunListHeaders.value.push({ field: 'status', header: "Status" });
     gageevaluationRunListHeaders.value.push({ field: 'submit_date', header: "Submit Date" });
-    gageevaluationRunListHeaders.value.push({ field: 'formulation_name', header: "Formulation Name" });
+    gageevaluationRunListHeaders.value.push({ field: 'job_name', header: "Job Name" });
     gageevaluationRunListHeaders.value.push({ field: 'gage_id', header: "Headwater Basin Gage" });
     gageevaluationRunListHeaders.value.push({ field: 'period', header: "Calibration Period" });
     gageevaluationRunListHeaders.value.push({ field: 'objective_function', header: "Objective Function" });
@@ -654,7 +654,7 @@ const viewSelectedGageCalibrationRuns = async (calibration_run_id: number, gage_
         rowData['calibration_run_id'] = calibration_job.calibration_run_id;
         rowData['status'] = calibration_job.status;
         rowData['submit_date'] = formatISOStringOrDateToYYYYMMDDHHMM(calibration_job.submit_date);
-        rowData['formulation_name'] = calibration_job.formulation_name;
+        rowData['job_name'] = calibration_job.job_name;
         rowData['gage_id'] = calibration_job.gage_id;
         rowData['period'] = formatISOStringOrDateToYYYYMMDD(calibration_job.calibration_start_period) + ' to ' + formatISOStringOrDateToYYYYMMDD(calibration_job.calibration_end_period);
         rowData['objective_function'] = calibration_job.objective_function;

@@ -93,7 +93,7 @@ export interface CalibrationJobListItem {
   status: string;
   calibration_start_period: Date;
   calibration_end_period: Date;
-  formulation_name: string;
+  job_name: string;
   submit_date: Date;
   objective_function: string;
   optimization_algorithm: string;
@@ -163,7 +163,7 @@ export interface UserCalibrationRunData {
     }
   }
   modules: string[];
-  formulation_name: string;
+  job_name: string;
   is_aet_rootzone: boolean;
   formulation_warning?: FormulationWarning;
   use_sloth: boolean;
@@ -272,6 +272,7 @@ export interface GageOptionData {
 
 export interface SaveGageTabPayload {
   calibration_run_id?: number;
+  job_name?: string;
   gage_id?: string;
   forcing_source_requested?: string;
   observational_source?: string;
@@ -335,7 +336,6 @@ export interface FormulationModuleData {
 
 export interface SaveFormulationTabPayload {
   calibration_run_id?: number;
-  formulation_name?: string;
   is_aet_rootzone?: boolean;
   modules?: string[];
   use_sloth?: boolean;
@@ -480,7 +480,7 @@ export interface SaveOptimizationPayload {
 
 export interface CalibrationRun {
   runId: number;
-  formulationName: string;
+  jobName: string;
   headwaterBasinGage: string;
   runDate: string;
   calibrationPeriod: string;
@@ -729,7 +729,7 @@ export type CalibrationRunForForecast = {
   status: string;
   calibration_start_period: string;
   calibration_end_period: string;
-  formulation_name: string;
+  job_name: string;
   submit_date: string;
   objective_function: string;
   optimization_algorithm: string;

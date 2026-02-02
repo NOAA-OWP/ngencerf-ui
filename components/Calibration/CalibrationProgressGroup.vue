@@ -2,8 +2,8 @@
   <table v-if="userCalibrationRunData" id="CalibrationProgressTable" class="progressTable prevent-select">
     <tbody>
       <tr>
-        <td><i v-if="userCalibrationRunData?.gage?.gage_id"
-            :class="(userCalibrationRunData?.gage?.gage_id) ? 'checkMark' : ''" class="pi pi-check font-bold"></i></td>
+        <td><i v-if="userCalibrationRunData?.job_name && userCalibrationRunData?.gage?.gage_id"
+            :class="(userCalibrationRunData?.job_name && userCalibrationRunData?.gage?.gage_id) ? 'checkMark' : ''" class="pi pi-check font-bold"></i></td>
         <td data-tab="2" title="Headwater Basin Gage" aria-label="Headwater Basin Gage" @click="tabClicked">
           Headwater Basin Gage</td>
       </tr>
@@ -26,8 +26,8 @@
         <td data-tab="2" title="Geopackage" aria-label="Geopackage" @click="tabClicked">Geopackage</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length && formulationIsCalibratable"
-            :class="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length && formulationIsCalibratable ? 'checkMark' : ''"
+        <td><i v-if="userCalibrationRunData?.job_name && userCalibrationRunData?.modules.length && formulationIsCalibratable"
+            :class="userCalibrationRunData?.job_name && userCalibrationRunData?.modules.length && formulationIsCalibratable ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
         <td data-tab="3" title="Formulation" aria-label="Formulation" @click="tabClicked">Formulation</td>
       </tr>

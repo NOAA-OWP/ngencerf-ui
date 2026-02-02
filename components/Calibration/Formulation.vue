@@ -2,18 +2,6 @@
   <div id="Formulation" class="">
     <div class="grid grid-rows-7 pt-4 text-sm">
       <div class="row-span-5">
-        <div class="grid grid-cols-8">
-          <div class="col-span-8">
-            <div id="FormulationName" class="block mt-1" aria-label="Forumulation Name" title="Formulation Name">
-              <label for="formulationNameInput" class="text-lg required-label">Formulation Name</label>
-              <InputText id="formulationNameInput" v-model="formulationNameInput" class="inline-block w-64 p-1"
-                aria-label="Input Forumulation Name" title="Input Formulation Name" required
-                @keypress="checkValidCharacters($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputText>
-            </div>
-          </div>
-        </div>
-        <div class="mb-2 hr mt-3"></div>
         <div class="grid grid-cols-12">
           <div class="col-span-5">
             <div class="text-left text-lg mt-2"><strong>Formulation Modules</strong></div>
@@ -176,7 +164,7 @@
           </div>
         </span>
 
-        <span v-if="formulationNameHasChanged || modulesHaveChanged || isAETRootzoneHasChanged">
+        <span v-if="modulesHaveChanged || isAETRootzoneHasChanged">
           <div class="col-span-1 mr-3">
             <Button class="ngenButtonDiv-yellow" title="Revert Changes" @click="restoreTab()"
               aria-label="Revert Changes">Revert</Button>
@@ -258,7 +246,6 @@ const {
   filterGroup,
   useSlothParameters,
   selectedModuleValues,
-  formulationNameInput,
   isAETRootzone,
   slothParameterInputs,
   fetchFormulationModuleOptions,
@@ -298,7 +285,6 @@ let mainLeftAreaElement: HTMLElement | null = null;
 let dataTableElement: HTMLElement | null = null;
 
 const toast = useToast();
-const formulationNameHasChanged = ref<boolean>(false);
 const isAETRootzoneHasChanged = ref<boolean>(false);
 
 onMounted(async() => {
@@ -393,25 +379,6 @@ const resetModuleList = () => {
 }
 
 /**
- * Prevent unwanted characters
- */
-const checkValidCharacters = (e: KeyboardEvent) => {
-  if (/^[a-zA-Z0-9_-]+$/.test(e.key) === false) {
-    e.preventDefault();
-    return true;
-  }
-  return false;
-}
-
-watch(formulationNameInput, () => {
-  if (formulationNameInput.value != userCalibrationRunData?.value?.formulation_name) {
-    formulationNameHasChanged.value = true;
-  } else {
-    formulationNameHasChanged.value = false;
-  }
-})
-
-/**
 * event bus for calibration button group click
 */
 const saveFormulationData = () => {
@@ -470,7 +437,6 @@ const saveFormulationData = () => {
         const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
         isLoading.value = false;
-        formulationNameHasChanged.value = false;
         modulesHaveChanged.value = false;
         isAETRootzoneHasChanged.value = false;
         updateJobData();
@@ -499,7 +465,6 @@ const saveFormulationData = () => {
 
 const updateJobData = () => {
   if (userCalibrationRunData.value) {
-    userCalibrationRunData.value.formulation_name = saveFormulationPayload.value.formulation_name ?? '';
     userCalibrationRunData.value.modules = saveFormulationPayload.value.modules as string[];
     userCalibrationRunData.value.is_aet_rootzone = saveFormulationPayload.value.is_aet_rootzone;
     userCalibrationRunData.value.sloth_parameters = saveFormulationPayload.value.sloth_parameters as [];
@@ -522,16 +487,6 @@ const validateModules = () => {
 const validateTab = () => {
   let error = false;
   let text = [];
-  /* Check if formulation name changed */
-  let newName = formulationNameInput.value ? formulationNameInput.value : '';
-  let savedName = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : '';
-  if (newName.trim() === "" && userCalibrationRunData?.value?.formulation_name) {
-    error = true;
-    text.push("Please enter a valid Formulation Name");
-  } else if (savedName !== newName) {
-    error = true;
-    text.push("Formulation Name has been changed");
-  }
   /* check if list of modules changed */
   let selModules = selectedModuleValues.value;
   let savedModules = userCalibrationRunData?.value?.modules;
@@ -581,7 +536,6 @@ const validateTab = () => {
 }
 
 const restoreTab = () => {
-  formulationNameInput.value = userCalibrationRunData?.value?.formulation_name ? userCalibrationRunData?.value?.formulation_name : "";
   filterGroup.value = '';
   resetModuleList();
   updateFormulationValidRefs();
@@ -669,17 +623,12 @@ onUnmounted(() => {
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
 
-#Groups,
-#formulationNameInput {
+#Groups {
   width: 256px;
 }
 
 #Formulation {
   width: auto;
-}
-
-#FormulationName {
-  font-size: 1.2em;
 }
 
 #SlothCheck {

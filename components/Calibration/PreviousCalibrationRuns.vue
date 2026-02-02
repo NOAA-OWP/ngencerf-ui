@@ -105,17 +105,17 @@
                   </span>
                 </template>
               </Column>
-              <Column :pt="ptColumn" field="formulation_name" sortable>
+              <Column :pt="ptColumn" field="job_name" sortable>
                 <template #header>
                   <div class="column-header">
-                    <span>Formulation Name</span>
+                    <span>Job Name</span>
                   </div>
                 </template>
                 <template #body="slotProps">
-                  <span v-if="slotProps.data.formulation_name"
-                    :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
-                    :title="'Formulation Name ' + slotProps.data.formulation_name">
-                    {{ slotProps.data.formulation_name }}
+                  <span v-if="slotProps.data.job_name"
+                    :aria-label="'Job Name ' + slotProps.data.job_name"
+                    :title="'Job Name ' + slotProps.data.job_name">
+                    {{ slotProps.data.job_name }}
                   </span>
                 </template>
               </Column>
@@ -832,7 +832,7 @@ const changeSelectedCalibrationRunStatus = (selectedCalibrationRun: any, jobStat
     acceptLock(selectedRunId, false)
   }
   else {
-    const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '" + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
+    const selectedRunName = (selectedCalibrationRun.value.job_name) ? " titled '" + selectedCalibrationRun.value.job_name + "'" : " (untitled)";
     let confirmMessage = "Are you sure you want to " + ty.toLowerCase() + " calibration run " + selectedRunId + selectedRunName;
     if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
 
