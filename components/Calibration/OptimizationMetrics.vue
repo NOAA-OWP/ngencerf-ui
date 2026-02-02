@@ -175,7 +175,7 @@
       </span>
       <span v-else>
         <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-          Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
+          {{ submitTimeDate ? 'Run on ' + formatDateForRunOnString(submitTimeDate) : 'Run on Unknown Date' }}
         </div>
       </span>
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
@@ -272,6 +272,10 @@ onMounted(async() => {
   hilightTab(CalibrationTabs.tab_optimizationMetrics);
   toast.removeAllGroups();
   if (ele) { ele.scrollTo(0, 0); }
+  
+  if (userCalibrationRunData?.value?.submit_date) {
+    submitTimeDate.value = new Date(userCalibrationRunData.value.submit_date);
+  }
 
   updateMetricFlowFieldVisibility();
 

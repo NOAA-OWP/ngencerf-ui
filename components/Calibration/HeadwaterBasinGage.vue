@@ -23,20 +23,19 @@
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
-            <div class="col-span-1">&nbsp;</div>
-          </div>
-        </div>
-        <div class="row-span-1">
-          <div class="grid grid-cols-3 gap-4">
-            <div class="col-span-1">
+            <div class="col-span-1" v-if="getForcingOptionsList.length > 1">
               <label for="Forcing">Forcing Source</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" @change="uploadForcingDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="Forcing Source Select" title="Forcing Source Select"></Select>
             </div>
+          </div>
+        </div>
+        <div class="row-span-1" v-if="getObservationalOptionsList.length > 1 || getGeopackageOptionsList.length > 1">
+          <div class="grid grid-cols-3 gap-4">
 
-            <div class="col-span-1">
+            <div class="col-span-1" v-if="getObservationalOptionsList.length > 1">
               <label for="Observational">Observational Data</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
                 optionLabel="name" optionValue="name" class="user-select" @change="uploadObservationalDlgOpen($event)"
@@ -44,7 +43,7 @@
                 aria-label="Observational Data Select" title="Observational Data Select"></Select>
             </div>
 
-            <div class="col-span-1">
+            <div class="col-span-1" v-if="getGeopackageOptionsList.length > 1">
               <label for="Geopackage">GeoPackage</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" @change="uploadGeopackageDlgOpen($event)"
@@ -117,7 +116,7 @@
             </span>
             <span v-else>
               <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-                Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
+                {{ submitTimeDate ? 'Run on ' + formatDateForRunOnString(submitTimeDate) : 'Run on Unknown Date' }}
               </div>
             </span>
             <span v-if="(gageHasChanged && userCalibrationRunData?.gage !== null) || gageDataSourceHasChanged">
@@ -231,6 +230,9 @@ onMounted(async() => {
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
     setResetDataValues();
+    if (userCalibrationRunData?.value?.submit_date) {
+      submitTimeDate.value = new Date(userCalibrationRunData.value.submit_date);
+    }
     if (userCalibrationRunData?.value?.gage?.gage_id) {
       gageSelectionReset();
     } else {

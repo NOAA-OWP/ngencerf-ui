@@ -690,7 +690,11 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   queryUserCalibrationRunData().then(queryResponse => {
     if (queryResponse?.status === 200) {
       userCalibrationRunData.value = queryResponse?._data;
-      gotoRunStatusTab();
+      if (userCalibrationRunData.value.status === 'Saved') {
+        gotoHeadwaterBasinGage();
+      } else {
+        gotoRunStatusTab();
+      }
     } else {
       let tDetail = "Unable to Retrieve Calibration Job Data";
       if (queryResponse?._data?.message) {
