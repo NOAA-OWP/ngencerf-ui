@@ -534,7 +534,7 @@ const saveTabData = async() => {
     toast.removeAllGroups();
 
     // Check for gage / data source change
-    if (gageHasChanged.value || gageDataSourceHasChanged) {
+    if (gageHasChanged.value || gageDataSourceHasChanged.value) {
       clearDataDueToGageChange();
       jobNameHasChanged.value = false;
       gageHasChanged.value = false;
