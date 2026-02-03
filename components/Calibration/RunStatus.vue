@@ -485,7 +485,7 @@ const createElapsedTimeInterval = () => {
       (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate calibrationElapsedTime every second while Calibration is Running or Validation is not Done
-      calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
+      calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date()); 
     } else {
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
@@ -499,7 +499,7 @@ const startRun = async () => {
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Validating and Preparing Job Data';
 
-    submitTimeDate.value = new Date();
+    submitTimeDate.value = new Date(); 
 
     createElapsedTimeInterval();
 
@@ -671,7 +671,6 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
             createElapsedTimeInterval();
           }
         }
-      } else {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
@@ -847,13 +846,15 @@ watch(selectedPlotName, async () => {
 
 // Handle submitTimeDate changes
 watch(submitTimeDate, () => {
-  if (isValidDate(submitTimeDate.value)) {
-    // show submitTimeDate as UTC
-    submitTime.value = formatDateForRunOnString(submitTimeDate.value as Date);
-  } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
-    toast.add(tMsg); addToastRecord(tMsg);
-  }
+  nextTick(() => {
+    if (isValidDate(submitTimeDate.value)) {
+      // show submitTimeDate as UTC
+      submitTime.value = formatDateForRunOnString(submitTimeDate.value as Date);
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+  });
 });
 
 // Handle iteration changes
