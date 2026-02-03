@@ -1,7 +1,10 @@
 <template>
   <div id="Formulation" class="">
+    <div v-if="disableAll" class="text-red-600">
+      Formulation cannot be set until Job Name and Gage are entered on the previous tab.
+    </div>
     <div class="grid grid-rows-7 pt-4 text-sm">
-      <div class="row-span-5">
+      <div class="row-span-5" :style="`opacity: ${disableAll ? '50%' : '100%'}`">
         <div class="grid grid-cols-12">
           <div class="col-span-5">
             <div class="text-left text-lg mt-2"><strong>Formulation Modules</strong></div>
@@ -10,13 +13,13 @@
                 <Select id="Groups" v-model="filterGroup" filter
                   :options="fetchFormulationModuleCoveredGroupFilterOptions" optionLabel="description"
                   optionValue="name" placeholder="Select group..."
-                  :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
+                  :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               </div>
             </div>
             <div class="pt-4 mb-1 font-bold text-base required-label">Select Modules</div>
             <Listbox id="ModuleList" v-model="selectedModuleValues" :options="fetchFormulationModuleOptions" multiple
               optionLabel="display_name" optionValue="name" class="h-60" @change="moduleListChanged"
-              :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+              :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
               <template #option="slotProps">
                 <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'">
                   <div class="font-ui pl-2 leading-none" :aria-label="slotProps.option.name"
@@ -30,7 +33,7 @@
               <Checkbox id="isAETRootzone" inputId="isAETRootzone" class="h-5 w-5 mr-3" style="display:inline-block"
                 :binary="true" v-model="isAETRootzone" aria-label="CFE AET Rootzone Checkbox"
                 title="CFE AET Rootzone Checkbox" @change="isAETRootzoneHasChanged = true" 
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
+                :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
               <label for="isAETRootzone" class="inline required-label">CFE AET Rootzone</label>
             </div>
           </div>
@@ -40,7 +43,7 @@
               <div class="mt-5 mb-2 pl-4 text-lg" aria-label="List of groups covered by selection"
                 title="List of groups covered by selection"><strong>Groups Covered By Selections</strong></div>
               <Listbox id="CoveredBy" :options="fetchFormulationModuleCoveredGroupOptions" optionLabel="name"
-                optionValue="name" scrollHeight="18rem" class="border-0">
+                optionValue="name" scrollHeight="18rem" class="border-0" :disabled="disableAll">
                 <template #option="slotProps">
                   <div v-bind:class="(slotProps.option.selected === true) ? 'pi pi-check font-bold' : 'pl-5'"
                     :aria-label="slotProps.option.name + ' is ' + (slotProps.option.selected === true ? 'Checked' : 'Not Checked')"
@@ -359,6 +362,10 @@ const moduleListChanged = (e: ListboxChangeEvent) => {
   updateFormulationValidRefs();
   modulesHaveChanged.value = !arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }
+
+const disableAll = computed(() => {
+  return userCalibrationRunData?.value?.job_name && userCalibrationRunData?.value?.gage ? false : true;
+});
 
 const resetModuleList = () => {
   if (selectedModuleValues.value && userCalibrationRunData?.value?.modules) {

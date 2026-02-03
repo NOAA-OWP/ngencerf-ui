@@ -530,6 +530,9 @@ const saveTabData = async() => {
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
+  } else if (!jobNameInput.value || jobNameInput.value === '') {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Unable to Save', detail: 'Job Name is required.', life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
 
@@ -546,7 +549,6 @@ const saveTabData = async() => {
       if (response.status === 400) {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Save Gage Data Failed.', detail: response._data.message, life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
-        isLoading.value = false;
       } else if (response.status === 200) {
         useProcessCalibrationGageSavedResponse(response?._data).forEach((toastMessage: ToastMessageOptions) => {
           toast.add(toastMessage); addToastRecord(toastMessage);
@@ -565,6 +567,7 @@ const saveTabData = async() => {
       }
     });
   }
+  isLoading.value = false;
 };
 
 const updateJobData = async (response: any) => {
