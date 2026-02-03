@@ -669,3 +669,15 @@ table.cols-bordered {
     }
   }
 }
+
+.required-label::after {
+  content: "* ";
+  color: #2563eb; /* your blue */
+  font-weight: 600; /* optional */
+}
+
+.required-asterisk {
+  color: #2563eb;
+  margin-left: 0.125rem;
+  font-weight: 600;
+}

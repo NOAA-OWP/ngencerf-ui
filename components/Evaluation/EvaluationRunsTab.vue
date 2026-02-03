@@ -68,7 +68,7 @@
       <!-- Show a list of calibration jobs from the same gage if user has chosen to Compare -->
       <div v-else-if="userEvaluationRunListDataByGage.length > 1">
         <div id="FilterDialog">
-          <label class="block text-left w-[90%]" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
+          <label class="block text-left w-[90%] required-label" for="HeadwaterBasinGage" aria-label="Headwater Basin Gage"
             title="Headwater Basin Gage">Headwater Basin Gage</label>
             <div class="inline-block w-1/6 pb-3">
                 <Select id="HeadwaterBasinGageCompare" class="mt-2 basin-gage-filter text-left" v-model="uiCompareGageId"
