@@ -12,7 +12,7 @@
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="logList.length > 1" class="inline-block">
+          <div v-if="logList.length > 0" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
@@ -320,15 +320,15 @@ onMounted(async () => {
   if (!cycleDate.value && calibrationRunForForecast?.value?.cycle_date) {
     cycleDate.value = calibrationRunForForecast.value.cycle_date;
   }
-  if (!coldStartDate.value && calibrationRunForForecast?.value?.cold_start_date) {
-    coldStartDate.value = calibrationRunForForecast.value.cold_start_date;
+  if (!coldStartDate.value && calibrationRunForForecast?.value?.cold_start?.cold_start_date) {
+    coldStartDate.value = calibrationRunForForecast.value.cold_start.cold_start_date;
   }
 
   watch(overallColdStartForecastStatus, (newColdStartForecastStatus, oldColdStartForecastStatus) => {
     if (forecastJobId.value && 
       ( 
-        ['Submitted','Running'].includes(coldStartJobStatus.value ?? '') || 
-        ['Submitted','Running'].includes(forecastJobStatus.value ?? '') ||
+        coldStartJobStatus.value === 'Running' ||
+        forecastJobStatus.value === 'Running' ||
         (oldColdStartForecastStatus && oldColdStartForecastStatus !== "Unknown" && 
         newColdStartForecastStatus && newColdStartForecastStatus !== "Unknown")
       )
