@@ -354,7 +354,7 @@ const ptColumn = ref({
 
 const ptValColumns = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
-  bodyCell: { style: { "text-align": "right", "padding-right": "10px" } }
+  bodyCell: { style: { "text-align": "center", "padding-right": "10px" } }
 });
 
 const { fetchUserCalibrationRunData } = userDataStore;
@@ -972,6 +972,10 @@ const rowStyle = (data: any) => {
 #EvalRunTable,
 #JobFilterDialog {
   width: 1325px;
+}
+
+#compare-list .p-datatable-tbody > tr > td {
+  text-align: center !important;
 }
 
 #MessagesGroupWindow {
