@@ -2,8 +2,8 @@
   <div id="HeadwaterBasinGage" class="">
     <div id="GageSettings" class="mt-4">
       <div id="JobName" class="block mt-1" aria-label="Job Name" title="Job Name">
-        <label for="jobNameInput" class="text-lg">Job Name </label>
-        <InputText id="jobNameInput" v-model="jobNameInput" class="inline-block w-64 p-1"
+        <label for="jobNameInput" class="text-lg required-label">Job Name</label>
+        <InputText id="jobNameInput" v-model="jobNameInput" class="inline-block w-64 p-1 ml-1"
           aria-label="Input Job Name" title="Input Job Name" required
           @keypress="checkValidCharacters($event)"
           :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputText>
