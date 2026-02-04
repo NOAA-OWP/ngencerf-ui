@@ -152,7 +152,7 @@
 
     <div class="grid grid-cols-2 pb-3">
       <div class="col-span-2">
-        <div class="mb-2 font-bold mt-2 required-label">Calibration Tuning Parameters</div>
+        <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
         <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
           <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
           <Button class="ngenButtonDiv-alt"
@@ -200,7 +200,14 @@
       :rowStyle="rowStyle">
 
       <!-- parameter column, uneditable -->
-      <Column field="parameter" header="Parameter" sortable>
+      <Column field="parameter" sortable>
+        <template #header>
+          <span class="p-datatable-column-title">
+            <span>
+            Parameter<span class="required-asterisk" aria-hidden="true">*</span>
+          </span>
+          </span>
+        </template>
         <template #body="slotProps">
           <span style="background-color: lightgrey; padding: 4px; display: block;"
             :aria-label="'Parameter name is ' + slotProps.data.name" :title="'Parameter name is' + slotProps.data.name">
@@ -209,7 +216,14 @@
       </Column>
 
       <!-- module column, uneditable -->
-      <Column field="module" header="Module" sortable>
+      <Column field="module" sortable>
+        <template #header>
+          <span class="p-datatable-column-title">
+          <span>
+            Module<span class="required-asterisk" aria-hidden="true">*</span>
+          </span>
+          </span>
+        </template>
         <template #body="slotProps">
           <span style="background-color: lightgrey; padding: 4px; display: inline-block; white-space: nowrap;"
             :aria-label="'Module name is ' + slotProps.data.module" :title="'Module name is ' + slotProps.data.module">
@@ -219,7 +233,14 @@
       </Column>
 
       <!-- min column, editable -->
-      <Column field="min" header="Tuning Range Min" sortable>
+      <Column field="min" sortable>
+        <template #header>
+          <span class="p-datatable-column-title">
+          <span>
+            Tuning Range Min<span class="required-asterisk" aria-hidden="true">*</span>
+          </span>
+          </span>
+        </template>
         <template #body="slotProps">
           <input type="text" v-model="slotProps.data.minimum"
             @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;"
@@ -229,7 +250,14 @@
       </Column>
 
       <!-- max column, editable -->
-      <Column field="max" header="Tuning Range Max" sortable>
+      <Column field="max" sortable>
+        <template #header>
+          <span class="p-datatable-column-title">
+          <span>
+            Tuning Range Max<span class="required-asterisk" aria-hidden="true">*</span>
+          </span>
+          </span>
+        </template>
         <template #body="slotProps">
           <input type="text" v-model="slotProps.data.maximum"
             @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;"
@@ -239,11 +267,18 @@
       </Column>
 
       <!-- initValue column, editable -->
-      <Column field="initValue" header="Initial Run Value" sortable>
+      <Column field="initValue" sortable>
+        <template #header>
+          <span class="p-datatable-column-title">
+          <span>
+            Initial Run Value<span class="required-asterisk" aria-hidden="true">*</span>
+          </span>
+          </span>
+        </template>
         <template #body="slotProps">
           <input type="text" v-model="slotProps.data.initial_value"
             @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)" style="width: 100%;"
-            slotProps.data.maximum :aria-label="'Initial value is ' + slotProps.data.initial_value"
+            :aria-label="'Initial value is ' + slotProps.data.initial_value"
             :title="'Initial value is ' + slotProps.data.initial_value" />
         </template>
       </Column>
