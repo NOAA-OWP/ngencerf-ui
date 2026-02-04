@@ -674,10 +674,16 @@ table.cols-bordered {
   content: "* ";
   color: #2563eb; /* your blue */
   font-weight: 600; /* optional */
+  font: inherit;
 }
 
 .required-asterisk {
   color: #2563eb;
   margin-left: 0.125rem;
   font-weight: 600;
+  font: inherit;
+}
+
+.p-datatable-thead .required-asterisk {
+  color: #93c5fd;   /* accessible on dark blue */
 }
