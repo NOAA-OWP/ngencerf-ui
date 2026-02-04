@@ -19,7 +19,7 @@
             <div class="mt-2">
               <div class="">
                 <div class="flex mt-2">
-                  <div class="text-left font-bold">Algorithm Parameter(s)</div>
+                  <div class="text-left font-bold required-label">Algorithm Parameter(s)</div>
                   <div id="ClearTableBtn" class="ml-auto">
                     <Button id="ClrBtn" @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2"
                       :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"

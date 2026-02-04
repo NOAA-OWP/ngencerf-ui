@@ -671,17 +671,20 @@ table.cols-bordered {
 }
 
 .required-label::after {
-  content: "* ";
+  font-size: 0.85rem;
+  content: "*";
+  margin-right: 0.125rem;
   color: #2563eb; /* your blue */
   font-weight: 600; /* optional */
-  font: inherit;
+  vertical-align: super;
 }
 
 .required-asterisk {
+  font-size: 0.85rem;
   color: #2563eb;
   margin-left: 0.125rem;
   font-weight: 600;
-  font: inherit;
+  vertical-align: super;
 }
 
 .p-datatable-thead .required-asterisk {

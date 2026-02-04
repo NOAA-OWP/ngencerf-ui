@@ -152,20 +152,22 @@
 
     <div class="grid grid-cols-2 pb-3">
       <div class="col-span-2">
-        <div class="mb-2 font-bold mt-2">Calibration Tuning Parameters</div>
+        <div class="mb-0 font-bold text-xl mt-2 required-label">Calibration Tuning Parameters</div>
+        <div class="mb-0 font-bold mt-2">Load Calibratable Parameters from File</div>
+        <div class="mb-2 font-sm italic mt-0">(file contents added to table below)</div>
         <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
           <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
           <Button class="ngenButtonDiv-alt"
             :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
-            aria-label="Load Parameters File optional" title="Load Parameters File optional">
-            Load Parameters File (optional)</Button>
+            aria-label="Load Parameters from File optional" title="Load Parameters from File optional">
+            Select File (optional)</Button>
           <div v-if="!isFormulationDataSaved()" class="overlay"></div>
         </div>
       </div>
 
       <div class="col-span-1 mt-2">
         <div class="text-left mt-2">
-          <div class="font-bold">Calibratable Parameters</div>
+          <div class="font-bold">Select Individual Calibratable Parameter</div>
           <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
             :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
             :options="calibrationTuningParameters" optionLabel="output" optionValue="output"
@@ -200,14 +202,7 @@
       :rowStyle="rowStyle">
 
       <!-- parameter column, uneditable -->
-      <Column field="parameter" sortable>
-        <template #header>
-          <span class="p-datatable-column-title">
-            <span>
-            Parameter<span class="required-asterisk" aria-hidden="true">*</span>
-          </span>
-          </span>
-        </template>
+      <Column field="parameter" header="Parameter" sortable>
         <template #body="slotProps">
           <span style="background-color: lightgrey; padding: 4px; display: block;"
             :aria-label="'Parameter name is ' + slotProps.data.name" :title="'Parameter name is' + slotProps.data.name">
@@ -216,14 +211,7 @@
       </Column>
 
       <!-- module column, uneditable -->
-      <Column field="module" sortable>
-        <template #header>
-          <span class="p-datatable-column-title">
-          <span>
-            Module<span class="required-asterisk" aria-hidden="true">*</span>
-          </span>
-          </span>
-        </template>
+      <Column field="module" header="Module" sortable>
         <template #body="slotProps">
           <span style="background-color: lightgrey; padding: 4px; display: inline-block; white-space: nowrap;"
             :aria-label="'Module name is ' + slotProps.data.module" :title="'Module name is ' + slotProps.data.module">

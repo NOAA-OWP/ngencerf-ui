@@ -116,9 +116,7 @@
             :teleport="true" utc='preserve' 
             :disabled="!forecastConfiguration"/>
         </div>
-        <div class="text-nowrap text-right font-bold p-1 required-label">
-          Cycle Date
-        </div>
+        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Date</div>
         <div class="text-nowrap p-1">
           <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
             @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
@@ -146,9 +144,7 @@
             :disabled="!forecastConfiguration">
           </Select>
         </div>
-        <div class="text-nowrap text-right font-bold p-1 required-label">
-          Cycle Hour
-        </div>
+        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Hour</div>
         <div class="text-nowrap p-1">
           <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
             aria-label="Cycle Hour Select" title="Cycle Hour Select"
