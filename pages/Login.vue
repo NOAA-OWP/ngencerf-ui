@@ -97,9 +97,10 @@
                     </div>
                   </div>
                 </div>
+                <div class="required-hint mt-4">
+                  <span class="required-asterisk">*</span> Required field
+                </div>
               </div>
-
-
             </div>
           </div>
         </div>
