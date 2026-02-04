@@ -152,20 +152,22 @@
 
     <div class="grid grid-cols-2 pb-3">
       <div class="col-span-2">
-        <div class="mb-2 font-bold mt-2 required-label">Calibration Tuning Parameters</div>
+        <div class="mb-0 font-bold text-xl mt-2 required-label">Calibration Tuning Parameters</div>
+        <div class="mb-0 font-bold mt-2">Load Calibratable Parameters from File</div>
+        <div class="mb-2 font-sm italic mt-0">(file contents added to table below)</div>
         <div id="UploadParams" class=" inline ml-3" style="position: relative;" @click="triggerFileInput">
           <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
           <Button class="ngenButtonDiv-alt"
             :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
-            aria-label="Load Parameters File optional" title="Load Parameters File optional">
-            Load Parameters File (optional)</Button>
+            aria-label="Load Parameters from File optional" title="Load Parameters from File optional">
+            Select File (optional)</Button>
           <div v-if="!isFormulationDataSaved()" class="overlay"></div>
         </div>
       </div>
 
       <div class="col-span-1 mt-2">
         <div class="text-left mt-2">
-          <div class="font-bold">Calibratable Parameters</div>
+          <div class="font-bold">Select Individual Calibratable Parameter</div>
           <Select id="ParamName" class="varInputs mt-1" v-model="selectedParameter"
             :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
             :options="calibrationTuningParameters" optionLabel="output" optionValue="output"
@@ -219,7 +221,14 @@
       </Column>
 
       <!-- min column, editable -->
-      <Column field="min" header="Tuning Range Min" sortable>
+      <Column field="min" sortable>
+        <template #header>
+          <span class="p-datatable-column-title">
+          <span>
+            Tuning Range Min<span class="required-asterisk" aria-hidden="true">*</span>
+          </span>
+          </span>
+        </template>
         <template #body="slotProps">
           <input type="text" v-model="slotProps.data.minimum"
             @input="updateCalibrationTuningParameter(slotProps.index, 'minimum', $event)" style="width: 100%;"
@@ -229,7 +238,14 @@
       </Column>
 
       <!-- max column, editable -->
-      <Column field="max" header="Tuning Range Max" sortable>
+      <Column field="max" sortable>
+        <template #header>
+          <span class="p-datatable-column-title">
+          <span>
+            Tuning Range Max<span class="required-asterisk" aria-hidden="true">*</span>
+          </span>
+          </span>
+        </template>
         <template #body="slotProps">
           <input type="text" v-model="slotProps.data.maximum"
             @input="updateCalibrationTuningParameter(slotProps.index, 'maximum', $event)" style="width: 100%;"
@@ -239,11 +255,18 @@
       </Column>
 
       <!-- initValue column, editable -->
-      <Column field="initValue" header="Initial Run Value" sortable>
+      <Column field="initValue" sortable>
+        <template #header>
+          <span class="p-datatable-column-title">
+          <span>
+            Initial Run Value<span class="required-asterisk" aria-hidden="true">*</span>
+          </span>
+          </span>
+        </template>
         <template #body="slotProps">
           <input type="text" v-model="slotProps.data.initial_value"
             @input="updateCalibrationTuningParameter(slotProps.index, 'initial_value', $event)" style="width: 100%;"
-            slotProps.data.maximum :aria-label="'Initial value is ' + slotProps.data.initial_value"
+            :aria-label="'Initial value is ' + slotProps.data.initial_value"
             :title="'Initial value is ' + slotProps.data.initial_value" />
         </template>
       </Column>
