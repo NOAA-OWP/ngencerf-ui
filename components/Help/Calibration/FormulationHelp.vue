@@ -159,12 +159,16 @@
                 <li><strong>Auxiliary Soil Process</strong> (Optional)
                     <ul style="margin-left: 20px;">
                         <li style="font-style:italic">aka <strong>Soil Moisture Group</strong></li>
-                        <li style="font-size:0.95em;"><strong>sft/smp:</strong></li>
+                        <li>Generally required to produce all NWM output variables.</li>
+                        <li style="font-size:0.95em;"><strong>SFT/SMP:</strong></li>
                         <li style="margin-left: 15px;">
-                            SFT and SMP currently run together in ngen-cal.<br />
-                            They require either CFE-(X, S) or LASAM.<br />
-                            They share parameters with CFE and LASAM, so calibration of those parameters is done
-                            jointly.
+                            <ul class="list-disc list-outside ml-6 space-y-0">
+                                <li>SFT is paired with SMP (required).</li>
+                                <li>They require a rainfall-runoff model for input (CFE-X/S, LASAM, and TopModel 
+                                    currently have integrations).</li>
+                                <li>They share parameters with CFE and LASAM, so when paired with either of those 
+                                    modules the calibration of parameters is done jointly.</li>
+                            </ul>
                         </li>
                     </ul>
                 </li>
