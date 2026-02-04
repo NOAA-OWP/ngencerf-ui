@@ -599,7 +599,7 @@ const cancelRun = async () => {
 const updateIteration = async () => {
   const getIterationResponse = await queryGetIteration();
   
-  if (getIterationResponse._data) {
+  if (getIterationResponse?._data) {
     // check if iteration changes
     if (isNotNullOrUndefined(getIterationResponse._data.iteration)) {
       iteration.value = getIterationResponse._data.iteration;
@@ -618,6 +618,8 @@ const updateIteration = async () => {
       }
     }
   } else {
+    clearInterval(calibrationStatusIntervalId.value);
+    calibrationStatusIntervalId.value = undefined;
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
@@ -671,6 +673,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
             createElapsedTimeInterval();
           }
         }
+      } else {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
@@ -1021,6 +1024,12 @@ onUnmounted(() => {
   validationBestStatus.value = undefined;
   validControlAndValidBestStatus.value = undefined;
   submitTimeDate.value = undefined;
+  clearInterval(elapsedTimeIntervalId.value);
+  clearInterval(calibrationStatusIntervalId.value);
+  clearInterval(validationsStatusIntervalId.value);
+  elapsedTimeIntervalId.value = undefined;
+  calibrationStatusIntervalId.value = undefined;
+  validationsStatusIntervalId.value = undefined;
   resetUserPlotRefs([]);
 })
 </script>
