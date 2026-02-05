@@ -14,7 +14,7 @@
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
               <div class="col-span-1">
-                <label for="Domain" class="required-label">Domain</label><br />
+                <label for="Domain">Domain</label><br />
                 <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
                   optionValue="name" placeholder=" ... " aria-label="Domain Select" title="Domain Select"
                   @change="onDomainSelectionChange"
