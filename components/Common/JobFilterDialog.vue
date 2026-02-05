@@ -148,7 +148,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getCurrentInstance, defineExpose } from 'vue';
+import { getCurrentInstance, defineExpose, ref } from 'vue';
 const instance = getCurrentInstance();
 
 import Button from "primevue/button";
@@ -180,7 +180,8 @@ const {
   jobIdEnd,
   minJobId,
   maxJobId,
-  selectedBulkJobAction
+  selectedBulkJobAction,
+  preFilterList
 } = storeToRefs(useUserDataStore());
 
 const emit = defineEmits([
@@ -384,10 +385,27 @@ const resetFilters = (refresh_job_list: boolean=true) => {
   }
 }
 
-defineExpose({ resetFilters });
+defineExpose({ 
+  resetFilters 
+});
 
 onMounted(() => {
   resetFilters(false);
+  if (preFilterList.value) {
+    Object.keys(preFilterList.value).forEach(key => {
+      console.log(key + ':' + preFilterList.value[key]);
+      switch(key) {
+        case 'status':
+          statusTypeFilterList.value = [preFilterList.value[key]];
+          console.log('statusTypeFilterList:',statusTypeFilterList.value);
+          break;
+        // other pre-filter cases can be added here as necessary
+      }
+    });
+    nextTick(async () => {
+      refreshJobList();
+    });
+  }
   if (instance?.vnode?.props?.onBulkJobAction) {
     showBulkJobAction.value = true;
   }
@@ -395,6 +413,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   resetFilters(false);
+  preFilterList.value = {};
   clearGageList();
 })
 

@@ -29,8 +29,9 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                     <!-- Running Processes Card -->
-                    <div class="bg-teal-100 text-teal-800 p-6 rounded-lg shadow-md flex flex-col items-center">
-                       <i class="pi pi-cog text-teal-600 text-3xl mb-2"
+                    <div class="bg-teal-100 text-teal-800 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer ..."
+                        @click="gotoCalibrationAndFilter({'status': 'Running'})">
+                        <i class="pi pi-cog text-teal-600 text-3xl mb-2"
                             :class="{ 'pi-spin': runningCalibrationJobs > 0 }"></i>
                             <div class="text-3xl sm:text-4xl font-extrabold text-teal-800">
                             {{ runningCalibrationJobs }}
@@ -41,7 +42,8 @@
                     </div>
 
                     <!-- Ready to Run Card -->
-                    <div class="bg-green-50 p-6 rounded-lg shadow-md flex flex-col items-center">
+                    <div class="bg-green-50 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer ..."
+                        @click="gotoCalibrationAndFilter({'status': 'Ready'})">
                         <i class="pi pi-play-circle text-green-600 text-3xl mb-2"></i>
                         <div class="text-3xl sm:text-4xl font-extrabold text-green-600">
                             {{ readyCalibrationJobs }}
@@ -52,7 +54,8 @@
                     </div>
 
                     <!-- Setups to Complete Card -->
-                    <div class="bg-amber-50 p-6 rounded-lg shadow-md flex flex-col items-center">
+                    <div class="bg-amber-50 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer ..."
+                        @click="gotoCalibrationAndFilter({'status': 'Saved'})">
                         <i class="pi pi-sliders-h text-amber-600 text-3xl mb-2"></i>
                         <div class="text-3xl sm:text-4xl font-extrabold text-amber-600">
                             {{ savedCalibrationJobs }}
@@ -106,7 +109,7 @@ const { addToastRecord } = generalStore();
 
 const formulationStore = useFormulationStore;
 const { formulationTabData } = storeToRefs(formulationStore());
-const { statusTypeFilterList } = storeToRefs(useUserDataStore());
+const { statusTypeFilterList, preFilterList } = storeToRefs(useUserDataStore());
 const { fetchUserCalibrationJobsListIDsOnly } = useUserDataStore();
 
 const { getUserFullName } = useUserDataStore()
@@ -138,5 +141,11 @@ onMounted(async () => {
   const savedCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
   savedCalibrationJobs.value = savedCalibrationJobsList.length;
 })
+
+const gotoCalibrationAndFilter = (filterList: DynamicObject={}) => {
+  preFilterList.value = filterList;
+  const e = document.getElementById('MainMenuCalibration');
+  e.click();
+}
 
 </script>
