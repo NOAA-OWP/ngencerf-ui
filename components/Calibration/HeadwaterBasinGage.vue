@@ -342,11 +342,13 @@ const clearDataDueToGageChange = () => {
       userCalibrationRunData.value.validation_times.simulation_end_time = "";
     }
 
-    const tMsg: ToastMessageOptions = {
-      severity: 'info', summary: `Gage or Sources Changed`,
-      detail: "Changes made here affect Time Controls. Make sure they are properly set on the Tuning Controls Tab.", 
-      life: ToastTimeout.timeoutInfo
-    };
+    if (userCalibrationRunData?.value?.gage?.gage_id) {
+      const tMsg: ToastMessageOptions = {
+        severity: 'info', summary: `Gage or Sources Changed`,
+        detail: "Changes made here affect Time Controls. Make sure they are properly set on the Tuning Controls Tab.", 
+        life: ToastTimeout.timeoutInfo
+      };
+    }
     toast.add(tMsg); addToastRecord(tMsg);
 
   }, 100);
