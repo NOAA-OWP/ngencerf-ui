@@ -34,7 +34,7 @@
                 :binary="true" v-model="isAETRootzone" aria-label="CFE AET Rootzone Checkbox"
                 title="CFE AET Rootzone Checkbox" @change="isAETRootzoneHasChanged = true" 
                 :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
-              <label for="isAETRootzone" class="inline required-label">CFE AET Rootzone</label>
+              <label for="isAETRootzone" class="inline">CFE AET Rootzone</label>
             </div>
           </div>
           <div class="col-span-2">&nbsp;</div>
