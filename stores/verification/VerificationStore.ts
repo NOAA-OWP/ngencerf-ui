@@ -367,73 +367,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   }
 
   /**
-    * Get Verification Log Names
-    * @return {any}
-    */
-  const queryGetLogNames = async (verification_run_id: number): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({
-        verification_run_id: verification_run_id
-      })
-    });
-  };
-
-  /**
-    * Get Verification Log Data
-    * @return {any}
-    */
-  const queryGetLogData = async (
-    log_category: string,
-    log_name: string,
-    verification_run_id: number,
-    start?: number,
-    limit?: number
-  ): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({
-        log_category: log_category,
-        log_name: log_name,
-        verification_run_id: verification_run_id,
-        start: start !== undefined ? start : 0,
-        limit: limit !== undefined ? limit : 1000
-      })
-    });
-  };
-
-  /** 
-   * Get Verification Log Status
-   * @return {any}
-   */
-  const queryGetLogStatus = async (
-    verification_run_id: number,
-    log_path: string,
-    byte_offset: number
-  ): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_status/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify({
-        verification_run_id: verification_run_id,
-        log_path: log_path,
-        byte_offset: byte_offset,
-      })
-    });
-  };
-
-  /**
    * Cancel Verification Job by querying cancel_job endpoint
    */
   const cancelVerificationJob = async (): Promise<any> => {
@@ -553,9 +486,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     loadVerificationTab,
     createAndRunVerificationJob,
     cancelVerificationJob,
-    queryGetLogNames,
-    queryGetLogData,
-    queryGetLogStatus,
     updateRunningTime,
     getVerificationStatus,
     loadVerificationStatusInformation,

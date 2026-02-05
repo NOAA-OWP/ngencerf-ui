@@ -14,7 +14,7 @@
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1">
               <div class="col-span-1">
-                <label for="Domain" class="required-label">Domain</label><br />
+                <label for="Domain">Domain</label><br />
                 <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
                   optionValue="name" placeholder=" ... " aria-label="Domain Select" title="Domain Select"
                   @change="onDomainSelectionChange"
@@ -341,13 +341,15 @@ const clearDataDueToGageChange = () => {
       userCalibrationRunData.value.validation_times.simulation_start_time = "";
       userCalibrationRunData.value.validation_times.simulation_end_time = "";
     }
-
-    const tMsg: ToastMessageOptions = {
-      severity: 'info', summary: `Gage or Sources Changed`,
-      detail: "Changes made here affect Time Controls. Make sure they are properly set on the Tuning Controls Tab.", 
-      life: ToastTimeout.timeoutInfo
-    };
-    toast.add(tMsg); addToastRecord(tMsg);
+    
+    if (userCalibrationRunData?.value?.gage?.gage_id) {
+      const tMsg: ToastMessageOptions = {
+        severity: 'info', summary: `Gage or Sources Changed`,
+        detail: "Changes made here affect Time Controls. Make sure they are properly set on the Tuning Controls Tab.", 
+        life: ToastTimeout.timeoutInfo
+      };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
 
   }, 100);
   isLoading.value = false;

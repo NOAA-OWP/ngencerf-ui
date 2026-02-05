@@ -358,7 +358,6 @@ const tuningStore = useTuningStore();
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
 
 const {
-  jobNameInput,
   selectedModuleValues,
   slothParameterInputs
 } = storeToRefs(useFormulationStore());
@@ -491,7 +490,7 @@ const isTimeRangeSet = (): boolean => {
  * @returns boolean
  */
 const isFormulationDataSaved = (): boolean => {
-  if (jobNameInput.value === "" && selectedModuleValues?.value.length === 0 && slothParameterInputs?.value.length === 0) {
+  if (selectedModuleValues?.value.length === 0 && slothParameterInputs?.value.length === 0) {
     return false;
   } else {
     return true;
