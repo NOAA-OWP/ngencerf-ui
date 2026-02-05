@@ -977,7 +977,8 @@ const updateLogRefs = async(getLogData: boolean) => {
     logTimeout = setTimeout(async() => {
       const status_response: any = await queryGetLogStatus(
         (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // calibration_run_id
-        selectedLogFilePath.value, // log_path
+        selectedLogCategory.value, // log_category
+        selectedLogName.value, // log_name
         selectedLogByteOffset.value // byte_offset
       )
       if (status_response._data) {

@@ -353,7 +353,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    */
   const queryGetLogStatus = async (
     calibration_run_id: number,
-    log_path: string,
+    log_category: string,
+    log_name: string,
     byte_offset: number
   ): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_status/`, {
@@ -364,7 +365,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       },
       body: JSON.stringify({
         calibration_run_id: calibration_run_id,
-        log_path: log_path,
+        log_category: log_category,
+        log_name: log_name,
         byte_offset: byte_offset,
       })
     });
