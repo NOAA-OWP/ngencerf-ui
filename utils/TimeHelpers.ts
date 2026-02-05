@@ -68,7 +68,6 @@ export const formatISOStringOrDateToYYYYMMDD = ( d: string | Date ): string => {
  */
 export const formatDateForRunOnString = (d: Date): string => {
   const dateTime = DateTime.fromJSDate(d, { zone: 'utc' });
-  console.log('dateTime:',dateTime);
   return dateTime.toFormat("MMM d, yyyy 'at' HH:mm:ss 'UTC'");
 };
 

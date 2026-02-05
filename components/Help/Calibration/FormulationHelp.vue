@@ -1,7 +1,7 @@
 <template>
     <div class="_help-page">
         <div class="_help-title">Calibration - Formulation Tab</div>
-        <div class="_help-subtitle">Provide a user defined formulation name for this calibration job and
+        <div class="_help-subtitle">Provide a user defined job name for this calibration job and
             select the forumlation modules.</div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
@@ -19,7 +19,7 @@
                 <ul style="list-style-type: disc;margin-left: 20px;">
                     <li>When entering data manually, press <strong>Enter</strong> to confirm each field;
                         otherwise, the value will be discarded.</li>
-                    <li>A <strong>Formulation Name</strong> is required before anything on this tab can be saved.</li>
+                    <li>A <strong>Job Name</strong> is required before anything on this tab can be saved.</li>
                     <li>Selecting modules automatically:
                         <ul class="list-disc list-outside ml-6 space-y-0">
                             <li>Checks the corresponding hydrologic group.</li>
@@ -46,8 +46,8 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="td1">Formulation Name</td>
-                        <td class="td2">Enter name for the formulation. Alphanumeric characters, underscore (_) and dashes (-) are
+                        <td class="td1">Job Name</td>
+                        <td class="td2">Enter name for the job. Alphanumeric characters, underscore (_) and dashes (-) are
                             allowed. <strong>Spaces are not allowed</strong>.</td>
                     </tr>
                     <tr>
@@ -159,12 +159,16 @@
                 <li><strong>Auxiliary Soil Process</strong> (Optional)
                     <ul style="margin-left: 20px;">
                         <li style="font-style:italic">aka <strong>Soil Moisture Group</strong></li>
-                        <li style="font-size:0.95em;"><strong>sft/smp:</strong></li>
+                        <li>Generally required to produce all NWM output variables.</li>
+                        <li style="font-size:0.95em;"><strong>SFT/SMP:</strong></li>
                         <li style="margin-left: 15px;">
-                            SFT and SMP currently run together in ngen-cal.<br />
-                            They require either CFE-(X, S) or LASAM.<br />
-                            They share parameters with CFE and LASAM, so calibration of those parameters is done
-                            jointly.
+                            <ul class="list-disc list-outside ml-6 space-y-0">
+                                <li>SFT is paired with SMP (required).</li>
+                                <li>They require a rainfall-runoff model for input (CFE-X/S, LASAM, and TopModel 
+                                    currently have integrations).</li>
+                                <li>They share parameters with CFE and LASAM, so when paired with either of those 
+                                    modules the calibration of parameters is done jointly.</li>
+                            </ul>
                         </li>
                     </ul>
                 </li>
