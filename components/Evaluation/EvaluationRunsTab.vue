@@ -85,7 +85,7 @@
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem" 
             selectionMode="multiple" :metaKeySelection="true" @rowContextmenu="onRowCpContextMenu"
             v-model:selection="selectedCalibrationCompareRuns" :rowStyle="rowStyle" class="boxed">
-            <Column :pt="ptValColumns" v-for="(col, colIndex) in gageevaluationRunListHeaders" :key="colIndex"
+            <Column :pt="ptCompareColumns" v-for="(col, colIndex) in gageevaluationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field" sortable>
             </Column>
           </DataTable>
@@ -353,6 +353,11 @@ const ptColumn = ref({
 });
 
 const ptValColumns = ref({
+  columnHeaderContent: { style: { "justify-content": "center" } },
+  bodyCell: { style: { "text-align": "right", "padding-right": "10px" } }
+});
+
+const ptCompareColumns = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
   bodyCell: { style: { "text-align": "center", "padding-right": "10px" } }
 });
