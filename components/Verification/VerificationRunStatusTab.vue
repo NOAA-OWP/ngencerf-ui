@@ -77,7 +77,7 @@
           </div>
           
           <div v-if="failureMessages && failureMessages.length > 0">
-            <span class="font-bold">Failure Message: </span>
+            <span class="font-bold">{{ failureMessages.length > 1 ? 'Messages' : 'Message' }}: </span>
             <span v-for="failure_message in failureMessages">
               {{ failure_message.message }}<br/>
             </span>

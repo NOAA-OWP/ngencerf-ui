@@ -95,10 +95,10 @@
     </div>
 
     <div v-if="failureMessages && failureMessages.length > 0">
-      <div style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
+      <div style="display:flex; margin-top: 1em;"  aria-label="Messages" title="Messages">
         <div class="text-right font-bold" style="width: 155px;">
           <label class="text-right whitespace-nowrap" for="failureMessage" style="width: 155px;padding-top:1px;">
-            Failure Message
+            {{ failureMessages.length > 1 ? 'Messages' : 'Message' }}
           </label>
         </div>
         <div class="pl-5" style="width: 100%;">
