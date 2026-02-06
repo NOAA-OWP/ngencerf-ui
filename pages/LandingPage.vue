@@ -1,70 +1,71 @@
 <template>
-  <client-only>
-    <div class="h-full">
-        <div class="grid grid-rows-3 h-full">
+    <client-only>
+        <div class="min-h-screen">
+            <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
 
             <!-- Header -->
-            <div class="row-span-1">
+            <div>
                 <AppHeader />
             </div>
 
-            <!-- Center Content -->
-            <div class="row-span-1">
+            <!-- Middle: centers CenterBox -->
+            <div class="flex items-center justify-center px-4 py-8">
+
                 <div
                 id="CenterBox"
                 class="bg-white mx-auto px-6 py-8 rounded-[10px] max-w-screen-lg shadow-md"
                 >
-                <!-- Page Title -->
-                <div class="text-center mb-6">
-                    <h1 class="text-4xl font-bold">Next Generation Water Prediction Capability</h1>
-                    <div class="text-lg sm:text-xl text-gray-700 mt-2">
-                    Welcome <strong>{{ getUserFullName() }}</strong>
-                    </div>
-                </div>
-
-                <hr class="my-6 border-black" />
-
-                <!-- Dashboard Section -->
-                <div class="text-center font-bold text-2xl mb-4">Dashboard</div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-                    <!-- Running Processes Card -->
-                    <div class="bg-teal-100 text-teal-800 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer ..."
-                        @click="gotoCalibrationAndFilter({'status': 'Running'})">
-                        <i class="pi pi-cog text-teal-600 text-3xl mb-2"
-                            :class="{ 'pi-spin': runningCalibrationJobs > 0 }"></i>
-                            <div class="text-3xl sm:text-4xl font-extrabold text-teal-800">
-                            {{ runningCalibrationJobs }}
-                        </div>
-                        <div class="text-sm sm:text-base text-gray-700 mt-2">
-                            Calibrations Running
+                    <!-- Page Title -->
+                    <div class="text-center mb-6">
+                        <h1 class="text-4xl font-bold">Next Generation Water Prediction Capability</h1>
+                        <div class="text-lg sm:text-xl text-gray-700 mt-2">
+                        Welcome <strong>{{ getUserFullName() }}</strong>
                         </div>
                     </div>
 
-                    <!-- Ready to Run Card -->
-                    <div class="bg-green-50 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer ..."
-                        @click="gotoCalibrationAndFilter({'status': 'Ready'})">
-                        <i class="pi pi-play-circle text-green-600 text-3xl mb-2"></i>
-                        <div class="text-3xl sm:text-4xl font-extrabold text-green-600">
-                            {{ readyCalibrationJobs }}
-                        </div>
-                        <div class="text-sm sm:text-base text-gray-700 mt-2">
-                            Calibrations Ready to Run
-                        </div>
-                    </div>
+                    <hr class="my-6 border-black" />
 
-                    <!-- Setups to Complete Card -->
-                    <div class="bg-amber-50 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer ..."
-                        @click="gotoCalibrationAndFilter({'status': 'Saved'})">
-                        <i class="pi pi-sliders-h text-amber-600 text-3xl mb-2"></i>
-                        <div class="text-3xl sm:text-4xl font-extrabold text-amber-600">
-                            {{ savedCalibrationJobs }}
+                    <!-- Dashboard Section -->
+                    <div class="text-center font-bold text-2xl mb-4">Dashboard</div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                        <!-- Running Processes Card -->
+                        <div class="bg-teal-100 text-teal-800 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer"
+                            @click="gotoCalibrationAndFilter({'status': 'Running'})">
+                            <i class="pi pi-cog text-teal-600 text-3xl mb-2"
+                                :class="{ 'pi-spin': runningCalibrationJobs > 0 }"></i>
+                                <div class="text-3xl sm:text-4xl font-extrabold text-teal-800">
+                                {{ runningCalibrationJobs }}
+                            </div>
+                            <div class="text-sm sm:text-base text-gray-700 mt-2">
+                                Calibrations Running
+                            </div>
                         </div>
-                        <div class="text-sm sm:text-base text-gray-700 mt-2">
-                            Calibrations In Setup
+
+                        <!-- Ready to Run Card -->
+                        <div class="bg-green-50 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer"
+                            @click="gotoCalibrationAndFilter({'status': 'Ready'})">
+                            <i class="pi pi-play-circle text-green-600 text-3xl mb-2"></i>
+                            <div class="text-3xl sm:text-4xl font-extrabold text-green-600">
+                                {{ readyCalibrationJobs }}
+                            </div>
+                            <div class="text-sm sm:text-base text-gray-700 mt-2">
+                                Calibrations Ready to Run
+                            </div>
+                        </div>
+
+                        <!-- Setups to Complete Card -->
+                        <div class="bg-amber-50 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer"
+                            @click="gotoCalibrationAndFilter({'status': 'Saved'})">
+                            <i class="pi pi-sliders-h text-amber-600 text-3xl mb-2"></i>
+                            <div class="text-3xl sm:text-4xl font-extrabold text-amber-600">
+                                {{ savedCalibrationJobs }}
+                            </div>
+                            <div class="text-sm sm:text-base text-gray-700 mt-2">
+                                Calibrations In Setup
+                            </div>
                         </div>
                     </div>
-                </div>
                 </div>
             </div>
 
