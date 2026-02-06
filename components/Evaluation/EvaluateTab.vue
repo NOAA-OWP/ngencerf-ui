@@ -1612,10 +1612,6 @@ watch(selectedLogName, async () => {
         selectedLogEndRow.value = logDataPageSize.value;
       }
       selectedLogFilePath.value = response?._data?.log_path;
-    } else {
-      toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 });

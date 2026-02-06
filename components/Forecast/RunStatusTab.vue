@@ -106,18 +106,16 @@
                 <span class="font-bold">Results Pathname: </span>
                 <span class="whitespace-nowrap overflow-auto">{{ resultsPathname }}</span>
               </div>
+              <div v-if="failureMessages && failureMessages.length > 0">
+                <span class="font-bold">Failure Message: </span>
+                <span v-for="failure_message in failureMessages">
+                  {{ failure_message.message }}<br/>
+                </span>
+              </div>
             </div>
           </div>
             
           <div>
-            <div v-if="failureMessages" class="text-left pl-3 text-nowrap" style="font-size:0.9em;">
-              <label for="status">Failure Message </label>
-              <div class="pl-5" style="width: 100%;">
-                <span v-for="message in failureMessages">
-                  {{ message }}<br/>
-                </span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -420,7 +418,7 @@ const startForecastRun = async () => {
     if (forecast) {
       forecastJobStatus.value = forecast?.status;
       coldStartJobStatus.value = forecast?.cold_start?.status;
-      failureMessages.value = forecast?.failure_messages;
+      failureMessages.value = forecast?.failure_messages ?? undefined;
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Unable to run forecast job`, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -437,7 +435,7 @@ const cancelForecastRun = async () => {
 
     if (cancelForecastJobResponse?._data?.status) {
       forecastJobStatus.value = cancelForecastJobResponse._data.status;
-      failureMessages.value = cancelForecastJobResponse._data.failure_messages;
+      failureMessages.value = cancelForecastJobResponse._data.failure_messages ?? undefined;
 
       if (forecastJobStatus.value !== 'Cancelled') {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };

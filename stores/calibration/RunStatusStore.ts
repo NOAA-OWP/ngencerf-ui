@@ -54,6 +54,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validationBestStatus = ref<string>();
   const validControlAndValidBestStatus = ref<string>();
   const validationBestAchieved = ref<BestIterationData>({ iteration: 0, isBest: false });
+  const failureMessages = ref<any>();
 
   /**
    * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
@@ -426,6 +427,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     validControlAndValidBestStatus,
     resultsPathname,
     overallCalibrationValidationStatus,
+    validationBestAchieved,
+    failureMessages,
     loadRunStatusStore,
     getValidControlAndValidBestStatus,
     queryGetCalibrationStatus,
@@ -438,8 +441,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     queryGetLogNames,
     queryGetLogData,
     queryGetLogStatus,
-    hardResetRunStatusStore,
-    validationBestAchieved
+    hardResetRunStatusStore
   };
 });
 

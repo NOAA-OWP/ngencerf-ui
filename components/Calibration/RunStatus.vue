@@ -90,15 +90,15 @@
           </div>
         </div>
       </div>
-      <div v-if="userCalibrationRunData?.failure_messages">
-        <div style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
+      <div>
+        <div v-if="failureMessages && failureMessages.length > 0" style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
           <div class="text-right font-bold" style="width: 155px;">
             <label class="text-right whitespace-nowrap" for="failureMessage" style="width: 155px;padding-top:1px;">
               Failure Message
             </label>
           </div>
           <div class="pl-5" style="width: 100%;">
-            <span v-for="failure_message in userCalibrationRunData.failure_messages">
+            <span v-for="failure_message in failureMessages">
               {{ failure_message.message }}<br/>
             </span>
           </div>
@@ -265,7 +265,8 @@ const {
   validationControlStatus,
   validationBestStatus,
   overallCalibrationValidationStatus,
-  validationBestAchieved
+  validationBestAchieved,
+  failureMessages
 } = storeToRefs(useRunStatusStore());
 
 const {
@@ -416,7 +417,7 @@ onMounted(async () => {
   });
   if (userCalibrationRunData?.value && getStatusResponse.status === 200) {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
-    userCalibrationRunData.value.failure_messages = getStatusResponse._data.failure_messages;
+    failureMessages.value = getStatusResponse._data.failure_messages ?? undefined;
   }
 
   // Clear best iteration flag
@@ -509,7 +510,7 @@ const startRun = async () => {
     if (runCalibrationResponse.status >= 200 && runCalibrationResponse.status < 300) {
       if (runCalibrationResponse?._data?.status) {
         userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
-        userCalibrationRunData.value.failure_messages = runCalibrationResponse._data.failure_messages;
+        failureMessages.value = runCalibrationResponse._data.failure_messages ?? undefined;
       } else {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -535,7 +536,7 @@ const startRun = async () => {
       
       if (getStatusResponse?._data?.status) {
         userCalibrationRunData.value.status = getStatusResponse._data.status;
-        userCalibrationRunData.value.failure_messages = getStatusResponse._data.failure_messages;
+        failureMessages.value = getStatusResponse._data.failure_messages ?? undefined;
       } else {
         const errorMessages: string[] = useApiErrorResponsePreprocess(getStatusResponse);
         errorMessages.forEach((msg: string) => {
@@ -613,9 +614,6 @@ const updateIteration = async () => {
         }
       }
       userCalibrationRunData.value.status = getIterationResponse._data.status;
-      if (getIterationResponse._data.failure_messages) {
-        userCalibrationRunData.value.failure_messages = getIterationResponse._data.failure_messages;
-      }
     }
   } else {
     clearInterval(calibrationStatusIntervalId.value);
@@ -700,7 +698,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
                 }
               }
               userCalibrationRunData.value.status = getStatusResponse._data.status;
-              userCalibrationRunData.value.failure_messages = getStatusResponse._data.failure_messages;
+              failureMessages.value = getStatusResponse._data.failure_messages && undefined;
             } else {
               clearInterval(calibrationStatusIntervalId.value);
               const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
@@ -964,11 +962,6 @@ const updateLogRefs = async(getLogData: boolean) => {
           - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
         });
       }
-    } else {
-      selectedLogDisplay.value = '';
-      selectedLogFilePath.value = '';
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
   if (userCalibrationRunData?.value?.status === 'Running' && selectedLogFilePath.value) {

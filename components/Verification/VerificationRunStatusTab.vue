@@ -75,16 +75,12 @@
               </div>
             </div>
           </div>
-            
-          <div>
-            <div v-if="failureMessages" class="text-left pl-3 text-nowrap" style="font-size:0.9em;">
-              <label for="status">Failure Message </label>
-              <div class="pl-5" style="width: 100%;">
-                <span v-for="message in failureMessages">
-                  {{ message }}<br/>
-                </span>
-              </div>
-            </div>
+          
+          <div v-if="failureMessages && failureMessages.length > 0">
+            <span class="font-bold">Failure Message: </span>
+            <span v-for="failure_message in failureMessages">
+              {{ failure_message.message }}<br/>
+            </span>
           </div>
         </div>
 
@@ -195,7 +191,7 @@ const startVerificationJob = async () => {
     if (response.status >= 200 && response.status < 300) {
       verificationJobId.value = response._data.verification_run_id;
       verificationJobStatus.value = response._data.status;
-      failureMessages.value = response._data.failure_messages;
+      failureMessages.value = response._data.failure_messages ?? undefined;
 
       if (response?._data?.submit_date) {
         submitTimeDate.value = new Date(response?._data?.submit_date);
@@ -232,7 +228,7 @@ const stopVerificationJob = async () => {
 
     if (cancelVerificationJobResponse?._data?.status) {
       verificationJobStatus.value = cancelVerificationJobResponse._data.status;
-      failureMessages.value = cancelVerificationJobResponse._data.failure_messages;
+      failureMessages.value = cancelVerificationJobResponse._data.failure_messages ?? undefined;
 
       if (verificationJobStatus.value !== 'Cancelled') {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Verification status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };

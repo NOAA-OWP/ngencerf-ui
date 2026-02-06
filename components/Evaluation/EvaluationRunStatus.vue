@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <div v-if="failureMessages">
+    <div v-if="failureMessages && failureMessages.length > 0">
       <div style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
         <div class="text-right font-bold" style="width: 155px;">
           <label class="text-right whitespace-nowrap" for="failureMessage" style="width: 155px;padding-top:1px;">
@@ -240,7 +240,7 @@ const startRun = async () => {
   executeIterationValidationRun().then((response) => {
     if (response.status === 201) {
       validationStatus.value = response?._data?.status;
-      failureMessages.value = response?._data?.failure_messages;
+      failureMessages.value = response?._data?.failure_messages ?? undefined;
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
       if (validationRunningTimeIntervalId.value) {
@@ -294,10 +294,6 @@ const updateLogDisplay = () => {
             }
           });
         }
-      } else {
-        selectedLogFilePath.value = '';
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
       }
     })
   }
@@ -350,7 +346,7 @@ watch(selectedLogCurrentPage, async () => {
 const cancelRun = async () => {
   executeCancelIterationValidationRun().then(response => {
     validationStatus.value = response?._data.status;
-    failureMessages.value = response?._data?.failure_messages;
+    failureMessages.value = response?._data?.failure_messages ?? undefined;
     clearInterval(validationStatusCheckingIntervalId.value);
     clearInterval(validationRunningTimeIntervalId.value);
     validationStatusCheckingIntervalId.value = undefined;

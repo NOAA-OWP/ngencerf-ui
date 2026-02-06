@@ -98,9 +98,6 @@ watch(selectedLogName, async () => {
           - ((document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top + 10)) + 'px');
         document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
       });
-    } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 });
