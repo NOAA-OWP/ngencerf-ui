@@ -62,6 +62,7 @@ export const useUserDataStore = defineStore(
     const maxJobId = ref<any>(null);
     const selectedBulkJobAction = ref<number>(0);
     const selectedBulkJobActionScope = ref<boolean>(false);
+    const preFilterList = ref<DynamicObject>({});
 
     const lastServerError = ref<ServerStatus>();
 
@@ -557,6 +558,7 @@ export const useUserDataStore = defineStore(
       maxJobId,
       selectedBulkJobAction,
       selectedBulkJobActionScope,
+      preFilterList,
       lastServerError,
       userCalibrationJobsListData,
       userCalibrationRunData,
