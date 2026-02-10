@@ -378,6 +378,7 @@ const {
   getGridTimeRange,
   queryGetIterations,
   queryGetPerformanceMetrics,
+  queryGetPerformanceMetricsForValidation,
   queryGetLogNames,
   queryGetLogData,
   loadGridImages,
@@ -641,8 +642,19 @@ watch(selectedPlotName, async () => {
               }
               performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = metric_value;
             });
-            // Now go through the values from our Validations and add each metric value to the appropriate row
             if (performanceMetrics.value?._data?.validations) {
+              if (!performanceMetrics.value?._data?.validations.some(validation => validation.validation_run_id === evaluateValidationRunId.value)) {
+                // We're looking at an alternate iteration - need to get its metrics from the server separately
+                let validationPerformanceMetrics = await queryGetPerformanceMetricsForValidation();
+                if (validationPerformanceMetrics?._data?.performance_metrics) {
+                  performanceMetrics.value._data.validations.push({
+                    validation_run_id: evaluateValidationRunId.value,
+                    validation_type: 'valid_iteration',
+                    iteration_num: validationPerformanceMetrics._data.iteration_num,
+                    performance_metrics: validationPerformanceMetrics._data.performance_metrics
+                  })
+                }
+              }
               for (let v = 0; v < performanceMetrics.value?._data?.validations.length; v++) {
                 let validation_run_id = performanceMetrics.value?._data?.validations[v].validation_run_id;
                 let validation_type = performanceMetrics.value?._data?.validations[v].validation_type;
