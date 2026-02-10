@@ -312,7 +312,7 @@ import { DateTime } from "luxon";
 import type { DynamicObject } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
-import { formatElapsedTime, formatISOStringOrDateToYYYYMMDD } from "@/utils/TimeHelpers";
+import { formatElapsedTime, formatISOStringOrDateToYYYYMMDD, formatDateTicks } from "@/utils/TimeHelpers";
 import { isValidDate, isValidDateTime } from "@/utils/CommonHelpers";
 
 import { generalStore } from '@/stores/common/GeneralStore';
@@ -1121,7 +1121,7 @@ const drawInteractivePlot = () => {
   let plotDotData = [];
   if (!plotGraphCheckboxesEmpty()) {
     plotGraphOptions.value = {
-      x: { grid: true, type: "time", tickSpacing: 80},
+      x: { grid: true, type: "time", tickSpacing: 80, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},
       y: { grid: true, labelAnchor: 'center', labelArrow: 'none' },
       marks: [],
       width: (plotGraphArea.value as HTMLElement).offsetWidth - 50,
@@ -1326,7 +1326,7 @@ const drawInteractiveSlider = () => {
       y: 'measurement'
     }
     plotGraphSliderOptions.value = {
-      x: { inset: 0, tickSpacing: 80 },
+      x: { inset: 0, tickSpacing: 80, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks) },
       y: { axis: null },
       marks: [
         Plot.lineY(plotGraphSliderData.value, lineOptions)

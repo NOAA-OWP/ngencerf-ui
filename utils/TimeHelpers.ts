@@ -237,3 +237,43 @@ export function formatDuration(duration: any): string {
   }
   return daysPart + Duration.fromObject({ hours, minutes, seconds }).toFormat("hh:mm:ss");
 };
+
+/**
+ * Format Date object to a string for display in Observable Plot ticks
+ * @param d Date object
+ * @param i iteration number
+ * @param ticks Array of dates to be used as ticks by Observable plot
+ * @returns {string} string representation of a date object
+ */
+export function formatDateTicks(d: Date, i: any, ticks: any): string {
+  let md = d.toLocaleDateString("en-US", {month: "short", day: "numeric", timeZone: "UTC"});
+  let m = d.toLocaleDateString("en-US", {month: "short", timeZone: "UTC"});
+  let y = d.getUTCFullYear();
+  let hmz = d.toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC"}) + 'Z';
+  // compare to previous date
+  let prevDate = i > 0 ? ticks[i-1] : new Date('1/1/1900');
+  if (d.getUTCMonth() !== prevDate.getUTCMonth()) {
+    if (ticks.some(date => date.getUTCDate() !== 1)) {
+      // we have dates that are not all on the 1st of the month
+      // show month + day, line break, year
+      return `${md}\n${y}`;
+    } else {
+      // all of our dates are on the first of the month
+      // show month, line break, year
+      return `${m}\n${y}`;
+    }
+  }
+  if (d.getUTCDate() !== prevDate.getUTCDate()) {
+    if (i === 0 || (d - prevDate) / (1000 * 60 * 60) < 24) {
+      // dates are less than a day apart
+      // show time, line break, month + day
+      return `${hmz}\n${md}`;
+    } else {
+      // dates are at least a day apart
+      // show month + day
+      return `${md}`;
+    }
+  }
+  // default is just to show time
+  return `${hmz}`;
+}

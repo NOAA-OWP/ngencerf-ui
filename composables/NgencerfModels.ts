@@ -741,7 +741,11 @@ export type CalibrationRunForForecast = {
   forecast_status: string;
   configuration: string;
   cycle_date: string;
-  cold_start_date: string;
+  cold_start?: {
+    cold_start_status: string;
+    cold_start_date: string;
+    cold_start_submit_date: string;
+  }
   logging_config: {
     logging_enabled: boolean;
     modules: {

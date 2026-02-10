@@ -51,7 +51,7 @@
               </div>
               <div>
                 <span class="font-medium">Cold Start Date: </span>
-                {{ (calibrationRunForForecast?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cold_start_date) + ' UTC' : 'None') }}
+                {{ (calibrationRunForForecast?.cold_start?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cold_start.cold_start_date) + ' UTC' : 'None') }}
               </div>
             </div>
             <div class="col-span-1">
@@ -171,7 +171,7 @@ import { useLogStore } from '@/stores/common/LogStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 
-import { convertISOStringOrDateToDateTime } from '@/utils/TimeHelpers';
+import { convertISOStringOrDateToDateTime, formatDateTicks } from '@/utils/TimeHelpers';
 import * as Plot from "@observablehq/plot";
 
 const { calibrationJobId, isLoading } = storeToRefs(generalStore());
@@ -289,6 +289,7 @@ onMounted(async () => {
   if (!userCalibrationRunData.value) {
     await fetchUserCalibrationRunData();
   }
+  console.log('cold_start_date:',calibrationRunForForecast?.value?.cold_start?.cold_start_date);
 });
 
 const toggleMessagesGroup = async () => {
@@ -345,7 +346,7 @@ const showForecastPlot = async () => {
     plotGraphDateLimits.value = {
       start: plotGraphDataRaw.value[0][plotGraphColumns.value[0].value],
       end: plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotGraphColumns.value[0].value],
-      span: Math.ceil((new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotGraphColumns.value[0].value]).getTime() - new Date(plotGraphDataRaw.value[0][plotGraphColumns.value[0].value]).getTime()) / (1000 * 3600))
+      span: Math.ceil((new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotGraphColumns.value[0].value] + 'Z').getTime() - new Date(plotGraphDataRaw.value[0][plotGraphColumns.value[0].value] + 'Z').getTime()) / (1000 * 3600))
     }
     plotGraphDateRange.value = {
       start: plotGraphDateLimits.value.start,
@@ -420,7 +421,7 @@ const drawInteractivePlot = () => {
   let plotDotData = [];
   if (!plotGraphCheckboxesEmpty()) {
     plotGraphOptions.value = {
-      x: { grid: true },
+      x: { grid: true, tickSpacing: 80, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},
       y: { grid: true, labelAnchor: 'center', labelArrow: 'none' },
       marks: [],
       width: (plotGraphArea.value as HTMLElement).offsetWidth - 50,
@@ -490,10 +491,10 @@ const drawInteractivePlot = () => {
   }
   lineOptions.y.label = 'Flow (m^3/s)';
   lineTipOptions.y.label = 'Flow';
-  lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} m^3/s`;
+  lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}X\nStreamflow: ${d.measurement} m^3/s`;
   dotOptions.y.label = 'Flow (m^3/s)';
   dotTipOptions.y.label = 'Flow';
-  dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} m^3/s`;
+  dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}Z\nStreamflow: ${d.measurement} m^3/s`;
   if (plotLineData.length > 0) {
     plotGraphLeftEdge = plotLineData[0].time;
     plotGraphOptions.value.marks.push(
@@ -554,7 +555,7 @@ const drawInteractiveSlider = () => {
       if (plotGraphLines.value.length === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
         for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
           let dataPoint = {
-            time: convertISOStringOrDateToDateTime((plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[0].value]).replace(" ","T")).toJSDate(),
+            time: convertISOStringOrDateToDateTime((plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[0].value] + 'Z').replace(" ","T")).toJSDate(),
             measurement: parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[c].value])
           };
           plotGraphSliderData.value.push(dataPoint);
@@ -566,15 +567,15 @@ const drawInteractiveSlider = () => {
       y: 'measurement'
     }
     plotGraphSliderOptions.value = {
-      x: { tickSize: 0, inset: 0 },
+      x: { inset: 0, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},
       y: { axis: null },
       marks: [
         Plot.lineY(plotGraphSliderData.value, lineOptions)
       ],
       width: (plotGraphArea.value as HTMLElement).offsetWidth - 100,
       height: 100,
-      marginLeft: 0,
-      marginRight: 0
+      marginLeft: 20,
+      marginRight: 20
     };
     while (plotGraphSlider.value && plotGraphSlider.value.children.length > 1) {
       plotGraphSlider.value.removeChild(plotGraphSlider.value.children[1]);
