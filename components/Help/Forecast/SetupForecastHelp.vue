@@ -24,8 +24,8 @@
                 <ul class="list-disc list-outside space-y-0 ml-6">
                     <li><strong>Cold Start Date</strong></li>
                     <li><strong>Cold Start Hour</strong></li>
-                    <li><strong>Cycle Date<span class="text-red-600">*</span></strong></li>
-                    <li><strong>Cycle Hour<span class="text-red-600">*</span></strong></li>
+                    <li><strong>Cycle Date<span class="required-asterisk" aria-hidden="true">*</span></strong></li>
+                    <li><strong>Cycle Hour<span class="required-asterisk" aria-hidden="true">*</span></strong></li>
                 </ul>
 
                 <p>
@@ -36,7 +36,9 @@
                 <p class="text-center mt-2">
                     Click <strong>Next</strong> to review your settings and run the forecast.
                 </p>
-                <p class="mt-4"><strong><span class="text-red-600">*</span></strong> Required Field</p>
+                <div class="required-hint mt-2 mb-4">
+                    <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
+                </div>
             </div>
         </div>
     </div>

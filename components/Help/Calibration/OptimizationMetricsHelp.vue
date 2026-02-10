@@ -11,7 +11,7 @@
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <hr />
+        <hr class="my-6 border-black" />
         <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
             <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup, 
                 starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
@@ -26,46 +26,46 @@
             </thead>
             <tbody>
             <tr>
-                <td class="td1">Optimization Algorithm</td>
+                <td class="td1">Optimization Algorithm<span class="required-asterisk" aria-hidden="true">*</span></td>
                 <td class="td2">
                 Select the optimization algorithm to use for calibration from the dropdown. Once selected,
                 any required algorithm parameters will be automatically populated in the Algorithm Parameter table.
                 </td>
             </tr>
             <tr>
-                <td class="td1">Algorithm Parameters</td>
+                <td class="td1">Algorithm Parameters<span class="required-asterisk" aria-hidden="true">*</span></td>
                 <td class="td2">
                 Each parameter name is listed. The user must provide the corresponding value.
                 </td>
             </tr>
             <tr>
-                <td class="td1">Calibration Stop Criteria</td>
+                <td class="td1">Calibration Stop Criteria<span class="required-asterisk" aria-hidden="true">*</span></td>
                 <td class="td2">
                 Specifies the number of iterations each worker executes during calibration. DDS uses one worker, while GWO and PSO use 20 workers.
                 </td>
             </tr>
             <tr>
-                <td class="td1">Objective Function</td>
+                <td class="td1">Objective Function<span class="required-asterisk" aria-hidden="true">*</span></td>
                 <td class="td2">
                 Select the metric to use as the objective function. All metrics in the table (MFDC, FBIAS, NSWwt) are valid choices.<br />
-                - For Categorical metrics (POD, CSI, FAR), the Flow Threshold must be provided.<br />
-                - For Event-based metrics (PKBIAS, PKTE, EVBIAS), the Peak Flow Threshold must be provided.
+                - For Categorical metrics (POD, CSI, FAR), the <strong>Flow Threshold</strong> is required.<br />
+                - For Event-based metrics (PKBIAS, PKTE, EVBIAS), the <strong>Peak Flow Threshold</strong> is required.
                 </td>
             </tr>
             <tr>
                 <td class="td1">Calculate Categorical Metrics</td>
                 <td class="td2">
-                Check this box to calculate Categorical Metrics if they are <strong>not</strong> selected as the Objective Function.  
-                If a Categorical metric (POD, CSI, FAR) <strong>is selected as the Objective Function</strong>, this checkbox is automatically disabled.  
-                The Flow Threshold must be entered when the checkbox is enabled.
+                Select this option to calculate <strong>Categorical Metrics</strong> when they are <strong>not</strong> chosen as the Objective Function.  
+                If a Categorical metric (POD, CSI, FAR) is selected as the Objective Function, this option is automatically disabled.
+                When enabled, the <strong>Flow Threshold</strong> field is required.
                 </td>
             </tr>
             <tr>
                 <td class="td1">Calculate Event-Based Metrics</td>
                 <td class="td2">
-                    Check this box to calculate Event-Based Metrics if they are <strong>not</strong> selected as the Objective Function.  
-                    If an Event-Based metric (PKBIAS, PKTE, EVBIAS) <strong>is selected as the Objective Function</strong>, this checkbox is automatically disabled.  
-                    The Peak Flow Threshold must be entered when the checkbox is enabled.
+                    Select this option to calculate <strong>Event-Based Metrics</strong> when they are <strong>not</strong> chosen as the Objective Function.
+                    If an Event-Based metric (PKBIAS, PKTE, EVBIAS) is selected as the Objective Function, this option is automatically disabled.
+                    When enabled, the <strong>Peak Flow Threshold</strong> field is required.
                 </td>
             </tr>
             <tr>
@@ -88,8 +88,11 @@
             </tr>
             </tbody>
         </table>
-        <hr />
-        <div class="mt-4">
+        <div class="required-hint mt-0 mb-4">
+            <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
+        </div>
+        <hr class="my-6 border-black" />
+        <div class="mt-2">
             <p class="mb-2 text-center font-bold">Metric Definitions</p>
             <div class="overflow-x-auto">
             <table class="min-w-full border border-gray-200 text-left text-sm" 

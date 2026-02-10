@@ -14,7 +14,7 @@
         <div class="w-5/6 relative">
 
           <div class="inline-block">
-            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <label for="DisplayOptions" class="pr-2 pt-3 required-label">Display</label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
                 optionLabel="name" optionValue="name" :disabled="!plotList">
@@ -27,8 +27,8 @@
             <div v-if="selectedPlotName && selectedPlotName == selectedGridDisplay?.name"
               class="p-0 relative overflow-visible">
               <div class="grid grid-cols-3 gap-4">
-                <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
-                  Select Date
+                <div class="text-nowrap text-right font-bold pt-1">
+                    Select Date<span class="required-asterisk" aria-hidden="true">*</span>
                 </div>
                 <div class="text-nowrap">
                   <VueDatePicker v-model="selectedGridDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
