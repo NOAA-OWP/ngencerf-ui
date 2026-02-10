@@ -12,7 +12,7 @@
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <hr />
+        <hr class="my-6 border-black" />
         <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
             <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration
                 setup, starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the
@@ -107,33 +107,33 @@
                         data selected in the Headwater Basin Gage tab. All time controls are constrained by this range.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Calibration Time Controls</td>
+                    <td class="td1">Calibration Time Controls<span class="required-asterisk" aria-hidden="true">*</span></td>
                     <td class="td2">The user selects four times to run the calibration. The Simulation Start and End
                         times reflect the period of time to perform the entire run. The Calibration Start and End times
                         reflect the period of time to actually calibrate using the tuning parameters. This allows for 
                         a “warm-up” period prior to performing the calibration.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Validation Time Controls</td>
+                    <td class="td1">Validation Time Controls<span class="required-asterisk" aria-hidden="true">*</span></td>
                     <td class="td2">Same rules as the Calibration Time Controls except the Validation time range is
                         further constrained in that it cannot overlap the Calibration time range.
                     </td>
                 </tr>
                 <tr>
-                    <td class="td1">Output Variable to Calibrate</td>
+                    <td class="td1">Output Variable to Calibrate<span class="required-asterisk" aria-hidden="true">*</span></td>
                     <td class="td2">Dropdown field to select the output variable to calibratte based on the chosen
                         formulation. Streamflow is the only option at this time.
                     </td>
                 </tr>
                 <tr>
-                    <td class="td1">Calibration Tuning Parameters</td>
+                    <td class="td1">Calibration Tuning Parameters<span class="required-asterisk" aria-hidden="true">*</span></td>
                     <td class="td2">Either upload from a file or select from the available calibration parameters based
                         on the formulation chosen.</td>
                 </tr>
 
                 <tr>
-                    <td class="td1">Load Parameters Button</td>
-                    <td class="td2">Click this to upload calibration tuning parameters from text file<br />
+                    <td class="td1">Select File Button</td>
+                    <td class="td2">User can optionally upload calibration tuning parameters from a text file<br />
                         <ul style="list-style-type: disc;margin-left: 20px;">
                             <li>File can be csv, space delimited or tab delimited</li>
                             <li>If a parameter already exists in the table, the value from the file will overwrite the
@@ -147,32 +147,37 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="td1">Calibratable Parameters</td>
+                    <td class="td1">Select Individual Calibratable Parameter</td>
                     <td class="td2">Dropdown field of calibration parameters based on the formulation.</td>
                 </tr>
                 <tr>
                     <td class="td1">Add Button</td>
-                    <td class="td2">Click this to add the selected parameter to the Paraemter Table. Any data provided
-                        by Enterprise Data Services will be added as well.
-                        The user must ensure all values for this parameter are entered in the table.
+                    <td class="td2">Click this to add the selected parameter to the Parameter Table. Any known
+                        data will be added as well. The user must ensure all values for this parameter are entered in the table.
                     </td>
                 </tr>
                 <tr>
                     <td class="td1">Parameter Table</td>
-                    <td class="td2">Editable list of the calibration parameters chosen. The source for these entries can
-                        be from the Calibratable Parameters dropdown or uploaded from a file.<br />
-                        Minimum, maximum and initial values must be
-                        provided.<br />
-                        The initial value is used for the calibration control run, iteration 0, and may be outside the
-                        min/max range.<br />
-                        If it is outside the min/max range, the value is saved and a warning issued but the user may
-                        proceed
-                        or change the value and save again.
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td1">Right Click</td>
-                    <td class="td2">Right click a parameters in the table to select Delete and remove it from the table.
+                    <td class="td2">
+                        Editable list of the calibration parameters
+                        <ul class="list-disc list-outside ml-6 space-y-0">
+                            <li>Parameters may be added from the Calibratable Parameters dropdown or 
+                                loaded from an uploaded file.
+                            </li>
+                            <li>Parameter and Module are un-editable fields.
+                            </li>
+                            <li>Tuning Range Min, Tuning Range Max, and Initial Run Value
+                                are required, editable fields.
+                            </li>
+                            <li>The Initial Run Value is used for the calibration control run (iteration 0) and 
+                                may fall outside the specified minimum/maximum range.
+                            </li>
+                            <li>If the Initial Run Value is outside this range, it will be saved and a warning will be issued;
+                                the user may either proceed or modify the value and save again.
+                            </li>
+                            <li>To remove a parameter, <strong>right-click</strong> it in the table and select Delete.
+                            </li>
+                        </ul>
                     </td>
                 </tr>
                 <tr>
@@ -195,19 +200,16 @@
                         prompted to
                         save.</td>
                 </tr>
-                <tr>
-                    <td class="td1">&nbsp;</td>
-                    <td class="td2">&nbsp;</td>
-                </tr>
             </tbody>
         </table>
-
+        <div class="required-hint mt-0 mb-4">
+            <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
+        </div>
+        <hr class="my-6 border-black" />
         <p><strong>HINTS</strong></p>
         <p><strong>Calibration Tuning Controls disabled</strong></p>
-        <p style="margin-left:10px;">Either the observation data, the forcing data or both have not yet been
-            selected. Go to the Headwater Basin Gage tab and make sure this data has selected, uploded if
-            Upload
-            selected, and saved.
+        <p style="margin-left:10px;">The gage or forcing data or both have not yet been
+            selected. Go to the Headwater Basin Gage tab and make sure this data has been selected and saved.
         </p>
         <p><strong>Parameters disabled</strong></p>
         <p style="margin-left:10px;">The Formulation has not been chosen. Go to the Formulation tab and select the

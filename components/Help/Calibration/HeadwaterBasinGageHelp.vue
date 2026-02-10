@@ -7,7 +7,7 @@
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <hr />
+        <hr class="my-6 border-black" />
         <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
             <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup, 
                 starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
@@ -22,67 +22,27 @@
             </thead>
             <tbody>
                 <tr>
+                    <td class="td1">Job Name<span class="required-asterisk" aria-hidden="true">*</span></td>
+                    <td class="td2">Enter name for the job. Alphanumeric characters, underscore (_) and dashes (-) are
+                        allowed. <strong>Spaces are not allowed</strong>.</td>
+                </tr>
+                <tr>
                     <th scope="row" class="td1">Domain</th>
                     <td class="td2">Pull down to select the domain of interest. Choices are CONUS, Alaska, Hawaii and
                         Puerto
                         Rico/US Virgin Islands. This is optional.</td>
                 </tr>
                 <tr>
-                    <th scope="row" class="td1">Gage</th>
+                    <th scope="row" class="td1">Gage<span class="required-asterisk" aria-hidden="true">*</span></th>
                     <td class="td2">Pull down to select a calibration gage. If a domain has been selected, only gages
                         from that domain will be avaialbe. Typing in this field shows predictive choices.
-                        User must select the choice from the list. Required if Upload is selected for Forcing Data,
-                        Observational Data or the GeoPackage.
+                        User must select the choice from the list.
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row" class="td1">Forcing</th>
+                    <th scope="row" class="td1">Forcing<span class="required-asterisk" aria-hidden="true">*</span></th>
                     <td class="td2">Pull down to select Forcing data source for the selected gage.
-                        Either AORC or Upload to upload from local computer. <br />
-                        <br />
-                        Upload allows the user to specify their own csv file containing hourly time-series details of
-                        forcing data.
-                        <strong><em>A gage must have already been selected to upload a file.</em></strong><br />
-                        <br />
-                        When uploading a csv file, there must be one forcing file per catchment in the headwater basin
-                        for the selected gage and they
-                        must be in the following format, with the 1st line being the header identifying the following
-                        fields:<br />
-                        Time, LWDOWN, PFC, Q2D, RAINRATE, SWDOWN, T2D, U2D, V2D<br />
-                        <br>
-                        Example:<span style="font-size:0.9em;"> <em>(Clicking on image makes it larger in a new
-                                tab.)</em></span><br />
-                        <a :href=image1 target="_blank"><img :src=image1 alt="" /></a><br />
-                        <img :src=image2 width="90%" class="mb-2" alt="" />
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row" class="td1">Observational</th>
-                    <td class="td2">Pull down to select Observational Data source for the selected gage.
-                        Either Data Services or Upload to upload from local computer. When using Data Servcies,
-                        the gage agency determines the source of the observational data.<br />
-                        <br />
-                        Upload allows the user to specify their own csv file hourly time-series details of observed gage
-                        streamflow data.
-                        <strong><em>A gage must have already been selected to upload a file.</em></strong><br />
-                        <br />
-                        When uploading an observational file, it must be in the following format, with the the 1st line
-                        being the header
-                        identifying the following fields:<br />
-                        <br />
-                        <span class="italic">dateTime, q_cms</span><br />
-                        Example:<br />
-                        <img :src=image3 alt="" /><br />
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row" class="td1">GeoPackage</th>
-                    <td class="td2">Pull down to select the source for the selected gage GeoPackage file. Either Data
-                        Services for Enterprise
-                        Data Services or Upload to upload from local computer.<br />
-                        <br />
-                        Upload allows the user to specify their own .gpkg file.
-                        <strong><em>A gage must have already been selected to upload a file.</em></strong>
+                        Either AORC or NWM Retrospective.
                     </td>
                 </tr>
                 <tr>
@@ -103,21 +63,19 @@
                     <td class="td2">Move to the Formulation Tab. If there is any unsaved data, the user will first be
                         prompted to save.</td>
                 </tr>
-                <tr>
-                    <th scope="row" class="td1">&nbsp;</th>
-                    <td class="td2">&nbsp;</td>
-                </tr>
             </tbody>
         </table>
-        <p><strong>Note:</strong><br /> Gage details are shown when a gage id is selected. The basin map is generated once
-                        the Save button is clicked.</p>
+        <div class="required-hint mt-0 mb-4">
+            <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
+        </div>
+        <hr class="my-6 border-black" />
+        <p><strong>Note:</strong><br /> 
+            Gage details are shown when a gage id is selected. The basin map is generated once
+            the Save button is clicked.</p>
     </div>
 </template>
 
 <script setup lang="ts">
-import image1 from "@/assets/styles/img/forcingexample.png"
-import image2 from "@/assets/styles/img/calworkhelp.png"
-import image3 from "@/assets/styles/img/observationalexample.png"
 </script>
 
 <style lang="scss" scoped>

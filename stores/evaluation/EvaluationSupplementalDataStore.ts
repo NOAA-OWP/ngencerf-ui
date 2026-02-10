@@ -11,7 +11,7 @@ import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers"
 import { formatISOStringOrDateToYYYYMMDD } from '@/utils/TimeHelpers';
 
 export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplementalDataStore', () => {
-  const { calibrationJobId } = storeToRefs(generalStore());
+  const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { userCalibrationRunData } = storeToRefs(useUserDataStore());
   const { selectedCalibrationCompareRuns } = storeToRefs(useEvaluationCalibrationRunStore());
@@ -177,7 +177,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   };
 
   /**
-  * Get Performance Metrics
+  * Get Performance Metrics for Calibration Job
   * @return {any}
   */
   const queryGetPerformanceMetrics = async (): Promise<any> => {
@@ -193,6 +193,28 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
       body: JSON.stringify(
         {
           calibration_run_id: calibrationJobId.value,
+          include_performance_metrics: true
+        }
+      )
+    });
+  };
+  /**
+  * Get Performance Metrics for Validation Job
+  * @return {any}
+  */
+  const queryGetPerformanceMetricsForValidation = async (): Promise<any> => {
+    if (!evaluateValidationRunId.value) {
+      return null;
+    }
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_status/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          validation_run_id: evaluateValidationRunId.value,
           include_performance_metrics: true
         }
       )
@@ -330,6 +352,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     getGridTimeRange,
     queryGetIterations,
     queryGetPerformanceMetrics,
+    queryGetPerformanceMetricsForValidation,
     queryGetPerformanceMetricsForComparison,
     queryGetLogNames,
     queryGetLogData,

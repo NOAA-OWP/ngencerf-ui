@@ -6,7 +6,7 @@
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <hr />
+        <hr class="my-6 border-black" />
         <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
             <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup, 
                 starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
@@ -19,7 +19,7 @@
                 <ul style="list-style-type: disc;margin-left: 20px;">
                     <li>When entering data manually, press <strong>Enter</strong> to confirm each field;
                         otherwise, the value will be discarded.</li>
-                    <li>A <strong>Job Name</strong> is required before anything on this tab can be saved.</li>
+                    <li>A <strong>gage</strong> is required before anything on this tab can be selected.</li>
                     <li>Selecting modules automatically:
                         <ul class="list-disc list-outside ml-6 space-y-0">
                             <li>Checks the corresponding hydrologic group.</li>
@@ -46,12 +46,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="td1">Job Name</td>
-                        <td class="td2">Enter name for the job. Alphanumeric characters, underscore (_) and dashes (-) are
-                            allowed. <strong>Spaces are not allowed</strong>.</td>
-                    </tr>
-                    <tr>
-                        <td class="td1">Select Modules</td>
+                        <td class="td1">Select Modules<span class="required-asterisk" aria-hidden="true">*</span></td>
                         <td class="td2">Select the modules to use in the formulation. When a module is selected,
                             the associated group(s) will be checked in the <strong>Groups Covered by Selections</strong> area.</td>
                     </tr>
@@ -92,8 +87,11 @@
                 </tbody>
             </table>
         </div>
-        <hr class="my-6 border-black mt-6" />
-        <div class="_help-title" style="padding-top: 20px;padding-bottom: 0px;">Formulation Rules</div>
+        <div class="required-hint mt-0 mb-4">
+            <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
+        </div>
+        <hr class="my-6 border-black" />
+        <div class="_help-title mt-2" style="padding-top: 20px;padding-bottom: 0px;">Formulation Rules</div>
         <div style="margin-left: 30px; margin-top:20px;">
             <ul style="list-style-type: disc;">
                 <li>Only one module per process (except for SFT and SMP, which are always run together currently)</li>
