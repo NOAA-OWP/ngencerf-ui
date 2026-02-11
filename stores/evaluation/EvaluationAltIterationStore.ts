@@ -64,8 +64,13 @@ export const useEvaluationAltIterationStore = defineStore(
             });
             retro_data.data.forEach(
               (data: CalibrationRunIterationMetricData) => {
+                let cell_value = 'N/A';
+                if (data.metric_value !== null) {
+                  const n = Number(data.metric_value);
+                  cell_value = Number.isFinite(n) ? n.toFixed(5) : 'N/A';
+                }
                 let headerCell = {
-                  header: `${Number(data.metric_value.toFixed(4))}`,
+                  header: cell_value,
                   colspan: 1,
                   metric_name: data.metric_name,
                   metric_display_name: data.metric_display_name,
@@ -133,8 +138,13 @@ export const useEvaluationAltIterationStore = defineStore(
                     header: metric_header_label,
                     tooltip: metric.metric_display_name,
                   };
+                  let cell_value = 'N/A';
+                  if (metric.metric_value !== null) {
+                    const n = Number(metric.metric_value);
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : 'N/A';
+                  }
                   let headerCell = {
-                    header: `${Number(metric.metric_value.toFixed(4))}`,
+                    header: cell_value,
                     colspan: 1,
                     metric_name: metric.metric_name,
                     metric_display_name: metric.metric_display_name,
@@ -204,9 +214,13 @@ export const useEvaluationAltIterationStore = defineStore(
                     field: parameter.parameter_name,
                     header: parameter.parameter_name,
                   });
-
+                  let cell_value = 'N/A';
+                  if (parameter.parameter_value !== null) {
+                    const n = Number(parameter.parameter_value);
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : 'N/A';
+                  }
                   headerRow.push({
-                    header: `${Number(parameter.parameter_value.toFixed(4))}`,
+                    header: cell_value,
                     colspan: 1,
                   });
                 }
@@ -227,7 +241,12 @@ export const useEvaluationAltIterationStore = defineStore(
 
               iteration_data.metrics.forEach(
                 (metric: CalibrationRunIterationMetricData) => {
-                  rowData[metric.metric_name] = Number(metric.metric_value.toFixed(4));
+                  let cell_value = 'N/A';
+                  if (metric.metric_value !== null) {
+                    const n = Number(metric.metric_value);
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : 'N/A';
+                  }
+                  rowData[metric.metric_name] = cell_value;
                 }
               );
               computedCalibrationRunDetailDataList.value.push(rowData);
@@ -245,7 +264,12 @@ export const useEvaluationAltIterationStore = defineStore(
 
               iteration_data.parameters.forEach(
                 (parameters: CalibrationRunIterationParameterData) => {
-                  rowData[parameters.parameter_name] = Number(parameters.parameter_value.toFixed(4));
+                  let cell_value = 'N/A';
+                  if (parameters.parameter_value !== null) {
+                    const n = Number(parameters.parameter_value);
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : 'N/A';
+                  }
+                  rowData[parameters.parameter_name] = cell_value;
                 }
               );
               computedtuningParametersDataList.value.push(rowData);
