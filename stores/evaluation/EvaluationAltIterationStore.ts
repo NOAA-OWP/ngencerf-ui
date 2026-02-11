@@ -64,10 +64,10 @@ export const useEvaluationAltIterationStore = defineStore(
             });
             retro_data.data.forEach(
               (data: CalibrationRunIterationMetricData) => {
-                let cell_value = 'N/A';
+                let cell_value = '';
                 if (data.metric_value !== null) {
                   const n = Number(data.metric_value);
-                  cell_value = Number.isFinite(n) ? n.toFixed(5) : 'N/A';
+                  cell_value = Number.isFinite(n) ? n.toFixed(5) : '';
                 }
                 let headerCell = {
                   header: cell_value,
@@ -138,10 +138,10 @@ export const useEvaluationAltIterationStore = defineStore(
                     header: metric_header_label,
                     tooltip: metric.metric_display_name,
                   };
-                  let cell_value = 'N/A';
+                  let cell_value = '';
                   if (metric.metric_value !== null) {
                     const n = Number(metric.metric_value);
-                    cell_value = Number.isFinite(n) ? n.toFixed(5) : 'N/A';
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : '';
                   }
                   let headerCell = {
                     header: cell_value,
@@ -214,10 +214,10 @@ export const useEvaluationAltIterationStore = defineStore(
                     field: parameter.parameter_name,
                     header: parameter.parameter_name,
                   });
-                  let cell_value = 'N/A';
+                  let cell_value = '';
                   if (parameter.parameter_value !== null) {
                     const n = Number(parameter.parameter_value);
-                    cell_value = Number.isFinite(n) ? n.toFixed(5) : 'N/A';
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : '';
                   }
                   headerRow.push({
                     header: cell_value,
@@ -241,10 +241,10 @@ export const useEvaluationAltIterationStore = defineStore(
 
               iteration_data.metrics.forEach(
                 (metric: CalibrationRunIterationMetricData) => {
-                  let cell_value = 'N/A';
+                  let cell_value = '';
                   if (metric.metric_value !== null) {
                     const n = Number(metric.metric_value);
-                    cell_value = Number.isFinite(n) ? n.toFixed(5) : 'N/A';
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : '';
                   }
                   rowData[metric.metric_name] = cell_value;
                 }
@@ -264,10 +264,10 @@ export const useEvaluationAltIterationStore = defineStore(
 
               iteration_data.parameters.forEach(
                 (parameters: CalibrationRunIterationParameterData) => {
-                  let cell_value = 'N/A';
+                  let cell_value = '';
                   if (parameters.parameter_value !== null) {
                     const n = Number(parameters.parameter_value);
-                    cell_value = Number.isFinite(n) ? n.toFixed(5) : 'N/A';
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : '';
                   }
                   rowData[parameters.parameter_name] = cell_value;
                 }
