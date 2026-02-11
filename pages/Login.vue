@@ -20,7 +20,7 @@
                     <h1>Login</h1>
 
                     <div class="mt-10">
-                      <label for="uname" style="font-weight: normal;">Email</label><br>
+                      <label for="uname" style="font-weight: normal;" class="required-label">Email</label><br>
                       <input id="uname" class="w-[350px]" type="text" v-model="userName" placeholder=" Email"
                         aria-label="Username" autocomplete="email" v-on:keypress="autoSubmit" />
                       <!-- <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
@@ -28,7 +28,7 @@
                       </Button> -->
                     </div>
                     <div class="mt-4">
-                      <label for="pword" style="font-weight: normal;">Password</label><br>
+                      <label for="pword" style="font-weight: normal;" class="required-label">Password</label><br>
                       <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
                         placeholder=" Password" aria-label="Password" toggleMask :feedback="false"
                         class="block w-[350px]" v-on:keypress="autoSubmit" />
@@ -53,19 +53,19 @@
                       <h1>Create an Account</h1>
                       <form @submit.prevent="SubmitNewAccountForm">
                         <div class="form-group inputBox">
-                          <label for="email">Email</label>
+                          <label for="email" class="required-label">Email</label>
                           <InputText v-model="newEmail" id="email" type="email" required />
                         </div>
                         <div class="form-group inputBox">
-                          <label for="first_name">First Name</label>
+                          <label for="first_name" class="required-label">First Name</label>
                           <InputText v-model="newFirstName" id="first_name" type="text" required />
                         </div>
                         <div class="form-group inputBox">
-                          <label for="last_name">Last Name</label>
+                          <label for="last_name" class="required-label">Last Name</label>
                           <InputText v-model="newLastName" id="last_name" type="text" required />
                         </div>
                         <div class="form-group inputBox">
-                          <label for="password">Password</label>
+                          <label for="password" class="required-label">Password</label>
                           <Password v-model="newPassword" id="password" type="password" name="password"
                             autocomplete="current-password" required toggleMask class="block">
                             <template #header>
@@ -82,7 +82,7 @@
                           </Password>
                         </div>
                         <div class="form-group inputBox">
-                          <label for="confirmPassword">Confirm Password</label>
+                          <label for="confirmPassword" class="required-label">Confirm Password</label>
                           <Password v-model="confirmPassword" id="confirmPassword" type="password" :feedback="false"
                             required toggleMask class="block" />
                         </div>
@@ -97,9 +97,10 @@
                     </div>
                   </div>
                 </div>
+                <div class="required-hint mt-4">
+                  <span class="required-asterisk">*</span> Required field
+                </div>
               </div>
-
-
             </div>
           </div>
         </div>

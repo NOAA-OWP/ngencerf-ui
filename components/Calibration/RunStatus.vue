@@ -51,11 +51,11 @@
                       </span>
                     </td>
                   </tr>
-                  <tr height="32px" aria-label="Select Plot Name" title="Select Plot Name">
-                    <th scope="row" class="text-right"><label for="DisplayOptions">{{ plotList.length > 0 ?
-                      'Display' : '' }}</label></th>
+                  <tr v-show="plotList.length > 1" height="32px" aria-label="Select Plot or Log Name" 
+                    title="Select Plot or Log Name">
+                    <th scope="row" class="text-right"><label for="DisplayOptions">Display</label></th>
                     <td class="pl-3">
-                      <Select v-show="plotList.length > 0" id="DisplayOptions" class="p-select" v-model="selectedPlotName" 
+                      <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" 
                         :options="plotList" option-label="name" optionValue="name">
                       </Select>
                     </td>
@@ -75,7 +75,7 @@
                           <Button class="font-normal ngenButtonDiv-green h-8" title="Run Button" aria-label="Run Button"
                             @click="startRun()">Run</Button>
                         </span>
-                        <span v-if="calibrationStatus === 'Running' || validationControlStatus === 'Running' || validationBestStatus === 'Running'">
+                        <span v-if="['Submitted','Running'].includes(calibrationStatus) || validationControlStatus === 'Running' || validationBestStatus === 'Running'">
                           <Button class="ngenButtonDiv-red h-8 mr-3" title="Cancel Button" @click="cancelRun()"
                             aria-label="Cancel Button">Cancel</Button>
                         </span>
@@ -98,8 +98,8 @@
             </label>
           </div>
           <div class="pl-5" style="width: 100%;">
-            <span v-for="message in userCalibrationRunData.failure_messages">
-              {{ message }}<br/>
+            <span v-for="failure_message in userCalibrationRunData.failure_messages">
+              {{ failure_message.message }}<br/>
             </span>
           </div>
         </div>
@@ -325,7 +325,7 @@ const populatePlotListOptions = async() => {
     logListOptions.value = [];
 
     nextTick(async () => {
-      if (userCalibrationRunData?.value?.status === 'Done' || (iteration.value && iteration.value >= 1)) {
+      if (['Running','Done','Cancelled','Failed','Server error'].includes(userCalibrationRunData?.value?.status) && (iteration.value && iteration.value >= 1)) {
         // Get Plot Names
         plotNames.value = await queryGetPlotNames();
 
@@ -383,6 +383,8 @@ const populatePlotListOptions = async() => {
 }
 
 onMounted(async () => {
+  isLoading.value = true;
+
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
@@ -455,8 +457,10 @@ onMounted(async () => {
         );
       }
     
-      // always update the iteration number for any status other than Saved or Ready
-      await updateIteration();
+      // check to see if iteration number is defined for any status other than Saved or Ready
+      if (!iteration.value) {
+        await updateIteration();
+      }
       await populatePlotListOptions();
     } else {
       // If job is saved or ready we need to explicitly clear the validation statuses
@@ -464,6 +468,7 @@ onMounted(async () => {
       validationBestStatus.value = undefined;
       validControlAndValidBestStatus.value = undefined;
     }
+    isLoading.value = false;
   });
 });
 
@@ -480,7 +485,7 @@ const createElapsedTimeInterval = () => {
       (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate calibrationElapsedTime every second while Calibration is Running or Validation is not Done
-      calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
+      calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date()); 
     } else {
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
@@ -490,12 +495,11 @@ const createElapsedTimeInterval = () => {
 
 // Run Calibration Job
 const startRun = async () => {
-  //isLoading.value = true;
   validationBestAchieved.value.isBest = false;
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Validating and Preparing Job Data';
 
-    submitTimeDate.value = new Date();
+    submitTimeDate.value = new Date(); 
 
     createElapsedTimeInterval();
 
@@ -546,12 +550,11 @@ const startRun = async () => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'userCalibrationRunData not set', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
-  //isLoading.value = false;
 };
 
 // Cancel Calibration Job
 const cancelRun = async () => {
-  if (calibrationStatus.value === 'Running' || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') {
+  if (['Submitted','Running'].includes(calibrationStatus.value) || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') {
     try {
       let cancelCalibrationResponse = undefined;
       if (calibrationStatus.value === 'Running') {
@@ -587,7 +590,7 @@ const cancelRun = async () => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration/Validation status not set to Running. Cannot cancel Calibration', life: ToastTimeout.timeoutWarn };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: 'Calibration/Validation status not set to Submitted or Running. Cannot cancel Calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
@@ -596,32 +599,35 @@ const cancelRun = async () => {
 const updateIteration = async () => {
   const getIterationResponse = await queryGetIteration();
   
-  // check if status changes from Submitted or Running
-  if (getIterationResponse._data && getIterationResponse._data.status) {
-    if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
-      if (userCalibrationRunData.value) {
-        clearInterval(calibrationStatusIntervalId.value);
-        calibrationStatusIntervalId.value = undefined;
+  if (getIterationResponse?._data) {
+    // check if iteration changes
+    if (isNotNullOrUndefined(getIterationResponse._data.iteration)) {
+      iteration.value = getIterationResponse._data.iteration;
+    }
+    // check if status changes from Submitted or Running
+    if (getIterationResponse._data.status) {
+      if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
+        if (userCalibrationRunData.value) {
+          clearInterval(calibrationStatusIntervalId.value);
+          calibrationStatusIntervalId.value = undefined;
+        }
+      }
+      userCalibrationRunData.value.status = getIterationResponse._data.status;
+      if (getIterationResponse._data.failure_messages) {
+        userCalibrationRunData.value.failure_messages = getIterationResponse._data.failure_messages;
       }
     }
-    userCalibrationRunData.value.status = getIterationResponse._data.status;
-    if (getIterationResponse._data.failure_messages) {
-      userCalibrationRunData.value.failure_messages = getIterationResponse._data.failure_messages;
-    }
   } else {
+    clearInterval(calibrationStatusIntervalId.value);
+    calibrationStatusIntervalId.value = undefined;
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
-  }
-
-  // check if iteration changes
-  if (getIterationResponse._data && isNotNullOrUndefined(getIterationResponse._data.iteration)) {
-    iteration.value = getIterationResponse._data.iteration;
   }
 }
 
 // Handle calibration/validation status changes
 watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
-  if (userCalibrationRunData.value) {
+  if (userCalibrationRunData.value && (oldCalibrationStatus || newCalibrationStatus) && !isLoading.value) {
     if (userCalibrationRunData.value.stop_criteria) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
     }
@@ -660,7 +666,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
 
         // calculate running time every second while calibration is Running 
         // or calibration is Done and valid_control and valid_best have not started or are Submitted, Ready, Running
-        if (['Validating and Preparing Job Data','Running'].includes(userCalibrationRunData.value?.status) || (userCalibrationRunData.value?.status === 'Done' &&
+        if (['Validating and Preparing Job Data','Submitted','Running'].includes(userCalibrationRunData.value?.status) || (userCalibrationRunData.value?.status === 'Done' &&
           (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
           // Create an interval to update calibrationElapsedTime every second while Calibration is Running or Validation is not Done
           if (!elapsedTimeIntervalId.value) {
@@ -843,18 +849,20 @@ watch(selectedPlotName, async () => {
 
 // Handle submitTimeDate changes
 watch(submitTimeDate, () => {
-  if (isValidDate(submitTimeDate.value)) {
-    // show submitTimeDate as UTC
-    submitTime.value = formatDateForRunOnString(submitTimeDate.value as Date);
-  } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
-    toast.add(tMsg); addToastRecord(tMsg);
-  }
+  nextTick(() => {
+    if (isValidDate(submitTimeDate.value)) {
+      // show submitTimeDate as UTC
+      submitTime.value = formatDateForRunOnString(submitTimeDate.value as Date);
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+  });
 });
 
 // Handle iteration changes
 watch(iteration, async () => {
-  if (iteration.value && iteration.value >= 1) {
+  if (iteration.value && iteration.value >= 1 && !isLoading.value) {
     // populate plotListOptions from iteration 1 onwards, in case a plot becomes available that wasn't before
     await populatePlotListOptions();
     if (selectedPlotName.value && selectedPlotName.value != plotListDefault.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
@@ -958,6 +966,7 @@ const updateLogRefs = async(getLogData: boolean) => {
       }
     } else {
       selectedLogDisplay.value = '';
+      selectedLogFilePath.value = '';
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
@@ -968,7 +977,8 @@ const updateLogRefs = async(getLogData: boolean) => {
     logTimeout = setTimeout(async() => {
       const status_response: any = await queryGetLogStatus(
         (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // calibration_run_id
-        selectedLogFilePath.value, // log_path
+        selectedLogCategory.value, // log_category
+        selectedLogName.value, // log_name
         selectedLogByteOffset.value // byte_offset
       )
       if (status_response._data) {
@@ -1014,6 +1024,13 @@ onUnmounted(() => {
   validationControlStatus.value = undefined;
   validationBestStatus.value = undefined;
   validControlAndValidBestStatus.value = undefined;
+  submitTimeDate.value = undefined;
+  clearInterval(elapsedTimeIntervalId.value);
+  clearInterval(calibrationStatusIntervalId.value);
+  clearInterval(validationsStatusIntervalId.value);
+  elapsedTimeIntervalId.value = undefined;
+  calibrationStatusIntervalId.value = undefined;
+  validationsStatusIntervalId.value = undefined;
   resetUserPlotRefs([]);
 })
 </script>
@@ -1029,7 +1046,6 @@ onUnmounted(() => {
   padding: 6px 10px 6px 20px;
   border-radius: 10px;
   border: 0px solid global.$ngwcp_neutral_gray_md;
-
 }
 
 #GraphArea {
@@ -1067,6 +1083,10 @@ onUnmounted(() => {
   border-right: 0;
   color: black;
   box-shadow: none;
+}
+
+.gray-border {
+  border: 2px solid #d9d9d9;
 }
 
 :root {

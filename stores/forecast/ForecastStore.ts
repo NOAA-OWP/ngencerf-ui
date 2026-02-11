@@ -75,9 +75,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const selectedForecastJob = ref<ForecastJob>();
 
   const forecastJobNgenGlobalLogging = ref<boolean>(true);
-
-  const isForecastLoading = ref<boolean>(false);
-
   /**
    * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
    */
@@ -138,23 +135,23 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       limit: forecastRunListPageSize.value,
       offset: (forecastRunListCurrentPage.value - 1) * forecastRunListPageSize.value,
       sort: {
-        field: forecastRunListSort.value.field,
+        field: forecastRunListSort.value.field.split(".").at(-1),
         direction: forecastRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
         date_filter:
-          (createdAtStart.value && createdAtEnd.value) ? {
-            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "between"
-          } : createdAtStart.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            operator: "after"
-          } : createdAtEnd.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "before"
-          } : {}
-        ,
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "before"
+            } : {}
+          ,
         id_filter:
           (jobIdStart.value && jobIdEnd.value) ? {
             start_id: jobIdStart.value,
@@ -231,15 +228,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   });
 
   /**
-   * Load Setup Forecast Tab data
-   */
-  const loadSetupForecastTabData = async (): Promise<void> => {
-    // load forecast cycles
-    const loadForecastTabResponse: any = await loadForecastTab();
-    forecastConfigurations.value = loadForecastTabResponse?._data?.forecast_configuration_values;
-  };
-
-  /**
    * Load Forecast Run/Status tab data
    */
   const loadForecastRunStatusTabData = async (): Promise<string[]> => {
@@ -250,34 +238,24 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       const getStatusResponse: any = await getStatus();
 
       if (getStatusResponse.status === 200) {
+        // set forecastConfiguration, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
+        forecastConfigurationName.value = getStatusResponse?._data?.configuration;
+        forecastJobStatus.value = getStatusResponse?._data?.status;
+        coldStartJobStatus.value = getStatusResponse?._data?.cold_start_run?.status;
         failureMessages.value = getStatusResponse?._data?.failure_messages;
 
-        // TODO: create forecastJob interface
-        const forecastJob: any = getStatusResponse?._data?.forecasts.find((forecast: any) => forecast.forecast_run_id === forecastJobId.value);
-        
-        if (!forecastJob) {
-          return ['No forecast job found'];
-        }
-
-        // set forecastConfiguration, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
-        forecastConfigurationName.value = forecastJob?.configuration;
-        forecastJobStatus.value = forecastJob?.status;
-        coldStartJobStatus.value = forecastJob?.cold_start_run?.status;
-
-        if (forecastJob?.cold_start_run?.submit_date) {
-          submitTimeDate.value = new Date(forecastJob?.cold_start_run.submit_date as string);
-        } else if (forecastJob?.submit_date) {
-          submitTimeDate.value = new Date(forecastJob?.submit_date as string);
+        if (getStatusResponse?._data?.cold_start_run?.submit_date) {
+          submitTimeDate.value = new Date(getStatusResponse?._data?.cold_start_run.submit_date as string);
+        } else if (getStatusResponse?._data?.submit_date) {
+          submitTimeDate.value = new Date(getStatusResponse?._data?.submit_date as string);
         }
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
+          if (overallColdStartForecastStatus.value === 'Done' && getStatusResponse?._data?.run_end) {
+            elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date(getStatusResponse._data.run_end as string));
+          }
         } else {
-          errorMessages.push(`Invalid submit date: ${forecastJob?.submit_date}`);
-        }
-        
-        if (forecastJob?.cold_start_run?.elapsed_time || forecastJob?.elapsed_time) {
-          // set elapsedTime
-          setElapsedTime(forecastJob);
+          errorMessages.push(`Invalid submit date: ${getStatusResponse?._data?.submit_date}`);
         }
       } else {
         return useApiErrorResponsePreprocess(getStatusResponse);
@@ -429,18 +407,18 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       filters: {
         gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         date_filter:
-          (createdAtStart.value && createdAtEnd.value) ? {
-            start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "between"
-          } : createdAtStart.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value),
-            operator: "after"
-          } : createdAtEnd.value ? {
-            create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value),
-            operator: "before"
-          } : {}
-        ,
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "before"
+            } : {}
+          ,
         id_filter:
           (jobIdStart.value && jobIdEnd.value) ? {
             start_id: jobIdStart.value,
@@ -498,7 +476,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationRunForForecast.value?.calibration_run_id })
+      body: JSON.stringify({ forecast_run_id: forecastJobId.value })
     });
   };
 
@@ -541,17 +519,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const setSelectedForecastRowData = async (forecast_row_data: ForecastJob): Promise<void> => {
     setSelectedForecastRunId(forecast_row_data.forecast_run_id);
     setSelectedCalibrationRunId(forecast_row_data.calibration_run_id);
-    loadSelectedCalibrationRun(forecast_row_data.calibration_run_id);
     
     calibrationRunForForecast.value = (forecast_row_data as any as CalibrationRunForForecast);
     forecastJobStatus.value = (forecast_row_data as any as CalibrationRunForForecast).status;
-
-    // load forecastConfigurations
-    await loadSetupForecastTabData();
-
-    forecastConfiguration.value = forecastConfigurations.value?.find((forecast_configuration_data: ForecastConfiguration) =>
-      forecast_configuration_data.name === forecast_row_data.configuration
-    );
+    forecastConfigurationName.value = forecast_row_data.configuration;
   }
 
   const resetSelectedForecastRunData = (): void => {
@@ -579,7 +550,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     }
   };
 
-
   /**
    * reset user-selected forecast data
    */
@@ -604,8 +574,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     elapsedTimeIntervalId.value = undefined;
     clearInterval(forecastJobStatusIntervalId.value);
     forecastJobStatusIntervalId.value = undefined;
-    
-    isForecastLoading.value = false;
 
     clearUserCalibrationRunData();
   }
@@ -630,6 +598,22 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     }
 
     forecastJobNgenGlobalLogging.value = true;
+  };
+
+  /**
+   * reset job filters
+   */
+  const resetFilters = () => {
+    uiGageId.value = 'All';
+    statusTypeFilterList.value = [];
+    createdAtStart.value = null;
+    createdAtEnd.value = null;
+    minCreatedAt.value = null;
+    maxCreatedAt.value = null;
+    jobIdStart.value = null;
+    jobIdEnd.value = null;
+    minJobId.value = null;
+    maxJobId.value = null;
   };
 
   return {
@@ -669,11 +653,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     forecastRunListSort,
     forecastRuns,
     selectedForecastJob,
-    isForecastLoading,
     overallColdStartForecastStatus,
     forecastJobNgenGlobalLogging,
     getForecastJobs,
-    loadSetupForecastTabData,
     loadForecastRunStatusTabData,
     loadForecastResultsTabData,
     loadForecastTab,
@@ -692,7 +674,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     setSelectedForecastRunId,
     resetSelectedForecastRunData,
     setSelectedForecastRowData,
-    hardResetForecastRunStatusStore
+    hardResetForecastRunStatusStore,
+    resetFilters
   };
 });
 

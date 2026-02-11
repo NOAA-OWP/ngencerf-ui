@@ -116,9 +116,7 @@
             :teleport="true" utc='preserve' 
             :disabled="!forecastConfiguration"/>
         </div>
-        <div class="text-nowrap text-right font-bold p-1">
-          Cycle Date
-        </div>
+        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Date</div>
         <div class="text-nowrap p-1">
           <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
             @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
@@ -145,17 +143,13 @@
             aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
             :disabled="!forecastConfiguration">
           </Select>
-          Z
         </div>
-        <div class="text-nowrap text-right font-bold p-1">
-          Cycle Hour
-        </div>
+        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Hour</div>
         <div class="text-nowrap p-1">
           <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
             aria-label="Cycle Hour Select" title="Cycle Hour Select"
             :disabled="!forecastConfiguration">
           </Select>
-          Z
         </div>
       </div>
     </div>
@@ -194,11 +188,12 @@ const {
   cycleDate,
   forecastConfigurations,
   forecastConfiguration,
+  forecastConfigurationName,
   forecastJobStatus,
   coldStartJobStatus,
 } = storeToRefs(useForecastStore());
 
-const { loadSetupForecastTabData } = useForecastStore();
+const { loadForecastTab } = useForecastStore();
 
 const minCycleDate = ref<any>();
 const maxCycleDate = ref<any>();
@@ -263,7 +258,13 @@ onMounted(async () => {
         calibrationJobId.value = calibrationRunForForecast.value?.calibration_run_id;
         await fetchUserCalibrationRunData();
         // load tab data to populate forecastConfigurations
-        await loadSetupForecastTabData();
+        const loadForecastTabResponse: any = await loadForecastTab();
+        if (loadForecastTabResponse?._data?.forecast_configuration_values) {
+          forecastConfigurations.value = loadForecastTabResponse?._data?.forecast_configuration_values;
+        } else {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Unable to load forecast configurations. Did you select a valid calibration job?', life: ToastTimeout.timeoutError };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
         if (forecastConfiguration.value) {
             getCycleHourList();
         }
@@ -294,6 +295,7 @@ const convertColdStartDateStringToDateTimeObject = (value: string) => {
 watch(forecastConfiguration, async () => {
   cycleHourList.value = [];
   getCycleHourList();
+  forecastConfigurationName.value = forecastConfiguration?.value?.name;
 })
 
 const getCycleHourList = () => {

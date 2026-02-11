@@ -1,130 +1,184 @@
 <template>
-  <div class="col-span-2">
-    <h1 class="pt-3 mb-8 text-3xl font-bold inline-block">
-      <span id="tab-title">Forecast Run Results</span>
-    </h1>
+  <Transition name="slide-fade">
+    <div id="MessagesGroupWindow" v-if="showMessagesGroup">
+      <div class="text-right sticky top-0">
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+          class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
+      </div>
+      <MessagesGroup />
+    </div>
+  </Transition>
+  <div id="ForecastRunStatusPage">
+    <div class="pl-6 pr-2 pt-2">
+      <div class="flex mt-3">
+        <div class="w-5/6 relative">
+          <div v-if="logList.length > 1" class="inline-block">
+            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <div class="inline-block w-2/3">
+              <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;" 
+                v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
+              </Select>
+            </div>
+          </div>
+          
+          <div class="grid auto-cols-max grid-cols-3 gap=1 text-sm text-left mt-2">
+            <div class="col-span-1">
+              <div>
+                <span class="font-medium">Calibration Job ID: </span>
+                {{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(15) }}
+              </div>
+              <div>
+                <span class="font-medium">Forecast Job ID: </span>
+                {{ forecastJobId ?? '-'.repeat(15) }}
+              </div>
+              <div>
+                <span class="font-medium">Gage: </span>
+                {{ userCalibrationRunData?.gage?.gage_id }}
+              </div>
+              <div>
+                <span class="font-medium">Station Name: </span>
+                {{ userCalibrationRunData?.gage?.station_name }}
+              </div>
+            </div>
+            <div class="col-span-1">
+              <div>
+                <span class="font-medium">Configuration: </span>
+                {{ forecastConfigurationName ?? 'Unknown' }}
+              </div>
+              <div>
+                <span class="font-medium">Cycle Date: </span>
+                {{ (calibrationRunForForecast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cycle_date) + ' UTC' : 'None') }}
+              </div>
+              <div>
+                <span class="font-medium">Cold Start Date: </span>
+                {{ (calibrationRunForForecast?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cold_start_date) + ' UTC' : 'None') }}
+              </div>
+            </div>
+            <div class="col-span-1">
+              <div>
+                <span class="font-medium">Status: </span>
+                {{ overallColdStartForecastStatus ?? 'Unknown' }}
+              </div>
+              <div>
+                <span class="font-medium">Submit Time: </span>
+                {{ submitTime ?? '-'.repeat(15) }}
+              </div>
+              <div>
+                <span class="font-medium">Elapsed Time: </span>
+                {{ elapsedTime ?? '-'.repeat(15) }}
+              </div>
+            </div>
+            <div class="col-span-3">
+              <div>
+                <span class="font-bold">Results Pathname: </span>
+                <span class="whitespace-nowrap overflow-auto">{{ resultsPathname }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <table aria-describedby="tab-title">
-      <tbody>
-        <tr height="30px" :aria-label="'Calibration Job ID is ' + calibrationJobId"
-          :title="'Calibration Job ID is ' + calibrationJobId">
-          <th class="text-right font-bold">
-            <div style="width: 140px;">Calibration Job ID</div>
-          </th>
-          <td class="pl-5" nowrap>{{ calibrationJobId }}</td>
-          <th class="text-right font-bold" :aria-label="'Status is ' + overallColdStartForecastStatus"
-            :title="'Status is ' + overallColdStartForecastStatus">
-            <div style="width: 140px;">Status</div>
-          </th>
-          <td class="pl-5" nowrap>{{ overallColdStartForecastStatus }}</td>
-        </tr>
-        <tr height="30px">
-          <th class="text-right font-bold" :aria-label="'Forecast Job ID is ' + forecastJobId"
-            :title="'Forecast Job ID is ' + forecastJobId">
-            <div style="width: 140px;">Forecast Job ID</div>
-          </th>
-          <td class="pl-5" nowrap>{{ forecastJobId }}</td>
-          <th class="text-right font-bold" :aria-label="'Elapsed Time is ' + elapsedTime"
-            :title="'Elapsed Time is ' + elapsedTime">
-            <div style="width: 140px;">Elapsed Time</div>
-          </th>
-          <td class="pl-5" nowrap>{{ elapsedTime ?? '-'.repeat(15) }}</td>
-        </tr>
-        <tr height="30px">
-          <th class="text-right font-bold" :aria-label="'Configuration is ' + forecastConfigurationName"
-            :title="'Configuration is ' + forecastConfigurationName">
-            <div style="width: 140px;">Configuration</div>
-          </th>
-          <td class="pl-5" nowrap>{{ forecastConfigurationName }}</td>
-          <th class="text-right font-bold" style="width: 140px;">
-            <label class="text-right" for="resultsPathname" style="width: 140px;">Results Pathname</label>
-          </th>
-          <td class="pl-5" style="width: 100%;" :aria-label="'Job Data Directory is ' + resultsPathname"
-            :title="'Job Data Directory is ' + resultsPathname">
-            <InputText id="resultsPathname" v-model="resultsPathname" placeholder="Job Data Directory" disabled />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="flex">
-    <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
-      <div id="PlotGraphArea" ref="plotGraphArea" v-if="!plotGraphCheckboxesEmpty()">
-        <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
-        <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
-          <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
-            @mouseup="sliderDragEnd" @mouseleave="sliderDragCancel">
-            <div id="PlotGraphSliderBox" ref="plotGraphSliderBox"></div>
+        <div class="pl-4 ml-auto text-nowrap text-right">
+          <a v-if="userCalibrationRunData" href="#" class="inline-block p-1 c-blue underline mt-1"
+            @click="toggleMessagesGroup">
+            Show Calibration Details</a>
+        </div>
+
+      </div>
+    </div>
+
+    <div v-show="selectedLogCategory == 'forecast plot'" class="flex">
+      <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
+        <div id="PlotGraphArea" ref="plotGraphArea" v-if="!plotGraphCheckboxesEmpty()">
+          <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
+          <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
+            <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
+              @mouseup="sliderDragEnd" @mouseleave="sliderDragCancel">
+              <div id="PlotGraphSliderBox" ref="plotGraphSliderBox"></div>
+            </div>
+          </div>
+          <div id="PlotGraphSliderDateRange">
+            <div class="flex flex-row justify-center">
+              {{ formatDateString(plotGraphDateRange.start) }} - {{ formatDateString(plotGraphDateRange.end) }}
+            </div>
+          </div>
+          <div id="PlotGraphSliderHelp">
+            <div class="flex flex-row justify-center">
+              {{ plotGraphSliderHelpDisplay }}
+            </div>
           </div>
         </div>
-        <div id="PlotGraphSliderDateRange">
-          <div class="flex flex-row justify-center">
-            {{ formatDateString(plotGraphDateRange.start) }} - {{ formatDateString(plotGraphDateRange.end) }}
+      </div>
+      <div class="p-4 grow-0" id="PlotGraphControls">
+        <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue underline mt-1 pb-2"
+          @click="toggleCustomizePlot">
+          Customize Viewer
+        </a>
+        <div v-if="plotGraphLines.length > 0">
+          <div v-for="item in plotGraphLines" :key="item.id">
+            <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
+              v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
+            <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
           </div>
         </div>
-        <div id="PlotGraphSliderHelp">
-          <div class="flex flex-row justify-center">
-            {{ plotGraphSliderHelpDisplay }}
+        <div v-if="plotGraphCheckboxesEmpty()">
+          Check at least one box to generate an interactive plot.
+        </div>
+        <div id="CustomizePlotWindow" v-if="showCustomizePlot">
+          <div class="text-right sticky top-0">
+            <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
+              class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
+          </div>
+          <h2 class="mt-5" aria-label="Customize Viewer" title="Customize Viewer">
+            Customize Viewer
+          </h2>
+          <div v-if="plotGraphLines.length > 0">
+            <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
+              <div>
+                <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
+              </div>
+              <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
+                :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+              </Select>
+              <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol"
+                :options="plotGraphSymbolList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
+              </Select>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="p-4 grow-0" id="PlotGraphControls">
-      <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue underline mt-1 pb-2"
-        @click="toggleCustomizePlot">
-        Customize Viewer
-      </a>
-      <div v-if="plotGraphLines.length > 0">
-        <div v-for="item in plotGraphLines" :key="item.id">
-          <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
-            v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
-          <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
-        </div>
-      </div>
-      <div v-if="plotGraphCheckboxesEmpty()">
-        Check at least one box to generate an interactive plot.
-      </div>
-      <div id="CustomizePlotWindow" v-if="showCustomizePlot">
-        <div class="text-right sticky top-0">
-          <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
-            class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleCustomizePlot" alt="Close" />
-        </div>
-        <h2 class="mt-5" aria-label="Customize Viewer" title="Customize Viewer">
-          Customize Viewer
-        </h2>
-        <div v-if="plotGraphLines.length > 0">
-          <div v-for="item in plotGraphLines" :key="item.id" class="text-nowrap">
-            <div>
-              <label :for="`plotGraphColor-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
-            </div>
-            <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
-              :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
-            </Select>
-            <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol"
-              :options="plotGraphSymbolList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
-            </Select>
-          </div>
-        </div>
-      </div>
+    <div v-show="selectedLogCategory && selectedLogCategory != 'forecast plot'">
+      <LogDisplay/>
+    </div>
+
+    <div class="waitgif" v-if="isLoading">
+      <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
+import MessagesGroup from "../Common/MessagesGroup.vue";
+import LogDisplay from "../Common/LogDisplay.vue";
 
 import type { ToastMessageOptions } from "primevue/toast";
 
-import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { generalStore } from '~/stores/common/GeneralStore';
+import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { useLogStore } from '@/stores/common/LogStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 
 import { convertISOStringOrDateToDateTime } from '@/utils/TimeHelpers';
 import * as Plot from "@observablehq/plot";
 
-const { calibrationJobId } = storeToRefs(generalStore());
+const { calibrationJobId, isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
+
+const { fetchUserCalibrationRunData } = useUserDataStore();
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
 const {
   calibrationRunForForecast,
@@ -132,15 +186,31 @@ const {
   forecastConfigurationName,
   resultsPathname,
   forecastPlot,
+  submitTimeDate,
+  submitTime,
   elapsedTime,
-  overallColdStartForecastStatus
+  forecastJobStatus,
+  coldStartJobStatus,
+  overallColdStartForecastStatus,
 } = storeToRefs(useForecastStore());
 
 const {
   loadForecastResultsTabData,
 } = useForecastStore();
 
+const {
+  selectedLogCategory,
+  logList,
+  logListOptions
+} = storeToRefs(useLogStore());
+const {
+  populateLogListOptions,
+  resetUserLogRefs
+} = useLogStore();
+
 const toast = useToast();
+
+const showMessagesGroup = ref<Boolean>(false);
 
 const plotGraphArea = ref<HTMLElement>();
 const plotGraphSVG = ref<HTMLElement>();
@@ -203,6 +273,9 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
 
   hilightTab(ForecastTabs.tab_results);
+  
+  await populateLogListOptions([{ name: 'forecast plot', display_name: 'Streamflow Time Series' }]);
+  selectedLogCategory.value = 'forecast plot';
 
   resetUserPlotRefs([]);
 
@@ -212,7 +285,19 @@ onMounted(async () => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   });
+  // get calibration job data if we don't already have it
+  if (!userCalibrationRunData.value) {
+    await fetchUserCalibrationRunData();
+  }
 });
+
+const toggleMessagesGroup = async () => {
+  if (showMessagesGroup.value) {
+    showMessagesGroup.value = false;
+  } else {
+    showMessagesGroup.value = true;
+  }
+}
 
 // Reset refs when mounting/unmounting tab
 const resetUserPlotRefs = (exceptions: any): void => {
@@ -319,7 +404,7 @@ function adjustPlotGraphColumns() {
         } else if (!isNaN(parseFloat(plotGraphDataRaw.value[d][key])) && isFinite(plotGraphDataRaw.value[d][key]) && plotGraphDataRaw.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
           try {
-            plotGraphDataRaw.value[d][key] = Number(plotGraphDataRaw.value[d][key]).toFixed(5);
+            plotGraphDataRaw.value[d][key] = parseFloat(Number(plotGraphDataRaw.value[d][key]).toFixed(5));
           } catch (error) {
             console.error('Error rounding value ' + plotGraphDataRaw.value[d][key] + ': ', error);
           }
@@ -351,14 +436,14 @@ const drawInteractivePlot = () => {
         for (let d = 0; d < plotGraphData.value.length; d++) {
           if (plotGraphLines.value[c - 1].symbol === 'line') {
             plotLineData.push({
-              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][plotGraphColumns.value[0].value].replace(" ","T") + "Z").toJSDate(),
+              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][plotGraphColumns.value[0].value].replace(" ","T")).toJSDate(),
               'measurement': parseFloat(plotGraphData.value[d][plotGraphColumns.value[c].value]),
               'color': plotGraphLines.value[c - 1].color,
               'name': plotGraphLines.value[c - 1].name
             });
           } else {
             plotDotData.push({
-              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][plotGraphColumns.value[0].value].replace(" ","T") + "Z").toJSDate(),
+              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][plotGraphColumns.value[0].value].replace(" ","T")).toJSDate(),
               'measurement': parseFloat(plotGraphData.value[d][plotGraphColumns.value[c].value]),
               'color': plotGraphLines.value[c - 1].color,
               'symbol': plotGraphLines.value[c - 1].symbol,
@@ -378,8 +463,8 @@ const drawInteractivePlot = () => {
     measurement: string;
   }
 
-  let plotGraphLeftEdge = convertISOStringOrDateToDateTime(plotGraphDateRange.value.start.replace(" ","T") + "Z").toJSDate();
-  let plotGraphRightEdge = convertISOStringOrDateToDateTime(plotGraphDateRange.value.end.replace(" ","T") + "Z").toJSDate();
+  let plotGraphLeftEdge = convertISOStringOrDateToDateTime(plotGraphDateRange.value.start.replace(" ","T")).toJSDate();
+  let plotGraphRightEdge = convertISOStringOrDateToDateTime(plotGraphDateRange.value.end.replace(" ","T")).toJSDate();
   let lineOptions = {
     x: { value: 'time', label: 'Time' },
     y: { value: 'measurement', label: 'Measurement' },
@@ -469,7 +554,7 @@ const drawInteractiveSlider = () => {
       if (plotGraphLines.value.length === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
         for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
           let dataPoint = {
-            time: convertISOStringOrDateToDateTime((plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[0].value]).replace(" ","T") + "Z").toJSDate(),
+            time: convertISOStringOrDateToDateTime((plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[0].value]).replace(" ","T")).toJSDate(),
             measurement: parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[c].value])
           };
           plotGraphSliderData.value.push(dataPoint);
@@ -669,11 +754,11 @@ const setSliderDateRange = () => {
   }
 
   let hoursFromStart = Math.ceil(sliderBoxPosition.value.start * (plotGraphDateLimits.value.span / getSliderWidth()));
-  let newStartDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.start).replace(" ","T") + "Z").toJSDate();
+  let newStartDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.start).replace(" ","T")).toJSDate();
   newStartDate.setHours(newStartDate.getHours() + hoursFromStart);
 
   let hoursFromEnd = Math.ceil((getSliderWidth() - sliderBoxPosition.value.end) * (plotGraphDateLimits.value.span / getSliderWidth()));
-  let newEndDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.end.replace(" ","T") + "Z")).toJSDate();
+  let newEndDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.end.replace(" ","T"))).toJSDate();
   newEndDate.setHours(newEndDate.getHours() - hoursFromEnd);
 
   (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
@@ -692,8 +777,12 @@ const toggleCustomizePlot = async () => {
   }
 }
 
-onUnmounted(async() => {
+onUnmounted(() => {
+  // make sure page clears all plot/log data when the user leaves
   resetUserPlotRefs([]);
+  logList.value = [];
+  logListOptions.value = [];
+  resetUserLogRefs();
 })
 </script>
 
@@ -772,5 +861,16 @@ onUnmounted(async() => {
 #CustomizePlotWindow label {
   margin: 0 4px 4px 4px !important;
   display: inline-block;
+}
+
+#MessagesGroupWindow {
+  z-index: 100;
+  border: 1px solid black;
+  position: absolute;
+  right: 2%;
+  top: 161px;
+  width: 48%;
+  background-color: white;
+  overflow: auto;
 }
 </style>

@@ -14,7 +14,7 @@
         <div class="w-5/6 relative">
 
           <div class="inline-block">
-            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <label for="DisplayOptions" class="pr-2 pt-3 required-label">Display</label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" v-model="selectedPlotName" :options="plotList"
                 optionLabel="name" optionValue="name" :disabled="!plotList">
@@ -27,8 +27,8 @@
             <div v-if="selectedPlotName && selectedPlotName == selectedGridDisplay?.name"
               class="p-0 relative overflow-visible">
               <div class="grid grid-cols-3 gap-4">
-                <div class="text-nowrap text-right font-bold" style="padding-top:8px;">
-                  Select Date
+                <div class="text-nowrap text-right font-bold pt-1">
+                    Select Date<span class="required-asterisk" aria-hidden="true">*</span>
                 </div>
                 <div class="text-nowrap">
                   <VueDatePicker v-model="selectedGridDateTime" class="dp__theme_dark" text-input format="yyyy-MM-dd"
@@ -378,6 +378,7 @@ const {
   getGridTimeRange,
   queryGetIterations,
   queryGetPerformanceMetrics,
+  queryGetPerformanceMetricsForValidation,
   queryGetLogNames,
   queryGetLogData,
   loadGridImages,
@@ -576,7 +577,7 @@ watch(selectedPlotName, async () => {
               if ((iterationMetricsRecord[metric_name] === null || iterationMetricsRecord[metric_name] === '') && iterationMetricsRecord[metric_name]) {
                 iterationMetricsRecord[metric_name] = 'N/A';
               } else if (!isNaN(parseFloat(iterationMetricsRecord[metric_name])) && isFinite(iterationMetricsRecord[metric_name])) {
-                iterationMetricsRecord[metric_name] = iterationMetricsRecord[metric_name].toFixed(5);
+                iterationMetricsRecord[metric_name] = Number(iterationMetricsRecord[metric_name].toFixed(5));
               }
               if (i === 0) {
                 let metric_display_name = iterations.value?._data?.iteration_data[i].metrics[m].metric_display_name;
@@ -609,7 +610,7 @@ watch(selectedPlotName, async () => {
               if ((iterationParamsRecord[param_name] === null || iterationParamsRecord[param_name] === '') && iterationParamsRecord[param_name]) {
                 iterationParamsRecord[param_name] = 'N/A';
               } else if (!isNaN(parseFloat(iterationParamsRecord[param_name])) && isFinite(iterationParamsRecord[param_name])) {
-                iterationParamsRecord[param_name] = iterationParamsRecord[param_name].toFixed(5);
+                iterationParamsRecord[param_name] = Number(iterationParamsRecord[param_name].toFixed(5));
               }
               if (i === 0) {
                 iterationParamsColumns.value.push({ header: param_name, field: param_name });
@@ -641,8 +642,19 @@ watch(selectedPlotName, async () => {
               }
               performanceMetricsData.value.at(-1)['calibration_job_id_' + calibrationJobId.value] = metric_value;
             });
-            // Now go through the values from our Validations and add each metric value to the appropriate row
             if (performanceMetrics.value?._data?.validations) {
+              if (!performanceMetrics.value?._data?.validations.some(validation => validation.validation_run_id === evaluateValidationRunId.value)) {
+                // We're looking at an alternate iteration - need to get its metrics from the server separately
+                let validationPerformanceMetrics = await queryGetPerformanceMetricsForValidation();
+                if (validationPerformanceMetrics?._data?.performance_metrics) {
+                  performanceMetrics.value._data.validations.push({
+                    validation_run_id: evaluateValidationRunId.value,
+                    validation_type: 'valid_iteration',
+                    iteration_num: validationPerformanceMetrics._data.iteration_num,
+                    performance_metrics: validationPerformanceMetrics._data.performance_metrics
+                  })
+                }
+              }
               for (let v = 0; v < performanceMetrics.value?._data?.validations.length; v++) {
                 let validation_run_id = performanceMetrics.value?._data?.validations[v].validation_run_id;
                 let validation_type = performanceMetrics.value?._data?.validations[v].validation_type;
@@ -1081,9 +1093,9 @@ const togglePlotGraph = async () => {
       }
       // setting min/max dates will trigger the date filter below
       plotGraphDateLimits.value = {
-        start: new Date(plotGraphDataRaw.value[0][plotTableColumns.value[0].value]).toISOString().split('T')[0],
-        end: new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotTableColumns.value[0].value]).toISOString().split('T')[0],
-        span: Math.ceil((new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotTableColumns.value[0].value]).getTime() - new Date(plotGraphDataRaw.value[0][plotTableColumns.value[0].value]).getTime()) / (1000 * 3600 * 24))
+        start: new Date(plotGraphDataRaw.value[0][plotTableColumns.value[0].value] + 'Z').toISOString().split('T')[0],
+        end: new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotTableColumns.value[0].value] + 'Z').toISOString().split('T')[0],
+        span: Math.ceil((new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotTableColumns.value[0].value] + 'Z').getTime() - new Date(plotGraphDataRaw.value[0][plotTableColumns.value[0].value] + 'Z').getTime()) / (1000 * 3600 * 24))
       }
       plotGraphDateRange.value = {
         start: plotGraphDateLimits.value.start,
@@ -1109,7 +1121,7 @@ const drawInteractivePlot = () => {
   let plotDotData = [];
   if (!plotGraphCheckboxesEmpty()) {
     plotGraphOptions.value = {
-      x: { grid: true },
+      x: { grid: true, type: "time", tickSpacing: 80},
       y: { grid: true, labelAnchor: 'center', labelArrow: 'none' },
       marks: [],
       width: (plotGraphArea.value as HTMLElement).offsetWidth - 50,
@@ -1133,14 +1145,14 @@ const drawInteractivePlot = () => {
         for (let d = 0; d < plotGraphData.value.length; d++) {
           if (plotGraphLines.value[c - 1].symbol === 'line') {
             plotLineData.push({
-              'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value]),
+              'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value] + 'Z'),
               'measurement': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]),
               'color': plotGraphLines.value[c - 1].color,
               'name': plotGraphLines.value[c - 1].name
             });
           } else {
             plotDotData.push({
-              'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value]),
+              'time': new Date(plotGraphData.value[d][plotTableColumns.value[0].value] + 'Z'),
               'measurement': parseFloat(plotGraphData.value[d][plotTableColumns.value[c].value]),
               'color': plotGraphLines.value[c - 1].color,
               'symbol': plotGraphLines.value[c - 1].symbol,
@@ -1189,17 +1201,17 @@ const drawInteractivePlot = () => {
   if (selectedPlotName.value == selectedGridDisplay?.value?.name) {
     lineOptions.y.label = 'Depth (m)';
     lineTipOptions.y.label = 'Depth';
-    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}Z\nDepth: ${d.measurement} m\nClick to select this date`
     dotOptions.y.label = 'Depth (m)';
     dotTipOptions.y.label = 'Depth';
-    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nDepth: ${d.measurement} m\nClick to select this date`
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}Z\nDepth: ${d.measurement} m\nClick to select this date`
   } else {
     lineOptions.y.label = 'Flow (m^3/s)';
     lineTipOptions.y.label = 'Flow';
-    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} m^3/s`;
+    lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}Z\nStreamflow: ${d.measurement} m^3/s`;
     dotOptions.y.label = 'Flow (m^3/s)';
     dotTipOptions.y.label = 'Flow';
-    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} m^3/s`;
+    dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}Z\nStreamflow: ${d.measurement} m^3/s`;
   }
   if (plotLineData.length > 0) {
     plotGraphLeftEdge = new Date(plotLineData[0].time);
@@ -1292,15 +1304,19 @@ const plotGraphCheckboxesEmpty = () => {
 const drawInteractiveSlider = () => {
   if (!plotGraphCheckboxesEmpty()) {
     plotGraphSliderData.value = [];
-    let rowSkip = plotGraphDataRaw.value.length / 1000;
     for (let c = 1; c < plotTableColumns.value.length; c++) {
       if (c === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
-        for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
-          let dataPoint = {
-            time: new Date(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[0].value]),
-            measurement: parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[c].value])
-          };
-          plotGraphSliderData.value.push(dataPoint);
+        let prevDate = null;
+        for (let d = 0; d < plotGraphDataRaw.value.length; d++) {
+          let currentDate = new Date(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[0].value] + 'Z');
+          if (prevDate && prevDate.getUTCDate() !== currentDate.getUTCDate()) {
+            let dataPoint = {
+              time: currentDate,
+              measurement: parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[c].value])
+            };
+            plotGraphSliderData.value.push(dataPoint);
+          }
+          prevDate = currentDate;
         }
         break;
       }
@@ -1310,7 +1326,7 @@ const drawInteractiveSlider = () => {
       y: 'measurement'
     }
     plotGraphSliderOptions.value = {
-      x: { tickSize: 0, inset: 0 },
+      x: { inset: 0, tickSpacing: 80 },
       y: { axis: null },
       marks: [
         Plot.lineY(plotGraphSliderData.value, lineOptions)
@@ -1341,7 +1357,7 @@ const drawInteractiveSlider = () => {
         for (let d = 0; d < plotGraphData.value.length; d++) {
           if (plotGraphData.value[d][gridColumnName] > gridMaxValue) {
             gridMaxValue = plotGraphData.value[d][gridColumnName];
-            gridMaxDate = new Date(plotGraphData.value[d]['timestamp'])
+            gridMaxDate = new Date(plotGraphData.value[d]['timestamp'] + 'Z')
           }
         }
         // override the default date for grid
@@ -1402,7 +1418,7 @@ const interactivePlotDateFilter = () => {
   endDate.setHours(23);
   endDate.setMinutes(59);
   for (let r = 0; r < plotGraphDataRaw.value.length; r++) {
-    let currentDate = new Date(plotGraphDataRaw.value[r][plotTableColumns.value[0].value]);
+    let currentDate = new Date(plotGraphDataRaw.value[r][plotTableColumns.value[0].value] + 'Z');
     if (currentDate >= startDate && currentDate <= endDate) {
       tempPlotGraphData.push(plotGraphDataRaw.value[r]);
     }

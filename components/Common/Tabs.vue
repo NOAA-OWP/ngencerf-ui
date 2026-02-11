@@ -64,14 +64,14 @@
             </div>
           </span>
           <span v-show="calibrationJobId > 0 && selectedCalibrationCompareRuns.length === 0">
-            <span v-show="computedCalibrationValidationRunList.length >= 1 && !selectedCalibrationModules?.some(item => item.toLowerCase() === 'lstm')">
+            <span v-show="computedCalibrationValidationRunList.length >= 1 && !['Submitted','Running'].includes(evaluateValidationRunStatus) && !selectedCalibrationModules?.some(item => item.toLowerCase() === 'lstm')">
               <div data-tab="4" class="tabs prevent-select pl-25 mr-10" @click="tabClicked"
                 aria-label="Select Alternate Iteration tab" title="Select Alternate Iteration tab">
                 Select Alternate Iteration
                 <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
               </div>
             </span>
-            <span v-show="runStatusTabVisible || (evaluateValidationRunId > 0 && evaluateValidationRunStatus === 'Running')">
+            <span v-show="runStatusTabVisible || (evaluateValidationRunId > 0 && ['Submitted','Running'].includes(evaluateValidationRunStatus))">
               <div data-tab="5" class="tabs prevent-select pl-25 mr-10" @click="tabClicked"
                 aria-label="Run / Status" title="Run / Status">
                 Run / Status
@@ -125,20 +125,14 @@
             Verification Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
-          <div v-show="1 === 0 && ([3].includes(currentVerificationTab) || (userVerificationJobData && (!userVerificationJobData.status || ['Saved','Ready'].includes(userVerificationJobData.status))))"
+          <div v-show="[3].includes(currentVerificationTab) || selectedVerificationJob" 
             data-tab="3" class="tabs prevent-select" @click="tabClicked" 
-            aria-label="Setup Verification Tab" title="Setup Verification Tab">
-            Setup Verification
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div v-show="[4].includes(currentVerificationTab) || userVerificationJobData" 
-            data-tab="4" class="tabs prevent-select" @click="tabClicked" 
             aria-label="Run/Status Tab" title="Run/Status Tab">
             Run/Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[5].includes(currentVerificationTab) || (userVerificationJobData && userVerificationJobData.status === 'Done')" 
-            id="results-tab" data-tab="5" class="tabs prevent-select" @click="tabClicked"
+          <div v-show="[4].includes(currentVerificationTab) || (selectedVerificationJob && selectedVerificationJob.status === 'Done')" 
+            id="results-tab" data-tab="4" class="tabs prevent-select" @click="tabClicked"
             aria-label="Results Tab" title="Results Tab">
             Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
@@ -177,22 +171,11 @@ const {
   computedCalibrationValidationRunList
 } = storeToRefs(useEvaluationCalibrationRunStore());
 
-const { 
-  runStatusTabVisible
-} = storeToRefs(useEvaluationRunStatusStore());
+const { runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
 
-const {
-  calibrationRunForForecast,
-  forecastConfiguration,
-  forecastJobStatus,
-  overallColdStartForecastStatus
-} = storeToRefs(useForecastStore());
+const { calibrationRunForForecast } = storeToRefs(useForecastStore());
 
-const {
-  verificationJobId,
-  verificationJobStatus,
-  userVerificationJobData
-} = storeToRefs(useVerificationStore());
+const { selectedVerificationJob } = storeToRefs(useVerificationStore());
 
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());

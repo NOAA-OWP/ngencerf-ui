@@ -669,3 +669,24 @@ table.cols-bordered {
     }
   }
 }
+
+.required-label::after {
+  font-size: 0.85rem;
+  content: "*";
+  margin-right: 0.125rem;
+  color: #2563eb; /* your blue */
+  font-weight: 600; /* optional */
+  vertical-align: super;
+}
+
+.required-asterisk {
+  font-size: 0.85rem;
+  color: #2563eb;
+  margin-left: 0.125rem;
+  font-weight: 600;
+  vertical-align: super;
+}
+
+.p-datatable-thead .required-asterisk {
+  color: #93c5fd;   /* accessible on dark blue */
+}
