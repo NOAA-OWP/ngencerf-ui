@@ -491,7 +491,7 @@ const drawInteractivePlot = () => {
   }
   lineOptions.y.label = 'Flow (m^3/s)';
   lineTipOptions.y.label = 'Flow';
-  lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}X\nStreamflow: ${d.measurement} m^3/s`;
+  lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}Z\nStreamflow: ${d.measurement} m^3/s`;
   dotOptions.y.label = 'Flow (m^3/s)';
   dotTipOptions.y.label = 'Flow';
   dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}Z\nStreamflow: ${d.measurement} m^3/s`;
