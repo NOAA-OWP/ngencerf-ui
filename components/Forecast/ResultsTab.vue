@@ -401,7 +401,7 @@ function adjustPlotGraphColumns() {
     for (let d = 0; d < plotGraphDataRaw.value.length; d++) {
       Object.keys(plotGraphDataRaw.value[d]).forEach(key => {
         if (plotGraphDataRaw.value[d][key] && (plotGraphDataRaw.value[d][key] === null || plotGraphDataRaw.value[d][key] === '')) {
-          plotGraphDataRaw.value[d][key] = 'N/A';
+          plotGraphDataRaw.value[d][key] = '';
         } else if (!isNaN(parseFloat(plotGraphDataRaw.value[d][key])) && isFinite(plotGraphDataRaw.value[d][key]) && plotGraphDataRaw.value[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
           try {
@@ -419,6 +419,7 @@ function adjustPlotGraphColumns() {
 const drawInteractivePlot = () => {
   let plotLineData = [];
   let plotDotData = [];
+  let plotBarData = [];
   if (!plotGraphCheckboxesEmpty()) {
     plotGraphOptions.value = {
       x: { grid: true, tickSpacing: 80, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},
@@ -456,7 +457,7 @@ const drawInteractivePlot = () => {
     }
   }
 
-  interface DotTipData {
+  interface PlotTooltipData {
     name: string;
     color: string;
     symbol: string;
@@ -474,7 +475,7 @@ const drawInteractivePlot = () => {
   let lineTipOptions = {
     x: { value: 'time', label: 'Time' },
     y: { value: 'measurement', label: 'Measurement' },
-    title: (d: DotTipData) => `${d.name} (${d.color})`,
+    title: (d: PlotTooltipData) => `${d.name} (${d.color})`,
     fontSize: 14
   }
   let dotOptions = {
@@ -486,7 +487,7 @@ const drawInteractivePlot = () => {
   let dotTipOptions = {
     x: { value: 'time', label: 'Time' },
     y: { value: 'measurement', label: 'Measurement' },
-    title: (d: DotTipData) => `${d.name} (${d.color} ${d.symbol})`,
+    title: (d: PlotTooltipData) => `${d.name} (${d.color} ${d.symbol})`,
     fontSize: 14
   }
   lineOptions.y.label = 'Flow (m^3/s)';
