@@ -20,8 +20,8 @@
       </div>
       <div id="verificationRunList">
         <div id="VerTable">
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
-            :show-gage="false" :show-modules="false" :show-archived="false"
+          <JobFilterDialog id="JobFilterDialog" job-type="Verification" :disable-all="false" 
+            :show-modules="false" :show-archived="false"
             :totalSize="verificationRunListTotalSize" :totalPages="verificationRunListTotalPages"
             v-model:currentPage="verificationRunListCurrentPage"
             @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
@@ -46,7 +46,12 @@
             v-model:selection="selectedVerificationJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onVerificationRowSelect" @rowUnselect="onVerificationRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column :pt="ptColumn" field="verification_run_id" header="Job ID" sortable>
+            <Column :pt="ptColumn" field="verification_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Verification Job ID</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.verification_run_id"
                   :aria-label="'Job ID ' + slotProps.data.verification_run_id"
@@ -55,7 +60,12 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="forecast_run_id" header="Forecast Job ID" sortable>
+            <Column :pt="ptColumn" field="forecast_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Forecast Job ID</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.forecast_run_id" :aria-label="'Forecast Job ID ' + slotProps.data.forecast_run_id"
                   :title="'Forecast Job ID ' + slotProps.data.forecast_run_id">

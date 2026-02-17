@@ -15,6 +15,9 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
   const { 
+    uiGageId,
+    uiGageList,
+    uiDomainName,
     createdAtStart,
     createdAtEnd,
     minCreatedAt,
@@ -78,6 +81,8 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         direction: forecastRunsForVerificationListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value: "",
+        gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
               start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
@@ -104,8 +109,9 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
             operator: "before"
           } : {}
         ,
-        status: statusTypeFilterList.value
-      }
+        status: statusTypeFilterList.value,
+      },
+      get_gages: uiGageList.value.length === 0
     }
     const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs_for_verification/`, {
       method: "POST",
@@ -122,6 +128,10 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     forecastRunsForVerificationListStartRow.value = (forecastRunsForVerificationListPageSize.value * (forecastRunsForVerificationListCurrentPage.value - 1)) + 1;
     forecastRunsForVerificationListEndRow.value = Math.min(forecastRunsForVerificationListStartRow.value + (forecastRunsForVerificationListPageSize.value - 1), forecastRunsForVerificationListTotalSize.value);
     
+    if (runListDataResult?._data?.gages) {
+      uiGageList.value = runListDataResult?._data?.gages;
+      uiGageList.value.sort();
+    }
     if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
       minCreatedAt.value = runListDataResult?._data?.date_range[0];
       maxCreatedAt.value = runListDataResult?._data?.date_range[1];
@@ -155,6 +165,8 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         direction: verificationRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value: "",
+        gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
               start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
@@ -181,8 +193,9 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
             operator: "before"
           } : {}
         ,
-        status: statusTypeFilterList.value
-      }
+        status: statusTypeFilterList.value,
+      },
+      get_gages: uiGageList.value.length === 0
     }
     const runListDataResult = await makeProtectedApiCall<VerificationJobs>(`${ngencerfBaseUrl}/calibration/get_verification_jobs/`, {
       method: "POST",
@@ -199,6 +212,10 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     verificationRunListStartRow.value = (verificationRunListPageSize.value * (verificationRunListCurrentPage.value - 1)) + 1;
     verificationRunListEndRow.value = Math.min(verificationRunListStartRow.value + (verificationRunListPageSize.value - 1), verificationRunListTotalSize.value);
 
+    if (runListDataResult?._data?.gages) {
+      uiGageList.value = runListDataResult?._data?.gages;
+      uiGageList.value.sort();
+    }
     if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
       minCreatedAt.value = runListDataResult?._data?.date_range[0];
       maxCreatedAt.value = runListDataResult?._data?.date_range[1];
@@ -433,6 +450,8 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
    * reset job filters
    */
   const resetFilters = () => {
+    uiDomainName.value = 'All';
+    uiGageId.value = 'All';
     statusTypeFilterList.value = [];
     createdAtStart.value = null;
     createdAtEnd.value = null;

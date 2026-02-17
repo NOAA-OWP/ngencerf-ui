@@ -281,6 +281,7 @@ export interface SaveGageTabPayload {
 
 export interface GageData {
   gage_id: string;
+  domain?: DomainValueData;
   agency: string;
   station_name: string;
   latitude: number;

@@ -21,8 +21,8 @@
             </h1>
           </div>
 
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
-            :show-gage="false" :show-modules="false" :show-archived="false"
+          <JobFilterDialog id="JobFilterDialog" job-type="Forecast" :disable-all="false" 
+            :show-modules="false" :show-archived="false"
             :totalSize="forecastRunListTotalSize" :totalPages="forecastRunListTotalPages"
             v-model:currentPage="forecastRunListCurrentPage"
             @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
@@ -50,7 +50,7 @@
             <Column :pt="ptColumn" field="forecast_run_id" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Forecast</span><br /><span>ID</span>
+                  <span>Forecast</span><br /><span>Job ID</span>
                 </div>
               </template>
               <template #body="slotProps">

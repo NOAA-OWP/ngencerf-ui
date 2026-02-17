@@ -23,7 +23,7 @@
 
       <div id="calibrationRunsForForecastList">
         <div id="CalTable" class="w-max mx-auto">
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+          <JobFilterDialog id="JobFilterDialog" job-type="Calibration" :disable-all="false" 
             :show-status="false" :show-modules="false" :show-archived="false"
             :totalSize="calibrationRunsForForecastListTotalSize" :totalPages="calibrationRunsForForecastListTotalPages"
             v-model:currentPage="calibrationRunsForForecastListCurrentPage"
@@ -49,11 +49,16 @@
             v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onCalibrationRunForForecastRowSelect" @rowUnselect="onCalibrationRunForForecastRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable>
+            <Column :pt="ptColumn" field="calibration_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Calibration</span><br /><span>Job ID</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.calibration_run_id"
-                  :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
-                  :title="'Job ID ' + slotProps.data.calibration_run_id">
+                  :aria-label="'Calibration Job ID ' + slotProps.data.calibration_run_id"
+                  :title="'Calibration Job ID ' + slotProps.data.calibration_run_id">
                   {{ slotProps.data.calibration_run_id }}
                   <span v-if="slotProps.data.is_locked" class="pi pi-lock"></span>
                 </span>

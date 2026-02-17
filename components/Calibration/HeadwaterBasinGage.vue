@@ -15,7 +15,7 @@
             <div class="col-span-1">
               <div class="col-span-1">
                 <label for="Domain">Domain</label><br />
-                <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
+                <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="display_name"
                   optionValue="name" placeholder=" ... " aria-label="Domain Select" title="Domain Select"
                   @change="onDomainSelectionChange"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
@@ -68,10 +68,10 @@
               <table class="table-auto">
                 <caption><span style="font-size:1.2em;font-weight: bold;">Gage Detail</span></caption>
                 <tbody>
-                  <tr v-if="selectedDomainValue" class="rowOdd" :aria-label="'Domain: ' + selectedDomainValue"
-                    :title="'Domain: ' + selectedDomainValue">
+                  <tr v-if="selectedDomain" class="rowOdd" :aria-label="'Domain: ' + selectedDomain?.display_name"
+                    :title="'Domain: ' + selectedDomain?.display_name">
                     <th scope="row" class="dataName td1">Domain:</th>
-                    <td class="dataText td2">{{ selectedDomainValue }}</td>
+                    <td class="dataText td2">{{ selectedDomain?.display_name }}</td>
                   </tr>
                   <tr v-if="gageData?.gage_id" lass="rowEven" :aria-label="'Gage ID: ' + gageData?.gage_id"
                     :title="'>Gage ID: ' + gageData?.gage_id">
@@ -205,6 +205,17 @@ const fileUploadDialogOpened = ref<boolean>(false);
 const nextPrevDialogOpened = ref<boolean>(false);
 const jobNameHasChanged = ref<boolean>(false);
 
+const selectedDomain = computed(() => {
+  if (gageData?.value?.gage_id) {
+    let gage = (gageTabData.value?.gages.find(gage => gage.gage_id === gageData.value.gage_id));
+    if (gage) {
+      let domain = (getDomainOptionsList.value.find(domain => domain.name === gage.domain || domain.display_name === gage.domain));
+      return domain;
+    }
+  }
+  return '';
+});
+
 const resetData = ref<GageResetData>({
   external_data_status: {
     observational: false,
@@ -261,6 +272,13 @@ watch(jobNameInput, () => {
   }
 })
 
+watch(selectedDomain, () => {
+  // update domain dropdown
+  if (selectedDomain.value) {
+    selectedDomainValue.value = selectedDomain?.value?.name ?? '';
+  }
+});
+
 const onDomainSelectionChange = () => {
   gageDataSourceHasChanged.value = true;
 }
@@ -280,7 +298,7 @@ const onGageSelectionChange = () => {
     nextTick(() => {
       const gage = document.getElementById('Gage');
       (gage?.childNodes[0] as HTMLInputElement).innerText = selectedGageValue.value;
-      document.getElementById("HBGSaveButton")?.focus();
+      document.getElementById("HBGSaveButton")?.focus()
     });
   }
   fetchSelectedGageData();
