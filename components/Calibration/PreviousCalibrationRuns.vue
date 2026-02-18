@@ -22,7 +22,7 @@
               @ResetFilters="resetFilters()" @BulkJobAction="bulkJobAction()" :showBulkActions="showBulkActions" 
               :selected-jobs="selectedMultipleCalibrationRuns" :all-jobs="allCalibrationRuns" :visible-jobs="visibleCalibrationRuns"
               @SelectAllJobs="selectAllJobs()" @SelectVisibleJobs="selectVisibleJobs()" @DeselectAllJobs="deselectAllJobs()"
-              ref="jobFilterRef" />
+              @UpdateGageList="updateGageList()" ref="jobFilterRef" />
             
             <ConfirmDialog></ConfirmDialog>
 
@@ -277,6 +277,7 @@ const { getMenuIndex, addToastRecord } = generalStore();
 const { 
   userCalibrationJobsListData, 
   userCalibrationRunData, 
+  uiGageList,
   includeArchivedJobs,
   selectedBulkJobAction,
   calibrationRunListPageSize,
@@ -291,6 +292,7 @@ const {
   queryUserCalibrationRunData, 
   fetchUserCalibrationJobsListData, 
   fetchUserCalibrationJobsListIDsOnly,
+  fetchGageList,
   clearUserCalibrationRunData,
   resetFilters
 } = useUserDataStore();
@@ -419,6 +421,7 @@ onMounted(async () => {
     hardResetRunStatusStore();
     clearUserCalibrationRunData();
     await fetchUserCalibrationJobsListData();
+    updateGageList();
     visibleCalibrationRuns.value = userCalibrationJobsListData.value.map(job => job.calibration_run_id);
     if (calibrationRunListTotalPages.value > 1) {
       allCalibrationRuns.value = await fetchUserCalibrationJobsListIDsOnly();
@@ -488,6 +491,10 @@ const highlightSelectedRows = () => {
       dtRows[r].classList.remove('p-datatable-row-selected');
     }
   }
+}
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchGageList();
 }
 
 /**

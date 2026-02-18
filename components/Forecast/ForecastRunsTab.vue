@@ -25,7 +25,8 @@
             :show-modules="false" :show-archived="false"
             :totalSize="forecastRunListTotalSize" :totalPages="forecastRunListTotalPages"
             v-model:currentPage="forecastRunListCurrentPage"
-            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+            @UpdateGageList="updateGageList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -184,6 +185,7 @@ import type { ToastMessageOptions } from "primevue/toast";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { generalStore } from "~/stores/common/GeneralStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -194,6 +196,7 @@ import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 const { isLoading } = storeToRefs(generalStore());
+const { uiGageList } = storeToRefs(useUserDataStore());
 
 const forecastStore = useForecastStore();
 const {
@@ -221,7 +224,8 @@ const {
   deleteForecastJob,
   resetUserSelectedForecastCalibrationRun,
   hardResetForecastRunStatusStore,
-  resetFilters
+  resetFilters,
+  fetchForecastGageList
 } = useForecastStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
@@ -302,10 +306,16 @@ onMounted(async () => {
 
     // load calibrationRunsForForecast
     await getCalibrationJobsForForecast();
+
+    updateGageList();
   });
 
   isLoading.value = false;
 });
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchForecastGageList();
+}
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
   const rowData = event.data as ForecastJob;

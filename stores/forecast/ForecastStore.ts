@@ -140,7 +140,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         direction: forecastRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
-        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value: "",
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
         gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
@@ -169,8 +169,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
           } : {}
         ,
         status: statusTypeFilterList.value
-      },
-      get_gages: uiGageList.value.length === 0
+      }
     }
     const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs/`, {
       method: "POST",
@@ -196,10 +195,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
           jobItem.submit_date = jobItem.cold_start.cold_start_submit_date;
         }
       });
-    }
-    if (runListDataResult?._data?.gages) {
-      uiGageList.value = runListDataResult?._data?.gages;
-      uiGageList.value.sort();
     }
     if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
       minCreatedAt.value = runListDataResult?._data?.date_range[0];
@@ -413,7 +408,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         direction: calibrationRunsForForecastListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
-        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value: "",
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
         gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
@@ -442,8 +437,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
           } : {}
         ,
         include_archived: false
-      },
-      get_gages: uiGageList.value.length === 0
+      }
     }
     const runListDataResult = await makeProtectedApiCall<CalibrationRunsForForecast>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_forecast/`, {
       method: "POST",
@@ -460,10 +454,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationRunsForForecastListStartRow.value = (calibrationRunsForForecastListPageSize.value * (calibrationRunsForForecastListCurrentPage.value - 1)) + 1;
     calibrationRunsForForecastListEndRow.value = Math.min(calibrationRunsForForecastListStartRow.value + (calibrationRunsForForecastListPageSize.value - 1), calibrationRunsForForecastListTotalSize.value);
     
-    if (runListDataResult?._data?.gages) {
-      uiGageList.value = runListDataResult?._data?.gages;
-      uiGageList.value.sort();
-    }
     if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
       minCreatedAt.value = runListDataResult?._data?.date_range[0];
       maxCreatedAt.value = runListDataResult?._data?.date_range[1];
@@ -473,6 +463,64 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       maxJobId.value = runListDataResult?._data?.id_range[1];
     }
   };
+
+  /**
+   * fetch list of gage IDs for calibration runs
+   * @return {void}
+   */
+  async function fetchGageList() {
+    // only apply domain and archived filters
+    let requestBody = {
+      domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+      include_archived: false
+    }
+    const gageListResult =
+      await makeProtectedApiCall<any>(
+        `${ngencerfBaseUrl}/calibration/get_calibration_gages_for_forecast/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+    
+    if (gageListResult?._data?.gages) {
+      return gageListResult._data.gages.sort();
+    }
+    return [];
+  }
+
+  /**
+   * fetch list of gage IDs for forecast runs
+   * @return {void}
+   */
+  async function fetchForecastGageList() {
+    // only apply domain and archived filters
+    let requestBody = {
+      domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+      include_archived: false
+    }
+    const gageListResult =
+      await makeProtectedApiCall<any>(
+        `${ngencerfBaseUrl}/calibration/get_forecast_gages/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+    
+    if (gageListResult?._data?.gages) {
+      return gageListResult._data.gages.sort();
+    }
+    return [];
+  }
 
   /**
    * Call get_status endpoint with calibrationRunForForecast.value.calibration_run_id
@@ -685,7 +733,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     resetSelectedForecastRunData,
     setSelectedForecastRowData,
     hardResetForecastRunStatusStore,
-    resetFilters
+    resetFilters,
+    fetchGageList,
+    fetchForecastGageList
   };
 });
 

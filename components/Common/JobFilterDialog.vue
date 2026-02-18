@@ -11,7 +11,7 @@
               <Select id="Domain" class="mt-1 basin-gage-filter text-left w-32" v-model="uiDomainName" 
                 :options="getDomainOptionsList" optionLabel="display_name" optionValue="name" placeholder="All" 
                 aria-label="Domain Filter Select" title="Domain Filter Select"
-                :disabled="disableAll" @change="refreshJobList();">
+                :disabled="disableAll" @change="refreshJobList(); updateGageList();">
               </Select>
             </div>
 
@@ -107,7 +107,7 @@
         <div>
           <div class="text-right mr-[16px] whitespace-nowrap">
             <Button id="ClearFiltersButton" class="c-blue mt-[22px]" label="Clear Filters"
-              @click="resetFilters()" aria-label="Clear filters" title="Clear filters" :disabled="filterInactive || disableAll">
+              @click="resetFilters();" aria-label="Clear filters" title="Clear filters" :disabled="filterInactive || disableAll">
             </Button><br />
             <Button id="RefreshJobList" class="c-blue mt-[5px]" label="Refresh List" @click="clearGageList(); refreshJobList()"
               aria-label="Refresh Job List" title="Refresh Job List" :disabled="disableAll">
@@ -115,7 +115,7 @@
             <div v-show="showArchived">
               <Checkbox v-model="includeArchivedJobs" inputId="ShowArchiveToggle" class="text-xs"
                 aria-label="Include Archived Jobs" title="Include Archived Jobs" binary variant="filled" size="large"
-                :pt="ptCheckbox" :disabled="disableAll" @change="refreshJobList()">
+                :pt="ptCheckbox" :disabled="disableAll" @change="refreshJobList(); updateGageList();">
               </Checkbox>
               <label class="cursor-pointer align-center ml-2" for="ShowArchiveToggle" aria-label="Include Archived Jobs"
                 title="Include Archived Jobs">Include Archived</label>
@@ -202,6 +202,7 @@ const emit = defineEmits([
   "ModulesFilterDialogClosing", 
   "RefreshJobList", 
   "ResetFilters", 
+  "UpdateGageList",
   "BulkJobAction", 
   "selectAllJobs",
   "selectVisibleJobs",
@@ -402,10 +403,18 @@ const resetFilters = (refresh_job_list: boolean=true) => {
   if(refresh_job_list) {
     refreshJobList();
   }
+  updateGageList();
+}
+
+/**
+ * Update gage list
+ */
+const updateGageList = () => {
+  emit("UpdateGageList");
 }
 
 defineExpose({ 
-  resetFilters 
+  resetFilters
 });
 
 onMounted(() => {

@@ -24,7 +24,8 @@
             :show-status="false" :show-modules="false" :show-archived="false"
             :totalSize="forecastRunsForVerificationListTotalSize" :totalPages="forecastRunsForVerificationListTotalPages"
             v-model:currentPage="forecastRunsForVerificationListCurrentPage"
-            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+            @UpdateGageList="updateGageList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'fr-context-menu' } }" class="bg-white" ref="frContextMenu"
@@ -157,6 +158,7 @@ import type { ToastMessageOptions } from "primevue/toast";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useVerificationStore } from "@/stores/verification/VerificationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -167,6 +169,7 @@ import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 const { isLoading } = storeToRefs(generalStore());
+const { uiGageList } = storeToRefs(useUserDataStore());
 
 const forecastStore = useForecastStore();
 const verificationStore = useVerificationStore();
@@ -193,7 +196,8 @@ const {
   fetchNewVerificationJobId,
   loadSelectedVerificationJob,
   setSelectedVerificationJobId,
-  resetFilters
+  resetFilters,
+  fetchForecastGageList
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
@@ -246,10 +250,15 @@ onMounted(async () => {
 
     // load forecast runs
     await getForecastRunsForVerification();
+    updateGageList();
   });
 
   isLoading.value = false;
 });
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchForecastGageList();
+}
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
   const rowData = event.data as ForecastJob;

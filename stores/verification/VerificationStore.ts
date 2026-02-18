@@ -81,7 +81,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         direction: forecastRunsForVerificationListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
-        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value: "",
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
         gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
@@ -110,8 +110,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
           } : {}
         ,
         status: statusTypeFilterList.value,
-      },
-      get_gages: uiGageList.value.length === 0
+      }
     }
     const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs_for_verification/`, {
       method: "POST",
@@ -128,10 +127,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     forecastRunsForVerificationListStartRow.value = (forecastRunsForVerificationListPageSize.value * (forecastRunsForVerificationListCurrentPage.value - 1)) + 1;
     forecastRunsForVerificationListEndRow.value = Math.min(forecastRunsForVerificationListStartRow.value + (forecastRunsForVerificationListPageSize.value - 1), forecastRunsForVerificationListTotalSize.value);
     
-    if (runListDataResult?._data?.gages) {
-      uiGageList.value = runListDataResult?._data?.gages;
-      uiGageList.value.sort();
-    }
     if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
       minCreatedAt.value = runListDataResult?._data?.date_range[0];
       maxCreatedAt.value = runListDataResult?._data?.date_range[1];
@@ -165,7 +160,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         direction: verificationRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
-        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value: "",
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
         gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
@@ -194,8 +189,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
           } : {}
         ,
         status: statusTypeFilterList.value,
-      },
-      get_gages: uiGageList.value.length === 0
+      }
     }
     const runListDataResult = await makeProtectedApiCall<VerificationJobs>(`${ngencerfBaseUrl}/calibration/get_verification_jobs/`, {
       method: "POST",
@@ -212,10 +206,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     verificationRunListStartRow.value = (verificationRunListPageSize.value * (verificationRunListCurrentPage.value - 1)) + 1;
     verificationRunListEndRow.value = Math.min(verificationRunListStartRow.value + (verificationRunListPageSize.value - 1), verificationRunListTotalSize.value);
 
-    if (runListDataResult?._data?.gages) {
-      uiGageList.value = runListDataResult?._data?.gages;
-      uiGageList.value.sort();
-    }
     if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
       minCreatedAt.value = runListDataResult?._data?.date_range[0];
       maxCreatedAt.value = runListDataResult?._data?.date_range[1];
@@ -224,6 +214,64 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
       minJobId.value = runListDataResult?._data?.id_range[0];
       maxJobId.value = runListDataResult?._data?.id_range[1];
     }
+  }
+
+  /**
+   * fetch list of gage IDs for forecast runs
+   * @return {void}
+   */
+  async function fetchForecastGageList() {
+    // only apply domain and archived filters
+    let requestBody = {
+      domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+      include_archived: false
+    }
+    const gageListResult =
+      await makeProtectedApiCall<any>(
+        `${ngencerfBaseUrl}/calibration/get_forecast_gages_for_verification/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+    
+    if (gageListResult?._data?.gages) {
+      return gageListResult._data.gages.sort();
+    }
+    return [];
+  }
+
+  /**
+   * fetch list of gage IDs for verification runs
+   * @return {void}
+   */
+  async function fetchVerificationGageList() {
+    // only apply domain and archived filters
+    let requestBody = {
+      domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+      include_archived: false
+    }
+    const gageListResult =
+      await makeProtectedApiCall<any>(
+        `${ngencerfBaseUrl}/calibration/get_verification_gages/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+    
+    if (gageListResult?._data?.gages) {
+      return gageListResult._data.gages.sort();
+    }
+    return [];
   }
 
   /**
@@ -514,7 +562,9 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     getVerificationPlotNames,
     getVerificationPlot,
     deleteVerificationJob,
-    resetFilters
+    resetFilters,
+    fetchForecastGageList,
+    fetchVerificationGageList
   };
 });
 

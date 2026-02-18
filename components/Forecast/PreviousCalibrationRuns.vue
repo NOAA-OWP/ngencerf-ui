@@ -27,7 +27,8 @@
             :show-status="false" :show-modules="false" :show-archived="false"
             :totalSize="calibrationRunsForForecastListTotalSize" :totalPages="calibrationRunsForForecastListTotalPages"
             v-model:currentPage="calibrationRunsForForecastListCurrentPage"
-            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+            @UpdateGageList="updateGageList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -248,7 +249,8 @@ const {
   getCalibrationJobsForForecast, 
   resetUserSelectedForecastCalibrationRun, 
   hardResetForecastRunStatusStore,
-  resetFilters
+  resetFilters,
+  fetchGageList
 } = forecastStore;
 
 
@@ -297,11 +299,11 @@ const {
   fetchUserValidatedCalibrationJobsListData,
 } = evaluationCalibrationRunStore;
 
-const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, uiGageList } = storeToRefs(useUserDataStore());
 
 const { calibrationRunsForForecast, calibrationRunForForecast, forecastRunGageList } = storeToRefs(useForecastStore());
 
-const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId } = useForecastStore();
+const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId, fetchForecastGageList } = useForecastStore();
 
 onMounted(async () => {
   isLoading.value = true;
@@ -321,9 +323,14 @@ onMounted(async () => {
     resetUserSelectedEvalCalibrationRun();
     resetUserSelectedForecastCalibrationRun();
     await getCalibrationJobsForForecast();
+    updateGageList();
     isLoading.value = false;
   });
 });
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchGageList();
+}
 
 // watch for sort order change - reset current page to 1
 watch(calibrationRunsForForecastListSort, () => {

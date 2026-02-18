@@ -108,7 +108,8 @@
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" :show-status="false" :show-archived="false"
           :totalSize="evaluationRunListTotalSize" :totalPages="evaluationRunListTotalPages"
           v-model:currentPage="evaluationRunListCurrentPage"
-          @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+          @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+          @UpdateGageList="updateGageList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -403,13 +404,14 @@ const {
   clearUserCalibrationRunData,
   setSelectedCalibrationRunId,
   fetchValidationRunListByCalibrationRun,
-  resetFilters
+  resetFilters,
+  fetchGageList
 } = evaluationCalibrationRunStore;
 
 const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
 const { hardResetEvaluationRunStatusStore } = useEvaluationRunStatusStore();
 
-const { userCalibrationRunData, gotoCalibrationRunId, includeArchivedJobs } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, gotoCalibrationRunId, includeArchivedJobs, uiGageList } = storeToRefs(useUserDataStore());
 
 const { isLoading, calibrationJobId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -433,6 +435,7 @@ onMounted(async() => {
   hardResetEvaluationRunStatusStore();
 
   await fetchUserValidatedCalibrationJobsListData();
+  updateGageList();
 
   if(gotoCalibrationRunId.value) {
     userSelectedEvalCalibrationRunId.value = gotoCalibrationRunId.value;
@@ -509,6 +512,10 @@ const refreshJobList = async () => {
   isLoading.value = true;
   await fetchUserValidatedCalibrationJobsListData();
   isLoading.value = false;
+}
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchGageList();
 }
 
 // A method to convert the binary value (boolean) to a sortable format

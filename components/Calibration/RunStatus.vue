@@ -860,7 +860,7 @@ watch(submitTimeDate, () => {
 
 // Handle iteration changes
 watch(iteration, async () => {
-  if (iteration.value && iteration.value >= 1 && !isLoading.value) {
+  if (iteration.value && iteration.value >= 0 && !isLoading.value) {
     // populate plotListOptions from iteration 1 onwards, in case a plot becomes available that wasn't before
     await populatePlotListOptions();
     if (selectedPlotName.value && selectedPlotName.value != plotListDefault.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {

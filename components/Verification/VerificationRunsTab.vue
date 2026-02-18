@@ -24,7 +24,8 @@
             :show-modules="false" :show-archived="false"
             :totalSize="verificationRunListTotalSize" :totalPages="verificationRunListTotalPages"
             v-model:currentPage="verificationRunListCurrentPage"
-            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+            @UpdateGageList="updateGageList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="vrContextMenu"
@@ -116,6 +117,7 @@ import type { ToastMessageOptions } from "primevue/toast";
 
 import { useVerificationStore } from "@/stores/verification/VerificationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -126,6 +128,7 @@ import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 const { isLoading } = storeToRefs(generalStore());
+const { uiGageList } = storeToRefs(useUserDataStore());
 
 const verificationStore = useVerificationStore();
 const {
@@ -146,7 +149,8 @@ const {
   setSelectedVerificationRowData,
   getVerificationJobs,
   deleteVerificationJob,
-  resetFilters
+  resetFilters,
+  fetchVerificationGageList
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
@@ -214,10 +218,15 @@ onMounted(() => {
 
     // load verificationJobs
     await getVerificationJobs();
+    updateGageList();
   });
 
   isLoading.value = false;
 })
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchVerificationGageList();
+}
 
 const onVerificationRowSelect = async (event: DataTableRowClickEvent) => {
   const rowData = event.data as VerificationJob;

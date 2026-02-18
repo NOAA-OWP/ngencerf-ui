@@ -283,7 +283,7 @@ export const useUserDataStore = defineStore(
           direction: calibrationRunListSort.value.direction === -1 ? 'desc' : 'asc'
         },
         filters: {
-          domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value: "",
+          domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
           gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
           module_filter: {
             modules: modulesFilterList.value,
@@ -317,8 +317,7 @@ export const useUserDataStore = defineStore(
           ,
           status: statusTypeFilterList.value,
           include_archived: includeArchivedJobs.value
-        },
-        get_gages: uiGageList.value.length === 0
+        }
       }
       const jobsListDataResult =
         await makeProtectedApiCall<CalibrationJobsList>(
@@ -339,10 +338,6 @@ export const useUserDataStore = defineStore(
       calibrationRunListStartRow.value = (calibrationRunListPageSize.value * (calibrationRunListCurrentPage.value - 1)) + 1;
       calibrationRunListEndRow.value = Math.min(calibrationRunListStartRow.value + (calibrationRunListPageSize.value - 1), calibrationRunListTotalSize.value);
       
-      if (jobsListDataResult?._data?.gages) {
-        uiGageList.value = jobsListDataResult?._data?.gages;
-        uiGageList.value.sort();
-      }
       if (jobsListDataResult?._data?.date_range && jobsListDataResult?._data?.date_range.length === 2) {
         minCreatedAt.value = jobsListDataResult?._data?.date_range[0];
         maxCreatedAt.value = jobsListDataResult?._data?.date_range[1];
@@ -361,7 +356,7 @@ export const useUserDataStore = defineStore(
       // apply user's filters without paging, since we want the entire list
       let requestBody = {
         filters: {
-          domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value: "",
+          domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
           gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
           module_filter: {
             modules: modulesFilterList.value,
@@ -412,6 +407,35 @@ export const useUserDataStore = defineStore(
         );
 
       return jobsListIDsResult?._data?.jobs ?? [];
+    }
+
+    /**
+     * fetch list of gage IDs
+     * @return {void}
+     */
+    async function fetchGageList() {
+      // only apply domain and archived filters
+      let requestBody = {
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+        include_archived: includeArchivedJobs.value
+      }
+      const gageListResult =
+        await makeProtectedApiCall<any>(
+          `${ngencerfBaseUrl}/calibration/get_calibration_gages/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${getAccessToken()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
+      
+      if (gageListResult?._data?.gages) {
+        return gageListResult._data.gages.sort();
+      }
+      return [];
     }
 
     /**
@@ -598,6 +622,7 @@ export const useUserDataStore = defineStore(
       getRefreshToken,
       fetchUserCalibrationJobsListData,
       fetchUserCalibrationJobsListIDsOnly,
+      fetchGageList,
       getValidationJobs,
       queryUserCalibrationRunData,
       fetchUserCalibrationRunData,
