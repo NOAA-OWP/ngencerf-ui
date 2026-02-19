@@ -326,7 +326,7 @@ const populatePlotListOptions = async() => {
     logListOptions.value = [];
 
     nextTick(async () => {
-      if (['Running','Done','Cancelled','Failed','Server error'].includes(userCalibrationRunData?.value?.status) && (iteration.value && iteration.value >= 1)) {
+      if (['Running','Done','Cancelled','Failed','Server error'].includes(userCalibrationRunData?.value?.status) && iteration.value !== undefined && iteration.value >= 0) {
         // Get Plot Names
         plotNames.value = await queryGetPlotNames();
 
@@ -632,7 +632,7 @@ const updateIteration = async () => {
 
 // Handle calibration/validation status changes
 watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibrationStatus, onCleanup) => {
-  if (userCalibrationRunData.value && (oldCalibrationStatus || newCalibrationStatus) && !isLoading.value) {
+  if (userCalibrationRunData.value && (oldCalibrationStatus || newCalibrationStatus)) {
     if (userCalibrationRunData.value.stop_criteria) {
       stopCriteria.value = userCalibrationRunData.value?.stop_criteria;
     }
@@ -679,7 +679,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
           }
         }
       } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object. Calibration job status is: ' + calibrationStatus.value, life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     }
@@ -867,7 +867,7 @@ watch(submitTimeDate, () => {
 
 // Handle iteration changes
 watch(iteration, async () => {
-  if (iteration.value && iteration.value >= 0 && !isLoading.value) {
+  if (iteration.value !== undefined && iteration.value >= 0 && !isLoading.value) {
     // populate plotListOptions from iteration 1 onwards, in case a plot becomes available that wasn't before
     await populatePlotListOptions();
     if (selectedPlotName.value && selectedPlotName.value != plotListDefault.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
