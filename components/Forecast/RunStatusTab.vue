@@ -402,6 +402,14 @@ const startForecastRun = async () => {
 
     if (createAndRunForecastJobResponse?._data?.submit_date) {
       submitTimeDate.value = new Date(createAndRunForecastJobResponse?._data?.submit_date);
+      calibrationRunForForecast.value.cycle_date = cycleDate.value;
+      if (coldStartDate.value) {
+        calibrationRunForForecast.value.cold_start = {
+          cold_start_date: coldStartDate.value,
+          cold_start_status: 'Submitted',
+          cold_start_submit_date: createAndRunForecastJobResponse._data.submit_date
+        };
+      }
 
       if (isValidDate(submitTimeDate.value)) {
         submitTime.value = formatDateForRunOnString(submitTimeDate.value);

@@ -290,7 +290,6 @@ onMounted(async () => {
   if (!userCalibrationRunData.value) {
     await fetchUserCalibrationRunData();
   }
-  console.log('cold_start_date:',calibrationRunForForecast?.value?.cold_start?.cold_start_date);
 });
 
 const toggleMessagesGroup = async () => {
