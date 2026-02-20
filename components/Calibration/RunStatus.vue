@@ -515,29 +515,34 @@ const startRun = async () => {
 
     // nominal case
     if (runCalibrationResponse.status >= 200 && runCalibrationResponse.status < 300) {
-      if (runCalibrationResponse?._data?.status) {
-        userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
-        failureMessages.value = runCalibrationResponse._data.failure_messages ?? undefined;
-      } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server', life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
+      // only update refs if calibration_run_id is still the same - i.e. if the user hasn't left the page
+      if (userCalibrationRunData?.value?.calibration_run_id === runCalibrationResponse?._data?.calibration_run_id) {
+        if (runCalibrationResponse?._data?.status) {
+          userCalibrationRunData.value.status = runCalibrationResponse?._data.status;
+          failureMessages.value = runCalibrationResponse._data.failure_messages ?? undefined;
+        } else {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration status from server', life: ToastTimeout.timeoutError };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
 
-      if (runCalibrationResponse._data.submit_date) {
-        // set submitTimeDate to submit_date from server as a Date object. 
-        // watch function for submitTimeDate will validate that it is a valid Date object and set submitTime, 
-        // which shows the time in local time format
-        submitTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
-      } else {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration submit date from server', life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
+        if (runCalibrationResponse._data.submit_date) {
+          // set submitTimeDate to submit_date from server as a Date object. 
+          // watch function for submitTimeDate will validate that it is a valid Date object and set submitTime, 
+          // which shows the time in local time format
+          // only update this values if calibration_run_id is still the same - i.e. if the user hasn't left the page
+          if (userCalibrationRunData?.value?.calibration_run_id === runCalibrationResponse?._data?.calibration_run_id) {
+            submitTimeDate.value = new Date(runCalibrationResponse?._data?.submit_date);
+          }
+        } else {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Could not get Calibration submit date from server', life: ToastTimeout.timeoutError };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
 
-      if (userCalibrationRunData?.value?.status !== 'Submitted' && userCalibrationRunData?.value?.status !== 'Running') {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Submitted or Running after clicking START', life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
+        if (userCalibrationRunData?.value?.status !== 'Submitted' && userCalibrationRunData?.value?.status !== 'Running') {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Calibration status not set to Submitted or Running after clicking START', life: ToastTimeout.timeoutError };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
       }
-      //fetchUserCalibrationRunData();
     } else {
       const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
       
