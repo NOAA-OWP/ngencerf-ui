@@ -384,7 +384,8 @@ const {
   automatic_validation,
   calibratableParametersHaveChanged,
   tuningDataHasChanged,
-  saveTuningTabRequestBody
+  saveTuningTabRequestBody,
+  tuningParametersAreValid
 } = storeToRefs(tuningStore);
 
 const toast = useToast();
@@ -1113,6 +1114,16 @@ const saveTuningData = () => {
           life: ToastTimeout.timeoutSuccess
         };
         toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (saveTuningTabResponse._data.parameter_warnings) {
+        tuningParametersAreValid.value = false;
+        toast.removeAllGroups();
+        saveTuningTabResponse._data.parameter_warnings.forEach((err: any) => {
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Tuning Parameters Warning', detail: err, life: ToastTimeout.timeoutWarn };
+          toast.add(tMsg); addToastRecord(tMsg);
+        });
+      } else {
+        tuningParametersAreValid.value = true;
       }
       updateJobData();
       calibratableParametersHaveChanged.value = false;
