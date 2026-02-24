@@ -88,7 +88,7 @@
 
     <div v-show="selectedLogCategory == 'forecast plot'" class="flex">
       <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
-        <div id="PlotGraphArea" ref="plotGraphArea" v-if="!plotGraphCheckboxesEmpty()">
+        <div id="PlotGraphArea" ref="plotGraphArea" v-if="numPlotGraphCheckboxesChecked() > 0">
           <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
           <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
             <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
@@ -116,11 +116,12 @@
         <div v-if="plotGraphLines.length > 0">
           <div v-for="item in plotGraphLines" :key="item.id">
             <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
-              v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
+              v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" 
+              :disabled="item.checked && numPlotGraphCheckboxesChecked() <= 1" class="align-top">
             <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
           </div>
         </div>
-        <div v-if="plotGraphCheckboxesEmpty()">
+        <div v-if="numPlotGraphCheckboxesChecked() === 0">
           Check at least one box to generate an interactive plot.
         </div>
         <div id="CustomizePlotWindow" v-if="showCustomizePlot">
@@ -420,7 +421,7 @@ const drawInteractivePlot = () => {
   let plotLineData = [];
   let plotDotData = [];
   let plotBarData = [];
-  if (!plotGraphCheckboxesEmpty()) {
+  if (numPlotGraphCheckboxesChecked() > 0) {
     plotGraphOptions.value = {
       x: { grid: true, tickSpacing: 80, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},
       y: { grid: true, labelAnchor: 'center', labelArrow: 'none' },
@@ -434,7 +435,7 @@ const drawInteractivePlot = () => {
     plotGraphOptions.value.marginLeft = 50;
 
     for (let c = 1; c < plotGraphColumns.value.length; c++) {
-      if (plotGraphLines.value.length === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
+      if ((document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
         for (let d = 0; d < plotGraphData.value.length; d++) {
           if (plotGraphLines.value[c - 1].symbol === 'line') {
             plotLineData.push({
@@ -533,23 +534,24 @@ const getSliderWidth = () => {
     - (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().left;
 }
 
-const plotGraphCheckboxesEmpty = () => {
+const numPlotGraphCheckboxesChecked = () => {
   if (plotGraphLines.value.length > 1) {
+    let numChecked = 0;
     for (let c = 0; c < plotGraphLines.value.length; c++) {
       if (!(document?.getElementById('plotGraphCheckbox-' + (c + 1)))) {
-        return false;
+        return plotGraphLines.value.length;
       } else if ((document?.getElementById('plotGraphCheckbox-' + (c + 1)) as HTMLInputElement).checked) {
-        return false;
+        numChecked += 1;
       }
     }
-    return true;
+    return numChecked;
   }
-  return false;
+  return 0;
 };
 
 // Create slider as a mini-plot of just the first plot line
 const drawInteractiveSlider = () => {
-  if (!plotGraphCheckboxesEmpty()) {
+  if (numPlotGraphCheckboxesChecked() > 0) {
     plotGraphSliderData.value = [];
     let rowSkip = plotGraphDataRaw.value.length / 1000;
     for (let c = 1; c < plotGraphColumns.value.length; c++) {

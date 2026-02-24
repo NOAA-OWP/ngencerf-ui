@@ -136,7 +136,7 @@
       </div>
     </div>
     <div class="flex mt-2" v-if="showPlotGraph && plotGraphData">
-      <div id="PlotGraphArea" ref="plotGraphArea" v-if="!plotGraphCheckboxesEmpty()">
+      <div id="PlotGraphArea" ref="plotGraphArea" v-if="numPlotGraphCheckboxesChecked() > 0">
         <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
         <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
           <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
@@ -163,11 +163,12 @@
         <div v-if="plotGraphLines.length > 0">
           <div v-for="item in plotGraphLines" :key="item.id">
             <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
-              v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
+              v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" 
+              :disabled="item.checked && numPlotGraphCheckboxesChecked() <= 2" class="align-top">
             <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
           </div>
         </div>
-        <div v-if="plotGraphCheckboxesEmpty()">
+        <div v-if="numPlotGraphCheckboxesChecked() === 0">
           Check at least one box to generate an interactive plot.
         </div>
         <div id="CustomizePlotWindow" v-if="showCustomizePlot">
@@ -186,7 +187,7 @@
               <Select class="select150" :id="`plotGraphColor-${item.id}`" v-model="item.color"
                 :options="plotGraphColorList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
               </Select>
-              <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-model="item.symbol"
+              <Select class="select150" :id="`plotGraphSymbol-${item.id}`" v-show="item.name.toLowerCase() !== 'precipitation'" v-model="item.symbol"
                 :options="plotGraphSymbolList" optionLabel="name" optionValue="name" @change="drawInteractivePlot">
               </Select>
             </div>
@@ -1110,7 +1111,7 @@ const drawInteractivePlot = () => {
   let plotLineData = [];
   let plotDotData = [];
   let plotBarData = [];
-  if (!plotGraphCheckboxesEmpty()) {
+  if (numPlotGraphCheckboxesChecked() > 0) {
     plotGraphOptions.value = {
       x: { grid: true, scale: { type: 'utc' }},
       y: { grid: true, axis: "left", label: 
@@ -1135,21 +1136,19 @@ const drawInteractivePlot = () => {
             'name': plotGraphLines.value[c - 1].name
           }
           if (plotTableColumns.value[c].value.toLowerCase() === 'precipitation') {
-            if (plotPoint.measurement > 0) {  // Only add non-zero values
-              // Normalize the time to remove hours/minutes/seconds for daily aggregation
-              let dayKey = plotPoint.time.toISOString().split('T')[0];  // Get the date only
+            // Normalize the time to remove hours/minutes/seconds for daily aggregation
+            let dayKey = plotPoint.time.toISOString().split('T')[0];  // Get the date only
 
-              plotPoint.time = new Date(dayKey);  // Set the time to 00:00:00 of that day
-              plotPoint.precipitation = plotPoint.measurement;
-              delete plotPoint.measurement;  // Remove the original measurement property for bar chart
+            plotPoint.time = new Date(dayKey);  // Set the time to 00:00:00 of that day
+            plotPoint.precipitation = plotPoint.measurement;
+            delete plotPoint.measurement;  // Remove the original measurement property for bar chart
 
-              // Check if the bar for this day already exists and update if necessary
-              let existingDay = plotBarData.find(p => p.time.toISOString().split('T')[0] === dayKey);
-              if (existingDay) {
-                existingDay.precipitation += plotPoint.precipitation;  // Aggregate the values for the same day
-              } else {
-                plotBarData.push(plotPoint);  // Add new day
-              }
+            // Check if the bar for this day already exists and update if necessary
+            let existingDay = plotBarData.find(p => p.time.toISOString().split('T')[0] === dayKey);
+            if (existingDay) {
+              existingDay.precipitation += plotPoint.precipitation;  // Aggregate the values for the same day
+            } else {
+              plotBarData.push(plotPoint);  // Add new day
             }
           } else if (plotGraphLines.value[c - 1].symbol === 'line') {
             plotLineData.push(plotPoint);
@@ -1223,13 +1222,17 @@ const drawInteractivePlot = () => {
   plotGraphOptions.value.marks.push(Plot.ruleY([0]));
   if (plotBarData.length > 0) {
     const plotV2 = (d) => d.precipitation;
-    const plotV2Inverted = (d) => d.precipitation * -1;
-    const plotV2InvertedX10 = (d) => d.precipitation * -10;
     let barOptions = {
       x: "time",
-      y: plotV2Inverted,
-      stroke: 'color',
-      x: "time"
+      y: plotV2,
+      stroke: 'color'
+    }
+    let barFillOptions = {
+      x: "time",
+      y: plotV2,
+      y2: () => 0,
+      fill: 'color',
+      opacity: 0.3,
     }
     let barTipOptions = {
       x: "time",
@@ -1237,13 +1240,15 @@ const drawInteractivePlot = () => {
       title: (d: PlotTooltipData) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}Z\nPrecpitation: ${d.precipitation} mm`,
       fontSize: 14
     }
-    const plotY2 = d3.scaleLinear(d3.extent(plotBarData, plotV2InvertedX10), [0, d3.max(plotLineData, plotV1)]);
+    const plotY2 = d3.scaleLinear(d3.extent(plotBarData, plotV2), [
+      d3.max(plotLineData, plotV1), d3.max(plotLineData, plotV1) * .75
+    ]);
     plotGraphOptions.value.marks.push(
       Plot.axisY(
-        plotY2.ticks(), 
+        plotY2.ticks(4), 
         {
           anchor: "right", y: plotY2, tickFormat: plotY2.tickFormat(),
-          label: "Precipitation (mm)", labelAnchor: 'center', labelArrow: 'none', labelOffset: -10
+          label: "Precipitation (mm/h)", labelAnchor: 'center', labelArrow: 'none', labelOffset: -10
         }
       )
     );
@@ -1251,6 +1256,9 @@ const drawInteractivePlot = () => {
     plotGraphOptions.value.marks.push(Plot.ruleY([d3.max(plotLineData, plotV1)]));
     plotGraphOptions.value.marks.push(
       Plot.lineY(plotBarData, Plot.mapY((D) => D.map(plotY2), barOptions))
+    );
+    plotGraphOptions.value.marks.push(
+      Plot.areaY(plotBarData, Plot.mapY((D) => D.map(plotY2), barFillOptions))
     );
     plotGraphOptions.value.marks.push(
       Plot.tip(plotBarData, Plot.mapY((D) => D.map(plotY2), Plot.pointer(barTipOptions)))
@@ -1311,27 +1319,28 @@ const getSliderWidth = () => {
     - (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().left;
 }
 
-const plotGraphCheckboxesEmpty = () => {
+const numPlotGraphCheckboxesChecked = () => {
   if (plotGraphLines.value.length > 1) {
+    let numChecked = 0;
     for (let c = 0; c < plotGraphLines.value.length; c++) {
       if (!(document?.getElementById('plotGraphCheckbox-' + (c + 1)))) {
-        return false;
+        return plotGraphLines.value.length;
       } else if ((document?.getElementById('plotGraphCheckbox-' + (c + 1)) as HTMLInputElement).checked) {
-        return false;
+        numChecked += 1;
       }
     }
-    return true;
+    return numChecked;
   }
-  return false;
+  return 0;
 };
 
 // Create slider as a mini-plot of just the first plot line
 const drawInteractiveSlider = () => {
-  if (!plotGraphCheckboxesEmpty()) {
+  if (numPlotGraphCheckboxesChecked() > 0) {
     plotGraphSliderData.value = [];
     let rowSkip = plotGraphDataRaw.value.length / 1000;
     for (let c = 1; c < plotTableColumns.value.length; c++) {
-      if (c === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
+      if ((document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
         for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
           let dataPoint = {
             time: new Date(plotGraphDataRaw.value[Math.floor(d)][plotTableColumns.value[0].value]),
