@@ -418,6 +418,13 @@ onMounted(async () => {
   if (userCalibrationRunData?.value && getStatusResponse.status === 200) {
     userCalibrationRunData.value.status = getStatusResponse._data.status;
     failureMessages.value = getStatusResponse._data.failure_messages ?? undefined;
+    if (getStatusResponse._data.warnings) {
+      toast.removeAllGroups();
+      getStatusResponse._data.warnings.forEach((err: any) => {
+        const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Warning', detail: err, life: ToastTimeout.timeoutWarn };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    }
   }
 
   // Clear best iteration flag

@@ -123,11 +123,11 @@ onMounted(async() => {
       validateTuningParameters().then(response => {
         if (response._data.parameter_warnings) {
           tuningParametersAreValid.value = false;
-          toast.removeAllGroups();
+          /* toast.removeAllGroups();
           response._data.parameter_warnings.forEach((err: any) => {
             const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Tuning Parameters Warning', detail: err, life: ToastTimeout.timeoutWarn };
             toast.add(tMsg); addToastRecord(tMsg);
-          });
+          }); */
         } else {
           tuningParametersAreValid.value = true;
         }
