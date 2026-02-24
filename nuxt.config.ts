@@ -1,23 +1,20 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { Base } from '#build/components';
-import Aura from '@primevue/themes/aura';
-import { b } from 'vitest/dist/suite-IbNSsUWN.js';
+import Aura from '@primeuix/themes/aura';
 
 export default defineNuxtConfig({
   devtools: { enabled: false },
-  css: ["/assets/styles/styles.scss"],
+  css: ["/assets/styles/styles.scss", "@vuepic/vue-datepicker/dist/main.css"],
   modules: [
-    [
-      "@pinia/nuxt",
-      {
-        // automatically imports `defineStore` and imports `defineStore` as `definePiniaStore`
-        autoImports: ["defineStore", ["defineStore", "definePiniaStore"], "acceptHMRUpdate"],
-      },
-    ],
+    '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
-    "@nuxtjs/google-fonts",
+    '@nuxtjs/google-fonts',
     '@primevue/nuxt-module'
   ],
+
+  piniaPluginPersistedstate: {
+    storage: 'localStorage',
+  },
 
   postcss: {
     plugins: {
@@ -48,7 +45,7 @@ export default defineNuxtConfig({
       theme: {
         preset: Aura,
         options: {
-            darkModeSelector: false,
+          darkModeSelector: false,
         }
       }
     }

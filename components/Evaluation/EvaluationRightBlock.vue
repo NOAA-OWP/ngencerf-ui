@@ -3,13 +3,13 @@
   <div id="EvaluationRightBlock" class="grid grid-cols-1">
     <div class="grid-rows-12" v-if="userCalibrationRunData?.calibration_run_id">
       <div id="TopRightBlock" class="row-span-5">
-        <div class="grid grid-cols-5">
-          <div class="col-span-5 mb-3">
+        <div class="grid grid-cols-6">
+          <div class="col-span-6 mb-3">
             <h2>Summary</h2>
           </div>
           <div id="ProgressGroup" class="col-span-3">
           </div>
-          <div id="GageCutout" class="col-span-2">
+          <div id="GageCutout" class="col-span-3">
             <GageCutout />
           </div>
 

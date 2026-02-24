@@ -3,9 +3,6 @@ import { defineConfig } from "vitest/config";
 import vue from "@vitejs/plugin-vue";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
-import PrimeVueResolvers from "unplugin-vue-components/resolvers";
-
-//import VueTypeImports from "vite-plugin-vue-type-imports";
 
 export default defineConfig({
   plugins: [
@@ -89,7 +86,7 @@ export default defineConfig({
     outputFile: { junit: "./junit.xml" },
     environment: "jsdom",
     exclude: ["**/tests-examples/**", "**/node_modules/**"],
-    setupFiles: [],
+    setupFiles: ["./test/vitest.setup.ts"],
     deps: {
       inline: [/@nuxt\/test-utils-edge/],
     },
@@ -98,9 +95,13 @@ export default defineConfig({
   resolve: {
     alias: {
       "~~": path.resolve(__dirname, "./"),
+      "~": path.resolve(__dirname, "./"), 
       "@": path.resolve(__dirname, "./"),
-      "#app": path.resolve(__dirname, "./node_modules/nuxt/dist/app/index.mjs"),
-      "#imports": path.resolve(__dirname, "./node_modules/nuxt/dist/pages/runtime/composables.mjs"),
+      "#app": path.resolve(__dirname, "./"),
+      "#imports": path.resolve(__dirname, "./"),
+      "~/*": path.resolve(__dirname, "./"),
+      "@/*": path.resolve(__dirname, "./"),
+      "~~/*": path.resolve(__dirname, "./"),
     },
   },
   root: ".",
