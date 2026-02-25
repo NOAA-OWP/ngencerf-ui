@@ -78,12 +78,26 @@ export const useOptimizationStore = defineStore(
         userCalibrationRunData.value?.streamflow_threshold ?? undefined;
       uiPeakFlowThreshold.value =
         userCalibrationRunData.value?.peak_flow_threshold ?? undefined;
-      uiObjectiveFunction.value =
-        userCalibrationRunData.value?.objective_function ?? "";
-      uiOptimization.value = userCalibrationRunData.value?.optimization ?? "";
-      uiPlotFrequency.value =
-        userCalibrationRunData.value?.save_plot_iteration_frequency ?? 1;
-      uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 2;
+      if (userCalibrationRunData.value?.objective_function) {
+        uiObjectiveFunction.value = userCalibrationRunData.value.objective_function;
+      } else {
+        uiObjectiveFunction.value = userCalibrationRunData.value.objective_function = "";
+      }
+      if (userCalibrationRunData.value?.optimization) {
+        uiOptimization.value = userCalibrationRunData.value.optimization;
+      } else {
+        uiOptimization.value = userCalibrationRunData.value.optimization = "";
+      }
+      if (userCalibrationRunData.value?.save_plot_iteration_frequency) {
+        uiPlotFrequency.value = userCalibrationRunData.value.save_plot_iteration_frequency;
+      } else {
+        uiPlotFrequency.value = userCalibrationRunData.value.save_plot_iteration_frequency = 1;
+      }
+      if (userCalibrationRunData.value?.stop_criteria) {
+        uiStopCriteria.value = userCalibrationRunData.value.stop_criteria;
+      } else {
+        uiStopCriteria.value = userCalibrationRunData.value.stop_criteria = 2;
+      }
       uiOptimizationInputs.value = getOptimizationInputUserData.value ?? [];
     };
 

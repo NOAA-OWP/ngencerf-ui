@@ -421,11 +421,9 @@ onMounted(() => {
   resetFilters(false);
   if (preFilterList.value) {
     Object.keys(preFilterList.value).forEach(key => {
-      console.log(key + ':' + preFilterList.value[key]);
       switch(key) {
         case 'status':
           statusTypeFilterList.value = [preFilterList.value[key]];
-          console.log('statusTypeFilterList:',statusTypeFilterList.value);
           break;
         // other pre-filter cases can be added here as necessary
       }
