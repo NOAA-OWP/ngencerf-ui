@@ -42,7 +42,7 @@
           @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Output Variable to Calibrate</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.parameters_selected && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="userCalibrationRunData?.parameters_selected && tuningParametersAreValid && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
         <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Tuning Parameters
         </td>
       </tr>
@@ -76,11 +76,20 @@
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
+import { useToast } from 'primevue/usetoast';
+
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { selectedModuleValues, formulationIsCalibratable } = storeToRefs(useFormulationStore());
 const { validateFormulationTabData } = useFormulationStore();
+const { tuningParametersAreValid } = storeToRefs(useTuningStore());
+const { validateTuningParameters } = useTuningStore();
+const { addToastRecord } = generalStore();
+const toast = useToast();
 
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 
@@ -106,6 +115,21 @@ onMounted(async() => {
       validateFormulationTabData().then(response => {
         if (!response._data.formulation_errors) {
           formulationIsCalibratable.value = true;
+        }
+      });
+    }
+    tuningParametersAreValid.value = false;
+    if (userCalibrationRunData?.value.parameters_selected && !userCalibrationRunData?.value.modules?.includes('LSTM')) {
+      validateTuningParameters().then(response => {
+        if (response._data.parameter_warnings) {
+          tuningParametersAreValid.value = false;
+          /* toast.removeAllGroups();
+          response._data.parameter_warnings.forEach((err: any) => {
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Tuning Parameters Warning', detail: err, life: ToastTimeout.timeoutWarn };
+            toast.add(tMsg); addToastRecord(tMsg);
+          }); */
+        } else {
+          tuningParametersAreValid.value = true;
         }
       });
     }

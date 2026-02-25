@@ -271,7 +271,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   }
 
   /**
-   * return save formulation tab response from the server
+   * return validate formulation tab response from the server
    * @returns {GeneralApiSaveResponse}
    */
   async function validateFormulationTabData() {
@@ -284,6 +284,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          calibration_run_id: calibrationJobId.value,
           modules: selectedModuleValues.value.length > 0 ? selectedModuleValues.value : []
         }),
       }
