@@ -203,7 +203,29 @@ export const useOptimizationStore = defineStore(
         saveOptMetPayload.value["save_plot_iteration_frequency"] =
           uiPlotFrequency.value;
 
-      if (Object.keys(saveOptMetPayload.value).length > 0) {
+      let validationErrors = {};
+      if (Object.keys(saveOptMetPayload.value).length === 0) {
+        validationErrors['Tab Error'] = ["Please select at least 1 field before saving."];
+      } else {
+        if (!saveOptMetPayload.value?.stop_criteria) {
+          validationErrors['Calibration Stop Criteria'] = ["This value must be numeric."];
+        }
+        if (!saveOptMetPayload.value?.save_plot_iteration_frequency) {
+          validationErrors['Plot Generation Frequency'] = ["This value must be numeric."];
+        }
+      }
+      if (Object.keys(validationErrors).length > 0) {
+        return Promise.resolve({
+          _data: {
+            respone_type: "exception",
+            message: "Error saving Optimization Data",
+            validation_errors: validationErrors,
+            calibration_run_id: calibrationJobId.value,
+            status: "error",
+          },
+          status: 400,
+        });
+      } else {
         saveOptMetPayload.value["calibration_run_id"] = calibrationJobId.value;
         saveOptMetPayload.value["save_output_iteration"] = true;
         return await makeProtectedApiCall<GeneralApiSaveResponse>(
@@ -217,19 +239,6 @@ export const useOptimizationStore = defineStore(
             body: JSON.stringify(saveOptMetPayload.value),
           }
         );
-      } else {
-        return Promise.resolve({
-          _data: {
-            respone_type: "exception",
-            message: "Error saving Optimization Data",
-            validation_errors: {
-              "Tab Error": ["Please select at least 1 field before saving."],
-            },
-            calibration_run_id: calibrationJobId.value,
-            status: "error",
-          },
-          status: 400,
-        });
       }
     }
 
