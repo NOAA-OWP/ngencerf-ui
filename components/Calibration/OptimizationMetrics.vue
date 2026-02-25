@@ -280,7 +280,7 @@ onMounted(async() => {
     submitTimeDate.value = new Date(userCalibrationRunData.value.submit_date);
   }
 
-  updateMetricFlowFieldVisibility();
+  updateMetricFlowFieldVisibility(false);
 
   if (userCalibrationRunData.value?.streamflow_threshold) {
     cbIsCategorical.value = true;
@@ -300,7 +300,7 @@ onMounted(async() => {
 /**
  * update objective function and metric peak flow/stream flow field visibility
  */
-const updateMetricFlowFieldVisibility = () => {
+const updateMetricFlowFieldVisibility = (dataChanged: boolean=true) => {
   //reset toggleable field available property
   cbCategoricalDisabled.value = false;
   cbEventBasedDisabled.value = false;
@@ -327,7 +327,9 @@ const updateMetricFlowFieldVisibility = () => {
       showObjectiveFunctionPeakFlow.value = true;
       cbEventBasedDisabled.value = true;
     }
-    optMetDataHasChanged.value = true;
+    if (dataChanged) {
+      optMetDataHasChanged.value = true;
+    }
   }
 };
 
