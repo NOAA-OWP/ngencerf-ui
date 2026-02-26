@@ -376,6 +376,7 @@ const handleAlgorithmParameterChange = () => {
  */
 const optimizationSelectChange = () => {
   uiOptimizationInputs.value = getOptimizationInputUserData.value;
+  algParamDataHasChanged.value = true;
   optMetDataHasChanged.value = true;
 };
 
@@ -469,10 +470,6 @@ const validateTab = () => {
     if ((userCalibrationRunData?.value?.save_plot_iteration_frequency || 0) !== uiPlotFrequency.value) {
       error = true;
       text.push("Plot Generation Frequency has been changed");
-    }
-    if (userCalibrationRunData?.value?.optimization_inputs?.length !== uiOptimizationInputs?.value?.length) {
-      error = true;
-      text.push("Algorithm Parameters have been changed");
     }
 
     if ((cbIsCategorical.value && !userCalibrationRunData.value?.streamflow_threshold ) ||
