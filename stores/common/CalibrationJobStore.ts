@@ -240,7 +240,7 @@ export const useCalibrationJobStore = defineStore('CalibrationJobStore', () => {
         const message = `Error: ${response.status} ${response.statusText}`;
         throw new Error(message);
       }
-      const downloadUrl = ngencerfBaseUrl + '/' + response._data.download_url
+      const downloadUrl = response._data.download_url
       const a = document.createElement("a");
       a.href = downloadUrl;
       a.download = '';
