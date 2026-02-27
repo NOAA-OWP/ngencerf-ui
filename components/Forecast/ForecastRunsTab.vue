@@ -260,14 +260,14 @@ const onRowContextMenu = (event: any) => {
     crContextMenu.value.show(event.originalEvent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
     if (crRowData.forecast_status === 'Saved') {
-      cmForecastRun.value.push({ label: 'Show Setup', icon: 'pi pi-bars', command: () => navigateToSetupForecast() });
+      cmForecastRun.value.push({ label: 'Show Setup', icon: 'pi pi-bars', command: () => navigateToSetupForecast(new_forecast=false) });
     }
     cmForecastRun.value.push({ label: 'View Status', icon: 'pi pi-gauge', command: () => navigateToForecastRunStatus() });
     if (crRowData.forecast_status === 'Done') {
       cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToForecastResults() });
     }
     if (crRowData.calibration_run_id) {
-      cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
+      cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => navigateToSetupForecast() });
       cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
     }
     if (crRowData.forecast_status !== 'Running') {
@@ -328,15 +328,7 @@ const viewCalibrationDetails = async (calibration_run_id: number) => {
   })
 }
 
-const clearDataAndNavigateToSetupForecast = () => {
-  isLoading.value = true;
-
-  nextTick(async () => {
-    navigateToSetupForecast();
-  });
-};
-
-const navigateToSetupForecast = () => {
+const navigateToSetupForecast = (new_forecast: boolean=true) => {
   isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
@@ -344,7 +336,14 @@ const navigateToSetupForecast = () => {
     if (e) {
       // set userCalibrationRunData
       await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
-      forecastJobId.value = undefined;
+      if (new_forecast) {
+        calibrationRunForForecast.value.forecast_run_id = undefined;
+        calibrationRunForForecast.value.forecast_status = undefined;
+        calibrationRunForForecast.value.configuration = undefined;
+        calibrationRunForForecast.value.cycle_date = undefined;
+        calibrationRunForForecast.value.cold_start.cold_start_date = undefined;
+        forecastJobId.value = undefined;
+      }
       isLoading.value = false;
       e.click();
     } else {
