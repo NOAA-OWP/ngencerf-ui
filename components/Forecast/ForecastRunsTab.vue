@@ -341,7 +341,9 @@ const navigateToSetupForecast = (new_forecast: boolean=true) => {
         calibrationRunForForecast.value.forecast_status = undefined;
         calibrationRunForForecast.value.configuration = undefined;
         calibrationRunForForecast.value.cycle_date = undefined;
-        calibrationRunForForecast.value.cold_start.cold_start_date = undefined;
+        if (calibrationRunForForecast.value?.cold_start) {
+          calibrationRunForForecast.value.cold_start.cold_start_date = undefined;
+        }
         forecastJobId.value = undefined;
       }
       isLoading.value = false;
