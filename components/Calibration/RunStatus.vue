@@ -619,7 +619,7 @@ const updateIteration = async () => {
     }
     // check if status changes from Submitted or Running
     if (getIterationResponse._data.status) {
-      if (getIterationResponse._data.status !== 'Submitted' && getIterationResponse._data.status !== 'Running') {
+      if (!['Submitted','Running'].includes(getIterationResponse._data.status)) {
         if (userCalibrationRunData.value) {
           clearInterval(calibrationStatusIntervalId.value);
           calibrationStatusIntervalId.value = undefined;
@@ -651,7 +651,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
       selectedPlotName.value = (logListOptions.value.at(-1)).name;
     }
 
-    if (['Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
+    if (['Submitted', 'Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
       // Calculate Running Time
       if (submitTimeDate.value && submitTimeDate.value instanceof Date && !isNaN(submitTimeDate?.value.getTime())) {    
         // show submitTimeDate as UTC
@@ -691,36 +691,34 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
     
     await populatePlotListOptions();
 
-    if (calibrationStatus.value === 'Submitted' || calibrationStatus.value === 'Running') {
-      if (!calibrationStatusIntervalId.value) {
-        // create an interval to keep checking calibration status every 10 seconds while calibration is 'Submitted' or 'Running'
-        if (calibrationStatusIntervalId.value) {
-          clearInterval(calibrationStatusIntervalId.value);
-        }
-        calibrationStatusIntervalId.value = setInterval(async () => {
-          if (calibrationStatus.value === 'Submitted') {
-            const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
-
-            // check if status changes from Submitted or Running
-            if (getStatusResponse._data && getStatusResponse._data.status) {
-              if (getStatusResponse._data.status !== 'Submitted' && getStatusResponse._data.status !== 'Running') {
-                if (userCalibrationRunData.value) {
-                  clearInterval(calibrationStatusIntervalId.value);
-                  calibrationStatusIntervalId.value = undefined;
-                }
-              }
-              userCalibrationRunData.value.status = getStatusResponse._data.status;
-              failureMessages.value = getStatusResponse._data.failure_messages && undefined;
-            } else {
-              clearInterval(calibrationStatusIntervalId.value);
-              const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
-              toast.add(tMsg); addToastRecord(tMsg);
-            }
-          } else {
-            updateIteration();
-          }
-        }, 10000) as unknown as number;
+    if (['Validating and Preparing Job Data','Submitted','Running'].includes(calibrationStatus.value)) {
+      // create an interval to keep checking calibration status every 10 seconds while calibration is 'Submitted' or 'Running'
+      if (calibrationStatusIntervalId.value) {
+        clearInterval(calibrationStatusIntervalId.value);
       }
+      calibrationStatusIntervalId.value = setInterval(async () => {
+        if (calibrationStatus.value === 'Submitted') {
+          const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
+
+          // check if status changes from Submitted or Running
+          if (getStatusResponse._data && getStatusResponse._data.status) {
+            if (!['Submitted','Running'].includes(getStatusResponse._data.status)) {
+              if (userCalibrationRunData.value) {
+                clearInterval(calibrationStatusIntervalId.value);
+                calibrationStatusIntervalId.value = undefined;
+              }
+            }
+            userCalibrationRunData.value.status = getStatusResponse._data.status;
+            failureMessages.value = getStatusResponse._data.failure_messages && undefined;
+          } else {
+            clearInterval(calibrationStatusIntervalId.value);
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to get Calibration Job Status', life: ToastTimeout.timeoutWarn };
+            toast.add(tMsg); addToastRecord(tMsg);
+          }
+        } else {
+          updateIteration();
+        }
+      }, 10000) as unknown as number;
     }
 
     else if (calibrationStatus.value === 'Done') {
@@ -810,7 +808,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
 
   onCleanup(() => {
     // if Calibration status changes to anything but Running or Done while still executing this watch function, set stopCriteriaMet to false
-    if (calibrationStatus.value !== 'Running' && calibrationStatus.value !== 'Done') {
+    if (!['Running','Done'].includes(calibrationStatus.value)) {
       stopCriteriaMet.value = false;
     }
   });
