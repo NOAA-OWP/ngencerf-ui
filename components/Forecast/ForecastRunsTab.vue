@@ -196,13 +196,12 @@ import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 const { isLoading } = storeToRefs(generalStore());
-const { uiGageList } = storeToRefs(useUserDataStore());
+const { uiGageList, userCalibrationRunData } = storeToRefs(useUserDataStore());
 
 const forecastStore = useForecastStore();
 const {
   forecastJobId,
   calibrationRunForForecast,
-  calibrationRunsForForecast,
   forecastRuns,
   forecastRunListPageSize,
   forecastRunListCurrentPage,
@@ -220,7 +219,6 @@ const {
   loadSelectedCalibrationRun,
   setSelectedForecastRowData,
   getForecastJobs,
-  getCalibrationJobsForForecast,
   deleteForecastJob,
   resetUserSelectedForecastCalibrationRun,
   hardResetForecastRunStatusStore,
@@ -237,7 +235,6 @@ const { addToastRecord } = generalStore();
 watch(forecastRunListSort, async() => {
   forecastRunListCurrentPage.value = 1;
   await getForecastJobs();
-  await getCalibrationJobsForForecast();
 },{ deep: true });
 
 // Watch for page number changes in job list
@@ -246,7 +243,6 @@ watch(forecastRunListCurrentPage, async () => {
     console.log('ERROR: Page number ' + forecastRunListCurrentPage.value + ' out of bounds');
   } else {
     await getForecastJobs();
-    await getCalibrationJobsForForecast();
   }
 });
 
@@ -304,9 +300,6 @@ onMounted(async () => {
     // load forecastRuns
     await getForecastJobs();
 
-    // load calibrationRunsForForecast
-    await getCalibrationJobsForForecast();
-
     updateGageList();
   });
 
@@ -349,11 +342,6 @@ const navigateToSetupForecast = () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
 
     if (e) {
-      // set calibrationRunForForecast based on selectedForecastJob
-      calibrationRunForForecast.value = calibrationRunsForForecast.value.find((calibrationRun: CalibrationRunForForecast) => {
-        return calibrationRun.calibration_run_id === selectedForecastJob.value?.calibration_run_id;
-      }) as CalibrationRunForForecast;
-
       // set userCalibrationRunData
       await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
       forecastJobId.value = undefined;
