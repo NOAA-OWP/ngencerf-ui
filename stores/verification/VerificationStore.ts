@@ -291,7 +291,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
           submitTime.value = formatDateForRunOnString(getVerificationStatusResponse._data.submit_date);
         }
 
-        if (verificationJobStatus?.value?.toLocaleUpperCase() === "RUNNING") {
+        if (['Submitted','Running'].includes(verificationJobStatus?.value)) {
           if (verificationStatusCheckingInterval.value) {
             clearInterval(verificationStatusCheckingInterval.value);
           }
@@ -414,7 +414,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
           if (isValidDate(submitTimeDate.value)) {
             submitTime.value = formatDateForRunOnString(submitTimeDate.value);
           }
-          if ( verificationJobStatus?.value?.toLocaleUpperCase() !== "RUNNING" ) {
+          if (!['Submitted','Running'].includes(verificationJobStatus?.value) ) {
             elapsedTime.value = response._data.elapsed_time ? formatElapsedTime(response._data.elapsed_time) : '';
             clearInterval(verificationStatusCheckingInterval.value);
             clearInterval(verificationRunningTimeInterval.value);
