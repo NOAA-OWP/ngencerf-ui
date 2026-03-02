@@ -111,7 +111,7 @@ const { addToastRecord } = generalStore();
 const formulationStore = useFormulationStore;
 const { formulationTabData } = storeToRefs(formulationStore());
 const { statusTypeFilterList, preFilterList } = storeToRefs(useUserDataStore());
-const { fetchUserCalibrationJobsListIDsOnly } = useUserDataStore();
+const { fetchUserCalibrationJobCounts } = useUserDataStore();
 
 const { getUserFullName } = useUserDataStore()
 
@@ -130,17 +130,16 @@ onMounted(async () => {
   await loadFormulationModels();
   await loadOptimizationTabStaticData();
 
-  statusTypeFilterList.value = ['Running'];
-  const runningCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
-  runningCalibrationJobs.value = runningCalibrationJobsList.length;
-
-  statusTypeFilterList.value = ['Ready'];
-  const readyCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
-  readyCalibrationJobs.value = readyCalibrationJobsList.length;
-
-  statusTypeFilterList.value = ['Saved'];
-  const savedCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
-  savedCalibrationJobs.value = savedCalibrationJobsList.length;
+  const jobCounts = await fetchUserCalibrationJobCounts();
+  if (jobCounts?._data) {
+    runningCalibrationJobs.value = jobCounts._data.running_count;
+    readyCalibrationJobs.value = jobCounts._data.ready_count;
+    savedCalibrationJobs.value = jobCounts._data.saved_count;
+  } else {
+    toast.removeAllGroups();
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Server Error', detail: 'Unable to retrieve job counts from server', life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
 })
 
 const gotoCalibrationAndFilter = (filterList: DynamicObject={}) => {

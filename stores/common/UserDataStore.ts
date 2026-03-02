@@ -270,6 +270,22 @@ export const useUserDataStore = defineStore(
       return tokenExpired.value;
     }
 
+    /** 
+     * fetch job counts for landing page
+     */
+    async function fetchUserCalibrationJobCounts() {
+      return await makeProtectedApiCall<CalibrationJobsList>(
+        `${ngencerfBaseUrl}/calibration/get_calibration_jobs_summary/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          }
+        }
+      );
+    }
+
     /**
      * fetch user created calibration job list datauser created calibration
      * @return {void}
@@ -620,6 +636,7 @@ export const useUserDataStore = defineStore(
       setLastName,
       getAccessToken,
       getRefreshToken,
+      fetchUserCalibrationJobCounts,
       fetchUserCalibrationJobsListData,
       fetchUserCalibrationJobsListIDsOnly,
       fetchGageList,
