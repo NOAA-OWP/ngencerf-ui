@@ -32,7 +32,7 @@
                         <!-- Running Processes Card -->
                         <div class="bg-teal-100 text-teal-800 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer"
                             @click="gotoCalibrationAndFilter({'status': 'Running'})">
-                            <i class="pi pi-cog text-teal-600 text-3xl mb-2"
+                            <i class="pi pi-sync text-teal-600 text-3xl mb-2"
                                 :class="{ 'pi-spin': runningCalibrationJobs > 0 }"></i>
                                 <div class="text-3xl sm:text-4xl font-extrabold text-teal-800">
                                 {{ runningCalibrationJobs }}
