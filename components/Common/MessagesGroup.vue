@@ -216,7 +216,7 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
 const { userCalibrationRunData, calibrationJobNgenGlobalLogging } = storeToRefs(useUserDataStore());
 const calData = ref(userCalibrationRunData);
-const { moduleProperties } = storeToRefs(useFormulationStore());
+const { moduleProperties, selectedModuleValues } = storeToRefs(useFormulationStore());
 const { updateFormulationValidRefs, fetchFormulationModuleOptions } = useFormulationStore();
 const {
   userSelectedCalibrationTuningParameters,
@@ -234,11 +234,11 @@ const componentProps = withDefaults(defineProps<{
 
 const getModuleList = () => {
   let modules = "";
-  calData.value?.modules.forEach(element => {
+  selectedModuleValues.value.forEach(element => {
     let module_option = fetchFormulationModuleOptions.find(module => module.name === element);
     if (module_option) {
       modules += module_option.display_name;
-      if (calData.value?.modules[calData.value?.modules.length - 1] !== element) {
+      if (selectedModuleValues.value[selectedModuleValues.value.length - 1] !== element) {
         modules += ", ";
       }
     }
