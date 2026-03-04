@@ -41,7 +41,7 @@
                     @change="modulePropertiesHaveChanged = true" 
                     :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
                 </span>
-                <label :for="property.name" class="inline">{{ property.display_name }}</label>
+                <label :for="property.name" :class="'inline' + (property.data_type !== 'boolean' ? ' required-label' : '')">{{ property.display_name }}</label>
                 <span v-if="property.choices">
                   <Select :id="property.name + '_' + m"
                     :title="module.name + ' ' + property.display_name + ' Select'" 
