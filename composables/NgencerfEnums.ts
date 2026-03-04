@@ -145,8 +145,8 @@ export const JobStatusAction = {
 
 export const ValidationFormFields = {
   job_name: "Job Name",
-  is_aet_rootzone: "CFE AET Rootzone",
   modules: "Formulation Modules",
+  module_parameters: "Module Parameters",
   sloth_parameters: "Sloth Parameters",
   maps_to_module: "Sloth Parameter For Module",
   maps_to_variable_name: "Sloth Parameter Module Param",

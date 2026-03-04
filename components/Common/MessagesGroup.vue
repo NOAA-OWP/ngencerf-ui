@@ -51,12 +51,24 @@
       <div class="grid grid-cols=1 gap=1 text-sm">
         <div class="col-span-1">
           <div v-if="calData?.modules?.length" :aria-label="'Modules ' + getModuleList()"
-            :title="'Modules ' + getModuleList()"><span class="font-medium">Modules:
-            </span>{{ getModuleList() }}</div>
-          <div v-if="calData?.modules?.includes('CFE-S') || calData?.modules?.includes('CFE-X')" :aria-label="'CFE AET Rootzone ' + (calData?.is_aet_rootzone ? 'Yes' : 'No')"
-            :title="'CFE AET Rootzone ' + (calData?.is_aet_rootzone ? 'Yes' : 'No')">
-            <span class="font-medium">CFE AET Rootzone:
-            </span>{{ (calData?.is_aet_rootzone ? 'Yes' : 'No') }}</div>
+            :title="'Modules ' + getModuleList()">
+            <span class="font-medium">Modules:</span>
+            <div v-for="module in moduleProperties">
+              <div class="font-bold">&middot; {{ module.name }}</div>
+              <div v-for="property in module.properties" class="pl-2">
+                {{ property.display_name }}: 
+                <span v-if="property.data_type === 'boolean'">
+                  {{ property.value === 'true' ? 'True' : 'False' }}
+                </span>
+                <span v-else-if="property.choices">
+                  {{ (property.choices.find(choice => choice.value === property.value))?.label }}
+                </span>
+                <span v-else>
+                  {{ property.value }}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -199,7 +211,8 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
 const { userCalibrationRunData, calibrationJobNgenGlobalLogging } = storeToRefs(useUserDataStore());
 const calData = ref(userCalibrationRunData);
-const { fetchFormulationModuleOptions } = useFormulationStore();
+const { moduleProperties } = storeToRefs(useFormulationStore());
+const { updateFormulationValidRefs, fetchFormulationModuleOptions } = useFormulationStore();
 const {
   userSelectedCalibrationTuningParameters,
   selectedOutputVariableToCalibrate,
@@ -237,6 +250,10 @@ const formatDate = (d: any) => {
 };
 
 onMounted(async() => {
+  // make sure module parameters are loaded
+  if (!moduleProperties.value || moduleProperties.value.length === 0) {
+    await updateFormulationValidRefs();
+  }
   // make sure tuning parameters are loaded
   if (!userSelectedCalibrationTuningParameters.value || userSelectedCalibrationTuningParameters.value.length === 0) {
     await loadTuningTabStaticData();

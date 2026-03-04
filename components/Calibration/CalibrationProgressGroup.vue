@@ -84,8 +84,8 @@ import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-const { selectedModuleValues, formulationIsCalibratable } = storeToRefs(useFormulationStore());
-const { validateFormulationTabData } = useFormulationStore();
+const { selectedModuleValues, formulationIsCalibratable, moduleProperties } = storeToRefs(useFormulationStore());
+const { loadFormulationTabData } = useFormulationStore();
 const { tuningParametersAreValid } = storeToRefs(useTuningStore());
 const { validateTuningParameters } = useTuningStore();
 const { addToastRecord } = generalStore();
@@ -112,7 +112,8 @@ onMounted(async() => {
     }
     formulationIsCalibratable.value = false;
     if (selectedModuleValues.value.length > 0) {
-      validateFormulationTabData().then(response => {
+      loadFormulationTabData().then(response => {
+        moduleProperties.value = response._data?.module_properties?.modules ?? [];
         if (!response._data.formulation_errors) {
           formulationIsCalibratable.value = true;
         }

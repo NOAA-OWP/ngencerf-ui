@@ -164,7 +164,6 @@ export interface UserCalibrationRunData {
   }
   modules: string[];
   job_name: string;
-  is_aet_rootzone: boolean;
   formulation_warning?: FormulationWarning;
   use_sloth: boolean;
   sloth_parameters: SlothParameterData[];
@@ -235,6 +234,12 @@ export interface UserCalibrationRunParametersData {
 export interface UserCalibrationRunOptimizationInputData {
   name: string;
   value: number;
+}
+
+export interface ModulePropertyData {
+  module: string;
+  property_name: number;
+  property_value: string;
 }
 
 export interface SlothParameterData {
@@ -337,8 +342,8 @@ export interface FormulationModuleData {
 
 export interface SaveFormulationTabPayload {
   calibration_run_id?: number;
-  is_aet_rootzone?: boolean;
   modules?: string[];
+  module_properties: ModulePropertyData[];
   use_sloth?: boolean;
   sloth_parameters?: SlothParameterData[];
 }
@@ -402,15 +407,6 @@ export interface module_params {
   minimum: number;
   maximum: number;
   intial_value: 0;
-}
-
-export interface ModuleParameter {
-  name: string;
-  data_type: string;
-  description: string;
-  minimum: number;
-  maximum: number;
-  initial_value: number;
 }
 
 export interface SaveTuningTabParameter {

@@ -29,12 +29,40 @@
 
               </template>
             </Listbox>
-            <div class="pt-4 pl-2" v-if="selectedModuleValues.some(item => item.toLowerCase() === 'cfe-s') || selectedModuleValues.some(item => item.toLowerCase() === 'cfe-x')">
-              <Checkbox id="isAETRootzone" inputId="isAETRootzone" class="h-5 w-5 mr-3" style="display:inline-block"
-                :binary="true" v-model="isAETRootzone" aria-label="CFE AET Rootzone Checkbox"
-                title="CFE AET Rootzone Checkbox" @change="isAETRootzoneHasChanged = true" 
-                :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
-              <label for="isAETRootzone" class="inline">CFE AET Rootzone</label>
+            <div class="pt-4 pl-2" v-for="(module, m) in moduleProperties" :key="m">
+              <div class="font-bold text-lg">{{ module.name }}:</div>
+              <div v-for="(property, p) in module.properties" :key="p">
+                <span v-if="property.data_type === 'boolean'">
+                  <Checkbox :id="property.name + '_' + m" :inputId="property.name + '_' + m" 
+                    class="h-5 w-5 mr-3" style="display:inline-block" :binary="true"
+                    :title="module.name + ' ' + property.display_name + ' Checkbox'" 
+                    :aria-label="module.name + ' ' + property.display_name + ' Checkbox'"
+                    v-model="property.value" true-value="true" false-value="false"
+                    @change="modulePropertiesHaveChanged = true" 
+                    :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
+                </span>
+                <label :for="property.name" class="inline">{{ property.display_name }}</label>
+                <span v-if="property.choices">
+                  <Select :id="property.name + '_' + m"
+                    :title="module.name + ' ' + property.display_name + ' Select'" 
+                    :aria-label="module.name + ' ' + property.display_name + ' Select'"
+                    v-model="property.value"
+                    :options="property.choices" optionLabel="label" optionValue="value"
+                    @change="modulePropertiesHaveChanged = true" 
+                    :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+                  </Select>
+                </span>
+                <span v-else-if="property.data_type !== 'boolean'">
+                  <input :type="property.data_type === 'string' ? 'text' : 'number'" 
+                    :step="property.data_type === 'double' ? 'any' : null"
+                    :id="property.name + '_' + m"
+                    :title="module.name + ' ' + property.display_name + ' Input'" 
+                    :aria-label="module.name + ' ' + property.display_name + ' Input'"
+                    v-model="property.value"
+                    @input="modulePropertiesHaveChanged = true" 
+                    :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+                </span>
+              </div>
             </div>
           </div>
           <div class="col-span-2">&nbsp;</div>
@@ -74,7 +102,7 @@
           </div>
           <div class="col-span-1">&nbsp;</div>
         </div>
-        <!--        <div class="mt-3 mb-5 hr"></div> -->
+        <!-- <div class="mt-3 mb-5 hr"></div> -->
       </div>
       <!--
       /* Don't Display this implemented SLoTH capability until available to send SLoTH variables to ngen-cal */
@@ -167,7 +195,7 @@
           </div>
         </span>
 
-        <span v-if="modulesHaveChanged || isAETRootzoneHasChanged">
+        <span v-if="modulesHaveChanged || modulePropertiesHaveChanged">
           <div class="col-span-1 mr-3">
             <Button class="ngenButtonDiv-yellow" title="Revert Changes" @click="restoreTab()"
               aria-label="Revert Changes">Revert</Button>
@@ -202,7 +230,7 @@ import { storeToRefs } from "pinia";
 import { useDialog } from "primevue/usedialog";
 import { useToast } from "primevue/usetoast";
 
-import type { SlothParameterData } from '@/composables/NgencerfModels';
+import type { ModulePropertyData, SlothParameterData } from '@/composables/NgencerfModels';
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 
@@ -228,6 +256,7 @@ const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
 import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess,useApiResponseToastSeverityLife } from "@/composables/ValidationHandlers";
 import type { ListboxChangeEvent } from "primevue/listbox";
+import { setProperty } from "@primeuix/styled";
 
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
@@ -249,7 +278,7 @@ const {
   filterGroup,
   useSlothParameters,
   selectedModuleValues,
-  isAETRootzone,
+  modulePropertyInputs,
   slothParameterInputs,
   fetchFormulationModuleOptions,
   fetchFormulationModuleCoveredGroupFilterOptions,
@@ -257,6 +286,7 @@ const {
   fetchFormulationSlothParameterTypeOptions,
   fetchFormulationSlothParameterUnitOptions,
   fetchSelectedFormulationModuleOptions,
+  moduleProperties,
   formulationInfoMessages,
   formulationErrorMessages,
   formulationWarningMessages,
@@ -288,7 +318,7 @@ let mainLeftAreaElement: HTMLElement | null = null;
 let dataTableElement: HTMLElement | null = null;
 
 const toast = useToast();
-const isAETRootzoneHasChanged = ref<boolean>(false);
+const modulePropertiesHaveChanged = ref<boolean>(false);
 
 onMounted(async() => {
   if (calibrationJobId.value) {
@@ -380,19 +410,12 @@ const resetModuleList = () => {
       modulesHaveChanged.value = false;
     }
   }
-  if (userCalibrationRunData?.value?.is_aet_rootzone) {
-    isAETRootzone.value = userCalibrationRunData.value.is_aet_rootzone;
-  }
 }
 
 /**
 * event bus for calibration button group click
 */
 const saveFormulationData = () => {
-  // de-select AET Rootzone if formulation does not include CFE
-  if (!selectedModuleValues.value.some(item => item.toLowerCase() === 'cfe-s') && !selectedModuleValues.value.some(item => item.toLowerCase() === 'cfe-x')) {
-    isAETRootzone.value = false;
-  }
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -407,73 +430,88 @@ const saveFormulationData = () => {
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
-    // Only validate changes if this isn't a new configuration
-    if (userCalibrationRunData?.value?.modules && userCalibrationRunData?.value?.modules.length > 1) {
-      var valOK = validateModules();
-      if (!valOK) {
-        modulesHaveChanged.value = false;
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Parameters on the Tuning Control tab", life: ToastTimeout.timeoutInfo };
-        toast.add(tMsg); addToastRecord(tMsg);
-        clearCalibratableParameters();
-      }
-    }
 
-    saveFormulationTabData().then(response => {
-      if (response.status === 200) {
-        formulationIsCalibratable.value = true;
-        if (response._data.eds_errors) {
-          formulationIsCalibratable.value = false;
-          response._data.eds_errors.forEach((err: any) => {
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeoutError };
-            toast.add(tMsg); addToastRecord(tMsg);
-          });
-        }
-        if (response._data.formulation_errors) {
-          formulationIsCalibratable.value = false;
-          response._data.formulation_errors.forEach((err: any) => {
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Formulation Error', detail: err, life: ToastTimeout.timeoutError };
-            toast.add(tMsg); addToastRecord(tMsg);
-          });
-        }
-        if (response._data.formulation_warnings) {
-          response._data.formulation_warnings.forEach((err: any) => {
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Warning', detail: err, life: ToastTimeout.timeoutWarn };
-            toast.add(tMsg); addToastRecord(tMsg);
-          });
-        }
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeoutInfo };
+    let modulePropertyErrors = validateModuleProperties();
+    console.log('modulePropertyErrors:',modulePropertyErrors);
+    if (modulePropertyErrors.length > 0) {
+      modulePropertyErrors.forEach((err: any) => {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Module Property Error', detail: err, life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
-        isLoading.value = false;
-        modulesHaveChanged.value = false;
-        isAETRootzoneHasChanged.value = false;
-        updateJobData();
-      } else {
-        isLoading.value = false;
-        useApiErrorResponsePreprocess(response).forEach(message => {
-          let msgSummary = '';
-          switch(useApiResponseToastSeverityCode(response?.status)) {
-            case 'error':
-              msgSummary = 'Save Formulation Data Failed';
-              break;
-            case 'warn':
-              msgSummary = 'Formulation Accepted with Notices';
-              break;
-            case 'success':
-              msgSummary = 'Formulation Accepted';
-              break;
-          }
-          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: msgSummary, detail: message, life: useApiResponseToastSeverityLife(response?.status) };
+      });
+    } else {
+      // Only validate changes if this isn't a new configuration
+      if (userCalibrationRunData?.value?.modules && userCalibrationRunData?.value?.modules.length > 1) {
+        var valOK = validateModules();
+        if (!valOK) {
+          modulesHaveChanged.value = false;
+          const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Parameters on the Tuning Control tab", life: ToastTimeout.timeoutInfo };
           toast.add(tMsg); addToastRecord(tMsg);
-        });
+          clearCalibratableParameters();
+        }
       }
-    });
+
+      saveFormulationTabData().then(response => {
+        if (response.status === 200) {
+          formulationIsCalibratable.value = true;
+          if (response._data.eds_errors) {
+            formulationIsCalibratable.value = false;
+            response._data.eds_errors.forEach((err: any) => {
+              const tMsg: ToastMessageOptions = { severity: 'error', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeoutError };
+              toast.add(tMsg); addToastRecord(tMsg);
+            });
+          }
+          if (response._data.formulation_errors) {
+            formulationIsCalibratable.value = false;
+            response._data.formulation_errors.forEach((err: any) => {
+              const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Formulation Error', detail: err, life: ToastTimeout.timeoutError };
+              toast.add(tMsg); addToastRecord(tMsg);
+            });
+          }
+          if (response._data.formulation_warnings) {
+            response._data.formulation_warnings.forEach((err: any) => {
+              const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Warning', detail: err, life: ToastTimeout.timeoutWarn };
+              toast.add(tMsg); addToastRecord(tMsg);
+            });
+          }
+          if (response._data.validation_errors) {
+            response._data.validation_errors.forEach((err: any) => {
+              const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Validation Error', detail: err, life: ToastTimeout.timeoutError };
+              toast.add(tMsg); addToastRecord(tMsg);
+            });
+          }
+          const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeoutInfo };
+          toast.add(tMsg); addToastRecord(tMsg);
+          isLoading.value = false;
+          modulesHaveChanged.value = false;
+          modulePropertiesHaveChanged.value = false;
+          updateJobData();
+        } else {
+          isLoading.value = false;
+          useApiErrorResponsePreprocess(response).forEach(message => {
+            let msgSummary = '';
+            switch(useApiResponseToastSeverityCode(response?.status)) {
+              case 'error':
+                msgSummary = 'Save Formulation Data Failed';
+                break;
+              case 'warn':
+                msgSummary = 'Formulation Accepted with Notices';
+                break;
+              case 'success':
+                msgSummary = 'Formulation Accepted';
+                break;
+            }
+            const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: msgSummary, detail: message, life: useApiResponseToastSeverityLife(response?.status) };
+            toast.add(tMsg); addToastRecord(tMsg);
+          });
+        }
+      });
+    }
   }
 }
 
 const updateJobData = () => {
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.modules = saveFormulationPayload.value.modules as string[];
-    userCalibrationRunData.value.is_aet_rootzone = saveFormulationPayload.value.is_aet_rootzone;
     userCalibrationRunData.value.sloth_parameters = saveFormulationPayload.value.sloth_parameters as [];
     userCalibrationRunData.value.use_sloth = saveFormulationPayload.value.use_sloth as boolean;
     userCalibrationRunData.value.last_updated_on = formatISOStringOrDateToYYYYMMDDHHMM(nowUTC());
@@ -489,6 +527,34 @@ const validateModules = () => {
   // fetchUserCalibrationRunData();
   /* check if list of modules changed */
   return userCalibrationRunData?.value?.modules !== null && arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
+}
+
+const validateModuleProperties = () => {
+  let errors = [];
+  // clear modulePropertyInputs - we'll add to it as properties are validated
+  modulePropertyInputs.value = [];
+  moduleProperties.value.forEach((module: any) => {
+    module.properties.forEach((property: any) => {
+      modulePropertyInputs.value.push({
+        module: module.name,
+        property_name: property.name,
+        property_value: property.value
+      })
+
+      if (!property.value || property.value === '') {
+        errors.push(module.name + ': ' + property.display_name + ' is Required');
+      } else if (property.choices && !property.choices.find(choice => choice.value === property.value)) {
+        errors.push(module.name + ': ' + property.display_name + ' has an invalid selection');
+      } else if (property.data_type === 'boolean' && !['true','false'].includes(property.value)) {
+        errors.push(module.name + ': ' + property.display_name + ' must be True or False');
+      } else if (property.data_type === 'integer' && !Number.isInteger(parseInt(property.value))) {
+        errors.push(module.name + ': ' + property.display_name + ' must be an integer');
+      } else if (property.data_type === 'double' && typeof parseFloat(property.value) !== 'number') {
+        errors.push(module.name + ': ' + property.display_name + ' must be numeric');
+      }
+    });
+  });
+  return errors;
 }
 
 const validateTab = () => {
@@ -524,10 +590,10 @@ const validateTab = () => {
       text.push("LSTM can only be paired with T-Route");
     }
   }
-  /* Has user checked/unchecked AET Rootzone? */
-  if (isAETRootzoneHasChanged.value) {
+  /* Have Module Properties changed? */
+  if (modulePropertiesHaveChanged.value) {
     error = true;
-    text.push("CFE AET Rootzone has changed");
+    text.push("Module Properties have changed");
   }
   /* Has user checked/unchecked Add SLoTH output variables? */
   if (useSlothParameters.value !== userCalibrationRunData?.value?.use_sloth) {
@@ -547,10 +613,9 @@ const restoreTab = () => {
   resetModuleList();
   updateFormulationValidRefs();
   if (userCalibrationRunData.value) {
-    isAETRootzone.value = userCalibrationRunData?.value?.is_aet_rootzone;
     useSlothParameters.value = userCalibrationRunData?.value?.use_sloth;
     slothParameterInputs.value = userCalibrationRunData?.value?.sloth_parameters;
-    isAETRootzoneHasChanged.value = false;
+    modulePropertiesHaveChanged.value = false;
   }
 }
 

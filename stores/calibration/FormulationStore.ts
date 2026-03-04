@@ -14,6 +14,7 @@ import type {
   SlothParameterData,
   GeneralApiSaveResponse,
   SaveFormulationTabPayload,
+  DynamicObject,
 } from "@/composables/NgencerfModels";
 import { useCalibrationFormulationTabSaveValidate } from "@/composables/ValidationHandlers";
 
@@ -29,11 +30,12 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
 
   const filterGroup = ref<string>("");
   const selectedModuleValues = ref<string[]>([]);
-  const isAETRootzone = ref<boolean>(false);
+  const modulePropertyInputs = ref<ModulePropertyData[]>([]);
   const slothParameterInputs = ref<SlothParameterData[]>([]);
   const useSlothParameters = ref<boolean>(false);
 
   const formulationTabData = ref<FormulationTabData>();
+  const moduleProperties = ref<DynamicObject[]>([]);
   const formulationInfoMessages = ref<string[]>([]);
   const formulationErrorMessages = ref<string[]>([]);
   const formulationWarningMessages = ref<string[]>([]);
@@ -78,7 +80,6 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     } else {
         selectedModuleValues.value = [];
     }
-    isAETRootzone.value = userCalibrationRunData.value?.is_aet_rootzone ? userCalibrationRunData.value.is_aet_rootzone : false;
     useSlothParameters.value = userCalibrationRunData.value?.use_sloth ?? false;
     slothParameterInputs.value =
       JSON.parse(
@@ -271,12 +272,12 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   }
 
   /**
-   * return validate formulation tab response from the server
+   * return load formulation tab response from the server
    * @returns {GeneralApiSaveResponse}
    */
-  async function validateFormulationTabData() {
+  async function loadFormulationTabData() {
     return await makeProtectedApiCall<GeneralApiSaveResponse>(
-      `${ngencerfBaseUrl}/calibration/validate_formulation_tab/`,
+      `${ngencerfBaseUrl}/calibration/load_formulation_tab/`,
       {
         method: "POST",
         headers: {
@@ -292,7 +293,8 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   }
   
   async function updateFormulationValidRefs() {
-    validateFormulationTabData().then(response => {
+    loadFormulationTabData().then(response => {
+      moduleProperties.value = response._data?.module_properties?.modules ?? [];
       formulationInfoMessages.value = [];
       formulationErrorMessages.value = [];
       formulationWarningMessages.value = [];
@@ -326,7 +328,9 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     saveFormulationPayload.value = <SaveFormulationTabPayload>{};
     saveFormulationPayload.value.modules =
       selectedModuleValues.value.length > 0 ? selectedModuleValues.value : [];
-    saveFormulationPayload.value.is_aet_rootzone = isAETRootzone.value;
+    // set up module parameters
+    saveFormulationPayload.value.module_properties = 
+      modulePropertyInputs.value.length > 0 ? modulePropertyInputs.value : [];
     saveFormulationPayload.value.sloth_parameters =
       slothParameterInputs.value.length > 0 ? slothParameterInputs.value : [];
 
@@ -394,13 +398,13 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
    */
   const resetFormulationStore = (): void => {
     selectedModuleValues.value = ['T-Route'];
-    isAETRootzone.value = false;
     useSlothParameters.value = false;
     slothParameterInputs.value = [];
   };
 
   return {
     formulationTabData,
+    moduleProperties,
     formulationInfoMessages,
     formulationErrorMessages,
     formulationWarningMessages,
@@ -408,7 +412,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     filterGroup,
     useSlothParameters,
     selectedModuleValues,
-    isAETRootzone,
+    modulePropertyInputs,
     slothParameterInputs,
     fetchFormulationModuleOptions,
     fetchFormulationModuleCoveredGroupFilterOptions,
@@ -418,7 +422,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     fetchSelectedFormulationModuleOptions,
     addNewSlothVariable,
     saveFormulationTabData,
-    validateFormulationTabData,
+    loadFormulationTabData,
     updateFormulationValidRefs,
     isLoading,
     resetUserSelectionFormulation,
