@@ -53,6 +53,11 @@
           <div v-if="calData?.modules?.length" :aria-label="'Modules ' + getModuleList()"
             :title="'Modules ' + getModuleList()">
             <span class="font-medium">Modules:</span>
+            {{ getModuleList() }}
+          </div>
+          <div v-if="calData?.modules?.length" aria-label="Module Properties"
+            title="Module Properties">
+            <span class="font-medium">Module Properties:</span>
             <div v-for="module in moduleProperties">
               <div class="font-bold">&middot; {{ module.name }}</div>
               <div v-for="property in module.properties" class="pl-2">
