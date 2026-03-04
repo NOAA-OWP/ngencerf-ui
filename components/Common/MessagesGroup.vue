@@ -55,21 +55,23 @@
             <span class="font-medium">Modules:</span>
             {{ getModuleList() }}
           </div>
-          <div v-if="calData?.modules?.length" aria-label="Module Properties"
+          <div v-if="moduleProperties.length" aria-label="Module Properties"
             title="Module Properties">
             <span class="font-medium">Module Properties:</span>
             <div v-for="module in moduleProperties">
-              <div class="font-bold">&middot; {{ module.name }}</div>
-              <div v-for="property in module.properties" class="pl-2">
-                {{ property.display_name }}: 
-                <span v-if="property.data_type === 'boolean'">
-                  {{ property.value === 'true' ? 'True' : 'False' }}
-                </span>
-                <span v-else-if="property.choices">
-                  {{ (property.choices.find(choice => choice.value === property.value))?.label }}
-                </span>
-                <span v-else>
-                  {{ property.value }}
+              <div>
+                <span class="font-bold">&middot; {{ module.name }}&nbsp;</span> 
+                <span v-for="property in module.properties">
+                  {{ property.display_name }}: 
+                  <span v-if="property.data_type === 'boolean'">
+                    {{ property.value === 'true' ? 'True' : 'False' }}
+                  </span>
+                  <span v-else-if="property.choices">
+                    {{ (property.choices.find(choice => choice.value === property.value))?.label }}
+                  </span>
+                  <span v-else>
+                    {{ property.value }}
+                  </span>
                 </span>
               </div>
             </div>
@@ -237,7 +239,7 @@ const getModuleList = () => {
   selectedModuleValues.value.forEach(element => {
     let module_option = fetchFormulationModuleOptions.find(module => module.name === element);
     if (module_option) {
-      modules += module_option.display_name;
+      modules += module_option.name;
       if (selectedModuleValues.value[selectedModuleValues.value.length - 1] !== element) {
         modules += ", ";
       }
