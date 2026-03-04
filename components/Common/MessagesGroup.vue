@@ -250,7 +250,7 @@ const formatDate = (d: any) => {
 };
 
 onMounted(async() => {
-  // make sure module parameters are loaded
+  // make sure module properties are loaded
   if (!moduleProperties.value || moduleProperties.value.length === 0) {
     await updateFormulationValidRefs();
   }

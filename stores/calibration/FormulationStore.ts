@@ -328,7 +328,7 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     saveFormulationPayload.value = <SaveFormulationTabPayload>{};
     saveFormulationPayload.value.modules =
       selectedModuleValues.value.length > 0 ? selectedModuleValues.value : [];
-    // set up module parameters
+    // set up module properties
     saveFormulationPayload.value.module_properties = 
       modulePropertyInputs.value.length > 0 ? modulePropertyInputs.value : [];
     saveFormulationPayload.value.sloth_parameters =
