@@ -59,18 +59,20 @@
             title="Module Properties">
             <span class="font-medium">Module Properties:</span>
             <div v-for="module in moduleProperties">
-              <div>
+              <div v-if="module.properties.some(property => property.data_type !== 'boolean' || property.value && property.value !== 'false')">
                 <span class="font-bold">&middot; {{ module.name }}&nbsp;</span> 
                 <span v-for="property in module.properties">
-                  {{ property.display_name }}: 
-                  <span v-if="property.data_type === 'boolean'">
-                    {{ property.value === 'true' ? 'True' : 'False' }}
-                  </span>
-                  <span v-else-if="property.choices">
-                    {{ (property.choices.find(choice => choice.value === property.value))?.label }}
-                  </span>
-                  <span v-else>
-                    {{ property.value }}
+                  <span v-if="property.data_type !== 'boolean' || property.value && property.value !== 'false'">
+                    {{ property.display_name }}: 
+                    <span v-if="property.data_type === 'boolean'">
+                      True
+                    </span>
+                    <span v-else-if="property.choices">
+                      {{ (property.choices.find(choice => choice.value === property.value))?.label }}
+                    </span>
+                    <span v-else>
+                      {{ property.value }}
+                    </span>
                   </span>
                 </span>
               </div>
