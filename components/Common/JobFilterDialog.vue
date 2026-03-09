@@ -65,7 +65,7 @@
                 <div v-show="modulesFilterList.length > 1">
                   <label for="ModuleList" class="block text-left mb-1" aria-label="Module Filter"
                     title="Module Filter">Module Match</label>
-                  <Select id="ModuleOperator" v-model="moduleOperator" :options="moduleOperatorList" optionLabel="name"
+                  <Select id="ModuleOperator" v-model="moduleOperator" :options="moduleOperatorList" optionLabel="display_name"
                     optionValue="name" class="user-select w-12" @change="refreshJobList()"
                     aria-label="Module Operator" title="Module Operator">
                   </Select>
@@ -277,8 +277,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const moduleOperatorList = [
-  { name: "Match all selected" },
-  { name: "Match any selected" }
+  { name: 'All', display_name: "Match all selected" },
+  { name: 'Any', display_name: "Match any selected" }
 ]
 const bulkJobActionsList: { name: string, value: number }[] = [
   {name: 'select an action', value: 0, show: true},
@@ -435,6 +435,7 @@ onMounted(() => {
   if (instance?.vnode?.props?.onBulkJobAction) {
     showBulkJobAction.value = true;
   }
+  console.log('moduleOperatorList:',moduleOperatorList);
 })
 
 onUnmounted(() => {
