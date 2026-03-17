@@ -133,7 +133,7 @@
                             </div>
                         </div>
 
-                        <!-- <div v-else-if="location.name === 'Hindcast'" class="py-10 px-1">
+                        <!-- <div v-else-if="location.name === 'Verification'" class="py-10 px-1">
                             <div v-if="getMenuIndex() === 4">
                                 <span v-if="getHindcastTabIndex() === 1">
                                     <LazyVerificationForecastRunsHelp />

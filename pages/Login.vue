@@ -129,7 +129,7 @@ import AppHeader from "@/components/Common/AppHeader.vue";
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 
-const { serverInfo, gitInfo, menuIndex, calibrationTabIndex, evaluationTabIndex, forecastTabIndex, verificationTabIndex } = storeToRefs(generalStore());
+const { serverInfo, gitInfo, menuIndex, calibrationTabIndex, evaluationTabIndex, forecastTabIndex, hindcastTabIndex } = storeToRefs(generalStore());
 
 const { popupActive } = storeToRefs(generalStore());
 

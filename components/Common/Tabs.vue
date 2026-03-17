@@ -183,7 +183,7 @@ const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 const currentEvaluationTab = ref(getEvaluationTabIndex());
 const currentForecastTab = ref(getForecastTabIndex());
-const currentVerificationTab = ref(getHindcastTabIndex());
+const currentHindcastTab = ref(getHindcastTabIndex());
 const currentMenu = ref(getMenuIndex());
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
@@ -205,8 +205,8 @@ const tabClicked = (event: Event) => {
       currentForecastTab.value = Number(ele.getAttribute("data-tab"));
       emit("tabNumber", currentForecastTab.value);
     } else if (currentMenu.value === 4) {
-      currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
-      emit("tabNumber", currentVerificationTab.value);
+      currentHindcastTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentHindcastTab.value);
     }
   })
 }

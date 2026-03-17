@@ -1,5 +1,5 @@
 <template> 
-  <!-- VerificationLeftBlock.vue -->
+  <!-- HindcastLeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
@@ -19,7 +19,7 @@ import HindcastRuns from "./HindcastRuns.vue"
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getHindcastTabIndex, setHindcastTabIndex } = generalStore();
 
-import { useVerificationStore } from '@/stores/verification/VerificationStore';
+import { useVerificationStore } from '@/stores/forecast/VerificationStore';
 const { verificationJobId } = storeToRefs(useVerificationStore());
 
 // Default to Tab 1, HeadwaterBasinGage

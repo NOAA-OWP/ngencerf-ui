@@ -10,7 +10,7 @@
         <ForecastRunsTab />
       </span>
       <span v-else-if="activeTab === 3">
-       <SetupForecastTab />
+        <SetupForecastTab />
       </span>
       <span v-else-if="activeTab === 4">
         <ForecastRunStatusTab />
