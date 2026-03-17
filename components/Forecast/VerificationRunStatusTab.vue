@@ -3,18 +3,18 @@
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="!verificationJobId" class="w-full">
-            <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
-              Click Run to submit and run the verification.
-            </p>
-          </div>
-          <div v-else-if="logListOptions.length > 0" class="inline-block">
+          <div v-if="logListOptions.length > 1" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
                 v-model="selectedLogCategory" :options="logListOptions" option-label="display_name" optionValue="name">
               </Select>
             </div>
+          </div>
+          <div v-else-if="!verificationJobId" class="w-full">
+            <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
+              Click Run to submit and run the verification.
+            </p>
           </div>
           
           <div class="grid auto-cols-max grid-cols-3 gap=1 text-sm text-left mt-2">
@@ -108,7 +108,8 @@ import { ToastTimeout } from "@/composables/NgencerfEnums";
 import { hilightTab } from '@/composables/TabHilight';
 import { storeToRefs } from "pinia";
 
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
+import { useForecastStore } from "~/stores/forecast/ForecastStore";
+import { useVerificationStore } from "~/stores/forecast/VerificationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useLogStore } from '@/stores/common/LogStore';
 
@@ -120,20 +121,24 @@ const cancelButtonDisabled = ref<boolean>(false);
 
 const toast = useToast();
 
+const forecastStore = useForecastStore();
 const verificationStore = useVerificationStore();
 
-const { 
+const {
   selectedForecastJob,
-  selectedVerificationJob,
   forecastJobId,
-  verificationJobId, 
   submitTimeDate,
   submitTime,
   elapsedTime,
+  failureMessages
+} = storeToRefs(forecastStore);
+
+const { 
+  selectedVerificationJob,
+  verificationJobId, 
   verificationStatusCheckingInterval,
   verificationRunningTimeInterval,
-  verificationJobStatus,
-  failureMessages
+  verificationJobStatus
 } = storeToRefs(verificationStore);
 const { 
   loadVerificationRunStatusTabData,
@@ -145,7 +150,6 @@ const {
 
 const {
   selectedLogCategory,
-  logList,
   logListOptions
 } = storeToRefs(useLogStore());
 const {
@@ -154,7 +158,7 @@ const {
 } = useLogStore();
 
 onMounted(async() => {
-  hilightTab(VerificationTabs.tab_runStatus);
+  hilightTab(ForecastTabs.tab_verificationRunStatus);
 
   clearInterval(verificationStatusCheckingInterval.value);
   clearInterval(verificationRunningTimeInterval.value);
@@ -260,7 +264,7 @@ const stopVerificationJob = async () => {
 
 const goNextTab = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[VerificationTabs.tab_results];
+  const e = <HTMLElement>tabs[ForecastTabs.tab_verificationResults];
   e.click();
 }
 
@@ -273,7 +277,6 @@ onUnmounted(() => {
   failureMessages.value = undefined;
   submitTime.value = undefined;
   elapsedTime.value = undefined;
-  logList.value = [];
   logListOptions.value = [];
   resetUserLogRefs();
 })

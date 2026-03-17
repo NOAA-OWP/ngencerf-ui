@@ -93,7 +93,7 @@ const toast = useToast();
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 const forecastStore = useForecastStore();
 
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
+import { useVerificationStore } from "~/stores/forecast/VerificationStore";
 const verificationStore = useVerificationStore();
 
 const { calibrationJobId } = storeToRefs(generalStore());
@@ -104,11 +104,15 @@ const { forecastJobId } = storeToRefs(forecastStore);
 const { getStatus } = forecastStore;
 
 const { 
-  verificationJobId, 
-  selectedVerificationJob, 
+  forecastJobId,
   submitTime,
   submitTimeDate,
-  elapsedTime,
+  elapsedTime
+} = storeToRefs(forecastStore);
+
+const { 
+  verificationJobId, 
+  selectedVerificationJob, 
   verificationJobStatus,
   verificationPlotNames
 } = storeToRefs(verificationStore);
@@ -132,7 +136,7 @@ const verificationPlotFileUrl = ref<string | undefined>();
 
 import { hilightTab } from '@/composables/TabHilight';
 onMounted(async() => {
-  hilightTab(VerificationTabs.tab_results);
+  hilightTab(ForecastTabs.tab_verificationResults);
 
   getVerificationStatus().then((response) => {
     if ( response._data.status ) {

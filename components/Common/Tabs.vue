@@ -113,30 +113,13 @@
         </div>
       </span>
 
-      <span v-else-if="currentMenu === 4"> <!-- VERIFICATION TABS -->
+      <span v-else-if="currentMenu === 4"> <!-- HINDCAST TABS -->
         <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
           <span data-tab="1" class="tabs activeTab prevent-select" @click="tabClicked"
-            aria-label="Forecast Runs Tab" title="Forecast Runs Tab">
-            Forecast Runs
+            aria-label="Hindcast Runs Tab" title="Hindcast Runs Tab">
+            Hindcast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
-          <span data-tab="2" class="tabs prevent-select" @click="tabClicked"
-            aria-label="Verification Runs Tab" title="Verification Runs Tab">
-            Verification Runs
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </span>
-          <div v-show="[3].includes(currentVerificationTab) || selectedVerificationJob" 
-            data-tab="3" class="tabs prevent-select" @click="tabClicked" 
-            aria-label="Run/Status Tab" title="Run/Status Tab">
-            Run/Status
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
-          <div v-show="[4].includes(currentVerificationTab) || (selectedVerificationJob && selectedVerificationJob.status === 'Done')" 
-            id="results-tab" data-tab="4" class="tabs prevent-select" @click="tabClicked"
-            aria-label="Results Tab" title="Results Tab">
-            Results
-            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </div>
         </div>
       </span>
     </div>
@@ -161,7 +144,7 @@ const {
   getCalibrationTabIndex,
   getEvaluationTabIndex,
   getForecastTabIndex,
-  getVerificationTabIndex,
+  getHindcastTabIndex,
   getMenuIndex,
 } = generalStore();
 
@@ -181,7 +164,7 @@ const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 const currentEvaluationTab = ref(getEvaluationTabIndex());
 const currentForecastTab = ref(getForecastTabIndex());
-const currentVerificationTab = ref(getVerificationTabIndex());
+const currentVerificationTab = ref(getHindcastTabIndex());
 const currentMenu = ref(getMenuIndex());
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData

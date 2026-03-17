@@ -115,7 +115,8 @@ import { useToast } from "primevue/usetoast";
 import type { DataTableContextMenuOption, VerificationJob } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
+import { useForecastStore } from "~/stores/forecast/ForecastStore";
+import { useVerificationStore } from "~/stores/forecast/VerificationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
@@ -130,6 +131,8 @@ import Paging from "../Common/Paging.vue";
 const { isLoading } = storeToRefs(generalStore());
 const { uiGageList } = storeToRefs(useUserDataStore());
 
+const { resetFilters } = useForecastStore();
+
 const verificationStore = useVerificationStore();
 const {
   verificationJobs,
@@ -140,8 +143,7 @@ const {
   verificationRunListStartRow,
   verificationRunListEndRow,
   verificationRunListSort,
-  selectedVerificationJob,
-  verificationJobId
+  selectedVerificationJob
 } = storeToRefs(verificationStore);
 
 const {
@@ -149,7 +151,6 @@ const {
   setSelectedVerificationRowData,
   getVerificationJobs,
   deleteVerificationJob,
-  resetFilters,
   fetchVerificationGageList
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
@@ -207,7 +208,7 @@ const onRowContextMenu = (event: any) => {
 onMounted(() => {
   isLoading.value = true;
 
-  hilightTab(VerificationTabs.tab_verificationJobs);
+  hilightTab(ForecastTabs.tab_verificationJobs);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
@@ -279,12 +280,12 @@ const acceptDelete = (selectedRunId: number) => {
 const navigateToVerificationJobStatus = () => {
   isLoading.value = true;
   nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Verification Run/Status Tab"]');
 
     if (e) {
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Verification Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
     isLoading.value = false;
   });
@@ -293,12 +294,12 @@ const navigateToVerificationJobStatus = () => {
 const navigateToVerificationResults = () => {
   isLoading.value = true;
   nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Results Tab"]');
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Verification Results Tab"]');
 
     if (e) {
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Verification Results Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
     isLoading.value = false;
   });

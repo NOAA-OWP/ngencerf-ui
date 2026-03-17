@@ -108,10 +108,10 @@ export const generalStore = defineStore(
     }
 
     //  Verification Tab index
-    function getVerificationTabIndex() {
+    function getHindcastTabIndex() {
       return parseInt(verificationTabIndex.value);
     }
-    function setVerificationTabIndex(tab: number) {
+    function setHindcastTabIndex(tab: number) {
       verificationTabIndex.value = tab.toString();
     }
 
@@ -146,8 +146,8 @@ export const generalStore = defineStore(
       setEvaluationTabIndex,
       getForecastTabIndex,
       setForecastTabIndex,
-      getVerificationTabIndex,
-      setVerificationTabIndex,
+      getHindcastTabIndex,
+      setHindcastTabIndex,
       getEvalRunSelected,
       setEvalRunSelected,
       calibrationJobId,

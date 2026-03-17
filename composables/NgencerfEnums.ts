@@ -23,18 +23,15 @@ export const ForecastTabs = {
   tab_results: 4,
 };
 
-export const VerificationTabs = {
-  tab_forecastRuns: 0,
-  tab_verificationJobs: 1,
-  tab_runStatus: 2,
-  tab_results: 3,
+export const HindcastTabs = {
+  tab_hindcastRuns: 0
 };
 
 export const NgencerfPages = {
   page_calibration: 1,
   page_evaluation: 2,
   page_forecast: 3,
-  page_verification: 4,
+  page_hindcast: 4,
 };
 
 export const CalibrationHelpPages = {

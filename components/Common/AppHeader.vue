@@ -28,10 +28,10 @@
                             to="forecast" data-menu='3' @click="MenuChanged"
                             oncontextmenu="return false;">Forecast</NuxtLink>
                     </li>
-                    <li aria-label="Verification" title="Verification">
-                        <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
-                            to="verification" data-menu='4' @click="MenuChanged"
-                            oncontextmenu="return false;">Verification</NuxtLink>
+                    <li aria-label="Hindcast" title="Hindcast">
+                        <NuxtLink id="MainMenuHindcast" :class="location.name === 'Hindcast' ? 'isActive' : ''"
+                            to="hindcast" data-menu='4' @click="MenuChanged"
+                            oncontextmenu="return false;">Hindcast</NuxtLink>
                     </li>
                 </ul>
 
@@ -135,16 +135,16 @@
 
                         <div v-else-if="location.name === 'Verification'" class="py-10 px-1">
                             <div v-if="getMenuIndex() === 4">
-                                <span v-if="getVerificationTabIndex() === 1">
+                                <span v-if="getHindcastTabIndex() === 1">
                                     <LazyVerificationForecastRunsHelp />
                                 </span>
-                                <span v-if="getVerificationTabIndex() === 2">
+                                <span v-if="getHindcastTabIndex() === 2">
                                     <LazyVerificationVerificationRunsHelp />
                                 </span>
-                                <span v-if="getVerificationTabIndex() === 3">
+                                <span v-if="getHindcastTabIndex() === 3">
                                     <LazyVerificationtRunStatusHelp />
                                 </span>
-                                <span v-if="getVerificationTabIndex() === 4">
+                                <span v-if="getHindcastTabIndex() === 4">
                                     <LazyVerificationResultsHelp />
                                 </span>
                             </div>
@@ -224,7 +224,7 @@ const accountOverlay = ref();
 const aboutOverlay = ref();
 const errorOverlay = ref();
 
-const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex } = generalStore();
+const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getHindcastTabIndex } = generalStore();
 
 const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
