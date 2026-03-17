@@ -19,8 +19,11 @@ export const ForecastTabs = {
   tab_calibrationRuns: 0,
   tab_forecastRuns: 1,
   tab_setupForecast: 2,
-  tab_runStatus: 3,
-  tab_results: 4,
+  tab_forecastRunStatus: 3,
+  tab_forecastResults: 4,
+  tab_verificationJobs: 5,
+  tab_verificationRunStatus: 6,
+  tab_verificationResults: 7,
 };
 
 export const HindcastTabs = {

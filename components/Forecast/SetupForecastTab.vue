@@ -342,7 +342,7 @@ const goToRunStatusTab = () => {
         }
     }
     const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[ForecastTabs.tab_runStatus] as HTMLElement;
+    const e = allTabs[ForecastTabs.tab_forecastRunStatus] as HTMLElement;
     e.click();
 };
 </script>

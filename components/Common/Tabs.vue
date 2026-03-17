@@ -100,14 +100,33 @@
             Setup Forecast
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[4].includes(currentForecastTab) || (calibrationRunForForecast && calibrationRunForForecast?.configuration)" data-tab="4"
-            class="tabs prevent-select" @click="tabClicked" aria-label="Run/Status tab" title="Run/Status Tab">
-            Run/Status
+          <div v-show="[4].includes(currentForecastTab) || (calibrationRunForForecast && calibrationRunForForecast?.configuration && currentForecastTab <= 5)" 
+            data-tab="4" class="tabs prevent-select" @click="tabClicked" 
+            aria-label="Forecast Run/Status tab" title="Forecast Run/Status Tab">
+            Forecast Run/Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[5].includes(currentForecastTab) || calibrationRunForForecast && calibrationRunForForecast?.forecast_status === 'Done'" data-tab="5" class="tabs prevent-select" @click="tabClicked"
-            aria-label="Results tab" title="Results tab">
-            Results
+          <div v-show="[5].includes(currentForecastTab) || (calibrationRunForForecast && calibrationRunForForecast?.forecast_status === 'Done' && currentForecastTab <= 5)" 
+            data-tab="5" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Forecast Results Tab" title="Forecast Results Tab">
+            Forecast Results
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div data-tab="6" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Verification Runs Tab" title="Verification Runs Tab">
+            Verification Runs
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[7].includes(currentForecastTab) || selectedVerificationJob" 
+            data-tab="7" class="tabs prevent-select" @click="tabClicked" 
+            aria-label="Verification Run/Status Tab" title="Verification Run/Status Tab">
+            Verification Run/Status
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[8].includes(currentForecastTab) || (selectedVerificationJob && selectedVerificationJob.status === 'Done')" 
+            id="results-tab" data-tab="8" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Verification Results Tab" title="Verification Results Tab">
+            Verification Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
         </div>
@@ -133,7 +152,7 @@ import { generalStore } from "@/stores/common/GeneralStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
+import { useVerificationStore } from "~/stores/forecast/VerificationStore";
 
 const {
   calibrationJobId,

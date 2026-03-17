@@ -288,7 +288,7 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
 
   // highlight the tab when selected
-  hilightTab(ForecastTabs.tab_runStatus);
+  hilightTab(ForecastTabs.tab_forecastRunStatus);
 
   clearInterval(forecastJobStatusIntervalId.value);
   clearInterval(elapsedTimeIntervalId.value);
@@ -490,7 +490,7 @@ const cancelForecastRun = async () => {
  */
 const goToResultsTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
-  const e = allTabs[ForecastTabs.tab_results] as HTMLElement;
+  const e = allTabs[ForecastTabs.tab_forecastResults] as HTMLElement;
   e.click();
 };
 

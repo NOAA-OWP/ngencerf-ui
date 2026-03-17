@@ -17,7 +17,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const { 
     userCalibrationRunData, 
     uiGageId, 
-    uiGageList, 
     uiDomainName,
     createdAtStart,
     createdAtEnd,

@@ -133,7 +133,7 @@
                             </div>
                         </div>
 
-                        <div v-else-if="location.name === 'Verification'" class="py-10 px-1">
+                        <!-- <div v-else-if="location.name === 'Hindcast'" class="py-10 px-1">
                             <div v-if="getMenuIndex() === 4">
                                 <span v-if="getHindcastTabIndex() === 1">
                                     <LazyVerificationForecastRunsHelp />
@@ -148,7 +148,7 @@
                                     <LazyVerificationResultsHelp />
                                 </span>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </div>
@@ -210,10 +210,10 @@ const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/compo
 const LazyForecastRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/RunStatusHelp.vue"));
 
 // Forecast Workflow Help Files
-const LazyVerificationForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/ForecastRunsHelp.vue"));
-const LazyVerificationVerificationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/VerificationRunsHelp.vue"));
-const LazyVerificationtRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Verification/RunStatusHelp.vue"));
-const LazyVerificationResultsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/ResultsHelp.vue"));
+// const LazyVerificationForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/ForecastRunsHelp.vue"));
+// const LazyVerificationVerificationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/VerificationRunsHelp.vue"));
+// const LazyVerificationtRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Verification/RunStatusHelp.vue"));
+// const LazyVerificationResultsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/ResultsHelp.vue"));
 
 
 const { popupActive } = storeToRefs(generalStore());

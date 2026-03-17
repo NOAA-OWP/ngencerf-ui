@@ -272,7 +272,7 @@ onMounted(async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
-  hilightTab(ForecastTabs.tab_results);
+  hilightTab(ForecastTabs.tab_forecastResults);
   
   await populateLogListOptions([{ name: 'forecast plot', display_name: 'Streamflow Time Series' }]);
   selectedLogCategory.value = 'forecast plot';

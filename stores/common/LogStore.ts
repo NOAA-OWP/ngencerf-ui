@@ -3,7 +3,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
-import { useVerificationStore } from '@/stores/verification/VerificationStore';
+import { useVerificationStore } from '~/stores/forecast/VerificationStore';
 
 function capitalCase(str: string) {
   return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
