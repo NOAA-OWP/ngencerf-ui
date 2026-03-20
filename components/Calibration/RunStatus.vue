@@ -120,6 +120,21 @@
               </div>
             </div>
           </div>
+          <div :class="[
+            'mb-4',
+            { 'opacity-50 pointer-events-none': !calibrationJobNgenGlobalLogging }
+          ]">
+            <div class="inline-flex flex-col items-center">
+              <p class="font-semibold mb-2">Log File Mode</p>
+              <div class="flex gap-6">
+                <label v-for="[label, val] in [['Unified', false], ['Split by Module', true]]" :key="label as string"
+                  class="flex items-center gap-1">
+                  <input type="radio" :value="val" v-model="calibrationJobLogFileMode" :disabled="!calibrationJobNgenGlobalLogging"/>
+                  <span class="whitespace-nowrap">{{ label }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
 
           <div class="mb-4">
             <p class="font-semibold mb-2 text-center">Ngen and Module Log Levels</p>
@@ -273,6 +288,7 @@ const {
   userCalibrationRunData,
   gotoCalibrationRunId,
   calibrationJobNgenGlobalLogging,
+  calibrationJobLogFileMode,
   ngenLogLevel,
   forcingLogLevel,
   logLevels,
