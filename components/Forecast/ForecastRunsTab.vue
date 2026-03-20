@@ -184,6 +184,7 @@ import type { DataTableContextMenuOption, ForecastJob } from "@/composables/Ngen
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
+import { useVerificationStore } from "~/stores/forecast/VerificationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
@@ -225,6 +226,8 @@ const {
   resetFilters,
   fetchForecastGageList
 } = useForecastStore();
+
+const { resetSelectedVerificationJobData } = useVerificationStore();
 
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
@@ -284,6 +287,9 @@ onMounted(async () => {
 
   //reset Run/Status store in case we have running intervals
   hardResetForecastRunStatusStore();
+
+  //reset any previously selected verification data
+  resetSelectedVerificationJobData();
 
   hilightTab(ForecastTabs.tab_forecastRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;

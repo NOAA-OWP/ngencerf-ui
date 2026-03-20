@@ -94,7 +94,7 @@
             Forecast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[3].includes(currentForecastTab) || calibrationRunForForecast && (!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status))" data-tab="3"
+          <div v-show="[3].includes(currentForecastTab) || (calibrationRunForForecast && (!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)) && currentForecastTab <= 5)" data-tab="3"
             class="tabs prevent-select" @click="tabClicked" aria-label="Setup Forecast Tab"
             title="Setup Forecast Tab">
             Setup Forecast
@@ -117,13 +117,13 @@
             Verification Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[7].includes(currentForecastTab) || selectedVerificationJob" 
+          <div v-show="[7].includes(currentForecastTab) || (selectedVerificationJob && currentForecastTab >= 6)" 
             data-tab="7" class="tabs prevent-select" @click="tabClicked" 
             aria-label="Verification Run/Status Tab" title="Verification Run/Status Tab">
             Verification Run/Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[8].includes(currentForecastTab) || (selectedVerificationJob && selectedVerificationJob.status === 'Done')" 
+          <div v-show="[8].includes(currentForecastTab) || (selectedVerificationJob && selectedVerificationJob.status === 'Done' && currentForecastTab >= 6)" 
             id="results-tab" data-tab="8" class="tabs prevent-select" @click="tabClicked"
             aria-label="Verification Results Tab" title="Verification Results Tab">
             Verification Results
