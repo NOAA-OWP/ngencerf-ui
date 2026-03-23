@@ -4,16 +4,16 @@
       <div v-if="selectedLogList.length > 1" style="font-size: 0.9em;">
         <span class="font-bold pr-2 pt-3">Select {{ selectedLogCategoryDisplay }} Log: </span>
         <Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
-          optionLabel="name" optionValue="name">
+          optionLabel="display_name" optionValue="name">
         </Select>
       </div>
       <div v-if="selectedLogFilePath !== '' && selectedLogList.length === 1" style="font-size: 0.9em;">
         <span class="font-bold">Log Name: </span>
-        {{ selectedLogName }}
+        {{ selectedLogName.split('/').at(-1).split('.')[0] }}
       </div>
       <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
         <span class="font-bold">Log File Path: </span>
-        <span class="whitespace-nowrap overflow-auto">{{ selectedLogFilePath }}</span>
+        <span class="whitespace-nowrap overflow-auto">{{ selectedLogName }}</span>
       </div>
 
       <div v-if="selectedLogDisplay" class="mt-2">
@@ -114,7 +114,6 @@ watch(selectedLogCurrentPage, async () => {
       selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
     }
     const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
       selectedLogName.value, // log_name
       selectedLogStartRow.value - 1, // start
       logDataPageSize.value // limit

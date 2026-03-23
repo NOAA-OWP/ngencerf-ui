@@ -161,6 +161,7 @@ export interface UserCalibrationRunData {
     modules: {
       [key: string]: string;
     }
+    split_logs_by_module: boolean;
   }
   modules: string[];
   job_name: string;
@@ -748,6 +749,7 @@ export type CalibrationRunForForecast = {
     modules: {
       [key: string]: string;
     }
+    split_logs_by_module: boolean;
   }
 };
 

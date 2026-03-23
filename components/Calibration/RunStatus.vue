@@ -125,7 +125,7 @@
             { 'opacity-50 pointer-events-none': !calibrationJobNgenGlobalLogging }
           ]">
             <div class="inline-flex flex-col items-center">
-              <p class="font-semibold mb-2">Log File Mode</p>
+              <p class="font-semibold mb-2">Log File Mode {{ calibrationJobLogFileMode }}</p>
               <div class="flex gap-6">
                 <label v-for="[label, val] in [['Unified', false], ['Split by Module', true]]" :key="label as string"
                   class="flex items-center gap-1">
@@ -194,16 +194,16 @@
                 <tr v-if="selectedLogList.length > 1" style="font-size: 0.9em;">
                   <td class="pr-2 pt-3 whitespace-nowrap"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }} Log</label></td>
                   <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
-                  optionLabel="name" optionValue="name">
+                  optionLabel="display_name" optionValue="name">
                 </Select></td>
                 </tr>
                 <tr v-if="selectedLogFilePath !== '' && selectedLogList.length === 1" style="font-size: 0.9em;">
                   <td class="pr-2 pt-3 whitespace-nowrap"><b>Log Name</b></td>
-                  <td class="pt-3">{{ selectedLogName }}</td>
+                  <td class="pt-3">{{ selectedLogName.split('/').at(-1).split('.')[0] }}</td>
                 </tr>
                 <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
                   <td class="pr-2 pt-3 whitespace-nowrap"><b>Log File Path</b></td>
-                  <td class="pt-3">{{ selectedLogFilePath }}</td>
+                  <td class="pt-3">{{ selectedLogName }}</td>
                 </tr>
               </tbody>
             </table>
@@ -362,7 +362,10 @@ const populatePlotListOptions = async() => {
             Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
               let logList = [];
               for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-                logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+                logList.push({ 
+                  'name': logs.value?._data?.log_names[l][key][n],
+                  'display_name': logs.value?._data?.log_names[l][key][n].split('/').at(-1).split('.')[0]
+                });
               }
               logLists.value[key] = logList;
             });
@@ -413,6 +416,12 @@ onMounted(async () => {
   const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
 
   // set log levels
+  if (userCalibrationRunData?.value?.logging_config?.logging_enabled) {
+    calibrationJobNgenGlobalLogging.value = true;
+  }
+  if (userCalibrationRunData?.value?.logging_config?.split_logs_by_module) {
+    calibrationJobLogFileMode.value = true;
+  }
   if (userCalibrationRunData?.value?.logging_config?.modules['ngen']) {
     ngenLogLevel.value = userCalibrationRunData?.value?.logging_config?.modules['ngen'] as LogLevel;
   } else {
@@ -960,7 +969,6 @@ watch(selectedLogCategory, async () => {
 const updateLogRefs = async(getLogData: boolean) => {
   if (getLogData) {
     const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category
       selectedLogName.value, // log_name
       (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // calibration_run_id
       -1, // start is -1 to tell the server we want only the last "page" of logs

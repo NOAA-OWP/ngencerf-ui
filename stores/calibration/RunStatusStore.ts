@@ -229,6 +229,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       logging_config?: {
         logging_enabled?: boolean;
         modules?: Record<string, LogLevel>;
+        split_logs_by_module?: boolean;
       }
     } = {
       calibration_run_id: calibrationJobId.value,
@@ -328,7 +329,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     * @return {any}
     */
   const queryGetLogData = async (
-    log_category: string,
     log_name: string,
     calibration_run_id: number,
     start?: number,
@@ -341,7 +341,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        log_category: log_category,
         log_name: log_name,
         calibration_run_id: calibration_run_id,
         start: start !== undefined ? start : 0,

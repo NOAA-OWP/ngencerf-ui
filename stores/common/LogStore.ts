@@ -63,7 +63,6 @@ export const useLogStore = defineStore('LogStore', () => {
     * @return {any}
     */
   const queryGetLogData = async (
-    log_category: string,
     log_name: string,
     start?: number,
     limit?: number
@@ -75,7 +74,6 @@ export const useLogStore = defineStore('LogStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        log_category: log_category,
         log_name: log_name,
         start: start !== undefined ? start : 0,
         limit: limit !== undefined ? limit : 1000,
@@ -148,7 +146,10 @@ export const useLogStore = defineStore('LogStore', () => {
         Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
           let logNameList = [];
           for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-            logNameList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+            logNameList.push({ 
+              'name': logs.value?._data?.log_names[l][key][n],
+              'display_name': logs.value?._data?.log_names[l][key][n].split('/').at(-1).split('.')[0]
+            });
           }
           logLists.value[key] = logNameList;
         });
@@ -207,7 +208,6 @@ export const useLogStore = defineStore('LogStore', () => {
   const updateLogRefs = async(getLogData: boolean) => {
     if (getLogData) {
       const response: any = await queryGetLogData(
-        selectedLogCategory.value, // log_category
         selectedLogName.value, // log_name
         currentJobStatus.value === 'Done' ? 0 : -1, // start from first page if done, else last page
         logDataPageSize.value // limit

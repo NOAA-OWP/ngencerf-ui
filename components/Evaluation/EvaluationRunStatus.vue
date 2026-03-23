@@ -263,7 +263,6 @@ const updateLogDisplay = () => {
       autoScrollLog.value = true;
     }
     queryGetLogData(
-      selectedLogCategory.value, // log_category
       selectedLogName.value, // log_name
       iterationValidationRunId.value, // validation_run_id
       selectedLogStartRow.value - 1, // start

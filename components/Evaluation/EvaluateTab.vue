@@ -239,16 +239,16 @@
               <td class="pr-2 pt-3"><label for="selectedLogOptions">Select {{ capitalCase(selectedLogCategory) }}
                   Log</label></td>
               <td><Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;"
-                  v-model="selectedLogName" :options="selectedLogList" optionLabel="name" optionValue="name">
+                  v-model="selectedLogName" :options="selectedLogList" optionLabel="display_name" optionValue="name">
                 </Select></td>
             </tr>
             <tr v-if="selectedLogList.length === 1" style="font-size: 0.9em;">
               <td class="pr-2 pt-3"><b>Log Name</b></td>
-              <td class="pt-3">{{ selectedLogName }}</td>
+              <td class="pt-3">{{ selectedLogName.split('/').at(-1).split('.')[0] }}</td>
             </tr>
             <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
               <td class="pr-2 pt-3"><b>Log File Path</b></td>
-              <td class="pt-3">{{ selectedLogFilePath }}</td>
+              <td class="pt-3">{{ selectedLogName }}</td>
             </tr>
           </tbody>
         </table>
@@ -525,7 +525,10 @@ onMounted(() => {
           Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
             let logList = [];
             for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-              logList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
+              logList.push({ 
+                'name': logs.value?._data?.log_names[l][key][n],
+                'display_name': logs.value?._data?.log_names[l][key][n].split('/').at(-1).split('.')[0],
+              });
             }
             logLists.value[key] = logList;
           });
@@ -1621,7 +1624,6 @@ watch(selectedLogName, async () => {
   if (selectedLogName.value !== '') {
     selectedLogCurrentPage.value = 1;
     const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
       selectedLogName.value, // log_name
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
       0, // start
@@ -1662,7 +1664,6 @@ watch(selectedLogCurrentPage, async () => {
       selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
     }
     const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
       selectedLogName.value, // log_name
       (evaluateValidationRunId.value) ? evaluateValidationRunId.value : 0, // validation_run_id
       selectedLogStartRow.value - 1, // start
