@@ -12,18 +12,18 @@
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="logList.length > 0" class="inline-block">
-            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
-            <div class="inline-block w-2/3">
-              <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
-                v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
-              </Select>
-            </div>
-          </div>
-          <div v-else-if="!forecastJobId || !overallColdStartForecastStatus" class="w-full">
+          <div v-if="!forecastJobId || !overallColdStartForecastStatus" class="w-full">
             <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
               Click Run to submit and run the forecast.
             </p>
+          </div>
+          <div v-else class="inline-block">
+            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <div class="inline-block w-2/3">
+              <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
+                v-model="selectedLogCategory" :options="logListOptions" option-label="display_name" optionValue="name">
+              </Select>
+            </div>
           </div>
           
           <div class="grid auto-cols-max grid-cols-3 gap=1 text-sm text-left mt-2">
@@ -113,9 +113,6 @@
                 </span>
               </div>
             </div>
-          </div>
-            
-          <div>
           </div>
         </div>
 
@@ -272,7 +269,7 @@ const {
 
 const {
   selectedLogCategory,
-  logList
+  logListOptions
 } = storeToRefs(useLogStore());
 const {
   populateLogListOptions,
@@ -385,7 +382,7 @@ const createElapsedTimeInterval = () => {
 const createColdStartAndForecastStatusInterval = () => {
   clearInterval(forecastJobStatusIntervalId.value);
   forecastJobStatusIntervalId.value = setInterval(async () => {
-    loadForecastRunStatusTabData();
+    await loadForecastRunStatusTabData();
     await populateLogListOptions();
     // if cold start and forecast job are not Submitted or Running, clear the interval
     if (!['Submitted', 'Running'].includes(coldStartJobStatus.value ?? '') && !['Submitted', 'Running'].includes(forecastJobStatus.value ?? ''))
@@ -498,7 +495,7 @@ const goToSetupForecastTab = () => {
 onUnmounted(() => {
   // make sure page clears all log data when the user leaves
   hardResetForecastRunStatusStore();
-  logList.value = [];
+  logListOptions.value = [];
   forecastJobStatus.value = undefined;
   coldStartJobStatus.value = undefined;
   resetUserLogRefs();
