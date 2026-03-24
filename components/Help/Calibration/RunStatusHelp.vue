@@ -18,6 +18,10 @@
                     Once all required data has been entered, all checkmarks are set and the status becomes <strong>Ready</strong>. Otherwise, the status remains <strong>Saved</strong> or one of the finished statuses.
                 </li>
                 <li>
+                    Set the desired <strong>Log</strong> settings before clicking the <strong>Run</strong> button.<br />
+                    <strong>Logs are not shared across MPI processes — each MPI process writes its own log file(s).</strong>
+                </li>
+                <li>
                     Clicking <strong>Run</strong> triggers the final subsetting and validation of acquired data. Depending on the size of the headwater basin, this may delay the start of the calibration run. Additional delays may occur while waiting for available resources.
                 </li>
                 <li><p class="mb-0">Normal status transitions</p>
@@ -54,9 +58,12 @@
                 <li>
                     If a job fails during the calibration run:
                     <ol class="list-decimal list-outside ml-4">
-                        <li>The <strong>ngen.log</strong> file is automatically displayed to help identify the problem.</li>
-                        <li>If the issue is not clear, select <strong>Calibration logs</strong> from <strong>Display</strong> 
-                            and scroll through the console output (stdout/stderr) to investigate further.</li>
+                        <li>Select the <strong>Calibration Logs</strong> from the <strong>Display</strong> pulldown menu to help 
+                            identify the problem.
+                        </li>
+                        <li>Suggest looking at an <strong>ngen</strong> log. If it not available or the issue is not clear, select 
+                            another log and scroll through the console output (stdout/stderr) to investigate further.
+                        </li>
                     </ol>
                 </li>
             </ul>
@@ -107,6 +114,15 @@
                 <tr>
                     <td class="td1">Global Logging</td>
                     <td class="td2">Enable or Disable the Error Warning and Trapping system for ngen and modules.</td>
+                </tr>
+                <tr>
+                    <td class="td1">Log Mode</td>
+                    <td class="td2">Logs are not shared across MPI processes. Each MPI process writes its own log file(s).<br />
+                                            <ol class="list-disc list-outside ml-4">
+                        <li><strong>Unifed</strong> Places log messages for all modules in single log file per rank.</li>
+                        <li><strong>Split By Module</strong> Places log messages in module prefixed log files per rank.</li>
+                    </ol>
+                </td>
                 </tr>
                 <tr>
                     <td class="td1">Log Levels</td>
