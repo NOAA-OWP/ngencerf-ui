@@ -116,7 +116,7 @@
                     <td class="td2">Enable or Disable the Error Warning and Trapping system for ngen and modules.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Log Mode</td>
+                    <td class="td1">Log File Mode</td>
                     <td class="td2">Logs are not shared across MPI processes. Each MPI process writes its own log file(s).<br />
                                             <ol class="list-disc list-outside ml-4">
                         <li><strong>Unifed</strong> Places log messages for all modules in single log file per rank.</li>
