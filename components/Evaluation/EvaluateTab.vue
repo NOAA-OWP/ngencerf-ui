@@ -1254,7 +1254,7 @@ const drawInteractivePlot = () => {
         plotY2.ticks(4), 
         {
           anchor: "right", y: plotY2, tickFormat: plotY2.tickFormat(),
-          label: "Precipitation (mm/h)", labelAnchor: 'center', labelArrow: 'none', labelOffset: -10
+          label: "Precipitation + Melt (mm/hr)", labelAnchor: 'center', labelArrow: 'none', labelOffset: -10
         }
       )
     );
