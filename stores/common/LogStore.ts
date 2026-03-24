@@ -94,7 +94,6 @@ export const useLogStore = defineStore('LogStore', () => {
    * @return {any}
    */
   const queryGetLogStatus = async (
-    log_category: string,
     log_name: string,
     byte_offset: number
   ): Promise<any> => {
@@ -105,7 +104,6 @@ export const useLogStore = defineStore('LogStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        log_category: log_category,
         log_name: log_name,
         byte_offset: byte_offset,
         [
@@ -245,7 +243,6 @@ export const useLogStore = defineStore('LogStore', () => {
       clearTimeout(logTimeout);
       logTimeout = setTimeout(async() => {
         const status_response: any = await queryGetLogStatus(
-          selectedLogCategory.value, // log_category
           selectedLogName.value, // log_name
           selectedLogByteOffset.value // byte_offset
         )

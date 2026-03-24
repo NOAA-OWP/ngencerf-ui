@@ -147,7 +147,7 @@
         'mb-4',
         { 'opacity-50 pointer-events-none': !forecastJobNgenGlobalLogging }
       ]">
-        <div class="inline-flex flex-col items-center">
+        <div class="inline-flex flex-col items-center mb-2">
           <p class="font-semibold mb-2">Log File Mode</p>
           <div class="flex gap-6">
             <label v-for="[label, val] in [['Unified', false], ['Split by Module', true]]" :key="label as string"
@@ -386,6 +386,7 @@ const createColdStartAndForecastStatusInterval = () => {
   clearInterval(forecastJobStatusIntervalId.value);
   forecastJobStatusIntervalId.value = setInterval(async () => {
     loadForecastRunStatusTabData();
+    await populateLogListOptions();
     // if cold start and forecast job are not Submitted or Running, clear the interval
     if (!['Submitted', 'Running'].includes(coldStartJobStatus.value ?? '') && !['Submitted', 'Running'].includes(forecastJobStatus.value ?? ''))
     {

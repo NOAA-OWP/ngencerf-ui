@@ -124,8 +124,8 @@
             'mb-4',
             { 'opacity-50 pointer-events-none': !calibrationJobNgenGlobalLogging }
           ]">
-            <div class="inline-flex flex-col items-center">
-              <p class="font-semibold mb-2">Log File Mode {{ calibrationJobLogFileMode }}</p>
+            <div class="inline-flex flex-col items-center mb-2">
+              <p class="font-semibold mb-2">Log File Mode</p>
               <div class="flex gap-6">
                 <label v-for="[label, val] in [['Unified', false], ['Split by Module', true]]" :key="label as string"
                   class="flex items-center gap-1">
@@ -386,15 +386,7 @@ const populatePlotListOptions = async() => {
         }
       }
 
-      if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
-        // Skip directly to ngen log if status is Failed
-        selectedPlotName.value = (logListOptions.value.at(-1)).name;
-        nextTick(async () => {
-          if (selectedLogList.value.length > 1) {
-              selectedLogName.value = selectedLogList.value.at(-1).name;
-          }
-        });
-      } else if (!selectedPlotName.value) {
+      if (!selectedPlotName.value) {
         // Start with default option
         selectedPlotName.value = plotListDefault.value;
       }
@@ -644,6 +636,7 @@ const updateIteration = async () => {
     }
     // check if status changes from Submitted or Running
     if (getIterationResponse._data.status) {
+      await populatePlotListOptions();
       if (!['Submitted','Running'].includes(getIterationResponse._data.status)) {
         if (userCalibrationRunData.value) {
           clearInterval(calibrationStatusIntervalId.value);
@@ -669,11 +662,6 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
 
     if (userCalibrationRunData.value.submit_date) {
       submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
-    }
-
-     // Skip directly to ngen log if status is Failed
-    if (calibrationStatus.value == 'Failed' && logListOptions.value.length > 0) {
-      selectedPlotName.value = (logListOptions.value.at(-1)).name;
     }
 
     if (['Submitted', 'Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
@@ -774,6 +762,8 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
             if (validationControlStatus?.value) {
               validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
             }
+
+            await populatePlotListOptions();
 
             // if valid_control and valid_best are Done, Cancelled, Failed, Server error, or Unknown, clear the interval
             if (['Done', 'Cancelled', 'Failed', 'Server error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
@@ -1004,7 +994,6 @@ const updateLogRefs = async(getLogData: boolean) => {
     logTimeout = setTimeout(async() => {
       const status_response: any = await queryGetLogStatus(
         (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0, // calibration_run_id
-        selectedLogCategory.value, // log_category
         selectedLogName.value, // log_name
         selectedLogByteOffset.value // byte_offset
       )
