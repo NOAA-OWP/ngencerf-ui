@@ -334,65 +334,98 @@ const selectedLogByteOffset = ref<number>(0);
 const selectedLogStatus = ref<DynamicObject>({});
 let logTimeout;
 
-const populatePlotListOptions = async() => {
-  if (userCalibrationRunData?.value?.calibration_run_id > 0 && !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
-    plotList.value = [];
-    plotList.value.push({ name: plotListDefault.value, display_name: '' });
-    plotListOptions.value = [];
-    logListOptions.value = [];
+const populatePlotListOptions = async () => {
+  if (
+    userCalibrationRunData?.value?.calibration_run_id > 0 &&
+    !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)
+  ) {
+    const nextPlotList = [{ name: plotListDefault.value, display_name: '' }];
+    const nextPlotListOptions: any[] = [];
+    const nextLogListOptions: any[] = [];
+    const nextLogLists: DynamicObject = {};
 
-    nextTick(async () => {
-      if (['Running','Done','Cancelled','Failed','Server error'].includes(userCalibrationRunData?.value?.status) && iteration.value !== undefined && iteration.value >= 0) {
-        // Get Plot Names
-        plotNames.value = await queryGetPlotNames();
+    if (
+      ['Running', 'Done', 'Cancelled', 'Failed', 'Server error'].includes(
+        userCalibrationRunData?.value?.status
+      ) &&
+      iteration.value !== undefined &&
+      iteration.value >= 0
+    ) {
+      plotNames.value = await queryGetPlotNames();
 
-        if ((plotNames.value as any)?._data?.plot_names) {
-          // setting plotList will populate the dropdown
-          plotListOptions.value = (plotNames.value as any)?._data?.plot_names
+      if ((plotNames.value as any)?._data?.plot_names) {
+        nextPlotListOptions.push(...(plotNames.value as any)._data.plot_names);
+      }
+    }
+
+    if (
+      !['Submitted', 'Validating and Preparing Job Data'].includes(
+        userCalibrationRunData?.value?.status
+      )
+    ) {
+      logs.value = await queryGetLogNames(
+        userCalibrationRunData?.value?.calibration_run_id ?? 0
+      );
+
+      if (logs.value?._data?.log_names) {
+        for (let l = 0; l < logs.value._data.log_names.length; l++) {
+          Object.keys(logs.value._data.log_names[l]).forEach((key) => {
+            const logList = logs.value._data.log_names[l][key].map((name: string) => ({
+              name,
+              display_name: name.split('/').pop()?.split('.')[0] ?? name
+            }));
+
+            nextLogLists[key] = logList;
+          });
         }
       }
+    }
 
-      if (!['Submitted','Validating and Preparing Job Data'].includes(userCalibrationRunData?.value?.status)) {
-        // Get Names of available Logs
-        logs.value = await queryGetLogNames(
-          (userCalibrationRunData?.value?.calibration_run_id) ? userCalibrationRunData?.value?.calibration_run_id : 0 // validation_run_id
-        );
-        if (logs.value?._data?.log_names) {
-          for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-            Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-              let logList = [];
-              for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-                logList.push({ 
-                  'name': logs.value?._data?.log_names[l][key][n],
-                  'display_name': logs.value?._data?.log_names[l][key][n].split('/').at(-1).split('.')[0]
-                });
-              }
-              logLists.value[key] = logList;
-            });
-          }
-        }
-      }
-      
-      // Add Log Options to the dropdown
-      Object.keys(logLists.value).forEach(key => {
-        let optionName = capitalCase(key) + ' Logs';
-        logListOptions.value.push({ name: optionName, display_name: '' });
+    Object.keys(nextLogLists).forEach((key) => {
+      nextLogListOptions.push({
+        name: capitalCase(key) + ' Logs',
+        display_name: ''
       });
-
-      // Combine available plot and log options
-      for (const option of plotListOptions.value.concat(logListOptions.value)) {
-        if (!(plotList.value.find(obj => obj.name === option.name))) {
-          plotList.value.push(option);
-        }
-      }
-
-      if (!selectedPlotName.value) {
-        // Start with default option
-        selectedPlotName.value = plotListDefault.value;
-      }
     });
+
+    for (const option of nextPlotListOptions.concat(nextLogListOptions)) {
+      if (!nextPlotList.find((obj) => obj.name === option.name)) {
+        nextPlotList.push(option);
+      }
+    }
+
+    const currentPlotSelection = selectedPlotName.value;
+    const currentLogCategory = selectedLogCategory.value;
+    const currentLogName = selectedLogName.value;
+
+    plotListOptions.value = nextPlotListOptions;
+    logListOptions.value = nextLogListOptions;
+    logLists.value = nextLogLists;
+    plotList.value = nextPlotList;
+
+    if (
+      !currentPlotSelection ||
+      !nextPlotList.some((obj) => obj.name === currentPlotSelection)
+    ) {
+      selectedPlotName.value = plotListDefault.value;
+    }
+
+    if (currentLogCategory && nextLogLists[currentLogCategory]) {
+      selectedLogList.value = nextLogLists[currentLogCategory];
+
+      if (selectedLogList.value.some((log: any) => log.name === currentLogName)) {
+        selectedLogName.value = currentLogName;
+      } else if (selectedLogList.value.length > 0) {
+        selectedLogName.value = selectedLogList.value[0].name;
+      } else {
+        selectedLogName.value = '';
+      }
+    } else {
+      selectedLogList.value = [];
+      selectedLogName.value = '';
+    }
   }
-}
+};
 
 onMounted(async () => {
   isLoading.value = true;
