@@ -1028,7 +1028,7 @@ const updateLogRefs = async(getLogData: boolean) => {
       }
     }
   }
-  if (userCalibrationRunData?.value?.status === 'Running' && selectedLogName.value) {
+  if ((calibrationStatus.value === 'Running' || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') && selectedLogName.value) {
     // watch status every 10 seconds to see if log file changes
     clearTimeout(logTimeout);
     logTimeout = setTimeout(async() => {
