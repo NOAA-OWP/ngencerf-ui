@@ -184,7 +184,7 @@ export const useLogStore = defineStore('LogStore', () => {
       selectedLogName.value = '';
     }
 
-    if (!selectedLogCategory.value && logListOptions.value.length > 0) {
+    if ((!selectedLogCategory.value || selectedLogCategory.value == logListDefault.value) && logListOptions.value.length > 0) {
       // Skip directly to first available log if no option has been picked
       selectedLogCategory.value = logListOptions.value[0].name;
       nextTick(() => {
@@ -195,9 +195,6 @@ export const useLogStore = defineStore('LogStore', () => {
           selectedLogName.value = selectedLogList.value[0].name;
         }
       });
-    } else if (!selectedLogCategory.value && logListOptions.value.length > 0) {
-      // Start with first option
-      selectedLogCategory.value = logListOptions.value[0].name;
     }
   }
 

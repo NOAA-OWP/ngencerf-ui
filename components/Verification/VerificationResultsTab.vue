@@ -164,7 +164,6 @@ onMounted(async() => {
   }
 
   await populateLogListOptions(verificationPlotNames.value);
-  selectedLogCategory.value = verificationPlotDefault.value;
 })
 
 function capitalCaseNonNumeric(str: string) {
