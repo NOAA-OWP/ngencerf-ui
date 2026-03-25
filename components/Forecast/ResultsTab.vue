@@ -12,11 +12,11 @@
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="logList.length > 1" class="inline-block">
+          <div v-if="logListOptions.length > 1" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;" 
-                v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
+                v-model="selectedLogCategory" :options="logListOptions" option-label="display_name" optionValue="name">
               </Select>
             </div>
           </div>
@@ -201,7 +201,6 @@ const {
 
 const {
   selectedLogCategory,
-  logList,
   logListOptions
 } = storeToRefs(useLogStore());
 const {
@@ -783,7 +782,6 @@ const toggleCustomizePlot = async () => {
 onUnmounted(() => {
   // make sure page clears all plot/log data when the user leaves
   resetUserPlotRefs([]);
-  logList.value = [];
   logListOptions.value = [];
   resetUserLogRefs();
 })

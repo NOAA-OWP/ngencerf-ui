@@ -138,7 +138,7 @@ export const useLogStore = defineStore('LogStore', () => {
    * populate log list options
    */
   const populateLogListOptions = async(plotListOptions: [] = []) => {
-    const nextLogListOptions: any[] = [];
+    const nextLogListOptions: any[] = Array.from(plotListOptions);
     const nextLogLists: DynamicObject = {};
 
     logs.value = await queryGetLogNames();
