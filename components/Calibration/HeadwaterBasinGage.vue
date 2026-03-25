@@ -608,7 +608,9 @@ const updateJobData = async (response: any) => {
     userCalibrationRunData.value.forcing_source_actual = response?._data?.forcing_source_actual as string;
     userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
-    userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
+    if (response?._data?.geopackage_image_url) {
+      userCalibrationRunData.value.geopackage_image_url = response._data.geopackage_image_url;
+    }
 
     // Assume EDS status is true if sources are set
     if (userCalibrationRunData.value.forcing_source_actual !== '') {
