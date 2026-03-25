@@ -334,7 +334,7 @@ const selectedLogByteOffset = ref<number>(0);
 const selectedLogStatus = ref<DynamicObject>({});
 let logTimeout;
 
-const populatePlotListOptions = async () => {
+const populatePlotAndLogListOptions = async (include_plots: boolean=true) => {
   if (
     userCalibrationRunData?.value?.calibration_run_id > 0 &&
     !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)
@@ -351,7 +351,9 @@ const populatePlotListOptions = async () => {
       iteration.value !== undefined &&
       iteration.value >= 0
     ) {
-      plotNames.value = await queryGetPlotNames();
+      if (include_plots || !plotNames.value) {
+        plotNames.value = await queryGetPlotNames();
+      }
 
       if ((plotNames.value as any)?._data?.plot_names) {
         nextPlotListOptions.push(...(plotNames.value as any)._data.plot_names);
@@ -519,7 +521,7 @@ onMounted(async () => {
       if (!iteration.value) {
         await updateIteration();
       }
-      await populatePlotListOptions();
+      await populatePlotAndLogListOptions();
     } else {
       // If job is saved or ready we need to explicitly clear the validation statuses
       validationControlStatus.value = undefined;
@@ -669,7 +671,6 @@ const updateIteration = async () => {
     }
     // check if status changes from Submitted or Running
     if (getIterationResponse._data.status) {
-      await populatePlotListOptions();
       if (!['Submitted','Running'].includes(getIterationResponse._data.status)) {
         if (userCalibrationRunData.value) {
           clearInterval(calibrationStatusIntervalId.value);
@@ -735,7 +736,7 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
       }
     }
     
-    await populatePlotListOptions();
+    await populatePlotAndLogListOptions();
 
     if (['Validating and Preparing Job Data','Submitted','Running'].includes(calibrationStatus.value)) {
       // create an interval to keep checking calibration status every 10 seconds while calibration is 'Submitted' or 'Running'
@@ -763,6 +764,8 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
           }
         } else {
           updateIteration();
+          // we are inside the 10-second interval, so only heck for new logs, not new plot
+          populatePlotAndLogListOptions(false);
         }
       }, 10000) as unknown as number;
     }
@@ -796,7 +799,8 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
               validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
             }
 
-            await populatePlotListOptions();
+            // we are inside the 10-second interval, so only heck for new logs, not new plot
+            await populatePlotAndLogListOptions(false);
 
             // if valid_control and valid_best are Done, Cancelled, Failed, Server error, or Unknown, clear the interval
             if (['Done', 'Cancelled', 'Failed', 'Server error', 'Unknown'].includes(validControlAndValidBestStatus.value ?? '')) {
@@ -920,7 +924,7 @@ watch(submitTimeDate, () => {
 watch(iteration, async () => {
   if (iteration.value !== undefined && iteration.value >= 0 && !isLoading.value) {
     // populate plotListOptions from iteration 1 onwards, in case a plot becomes available that wasn't before
-    await populatePlotListOptions();
+    await populatePlotAndLogListOptions();
     if (selectedPlotName.value && selectedPlotName.value != plotListDefault.value && !(selectedPlotName.value.includes(" Logs") && selectedPlotName.value.replace(" Logs", "").toLowerCase() in logLists.value)) {
       let plotNotAvailableMessage: string = selectedPlotName.value?.toString() + ' plot is not yet available';
 
