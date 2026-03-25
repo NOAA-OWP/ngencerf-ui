@@ -10,11 +10,10 @@ import { makeProtectedApiCall } from "@/composables/UserAuth"
 import { calculateElapsedTime } from '@/utils/TimeHelpers';
 
 export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore', () => {
-  const { calibrationJobId, evaluateIterationRunId, iterationValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());
+  const { calibrationJobId, evaluateIterationRunId, iterationValidationRunId, evaluateDisplayIterationNumber, validationStatus } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
 
-  const validationStatus = ref<string>( "" );
   const runningTime = ref<string>("");
   const startTime = ref<string>("");
   const validationStopStatus = ref<string[]>(['DONE', 'SERVER ERROR', 'FAILED', 'CANCELLED']);

@@ -8,7 +8,7 @@
               Click Run to submit and run the verification.
             </p>
           </div>
-          <div v-else class="inline-block">
+          <div v-else-if="logListOptions.length > 0" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
@@ -88,7 +88,7 @@
     </div>
 
     <!-- DISPLAY LOGS -->
-    <div v-show="logList.length > 0">
+    <div v-show="logListOptions.length > 0">
       <LogDisplay/>
     </div>
 
@@ -195,7 +195,6 @@ const startVerificationJob = async () => {
 
       if (response?._data?.submit_date) {
         submitTimeDate.value = new Date(response?._data?.submit_date);
-
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
         }
@@ -205,7 +204,9 @@ const startVerificationJob = async () => {
         if (verificationRunningTimeInterval.value) {
           clearInterval(verificationRunningTimeInterval.value);
         }
-        verificationStatusCheckingInterval.value = setInterval(loadVerificationStatusInformation, 10000);
+        // Wait a second to populate log list for the first time
+        setTimeout(populateLogListOptions, 2000);
+        verificationStatusCheckingInterval.value = setInterval(loadVerificationStatusInformation, 5000);
         verificationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
       } else {
         loadVerificationStatusInformation();

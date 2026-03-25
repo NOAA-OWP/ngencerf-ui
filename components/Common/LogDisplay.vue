@@ -23,6 +23,9 @@
           <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
         </div>
       </div>
+      <div v-else-if="selectedLogDisplay === ''">
+        Log file is empty
+      </div>
       <div v-else>
         Log file unavailable
       </div>

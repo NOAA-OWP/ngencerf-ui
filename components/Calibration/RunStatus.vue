@@ -221,6 +221,9 @@
                 </span>
               </div>
             </div>
+            <div v-else-if="selectedLogDisplay === ''">
+              Log file is empty
+            </div>
             <div v-else>
               Log file unavailable
             </div>

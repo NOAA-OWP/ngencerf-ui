@@ -17,7 +17,7 @@
               Click Run to submit and run the forecast.
             </p>
           </div>
-          <div v-else class="inline-block">
+          <div v-else-if="logListOptions.length > 0" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"

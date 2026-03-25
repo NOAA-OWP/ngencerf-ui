@@ -1,5 +1,6 @@
 import { defineStore, storeToRefs } from "pinia";
 
+import { generalStore } from '@/stores/common/GeneralStore';
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { useVerificationStore } from '@/stores/verification/VerificationStore';
@@ -11,6 +12,8 @@ function capitalCase(str: string) {
 export const useLogStore = defineStore('LogStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
+  const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+  const { iterationValidationRunId, validationStatus } = storeToRefs(generalStore());
   const { forecastJobId, overallColdStartForecastStatus } = storeToRefs(useForecastStore());
   const { verificationJobId, verificationJobStatus } = storeToRefs(useVerificationStore());
 
@@ -49,11 +52,13 @@ export const useLogStore = defineStore('LogStore', () => {
       body: JSON.stringify({[
           verificationJobId.value ? 'verification_run_id' :
           (forecastJobId.value ? 'forecast_run_id' :
-          'calibration_run_id')
+          (iterationValidationRunId.value ? 'validation_run_id' :
+          'calibration_run_id'))
         ]:
         verificationJobId.value ? verificationJobId.value :
         (forecastJobId.value ? forecastJobId.value :
-        null)
+        (iterationValidationRunId.value ? iterationValidationRunId.value :
+        userCalibrationRunData?.value?.calibration_run_id))
       })
     });
   };
@@ -80,11 +85,13 @@ export const useLogStore = defineStore('LogStore', () => {
         [
           verificationJobId.value ? 'verification_run_id' :
           (forecastJobId.value ? 'forecast_run_id' :
-          'calibration_run_id')
+          (iterationValidationRunId.value ? 'validation_run_id' :
+          'calibration_run_id'))
         ]:
         verificationJobId.value ? verificationJobId.value :
         (forecastJobId.value ? forecastJobId.value :
-        null)
+        (iterationValidationRunId.value ? iterationValidationRunId.value :
+        userCalibrationRunData?.value?.calibration_run_id))
       })
     });
   };
@@ -109,11 +116,13 @@ export const useLogStore = defineStore('LogStore', () => {
         [
           verificationJobId.value ? 'verification_run_id' :
           (forecastJobId.value ? 'forecast_run_id' :
-          'calibration_run_id')
+          (iterationValidationRunId.value ? 'validation_run_id' :
+          'calibration_run_id'))
         ]:
         verificationJobId.value ? verificationJobId.value :
         (forecastJobId.value ? forecastJobId.value :
-        null)
+        (iterationValidationRunId.value ? iterationValidationRunId.value :
+        userCalibrationRunData?.value?.calibration_run_id))
       })
     });
   };
@@ -121,7 +130,8 @@ export const useLogStore = defineStore('LogStore', () => {
   const currentJobStatus = computed(() => {
     return verificationJobId.value ? verificationJobStatus.value :
       (forecastJobId.value ? overallColdStartForecastStatus.value :
-      undefined)
+      (iterationValidationRunId.value ? validationStatus.value :
+      userCalibrationRunData?.value?.status))
   });
 
   /**
@@ -185,7 +195,7 @@ export const useLogStore = defineStore('LogStore', () => {
           selectedLogName.value = selectedLogList.value[0].name;
         }
       });
-    } else if (!selectedLogCategory.value) {
+    } else if (!selectedLogCategory.value && logListOptions.value.length > 0) {
       // Start with first option
       selectedLogCategory.value = logListOptions.value[0].name;
     }

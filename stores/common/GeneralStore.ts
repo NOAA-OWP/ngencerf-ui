@@ -33,6 +33,8 @@ export const generalStore = defineStore(
     const evaluateValidationRunStatus = ref<string>("");
     // user seleted iteration run number for display only
     const evaluateDisplayIterationNumber = ref<number>(0);
+    // validation status for display only
+    const validationStatus = ref<string>( "" );
 
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
@@ -154,6 +156,7 @@ export const generalStore = defineStore(
       iterationValidationRunId,
       evaluateValidationRunStatus,
       evaluateDisplayIterationNumber,
+      validationStatus,
       calibrationTabIndex,
       evaluationTabIndex,
       forecastTabIndex,
