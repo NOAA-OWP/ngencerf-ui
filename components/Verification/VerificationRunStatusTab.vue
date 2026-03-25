@@ -3,18 +3,18 @@
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="logList.length > 0" class="inline-block">
-            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
-            <div class="inline-block w-2/3">
-              <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
-                v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
-              </Select>
-            </div>
-          </div>
-          <div v-else-if="!verificationJobId" class="w-full">
+          <div v-if="!verificationJobId" class="w-full">
             <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
               Click Run to submit and run the verification.
             </p>
+          </div>
+          <div v-else class="inline-block">
+            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <div class="inline-block w-2/3">
+              <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
+                v-model="selectedLogCategory" :options="logListOptions" option-label="display_name" optionValue="name">
+              </Select>
+            </div>
           </div>
           
           <div class="grid auto-cols-max grid-cols-3 gap=1 text-sm text-left mt-2">

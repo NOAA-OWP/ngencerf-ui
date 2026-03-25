@@ -196,6 +196,12 @@
               NGen Global Logging:</span>
             {{ calibrationJobNgenGlobalLogging ? 'ENABLED' : 'DISABLED' }}</div>
         </div>
+        <div class="col-span-2">
+          <div :aria-label="'Log File Mode ' + calibrationJobLogFileMode"
+            :title="'Log File Mode ' + calibrationJobLogFileMode"><span class="font-medium">
+              Log File Mode:</span>
+            {{ calibrationJobLogFileMode ? 'Split by Module' : 'Unified' }}</div>
+        </div>
         <div v-if="calData?.last_updated_on" class="col-span-2">
           <div :aria-label="'Last Updated At ' + formatDate(calData?.last_updated_on)"
             :title="'Last Updated At ' + formatDate(calData?.last_updated_on)"><span class="font-medium">
@@ -218,7 +224,11 @@ import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
-const { userCalibrationRunData, calibrationJobNgenGlobalLogging } = storeToRefs(useUserDataStore());
+const { 
+  userCalibrationRunData, 
+  calibrationJobNgenGlobalLogging, 
+  calibrationJobLogFileMode 
+} = storeToRefs(useUserDataStore());
 const calData = ref(userCalibrationRunData);
 const { moduleProperties, selectedModuleValues } = storeToRefs(useFormulationStore());
 const { updateFormulationValidRefs, fetchFormulationModuleOptions } = useFormulationStore();

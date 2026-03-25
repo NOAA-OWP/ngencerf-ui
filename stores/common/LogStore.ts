@@ -63,7 +63,6 @@ export const useLogStore = defineStore('LogStore', () => {
     * @return {any}
     */
   const queryGetLogData = async (
-    log_category: string,
     log_name: string,
     start?: number,
     limit?: number
@@ -75,7 +74,6 @@ export const useLogStore = defineStore('LogStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        log_category: log_category,
         log_name: log_name,
         start: start !== undefined ? start : 0,
         limit: limit !== undefined ? limit : 1000,
@@ -96,7 +94,6 @@ export const useLogStore = defineStore('LogStore', () => {
    * @return {any}
    */
   const queryGetLogStatus = async (
-    log_category: string,
     log_name: string,
     byte_offset: number
   ): Promise<any> => {
@@ -107,7 +104,6 @@ export const useLogStore = defineStore('LogStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        log_category: log_category,
         log_name: log_name,
         byte_offset: byte_offset,
         [
@@ -132,58 +128,67 @@ export const useLogStore = defineStore('LogStore', () => {
    * populate log list options
    */
   const populateLogListOptions = async(plotListOptions: [] = []) => {
-    logLists.value = {};
-    logList.value = [];
-    logListOptions.value = [];
-    
-    logList.value.push({ name: '', display_name: logListDefault.value });
-    for (const option of plotListOptions) {
-      logListOptions.value.push(option);
-    }
-  
-    // Get Names of available Logs
+    const nextLogListOptions: any[] = [];
+    const nextLogLists: DynamicObject = {};
+
     logs.value = await queryGetLogNames();
+
     if (logs.value?._data?.log_names) {
-      for (let l = 0; l < logs.value?._data?.log_names.length; l++) {
-        Object.keys(logs.value?._data?.log_names[l]).forEach(key => {
-          let logNameList = [];
-          for (let n = 0; n < logs.value?._data?.log_names[l][key].length; n++) {
-            logNameList.push({ 'name': logs.value?._data?.log_names[l][key][n] });
-          }
-          logLists.value[key] = logNameList;
+      for (let l = 0; l < logs.value._data.log_names.length; l++) {
+        Object.keys(logs.value._data.log_names[l]).forEach((key) => {
+          const logList = logs.value._data.log_names[l][key].map((name: string) => ({
+            name,
+            display_name: name.split('/').pop()?.split('.')[0] ?? name
+          }));
+
+          nextLogLists[key] = logList;
         });
       }
     }
-    
-    // Add Log Options to the dropdown
-    Object.keys(logLists.value).forEach(key => {
-      logListOptions.value.push({ name: key, display_name: capitalCase(key) + ' Logs' });
+
+    Object.keys(nextLogLists).forEach((key) => {
+      nextLogListOptions.push({
+        name: key,
+        display_name: capitalCase(key) + ' Logs',
+      });
     });
-    for (const option of logListOptions.value) {
-      if (!(logList.value.find(obj => obj.name === option.name))) {
-        logList.value.push(option);
+
+    const currentLogCategory = selectedLogCategory.value;
+    const currentLogName = selectedLogName.value;
+;
+    logListOptions.value = nextLogListOptions;
+    logLists.value = nextLogLists;
+
+    if (currentLogCategory && nextLogLists[currentLogCategory]) {
+      selectedLogList.value = nextLogLists[currentLogCategory];
+
+      if (selectedLogList.value.some((log: any) => log.name === currentLogName)) {
+        selectedLogName.value = currentLogName;
+      } else if (selectedLogList.value.length > 0) {
+        selectedLogName.value = selectedLogList.value[0].name;
+      } else {
+        selectedLogName.value = '';
       }
+    } else {
+      selectedLogList.value = [];
+      selectedLogName.value = '';
     }
 
-    if ((!selectedLogCategory.value || (currentJobStatus.value && currentJobStatus.value.includes('Failed'))) && logListOptions.value.length > 0) {
-      // Skip directly to first available log if status is Failed or no option has been picked
+    if (!selectedLogCategory.value && logListOptions.value.length > 0) {
+      // Skip directly to first available log if no option has been picked
       selectedLogCategory.value = logListOptions.value[0].name;
       nextTick(() => {
         if (!selectedLogList.value || selectedLogList.value.length === 0) {
           selectedLogList.value = logLists.value[selectedLogCategory.value];
         }
         if (selectedLogList.value && selectedLogList.value.length > 0) {
-          selectedLogName.value = selectedLogList.value.at(-1).name;
+          selectedLogName.value = selectedLogList.value[0].name;
         }
       });
     } else if (!selectedLogCategory.value) {
       // Start with first option
       selectedLogCategory.value = logListOptions.value[0].name;
     }
-
-    logLists.value = logLists.value;
-    logList.value = logList.value;
-    logListOptions.value = logListOptions.value;
   }
 
   // Reset refs when selectedLogName changes
@@ -207,7 +212,6 @@ export const useLogStore = defineStore('LogStore', () => {
   const updateLogRefs = async(getLogData: boolean) => {
     if (getLogData) {
       const response: any = await queryGetLogData(
-        selectedLogCategory.value, // log_category
         selectedLogName.value, // log_name
         currentJobStatus.value === 'Done' ? 0 : -1, // start from first page if done, else last page
         logDataPageSize.value // limit
@@ -245,7 +249,6 @@ export const useLogStore = defineStore('LogStore', () => {
       clearTimeout(logTimeout);
       logTimeout = setTimeout(async() => {
         const status_response: any = await queryGetLogStatus(
-          selectedLogCategory.value, // log_category
           selectedLogName.value, // log_name
           selectedLogByteOffset.value // byte_offset
         )

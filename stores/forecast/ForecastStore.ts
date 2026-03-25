@@ -76,6 +76,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const selectedForecastJob = ref<ForecastJob>();
 
   const forecastJobNgenGlobalLogging = ref<boolean>(true);
+  const forecastJobLogFileMode = ref<boolean>(false);
+
   /**
    * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
    */
@@ -352,6 +354,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
         logging_config: {
           logging_enabled: forecastJobNgenGlobalLogging.value,
+          split_logs_by_module: forecastJobLogFileMode.value,
           ...(serializedModules && {
             // add ngenLogLevel and forcingLogLevel to beginning of the object
             modules: {
@@ -655,6 +658,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     }
 
     forecastJobNgenGlobalLogging.value = true;
+    forecastJobLogFileMode.value = false;
   };
 
   /**
@@ -713,6 +717,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     selectedForecastJob,
     overallColdStartForecastStatus,
     forecastJobNgenGlobalLogging,
+    forecastJobLogFileMode,
     getForecastJobs,
     loadForecastRunStatusTabData,
     loadForecastResultsTabData,

@@ -435,7 +435,6 @@ onMounted(() => {
   if (instance?.vnode?.props?.onBulkJobAction) {
     showBulkJobAction.value = true;
   }
-  console.log('moduleOperatorList:',moduleOperatorList);
 })
 
 onUnmounted(() => {
