@@ -72,14 +72,6 @@
                         adjacent table.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Streamflow Precipitation</td>
-                    <td class="td2">Same as Hydrograph evolution but here precipitation time series is add at the top
-                        using
-                        inverted y-axis.
-                        Data for this plot is calcuated internally by the program and unavailable for table display.
-                    </td>
-                </tr>
-                <tr>
                     <td class="td1">Flow Duration Curves</td>
                     <td class="td2">Comparison of flow duration curve (FDC) between streamflow observation and
                         simulations
@@ -145,13 +137,6 @@
                         Data for this plot is calcuated internally by the program and unavailable for table display.
                     </td>
                 </tr>
-                <tr>
-                    <td class="td1">Streamflow Validation Precipitation</td>
-                    <td class="td2">Same as Hydrograph Validation but with precipitation added at the top using inverted
-                        y-axis.
-                        Data for this plot is calcuated internally by the program and unavailable for table display.S
-                    </td>
-                </tr>
             </tbody>
         </table>
         <br />
@@ -215,10 +200,6 @@
                 <tr>
                     <td class="td1">Validation Logs</td>
                     <td class="td2">Outputs (stdout, stderr) from ngen-cal and ngen validation run.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Global Logs</td>
-                    <td class="td2">Error Warning and Trapping System log from the last run of ngen.</td>
                 </tr>
             </tbody>
         </table>
