@@ -100,15 +100,13 @@ const { calibrationJobId } = storeToRefs(generalStore());
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
 
-const { forecastJobId } = storeToRefs(forecastStore);
-const { getStatus } = forecastStore;
-
 const { 
   forecastJobId,
   submitTime,
   submitTimeDate,
   elapsedTime
 } = storeToRefs(forecastStore);
+const { getStatus } = forecastStore;
 
 const { 
   verificationJobId, 
