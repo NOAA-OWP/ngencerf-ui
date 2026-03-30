@@ -82,13 +82,13 @@
                 </span>
                 <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
                   <Button class="ngenButtonDiv-green ml-6 font-normal px-4" title="Run Button" aria-label="Run Button"
-                    @click="startForecastRun()">
+                    @click="startForecastRun()" :disabled="runButtonDisabled">
                     Run
                   </Button>
                 </span>
                 <span v-if="['Submitted','Running'].includes(coldStartJobStatus) || ['Submitted','Running'].includes(forecastJobStatus)">
-                  <Button class="ngenButtonDiv-red ml-6 font-normal px-4" title="Cancel Button" @click="cancelForecastRun()"
-                    aria-label="Cancel Button">
+                  <Button class="ngenButtonDiv-red ml-6 font-normal px-4" title="Cancel Button" aria-label="Cancel Button" 
+                    @click="cancelForecastRun()" :disabled="cancelButtonDisabled">
                     Cancel
                   </Button>
                 </span>
@@ -234,7 +234,10 @@ const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
-const showMessagesGroup = ref<Boolean>(false);
+
+const runButtonDisabled = ref<boolean>(false);
+const cancelButtonDisabled = ref<boolean>(false);
+const showMessagesGroup = ref<boolean>(false);
 
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
@@ -334,6 +337,9 @@ onMounted(async () => {
   if (!coldStartDate.value && calibrationRunForForecast?.value?.cold_start?.cold_start_date) {
     coldStartDate.value = calibrationRunForForecast.value.cold_start.cold_start_date;
   }
+  
+  runButtonDisabled.value = !['Unknown','Ready'].includes(overallColdStartForecastStatus.value);
+  cancelButtonDisabled.value = ['Submitted','Running'].includes(coldStartJobStatus.value) || ['Submitted','Running'].includes(forecastJobStatus.value);
 
   watch(overallColdStartForecastStatus, (newColdStartForecastStatus, oldColdStartForecastStatus) => {
     if (forecastJobId.value && 
@@ -399,7 +405,8 @@ const createColdStartAndForecastStatusInterval = () => {
  * Start the forecast run
  */
 const startForecastRun = async () => {
-  calibrationRunForForecast.value.forecast_status = 'Submitted';
+  runButtonDisabled.value = true;
+  calibrationRunForForecast.value.forecast_status = forecastJobStatus.value = 'Submitted';
   const createAndRunForecastJobResponse = await createAndRunForecastJob(
     calibrationRunForForecast?.value?.calibration_run_id as number, 
     forecastConfiguration?.value?.name as string,
@@ -433,6 +440,8 @@ const startForecastRun = async () => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
+    runButtonDisabled.value = false;
+    cancelButtonDisabled.value = true;
     const getStatusResponse = await getStatus();
     const forecasts: any[] = getStatusResponse?._data?.forecasts;
     const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
@@ -452,6 +461,7 @@ const startForecastRun = async () => {
  * Cancel the forecast run
  */
 const cancelForecastRun = async () => {
+  cancelButtonDisabled.value = true;
   try {
     const cancelForecastJobResponse = await cancelForecastJob();
 
@@ -469,6 +479,7 @@ const cancelForecastRun = async () => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } catch (error) {
+    cancelButtonDisabled.value = false;
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Forecast job', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
