@@ -83,13 +83,13 @@
                 <span v-if="!hindcastJobStatus || hindcastJobStatus === 'Ready'">
                   <Button class="ngenButtonDiv-green ml-6 font-normal px-4" title="Run Button" aria-label="Run Button"
                     @click="startHindcastRun()" :disabled="runButtonDisabled">
-                    {{ runButtonDisabled ? 'Running...' : 'Run' }}
+                    Run
                   </Button>
                 </span>
                 <span v-if="['Submitted','Running'].includes(coldStartJobStatus) || ['Submitted','Running'].includes(hindcastJobStatus)">
                   <Button class="ngenButtonDiv-red ml-6 font-normal px-4" title="Cancel Button" aria-label="Cancel Button" 
                     @click="cancelHindcastRun()" :disabled="cancelButtonDisabled">
-                    {{ cancelButtonDisabled ? 'Cancelling...' : 'Cancel' }}
+                    Cancel
                   </Button>
                 </span>
                 <span v-if="overallColdStartHindcastStatus === 'Done'">
@@ -405,7 +405,7 @@ const createColdStartAndHindcastStatusInterval = () => {
  */
 const startHindcastRun = async () => {
   runButtonDisabled.value = true;
-  calibrationRunForHindcast.value.hindcast_status = 'Submitted';
+  calibrationRunForHindcast.value.hindcast_status = hindcastJobStatus.value = 'Submitted';
   const createAndRunHindcastJobResponse = await createAndRunHindcastJob(
     calibrationRunForHindcast?.value?.calibration_run_id as number, 
     hindcastConfiguration?.value?.name as string,

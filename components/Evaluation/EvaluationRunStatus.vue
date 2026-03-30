@@ -80,12 +80,12 @@
                       <span v-else>
                         <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()"
                           title="Run Button" :disabled="runButtonDisabled" aria-label="Run Button">
-                          {{ runButtonDisabled ? 'Running...' : 'Run' }}
+                          Run
                         </Button>
                         <Button v-if="!isCancelHidden()" @click="cancelRun()"
                           class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button" aria-label="Cancel Button"
                           :disabled="cancelButtonDisabled">
-                          {{ cancelButtonDisabled ? 'Cancelling...' : 'Cancel' }}
+                          Cancel
                         </Button>
                       </span>
                       <!--BUTTONS - END-->
@@ -219,6 +219,7 @@ const isCancelHidden = (): boolean => {
 
 const startRun = async () => {
   runButtonDisabled.value = true;
+  cancelButtonDisabled.value = false;
   toast.removeAllGroups();
 
   executeIterationValidationRun().then((response) => {
@@ -236,6 +237,7 @@ const startRun = async () => {
       }, 1000) as unknown as number;
     } else {
       runButtonDisabled.value = false;
+      cancelButtonDisabled.value = true;
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation', life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }

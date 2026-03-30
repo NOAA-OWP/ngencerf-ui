@@ -74,13 +74,13 @@
                         <span v-if="calibrationStatus === 'Ready'">
                           <Button class="font-normal ngenButtonDiv-green h-8" title="Run Button" aria-label="Run Button"
                             @click="startRun()" :disabled="runButtonDisabled">
-                            {{ runButtonDisabled ? 'Running...' : 'Run' }}
+                            Run
                           </Button>
                         </span>
                         <span v-if="['Submitted','Running'].includes(calibrationStatus) || validationControlStatus === 'Running' || validationBestStatus === 'Running'">
                           <Button class="ngenButtonDiv-red h-8 mr-3" title="Cancel Button" aria-label="Cancel Button"
                             @click="cancelRun()" :disabled="cancelButtonDisabled">
-                            {{ cancelButtonDisabled ? 'Cancelling...' : 'Cancel' }}
+                            Cancel
                           </Button>
                         </span>
                       </div>
