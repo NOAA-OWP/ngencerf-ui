@@ -53,15 +53,15 @@
               </div>
               <div class="mt-2 mb-2">
                 <!--BUTTONS - START-->
-                <span v-if="forecastJobId && !verificationJobId">
+                <span v-if="forecastJobId && !verificationJobId && !verificationJobStatus">
                   <Button class=" ngenButtonDiv-green font-normal" title="Run Button" aria-label="Run Button"
-                    @click="startVerificationJob()">
+                    @click="startVerificationJob()" :disabled="runButtonDisabled">
                     Run
                   </Button>
                 </span>
                 <span v-if="['Submitted','Running'].includes(verificationJobStatus)">
-                  <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" @click="stopVerificationJob()"
-                    aria-label="Cancel Button">
+                  <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" aria-label="Cancel Button"
+                    @click="stopVerificationJob()" :disabled="cancelButtonDisabled">
                     Cancel
                   </Button>
                 </span>
@@ -114,6 +114,9 @@ import { useLogStore } from '@/stores/common/LogStore';
 
 const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
+
+const runButtonDisabled = ref<boolean>(false);
+const cancelButtonDisabled = ref<boolean>(false);
 
 const toast = useToast();
 
@@ -170,6 +173,9 @@ onMounted(async() => {
     }
   }
 
+  runButtonDisabled.value = verificationJobStatus.value && !['Unknown','Ready'].includes(verificationJobStatus.value);
+  cancelButtonDisabled.value = ['Submitted','Running'].includes(verificationJobStatus.value);
+
   watch(verificationJobStatus, async (newVerificationJobStatus, oldVerificationJobStatus) => {
     if (verificationJobId.value && 
       ( 
@@ -187,6 +193,8 @@ onMounted(async() => {
  * Start the verification job
  */
 const startVerificationJob = async () => {
+  runButtonDisabled.value = true;
+  cancelButtonDisabled.value = false;
   createAndRunVerificationJob().then((response) => {
     if (response.status >= 200 && response.status < 300) {
       verificationJobId.value = response._data.verification_run_id;
@@ -214,6 +222,8 @@ const startVerificationJob = async () => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } else {
+      runButtonDisabled.value = false;
+      cancelButtonDisabled.value = true;
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Verification job ${verificationJobId.value} in server response`, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
@@ -224,6 +234,7 @@ const startVerificationJob = async () => {
  * Stop (Cancel) the verification job
  */
 const stopVerificationJob = async () => {
+  cancelButtonDisabled.value = true;
   try {
     const cancelVerificationJobResponse = await cancelVerificationJob();
 
@@ -241,6 +252,7 @@ const stopVerificationJob = async () => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } catch (error) {
+    cancelButtonDisabled.value = false;
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Verification job', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
