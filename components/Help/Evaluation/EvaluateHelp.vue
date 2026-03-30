@@ -8,7 +8,22 @@
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
         <hr />
-        <p class="text-center font-bold" id="actionsSectionTitle">Available Actions</p>
+        <div class="ml-2 mb-4">
+            <p class="text-center font-bold">Time Series Viewers</p>
+            <p class="text-center mt-2 mr-4 mb-2 ml-4">
+                Several plots include an interactive time series<br />viewer for exploring the data.
+            </p>
+            <ul style="list-style-type: disc;padding-left:20px;">
+                <li>Use the slider at the bottom of the viewer to change the visible time range.</li>
+                <li>Drag the slider to adjust the date range.</li>
+                <li>Resize the viewable area by dragging the left or right edges of the slider.</li>
+                <li>Hover over a point on the graph to view details such as source, date/time, and value.</li>
+                <li>Toggle the checkboxes to show or hide different plots.</li>
+                <li>Customize plot colors and point styles using <strong>Customize Viewer</strong>.</li>  
+            </ul>
+        </div>
+        <hr />
+        <p class="text-center font-bold text-xl" id="actionsSectionTitle">Available Actions</p>
         <table class="_help-table" aria-describedby="Evaluate Button and Link Action Help Table">
             <thead>
                 <tr>
@@ -17,6 +32,10 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td class="td1">Display<span class="required-asterisk">*</span></td>
+                    <td class="td2  pt-2">Select a plot or log to display.</td>
+                </tr>
                 <tr>
                     <td class="td1">New Validation Button</td>
                     <td class="td2">Select an alternate iteration to run a validation to generate the associated plots.
@@ -30,7 +49,7 @@
         </table>
 
         <hr class="mt-2 mb-4" />
-        <p class="text-center font-bold" id="CaliPlotSectionTitle">Calibration Plots</p>
+        <p class="text-center font-bold text-xl" id="CaliPlotSectionTitle">Calibration Plots</p>
         <table class="_help-table" aria-describedby="Evaluate Calibration Plots Help Table">
             <thead>
                 <tr>
@@ -42,12 +61,16 @@
                 <tr>
                     <td class="td1">Hydrograph evolution</td>
                     <td class="td2">Comparison of streamflow time series between observation and simulations from the
-                        control, last, and best runs. Associated data displayed in adjacent table.</td>
+                        control, last, and best runs. Associated data displayed in adjacent table. Click on <strong>Show
+                        Interactive Time Series</strong> to view the hydrograph overlayed with the precipitation plot.
+                        Hover over a point on the plot to View associated data.
+                    </td>
                 </tr>
                 <tr>
                     <td class="td1">Objective Funtion evolution</td>
                     <td class="td2">Scatter plot of objective function vs iteration number. Associated data displayed in
-                        adjacent table.</td>
+                        adjacent table.
+                    </td>
                 </tr>
                 <tr>
                     <td class="td1">Metric evolution</td>
@@ -62,50 +85,51 @@
                 <tr>
                     <td class="td1">Scatterplot streamflow</td>
                     <td class="td2">Scatter plot of observed streamflow vs simulated streamflow from the control, best,
-                        and
-                        last runs. Associated data displayed in adjacent table.</td>
+                        and last runs. Associated data displayed in adjacent table.</td>
                 </tr>
                 <tr>
                     <td class="td1">Metrics vs Objective Function</td>
                     <td class="td2">Scatter plots of objective function and each other metric. Associated data displayed
-                        in
-                        adjacent table.</td>
+                        in adjacent table.</td>
                 </tr>
                 <tr>
                     <td class="td1">Flow Duration Curves</td>
                     <td class="td2">Comparison of flow duration curve (FDC) between streamflow observation and
-                        simulations
-                        from the control, last, and best runs.
+                        simulations from the control, last, and best runs.
                         Data for this plot is calcuated internally by the program and unavailable for table display.
                     </td>
                 </tr>
                 <tr>
                     <td class="td1">Snow Water Equivalent</td>
                     <td class="td2">View a time series of SWE data from the simulation run, historical SNODAS SWE and
-                        SNOTEL
-                        data.
+                        SNOTEL data.
                         <ul style="list-style-type: disc;padding-left:20px;">
-                            <li>Use the slider at the bottom of the viewer to change the area of view.</li>
-                            <li>Adjust the date range viewed by dragging the slider.</li>
-                            <li>Adjust the size of viewable area by dragging the left or right edge.</li>
-                            <li>Hover over a point on the graph to get specific details, such as source, date/time,
-                                and depth.</li>
-                            <li>Toggle the checkboxes to hide/show differnt plots</li>
-                            <li>Customize the plot colors and points using <strong>Customize Viewer</strong>.</li>
-                            <li>Click on a point on a graph to populate the <strong>Select Date</strong> field</li>
+                            <li>Click on a point on a graph to populate the <strong>Select Date</strong>
+                                <span class="required-asterisk">*</span> field</li>
                             <li>Click <strong>Get Spatial Plots</strong> to generate and view the gridded
                                 and basin average images of the SNODAS SWE next to the basin averaged image of the
-                                simulated
-                                SWE.
-                                SNOTEL stations, if they are available, will be shown in the images.</li>
+                                simulated SWE. SNOTEL stations, if they are available, will be shown in the images.</li>
                             <li>Click <strong>Show SWE Time Series</strong> to return to the Time Series Viewer</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td1">Soil Moisture</td>
+                    <td class="td2">View a time series of soil moisture data from the simulation run and SMAP data.
+                        <ul style="list-style-type: disc;padding-left:20px;">
+                            <li>Click on a point on a graph to populate the <strong>Select Date</strong>
+                                <span class="required-asterisk">*</span> field</li>
+                            <li>Click <strong>Get Spatial Plots</strong> to generate and view the gridded
+                                and basin average images of the SMAP Soil Moisture next to the basin averaged image of the
+                                simulated Soil Moisture</li>
+                            <li>Click <strong>Show SMAP Time Series</strong> to return to the Time Series Viewer</li>
                         </ul>
                     </td>
                 </tr>
             </tbody>
         </table>
         <br />
-        <p class="text-center font-bold" id="ValidatePlotSectionTitle">Validation Plots</p>
+        <p class="text-center font-bold text-xl" id="ValidatePlotSectionTitle">Validation Plots</p>
         <table class="_help-table" aria-describedby="Evaluate Validation Plots Help Table">
             <thead>
                 <tr>
@@ -133,14 +157,15 @@
                 <tr>
                     <td class="td1">Hydrograph Validation</td>
                     <td class="td2">Plot comparing streamflow time series from best and control validation runs with
-                        observed streamflow.
-                        Data for this plot is calcuated internally by the program and unavailable for table display.
+                        observed and NWM Retrospective streamflow. Click on <strong>Show Interactive Time Series</strong> 
+                        to view the hydrograph overlayed with the precipitation plot. Hover over a point on the plot to View
+                        associated data.
                     </td>
                 </tr>
             </tbody>
         </table>
         <br />
-        <p class="text-center font-bold" id="TableSectionTitle">Tables</p>
+        <p class="text-center font-bold text-xl" id="TableSectionTitle">Tables</p>
         <table class="_help-table" aria-describedby="Evaluate List of Displayabe Tables Help Table">
             <thead>
                 <tr>
@@ -161,7 +186,7 @@
                     <td class="td1">Performance Metrics Table</td>
                     <td class="td2"><strong>Metric:</strong>
                         <ul style="margin-left: 10px;">
-                            <li><b>Elapsed Time</b> - <em>The job's elapsed time</em></li>
+                            <li><b>Run Time</b> - <em>The job's actual run time</em></li>
                             <li><b>Num Cpus</b> - <em>Total number of CPUs allocated to the job</em></li>
                             <li><b>Cpu Time </b>- <em>Elapsed time * CPU count</em></li>
                             <li><b>Max Rss</b> - <em>Maximum resident set size of all tasks in job</em></li>
@@ -184,7 +209,22 @@
             </tbody>
         </table>
         <br />
-        <p class="text-center font-bold" id="LogSectionTitle">Logs</p>
+        <p class="text-center font-bold text-xl" id="LogSectionTitle">Logs</p>
+        <div class="mt-4 ml-2 mb-4">
+            <p class="text-center font-bold">MPI Runs</p>
+            <p class="text-center mt-2 mr-4 mb-2 ml-4">
+                Log files are not shared across processes. Instead, each rank writes its own 
+                log file. Logs are either unified or split by module.
+            </p>
+            <p class="font-bold ml-4">Examples</p>
+            <ul style="list-style-type: disc;padding-left:60px;">
+                <li><strong>Unified</strong>: ngen_mpi_process_0.log, ngen_mpi_process_1.log, ngen_mpi_process_3.log, etc.</li>
+                <li><strong>Split By Module</strong>: ngen_mpi_process_0.log, cfe_mpi_process_0.log,
+                                noahowp_mpi_process_0.log, troute_mpi_process_0.log, ngen_mpi_process_1.log, cfe_mpi_process_1.log,
+                                noahowp_mpi_process_1.log, troute_mpi_process_1.log, etc</li>  
+            </ul>
+        </div>
+
         <table class="_help-table" aria-describedby="Evaluate Calibration and Validation Logs Help Table">
             <thead>
                 <tr>
@@ -194,19 +234,19 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="td1">Calibration</td>
-                    <td class="td2">Output (stdout, stderr) from ngen-cal and ngen calibration runs.</td>
+                    <td class="td1">Calibration Logs</td>
+                    <td class="td2">Outputs from the calibration manager, model setup workflow manager, and ngen calibration run.</td>
                 </tr>
                 <tr>
                     <td class="td1">Validation Logs</td>
-                    <td class="td2">Outputs (stdout, stderr) from ngen-cal and ngen validation run.</td>
+                    <td class="td2">Outputs from the calibration manager and ngen validation run.</td>
                 </tr>
             </tbody>
         </table>
+        <hr class="my-6 border-black" />
         <div class="required-hint mt-0 mb-4">
             <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
         </div>
-        <hr class="my-6 border-black" />
     </div>
 </template>
 
