@@ -188,7 +188,7 @@
                         <ul style="margin-left: 10px;">
                             <li><b>Run Time</b> - <em>The job's actual run time</em></li>
                             <li><b>Num Cpus</b> - <em>Total number of CPUs allocated to the job</em></li>
-                            <li><b>Cpu Time </b>- <em>Elapsed time * CPU count</em></li>
+                            <li><b>Cpu Time </b>- <em>Run time * CPU count</em></li>
                             <li><b>Max Rss</b> - <em>Maximum resident set size of all tasks in job</em></li>
                             <li><b>Max Disk Read</b> - <em>Maximum number of bytes read by all tasks in job</em></li>
                             <li><b>Max Disk Write</b> - <em>Maximum number of bytes written by all tasks in job</em>
