@@ -4,7 +4,19 @@
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
       <span v-if="activeTab === 1">
-        <HindcastRuns />
+        <PreviousCalibrationRuns />
+      </span>
+      <span v-else-if="activeTab === 2">
+        <HindcastRunsTab />
+      </span>
+      <span v-else-if="activeTab === 3">
+        <SetupHindcastTab />
+      </span>
+      <span v-else-if="activeTab === 4">
+        <HindcastRunStatusTab />
+      </span>
+      <span v-else-if="activeTab === 5">
+        <HindcastResultsTab />
       </span>
     </div>
   </div>
@@ -13,8 +25,11 @@
 <script setup lang="ts">
 import Tabs from '@/components/Common/Tabs.vue'
 
-// Default to Tab 1, Previous Forecast Runs
-import HindcastRuns from "./HindcastRuns.vue"
+import PreviousCalibrationRuns from "./PreviousCalibrationRuns.vue"
+import HindcastRunsTab from "./HindcastRunsTab.vue"
+import SetupHindcastTab from './SetupHindcastTab.vue';
+import HindcastRunStatusTab from './HindcastRunStatusTab.vue';
+import HindcastResultsTab from './HindcastResultsTab.vue';
 
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getHindcastTabIndex, setHindcastTabIndex } = generalStore();

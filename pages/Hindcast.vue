@@ -17,7 +17,7 @@ onMounted(() => {
   popupActive.value = false;
   nextTick(() => {
     const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[HindcastTabs.tab_hindcastRuns] as HTMLElement;
+    const e = allTabs[HindcastTabs.tab_calibrationRuns] as HTMLElement;
     if (e) {
       e.click();
     }

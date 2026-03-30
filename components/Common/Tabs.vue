@@ -135,10 +135,33 @@
       <span v-else-if="currentMenu === 4"> <!-- HINDCAST TABS -->
         <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
           <span data-tab="1" class="tabs activeTab prevent-select" @click="tabClicked"
-            aria-label="Hindcast Runs Tab" title="Hindcast Runs Tab">
-            Hindcast Runs
+            aria-label="Calibration Runs tab" title="Calibration Runs tab">
+            Calibration Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
+          <div data-tab="2" class="tabs prevent-select" @click="tabClicked" aria-label="Hindcast Runs Tab"
+            title="Hindcast Runs Tab">
+            Hindcast Runs
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[3].includes(currentHindcastTab) || (calibrationRunForHindcast && (!calibrationRunForHindcast?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast?.hindcast_status)) && currentHindcastTab <= 5)" data-tab="3"
+            class="tabs prevent-select" @click="tabClicked" aria-label="Setup Hindcast Tab"
+            title="Setup Hindcast Tab">
+            Setup Hindcast
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[4].includes(currentHindcastTab) || (calibrationRunForHindcast && calibrationRunForHindcast?.configuration && currentHindcastTab <= 5)" 
+            data-tab="4" class="tabs prevent-select" @click="tabClicked" 
+            aria-label="Hindcast Run/Status tab" title="Hindcast Run/Status Tab">
+            Hindcast Run/Status
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[5].includes(currentHindcastTab) || (calibrationRunForHindcast && calibrationRunForHindcast?.hindcast_status === 'Done' && currentHindcastTab <= 5)" 
+            data-tab="5" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Hindcast Results Tab" title="Hindcast Results Tab">
+            Hindcast Results
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
         </div>
       </span>
     </div>
@@ -153,6 +176,7 @@ import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/Evaluation
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { useVerificationStore } from "~/stores/forecast/VerificationStore";
+import { useHindcastStore } from "@/stores/hindcast/HindcastStore";
 
 const {
   calibrationJobId,
@@ -178,6 +202,8 @@ const { runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
 const { calibrationRunForForecast } = storeToRefs(useForecastStore());
 
 const { selectedVerificationJob } = storeToRefs(useVerificationStore());
+
+const { calibrationRunForHindcast } = storeToRefs(useHindcastStore());
 
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());

@@ -79,12 +79,13 @@
 
                       <span v-else>
                         <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()"
-                          title="Run Button" aria-label="Run Button">
-                          Run
+                          title="Run Button" :disabled="runButtonDisabled" aria-label="Run Button">
+                          {{ runButtonDisabled ? 'Running...' : 'Run' }}
                         </Button>
                         <Button v-if="!isCancelHidden()" @click="cancelRun()"
-                          class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button"
-                          aria-label="Cancel Button">Cancel
+                          class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button" aria-label="Cancel Button"
+                          :disabled="cancelButtonDisabled">
+                          {{ cancelButtonDisabled ? 'Cancelling...' : 'Cancel' }}
                         </Button>
                       </span>
                       <!--BUTTONS - END-->
@@ -149,6 +150,9 @@ import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 
+const runButtonDisabled = ref<boolean>(false);
+const cancelButtonDisabled = ref<boolean>(false);
+
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
@@ -192,6 +196,9 @@ onMounted(async () => {
     evaluateValidationRunId.value = displayValidationId.value = 0;
     runningTime.value = startTime.value = "";
   }
+  
+  runButtonDisabled.value = isStartHidden();
+  cancelButtonDisabled.value = isCancelHidden();
 });
 
 const isStartHidden = (): boolean => {
@@ -211,6 +218,7 @@ const isCancelHidden = (): boolean => {
 }
 
 const startRun = async () => {
+  runButtonDisabled.value = true;
   toast.removeAllGroups();
 
   executeIterationValidationRun().then((response) => {
@@ -227,6 +235,7 @@ const startRun = async () => {
         updateRunningTime()
       }, 1000) as unknown as number;
     } else {
+      runButtonDisabled.value = false;
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation', life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
@@ -263,6 +272,7 @@ watch(validationStatus, async (newStatus, initialStatus) => {
 });
 
 const cancelRun = async () => {
+  cancelButtonDisabled.value = true;
   executeCancelIterationValidationRun().then(response => {
     validationStatus.value = response?._data.status;
     failureMessages.value = response?._data?.failure_messages ?? undefined;

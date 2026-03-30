@@ -27,7 +27,14 @@ export const ForecastTabs = {
 };
 
 export const HindcastTabs = {
-  tab_hindcastRuns: 0
+  tab_calibrationRuns: 0,
+  tab_hindcastRuns: 1,
+  tab_setupHindcast: 2,
+  tab_hindcastRunStatus: 3,
+  tab_hindcastResults: 4,
+  tab_verificationJobs: 5,
+  tab_verificationRunStatus: 6,
+  tab_verificationResults: 7,
 };
 
 export const NgencerfPages = {

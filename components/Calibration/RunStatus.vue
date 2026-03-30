@@ -73,11 +73,15 @@
                       <div v-if="overallCalibrationValidationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
                         <span v-if="calibrationStatus === 'Ready'">
                           <Button class="font-normal ngenButtonDiv-green h-8" title="Run Button" aria-label="Run Button"
-                            @click="startRun()">Run</Button>
+                            @click="startRun()" :disabled="runButtonDisabled">
+                            {{ runButtonDisabled ? 'Running...' : 'Run' }}
+                          </Button>
                         </span>
                         <span v-if="['Submitted','Running'].includes(calibrationStatus) || validationControlStatus === 'Running' || validationBestStatus === 'Running'">
-                          <Button class="ngenButtonDiv-red h-8 mr-3" title="Cancel Button" @click="cancelRun()"
-                            aria-label="Cancel Button">Cancel</Button>
+                          <Button class="ngenButtonDiv-red h-8 mr-3" title="Cancel Button" aria-label="Cancel Button"
+                            @click="cancelRun()" :disabled="cancelButtonDisabled">
+                            {{ cancelButtonDisabled ? 'Cancelling...' : 'Cancel' }}
+                          </Button>
                         </span>
                       </div>
                       <!--BUTTONS - END-->
@@ -263,6 +267,9 @@ import { hilightTab } from '@/composables/TabHilight';
 const userDataStore = useUserDataStore();
 
 const toast = useToast();
+
+const runButtonDisabled = ref<boolean>(false);
+const cancelButtonDisabled = ref<boolean>(false);
 
 const {
   submitTimeDate,
@@ -533,6 +540,9 @@ onMounted(async () => {
     }
     isLoading.value = false;
   });
+  
+  runButtonDisabled.value = !['Saved','Ready'].includes(calibrationStatus.value);
+  cancelButtonDisabled.value = ['Submitted','Running'].includes(calibrationStatus.value) || ['Submitted','Running'].includes(validControlAndValidBestStatus.value);
 });
 
 /**
@@ -558,6 +568,7 @@ const createElapsedTimeInterval = () => {
 
 // Run Calibration Job
 const startRun = async () => {
+  runButtonDisabled.value = true;
   validationBestAchieved.value.isBest = false;
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Validating and Preparing Job Data';
@@ -599,6 +610,7 @@ const startRun = async () => {
         }
       }
     } else {
+      runButtonDisabled.value = false;
       const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
       
       if (getStatusResponse?._data?.status) {
@@ -624,6 +636,7 @@ const startRun = async () => {
 const cancelRun = async () => {
   if (['Submitted','Running'].includes(calibrationStatus.value) || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') {
     try {
+      cancelButtonDisabled.value = true;
       let cancelCalibrationResponse = undefined;
       if (calibrationStatus.value === 'Running') {
         cancelCalibrationResponse = await cancelCalibrationJob();
@@ -654,6 +667,7 @@ const cancelRun = async () => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } catch (error) {
+      cancelButtonDisabled.value = false;
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }

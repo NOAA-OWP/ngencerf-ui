@@ -1,5 +1,5 @@
 <template>
-  <div id="VerificationRunStatusPage">
+  <div id="VerificationResultsPage">
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">

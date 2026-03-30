@@ -116,10 +116,10 @@ import { useLogStore } from '@/stores/common/LogStore';
 const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
+const toast = useToast();
+
 const runButtonDisabled = ref<boolean>(false);
 const cancelButtonDisabled = ref<boolean>(false);
-
-const toast = useToast();
 
 const forecastStore = useForecastStore();
 const verificationStore = useVerificationStore();
@@ -199,6 +199,7 @@ onMounted(async() => {
 const startVerificationJob = async () => {
   runButtonDisabled.value = true;
   cancelButtonDisabled.value = false;
+  verificationJobStatus.value = 'Submitted';
   createAndRunVerificationJob().then((response) => {
     if (response.status >= 200 && response.status < 300) {
       verificationJobId.value = response._data.verification_run_id;
@@ -240,6 +241,7 @@ const startVerificationJob = async () => {
 const stopVerificationJob = async () => {
   cancelButtonDisabled.value = true;
   try {
+    cancelButtonDisabled.value = true;
     const cancelVerificationJobResponse = await cancelVerificationJob();
 
     if (cancelVerificationJobResponse?._data?.status) {

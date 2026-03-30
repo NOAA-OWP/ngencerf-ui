@@ -8,7 +8,7 @@
       <MessagesGroup />
     </div>
   </Transition>
-  <div id="ForecastResultsPage">
+  <div id="HindcastResultsPage">
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
@@ -25,11 +25,11 @@
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Calibration Job ID: </span>
-                {{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(15) }}
+                {{ calibrationRunForHindcast?.calibration_run_id ?? '-'.repeat(15) }}
               </div>
               <div>
-                <span class="font-medium">Forecast Job ID: </span>
-                {{ forecastJobId ?? '-'.repeat(15) }}
+                <span class="font-medium">Hindcast Job ID: </span>
+                {{ hindcastJobId ?? '-'.repeat(15) }}
               </div>
               <div>
                 <span class="font-medium">Gage: </span>
@@ -43,21 +43,21 @@
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Configuration: </span>
-                {{ forecastConfigurationName ?? 'Unknown' }}
+                {{ hindcastConfigurationName ?? 'Unknown' }}
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (calibrationRunForForecast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cycle_date) + ' UTC' : 'None') }}
+                {{ (calibrationRunForHindcast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForHindcast.cycle_date) + ' UTC' : 'None') }}
               </div>
               <div>
                 <span class="font-medium">Cold Start Date: </span>
-                {{ (calibrationRunForForecast?.cold_start?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cold_start.cold_start_date) + ' UTC' : 'None') }}
+                {{ (calibrationRunForHindcast?.cold_start?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForHindcast.cold_start.cold_start_date) + ' UTC' : 'None') }}
               </div>
             </div>
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Status: </span>
-                {{ overallColdStartForecastStatus ?? 'Unknown' }}
+                {{ overallColdStartHindcastStatus ?? 'Unknown' }}
               </div>
               <div>
                 <span class="font-medium">Submit Time: </span>
@@ -86,7 +86,7 @@
       </div>
     </div>
 
-    <div v-show="selectedLogCategory == 'forecast plot'" class="flex">
+    <div v-show="selectedLogCategory == 'hindcast plot'" class="flex">
       <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
         <div id="PlotGraphArea" ref="plotGraphArea" v-if="numPlotGraphCheckboxesChecked() > 0">
           <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
@@ -148,7 +148,7 @@
         </div>
       </div>
     </div>
-    <div v-show="selectedLogCategory && selectedLogCategory != 'forecast plot'">
+    <div v-show="selectedLogCategory && selectedLogCategory != 'hindcast plot'">
       <LogDisplay/>
     </div>
 
@@ -167,7 +167,7 @@ import type { ToastMessageOptions } from "primevue/toast";
 
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
-import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { useHindcastStore } from '@/stores/hindcast/HindcastStore';
 import { useLogStore } from '@/stores/common/LogStore';
 
 import { hilightTab } from '@/composables/TabHilight';
@@ -182,22 +182,22 @@ const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
 const {
-  calibrationRunForForecast,
-  forecastJobId,
-  forecastConfigurationName,
+  calibrationRunForHindcast,
+  hindcastJobId,
+  hindcastConfigurationName,
   resultsPathname,
-  forecastPlot,
+  hindcastPlot,
   submitTimeDate,
   submitTime,
   elapsedTime,
-  forecastJobStatus,
+  hindcastJobStatus,
   coldStartJobStatus,
-  overallColdStartForecastStatus,
-} = storeToRefs(useForecastStore());
+  overallColdStartHindcastStatus,
+} = storeToRefs(useHindcastStore());
 
 const {
-  loadForecastResultsTabData,
-} = useForecastStore();
+  loadHindcastResultsTabData,
+} = useHindcastStore();
 
 const {
   selectedLogCategory,
@@ -272,15 +272,15 @@ onMounted(async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
-  hilightTab(ForecastTabs.tab_forecastResults);
+  hilightTab(HindcastTabs.tab_hindcastResults);
   
-  await populateLogListOptions([{ name: 'forecast plot', display_name: 'Streamflow Time Series' }]);
-  selectedLogCategory.value = 'forecast plot';
+  await populateLogListOptions([{ name: 'hindcast plot', display_name: 'Streamflow Time Series' }]);
+  selectedLogCategory.value = 'hindcast plot';
 
   resetUserPlotRefs([]);
 
   // load Results tab data
-  const errorMessages: string[] = await loadForecastResultsTabData();
+  const errorMessages: string[] = await loadHindcastResultsTabData();
   errorMessages.forEach((msg: string) => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -328,17 +328,17 @@ const resetUserPlotRefs = (exceptions: any): void => {
   showCustomizePlot.value = false;
 }
 
-watch(forecastPlot, async () => {
-  if (forecastPlot.value.timeseries_data && forecastPlot.value.timeseries_data.length > 0) {
-    showForecastPlot();
+watch(hindcastPlot, async () => {
+  if (hindcastPlot.value.timeseries_data && hindcastPlot.value.timeseries_data.length > 0) {
+    showhindcastPlot();
   }
 });
 
-const showForecastPlot = async () => {
+const showhindcastPlot = async () => {
   if (!plotGraphData.value || plotGraphData.value.length === 0) {
     // standard interactive plot logic
-    if (forecastPlot.value.timeseries_data) {
-      plotGraphDataRaw.value = forecastPlot.value.timeseries_data;
+    if (hindcastPlot.value.timeseries_data) {
+      plotGraphDataRaw.value = hindcastPlot.value.timeseries_data;
       adjustPlotGraphColumns();
     }
     // setting min/max dates will trigger the date filter below

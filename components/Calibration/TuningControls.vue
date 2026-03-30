@@ -391,7 +391,7 @@ const {
 const toast = useToast();
 const selectedParameter = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const isInitialSetupDone = ref<Boolean>(false);
+const isInitialSetupDone = ref<boolean>(false);
 const selectedTuningParameterData = ref();
 const tuningContextMenu = ref();
 
