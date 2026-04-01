@@ -2,7 +2,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { DateTime, Duration } from "luxon";
 
 
-import type { SelectOption, calibrationRunForHindcast, calibrationRunsForHindcast, HindcastConfiguration, HindcastJob, HindcastJobs } from "@/composables/NgencerfModels";
+import type { SelectOption, CalibrationRunForHindcast, CalibrationRunsForHindcast, HindcastConfiguration, HindcastJob, HindcastJobs } from "@/composables/NgencerfModels";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
@@ -57,6 +57,10 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
   const hindcastConfigurations = ref<HindcastConfiguration[]>();
   const hindcastConfiguration = ref<HindcastConfiguration>();
   const hindcastConfigurationName = ref<string>();
+  const coldStartRunsForHindcast = ref<ColdStartRun[]>();
+  const coldStartJobId = ref<number>();
+  const intervalCycle = ref<number>();
+  const numIterations = ref<number>();
   const hindcastJobStatus = ref<string>();
   const coldStartJobStatus = ref<string>();
   const failureMessages = ref<any>();;
@@ -75,6 +79,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
   const SelectedHindcastJob = ref<HindcastJob>();
 
   const hindcastJobNgenGlobalLogging = ref<boolean>(true);
+  const hindcastJobLogFileMode = ref<boolean>(false);
   /**
    * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
    */
@@ -323,13 +328,32 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
   };
 
   /**
+   * Query get_cold_start_jobs_for_configuration endpoint
+   */
+  const getColdStartJobsForConfiguration = async (): Promise<any> => {
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_cold_start_jobs_for_configuration/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ 
+        configuration_name: hindcastConfiguration?.value?.name
+      })
+    });
+  };
+
+  /**
    * Create and Run Hindcast Job by querying create_and_run_hindcast endpoint
    */
   const createAndRunHindcastJob = async (
     calibrationRunId: number, 
     hindcastConfigurationName: string,
     cycleDate: DateTime,
-    coldStartDate: DateTime | null
+    coldStartDate: DateTime | null,
+    coldStartJobId: number | null,
+    intervalCycle: number,
+    numIterations: number
   ): Promise<any> => {
     const rawLogLevels = toRaw(logLevels.value);
 
@@ -352,8 +376,12 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         configuration_name: hindcastConfigurationName,
         cycle_date: cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
         cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
+        cold_start_run_id: coldStartJobId ?? null,
+        interval_cycle: intervalCycle,
+        num_iterations: numIterations,
         logging_config: {
           logging_enabled: hindcastJobNgenGlobalLogging.value,
+          split_logs_by_module: hindcastJobLogFileMode.value,
           ...(serializedModules && {
             // add ngenLogLevel and forcingLogLevel to beginning of the object
             modules: {
@@ -657,6 +685,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     }
 
     hindcastJobNgenGlobalLogging.value = true;
+    hindcastJobLogFileMode.value = false;
   };
 
   /**
@@ -683,6 +712,10 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     hindcastConfigurations,
     hindcastConfiguration,
     hindcastConfigurationName,
+    coldStartRunsForHindcast,
+    coldStartJobId,
+    intervalCycle,
+    numIterations,
     hindcastJobStatus,
     coldStartJobStatus,
     failureMessages,
@@ -715,10 +748,12 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     SelectedHindcastJob,
     overallColdStartHindcastStatus,
     hindcastJobNgenGlobalLogging,
+    hindcastJobLogFileMode,
     getHindcastJobs,
     loadHindcastRunStatusTabData,
     loadHindcastResultsTabData,
     loadHindcastTab,
+    getColdStartJobsForConfiguration,
     createAndRunHindcastJob,
     cancelHindcastJob,
     deleteHindcastJob,

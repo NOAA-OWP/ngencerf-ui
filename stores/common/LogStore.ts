@@ -3,6 +3,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { useHindcastStore } from '@/stores/hindcast/HindcastStore';
 import { useVerificationStore } from '~/stores/forecast/VerificationStore';
 
 function capitalCase(str: string) {
@@ -15,6 +16,7 @@ export const useLogStore = defineStore('LogStore', () => {
   const { userCalibrationRunData } = storeToRefs(useUserDataStore());
   const { iterationValidationRunId, validationStatus } = storeToRefs(generalStore());
   const { forecastJobId, overallColdStartForecastStatus } = storeToRefs(useForecastStore());
+  const { hindcastJobId, overallColdStartHindcastStatus } = storeToRefs(useHindcastStore());
   const { verificationJobId, verificationJobStatus } = storeToRefs(useVerificationStore());
 
   const logList = ref<any[]>([]);
@@ -51,14 +53,16 @@ export const useLogStore = defineStore('LogStore', () => {
       },
       body: JSON.stringify({[
           verificationJobId.value ? 'verification_run_id' :
+          (hindcastJobId.value ? 'hindcast_run_id' :
           (forecastJobId.value ? 'forecast_run_id' :
           (iterationValidationRunId.value ? 'validation_run_id' :
-          'calibration_run_id'))
+          'calibration_run_id')))
         ]:
         verificationJobId.value ? verificationJobId.value :
+        (hindcastJobId.value ? hindcastJobId.value :
         (forecastJobId.value ? forecastJobId.value :
         (iterationValidationRunId.value ? iterationValidationRunId.value :
-        userCalibrationRunData?.value?.calibration_run_id))
+        userCalibrationRunData?.value?.calibration_run_id)))
       })
     });
   };
@@ -84,14 +88,16 @@ export const useLogStore = defineStore('LogStore', () => {
         limit: limit !== undefined ? limit : 1000,
         [
           verificationJobId.value ? 'verification_run_id' :
+          (hindcastJobId.value ? 'hindcast_run_id' :
           (forecastJobId.value ? 'forecast_run_id' :
           (iterationValidationRunId.value ? 'validation_run_id' :
-          'calibration_run_id'))
+          'calibration_run_id')))
         ]:
         verificationJobId.value ? verificationJobId.value :
+        (hindcastJobId.value ? hindcastJobId.value :
         (forecastJobId.value ? forecastJobId.value :
         (iterationValidationRunId.value ? iterationValidationRunId.value :
-        userCalibrationRunData?.value?.calibration_run_id))
+        userCalibrationRunData?.value?.calibration_run_id)))
       })
     });
   };
@@ -115,23 +121,26 @@ export const useLogStore = defineStore('LogStore', () => {
         byte_offset: byte_offset,
         [
           verificationJobId.value ? 'verification_run_id' :
+          (hindcastJobId.value ? 'hindcast_run_id' :
           (forecastJobId.value ? 'forecast_run_id' :
           (iterationValidationRunId.value ? 'validation_run_id' :
-          'calibration_run_id'))
+          'calibration_run_id')))
         ]:
         verificationJobId.value ? verificationJobId.value :
+        (hindcastJobId.value ? hindcastJobId.value :
         (forecastJobId.value ? forecastJobId.value :
         (iterationValidationRunId.value ? iterationValidationRunId.value :
-        userCalibrationRunData?.value?.calibration_run_id))
+        userCalibrationRunData?.value?.calibration_run_id)))
       })
     });
   };
 
   const currentJobStatus = computed(() => {
     return verificationJobId.value ? verificationJobStatus.value :
+      (hindcastJobId.value ? overallColdStartHindcastStatus.value :
       (forecastJobId.value ? overallColdStartForecastStatus.value :
       (iterationValidationRunId.value ? validationStatus.value :
-      userCalibrationRunData?.value?.status))
+      userCalibrationRunData?.value?.status)))
   });
 
   /**

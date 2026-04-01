@@ -46,7 +46,7 @@
         <br />
     </div>
     <div v-if="!calibrationRunForHindcast?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast?.hindcast_status)">
-        <DataTable :value="hindcastConfigurations" sortField="hcst_win" scrollable v-model:selection="hindcastConfiguration"
+        <DataTable :value="hindcastConfigurations" sortField="fcst_win" scrollable v-model:selection="hindcastConfiguration"
             selectionMode="single" :rowClass="rowClass" :rowStyle="rowStyle">
             <Column field="name" header="Configuration" sortable>
                 <template #body="slotProps">
@@ -74,11 +74,11 @@
                         </div>
                 </template>
             </Column>
-            <Column field="hcst_win" header="Hindcast Window" sortable>
+            <Column field="fcst_win" header="Hindcast Window" sortable>
                 <template #body="slotProps">
-                    <div :aria-label="'Hindcast Window is ' + slotProps.data.hcst_win"
-                        :title="'Hindcast Window is ' + slotProps.data.hcst_win">
-                        {{ slotProps.data.hcst_win }} hour{{ slotProps.data.hcst_win > 1 ? 's' : '' }}</div>
+                    <div :aria-label="'Hindcast Window is ' + slotProps.data.fcst_win"
+                        :title="'Hindcast Window is ' + slotProps.data.fcst_win">
+                        {{ slotProps.data.fcst_win }} hour{{ slotProps.data.fcst_win > 1 ? 's' : '' }}</div>
                 </template>
             </Column>
         </DataTable>
@@ -101,32 +101,90 @@
           Cycle hours available: {{ cycleHourList.length < 24 ? cycleHourList.join(', ') : '0-23' }}
         </li>
         <li>
-          Hindcast window: {{ hindcastConfiguration.hcst_win }} hour{{ hindcastConfiguration.hcst_win > 1 ? 's' : '' }}
+          Hindcast window: {{ hindcastConfiguration.fcst_win }} hour{{ hindcastConfiguration.fcst_win > 1 ? 's' : '' }}
         </li>
       </ul>
-      <div class="grid grid-cols-5">
-        <div class="text-nowrap text-right font-bold p-1">
-          Cold Start Date
+      <div class="text-nowrap flex gap-2 mt-2">
+        <input id="useSavedState_1" type="radio" :value="true" v-model="useSavedState" :disabled="!hindcastConfiguration"/>
+        <label for="useSavedState_1" class="mr-6">Use Saved State</label>
+        <input id="useSavedState_0" type="radio" :value="false" v-model="useSavedState" :disabled="!hindcastConfiguration"/>
+        <label for="useSavedState_0">Use Manual Dates</label>
+      </div>
+      <div class="flex gap-6">
+        <div class="grid grid-cols-4">
+          <div v-if="useSavedState" class="text-nowrap text-right font-bold p-2 required-label">
+            Saved State
+          </div>
+          <div v-if="useSavedState" class="text-nowrap p-1">
+            <Select id="coldStartJobId" v-model="coldStartJobId" :options="formattedColdStartRunsForHindcast" 
+              optionLabel="cold_start_date_display" optionValue="cold_start_run_id"
+              aria-label="Saved State Select" title="Saved State Select"
+              class="w-24" :disabled="!hindcastConfiguration">
+            </Select>
+          </div>
+          <div v-if="useSavedState" class="text-nowrap text-right font-bold p-2">
+            Cycle Date
+          </div>
+          <div v-if="useSavedState" class="text-nowrap p-1">
+            {{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + 'Z' : 'None Selected') }}
+          </div>
+          <div v-if="!useSavedState" class="text-nowrap text-right font-bold p-2 required-label">
+            Cold Start Date
+          </div>
+          <div v-if="!useSavedState" class="text-nowrap p-1">
+            <VueDatePicker v-model="coldStartDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+              @update:model-value="convertColdStartDateStringToDateTimeObject" :enable-time-picker="false"
+              :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
+              :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
+              :teleport="true" utc='preserve' 
+              :disabled="!hindcastConfiguration"/>
+          </div>
+          <div v-if="!useSavedState" class="text-nowrap text-right font-bold p-2 required-label">
+            Cycle Date
+          </div>
+          <div v-if="!useSavedState" class="text-nowrap p-1">
+            <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+              @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
+              :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
+              :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
+              :teleport="true" utc='preserve' 
+              :disabled="!hindcastConfiguration"/>
+          </div>
+          <div v-if="!useSavedState" class="text-nowrap text-right font-bold p-2 required-label">
+            Cold Start Hour
+          </div>
+          <div v-if="!useSavedState" class="text-nowrap p-1">
+            <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
+              aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
+              class="w-24" :disabled="!hindcastConfiguration">
+            </Select>
+          </div>
+          <div v-if="!useSavedState" class="text-nowrap text-right font-bold p-2 required-label">Cycle Hour</div>
+          <div v-if="!useSavedState" class="text-nowrap p-1">
+            <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
+              aria-label="Cycle Hour Select" title="Cycle Hour Select"
+              class="user-select w-12" :disabled="!hindcastConfiguration">
+            </Select>
+          </div>
+          <div class="text-nowrap text-right font-bold p-2 required-label">
+            Advance Interval
+          </div>
+          <div class="text-nowrap p-1">
+            <Select id="intervalCycle" v-model="intervalCycle" :options="formattedIntervalCycleList" default="6"
+              optionLabel="interval_display" optionValue="interval" 
+              aria-label="Hindcast Advance Interval Select" title="Hindcast Advance Interval Select"
+              class="user-select w-12" :disabled="!hindcastConfiguration">
+            </Select>
+          </div>
+          <div class="text-nowrap text-right font-bold p-2 required-label">
+            Number of Intervals
+          </div>
+          <div class="text-nowrap p-1">
+            <InputNumber id="jobIdEnd" class="w-24" v-model="numIterations" :min="1"/>
+          </div>
         </div>
-        <div class="text-nowrap p-1">
-          <VueDatePicker v-model="coldStartDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-            @update:model-value="convertColdStartDateStringToDateTimeObject" :enable-time-picker="false"
-            :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
-            :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
-            :teleport="true" utc='preserve' 
-            :disabled="!hindcastConfiguration"/>
-        </div>
-        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Date</div>
-        <div class="text-nowrap p-1">
-          <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-            @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
-            :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
-            :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
-            :teleport="true" utc='preserve' 
-            :disabled="!hindcastConfiguration"/>
-        </div>
-        <div>
-          <span v-if="cycleDate && (cycleHour || cycleHour === 0) && hindcastConfiguration">
+        <div class="w-24">
+          <span v-if="showNextButton">
             <div class="col-span-1 mr-4 p-1">
               <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
                 @click="goToRunStatusTab()">
@@ -134,22 +192,6 @@
               </Button>
             </div>
           </span>
-        </div>
-        <div class="text-nowrap text-right font-bold p-1">
-          Cold Start Hour
-        </div>
-        <div class="text-nowrap p-1">
-          <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
-            aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
-            :disabled="!hindcastConfiguration">
-          </Select>
-        </div>
-        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Hour</div>
-        <div class="text-nowrap p-1">
-          <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
-            aria-label="Cycle Hour Select" title="Cycle Hour Select"
-            :disabled="!hindcastConfiguration">
-          </Select>
         </div>
       </div>
     </div>
@@ -177,6 +219,7 @@ const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
+const useSavedState = ref<boolean>(true);
 const showMessagesGroup = ref<boolean>(false);
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
@@ -189,18 +232,25 @@ const {
   hindcastConfigurations,
   hindcastConfiguration,
   hindcastConfigurationName,
+  coldStartRunsForHindcast,
+  coldStartJobId,
+  intervalCycle,
+  numIterations,
   hindcastJobStatus,
   coldStartJobStatus,
 } = storeToRefs(useHindcastStore());
 
-const { loadHindcastTab } = useHindcastStore();
+const { loadHindcastTab, getColdStartJobsForConfiguration } = useHindcastStore();
 
 const minCycleDate = ref<any>();
 const maxCycleDate = ref<any>();
 const cycleHour = ref<number>();
 const cycleHourList = ref<number[]>([]);
+const intervalCycleList = ref<number[]>([]);
 const coldStartHour = ref<number>();
 const coldStartHourList = ref<number[]>(Array.from({ length: 24 }, (_, index) => index));
+
+let intervalCycleListOptions = [1,3,6,12,18,24,36,48,60,72,84,96,108,120,180,240]
 
 /**
  * Disable row if hindcast configuration is not active
@@ -266,7 +316,14 @@ onMounted(async () => {
           toast.add(tMsg); addToastRecord(tMsg);
         }
         if (hindcastConfiguration.value) {
-            getCycleHourList();
+          getCycleHourList();
+          getColdStartJobsForConfiguration();
+          getIntervalCycleList();
+          if (coldStartJobId.value) {
+            useSavedState.value = true;
+          } else {
+            useSavedState.value = false;
+          }
         }
     });
 });
@@ -293,12 +350,86 @@ const convertColdStartDateStringToDateTimeObject = (value: string) => {
 }
 
 watch(hindcastConfiguration, async () => {
-  cycleHourList.value = [];
   getCycleHourList();
-  hindcastConfigurationName.value = hindcastConfiguration?.value?.name;
+  getIntervalCycleList();
+  if (hindcastConfiguration?.value) {
+    hindcastConfigurationName.value = hindcastConfiguration.value.name;
+    const response = await getColdStartJobsForConfiguration();
+    coldStartRunsForHindcast.value = response?._data?.cold_start_jobs;
+  } else {
+    hindcastConfigurationName.value = '';
+    coldStartRunsForHindcast.value = [];
+  }
 })
 
+watch(useSavedState, async () => {
+  if (!useSavedState.value) {
+    coldStartJobId.value = undefined;
+  }
+});
+
+watch(coldStartJobId, async () => {
+  coldStartDate.value = undefined;
+  coldStartHour.value = undefined;
+  if(coldStartJobId.value) {
+    let selectedRun = coldStartRunsForHindcast.value.find(run => run.cold_start_run_id === coldStartJobId.value);
+    if (selectedRun) {
+      cycleDate.value = selectedRun.cold_start_date;
+      try {
+        cycleHour.value = cycleDate.value.getHours();
+      } catch {
+        cycleHour.value = cycleDate.value.hour;
+      }
+    }
+  } else {
+    cycleDate.value = undefined;
+    cycleHour.value = undefined;
+  }
+});
+
+const formattedColdStartRunsForHindcast = computed(() => {
+  if (coldStartRunsForHindcast.value) {
+    return coldStartRunsForHindcast.value.map(run => ({
+      ...run,
+      cold_start_date_display: (convertISOStringOrDateToDateTime(run.cold_start_date)).toFormat('yyyy-MM-dd HH') + 'Z'
+    }));
+  }
+  return [];
+});
+
+const formattedIntervalCycleList = computed(() => {
+  if (intervalCycleList.value) {
+    return intervalCycleList.value.map(option => ({
+      interval: option,
+      interval_display: option + (option > 1 ? ' hours' : ' hour')
+    }))
+  }
+  return [];
+})
+
+const showNextButton = computed(() => {
+  if (!hindcastConfiguration.value) {
+    return false;
+  }
+  if (useSavedState.value && !coldStartJobId.value) {
+    return false;
+  }
+  if (!useSavedState.value && 
+    (
+      (!coldStartDate.value || (!coldStartHour.value && coldStartHour.value !== 0)) || 
+      (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0))
+    )
+  ) {
+    return false;
+  }
+  if (!intervalCycle.value || !numIterations.value) {
+    return false;
+  }
+  return true;
+});
+
 const getCycleHourList = () => {
+  cycleHourList.value = [];
   if (hindcastConfiguration?.value) {
     let h = hindcastConfiguration?.value?.cycle_start;
     while (h <= hindcastConfiguration?.value?.cycle_end) {
@@ -311,6 +442,13 @@ const getCycleHourList = () => {
   }
 }
 
+const getIntervalCycleList = () => {
+  intervalCycleList.value = [];
+  if (hindcastConfiguration?.value?.cycle_freq) {
+    intervalCycleList.value = intervalCycleListOptions.filter(h => h % hindcastConfiguration.value.cycle_freq === 0)
+  }
+}
+
 /**
  * Go to the Status Run tab
  */
@@ -319,25 +457,33 @@ const goToRunStatusTab = () => {
         if (!hindcastConfiguration.value) {
           const alert = window.alert('You must select a configuration and then set the Cycle Date/Hour.');
           return false;
-        } else if (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0)) {
-          const alert = window.alert('Invalid Cycle Date chosen.\n\nMake sure to choose a date within the available date range, and an hour that is available for your chosen configuration.');
+        } else if (!intervalCycle.value) { 
+          const alert = window.alert('Advance Interval must be chosen.');
           return false;
-        } else if (!coldStartDate.value && (coldStartHour.value && coldStartHour.value > 0)) {
-          const alert = window.alert('Invalid Cold Start Date chosen.\n\nMake sure to choose a date and an hour, or leave both fields empty to run a hindcast without a cold start.');
+        }  else if (!numIterations.value) { 
+          const alert = window.alert('Number of Intervals must be indicated.');
           return false;
-        } else {
-          cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
-          if (coldStartDate.value) {
-            coldStartDate.value = coldStartDate.value.set({ hour: coldStartHour.value ? coldStartHour.value : 0, minute: 0, second: 0 });
-          }
-          if (coldStartDate.value && coldStartDate.value >= cycleDate.value) {
-            const alert = window.alert('Cold Start Date must be before the Cycle Date.');
+        } else if (!coldStartJobId.value) {
+          if (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0)) {
+            const alert = window.alert('Invalid Cycle Date chosen.\n\nMake sure to choose a date within the available date range, and an hour that is available for your chosen configuration.');
             return false;
-          }
-          // validate the day/hour to make sure it is within the availability window
-          let latestHindcastDate = maxCycleDate.value.minus({ hours: hindcastConfiguration.value.availability_lag})
-          if (latestHindcastDate < cycleDate.value) {
-              const alert = window.alert('Hindcast data might not yet be available for your chosen cycle date.');
+          } else if (!coldStartDate.value || (!coldStartHour.value && !coldStartHour.value !== 0)) {
+            const alert = window.alert('Invalid Cold Start Date chosen.\n\nMake sure to choose a date and an hour.');
+            return false;
+          } else {
+            cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
+            if (coldStartDate.value) {
+              coldStartDate.value = coldStartDate.value.set({ hour: coldStartHour.value ? coldStartHour.value : 0, minute: 0, second: 0 });
+            }
+            if (coldStartDate.value && coldStartDate.value >= cycleDate.value) {
+              const alert = window.alert('Cold Start Date must be before the Cycle Date.');
+              return false;
+            }
+            // validate the day/hour to make sure it is within the availability window
+            let latestHindcastDate = maxCycleDate.value.minus({ hours: hindcastConfiguration.value.availability_lag})
+            if (latestHindcastDate < cycleDate.value) {
+                const alert = window.alert('Hindcast data might not yet be available for your chosen cycle date.');
+            }
           }
         }
     }

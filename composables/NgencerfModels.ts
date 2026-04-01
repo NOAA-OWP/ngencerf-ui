@@ -716,6 +716,12 @@ export type ForecastConfiguration = {
   fcst_timestep: number;
 };
 
+export type ColdStartRun = {
+  cold_start_status: string;
+  cold_start_date: string;
+  cold_start_submit_date: string;
+}
+
 export type CalibrationRunsForForecast = CalibrationRunForForecast[];
 
 export type CalibrationRunForForecast = {
@@ -739,11 +745,7 @@ export type CalibrationRunForForecast = {
   forecast_status: string;
   configuration: string;
   cycle_date: string;
-  cold_start?: {
-    cold_start_status: string;
-    cold_start_date: string;
-    cold_start_submit_date: string;
-  }
+  cold_start?: ColdStartRun;
   logging_config: {
     logging_enabled: boolean;
     modules: {
@@ -790,11 +792,7 @@ export type CalibrationRunForHindcast = {
   hindcast_status: string;
   configuration: string;
   cycle_date: string;
-  cold_start?: {
-    cold_start_status: string;
-    cold_start_date: string;
-    cold_start_submit_date: string;
-  }
+  cold_start?: ColdStartRun;
   logging_config: {
     logging_enabled: boolean;
     modules: {
@@ -811,11 +809,7 @@ export interface ForecastJob {
   cycle_date: string;
   gage_id: string;
   forecast_status: string;
-  cold_start?: {
-    cold_start_status: string;
-    cold_start_date: string;
-    cold_start_submit_date: string;
-  }
+  cold_start?: ColdStartRun;
   submit_date: string;
   failure_messages: any;
 }
@@ -832,11 +826,10 @@ export interface HindcastJob {
   cycle_date: string;
   gage_id: string;
   hindcast_status: string;
-  cold_start?: {
-    cold_start_status: string;
-    cold_start_date: string;
-    cold_start_submit_date: string;
-  }
+  cold_start?: ColdStartRun;
+  cold_start_run_id?: number;
+  interval_cycle: number;
+  num_iterations: number;
   submit_date: string;
   failure_messages: any;
 }
