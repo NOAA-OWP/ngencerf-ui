@@ -638,9 +638,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   }
 
   /**
-   * Hard Reset Run/Status Store
+   * Hard Reset Forecast Store
    */
-  const hardResetForecastRunStatusStore = (): void => {
+  const hardResetForecastStore = (): void => {
     forecastJobStatus.value = "";
     coldStartJobStatus.value = "";
     elapsedTime.value = undefined;
@@ -736,7 +736,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     setSelectedForecastRunId,
     resetSelectedForecastRunData,
     setSelectedForecastRowData,
-    hardResetForecastRunStatusStore,
+    hardResetForecastStore,
     resetFilters,
     fetchGageList,
     fetchForecastGageList

@@ -375,7 +375,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         calibration_run_id: calibrationRunId, 
         configuration_name: hindcastConfigurationName,
         cycle_date: cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
-        cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
+        cold_start_date: (!coldStartJobId && coldStartDate) ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
         cold_start_run_id: coldStartJobId ?? null,
         interval_cycle: intervalCycle,
         num_iterations: numIterations,
@@ -666,9 +666,15 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
   }
 
   /**
-   * Hard Reset Run/Status Store
+   * Hard Reset Hindcast Store
    */
-  const hardResetHindcastRunStatusStore = (): void => {
+  const hardResetHindcastStore = (): void => {
+    hindcastJobId.value = undefined;
+    coldStartDate.value = undefined;
+    cycleDate.value = undefined;
+    coldStartJobId.value = undefined;
+    intervalCycle.value = undefined;
+    numIterations.value = undefined;
     hindcastJobStatus.value = "";
     coldStartJobStatus.value = "";
     elapsedTime.value = undefined;
@@ -769,7 +775,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     setSelectedHindcastRunId,
     resetSelectedHindcastRunData,
     setSelectedHindcastRowData,
-    hardResetHindcastRunStatusStore,
+    hardResetHindcastStore,
     resetFilters,
     fetchGageList,
     fetchHindcastGageList

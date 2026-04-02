@@ -266,7 +266,7 @@ const {
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
-  hardResetForecastRunStatusStore
+  hardResetForecastStore
 } = useForecastStore();
 
 const {
@@ -508,7 +508,7 @@ const goToSetupForecastTab = () => {
 
 onUnmounted(() => {
   // make sure page clears all log data when the user leaves
-  hardResetForecastRunStatusStore();
+  hardResetForecastStore();
   logListOptions.value = [];
   forecastJobStatus.value = undefined;
   coldStartJobStatus.value = undefined;

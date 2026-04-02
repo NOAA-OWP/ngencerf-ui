@@ -283,10 +283,6 @@ onMounted(async () => {
 
     minCycleDate.value = DateTime.utc(2022, 1, 1, 12, 0, 0);
     maxCycleDate.value = DateTime.utc();
-
-    if (!cycleDate.value) {
-      cycleDate.value = maxCycleDate.value;
-    }
     
     if (!coldStartHour.value && coldStartDate.value) {
       try {
@@ -323,6 +319,9 @@ onMounted(async () => {
             useSavedState.value = true;
           } else {
             useSavedState.value = false;
+            if (!cycleDate.value && !coldStartJobId.value) {
+              cycleDate.value = maxCycleDate.value;
+            }
           }
         }
     });
@@ -365,6 +364,13 @@ watch(hindcastConfiguration, async () => {
 watch(useSavedState, async () => {
   if (!useSavedState.value) {
     coldStartJobId.value = undefined;
+    console.log('cycleDate:',cycleDate.value);
+    if (!cycleDate.value) {
+      cycleDate.value = maxCycleDate.value;
+    }
+    console.log('cycleDate:',cycleDate.value);
+  } else if (!coldStartJobId.value) {
+    cycleDate.value = undefined;
   }
 });
 
@@ -374,7 +380,7 @@ watch(coldStartJobId, async () => {
   if(coldStartJobId.value) {
     let selectedRun = coldStartRunsForHindcast.value.find(run => run.cold_start_run_id === coldStartJobId.value);
     if (selectedRun) {
-      cycleDate.value = selectedRun.cold_start_date;
+      cycleDate.value = selectedRun.cold_start_cycle_date;
       try {
         cycleHour.value = cycleDate.value.getHours();
       } catch {
@@ -391,7 +397,9 @@ const formattedColdStartRunsForHindcast = computed(() => {
   if (coldStartRunsForHindcast.value) {
     return coldStartRunsForHindcast.value.map(run => ({
       ...run,
-      cold_start_date_display: (convertISOStringOrDateToDateTime(run.cold_start_date)).toFormat('yyyy-MM-dd HH') + 'Z'
+      cold_start_date_display: 
+       (convertISOStringOrDateToDateTime(run.cold_start_date)).toFormat('yyyy-MM-dd HH') + 'Z - ' +
+       (convertISOStringOrDateToDateTime(run.cold_start_cycle_date)).toFormat('yyyy-MM-dd HH') + 'Z'
     }));
   }
   return [];

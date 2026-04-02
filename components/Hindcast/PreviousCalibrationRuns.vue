@@ -248,7 +248,7 @@ const {
 const { 
   getCalibrationJobsForHindcast, 
   resetUserSelectedHindcastCalibrationRun, 
-  hardResetHindcastRunStatusStore,
+  hardResetHindcastStore,
   resetFilters,
   fetchGageList
 } = HindcastStore;
@@ -307,11 +307,10 @@ const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId, fetchHindcas
 
 onMounted(async () => {
   isLoading.value = true;
-  hindcastJobId.value = undefined;
   calibrationRunsForHindcastListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
-  hardResetHindcastRunStatusStore();
+  hardResetHindcastStore();
 
   hilightTab(HindcastTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;

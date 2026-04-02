@@ -281,7 +281,7 @@ const {
   createAndRunHindcastJob,
   cancelHindcastJob,
   getStatus,
-  hardResetHindcastRunStatusStore
+  hardResetHindcastStore
 } = useHindcastStore();
 
 const {
@@ -350,6 +350,12 @@ onMounted(async () => {
   }
   if (!coldStartDate.value && calibrationRunForHindcast?.value?.cold_start?.cold_start_date) {
     coldStartDate.value = calibrationRunForHindcast.value.cold_start.cold_start_date;
+  }
+  if (!intervalCycle.value && calibrationRunForHindcast?.value?.interval_cycle) {
+    intervalCycle.value = calibrationRunForHindcast.value.cold_start.interval_cycle;
+  }
+  if (!numIterations.value && calibrationRunForHindcast?.value?.num_iterations) {
+    numIterations.value = calibrationRunForHindcast.value.cold_start.num_iterations;
   }
 
   runButtonDisabled.value = !['Unknown','Ready'].includes(overallColdStartHindcastStatus.value);
@@ -521,7 +527,7 @@ const goToSetupHindcastTab = () => {
 
 onUnmounted(() => {
   // make sure page clears all log data when the user leaves
-  hardResetHindcastRunStatusStore();
+  hardResetHindcastStore();
   logListOptions.value = [];
   hindcastJobStatus.value = undefined;
   coldStartJobStatus.value = undefined;

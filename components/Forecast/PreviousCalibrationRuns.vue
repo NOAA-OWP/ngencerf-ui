@@ -248,7 +248,7 @@ const {
 const { 
   getCalibrationJobsForForecast, 
   resetUserSelectedForecastCalibrationRun, 
-  hardResetForecastRunStatusStore,
+  hardResetForecastStore,
   resetFilters,
   fetchGageList
 } = forecastStore;
@@ -311,7 +311,7 @@ onMounted(async () => {
   calibrationRunsForForecastListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
-  hardResetForecastRunStatusStore();
+  hardResetForecastStore();
 
   hilightTab(ForecastTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;

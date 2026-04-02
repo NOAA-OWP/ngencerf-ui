@@ -222,7 +222,7 @@ const {
   getHindcastJobs,
   deleteHindcastJob,
   resetUserSelectedHindcastCalibrationRun,
-  hardResetHindcastRunStatusStore,
+  hardResetHindcastStore,
   resetFilters,
   fetchHindcastGageList
 } = useHindcastStore();
@@ -282,11 +282,10 @@ const onRowContextMenu = (event: any) => {
 
 onMounted(async () => {
   isLoading.value = true;
-  hindcastJobId.value = undefined;
   hindcastRunListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
-  hardResetHindcastRunStatusStore();
+  hardResetHindcastStore();
 
   //reset any previously selected verification data
   resetSelectedVerificationJobData();

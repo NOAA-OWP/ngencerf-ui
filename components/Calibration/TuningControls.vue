@@ -435,7 +435,6 @@ onMounted(async () => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
 
-    console.log('userSelectedCalibrationTuningParameters:',userSelectedCalibrationTuningParameters.value);
     if (userSelectedCalibrationTuningParameters.value.length > 0 && !userCalibrationRunData?.value?.modules?.includes('LSTM')) {
       validateTuningParameters().then(response => {
         if (response._data.parameter_warnings) {

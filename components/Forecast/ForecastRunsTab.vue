@@ -222,7 +222,7 @@ const {
   getForecastJobs,
   deleteForecastJob,
   resetUserSelectedForecastCalibrationRun,
-  hardResetForecastRunStatusStore,
+  hardResetForecastStore,
   resetFilters,
   fetchForecastGageList
 } = useForecastStore();
@@ -286,7 +286,7 @@ onMounted(async () => {
   forecastRunListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
-  hardResetForecastRunStatusStore();
+  hardResetForecastStore();
 
   //reset any previously selected verification data
   resetSelectedVerificationJobData();

@@ -793,6 +793,8 @@ export type CalibrationRunForHindcast = {
   configuration: string;
   cycle_date: string;
   cold_start?: ColdStartRun;
+  interval_cycle: number;
+  num_iterations: number;
   logging_config: {
     logging_enabled: boolean;
     modules: {
