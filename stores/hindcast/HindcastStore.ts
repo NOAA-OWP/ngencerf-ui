@@ -251,15 +251,15 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         coldStartJobStatus.value = getStatusResponse?._data?.cold_start_run?.status;
         failureMessages.value = getStatusResponse?._data?.failure_messages;
 
-        if (getStatusResponse?._data?.cold_start_run?.submit_date) {
+        if (getStatusResponse?._data?.cold_start_run?.submit_date && !getStatusResponse?._data?.cold_start_run?.run_end) {
           submitTimeDate.value = new Date(getStatusResponse?._data?.cold_start_run.submit_date as string);
         } else if (getStatusResponse?._data?.submit_date) {
           submitTimeDate.value = new Date(getStatusResponse?._data?.submit_date as string);
-        }
+        } 
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
           if (overallColdStartHindcastStatus.value === 'Done' && getStatusResponse?._data?.run_end) {
-            elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date(getStatusResponse._data.run_end as string));
+            setElapsedTime(getStatusResponse?._data);
           }
         } else {
           errorMessages.push(`Invalid submit date: ${getStatusResponse?._data?.submit_date}`);
@@ -277,14 +277,20 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
   const setElapsedTime = (hindcastJob: any): void => {
     const elapsedTimeArray: string[] = [];
 
-    if (hindcastJob?.cold_start_run?.elapsed_time) {
-      elapsedTimeArray.push(hindcastJob?.cold_start_run?.elapsed_time);
-    }
-    if (hindcastJob?.elapsed_time) {
-      elapsedTimeArray.push(hindcastJob?.elapsed_time);
-    }
-    
     // sum and format hindcast and cold start elapsed times
+    if (hindcastJob.cold_start_run?.submit_date && hindcastJob.cold_start_run?.run_end) {
+      elapsedTimeArray.push(calculateElapsedTime(
+        new Date(hindcastJob.cold_start_run.submit_date as string), 
+        new Date(hindcastJob.cold_start_run.run_end as string)
+      ));
+    }
+    if (hindcastJob?.submit_date && hindcastJob?.run_end) {
+      elapsedTimeArray.push(calculateElapsedTime(
+        new Date(hindcastJob.submit_date as string), 
+        new Date(hindcastJob.run_end as string)
+      ));
+    }
+
     elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
   };
 
