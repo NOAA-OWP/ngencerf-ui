@@ -184,7 +184,7 @@
           </div>
         </div>
         <div class="w-24">
-          <span v-if="showNextButton">
+          <span>
             <div class="col-span-1 mr-4 p-1">
               <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
                 @click="goToRunStatusTab()">
@@ -364,11 +364,9 @@ watch(hindcastConfiguration, async () => {
 watch(useSavedState, async () => {
   if (!useSavedState.value) {
     coldStartJobId.value = undefined;
-    console.log('cycleDate:',cycleDate.value);
     if (!cycleDate.value) {
       cycleDate.value = maxCycleDate.value;
     }
-    console.log('cycleDate:',cycleDate.value);
   } else if (!coldStartJobId.value) {
     cycleDate.value = undefined;
   }
@@ -462,38 +460,44 @@ const getIntervalCycleList = () => {
  */
 const goToRunStatusTab = () => {
     if (!calibrationRunForHindcast.value?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast.value?.hindcast_status)) {
-        if (!hindcastConfiguration.value) {
-          const alert = window.alert('You must select a configuration and then set the Cycle Date/Hour.');
-          return false;
-        } else if (!intervalCycle.value) { 
-          const alert = window.alert('Advance Interval must be chosen.');
-          return false;
-        }  else if (!numIterations.value) { 
-          const alert = window.alert('Number of Intervals must be indicated.');
-          return false;
-        } else if (!coldStartJobId.value) {
-          if (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0)) {
-            const alert = window.alert('Invalid Cycle Date chosen.\n\nMake sure to choose a date within the available date range, and an hour that is available for your chosen configuration.');
-            return false;
-          } else if (!coldStartDate.value || (!coldStartHour.value && !coldStartHour.value !== 0)) {
-            const alert = window.alert('Invalid Cold Start Date chosen.\n\nMake sure to choose a date and an hour.');
-            return false;
-          } else {
-            cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
-            if (coldStartDate.value) {
-              coldStartDate.value = coldStartDate.value.set({ hour: coldStartHour.value ? coldStartHour.value : 0, minute: 0, second: 0 });
-            }
-            if (coldStartDate.value && coldStartDate.value >= cycleDate.value) {
-              const alert = window.alert('Cold Start Date must be before the Cycle Date.');
-              return false;
-            }
-            // validate the day/hour to make sure it is within the availability window
-            let latestHindcastDate = maxCycleDate.value.minus({ hours: hindcastConfiguration.value.availability_lag})
-            if (latestHindcastDate < cycleDate.value) {
-                const alert = window.alert('Hindcast data might not yet be available for your chosen cycle date.');
-            }
+      let alerts = [];
+      if (!hindcastConfiguration.value) {
+        alerts.push('You must select a configuration and then set the Cycle Date/Hour.');
+      }
+      if (!useSavedState.value) {
+        if (!coldStartDate.value || (!coldStartHour.value && !coldStartHour.value !== 0)) {
+          alerts.push('Invalid Cold Start Date chosen. Make sure to choose a date and an hour.');
+        } else {
+          cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
+          if (coldStartDate.value) {
+            coldStartDate.value = coldStartDate.value.set({ hour: coldStartHour.value ? coldStartHour.value : 0, minute: 0, second: 0 });
+          }
+          if (coldStartDate.value && coldStartDate.value >= cycleDate.value) {
+            alerts.push('Cold Start Date must be before the Cycle Date.');
+          }
+          // validate the day/hour to make sure it is within the availability window
+          // TO DO: Factor the interval cycle/number of intervals into this, or use server-side validation
+          let latestHindcastDate = maxCycleDate.value.minus({ hours: hindcastConfiguration.value.availability_lag})
+          if (latestHindcastDate < cycleDate.value) {
+              alerts.push('Hindcast data is not yet be available for your chosen cycle date.');
           }
         }
+        if (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0)) {
+          alerts.push('Invalid Cycle Date chosen. Make sure to choose a date within the available date range, and an hour that is available for your chosen configuration.');
+        }
+      } else if (!coldStartJobId.value) {
+        alerts.push('You must choose a saved state.');
+      }
+      if (!intervalCycle.value) { 
+        alerts.push('Advance Interval must be chosen.');
+      }
+      if (!numIterations.value) { 
+        alerts.push('Number of Intervals must be indicated.');
+      }
+      if (alerts.length > 0) {
+        const alert = window.alert(alerts.join('\n'));
+        return false;
+      }
     }
     const allTabs = document.getElementsByClassName("tabs");
     const e = allTabs[HindcastTabs.tab_hindcastRunStatus] as HTMLElement;
