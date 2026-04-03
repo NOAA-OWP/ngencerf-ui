@@ -111,7 +111,7 @@
         <label for="useSavedState_0">Use Manual Dates</label>
       </div>
       <div class="flex gap-6">
-        <div class="grid grid-cols-4">
+        <div class="grid grid-cols-[max-content_max-content_max-content_max-content]">
           <div v-if="useSavedState" class="text-nowrap text-right font-bold p-2 required-label">
             Saved State
           </div>
@@ -119,7 +119,7 @@
             <Select id="coldStartJobId" v-model="coldStartJobId" :options="formattedColdStartRunsForHindcast" 
               optionLabel="cold_start_date_display" optionValue="cold_start_run_id"
               aria-label="Saved State Select" title="Saved State Select"
-              class="w-24" :disabled="!hindcastConfiguration">
+              class="!w-[320px]" :disabled="!hindcastConfiguration">
             </Select>
           </div>
           <div v-if="useSavedState" class="text-nowrap text-right font-bold p-2">
@@ -156,14 +156,14 @@
           <div v-if="!useSavedState" class="text-nowrap p-1">
             <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
               aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
-              class="w-24" :disabled="!hindcastConfiguration">
+              class="!w-12" :disabled="!hindcastConfiguration">
             </Select>
           </div>
           <div v-if="!useSavedState" class="text-nowrap text-right font-bold p-2 required-label">Cycle Hour</div>
           <div v-if="!useSavedState" class="text-nowrap p-1">
             <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
               aria-label="Cycle Hour Select" title="Cycle Hour Select"
-              class="user-select w-12" :disabled="!hindcastConfiguration">
+              class="!w-12" :disabled="!hindcastConfiguration">
             </Select>
           </div>
           <div class="text-nowrap text-right font-bold p-2 required-label">
@@ -173,17 +173,17 @@
             <Select id="intervalCycle" v-model="intervalCycle" :options="formattedIntervalCycleList" default="6"
               optionLabel="interval_display" optionValue="interval" 
               aria-label="Hindcast Advance Interval Select" title="Hindcast Advance Interval Select"
-              class="user-select w-12" :disabled="!hindcastConfiguration">
+              class="!w-[160px]" :disabled="!hindcastConfiguration">
             </Select>
           </div>
           <div class="text-nowrap text-right font-bold p-2 required-label">
             Number of Intervals
           </div>
           <div class="text-nowrap p-1">
-            <InputNumber id="jobIdEnd" class="w-24" v-model="numIterations" :min="1"/>
+            <InputNumber id="jobIdEnd" class="!w-12" v-model="numIterations" :min="1"/>
           </div>
         </div>
-        <div class="w-24">
+        <div>
           <span>
             <div class="col-span-1 mr-4 p-1">
               <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"

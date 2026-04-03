@@ -338,6 +338,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({ 
+        calibration_run_id: calibrationJobId?.value, 
         configuration_name: hindcastConfiguration?.value?.name
       })
     });
@@ -374,7 +375,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
       body: JSON.stringify({
         calibration_run_id: calibrationRunId, 
         configuration_name: hindcastConfigurationName,
-        cycle_date: cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
+        cycle_date: (!coldStartJobId && cycleDate) ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
         cold_start_date: (!coldStartJobId && coldStartDate) ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
         cold_start_run_id: coldStartJobId ?? null,
         interval_cycle: intervalCycle,
