@@ -1,4 +1,29 @@
-FROM rockylinux:9.3
+ARG BASE_REPO=rockylinux
+ARG BASE_TAG=9.3
+
+FROM ${BASE_REPO}:${BASE_TAG}
+
+# OCI Metadata Arguments
+ARG BASE_REPO
+ARG BASE_TAG
+ARG BASE_NAME="${BASE_REPO}:${BASE_TAG}"
+ARG BASE_DIGEST="unknown"
+ARG BASE_REVISION="unknown"
+ARG IMAGE_SOURCE="unknown"
+ARG IMAGE_VENDOR="unknown"
+ARG IMAGE_VERSION="unknown"
+ARG IMAGE_REVISION="unknown"
+
+# OCI Standard Labels
+LABEL org.opencontainers.image.base.name="${BASE_NAME}" \
+    org.opencontainers.image.base.digest="${BASE_DIGEST}" \
+    io.ngwpc.image.base.revision="${BASE_REVISION}" \
+    org.opencontainers.image.source="${IMAGE_SOURCE}" \
+    org.opencontainers.image.vendor="${IMAGE_VENDOR}" \
+    org.opencontainers.image.version="${IMAGE_VERSION}" \
+    org.opencontainers.image.revision="${IMAGE_REVISION}" \
+    org.opencontainers.image.title="NGENCERF UI" \
+    org.opencontainers.image.description="Docker image for the NGENCERF UI application"
 
 # runtime dependencies
 RUN set -eux; \
@@ -77,7 +102,7 @@ RUN rm --recursive --force .git
 ENV NUXT_HOST=0.0.0.0
 ENV NUXT_PORT=3000
 
-ENTRYPOINT [ "npm" ] 
+ENTRYPOINT [ "npm" ]
 CMD [ "run", "start" ]
 
 EXPOSE 3000
