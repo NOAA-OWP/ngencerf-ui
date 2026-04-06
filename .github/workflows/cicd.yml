@@ -27,6 +27,8 @@ permissions:
 env:
   REGISTRY: ghcr.io
   NODE_VERSION: '22.17.0'
+  BASE_REPO: rockylinux
+  BASE_TAG: '9.3'
 
 jobs:
   # set variables to use in other jobs
@@ -41,8 +43,10 @@ jobs:
       commit_sha_short: ${{ steps.vars.outputs.commit_sha_short }}
       test_image_tag: ${{ steps.vars.outputs.test_image_tag }}
       alias_tag: ${{ steps.vars.outputs.alias_tag }}
-      build_date: ${{ steps.vars.outputs.build_date }}
       clean_ref: ${{ steps.vars.outputs.clean_ref }}
+      base_name: ${{ steps.vars.outputs.base_name }}
+      base_digest: ${{ steps.vars.outputs.base_digest }}
+      base_revision: ${{ steps.vars.outputs.base_revision }}
     steps:
       - name: Compute image vars
         id: vars
@@ -57,9 +61,6 @@ jobs:
 
           # one datetime for all time variables
           NOW=$(date -u +'%Y-%m-%d %H:%M:%S')
-
-          # for OCI labels
-          BUILD_DATE=$(date -u -d "$NOW" +'%Y-%m-%dT%H:%M:%SZ')
 
           # for Docker image tags
           TIMESTAMP=$(date -u -d "$NOW" +'%Y%m%d%H%M%SZ')
@@ -95,15 +96,29 @@ jobs:
             ALIAS="${TIMESTAMP}-${CLEAN_REF}"
           fi
 
+          # skopeo is needed to inspect the base image
+          if ! command -v skopeo >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y --no-install-recommends skopeo
+          fi
+
+          # base image metadata for Dockerfile labels
+          BASE_NAME="${{ env.BASE_REPO }}:${{ env.BASE_TAG }}"
+          BASE_INSPECT=$(skopeo inspect "docker://${BASE_NAME}" 2>/dev/null || echo '{}')
+          BASE_DIGEST=$(echo "$BASE_INSPECT" | jq -r '.Digest // "unknown"')
+          BASE_REVISION=$(echo "$BASE_INSPECT" | jq -r '.Labels["org.opencontainers.image.revision"] // "unknown"')
+
           # save outputs
           echo "org=${ORG}" >> "$GITHUB_OUTPUT"
           echo "image_base=${IMAGE_BASE}" >> "$GITHUB_OUTPUT"
-          echo "build_date=${BUILD_DATE}" >> "$GITHUB_OUTPUT"
           echo "test_image_tag=${TEST_TAG}" >> "$GITHUB_OUTPUT"
           echo "alias_tag=${ALIAS}" >> "$GITHUB_OUTPUT"
           echo "commit_sha=${REAL_SHA}" >> "$GITHUB_OUTPUT"
           echo "commit_sha_short=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
           echo "clean_ref=${CLEAN_REF}" >> "$GITHUB_OUTPUT"
+          echo "base_name=${BASE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "base_digest=${BASE_DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "base_revision=${BASE_REVISION}" >> "$GITHUB_OUTPUT"
 
   # CodeQL scan
   codeql-scan:
@@ -166,11 +181,14 @@ jobs:
           push: true
           tags: ${{ needs.setup.outputs.image_base }}:${{ needs.setup.outputs.test_image_tag }}${{ matrix.tag_suffix }}
           build-args: |
+            BASE_REPO=${{ env.BASE_REPO }}
+            BASE_TAG=${{ env.BASE_TAG }}
+            BASE_DIGEST=${{ needs.setup.outputs.base_digest }}
+            BASE_REVISION=${{ needs.setup.outputs.base_revision }}
             IMAGE_SOURCE=https://github.com/${{ github.repository }}
             IMAGE_VENDOR=${{ github.repository_owner }}
             IMAGE_VERSION=${{ needs.setup.outputs.clean_ref }}
             IMAGE_REVISION=${{ needs.setup.outputs.commit_sha }}
-            IMAGE_CREATED=${{ needs.setup.outputs.build_date }}
 
 # run unit tests inside the Docker images
   unit-test:
