@@ -1,18 +1,17 @@
 <template>
-  <table id="CalibrationProgressTable" class="progressTable prevent-select">
+  <table v-if="userCalibrationRunData" id="CalibrationProgressTable" class="progressTable prevent-select">
     <tbody>
       <tr>
-        <td><i v-if="userCalibrationRunData?.gage?.gage_id"
-            :class="(userCalibrationRunData?.gage?.gage_id) ? 'checkMark' : ''" class="pi pi-check font-bold"></i></td>
-        <td data-tab="2" title="Headwater Basin Gage" aria-label="Headwater Basin Gage"
-          @click="tabClicked">
+        <td><i v-if="userCalibrationRunData?.job_name && userCalibrationRunData?.gage?.gage_id"
+            :class="(userCalibrationRunData?.job_name && userCalibrationRunData?.gage?.gage_id) ? 'checkMark' : ''" class="pi pi-check font-bold"></i></td>
+        <td data-tab="2" title="Headwater Basin Gage" aria-label="Headwater Basin Gage" @click="tabClicked">
           Headwater Basin Gage</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.external_data_status?.forcing"
             :class="userCalibrationRunData?.external_data_status?.forcing ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing</td>
+        <td data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing Source</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.external_data_status?.observational"
@@ -27,43 +26,46 @@
         <td data-tab="2" title="Geopackage" aria-label="Geopackage" @click="tabClicked">Geopackage</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length"
-            :class="userCalibrationRunData?.formulation_name && userCalibrationRunData?.modules.length ? 'checkMark' : ''"
+        <td><i v-if="userCalibrationRunData?.job_name && userCalibrationRunData?.modules.length && formulationIsCalibratable"
+            :class="userCalibrationRunData?.job_name && userCalibrationRunData?.modules.length && formulationIsCalibratable ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
         <td data-tab="3" title="Formulation" aria-label="Formulation" @click="tabClicked">Formulation</td>
       </tr>
       <tr>
         <td><i v-if="checkStartEndTimeValues()" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="4" title="Start and End Times" aria-label="Start and End Times"
-          @click="tabClicked">
+        <td data-tab="4" title="Start and End Times" aria-label="Start and End Times" @click="tabClicked">
           Start and End Times</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.parameters_selected" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters"
-          @click="tabClicked">Tuning Parameters</td>
+        <td><i v-if="(checkStartEndTimeValues() || userCalibrationRunData?.parameters_selected) && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
+        <td data-tab="4" title="Output Variable to Calibrate" aria-label="Output Variable to Calibrate"
+          @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Output Variable to Calibrate</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.optimization" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Optimization Algorithm"
-          aria-label="Optimization Algorithm" @click="tabClicked">Optimization Algorithm</td>
+        <td><i v-if="userCalibrationRunData?.parameters_selected && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
+        <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Tuning Parameters
+        </td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.objective_function" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Objective Function" aria-label="Objective Function"
-          @click="tabClicked">
+        <td><i v-if="userCalibrationRunData?.optimization && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
+        <td data-tab="5" title="Optimization Algorithm" aria-label="Optimization Algorithm" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
+          Optimization Algorithm</td>
+      </tr>
+      <tr>
+        <td><i v-if="userCalibrationRunData?.objective_function && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
+        <td data-tab="5" title="Objective Function" aria-label="Objective Function" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
           Objective Function</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.stop_criteria" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Calibration Stop Criteria"
-          aria-label="Calibration Stop Criteria" @click="tabClicked">Calibration Stop Criteria</td>
+        <td><i v-if="userCalibrationRunData?.stop_criteria && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
+        <td data-tab="5" title="Calibration Stop Criteria" aria-label="Calibration Stop Criteria" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
+          Calibration Stop Criteria</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.save_plot_iteration_frequency" class="pi pi-check font-bold checkMark"></i>
+        <td><i v-if="userCalibrationRunData?.save_plot_iteration_frequency && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i>
         </td>
-        <td data-tab="5" title="Metrics and Plot Inteval"
-          aria-label="Metrics and Plot Inteval" @click="tabClicked">Metrics / Plot Inteval</td>
+        <td data-tab="5" title="Metrics and Plot Interval" aria-label="Metrics and Plot Interval" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
+          Metrics / Plot Interval</td>
       </tr>
     </tbody>
   </table>
@@ -71,16 +73,44 @@
 </template>
 
 <script lang="ts" setup>
- 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 
-const userDataStore = useUserDataStore();
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
-const { userCalibrationRunData } = storeToRefs(userDataStore);
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+const { selectedModuleValues, formulationIsCalibratable } = storeToRefs(useFormulationStore());
+const { validateFormulationTabData } = useFormulationStore();
+
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 
 const emit = defineEmits(["tabNumber"]);
+
+onMounted(async() => {
+  if (userCalibrationRunData.value) {
+    // check to see if formulation is calibratable
+    if (userCalibrationRunData.value?.modules != null) {
+      try {
+        selectedModuleValues.value = JSON.parse(
+          JSON.stringify(userCalibrationRunData.value.modules)
+        );
+      } catch (e) {
+        console.error("Failed to clone modules:", e);
+        selectedModuleValues.value = [];
+      }
+    } else {
+      selectedModuleValues.value = [];
+    }
+    formulationIsCalibratable.value = false;
+    if (selectedModuleValues.value.length > 0) {
+      validateFormulationTabData().then(response => {
+        if (!response._data.formulation_errors) {
+          formulationIsCalibratable.value = true;
+        }
+      });
+    }
+  }
+})
 
 const checkStartEndTimeValues = () => {
   return (

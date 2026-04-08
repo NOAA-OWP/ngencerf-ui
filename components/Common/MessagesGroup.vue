@@ -6,25 +6,21 @@
           userCalibrationRunData?.calibration_run_id ? userCalibrationRunData.calibration_run_id : '' }}</h2>
 
       <div class=" grid grid-cols-2 gap=1 text-sm mt-4">
+        <div class="col-span-2">
+          <div v-if="calData?.job_name" :aria-label="'Job Name ' + calData?.job_name"
+            :title="'Job Name ' + calData?.job_name"><span class="font-medium">Job Name:</span>
+            {{
+              calData?.job_name }}
+          </div>
+        </div>
         <div class="col-span-1">
           <div v-if="calData?.gage?.gage_id" :aria-label="'Gage ' + calData?.gage?.gage_id"
             :title="'Gage ' + calData?.gage?.gage_id"><span class="font-medium">Gage:</span>
             {{ calData?.gage?.gage_id }}</div>
 
-            <div v-if="calData?.num_catchments" :aria-label="'Catchments ' + calData?.num_catchments"
+          <div v-if="calData?.num_catchments" :aria-label="'Catchments ' + calData?.num_catchments"
             :title="'Gage ' + calData?.num_catchments"><span class="font-medium">Catchments:</span>
             {{ calData?.num_catchments }}</div>
-
-          <div v-if="calData?.forcing_source" :aria-label="'Forcing Data ' + calData?.forcing_source"
-            :title="'Forcing Data ' + calData?.forcing_source"><span class="font-medium">Forcing Data:</span>
-            {{ calData?.forcing_source }}
-          </div>
-          <div v-if="calData?.observational_source" :aria-label="'Observational Data ' + calData?.observational_source"
-            :title="'Observational Data ' + calData?.observational_source"><span class="font-medium">Observational
-              Data:</span> {{
-                calData?.observational_source }}
-          </div>
-
         </div>
 
         <div class="col-span-1">
@@ -33,18 +29,34 @@
             <span class="font-medium">{{ calData?.gage?.station_name }}</span>
           </div>
         </div>
+
+        <div class="col-span-2">
+          <div v-if="calData?.forcing_source_requested" :aria-label="'Forcing Data ' + calData?.forcing_source_requested"
+            :title="'Forcing Data ' + calData?.forcing_source_requested"><span class="font-medium">Forcing Source: </span>
+            <span v-if="(calData?.forcing_source_actual && calData.forcing_source_actual != calData?.forcing_source_requested)">
+              {{ calData?.forcing_source_actual }} ({{ calData?.forcing_source_requested }} Was Requested)
+            </span>
+            <span v-else>
+              {{ calData?.forcing_source_requested }}
+            </span>
+          </div>
+          <div v-if="calData?.observational_source" :aria-label="'Observational Data ' + calData?.observational_source"
+            :title="'Observational Data ' + calData?.observational_source"><span class="font-medium">Observational
+              Data:</span> 
+            {{ calData?.observational_source }}
+          </div>
+        </div>
       </div>
       <div class="line-spacer">&nbsp;</div>
       <div class="grid grid-cols=1 gap=1 text-sm">
         <div class="col-span-1">
-          <div v-if="calData?.formulation_name" :aria-label="'Formulation Name ' + calData?.formulation_name"
-            :title="'Formulation Name ' + calData?.formulation_name"><span class="font-medium">Formulation Name:</span>
-            {{
-              calData?.formulation_name }}
-          </div>
           <div v-if="calData?.modules?.length" :aria-label="'Modules ' + getModuleList()"
             :title="'Modules ' + getModuleList()"><span class="font-medium">Modules:
             </span>{{ getModuleList() }}</div>
+          <div v-if="calData?.modules?.includes('CFE-S') || calData?.modules?.includes('CFE-X')" :aria-label="'CFE AET Rootzone ' + (calData?.is_aet_rootzone ? 'Yes' : 'No')"
+            :title="'CFE AET Rootzone ' + (calData?.is_aet_rootzone ? 'Yes' : 'No')">
+            <span class="font-medium">CFE AET Rootzone:
+            </span>{{ (calData?.is_aet_rootzone ? 'Yes' : 'No') }}</div>
         </div>
       </div>
 
@@ -80,20 +92,27 @@
               {{ formatDate(calData?.calibration_times?.calibration_end_time) }}</div>
           </div>
           <div class="line-spacer">&nbsp;</div>
-          <div v-if="calData?.optimization"><span class="font-medium"
+
+          <div v-if="userCalibrationRunData?.parameters_selected && !calData?.modules?.includes('LSTM')"
+            :aria-label="'Output Variable ' + selectedOutputVariableToCalibrate"
+            :title="'Output Variable ' + selectedOutputVariableToCalibrate">
+            <span class="font-medium">
+              Output Var:
+            </span>
+            {{ selectedOutputVariableToCalibrate }}
+          </div>
+
+          <div v-if="calData?.optimization && !calData?.modules?.includes('LSTM')"><span class="font-medium"
               :aria-label="'Optimization Algorithm ' + calData?.optimization"
               :title="'Optimization Algorithm ' + calData?.optimization">Optimization Algorithm:</span>
             {{ calData?.optimization }}</div>
-          <div v-if="calData?.objective_function" :aria-label="'Objective Function ' + calData?.objective_function"
-            :title="'Objective Function ' + calData?.objective_function"><span class="font-medium">Objective
-              Function:</span>
-            {{ calData?.objective_function }}</div>
-          <div v-if="calData?.save_plot_iteration_frequency"
-            :aria-label="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"
-            :title="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"><span
-            class="font-medium">Plot Generation Frequency:</span>
-          {{ calData?.save_plot_iteration_frequency }}</div>
+
+          <div v-if="calData?.stop_criteria && !calData?.modules?.includes('LSTM')"><span class="font-medium"
+              :aria-label="'Calibration Stop Criteria ' + calData?.stop_criteria"
+              :title="'Calibration Stop Criteria ' + calData?.stop_criteria">Calibration Stop Criteria:</span>
+            {{ calData?.stop_criteria }}</div>
         </div>
+
         <div class="col-span-1">
           <div v-if="calData?.validation_times?.simulation_start_time"><span class="font-medium">Validation Run</span>
           </div>
@@ -126,26 +145,42 @@
               {{ formatDate(calData?.validation_times?.validation_end_time) }}</div>
           </div>
           <div class="line-spacer">&nbsp;</div>
-          <div v-if="userSelectedCalibrationTuningParameters && userSelectedCalibrationTuningParameters.length > 0"
+          <div v-if="userSelectedCalibrationTuningParameters && userSelectedCalibrationTuningParameters.length > 0 && !calData?.modules?.includes('LSTM')"
             :aria-label="'Tuning Parameters ' + userSelectedCalibrationTuningParameters.length"
             :title="'Tuning Parameters ' + userSelectedCalibrationTuningParameters.length">
             <span class="font-medium">Tuning Parameters:</span>
             {{ userSelectedCalibrationTuningParameters.length }}
           </div>
-          <div v-if="calData?.stop_criteria"><span class="font-medium"
-              :aria-label="'Calibration Stop Criteria ' + calData?.stop_criteria"
-              :title="'Calibration Stop Criteria ' + calData?.stop_criteria">Calibration Stop Criteria:</span>
-            {{ calData?.stop_criteria }}</div>
+          <div v-if="calData?.objective_function && !calData?.modules?.includes('LSTM')" :aria-label="'Objective Function ' + calData?.objective_function"
+            :title="'Objective Function ' + calData?.objective_function"><span class="font-medium">Objective
+              Function:</span>
+            {{ calData?.objective_function }}</div>
+          <div v-if="calData?.save_plot_iteration_frequency && !calData?.modules?.includes('LSTM')"
+            :aria-label="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"
+            :title="'Plot Generation Frequency ' + calData?.save_plot_iteration_frequency"><span
+              class="font-medium">Plot Generation Frequency:</span>
+            {{ calData?.save_plot_iteration_frequency }}</div>
         </div>
+
         <div class="line-spacer">&nbsp;</div>
-	      <div class="col-span-2">
-          <div v-if="resultsPathname"
-            :aria-label="'Results Pathname ' + resultsPathname"
+        <div class="col-span-2">
+          <div v-if="resultsPathname" :aria-label="'Results Pathname ' + resultsPathname"
             :title="'Results Pathname ' + resultsPathname"><span class="font-medium">
               Results Pathname:</span>
             {{ resultsPathname }}</div>
         </div>
-        <div class="col-span-2">&nbsp;</div>
+        <div class="col-span-2">
+          <div :aria-label="'NGEN Global Logging ' + calibrationJobNgenGlobalLogging"
+            :title="'NGEN Global Logging ' + calibrationJobNgenGlobalLogging"><span class="font-medium">
+              NGen Global Logging:</span>
+            {{ calibrationJobNgenGlobalLogging ? 'ENABLED' : 'DISABLED' }}</div>
+        </div>
+        <div v-if="calData?.last_updated_on" class="col-span-2">
+          <div :aria-label="'Last Updated At ' + formatDate(calData?.last_updated_on)"
+            :title="'Last Updated At ' + formatDate(calData?.last_updated_on)"><span class="font-medium">
+              Last Updated:</span>
+            {{ formatDate(calData?.last_updated_on) }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -156,18 +191,21 @@
 import { storeToRefs } from 'pinia';
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
-const calRunStore = useUserDataStore();
-const { userCalibrationRunData } = storeToRefs(calRunStore);
+const { userCalibrationRunData, calibrationJobNgenGlobalLogging } = storeToRefs(useUserDataStore());
 const calData = ref(userCalibrationRunData);
-const tuningStore = useTuningStore();
-const { userSelectedCalibrationTuningParameters } = storeToRefs(tuningStore);
-const runStatusStore = useRunStatusStore();
-const { resultsPathname } = storeToRefs(runStatusStore);
+const { fetchFormulationModuleOptions } = useFormulationStore();
+const {
+  userSelectedCalibrationTuningParameters,
+  selectedOutputVariableToCalibrate,
+} = storeToRefs(useTuningStore());
+const { loadTuningTabStaticData } = useTuningStore();
+const { resultsPathname } = storeToRefs(useRunStatusStore());
 
 const componentProps = withDefaults(defineProps<{
   title?: string
@@ -179,9 +217,12 @@ const componentProps = withDefaults(defineProps<{
 const getModuleList = () => {
   let modules = "";
   calData.value?.modules.forEach(element => {
-    modules += element;
-    if (calData.value?.modules[calData.value?.modules.length - 1] !== element) {
-      modules += ", ";
+    let module_option = fetchFormulationModuleOptions.find(module => module.name === element);
+    if (module_option) {
+      modules += module_option.display_name;
+      if (calData.value?.modules[calData.value?.modules.length - 1] !== element) {
+        modules += ", ";
+      }
     }
   });
   return modules;
@@ -189,17 +230,24 @@ const getModuleList = () => {
 
 const formatDate = (d: any) => {
   if ((d instanceof Date)) {
-    console.log('Date');
+    return d;
   } else {
     return formatISOStringOrDateToYYYYMMDDHHMM(d);
   }
 };
 
+onMounted(async() => {
+  // make sure tuning parameters are loaded
+  if (!userSelectedCalibrationTuningParameters.value || userSelectedCalibrationTuningParameters.value.length === 0) {
+    await loadTuningTabStaticData();
+  }
+})
+
 </script>
 
 <style lang="scss" scoped>
 #Messages {
-  padding: 0 15px;
+  padding: 0 0 0 15px;
   font-size: 1.2em;
 }
 

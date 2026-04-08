@@ -1,86 +1,214 @@
 <template>
-  <div class="_help-page">
-    <div class="_help-title">Calibration - Optimization/Metrics Tab</div>
-    <div class="_help-subtitle">This tab provides the user the ability to select the optimization algorithm, the
-      objective function, the calibration stop criteria, the plot generation frequency and additional metrics to calculate. By default, the ngen-cal
-      program does not calculate the Categorical Metrics, POD, CSI, and FAR or the Event Based Metrics, PKBIAS, PKTE, and EVBIAS but the user can opt to calculate these.</div>
-    <p class="text-center" style="color:#cc5500;font-size:0.8em;">
-      WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
-    </p>
-    <p style="margin-left: 40px; margin-top:20px;font-size:0.9em; line-height: 20px;">
-      <strong>NOTE:</strong> <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup,
-        starting at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress area to go to that specific setup tab.</em>
-    </p>
-
-    <table class="_help-table">
-      <thead>
-        <th>Item</th>
-        <th>Description</th>
-      </thead>      
-      <tbody>
-        <tr>
-          <td class="td1">Optimization Algorithm</td>
-          <td class="td2">Select from the dropdown which optimization algorithm to use for the calibration. Once one is
-            selected any required algorithm parameters will be populated in the Parameter table. </td>
-        </tr>
-        <tr>
-          <td class="td1">Algorithm Parameters</td>
-          <td class="td2">The parameter name is provided. The user must provide the value.</td>
-        </tr>
-        <tr>
-          <td class="td1">Calibration Stop Criteria</td>
-          <td class="td2">The number of iterations for each worker to execute while performing calibration. DDS has one
-            worker, but both GWO and PSO have 20 workers.
-          </td>
-        </tr>
-        <tr>
-          <td class="td1">Objective Function</td>
-          <td class="td2">
-            Select a metric to use as the objective function during calibration. Note that all metric
-            in the table below are appropriate to use as an objective function. (MFDC, FBIAS, NSWwt)<br />
-            If a Categorical metric (POD, CSI, FAR) is selected, the user must provide the Flow Threshold.<br />
-            If an Event based metric (PKBIAS, PKTE, EVBIAS) is selected, the user must provide the Peak Flow Threshold.
-          </td>
-        </tr>
-        <tr>
-          <td class="td1">Calculate Categorical Metrics</td>
-          <td class="td2">If a Categorical metric (POD, CSI, FAR) is not selected as the objective function, 
-            the user can select this checkbox to have the program also calculate the Categorical Metrics. The 
-            Flow Threshold must be entered by the user.
-          </td>
-        </tr>
-        <tr>
-          <td class="td1">Calculate Event Based Metrics</td>
-          <td class="td2">If an Event Based metric (PKBIAS, PKTE, EVBIAS) is not selected as the objective function, the user can select
-            this checkbox to have the program also calculate the Event Based Metrics.
-            The Peak Flow Threshold must be entered by the user.
-          </td>
-        </tr>
-        <tr>
-          <td class="td1">Save Button</td>
-          <td class="td2">Save data from the tab. Partial saves are allowed.</td>
-        </tr>
-        <tr>
-          <td class="td1">Prev Button</td>
-          <td class="td2">Move to the Tuning Controls Tab. If there is any unsaved data, the user will first be prompted
-            to save.</td>
-        </tr>
-        <tr>
-          <td class="td1">Next Button</td>
-          <td class="td2">Move to the Status/Run Tab. If there is any unsaved data, the user will first be prompted
-            to save.</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="mt-4">
-      <p style="text-align: center;font-weight: bold;">Metric Definitions</p>
-      <img class="mx-auto" width="90%" :src="image1" alt="" />
+    <div class="_help-page">
+        <div class="_help-title">Calibration - Optimization/Metrics Tab</div>
+        <div class="_help-subtitle">This tab provides the ability to select the optimization algorithm, the
+            objective function, the calibration stop criteria, the plot generation frequency and additional metrics to
+            calculate. By default, the ngen-cal program does not calculate the Categorical Metrics, POD, CSI, and FAR or
+            the Event Based Metrics, PKBIAS, PKTE, and EVBIAS but the user can opt to calculate these.<br />
+            <br />
+            This tab is not available when LSTM is a module in the formulation.
+        </div>
+        <p class="text-center" style="color:#cc5500;font-size:0.8em;">
+            WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
+        </p>
+        <hr class="my-6 border-black" />
+        <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
+            <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup, 
+                starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
+                area to go to that specific setup tab.</em>
+        </p>
+        <table class="_help-table"  aria-describedby="Optimization/Metrics Tab Help Table">
+            <thead>
+            <tr>
+                <th>Item</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="td1">Optimization Algorithm<span class="required-asterisk" aria-hidden="true">*</span></td>
+                <td class="td2">
+                Select the optimization algorithm to use for calibration from the dropdown. Once selected,
+                any required algorithm parameters will be automatically populated in the Algorithm Parameter table.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Algorithm Parameters<span class="required-asterisk" aria-hidden="true">*</span></td>
+                <td class="td2">
+                Each parameter name is listed. The user must provide the corresponding value.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Calibration Stop Criteria<span class="required-asterisk" aria-hidden="true">*</span></td>
+                <td class="td2">
+                Specifies the number of iterations each worker executes during calibration. DDS uses one worker, while GWO and PSO use 20 workers.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Objective Function<span class="required-asterisk" aria-hidden="true">*</span></td>
+                <td class="td2">
+                Select the metric to use as the objective function. All metrics in the table (MFDC, FBIAS, NSWwt) are valid choices.<br />
+                - For Categorical metrics (POD, CSI, FAR), the <strong>Flow Threshold</strong> is required.<br />
+                - For Event-based metrics (PKBIAS, PKTE, EVBIAS), the <strong>Peak Flow Threshold</strong> is required.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Calculate Categorical Metrics</td>
+                <td class="td2">
+                Select this option to calculate <strong>Categorical Metrics</strong> when they are <strong>not</strong> chosen as the Objective Function.  
+                If a Categorical metric (POD, CSI, FAR) is selected as the Objective Function, this option is automatically disabled.
+                When enabled, the <strong>Flow Threshold</strong> field is required.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Calculate Event-Based Metrics</td>
+                <td class="td2">
+                    Select this option to calculate <strong>Event-Based Metrics</strong> when they are <strong>not</strong> chosen as the Objective Function.
+                    If an Event-Based metric (PKBIAS, PKTE, EVBIAS) is selected as the Objective Function, this option is automatically disabled.
+                    When enabled, the <strong>Peak Flow Threshold</strong> field is required.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Save Button</td>
+                <td class="td2">
+                Saves data from the tab. Partial saves are allowed.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Prev Button</td>
+                <td class="td2">
+                Moves to the Tuning Controls Tab. If there is unsaved data, the user is prompted to save or discard changes.
+                </td>
+            </tr>
+            <tr>
+                <td class="td1">Next Button</td>
+                <td class="td2">
+                Moves to the Run/Status Tab. If there is unsaved data, the user is prompted to save or discard changes.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="required-hint mt-0 mb-4">
+            <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
+        </div>
+        <hr class="my-6 border-black" />
+        <div class="mt-2">
+            <p class="mb-2 text-center font-bold">Metric Definitions</p>
+            <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-200 text-left text-sm" 
+                    aria-label="Metrics table listing all calibration and evaluation metrics with descriptions">
+                <thead class="bg-gray-300 font-bold">
+                <tr>
+                    <th class="px-4 py-1 font-bold">Metric Acronym</th>
+                    <th class="px-4 py-1 font-bold">Description</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">Corr</td>
+                    <td class="px-4 py-1">Pearson Correlation</td>
+                </tr>
+                <tr class="bg-yellow-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">CSI</td>
+                    <td class="px-4 py-1">Critical Success Index (Categorical Metric)</td>
+                </tr>
+                <tr class="bg-blue-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">EVBIAS</td>
+                    <td class="px-4 py-1">Event Volume Bias (Event-Based Metric)</td>
+                </tr>
+                <tr class="bg-yellow-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">FAR</td>
+                    <td class="px-4 py-1">False Alarm Ratio (Categorical Metric)</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">HSEG_FDC</td>
+                    <td class="px-4 py-1">Percent bias of high flow segment of flow duration curve</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">KGE</td>
+                    <td class="px-4 py-1">Kling-Gupta Efficiency</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">LSEG_FDC</td>
+                    <td class="px-4 py-1">Percent bias of low flow segment of flow duration curve</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">MAE</td>
+                    <td class="px-4 py-1">Mean Absolute Error</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">NNSE</td>
+                    <td class="px-4 py-1">Normalized NSE</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">NSE</td>
+                    <td class="px-4 py-1">Nash-Sutcliffe Efficiency</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">NSELog</td>
+                    <td class="px-4 py-1">NSE of logarithmic values</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">PBIAS</td>
+                    <td class="px-4 py-1">Percent Bias</td>
+                </tr>
+                <tr class="bg-blue-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">PKBIAS</td>
+                    <td class="px-4 py-1">Event Absolute Peak Flow Bias (Event-Based Metric)</td>
+                </tr>
+                <tr class="bg-blue-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">PKTE</td>
+                    <td class="px-4 py-1">Event Peak Flow Timing Error (Event-Based Metric)</td>
+                </tr>
+                <tr class="bg-yellow-50 hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">POD</td>
+                    <td class="px-4 py-1">Probability of Detection (Categorical Metric)</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">RMSE</td>
+                    <td class="px-4 py-1">Root Mean Square Error</td>
+                </tr>
+                <tr class="hover:bg-gray-100">
+                    <td class="px-4 py-1 font-bold">RSR</td>
+                    <td class="px-4 py-1">Ratio of RMSE to standard deviation of observation</td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+            <p class="mt-4 text-md font-semibold">Legend</p>
+            <div class="overflow-x-auto mt-1">
+            <table class="min-w-max border border-gray-200 text-left text-sm" aria-label="Legend table explaining metric types and corresponding background colors">
+                <thead class="bg-gray-300 font-bold">
+                <tr>
+                    <th>&nbsp;</th> 
+                    <th class="px-2 py-1 font-bold" scope="col">Metric Type</th>
+                    <th class="px-2 py-1 font-bold" scope="col">Description</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                    <td class="px-2 py-0.5">
+                    <div class="w-5 h-5 bg-yellow-50 border border-gray-300"></div>
+                    </td>
+                    <td class="px-2 py-0.5 font-bold">Categorical Metric</td>
+                    <td class="px-2 py-0.5">Metrics based on categorical event detection (e.g., POD, CSI, FAR)</td>
+                </tr>
+                <tr>
+                    <td class="px-2 py-0.5">
+                    <div class="w-5 h-5 bg-blue-50 border border-gray-300"></div>
+                    </td>
+                    <td class="px-2 py-0.5 font-bold">Event-Based Metric</td>
+                    <td class="px-2 py-0.5">Metrics based on event flows, peaks, or volumes (e.g., EVBIAS, PKBIAS, PKTE)</td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
-import image1 from "@/assets/styles/img/OptimizationMetricsTable.png"
+
 </script>
 
 <style lang="scss" scoped>
