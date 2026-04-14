@@ -251,11 +251,18 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         coldStartJobStatus.value = getStatusResponse?._data?.cold_start_run?.status;
         failureMessages.value = getStatusResponse?._data?.failure_messages;
 
-        if (getStatusResponse?._data?.cold_start_run?.submit_date && !getStatusResponse?._data?.cold_start_run?.run_end) {
+        if (getStatusResponse?._data?.created_new_cold_start && getStatusResponse?._data?.cold_start_run?.submit_date) {
           submitTimeDate.value = new Date(getStatusResponse?._data?.cold_start_run.submit_date as string);
-        } else if (getStatusResponse?._data?.submit_date) {
-          submitTimeDate.value = new Date(getStatusResponse?._data?.submit_date as string);
-        } 
+        } else {
+          if (getStatusResponse?._data?.submit_date) {
+            submitTimeDate.value = new Date(getStatusResponse?._data?.submit_date as string);
+          }
+          if (!getStatusResponse?._data?.created_new_cold_start && getStatusResponse?._data?.cold_start_run?.cold_start_run_id) {
+            coldStartJobId.value = getStatusResponse._data.cold_start_run.cold_start_run_id;
+          }
+        }
+        console.log(getStatusResponse?._data?.created_new_cold_start);
+        console.log('submitTimeDate:',submitTimeDate.value);
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
           if (overallColdStartHindcastStatus.value === 'Done' && getStatusResponse?._data?.run_end) {
@@ -278,7 +285,11 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     const elapsedTimeArray: string[] = [];
 
     // sum and format hindcast and cold start elapsed times
-    if (hindcastJob.cold_start_run?.submit_date && hindcastJob.cold_start_run?.run_end) {
+    if (hindcastJob?.created_new_cold_start && hindcastJob.cold_start_run?.submit_date && hindcastJob.cold_start_run?.run_end) {
+      console.log('Including cold start run time in total:',calculateElapsedTime(
+        new Date(hindcastJob.cold_start_run.submit_date as string), 
+        new Date(hindcastJob.cold_start_run.run_end as string)
+      ));
       elapsedTimeArray.push(calculateElapsedTime(
         new Date(hindcastJob.cold_start_run.submit_date as string), 
         new Date(hindcastJob.cold_start_run.run_end as string)

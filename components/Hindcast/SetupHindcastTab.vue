@@ -41,7 +41,7 @@
         </h1>
         <p  v-if="!calibrationRunForHindcast?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast?.hindcast_status)"
             class="prompt-txt mt-2 text-center">
-            Select a configuration, choose Cycle Date/Hour and optional Cold Start Date, then click Next.
+            Select a configuration, choose a Saved State (or manually set Cold Start Date and Cycle Date), set Advance Interval and Number of Intervals, then click Next.
         </p>
         <br />
     </div>
@@ -465,7 +465,7 @@ const goToRunStatusTab = () => {
         alerts.push('You must select a configuration and then set the Cycle Date/Hour.');
       }
       if (!useSavedState.value) {
-        if (!coldStartDate.value || (!coldStartHour.value && !coldStartHour.value !== 0)) {
+        if (!coldStartDate.value || (!coldStartHour.value && coldStartHour.value !== 0)) {
           alerts.push('Invalid Cold Start Date chosen. Make sure to choose a date and an hour.');
         } else {
           cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });

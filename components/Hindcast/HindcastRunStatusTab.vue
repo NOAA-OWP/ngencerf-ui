@@ -352,14 +352,14 @@ onMounted(async () => {
     coldStartDate.value = calibrationRunForHindcast.value.cold_start.cold_start_date;
   }
   if (!intervalCycle.value && calibrationRunForHindcast?.value?.interval_cycle) {
-    intervalCycle.value = calibrationRunForHindcast.value.cold_start.interval_cycle;
+    intervalCycle.value = calibrationRunForHindcast.value.interval_cycle;
   }
   if (!numIterations.value && calibrationRunForHindcast?.value?.num_iterations) {
-    numIterations.value = calibrationRunForHindcast.value.cold_start.num_iterations;
+    numIterations.value = calibrationRunForHindcast.value.num_iterations;
   }
 
   runButtonDisabled.value = !['Unknown','Ready'].includes(overallColdStartHindcastStatus.value);
-  cancelButtonDisabled.value = ['Submitted','Running'].includes(coldStartJobStatus.value) || ['Submitted','Running'].includes(hindcastJobStatus.value);
+  cancelButtonDisabled.value = !['Submitted','Running'].includes(coldStartJobStatus.value) && !['Submitted','Running'].includes(hindcastJobStatus.value);
 
   watch(overallColdStartHindcastStatus, (newColdStartHindcastStatus, oldColdStartHindcastStatus) => {
     if (hindcastJobId.value && 
