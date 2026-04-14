@@ -12,7 +12,7 @@
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="logListOptions.length > 1" class="inline-block">
+          <div v-if="logListOptions.length > 0" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;" 
