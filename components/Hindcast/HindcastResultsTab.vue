@@ -86,9 +86,9 @@
       </div>
     </div>
 
-    <div v-show="selectedLogCategory == 'hindcast plot'" class="flex">
+    <div v-show="selectedLogCategory != null && hindcastPlotIterations.includes(selectedLogCategory)" class="flex">
       <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
-        <div id="PlotGraphArea" ref="plotGraphArea" v-if="numPlotGraphCheckboxesChecked() > 0">
+        <div id="PlotGraphArea" ref="plotGraphArea" v-show="numPlotGraphCheckboxesChecked() > 0">
           <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
           <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
             <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
@@ -148,7 +148,7 @@
         </div>
       </div>
     </div>
-    <div v-show="selectedLogCategory && selectedLogCategory != 'hindcast plot'">
+    <div v-show="selectedLogCategory != null && !hindcastPlotIterations.includes(selectedLogCategory)">
       <LogDisplay/>
     </div>
 
@@ -186,6 +186,8 @@ const {
   hindcastJobId,
   hindcastConfigurationName,
   resultsPathname,
+  hindcastPlotIterations,
+  hindcastPlotIterationId,
   hindcastPlot,
   submitTimeDate,
   submitTime,
@@ -197,6 +199,7 @@ const {
 
 const {
   loadHindcastResultsTabData,
+  setHindcastPlot
 } = useHindcastStore();
 
 const {
@@ -273,9 +276,6 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
 
   hilightTab(HindcastTabs.tab_hindcastResults);
-  
-  await populateLogListOptions([{ name: 'hindcast plot', display_name: 'Streamflow Time Series' }]);
-  selectedLogCategory.value = 'hindcast plot';
 
   resetUserPlotRefs([]);
 
@@ -285,10 +285,21 @@ onMounted(async () => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   });
+
   // get calibration job data if we don't already have it
   if (!userCalibrationRunData.value) {
     await fetchUserCalibrationRunData();
   }
+
+  let plotListOptions = [];
+  if (hindcastPlotIterations.value.length > 0) {
+    plotListOptions = hindcastPlotIterations.value.map(iteration => ({ name: iteration, display_name: 'Iteration ' + iteration + ' Plot' }));
+  }
+  if (hindcastPlotIterationId.value) {
+    selectedLogCategory.value = hindcastPlotIterationId.value;
+  }
+  
+  await populateLogListOptions(plotListOptions);
 });
 
 const toggleMessagesGroup = async () => {
@@ -329,12 +340,13 @@ const resetUserPlotRefs = (exceptions: any): void => {
 }
 
 watch(hindcastPlot, async () => {
-  if (hindcastPlot.value.timeseries_data && hindcastPlot.value.timeseries_data.length > 0) {
-    showhindcastPlot();
+  if (hindcastPlot?.value?.timeseries_data && hindcastPlot.value.timeseries_data.length > 0) {
+    plotGraphData.value = [];
+    showHindcastPlot();
   }
 });
 
-const showhindcastPlot = async () => {
+const showHindcastPlot = async () => {
   if (!plotGraphData.value || plotGraphData.value.length === 0) {
     // standard interactive plot logic
     if (hindcastPlot.value.timeseries_data) {
@@ -387,6 +399,7 @@ watch(plotGraphData, async () => {
 });
 
 function adjustPlotGraphColumns() {
+  plotGraphColumns.value = [];
   if (plotGraphDataRaw.value.length > 0) {
     Object.keys(plotGraphDataRaw.value[0]).forEach(key => {
       let column_header_words = key.split("_");
@@ -418,13 +431,12 @@ function adjustPlotGraphColumns() {
 const drawInteractivePlot = () => {
   let plotLineData = [];
   let plotDotData = [];
-  let plotBarData = [];
   if (numPlotGraphCheckboxesChecked() > 0) {
     plotGraphOptions.value = {
       x: { grid: true, tickSpacing: 80, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},
       y: { grid: true, labelAnchor: 'center', labelArrow: 'none' },
       marks: [],
-      width: (plotGraphArea.value as HTMLElement).offsetWidth - 50,
+      width: (plotGraphArea.value?.offsetWidth || document?.getElementById('HindcastResultsPage')?.offsetWidth - 250 ) - 50,
       height: ((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
         - (document.getElementById('PlotGraphArea') as HTMLElement).getBoundingClientRect().top) - 150
     };
@@ -520,16 +532,19 @@ const drawInteractivePlot = () => {
   (plotGraphSVG.value as HTMLElement).append(plot);
   nextTick(() => {
     if (plotGraphArea.value) {
-      plotGraphOptions.value.width = plotGraphArea.value.offsetWidth - 50;
-      plotGraphSliderOptions.value.width = plotGraphArea.value.offsetWidth - 100;
+      plotGraphOptions.value.width = (plotGraphArea?.value?.offsetWidth || document?.getElementById('HindcastResultsPage')?.offsetWidth - 250) - 50;
+      plotGraphSliderOptions.value.width = (plotGraphArea?.value?.offsetWidth || document?.getElementById('HindcastResultsPage')?.offsetWidth - 250) - 100;
     };
   })
 }
 
 
 const getSliderWidth = () => {
-  return (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().right
-    - (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().left;
+  if (document.getElementById('PlotGraphSlider').offsetWidth > 0) {
+    return (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().right
+      - (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().left;
+  }
+  return (document?.getElementById('HindcastResultsPage')?.offsetWidth - 250) - 100;
 }
 
 const numPlotGraphCheckboxesChecked = () => {
@@ -549,54 +564,56 @@ const numPlotGraphCheckboxesChecked = () => {
 
 // Create slider as a mini-plot of just the first plot line
 const drawInteractiveSlider = () => {
-  if (numPlotGraphCheckboxesChecked() > 0) {
-    plotGraphSliderData.value = [];
-    let rowSkip = plotGraphDataRaw.value.length / 1000;
-    for (let c = 1; c < plotGraphColumns.value.length; c++) {
-      if (plotGraphLines.value.length === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
-        for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
-          let dataPoint = {
-            time: convertISOStringOrDateToDateTime((plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[0].value] + 'Z').replace(" ","T")).toJSDate(),
-            measurement: parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[c].value])
-          };
-          plotGraphSliderData.value.push(dataPoint);
+  requestAnimationFrame(() => {
+    if (numPlotGraphCheckboxesChecked() > 0) {
+      plotGraphSliderData.value = [];
+      let rowSkip = plotGraphDataRaw.value.length / 1000;
+      for (let c = 1; c < plotGraphColumns.value.length; c++) {
+        if (plotGraphLines.value.length === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
+          for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
+            let dataPoint = {
+              time: convertISOStringOrDateToDateTime((plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[0].value] + 'Z').replace(" ","T")).toJSDate(),
+              measurement: parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[c].value])
+            };
+            plotGraphSliderData.value.push(dataPoint);
+          }
         }
       }
-    }
-    let lineOptions = {
-      x: 'time',
-      y: 'measurement'
-    }
-    plotGraphSliderOptions.value = {
-      x: { inset: 0, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},
-      y: { axis: null },
-      marks: [
-        Plot.lineY(plotGraphSliderData.value, lineOptions)
-      ],
-      width: (plotGraphArea.value as HTMLElement).offsetWidth - 100,
-      height: 100,
-      marginLeft: 20,
-      marginRight: 20
-    };
-    while (plotGraphSlider.value && plotGraphSlider.value.children.length > 1) {
-      plotGraphSlider.value.removeChild(plotGraphSlider.value.children[1]);
-    }
-
-    plotGraphSlider?.value?.append(Plot.plot(plotGraphSliderOptions.value));
-
-    if (!sliderBoxPosition.value || Object.keys(sliderBoxPosition.value).length !== 2) {
-      // we don't have a previous position to remember
-      // start with the entire available range
-      sliderBoxPosition.value = {
-        start: 0,
-        end: getSliderWidth()
+      let lineOptions = {
+        x: 'time',
+        y: 'measurement'
       }
+      plotGraphSliderOptions.value = {
+        x: { inset: 0, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},
+        y: { axis: null },
+        marks: [
+          Plot.lineY(plotGraphSliderData.value, lineOptions)
+        ],
+        width: ((plotGraphArea.value as HTMLElement)?.offsetWidth || document?.getElementById('HindcastResultsPage')?.offsetWidth - 250) - 100,
+        height: 100,
+        marginLeft: 20,
+        marginRight: 20
+      };
+      while (plotGraphSlider.value && plotGraphSlider.value.children.length > 1) {
+        plotGraphSlider.value.removeChild(plotGraphSlider.value.children[1]);
+      }
+
+      plotGraphSlider?.value?.append(Plot.plot(plotGraphSliderOptions.value));
+
+      if (!sliderBoxPosition.value || Object.keys(sliderBoxPosition.value).length !== 2) {
+        // we don't have a previous position to remember
+        // start with the entire available range
+        sliderBoxPosition.value = {
+          start: 0,
+          end: getSliderWidth()
+        }
+      }
+      (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
+      (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
+      setSliderDateRange();
+      plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
     }
-    (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
-    (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
-    setSliderDateRange();
-    plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
-  }
+  });
 }
 
 // Filter interactive plot when date range is changed
@@ -755,20 +772,22 @@ const setSliderDateRange = () => {
     };
   }
 
-  let hoursFromStart = Math.ceil(sliderBoxPosition.value.start * (plotGraphDateLimits.value.span / getSliderWidth()));
-  let newStartDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.start).replace(" ","T")).toJSDate();
-  newStartDate.setHours(newStartDate.getHours() + hoursFromStart);
+  nextTick(async() => {
+    let hoursFromStart = Math.ceil(sliderBoxPosition.value.start * (plotGraphDateLimits.value.span / getSliderWidth()));
+    let newStartDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.start).replace(" ","T")).toJSDate();
+    newStartDate.setHours(newStartDate.getHours() + hoursFromStart);
+    
+    let hoursFromEnd = Math.ceil((getSliderWidth() - sliderBoxPosition.value.end) * (plotGraphDateLimits.value.span / getSliderWidth()));
+    let newEndDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.end.replace(" ","T"))).toJSDate();
+    newEndDate.setHours(newEndDate.getHours() - hoursFromEnd);
 
-  let hoursFromEnd = Math.ceil((getSliderWidth() - sliderBoxPosition.value.end) * (plotGraphDateLimits.value.span / getSliderWidth()));
-  let newEndDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.end.replace(" ","T"))).toJSDate();
-  newEndDate.setHours(newEndDate.getHours() - hoursFromEnd);
-
-  (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
-  plotGraphDateRange.value.start = (newStartDate.toISOString()).replace("T"," ").split(".")[0];
-  (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
-  plotGraphDateRange.value.end = (newEndDate.toISOString()).replace("T"," ").split(".")[0];
-  
-  updatePlotGraphDates();
+    (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
+    plotGraphDateRange.value.start = (newStartDate.toISOString()).replace("T"," ").split(".")[0];
+    (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
+    plotGraphDateRange.value.end = (newEndDate.toISOString()).replace("T"," ").split(".")[0];
+    
+    updatePlotGraphDates();
+  });
 }
 
 const toggleCustomizePlot = async () => {
@@ -778,6 +797,22 @@ const toggleCustomizePlot = async () => {
     showCustomizePlot.value = true;
   }
 }
+
+// Handle verification plot changes
+watch(selectedLogCategory, async () => {
+  if(selectedLogCategory.value !== null && hindcastPlotIterations.value.includes(selectedLogCategory.value)) {
+    hindcastPlotIterationId.value = selectedLogCategory.value;
+    nextTick(async() => {
+      const errorMessages: string[] = await setHindcastPlot(hindcastPlotIterationId.value);
+      errorMessages.forEach((msg: string) => {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    });
+  } else {
+    hindcastPlotIterationId.value = undefined;
+  }
+})
 
 onUnmounted(() => {
   // make sure page clears all plot/log data when the user leaves

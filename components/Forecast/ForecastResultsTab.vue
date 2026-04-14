@@ -418,7 +418,6 @@ function adjustPlotGraphColumns() {
 const drawInteractivePlot = () => {
   let plotLineData = [];
   let plotDotData = [];
-  let plotBarData = [];
   if (numPlotGraphCheckboxesChecked() > 0) {
     plotGraphOptions.value = {
       x: { grid: true, tickSpacing: 80, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},

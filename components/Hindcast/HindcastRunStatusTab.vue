@@ -530,7 +530,6 @@ const goToSetupHindcastTab = () => {
 
 onUnmounted(() => {
   // make sure page clears all log data when the user leaves
-  hardResetHindcastStore();
   logListOptions.value = [];
   hindcastJobStatus.value = undefined;
   coldStartJobStatus.value = undefined;
