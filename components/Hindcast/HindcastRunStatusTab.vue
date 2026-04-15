@@ -317,9 +317,11 @@ onMounted(async () => {
     await loadHindcastRunStatusTabData();
     if (overallColdStartHindcastStatus.value && !['Ready','Submitted'].includes(overallColdStartHindcastStatus.value)) {
       await populateLogListOptions();
+      if (['Submitted', 'Running'].includes(coldStartJobStatus.value ?? '') || ['Submitted', 'Running'].includes(hindcastJobStatus.value ?? '')) {
+        createColdStartAndHindcastStatusInterval();
+        createElapsedTimeInterval();
+      }
     }
-    createColdStartAndHindcastStatusInterval();
-    createElapsedTimeInterval();
   }
 
   // set log levels

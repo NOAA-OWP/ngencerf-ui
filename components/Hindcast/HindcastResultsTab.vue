@@ -49,9 +49,21 @@
                 <span class="font-medium">Cycle Date: </span>
                 {{ (calibrationRunForHindcast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForHindcast.cycle_date) + ' UTC' : 'None') }}
               </div>
-              <div>
+              <div v-if="coldStartJobId">
+                <span class="font-medium">Saved State (Cold Start Job ID): </span>
+                {{ coldStartJobId ?? '-'.repeat(15) }}
+              </div>
+              <div v-else>
                 <span class="font-medium">Cold Start Date: </span>
-                {{ (calibrationRunForHindcast?.cold_start?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForHindcast.cold_start.cold_start_date) + ' UTC' : 'None') }}
+                {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + ' UTC'  : 'None') }}
+              </div>
+              <div>
+                <span class="font-medium">Interval Cycle: </span>
+                {{ (intervalCycle ?? 'Undefined') }}
+              </div>
+              <div>
+                <span class="font-medium">Number of Intervals: </span>
+                {{ (numIterations ?? 'Undefined') }}
               </div>
             </div>
             <div class="col-span-1">
@@ -115,7 +127,7 @@
         </a>
         <div v-if="plotGraphLines.length > 0">
           <div v-for="item in plotGraphLines" :key="item.id">
-            <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
+            <input type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
               v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" 
               :disabled="item.checked && numPlotGraphCheckboxesChecked() <= 1" class="align-top">
             <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
@@ -174,6 +186,7 @@ import { hilightTab } from '@/composables/TabHilight';
 
 import { convertISOStringOrDateToDateTime, formatDateTicks } from '@/utils/TimeHelpers';
 import * as Plot from "@observablehq/plot";
+import { normalizeStyle } from 'vue';
 
 const { calibrationJobId, isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -185,6 +198,11 @@ const {
   calibrationRunForHindcast,
   hindcastJobId,
   hindcastConfigurationName,
+  coldStartJobId,
+  coldStartDate,
+  cycleDate,
+  intervalCycle,
+  numIterations,
   resultsPathname,
   hindcastPlotIterations,
   hindcastPlotIterationId,
@@ -289,6 +307,19 @@ onMounted(async () => {
   // get calibration job data if we don't already have it
   if (!userCalibrationRunData.value) {
     await fetchUserCalibrationRunData();
+  }
+
+  if (!cycleDate.value && calibrationRunForHindcast?.value?.cycle_date) {
+    cycleDate.value = calibrationRunForHindcast.value.cycle_date;
+  }
+  if (!coldStartDate.value && calibrationRunForHindcast?.value?.cold_start?.cold_start_date) {
+    coldStartDate.value = calibrationRunForHindcast.value.cold_start.cold_start_date;
+  }
+  if (!intervalCycle.value && calibrationRunForHindcast?.value?.interval_cycle) {
+    intervalCycle.value = calibrationRunForHindcast.value.interval_cycle;
+  }
+  if (!numIterations.value && calibrationRunForHindcast?.value?.num_iterations) {
+    numIterations.value = calibrationRunForHindcast.value.num_iterations;
   }
 
   let plotListOptions = [];
@@ -559,7 +590,7 @@ const numPlotGraphCheckboxesChecked = () => {
     }
     return numChecked;
   }
-  return 0;
+  return plotGraphLines.value.length;
 };
 
 // Create slider as a mini-plot of just the first plot line
