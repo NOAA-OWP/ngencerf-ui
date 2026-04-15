@@ -87,7 +87,7 @@
     </div>
 
     <div v-show="selectedLogCategory == 'forecast plot'" class="flex">
-      <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
+      <div class="flex-grow text-center" id="GraphArea">
         <div id="PlotGraphArea" ref="plotGraphArea" v-if="numPlotGraphCheckboxesChecked() > 0">
           <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
           <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">

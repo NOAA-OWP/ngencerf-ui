@@ -58,7 +58,7 @@
                 {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + ' UTC'  : 'None') }}
               </div>
               <div>
-                <span class="font-medium">Interval Cycle: </span>
+                <span class="font-medium">Advance Interval: </span>
                 {{ (intervalCycle ?? 'Undefined') }}
               </div>
               <div>
@@ -98,8 +98,8 @@
       </div>
     </div>
 
-    <div v-show="selectedLogCategory != null && hindcastPlotIterations.includes(selectedLogCategory)" class="flex">
-      <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
+    <div v-show="selectedLogCategory == 'hindcast plot'" class="flex">
+      <div class="flex-grow text-center" id="GraphArea">
         <div id="PlotGraphArea" ref="plotGraphArea" v-show="numPlotGraphCheckboxesChecked() > 0">
           <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
           <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
@@ -120,7 +120,7 @@
           </div>
         </div>
       </div>
-      <div class="p-4 grow-0" id="PlotGraphControls">
+      <div v-show="false" class="p-4 grow-0" id="PlotGraphControls">
         <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue underline mt-1 pb-2"
           @click="toggleCustomizePlot">
           Customize Viewer
@@ -160,7 +160,7 @@
         </div>
       </div>
     </div>
-    <div v-show="selectedLogCategory != null && !hindcastPlotIterations.includes(selectedLogCategory)">
+    <div v-show="selectedLogCategory && selectedLogCategory != 'hindcast plot'">
       <LogDisplay/>
     </div>
 
@@ -204,8 +204,6 @@ const {
   intervalCycle,
   numIterations,
   resultsPathname,
-  hindcastPlotIterations,
-  hindcastPlotIterationId,
   hindcastPlot,
   submitTimeDate,
   submitTime,
@@ -260,7 +258,8 @@ const ptColumn = ref({
 });
 
 const plotGraphColors = ref<any[]>([
-  'grey', 'blue', 'gold', 'green', 'teal', 'black', 'orange', 'pink', 'purple', 'red', 'yellow'
+  'blue', 'turquoise', 'aqua', 'teal', 'green', 'lime', 'gold', 'yellow', 'orange', 'coral', 
+  'pink', 'red', 'maroon', 'purple', 'violet'
 ]);
 const plotGraphColorList = ref<any[]>([]);
 for (let c = 0; c < plotGraphColors.value.toSorted().length; c++) {
@@ -294,6 +293,9 @@ onMounted(async () => {
   if (ele) { ele.scrollTo(0, 0); }
 
   hilightTab(HindcastTabs.tab_hindcastResults);
+  
+  await populateLogListOptions([{ name: 'hindcast plot', display_name: 'Streamflow Time Series' }]);
+  selectedLogCategory.value = 'hindcast plot';
 
   resetUserPlotRefs([]);
 
@@ -321,16 +323,6 @@ onMounted(async () => {
   if (!numIterations.value && calibrationRunForHindcast?.value?.num_iterations) {
     numIterations.value = calibrationRunForHindcast.value.num_iterations;
   }
-
-  let plotListOptions = [];
-  if (hindcastPlotIterations.value.length > 0) {
-    plotListOptions = hindcastPlotIterations.value.map(iteration => ({ name: iteration, display_name: 'Iteration ' + iteration + ' Plot' }));
-  }
-  if (hindcastPlotIterationId.value) {
-    selectedLogCategory.value = hindcastPlotIterationId.value;
-  }
-  
-  await populateLogListOptions(plotListOptions);
 });
 
 const toggleMessagesGroup = async () => {
@@ -411,7 +403,7 @@ watch(plotGraphData, async () => {
   if (plotGraphData.value.length > 0) {
     if (plotGraphLines.value.length === 0) {
       for (let c = 1; c < plotGraphColumns.value.length; c++) {
-        let strokeColor = c < plotGraphColors.value.length ? plotGraphColors.value[c - 1] : plotGraphColors.value[0];
+        let strokeColor = plotGraphColors.value[(c % plotGraphColors.value.length) - 1];
         plotGraphLines.value.push({
           id: c,
           name: plotGraphColumns.value[c].header,
@@ -432,17 +424,17 @@ watch(plotGraphData, async () => {
 function adjustPlotGraphColumns() {
   plotGraphColumns.value = [];
   if (plotGraphDataRaw.value.length > 0) {
-    Object.keys(plotGraphDataRaw.value[0]).forEach(key => {
-      let column_header_words = key.split("_");
-      for (let w = 0; w < column_header_words.length; w++) {
-        let word = column_header_words[w]
-        column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
-      }
-      let column_header = column_header_words.join(" ");
-      plotGraphColumns.value.push({ header: column_header, value: key });
-    });
     for (let d = 0; d < plotGraphDataRaw.value.length; d++) {
       Object.keys(plotGraphDataRaw.value[d]).forEach(key => {
+        if (!plotGraphColumns.value.find(col => col.value == key)) {
+          let column_header_words = key.split("_");
+          for (let w = 0; w < column_header_words.length; w++) {
+            let word = column_header_words[w]
+            column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+          }
+          let column_header = column_header_words.join(" ");
+          plotGraphColumns.value.push({ header: column_header, value: key });
+        }
         if (plotGraphDataRaw.value[d][key] && (plotGraphDataRaw.value[d][key] === null || plotGraphDataRaw.value[d][key] === '')) {
           plotGraphDataRaw.value[d][key] = '';
         } else if (!isNaN(parseFloat(plotGraphDataRaw.value[d][key])) && isFinite(plotGraphDataRaw.value[d][key]) && plotGraphDataRaw.value[d][key].toString().indexOf('.') > 0) {
@@ -831,17 +823,14 @@ const toggleCustomizePlot = async () => {
 
 // Handle verification plot changes
 watch(selectedLogCategory, async () => {
-  if(selectedLogCategory.value !== null && hindcastPlotIterations.value.includes(selectedLogCategory.value)) {
-    hindcastPlotIterationId.value = selectedLogCategory.value;
+  if(selectedLogCategory.value == 'hindcast plot') {
     nextTick(async() => {
-      const errorMessages: string[] = await setHindcastPlot(hindcastPlotIterationId.value);
+      const errorMessages: string[] = await setHindcastPlot();
       errorMessages.forEach((msg: string) => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     });
-  } else {
-    hindcastPlotIterationId.value = undefined;
   }
 })
 

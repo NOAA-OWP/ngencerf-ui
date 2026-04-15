@@ -69,8 +69,6 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
   const submitTime = ref<string>();
   const elapsedTimeIntervalId = ref<number>();
   const hindcastJobStatusIntervalId = ref<number>();
-  const hindcastPlotIterations = ref<number[]>([]);
-  const hindcastPlotIterationId = ref<number>();
   const hindcastPlot = ref<any>(); // TODO: create hindcastPlot interface
 
   const calibrationRunsForHindcast = ref<calibrationRunsForHindcast>([]);
@@ -311,17 +309,12 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     if (loadHindcastErrors.length > 0) {
       errorMessages.push(...loadHindcastErrors);
     }
-    const response = await getHindcastIterations();
-    if (response?._data?.iterations) {
-      hindcastPlotIterations.value = response._data.iterations;
-      hindcastPlotIterationId.value = hindcastPlotIterations.value[0];
-      nextTick(async() => {
-        const setHindcastPlotErrors: string[] = await setHindcastPlot(hindcastPlotIterationId.value);
-        if (setHindcastPlotErrors.length > 0) {
-          errorMessages.push(...setHindcastPlotErrors);
-        }
-      });
-    }
+    nextTick(async() => {
+      const setHindcastPlotErrors: string[] = await setHindcastPlot();
+      if (setHindcastPlotErrors.length > 0) {
+        errorMessages.push(...setHindcastPlotErrors);
+      }
+    });
     if (errorMessages.length > 0) {
       return errorMessages;
     } else {
@@ -588,25 +581,9 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
   };
 
   /**
-   * Get Hindcast Iterations
-   */
-  const getHindcastIterations = async (): Promise<any> => {
-    if (hindcastJobId.value) {
-      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_hindcast_iterations/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-        body: JSON.stringify({ hindcast_run_id: hindcastJobId.value })
-      });
-    }
-  };
-
-  /**
    * Get Hindcast Plot
    */
-  const getHindcastPlot = async (iteration: number): Promise<any> => {
+  const getHindcastPlot = async (): Promise<any> => {
     if (hindcastJobId.value) {
       return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_hindcast_timeseries_data/`, {
         method: "POST",
@@ -615,8 +592,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
           "Content-Type": 'application/json'
         },
         body: JSON.stringify({ 
-          hindcast_run_id: hindcastJobId.value,
-          iteration: iteration
+          hindcast_run_id: hindcastJobId.value
         })
       });
     }
@@ -658,9 +634,9 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
   /**
    * Set hindcastPlot
    */
-  const setHindcastPlot = async (iteration: number): Promise<string[]> => {
+  const setHindcastPlot = async (): Promise<string[]> => {
     if (hindcastJobId?.value) {
-      const getHindcastPlotResponse: any = await getHindcastPlot(iteration);
+      const getHindcastPlotResponse: any = await getHindcastPlot();
 
       if (getHindcastPlotResponse.status === 200) {
         hindcastPlot.value = getHindcastPlotResponse._data;
@@ -669,7 +645,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         return useApiErrorResponsePreprocess(getHindcastPlotResponse);
       }
     } else {
-      return ['No dataset found for this hindcast job id and iteration'];
+      return ['No dataset found for this hindcast job id'];
     }
   };
 
@@ -689,8 +665,6 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     elapsedTime.value = undefined;
     submitTimeDate.value = undefined;
     submitTime.value = undefined;
-    hindcastPlotIterations.value = [];
-    hindcastPlotIterationId.value = undefined;
     hindcastPlot.value = undefined;
     calibrationRunForHindcast.value = undefined;
 
@@ -716,8 +690,6 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     coldStartJobStatus.value = "";
     elapsedTime.value = undefined;
     submitTime.value = undefined;
-    hindcastPlotIterations.value = [];
-    hindcastPlotIterationId.value = undefined;
     hindcastPlot.value = undefined;
 
     if (elapsedTimeIntervalId.value) {
@@ -771,8 +743,6 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     elapsedTimeIntervalId,
     hindcastJobStatusIntervalId,
     resultsPathname,
-    hindcastPlotIterations,
-    hindcastPlotIterationId,
     hindcastPlot,
     hindcastRunGageList,
     calibrationRunsForHindcast,
@@ -812,7 +782,6 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     setHindcastPlot,
     setElapsedTime,
     getStatus,
-    getHindcastIterations,
     getHindcastPlot,
     setSelectedHindcastRunId,
     resetSelectedHindcastRunData,

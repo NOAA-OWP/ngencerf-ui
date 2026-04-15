@@ -156,14 +156,14 @@
           <div v-if="!useSavedState" class="text-nowrap p-1">
             <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
               aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
-              class="!w-12" :disabled="!hindcastConfiguration">
+              class="!w-24" :disabled="!hindcastConfiguration">
             </Select>
           </div>
           <div v-if="!useSavedState" class="text-nowrap text-right font-bold p-2 required-label">Cycle Hour</div>
           <div v-if="!useSavedState" class="text-nowrap p-1">
             <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
               aria-label="Cycle Hour Select" title="Cycle Hour Select"
-              class="!w-12" :disabled="!hindcastConfiguration">
+              class="!w-24" :disabled="!hindcastConfiguration">
             </Select>
           </div>
           <div class="text-nowrap text-right font-bold p-2 required-label">
@@ -476,7 +476,7 @@ const goToRunStatusTab = () => {
             alerts.push('Cold Start Date must be before the Cycle Date.');
           }
           // validate the day/hour to make sure it is within the availability window
-          // TO DO: Factor the interval cycle/number of intervals into this, or use server-side validation
+          // TO DO: Factor the advance interval/number of intervals into this, or use server-side validation
           let latestHindcastDate = maxCycleDate.value.minus({ hours: hindcastConfiguration.value.availability_lag})
           if (latestHindcastDate < cycleDate.value) {
               alerts.push('Hindcast data is not yet be available for your chosen cycle date.');

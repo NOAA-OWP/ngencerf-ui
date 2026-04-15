@@ -54,16 +54,12 @@
                 <span class="font-medium">Cycle Date: </span>
                 {{ (cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) + ' UTC' : 'None') }}
               </div>
-              <div v-if="coldStartJobId">
-                <span class="font-medium">Saved State (Cold Start Job ID): </span>
-                {{ coldStartJobId ?? '-'.repeat(15) }}
-              </div>
-              <div v-else>
-                <span class="font-medium">Cold Start Date: </span>
+              <div>
+                <span class="font-medium">{{ coldStartJobId ? 'Saved State' : 'Cold' }} Start Date: </span>
                 {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + ' UTC'  : 'None') }}
               </div>
               <div>
-                <span class="font-medium">Interval Cycle: </span>
+                <span class="font-medium">Advance Interval: </span>
                 {{ (intervalCycle ?? 'Undefined') }}
               </div>
               <div>
