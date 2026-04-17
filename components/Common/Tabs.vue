@@ -124,7 +124,7 @@
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
           <div v-show="[8].includes(currentForecastTab) || (selectedVerificationJob && selectedVerificationJob.status === 'Done' && currentForecastTab >= 6)" 
-            id="results-tab" data-tab="8" class="tabs prevent-select" @click="tabClicked"
+            data-tab="8" class="tabs prevent-select" @click="tabClicked"
             aria-label="Verification Results Tab" title="Verification Results Tab">
             Verification Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
@@ -160,6 +160,23 @@
             data-tab="5" class="tabs prevent-select" @click="tabClicked"
             aria-label="Hindcast Results Tab" title="Hindcast Results Tab">
             Hindcast Results
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div data-tab="6" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Verification Runs Tab" title="Verification Runs Tab">
+            Verification Runs
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[7].includes(currentHindcastTab) || (selectedVerificationJob && currentHindcastTab >= 6)" 
+            data-tab="7" class="tabs prevent-select" @click="tabClicked" 
+            aria-label="Verification Run/Status Tab" title="Verification Run/Status Tab">
+            Verification Run/Status
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[8].includes(currentHindcastTab) || (selectedVerificationJob && selectedVerificationJob.status === 'Done' && currentHindcastTab >= 6)" 
+            data-tab="8" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Verification Results Tab" title="Verification Results Tab">
+            Verification Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
         </div>

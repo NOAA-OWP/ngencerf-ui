@@ -45,7 +45,7 @@
           <DataTable id="HindcastRuns" :value="hindcastRuns" 
             scrollable scroll-height="400px" table-style="min-width: 50rem"
             v-model:sortField="hindcastRunListSort.field" v-model:sortOrder="hindcastRunListSort.direction"
-            v-model:selection="SelectedHindcastJob" selectionMode="single" :rowStyle="rowStyle"
+            v-model:selection="selectedHindcastJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onHindcastRowSelect" @rowUnselect="onHindcastRowUnSelect" @rowContextmenu="onRowContextMenu"
             class="boxed">
             <Column :pt="ptColumn" field="hindcast_run_id" sortable>
@@ -211,7 +211,7 @@ const {
   hindcastRunListStartRow,
   hindcastRunListEndRow,
   hindcastRunListSort,
-  SelectedHindcastJob
+  selectedHindcastJob
 } = storeToRefs(HindcastStore);
 
 const {
@@ -260,7 +260,7 @@ const ptColumn = ref({
 const onRowContextMenu = (event: any) => {
   cmHindcastRun.value = [];
   const crRowData = event.data as HindcastJob;
-  if (SelectedHindcastJob && SelectedHindcastJob.value?.hindcast_run_id === crRowData.hindcast_run_id) {
+  if (selectedHindcastJob && selectedHindcastJob.value?.hindcast_run_id === crRowData.hindcast_run_id) {
     crContextMenu.value.show(event.originalEvent);
     setSelectedHindcastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
     cmHindcastRun.value.push({ label: 'View Status', icon: 'pi pi-gauge', command: () => navigateToHindcastRunStatus() });
@@ -296,8 +296,8 @@ onMounted(async () => {
 
   nextTick(async () => {
     // clear previously selected hindcast job
-    if (SelectedHindcastJob.value) {
-      SelectedHindcastJob.value = undefined;
+    if (selectedHindcastJob.value) {
+      selectedHindcastJob.value = undefined;
     }
 
     // clear all user-selected hindcast and calibration data
@@ -341,7 +341,7 @@ const navigateToSetupHindcast = (new_hindcast: boolean=true) => {
 
     if (e) {
       // set userCalibrationRunData
-      await loadSelectedCalibrationRun(SelectedHindcastJob?.value?.calibration_run_id as number);
+      await loadSelectedCalibrationRun(selectedHindcastJob?.value?.calibration_run_id as number);
       if (new_hindcast) {
         calibrationRunForHindcast.value.hindcast_run_id = undefined;
         calibrationRunForHindcast.value.hindcast_status = undefined;
@@ -367,7 +367,7 @@ const navigateToHindcastRunStatus = () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Hindcast Run/Status Tab"]');
 
     if (e) {
-      await loadSelectedCalibrationRun(SelectedHindcastJob?.value?.calibration_run_id as number);
+      await loadSelectedCalibrationRun(selectedHindcastJob?.value?.calibration_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
@@ -382,7 +382,7 @@ const navigateToHindcastResults = () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Hindcast Results Tab"]');
 
     if (e) {
-      await loadSelectedCalibrationRun(SelectedHindcastJob?.value?.calibration_run_id as number);
+      await loadSelectedCalibrationRun(selectedHindcastJob?.value?.calibration_run_id as number);
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
@@ -472,8 +472,8 @@ const refreshJobList = async () => {
   isLoading.value = false;
 }
 
-watch(SelectedHindcastJob, () => {
-  if (!SelectedHindcastJob.value) {
+watch(selectedHindcastJob, () => {
+  if (!selectedHindcastJob.value) {
     calibrationRunForHindcast.value = undefined;
   }
 })

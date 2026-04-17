@@ -18,6 +18,15 @@
       <span v-else-if="activeTab === 5">
         <HindcastResultsTab />
       </span>
+      <span v-if="activeTab === 6">
+        <VerificationRunsTab />
+      </span>
+      <span v-else-if="activeTab === 7">
+        <VerificationRunStatusTab />
+      </span>
+      <span v-else-if="activeTab === 8">
+        <VerificationResultsTab />
+      </span>
     </div>
   </div>
 </template>
@@ -30,6 +39,9 @@ import HindcastRunsTab from "./HindcastRunsTab.vue"
 import SetupHindcastTab from './SetupHindcastTab.vue';
 import HindcastRunStatusTab from './HindcastRunStatusTab.vue';
 import HindcastResultsTab from './HindcastResultsTab.vue';
+import VerificationRunsTab from "./VerificationRunsTab.vue"
+import VerificationRunStatusTab from "./VerificationRunStatusTab.vue"
+import VerificationResultsTab from "./VerificationResultsTab.vue"
 
 import { generalStore } from "@/stores/common/GeneralStore";
 const { getHindcastTabIndex, setHindcastTabIndex } = generalStore();

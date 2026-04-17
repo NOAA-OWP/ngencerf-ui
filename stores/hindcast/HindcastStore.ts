@@ -75,7 +75,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
   const calibrationRunForHindcast = ref<calibrationRunForHindcast>();
 
   const hindcastRuns = ref<HindcastJob[]>([]);
-  const SelectedHindcastJob = ref<HindcastJob>();
+  const selectedHindcastJob = ref<HindcastJob>();
 
   const hindcastJobNgenGlobalLogging = ref<boolean>(true);
   const hindcastJobLogFileMode = ref<boolean>(false);
@@ -762,7 +762,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     hindcastRunListEndRow,
     hindcastRunListSort,
     hindcastRuns,
-    SelectedHindcastJob,
+    selectedHindcastJob,
     overallColdStartHindcastStatus,
     hindcastJobNgenGlobalLogging,
     hindcastJobLogFileMode,
